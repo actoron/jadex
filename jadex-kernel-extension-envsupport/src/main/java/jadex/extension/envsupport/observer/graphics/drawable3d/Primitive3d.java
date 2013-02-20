@@ -1,8 +1,10 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
-import java.awt.Color;
-
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.javaparser.IParsedExpression;
+
+import java.awt.Color;
+import java.util.ArrayList;
 
 /**
  * @author 7willuwe
@@ -27,6 +29,7 @@ public class Primitive3d extends AbstractVisual3d
 	public static final int PRIMITIVE_TYPE_POINTLIGHT	 	= 11;
 	public static final int PRIMITIVE_TYPE_DIRECTIONALLIGHT	= 12;
 	public static final int PRIMITIVE_TYPE_EFFECT 	= 13;
+	public static final int PRIMITIVE_TYPE_QUAD 	= 14;
 	
 	public static final String SHADOW_OFF = "Off";
 	public static final String SHADOW_CAST = "Cast";
@@ -61,6 +64,9 @@ public class Primitive3d extends AbstractVisual3d
 	
 	/** Primitive shadow */
 	protected String shadowtype;
+	
+	/** The SpatialControler */
+	private ArrayList<SpatialControl>	controler;
 	
 	public Primitive3d()
 	{
@@ -201,7 +207,9 @@ public class Primitive3d extends AbstractVisual3d
 	 * @param absFlags flags for setting position, size and rotation as absolutes
 	 * @param c the drawable's color or color binding
 	 */
-	public Primitive3d(int type, Object position, Object rotation, Object size, int absFlags, Object c,  String materialPath, String texturePath, IParsedExpression drawcondition, String shadowtype)
+	public Primitive3d(int type, Object position, Object rotation, Object size, int absFlags, Object c,  String materialPath, String texturePath, IParsedExpression drawcondition, String shadowtype
+			, ArrayList<SpatialControl> controler
+			)
 	{
 		super(position, rotation, size);
 		this.type = type;
@@ -224,7 +232,11 @@ public class Primitive3d extends AbstractVisual3d
 		{
 			setShadowtype(SHADOW_OFF);
 		}
+		
+		this.controler = controler;
 	}
+	
+	
 	
 	
 	
@@ -387,5 +399,21 @@ public class Primitive3d extends AbstractVisual3d
 
 	public void setMaterialPath(String materialPath_) {
 		this.materialPath_ = materialPath_;
+	}
+
+	/**
+	 * @return the controler
+	 */
+	public ArrayList<SpatialControl> getControler()
+	{
+		return controler;
+	}
+
+	/**
+	 * @param controler the controler to set
+	 */
+	public void setControler(ArrayList<SpatialControl> controler)
+	{
+		this.controler = controler;
 	}
 }

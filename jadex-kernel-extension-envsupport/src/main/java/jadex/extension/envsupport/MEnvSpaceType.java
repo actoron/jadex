@@ -36,6 +36,7 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Effect;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.NiftyScreen;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpecialAction;
 import jadex.extension.envsupport.observer.graphics.layer.GridLayer;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
@@ -692,6 +693,7 @@ public class MEnvSpaceType
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "sphere"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "box"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "quad"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "effect"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "cylinder"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "dome"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
@@ -772,14 +774,118 @@ public class MEnvSpaceType
 						{
 							shadowtype = "Off";
 						}
+						List spatialcontroler = (List)args.get("spatialcontroler");
+						ArrayList<SpatialControl> fspatialcontroler = null;
+						if(spatialcontroler!=null)
+						{
+							fspatialcontroler = new ArrayList<SpatialControl>();
+							for(int i=0; i<spatialcontroler.size(); i++)
+							{
+								Map srcspatialcontroler = (Map)spatialcontroler.get(i);
+								SpatialControl con = (SpatialControl)((IObjectCreator)getProperty(srcspatialcontroler, "creator")).createObject(srcspatialcontroler);
+								fspatialcontroler.add(con);
+							}
+						}
+						
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_BOX, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype);
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_BOX, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype, fspatialcontroler);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "spatialcontroler"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "quad")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(expconv, null)),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(expconv, null)),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(expconv, null)),
+				new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("materialpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("shadowtype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}		
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+								(Double)getProperty(args, "height"),
+								(Double)getProperty(args, "depth"));
+						}
+						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+						
+						String texturepath = (String)getProperty(args, "texturepath");
+						if(texturepath==null)
+						{
+							texturepath = "";
+						}
+						String materialpath = (String)getProperty(args, "materialpath");
+						if(materialpath==null)
+						{
+							materialpath = "";
+						}
+						String shadowtype = (String)getProperty(args, "shadowtype");
+						if(shadowtype==null)
+						{
+							shadowtype = "Off";
+						}
+						List spatialcontroler = (List)args.get("spatialcontroler");
+						ArrayList<SpatialControl> fspatialcontroler = null;
+						if(spatialcontroler!=null)
+						{
+							fspatialcontroler = new ArrayList<SpatialControl>();
+							for(int i=0; i<spatialcontroler.size(); i++)
+							{
+								Map srcspatialcontroler = (Map)spatialcontroler.get(i);
+								SpatialControl con = (SpatialControl)((IObjectCreator)getProperty(srcspatialcontroler, "creator")).createObject(srcspatialcontroler);
+								fspatialcontroler.add(con);
+							}
+						}
+						
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_QUAD, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype, fspatialcontroler);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "spatialcontroler"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "effect")}), new ObjectInfo(MultiCollection.class),
 				new MappingInfo(null, new AttributeInfo[]{
@@ -914,13 +1020,27 @@ public class MEnvSpaceType
 						{
 							shadowtype = "Off";
 						}
+						
+						List spatialcontroler = (List)args.get("spatialcontroler");
+						ArrayList<SpatialControl> fspatialcontroler = null;
+						if(spatialcontroler!=null)
+						{
+							fspatialcontroler = new ArrayList<SpatialControl>();
+							for(int i=0; i<spatialcontroler.size(); i++)
+							{
+								Map srcspatialcontroler = (Map)spatialcontroler.get(i);
+								SpatialControl con = (SpatialControl)((IObjectCreator)getProperty(srcspatialcontroler, "creator")).createObject(srcspatialcontroler);
+								fspatialcontroler.add(con);
+							}
+						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_SPHERE, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype);
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_SPHERE, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype, fspatialcontroler);
 						//return new Rectangle(position, rotation, size, absFlags, getProperty(args, "color"), exp);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "spatialcontroler"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
@@ -995,12 +1115,27 @@ public class MEnvSpaceType
 						{
 							shadowtype = "Off";
 						}
+						
+						List spatialcontroler = (List)args.get("spatialcontroler");
+						ArrayList<SpatialControl> fspatialcontroler = null;
+						if(spatialcontroler!=null)
+						{
+							fspatialcontroler = new ArrayList<SpatialControl>();
+							for(int i=0; i<spatialcontroler.size(); i++)
+							{
+								Map srcspatialcontroler = (Map)spatialcontroler.get(i);
+								SpatialControl con = (SpatialControl)((IObjectCreator)getProperty(srcspatialcontroler, "creator")).createObject(srcspatialcontroler);
+								fspatialcontroler.add(con);
+							}
+						}
+						
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Cylinder3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, radius, height, exp, shadowtype);
+						return new Cylinder3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, radius, height, exp, shadowtype, fspatialcontroler);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "spatialcontroler"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
@@ -1137,12 +1272,28 @@ public class MEnvSpaceType
 						{
 							shadowtype = "Off";
 						}
+						
+						List spatialcontroler = (List)args.get("spatialcontroler");
+						ArrayList<SpatialControl> fspatialcontroler = null;
+						if(spatialcontroler!=null)
+						{
+							fspatialcontroler = new ArrayList<SpatialControl>();
+							for(int i=0; i<spatialcontroler.size(); i++)
+							{
+								Map srcspatialcontroler = (Map)spatialcontroler.get(i);
+								SpatialControl con = (SpatialControl)((IObjectCreator)getProperty(srcspatialcontroler, "creator")).createObject(srcspatialcontroler);
+								fspatialcontroler.add(con);
+							}
+						}
+						
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Dome3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, radius, (int)samples, (int)planes, exp, shadowtype);
+						
+						return new Dome3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, radius, (int)samples, (int)planes, exp, shadowtype, fspatialcontroler);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "spatialcontroler"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
@@ -1239,12 +1390,27 @@ public class MEnvSpaceType
 						{
 							shadowtype = "Off";
 						}
+						
+						List spatialcontroler = (List)args.get("spatialcontroler");
+						ArrayList<SpatialControl> fspatialcontroler = null;
+						if(spatialcontroler!=null)
+						{
+							fspatialcontroler = new ArrayList<SpatialControl>();
+							for(int i=0; i<spatialcontroler.size(); i++)
+							{
+								Map srcspatialcontroler = (Map)spatialcontroler.get(i);
+								SpatialControl con = (SpatialControl)((IObjectCreator)getProperty(srcspatialcontroler, "creator")).createObject(srcspatialcontroler);
+								fspatialcontroler.add(con);
+							}
+						}
+						
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Torus3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, innerRadius, outerRadius, (int)circleSamples, (int)radialSamples, exp, shadowtype);
+						return new Torus3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, innerRadius, outerRadius, (int)circleSamples, (int)radialSamples, exp, shadowtype, fspatialcontroler);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "spatialcontroler"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
@@ -1350,18 +1516,35 @@ public class MEnvSpaceType
 								fmaterials.add(mat);
 							}
 						}
+						
+						
+						List spatialcontroler = (List)args.get("spatialcontroler");
+						ArrayList<SpatialControl> fspatialcontroler = null;
+						if(spatialcontroler!=null)
+						{
+							fspatialcontroler = new ArrayList<SpatialControl>();
+							for(int i=0; i<spatialcontroler.size(); i++)
+							{
+								Map srcspatialcontroler = (Map)spatialcontroler.get(i);
+								SpatialControl con = (SpatialControl)((IObjectCreator)getProperty(srcspatialcontroler, "creator")).createObject(srcspatialcontroler);
+								fspatialcontroler.add(con);
+							}
+						}
+						
+						
 						String shadowtype = (String)getProperty(args, "shadowtype");
 						if(shadowtype==null)
 						{
 							shadowtype = "Off";
 						}
-						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), materialpath, texturepath, hasLightMaterials, rigDebug, exp, shadowtype, fanims, fmaterials);
+						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), materialpath, texturepath, hasLightMaterials, rigDebug, exp, shadowtype, fanims, fmaterials, fspatialcontroler);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo(new QName(uri, "animation"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "materialfile"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "spatialcontroler"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
@@ -1490,6 +1673,24 @@ public class MEnvSpaceType
 				new SubobjectInfo(new AccessInfo(new QName(uri, "materialcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spatialcontroler")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null,
+				new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("classpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						String classpath = (String)getProperty(args, "classpath");
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "controlercondition");
+						return new SpatialControl(classpath, exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				}, 
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "materialcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "arrow")}), new ObjectInfo(MultiCollection.class),
 				new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
@@ -1558,12 +1759,27 @@ public class MEnvSpaceType
 						{
 							shadowtype = "Off";
 						}
+						
+						List spatialcontroler = (List)args.get("spatialcontroler");
+						ArrayList<SpatialControl> fspatialcontroler = null;
+						if(spatialcontroler!=null)
+						{
+							fspatialcontroler = new ArrayList<SpatialControl>();
+							for(int i=0; i<spatialcontroler.size(); i++)
+							{
+								Map srcspatialcontroler = (Map)spatialcontroler.get(i);
+								SpatialControl con = (SpatialControl)((IObjectCreator)getProperty(srcspatialcontroler, "creator")).createObject(srcspatialcontroler);
+								fspatialcontroler.add(con);
+							}
+						}
+						
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_ARROW, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype);
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_ARROW, position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, exp, shadowtype, fspatialcontroler);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "spatialcontroler"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		
@@ -1631,12 +1847,27 @@ public class MEnvSpaceType
 						{
 							shadowtype = "Off";
 						}
+						
+						List spatialcontroler = (List)args.get("spatialcontroler");
+						ArrayList<SpatialControl> fspatialcontroler = null;
+						if(spatialcontroler!=null)
+						{
+							fspatialcontroler = new ArrayList<SpatialControl>();
+							for(int i=0; i<spatialcontroler.size(); i++)
+							{
+								Map srcspatialcontroler = (Map)spatialcontroler.get(i);
+								SpatialControl con = (SpatialControl)((IObjectCreator)getProperty(srcspatialcontroler, "creator")).createObject(srcspatialcontroler);
+								fspatialcontroler.add(con);
+							}
+						}
+						
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
-						return new Text3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, (String)getProperty(args, "text"), exp, shadowtype);
+						return new Text3d(position, rotation, size, absFlags, getProperty(args, "color"), materialpath, texturepath, (String)getProperty(args, "text"), exp, shadowtype, fspatialcontroler);
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
 				},
 				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "spatialcontroler"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 				})));
 		

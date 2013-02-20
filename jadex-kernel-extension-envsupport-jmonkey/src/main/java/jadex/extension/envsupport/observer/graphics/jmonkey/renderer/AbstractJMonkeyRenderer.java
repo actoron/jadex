@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
+import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
@@ -9,27 +10,26 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Sound3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
-import jadex.extension.envsupport.observer.gui.SObjectInspector;
+import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStateCreator;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Color;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 import com.jme3.animation.AnimChannel;
-import com.jme3.animation.LoopMode;
+import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.audio.AudioNode.Status;
-import com.jme3.effect.ParticleEmitter;
 import com.jme3.font.BitmapText;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
-import com.jme3.material.RenderState.FaceCullMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -38,8 +38,8 @@ import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.Control;
 import com.jme3.scene.control.LightControl;
-import com.jme3.scene.control.LodControl;
 import com.jme3.texture.Texture;
 
 
@@ -146,6 +146,30 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 				else if(shadow.equals(Primitive3d.SHADOW_RECEIVE))
 				{
 					spatial.setShadowMode(ShadowMode.Receive);
+				}
+				
+				
+				if(primitive.getControler() != null)
+				{
+					for(SpatialControl control :  primitive.getControler())
+					{
+						Control tmp;
+						try
+						{
+							Constructor con = Class.forName(control.getClasspath(), true, Thread.currentThread().getContextClassLoader()).getConstructor(
+									new Class[]{});
+							tmp = (Control)con.newInstance(new Object[]{});
+							spatial.addControl(tmp);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							System.out.println("exception creating controler");
+						}
+						
+
+						
+					}
 				}
 
 
@@ -396,8 +420,21 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						if(animActive)
 						{
 							AnimChannel chan = anichannels.get(a.getChannel()+" "+ sobj.hashCode());
-
+							
+							//TODO: Animation Loop
+//							if(a.isLoop())
+//							{
+//								chan.setLoopMode(LoopMode.DontLoop);
+//							}
+//							else
+//							{
+//								chan.setLoopMode(LoopMode.Loop);
+//							}
+//							
+							
+							
 							chan.setSpeed(a.getSpeed());
+							
 							if(!a.getName().equals(chan.getAnimationName()))
 							{
 								

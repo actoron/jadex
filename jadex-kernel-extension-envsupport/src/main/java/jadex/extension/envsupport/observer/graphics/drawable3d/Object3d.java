@@ -2,11 +2,13 @@ package jadex.extension.envsupport.observer.graphics.drawable3d;
 
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.javaparser.IParsedExpression;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+
 
 /**
  * 
@@ -14,18 +16,18 @@ import java.util.TreeSet;
 public class Object3d extends Primitive3d
 {
 	/** Model path. */
-	protected String			_modelPath;
-	
-	/** Light Materials - to deal with possible render Errors  */
-	protected boolean _hasLightMaterials;
-	
-	protected ArrayList<Animation> _animations;
-	
-	protected ArrayList<Materialfile> materials;
-	
-	protected TreeSet<String> _channels;
-	
-	protected boolean _rigDebug;
+	protected String					_modelPath;
+
+	/** Light Materials - to deal with possible render Errors */
+	protected boolean					_hasLightMaterials;
+
+	protected ArrayList<Animation>		_animations;
+
+	protected ArrayList<Materialfile>	materials;
+
+	protected TreeSet<String>			_channels;
+
+	protected boolean					_rigDebug;
 
 	/**
 	 * Creates default Polygon.
@@ -39,8 +41,8 @@ public class Object3d extends Primitive3d
 		_modelPath = modelPath;
 		_hasLightMaterials = hasLightMaterials;
 	}
+
 	/**
-	 * 
 	 * Creates a new Polygon drawable.
 	 * 
 	 * @param position
@@ -52,15 +54,17 @@ public class Object3d extends Primitive3d
 	 * @param texturePath
 	 * @param drawcondition
 	 */
-	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String materialpath, String texturePath, boolean hasLightMaterials, boolean rigDebug, IParsedExpression drawcondition, String shadowtype, List<Animation> animations, List<Materialfile> materials)
+	public Object3d(Object position, Object rotation, Object size, int absFlags, Object c, String modelPath, String materialpath, String texturePath,
+			boolean hasLightMaterials, boolean rigDebug, IParsedExpression drawcondition, String shadowtype, List<Animation> animations,
+			List<Materialfile> materials, ArrayList<SpatialControl> controler)
 	{
-		super(Primitive3d.PRIMITIVE_TYPE_OBJECT3D, position, rotation, size, absFlags, c, materialpath, texturePath, drawcondition, shadowtype);
+		super(Primitive3d.PRIMITIVE_TYPE_OBJECT3D, position, rotation, size, absFlags, c, materialpath, texturePath, drawcondition, shadowtype, controler);
 		_modelPath = modelPath;
 		_hasLightMaterials = hasLightMaterials;
 		_rigDebug = rigDebug;
 		_animations = (ArrayList<Animation>)animations;
 		_channels = new TreeSet<String>();
-		this.materials = (ArrayList<Materialfile>) materials;
+		this.materials = (ArrayList<Materialfile>)materials;
 		if(_animations != null)
 		{
 			for(Animation a : _animations)
@@ -71,11 +75,12 @@ public class Object3d extends Primitive3d
 
 		System.out.println("_channels:" + _channels.toString() + " Size: " + _channels.size());
 	}
-	
-	
+
+
 	/**
-	 *  Set the primitive type (Disabled).
-	 *  @param type The type to set.
+	 * Set the primitive type (Disabled).
+	 * 
+	 * @param type The type to set.
 	 */
 	public void setType(int type)
 	{
@@ -97,18 +102,23 @@ public class Object3d extends Primitive3d
 	{
 		this._modelPath = modelPath;
 	}
+
 	/**
 	 * @return the _hasLightMaterials
 	 */
-	public boolean isHasLightMaterials() {
+	public boolean isHasLightMaterials()
+	{
 		return _hasLightMaterials;
 	}
+
 	/**
 	 * @param _hasLightMaterials the _hasLightMaterials to set
 	 */
-	public void setHasLightMaterials(boolean hasLightMaterials) {
+	public void setHasLightMaterials(boolean hasLightMaterials)
+	{
 		this._hasLightMaterials = hasLightMaterials;
 	}
+
 	/**
 	 * @return the _animations
 	 */
@@ -116,6 +126,7 @@ public class Object3d extends Primitive3d
 	{
 		return _animations;
 	}
+
 	/**
 	 * @param _animations the _animations to set
 	 */
@@ -123,6 +134,7 @@ public class Object3d extends Primitive3d
 	{
 		this._animations = _animations;
 	}
+
 	/**
 	 * @return the _channels
 	 */
@@ -130,6 +142,7 @@ public class Object3d extends Primitive3d
 	{
 		return _channels;
 	}
+
 	/**
 	 * @param _channels the _channels to set
 	 */
@@ -137,6 +150,7 @@ public class Object3d extends Primitive3d
 	{
 		this._channels = channels;
 	}
+
 	/**
 	 * @return the _rigDebug
 	 */
@@ -144,6 +158,7 @@ public class Object3d extends Primitive3d
 	{
 		return this._rigDebug;
 	}
+
 	/**
 	 * @param _rigDebug the _rigDebug to set
 	 */
@@ -151,13 +166,16 @@ public class Object3d extends Primitive3d
 	{
 		this._rigDebug = rigDebug;
 	}
-	public ArrayList<Materialfile> getMaterials() {
+
+	public ArrayList<Materialfile> getMaterials()
+	{
 		return materials;
 	}
-	public void setMaterials(ArrayList<Materialfile> materials) {
+
+	public void setMaterials(ArrayList<Materialfile> materials)
+	{
 		this.materials = materials;
 	}
-	
+
 
 }
-

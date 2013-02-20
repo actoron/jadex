@@ -1,11 +1,13 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.javaparser.IParsedExpression;
+
+import java.util.ArrayList;
 
 
 /**
  * @author 7willuwe
- *
  */
 public class Cylinder3d extends Primitive3d
 {
@@ -27,8 +29,6 @@ public class Cylinder3d extends Primitive3d
 	}
 
 
-
-
 	/**
 	 * Generates a new Cylinder3d
 	 * 
@@ -42,12 +42,10 @@ public class Cylinder3d extends Primitive3d
 	 * @param height
 	 * @param drawcondition
 	 */
-	public Cylinder3d(Object position, Object rotation, Object size, int absFlags,
-			Object c, String texturePath, String materialPath, double radius,
-			double height, IParsedExpression drawcondition, String shadowtype)
+	public Cylinder3d(Object position, Object rotation, Object size, int absFlags, Object c, String texturePath, String materialPath, double radius,
+			double height, IParsedExpression drawcondition, String shadowtype, ArrayList<SpatialControl> controler)
 	{
-		super(Primitive3d.PRIMITIVE_TYPE_CYLINDER, position, rotation, size,
-				absFlags, c, materialPath, texturePath, drawcondition, shadowtype);
+		super(Primitive3d.PRIMITIVE_TYPE_CYLINDER, position, rotation, size, absFlags, c, materialPath, texturePath, drawcondition, shadowtype, controler);
 		_radius = radius;
 		_height = height;
 	}

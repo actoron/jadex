@@ -1,6 +1,9 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.javaparser.IParsedExpression;
+
+import java.util.ArrayList;
 
 
 public class Torus3d extends Primitive3d
@@ -51,10 +54,10 @@ public class Torus3d extends Primitive3d
 	public Torus3d(Object position, Object rotation, Object size, int absFlags,
 			Object c, String materialpath, String texturePath, double innerRadius,
 			double outerRadius, int circleSamples, int radialSamples,
-			IParsedExpression drawcondition, String shadowtype)
+			IParsedExpression drawcondition, String shadowtype , ArrayList<SpatialControl> controler)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_TORUS, position, rotation, size,
-				absFlags, c, materialpath, texturePath, drawcondition, shadowtype);
+				absFlags, c, materialpath, texturePath, drawcondition, shadowtype, controler);
 		_innerRadius = innerRadius;
 		_outerRadius = outerRadius;
 		_circleSamples = circleSamples;

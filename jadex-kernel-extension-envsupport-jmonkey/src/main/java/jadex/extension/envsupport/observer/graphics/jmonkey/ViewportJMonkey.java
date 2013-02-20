@@ -16,6 +16,7 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.Bo
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.CylinderJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.DomeJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.Object3dJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.QuadJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.SphereJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.Text3dJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.geometry.TorusJMonkeyRenderer;
@@ -158,7 +159,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 
 	/** The 3d renderers. */
-	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[14];
+	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[15];
 	static
 	{
 		RENDERERS[0] = new SphereJMonkeyRenderer();
@@ -175,6 +176,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		RENDERERS[11] = new PointLightRenderer();
 		RENDERERS[12] = new PointLightRenderer();
 		RENDERERS[13] = new EffectRenderer();
+		RENDERERS[14] = new QuadJMonkeyRenderer();
 	}
 
 	/**

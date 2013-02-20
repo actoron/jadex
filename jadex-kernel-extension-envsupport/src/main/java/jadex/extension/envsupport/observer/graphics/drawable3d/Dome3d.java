@@ -1,6 +1,9 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.javaparser.IParsedExpression;
+
+import java.util.ArrayList;
 
 
 public class Dome3d extends Primitive3d
@@ -46,10 +49,10 @@ public class Dome3d extends Primitive3d
 	 */
 	public Dome3d(Object position, Object rotation, Object size, int absFlags,
 			Object c, String materialpath, String texturePath, double radius, int samples,
-			int planes, IParsedExpression drawcondition, String shadowtype)
+			int planes, IParsedExpression drawcondition, String shadowtype, ArrayList<SpatialControl> controler)
 	{
 		super(Primitive3d.PRIMITIVE_TYPE_DOME, position, rotation, size,
-				absFlags, c, materialpath, texturePath, drawcondition, shadowtype);
+				absFlags, c, materialpath, texturePath, drawcondition, shadowtype, controler);
 		_radius = radius;
 		_samples = samples;
 		_planes = planes;

@@ -1,7 +1,10 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
 import jadex.extension.envsupport.observer.graphics.IViewport3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.javaparser.IParsedExpression;
+
+import java.util.ArrayList;
 
 /**
  * 
@@ -35,9 +38,9 @@ public class Text3d extends Primitive3d
 	 * @param c modulation color or binding
 	 * @param modelPath resource path of the texture
 	 */
-	public Text3d(Object position, Object rotation, Object size, int absFlags, Object c, String materialpath, String texturePath, String text, IParsedExpression drawcondition, String shadowtype)
+	public Text3d(Object position, Object rotation, Object size, int absFlags, Object c, String materialpath, String texturePath, String text, IParsedExpression drawcondition, String shadowtype, ArrayList<SpatialControl> controler)
 	{
-		super(Primitive3d.PRIMITIVE_TYPE_TEXT3D, position, rotation, size, absFlags, c, materialpath, texturePath, drawcondition, shadowtype);
+		super(Primitive3d.PRIMITIVE_TYPE_TEXT3D, position, rotation, size, absFlags, c, materialpath, texturePath, drawcondition, shadowtype, controler);
 		_text = text;
 	}
 	
