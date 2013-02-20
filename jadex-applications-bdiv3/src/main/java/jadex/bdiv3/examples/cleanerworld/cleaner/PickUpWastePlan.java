@@ -8,6 +8,7 @@ import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchievePickupWaste;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.PickupWasteAction;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -64,6 +65,7 @@ public class PickUpWastePlan
 					public void customResultAvailable(PickupWasteAction pwa)
 					{
 						capa.setCarriedwaste(waste);
+						System.out.println("carried waste set to: "+waste+rplan.getId()+" "+((IGoal)rplan.getReason()).getId());
 						capa.getWastes().remove(waste);
 						ret.setResult(null);
 					}

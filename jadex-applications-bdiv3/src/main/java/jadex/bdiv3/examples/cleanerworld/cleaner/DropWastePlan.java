@@ -11,6 +11,7 @@ import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.DropWasteAction;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.bdiv3.runtime.impl.RPlan;
@@ -55,8 +56,8 @@ public class DropWastePlan
 		
 		final Waste waste = capa.getCarriedWaste();
 //		System.out.println("carriedwaste a ="+waste);
-//		if(waste==null)
-//			System.out.println("here");
+		if(waste==null)
+			System.out.println("here");
 		
 		// Move to a not full waste-bin
 		final Wastebin wastebin = goal.getWastebin();
@@ -77,6 +78,7 @@ public class DropWastePlan
 					{
 						wastebin.addWaste(waste);
 						capa.setCarriedwaste(null);
+						System.out.println("carried waste set null: "+rplan.getId()+" "+((IGoal)rplan.getReason()).getId());
 						ret.setResult(null);
 					}
 				});

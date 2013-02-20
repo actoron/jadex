@@ -34,5 +34,10 @@ public class PlanAbortedException extends RuntimeException
 	{
 		super(message==null? cause!=null?cause.getMessage():null : null, cause);
 	}
+	
+	public void printStackTrace()
+	{
+		super.printStackTrace();
+	}
 }
 

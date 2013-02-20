@@ -352,7 +352,7 @@ public class RCapability extends RElement implements ICapability
 			System.out.println("--------");
 			for(RGoal goal: goals)
 			{
-				System.out.println(goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState());
+				System.out.println(goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState()+" "+goal.getParentPlan());
 				System.out.println(goal.getInhibitors());
 				System.out.println("--------");
 			}
@@ -370,7 +370,7 @@ public class RCapability extends RElement implements ICapability
 			System.out.println("--------");
 			for(RPlan plan: plans)
 			{
-				System.out.println(plan+" "+plan.getLifecycleState()+" "+plan.getProcessingState());
+				System.out.println(plan+" "+plan.getLifecycleState()+" "+plan.getProcessingState()+" "+plan.getReason());
 				System.out.println("--------");
 			}
 		}

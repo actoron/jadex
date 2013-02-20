@@ -1062,8 +1062,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// perform init write fields (after injection of bdiagent)
 		BDIAgent.performInitWrites((BDIAgent)microagent);
 	
-//		getCapability().dumpGoalsPeriodically(getInternalAccess());
-//		getCapability().dumpPlansPeriodically(getInternalAccess());
+		getCapability().dumpGoalsPeriodically(getInternalAccess());
+		getCapability().dumpPlansPeriodically(getInternalAccess());
 	}
 	
 	/**

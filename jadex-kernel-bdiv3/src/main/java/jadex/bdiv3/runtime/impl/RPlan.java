@@ -637,9 +637,9 @@ public class RPlan extends RElement implements IPlan
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				if(isAborted() || isFailed())
+				if(getException()!=null)
 				{
-					return new Future<Void>(new PlanFailureException());
+					return new Future<Void>(getException());
 				}
 				else
 				{
@@ -694,7 +694,7 @@ public class RPlan extends RElement implements IPlan
 					{
 						if(rescom.equals(getResumeCommand()))
 						{
-							if(rgoal.isFinished() && (!isAborted() || !isFailed()))
+							if(rgoal.isFinished() && getException()==null)
 							{
 								Object o = RGoal.getGoalResult(goal, mgoal, ia.getClassLoader());
 								setDispatchedElement(o);
@@ -703,6 +703,7 @@ public class RPlan extends RElement implements IPlan
 							{
 								setException(new PlanAbortedException());
 							}
+								
 							RPlan.executePlan(RPlan.this, ia);
 							
 	//						if(!rgoal.isFinished() && (isAborted() || isFailed()))
