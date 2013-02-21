@@ -193,16 +193,23 @@ public class PlatformInfo
 	 */
 	public String	getConnectTime()
 	{
-		GregorianCalendar	cal	= new GregorianCalendar();
-		GregorianCalendar	con	= new GregorianCalendar();
-		con.setTime(connect_time);
-		
-		DateFormat	df	= (con.get(Calendar.YEAR)!=cal.get(Calendar.YEAR)
-			|| con.get(Calendar.MONTH)!=cal.get(Calendar.MONTH)
-			|| con.get(Calendar.DAY_OF_MONTH)!=cal.get(Calendar.DAY_OF_MONTH))
-			? TIME_FORMAT_LONG : TIME_FORMAT_SHORT;
-		
-		return df.format(connect_time);
+		if(connect_time!=null)
+		{
+			GregorianCalendar	cal	= new GregorianCalendar();
+			GregorianCalendar	con	= new GregorianCalendar();
+			con.setTime(connect_time);
+			
+			DateFormat	df	= (con.get(Calendar.YEAR)!=cal.get(Calendar.YEAR)
+				|| con.get(Calendar.MONTH)!=cal.get(Calendar.MONTH)
+				|| con.get(Calendar.DAY_OF_MONTH)!=cal.get(Calendar.DAY_OF_MONTH))
+				? TIME_FORMAT_LONG : TIME_FORMAT_SHORT;
+			
+			return df.format(connect_time);
+		}
+		else
+		{
+			return "";
+		}
 	}
 	
 	/**

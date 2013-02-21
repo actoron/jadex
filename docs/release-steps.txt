@@ -21,6 +21,7 @@ Build Distribution:
 Upload stuff:
 - upload distribution to sourceforge
 - upload schema documents to sourceforge web
+- update wiki download overview page
 
 Communicate stuff:
 - email to JADE list
