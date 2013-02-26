@@ -14,6 +14,8 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.ServiceInterface;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
@@ -24,6 +26,8 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
+import jadex.commons.IRemotable;
+import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -35,6 +39,7 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -726,6 +731,41 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 			});
 		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<Collection<Class<?>>> getServiceTypes(final IServiceIdentifier sid)
+	{
+		if(shutdowned)
+		{
+			return new Future<Collection<Class<?>>>(new ComponentTerminatedException(id));
+		}
+		
+		final Future<Collection<Class<?>>> ret = new Future<Collection<Class<?>>>();
+		getServiceType(sid).addResultListener(new ExceptionDelegationResultListener<Class<?>, Collection<Class<?>>>(ret)
+		{
+			public void customResultAvailable(Class<?> result)
+			{
+				// todo: cache results
+				List<Class<?>> res = new ArrayList<Class<?>>();
+				res.add(result);
+				
+				Class<?>[] sins = SReflect.getSuperInterfaces(new Class[]{result});
+				for(Class<?> sin: sins)
+				{
+					if(sin.isAnnotationPresent(ServiceInterface.class))
+					{
+						res.add(sin);
+					}
+				}
+				
+				ret.setResult(res);
+			}
+		});
+		
 		return ret;
 	}
 	

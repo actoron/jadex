@@ -154,7 +154,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						serviceinfos = Collections.synchronizedMap(new HashMap<IServiceIdentifier, ProvidedServiceInfo>());
 					}
 					serviceinfos.put(service.getServiceIdentifier(), info);
-
 					
 					if(started)
 					{
@@ -883,6 +882,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 * 
 	 */
 	public abstract IFuture<Class<?>> getServiceType(final IServiceIdentifier sid);
+	
+	/**
+	 * 
+	 */
+	public abstract IFuture<Collection<Class<?>>> getServiceTypes(final IServiceIdentifier sid);
 	
 	/**
 	 *  Get the logger.
