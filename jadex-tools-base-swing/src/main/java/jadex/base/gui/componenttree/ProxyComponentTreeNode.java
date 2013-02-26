@@ -83,7 +83,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		IComponentManagementService cms, ComponentIconCache iconcache, IExternalAccess access)
 	{
 		super(parent, model, tree, desc, cms, iconcache, access);
-//		this.state = STATE_UNCONNECTED;
+		this.state = State.UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
 		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
