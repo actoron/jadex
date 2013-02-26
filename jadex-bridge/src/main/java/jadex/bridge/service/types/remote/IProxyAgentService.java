@@ -8,6 +8,14 @@ import jadex.commons.future.IFuture;
  */
 public interface IProxyAgentService
 {
+	/** The connection state. */
+	public static enum State
+	{
+		CONNECTED,
+		UNCONNECTED,
+		LOCKED
+	}
+	
 	/**
 	 *  Get the component identifier of the remote platform.
 	 */
@@ -18,4 +26,10 @@ public interface IProxyAgentService
 	 *  i.e., top reflect new transport addresses.
 	 */
 	public IFuture<Void>	setRemoteComponentIdentifier(IComponentIdentifier cid);
+	
+	/**
+	 *  Get the connection state of the proxy.
+	 *  @return The connection state.
+	 */
+	public IFuture<State> getConnectionState();
 }

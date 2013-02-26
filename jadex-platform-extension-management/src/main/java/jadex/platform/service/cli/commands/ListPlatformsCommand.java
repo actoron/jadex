@@ -7,6 +7,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -14,9 +15,12 @@ import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.bridge.service.types.remote.IProxyAgentService.State;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
@@ -24,6 +28,7 @@ import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.platform.service.cli.ACliCommand;
+import jadex.platform.service.cli.ArgumentInfo;
 import jadex.platform.service.cli.CliContext;
 import jadex.platform.service.cli.ResultInfo;
 
@@ -64,7 +69,10 @@ public class ListPlatformsCommand extends ACliCommand
 	 */
 	public String getExampleUsage()
 	{
-		return "lp : list all available platforms";
+		StringBuffer buf = new StringBuffer();
+		buf.append("lp : list all available platforms").append(SUtil.LF);
+		buf.append("lp -s: list all available platforms with their connection state").append(SUtil.LF);
+		return buf.toString();
 	}
 	
 	/**
@@ -74,8 +82,11 @@ public class ListPlatformsCommand extends ACliCommand
 	 */
 	public Object invokeCommand(CliContext context, Map<String, Object> args)
 	{
-		final IntermediateFuture<IComponentIdentifier> ret = new IntermediateFuture<IComponentIdentifier>();
+//		final IntermediateFuture<IComponentIdentifier> ret = new IntermediateFuture<IComponentIdentifier>();
+		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
 		final IExternalAccess comp = (IExternalAccess)context.getUserContext();
+		
+		final boolean state = args.containsKey("-s");
 		
 		SServiceProvider.getServices(comp.getServiceProvider(), IProxyAgentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingIntermediateResultListener<IProxyAgentService>(new IIntermediateResultListener<IProxyAgentService>()
@@ -88,12 +99,37 @@ public class ListPlatformsCommand extends ACliCommand
 	//			System.out.println("found: "+result);
 				ser.getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
 				{
-					public void resultAvailable(IComponentIdentifier cid)
+					public void resultAvailable(final IComponentIdentifier cid)
 					{
 //						IComponentIdentifier key = ((IService)ser).getServiceIdentifier().getProviderId();
-						ret.addIntermediateResultIfUndone(cid);
-						ongoing--;
-						checkFinished();
+						
+						if(state)
+						{
+							ser.getConnectionState().addResultListener(new SwingResultListener<IProxyAgentService.State>(new IResultListener<IProxyAgentService.State>()
+							{
+								public void resultAvailable(State result) 
+								{
+//									System.out.println("rec: "+cid.getName()+" ("+result+")");
+									ret.addIntermediateResultIfUndone(cid.getName()+" ("+result+")");
+									ongoing--;
+									checkFinished();
+								}
+								
+								public void exceptionOccurred(Exception exception) 
+								{
+//									System.out.println("ex: "+cid.getName()+" (UNCONNECTED)");
+									ret.addIntermediateResultIfUndone(cid.getName()+" ("+State.UNCONNECTED+")");
+									ongoing--;
+									checkFinished();
+								}
+							}));
+						}
+						else
+						{
+							ret.addIntermediateResultIfUndone(cid.getName());
+							ongoing--;
+							checkFinished();
+						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -137,52 +173,18 @@ public class ListPlatformsCommand extends ACliCommand
 			}
 		}));
 		
-//		SServiceProvider.getService(comp.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//			.addResultListener(new ExceptionDelegationResultListener<IAwarenessManagementService, Collection<IComponentIdentifier>>(ret)
-//		{
-//			public void customResultAvailable(IAwarenessManagementService awas)
-//			{
-//				awas.getKnownPlatforms().addResultListener(new ExceptionDelegationResultListener<Collection<DiscoveryInfo>, Collection<IComponentIdentifier>>(ret)
-//				{
-//					public void customResultAvailable(Collection<DiscoveryInfo> result)
-//					{
-//						final List<IComponentIdentifier> res = new ArrayList<IComponentIdentifier>();
-//						for(DiscoveryInfo dis: result)
-//						{
-//							res.add(dis.getComponentIdentifier());
-//						}
-//						
-//						SServiceProvider.getService(comp.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IComponentIdentifier>>(ret)
-//						{
-//							public void customResultAvailable(IComponentManagementService cms)
-//							{
-//								cms.getChildrenDescriptions(comp.getComponentIdentifier().getRoot()).addResultListener(
-//									new ExceptionDelegationResultListener<IComponentDescription[], Collection<IComponentIdentifier>>(ret)
-//								{
-//									public void customResultAvailable(IComponentDescription[] results) 
-//									{
-//										for(IComponentDescription desc: results)
-//										{
-//											// Hack, use constant?!o
-//											if("jadex.platform.service.remote.Proxy".equals(desc.getModelName())
-//												&& !res.contains(desc.getName()))
-//											{
-//												res.add(new ComponentIdentifier(desc.getName().getLocalName(), desc.getName().getAddresses()));
-//											}
-//										}
-//										
-//										ret.setResult(res);
-//									}
-//								});
-//							}
-//						});
-//					}
-//				});
-//			}
-//		});
-		
 		return ret;
+	}
+	
+	/**
+	 *  Get the argument infos.
+	 *  @param context The context.
+	 *  @return The argument infos.
+	 */
+	public ArgumentInfo[] getArgumentInfos(CliContext context)
+	{
+		ArgumentInfo state = new ArgumentInfo("-s", String.class, null, "The platform connection state.", null);
+		return new ArgumentInfo[]{state};
 	}
 	
 	/**
@@ -197,10 +199,10 @@ public class ListPlatformsCommand extends ACliCommand
 			public String convertObject(Object val, Object context)
 			{
 				StringBuffer buf = new StringBuffer();
-				Collection<IComponentIdentifier> res = (Collection<IComponentIdentifier>)val;
+				Collection<String> res = (Collection<String>)val;
 				if(res!=null)
 				{
-					Iterator<IComponentIdentifier> it = res.iterator();
+					Iterator<String> it = res.iterator();
 					for(int i=0; it.hasNext(); i++)
 					{
 //						buf.append("(").append(i).append(") ").append(it.next().getComponentIdentifier()).append(SUtil.LF);

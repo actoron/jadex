@@ -1,12 +1,17 @@
 package jadex.platform.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
-import jadex.commons.SUtil;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -15,6 +20,9 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 
@@ -65,5 +73,43 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	{
 		((RemoteServiceContainer)getServiceContainer()).setRemoteComponentIdentifier(cid);
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Get the connection state of the proxy.
+	 *  @return The connection state.
+	 */
+	public IFuture<State> getConnectionState()
+	{
+		final Future<State> ret = new Future<State>();
+		
+		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.getExternalAccess(rcid).addResultListener(new IResultListener<IExternalAccess>()
+				{
+					public void resultAvailable(IExternalAccess result) 
+					{
+						ret.setResult(State.CONNECTED);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof SecurityException)
+						{
+							ret.setResult(State.LOCKED);
+						}
+						else
+						{
+							ret.setResult(State.UNCONNECTED);
+						}
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 }
