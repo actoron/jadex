@@ -1254,28 +1254,28 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			this.away	= away;
 			postStatus();
+		}
+
+		if(awaytimer!=null)
+		{
+			awaytimer.stop();
+		}
 		
-			if(awaytimer!=null)
+		if(!away)
+		{
+			if(awaytimer==null)
 			{
-				awaytimer.stop();
+				awaytimer	= new Timer(300000, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						setAway(true);
+					}
+				});
+				awaytimer.setRepeats(false);
 			}
 			
-			if(!away)
-			{
-				if(awaytimer==null)
-				{
-					awaytimer	= new Timer(300000, new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							setAway(true);
-						}
-					});
-					awaytimer.setRepeats(false);
-				}
-				
-				awaytimer.start();
-			}
+			awaytimer.start();
 		}
 	}
 	
