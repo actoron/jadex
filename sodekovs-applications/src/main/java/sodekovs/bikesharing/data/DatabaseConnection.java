@@ -25,8 +25,8 @@ public class DatabaseConnection {
 	public static Connection getConnection() {
 		try {
 			if (connection == null || connection.isClosed()) {
-				String dbUrl = "jdbc:mysql://127.0.0.1:3306/bicycle_rental";
-				String dbUser = "bicycle_rental";
+				String dbUrl = "jdbc:mysql://141.22.64.3:3306/bikesharing";
+				String dbUser = "bikes";
 
 				// fetch the password from the console
 				Scanner s = new Scanner(System.in);
