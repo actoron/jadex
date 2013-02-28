@@ -220,7 +220,8 @@ public class BasicResultSelector<T> implements IResultSelector
 				Object[] vals = coll.toArray();
 				for(int j=0; j<vals.length; j++)
 				{
-					ret.add((IService)vals[j]);
+					if(!ret.contains(vals[j]))
+						ret.add((IService)vals[j]);
 				}
 			}
 		}

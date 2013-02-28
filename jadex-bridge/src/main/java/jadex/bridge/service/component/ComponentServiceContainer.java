@@ -14,8 +14,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.annotation.ServiceInterface;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
@@ -26,7 +25,6 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
-import jadex.commons.IRemotable;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -756,7 +754,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				Class<?>[] sins = SReflect.getSuperInterfaces(new Class[]{result});
 				for(Class<?> sin: sins)
 				{
-					if(sin.isAnnotationPresent(ServiceInterface.class))
+					if(sin.isAnnotationPresent(Service.class))
 					{
 						res.add(sin);
 					}

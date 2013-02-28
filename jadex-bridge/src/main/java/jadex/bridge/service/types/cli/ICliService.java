@@ -8,7 +8,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Service to invoke the command line via a service call.
  */
-@Service
+//@Service
 public interface ICliService
 {
 	/**

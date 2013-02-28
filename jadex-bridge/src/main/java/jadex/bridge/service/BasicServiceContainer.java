@@ -129,9 +129,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return new Future<Void>(new ComponentTerminatedException(id));
 		final Future<Void> ret = new Future<Void>();
 		
-		getServiceType(service.getServiceIdentifier()).addResultListener(new ExceptionDelegationResultListener<Class<?>, Void>(ret)
+		getServiceTypes(service.getServiceIdentifier()).addResultListener(new ExceptionDelegationResultListener<Collection<Class<?>>, Void>(ret)
 		{
-			public void customResultAvailable(Class<?> servicetype)
+			public void customResultAvailable(Collection<Class<?>> servicetypes)
 			{
 //				System.out.println("Adding service: " + info.getName() + " " + service);
 				synchronized(this)
@@ -141,13 +141,16 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						services = Collections.synchronizedMap(new LinkedHashMap<Class<?>, Collection<IInternalService>>());
 					}
 					
-					Collection<IInternalService> tmp = services.get(servicetype);
-					if(tmp==null)
+					for(Class<?> servicetype: servicetypes)
 					{
-						tmp = Collections.synchronizedList(new ArrayList<IInternalService>());
-						services.put(servicetype, tmp);
+						Collection<IInternalService> tmp = services.get(servicetype);
+						if(tmp==null)
+						{
+							tmp = Collections.synchronizedList(new ArrayList<IInternalService>());
+							services.put(servicetype, tmp);
+						}
+						tmp.add(service);
 					}
-					tmp.add(service);
 					
 					if(serviceinfos==null)
 					{
@@ -194,55 +197,71 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return ret;
 		}
 		
-		getServiceType(sid).addResultListener(new ExceptionDelegationResultListener<Class<?>, Void>(ret)
+		getServiceTypes(sid).addResultListener(new ExceptionDelegationResultListener<Collection<Class<?>>, Void>(ret)
 		{
-			public void customResultAvailable(final Class<?> servicetype)
+			public void customResultAvailable(final Collection<Class<?>> servicetypes)
 			{
 //				System.out.println("Removing service: " + servicetype);
 				synchronized(this)
 				{
-					Collection<IInternalService> tmp = services!=null? services.get(servicetype): null;
-					
 					IInternalService service = null;
-					if(tmp!=null)
+					
+					for(Class<?> servicetype: servicetypes)
 					{
-						for(Iterator<IInternalService> it=tmp.iterator(); it.hasNext() && service==null; )
+						Collection<IInternalService> tmp = services!=null? services.get(servicetype): null;
+						
+						service = null;
+						
+						if(tmp!=null)
 						{
-							final IInternalService tst = it.next();
-							if(tst.getServiceIdentifier().equals(sid))
+							for(Iterator<IInternalService> it=tmp.iterator(); it.hasNext() && service==null; )
 							{
-								service = tst;
-								tmp.remove(service);
-								// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
-//								if(!terminated)
-//								{
-//									System.out.println("Terminating service: "+sid);
-									getLogger().info("Terminating service: "+sid);
-									service.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
-									{
-										public void customResultAvailable(Void result)
-										{
-//											if(sid.toString().indexOf("MarshalService")!=-1)
-//												System.out.println("Terminated service: "+sid);
-											getLogger().info("Terminated service: "+sid);
-											serviceShutdowned(tst).addResultListener(new DelegationResultListener<Void>(ret));
-										}
-									});
-//								}
-//								else
-//								{
-//									ret.setResult(null);
-//								}
+								final IInternalService tst = it.next();
+								if(tst.getServiceIdentifier().equals(sid))
+								{
+									service = tst;
+									tmp.remove(service);
+								}
+							}
+							
+							// Remove collection if last service
+							if(tmp.isEmpty())
+							{
+								services.remove(servicetype);
 							}
 						}
+						
+						if(service==null)
+						{
+							ret.setException(new IllegalArgumentException("Service not found: "+sid));
+							break;
+						}
 					}
-					if(service==null)
+					
+					if(service!=null)
 					{
-						ret.setException(new IllegalArgumentException("Service not found: "+sid));
+						// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
+	//					if(!terminated)
+	//					{
+	//						System.out.println("Terminating service: "+sid);
+							getLogger().info("Terminating service: "+sid);
+							final IInternalService fservice = service;
+							service.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
+							{
+								public void customResultAvailable(Void result)
+								{
+	//								if(sid.toString().indexOf("MarshalService")!=-1)
+	//									System.out.println("Terminated service: "+sid);
+									getLogger().info("Terminated service: "+sid);
+									serviceShutdowned(fservice).addResultListener(new DelegationResultListener<Void>(ret));
+								}
+							});
+	//					}
+	//					else
+	//					{
+	//						ret.setResult(null);
+	//					}
 					}
-			
-					if(tmp.isEmpty())
-						services.remove(servicetype);
 				}
 			}
 		});
@@ -268,7 +287,16 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			List<IInternalService> allservices = new ArrayList<IInternalService>();
 			for(Iterator<Collection<IInternalService>> it=services.values().iterator(); it.hasNext(); )
 			{
-				allservices.addAll(it.next());
+				// Service may occur at different positions if added with more than one interface
+				Collection<IInternalService> col = it.next();
+				for(IInternalService ser: col)
+				{
+					if(!allservices.contains(ser))
+					{
+						allservices.add(ser);
+					}
+				}
+//				allservices.addAll(it.next());
 			}
 			initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
 		}
@@ -341,7 +369,16 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			final List<IInternalService> allservices = new ArrayList<IInternalService>();
 			for(Iterator<Collection<IInternalService>> it=services.values().iterator(); it.hasNext(); )
 			{
-				allservices.addAll(it.next());
+				// Service may occur at different positions if added with more than one interface
+				Collection<IInternalService> col = it.next();
+				for(IInternalService ser: col)
+				{
+					if(!allservices.contains(ser))
+					{
+						allservices.add(ser);
+					}
+				}
+//				allservices.addAll(it.next());
 			}
 			
 			doShutdown(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret)
