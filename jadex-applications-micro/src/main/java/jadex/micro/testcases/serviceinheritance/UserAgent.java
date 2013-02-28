@@ -86,13 +86,13 @@ public class UserAgent
 		{
 			public void resultAvailable(IBasicService service)
 			{
-				System.out.println("Fetched basic service: "+service);
+//				System.out.println("Fetched basic service: "+service);
 				
 				service.getBasicInfo().addResultListener(new IResultListener<String>()
 				{
 					public void resultAvailable(String result) 
 					{
-						System.out.println("Invoked basic service: "+result);
+//						System.out.println("Invoked basic service: "+result);
 						tr.setSucceeded(true);
 						ret.setResult(tr);
 					}
@@ -128,13 +128,13 @@ public class UserAgent
 		{
 			public void resultAvailable(IExtendedService service)
 			{
-				System.out.println("Fetched extended service: "+service);
+//				System.out.println("Fetched extended service: "+service);
 				
 				service.getExtendedInfo().addResultListener(new IResultListener<String>()
 				{
 					public void resultAvailable(String result) 
 					{
-						System.out.println("Invoked extended service: "+result);
+//						System.out.println("Invoked extended service: "+result);
 						tr.setSucceeded(true);
 						ret.setResult(tr);
 					}
