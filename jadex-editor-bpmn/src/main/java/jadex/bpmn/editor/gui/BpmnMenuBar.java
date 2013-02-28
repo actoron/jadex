@@ -15,6 +15,7 @@ import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bpmn.model.io.SBpmnModelWriter;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.ResourceInfo;
+import jadex.commons.SUtil;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -363,7 +364,8 @@ public class BpmnMenuBar extends JMenuBar
 						{
 							file = new File(file.getAbsolutePath() + ext);
 						}
-			        	tmpfile.renameTo(file);
+			        	
+			        	SUtil.moveFile(tmpfile, file);
 					}
 					catch (IOException e1)
 					{

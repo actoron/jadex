@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+
 /**
  *  Class for starting the BPMN editor.
  *
@@ -19,7 +22,7 @@ import java.util.logging.Logger;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 18;
+	public static final int BUILD = 19;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";
@@ -101,6 +104,22 @@ public class BpmnEditor
 	public static void main(String[] args)
 	{
 		LOGGER.setUseParentHandlers(false);
+		
+//		try
+//		{
+//			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
+//			{
+//		        if ("Nimbus".equals(info.getName()))
+//		        {
+//		            UIManager.setLookAndFeel(info.getClassName());
+//		            break;
+//		        }
+//		    }
+//		}
+//		catch (Exception e)
+//		{
+//		}
+		
 		new BpmnEditorWindow();
 	}
 }

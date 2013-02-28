@@ -102,7 +102,7 @@ public abstract class AbstractEditingToolbar extends JPanel
 		tool.setPressedIcon(onicon);
 		tool.setSelectedIcon(onicon);
 		
-		tool.setBorder(new EmptyBorder(0, 0, 0, 0));
+		tool.setBorder(new EmptyBorder(0, 1, 0, 1));
 		tool.setMargin(new Insets(0, 0, 0, 0));
 		tool.setToolTipText(tooltip);
 		
@@ -110,7 +110,7 @@ public abstract class AbstractEditingToolbar extends JPanel
 		JToolBar tb = getToolBar(row);
 		tb.add(tool);
 		
-		tb.addSeparator(new Dimension(2, 0));
+		//tb.addSeparator(new Dimension(2, 0));
 	}
 	
 	/**
