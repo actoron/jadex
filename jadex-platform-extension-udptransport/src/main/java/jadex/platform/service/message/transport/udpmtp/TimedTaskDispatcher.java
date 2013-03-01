@@ -1,11 +1,10 @@
 package jadex.platform.service.message.transport.udpmtp;
 
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.collection.MultiCollection;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.PriorityQueue;
 
 /**
@@ -21,7 +20,7 @@ public class TimedTaskDispatcher implements Runnable
 	protected PriorityQueue<TimedTask> taskqueue;
 	
 	/** Tasks with a key */
-	protected Map<Object, TimedTask> keyedtasks;
+	protected MultiCollection keyedtasks;
 	
 	/** Flag if the dispatcher is running */
 	protected volatile boolean running;
@@ -34,7 +33,8 @@ public class TimedTaskDispatcher implements Runnable
 	public TimedTaskDispatcher(IDaemonThreadPoolService threadpool)
 	{
 		this.threadpool = threadpool;
-		keyedtasks = Collections.synchronizedMap(new HashMap<Object, TimedTask>());
+		//keyedtasks = Collections.synchronizedMap(new HashMap<Object, TimedTask>());
+		keyedtasks = new MultiCollection();
 		taskqueue = new PriorityQueue<TimedTask>(11, new Comparator<TimedTask>()
 		{
 			/**
@@ -59,9 +59,11 @@ public class TimedTaskDispatcher implements Runnable
 	{
 		while (running)
 		{
+			TimedTask task = null;
+			
 			synchronized(taskqueue)
 			{
-				TimedTask task = taskqueue.peek();
+				task = taskqueue.peek();
 				
 				if (task != null)
 				{
@@ -69,14 +71,23 @@ public class TimedTaskDispatcher implements Runnable
 					if (current >= task.getExecutionTime())
 					{
 						taskqueue.poll();
+						Collection<TimedTask> ktasks = (Collection<TimedTask>) keyedtasks.get(task.getKey());
+						if (ktasks != null)
+						{
+							ktasks.remove(task);
+							if (ktasks.isEmpty())
+							{
+								keyedtasks.remove(task.getKey());
+							}
+						}
 						keyedtasks.remove(task.getKey());
-						threadpool.execute(task);
 					}
 					else
 					{
 						try
 						{
 							long delta = task.getExecutionTime() - current;
+							task = null;
 							taskqueue.wait(delta);
 						}
 						catch (InterruptedException e)
@@ -95,6 +106,14 @@ public class TimedTaskDispatcher implements Runnable
 					}
 				}
 			}
+			
+			if (task != null)
+			{
+//				System.out.println("Executing: " + task);
+//				task.run();
+//				System.out.println("Exiting: " + task);
+				threadpool.execute(task);
+			}
 		}
 	}
 	
@@ -105,16 +124,33 @@ public class TimedTaskDispatcher implements Runnable
 	 */
 	public void scheduleTask(TimedTask task)
 	{
-		if (task.getKey() != null)
-		{
-			keyedtasks.put(task.getKey(), task);
-		}
-		
 		synchronized(taskqueue)
 		{
+			if (task.getKey() != null)
+			{
+				keyedtasks.put(task.getKey(), task);
+			}
+//			else
+//			{
+//				taskqueue.remove(task);
+//			}
+//			if (taskqueue.size() > 10)
+//			{
+//				System.out.println("tasks: " + taskqueue.size() + " " + task.getClass());
+//			}
 			taskqueue.offer(task);
 			taskqueue.notify();
 		}
+	}
+	
+	/**
+	 *  Instantly executes a task.
+	 *  
+	 *  @param task The task.
+	 */
+	public void executeNow(Runnable task)
+	{
+		threadpool.execute(task);
 	}
 	
 	/**
@@ -123,7 +159,7 @@ public class TimedTaskDispatcher implements Runnable
 	 *  
 	 *  @param task The task.
 	 */
-	public void cancelTask(TimedTask task)
+	public void cancel(TimedTask task)
 	{
 		synchronized (taskqueue)
 		{
@@ -137,10 +173,34 @@ public class TimedTaskDispatcher implements Runnable
 	 *  
 	 *  @param key The key identifying the task.
 	 */
-	public void cancelTask(Object key)
+	public void cancel(Object key)
 	{
-		TimedTask task = keyedtasks.remove(key);
-		cancelTask(task);
+		Collection<TimedTask> tasks = null;
+		synchronized(taskqueue)
+		{
+			tasks = (Collection<TimedTask>) keyedtasks.remove(key);
+			if (tasks != null)
+			{
+				for (TimedTask task : tasks)
+				{
+					cancel(task);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Attempts to cancel a task, there is no guarantee
+	 *  that this will intercept the task in time before execution.
+	 *  
+	 *  @param key The key identifying the task.
+	 */
+	public boolean hasTask(Object key)
+	{
+		synchronized(taskqueue)
+		{
+			return keyedtasks.containsKey(key);
+		}
 	}
 	
 	/**
@@ -148,7 +208,10 @@ public class TimedTaskDispatcher implements Runnable
 	 */
 	public void stop()
 	{
-		running = false;
-		taskqueue.notify();
+		synchronized (taskqueue)
+		{
+			running = false;
+			taskqueue.notify();
+		}
 	}
 }

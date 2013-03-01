@@ -40,6 +40,16 @@ public abstract class TimedTask implements Runnable
 	{
 		return executiontime;
 	}
+	
+	/**
+	 *  Sets the execution time.
+	 *
+	 *  @param executiontime The execution time.
+	 */
+	public void setExecutionTime(long executiontime)
+	{
+		this.executiontime = executiontime;
+	}
 
 	/**
 	 *  Gets the key.

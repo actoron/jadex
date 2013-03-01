@@ -1,13 +1,17 @@
 package jadex.platform.service.message.transport.udpmtp.receiving.handlers;
 
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.platform.service.message.transport.udpmtp.PeerInfo;
 import jadex.platform.service.message.transport.udpmtp.SCodingUtil;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs.L_MSG;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs.S_MSG;
+import jadex.platform.service.message.transport.udpmtp.STunables;
+import jadex.platform.service.message.transport.udpmtp.TimedTask;
+import jadex.platform.service.message.transport.udpmtp.TimedTaskDispatcher;
 import jadex.platform.service.message.transport.udpmtp.receiving.PacketDispatcher;
 import jadex.platform.service.message.transport.udpmtp.receiving.RxMessage;
-import jadex.platform.service.message.transport.udpmtp.sending.ITxTask;
+import jadex.platform.service.message.transport.udpmtp.sending.SendingThreadTask;
 import jadex.platform.service.message.transport.udpmtp.sending.TxPacket;
 
 import java.net.InetSocketAddress;
@@ -24,23 +28,35 @@ public class MsgPacketHandler implements IPacketHandler
 	/** Incoming Message pool. */
 	protected Map<InetSocketAddress, Map<Integer, RxMessage>> incomingmessages;
 	
-	/** Queue for scheduled transmissions */
-	protected PriorityBlockingQueue<ITxTask> txqueue;
+	/** Information about known peers. */
+	protected Map<InetSocketAddress, PeerInfo> peerinfos;
+	
+	/** The transmission queue. */
+	protected PriorityBlockingQueue<TxPacket> packetqueue;
+	
+	/** The timed task dispatcher. */
+	protected TimedTaskDispatcher timedtaskdispatcher;
 	
 	/**
 	 *  Creates the handler.
 	 *  
 	 *  @param msgservice The message service.
 	 *  @param incomingsendermessages Incoming Messages pool.
-	 *  @param txqueue Queue for scheduled transmissions.
+	 *  @param peerinfos Information about known peers.
+	 *  @param packetqueue Queue for scheduled packet transmissions.
+	 *  @param timedtaskdispatcher The timed task dispatcher.
 	 */
 	public MsgPacketHandler(IMessageService msgservice, 
 							Map<InetSocketAddress, Map<Integer, RxMessage>> incomingmessages,
-							PriorityBlockingQueue<ITxTask> txqueue)
+							Map<InetSocketAddress, PeerInfo> peerinfos,
+							PriorityBlockingQueue<TxPacket> packetqueue,
+							TimedTaskDispatcher timedtaskdispatcher)
 	{
 		this.msgservice = msgservice;
-		this.txqueue = txqueue;
+		this.peerinfos = peerinfos;
 		this.incomingmessages = incomingmessages;
+		this.packetqueue = packetqueue;
+		this.timedtaskdispatcher = timedtaskdispatcher;
 	}
 	
 	/**
@@ -79,8 +95,10 @@ public class MsgPacketHandler implements IPacketHandler
 		int baseheadersize = 0;
 		int msgidoffset = 0;
 		int msgsizeoffset = 0;
-		int packetnumberoffset = 0;
-		int totalpacketsoffset = 0;
+//		int packetnumberoffset = 0;
+//		int totalpacketsoffset = 0;
+		int packetnum = 0;
+		int totalpackets = 0;
 		
 		switch (packettype)
 		{
@@ -88,25 +106,25 @@ public class MsgPacketHandler implements IPacketHandler
 				baseheadersize = L_MSG.HEADER_SIZE;
 				msgidoffset = L_MSG.MSG_ID_OFFSET;
 				msgsizeoffset = L_MSG.MSG_SIZE_OFFSET;
-				packetnumberoffset = L_MSG.PACKET_NUMBER_OFFSET;
-				totalpacketsoffset = L_MSG.TOTAL_PACKETS_OFFSET;
+				packetnum = SCodingUtil.shortFromByteArray(packet, L_MSG.PACKET_NUMBER_OFFSET) & 0xFFFF;
+				totalpackets = SCodingUtil.shortFromByteArray(packet, L_MSG.TOTAL_PACKETS_OFFSET) & 0xFFFF;
+				
 				break;
 				
 			case S_MSG.PACKET_TYPE_ID:
 			default:
 				baseheadersize = S_MSG.HEADER_SIZE;
 				msgidoffset = S_MSG.MSG_ID_OFFSET;
-				msgsizeoffset = L_MSG.MSG_SIZE_OFFSET;
-				packetnumberoffset = S_MSG.PACKET_NUMBER_OFFSET;
-				totalpacketsoffset = S_MSG.TOTAL_PACKETS_OFFSET;
+				msgsizeoffset = S_MSG.MSG_SIZE_OFFSET;
+				packetnum = packet[S_MSG.PACKET_NUMBER_OFFSET] & 0xFF;
+				totalpackets = packet[S_MSG.TOTAL_PACKETS_OFFSET] & 0xFF; 
 		}
 		
 		if (packet.length > baseheadersize)
 		{
 			int msgid = SCodingUtil.intFromByteArray(packet, msgidoffset);
 			int msgsize = SCodingUtil.intFromByteArray(packet, msgsizeoffset);
-			int packetnum = packet[packetnumberoffset];
-			int totalpackets = packet[totalpacketsoffset];
+			
 			
 			int headersize = baseheadersize;
 			int checksum = 0;
@@ -146,7 +164,7 @@ public class MsgPacketHandler implements IPacketHandler
 	 *  @param dataoffset The offset where the packet payload starts.
 	 *  @param checksum The checksum, only needed for first packet.
 	 */
-	protected void writeMessagePacket(InetSocketAddress sender, byte packettypeid, int msgid, int msgsize, int packetnum, int totalpackets, byte[] packet, int dataoffset, int checksum)
+	protected void writeMessagePacket(final InetSocketAddress sender, byte packettypeid, final int msgid, int msgsize, int packetnum, int totalpackets, byte[] packet, int dataoffset, int checksum)
 	{
 		Map<Integer, RxMessage> incomingsendermessages = incomingmessages.get(sender);
 		if (incomingsendermessages == null)
@@ -162,7 +180,7 @@ public class MsgPacketHandler implements IPacketHandler
 			}
 		}
 		
-//		System.out.println("Writing packet with msgid: " + msgid);
+		System.out.println("Writing packet number " + packetnum + " for msg with msgid " + msgid + ", total packets: " + totalpackets);
 		RxMessage msg = incomingsendermessages.get(msgid);
 		
 		if (msg == null)
@@ -174,6 +192,17 @@ public class MsgPacketHandler implements IPacketHandler
 				{
 					msg = new RxMessage(msgsize, totalpackets);
 					incomingsendermessages.put(msgid, msg);
+					timedtaskdispatcher.scheduleTask(new TimedTask(msgid, System.currentTimeMillis() + STunables.RX_MESSAGE_DECAY)
+					{
+						public void run()
+						{
+							Map<Integer, RxMessage> incomingsendermessages = incomingmessages.get(sender);
+							if (incomingsendermessages != null)
+							{
+								incomingsendermessages.remove(msgid);
+							}
+						}
+					});
 				}
 			}
 		}
@@ -186,38 +215,132 @@ public class MsgPacketHandler implements IPacketHandler
 			return;
 		}
 		
-//		System.out.println("Entering " + (packetnum + 1)+ " of " + totalpackets + " packets.");
+//		System.out.println("Writing " + (packetnum + 1)+ " of " + totalpackets + " packets for msg " + msgid);
+//		int old = msg.getMissingPacketsBitfield()[0];
 		msg.writePacket(packetnum, packet, dataoffset);
 		if (packetnum == 0)
 		{
 			msg.setReceivedChecksum(checksum);
 //			System.out.println("Packet 0 received checksum: "+ checksum);
 		}
+//		System.out.println("Old/New for " + msgid + " " + old + " " + msg.getMissingPacketsBitfield()[0]);
 		
+//		System.out.println("Completeness check: " + msgid);
 		if (msg.isComplete())
 		{
 			boolean result = false;
 			synchronized(msg)
 			{
-				result = msg.confirmChecksumAndLock();
-				if (!result)
+//				System.out.println("Completeness check seems legit, checking for dispatched: " + msgid);
+				if (msg.isComplete() && !msg.isDispatched())
 				{
-					resetMessage(packettypeid, sender, msgid, msgsize, totalpackets, msg);
+//					System.out.println("Not dispatched, checking checksum: " + msgid);
+					result = msg.confirmChecksumAndLock();
+					if (!result)
+					{
+						resetMessage(packettypeid, sender, msgid, msgsize, totalpackets, msg);
+					}
 				}
 			}
 			
 			if (result)
 			{
-				byte[] ackmsgpacket = new byte[5];
-				ackmsgpacket[0] = SPacketDefs.MSG_ACK;
-				SCodingUtil.intIntoByteArray(ackmsgpacket, 1, msgid);
+				final byte[] data = msg.getData();
+				timedtaskdispatcher.executeNow(new Runnable()
+				{
+					public void run()
+					{
+						msgservice.deliverMessage(data);
+					}
+				});
 				
-				TxPacket ackpacket = new TxPacket(sender, ackmsgpacket);
-				txqueue.put(ackpacket);
-				
-				msgservice.deliverMessage(msg.getData());
+//				System.out.println("Checksum ok, scheduling ack: " + msgid);
+//				System.out.println("ACK_SCHED " +msgid+": "+ System.currentTimeMillis());
+				timedtaskdispatcher.executeNow(new TimedTask(sender, Long.MIN_VALUE)
+				{
+					public void run()
+					{
+//						System.out.println("ACK_RUN " +msgid+": "+ System.currentTimeMillis());
+//						System.out.println("Attempt sending ack for: " + msgid);
+						byte[] ackmsgpacket = new byte[5];
+						ackmsgpacket[0] = SPacketDefs.MSG_ACK;
+						SCodingUtil.intIntoByteArray(ackmsgpacket, 1, msgid);
+						
+						TxPacket ackpacket = new TxPacket(sender, ackmsgpacket);
+						
+						PeerInfo info = peerinfos.get(sender);
+						Map<Integer, RxMessage> incomingsendermessages = incomingmessages.get(sender);
+						if (incomingsendermessages != null)
+						{
+							if (incomingsendermessages.get(msgid) != null)
+							{
+//								System.out.println("Sending ack for: " + msgid);
+								SendingThreadTask.queuePacket(packetqueue, ackpacket);
+								if (info == null)
+								{
+									executiontime = System.currentTimeMillis() + STunables.ACK_DELAY;
+								}
+								else
+								{
+									executiontime = System.currentTimeMillis() + (long)(info.getPing() * STunables.RESEND_DELAY_FACTOR);
+								}
+								timedtaskdispatcher.scheduleTask(this);
+							}
+//							else
+//							{
+//								System.err.println("but msg not found: " + msgid);
+//							}
+						}
+//						else
+//						{
+//							System.err.println("but sender not found: " + msgid);
+//						}
+					}
+				});
 			}
 		}
+		
+		int[] mp = msg.getMissingPacketsBitfield();
+		byte[] confpacket = new byte[mp.length * 4 + 5];
+		confpacket[0] = SPacketDefs.MSG_CONFIRM;
+		SCodingUtil.intIntoByteArray(confpacket, 1, msgid);
+		for (int i = 0; i < mp.length; ++i)
+		{
+			SCodingUtil.intIntoByteArray(confpacket, 5 + i * 4, mp[i]);
+		}
+		SendingThreadTask.queuePacket(packetqueue, new TxPacket(sender, confpacket));
+		
+//		PeerInfo info = peerinfos.get(sender);
+//		if (info != null)
+//		{
+////			if (info.getReceivedBytes().addAndGet(packet.length) > STunables.CONFIRMATION_THRESHOLD)
+//			{
+//				info.getReceivedBytes().set(0);
+//				synchronized(incomingsendermessages)
+//				{
+//					System.out.println("Sending confirmations at: " + info.getReceivedBytes().get());
+//					for (Map.Entry<Integer, RxMessage> curmsg : incomingsendermessages.entrySet())
+//					{
+//						if (!curmsg.getValue().isComplete())// && curmsg.getValue().getUnconfirmedWrites() > 0)
+//						{
+//							int[] mp = curmsg.getValue().getMissingPacketsBitfield();
+//							byte[] confpacket = new byte[mp.length * 4 + 5];
+//							confpacket[0] = SPacketDefs.MSG_CONFIRM;
+//							SCodingUtil.intIntoByteArray(confpacket, 1, curmsg.getKey());
+//							for (int i = 0; i < mp.length; ++i)
+//							{
+//								SCodingUtil.intIntoByteArray(confpacket, 5 + i * 4, mp[i]);
+//							}
+//							
+//							
+//							SendingThreadTask.queuePacket(packetqueue, new TxPacket(sender, confpacket));
+//							curmsg.getValue().setUnconfirmedWrites(0);
+//						}
+//					}
+////					System.out.println("Done sending confirmations at: " + info.getReceivedBytes().get() + " " + count);
+//				}
+//			}
+//		}
 	}
 	
 	/**
@@ -236,17 +359,9 @@ public class MsgPacketHandler implements IPacketHandler
 		{
 			msg.reset(msgsize, totalpackets);
 			
-			TxPacket resendreq = null;
-			if (packettypeid == S_MSG.PACKET_TYPE_ID)
-			{
-				resendreq = TxPacket.createSmallResendRequest(sender, msgid, new int[0]);
-			}
-			else
-			{
-				resendreq = TxPacket.createLargeResendRequest(sender, msgid, new int[0]);
-			}
+			TxPacket msggarbage = TxPacket.createGenericMsgIdPacket(SPacketDefs.MSG_GARBAGE, sender, msgid);
 			
-			txqueue.put(resendreq);
+			SendingThreadTask.queuePacket(packetqueue, msggarbage);
 		}
 	}
 }

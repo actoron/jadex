@@ -29,7 +29,7 @@ public interface ITxTask
 	 *  
 	 *  @return The IDs of packets that should be transmitted, null for all packets.
 	 */
-	public short[] getTxPacketIds();
+//	public short[] getTxPacketIds();
 	
 	/**
 	 *  Gets the priority of the transmission.
@@ -37,6 +37,11 @@ public interface ITxTask
 	 *  @return The priority.
 	 */
 	public int getPriority();
+	
+	/**
+	 *  Notification when transmission is done.
+	 */
+	public void done();
 	
 	/**
 	 *  Notification about a transmission failure.

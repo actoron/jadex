@@ -4,8 +4,9 @@ import jadex.platform.service.message.transport.udpmtp.PeerInfo;
 import jadex.platform.service.message.transport.udpmtp.SCodingUtil;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
 import jadex.platform.service.message.transport.udpmtp.STunables;
+import jadex.platform.service.message.transport.udpmtp.TimedTaskDispatcher;
 import jadex.platform.service.message.transport.udpmtp.receiving.PacketDispatcher;
-import jadex.platform.service.message.transport.udpmtp.sending.ITxTask;
+import jadex.platform.service.message.transport.udpmtp.sending.SendingThreadTask;
 import jadex.platform.service.message.transport.udpmtp.sending.TxPacket;
 
 import java.net.InetSocketAddress;
@@ -21,19 +22,23 @@ public class ProbeHandler implements IPacketHandler
 	/** Information about known peers. */
 	protected Map<InetSocketAddress, PeerInfo> peerinfos;
 	
-	/** Queue for scheduled transmissions */
-	protected PriorityBlockingQueue<ITxTask> txqueue;
+	/** The transmission queue. */
+	protected PriorityBlockingQueue<TxPacket> packetqueue;
+	
+	/** The timed task dispatcher. */
+	protected TimedTaskDispatcher timedtaskdispatcher;
 	
 	/**
 	 *  Creates the handler.
 	 *  
 	 *  @param peerinfos Information about known peers.
-	 *  @param txqueue Queue for scheduled transmissions.
+	 *  @param packetqueue Queue for scheduled packets.
+	 *  @param timedtaskdispatcher The timed task dispatcher.
 	 */
-	public ProbeHandler(Map<InetSocketAddress, PeerInfo> peerinfos, PriorityBlockingQueue<ITxTask> txqueue)
+	public ProbeHandler(Map<InetSocketAddress, PeerInfo> peerinfos, PriorityBlockingQueue<TxPacket> packetqueue, TimedTaskDispatcher timedtaskdispatcher)
 	{
 		this.peerinfos = peerinfos;
-		this.txqueue = txqueue;
+		this.packetqueue = packetqueue;
 	}
 	
 	/**
@@ -44,9 +49,11 @@ public class ProbeHandler implements IPacketHandler
 	 */
 	public boolean isApplicable(byte packettype)
 	{
-		return SPacketDefs.PROBE == packettype ||
+		boolean ret = SPacketDefs.PROBE == packettype ||
 			   SPacketDefs.PROBE_ACK == packettype ||
 			   SPacketDefs.PROBE_FIN == packettype;
+		
+		return ret;
 	}
 	
 	/**
@@ -77,7 +84,7 @@ public class ProbeHandler implements IPacketHandler
 					reply[0] = SPacketDefs.PROBE_ACK;
 					System.arraycopy(packet, 1, reply, 1, 8);
 					SCodingUtil.longIntoByteArray(reply, 9, System.currentTimeMillis());
-					txqueue.put(new TxPacket(sender, STunables.PROBE_PACKETS_DEFAULT_PRIORITY, reply));
+					SendingThreadTask.queuePacket(packetqueue, new TxPacket(sender, STunables.PROBE_PACKETS_DEFAULT_PRIORITY, reply));
 				}
 				else
 				{
@@ -91,8 +98,15 @@ public class ProbeHandler implements IPacketHandler
 					PeerInfo info = peerinfos.get(sender);
 					if (info != null)
 					{
-						info.setLastProbe(System.currentTimeMillis());
+						long current = System.currentTimeMillis();
+						info.setLastProbe(current);
 						info.setState(PeerInfo.STATE_OK);
+						
+						long calcping = SCodingUtil.longFromByteArray(packet, 1);
+						
+						calcping = current - calcping;
+						info.newPing(calcping);
+						
 						Runnable waiter = null;
 						while ((waiter = info.getStateWaiters().poll()) != null)
 						{
@@ -107,7 +121,23 @@ public class ProbeHandler implements IPacketHandler
 				break;
 				
 			case SPacketDefs.PROBE_FIN:
-				//TODO: Update Peer Info with statistics
+//				PeerInfo info = peerinfos.get(sender);
+//				if (info == null)
+//				{
+//					synchronized (peerinfos)
+//					{
+//						info = peerinfos.get(sender);
+//						if (info == null)
+//						{
+//							info = new PeerInfo(sender, timedtaskdispatcher);
+//							System.out.println("Creating peer:" + info);
+//							peerinfos.put(sender, info);
+//							
+//							TimedTask peerprober = new PeerProber(peerinfos, info, timedtaskdispatcher, packetqueue);
+//							timedtaskdispatcher.scheduleTask(peerprober);
+//						}
+//					}
+//				}
 				break;
 		}
 	}

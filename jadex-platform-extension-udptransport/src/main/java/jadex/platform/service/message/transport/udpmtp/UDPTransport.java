@@ -18,12 +18,14 @@ import jadex.platform.service.message.transport.udpmtp.receiving.PacketDispatche
 import jadex.platform.service.message.transport.udpmtp.receiving.RxMessage;
 import jadex.platform.service.message.transport.udpmtp.receiving.handlers.IPacketHandler;
 import jadex.platform.service.message.transport.udpmtp.receiving.handlers.MsgAckFinHandler;
+import jadex.platform.service.message.transport.udpmtp.receiving.handlers.MsgConfirmationHandler;
 import jadex.platform.service.message.transport.udpmtp.receiving.handlers.MsgPacketHandler;
-import jadex.platform.service.message.transport.udpmtp.receiving.handlers.MsgResendHandler;
 import jadex.platform.service.message.transport.udpmtp.receiving.handlers.ProbeHandler;
-import jadex.platform.service.message.transport.udpmtp.sending.ITxTask;
+import jadex.platform.service.message.transport.udpmtp.sending.FlowControl;
+import jadex.platform.service.message.transport.udpmtp.sending.SendMessageTask;
 import jadex.platform.service.message.transport.udpmtp.sending.SendingThreadTask;
 import jadex.platform.service.message.transport.udpmtp.sending.TxMessage;
+import jadex.platform.service.message.transport.udpmtp.sending.TxPacket;
 import jadex.platform.service.message.transport.udpmtp.sending.TxShutdownTask;
 import jadex.platform.service.message.transport.udpmtp.timed.PeerProber;
 
@@ -41,14 +43,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class UDPTransport implements ITransport
 {
+	/** Debug GUI. */
+	public final static boolean DEBUG_GUI = true;
+//	public final static boolean DEBUG_GUI = false;
+	
 	/** The direct connect schema */
 	public final static String DIRECT_SCHEMA = "udp-mtp://";
 	
@@ -65,7 +70,7 @@ public class UDPTransport implements ITransport
 	protected Map<String, InetSocketAddress> resolvecache;
 	
 	/** The thread pool. */
-	protected IDaemonThreadPoolService threadpool;
+	protected IDaemonThreadPoolService threadpoool;
 	
 	/** The timed task dispatcher. */
 	protected TimedTaskDispatcher timedtaskdispatcher;
@@ -91,11 +96,8 @@ public class UDPTransport implements ITransport
 	/** Messages in-flight. */
 	protected Map<Integer, TxMessage> inflightmessages;
 	
-	/** Queue for scheduled transmissions */
-	protected PriorityBlockingQueue<ITxTask> txqueue;
-	
-	/** Send task queue. */
-	protected Queue<ISendTask> sendtaskqueue;
+	/** The transmission queue. */
+	protected PriorityBlockingQueue<TxPacket> packetqueue;
 	
 	/** Handlers for incoming packets. */
 	protected List<IPacketHandler> packethandlers;
@@ -108,6 +110,12 @@ public class UDPTransport implements ITransport
 	
 	/** Incoming Message pool. */
 	protected Map<InetSocketAddress, Map<Integer, RxMessage>> incomingmessages;
+	
+	/** The remaining send quota. */
+	protected AtomicInteger sendquota;
+	
+	/** The flow control. */
+	protected FlowControl flowcontrol;
 	
 	/**
 	 *  Creates a UDP transport.
@@ -135,15 +143,19 @@ public class UDPTransport implements ITransport
 		this.usedids = Collections.synchronizedSet(new HashSet<Integer>());
 		this.incomingmessages = Collections.synchronizedMap(new HashMap<InetSocketAddress, Map<Integer, RxMessage>>());
 		this.inflightmessages = Collections.synchronizedMap(new HashMap<Integer, TxMessage>());
-		this.txqueue = new PriorityBlockingQueue<ITxTask>(11, new Comparator<ITxTask>()
+		this.packetqueue = new PriorityBlockingQueue<TxPacket>(11, new Comparator<TxPacket>()
 		{
-			public int compare(ITxTask o1, ITxTask o2)
+			public int compare(TxPacket o1, TxPacket o2)
 			{
+				int prio1 = o1.getPriority();
+				int prio2 = o2.getPriority();
+				if (prio1 == prio2)
+				{
+					return o1.getPacketNumber() - o2.getPacketNumber();
+				}
 				return o1.getPriority() - o2.getPriority();
 			}
 		});
-		
-		this.sendtaskqueue = new ConcurrentLinkedQueue<ISendTask>();
 		
 		this.resolvecache = Collections.synchronizedMap((new LRU<String, InetSocketAddress>(resolvecachesize)));
 		this.lowport = lowport;
@@ -154,7 +166,10 @@ public class UDPTransport implements ITransport
 			this.highport = this.lowport;
 			this.lowport = lowport;
 		}
+		
 		this.provider = provider;
+		this.sendquota = new AtomicInteger(STunables.MIN_SENDABLE_BYTES);
+		this.flowcontrol = new FlowControl(sendquota);
 	}
 	
 	/**
@@ -199,6 +214,14 @@ public class UDPTransport implements ITransport
 		
 		if (socket != null)
 		{
+			try
+			{
+				socket.setSendBufferSize(STunables.BUFFER_SIZE);
+				socket.setReceiveBufferSize(STunables.BUFFER_SIZE);
+			}
+			catch (SocketException e2)
+			{
+			}
 			String[] addresses;
 			try
 			{
@@ -225,8 +248,7 @@ public class UDPTransport implements ITransport
 			{
 				public void customResultAvailable(IDaemonThreadPoolService tp)
 				{
-					threadpool = tp;
-					timedtaskdispatcher = new TimedTaskDispatcher(threadpool);
+					timedtaskdispatcher = new TimedTaskDispatcher(tp);
 					
 					SServiceProvider.getService(provider, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
@@ -236,22 +258,23 @@ public class UDPTransport implements ITransport
 							msgservice = result;
 							
 							// Sender Thread.
-							threadpool.execute(new SendingThreadTask(socket, txqueue, threadpool));
+							SendingThreadTask stt = new SendingThreadTask(socket, packetqueue, sendquota, inflightmessages, peerinfos, timedtaskdispatcher);
+							timedtaskdispatcher.executeNow(stt);
 							
 							// Message handlers, the order has a purpose.
 							packethandlers = Collections.synchronizedList(new ArrayList<IPacketHandler>());
-							packethandlers.add(new ProbeHandler(peerinfos, txqueue));
-							packethandlers.add(new MsgPacketHandler(msgservice, incomingmessages, txqueue));
-							packethandlers.add(new MsgAckFinHandler(incomingmessages, inflightmessages, txqueue, usedids));
-							packethandlers.add(new MsgResendHandler(incomingmessages, inflightmessages, txqueue));
+							packethandlers.add(new ProbeHandler(peerinfos, packetqueue, timedtaskdispatcher));
+							packethandlers.add(new MsgPacketHandler(msgservice, incomingmessages, peerinfos, packetqueue, timedtaskdispatcher));
+							packethandlers.add(new MsgAckFinHandler(incomingmessages, inflightmessages, sendquota, flowcontrol, packetqueue, peerinfos, usedids, timedtaskdispatcher));
+							packethandlers.add(new MsgConfirmationHandler(incomingmessages, inflightmessages, sendquota, packetqueue, peerinfos));
 							
 							
 							// Receiver Thread.
-							threadpool.execute(new Runnable()
+							timedtaskdispatcher.executeNow(new Runnable()
 							{
 								public void run()
 								{
-									byte[] buf = new byte[65535];
+									byte[] buf = new byte[65536];
 									boolean running = true;
 									
 									while (running)
@@ -266,7 +289,7 @@ public class UDPTransport implements ITransport
 											
 											InetSocketAddress sender = new InetSocketAddress(dgp.getAddress(), dgp.getPort());
 											
-											threadpool.execute(new PacketDispatcher(sender, packet, packethandlers, threadpool));
+											timedtaskdispatcher.executeNow(new PacketDispatcher(sender, packet, packethandlers, timedtaskdispatcher));
 										}
 										catch (IOException e)
 										{
@@ -276,6 +299,10 @@ public class UDPTransport implements ITransport
 									}
 								}
 							});
+							if (DEBUG_GUI)
+							{
+								new DebugGui(peerinfos, inflightmessages, packetqueue, sendquota, flowcontrol, stt);
+							}
 							System.out.println("UDP Transport start done.");
 							ret.setResult(null);
 						}	
@@ -290,7 +317,6 @@ public class UDPTransport implements ITransport
 		}
 		
 		System.out.println("UDP-Socket bound port: " + socket.getLocalPort());
-		
 		return ret;
 	}
 
@@ -299,7 +325,8 @@ public class UDPTransport implements ITransport
 	 */
 	public IFuture<Void> shutdown()
 	{
-		txqueue.put(new TxShutdownTask());
+		SendingThreadTask.queuePacket(packetqueue, new TxShutdownTask());
+		socket.close();
 		return IFuture.DONE;
 	}
 	
@@ -338,7 +365,7 @@ public class UDPTransport implements ITransport
 	 */
 	public void	sendMessage(final String address, final ISendTask task)
 	{
-		threadpool.execute(new Runnable()
+		timedtaskdispatcher.executeNow(new Runnable()
 		{
 			public void run()
 			{
@@ -374,28 +401,15 @@ public class UDPTransport implements ITransport
 					if (state == PeerInfo.STATE_OK)
 					{
 						final int msgid = allocateMsgId();
-						task.ready(new IResultCommand<IFuture<Void>, Void>()
-						{
-							public IFuture<Void> execute(Void args)
-							{
-								final Future<Void> ret = new Future<Void>();
-								
-								threadpool.execute(new Runnable()
-								{
-									public void run()
-									{
-										TxMessage msg = TxMessage.createTxMessage(resolvedreceiver, msgid, task, ret);
-										if (msg != null)
-										{
-											inflightmessages.put(msgid, msg);
-											txqueue.put(msg);
-										}
-									}
-								});
-								
-								return ret;
-							}
-						});
+						final PeerInfo peerinfo = info;
+						SendMessageTask.executeTask(resolvedreceiver,
+													msgid,
+													task,
+													peerinfo,
+													inflightmessages,
+													packetqueue,
+													timedtaskdispatcher,
+													flowcontrol);
 					}
 					else
 					{
@@ -420,17 +434,20 @@ public class UDPTransport implements ITransport
 								info = peerinfos.get(resolvedreceiver);
 								if (info == null)
 								{
-									info = new PeerInfo(resolvedreceiver);
+									info = new PeerInfo(resolvedreceiver, timedtaskdispatcher);
+									System.out.println("Creating peer:" + info);
 									peerinfos.put(resolvedreceiver, info);
 									
-									TimedTask peerprober = new PeerProber(peerinfos, info, timedtaskdispatcher, txqueue);
-									timedtaskdispatcher.scheduleTask(peerprober);
+									TimedTask peerprober = new PeerProber(peerinfos, info, timedtaskdispatcher, packetqueue, inflightmessages);
+									timedtaskdispatcher.executeNow(peerprober);
+									
+									//timedtaskdispatcher.scheduleTask(info.getFlowController());
 								}
 							}
 								
 							if (info.getState() == PeerInfo.STATE_OK)
 							{
-								threadpool.execute(new Runnable()
+								timedtaskdispatcher.executeNow(new Runnable()
 								{
 									public void run()
 									{
@@ -501,14 +518,14 @@ public class UDPTransport implements ITransport
 	 */
 	protected int allocateMsgId()
 	{
-		int ret = 0;
+		int ret = -1;
 		synchronized (usedids)
 		{
-			ret = ++idcounter;
-			while (usedids.contains(ret))
+			do
 			{
 				ret = ++idcounter;
 			}
+			while (usedids.contains(ret));
 		}
 		
 		return ret;

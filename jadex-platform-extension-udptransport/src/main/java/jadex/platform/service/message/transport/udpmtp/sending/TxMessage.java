@@ -4,9 +4,9 @@ import jadex.commons.future.Future;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.udpmtp.SCodingUtil;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
-import jadex.platform.service.message.transport.udpmtp.STunables;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs.L_MSG;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs.S_MSG;
+import jadex.platform.service.message.transport.udpmtp.STunables;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -16,8 +16,11 @@ import java.util.zip.CRC32;
  *  Class representing a message being send.
  *
  */
-public class TxMessage implements ITxTask
+public class TxMessage
 {
+	/** The message ID. */
+	protected int msgid;
+	
 	/** The resolved receiver. */
 	protected InetSocketAddress resolvedreceiver;
 	
@@ -28,27 +31,74 @@ public class TxMessage implements ITxTask
 	protected int priority;
 	
 	/** The packets being transmitted. */
-	protected byte[][] packets;
+	protected TxPacket[] packets;
 	
-	/** The packets that need to be re-send. */
-	protected short[] resendpackets;
+	/** Re-send counter. */
+	protected volatile int resendcounter;
+	
+	/** Callback used when resends should start. */
+	protected Runnable sentcallback;
+	
+	/** Counter for sent packets. */
+	protected volatile int lastsentpacket;
+	
+	public volatile long ls;
 	
 	/**
 	 *  Creates a new message for transmission.
 	 *  
+	 *  @param msgid The message ID.
 	 *  @param receiver The receiver of the message.
 	 *  @param conffuture The confirmation future.
 	 *  @param priority Initial priority of the message.
 	 *  @param packets The packets of the message.
+	 *  @param txcallback Called when transmission is done.
 	 */
-	protected TxMessage(InetSocketAddress receiver, Future<Void> conffuture, int priority, byte[][] packets)
+	protected TxMessage(int msgid, InetSocketAddress receiver, Future<Void> conffuture, int priority, TxPacket[] packets, Runnable sentcallback)
 	{
+		this.msgid = msgid;
 		confirmationfuture = conffuture;
 		resolvedreceiver = receiver;
 		this.priority = priority;
 		this.packets = packets;
+		this.lastsentpacket = packets.length - 1;
+		this.sentcallback = sentcallback;
+//		this.confirmedpackets = new int[packets.length / 32 + 1];
+		this.resendcounter = 0;
+		resetConfirmedPackets();
+		
 	}
 	
+	/**
+	 *  Resets the confirmed packets.
+	 */
+	public void resetConfirmedPackets()
+	{
+		for (int i = 0; i < packets.length; ++i)
+		{
+			packets[i].setConfirmed(false);
+		}
+//		synchronized (confirmedpackets)
+//		{
+//			Arrays.fill(confirmedpackets, 0);
+//			int padmax = (confirmedpackets.length * 32);
+//			for (int i = packets.length; i <  padmax; ++i)
+//			{
+//				confirmedpackets[i / 32] |= (1L << (i % 32));
+//			}
+//		}
+	}
+	
+	/**
+	 *  Gets the message ID.
+	 *
+	 *  @return The message ID.
+	 */
+	public int getMsgId()
+	{
+		return msgid;
+	}
+
 	/**
 	 *  Gets the resolved receiver.
 	 *
@@ -74,7 +124,7 @@ public class TxMessage implements ITxTask
 	 *
 	 *  @return The packets.
 	 */
-	public byte[][] getPackets()
+	public TxPacket[] getPackets()
 	{
 		return packets;
 	}
@@ -90,31 +140,107 @@ public class TxMessage implements ITxTask
 	}
 	
 	/**
-	 *  Sets the re-send packets.
+	 *  Gets the number of sent packets.
 	 *
-	 *  @param resendpackets The re-send packets.
+	 *  @return The number of sent packets.
 	 */
-	public void setResendPackets(short[] resendpackets)
+//	public int getSentPackets()
+//	{
+//		return sentpackets;
+//	}
+
+	/**
+	 *  Sets the number of sent packets.
+	 *
+	 *  @param sentpackets The number of sent packets.
+	 */
+//	public void setSentPackets(int sentpackets)
+//	{
+//		this.sentpackets = sentpackets;
+//	}
+
+	/**
+	 *  Gets the confirmed packets bit-field.
+	 *
+	 *  @return The confirmed packets bit-field.
+	 */
+//	public int[] getConfirmedPackets()
+//	{
+//		return confirmedpackets;
+//	}
+	
+	/**
+	 *  Gets the re-send counter.
+	 *
+	 *  @return The re-send counter.
+	 */
+	public int getResendCounter()
 	{
-		this.resendpackets = resendpackets;
+		return resendcounter;
 	}
 
 	/**
-	 *  Returns the packet IDs of all the packets
-	 *  that should be transmitted.
-	 *  Returning null requests transmitting all packets.
-	 *  
-	 *  @return The IDs of packets that should be transmitted, null for all packets.
+	 *  Sets the re-send counter.
+	 *
+	 *  @param resendcounter The re-send counter.
 	 */
-	public short[] getTxPacketIds()
+	public void setResendCounter(int resendcounter)
 	{
-		return resendpackets;
+		this.resendcounter = resendcounter;
 	}
 	
 	/**
+	 *  Gets the sent packet.
+	 *
+	 *  @return The sent packets.
+	 */
+	public int getLastSentPacket()
+	{
+		return lastsentpacket;
+	}
+
+	/**
+	 *  Sets the sent packet.
+	 *
+	 *  @param lastsentpacket The sent packet.
+	 */
+	public void setLastSentPacket(int lastsentpacket)
+	{
+		this.lastsentpacket = lastsentpacket;
+	}
+
+	/**
+	 *  Gets the sent callback.
+	 *
+	 *  @return The sent callback.
+	 */
+	public Runnable getSentCallback()
+	{
+		return sentcallback;
+	}
+
+	/**
+	 *  Sets the sent callback.
+	 *
+	 *  @param sentcallback The sent callback.
+	 */
+	public void setSentCallback(Runnable sentcallback)
+	{
+		this.sentcallback = sentcallback;
+	}
+
+	/**
+	 *  Increases the priority of the message.
+	 */
+	public void increasePriority()
+	{
+		priority = Math.max(0, priority - 1);
+	}
+
+	/**
 	 *  Reduces the priority of the message.
 	 */
-	public void reducePriority()
+	public void decreasePriority()
 	{
 		++priority;
 	}
@@ -124,8 +250,29 @@ public class TxMessage implements ITxTask
 	 */
 	public void confirmTransmission()
 	{
-		confirmationfuture.setResult(null);
+		confirmationfuture.setResultIfUndone(null);
 	}
+	
+	/**
+	 *  Sets the transmission callback.
+	 *
+	 *  @param txcallback The transmission callback.
+	 */
+//	public void setTxCallback(Runnable txcallback)
+//	{
+//		this.txcallback = txcallback;
+//	}
+
+	/**
+	 *  Notification when transmission is done.
+	 */
+//	public void done()
+//	{
+//		if (txcallback != null)
+//		{
+//			txcallback.run();
+//		}
+//	}
 	
 	/**
 	 *  Notification about a transmission failure.
@@ -134,7 +281,8 @@ public class TxMessage implements ITxTask
 	 */
 	public void transmissionFailed(String reason)
 	{
-		confirmationfuture.setException(new IOException(reason));
+		System.err.println("Transmission failed: " + reason);
+		confirmationfuture.setExceptionIfUndone(new IOException(reason));
 	}
 	
 	/**
@@ -144,23 +292,27 @@ public class TxMessage implements ITxTask
 	 *  @param address
 	 *  @param task
 	 *  @param conffuture
+	 *  @param txcallback Called when transmission is done.
+	 *  @param allowtiny Allow tiny packet mode.
+	 *  @param allowsmall Allow small packet mode.
 	 *  @return
 	 */
-	public static final TxMessage createTxMessage(InetSocketAddress receiver, int msgid, ISendTask task, Future<Void> conffuture)
+	public static final TxMessage createTxMessage(InetSocketAddress receiver, int msgid, ISendTask task, Future<Void> conffuture, Runnable txcallback, boolean allowtiny, boolean allowsmall)
 	{
 		int payloadsize = task.getProlog().length + task.getData().length;
+		System.out.println("New Message " + msgid + ", size: " + payloadsize);
 		int priority = STunables.LARGE_MESSAGES_DEFAULT_PRIORITY;
 		
 		// Packet size for medium and large mode.
 		int packetsize = 8192;
 		
-		if (STunables.ENABLE_TINY_MODE && payloadsize < 131073)
+		if (allowtiny && payloadsize < 131073)
 		{
 			// Tiny mode
 			packetsize = 512;
 			priority = STunables.TINY_MESSAGES_DEFAULT_PRIORITY;
 		}
-		else if (STunables.ENABLE_SMALL_MODE && payloadsize < 262145)
+		else if (allowsmall && payloadsize < 262145)
 		{
 			// Small mode
 			packetsize = 1024;
@@ -172,9 +324,9 @@ public class TxMessage implements ITxTask
 			priority = STunables.MEDIUM_MESSAGES_DEFAULT_PRIORITY;
 		}
 		
-		byte[][] packets = TxMessage.fragmentMessage(msgid, task.getProlog(), task.getData(), packetsize);
+		TxPacket[] packets = TxMessage.fragmentMessage(receiver, msgid, priority, task.getProlog(), task.getData(), packetsize, txcallback);
 		
-		TxMessage ret = new TxMessage(receiver, conffuture, priority, packets);
+		TxMessage ret = new TxMessage(msgid, receiver, conffuture, priority, packets, txcallback);
 		
 		return ret;
 	}
@@ -188,7 +340,7 @@ public class TxMessage implements ITxTask
 	 *  @param packetsize The chosen packet size.
 	 *  @return The fragmented message.
 	 */
-	public static final byte[][] fragmentMessage(int msgid, byte[] prolog, byte[] data, int packetsize)
+	public static final TxPacket[] fragmentMessage(InetSocketAddress receiver, int msgid, int priority, byte[] prolog, byte[] data, int packetsize, final Runnable txcallback)
 	{
 //		System.out.println("Fragmenting message of size " + (prolog.length + data.length) + " msg id " + msgid);
 		int payloadsize = prolog.length + data.length;
@@ -204,7 +356,7 @@ public class TxMessage implements ITxTask
 		int checksum = (int) crc.getValue();
 //		System.out.print("cs1 : " + checksum);
 		int pos = 0;
-		byte[][] ret = new byte[packettotal][];
+		TxPacket[] ret = new TxPacket[packettotal];
 		for (int i = 0; i < packettotal; ++i)
 		{
 			byte[] packet = null;
@@ -272,7 +424,10 @@ public class TxMessage implements ITxTask
 			}
 			
 			pos += (packet.length - headersize);
-			ret[i] = packet;
+			
+			
+			ret[i] = new TxPacket(receiver, packet, priority, true);
+			ret[i].setPacketNumber(i);
 		}
 		
 		return ret;

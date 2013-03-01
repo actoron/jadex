@@ -1,17 +1,10 @@
 package jadex.platform.service.message.transport.udpmtp.receiving;
 
-import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
-import jadex.platform.service.message.transport.udpmtp.PeerInfo;
+import jadex.platform.service.message.transport.udpmtp.TimedTaskDispatcher;
 import jadex.platform.service.message.transport.udpmtp.receiving.handlers.IPacketHandler;
-import jadex.platform.service.message.transport.udpmtp.sending.ITxTask;
-import jadex.platform.service.message.transport.udpmtp.sending.TxMessage;
 
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  *  Dispatcher for incoming packets.
@@ -28,15 +21,15 @@ public class PacketDispatcher implements Runnable
 	/** Handlers for incoming packets. */
 	protected List<IPacketHandler> packethandlers;
 	
-	/** The thread pool. */
-	protected IDaemonThreadPoolService threadpool;
+	/** The timed task dispatcher. */
+	protected TimedTaskDispatcher timedtaskdispatcher;
 	
-	public PacketDispatcher(InetSocketAddress sender, byte[] packet, List<IPacketHandler> packethandlers, IDaemonThreadPoolService threadpool)
+	public PacketDispatcher(InetSocketAddress sender, byte[] packet, List<IPacketHandler> packethandlers, TimedTaskDispatcher timedtaskdispatcher)
 	{
 		this.sender = sender;
 		this.packet = packet;
 		this.packethandlers = packethandlers;
-		this.threadpool = threadpool;
+		this.timedtaskdispatcher = timedtaskdispatcher;
 	}
 	
 	/**
@@ -49,6 +42,8 @@ public class PacketDispatcher implements Runnable
 		if (packet.length > 0)
 		{
 			final byte packettype = packet[0];
+			
+//			System.out.println("Got packet: " + packettype);
 //			
 			IPacketHandler[] handlers = null;
 			synchronized(packethandlers)
@@ -62,17 +57,17 @@ public class PacketDispatcher implements Runnable
 				if (handlers[i].isApplicable(packettype))
 				{
 					final IPacketHandler handler = handlers[i];
-					threadpool.execute(new Runnable()
-					{
-						public void run()
-						{
+//					threadpool.execute(new Runnable()
+//					{
+//						public void run()
+//						{
 							handler.handlePacket(sender, packettype, packet);
 							if (handler.isDone())
 							{
 								packethandlers.remove(handler);
 							}
-						}
-					});
+//						}
+//					});
 					
 					handled = true;
 				}
@@ -80,7 +75,7 @@ public class PacketDispatcher implements Runnable
 			
 			if (!handled)
 			{
-				unknownPacketTypeError();
+				unknownPacketTypeError(packettype);
 			}
 		}
 		else
@@ -95,8 +90,8 @@ public class PacketDispatcher implements Runnable
 		System.err.println("Packet sanity failed!");
 	}
 	
-	protected void unknownPacketTypeError()
+	protected void unknownPacketTypeError(byte type)
 	{
-		System.err.println("Unknown Packet!");
+		System.err.println("Unknown Packet: " + type);
 	}
 }

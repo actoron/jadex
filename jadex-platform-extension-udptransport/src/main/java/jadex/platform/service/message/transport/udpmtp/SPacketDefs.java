@@ -13,9 +13,6 @@ public class SPacketDefs
 		/** Message ID Definition. */
 		public static final byte PACKET_TYPE_ID = 32;
 		
-		/** Message ID Definition. */
-		public static final byte RESEND_REQ_ID = 33;
-		
 		/** Header size. */
 		public static final int HEADER_SIZE = 11;
 		
@@ -40,9 +37,6 @@ public class SPacketDefs
 	{
 		/** Message ID Definition. */
 		public static final byte PACKET_TYPE_ID = 34;
-		
-		/** Message re-send request. */
-		public static final byte RESEND_REQ_ID = 35;
 		
 		/** Header size. */
 		public static final int HEADER_SIZE = 13;
@@ -86,9 +80,15 @@ public class SPacketDefs
 	/** Message acknowledged. */
 	public static final byte MSG_ACK = 16;
 	
-	/** Message finished. */
-	public static final byte MSG_FIN = 17;
+	/** Message that arrived is garbage. */
+	public static final byte MSG_GARBAGE = 17;
 	
-	/** Message re-send error/denied. */
-	public static final byte MSG_RESEND_ERROR = 18;
+	/** Message finished. */
+	public static final byte MSG_FIN = 18;
+	
+	/** Message confirmation packet. */
+	public static final byte MSG_CONFIRM = 19;
+	
+	/** Message confirm error/denied. */
+	public static final byte MSG_CONFIRM_ERROR = 20;
 }

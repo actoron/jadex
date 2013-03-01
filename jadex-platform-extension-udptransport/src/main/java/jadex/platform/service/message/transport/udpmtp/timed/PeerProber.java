@@ -1,16 +1,17 @@
 package jadex.platform.service.message.transport.udpmtp.timed;
 
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import jadex.platform.service.message.transport.udpmtp.PeerInfo;
 import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
 import jadex.platform.service.message.transport.udpmtp.STunables;
 import jadex.platform.service.message.transport.udpmtp.TimedTask;
 import jadex.platform.service.message.transport.udpmtp.TimedTaskDispatcher;
-import jadex.platform.service.message.transport.udpmtp.sending.ITxTask;
+import jadex.platform.service.message.transport.udpmtp.sending.SendingThreadTask;
+import jadex.platform.service.message.transport.udpmtp.sending.TxMessage;
 import jadex.platform.service.message.transport.udpmtp.sending.TxPacket;
+
+import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  *  Task for probing peers.
@@ -28,7 +29,10 @@ public class PeerProber extends TimedTask
 	protected TimedTaskDispatcher dispatcher;
 	
 	/** The transmission queue. */
-	protected PriorityBlockingQueue<ITxTask> txqueue;
+	protected PriorityBlockingQueue<TxPacket> packetqueue;
+	
+	/** Messages in-flight. */
+	protected Map<Integer, TxMessage> inflightmessages;
 	
 	/**
 	 *  Creates a peer prober.
@@ -36,13 +40,14 @@ public class PeerProber extends TimedTask
 	 *  @param info The peer info. 
 	 *  @param dispatcher The timed task dispatcher.
 	 */
-	public PeerProber(Map<InetSocketAddress, PeerInfo> peerinfos, PeerInfo info, TimedTaskDispatcher dispatcher, PriorityBlockingQueue<ITxTask> txqueue)
+	public PeerProber(Map<InetSocketAddress, PeerInfo> peerinfos, PeerInfo info, TimedTaskDispatcher dispatcher, PriorityBlockingQueue<TxPacket> packetqueue, Map<Integer, TxMessage> inflightmessages)
 	{
 		super(info.getAddress(), Long.MIN_VALUE);
 		this.peerinfos = peerinfos;
 		this.peerinfo = info;
 		this.dispatcher = dispatcher;
-		this.txqueue = txqueue;
+		this.packetqueue = packetqueue;
+		this.inflightmessages = inflightmessages;
 	}
 	
 	/**
@@ -52,9 +57,10 @@ public class PeerProber extends TimedTask
 	{
 		long currenttime = System.currentTimeMillis();
 		TxPacket probe = TxPacket.createGenericTimestampPacket(SPacketDefs.PROBE, peerinfo.getAddress(), currenttime);
-		txqueue.put(probe);
-		System.out.println("Probe sent, time: " + currenttime + ".");
-		System.out.println("Last Probe of " + peerinfo + " was: " + peerinfo.getLastProbe());
+		probe.setPriority(STunables.PROBE_PACKETS_DEFAULT_PRIORITY);
+		SendingThreadTask.queuePacket(packetqueue, probe);
+//		System.out.println("Probe sent, time: " + currenttime + ".");
+//		System.out.println("Last Probe of " + peerinfo + " was: " + peerinfo.getLastProbe());
 		
 		if (peerinfo.getLastProbe() > Long.MIN_VALUE && peerinfo.getLastProbe() < currenttime - STunables.PROBE_INTERVAL_DELAY)
 		{
@@ -63,11 +69,25 @@ public class PeerProber extends TimedTask
 			if (retries > STunables.PROBE_RETRIES)
 			{
 				peerinfo.setState(PeerInfo.STATE_LOST);
+				System.out.println("Banning: " + peerinfo.getAddress());
+				dispatcher.cancel(peerinfo.getAddress());
+				synchronized (inflightmessages)
+				{
+					TxMessage[] msgs = inflightmessages.values().toArray(new TxMessage[inflightmessages.size()]);
+					for (TxMessage msg : msgs)
+					{
+						if (msg.getResolvedReceiver().equals(peerinfo.getAddress()))
+						{
+							inflightmessages.remove(msg.getMsgId());
+							msg.transmissionFailed("Lost connection to peer: " + peerinfo.getAddress());
+						}
+					}
+				}
 				TimedTask unbantask = new TimedTask(currenttime + STunables.PROBE_RESPONSE_BAN_TIME)
 				{
 					public void run()
 					{
-						System.out.println("Performing unban. ");
+//						System.out.println("Performing unban. ");
 						peerinfos.remove(peerinfo.getAddress());
 					}
 				};
@@ -76,10 +96,14 @@ public class PeerProber extends TimedTask
 			}
 			
 			peerinfo.setProbeRetries(retries + 1);
-			executiontime = currenttime + STunables.PROBE_INTERVAL_REDUCED_DELAY;
+			if (retries > STunables.PROBE_NORMAL_RETRIES)
+			{
+				executiontime = currenttime + STunables.PROBE_INTERVAL_REDUCED_DELAY;
+			}
 		}
 		else
 		{
+			peerinfo.setProbeRetries(0);
 			executiontime = currenttime + STunables.PROBE_INTERVAL_DELAY;
 		}
 		
