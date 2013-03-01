@@ -11,6 +11,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
 
@@ -19,6 +20,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,7 +88,7 @@ public class SBpmnModelWriter
 	 */
 	public static final void writeModel(File outputfile, MBpmnModel mmodel, IBpmnVisualModelWriter vmodelwriter) throws IOException
 	{
-		File file = File.createTempFile(outputfile.getName(), ".bpmn");
+		File file = File.createTempFile(outputfile.getName(), ".bpmn2");
 		PrintStream out = new PrintStream(new BufferedOutputStream(new FileOutputStream(file)), false, "UTF-8");
 		
 		writeInitialBoilerPlate(out);
@@ -108,7 +111,7 @@ public class SBpmnModelWriter
 		
 		out.close();
 		
-		file.renameTo(outputfile);
+		SUtil.moveFile(file, outputfile);
 	}
 	
 	/**
@@ -262,7 +265,7 @@ public class SBpmnModelWriter
 			
 			for (int i = 0; i < args.length; ++i)
 			{
-				if (args[i].getName() != null && args[i].getName().length() > 0)
+				if (args != null && args[i].getName() != null && args[i].getName().length() > 0)
 				{
 					IArgument arg = args[i];
 					
