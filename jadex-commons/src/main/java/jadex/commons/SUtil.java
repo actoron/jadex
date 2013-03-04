@@ -93,7 +93,7 @@ public class SUtil
 	/** Simple date format. */
 	public static final SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 	public static final SimpleDateFormat SDF2 = new SimpleDateFormat("dd.MM.yyyy");
-
+	public static final SimpleDateFormat SDF3 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 	
 	/**
 	 * Mapping from single characters to encoded version for displaying on

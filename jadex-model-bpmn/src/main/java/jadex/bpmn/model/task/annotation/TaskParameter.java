@@ -19,17 +19,17 @@ public @interface TaskParameter
 	//-------- attributes --------
 	
 	/** The direction (in, out or inout). */
-	String direction() default DIRECTION_INOUT;
+	public String direction() default DIRECTION_INOUT;
 	
 	/** The clazz (i.e. type) of the parameter. */
-	Class<?> clazz() default Object.class;
+	public Class<?> clazz() default Object.class;
 	
 	/** The parameter name. */
-	String name();
+	public String name();
 	
 	/** The initial value (as Java expression). */
-	String initialvalue() default "null";
+	public String initialvalue() default "null";
 	
 	/** The parameter description. */
-	String description() default "";
+	public String description() default "";
 }

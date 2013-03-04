@@ -9,6 +9,7 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.EditableList;
@@ -32,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -736,12 +738,12 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				case 1:
 					return "Properties";
 				case 2:
-					return "Delay";
+					return "Time/Delay per Mechanism";
+//				case 3:
+//					return "Time of Last Info";
 				case 3:
-					return "Time of Last Info";
-				case 4:
 					return "Has a Proxy";
-				case 5:
+				case 4:
 					return "Remote Excluded";
 				default:
 					return "";
@@ -767,17 +769,27 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			}
 			else if(column == 2)
 			{
-				value = new Long(dif.getDelay());
+//				value = new Long(dif.getDelay());
+//				value = dif.getTimeDelays().toString();
+				StringBuffer buf = new StringBuffer();
+				Map<String, long[]> tds = dif.getTimeDelays();
+				for(String key: tds.keySet())
+				{
+					long[] vals = tds.get(key);
+					buf.append(key).append("=[").append(SUtil.SDF3.format(vals[0])).append(" ").append(vals[1]).append("], ");
+				}
+				value = buf.toString();
+				
 			}
+//			else if(column == 3)
+//			{
+//				value = new Date(dif.getTime());
+//			}
 			else if(column == 3)
-			{
-				value = new Date(dif.getTime());
-			}
-			else if(column == 4)
 			{
 				value = dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null ? Boolean.TRUE : Boolean.FALSE;
 			}
-			else if(column == 5)
+			else if(column == 4)
 			{
 				value = dif.isRemoteExcluded() ? Boolean.TRUE : Boolean.FALSE;
 			}
@@ -883,17 +895,17 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			}
 			else if(column == 2)
 			{
-				ret = Long.class;
+				ret = String.class;
 			}
+//			else if(column == 3)
+//			{
+//				ret = Date.class;
+//			}
 			else if(column == 3)
-			{
-				ret = Date.class;
-			}
-			else if(column == 4)
 			{
 				ret = Boolean.class;
 			}
-			else if(column == 5)
+			else if(column == 4)
 			{
 				ret = Boolean.class;
 			}

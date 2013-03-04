@@ -9,13 +9,13 @@ import jadex.commons.future.IFuture;
 public interface IRelayAwarenessService
 {
 	/**
-	 *  Let the awareness now that the transport connected to an address.
+	 *  Let the awareness know that the transport connected to an address.
 	 *  @param address	The relay address.
 	 */
 	public IFuture<Void>	connected(String address);
 
 	/**
-	 *  Let the awareness now that the transport was disconnected from an address.
+	 *  Let the awareness know that the transport was disconnected from an address.
 	 *  @param address	The relay address.
 	 */
 	public IFuture<Void>	disconnected(String address);

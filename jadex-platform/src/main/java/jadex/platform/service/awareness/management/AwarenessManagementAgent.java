@@ -312,7 +312,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		if(info.getState()==null)
 			info.setState(AwarenessInfo.STATE_ONLINE);
 //		System.out.println("received: "+getComponentIdentifier()+" "+info.getSender());
-
+		
 		IComponentIdentifier sender = info.getSender();
 		boolean	online	= AwarenessInfo.STATE_ONLINE.equals(info.getState());
 //			boolean	initial	= false;	// Initial discovery of component.
@@ -320,36 +320,58 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		boolean	changedaddrs	= false;	// Should an existing proxy be updated with new addresses?
 		
 		dif = (DiscoveryInfo)discovered.get(sender);
+		final String awamech = info.getProperties().get(AwarenessInfo.PROPERTY_AWAMECHANISM);
+		
+		// Hack!!! Used from relay if connection disappeared
+		if(awamech!=null && AwarenessInfo.STATE_ALLOFFLINE.equals(info.getState()))
+		{
+			for(DiscoveryInfo di: discovered.values().toArray(new DiscoveryInfo[0]))
+			{
+				di.removeTimeDelay(awamech);
+			}
+			return new Future<Boolean>(false);
+		}
+		
 		if(online)
 		{
 			boolean	remoteexcluded	= !isIncluded(root, info.getIncludes(), info.getExcludes());
 			if(dif==null)
 			{
-				dif = new DiscoveryInfo(sender, null, getClockTime(), info.getDelay(), remoteexcluded, info.getProperties());
+				dif = new DiscoveryInfo(sender, null, remoteexcluded, info.getProperties());
+				dif.setTimeDelay(awamech, getClockTime(), info.getDelay());
 				discovered.put(sender, dif);
 				informListeners(dif);
 				ret	= true;
 			}
 			else
 			{
-				changedaddrs	= !SUtil.arrayEquals(dif.getComponentIdentifier().getAddresses(), sender.getAddresses());
-				
+				changedaddrs = !SUtil.arrayEquals(dif.getComponentIdentifier().getAddresses(), sender.getAddresses());
 				dif.setComponentIdentifier(sender);
-				// Hack!!! Only update times when longer valid.
-				if(dif.getDelay()!=-1)
+				
+				if(awamech!=null)
 				{
-					if(info.getDelay()==-1 || getClockTime()+info.getDelay()>dif.getTime()+dif.getDelay())
-					{
-						dif.setTime(getClockTime());
-						dif.setDelay(info.getDelay());
-						informListeners(dif);
-					}
+					dif.setTimeDelay(awamech, getClockTime(), info.getDelay());
+					informListeners(dif);
 				}
 				else
 				{
-					// Allow users to keep track of recency of platform info.
-					dif.setTime(getClockTime());
+					// Hack!!! Only update times when longer valid.
+					if(dif.getDelay(null)!=-1)
+					{
+						if(info.getDelay()==-1 || getClockTime()+info.getDelay()>dif.getTime()+dif.getDelay())
+						{
+							dif.setTimeDelay(null, getClockTime(), info.getDelay());
+							informListeners(dif);
+						}
+					}
+					else
+					{
+						// Allow users to keep track of recency of platform info.
+						dif.setTimeDelay(null, getClockTime(), info.getDelay());
+//						dif.setTime(getClockTime());
+					}
 				}
+				
 				dif.setRemoteExcluded(remoteexcluded);
 			}
 			
@@ -416,7 +438,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			discovered.remove(sender);
 			if(dif!=null)
 			{
-				dif.setTime(-1);
+				dif.removeTimeDelay(awamech);
+//				dif.setTime(-1);
 				informListeners(dif);
 				deleteProxy(dif);
 			}

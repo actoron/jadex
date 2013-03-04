@@ -11,6 +11,7 @@ import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -118,7 +119,7 @@ public abstract class DiscoveryAgent
 	
 	/** The map of all codecs. */
 	protected Map<Byte, ICodec> allcodecs;
-
+	
 	//-------- methods --------
 	
 	@AgentCreated
@@ -519,6 +520,8 @@ public abstract class DiscoveryAgent
 	public IFuture<AwarenessInfo> createAwarenessInfo()
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
+		final String awa = SReflect.getInnerClassName(this.getClass());
+//		System.out.println("awa: "+awa);
 		IFuture<IMessageService> fut = agent.getServiceContainer().getRequiredService("ms");
 		fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
 		{
@@ -529,7 +532,8 @@ public abstract class DiscoveryAgent
 				{
 					public void customResultAvailable(IComponentIdentifier root)
 					{
-						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), getExcludes(), null);
+						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), 
+							getExcludes(), null, awa);
 						ret.setResult(info);
 					}
 				}));
@@ -544,6 +548,7 @@ public abstract class DiscoveryAgent
 	public IFuture<AwarenessInfo> createAwarenessInfo(final String state, final String masterid)
 	{
 		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
+		final String awa = SReflect.getInnerClassName(this.getClass());
 		IFuture<IMessageService> fut = agent.getServiceContainer().getRequiredService("ms");
 		fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
 		{
@@ -554,7 +559,8 @@ public abstract class DiscoveryAgent
 				{
 					public void customResultAvailable(IComponentIdentifier root)
 					{
-						AwarenessInfo info = new AwarenessInfo(root, state, getDelay(), getIncludes(), getExcludes(), masterid);
+						AwarenessInfo info = new AwarenessInfo(root, state, getDelay(), getIncludes(), 
+							getExcludes(), masterid, awa);
 						ret.setResult(info);
 					}
 				}));

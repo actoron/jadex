@@ -4,6 +4,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,25 +19,28 @@ public class DiscoveryInfo
 //	public static long NOW = 0;
 	
 	//-------- attributes --------
-	// todo: why public?
 	
 	/** The component identifier of the remote component. */
-	public IComponentIdentifier cid;
+	protected IComponentIdentifier cid;
 	
 	/** Component id of local proxy (if any). */
-	public IFuture<IComponentIdentifier> proxy;
+	protected IFuture<IComponentIdentifier> proxy;
 	
-	/** Time when last awareness info was received. */
-	public long time;
+//	/** Time when last awareness info was received. */
+//	protected long time;
 	
 	/** The current send delay time. */
-	public long delay;
+//	protected long delay;
+	// The times per source, i.e. awa mechanism. */
+	protected Map<String, long[]> timedelays;
+	
+	// todo: save time and delay for each entry :-(
 
 	/** Flag indicating that the remote component has excluded our local component. */
-	public boolean	remoteexcluded;
+	protected boolean	remoteexcluded;
 	
 	/** Platform properties (if any). */
-	public Map<String, String>	properties;
+	protected Map<String, String>	properties;
 	
 	//-------- constructors --------
 	
@@ -49,12 +54,13 @@ public class DiscoveryInfo
 	/**
 	 *  Create a new discovery info.
 	 */
-	public DiscoveryInfo(IComponentIdentifier cid, IFuture<IComponentIdentifier> proxy, long time, long delay, boolean remoteexcluded, Map<String, String> properties)
+	public DiscoveryInfo(IComponentIdentifier cid, IFuture<IComponentIdentifier> proxy, //long time, //long delay, 
+			boolean remoteexcluded, Map<String, String> properties)
 	{
 		this.cid = cid;
 		this.proxy = proxy;
-		this.time = time;
-		this.delay = delay;
+//		this.time = time;
+//		this.delay = delay;
 		this.remoteexcluded = remoteexcluded;
 		this.properties	= properties;
 	}
@@ -103,34 +109,135 @@ public class DiscoveryInfo
 	 */
 	public long getTime()
 	{
-		return time;
+		return getMaxEntry()[0];
 	}
-
+//
+//	/**
+//	 *  Set the time.
+//	 *  @param time The time to set.
+//	 */
+//	public void setTime(long time)
+//	{
+//		this.time = time;
+//	}
+	
 	/**
-	 *  Set the time.
-	 *  @param time The time to set.
+	 *  Get the time.
+	 *  @return the time.
 	 */
-	public void setTime(long time)
+	public long[] getMaxEntry()
 	{
-		this.time = time;
+		long ret[] = new long[2];
+		
+		if(timedelays!=null)
+		{
+			for(long[] td :timedelays.values())
+			{
+				// unlimited immediately wins
+				if(td[1]==-1)
+				{
+					ret = td;
+					break;
+				}
+				else if(td[0]+td[1]>ret[0]+ret[1])
+				{
+					ret = td;
+				}
+			}
+		}
+		return ret;
 	}
-
+	
 	/**
-	 *  Get the delay.
-	 *  @return the delay.
+	 *  Get the time.
+	 *  @return the time.
 	 */
 	public long getDelay()
 	{
-		return delay;
+		return getMaxEntry()[1];
+	}
+	
+	/**
+	 *  Get the time.
+	 *  @return the time.
+	 */
+	public long getDelay(String src)
+	{
+		long ret = 0;
+		if(timedelays!=null && timedelays.containsKey(src))
+		{
+			ret = timedelays.get(src)[1];
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the time.
+	 *  @return the time.
+	 */
+	public long getTime(String src)
+	{
+		long ret = 0;
+		if(timedelays!=null && timedelays.containsKey(src))
+		{
+			ret = timedelays.get(src)[0];
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Add a new time support.
+	 */
+	public void setTimeDelay(String src, long time, long delay)
+	{
+		if(timedelays==null)
+			timedelays = new HashMap<String, long[]>();
+		timedelays.put(src, new long[]{time, delay});
+	}
+	
+	/**
+	 *  Remove a time support.
+	 */
+	public void removeTimeDelay(String src)
+	{
+		if(timedelays!=null)
+			timedelays.remove(src);
+	}
+
+//	/**
+//	 *  Get the delay.
+//	 *  @return the delay.
+//	 */
+//	public long getDelay()
+//	{
+//		return delay;
+//	}
+//
+//	/**
+//	 *  Set the delay.
+//	 *  @param delay The delay to set.
+//	 */
+//	public void setDelay(long delay)
+//	{
+//		this.delay = delay;
+//	}
+	
+	/**
+	 *  Get the delays.
+	 *  @return The delays.
+	 */
+	public Map<String, long[]> getTimeDelays()
+	{
+		return timedelays==null? Collections.EMPTY_MAP: timedelays;
 	}
 
 	/**
-	 *  Set the delay.
-	 *  @param delay The delay to set.
+	 *  Set the delays.
+	 *  @param delays The delays to set.
 	 */
-	public void setDelay(long delay)
+	public void setDelays(Map<String, long[]> timedelays)
 	{
-		this.delay = delay;
+		this.timedelays = timedelays;
 	}
 
 	/**
@@ -204,8 +311,41 @@ public class DiscoveryInfo
 	 */
 	public boolean	isAlive()
 	{
+		boolean ret = false;
+		
+		if(timedelays!=null)
+		{
+			for(String key : timedelays.keySet().toArray(new String[0]))
+			{
+				long[] td = timedelays.get(key);
+				// unlimited immediately wins
+				if(td[1]==-1)
+				{
+					ret = true;
+				}
+				else //if(td[0]+td[1]>ret[0]+ret[1])
+				{
+					// Allow three missed updates and some time buffer before delete
+					long t = (long)(td[0]+td[1]*3.2);
+					if(t>System.currentTimeMillis())
+					{
+						ret = true;
+					}
+					else
+					{
+						// remove outtimed entry
+						timedelays.remove(key);
+					}
+				}
+			}
+		}
+
+		return ret;
+		
+//		long[] max = getMaxEntry();
+//		return max[0]>0 && (max[1]==-1 || max[0]+max[1]*3.2>System.currentTimeMillis()); 
 		// Allow three missed updates and some time buffer before delete
-		return getTime()>0 && (getDelay()==-1 || getTime()+getDelay()*3.2 > System.currentTimeMillis());
+//		return getTime()>0 && (getDelay()==-1 || getTime()+getDelay()*3.2 > System.currentTimeMillis());
 	}
 
 	/**
@@ -214,6 +354,6 @@ public class DiscoveryInfo
 	public String toString()
 	{
 		return "DiscoveryInfo(cid=" + cid + ", proxy=" + proxy
-			+ ", time=" + time + ", delay=" + delay + ")";
+			+ ", time=" + getTimeDelays() + ")";
 	}
 }

@@ -7,6 +7,7 @@ import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
@@ -646,7 +647,8 @@ public class RelayHandler
 							AwarenessInfo	awanoprop	= awainfo;
 							if(awainfo.getProperties()!=null)
 							{
-								awanoprop	= new AwarenessInfo(awainfo.getSender(), awainfo.getState(), awainfo.getDelay(), awainfo.getIncludes(), awainfo.getExcludes(), awainfo.getMasterId());
+								awanoprop	= new AwarenessInfo(awainfo.getSender(), awainfo.getState(), awainfo.getDelay(), 
+									awainfo.getIncludes(), awainfo.getExcludes(), awainfo.getMasterId(), SReflect.getInnerClassName(this.getClass()));
 								awanoprop.setProperties(null);
 							}
 							
@@ -689,7 +691,8 @@ public class RelayHandler
 						// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
 						if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
 						{
-							awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
+							awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), 
+								awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId(), SReflect.getInnerClassName(this.getClass()));
 							awainfo2.setProperties(null);
 						}
 						
@@ -728,7 +731,8 @@ public class RelayHandler
 								// Send awareness infos with or without properties, for backwards compatibility with Jadex 2.1
 								if(awainfo.getProperties()==null && awainfo2.getProperties()!=null)
 								{
-									awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId());
+									awainfo2	= new AwarenessInfo(awainfo2.getSender(), awainfo2.getState(), awainfo2.getDelay(), 
+										awainfo2.getIncludes(), awainfo2.getExcludes(), awainfo2.getMasterId(), SReflect.getInnerClassName(this.getClass()));
 									awainfo2.setProperties(null);
 								}
 								

@@ -7,6 +7,7 @@ import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -79,7 +80,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 	//-------- service methods --------
 	
 	/**
-	 *  Let the awareness now that the transport connected to an address.
+	 *  Let the awareness know that the transport connected to an address.
 	 *  @param address	The relay address.
 	 */
 	public IFuture<Void>	connected(String address)
@@ -90,14 +91,42 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 	}
 
 	/**
-	 *  Let the awareness now that the transport was disconnected from an address.
+	 *  Let the awareness know that the transport was disconnected from an address.
 	 *  @param address	The relay address.
 	 */
 	public IFuture<Void>	disconnected(String address)
 	{
 		agent.getLogger().info("Awareness disconnected: "+address);
 		// Todo: remove discovery infos received from awareness
-		return IFuture.DONE;		
+		
+		final Future<Void> ret = new Future<Void>();
+		
+		// Announce virtual offline info. 
+		IFuture<IAwarenessManagementService>	msfut	= agent.getRequiredService("management");
+		msfut.addResultListener(new ExceptionDelegationResultListener<IAwarenessManagementService, Void>(ret)
+		{
+			public void customResultAvailable(final IAwarenessManagementService ms)
+			{
+				createAwarenessInfo(AwarenessInfo.STATE_ALLOFFLINE, createMasterId())
+					.addResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
+				{
+					public void customResultAvailable(AwarenessInfo info)
+					{
+						ms.addAwarenessInfo(info).addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
+						{
+							public void customResultAvailable(Boolean result)
+							{
+								ret.setResult(null);
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;		
+	
+//		return IFuture.DONE;
 	}
 
 	//-------- internal methods --------

@@ -11,6 +11,7 @@ import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -148,7 +149,8 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 	 */
 	protected void performAnnouncements(final IComponentIdentifier cid)
 	{
-		AwarenessInfo info = new AwarenessInfo(cid.getRoot(), AwarenessInfo.STATE_ONLINE, getDelay(), null, null, null);
+		AwarenessInfo info = new AwarenessInfo(cid.getRoot(), AwarenessInfo.STATE_ONLINE, getDelay(), 
+			null, null, null, SReflect.getInnerClassName(this.getClass()));
 		announceAwareness(info);
 		
 		// Check alive via sending ping message before delay is due

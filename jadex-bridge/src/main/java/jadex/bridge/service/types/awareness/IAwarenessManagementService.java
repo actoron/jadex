@@ -5,7 +5,6 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
 
 import java.util.Collection;
 
@@ -27,6 +26,7 @@ public interface IAwarenessManagementService
 	 *  @return The discovery info.
 	 */
 	public IFuture<DiscoveryInfo> getPlatformInfo(IComponentIdentifier cid);
+	
 	
 	/**
 	 *  Get the currently known platforms.

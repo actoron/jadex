@@ -20,11 +20,18 @@ public class AwarenessInfo
 	/** State indicating that a component is going offline. */
 	public static final String	STATE_OFFLINE	= "offline";
 	
+	/** Hack. Indicate that the underlying awareness mechanism died. */
+	public static final String	STATE_ALLOFFLINE	= "alloffline";
+	
 	/** The property for the Jadex version. */
 	public static final String	PROPERTY_JADEXVERSION	= "jadex.version";
 	
 	/** The property for the Jadex build date. */
 	public static final String	PROPERTY_JADEXDATE	= "jadex.date";
+	
+	/** The mechanism src. */
+	public static final String	PROPERTY_AWAMECHANISM	= "awamechanism";
+
 	
 	/** The system properties to send in awareness infos. */
 	protected static final String[]	SYSTEM_PROPERTIES	= new String[]
@@ -81,7 +88,7 @@ public class AwarenessInfo
 	 *  Create a new awareness info.
 	 */
 	public AwarenessInfo(IComponentIdentifier sender, String state, long delay, 
-		String[] includes, String[] excludes, String masterid)
+		String[] includes, String[] excludes, String masterid, String mechsrc)
 	{
 		this.sender = sender;
 		this.state = state;
@@ -97,6 +104,8 @@ public class AwarenessInfo
 		{
 			properties.put(prop, System.getProperty(prop));
 		}
+		
+		properties.put(PROPERTY_AWAMECHANISM, mechsrc);
 	}
 	
 	//-------- methods --------

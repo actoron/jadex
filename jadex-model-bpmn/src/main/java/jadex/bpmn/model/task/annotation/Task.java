@@ -17,10 +17,10 @@ public @interface Task
 	/**
 	 *  A human readable description of the task.
 	 */
-	String description() default "";
+	public String description() default "";
 	
 	/**
 	 *  The parameters of the task.
 	 */
-	TaskParameter[] parameters() default {};
+	public TaskParameter[] parameters() default {};
 }
