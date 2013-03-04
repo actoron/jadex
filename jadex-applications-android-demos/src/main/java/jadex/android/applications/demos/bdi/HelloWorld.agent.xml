@@ -45,6 +45,9 @@
 	</plans>
 	
 	<services>
+		<providedservice name="displayTextService" class="IDisplayTextService">
+			<implementation class="DisplayTextServiceImpl"/>
+		</providedservice>
 		<requiredservice name="cms" class="IComponentManagementService">
 			<binding scope="platform"/>
 		</requiredservice>
