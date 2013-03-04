@@ -362,4 +362,15 @@ public class BDIAgent extends MicroAgent
 			}
 		}
 	}
+	
+	/**
+	 *  Method that is called automatically when a belief 
+	 *  is written as array access.
+	 */
+//	public static void writeArrayField(Object val, final int index , Object obj, BDIAgent agent)
+	public static void writeArrayField(Object obj, final int index , Object val, BDIAgent agent)
+	{
+		System.out.println("write array index: "+val+" "+index+" "+obj+" "+agent);
+		
+	}
 }
