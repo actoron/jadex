@@ -14,6 +14,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -29,6 +30,7 @@ import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -229,11 +231,32 @@ public class BDIAgent extends MicroAgent
 	 */
 	protected static Object setFieldValue(Object obj, String fieldname, Object val) throws IllegalAccessException
 	{
+		Tuple2<Field, Object> res = findFieldWithOuterClass(obj, fieldname);
+		Field f = res.getFirstEntity();
+		if(f==null)
+			throw new RuntimeException("Field not found: "+fieldname);
+		
+		Object tmp = res.getSecondEntity();
+		f.setAccessible(true);
+		Object oldval = f.get(tmp);
+		f.set(tmp, val);
+	
+		return oldval;
+	}
+	
+	/**
+	 * 
+	 * @param obj
+	 * @param fieldname
+	 * @return
+	 */
+	protected static Tuple2<Field, Object> findFieldWithOuterClass(Object obj, String fieldname)
+	{
 		Field f = null;
 		Object tmp = obj;
 		while(f==null && tmp!=null)
 		{
-			f = findField(tmp.getClass(), fieldname);
+			f = findFieldWithSuperclass(tmp.getClass(), fieldname);
 			if(f==null)
 			{
 				try
@@ -244,18 +267,12 @@ public class BDIAgent extends MicroAgent
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+//					e.printStackTrace();
+					tmp=null;
 				}
 			}
 		}
-		if(f==null)
-			throw new RuntimeException("Field not found: "+fieldname);
-		
-		f.setAccessible(true);
-		Object oldval = f.get(tmp);
-		f.set(tmp, val);
-	
-		return oldval;
+		return new Tuple2<Field, Object>(f, tmp);
 	}
 	
 	/**
@@ -264,7 +281,7 @@ public class BDIAgent extends MicroAgent
 	 * @param fieldname
 	 * @return
 	 */
-	protected static Field findField(Class<?> cl, String fieldname)
+	protected static Field findFieldWithSuperclass(Class<?> cl, String fieldname)
 	{
 		Field ret = null;
 		while(ret==null && !Object.class.equals(cl))
@@ -367,10 +384,30 @@ public class BDIAgent extends MicroAgent
 	 *  Method that is called automatically when a belief 
 	 *  is written as array access.
 	 */
-//	public static void writeArrayField(Object val, final int index , Object obj, BDIAgent agent)
-	public static void writeArrayField(Object obj, final int index , Object val, BDIAgent agent)
+	// todo: allow init writes in constructor also for arrays
+	public static void writeArrayField(Object array, final int index , Object val, BDIAgent agent, String fieldname)
 	{
-		System.out.println("write array index: "+val+" "+index+" "+obj+" "+agent);
-		
+		try
+		{
+//			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
+			
+			Object oldval = Array.get(array, index);
+			Array.set(array, index, val);
+			
+			if(!SUtil.equals(val, oldval))
+			{
+				BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+				RuleSystem rs = ip.getRuleSystem();
+				
+				Event ev = new Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, fieldname}), val); // todo: index
+				rs.addEvent(ev);
+				// execute rulesystem immediately to ensure that variable values are not changed afterwards
+				rs.processAllEvents(); 
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

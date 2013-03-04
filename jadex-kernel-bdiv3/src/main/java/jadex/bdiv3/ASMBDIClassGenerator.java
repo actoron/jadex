@@ -37,6 +37,12 @@ import org.kohsuke.asm4.tree.LabelNode;
 import org.kohsuke.asm4.tree.LdcInsnNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
 import org.kohsuke.asm4.tree.MethodNode;
+import org.kohsuke.asm4.tree.VarInsnNode;
+import org.kohsuke.asm4.tree.analysis.Analyzer;
+import org.kohsuke.asm4.tree.analysis.BasicInterpreter;
+import org.kohsuke.asm4.tree.analysis.BasicValue;
+import org.kohsuke.asm4.tree.analysis.Frame;
+import org.kohsuke.asm4.tree.analysis.Value;
 import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
@@ -181,23 +187,23 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 							}
 						}
 						
-						public void visitInsn(int opcode)
-						{
-							if(Opcodes.AASTORE==opcode)
-							{
-								// on stack: arrayref, index, value 
-								visitVarInsn(Opcodes.ALOAD, 0);
-								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
-
-								// invoke method
-								visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", "(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
-							}
-							else
-							{
-								super.visitInsn(opcode);
-							}
-//							super.visitInsn(opcode);
-						}
+//						public void visitInsn(int opcode)
+//						{
+//							if(Opcodes.AASTORE==opcode)
+//							{
+//								// on stack: arrayref, index, value 
+//								visitVarInsn(Opcodes.ALOAD, 0);
+//								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
+//
+//								// invoke method
+//								visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", "(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
+//							}
+//							else
+//							{
+//								super.visitInsn(opcode);
+//							}
+////							super.visitInsn(opcode);
+//						}
 					};
 				}
 				
@@ -233,8 +239,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				cn.accept(cw);
 				byte[] data = cw.toByteArray();
 				
-				CheckClassAdapter.verify(new ClassReader(data), false, new PrintWriter(System.out));
-
+//				CheckClassAdapter.verify(new ClassReader(data), false, new PrintWriter(System.out));
 				
 				// Find correct cloader for injecting the class.
 				// Probes to load class without loading class.
@@ -294,6 +299,55 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	 */
 	protected void transformClassNode(ClassNode cn, final String clname, final BDIModel model)
 	{
+		final String iclname = clname.replace(".", "/");
+		
+		// Check method for array store access of beliefs and replace with static method call
+		MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
+		for(MethodNode mn: mths)
+		{
+//			System.out.println(mn.name);
+			
+			InsnList ins = mn.instructions;
+			LabelNode lab = null;
+			List<String> belnames = new ArrayList<String>();
+			
+			for(int i=0; i<ins.size(); i++)
+			{
+				AbstractInsnNode n = ins.get(i);
+				
+				if(lab==null && n instanceof LabelNode)
+				{
+					lab = (LabelNode)n;
+					belnames.clear();
+				}
+				
+				if(n.getOpcode()==Opcodes.GETFIELD)
+				{
+					String bn = ((FieldInsnNode)n).name;
+					if(model.getCapability().hasBelief(bn))
+					{
+						belnames.add(bn);
+					}
+				}
+				
+				if(Opcodes.AASTORE==n.getOpcode() && !belnames.isEmpty())
+				{
+//					// on stack: arrayref, index, value 
+//					System.out.println("found: "+belnames);
+					String belname = belnames.get(0);
+					
+					InsnList newins = new InsnList();
+					newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
+					newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+					newins.add(new LdcInsnNode(belname));
+					newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
+						"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+					ins.insert(n.getPrevious(), newins);
+					ins.remove(n); // remove old aastore
+				}
+			}
+		}
+		
 		// Check if there are dynamic beliefs
 		List<MBelief> mbels = model.getCapability().getBeliefs();
 		List<String> todo = new ArrayList<String>();
@@ -308,7 +362,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 		
 		if(!todo.isEmpty())
 		{
-			MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
+//			MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
 			for(MethodNode mn: mths)
 			{
 //				System.out.println(mn.name);
@@ -328,7 +382,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						
 						if(begin==null && n instanceof LabelNode)
 						{
-							begin = (LabelNode)n;;
+							begin = (LabelNode)n;
 						}
 						
 						// find first constructor call

@@ -10,6 +10,11 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Event
 {
 	/**
+	 *  The event type.
+	 */
+	public String type() default "";
+	
+	/**
 	 *  The event content.
 	 */
 	public String value() default "";

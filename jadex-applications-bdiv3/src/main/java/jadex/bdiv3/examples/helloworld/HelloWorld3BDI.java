@@ -6,6 +6,7 @@ import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -48,7 +49,7 @@ public class HelloWorld3BDI
 		 *  Create a new goal whenever sayhello belief is changed.
 		 */
 		@GoalCreationCondition
-		public HelloGoal(@Event("sayhello") String text)
+		public HelloGoal(@Event(type=ChangeEvent.FACTCHANGED, value="sayhello") String text)
 		{
 			this.text = text;
 		}
@@ -76,8 +77,10 @@ public class HelloWorld3BDI
 	@AgentBody
 	public void body()
 	{
-		sayhello[0] = "Hello BDI agent V3.";
-		System.out.println("body end: "+getClass().getName());
+		sayhello[0] = "1";
+		sayhello[1] = "2";
+		sayhello[2] = "3";
+//		System.out.println("body end: "+getClass().getName());
 	}
 	
 	/**
@@ -86,7 +89,7 @@ public class HelloWorld3BDI
 	@Plan(trigger=@Trigger(goals=HelloGoal.class))
 	protected IFuture<Void> printHello2(HelloGoal goal)
 	{
-		System.out.println("1: "+goal.getText());
+		System.out.println("Plan body: "+goal.getText());
 		return IFuture.DONE;
 	}
 }

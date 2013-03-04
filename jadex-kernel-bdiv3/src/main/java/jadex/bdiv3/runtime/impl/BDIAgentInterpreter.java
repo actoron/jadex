@@ -1256,8 +1256,17 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				if(an instanceof jadex.rules.eca.annotations.Event)
 				{
-					String belname = ((jadex.rules.eca.annotations.Event)an).value();
-					addBeliefEvents(ia, events, belname);
+					jadex.rules.eca.annotations.Event ev = (jadex.rules.eca.annotations.Event)an;
+					String name = ev.value();
+					String type = ev.type();
+					if(type.isEmpty())
+					{
+						addBeliefEvents(ia, events, name);
+					}
+					else
+					{
+						events.add(new EventType(new String[]{type, name}));
+					}
 				}
 			}
 		}

@@ -66,6 +66,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 	{
 		// Only wait 5 seconds for disconnect message.
 		Future<Void>	ret	= new Future<Void>();
+		
 		sendInfo(true).addResultListener(new TimeoutResultListener<Void>(5000, agent.getExternalAccess(), new DelegationResultListener<Void>(ret)
 		{
 			public void exceptionOccurred(Exception exception)
