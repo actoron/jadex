@@ -17,10 +17,10 @@ public class DiscoveryPreference extends LongClickablePreference {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		StringBuilder summaryString = new StringBuilder("Last info: ");
 		summaryString.append(dateFormat.format(info.getTime()));
-		if (info.proxy != null && info.proxy.isDone() && info.proxy.getException() == null) {
+		if (info.getProxy() != null && info.getProxy().isDone() && info.getProxy().getException() == null) {
 			summaryString.append("\nHas Proxy");
 		}
-		if (info.remoteexcluded) {
+		if (info.isRemoteExcluded()) {
 			summaryString.append("\nRemote excluded");
 		}
 		setSummary(summaryString);

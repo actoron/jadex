@@ -394,7 +394,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 
 			Builder builder = new AlertDialog.Builder(pref.getContext());
 			String addRemoveProxyText;
-			if (info.proxy == null)
+			if (info.getProxy() == null)
 			{
 				addRemoveProxyText = "Add local Proxy";
 			} else
@@ -412,7 +412,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 					switch (which)
 					{
 					case 0: // add/remove proxy
-						final Boolean create = (info.proxy == null);
+						final Boolean create = (info.getProxy() == null);
 
 						final IComponentIdentifier proxy = info.getProxy() != null && info.getProxy().isDone() && info.getProxy().getException() == null ? info
 								.getProxy().get(null) : null;
