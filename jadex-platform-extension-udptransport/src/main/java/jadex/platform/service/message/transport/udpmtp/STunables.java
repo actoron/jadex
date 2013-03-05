@@ -12,10 +12,10 @@ public class STunables
 	public final static int PARSE_CACHE_SIZE = 500;
 	
 	/** Enables the tiny packet transfer mode. */
-	public static final boolean ENABLE_TINY_MODE = true;
+	public static final boolean ENABLE_TINY_MODE = false;
 	
 	/** Enables the small packet transfer mode. */
-	public static final boolean ENABLE_SMALL_MODE = true;
+	public static final boolean ENABLE_SMALL_MODE = false;
 	
 	/** Probe interval delay. */
 	public static final int PROBE_INTERVAL_DELAY = 1000;
@@ -41,24 +41,27 @@ public class STunables
 	/** Inverse historic round-trip weight. */
 	public static final double INV_ROUNDTRIP_WEIGHT = 1.0 - ROUNDTRIP_WEIGHT;
 	
-	/** The acknowledgment delay. */
+	/** The default acknowledgment delay if no ping is available. */
 	public static final long ACK_DELAY = 2000;
 	
 	/** Decay time for receiving messages. */
 	public static final long RX_MESSAGE_DECAY = 1200000;
 	
 	/** The fin delay. */
-	public static final long FIN_DELAY = ACK_DELAY >> 1;
+//	public static final long FIN_DELAY = ACK_DELAY >> 1;
 	
 	/** The re-send delay factor. */
-	public static final double RESEND_DELAY_FACTOR = 20;
+	public static final double RESEND_DELAY_FACTOR = 1.3;
 	
 	/** Send-able bytes at start up. */
 //	public static final int START_SENDABLE_BYTES = 16384;
 	public static final int MIN_SENDABLE_BYTES = 16384;
+//	public static final int MIN_SENDABLE_BYTES = 16;
 //	public static final int INITIAL_SENDABLE_BYTES = 131072;
 	
-	public static final int MAX_SENDABLE_BYTES = 262144;
+	public static final int MAX_SENDABLE_BYTES = 16777216;
+//	public static final int MAX_SENDABLE_BYTES = 1048576;
+//	public static final int MAX_SENDABLE_BYTES = 262144;
 //	public static final int MAX_SENDABLE_BYTES = 131072;
 //	public static final int MAX_SENDABLE_BYTES = 16384;
 	
@@ -69,13 +72,17 @@ public class STunables
 //	public static final int BUFFER_SIZE = 16384;
 	
 	/** The confirmation threshold in bytes. */
-	public static final int CONFIRMATION_THRESHOLD = MIN_SENDABLE_BYTES / 16;
+	public static final int CONFIRMATION_THRESHOLD = MIN_SENDABLE_BYTES / 4;
 	
 	/** Minimum round-trip time. */
-	public static final int MIN_ROUNDTRIP = 10;
+	public static final int MIN_ROUNDTRIP = 200;
 	
-	/** Maximum number of re-sends. */
-	public static final int MAX_RESENDS = 30;
+	/** 
+	 *  This number multiplied by the number of packets in the
+	 *  message defines the re-send upper limit
+	 *  (message-size-equivalent re-sends).
+	 */
+	public static final int MAX_RESENDS = 100;
 	
 	/* Default priorities, lower number is higher priority. */
 	

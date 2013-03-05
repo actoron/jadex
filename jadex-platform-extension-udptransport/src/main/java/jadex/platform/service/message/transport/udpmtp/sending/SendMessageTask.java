@@ -11,6 +11,7 @@ import jadex.platform.service.message.transport.udpmtp.TimedTaskDispatcher;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -90,79 +91,89 @@ public class SendMessageTask implements Runnable
 		final TxMessage msg = TxMessage.createTxMessage(resolvedreceiver, msgid, task, conffuture, new TimedTask(resolvedreceiver, Long.MIN_VALUE)
 			{
 				/** Flag for re-send mode. */
-				protected boolean resend = false;
+				private boolean resend = false;
+				
+				/** The maximum re-send counter */
+				protected int maxresends = 0;
 				
 				public void run()
 				{
-					if (resend)
+					TxMessage msg = inflightmessages.get(msgid);
+					
+					if (msg != null)
 					{
-//						System.out.println("Running resend for: " + msgid);
-						resend = false;
-						TxMessage msg = inflightmessages.get(msgid);
-						if (msg != null)
+						if (resend)
 						{
-							if (msg.getResendCounter() < STunables.MAX_RESENDS)
-							{
+//							System.out.println("Running resend for: " + msgid);
+							resend = false;
+							
+							
 //								System.out.println("Performing resend for: " + msgid + " to " + msg.getLastSentPacket());
 								List<TxPacket> packets = new ArrayList<TxPacket>();
 								for (int i = 0; i <= msg.getLastSentPacket(); ++i)
 								{
 									if (!msg.getPackets()[i].isConfirmed())
 									{
-//										sendquota.addAndGet(msg.getPackets()[i].getRawPacket().length);
-										packets.add(msg.getPackets()[i]);
-										flowcontrol.resend();
+										if (msg.getPackets()[i].getResendCounter() < STunables.MAX_RESENDS)
+										{
+//											sendquota.addAndGet(msg.getPackets()[i].getRawPacket().length);
+											packets.add(msg.getPackets()[i]);
+										}
+										else
+										{
+											inflightmessages.remove(msgid);
+											synchronized (msg)
+											{
+												int quota = 0;
+												for (int j = 0; j < msg.getPackets().length; ++j)
+												{
+													if (!msg.getPackets()[j].isConfirmed())
+													{
+														msg.getPackets()[j].setConfirmed(true);
+														quota += msg.getPackets()[j].getRawPacket().length;
+//														sendquota.addAndGet(msg.getPackets()[i].getRawPacket().length);
+//														System.out.println("IncA: " + msgid + " " + sendquota.get());
+													}
+												}
+												flowcontrol.addAndGetQuota(quota);
+											}
+											msg.transmissionFailed("Message exceeded resend count.");
+											return;
+										}
 									}
 								}
-								msg.setResendCounter(msg.getResendCounter() + 1);
 								
 								if (packets.isEmpty())
 								{
-									packets.add(msg.getPackets()[msg.getPackets().length - 1]);
+									packets.add(msg.getPackets()[0]);
+								}
+								else
+								{
+									msg.ls = System.currentTimeMillis();
 								}
 								
 								packets.get(packets.size() - 1).setSentCallback(this);
 								
-								for (TxPacket packet : packets)
+								for (Iterator<TxPacket> it = packets.iterator(); it.hasNext(); )
 								{
+									TxPacket packet = it.next();
+									if (!packet.isConfirmed() || !it.hasNext())
 									SendingThreadTask.queuePacket(packetqueue, packet);
+									flowcontrol.resend(packet.getRawPacket().length);
+									packet.setResendCounter(packet.getResendCounter() + 1);
+									maxresends = Math.max(maxresends, packet.getResendCounter());
 								}
 								
 //								System.out.println("Done resend for: " + msgid + " " + packets.size());
-							}
-							else
-							{
-								inflightmessages.remove(msgid);
-								synchronized (msg)
-								{
-									int quota = 0;
-									for (int i = 0; i < msg.getPackets().length; ++i)
-									{
-										if (!msg.getPackets()[i].isConfirmed())
-										{
-											msg.getPackets()[i].setConfirmed(true);
-											quota += msg.getPackets()[i].getRawPacket().length;
-//											sendquota.addAndGet(msg.getPackets()[i].getRawPacket().length);
-//											System.out.println("IncA: " + msgid + " " + sendquota.get());
-										}
-									}
-									flowcontrol.getSendQuota().addAndGet(quota);
-								}
-								msg.transmissionFailed("Message exceeded resend count.");
-							}
+							
 						}
 						else
 						{
-							// Message confirmed.
-							return;
+							resend = true;
+//							System.out.println("Resend Callback: " + msgid + " curr " + System.currentTimeMillis() + " next " + (System.currentTimeMillis() + (long) (peerinfo.getPing() * STunables.RESEND_DELAY_FACTOR)));
+							executiontime = System.currentTimeMillis() + (long) (peerinfo.getPing() * STunables.RESEND_DELAY_FACTOR * (maxresends + 1));
+							timedtaskdispatcher.scheduleTask(this);
 						}
-					}
-					else
-					{
-						resend = true;
-//						System.out.println("Resend Callback: " + msgid + " curr " + System.currentTimeMillis() + " next " + (System.currentTimeMillis() + (long) (peerinfo.getPing() * STunables.RESEND_DELAY_FACTOR)));
-						executiontime = System.currentTimeMillis() + (long) (peerinfo.getPing() * STunables.RESEND_DELAY_FACTOR);
-						timedtaskdispatcher.scheduleTask(this);
 					}
 				}
 			}, STunables.ENABLE_TINY_MODE, STunables.ENABLE_SMALL_MODE);

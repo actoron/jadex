@@ -180,7 +180,7 @@ public class MsgPacketHandler implements IPacketHandler
 			}
 		}
 		
-		System.out.println("Writing packet number " + packetnum + " for msg with msgid " + msgid + ", total packets: " + totalpackets);
+//		System.out.println("Writing packet number " + packetnum + " for msg with msgid " + msgid + ", total packets: " + totalpackets);
 		RxMessage msg = incomingsendermessages.get(msgid);
 		
 		if (msg == null)
@@ -300,47 +300,47 @@ public class MsgPacketHandler implements IPacketHandler
 			}
 		}
 		
-		int[] mp = msg.getMissingPacketsBitfield();
-		byte[] confpacket = new byte[mp.length * 4 + 5];
-		confpacket[0] = SPacketDefs.MSG_CONFIRM;
-		SCodingUtil.intIntoByteArray(confpacket, 1, msgid);
-		for (int i = 0; i < mp.length; ++i)
-		{
-			SCodingUtil.intIntoByteArray(confpacket, 5 + i * 4, mp[i]);
-		}
-		SendingThreadTask.queuePacket(packetqueue, new TxPacket(sender, confpacket));
-		
-//		PeerInfo info = peerinfos.get(sender);
-//		if (info != null)
+//		int[] mp = msg.getMissingPacketsBitfield();
+//		byte[] confpacket = new byte[mp.length * 4 + 5];
+//		confpacket[0] = SPacketDefs.MSG_CONFIRM;
+//		SCodingUtil.intIntoByteArray(confpacket, 1, msgid);
+//		for (int i = 0; i < mp.length; ++i)
 //		{
-////			if (info.getReceivedBytes().addAndGet(packet.length) > STunables.CONFIRMATION_THRESHOLD)
-//			{
-//				info.getReceivedBytes().set(0);
-//				synchronized(incomingsendermessages)
-//				{
-//					System.out.println("Sending confirmations at: " + info.getReceivedBytes().get());
-//					for (Map.Entry<Integer, RxMessage> curmsg : incomingsendermessages.entrySet())
-//					{
-//						if (!curmsg.getValue().isComplete())// && curmsg.getValue().getUnconfirmedWrites() > 0)
-//						{
-//							int[] mp = curmsg.getValue().getMissingPacketsBitfield();
-//							byte[] confpacket = new byte[mp.length * 4 + 5];
-//							confpacket[0] = SPacketDefs.MSG_CONFIRM;
-//							SCodingUtil.intIntoByteArray(confpacket, 1, curmsg.getKey());
-//							for (int i = 0; i < mp.length; ++i)
-//							{
-//								SCodingUtil.intIntoByteArray(confpacket, 5 + i * 4, mp[i]);
-//							}
-//							
-//							
-//							SendingThreadTask.queuePacket(packetqueue, new TxPacket(sender, confpacket));
-//							curmsg.getValue().setUnconfirmedWrites(0);
-//						}
-//					}
-////					System.out.println("Done sending confirmations at: " + info.getReceivedBytes().get() + " " + count);
-//				}
-//			}
+//			SCodingUtil.intIntoByteArray(confpacket, 5 + i * 4, mp[i]);
 //		}
+//		SendingThreadTask.queuePacket(packetqueue, new TxPacket(sender, confpacket));
+		
+		PeerInfo info = peerinfos.get(sender);
+		if (info != null)
+		{
+//			if (info.getReceivedBytes().addAndGet(packet.length) > STunables.CONFIRMATION_THRESHOLD)
+			{
+				info.getReceivedBytes().set(0);
+				synchronized(incomingsendermessages)
+				{
+//					System.out.println("Sending confirmations at: " + info.getReceivedBytes().get());
+					for (Map.Entry<Integer, RxMessage> curmsg : incomingsendermessages.entrySet())
+					{
+						if (!curmsg.getValue().isComplete())// && curmsg.getValue().getUnconfirmedWrites() > 0)
+						{
+							int[] mp = curmsg.getValue().getMissingPacketsBitfield();
+							byte[] confpacket = new byte[mp.length * 4 + 5];
+							confpacket[0] = SPacketDefs.MSG_CONFIRM;
+							SCodingUtil.intIntoByteArray(confpacket, 1, curmsg.getKey());
+							for (int i = 0; i < mp.length; ++i)
+							{
+								SCodingUtil.intIntoByteArray(confpacket, 5 + i * 4, mp[i]);
+							}
+							
+							
+							SendingThreadTask.queuePacket(packetqueue, new TxPacket(sender, confpacket));
+							curmsg.getValue().setUnconfirmedWrites(0);
+						}
+					}
+//					System.out.println("Done sending confirmations at: " + info.getReceivedBytes().get() + " " + count);
+				}
+			}
+		}
 	}
 	
 	/**

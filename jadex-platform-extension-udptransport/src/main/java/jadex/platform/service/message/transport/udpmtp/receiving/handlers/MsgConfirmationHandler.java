@@ -6,13 +6,13 @@ import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
 import jadex.platform.service.message.transport.udpmtp.STunables;
 import jadex.platform.service.message.transport.udpmtp.receiving.PacketDispatcher;
 import jadex.platform.service.message.transport.udpmtp.receiving.RxMessage;
+import jadex.platform.service.message.transport.udpmtp.sending.FlowControl;
 import jadex.platform.service.message.transport.udpmtp.sending.TxMessage;
 import jadex.platform.service.message.transport.udpmtp.sending.TxPacket;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *  Handler dealing with re-sends.
@@ -29,11 +29,11 @@ public class MsgConfirmationHandler implements IPacketHandler
 	/** Information about known peers. */
 	protected Map<InetSocketAddress, PeerInfo> peerinfos;
 	
-	/** The remaining send quota. */
-	protected AtomicInteger sendquota;
-	
 	/** The transmission queue. */
 	protected PriorityBlockingQueue<TxPacket> packetqueue;
+	
+	/** The flow control. */
+	protected FlowControl flowcontrol;
 	
 	/**
 	 *  Creates the handler.
@@ -44,13 +44,13 @@ public class MsgConfirmationHandler implements IPacketHandler
 	 */
 	public MsgConfirmationHandler(Map<InetSocketAddress, Map<Integer, RxMessage>> incomingmessages,
 							Map<Integer, TxMessage> inflightmessages,
-							AtomicInteger sendquota,
+							FlowControl flowcontrol,
 							PriorityBlockingQueue<TxPacket> packetqueue,
 							Map<InetSocketAddress, PeerInfo> peerinfos)
 	{
 		this.incomingmessages = incomingmessages;
 		this.inflightmessages = inflightmessages;
-		this.sendquota = sendquota;
+		this.flowcontrol = flowcontrol;
 		this.packetqueue = packetqueue;
 		this.peerinfos = peerinfos;
 	}
@@ -103,7 +103,7 @@ public class MsgConfirmationHandler implements IPacketHandler
 							pflags[i] = SCodingUtil.intFromByteArray(packet, 5 + (i * 4));
 						}
 						
-						int quota = 0;
+						PeerInfo info = peerinfos.get(sender);
 						synchronized (msg)
 						{
 //							for (int packetnum = 0; packetnum < msg.getPackets().length; ++packetnum)
@@ -127,16 +127,20 @@ public class MsgConfirmationHandler implements IPacketHandler
 									if ((pflags[i] & (1 << j)) != 0 && !msg.getPackets()[pnum].isConfirmed())
 									{
 										msg.getPackets()[pnum].setConfirmed(true);
-										System.out.println("Confirmed: " + pnum);
-										quota += msg.getPackets()[pnum].getRawPacket().length;
+//										System.out.println("Confirmed: " + pnum);
+										int size = msg.getPackets()[pnum].getRawPacket().length;
+										if (info != null)
+										{
+											info.newPing(System.currentTimeMillis() - msg.getPackets()[pnum].sentts);
+										}
+										flowcontrol.ack(size);
 									}
 									++pnum;
 								}
 							}
 						}
-						int remains = sendquota.addAndGet(quota);
 //						System.out.println("IncC " + msg.getMsgId() + ":" + quota);
-						if (remains >= STunables.CONFIRMATION_THRESHOLD)
+						if (flowcontrol.getSendQuota() >= STunables.MIN_SENDABLE_BYTES)
 						{
 							synchronized (packetqueue)
 							{

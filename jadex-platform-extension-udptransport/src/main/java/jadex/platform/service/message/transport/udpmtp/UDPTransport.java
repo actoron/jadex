@@ -111,9 +111,6 @@ public class UDPTransport implements ITransport
 	/** Incoming Message pool. */
 	protected Map<InetSocketAddress, Map<Integer, RxMessage>> incomingmessages;
 	
-	/** The remaining send quota. */
-	protected AtomicInteger sendquota;
-	
 	/** The flow control. */
 	protected FlowControl flowcontrol;
 	
@@ -168,8 +165,7 @@ public class UDPTransport implements ITransport
 		}
 		
 		this.provider = provider;
-		this.sendquota = new AtomicInteger(STunables.MIN_SENDABLE_BYTES);
-		this.flowcontrol = new FlowControl(sendquota);
+		this.flowcontrol = new FlowControl();
 	}
 	
 	/**
@@ -258,15 +254,15 @@ public class UDPTransport implements ITransport
 							msgservice = result;
 							
 							// Sender Thread.
-							SendingThreadTask stt = new SendingThreadTask(socket, packetqueue, sendquota, inflightmessages, peerinfos, timedtaskdispatcher);
+							SendingThreadTask stt = new SendingThreadTask(socket, packetqueue, flowcontrol, inflightmessages, peerinfos, timedtaskdispatcher);
 							timedtaskdispatcher.executeNow(stt);
 							
 							// Message handlers, the order has a purpose.
 							packethandlers = Collections.synchronizedList(new ArrayList<IPacketHandler>());
 							packethandlers.add(new ProbeHandler(peerinfos, packetqueue, timedtaskdispatcher));
 							packethandlers.add(new MsgPacketHandler(msgservice, incomingmessages, peerinfos, packetqueue, timedtaskdispatcher));
-							packethandlers.add(new MsgAckFinHandler(incomingmessages, inflightmessages, sendquota, flowcontrol, packetqueue, peerinfos, usedids, timedtaskdispatcher));
-							packethandlers.add(new MsgConfirmationHandler(incomingmessages, inflightmessages, sendquota, packetqueue, peerinfos));
+							packethandlers.add(new MsgAckFinHandler(incomingmessages, inflightmessages, flowcontrol, packetqueue, peerinfos, usedids, timedtaskdispatcher));
+							packethandlers.add(new MsgConfirmationHandler(incomingmessages, inflightmessages, flowcontrol, packetqueue, peerinfos));
 							
 							
 							// Receiver Thread.
@@ -301,7 +297,7 @@ public class UDPTransport implements ITransport
 							});
 							if (DEBUG_GUI)
 							{
-								new DebugGui(peerinfos, inflightmessages, packetqueue, sendquota, flowcontrol, stt);
+								new DebugGui(peerinfos, inflightmessages, incomingmessages, packetqueue, flowcontrol, stt);
 							}
 							System.out.println("UDP Transport start done.");
 							ret.setResult(null);
@@ -438,7 +434,7 @@ public class UDPTransport implements ITransport
 									System.out.println("Creating peer:" + info);
 									peerinfos.put(resolvedreceiver, info);
 									
-									TimedTask peerprober = new PeerProber(peerinfos, info, timedtaskdispatcher, packetqueue, inflightmessages);
+									TimedTask peerprober = new PeerProber(peerinfos, info, timedtaskdispatcher, packetqueue, inflightmessages, flowcontrol);
 									timedtaskdispatcher.executeNow(peerprober);
 									
 									//timedtaskdispatcher.scheduleTask(info.getFlowController());

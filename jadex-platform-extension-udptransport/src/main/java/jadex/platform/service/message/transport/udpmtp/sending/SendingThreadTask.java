@@ -10,7 +10,6 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *  Task of the thread handling sending packets.
@@ -46,8 +45,8 @@ public class SendingThreadTask implements Runnable
 	/** The timed task dispatcher. */
 	protected TimedTaskDispatcher timedtaskdispatcher;
 	
-	/** The remaining send quota. */
-	protected AtomicInteger sendquota;
+	/** The flow control. */
+	protected FlowControl flowcontrol;
 	
 	/** The state of the thread. */
 	protected volatile String state;
@@ -64,13 +63,13 @@ public class SendingThreadTask implements Runnable
 	 *  @param timedtaskdispatcher The timed task dispatcher.
 	 *  @param threadpool The thread pool.
 	 */
-	public SendingThreadTask(DatagramSocket socket, PriorityBlockingQueue<TxPacket> packetqueue, AtomicInteger sendquota, Map<Integer, TxMessage> inflightmessages, Map<InetSocketAddress, PeerInfo> peerinfos, TimedTaskDispatcher timedtaskdispatcher)
+	public SendingThreadTask(DatagramSocket socket, PriorityBlockingQueue<TxPacket> packetqueue, FlowControl flowcontrol, Map<Integer, TxMessage> inflightmessages, Map<InetSocketAddress, PeerInfo> peerinfos, TimedTaskDispatcher timedtaskdispatcher)
 	{
 		this.socket = socket;
 		this.packetqueue = packetqueue;
-		this.sendquota = sendquota;
 		this.inflightmessages = inflightmessages;
 		this.peerinfos = peerinfos;
+		this.flowcontrol = flowcontrol;
 		this.timedtaskdispatcher = timedtaskdispatcher;
 		this.state = RUNNING_STATE;
 	}
@@ -80,42 +79,163 @@ public class SendingThreadTask implements Runnable
 		boolean running = true;
 		PeerInfo[] peers = null;
 		int currentpeer = 0;
-		boolean scheduledmessage = false;
+		TxMessage currentmessage = null;
+		while (running)
+		{
+			synchronized (packetqueue)
+			{
+				if (packetqueue.peek() != null && packetqueue.peek().isCost() && flowcontrol.getSendQuota() < 0)
+				{
+					state = WAIT_STATE;
+					
+					if (currentmessage!= null)
+					{
+						Runnable cb = currentmessage.getSentCallback();
+						if (cb != null)
+						{
+							currentmessage.setSentCallback(null);
+							timedtaskdispatcher.executeNow(cb);
+						}
+					}
+					
+					try
+					{
+						packetqueue.wait();
+					}
+					catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					}
+					state = RUNNING_STATE;
+				}
+				else if (!packetqueue.isEmpty())
+				{
+					TxPacket packet = packetqueue.poll();
+					if (packet instanceof TxShutdownTask)
+					{
+						running = false;
+						return;
+					}
+					
+					if (!packet.isConfirmed())
+					{
+//						System.out.println("Packet to wire: " + packet.getPacketNumber());
+						packet.sentts = System.currentTimeMillis();
+						running = sendPacket(packet);
+					}
+					
+					if (packet.isCost())
+					{
+						flowcontrol.subtractAndGetQuota(packet.getRawPacket().length);
+						packet.setPriority(STunables.RESEND_MESSAGES_PRIORITY);
+						int packetnum = packet.getPacketNumber();
+						currentmessage.setLastSentPacket(packetnum);
+						if ((packetnum + 1) == currentmessage.getPackets().length)
+						{
+							final TxMessage dmsg = currentmessage;
+							timedtaskdispatcher.executeNow(new Runnable()
+							{
+								public void run()
+								{
+									dmsg.confirmTransmission();
+								}
+							});
+							
+							Runnable cb = currentmessage.getSentCallback();
+							if (cb != null)
+							{
+								currentmessage.setSentCallback(null);
+								timedtaskdispatcher.executeNow(cb);;
+								currentmessage = null;
+							}
+						}
+						packet.enableCost(false);
+					}
+					
+					Runnable cb = packet.getSentCallback();
+					if (cb != null)
+					{
+						packet.setSentCallback(null);
+						timedtaskdispatcher.executeNow(cb);;
+					}
+				}
+				else
+				{
+					if (peers != null && currentpeer < peers.length)
+					{
+						TxMessage msg = peers[currentpeer].getMessageQueue().poll();
+						if (msg != null && inflightmessages.containsKey(msg.getMsgId()))
+						{
+							currentmessage = msg;
+							
+							for (int i = 0; i < currentmessage.getPackets().length; ++i)
+							{
+								if (!currentmessage.getPackets()[i].isConfirmed())
+								{
+//									System.out.println("Adding packet: " + msg.getMsgId() + " " + currentmessage.getPackets()[i]);
+									packetqueue.put(currentmessage.getPackets()[i]);
+								}
+							}
+						}
+						++currentpeer;
+					}
+					else
+					{
+						synchronized(peerinfos)
+						{
+							peers = peerinfos.values().toArray(new PeerInfo[peerinfos.size()]);
+							currentpeer = 0;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public void runx()
+	{
+		boolean running = true;
+		PeerInfo[] peers = null;
+		int currentpeer = 0;
+		//boolean scheduledmessage = false;
 		TxMessage currentmessage = null;
 //		List<Integer> scheduledmessages = new LinkedList<Integer>();
 		
 		while (running)
 		{
-			if (!packetqueue.isEmpty())
+			if (!packetqueue.isEmpty() || flowcontrol.getSendQuota() > 0)
 			{
 				TxPacket packet = null;
 				synchronized(packetqueue)
 				{
 					packet = packetqueue.peek();
-//					System.out.println("packet: "+packet.isCost()+" " + packet.getPriority() + " " + packet.getRawPacket()[0]);
-					if (packet instanceof TxShutdownTask)
+					if (packet != null)
 					{
-						running = false;
-					}
-					
-					if (packet.isCost())
-					{
-						int remains = sendquota.get();
-						if (remains >= packet.getRawPacket().length)
+	//					System.out.println("packet: "+packet.isCost()+" " + packet.getPriority() + " " + packet.getRawPacket()[0]);
+						if (packet instanceof TxShutdownTask)
 						{
-							packet = packetqueue.poll();
-							sendquota.addAndGet(-packet.getRawPacket().length);
-							packet.setPriority(STunables.RESEND_MESSAGES_PRIORITY);
+							running = false;
+						}
+						
+						if (packet.isCost())
+						{
+	//						if (remains >= packet.getRawPacket().length)
+							if (flowcontrol.getSendQuota() > 0)
+							{
+								packet = packetqueue.poll();
+								flowcontrol.subtractAndGetQuota(packet.getRawPacket().length);
+								packet.setPriority(STunables.RESEND_MESSAGES_PRIORITY);
+							}
+							else
+							{
+								packet = null;
+							}
+	//						System.out.println("Red: " + sendquota.get());
 						}
 						else
 						{
-							packet = null;
+							packet = packetqueue.poll();
 						}
-//						System.out.println("Red: " + sendquota.get());
-					}
-					else
-					{
-						packet = packetqueue.poll();
 					}
 				}
 				
@@ -124,24 +244,38 @@ public class SendingThreadTask implements Runnable
 					if (!packet.isConfirmed())
 					{
 //						System.out.println("Packet to wire: " + packet.getPacketNumber());
+						packet.sentts = System.currentTimeMillis();
 						running = sendPacket(packet);
 					}
 					if (packet.isCost())
 					{
 						int packetnum = packet.getPacketNumber();
 						currentmessage.setLastSentPacket(packetnum);
-						if (((packetnum + 1) == currentmessage.getPackets().length) && currentmessage.getSentCallback() != null)
+						if ((packetnum + 1) == currentmessage.getPackets().length)
 						{
+							final TxMessage dmsg = currentmessage;
+							timedtaskdispatcher.executeNow(new Runnable()
+							{
+								public void run()
+								{
+									dmsg.confirmTransmission();
+								}
+							});
+							
 							Runnable cb = currentmessage.getSentCallback();
-							currentmessage.setSentCallback(null);
-							timedtaskdispatcher.executeNow(cb);
-							currentmessage = null;
+							if (cb != null)
+							{
+								currentmessage.setSentCallback(null);
+								timedtaskdispatcher.executeNow(cb);;
+								currentmessage = null;
+							}
 						}
 						packet.enableCost(false);
 					}
 					Runnable cb = packet.getSentCallback();
 					if (cb != null)
 					{
+						packet.setSentCallback(null);
 						timedtaskdispatcher.executeNow(cb);
 					}
 				}
@@ -150,7 +284,7 @@ public class SendingThreadTask implements Runnable
 					synchronized(packetqueue)
 					{
 						packet = packetqueue.peek();
-						int remains = sendquota.get();
+						int remains = flowcontrol.getSendQuota();
 						if (packet != null && packet.isCost() && packet.getRawPacket().length > remains)
 						{
 //							System.out.println("Entering quota wait: " + packet.getRawPacket().length);
@@ -196,37 +330,39 @@ public class SendingThreadTask implements Runnable
 //					}
 //				}
 				
-				if (peers.length > 0)
+				synchronized(packetqueue)
 				{
-					TxMessage msg = peers[currentpeer].getMessageQueue().poll();
-					if (msg != null && inflightmessages.containsKey(msg.getMsgId()))
+					if (packetqueue.isEmpty() && peers.length > 0 && flowcontrol.getSendQuota() > 0)
 					{
-						currentmessage = msg;
-//						if (msg.getResendCounter() == 0)
-//						{
-//							scheduledmessage = true;
-//							SendingThreadTask.schedmsg.add(msg.getMsgId());
-//							synchronized (schedmsg)
-//							{
-//								System.out.println("msgaccounting+: " + Arrays.toString(SendingThreadTask.schedmsg.toArray()));
-//							}
-//						}
-						for (int i = 0; i < currentmessage.getPackets().length; ++i)
+						TxMessage msg = peers[currentpeer].getMessageQueue().poll();
+						if (msg != null && inflightmessages.containsKey(msg.getMsgId()))
 						{
-							if (!currentmessage.getPackets()[i].isConfirmed())
+							currentmessage = msg;
+	//						if (msg.getResendCounter() == 0)
+	//						{
+	//							scheduledmessage = true;
+	//							SendingThreadTask.schedmsg.add(msg.getMsgId());
+	//							synchronized (schedmsg)
+	//							{
+	//								System.out.println("msgaccounting+: " + Arrays.toString(SendingThreadTask.schedmsg.toArray()));
+	//							}
+	//						}
+							
+							for (int i = 0; i < currentmessage.getPackets().length; ++i)
 							{
-//								System.out.println("Adding packet: " + msg.getMsgId() + " " + currentmessage.getPackets()[i]);
-								packetqueue.put(currentmessage.getPackets()[i]);
+								if (!currentmessage.getPackets()[i].isConfirmed())
+								{
+	//								System.out.println("Adding packet: " + msg.getMsgId() + " " + currentmessage.getPackets()[i]);
+									packetqueue.put(currentmessage.getPackets()[i]);
+								}
 							}
 						}
+						++currentpeer;
 					}
-				}
-				
-				if (peers.length == 0 || ++currentpeer >= peers.length)
-				{
-					if (!scheduledmessage)
+					
+					if (peers.length == 0 || currentpeer >= peers.length)
 					{
-						synchronized(packetqueue)
+						if (packetqueue.isEmpty() && flowcontrol.getSendQuota() > 0)
 						{
 							int msgcount = 0;
 							synchronized(peerinfos)
@@ -252,14 +388,14 @@ public class SendingThreadTask implements Runnable
 								state = RUNNING_STATE;
 //								System.out.println("Exiting packet wait.");
 							}
+							
 						}
-						
+//						else
+//						{
+//							scheduledmessage = false;
+//						}
+						peers = null;
 					}
-					else
-					{
-						scheduledmessage = false;
-					}
-					peers = null;
 				}
 			}
 		}

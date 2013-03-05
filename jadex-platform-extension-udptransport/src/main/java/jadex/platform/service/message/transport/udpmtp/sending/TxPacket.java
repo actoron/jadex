@@ -32,6 +32,9 @@ public class TxPacket
 	/** Callback used when resends should resume. */
 	protected volatile Runnable sentcallback;
 	
+	/** Re-send counter. */
+	protected volatile int resendcounter;
+	
 	public volatile long sentts;
 	
 	/**
@@ -73,6 +76,7 @@ public class TxPacket
 		this.cost = cost;
 		this.confirmed = false;
 		this.packetnumber = 0;
+		this.resendcounter = 0;
 	}
 	
 	/**
@@ -147,6 +151,26 @@ public class TxPacket
 	public void setPacketNumber(int packetnumber)
 	{
 		this.packetnumber = packetnumber;
+	}
+	
+	/**
+	 *  Gets the re-send counter.
+	 *
+	 *  @return The re-send counter.
+	 */
+	public int getResendCounter()
+	{
+		return resendcounter;
+	}
+
+	/**
+	 *  Sets the re-send counter.
+	 *
+	 *  @param resendcounter The re-send counter.
+	 */
+	public void setResendCounter(int resendcounter)
+	{
+		this.resendcounter = resendcounter;
 	}
 	
 	/**

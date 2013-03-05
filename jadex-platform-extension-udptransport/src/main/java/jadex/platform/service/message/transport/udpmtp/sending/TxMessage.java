@@ -33,9 +33,6 @@ public class TxMessage
 	/** The packets being transmitted. */
 	protected TxPacket[] packets;
 	
-	/** Re-send counter. */
-	protected volatile int resendcounter;
-	
 	/** Callback used when resends should start. */
 	protected Runnable sentcallback;
 	
@@ -43,6 +40,8 @@ public class TxMessage
 	protected volatile int lastsentpacket;
 	
 	public volatile long ls;
+	
+	public volatile int maxrs;
 	
 	/**
 	 *  Creates a new message for transmission.
@@ -64,7 +63,6 @@ public class TxMessage
 		this.lastsentpacket = packets.length - 1;
 		this.sentcallback = sentcallback;
 //		this.confirmedpackets = new int[packets.length / 32 + 1];
-		this.resendcounter = 0;
 		resetConfirmedPackets();
 		
 	}
@@ -168,26 +166,6 @@ public class TxMessage
 //	{
 //		return confirmedpackets;
 //	}
-	
-	/**
-	 *  Gets the re-send counter.
-	 *
-	 *  @return The re-send counter.
-	 */
-	public int getResendCounter()
-	{
-		return resendcounter;
-	}
-
-	/**
-	 *  Sets the re-send counter.
-	 *
-	 *  @param resendcounter The re-send counter.
-	 */
-	public void setResendCounter(int resendcounter)
-	{
-		this.resendcounter = resendcounter;
-	}
 	
 	/**
 	 *  Gets the sent packet.
@@ -300,11 +278,11 @@ public class TxMessage
 	public static final TxMessage createTxMessage(InetSocketAddress receiver, int msgid, ISendTask task, Future<Void> conffuture, Runnable txcallback, boolean allowtiny, boolean allowsmall)
 	{
 		int payloadsize = task.getProlog().length + task.getData().length;
-		System.out.println("New Message " + msgid + ", size: " + payloadsize);
+//		System.out.println("New Message " + msgid + ", size: " + payloadsize);
 		int priority = STunables.LARGE_MESSAGES_DEFAULT_PRIORITY;
 		
 		// Packet size for medium and large mode.
-		int packetsize = 8192;
+		int packetsize = 16384;
 		
 		if (allowtiny && payloadsize < 131073)
 		{
@@ -348,7 +326,7 @@ public class TxMessage
 		int baseheadersize = packettotal > S_MSG.MAX_PACKETS?
 						 L_MSG.HEADER_SIZE : S_MSG.HEADER_SIZE;
 		
-//		System.out.println("Fragmented message into " + packettotal + " packets of " + packetsize + " bytes");
+//		System.out.println("Fragmented message " + msgid + " into " + packettotal + " packets of " + packetsize + " bytes");
 		CRC32 crc = new CRC32();
 		crc.update(prolog);
 		crc.update(data);
@@ -445,7 +423,7 @@ public class TxMessage
 	 */
 	protected static final void createMsgPacketHeader(byte[] packet, int msgid, int msgsize, int pnum, int ptotal, int checksum)
 	{
-		if (pnum > S_MSG.MAX_PACKETS)
+		if (ptotal > S_MSG.MAX_PACKETS)
 		{
 			SCodingUtil.intIntoByteArray(packet, L_MSG.MSG_ID_OFFSET, msgid);
 			SCodingUtil.intIntoByteArray(packet, L_MSG.MSG_SIZE_OFFSET, msgsize);

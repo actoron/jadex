@@ -5,11 +5,14 @@ import jadex.platform.service.message.transport.udpmtp.SPacketDefs;
 import jadex.platform.service.message.transport.udpmtp.STunables;
 import jadex.platform.service.message.transport.udpmtp.TimedTask;
 import jadex.platform.service.message.transport.udpmtp.TimedTaskDispatcher;
+import jadex.platform.service.message.transport.udpmtp.sending.FlowControl;
 import jadex.platform.service.message.transport.udpmtp.sending.SendingThreadTask;
 import jadex.platform.service.message.transport.udpmtp.sending.TxMessage;
 import jadex.platform.service.message.transport.udpmtp.sending.TxPacket;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -34,13 +37,16 @@ public class PeerProber extends TimedTask
 	/** Messages in-flight. */
 	protected Map<Integer, TxMessage> inflightmessages;
 	
+	/** The flow control. */
+	protected FlowControl flowcontrol;
+	
 	/**
 	 *  Creates a peer prober.
 	 * 
 	 *  @param info The peer info. 
 	 *  @param dispatcher The timed task dispatcher.
 	 */
-	public PeerProber(Map<InetSocketAddress, PeerInfo> peerinfos, PeerInfo info, TimedTaskDispatcher dispatcher, PriorityBlockingQueue<TxPacket> packetqueue, Map<Integer, TxMessage> inflightmessages)
+	public PeerProber(Map<InetSocketAddress, PeerInfo> peerinfos, PeerInfo info, TimedTaskDispatcher dispatcher, PriorityBlockingQueue<TxPacket> packetqueue, Map<Integer, TxMessage> inflightmessages, FlowControl flowcontrol)
 	{
 		super(info.getAddress(), Long.MIN_VALUE);
 		this.peerinfos = peerinfos;
@@ -48,6 +54,7 @@ public class PeerProber extends TimedTask
 		this.dispatcher = dispatcher;
 		this.packetqueue = packetqueue;
 		this.inflightmessages = inflightmessages;
+		this.flowcontrol = flowcontrol;
 	}
 	
 	/**
@@ -71,6 +78,7 @@ public class PeerProber extends TimedTask
 				peerinfo.setState(PeerInfo.STATE_LOST);
 				System.out.println("Banning: " + peerinfo.getAddress());
 				dispatcher.cancel(peerinfo.getAddress());
+				List<TxMessage> canceledmsg = new ArrayList<TxMessage>();
 				synchronized (inflightmessages)
 				{
 					TxMessage[] msgs = inflightmessages.values().toArray(new TxMessage[inflightmessages.size()]);
@@ -79,10 +87,36 @@ public class PeerProber extends TimedTask
 						if (msg.getResolvedReceiver().equals(peerinfo.getAddress()))
 						{
 							inflightmessages.remove(msg.getMsgId());
-							msg.transmissionFailed("Lost connection to peer: " + peerinfo.getAddress());
+							canceledmsg.add(msg);
 						}
 					}
 				}
+				
+				int quota = 0;
+				for (TxMessage msg : canceledmsg)
+				{
+					synchronized(msg)
+					{
+						msg.transmissionFailed("Lost connection to peer: " + peerinfo.getAddress());
+						for (int i = 0; i < msg.getPackets().length; ++i)
+						{
+							if (!msg.getPackets()[i].isConfirmed())
+							{
+								msg.getPackets()[i].setConfirmed(true);
+								quota += msg.getPackets()[i].getRawPacket().length;
+							}
+						}
+					}
+				}
+				quota = flowcontrol.addAndGetQuota(quota);
+				if (quota >= STunables.CONFIRMATION_THRESHOLD)
+				{
+					synchronized (packetqueue)
+					{
+						packetqueue.notifyAll();
+					}
+				}
+				
 				TimedTask unbantask = new TimedTask(currenttime + STunables.PROBE_RESPONSE_BAN_TIME)
 				{
 					public void run()

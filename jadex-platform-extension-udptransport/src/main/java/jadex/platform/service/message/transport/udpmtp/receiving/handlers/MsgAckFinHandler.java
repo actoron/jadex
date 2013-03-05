@@ -16,7 +16,6 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *  Handler for message acknowledgment and fin packets.
@@ -42,9 +41,6 @@ public class MsgAckFinHandler implements IPacketHandler
 	/** Information about known peers. */
 	protected Map<InetSocketAddress, PeerInfo> peerinfos;
 	
-	/** The remaining send quota. */
-	protected AtomicInteger sendquota;
-	
 	/** The flow control. */
 	protected FlowControl flowcontrol;
 	
@@ -61,7 +57,6 @@ public class MsgAckFinHandler implements IPacketHandler
 	 */
 	public MsgAckFinHandler(Map<InetSocketAddress, Map<Integer, RxMessage>> incomingmessages,
 							Map<Integer, TxMessage> inflightmessages,
-							AtomicInteger sendquota,
 							FlowControl flowcontrol,
 							PriorityBlockingQueue<TxPacket> packetqueue,
 							Map<InetSocketAddress, PeerInfo> peerinfos,
@@ -70,7 +65,6 @@ public class MsgAckFinHandler implements IPacketHandler
 	{
 		this.incomingmessages = incomingmessages;
 		this.inflightmessages = inflightmessages;
-		this.sendquota = sendquota;
 		this.flowcontrol = flowcontrol;
 		this.packetqueue = packetqueue;
 		this.usedids = usedids;
@@ -136,49 +130,64 @@ public class MsgAckFinHandler implements IPacketHandler
 				
 				if (msg != null)
 				{
-					final TxMessage dmsg = msg;
-					timedtaskdispatcher.executeNow(new Runnable()
-					{
-						public void run()
-						{
-							dmsg.confirmTransmission();
-						}
-					});
+//					final TxMessage dmsg = msg;
+//					timedtaskdispatcher.executeNow(new Runnable()
+//					{
+//						public void run()
+//						{
+//							dmsg.confirmTransmission();
+//						}
+//					});
 					
+					long currenttime = System.currentTimeMillis();
 					long roundtrip = System.currentTimeMillis() - msg.ls;
-					//info.newPing(roundtrip);
 					synchronized (MsgAckFinHandler.class)
 					{
 						++count;
 						ackstat = ackstat * 0.99 + roundtrip * 0.01;
-						rsstat = rsstat * 0.99 + msg.getResendCounter() * 0.01;
-						maxrs = Math.max(maxrs, msg.getResendCounter());
+//						rsstat = rsstat * 0.99 + msg.getResendCounter() * 0.01;
+//						maxrs = Math.max(maxrs, msg.getResendCounter());
+						int max = 0;
+						int min = Integer.MAX_VALUE;
+						double avg = 0;
+						for (int i = 0; i < msg.getPackets().length; ++i)
+						{
+							max = Math.max(max, msg.getPackets()[i].getResendCounter());
+							min = Math.min(min, msg.getPackets()[i].getResendCounter());
+							avg += msg.getPackets()[i].getResendCounter();
+						}
+						avg /= msg.getPackets().length;
 						if (count % 1000 == 0)
-							System.out.println("Stats: " + ackstat + " " + String.valueOf(rsstat) + " " + maxrs + " rt " + roundtrip +" schedtosend " + (msg.getPackets()[msg.getPackets().length-1].sentts - msg.ls));
+							System.out.println("Stats: " + ackstat + " " + String.valueOf(rsstat) + " " + maxrs + " rt " + roundtrip +" schedtosend " + (msg.getPackets()[msg.getPackets().length-1].sentts - msg.ls) + " RSSTATS: " + min + " " + max + " " + avg);
 					}
-					int quota = 0;
+					PeerInfo info = peerinfos.get(sender);
 					synchronized (msg)
 					{
 						for (int i = 0; i < msg.getPackets().length; ++i)
 						{
 							if (!msg.getPackets()[i].isConfirmed())
 							{
+								int size = msg.getPackets()[i].getRawPacket().length;
+								flowcontrol.ack(size);
 								msg.getPackets()[i].setConfirmed(true);
-								quota += msg.getPackets()[i].getRawPacket().length;
+								if (info != null)
+								{
+									info.newPing(System.currentTimeMillis() - msg.getPackets()[i].sentts);
+								}
 //								sendquota.addAndGet(msg.getPackets()[i].getRawPacket().length);
 //								System.out.println("IncA: " + msgid + " " + sendquota.get());
 							}
 						}
 					}
-					int remains = sendquota.addAndGet(quota);
-					if (remains >= STunables.CONFIRMATION_THRESHOLD)
+					
+					if (flowcontrol.getSendQuota() >= STunables.MIN_SENDABLE_BYTES)
 					{
 						synchronized (packetqueue)
 						{
 							packetqueue.notifyAll();
 						}
 					}
-					flowcontrol.ack();
+					
 				}
 			}
 			else if (SPacketDefs.MSG_FIN == packettype)
@@ -202,7 +211,7 @@ public class MsgAckFinHandler implements IPacketHandler
 				int msgid = SCodingUtil.intFromByteArray(packet, 1);
 				TxMessage msg = inflightmessages.get(msgid);
 				msg.resetConfirmedPackets();
-				msg.setResendCounter(msg.getResendCounter() + 1);
+//				msg.setResendCounter(msg.getResendCounter() + 1);
 			}
 		}
 		else
