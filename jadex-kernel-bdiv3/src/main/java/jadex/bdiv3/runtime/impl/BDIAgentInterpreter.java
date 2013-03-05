@@ -436,7 +436,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								
 								for(int i=0; i<ptypes.length; i++)
 								{
-									if(event.getContent()!=null && SReflect.isSupertype(event.getContent().getClass(), ptypes[i]))
+									if(event.getContent()!=null && SReflect.isSupertype(ptypes[i], event.getContent().getClass()))
 									{
 										pvals[i] = event.getContent();
 									}

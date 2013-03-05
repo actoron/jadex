@@ -311,10 +311,9 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 			LabelNode lab = null;
 			List<String> belnames = new ArrayList<String>();
 			
-			for(int i=0; i<ins.size(); i++)
+			AbstractInsnNode[] nodes = ins.toArray();
+			for(AbstractInsnNode n: nodes)
 			{
-				AbstractInsnNode n = ins.get(i);
-				
 				if(lab==null && n instanceof LabelNode)
 				{
 					lab = (LabelNode)n;
@@ -330,20 +329,63 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 					}
 				}
 				
-				if(Opcodes.AASTORE==n.getOpcode() && !belnames.isEmpty())
+				if(!belnames.isEmpty())
 				{
-//					// on stack: arrayref, index, value 
-//					System.out.println("found: "+belnames);
-					String belname = belnames.get(0);
+					InsnList newins = null;
 					
-					InsnList newins = new InsnList();
-					newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
-					newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
-					newins.add(new LdcInsnNode(belname));
-					newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
-						"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
-					ins.insert(n.getPrevious(), newins);
-					ins.remove(n); // remove old aastore
+					if(Opcodes.IASTORE==n.getOpcode() || Opcodes.BASTORE==n.getOpcode()) // for int, byte and boolean :-((	
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(I)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.LASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(J)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.FASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(F)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.DASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(D)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.CASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(C)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.SASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(S)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.AASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+					}
+					
+					if(newins!=null)
+					{
+	//					// on stack: arrayref, index, value 
+	//					System.out.println("found: "+belnames);
+						String belname = belnames.get(0);
+						
+						newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
+						newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+						newins.add(new LdcInsnNode(belname));
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
+							"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+						
+						ins.insert(n.getPrevious(), newins);
+						ins.remove(n); // remove old Xastore
+						
+						lab = null;
+						belnames.clear();
+					}
 				}
 			}
 		}
@@ -448,49 +490,6 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 							
 							begin = null;
 						}
-//						else if(n instanceof FieldInsnNode)
-//						{
-//							FieldInsnNode fn = (FieldInsnNode)n;
-//							
-//							if(Opcodes.PUTFIELD==fn.getOpcode() && todo.contains(fn.name))
-//							{
-//								todo.remove(fn.name);
-//								System.out.println("found putfield node: "+fn.name+" "+fn.getOpcode());
-//								AbstractInsnNode start = fn;
-//								while(!(start instanceof LabelNode))
-//								{
-//									start = start.getPrevious();
-//								}
-//	
-//								MethodNode mnode = new MethodNode(mn.access, IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX
-//									+SUtil.firstToUpperCase(fn.name), mn.desc, mn.signature, null);
-//								
-//								Map<LabelNode, LabelNode> labels = new HashMap<LabelNode, LabelNode>();
-//								while(!start.equals(fn))
-//								{
-//									AbstractInsnNode clone;
-//									if(start instanceof LabelNode)
-//									{
-//										clone = new LabelNode(new Label());
-//										labels.put((LabelNode)start, (LabelNode)clone);
-//									}
-//									else
-//									{
-//										clone = start.clone(labels);
-//									}
-//									mnode.instructions.add(clone);
-//									start = start.getNext();
-//								}
-//								mnode.instructions.add(start.clone(labels));
-//								mnode.visitInsn(Opcodes.RETURN);
-//								
-//								cn.methods.add(mnode);
-//							}
-//						}
-//						else
-//						{
-//							System.out.println(n);
-//						}
 					}
 					break;
 				}
@@ -558,9 +557,13 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	{
 //		System.out.println(int.class.getName());
 		
-		Method m = SReflect.getMethods(BDIAgent.class, "writeArrayField")[0];
-		System.out.println(Type.getMethodDescriptor(m));
-		
+//		Method m = SReflect.getMethods(BDIAgent.class, "writeArrayField")[0];
+		Method[] ms = SReflect.getMethods(SReflect.class, "wrapValue");
+		for(Method m: ms)
+		{
+			System.out.println(m.toString()+" "+Type.getMethodDescriptor(m));
+		}
+				
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
 //		TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));

@@ -34,7 +34,19 @@ public class HelloWorld3BDI
 	
 	/** The text that is printed. */
 	@Belief
-	private String[] sayhello = new String[3];
+//	private String[] sayhello = new String[3];
+	private boolean[] sayhello = new boolean[3];
+//	private byte[] sayhello = new byte[3];
+//	private long[] sayhello = new long[3];
+//	private short[] sayhello = new short[3];
+//	private int[] sayhello = new int[3];
+//	private float[] sayhello = new float[3];
+//	private double[] sayhello = new double[3];
+//	private char[] sayhello = new char[3];
+	
+	
+//	@Belief
+//	private byte[] by = new byte[2];
 	
 	/**
 	 *  Simple hello world goal.
@@ -43,15 +55,15 @@ public class HelloWorld3BDI
 	public class HelloGoal
 	{
 		/** The text. */
-		protected String text;
+		protected Object val;
 		
 		/**
 		 *  Create a new goal whenever sayhello belief is changed.
 		 */
 		@GoalCreationCondition
-		public HelloGoal(@Event(type=ChangeEvent.FACTCHANGED, value="sayhello") String text)
+		public HelloGoal(@Event(type=ChangeEvent.FACTCHANGED, value="sayhello") Object val)
 		{
-			this.text = text;
+			this.val = val;
 		}
 		
 		/**
@@ -60,7 +72,7 @@ public class HelloWorld3BDI
 		 */
 		public String getText()
 		{
-			return text;
+			return ""+val;
 		}
 	}
 	
@@ -77,9 +89,11 @@ public class HelloWorld3BDI
 	@AgentBody
 	public void body()
 	{
-		sayhello[0] = "1";
-		sayhello[1] = "2";
-		sayhello[2] = "3";
+//		sayhello[0] = "1";
+//		sayhello[1] = "2";
+//		sayhello[2] = "3";
+		sayhello[0] = true;
+//		sayhello[0] = 10;
 //		System.out.println("body end: "+getClass().getName());
 	}
 	

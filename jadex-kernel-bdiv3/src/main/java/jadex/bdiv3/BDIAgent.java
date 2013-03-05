@@ -392,6 +392,17 @@ public class BDIAgent extends MicroAgent
 //			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
 			
 			Object oldval = Array.get(array, index);
+			
+			Class<?> ct = array.getClass().getComponentType();
+			if(boolean.class.equals(ct))
+			{
+				val = ((Integer)val)==1? Boolean.TRUE: Boolean.FALSE;
+			}
+			else if(byte.class.equals(ct))
+			{
+				val = new Byte(((Integer)val).byteValue());
+			}
+			
 			Array.set(array, index, val);
 			
 			if(!SUtil.equals(val, oldval))
