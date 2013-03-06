@@ -1057,6 +1057,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				collectManifestURLs(urls[i], set, jarnames);
 			}
 		}
+		
+//		System.out.println("non man: "+classloader+" "+set+" "+jarnames);
 	}
 	
 	/**
@@ -1166,7 +1168,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected boolean isLocal(IResourceIdentifier rid)
 	{
-		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot());		
+//		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot());		
+		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getHostIdentifier().equals(SUtil.getMacAddress());		
 	}
 	
 	/**

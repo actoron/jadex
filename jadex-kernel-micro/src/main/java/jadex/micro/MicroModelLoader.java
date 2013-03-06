@@ -54,7 +54,7 @@ public class MicroModelLoader extends AbstractModelLoader
 	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, 
 		ClassLoader classloader, Object context) throws Exception
 	{
-//		if(name.indexOf("RemoteServiceManagementAgent")!=-1)
+//		if(name.indexOf("HelloWorldAgent")!=-1)
 //			System.out.println("cache miss: "+name);
 		
 		return (ICacheableModel)reader.read(name, imports, classloader, 

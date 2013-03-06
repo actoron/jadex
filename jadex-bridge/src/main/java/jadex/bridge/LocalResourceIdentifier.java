@@ -19,6 +19,9 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	/** The URL. */
 	protected URL url;
 	
+	/** The host id. */
+	protected String hostid;
+	
 	//-------- constructors --------
 
 	/**
@@ -36,6 +39,16 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 */
 	public LocalResourceIdentifier(IComponentIdentifier cid, URL url)
 	{
+		this(cid, url, SUtil.getMacAddress());
+	}
+		
+	/**
+	 *  Create a resource identifier.
+	 *  @param cid The platform identifier.
+	 *  @param url The local URL.
+	 */
+	public LocalResourceIdentifier(IComponentIdentifier cid, URL url, String hostid)
+	{
 		if(cid==null)
 		{
 			throw new IllegalArgumentException("Cid must not null.");
@@ -43,6 +56,10 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		if(url==null)
 		{
 			throw new IllegalArgumentException("Url must not null.");
+		}
+		if(hostid==null)
+		{
+			hostid = url.toString(); // in case no mac is available use url (strict as before)
 		}
 		if(url.toString().indexOf("..")!=-1)
 		{
@@ -53,10 +70,11 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 			throw new IllegalArgumentException("Url must be absolute: "+url);
 		}
 		
+		this.hostid = hostid;
 		this.cid = cid;
 		this.url = url;
 	}
-	
+
 	//-------- methods --------
 	
 	/**
@@ -78,6 +96,15 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	}
 	
 	/**
+	 *  Get the host identifier.
+	 *  @return The host identifier.
+	 */
+	public String	getHostIdentifier()
+	{
+		return hostid;
+	}
+	
+	/**
 	 *  Set the platform identifier belonging to the resource identifier.
 	 *  @param cid The component identifier of the platform. 
 	 */
@@ -95,6 +122,14 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		this.url	= url;
 	}
 	
+	/**
+	 *  Set the host identifier.
+	 *  @param hostid The host identifier.
+	 */
+	public void	setHostIdentifier(String hostid)
+	{
+		this.hostid = hostid;
+	}
 	
 	/**
 	 *  Get the hashcode.
@@ -103,8 +138,9 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (cid!=null? cid.hashCode(): 0);
-		result = prime * result + (url!=null? url.hashCode(): 0);
+//		result = prime * result + (cid!=null? cid.hashCode(): 0);
+		result = prime * result + hostid.hashCode();
+		result = prime * result + url.hashCode();
 		return result;
 	}
 
@@ -118,7 +154,9 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		if(obj instanceof ILocalResourceIdentifier)
 		{
 			ILocalResourceIdentifier other = (ILocalResourceIdentifier)obj;
-			ret = SUtil.equals(getComponentIdentifier(), other.getComponentIdentifier())
+//			ret = SUtil.equals(getComponentIdentifier(), other.getComponentIdentifier())
+//				&& SUtil.equals(getUrl(), other.getUrl());
+			ret = SUtil.equals(getHostIdentifier(), other.getHostIdentifier())
 				&& SUtil.equals(getUrl(), other.getUrl());
 		}
 		return ret;
@@ -129,6 +167,6 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 */
 	public String	toString()
 	{
-		return url+"@"+cid;
+		return url+"-"+hostid+"@"+cid;
 	}
 }

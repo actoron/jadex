@@ -13,6 +13,12 @@ public interface ILocalResourceIdentifier
 	 *  @return The component identifier of the platform. 
 	 */
 	public IComponentIdentifier	getComponentIdentifier();
+
+	/**
+	 *  Get the host identifier.
+	 *  @return The host identifier.
+	 */
+	public String getHostIdentifier();
 	
 	/**
 	 *  Get the url.

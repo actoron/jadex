@@ -9,7 +9,11 @@ import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -248,10 +252,48 @@ public class ComponentSelectorDialog
 						int	row	= list.getSelectionModel().getMinSelectionIndex();
 						selected	= (IComponentIdentifier)sels.get(row);
 					}
-					aidpanel.setComponentIdentifier(selected);
-					aidpanel.setEditable(selected!=null);
-					remove.setEnabled(selected!=null);
+					
+					if(selected!=null)
+					{
+						final IComponentIdentifier fselected = selected;
+						SServiceProvider.getService(access.getServiceProvider(), selected, IProxyAgentService.class)
+							.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()
+						{
+							public void resultAvailable(IProxyAgentService ps)
+							{
+								ps.getRemoteComponentIdentifier().addResultListener(
+									new SwingResultListener<IComponentIdentifier>(new IResultListener<IComponentIdentifier>()
+								{
+									public void resultAvailable(IComponentIdentifier result)
+									{
+										proceed(result);
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										proceed(fselected);
+									}
+								}));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								proceed(fselected);
+							}
+						}));
+					}
+					else
+					{
+						proceed(selected);
+					}
 				}
+			}
+			
+			protected void proceed(IComponentIdentifier selected)
+			{
+				aidpanel.setComponentIdentifier(selected);
+				aidpanel.setEditable(selected!=null);
+				remove.setEnabled(selected!=null);
 			}
 		});
 
