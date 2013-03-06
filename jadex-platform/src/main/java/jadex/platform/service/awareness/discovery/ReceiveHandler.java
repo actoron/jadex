@@ -114,12 +114,14 @@ public abstract class ReceiveHandler
 								{
 									// Can happen if is slave and master goes down.
 									// In that case it tries to find new master.
+									System.out.println("master down, reconfiguring");
 									
 									// Can also happen when getSocket() does not work
 									// In this case stop calling receive for some time.
 									if(e instanceof ConnectionException)
 									{
 										// todo: make customizable
+										System.out.println("ConnectionException sleeping");
 										Thread.sleep(60000);
 									}
 									
@@ -190,7 +192,7 @@ public abstract class ReceiveHandler
 //			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 			
 			IFuture<IAwarenessManagementService>	msfut	= agent.getMicroAgent().getRequiredService("management");
-			msfut.addResultListener(new DefaultResultListener<IAwarenessManagementService>(agent.getMicroAgent().getLogger())
+			msfut.addResultListener(new IResultListener<IAwarenessManagementService>()
 			{
 				public void resultAvailable(IAwarenessManagementService ms)
 				{
@@ -242,8 +244,9 @@ public abstract class ReceiveHandler
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					if(!(exception instanceof ComponentTerminatedException))
-						super.exceptionOccurred(exception);
+					exception.printStackTrace();
+//					if(!(exception instanceof ComponentTerminatedException))
+//						super.exceptionOccurred(exception);
 				}
 			});
 		}

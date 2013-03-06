@@ -176,7 +176,6 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						}
 						catch(Exception ex)
 						{
-							
 						}
 					}
 					

@@ -81,6 +81,7 @@ public class LeaseTimeHandler
 		{
 			oldentry.setInfo(entry.getInfo());
 			oldentry.setTime(getClockTime());
+			oldentry.setEntry(entry.getEntry());
 		}
 		else
 		{

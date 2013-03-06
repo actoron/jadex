@@ -1,6 +1,7 @@
 package jadex.platform.service.awareness.discovery;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 
 import java.net.InetAddress;
@@ -136,9 +137,9 @@ public abstract class MasterSlaveSendHandler extends SendHandler
 	public void sendToLocals(byte[] data)
 	{
 		DiscoveryEntry[] locs = getAgent().getLocals().getEntries();
-		for(int i=0; i<locs.length; i++)
+		for(DiscoveryEntry de: locs)
 		{
-			InetSocketAddress sa = (InetSocketAddress)locs[i].getEntry();
+			InetSocketAddress sa = (InetSocketAddress)de.getEntry();
 			send(data, sa.getAddress(), sa.getPort());
 		}
 //		System.out.println("sent to locals: "+locs.length+" "+SUtil.arrayToString(locs));
