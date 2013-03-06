@@ -419,7 +419,7 @@ public class RuntimeManagerPlan extends Plan {
 				space.addDataConsumer(name, con);
 			}
 		}
-		// System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
+		// System.out.println("nnnnnnnnnnnneded iterations: " + counterTmp);
 	}
 
 	private void startOnlineVisualization(SimulationConfiguration simConf) {
@@ -453,7 +453,7 @@ public class RuntimeManagerPlan extends Plan {
 		// 1: delete the ".." at the beginning
 		String oldDirpath = simConf.getApplicationReference().substring(2);
 		// 2.delete the *.application.xml at the end of the path
-		directoryPath += oldDirpath.substring(0, oldDirpath.lastIndexOf("/")+1);
+		directoryPath += oldDirpath.substring(0, oldDirpath.lastIndexOf("\\\\") + 2);
 
 		// ***********************************************************
 		// Purpose: Replace 'name' of application in the *.application.xml with the new name
@@ -477,7 +477,7 @@ public class RuntimeManagerPlan extends Plan {
 		// ***********************************************************
 
 		// change reference to current path
-		simConf.setApplicationReference(directoryPath +  simConf.getName() + ".application.xml");
+		simConf.setApplicationReference(directoryPath + "\\" + simConf.getName() + ".application.xml");
 
 		return simConf;
 	}
