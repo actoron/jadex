@@ -1,8 +1,10 @@
 package sodekovs.bikesharing.env;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
@@ -325,6 +327,9 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	private void createBikeStations(String path, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
 		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);		
 
+//		IComponentManagementService cms = cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+////		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		
 		for (Station station : scenario.getStations().getStation()) {
 
 			HashMap<String, Object> props = new HashMap<String, Object>();
@@ -334,8 +339,16 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 			props.put("stationID", station.getStationID());
 			props.put("capacity", station.getNumberOfDocks());
 			props.put("stock", station.getNumberOfBikes());
+			props.put("type", "Bikestation");
 
+			//Old version with ISpaceObjects
 			space.createSpaceObject("bikestation", props, null);
+//			createBikeStation(space,props);
+			
+//			IFuture<IComponentManagementService> fut = cms.createComponent("Scheduler" + GetRandom.getRandom(100000), Constants.PATH_OF_SCHEDULER, new CreationInfo(null, props, null, true, false), null);
+//			schedulerCID = (IComponentIdentifier) fut.get(this);
+			
+			
 //			System.out.println("Create Station: " + x + "," + y);
 		}
 		
@@ -346,4 +359,38 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 
 		// erstellVerleihObjekte(grid);
 	}
+	
+	private void createBikeStation(final IEnvironmentSpace space,HashMap<String, Object> props) {
+
+		SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener() {
+			public void resultAvailable(Object result) {
+				final IComponentManagementService cms = (IComponentManagementService) result;
+
+				// longi = x-pos
+//				Station depStation = stationsMap.get(departureStation);
+//				Station destStation = stationsMap.get(destinationStation);
+//				final Vector2Double depPos = new Vector2Double(depStation.getLongitude(), depStation.getLatitude());
+//				Vector2Double destPos = new Vector2Double(destStation.getLongitude(), destStation.getLatitude());
+
+				// TODO: Hack: Add more properties here?
+//				HashMap<String, Object> properties = new HashMap<String, Object>();
+//				properties.put("destination_station_pos", destPos);
+
+				cms.createComponent("Bikestation-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/bikestation/Bikestation.agent.xml",
+						new CreationInfo(null, properties, space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(new DefaultResultListener() {
+					public void resultAvailable(Object result) {
+						final IComponentIdentifier cid = (IComponentIdentifier) result;
+						cms.getComponentDescription(cid).addResultListener(new DefaultResultListener() {
+							public void resultAvailable(Object result) {
+								// add the start position to the agent/avatar
+//								space.getAvatar((IComponentDescription) result).setProperty(Space2D.PROPERTY_POSITION, depPos);
+//								space.getAvatar((IComponentDescription) result).setProperty(Space2D.PROPERTY_POSITION, depPos);
+
+							}
+						});
+					}
+				});
+			}
+		});
+}
 }

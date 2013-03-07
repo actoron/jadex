@@ -60,6 +60,10 @@ public class DetermineBehaviourStrategyPlan extends Plan {
 			//Drive from station to station strategy
 			IGoal stationToStation = createGoal("station_to_station_strategy");
 			dispatchTopLevelGoal(stationToStation);
+		}else if(behaviourStrategy==2){
+			//Adaptable drive from station to station strategy
+			IGoal adaptableStationToStation = createGoal("adaptable_station_to_station_strategy");
+			dispatchTopLevelGoal(adaptableStationToStation);
 		}else{
 			System.out.println("#DetermineBehaviourStrategyPlan# Error: No strategy found for pedestrian....");
 		}

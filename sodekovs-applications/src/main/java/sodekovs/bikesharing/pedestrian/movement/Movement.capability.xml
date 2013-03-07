@@ -62,6 +62,15 @@
    			3)Return bike and terminate
    		-->
 		<achievegoal name="station_to_station_strategy" retry="true" exclude="never" exported="true"/>		
+		
+		  <!-- Realize: ADAPTABLE drive from station to station strategy for pedestrian:
+   			1)Take a bike from the start point, which is a bike station. 
+   			1a) If departure station is empty, go to a proposed station and drive from this point
+   			2)Drive to a bike station, which is stochastically determined   			
+   			3)Return bike and terminate
+   			3a) If destination station is full, drive to a proposed station and leave bike there
+   		-->
+		<achievegoal name="adaptable_station_to_station_strategy" retry="true" exclude="never" exported="true"/>
 					  		  		
 	</goals>
 
@@ -99,6 +108,14 @@
 			<body class="DriveFromToBehaviourPlan"/>
 			<trigger>
 				<goal ref="station_to_station_strategy"/>
+			</trigger>
+		</plan>
+		
+		<!-- Default behaviour with capability to adapt. -->
+		<plan name="adaptable_station_to_station_strategy_plan">
+			<body class="AdaptableDriveFromToBehaviourPlan"/>
+			<trigger>
+				<goal ref="adaptable_station_to_station_strategy"/>
 			</trigger>
 		</plan>
 		

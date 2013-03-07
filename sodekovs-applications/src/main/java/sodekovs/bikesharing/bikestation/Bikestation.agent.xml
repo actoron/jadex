@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Bikestation" package="sodekovs.bikesharing.bikestation">
+
+	<imports>
+		<import>jadex.extension.envsupport.math.Vector2Int</import>
+		<import>jadex.extension.envsupport.math.IVector2</import>
+		<import>jadex.extension.envsupport.math.Vector2Double</import>		
+		<import>jadex.extension.envsupport.environment.space2d.ContinuousSpace2D</import>
+		<import>jadex.extension.envsupport.environment.ISpaceObject</import>
+		<import>jadex.commons.future.IFuture</import>
+		<import>sodekovs.bikesharing.container.*</import>			
+	</imports>
+
+
+	
+	<beliefs>
+		<!-- The agent's avatar  in the environment. -->				
+ 		<belief name="myself" class="ISpaceObject"> 			
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
+ 		</belief>
+ 		
+ 		
+ 		<!-- Environment. -->
+		<belief name="environment" class="ContinuousSpace2D"> 			
+ 			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
+ 		</belief>														 
+		
+		<!--  Test for evaluation! -->
+		<belief name="myPos" class="Vector2Double" evaluationmode="push">
+			<fact language="jcl">$beliefbase.myself.position</fact>
+		</belief>
+						
+		<!-- Used for SO. Which alternative departure station is proposed? -->
+		<belief name="proposed_departure_station" class="String"/> 				
+		
+		<!-- Used for SO. Which alternative arrival station is proposed? -->
+		<belief name="proposed_arrival_station" class="String"/>
+	</beliefs>
+	
+	<plans>
+	<!-- Test plan. -->
+		<plan name="test_plan">
+			<body class="TestPlan"/>			
+		</plan>		
+	</plans>
+	
+	<configurations>
+		<configuration name="default">		
+			<plans>
+				<initialplan ref="test_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

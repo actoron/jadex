@@ -29,6 +29,7 @@
 		<import>sodekovs.bikesharing.container.Weg</import>
 		<import>sodekovs.bikesharing.fahrrad.FahrradVerleihStation</import>
 		<import>sodekovs.bikesharing.pedestrian.*</import>
+		<import>sodekovs.bikesharing.bikestation.*</import>
 		<import>sodekovs.bikesharing.pedestrian.movement.*</import>
 		<import>sodekovs.bikesharing.env.*</import>
 	</imports>
@@ -55,14 +56,16 @@
 					<env:property name="drives_bike">false</env:property>
 					<!-- check the movement.capability.xml for an explanation of possible 
 						strategies -->
-					<env:property name="behaviour_strategy">1</env:property>
+					<env:property name="behaviour_strategy">2</env:property>
 				</env:objecttype>
 				<env:objecttype name="bikestation">
 					<env:property name="stationID" class="String" />
 					<env:property name="stock" class="int" />
 					<env:property name="capacity" class="int" />
 					<env:property name="position" class="Vector2Double" />
-				</env:objecttype>
+					<env:property name="proposed_departure_station" class="String" />
+					<env:property name="proposed_arrival_station" class="String" />
+				</env:objecttype> 
 
 				<!-- Placeholder to display simulation information. -->
 				<env:objecttype name="SimInfo">
@@ -74,6 +77,9 @@
 			<env:avatarmappings>
 				<env:avatarmapping componenttype="Pedestrian"
 					objecttype="pedestrian" />
+					<env:avatarmapping componenttype="Bikestation"
+					objecttype="bikestation" />
+					<!-- objecttype="bikestation" createcomponent="true"/>-->									
 			</env:avatarmappings>
 
 			<env:tasktypes>
@@ -128,7 +134,7 @@
 					</env:drawable>
 
 					<env:prelayers>
-						<env:tiledlayer width="100" height="100"
+						<env:tiledlayer width="1" height="1"
 							imagepath="sodekovs/bikesharing/bilder/WashingtonMap.png" />
 					</env:prelayers>
 				</env:perspective>
@@ -152,6 +158,8 @@
 
 		<componenttype name="Pedestrian"
 			filename="sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml" />
+			<componenttype name="Bikestation"
+			filename="sodekovs/bikesharing/bikestation/Bikestation.agent.xml" />
 	</componenttypes>
 
 	<properties>
