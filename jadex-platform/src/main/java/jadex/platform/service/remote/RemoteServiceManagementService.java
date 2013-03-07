@@ -578,7 +578,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							{
 								public void customResultAvailable(IResourceIdentifier rid)
 								{
-									if(rid!=null)
+									if(rid!=null && rid.getGlobalIdentifier()!=null)
 									{
 //										System.out.println("rid: "+rid+" "+content.getClass()+" "+msg.get(SFipa.SENDER));
 										msg.put(SFipa.X_RID, rid);
@@ -587,6 +587,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //									{
 //										System.out.println("no rid: "+content.getClass());
 //									}
+									
+									// todo:
+//									msg.put(SFipa.X_RECEIVER, realrec);
 									
 									ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 										.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(future)

@@ -195,6 +195,7 @@ public class InvokerAgent
 					{
 						IResourceIdentifier	rid	= new ResourceIdentifier(
 							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+//						System.out.println("Using rid: "+rid);
 						final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
 						CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
 						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", ci, null)

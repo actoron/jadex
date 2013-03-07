@@ -301,7 +301,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									public void resultAvailable(Void v)
 									{
 										final Map reply = createReply(msg, mt);
-										if(rid[0]!=null)
+										if(rid[0]!=null && rid[0].getGlobalIdentifier()!=null)
 										{
 //											System.out.println("rid: "+rid+" "+result.getClass());
 											reply.put(SFipa.X_RID, rid[0]);

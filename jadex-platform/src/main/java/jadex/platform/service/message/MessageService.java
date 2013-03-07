@@ -405,7 +405,7 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				
 				final String ridid = type.getResourceIdIdentifier();
-				if(msg.get(ridid)==null && rid!=null)
+				if(msg.get(ridid)==null && rid!=null && rid.getGlobalIdentifier()!=null)
 				{
 					msg.put(ridid, rid);
 				}
@@ -518,7 +518,8 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			else if(value!=null && !((value instanceof String) || (value instanceof byte[])) 
 				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())
-				|| name.equals(type.getResourceIdIdentifier()) || name.equals(type.getNonFunctionalPropertiesIdentifier())))
+				|| name.equals(type.getResourceIdIdentifier()) || name.equals(type.getNonFunctionalPropertiesIdentifier())
+				|| name.equals(type.getRealReceiverIdentifier())))
 			{	
 				// HACK!!!
 				if(SFipa.FIPA_MESSAGE_TYPE.equals(type) && !msgcopy.containsKey(SFipa.LANGUAGE))
@@ -1382,7 +1383,10 @@ public class MessageService extends BasicService implements IMessageService
 		
 //		System.out.println("getRIDCl: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+" "+rid+" "+realrec);
 		
-		if(rid!=null)
+		// Explanation for only using global rids:
+		// Local rids are mapped to a path, but different platforms may use different
+		// means for inlcuding them a) as new resource with custom rid b) in the startup path with platform rid
+		if(rid!=null && rid.getGlobalIdentifier()!=null)
 		{
 			SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class)
 				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
@@ -1393,6 +1397,7 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						public void customResultAvailable(ClassLoader result)
 						{
+//							System.out.println("got: "+result+" "+rid);
 							// Hack!!! Use current platform class loader for rms message, if no rid class loader available.
 							if(result==null)
 							{
@@ -1458,7 +1463,23 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		else
 		{
-			ret.setResult(null);
+			// Hack? Use global loader if no rid declared? Use x_receiver?
+			
+			SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class)
+				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
+			{
+				public void customResultAvailable(final ILibraryService ls)
+				{
+					ls.getClassLoader(null).addResultListener(new DelegationResultListener<ClassLoader>(ret)
+					{
+						public void customResultAvailable(ClassLoader result)
+						{
+							super.customResultAvailable(result);
+						}
+					});
+				}
+			});
+//			ret.setResult(null);
 		}
 		
 		return ret;
@@ -2102,7 +2123,7 @@ public class MessageService extends BasicService implements IMessageService
 	protected IFuture<Void> deliverToReceiver(final IComponentIdentifier[] receivers, final int i, final IComponentManagementService cms, final ClassLoader classloader, 
 		final Map decoded, final Map msg, final Logger logger, final MessageType messagetype)
 	{
-//		System.out.println("dtr: "+SUtil.arrayToString(receivers)+" "+i);
+//		System.out.println("dtr: "+SUtil.arrayToString(receivers)+" "+i+" "+classloader);
 		
 		final Future<Void> ret = new Future<Void>();
 		
@@ -2168,6 +2189,8 @@ public class MessageService extends BasicService implements IMessageService
 												}
 												catch(Exception e)
 												{
+//													System.out.println("classloader: "+cl);
+//													e.printStackTrace();
 													if(!(e instanceof ContentException))
 													{
 														// Todo: find out why 50MB sized messages are sent... 
