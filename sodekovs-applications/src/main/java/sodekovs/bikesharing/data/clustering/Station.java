@@ -6,26 +6,36 @@ package sodekovs.bikesharing.data.clustering;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
 /**
- * @author thomas
- *
+ * Helper class containing the name, latidude and longitude of a bike station.
+ * 
+ * @author Thomas Preisler
  */
 @XmlRootElement(name = "Station")
 public class Station {
-	
+
 	private Double lat = null;
 	private Double lon = null;
 	private String name = null;
-	
+
+	/**
+	 * Default constructor
+	 */
 	public Station() {
 		super();
 	}
-	
+
+	/**
+	 * Constructor
+	 * 
+	 * @param lat
+	 * @param lon
+	 * @param name
+	 */
 	public Station(Double lat, Double lon, String name) {
 		this.lat = lat;
 		this.lon = lon;
-		this. name = name;
+		this.name = name;
 	}
 
 	/**
@@ -37,7 +47,8 @@ public class Station {
 	}
 
 	/**
-	 * @param lat the lat to set
+	 * @param lat
+	 *            the lat to set
 	 */
 	public void setLat(Double lat) {
 		this.lat = lat;
@@ -52,7 +63,8 @@ public class Station {
 	}
 
 	/**
-	 * @param lon the lon to set
+	 * @param lon
+	 *            the lon to set
 	 */
 	public void setLon(Double lon) {
 		this.lon = lon;
@@ -67,13 +79,16 @@ public class Station {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -86,7 +101,9 @@ public class Station {
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -116,7 +133,9 @@ public class Station {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

@@ -7,8 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author thomas
+ * A Quadrant of bike stations.
  * 
+ * @author Thomas Preisler
  */
 public class Quadrant {
 
@@ -20,6 +21,9 @@ public class Quadrant {
 	private Double west = null;
 	private Double east = null;
 
+	/**
+	 * List of stations
+	 */
 	private List<Station> stations = null;
 
 	/**

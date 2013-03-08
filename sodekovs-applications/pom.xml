@@ -154,5 +154,10 @@
   			<artifactId>simplelatlng</artifactId>
   			<version>RELEASE</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.sis</groupId>
+			<artifactId>sis-core</artifactId>
+			<version>0.2-incubating</version>
+		</dependency>
 	</dependencies>
 </project>

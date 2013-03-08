@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author thomas
  *
  */
-@XmlRootElement(name = "supercluster")
+@XmlRootElement(name = "superCluster")
 public class SuperCluster {
 
 	private List<Cluster> cluster = null;

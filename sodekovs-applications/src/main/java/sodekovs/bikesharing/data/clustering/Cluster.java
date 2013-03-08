@@ -8,6 +8,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Cluster of bike stations.
+ * 
+ * @author Thomas Preisler
+ */
 @XmlRootElement(name = "Cluster")
 public class Cluster {
 
@@ -19,14 +24,28 @@ public class Cluster {
 	private Double west = null;
 	private Double east = null;
 
+	/**
+	 * List of stations
+	 */
 	private List<Station> stations = null;
 
+	/**
+	 * The super station
+	 */
 	private Station superStation = null;
 
+	/**
+	 * Default constructor
+	 */
 	public Cluster() {
 		super();
 	}
 
+	/**
+	 * Creates a cluster from the given {@link Quadrant} and selects randomly one of the stations as super station.
+	 * 
+	 * @param quadrant
+	 */
 	public Cluster(Quadrant quadrant) {
 		this.north = quadrant.getNorth();
 		this.south = quadrant.getSouth();
