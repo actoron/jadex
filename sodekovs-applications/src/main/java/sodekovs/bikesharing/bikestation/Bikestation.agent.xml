@@ -18,22 +18,16 @@
 
 	
 	<beliefs>
-		<!-- The agent's avatar  in the environment. -->				
- 		<belief name="myself" class="ISpaceObject"> 			
- 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
- 		</belief>
- 		
- 		
- 		<!-- Environment. -->
+	
+	<!-- Environment. -->
 		<belief name="environment" class="ContinuousSpace2D"> 			
  			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
- 		</belief>														 
-		
-		<!--  Test for evaluation! -->
-		<belief name="myPos" class="Vector2Double" evaluationmode="push">
-			<fact language="jcl">$beliefbase.myself.position</fact>
-		</belief>
-						
+ 		</belief>
+ 		 		
+ 		<belief name="myself" class="ISpaceObject"> 			
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
+ 		</belief> 		
+ 		
 		<!-- Used for SO. Which alternative departure station is proposed? -->
 		<belief name="proposed_departure_station" class="String"/> 				
 		

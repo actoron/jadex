@@ -32,6 +32,7 @@ import sodekovs.bikesharing.model.SimulationDescription;
 import sodekovs.bikesharing.model.Station;
 import sodekovs.bikesharing.model.TimeSlice;
 import sodekovs.util.math.GetRandom;
+import sodekovs.util.misc.XMLHandler;
 
 /**
  * Process is responsible to manage the time slices from the simulation-setup xml-file that describe the probability of different events.
@@ -73,7 +74,20 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	 */
 	public void start(IClockService clock, final IEnvironmentSpace space) {
 
-		// init((String) getProperty("simDataSetupFilePath"), space);
+				
+		// create 
+		try {
+			createBikeStations((String) getProperty("simDataSetupFilePath"), space);
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		init(space);
 
 		// *******************************************************************************
@@ -347,6 +361,38 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 
 		// change tick size
 		clockservice.setDelta(tickSize);
+	}
+	
+	/**
+	 * 
+	 * Create bikestations according to the xml setup file.
+	 * 
+	 * @param path
+	 *            path of the xml file
+	 * @param grid
+	 *            the used space
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	private void createBikeStations(String path, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
+		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);
+
+		for (Station station : scenario.getStations().getStation()) {
+
+			HashMap<String, Object> props = new HashMap<String, Object>();
+			double x = new Double(station.getLongitude());
+			double y = new Double(station.getLatitude());
+			props.put("position", new Vector2Double(x, y));
+			props.put("stationID", station.getStationID());
+			props.put("capacity", station.getNumberOfDocks());
+			props.put("stock", station.getNumberOfBikes());
+
+			space.createSpaceObject("bikestation", props, null);
+		}
+
+		// put it here, so it can be reused within the application without the need to parse again
+		space.setProperty("SimulationDescription", scenario);
 	}
 
 }
