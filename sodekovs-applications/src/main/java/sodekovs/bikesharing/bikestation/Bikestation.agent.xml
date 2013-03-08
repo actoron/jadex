@@ -26,7 +26,11 @@
  		 		
  		<belief name="myself" class="ISpaceObject"> 			
  			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
- 		</belief> 		
+ 		</belief> 
+ 		
+ 		<belief name="stationID" class="String">
+ 		    <fact class="IFuture">$beliefbase.myself.getProperty("stationID")</fact>
+ 		</belief>		
  		
 		<!-- Used for SO. Which alternative departure station is proposed? -->
 		<belief name="proposed_departure_station" class="String">
@@ -45,16 +49,44 @@
 	</beliefs>
 	
 	<plans>
-	<!-- Test plan. -->
+		<!-- Test plan. -->
 		<plan name="test_plan">
 			<body class="TestPlan"/>			
+		</plan>
+		
+		<!-- Super station plan -->
+		<plan name ="super_station_plan">
+	    	<body class="SuperStationPlan"/>
+		</plan>
+		
+		<plan name="gather_occupancy_plan">
+		    <body class="GatherOccupancyPlan"/>
+		    <parameter name="superStationID" class="String">
+		        <internaleventmapping ref="gather_occupancy_rate.superStationID"/>
+		    </parameter>
+		    <trigger>
+		        <internalevent ref="gather_occupancy_rate"/>
+		    </trigger>
 		</plan>		
 	</plans>
+	
+	<events>
+	    <!-- DeCoMAS event -->
+	    <internalevent name="poll_cluster_stations">
+	        <parameter name="stationID" class="String"/>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS event -->
+	    <internalevent name="gather_occupancy_rate">
+	        <parameter name="superStationID" class="String"/>
+	    </internalevent>
+	</events>
 	
 	<configurations>
 		<configuration name="default">		
 			<plans>
 				<initialplan ref="test_plan"/>
+				<initialplan ref="super_station_plan"/>
 			</plans>
 		</configuration>
 	</configurations>

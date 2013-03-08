@@ -34,7 +34,20 @@
 		<import>sodekovs.bikesharing.env.*</import>
 	</imports>
 
+	<arguments>
+		<!--Context ID. Required for MASDynamics respectice distributed coordination. -->
+		<argument name="CoordinationContextID" class="String">"bikesharing-distributed"</argument>
+	</arguments>
+	
 	<extensiontypes>
+	    <env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">					
+				<env:property name="dynamics_configuration">"sodekovs-applications/src/main/java/sodekovs/bikesharing/coordination/BikeSharingCoordination.dynamics.xml"</env:property>				
+			<env:spaceexecutor class="DeltaTimeExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="tick">true</env:property>
+			</env:spaceexecutor>
+		</env:envspacetype>
+	    
 		<env:envspacetype name="MySimulation" width="100"
 			height="100" class="ContinuousSpace2D">
 
@@ -166,6 +179,9 @@
 	<configurations>
 		<configuration name="Washington">
 			<extension>
+			    <!-- The CoordinationSpace -->
+				<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />
+			    
 				<env:envspace name="my2dspace" type="MySimulation"
 					width="100" height="100">
 					<env:processes>
@@ -192,6 +208,9 @@
 		</configuration>
 		<configuration name="WashingtonTestEnv">
 			<extension>
+			    <!-- The CoordinationSpace -->
+				<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />
+			    
 				<env:envspace name="my2dspace" type="MySimulation"
 					width="100" height="100">
 					<env:processes>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MASDynamic name="bikeSharing">
+	<!--
+		Responsible for the coordination within the Bike Sharing Simulation.
+	-->
+
+	<!--
+		System Properties: Definitions of the behaviors that agents can adopt
+		and that makes them: - engage in coordinative activities - react to
+		coordinative activities
+	-->
+	<system_properties>
+		<role_occupations>
+		<!-- The roles required for the coordination of new detected targets. -->
+			<role_occupation name="super_station" multiple="true">
+				<agent id="Bikestation">
+				    <constraints>
+				        <condition name="isSuperStation">
+				           $beliefbase.isSuperStation
+				        </condition>
+				    </constraints>
+				</agent>
+			</role_occupation>
+			<role_occupation name="cluster_station" multiple="true">
+				<agent id="Bikestation"/>							
+			</role_occupation>
+		</role_occupations>
+	</system_properties>
+
+
+	<!--
+		Causal links: Definition of the interdependencies between
+		agent-behaviors.
+	-->
+	<causalities>
+		<deco_links>
+			<!-- The link where the super stations polls its cluster stations. -->
+			<deco_link realization="poll_cluster_stations" type="POSITIVE" name="poll_cluster_stations" spaces="mycoordspace">
+				<froms>
+					<from>super_station</from>
+				</froms>
+				<tos>
+					<to>cluster_station</to>
+				</tos>
+			</deco_link>			
+		</deco_links>
+
+		<!-- The detailed configuration of interdependency enactment. -->
+		<deco-link-realizations>
+		<!-- The link where the super stations polls its cluster stations. -->
+			<realization id="poll_cluster_stations">
+				<from>
+					<agent_element element="poll_cluster_stations" agent_id="Bikestation" type="INTERNAL_EVENT">					
+						<parameter_mappings>
+							<mapping ref="stationID" name="stationID"/>
+						</parameter_mappings>
+					</agent_element>
+				</from>
+				<!-- Coordination Medium configuration: -->
+				<mechanism_configuration
+					mechanism_id="sodekovs.bikesharing.coordination.ClusterMechanism"
+					agent_type="JADEX">
+					<properties>
+						<entry>
+							<key>cluster-file</key>
+							<value>../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/stationCluster-16.xml</value>
+						</entry>
+					</properties>
+				</mechanism_configuration>			
+				<to>		
+					 <agent_element element="gather_occupancy_rate" agent_id="Bikestation" type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping ref="stationID" name="superStationID"/>
+						</parameter_mappings>
+					</agent_element>
+				</to>
+			</realization>						
+		</deco-link-realizations>
+	</causalities>
+</MASDynamic>
