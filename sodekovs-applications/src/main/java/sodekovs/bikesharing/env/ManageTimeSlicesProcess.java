@@ -16,6 +16,7 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.Vector2Double;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,6 +27,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import sodekovs.bikesharing.data.clustering.Cluster;
+import sodekovs.bikesharing.data.clustering.SuperCluster;
 import sodekovs.bikesharing.model.DestinationProbability;
 import sodekovs.bikesharing.model.ProbabilitiesForStation;
 import sodekovs.bikesharing.model.SimulationDescription;
@@ -74,10 +77,9 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	 */
 	public void start(IClockService clock, final IEnvironmentSpace space) {
 
-				
-		// create 
+		// create
 		try {
-			createBikeStations((String) getProperty("simDataSetupFilePath"), space);
+			createBikeStations((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -134,20 +136,20 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			if (i + 1 < timeSlicesList.size()) {
 				if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta)) && (timeSlicesList.get(i + 1).getStartTime() > (clock.getTick() - tickDelta))) {
 					executeTimeSlice(i, space);
-//					 System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+					// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
 					// counterTmp++;
 					break;
 				}
 			} else if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta))) {
 				executeTimeSlice(i, space);
-//				 System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+				// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
 			}
 		}
 
 		// printClockAndSimSettings();
 	}
 
-	// } 
+	// }
 
 	/**
 	 * Parse the xml setup file.
@@ -363,21 +365,30 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 		// change tick size
 		clockservice.setDelta(tickSize);
 	}
-	
+
 	/**
 	 * 
 	 * Create bikestations according to the xml setup file.
 	 * 
 	 * @param path
 	 *            path of the xml file
+	 * @param clusterPath
+	 * 			path of the cluster xml file
 	 * @param grid
 	 *            the used space
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	private void createBikeStations(String path, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
+	private void createBikeStations(String path, String clusterPath, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
 		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);
+		SuperCluster superCluster = (SuperCluster) XMLHandler.parseXMLFromXMLFile(clusterPath, SuperCluster.class);
+		
+		// get all super station names (ids)
+		List<String> superStations = new ArrayList<String>();
+		for (Cluster cluster : superCluster.getCluster()) {
+			superStations.add(cluster.getSuperStation().getName());
+		}
 
 		for (Station station : scenario.getStations().getStation()) {
 
@@ -388,17 +399,22 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			props.put("stationID", station.getStationID());
 			props.put("capacity", station.getNumberOfDocks());
 			props.put("stock", station.getNumberOfBikes());
-			props.put("isSuperStation", false);
-//			props.put("proposed_departure_station", "A");
-//			props.put("proposed_arrival_station", "D");
+			props.put("proposed_departure_station", "");
+			props.put("proposed_arrival_station", "");
 			
-			
+			// check if station is a super station
+			if (superStations.contains(station.getStationID())) {
+				props.put("isSuperStation", true);
+			} else {
+				props.put("isSuperStation", false);
+			}
 
 			space.createSpaceObject("bikestation", props, null);
 		}
 
 		// put it here, so it can be reused within the application without the need to parse again
 		space.setProperty("SimulationDescription", scenario);
+		space.setProperty("StationCluster", superCluster);
 	}
 
 }
