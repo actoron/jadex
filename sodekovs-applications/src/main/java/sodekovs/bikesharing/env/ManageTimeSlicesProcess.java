@@ -206,12 +206,13 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 
 		// Create number of pedestrians according to the "Andrang"
 		long congestion = Math.round((timeSlicesList.get(currentTimeSlice).getRunRelative() * totalDepartures) / 60);
+//		System.out.println("#Congestion: # " + cong);
 		for (int i = 0; i < congestion; i++) {
 			int departureStation = computeDeparture(stationList);
 
 			// compute destination probabilities of this departure
 			int destination = computeDestination(stationList.get(departureStation));
-			// System.out.println("Start Event from: " + station.getStationID() + "  to : " + station.getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
+			 System.out.println("##Start Event from: " + stationList.get(departureStation).getStationID() + "  to : " + stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination));
 			createPedestrian(space, stationList.get(departureStation).getStationID(), stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination)
 					.getDestination());
 		}
@@ -387,6 +388,11 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			props.put("stationID", station.getStationID());
 			props.put("capacity", station.getNumberOfDocks());
 			props.put("stock", station.getNumberOfBikes());
+			props.put("isSuperStation", false);
+//			props.put("proposed_departure_station", "A");
+//			props.put("proposed_arrival_station", "D");
+			
+			
 
 			space.createSpaceObject("bikestation", props, null);
 		}

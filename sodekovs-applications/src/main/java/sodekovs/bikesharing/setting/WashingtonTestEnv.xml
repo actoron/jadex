@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimulationDescription>
     <TimeSlices>
-        <TimeSlice runRelative="0.853521184444945" runTotal="2224" offset="60" startTime="0">
+        <TimeSlice runRelative="0.853521184444945" runTotal="50" offset="60" startTime="0">
            <ProbabilitiesForStations>			
                 <ProbabilitiesForStation stationID="A" departureProbability="0.11764705882352941">
                     <DestinationProbabilities>
@@ -29,7 +29,7 @@
                 </ProbabilitiesForStation>
             </ProbabilitiesForStations>
         </TimeSlice>        
-        <TimeSlice runRelative="0.853521184444945" runTotal="2224" offset="60" startTime="100000">
+        <TimeSlice runRelative="0.853521184444945" runTotal="50" offset="60" startTime="100000">
             <ProbabilitiesForStations>			
                 <ProbabilitiesForStation stationID="A" departureProbability="0.11764705882352941">
                     <DestinationProbabilities>
@@ -59,7 +59,7 @@
         </TimeSlice>
     </TimeSlices>
     <Stations>
-        <Station numberOfDocks="15" numberOfBikes="9" longitude="36.04085603112838" latitude="46.87500000000277" stationID="A"/>
+        <Station numberOfDocks="15" numberOfBikes="9" longitude="15.04085603112838" latitude="15.87500000000277" stationID="A"/>
         <Station numberOfDocks="23" numberOfBikes="11" longitude="36.72178988327031" latitude="49.37500000000144" stationID="B"/>
         <Station numberOfDocks="11" numberOfBikes="4" longitude="47.13035019455409" latitude="28.99999999999964" stationID="C"/>
         <Station numberOfDocks="11" numberOfBikes="6" longitude="33.474708171208704" latitude="69.41000000000011" stationID="D"/>        

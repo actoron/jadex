@@ -63,6 +63,7 @@
 					<env:property name="position" class="Vector2Double" />
 					<env:property name="proposed_departure_station" class="String" />
 					<env:property name="proposed_arrival_station" class="String" />
+					<env:property name="isSuperStation" class="Boolean" />
 				</env:objecttype> 
 
 				<!-- Placeholder to display simulation information. -->
