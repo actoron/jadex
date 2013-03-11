@@ -30,8 +30,10 @@
 		<import>sodekovs.bikesharing.container.Weg</import>
 		<import>sodekovs.bikesharing.fahrrad.FahrradVerleihStation</import>
 		<import>sodekovs.bikesharing.pedestrian.*</import>
-		<import>sodekovs.bikesharing.bikestation.*</import>
 		<import>sodekovs.bikesharing.pedestrian.movement.*</import>
+		<import>sodekovs.bikesharing.bikestation.*</import>
+		<import>sodekovs.bikesharing.truck.*</import>
+		<import>sodekovs.bikesharing.truck.movement.*</import>
 		<import>sodekovs.bikesharing.env.*</import>
 		<import>jadex.simulation.environment.DeltaTimeExecutor4Simulation</import>
 		<import>deco4mas.distributed.coordinate.environment.*</import>
@@ -62,8 +64,8 @@
 			</env:processtypes>
 
 			<env:objecttypes>
-
-				<env:objecttype name="pedestrian">
+			    
+			<env:objecttype name="pedestrian">
 					<env:property name="vision">0.15</env:property>
 					<env:property name="vision_range">0.3</env:property>
 					<env:property name="speed">0.7</env:property>
@@ -72,6 +74,7 @@
 						strategies -->
 					<env:property name="behaviour_strategy">2</env:property>
 				</env:objecttype>
+				
 				<env:objecttype name="bikestation">
 					<env:property name="stationID" class="String" />
 					<env:property name="stock" class="int" />
@@ -80,7 +83,17 @@
 					<env:property name="proposed_departure_station" class="String" />
 					<env:property name="proposed_arrival_station" class="String" />
 					<env:property name="isSuperStation" class="Boolean" />
-				</env:objecttype> 
+				</env:objecttype>
+				
+				<env:objecttype name="truck">
+					<env:property name="vision">0.15</env:property>
+					<env:property name="vision_range">0.3</env:property>
+					<env:property name="speed">0.7</env:property>
+					<env:property name="nrOfBikes">0</env:property>
+					<!-- check the movement.capability.xml for an explanation of possible 
+						strategies -->
+					<!-- <env:property name="behaviour_strategy">2</env:property> -->
+				</env:objecttype>
 
 				<!-- Placeholder to display simulation information. -->
 				<env:objecttype name="SimInfo">
@@ -92,6 +105,7 @@
 			<env:avatarmappings>
 				<env:avatarmapping componenttype="Pedestrian" objecttype="pedestrian" />
 				<env:avatarmapping componenttype="Bikestation" 	objecttype="bikestation" createcomponent="true"/>									
+				<env:avatarmapping componenttype="Truck" 	objecttype="truck" createcomponent="true"/>
 			</env:avatarmappings>
 
 			<env:tasktypes>
@@ -118,6 +132,22 @@
 						<env:texturedrectangle layer="3"
 							imagepath="sodekovs/bikesharing/bilder/bike.gif">
 							<env:drawcondition>$object.drives_bike</env:drawcondition>
+						</env:texturedrectangle>
+					</env:drawable>
+					
+					<!-- Truck -->
+					<env:drawable objecttype="truck" width="1.5"
+						height="1.5">
+						<env:property name="visionsize" dynamic="true">new
+							Vector2Double($object.getProperty("vision").doubleValue()*2)
+						</env:property>
+						<env:ellipse layer="1" size="visionsize" abssize="true"
+							color="#FAFA1E32" />
+						<env:texturedrectangle layer="2"
+							imagepath="sodekovs/bikesharing/bilder/truck.png" />
+						<env:texturedrectangle layer="3"
+							imagepath="sodekovs/bikesharing/bilder/bike.gif">
+							<env:drawcondition>$object.nrOfBikes > 0</env:drawcondition>
 						</env:texturedrectangle>
 					</env:drawable>
 
@@ -172,6 +202,8 @@
 			filename="sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml" />
 			<componenttype name="Bikestation"
 			filename="sodekovs/bikesharing/bikestation/Bikestation.agent.xml" />
+			<componenttype name="Truck"
+			filename="sodekovs/bikesharing/truck/Truck.agent.xml" />
 	</componenttypes>
 
 	<properties>
