@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import sodekovs.bikesharing.model.SimulationDescription;
-import sodekovs.bikesharing.model.Station;
-import sodekovs.bikesharing.model.TimeSlice;
 import sodekovs.investigation.helper.Constants;
+import sodekovs.util.bikesharing.model.SimulationDescription;
+import sodekovs.util.bikesharing.model.Station;
+import sodekovs.util.bikesharing.model.TimeSlice;
 import sodekovs.util.misc.XMLHandler;
 
 /**
