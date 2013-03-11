@@ -19,16 +19,16 @@ import java.util.TreeMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.ValidationException;
 
-import sodekovs.bikesharing.model.DestinationProbability;
-import sodekovs.bikesharing.model.ObjectFactory;
-import sodekovs.bikesharing.model.ProbabilitiesForStation;
-import sodekovs.bikesharing.model.ProbabilitiesForStation.DestinationProbabilities;
-import sodekovs.bikesharing.model.SimulationDescription;
-import sodekovs.bikesharing.model.SimulationDescription.Stations;
-import sodekovs.bikesharing.model.SimulationDescription.TimeSlices;
-import sodekovs.bikesharing.model.Station;
-import sodekovs.bikesharing.model.TimeSlice;
-import sodekovs.bikesharing.model.TimeSlice.ProbabilitiesForStations;
+import sodekovs.util.bikesharing.model.DestinationProbability;
+import sodekovs.util.bikesharing.model.ObjectFactory;
+import sodekovs.util.bikesharing.model.ProbabilitiesForStation;
+import sodekovs.util.bikesharing.model.SimulationDescription;
+import sodekovs.util.bikesharing.model.Station;
+import sodekovs.util.bikesharing.model.TimeSlice;
+import sodekovs.util.bikesharing.model.ProbabilitiesForStation.DestinationProbabilities;
+import sodekovs.util.bikesharing.model.SimulationDescription.Stations;
+import sodekovs.util.bikesharing.model.SimulationDescription.TimeSlices;
+import sodekovs.util.bikesharing.model.TimeSlice.ProbabilitiesForStations;
 import de.jollyday.Holiday;
 import de.jollyday.HolidayCalendar;
 import de.jollyday.HolidayManager;
@@ -808,7 +808,7 @@ public class RealDataExtractor {
 			for (Integer hour : dataByHour.keySet()) {
 				// ...then by stations
 				Map<String, List<StationTimeData>> dataByHourAndStation = partitionByStation(dataByHour.get(hour));
-				sodekovs.bikesharing.model.TimeSlice.Stations stations = of.createTimeSliceStations();
+				sodekovs.util.bikesharing.model.TimeSlice.Stations stations = of.createTimeSliceStations();
 
 				for (String stationId : dataByHourAndStation.keySet()) {
 					List<StationTimeData> stationTimeDatas = dataByHourAndStation.get(stationId);

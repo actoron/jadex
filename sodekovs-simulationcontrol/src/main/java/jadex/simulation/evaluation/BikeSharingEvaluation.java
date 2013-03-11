@@ -10,9 +10,9 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import sodekovs.bikesharing.model.SimulationDescription;
-import sodekovs.bikesharing.model.Station;
-import sodekovs.bikesharing.model.TimeSlice;
+import sodekovs.util.bikesharing.model.SimulationDescription;
+import sodekovs.util.bikesharing.model.Station;
+import sodekovs.util.bikesharing.model.TimeSlice;
 import sodekovs.util.misc.XMLHandler;
 
 /**

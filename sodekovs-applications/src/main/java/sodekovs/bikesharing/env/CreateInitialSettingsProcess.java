@@ -13,8 +13,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import sodekovs.bikesharing.model.SimulationDescription;
-import sodekovs.bikesharing.model.Station;
+import sodekovs.util.bikesharing.model.SimulationDescription;
+import sodekovs.util.bikesharing.model.Station;
 import sodekovs.util.misc.XMLHandler;
 
 /**

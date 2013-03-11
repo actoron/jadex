@@ -29,11 +29,11 @@ import org.xml.sax.SAXException;
 
 import sodekovs.bikesharing.data.clustering.Cluster;
 import sodekovs.bikesharing.data.clustering.SuperCluster;
-import sodekovs.bikesharing.model.DestinationProbability;
-import sodekovs.bikesharing.model.ProbabilitiesForStation;
-import sodekovs.bikesharing.model.SimulationDescription;
-import sodekovs.bikesharing.model.Station;
-import sodekovs.bikesharing.model.TimeSlice;
+import sodekovs.util.bikesharing.model.DestinationProbability;
+import sodekovs.util.bikesharing.model.ProbabilitiesForStation;
+import sodekovs.util.bikesharing.model.SimulationDescription;
+import sodekovs.util.bikesharing.model.Station;
+import sodekovs.util.bikesharing.model.TimeSlice;
 import sodekovs.util.math.GetRandom;
 import sodekovs.util.misc.XMLHandler;
 

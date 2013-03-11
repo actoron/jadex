@@ -6,7 +6,7 @@
 //
 
 
-package sodekovs.bikesharing.model;
+package sodekovs.util.bikesharing.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

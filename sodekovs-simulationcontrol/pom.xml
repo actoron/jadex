@@ -111,11 +111,11 @@
 			<artifactId>sodekovs-util</artifactId>
 			<version>2.1</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>sodekovs-applications</artifactId>
 			<version>2.1</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>sodekovs-benchmarking</artifactId>
