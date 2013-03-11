@@ -399,8 +399,8 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			props.put("stationID", station.getStationID());
 			props.put("capacity", station.getNumberOfDocks());
 			props.put("stock", station.getNumberOfBikes());
-			props.put("proposed_departure_station", "");
-			props.put("proposed_arrival_station", "");
+			props.put("proposed_departure_station", null);
+			props.put("proposed_arrival_station", null);
 			
 			// check if station is a super station
 			if (superStations.contains(station.getStationID())) {
