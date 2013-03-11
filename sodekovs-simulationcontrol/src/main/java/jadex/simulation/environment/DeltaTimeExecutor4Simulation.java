@@ -156,7 +156,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 							// consumer.consumeData(currenttime, clockservice.getTick());
 							// }
 
-							System.out.println("#DeltaTimeExecutor# Tick Size: " + clockservice.getTick());
+//							System.out.println("#DeltaTimeExecutor# Tick Size: " + clockservice.getTick());
 							dilationCounter += progress;
 
 //							if (dilationCounter >= 100) {

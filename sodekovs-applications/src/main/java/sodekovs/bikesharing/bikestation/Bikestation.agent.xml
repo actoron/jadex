@@ -11,18 +11,25 @@
 		<import>jadex.extension.envsupport.math.Vector2Double</import>		
 		<import>jadex.extension.envsupport.environment.space2d.ContinuousSpace2D</import>
 		<import>jadex.extension.envsupport.environment.ISpaceObject</import>
-		<import>jadex.commons.future.IFuture</import>
-		<import>sodekovs.bikesharing.container.*</import>			
+		<import>sodekovs.bikesharing.container.*</import>	
+		<import>sodekovs.bikesharing.coordination.*</import>
+		<import>deco4mas.distributed.coordinate.environment.*</import>	
+		<import>jadex.commons.future.*</import>		
 	</imports>
 
 
 	
 	<beliefs>
-	
-	<!-- Environment. -->
+		<!-- Environment. -->
 		<belief name="environment" class="ContinuousSpace2D"> 			
  			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
  		</belief>
+ 		
+				<!-- Environment. DO NOT CHANGE the name "env".-->
+		<belief name="env" class="CoordinationSpace">
+			<fact>(CoordinationSpace)$scope.getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable())
+			</fact>
+		</belief>
  		 		
  		<belief name="myself" class="ISpaceObject"> 			
  			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
@@ -61,8 +68,8 @@
 		
 		<plan name="gather_occupancy_plan">
 		    <body class="GatherOccupancyPlan"/>
-		    <parameter name="superStationID" class="String">
-		        <internaleventmapping ref="gather_occupancy_rate.superStationID"/>
+		    <parameter name="coordData" class="ClusterStationCoordData">
+		        <internaleventmapping ref="gather_occupancy_rate.coordData"/>
 		    </parameter>
 		    <trigger>
 		        <internalevent ref="gather_occupancy_rate"/>
@@ -73,12 +80,12 @@
 	<events>
 	    <!-- DeCoMAS event -->
 	    <internalevent name="poll_cluster_stations">
-	        <parameter name="stationID" class="String"/>
+	        <parameter name="coordData" class="ClusterStationCoordData"/>
 	    </internalevent>
 	    
 	    <!-- DeCoMAS event -->
 	    <internalevent name="gather_occupancy_rate">
-	        <parameter name="superStationID" class="String"/>
+	        <parameter name="coordData" class="ClusterStationCoordData"/>
 	    </internalevent>
 	</events>
 	

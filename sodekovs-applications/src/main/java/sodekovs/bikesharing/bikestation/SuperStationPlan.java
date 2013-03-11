@@ -5,6 +5,7 @@ package sodekovs.bikesharing.bikestation;
 
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
+import sodekovs.bikesharing.coordination.ClusterStationCoordData;
 
 /**
  * Plan handles the periodically polling of stations in the super stations cluster via decomas.
@@ -27,7 +28,12 @@ public class SuperStationPlan extends Plan {
 				// wait for some time
 				waitFor(PERIOD);
 				IInternalEvent pollEvent = createInternalEvent("poll_cluster_stations");
-				pollEvent.getParameter("stationID").setValue(stationID);
+				
+				ClusterStationCoordData data = new ClusterStationCoordData();
+				data.setSuperStationId(stationID);
+				data.setState(ClusterStationCoordData.STATE_POLLING);
+				
+				pollEvent.getParameter("coordData").setValue(data);
 				dispatchInternalEvent(pollEvent);
 			}
 		}

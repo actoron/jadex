@@ -52,7 +52,7 @@
 				<from>
 					<agent_element element="poll_cluster_stations" agent_id="Bikestation" type="INTERNAL_EVENT">					
 						<parameter_mappings>
-							<mapping ref="stationID" name="stationID"/>
+							<mapping ref="coordData" name="coordData"/>
 						</parameter_mappings>
 					</agent_element>
 				</from>
@@ -60,17 +60,11 @@
 				<mechanism_configuration
 					mechanism_id="sodekovs.bikesharing.coordination.ClusterMechanism"
 					agent_type="JADEX">
-					<properties>
-						<entry>
-							<key>cluster-file</key>
-							<value>../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/stationCluster-16.xml</value>
-						</entry>
-					</properties>
 				</mechanism_configuration>			
 				<to>		
 					 <agent_element element="gather_occupancy_rate" agent_id="Bikestation" type="INTERNAL_EVENT">
 						<parameter_mappings>
-							<mapping ref="stationID" name="superStationID"/>
+							<mapping ref="coordData" name="coordData"/>
 						</parameter_mappings>
 					</agent_element>
 				</to>

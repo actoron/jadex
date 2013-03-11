@@ -41,5 +41,20 @@ public class SuperCluster {
 	 */
 	public void setCluster(List<Cluster> cluster) {
 		this.cluster = cluster;
-	}	
+	}
+	
+	public List<String> getClusterStationIDs(String superStationId) {
+		List<String> clusterStations = new ArrayList<String>();
+		
+		for (Cluster cluster : this.cluster) {
+			Station superStation = cluster.getSuperStation();
+			if (superStation.getName().equals(superStationId)) {
+				for (Station station : cluster.getStations()) {
+					clusterStations.add(station.getName());
+				}
+			}
+		}
+		
+		return clusterStations;
+	}
 }
