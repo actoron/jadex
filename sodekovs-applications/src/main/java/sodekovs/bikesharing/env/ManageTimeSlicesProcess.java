@@ -311,6 +311,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 				properties.put("destination_station_pos", destPos);
 
 				cms.createComponent("Pedestrian-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml",
+//				cms.createComponent("Truck-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/truck/Truck.agent.xml",
 						new CreationInfo(null, properties, space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(new DefaultResultListener() {
 					public void resultAvailable(Object result) {
 						final IComponentIdentifier cid = (IComponentIdentifier) result;
