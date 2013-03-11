@@ -23,8 +23,7 @@ import sodekovs.util.misc.XMLHandler;
  */
 public class BikeSharingEvaluation {
 
-	// private String realDataXMLFile = "E:\\Workspaces\\Jadex\\BikeSharing\\MyProject\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday.xml";
-	private String realDataXMLFile = "E:\\Workspaces\\Jadex\\Jadex mit altem Maven 2\\Jadex\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday.xml";
+	private String realDataXMLFile = "E:\\Workspaces\\Jadex\\BikeSharing2\\Jadex\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
 	private SimulationDescription realData;
 	// conf. following method for understanding the data structure:
 	// EvaluateRow.evaluateRowData(preparedRowData)

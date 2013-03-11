@@ -7,11 +7,14 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.MEnvSpaceType;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.evaluation.AbstractChartDataConsumer;
 import jadex.extension.envsupport.evaluation.DefaultDataProvider;
 import jadex.extension.envsupport.evaluation.IObjectSource;
@@ -196,7 +199,26 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Decrement the number of currently running experiments on this agent
 		numberOfRunningExperiments(-1);
-		cms.destroyComponent(exta.getComponentIdentifier());
+//		try{
+		cms.destroyComponent(exta.getComponentIdentifier()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				System.out.println("#RuntimeManager# Killed app. " + result.toString());
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
+//			
+//		}
+//		};
+//		
+//		}catch(Exception e){
+//			System.out.println("#RunTimeMgr.# Exception ");
+//			e.printStackTrace();
+//		}
 		// delete *.application.xml from disk
 		FileHandler.deleteFile(directoryPath + simConf.getName() + ".application.xml");
 		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
