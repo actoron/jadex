@@ -214,7 +214,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 
 			// compute destination probabilities of this departure
 			int destination = computeDestination(stationList.get(departureStation));
-			 System.out.println("##Start Event from: " + stationList.get(departureStation).getStationID() + "  to : " + stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination));
+//			 System.out.println("##Start Event from: " + stationList.get(departureStation).getStationID() + "  to : " + stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination));
 			createPedestrian(space, stationList.get(departureStation).getStationID(), stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination)
 					.getDestination());
 		}

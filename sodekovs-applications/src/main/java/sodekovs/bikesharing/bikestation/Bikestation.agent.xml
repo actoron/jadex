@@ -47,6 +47,8 @@
  		     <fact class="IFuture">$beliefbase.myself.getProperty("stock")</fact>
  		</belief>		
  		
+ 		<belief name="noClusterStations" class="Integer"/>
+ 		
 		<!-- Used for SO. Which alternative departure station is proposed? -->
 		<belief name="proposed_departure_station" class="String">
 			<fact class="IFuture">$beliefbase.myself.getProperty("proposed_departure_station")</fact>
@@ -61,14 +63,12 @@
 		<belief name="isSuperStation" class="Boolean">
 			<fact class="IFuture">$beliefbase.myself.getProperty("isSuperStation")</fact>
 		</belief>
+		
+		<!-- Used for So. Stores the received replies from a poll request -->
+		<beliefset name="receivedCoordData" class="ClusterStationCoordData"/>
 	</beliefs>
 	
 	<plans>
-		<!-- Test plan. -->
-		<plan name="test_plan">
-			<body class="TestPlan"/>			
-		</plan>
-		
 		<!-- Super station plan -->
 		<plan name ="super_station_plan">
 	    	<body class="SuperStationPlan"/>
@@ -92,7 +92,7 @@
 		    <trigger>
 		        <internalevent ref="calculate_proposed_stations"/>
 		    </trigger>
-		</plan>		
+		</plan>
 	</plans>
 	
 	<events>
@@ -120,7 +120,6 @@
 	<configurations>
 		<configuration name="default">		
 			<plans>
-				<initialplan ref="test_plan"/>
 				<initialplan ref="super_station_plan"/>
 			</plans>
 		</configuration>

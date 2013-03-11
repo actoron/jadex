@@ -14,11 +14,22 @@ public class CalculateProposedStationsPlan extends Plan {
 
 	public void body() {
 		ClusterStationCoordData receivedCoordData = (ClusterStationCoordData) getParameter("coordData").getValue();
-		String superStationId = receivedCoordData.getSuperStationId();
+		Integer noClusterStations = (Integer) getBeliefbase().getBelief("noClusterStations").getFact();
 		
-		System.out.println(getComponentDescription() + " GatherOccupancyPlan received " + receivedCoordData);
-		// TODO Auto-generated method stub
-
+		System.out.println(getComponentDescription() + " CalculateProposedStationsPlan received " + receivedCoordData);
+		
+		//TODO Anstelle des atomic Blocks werden die daten nur in den beliefset geschrieben, dann wird noch ein plan geschrieben der initial ausgeführt wird und per condition oder timeout wartet bis
+		// alle antworten eingesammelt wurden oder der timeout eintritt ehe er die proposed stations berechnet
+		startAtomic();
+		getBeliefbase().getBeliefSet("receivedCoordData").addFact(receivedCoordData);
+		
+		if (getBeliefbase().getBeliefSet("receivedCoordData").getFacts().length == noClusterStations) {
+			System.out.println(getComponentDescription() + " CalculateProposedStationsPlan MASTER!");
+			
+			ClusterStationCoordData[] data = (ClusterStationCoordData[]) getBeliefbase().getBeliefSet("receivedCoordData").getFacts();
+			getBeliefbase().getBeliefSet("receivedCoordData").removeFacts();
+			System.out.println(data.length);
+ 		}
+		endAtomic();
 	}
-
 }
