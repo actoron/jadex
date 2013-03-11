@@ -18,6 +18,9 @@ public class ClusterStationCoordData {
 	public static final int STATE_REPLY = 1;
 	public static final int STATE_ALTERNATIVES = 2;
 
+	public static final String CAPACITY = "capacity";
+	public static final String STOCK = "stock";
+	
 	private String superStationId = null;
 	
 	private Integer state = null;

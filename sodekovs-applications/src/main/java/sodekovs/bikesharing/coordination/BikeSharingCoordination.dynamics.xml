@@ -42,12 +42,22 @@
 				<tos>
 					<to>cluster_station</to>
 				</tos>
-			</deco_link>			
+			</deco_link>
+			
+			<!-- The link where the cluster stations informs the super station about its stocks and capacities. -->
+			<deco_link realization="reply_cluster_stations" type="POSITIVE" name="reply_cluster_stations" spaces="mycoordspace">
+				<froms>
+					<from>cluster_station</from>
+				</froms>
+				<tos>
+					<to>super_station</to>
+				</tos>
+			</deco_link>				
 		</deco_links>
 
 		<!-- The detailed configuration of interdependency enactment. -->
 		<deco-link-realizations>
-		<!-- The link where the super stations polls its cluster stations. -->
+			<!-- The link where the super stations polls its cluster stations. -->
 			<realization id="poll_cluster_stations">
 				<from>
 					<agent_element element="poll_cluster_stations" agent_id="Bikestation" type="INTERNAL_EVENT">					
@@ -63,6 +73,29 @@
 				</mechanism_configuration>			
 				<to>		
 					 <agent_element element="gather_occupancy_rate" agent_id="Bikestation" type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping ref="coordData" name="coordData"/>
+						</parameter_mappings>
+					</agent_element>
+				</to>
+			</realization>
+			
+			<!-- The link where the super stations polls its cluster stations. -->
+			<realization id="reply_cluster_stations">
+				<from>
+					<agent_element element="reply_cluster_stations" agent_id="Bikestation" type="INTERNAL_EVENT">					
+						<parameter_mappings>
+							<mapping ref="coordData" name="coordData"/>
+						</parameter_mappings>
+					</agent_element>
+				</from>
+				<!-- Coordination Medium configuration: -->
+				<mechanism_configuration
+					mechanism_id="sodekovs.bikesharing.coordination.ClusterMechanism"
+					agent_type="JADEX">
+				</mechanism_configuration>			
+				<to>		
+					 <agent_element element="calculate_proposed_stations" agent_id="Bikestation" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="coordData" name="coordData"/>
 						</parameter_mappings>

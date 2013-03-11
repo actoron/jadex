@@ -37,6 +37,14 @@
  		
  		<belief name="stationID" class="String">
  		    <fact class="IFuture">$beliefbase.myself.getProperty("stationID")</fact>
+ 		</belief>
+ 		
+ 		<belief name="capacity" class="Integer">
+ 		     <fact class="IFuture">$beliefbase.myself.getProperty("capacity")</fact>
+ 		</belief>
+ 		
+ 		<belief name="stock" class="Integer">
+ 		     <fact class="IFuture">$beliefbase.myself.getProperty("stock")</fact>
  		</belief>		
  		
 		<!-- Used for SO. Which alternative departure station is proposed? -->
@@ -74,6 +82,16 @@
 		    <trigger>
 		        <internalevent ref="gather_occupancy_rate"/>
 		    </trigger>
+		</plan>
+		
+		<plan name="calculate_proposed_stations">
+		    <body class="CalculateProposedStationsPlan"/>
+		    <parameter name="coordData" class="ClusterStationCoordData">
+		        <internaleventmapping ref="calculate_proposed_stations.coordData"/>
+		    </parameter>
+		    <trigger>
+		        <internalevent ref="calculate_proposed_stations"/>
+		    </trigger>
 		</plan>		
 	</plans>
 	
@@ -85,6 +103,16 @@
 	    
 	    <!-- DeCoMAS event -->
 	    <internalevent name="gather_occupancy_rate">
+	        <parameter name="coordData" class="ClusterStationCoordData"/>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS event -->
+	    <internalevent name="reply_cluster_stations">
+	        <parameter name="coordData" class="ClusterStationCoordData"/>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS event -->
+	    <internalevent name="calculate_proposed_stations">
 	        <parameter name="coordData" class="ClusterStationCoordData"/>
 	    </internalevent>
 	</events>

@@ -73,8 +73,19 @@ public class ClusterMechanism extends CoordinationMechanism {
 	}
 
 	private void coordinationReply(CoordinationInfo coordInfo) {
-		// TODO Auto-generated method stub
+		ClusterStationCoordData coordData = (ClusterStationCoordData) coordInfo.getValueByName(Constants.VALUE);
+		String superStationId = coordData.getSuperStationId();
 		
+		List<IComponentDescription> receiver = new ArrayList<IComponentDescription>();
+		
+		for (ISpaceObject spaceObj : appSpace.getSpaceObjectsByType("bikestation")) {
+			String stationId = (String) spaceObj.getProperty("stationID");
+			if (stationId.equals(superStationId)) {
+				receiver.add(appSpace.getOwner(spaceObj.getId()));
+			}
+		}
+		
+		space.publishCoordinationEvent(coordInfo, receiver, getRealisationName(), eventNumber++);
 	}
 
 	private void coordinationPolling(CoordinationInfo coordInfo) {
