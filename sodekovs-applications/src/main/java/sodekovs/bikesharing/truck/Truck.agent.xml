@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Truck" package="sodekovs.bikesharing.truck">
+
+	<imports>
+		<import>jadex.extension.envsupport.math.Vector2Int</import>
+		<import>jadex.extension.envsupport.math.IVector2</import>
+		<import>jadex.extension.envsupport.math.Vector2Double</import>		
+		<import>jadex.extension.envsupport.environment.space2d.ContinuousSpace2D</import>
+		<import>jadex.extension.envsupport.environment.ISpaceObject</import>
+		<import>jadex.commons.future.IFuture</import>
+		<import>sodekovs.bikesharing.container.*</import>
+		<import>sodekovs.bikesharing.truck.movement.*</import>		
+	</imports>
+
+	<capabilities>
+		<!-- Include the move capability as move for basic movement. -->
+		<capability name="move" file="Movement" />
+	</capabilities>
+	
+	<beliefs>
+		<!-- The agent's avatar  in the environment. -->
+		<beliefref name="myself">
+			<concrete ref="move.myself"/>
+		</beliefref>
+		
+		<!--  Test for evaluation! -->
+		<belief name="myPos" class="Vector2Double" evaluationmode="push">
+			<fact language="jcl">$beliefbase.myself.position</fact>
+		</belief>		
+		
+		<!-- The position of the destination station -->
+		<beliefref name="destination_station_pos">
+			<concrete ref="move.destination_station_pos"/>
+		</beliefref>	
+	</beliefs>
+</agent>
