@@ -58,21 +58,13 @@ public class ClusterMechanism extends CoordinationMechanism {
 	public void perceiveCoordinationEvent(Object obj) {
 		CoordinationInfo coordInfo = (CoordinationInfo) obj;
 		ClusterStationCoordData coordData = (ClusterStationCoordData) coordInfo.getValueByName(Constants.VALUE);
-		if (coordData.getState().equals(ClusterStationCoordData.STATE_POLLING)) {
-			coordinationPolling(coordInfo);
+		if (coordData.getState().equals(ClusterStationCoordData.STATE_POLLING) || coordData.getState().equals(ClusterStationCoordData.STATE_ALTERNATIVES)) {
+			informClusterStations(coordInfo);
 		} else if (coordData.getState().equals(ClusterStationCoordData.STATE_REPLY)) {
-			coordinationReply(coordInfo);
-		} else if (coordData.getState().equals(ClusterStationCoordData.STATE_ALTERNATIVES)) {
-			coordinationAlternatives(coordInfo);
+			informSuperStation(coordInfo);
 		}
 	}
-
-	private void coordinationAlternatives(CoordinationInfo coordInfo) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void coordinationReply(CoordinationInfo coordInfo) {
+	private void informSuperStation(CoordinationInfo coordInfo) {
 		ClusterStationCoordData coordData = (ClusterStationCoordData) coordInfo.getValueByName(Constants.VALUE);
 		String superStationId = coordData.getSuperStationId();
 		
@@ -88,11 +80,11 @@ public class ClusterMechanism extends CoordinationMechanism {
 		space.publishCoordinationEvent(coordInfo, receiver, getRealisationName(), eventNumber++);
 	}
 
-	private void coordinationPolling(CoordinationInfo coordInfo) {
+	private void informClusterStations(CoordinationInfo coordInfo) {
 		ClusterStationCoordData coordData = (ClusterStationCoordData) coordInfo.getValueByName(Constants.VALUE);
 		List<IComponentDescription> receiver = new ArrayList<IComponentDescription>();
 		
-		// only poll cluster stations
+		// only inform cluster stations
 		List<String> clusterStations = superCluster.getClusterStationIDs(coordData.getSuperStationId());
 		for (ISpaceObject spaceObj: appSpace.getSpaceObjectsByType("bikestation")) {
 			String stationID = (String) spaceObj.getProperty("stationID");

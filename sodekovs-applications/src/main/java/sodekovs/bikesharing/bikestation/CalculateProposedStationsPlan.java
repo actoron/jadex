@@ -1,5 +1,6 @@
 package sodekovs.bikesharing.bikestation;
 
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import sodekovs.bikesharing.coordination.ClusterStationCoordData;
 
@@ -18,8 +19,7 @@ public class CalculateProposedStationsPlan extends Plan {
 		
 		System.out.println(getComponentDescription() + " CalculateProposedStationsPlan received " + receivedCoordData);
 		
-		//TODO Anstelle des atomic Blocks werden die daten nur in den beliefset geschrieben, dann wird noch ein plan geschrieben der initial ausgeführt wird und per condition oder timeout wartet bis
-		// alle antworten eingesammelt wurden oder der timeout eintritt ehe er die proposed stations berechnet
+		// only one plan instance should do the actual calculation when all answer have been received
 		startAtomic();
 		getBeliefbase().getBeliefSet("receivedCoordData").addFact(receivedCoordData);
 		
@@ -29,7 +29,21 @@ public class CalculateProposedStationsPlan extends Plan {
 			ClusterStationCoordData[] data = (ClusterStationCoordData[]) getBeliefbase().getBeliefSet("receivedCoordData").getFacts();
 			getBeliefbase().getBeliefSet("receivedCoordData").removeFacts();
 			System.out.println(data.length);
+			calculateProposedStations(data);
  		}
 		endAtomic();
+	}
+
+	private void calculateProposedStations(ClusterStationCoordData[] data) {
+		String stationId = (String) getBeliefbase().getBelief("stationID").getFact();
+		
+		// TODO The actual calculation
+		
+		IInternalEvent event = createInternalEvent("inform_alternatives");
+		ClusterStationCoordData coordData = new ClusterStationCoordData();
+		coordData.setState(ClusterStationCoordData.STATE_ALTERNATIVES);
+		coordData.setSuperStationId(stationId);
+		event.getParameter("coordData").setValue(coordData);
+		dispatchInternalEvent(event);
 	}
 }

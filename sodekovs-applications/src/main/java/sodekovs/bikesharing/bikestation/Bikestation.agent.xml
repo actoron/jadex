@@ -16,8 +16,6 @@
 		<import>deco4mas.distributed.coordinate.environment.*</import>	
 		<import>jadex.commons.future.*</import>		
 	</imports>
-
-
 	
 	<beliefs>
 		<!-- Environment. -->
@@ -93,6 +91,16 @@
 		        <internalevent ref="calculate_proposed_stations"/>
 		    </trigger>
 		</plan>
+		
+		<plan name="receive_alternatives">
+		    <body class="ReceiveAlternativesPlan"/>
+		    <parameter name="coordData" class="ClusterStationCoordData">
+		        <internaleventmapping ref="receive_alternatives.coordData"/>
+		    </parameter>
+		    <trigger>
+		        <internalevent ref="receive_alternatives"/>
+		    </trigger>
+		</plan>
 	</plans>
 	
 	<events>
@@ -113,6 +121,16 @@
 	    
 	    <!-- DeCoMAS event -->
 	    <internalevent name="calculate_proposed_stations">
+	        <parameter name="coordData" class="ClusterStationCoordData"/>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS event -->
+	    <internalevent name="inform_alternatives">
+	        <parameter name="coordData" class="ClusterStationCoordData"/>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS event -->
+	    <internalevent name="receive_alternatives">
 	        <parameter name="coordData" class="ClusterStationCoordData"/>
 	    </internalevent>
 	</events>

@@ -3,12 +3,12 @@
     <cluster>
         <cluster west="0.0" south="0.0" north="100.0" east="100.0">
             <stations>
-                <station name="A" lon="15.04085603112838" lat="15.87500000000277"/>
-                <station name="B" lon="36.72178988327031" lat="49.37500000000144"/>
-                <station name="C" lon="47.13035019455409" lat="28.99999999999964"/>
-                <station name="D" lon="33.474708171208704" lat="69.41000000000011"/>
+                <station name="17th and K St NW [formerly 17th and L St NW]" lon="15.04085603112838" lat="15.87500000000277"/>
+                <station name="10th and U St NW" lon="36.72178988327031" lat="49.37500000000144"/>
+                <station name="16th and U St NW" lon="47.13035019455409" lat="28.99999999999964"/>
+                <station name="23rd and Crystal Dr" lon="33.474708171208704" lat="69.41000000000011"/>
             </stations>
-            <superStation name="A" lon="15.04085603112838" lat="15.87500000000277"/>
+            <superStation name="17th and K St NW [formerly 17th and L St NW]" lon="15.04085603112838" lat="15.87500000000277"/>
         </cluster>
     </cluster>
 </superCluster>
