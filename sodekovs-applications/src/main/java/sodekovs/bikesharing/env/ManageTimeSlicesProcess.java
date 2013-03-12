@@ -13,7 +13,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceProcess;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.Vector2Double;
 
 import java.io.IOException;
@@ -435,7 +434,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 //			if ("23rd and Crystal Dr".equals(station.getStationID())) {
 //				props.put("proposed_departure_station", "16th and U St NW");
 //			} else {
-				props.put("proposed_arrival_station", null);
+				props.put("proposed_departure_station", null);
 //			}
 
 //			if ("17th and K St NW [formerly 17th and L St NW]".equals(station.getStationID())) {

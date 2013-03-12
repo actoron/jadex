@@ -43,6 +43,10 @@
  		
  		<belief name="stock" class="Integer">
  		     <fact class="IFuture">$beliefbase.myself.getProperty("stock")</fact>
+ 		</belief>
+ 		
+ 		<belief name="position" class="Vector2Double">
+ 		    <fact class="IFuture">$beliefbase.myself.getProperty("position")</fact>
  		</belief>		
  		
  		<belief name="noClusterStations" class="Integer"/>

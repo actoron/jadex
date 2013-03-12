@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+
 /**
  * @author thomas
  *
@@ -17,23 +18,24 @@ public class ClusterStationCoordData {
 	public static final int STATE_POLLING = 0;
 	public static final int STATE_REPLY = 1;
 	public static final int STATE_ALTERNATIVES = 2;
-
-	public static final String CAPACITY = "capacity";
-	public static final String STOCK = "stock";
 	
 	private String superStationId = null;
 	
 	private Integer state = null;
 	
-	private Map<String, Object> data = null;
-
+	private CoordinationStationData stationData = null;
+	
+	private Map<String, String> proposedArrivalStations = null;
+	
+	private Map<String, String> proposedDepartureStations = null;
 	
 	/**
 	 * 
 	 */
 	public ClusterStationCoordData() {
 		super();
-		this.data = new HashMap<String, Object>();
+		this.proposedArrivalStations = new HashMap<String, String>();
+		this.proposedDepartureStations = new HashMap<String, String>();
 	}
 
 	/**
@@ -65,26 +67,17 @@ public class ClusterStationCoordData {
 	}
 
 	/**
-	 * @return the data
+	 * @return the stationData
 	 */
-	public Map<String, Object> getData() {
-		return data;
+	public CoordinationStationData getStationData() {
+		return stationData;
 	}
 
 	/**
-	 * @param data the data to set
+	 * @param stationData the stationData to set
 	 */
-	public void setData(Map<String, Object> data) {
-		this.data = data;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		final int maxLen = 10;
-		return "ClusterStationCoordData [superStationId=" + superStationId + ", state=" + state + ", data=" + (data != null ? toString(data.entrySet(), maxLen) : null) + "]";
+	public void setStationData(CoordinationStationData stationData) {
+		this.stationData = stationData;
 	}
 
 	private String toString(Collection<?> collection, int maxLen) {
@@ -100,6 +93,45 @@ public class ClusterStationCoordData {
 		return builder.toString();
 	}
 
+	/**
+	 * @return the proposedArrivalStations
+	 */
+	public Map<String, String> getProposedArrivalStations() {
+		return proposedArrivalStations;
+	}
+
+	/**
+	 * @param proposedArrivalStations the proposedArrivalStations to set
+	 */
+	public void setProposedArrivalStations(Map<String, String> proposedArrivalStations) {
+		this.proposedArrivalStations = proposedArrivalStations;
+	}
+
+	/**
+	 * @return the proposedDepartureStations
+	 */
+	public Map<String, String> getProposedDepartureStations() {
+		return proposedDepartureStations;
+	}
+
+	/**
+	 * @param proposedDepartureStations the proposedDepartureStations to set
+	 */
+	public void setProposedDepartureStations(Map<String, String> proposedDepartureStations) {
+		this.proposedDepartureStations = proposedDepartureStations;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		final int maxLen = 10;
+		return "ClusterStationCoordData [superStationId=" + superStationId + ", state=" + state + ", stationData=" + stationData + ", proposedArrivalStations="
+				+ (proposedArrivalStations != null ? toString(proposedArrivalStations.entrySet(), maxLen) : null) + ", proposedDepartureStations="
+				+ (proposedDepartureStations != null ? toString(proposedDepartureStations.entrySet(), maxLen) : null) + "]";
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -107,8 +139,10 @@ public class ClusterStationCoordData {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((data == null) ? 0 : data.hashCode());
+		result = prime * result + ((proposedArrivalStations == null) ? 0 : proposedArrivalStations.hashCode());
+		result = prime * result + ((proposedDepartureStations == null) ? 0 : proposedDepartureStations.hashCode());
 		result = prime * result + ((state == null) ? 0 : state.hashCode());
+		result = prime * result + ((stationData == null) ? 0 : stationData.hashCode());
 		result = prime * result + ((superStationId == null) ? 0 : superStationId.hashCode());
 		return result;
 	}
@@ -125,15 +159,25 @@ public class ClusterStationCoordData {
 		if (getClass() != obj.getClass())
 			return false;
 		ClusterStationCoordData other = (ClusterStationCoordData) obj;
-		if (data == null) {
-			if (other.data != null)
+		if (proposedArrivalStations == null) {
+			if (other.proposedArrivalStations != null)
 				return false;
-		} else if (!data.equals(other.data))
+		} else if (!proposedArrivalStations.equals(other.proposedArrivalStations))
+			return false;
+		if (proposedDepartureStations == null) {
+			if (other.proposedDepartureStations != null)
+				return false;
+		} else if (!proposedDepartureStations.equals(other.proposedDepartureStations))
 			return false;
 		if (state == null) {
 			if (other.state != null)
 				return false;
 		} else if (!state.equals(other.state))
+			return false;
+		if (stationData == null) {
+			if (other.stationData != null)
+				return false;
+		} else if (!stationData.equals(other.stationData))
 			return false;
 		if (superStationId == null) {
 			if (other.superStationId != null)

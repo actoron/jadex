@@ -18,8 +18,14 @@ public class ReceiveAlternativesPlan extends Plan {
 	@Override
 	public void body() {
 		ClusterStationCoordData receivedCoordData = (ClusterStationCoordData) getParameter("coordData").getValue();
-		String superStationId = receivedCoordData.getSuperStationId();
+		String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
 		
 		System.out.println(getComponentDescription() + " ReceiveAlternativesPlan received " + receivedCoordData);
+		
+		String proposedArrivalStation = receivedCoordData.getProposedArrivalStations().get(stationID);
+		String proposedDepartureStation = receivedCoordData.getProposedDepartureStations().get(stationID);
+		
+		getBeliefbase().getBelief("proposed_arrival_station").setFact(proposedArrivalStation);
+		getBeliefbase().getBelief("proposed_departure_station").setFact(proposedDepartureStation);
 	}
 }
