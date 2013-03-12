@@ -12,6 +12,7 @@ import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceProcess;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.Vector2Double;
 
@@ -53,6 +54,8 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	private IClockService clockservice;
 	private ISimulationService simulationservice;
 	private int totalDepartures = 0;
+	// Limit nr of created pedestrian. required for better debugging.
+	private int limitPedNr = 0;
 
 	// int counterTmp = 0;
 
@@ -126,25 +129,31 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	 *            The space this process is running in.
 	 */
 	public void execute(IClockService clock, IEnvironmentSpace space) {
+
 		if (tickDelta == -1) {
 			tickDelta = clock.getTick();
 		}
 
-		// if (counterTmp < 6) {
-		for (int i = 0; i < timeSlicesList.size(); i++) {
-			// avoid index out of bounds exception
-			if (i + 1 < timeSlicesList.size()) {
-				if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta)) && (timeSlicesList.get(i + 1).getStartTime() > (clock.getTick() - tickDelta))) {
+//		if (limitPedNr < 30) {
+//			limitPedNr++;
+
+			// if (counterTmp < 6) {
+			for (int i = 0; i < timeSlicesList.size(); i++) {
+				// avoid index out of bounds exception
+				if (i + 1 < timeSlicesList.size()) {
+					if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta)) && (timeSlicesList.get(i + 1).getStartTime() > (clock.getTick() - tickDelta))) {
+						executeTimeSlice(i, space);
+						// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+						// counterTmp++;
+						break;
+					}
+				} else if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta))) {
 					executeTimeSlice(i, space);
 					// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
-					// counterTmp++;
-					break;
 				}
-			} else if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta))) {
-				executeTimeSlice(i, space);
-				// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
 			}
-		}
+
+//		}
 
 		// printClockAndSimSettings();
 	}
@@ -208,15 +217,16 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 
 		// Create number of pedestrians according to the "Andrang"
 		long congestion = Math.round((timeSlicesList.get(currentTimeSlice).getRunRelative() * totalDepartures) / 60);
-//		System.out.println("#Congestion: # " + cong);
+		// System.out.println("#Congestion: # " + cong);
 		for (int i = 0; i < congestion; i++) {
 			int departureStation = computeDeparture(stationList);
 
 			// compute destination probabilities of this departure
 			int destination = computeDestination(stationList.get(departureStation));
-//			 System.out.println("##Start Event from: " + stationList.get(departureStation).getStationID() + "  to : " + stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination));
-			createPedestrian(space, stationList.get(departureStation).getStationID(), stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination)
-					.getDestination());
+			// System.out.println("##Start Event from: " + stationList.get(departureStation).getStationID() + "  to : " +
+			// stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination));
+			createPedestrianAsISpaceObject(space, stationList.get(departureStation).getStationID(),
+					stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
 		}
 	}
 
@@ -292,7 +302,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	private void createPedestrian(final IEnvironmentSpace space, final String departureStation, final String destinationStation) {
+	private void createPedestrianAsBDIAgent(final IEnvironmentSpace space, final String departureStation, final String destinationStation) {
 
 		SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener() {
 			public void resultAvailable(Object result) {
@@ -311,14 +321,14 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 				properties.put("destination_station_pos", destPos);
 
 				cms.createComponent("Pedestrian-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml",
-//				cms.createComponent("Truck-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/truck/Truck.agent.xml",
+				// cms.createComponent("Truck-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/truck/Truck.agent.xml",
 						new CreationInfo(null, properties, space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(new DefaultResultListener() {
 					public void resultAvailable(Object result) {
 						final IComponentIdentifier cid = (IComponentIdentifier) result;
 						cms.getComponentDescription(cid).addResultListener(new DefaultResultListener() {
 							public void resultAvailable(Object result) {
 								// add the start position to the agent/avatar
-								space.getAvatar((IComponentDescription) result).setProperty(Space2D.PROPERTY_POSITION, depPos);
+								space.getAvatar((IComponentDescription) result).setProperty(ContinuousSpace2D.PROPERTY_POSITION, depPos);
 
 							}
 						});
@@ -326,9 +336,31 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 				});
 			}
 		});
+	}
 
-		// System.out.println("#CreateInitialSettingsProcess# pedestrians in Space?: "
-		// + space.getSpaceObjectsByType("pedestrian").length);
+	/**
+	 * Create pedestrian
+	 * 
+	 * @param path
+	 *            path
+	 * @param space
+	 *            space
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	private void createPedestrianAsISpaceObject(final IEnvironmentSpace space, final String departureStation, final String destinationStation) {
+
+		Station depStation = stationsMap.get(departureStation);
+		Station destStation = stationsMap.get(destinationStation);
+		final Vector2Double depPos = new Vector2Double(depStation.getLongitude(), depStation.getLatitude());
+		Vector2Double destPos = new Vector2Double(destStation.getLongitude(), destStation.getLatitude());
+
+		HashMap<String, Object> props = new HashMap<String, Object>();
+		props.put(ContinuousSpace2D.PROPERTY_POSITION, depPos);
+		props.put("destination_station_pos", destPos);
+		space.createSpaceObject("pedestrian", props, null);
+
 	}
 
 	private void initSimService(final IEnvironmentSpace space) {
@@ -374,7 +406,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	 * @param path
 	 *            path of the xml file
 	 * @param clusterPath
-	 * 			path of the cluster xml file
+	 *            path of the cluster xml file
 	 * @param grid
 	 *            the used space
 	 * @throws ParserConfigurationException
@@ -384,7 +416,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	private void createBikeStations(String path, String clusterPath, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
 		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);
 		SuperCluster superCluster = (SuperCluster) XMLHandler.parseXMLFromXMLFile(clusterPath, SuperCluster.class);
-		
+
 		// get all super station names (ids)
 		List<String> superStations = new ArrayList<String>();
 		for (Cluster cluster : superCluster.getCluster()) {
@@ -400,9 +432,18 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			props.put("stationID", station.getStationID());
 			props.put("capacity", station.getNumberOfDocks());
 			props.put("stock", station.getNumberOfBikes());
-			props.put("proposed_departure_station", null);
-			props.put("proposed_arrival_station", null);
-			
+//			if ("23rd and Crystal Dr".equals(station.getStationID())) {
+//				props.put("proposed_departure_station", "16th and U St NW");
+//			} else {
+				props.put("proposed_arrival_station", null);
+//			}
+
+//			if ("17th and K St NW [formerly 17th and L St NW]".equals(station.getStationID())) {
+//				props.put("proposed_arrival_station", "10th and U St NW");
+//			} else {
+				props.put("proposed_arrival_station", null);
+//			}
+
 			// check if station is a super station
 			if (superStations.contains(station.getStationID())) {
 				props.put("isSuperStation", true);

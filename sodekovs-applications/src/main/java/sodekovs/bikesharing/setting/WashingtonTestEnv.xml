@@ -59,9 +59,9 @@
         </TimeSlice>
     </TimeSlices>
     <Stations>
-        <Station numberOfDocks="23" numberOfBikes="11" longitude="36.72178988327031" latitude="49.37500000000144" stationID="10th and U St NW"/>
-        <Station numberOfDocks="15" numberOfBikes="9" longitude="15.04085603112838" latitude="15.87500000000277" stationID="17th and K St NW [formerly 17th and L St NW]"/>        
-        <Station numberOfDocks="11" numberOfBikes="4" longitude="47.13035019455409" latitude="28.99999999999964" stationID="16th and U St NW"/>
-        <Station numberOfDocks="11" numberOfBikes="6" longitude="33.474708171208704" latitude="69.41000000000011" stationID="23rd and Crystal Dr"/>               
+        <Station numberOfDocks="23" numberOfBikes="11" longitude="46.72178988327031" latitude="48.37500000000144" stationID="10th and U St NW"/>
+        <Station numberOfDocks="15" numberOfBikes="9" longitude="25.04085603112838" latitude="25.87500000000277" stationID="17th and K St NW [formerly 17th and L St NW]"/>        
+        <Station numberOfDocks="11" numberOfBikes="4" longitude="47.13035019455409" latitude="35.99999999999964" stationID="16th and U St NW"/>
+        <Station numberOfDocks="11" numberOfBikes="6" longitude="15.474708171208704" latitude="69.41000000000011" stationID="23rd and Crystal Dr"/>               
     </Stations>
 </SimulationDescription>

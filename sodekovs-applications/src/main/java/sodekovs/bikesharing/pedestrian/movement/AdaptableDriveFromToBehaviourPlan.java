@@ -2,7 +2,6 @@ package sodekovs.bikesharing.pedestrian.movement;
 
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -12,7 +11,6 @@ import jadex.extension.envsupport.math.Vector2Double;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import sodekovs.bikesharing.pedestrian.RentBikeTask;
 import sodekovs.bikesharing.pedestrian.ReturnBikeTask;
@@ -48,7 +46,7 @@ public class AdaptableDriveFromToBehaviourPlan extends Plan {
 		Vector2Double dest = (Vector2Double) getBeliefbase().getBelief("destination_station_pos").getFact();
 
 		String checkProposedDepartureStation = checkStation(space, myself, "proposed_departure_station");
-		double startTime = getClock().getTick();
+//		double startTime = getClock().getTick();
 		if (checkProposedDepartureStation != null) {
 			// go to alternative departure station
 			ISpaceObject[] allBikestations = space.getSpaceObjectsByType("bikestation");
@@ -74,6 +72,7 @@ public class AdaptableDriveFromToBehaviourPlan extends Plan {
 		// " Going from to " + myPos + "..to .." + dest + " : tick: " +
 		// getClock().getTick());
 		// double startTime = getClock().getTick();
+//		System.out.println("#RentedBike# " + myself.getId() + " - " +  myself.getProperty("drives_bike"));
 		moveToDestination(dest, space, myself);
 		// System.out.println("#DriveFromToBehaviourPlan# Plan accomplished: : tick: "
 		// + getClock().getTick());

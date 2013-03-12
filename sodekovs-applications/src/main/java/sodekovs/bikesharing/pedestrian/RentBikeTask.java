@@ -40,6 +40,11 @@ public class RentBikeTask extends AbstractTask {
 
 		// TODO: atomic action?
 		ISpaceObject[] allBiketations = contSpace.getSpaceObjectsByType("bikestation");
+		
+//		synchronized (allBiketations) {
+		
+		StringBuffer buf = new StringBuffer();
+		buf.append("Tries to rent bike: " + myself.getId() + "\n");
 
 		// Get the "right" nest.
 		for (ISpaceObject bikestation : allBiketations) {
@@ -49,10 +54,16 @@ public class RentBikeTask extends AbstractTask {
 				//TODO: assert: stock > 1 before renting
 				bikestation.setProperty("stock", stock - 1);
 				myself.setProperty("drives_bike", true);
+				buf.append(bikestation.getProperty(ContinuousSpace2D.PROPERTY_POSITION) + " vs.\t" + myself.getProperty(ContinuousSpace2D.PROPERTY_POSITION)+"\t");
+				buf.append(bikestation.getProperty(ContinuousSpace2D.PROPERTY_POSITION).equals(myself.getProperty(ContinuousSpace2D.PROPERTY_POSITION))+"\n");
 				break;
+			}else{
+				buf.append(bikestation.getProperty(ContinuousSpace2D.PROPERTY_POSITION) + " vs.\t" + myself.getProperty(ContinuousSpace2D.PROPERTY_POSITION) +"\t");
+				buf.append(bikestation.getProperty(ContinuousSpace2D.PROPERTY_POSITION).equals(myself.getProperty(ContinuousSpace2D.PROPERTY_POSITION))+"\n");
 			}
 		}
+//		System.out.println(buf.toString());
 		setFinished(space, obj, true);
-
-	}
+		}
+//	}
 }
