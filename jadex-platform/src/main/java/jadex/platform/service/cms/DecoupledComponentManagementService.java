@@ -135,7 +135,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	/** The realtime timeout flag. */
 	protected boolean realtime;
 	
-	/** The locked components. */
+	/** The locked components (component are locked till init is finished,
+	    i.e. if destroy is called during init it wait till lock is away). */
 	protected Map<IComponentIdentifier, LockEntry> lockentries;
 	
 	/** The time service. */
@@ -2472,7 +2473,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 					ret = new ComponentIdentifier(localname+cnt+"@"+platformname, addresses); // Hack?!
 				}
 			}
-			while(adapters.containsKey(ret) || initinfos.containsKey(ret));
+			while(adapters.containsKey(ret) || initinfos.containsKey(ret) || cfs.containsKey(ret));
 		}
 		
 		return ret;

@@ -169,7 +169,7 @@ public class UserAgent
 						{
 							public void customResultAvailable(Collection<IAService> result)
 							{
-								System.out.println("found: "+result.size());
+//								System.out.println("found: "+result.size());
 								if(result.size()==1)
 								{
 									rep3.setSucceeded(true);
@@ -185,7 +185,7 @@ public class UserAgent
 								{
 									public void resultAvailable(Void result) 
 									{
-//										System.out.println("called "+cntma1+" times ma1");
+//										System.out.println("called "+cnt4+" times ma1");
 										rep4.setSucceeded(true);
 										
 										ServiceCall call = CallAccess.getInvocation();
@@ -196,7 +196,7 @@ public class UserAgent
 										{
 											public void resultAvailable(TestReport rep5)
 											{
-												System.err.println("FFFFFFFFFFFINI: "+agent.getComponentIdentifier());
+//												System.err.println("FFFFFFFFFFFINI: "+agent.getComponentIdentifier());
 												agent.setResultValue("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
 												ret.setResult(null);
 											}

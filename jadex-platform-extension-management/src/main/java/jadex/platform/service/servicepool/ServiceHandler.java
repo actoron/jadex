@@ -84,12 +84,16 @@ public class ServiceHandler implements InvocationHandler
 	/**
 	 *  Callback of the invocation handler interface.
 	 */
-	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
 		assert component.isComponentThread();
 		
 		if(!SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			return new Future<Object>(new IllegalArgumentException("Return type must be future: "+method.getName()));
+		
+		final ServiceCall sc = ServiceCall.getCurrentInvocation();
+		if(sc!=null && !component.getComponentIdentifier().getParent().equals(sc.getCaller()))
+			System.out.println("wrong call: "+component.getComponentIdentifier()+" "+sc.getCaller());
 		
 		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
 		
@@ -113,6 +117,7 @@ public class ServiceHandler implements InvocationHandler
 					{
 						public void customResultAvailable(IComponentIdentifier result)
 						{
+//							System.out.println("created: "+result);
 							cms.getExternalAccess(result)
 								.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 							{
@@ -128,10 +133,11 @@ public class ServiceHandler implements InvocationHandler
 									}));
 								}
 								
-//								public void exceptionOccurred(Exception exception)
-//								{
-//									super.exceptionOccurred(exception);
-//								}
+								public void exceptionOccurred(Exception exception)
+								{
+									System.out.println("method: "+method+" "+args+" "+sc);
+									super.exceptionOccurred(exception);
+								}
 							}));
 						};
 					}));
@@ -252,10 +258,10 @@ public class ServiceHandler implements InvocationHandler
 					ret.setResult(null);
 				}
 				
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					super.exceptionOccurred(exception);
-//				}
+				public void exceptionOccurred(Exception exception)
+				{
+					super.exceptionOccurred(exception);
+				}
 			});
 		}
 		else
@@ -356,7 +362,7 @@ public class ServiceHandler implements InvocationHandler
 					public void customResultAvailable(Map<String, Object> result) 
 					{
 //						System.out.println("removed worker: "+workercid);
-						System.out.println("strategy state: "+strategy);
+//						System.out.println("strategy state: "+strategy);
 						ret.setResult(null);
 					}
 				}));
