@@ -3,25 +3,25 @@
    <TimeSlices>
     <TimeSlice runRelative="0.853521184444945" runTotal="50" offset="60" startTime="0">
             <ProbabilitiesForStations>			
-                <ProbabilitiesForStation stationID="10th and U St NW" departureProbability="0.11764705882352941">
+                <ProbabilitiesForStation stationID="10th and U St NW" departureProbability="0.25">
                     <DestinationProbabilities>
                         <DestinationProbability probability="0.5" destination="17th and K St NW [formerly 17th and L St NW]"/>
                         <DestinationProbability probability="0.5" destination="16th and U St NW"/>
                     </DestinationProbabilities>
                 </ProbabilitiesForStation>
-                <ProbabilitiesForStation stationID="17th and K St NW [formerly 17th and L St NW]" departureProbability="0.11764705882352941">
+                <ProbabilitiesForStation stationID="17th and K St NW [formerly 17th and L St NW]" departureProbability="0.25">
                     <DestinationProbabilities>
                         <DestinationProbability probability="0.5" destination="16th and U St NW"/>
                         <DestinationProbability probability="0.5" destination="23rd and Crystal Dr"/>
                     </DestinationProbabilities>
                 </ProbabilitiesForStation>
-                <ProbabilitiesForStation stationID="16th and U St NW" departureProbability="0.11764705882352941">
+                <ProbabilitiesForStation stationID="16th and U St NW" departureProbability="0.25">
                     <DestinationProbabilities>
                         <DestinationProbability probability="0.5" destination="23rd and Crystal Dr"/>
                         <DestinationProbability probability="0.5" destination="10th and U St NW"/>
                     </DestinationProbabilities>
                 </ProbabilitiesForStation>              
-                 <ProbabilitiesForStation stationID="23rd and Crystal Dr" departureProbability="0.11764705882352941">
+                 <ProbabilitiesForStation stationID="23rd and Crystal Dr" departureProbability="0.25">
                     <DestinationProbabilities>
                         <DestinationProbability probability="0.5" destination="10th and U St NW"/>
                         <DestinationProbability probability="0.5" destination="17th and K St NW [formerly 17th and L St NW]"/>
