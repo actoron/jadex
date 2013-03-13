@@ -224,7 +224,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			int destination = computeDestination(stationList.get(departureStation));
 			// System.out.println("##Start Event from: " + stationList.get(departureStation).getStationID() + "  to : " +
 			// stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination));
-			createPedestrianAsISpaceObject(space, stationList.get(departureStation).getStationID(),
+			createPedestrianAsBDIAgent(space, stationList.get(departureStation).getStationID(),
 					stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
 		}
 	}
@@ -318,17 +318,20 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 				// TODO: Hack: Add more properties here?
 				HashMap<String, Object> properties = new HashMap<String, Object>();
 				properties.put("destination_station_pos", destPos);
-
 				cms.createComponent("Pedestrian-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml",
-				// cms.createComponent("Truck-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/truck/Truck.agent.xml",
-						new CreationInfo(null, properties, space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(new DefaultResultListener() {
+				//HACK: Has to be started "suspended" in order to force start from DeparturePos. Otherwise componten will start from random pos that is computed by the avatar when it is intialized.
+						new CreationInfo(null, properties, space.getExternalAccess().getComponentIdentifier(), true, false), null).addResultListener(new DefaultResultListener() {
 					public void resultAvailable(Object result) {
 						final IComponentIdentifier cid = (IComponentIdentifier) result;
 						cms.getComponentDescription(cid).addResultListener(new DefaultResultListener() {
 							public void resultAvailable(Object result) {
 								// add the start position to the agent/avatar
 								space.getAvatar((IComponentDescription) result).setProperty(ContinuousSpace2D.PROPERTY_POSITION, depPos);
-
+								cms.resumeComponent(cid).addResultListener(new DefaultResultListener() {
+									public void resultAvailable(Object result) {
+										
+									}
+								});
 							}
 						});
 					}

@@ -37,10 +37,7 @@
 		</belief>
 		
 		<!-- The position of the destination station -->
-		<belief name="destination_station_pos" class="Vector2Double" updaterate="1000" evaluationmode="pull" exported="true">
-			<fact>
- 				$beliefbase.myself.getProperty("destination_station_pos")
- 			</fact>
+		 <belief name="destination_station_pos" class="Vector2Double" exported="true">		
 		</belief>		
 		 			 							
 	</beliefs>
