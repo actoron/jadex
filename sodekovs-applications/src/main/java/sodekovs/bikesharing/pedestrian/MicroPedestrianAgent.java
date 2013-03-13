@@ -6,7 +6,6 @@ import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector2;
@@ -18,6 +17,11 @@ import java.util.Map;
 
 import sodekovs.bikesharing.pedestrian.movement.MoveTask;
 
+/**
+ * Micro agent implementation for pedestrians.
+ * 
+ * @author Thomas Preisler
+ */
 public class MicroPedestrianAgent extends MicroAgent {
 
 	private ContinuousSpace2D environment = null;
@@ -34,10 +38,12 @@ public class MicroPedestrianAgent extends MicroAgent {
 
 			@Override
 			public void resultAvailable(IExtensionInstance result) {
+				// get the important variables
 				environment = (ContinuousSpace2D) result;
 				myself = environment.getAvatar(getComponentDescription());
 				int behaviourStrategy = ((Integer) myself.getProperty("behaviour_strategy")).intValue();
 
+				// choose the behaviour
 				if (behaviourStrategy == 0) {
 					// Default-Behaviour-Strategy
 					scheduleStep(new WalkAroundStep());
@@ -57,129 +63,170 @@ public class MicroPedestrianAgent extends MicroAgent {
 				exception.printStackTrace();
 			}
 		});
-		
+
 		return IFuture.DONE;
 	}
-	
+
+	/**
+	 * Component step for the realization of the station to random station default behavior.
+	 */
 	private class WalkAroundStep implements IComponentStep<Void> {
 
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
 			throw new RuntimeException("WalkAroundStep and behaviour not yet implemented");
 		}
-		
+
 	}
-	
+
+	/**
+	 * Component step for the realization of station to station behavior.
+	 */
 	private class StationToStationStep implements IComponentStep<Void> {
 
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
-			throw new RuntimeException("StationToStationStep and behaviour not yet implemented");
+			// get destination
+			final Vector2Double dest = (Vector2Double) myself.getProperty("destination_station_pos");
+			// rent bike
+			rentBike(new DefaultResultListener<Object>() {
+
+				@Override
+				public void resultAvailable(Object result) {
+					// move to destination
+					moveToDestination(dest, new DefaultResultListener<Object>() {
+
+						@Override
+						public void resultAvailable(Object result) {
+							// return bike
+							returnBike(new DefaultResultListener<Object>() {
+
+								@Override
+								public void resultAvailable(Object result) {
+									// get yourself killed
+									killAgent();
+								}
+
+							});
+						}
+					});
+				}
+			});
+
+			return IFuture.DONE;
 		}
-		
 	}
-	
+
+	/**
+	 * Component step for the realization of the adaptable station to station behavior.
+	 */
 	private class AdaptableStationToStationStep implements IComponentStep<Void> {
 
+		/**
+		 * The destination
+		 */
 		private Vector2Double dest = null;
 		
+		/**
+		 * Result listener for the rent bike task
+		 */
+		private DefaultResultListener<Object> rentListener =  new DefaultResultListener<Object>() {
+
+			@Override
+			public void resultAvailable(Object result) {
+				// after renting move to destination
+				moveToDestination(dest, new DefaultResultListener<Object>() {
+
+					@Override
+					public void resultAvailable(Object result) {
+						// check there for alternative stations
+						String checkProposedArrivalStation = checkStation("proposed_arrival_station");
+						if (checkProposedArrivalStation != null) {
+							// go to alternative arrival station
+							ISpaceObject[] allBikestations = environment.getSpaceObjectsByType("bikestation");
+							for (ISpaceObject bikestation : allBikestations) {
+								if (bikestation.getProperty("stationID").equals(checkProposedArrivalStation)) {
+									// move to alternative station
+									moveToDestination((IVector2) bikestation.getProperty("position"), new DefaultResultListener<Object>() {
+
+										@Override
+										public void resultAvailable(Object result) {
+											// return bike there
+											returnBike(returnListener);
+										}
+
+										@Override
+										public void exceptionOccurred(Exception exception) {
+											exception.printStackTrace();
+										}
+									});
+								}
+							}
+						}
+						
+						//return bike at destination
+						returnBike(returnListener);
+					}
+				});
+			}
+		};
+		
+		/**
+		 * Result listener for the return bike task
+		 */
+		private DefaultResultListener<Object> returnListener = new DefaultResultListener<Object>() {
+
+			@Override
+			public void resultAvailable(Object result) {
+				// get yourself killed after returning
+				killAgent();
+			}
+
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				exception.printStackTrace();
+			}
+		};
+
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
+			// get destination
 			dest = (Vector2Double) myself.getProperty("destination_station_pos");
-			String checkProposedDepartureStation = checkStation(environment, myself, "proposed_departure_station");
 			
+			// check alternative stations
+			String checkProposedDepartureStation = checkStation("proposed_departure_station");
 			if (checkProposedDepartureStation != null) {
 				// go to alternative departure station
 				ISpaceObject[] allBikestations = environment.getSpaceObjectsByType("bikestation");
 				for (ISpaceObject bikestation : allBikestations) {
 					if (bikestation.getProperty("stationID").equals(checkProposedDepartureStation)) {
+						// if available move to alternative station
 						moveToDestination((IVector2) bikestation.getProperty("position"), new DefaultResultListener<Object>() {
 
 							@Override
 							public void resultAvailable(Object result) {
-								rentBike();
+								// rent a bike there
+								rentBike(rentListener);
 							}
-							
-							@Override
-							public void exceptionOccurred(Exception exception) {
-								exception.printStackTrace();
-							}
+
 						});
 					}
 				}
 			}
-			
-			rentBike();
+
+			// rent a bike
+			rentBike(rentListener);
 			return IFuture.DONE;
 		}
-		
-		private void rentBike() {
-			Map<String, Object> props = new HashMap<String, Object>();
-			props.put(RentBikeTask.ACTOR_ID, myself.getId());
-			Object taskid = environment.createObjectTask(RentBikeTask.PROPERTY_TYPENAME, props, myself.getId());
-			environment.addTaskListener(taskid, myself.getId(), new DefaultResultListener<Object>() {
 
-				@Override
-				public void resultAvailable(Object result) {
-					moveToDestination(dest, new DefaultResultListener<Object>() {
-
-						@Override
-						public void resultAvailable(Object result) {
-							String checkProposedArrivalStation = checkStation(environment, myself, "proposed_arrival_station");
-							if (checkProposedArrivalStation != null) {
-								// go to alternative arrival station
-								ISpaceObject[] allBikestations = environment.getSpaceObjectsByType("bikestation");
-								for (ISpaceObject bikestation : allBikestations) {
-									if (bikestation.getProperty("stationID").equals(checkProposedArrivalStation)) {
-										moveToDestination((IVector2) bikestation.getProperty("position"), new DefaultResultListener<Object>() {
-
-											@Override
-											public void resultAvailable(Object result) {
-												returnBike();
-											}
-											
-											@Override
-											public void exceptionOccurred(Exception exception) {
-												exception.printStackTrace();
-											}
-										});
-									}
-								}
-							}
-							returnBike();
-						}
-					});
-				}
-			});
-		}
-		
 		/**
-		 * Return a bike at a station.
+		 * Check if the station at the current position (of myself) offers alternative arrival or departure stations.
 		 * 
-		 * @param env
-		 * @param myself
+		 * @param propertyToCheck
+		 * @return
 		 */
-		private void returnBike() {
-			Map<String, Object> props = new HashMap<String, Object>();
-			props.put(ReturnBikeTask.ACTOR_ID, myself.getId());
-			Object taskid = environment.createObjectTask(ReturnBikeTask.PROPERTY_TYPENAME, props, myself.getId());
-			environment.addTaskListener(taskid, myself.getId(), new DefaultResultListener<Object>() {
-
-				@Override
-				public void resultAvailable(Object result) {
-					killAgent();
-				}
-				
-				@Override
-				public void exceptionOccurred(Exception exception) {
-					exception.printStackTrace();
-				}
-			});
-		}
-		
-		private String checkStation(IEnvironmentSpace space, ISpaceObject myself, String propertyToCheck) {
-			ContinuousSpace2D contSpace = (ContinuousSpace2D) space;
-			ISpaceObject[] allBikestations = contSpace.getSpaceObjectsByType("bikestation");
+		private String checkStation(String propertyToCheck) {
+			ISpaceObject[] allBikestations = environment.getSpaceObjectsByType("bikestation");
 			String res = null;
 
 			// Get the "right" station.
@@ -192,21 +239,44 @@ public class MicroPedestrianAgent extends MicroAgent {
 			}
 			return res;
 		}
-		
-		/**
-		 * Move to a destination task.
-		 * 
-		 * @param dest
-		 * @param env
-		 * @param myself
-		 */
-		private void moveToDestination(IVector2 dest, IResultListener<Object> res) {
-			Map<String, Object> props = new HashMap<String, Object>();
-			props.put(MoveTask.PROPERTY_DESTINATION, dest);
-			props.put(MoveTask.ACTOR_ID, myself.getId());
-			props.put(MoveTask.PROPERTY_SCOPE, getExternalAccess());
-			Object taskid = environment.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
-			environment.addTaskListener(taskid, myself.getId(), res);
-		}
+	}
+
+	/**
+	 * Call the {@link MoveTask}.
+	 * 
+	 * @param dest the given destination
+	 * @param res the result listener to call after executing the task
+	 */
+	private void moveToDestination(IVector2 dest, IResultListener<Object> res) {
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put(MoveTask.PROPERTY_DESTINATION, dest);
+		props.put(MoveTask.ACTOR_ID, myself.getId());
+		props.put(MoveTask.PROPERTY_SCOPE, getExternalAccess());
+		Object taskid = environment.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
+		environment.addTaskListener(taskid, myself.getId(), res);
+	}
+
+	/**
+	 * Call the {@link ReturnBikeTask}.
+	 * 
+	 * @param res the result listener to call after executing the task
+	 */
+	private void rentBike(IResultListener<Object> res) {
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put(RentBikeTask.ACTOR_ID, myself.getId());
+		Object taskid = environment.createObjectTask(RentBikeTask.PROPERTY_TYPENAME, props, myself.getId());
+		environment.addTaskListener(taskid, myself.getId(), res);
+	}
+
+	/**
+	 * Call the {@link ReturnBikeTask}.
+	 * 
+	 * @param res the result listener to call after executing the task
+	 */
+	private void returnBike(IResultListener<Object> res) {
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put(ReturnBikeTask.ACTOR_ID, myself.getId());
+		Object taskid = environment.createObjectTask(ReturnBikeTask.PROPERTY_TYPENAME, props, myself.getId());
+		environment.addTaskListener(taskid, myself.getId(), res);
 	}
 }
