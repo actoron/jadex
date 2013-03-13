@@ -66,6 +66,28 @@ public class MicroPedestrianAgent extends MicroAgent {
 
 		return IFuture.DONE;
 	}
+	
+	
+
+	/* (non-Javadoc)
+	 * @see jadex.micro.MicroAgent#executeBody()
+	 */
+	@Override
+	public IFuture<Void> executeBody() {
+		// TODO Auto-generated method stub
+		return super.executeBody();
+	}
+
+	/* (non-Javadoc)
+	 * @see jadex.micro.MicroAgent#agentKilled()
+	 */
+	@Override
+	public IFuture<Void> agentKilled() {
+		System.out.println(getAgentName() + " was killed");
+		return IFuture.DONE;
+	}
+
+
 
 	/**
 	 * Component step for the realization of the station to random station default behavior.
@@ -162,10 +184,10 @@ public class MicroPedestrianAgent extends MicroAgent {
 									});
 								}
 							}
+						} else {
+							//return bike at destination
+							returnBike(returnListener);
 						}
-						
-						//return bike at destination
-						returnBike(returnListener);
 					}
 				});
 			}
@@ -212,10 +234,11 @@ public class MicroPedestrianAgent extends MicroAgent {
 						});
 					}
 				}
+			} else {
+				// rent a bike
+				rentBike(rentListener);
 			}
-
-			// rent a bike
-			rentBike(rentListener);
+			
 			return IFuture.DONE;
 		}
 
