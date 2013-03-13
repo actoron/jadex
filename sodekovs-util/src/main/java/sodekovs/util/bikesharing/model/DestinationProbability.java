@@ -83,4 +83,11 @@ public class DestinationProbability {
         this.probability = value;
     }
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "[destination=" + destination + ", probability=" + probability + "]";
+	}
 }
