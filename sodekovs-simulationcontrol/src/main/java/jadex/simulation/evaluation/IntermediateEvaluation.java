@@ -1,15 +1,7 @@
 package jadex.simulation.evaluation;
 
-import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.IntermediateResult;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import cern.colt.list.DoubleArrayList;
-import cern.jet.stat.Descriptive;
 
 public class IntermediateEvaluation {
 
