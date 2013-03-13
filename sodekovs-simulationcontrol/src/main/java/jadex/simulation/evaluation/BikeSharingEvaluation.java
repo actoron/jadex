@@ -354,7 +354,7 @@ public class BikeSharingEvaluation {
 			int green = tmp.get(Constants.STOCK_LEVEL_GREEN);
 			int blue = tmp.get(Constants.STOCK_LEVEL_BLUE);
 			int total = red + blue + green;
-			result.append("\n******** Print the evaluation of the stock levels of the bikestations using following three buckets:");
+			result.append("\n Print the evaluation of the stock levels of the bikestations using following three buckets:");
 			result.append("\n stock < 1 --> \"red\"");
 			result.append("\n stock > 0 && stock < capacity  --> \"green\"");
 			result.append("\n stock >= capacity --> \"blue\"");
@@ -362,8 +362,8 @@ public class BikeSharingEvaluation {
 			result.append("\n RED: " + red + "(" + numberFormat.format(((double) red / (double) total) * 100) + "%)");
 			result.append("\n GREEN: " + green + "(" + numberFormat.format(((double) green / (double) total) * 100) + "%)");
 			result.append("\n BLUE: " + blue + "(" + numberFormat.format(((double) blue / (double) total) * 100) + "%)");
-			result.append("\n*********************************************************************");
-			result.append("\n*********************************************************************");
+			result.append("\n#####################################################################");			
+			result.append("\n#####################################################################\n");
 		}
 
 		return result.toString();

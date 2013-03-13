@@ -200,15 +200,18 @@ public class RuntimeManagerPlan extends Plan {
 		// Decrement the number of currently running experiments on this agent
 		numberOfRunningExperiments(-1);
 //		try{
+//		cms.suspendComponent(exta.getComponentIdentifier()).addResultListener(new IResultListener()
 		cms.destroyComponent(exta.getComponentIdentifier()).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				System.out.println("#RuntimeManager# Killed app. " + result.toString());
+				System.out.println("#RuntimeManager# Killed app. " );//+ result.toString());
+//				System.out.println("#RuntimeManager# Suspended app. ");// + result.toString());
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				exception.printStackTrace();
 			}
 		});
 //			
