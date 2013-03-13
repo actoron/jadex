@@ -4,9 +4,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -92,11 +94,11 @@ public class ServiceHandler implements InvocationHandler
 		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
 		
 		// Add task to queue.
-		queue.add(new Object[]{method, args, ret});
+		queue.add(new Object[]{method, args, ret, ServiceCall.getCurrentInvocation()});
 		// Notify strategy that task was added
 		boolean create = strategy.taskAdded();
 		
-		// Create new service if necessary
+		// Create new component / service if necessary
 		if(create)
 		{
 			component.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -107,12 +109,12 @@ public class ServiceHandler implements InvocationHandler
 					CreationInfo ci  = new CreationInfo(component.getComponentIdentifier());
 					ci.setImports(component.getModel().getAllImports());
 					cms.createComponent(null, componentname, ci, null)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
+						.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier result)
 						{
 							cms.getExternalAccess(result)
-								.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
+								.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 							{
 								public void customResultAvailable(IExternalAccess ea)
 								{
@@ -125,9 +127,14 @@ public class ServiceHandler implements InvocationHandler
 										}
 									}));
 								}
-							});
+								
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									super.exceptionOccurred(exception);
+//								}
+							}));
 						};
-					});
+					}));
 				}
 			});
 		}
@@ -168,7 +175,8 @@ public class ServiceHandler implements InvocationHandler
 				Method method = (Method)task[0];
 				Object[] args = (Object[])task[1];
 				Future<?> ret = (Future<?>)task[2];
-				invokeService(service, method, args, ret);
+				ServiceCall call = (ServiceCall)task[3];
+				invokeService(service, method, args, ret, call);
 			}
 		}
 		else if(service!=null)
@@ -187,7 +195,7 @@ public class ServiceHandler implements InvocationHandler
 	/**
 	 *  Update the worker timer by:
 	 *  - creating a timer (if timeout)
-	 *  - update the service pool entry for the service (service, timer)
+	 *  - updating the service pool entry for the service (service, timer)
 	 */
 	protected IFuture<Void> updateWorkerTimer(final IService service)
 	{
@@ -195,7 +203,7 @@ public class ServiceHandler implements InvocationHandler
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		if(strategy.getWorkerTimeout()>0)
+		if(strategy.getWorkerTimeout()>0 && false)
 		{
 			// Add service with timer to pool
 			createTimer(strategy.getWorkerTimeout(), new ITimedObject()
@@ -243,6 +251,11 @@ public class ServiceHandler implements InvocationHandler
 					servicepool.put(service, timer);
 					ret.setResult(null);
 				}
+				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					super.exceptionOccurred(exception);
+//				}
 			});
 		}
 		else
@@ -256,17 +269,28 @@ public class ServiceHandler implements InvocationHandler
 	/**
 	 *  Execute a task on a service.
 	 */
-	protected void invokeService(final IService service, Method method, Object[] args, Future<?> ret)
+	protected void invokeService(final IService service, final Method method, Object[] args, Future<?> ret, ServiceCall call)
 	{
 		assert component.isComponentThread();
 		
+//		System.out.println("Using worker: "+service.getServiceIdentifier());
+		
+//		System.out.println("non-func in pool: "+method.getName()+" "+(call!=null? call.getProperties(): "null"));
+		
 		try
 		{
+			// Create new next invocation to preserve the non-func props
+			ServiceCall mcall = CallAccess.getInvocation();
+			for(String key: call.getProperties().keySet())
+			{
+				mcall.setProperty(key, call.getProperty(key));
+			}
 			IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
 			FutureFunctionality.connectDelegationFuture(ret, res);
 			
-			// put the components back in pool after call is done
-			res.addResultListener(new IResultListener<Object>()
+			// Put the components back in pool after call is done
+			// Must reschedule on component thread as it has no required service proxy
+			res.addResultListener(component.createResultListener(new IResultListener<Object>()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -275,8 +299,8 @@ public class ServiceHandler implements InvocationHandler
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("Exception during service invocation in service pool:_"+exception.getMessage());
-//					exception.printStackTrace();
+					System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
+					exception.printStackTrace();
 					proceed();
 				}
 				
@@ -299,7 +323,7 @@ public class ServiceHandler implements InvocationHandler
 						addFreeService(service);
 					}
 				}
-			});
+			}));
 		}
 		catch(Exception e)
 		{
@@ -312,9 +336,14 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	protected IFuture<Void> removeService(IService service)
 	{
+		assert component.isComponentThread();
+
+		final IComponentIdentifier workercid = service.getServiceIdentifier().getProviderId();
+
+//		System.out.println("removing worker: "+workercid+" "+servicepool);
+		
 		final Future<Void> ret = new Future<Void>();
 		
-		final IComponentIdentifier workercid = service.getServiceIdentifier().getProviderId();
 		IFuture<IComponentManagementService> fut = SServiceProvider.getService(component.getServiceContainer(), 
 			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		fut.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
@@ -356,6 +385,8 @@ public class ServiceHandler implements InvocationHandler
 			{
 				public void customResultAvailable(IClockService cs)
 				{
+					assert component.isComponentThread();
+
 					clock = cs;
 					ret.setResult(clock);
 				}
@@ -370,6 +401,10 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	protected IFuture<ITimer> createTimer(final long delay, final ITimedObject to)
 	{
+		assert component.isComponentThread();
+
+//		System.out.println("create timer");
+		
 		final Future<ITimer> ret = new Future<ITimer>();
 		
 		getClockService().addResultListener(new ExceptionDelegationResultListener<IClockService, ITimer>(ret)
@@ -382,4 +417,15 @@ public class ServiceHandler implements InvocationHandler
 		
 		return ret;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "ServiceHandler(servicetype="+ servicetype + ", servicepool=" + servicepool 
+			+ ", queue="+ queue + ", strategy=" + strategy+")";
+	}
+	
+	
 }

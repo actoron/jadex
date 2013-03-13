@@ -297,11 +297,19 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			// Test if method is constant and a cache value is available.
 			if(pr.getCache()!=null && !pi.isUncached(method) && !pi.isReplaced(method))
 			{
-				Class rt = method.getReturnType();
-				Class[] ar = method.getParameterTypes();
+				Class<?> rt = method.getReturnType();
+				Class<?>[] ar = method.getParameterTypes();
 				if(!rt.equals(void.class) && !(SReflect.isSupertype(IFuture.class, rt)) && ar.length==0)
 				{
-					return pr.getCache().get(method.getName());
+					Object res = pr.getCache().get(method.getName());
+					if(res instanceof Throwable && SReflect.isSupertype(Throwable.class, rt))
+					{
+						throw (Throwable)res;
+					}
+					else
+					{
+						return res;
+					}
 				}
 			}
 			

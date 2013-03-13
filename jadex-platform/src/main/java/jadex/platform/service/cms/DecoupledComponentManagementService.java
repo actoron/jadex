@@ -1055,6 +1055,9 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
+		ServiceCall sc = ServiceCall.getCurrentInvocation();
+//		System.err.println("kill compo: "+cid+" "+(sc!=null? sc.getCaller(): "null"));
+		
 //		if(cid.toString().indexOf("MegaParallel")!=-1)
 //			System.out.println("destroy: "+cid.getName());
 //		else if(getDescription(cid)==null) 

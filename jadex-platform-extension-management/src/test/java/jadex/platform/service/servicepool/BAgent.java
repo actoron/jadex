@@ -5,6 +5,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -27,4 +28,11 @@ public class BAgent implements IBService
 	{
 		return new Future<String>(str+" result of mb1");
 	}
+	
+//	@AgentKilled
+//	public IFuture<Void> killed()
+//	{
+//		System.out.println("killed: "+agent.getComponentIdentifier());
+//		return IFuture.DONE;
+//	}
 }

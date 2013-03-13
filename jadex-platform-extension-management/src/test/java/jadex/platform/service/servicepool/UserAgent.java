@@ -2,7 +2,10 @@ package jadex.platform.service.servicepool;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.ServiceCall;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.Tuple2;
@@ -12,6 +15,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -25,6 +29,7 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  *  User agent that first registers services A, B at the service pool (which is created if not present).
@@ -35,7 +40,7 @@ import java.util.Collection;
 @RequiredServices(
 {
 	@RequiredService(name="poolser", type=IServicePoolService.class, binding=@Binding(
-		scope=RequiredServiceInfo.SCOPE_PLATFORM, create=true, 
+		scope=RequiredServiceInfo.SCOPE_COMPONENT, create=true, 
 		creationinfo=@CreationInfo(type="spa"))),
 	@RequiredService(name="aser", type=IAService.class),
 	@RequiredService(name="bser", type=IBService.class)
@@ -88,6 +93,9 @@ public class UserAgent
 		{
 			public void customResultAvailable(final IServicePoolService sps)
 			{
+				if(!agent.getComponentIdentifier().equals(((IService)sps).getServiceIdentifier().getProviderId().getParent()))
+					System.out.println("gasjjjjjjjashjfha");
+				
 				sps.addServiceType(IAService.class, new DefaultPoolStrategy(5, 35000, 10), "jadex.platform.service.servicepool.example.AAgent.class")
 					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
@@ -172,7 +180,7 @@ public class UserAgent
 								}
 								
 								final TestReport rep4 = new TestReport("#4", "Test invoking service B mb1");
-								final int cnt4 = 100;
+								final int cnt4 = 1000;
 								CounterResultListener<String> lis4 = new CounterResultListener<String>(cnt4, new DefaultResultListener<Void>()
 								{
 									public void resultAvailable(Void result) 
@@ -180,9 +188,27 @@ public class UserAgent
 //										System.out.println("called "+cntma1+" times ma1");
 										rep4.setSucceeded(true);
 										
-										agent.setResultValue("testresults", new Testcase(4, new TestReport[]{rep1, rep2, rep3, rep4}));
+										ServiceCall call = CallAccess.getInvocation();
+										call.setTimeout(33000);
+										call.setProperty("myprop", "myval");
 										
-										ret.setResult(null);
+										aser.ma3(call.getProperties()).addResultListener(new IResultListener<TestReport>()
+										{
+											public void resultAvailable(TestReport rep5)
+											{
+												System.err.println("FFFFFFFFFFFINI: "+agent.getComponentIdentifier());
+												agent.setResultValue("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												ret.setResult(null);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												TestReport rep5 = new TestReport("#5", "Test non-func props");
+												rep5.setReason("Exception "+exception.toString());
+												agent.setResultValue("testresults", new Testcase(5, new TestReport[]{rep1, rep2, rep3, rep4, rep5}));
+												ret.setResult(null);
+											}
+										});
 									}
 								});
 								for(int i=0; i<cnt4; i++)
@@ -195,12 +221,21 @@ public class UserAgent
 				});
 				for(int i=0; i<cnt2; i++)
 				{
+					ServiceCall call = CallAccess.getInvocation();
+					call.setTimeout(32000);
+					call.setProperty("myprop", "myval");
+
 					aser.ma2().addResultListener(lis);
 				}
 			}
 		});
+		
 		for(int i=0; i<cnt1; i++)
 		{
+			ServiceCall call = CallAccess.getInvocation();
+			call.setTimeout(31000);
+			call.setProperty("myprop", "myval");
+
 			aser.ma1("hello "+i).addResultListener(lis1);
 		}
 		

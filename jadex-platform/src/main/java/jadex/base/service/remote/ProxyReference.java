@@ -18,7 +18,7 @@ public class ProxyReference
 	protected RemoteReference rr;
 	
 	/** The value cache. */
-	protected Map cache;
+	protected Map<String, Object> cache;
 		
 	//-------- constructors --------
 	
@@ -81,7 +81,7 @@ public class ProxyReference
 	 *  Get the cached values.
 	 *  @return The cached values. 
 	 */
-	public Map getCache()
+	public Map<String, Object> getCache()
 	{
 		return cache;
 	}
@@ -90,7 +90,7 @@ public class ProxyReference
 	 *  Set the cached values.
 	 *  @param cache The cached values. 
 	 */
-	public void setCache(Map cache)
+	public void setCache(Map<String, Object> cache)
 	{
 		this.cache = cache;
 	}
@@ -98,10 +98,10 @@ public class ProxyReference
 	/**
 	 *  Get the cached values.
 	 */
-	public void putCache(Object key, Object value)
+	public void putCache(String key, Object value)
 	{
 		if(cache==null)
-			cache = new HashMap();
+			cache = new HashMap<String, Object>();
 		cache.put(key, value);
 	}
 	

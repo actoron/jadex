@@ -1,5 +1,8 @@
 package jadex.platform.service.servicepool;
 
+import java.util.Map;
+
+import jadex.base.test.TestReport;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -19,5 +22,10 @@ public interface IAService
 	 *  Example method 2.
 	 */
 	public IIntermediateFuture<Integer> ma2();
-	
+
+	/**
+	 *  Example method 3 (for non func).
+	 */
+	public IFuture<TestReport> ma3(Map<String, Object> tprops); 
+
 }

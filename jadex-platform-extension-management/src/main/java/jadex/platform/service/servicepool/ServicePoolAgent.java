@@ -1,5 +1,7 @@
 package jadex.platform.service.servicepool;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
@@ -10,6 +12,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -39,6 +43,32 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	protected Map<Class<?>, ServiceHandler> servicetypes;
 	
 	//-------- interface methods --------
+	
+//	/**
+//	 *  Execute the functional body of the agent.
+//	 *  Is only called once.
+//	 */
+//	public IFuture<Void> executeBody()
+//	{
+//		System.out.println("body");
+//		IComponentStep<Void> step = new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				if(servicetypes!=null)
+//				{
+//					for(ServiceHandler sh: servicetypes.values())
+//					{
+//						System.out.println("handler state: "+sh);
+//					}
+//					waitFor(3000, this);
+//				}
+//				return IFuture.DONE;
+//			}
+//		};
+//		waitFor(3000, step);
+//		return new Future<Void>();
+//	}
 	
 	/**
 	 *  Add a new service type and a strategy.

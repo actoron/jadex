@@ -165,7 +165,9 @@ public class SequentialSearchManager implements ISearchManager
 				context.todo.put(provider.getId(), new Object[]{provider, source});
 			}
 			
-			if(context.decider.searchNode(start==null? null: start.getId(), source==null? null: source.getId(), provider==null? null: provider.getId(), ischild, ret.getIntermediateResults()))
+			if(context.decider.searchNode(start==null? null: start.getId(), 
+				source==null? null: source.getId(), provider==null? null: provider.getId(), 
+				ret.getIntermediateResults()))
 			{
 				// Use fut.isDone() to reduce stack depth
 				IFuture future = provider.getServices(lsm, context.decider, context.selector);

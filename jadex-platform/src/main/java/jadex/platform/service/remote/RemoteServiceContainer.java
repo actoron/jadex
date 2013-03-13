@@ -79,7 +79,7 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 				// Problem that the container calls itself the decider, could already
 				// be done in search manager when this call is part of a search
 				// But could also be called directly :-(
-				if(!decider.searchNode(RemoteServiceContainer.this.getId(), RemoteServiceContainer.this.getId(), componentid, false, result)
+				if(!decider.searchNode(RemoteServiceContainer.this.getId(), RemoteServiceContainer.this.getId(), componentid, result)
 					|| rms==null || componentid==null)// || selector instanceof ComponentFactorySelector)
 				{
 					ret.setResult(result);

@@ -64,9 +64,21 @@ public class DefaultVisitDecider implements IVisitDecider
 	 *  @param target The target data provider.
 	 *  @param results The preliminary results.
 	 */
-	public synchronized boolean searchNode(IComponentIdentifier start, IComponentIdentifier source, IComponentIdentifier target, boolean ischild, Collection results)
+	public synchronized boolean searchNode(IComponentIdentifier start, IComponentIdentifier source, IComponentIdentifier target, Collection results)
 	{
 		boolean ret = !(abort && results.size()>0);
+			
+		boolean ischild = false;
+		IComponentIdentifier tmp = target;
+		while(tmp!=null)
+		{
+			tmp = tmp.getParent();
+			if(start.equals(tmp))
+			{
+				ischild = true;
+				break;
+			}
+		}
 		
 		// todo: support other search scopes!!!
 		if(ret)
@@ -125,6 +137,9 @@ public class DefaultVisitDecider implements IVisitDecider
 //		}
 		
 //		System.out.println("search: "+target.getId()+" "+ret+" "+visited);
+		
+//		if(start.getName().startsWith("User"))
+//			System.out.println("search: "+start+" "+source+" "+target+" "+ischild+" "+ret);
 		
 		return ret;
 	}

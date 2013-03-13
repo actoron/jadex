@@ -1,7 +1,11 @@
 package jadex.platform.service.servicepool;
 
+import java.util.Map;
+
+import jadex.base.test.TestReport;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -54,7 +58,7 @@ public class AAgent implements IAService
 				{
 //					System.out.println("ma2 called "+cnt[0]+" "+agent.getComponentIdentifier().getLocalName());
 					ret.addIntermediateResult(new Integer(cnt[0]++));
-					agent.waitForDelay(100, this);
+					agent.waitForDelay(10, this);
 				}
 				else
 				{
@@ -65,5 +69,28 @@ public class AAgent implements IAService
 		};
 		agent.scheduleStep(step);
 		return ret;
+	}
+	
+	/**
+	 *  Example method 3 (for non func).
+	 */
+	public IFuture<TestReport> ma3(Map<String, Object> tprops)
+	{
+		ServiceCall sc = ServiceCall.getCurrentInvocation();
+		Map<String, Object> cprops = sc.getProperties();
+		
+		TestReport tr = new TestReport("#?", "Test of non-functional props");
+		
+		if(tprops.equals(cprops))
+		{
+			tr.setSucceeded(true);
+		}
+		else
+		{
+			System.out.println("properties (target, received): "+tprops+" "+cprops);
+			tr.setReason("Unequal non-func props.");
+		}
+		
+		return new Future<TestReport>(tr);
 	}
 }
