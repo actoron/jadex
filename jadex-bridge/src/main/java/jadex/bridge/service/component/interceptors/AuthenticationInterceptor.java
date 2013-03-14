@@ -154,7 +154,8 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final ServiceCall call = ServiceCall.getCurrentInvocation();
+//		final ServiceCall call = ServiceCall.getCurrentInvocation();
+		final ServiceCall call = context.getServiceCall();
 		final IComponentIdentifier caller = call.getCaller();
 		final String callername = caller.getPlatformPrefix();
 		final byte[] signed = (byte[])call.getProperty(Authenticated.AUTHENTICATED);

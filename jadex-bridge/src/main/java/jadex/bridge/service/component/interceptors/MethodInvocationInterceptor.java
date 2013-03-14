@@ -5,6 +5,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 
 /**
  *  Calls a methods on an object and returns the result.
@@ -28,22 +29,42 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			// a) the method is directly the business logic or
 			// b) the method jumps from required to provided interceptor chain
 				
-//			if(sic.getMethod().getName().indexOf("method2")!=-1)
+//			if(sic.getMethod().getName().indexOf("method")!=-1)
 //				System.out.println("ggggg");
 			
-			CallAccess.setServiceCall(sic.getServiceCall()); // next becomes current
-			CallAccess.setNextInvocation(sic.getServiceCall());
-			CallAccess.resetNextInvocation();
-			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
-//			CallAccess.resetNextInvocation();
-			if(sic.getLastServiceCall()==null)
+			// Problem that the object could be an rmi proxy itself that delegates the call
+			// Is this case the switch (current becomes next) must not occur
+			
+			// Hack, user may want to use proxy as well :-(
+			// todo:
+			boolean switchcall = !Proxy.isProxyClass(sic.getObject().getClass());
+			 
+			// is not sufficient as could also be basicinvocationhandler of provided proxy
+//			if(Proxy.isProxyClass(sic.getObject().getClass()))
+//			{
+//				Object handler = Proxy.getInvocationHandler(sic.getObject());
+//				if(handler.getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1) // HACK!!!
+//				{
+//					switchcall = false;
+//				}
+//			}
+			
+			if(switchcall)
 			{
-				CallAccess.resetServiceCall();
+				CallAccess.setServiceCall(sic.getServiceCall()); // next becomes current
+				CallAccess.resetNextInvocation();
 			}
 			else
 			{
 				CallAccess.setServiceCall(sic.getLastServiceCall());
+				CallAccess.setNextInvocation(sic.getServiceCall());
 			}
+			
+			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
+
+			CallAccess.setServiceCall(sic.getLastServiceCall()); 
+			CallAccess.resetNextInvocation();
+			
 			sic.setResult(res);
 		}
 		catch(Exception e)

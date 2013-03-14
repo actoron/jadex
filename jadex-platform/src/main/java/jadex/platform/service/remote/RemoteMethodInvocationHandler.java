@@ -98,7 +98,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		ProxyInfo pi = pr.getProxyInfo();
 		
 		// Get the current service invocation 
-		ServiceCall invoc = ServiceCall.getCurrentInvocation();
+//		ServiceCall invoc = ServiceCall.getCurrentInvocation();
+		ServiceCall invoc = ServiceCall.getInvocation();
 		
 		// Get method timeout
 		final long to = invoc!=null && invoc.getTimeout()!=-1? invoc.getTimeout(): pi.getMethodTimeout(method);

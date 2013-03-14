@@ -200,6 +200,8 @@ public class InitiatorAgent extends TestAgent
 					call.setProperty("extra", "somval");
 				}				
 				
+				System.out.println("calling method: "+ServiceCall.getInvocation());
+				
 				ts.method("test1").addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
