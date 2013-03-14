@@ -96,7 +96,8 @@ public class DefaultVisitDecider implements IVisitDecider
 			else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 			{
 				// Ok when does not cross application boundary.
-				ret = (!isApplication(source) || ischild) && isSamePlatform(source, target);
+//				ret = (!isApplication(source) || ischild) && isSamePlatform(source, target);
+				ret = (isInApplication(start, target) || ischild) && isSamePlatform(source, target);
 			}
 			else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
 			{
@@ -205,6 +206,32 @@ public class DefaultVisitDecider implements IVisitDecider
 	protected boolean isApplication(IComponentIdentifier source)
 	{
 		return source!=null && source.getParent()!=null && source.getParent().getParent()==null;
+	}
+	
+	/**
+	 *  Is in application when target can be traced back to app.
+	 */
+	protected boolean isInApplication(IComponentIdentifier start, IComponentIdentifier target)
+	{
+		boolean ret = false;
+		
+		IComponentIdentifier app = start;
+		while(app.getParent()!=null && app.getParent().getParent()!=null)
+		{
+			app = app.getParent();
+		}
+		IComponentIdentifier tmp = target;
+		while(tmp!=null)
+		{
+			if(tmp.equals(app))
+			{
+				ret = true;
+				break;
+			}
+			tmp = tmp.getParent();
+		}
+		
+		return ret;
 	}
 	
 	/**

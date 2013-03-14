@@ -304,7 +304,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		final IComponentIdentifier creator = ServiceCall.getCurrentInvocation().getCaller();
 
 //		if(modelname.indexOf("Hello")!=-1)
-			System.out.println("create: "+modelname);//+" "+info!=null? info.getResourceIdentifier(): "norid");
+//			System.out.println("create: "+modelname);//+" "+info!=null? info.getResourceIdentifier(): "norid");
 		
 //		final DebugException	de	= new DebugException();
 	
