@@ -3538,42 +3538,49 @@ public class SUtil
 		return str.substring(0, 1).toUpperCase()+str.substring(1);
 	}
 	
+	/** Cached for speed. */
+	public static String mac;
+	
 	/**
 	 *  Get the mac address.
 	 *  @return The mac address.
 	 */
 	public static String getMacAddress()
 	{
-		TreeSet<String> res = new TreeSet<String>(new Comparator<String>()
+		if(mac==null)
 		{
-			public int compare(String o1, String o2)
+			TreeSet<String> res = new TreeSet<String>(new Comparator<String>()
 			{
-				return o1.compareTo(o2);
-			}
-		});
-		
-		try
-		{
-			List<NetworkInterface> nis = SUtil.getNetworkInterfaces();
-			for(NetworkInterface ni: nis)
-			{
-				byte[] hwa = ni.getHardwareAddress();
-				if(hwa!=null && hwa.length>0)
+				public int compare(String o1, String o2)
 				{
-					String mac = Arrays.toString(hwa);
-					if(!res.contains(mac))
+					return o1.compareTo(o2);
+				}
+			});
+			
+			try
+			{
+				List<NetworkInterface> nis = SUtil.getNetworkInterfaces();
+				for(NetworkInterface ni: nis)
+				{
+					byte[] hwa = ni.getHardwareAddress();
+					if(hwa!=null && hwa.length>0)
 					{
-						res.add(mac);
+						String mac = Arrays.toString(hwa);
+						if(!res.contains(mac))
+						{
+							res.add(mac);
+						}
 					}
 				}
 			}
-		}
-		catch(Exception e)
-		{
-//			e.printStackTrace();
+			catch(Exception e)
+			{
+	//			e.printStackTrace();
+			}
+			mac = res.isEmpty()? SUtil.NULL: res.first();
 		}
 		
-		return res.isEmpty()? null: res.first();
+		return mac.equals(NULL)? null: mac;
 	}
 	
 	/**

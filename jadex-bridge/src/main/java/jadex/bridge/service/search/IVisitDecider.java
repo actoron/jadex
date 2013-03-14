@@ -11,6 +11,11 @@ import java.util.Collection;
  */
 public interface IVisitDecider
 {
+	public static enum Direction
+	{
+		UP, DOWN, UPDOWN, NONE;
+	}
+	
 	/**
 	 *  Test if a specific node should be searched.
 	 *  @param start The start provider.
@@ -19,6 +24,16 @@ public interface IVisitDecider
 	 *  @param results The collection of preliminary results.
 	 */
 	public boolean searchNode(IComponentIdentifier start, IComponentIdentifier source, IComponentIdentifier target, Collection results);
+	
+//	/**
+//	 *  Test if a specific node should be searched.
+//	 *  @param start The start provider.
+//	 *  @param source The source data provider.
+//	 *  @param target The target data provider.
+//	 *  @param results The collection of preliminary results.
+//	 */
+//	public Direction getDirections(IComponentIdentifier start, IComponentIdentifier source, IComponentIdentifier target, Collection results);
+
 	
 	/**
 	 *  Get the cache key.

@@ -3,6 +3,8 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
@@ -25,6 +27,11 @@ import java.util.List;
  *  Service name may alternatively supplied as name of lane and
  *  method name as name of activity. 
  */
+@Task(description="The print task can be used for calling a component service.", parameters={
+	@TaskParameter(name="service", clazz=String.class, direction=TaskParameter.DIRECTION_IN, description="The required service name."),
+	@TaskParameter(name="method", clazz=String.class, direction=TaskParameter.DIRECTION_IN, description="The required method name."),
+	@TaskParameter(name="rebind", clazz=boolean.class, direction=TaskParameter.DIRECTION_IN, description="The rebind flag (forces a frsh search).")
+})
 public class ServiceCallTask implements ITask
 {
 	//-------- constants --------

@@ -27,11 +27,23 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			// Must set nextinvoc and service call as it is not unknown if
 			// a) the method is directly the business logic or
 			// b) the method jumps from required to provided interceptor chain
-			CallAccess.setServiceCall(sic.getServiceCall());
+				
+//			if(sic.getMethod().getName().indexOf("method2")!=-1)
+//				System.out.println("ggggg");
+			
+			CallAccess.setServiceCall(sic.getServiceCall()); // next becomes current
 			CallAccess.setNextInvocation(sic.getServiceCall());
-			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
 			CallAccess.resetNextInvocation();
-			CallAccess.resetServiceCall();
+			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
+//			CallAccess.resetNextInvocation();
+			if(sic.getLastServiceCall()==null)
+			{
+				CallAccess.resetServiceCall();
+			}
+			else
+			{
+				CallAccess.setServiceCall(sic.getLastServiceCall());
+			}
 			sic.setResult(res);
 		}
 		catch(Exception e)

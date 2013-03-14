@@ -6,6 +6,7 @@ import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -97,26 +98,29 @@ public class ServiceInvocationContext
 	
 	
 	/** The object. */
-	protected List object;
+	protected List<Object> object;
 	
 	/** The method to be called. */
-	protected List method;
+	protected List<Method> method;
 	
 	/** The invocation arguments. */
-	protected List arguments;
+	protected List<List<Object>> arguments;
 	
 	/** The call result. */
-	protected List result;
+	protected List<Object> result;
 	
 
 	/** The service interceptors. */
 	protected IServiceInvocationInterceptor[] interceptors;
 
 	/** The stack of used interceptors. */
-	protected List used;
+	protected List<Integer> used;
 	
 	/** The service call. */
 	protected ServiceCall	call;
+	
+	/** The last service call (to be reestablished after call). */
+	protected ServiceCall	lastcall;
 	
 	/** The caller component. */
 	protected IComponentIdentifier caller;
@@ -140,12 +144,12 @@ public class ServiceInvocationContext
 		this.platform = platform;
 		this.proxy = proxy;
 		this.realtime	= realtime;
-		this.object = new ArrayList();
-		this.method = new ArrayList();
-		this.arguments = new ArrayList();
-		this.result = new ArrayList();
+		this.object = new ArrayList<Object>();
+		this.method = new ArrayList<Method>();
+		this.arguments = new ArrayList<List<Object>>();
+		this.result = new ArrayList<Object>();
 		
-		this.used = new ArrayList();
+		this.used = new ArrayList<Integer>();
 		this.interceptors = interceptors;
 		
 		this.caller = IComponentIdentifier.LOCAL.get();
@@ -163,6 +167,21 @@ public class ServiceInvocationContext
 			props.put(ServiceCall.REALTIME, realtime ? Boolean.TRUE : Boolean.FALSE);
 		}
 		this.call	= CallAccess.createServiceCall(caller, props);
+		
+		this.lastcall = CallAccess.getCurrentInvocation();
+		
+//		if(method.getName().indexOf("method")!=-1)
+//			System.out.println("ggggg");
+		
+		// Init the cause of the next call based on the last one
+		if(this.call.getCause()==null && lastcall!=null)
+		{
+			Tuple2<String, String> cause = lastcall.getCause();
+			if(cause!=null)
+			{
+				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
+			}
+		}
 	}
 	
 	/**
@@ -171,15 +190,16 @@ public class ServiceInvocationContext
 	public ServiceInvocationContext(ServiceInvocationContext context)
 	{
 		this.call	= context.call;
+		this.lastcall = context.lastcall;
 		this.realtime	= context.realtime;
 		this.platform = context.platform;
 		this.proxy = context.proxy;
-		this.object = new ArrayList(context.object);
-		this.method = new ArrayList(context.method);
-		this.arguments = new ArrayList(context.arguments);
-		this.result = new ArrayList(context.result);
+		this.object = new ArrayList<Object>(context.object);
+		this.method = new ArrayList<Method>(context.method);
+		this.arguments = new ArrayList<List<Object>>(context.arguments);
+		this.result = new ArrayList<Object>(context.result);
 		
-		this.used = new ArrayList(context.used);
+		this.used = new ArrayList<Integer>(context.used);
 		this.interceptors = context.interceptors;
 		
 		this.caller = context.caller;
@@ -254,9 +274,9 @@ public class ServiceInvocationContext
 	 *  Get the args.
 	 *  @return the args.
 	 */
-	public List getArguments()
+	public List<Object> getArguments()
 	{
-		return (List)arguments.get(used.size()-1);
+		return arguments.get(used.size()-1);
 	}
 	
 	/**
@@ -265,7 +285,7 @@ public class ServiceInvocationContext
 	 */
 	public Object[] getArgumentArray()
 	{
-		List args = (List)arguments.get(used.size()-1);
+		List<Object> args = arguments.get(used.size()-1);
 		return args!=null? args.toArray(): new Object[0];
 	}
 	
@@ -273,7 +293,7 @@ public class ServiceInvocationContext
 	 *  Set the arguments.
 	 *  @param args The arguments to set.
 	 */
-	public void setArguments(List args)
+	public void setArguments(List<Object> args)
 	{
 		this.arguments.set(used.size()-1, args);
 	}
@@ -301,7 +321,7 @@ public class ServiceInvocationContext
 	/**
 	 *  Invoke the next interceptor.
 	 */
-	public IFuture<Void> invoke(Object object, final Method method, List args)
+	public IFuture<Void> invoke(Object object, final Method method, List<Object> args)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -395,7 +415,7 @@ public class ServiceInvocationContext
 	/**
 	 *  Push saves and copies the current set of values.
 	 */
-	protected void push(Object o, Method m, List args, Object res)
+	protected void push(Object o, Method m, List<Object> args, Object res)
 	{
 		// profile on first invoke
 		if(PROFILING && method.isEmpty())
@@ -526,9 +546,22 @@ public class ServiceInvocationContext
 		return "ServiceInvocationContext(method="+method+", caller="+caller+")";
 	}
 
+	/**
+	 *  Get the service call.
+	 *  @return The service call.
+	 */
 	public ServiceCall	getServiceCall()
 	{
 		return call;
+	}
+	
+	/**
+	 *  Get the last service call.
+	 *  @return The last service call.
+	 */
+	public ServiceCall	getLastServiceCall()
+	{
+		return lastcall;
 	}
 }
 

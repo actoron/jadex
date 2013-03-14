@@ -68,21 +68,21 @@ public class DefaultVisitDecider implements IVisitDecider
 	{
 		boolean ret = !(abort && results.size()>0);
 			
-		boolean ischild = false;
-		IComponentIdentifier tmp = target;
-		while(tmp!=null)
-		{
-			tmp = tmp.getParent();
-			if(start.equals(tmp))
-			{
-				ischild = true;
-				break;
-			}
-		}
-		
 		// todo: support other search scopes!!!
 		if(ret)
 		{
+			boolean ischild = false;
+			IComponentIdentifier tmp = target;
+			while(tmp!=null)
+			{
+				tmp = tmp.getParent();
+				if(start.equals(tmp))
+				{
+					ischild = true;
+					break;
+				}
+			}
+			
 			if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
 			{
 				// Ok when on start component.
@@ -139,7 +139,7 @@ public class DefaultVisitDecider implements IVisitDecider
 //		System.out.println("search: "+target.getId()+" "+ret+" "+visited);
 		
 //		if(start.getName().startsWith("User"))
-//			System.out.println("search: "+start+" "+source+" "+target+" "+ischild+" "+ret);
+//			System.out.println("search: "+start+" "+source+" "+target+" "+ret);
 		
 		return ret;
 	}

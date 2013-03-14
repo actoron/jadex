@@ -11,9 +11,11 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.ITransferableStep;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -26,13 +28,10 @@ import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
@@ -60,7 +59,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	protected MicroAgent microagent;
 	
 	/** The scheduled steps of the agent. */
-	protected List steps;
+	protected List<Tuple3<IComponentStep<?>, Future<?>, ServiceCall>> steps;
 	
 	/** Flag indicating that no steps may be scheduled any more. */
 	protected boolean nosteps;
@@ -98,7 +97,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 
 			this.container = createMyServiceContainer(args);
 						
-			addStep((new Object[]{new IComponentStep<Void>()
+			addStep((new Tuple3<IComponentStep<?>, Future<?>, ServiceCall>(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -126,7 +125,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					
 					return IFuture.DONE;
 				}
-			}, new Future()}));
+			}, new Future(), ServiceCall.getCurrentInvocation())));
 		}
 		catch(Exception e)
 		{
@@ -520,8 +519,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		{
 			if(steps!=null && !steps.isEmpty())
 			{
-				Object[] step = removeStep();
-				Future future = (Future)step[1];
+				Tuple3<IComponentStep<?>, Future<?>, ServiceCall> step = removeStep();
+				Future future = (Future)step.getSecondEntity();
 				
 				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
 					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
@@ -530,17 +529,23 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				try
 				{
 					boolean done = false;
-					if(step[0] instanceof IConditionalComponentStep)
+					if(step.getFirstEntity() instanceof IConditionalComponentStep)
 					{
-						if(!((IConditionalComponentStep<?>)step[0]).isValid())
+						if(!((IConditionalComponentStep<?>)step.getFirstEntity()).isValid())
 						{
-							future.setException(new RuntimeException("Step invalid: "+step[0]));
+							future.setException(new RuntimeException("Step invalid: "+step.getFirstEntity()));
 							done = true;
 						}
 					}
 					if(!done)
 					{
-						IFuture<?>	res	= ((IComponentStep<?>)step[0]).execute(microagent);
+						// Set again the service call context (if any) for dependent steps
+						ServiceCall sc = (ServiceCall)step.getThirdEntity();
+						if(sc!=null && ServiceCall.getCurrentInvocation()==null)
+						{
+							CallAccess.setServiceCall(sc);
+						}
+						IFuture<?>	res	= ((IComponentStep<?>)step.getFirstEntity()).execute(microagent);
 //						if(step[0].toString().indexOf("ListFiles")!=-1)
 //						{
 //							System.out.println("children: "+step[0]+", "+res.getClass());
@@ -815,7 +820,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				{			
 					public void run()
 					{
-						addStep(new Object[]{step, ret});
+						addStep(new Tuple3<IComponentStep<?>, Future<?>, ServiceCall>(step, ret, null));
 					}
 					
 					public String toString()
@@ -837,7 +842,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 		else
 		{
-			addStep(new Object[]{step, ret});
+			addStep(new Tuple3<IComponentStep<?>, Future<?>, ServiceCall>(step, ret, ServiceCall.getCurrentInvocation()));
 		}
 		return ret;
 	}
@@ -845,11 +850,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Add a new step.
 	 */
-	protected void addStep(Object[] step)
+	protected void addStep(Tuple3<IComponentStep<?>, Future<?>, ServiceCall> step)
 	{
 		if(nosteps)
 		{
-			((Future)step[1]).setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
+			((Future)step.getSecondEntity()).setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
 		}
 		else
 		{
@@ -858,8 +863,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			steps.add(step);
 			if(componentlisteners!=null)
 			{
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
-					step[0].toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)step[0])));
+				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step.getFirstEntity().getClass().getName(), 
+					step.getFirstEntity().toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)step.getFirstEntity())));
 			}
 			
 		}
@@ -868,16 +873,16 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Add a new step.
 	 */
-	protected Object[] removeStep()
+	protected Tuple3<IComponentStep<?>, Future<?>, ServiceCall> removeStep()
 	{
 		assert steps!=null && !steps.isEmpty();
-		Object[] ret = (Object[])steps.remove(0);
+		Tuple3<IComponentStep<?>, Future<?>, ServiceCall> ret = steps.remove(0);
 		if(steps.isEmpty())
 			steps	= null;
 		if(componentlisteners!=null)
 		{
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, ret[0].getClass().getName(),
-				ret[0].toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)ret[0])));
+			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, ret.getFirstEntity().getClass().getName(),
+				ret.getFirstEntity().toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)ret.getFirstEntity())));
 		}
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		return ret;
@@ -1058,8 +1063,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
 		while(steps!=null && !steps.isEmpty())
 		{
-			Object[] step = removeStep();
-			Future future = (Future)step[1];
+			Tuple3<IComponentStep<?>, Future<?>, ServiceCall> step = removeStep();
+			Future<?> future = step.getSecondEntity();
 			future.setException(ex);
 //			System.out.println("Cleaning obsolete step: "+getAgentAdapter().getComponentIdentifier()+", "+step[0]);
 		}

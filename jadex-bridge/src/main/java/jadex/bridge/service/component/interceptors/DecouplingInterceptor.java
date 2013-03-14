@@ -595,7 +595,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{					
 			IFuture<Void> ret;
 			
-			CallAccess.setServiceCall(sic.getServiceCall());
+//			CallAccess.setServiceCall(sic.getServiceCall());
 			
 			try
 			{
@@ -608,8 +608,14 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				ret	= new Future<Void>(e);
 			}
 			
-			CallAccess.resetServiceCall();
-			
+//			if(sic.getLastServiceCall()==null)
+//			{
+//				CallAccess.resetServiceCall();
+//			}
+//			else
+//			{
+//				CallAccess.setServiceCall(sic.getLastServiceCall());
+//			}
 			return ret;
 		}
 

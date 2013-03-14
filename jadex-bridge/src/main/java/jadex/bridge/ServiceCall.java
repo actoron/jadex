@@ -1,8 +1,9 @@
 package jadex.bridge;
 
 import jadex.bridge.service.annotation.Timeout;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,9 @@ public class ServiceCall
 	
 	/** The realtime constant. */
 	public static final String REALTIME = "realtime";
+	
+	/** The cause constant. */
+	public static final String CAUSE = "cause";
 	
 	/** The current service calls mapped to threads. */
 	protected static ThreadLocal<ServiceCall> CALLS	= new ThreadLocal<ServiceCall>();
@@ -48,7 +52,7 @@ public class ServiceCall
 		this.properties = props!=null? props: new HashMap<String, Object>();
 		if(!properties.containsKey(TIMEOUT))
 			properties.put(TIMEOUT, new Long(-1)); // todo: refactor that
-		
+				
 //		if(props!=null)
 //			properties.putAll(props);
 		
@@ -99,7 +103,7 @@ public class ServiceCall
 	}
 	
 	/**
-	 *  Set the properties of the next invocation.
+	 *  Get or create the next servicecall for the next invocation. 
 	 *  @param timeout The timeout.
 	 *  @param realtime The realtime flag.
 	 */
@@ -110,6 +114,16 @@ public class ServiceCall
 		{
 			ret = new ServiceCall(IComponentIdentifier.LOCAL.get(), props);
 			INVOCATIONS.set(ret);
+			
+//			if(getCurrentInvocation()!=null)
+//			{
+//				ServiceCall cur = getCurrentInvocation();
+//				Tuple2<String, String> cause = cur.getCause();
+//				if(cause!=null)
+//				{
+//					ret.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller.getName(), 3)));
+//				}
+//			}
 		}
 		else if(props!=null)
 		{
@@ -174,6 +188,24 @@ public class ServiceCall
 	}
 	
 	/**
+	 *  Get the cause.
+	 *  @return The cause.
+	 */
+	public Tuple2<String, String> getCause()
+	{
+		return (Tuple2<String, String>)properties.get(CAUSE);
+	}
+	
+	/**
+	 *  Set the cause.
+	 *  @param cause The cause.
+	 */
+	public void setCause(Tuple2<String, String> cause)
+	{
+		properties.put(CAUSE, cause);
+	}
+	
+	/**
 	 *  Get a property.
 	 *  @param name The property name.
 	 *  @return The property.
@@ -201,5 +233,13 @@ public class ServiceCall
 	public Map<String, Object> getProperties()
 	{
 		return properties;
+	}
+
+	/** 
+	 *  Get the string represntation.
+	 */
+	public String toString()
+	{
+		return "ServiceCall(caller=" + caller + ", properties=" + properties+ ")";
 	}
 }

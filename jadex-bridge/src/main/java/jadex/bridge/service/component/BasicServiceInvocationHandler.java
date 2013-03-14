@@ -23,6 +23,7 @@ import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
+import jadex.bridge.service.component.interceptors.ServiceCallFutureFunctionality;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
@@ -129,8 +130,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		Object ret = null;
 		
-//		if(method.getName().indexOf("ma1")!=-1)
-//			System.out.println("call ma1");
+//		if(method.getName().indexOf("method1")!=-1)
+//			System.out.println("call method1");
 		
 		if((args==null || args.length==0) && "getServiceIdentifier".equals(method.getName()))
 		{
@@ -149,7 +150,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			
 			if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			{
-				final Future<Object> fret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality(logger));
+				final Future<Object> fret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), 
+					new FutureFunctionality(logger));
+//					new ServiceCallFutureFunctionality(logger, sic.getLastServiceCall(), method.getName()));
 				ret	= fret;
 //				System.out.println("fret: "+fret+" "+method);
 //				fret.addResultListener(new IResultListener()

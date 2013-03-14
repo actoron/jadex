@@ -114,7 +114,7 @@ public abstract class ReceiveHandler
 								{
 									// Can happen if is slave and master goes down.
 									// In that case it tries to find new master.
-									System.out.println("master down, reconfiguring");
+//									System.out.println("master down, reconfiguring");
 									
 									// Can also happen when getSocket() does not work
 									// In this case stop calling receive for some time.

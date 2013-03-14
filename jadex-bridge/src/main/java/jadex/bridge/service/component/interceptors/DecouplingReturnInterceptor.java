@@ -93,10 +93,14 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						
 						public void notifyListener(final IResultListener<Void> listener)
 						{
+//							if(sic.getMethod().getName().indexOf("method")!=-1)
+//								System.out.println("sjdjfhsdfhj");
+							
 							// Don't reschedule if already on correct thread or called from remote.
 							if(ada==null || !ada.isExternalThread())
 //								|| !caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()) )
 							{
+								CallAccess.setServiceCall(sic.getLastServiceCall());
 								listener.resultAvailable(null);
 							}
 							else
@@ -107,6 +111,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									{
 										public void run()
 										{
+//											System.out.println("resched: "+sic.getMethod().getName());
+											CallAccess.setServiceCall(sic.getLastServiceCall());
 											listener.resultAvailable(null);
 										}
 									});
