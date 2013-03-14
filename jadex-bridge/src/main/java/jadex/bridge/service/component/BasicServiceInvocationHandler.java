@@ -23,7 +23,6 @@ import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
-import jadex.bridge.service.component.interceptors.ServiceCallFutureFunctionality;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
@@ -46,7 +45,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-//import jadex.bridge.service.component.interceptors.AuthenticationInterceptor;
 
 /**
  *  Basic service invocation interceptor.
