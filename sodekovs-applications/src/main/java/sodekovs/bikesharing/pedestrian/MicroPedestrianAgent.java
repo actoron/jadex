@@ -26,7 +26,7 @@ public class MicroPedestrianAgent extends MicroAgent {
 
 	private ContinuousSpace2D environment = null;
 	private ISpaceObject myself = null;
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -68,26 +68,6 @@ public class MicroPedestrianAgent extends MicroAgent {
 	}
 	
 	
-
-	/* (non-Javadoc)
-	 * @see jadex.micro.MicroAgent#executeBody()
-	 */
-	@Override
-	public IFuture<Void> executeBody() {
-		// TODO Auto-generated method stub
-		return super.executeBody();
-	}
-
-	/* (non-Javadoc)
-	 * @see jadex.micro.MicroAgent#agentKilled()
-	 */
-	@Override
-	public IFuture<Void> agentKilled() {
-		System.out.println(getAgentName() + " was killed");
-		return IFuture.DONE;
-	}
-
-
 
 	/**
 	 * Component step for the realization of the station to random station default behavior.
@@ -301,5 +281,8 @@ public class MicroPedestrianAgent extends MicroAgent {
 		props.put(ReturnBikeTask.ACTOR_ID, myself.getId());
 		Object taskid = environment.createObjectTask(ReturnBikeTask.PROPERTY_TYPENAME, props, myself.getId());
 		environment.addTaskListener(taskid, myself.getId(), res);
+		
+		//Kill Agent via ISpaceObject
+		environment.destroySpaceObject(myself.getId());
 	}
 }

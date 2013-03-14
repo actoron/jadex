@@ -70,7 +70,8 @@
 					<env:property name="vision_range">0.3</env:property>
 					<env:property name="speed">0.7</env:property>
 					<env:property name="drives_bike">false</env:property>
-					<!-- <env:property name="destination_station_pos" class="Vector2Double" />-->					
+					<!-- Used for MicroAgent, but not for BDI-Agent. -->
+					<env:property name="destination_station_pos" class="Vector2Double" />			
 					<!-- check the movement.capability.xml for an explanation of possible 
 						strategies -->
 					<env:property name="behaviour_strategy">2</env:property>
@@ -105,7 +106,7 @@
 
 			<env:avatarmappings>
 			<!-- USE createcomponent="true" ONLY if avatar is started first. If BDIAgent is started first, don't use it!!! -->
-				<env:avatarmapping componenttype="Pedestrian" objecttype="pedestrian"/>
+				<env:avatarmapping componenttype="Pedestrian" objecttype="pedestrian" createcomponent="true"/>
 				<env:avatarmapping componenttype="Bikestation" 	objecttype="bikestation" createcomponent="true"/>									
 				<env:avatarmapping componenttype="Truck" 	objecttype="truck" createcomponent="true"/>
 			</env:avatarmappings>
@@ -200,8 +201,9 @@
 
 	<componenttypes>
 
-		<componenttype name="Pedestrian"
-			filename="sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml" />
+		<componenttype name="Pedestrian"			
+			filename="sodekovs/bikesharing/pedestrian/MicroPedestrianAgent.class" />
+			<!-- filename="sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml" />-->
 			<componenttype name="Bikestation"
 			filename="sodekovs/bikesharing/bikestation/Bikestation.agent.xml" />
 			<componenttype name="Truck"
