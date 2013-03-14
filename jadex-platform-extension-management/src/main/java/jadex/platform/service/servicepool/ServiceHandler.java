@@ -87,6 +87,7 @@ public class ServiceHandler implements InvocationHandler
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
 		assert component.isComponentThread();
+		final IInternalAccess inta = component;
 		
 		if(!SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			return new Future<Object>(new IllegalArgumentException("Return type must be future: "+method.getName()));
@@ -105,26 +106,26 @@ public class ServiceHandler implements InvocationHandler
 		// Create new component / service if necessary
 		if(create)
 		{
-			component.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			inta.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 			{
 				public void customResultAvailable(final IComponentManagementService cms)
 				{
-					CreationInfo ci  = new CreationInfo(component.getComponentIdentifier());
-					ci.setImports(component.getModel().getAllImports());
+					CreationInfo ci  = new CreationInfo(inta.getComponentIdentifier());
+					ci.setImports(inta.getModel().getAllImports());
 					cms.createComponent(null, componentname, ci, null)
-						.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
+						.addResultListener(inta.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier result)
 						{
 //							System.out.println("created: "+result);
 							cms.getExternalAccess(result)
-								.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
+								.addResultListener(inta.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 							{
 								public void customResultAvailable(IExternalAccess ea)
 								{
 									Future<Object> fut = (Future<Object>)SServiceProvider.getService(ea.getServiceProvider(), servicetype, RequiredServiceInfo.SCOPE_LOCAL);
-									fut.addResultListener(component.createResultListener(new DelegationResultListener<Object>(ret)
+									fut.addResultListener(inta.createResultListener(new DelegationResultListener<Object>(ret)
 									{
 										public void customResultAvailable(Object service)
 										{
@@ -206,6 +207,7 @@ public class ServiceHandler implements InvocationHandler
 	protected IFuture<Void> updateWorkerTimer(final IService service)
 	{
 		assert component.isComponentThread();
+		final IInternalAccess inta = component;
 		
 		final Future<Void> ret = new Future<Void>();
 		
@@ -216,7 +218,7 @@ public class ServiceHandler implements InvocationHandler
 			{
 				public void timeEventOccurred(long currenttime)
 				{
-					component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+					inta.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
@@ -343,7 +345,8 @@ public class ServiceHandler implements InvocationHandler
 	protected IFuture<Void> removeService(IService service)
 	{
 		assert component.isComponentThread();
-
+		final IInternalAccess inta = component;
+		
 		final IComponentIdentifier workercid = service.getServiceIdentifier().getProviderId();
 
 //		System.out.println("removing worker: "+workercid+" "+servicepool);
@@ -357,7 +360,7 @@ public class ServiceHandler implements InvocationHandler
 			public void customResultAvailable(IComponentManagementService cms)
 			{
 				cms.destroyComponent(workercid).addResultListener(
-					component.createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+					inta.createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
 				{
 					public void customResultAvailable(Map<String, Object> result) 
 					{

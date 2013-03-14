@@ -180,7 +180,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
-														listener.exceptionOccurred(/*ex!=null ? ex :*/ new TimeoutException(message));
+														listener.exceptionOccurred(/*ex!=null ? ex :*/ new TimeoutException("Timeout was: "+timeout+" "+message));
 														return IFuture.DONE;
 													}
 												});
