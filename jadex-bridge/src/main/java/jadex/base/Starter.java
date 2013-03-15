@@ -7,11 +7,13 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -265,6 +267,14 @@ public class Starter
 		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
+		// Perform manual switch to allow users specify next call properties
+		ServiceCall sc = CallAccess.getCurrentInvocation();
+		ServiceCall scn = CallAccess.getNextInvocation();
+		if(sc==null && scn!=null)
+		{
+			CallAccess.setServiceCall(scn);
+		}
+		
 		try
 		{
 			// Absolute start time (for testing and benchmarking).
@@ -441,9 +451,13 @@ public class Starter
 						{
 							try
 							{
+								ServiceCall sc = CallAccess.getCurrentInvocation();
+								IComponentIdentifier caller = sc==null? null: sc.getCaller();
+								Tuple2<String, String> cause = sc==null? null: sc.getCause();
+								
 								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, 
-									autosd, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), null);
+									autosd, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
 								
 								Object	af = getArgumentValue(ADAPTER_FACTORY, model, cmdargs, compargs);
 								if(af==null)

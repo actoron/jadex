@@ -2,6 +2,7 @@ package jadex.bridge.service.types.cms;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.commons.Tuple2;
 
 
 /**
@@ -89,10 +90,16 @@ public interface IComponentDescription
 	public long getCreationTime();
 
 	/**
-	 *  Get the creator of this component 
+	 *  Get the creator of this component. 
 	 *  (parent in case of child or external in case of top-level component).
 	 */
 	public IComponentIdentifier getCreator();
+	
+	/**
+	 *  Get the cause for creating the component.
+	 *  @return The cause.
+	 */
+	public Tuple2<String, String> getCause();
 	
 	/**
 	 *  Get the enabled breakpoints (if any).

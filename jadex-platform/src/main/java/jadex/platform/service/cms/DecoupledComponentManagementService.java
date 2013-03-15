@@ -301,8 +301,10 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
 
-		final IComponentIdentifier creator = ServiceCall.getCurrentInvocation().getCaller();
-
+		ServiceCall sc = ServiceCall.getCurrentInvocation();
+		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
+		final Tuple2<String, String> cause = sc==null? null: sc.getCause();
+		
 //		if(modelname.indexOf("Hello")!=-1)
 //			System.out.println("create: "+modelname);//+" "+info!=null? info.getResourceIdentifier(): "norid");
 		
@@ -457,7 +459,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 																	Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
 																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master, daemon, autosd, 
-																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator);
+																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause);
 																	
 																	logger.info("Starting component: "+cid.getName());
 							//										System.err.println("Pre-Init: "+cid);
