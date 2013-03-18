@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.monitoring;
 
+import jadex.bridge.Cause;
 import jadex.commons.Tuple2;
 
 import java.util.HashMap;
@@ -22,7 +23,7 @@ public class MonitoringEvent implements IMonitoringEvent
 	protected long time;
 	
 	/** The cause. */
-	protected Tuple2<String, String> cause;
+	protected Cause cause;
 	
 	/** The service call properties. */
 	protected Map<String, Object> properties;
@@ -40,7 +41,7 @@ public class MonitoringEvent implements IMonitoringEvent
 	/**
 	 *  Create a new monitoring event.
 	 */
-	public MonitoringEvent(String source, String type, Tuple2<String, String> cause, long time)
+	public MonitoringEvent(String source, String type, Cause cause, long time)
 	{
 		this(source, type, cause, time, null);
 	}
@@ -48,7 +49,7 @@ public class MonitoringEvent implements IMonitoringEvent
 	/**
 	 *  Create a new monitoring event.
 	 */
-	public MonitoringEvent(String source, String type, Tuple2<String, String> cause, long time, Map<String, Object> props)
+	public MonitoringEvent(String source, String type, Cause cause, long time, Map<String, Object> props)
 	{
 		this.source = source;
 		this.type = type;
@@ -127,7 +128,7 @@ public class MonitoringEvent implements IMonitoringEvent
 	 *  Get the cause.
 	 *  @return The cause.
 	 */
-	public Tuple2<String, String> getCause()
+	public Cause getCause()
 	{
 		return cause;
 	}
@@ -136,7 +137,7 @@ public class MonitoringEvent implements IMonitoringEvent
 	 *  Set the cause.
 	 *  @param cause The cause to set.
 	 */
-	public void setCause(Tuple2<String, String> cause)
+	public void setCause(Cause cause)
 	{
 		this.cause = cause;
 	}
@@ -172,12 +173,15 @@ public class MonitoringEvent implements IMonitoringEvent
 		this.properties = properties;
 	}
 
-	/** 
+	/**
 	 *  Get the string representation.
 	 */
 	public String toString()
 	{
-		return "MonitoringEvent(source=" + source + ", type="+type+", cause=" + cause
-			+ ", properties=" + properties + ")";
+		return "MonitoringEvent(source=" + source + ", type=" + type
+			+ ", time=" + time + ", cause=" + cause + ", properties="
+			+ properties + ")";
 	}
+
+	
 }

@@ -643,7 +643,7 @@ public class SecurityService implements ISecurityService
 
 	/**
 	 *  Get the password for a network.
-	 *  @param target	The id of the target component.
+	 *  @param targetName	The id of the target component.
 	 *  @return	The stored password. Returns null if no password is stored, unless the
 	 *    component is a local component in which case the local password (if any) is returned.
 	 */

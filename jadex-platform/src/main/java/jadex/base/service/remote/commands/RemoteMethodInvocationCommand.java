@@ -234,7 +234,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 
 	/**
 	 *  Invoke remote method.
-	 *  @param target The target object.
+	 *  @param targetName The target object.
 	 *  @param ret The result future.
 	 */
 	public void invokeMethod(final IntermediateFuture<IRemoteCommand> ret, final RemoteServiceManagementService rsms)

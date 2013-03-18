@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.cms;
 
+import jadex.bridge.Cause;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -64,7 +65,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	protected IComponentIdentifier creator;
 	
 	/** The cause. */
-	protected Tuple2<String, String> cause;
+	protected Cause cause;
 	
 	//-------- constructors --------
 
@@ -81,7 +82,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 */
 	public CMSComponentDescription(IComponentIdentifier cid, String type, Boolean master, 
 		Boolean daemon, Boolean autoshutdown, String modelname, String localtype, IResourceIdentifier rid,
-		long creationtime, IComponentIdentifier creator, Tuple2<String, String> cause)
+		long creationtime, IComponentIdentifier creator, Cause cause)
 	{
 //		System.out.println("created desc: "+cid+" "+hashCode());
 		setName(cid);
@@ -399,7 +400,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Get the cause.
 	 *  @return The cause.
 	 */
-	public Tuple2<String, String> getCause()
+	public Cause getCause()
 	{
 		return cause;
 	}
@@ -408,7 +409,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the cause.
 	 *  @param cause The cause to set.
 	 */
-	public void setCause(Tuple2<String, String> cause)
+	public void setCause(Cause cause)
 	{
 		this.cause = cause;
 	}

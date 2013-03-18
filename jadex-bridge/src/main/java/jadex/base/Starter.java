@@ -1,5 +1,6 @@
 package jadex.base;
 
+import jadex.bridge.Cause;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -453,7 +454,7 @@ public class Starter
 							{
 								ServiceCall sc = CallAccess.getCurrentInvocation();
 								IComponentIdentifier caller = sc==null? null: sc.getCaller();
-								Tuple2<String, String> cause = sc==null? null: sc.getCause();
+								Cause cause = sc==null? null: sc.getCause();
 								
 								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, 

@@ -20,6 +20,7 @@ import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
+import jadex.bridge.service.component.interceptors.MonitoringInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
@@ -142,7 +143,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		}
 		else
 		{
-			final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, method, getInterceptors(), getServiceIdentifier().getProviderId().getRoot(), realtime);
+			final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, method, getInterceptors(), 
+				getServiceIdentifier().getProviderId().getRoot(), realtime, getServiceIdentifier());
 			
 			List<Object> myargs = args!=null? SUtil.arrayToList(args): null;
 			
@@ -518,10 +520,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 //		System.out.println("addI:"+service);
 
+		// todo:
+		boolean monitoring = true;
+		
 		// Only add standard interceptors if not raw.
 		if(!PROXYTYPE_RAW.equals(proxytype))
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
+			if(monitoring)
+				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
 			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia.getExternalAccess(), false));
 			handler.addFirstServiceInterceptor(new PrePostConditionInterceptor());
 			if(!(service instanceof IService))

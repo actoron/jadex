@@ -191,16 +191,16 @@ public class ServiceCall
 	 *  Get the cause.
 	 *  @return The cause.
 	 */
-	public Tuple2<String, String> getCause()
+	public Cause getCause()
 	{
-		return (Tuple2<String, String>)properties.get(CAUSE);
+		return (Cause)properties.get(CAUSE);
 	}
 	
 	/**
 	 *  Set the cause.
 	 *  @param cause The cause.
 	 */
-	public void setCause(Tuple2<String, String> cause)
+	public void setCause(Cause cause)
 	{
 		properties.put(CAUSE, cause);
 	}

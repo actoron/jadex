@@ -31,20 +31,36 @@ public class MonitoringService implements IMonitoringService
 	/** The subscriptions (subscription future -> subscription info). */
 	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>> subscriptions;
 	
+	/** The event filter to filter out some events. */
+	protected IFilter<IMonitoringEvent> filter;
+	
 	/**
 	 *  Create a new MonitoringService. 
 	 */
 	public MonitoringService()
 	{
-		this(10000); // default is 10000 entries
+		this(10000, null); // default is 10000 entries
 	}
 	
 	/**
 	 *  Create a new MonitoringService. 
 	 */
-	public MonitoringService(long max)
+	public MonitoringService(long max, IFilter<IMonitoringEvent> filter)
 	{
 		this.max = max;
+		this.filter = filter;
+		
+		this.filter = new IFilter<IMonitoringEvent>()
+		{
+			public boolean filter(IMonitoringEvent ev)
+			{
+				String tn = ev.getCause().getTargetName();
+				boolean ret = tn.indexOf("DecoupledComponentManagementService")!=-1
+					|| tn.indexOf("LibraryService")!=-1
+					|| tn.indexOf("MonitoringService")!=-1;
+				return ret;
+			}
+		};
 	}
 
 	/**
@@ -100,15 +116,20 @@ public class MonitoringService implements IMonitoringService
 	 */
 	protected void addEvent(IMonitoringEvent event)
 	{
-		if(events==null)
-			events = new LinkedList<IMonitoringEvent>();
-		events.add(event);
-		
-		if(max>0)
+		if(filter!=null && !filter.filter(event))
 		{
-			while(max>=events.size())
+			if(events==null)
+				events = new LinkedList<IMonitoringEvent>();
+			events.add(event);
+			
+			System.out.println("Added event: "+event);
+			
+			if(max>0)
 			{
-				events.remove(0);
+				while(max>=events.size())
+				{
+					events.remove(0);
+				}
 			}
 		}
 	}
@@ -141,9 +162,12 @@ public class MonitoringService implements IMonitoringService
 	 */
 	protected void forwardEvent(IMonitoringEvent event)
 	{
-		for(SubscriptionIntermediateFuture<IMonitoringEvent> sub: subscriptions.keySet().toArray(new SubscriptionIntermediateFuture[0]))
+		if(subscriptions!=null)
 		{
-			forwardEvent(event, sub);
+			for(SubscriptionIntermediateFuture<IMonitoringEvent> sub: subscriptions.keySet().toArray(new SubscriptionIntermediateFuture[0]))
+			{
+				forwardEvent(event, sub);
+			}
 		}
 	}
 	

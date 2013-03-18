@@ -2,9 +2,11 @@ package jadex.micro.testcases.tracing;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.Tuple2;
@@ -175,7 +177,7 @@ public class InitiatorAgent extends TestAgent
 //					ServiceCall.setInvocationProperties(to, true);
 					ServiceCall call = ServiceCall.getInvocation();
 					call.setProperty("extra", "somval");
-					call.setCause(new Tuple2<String, String>(null, "mycause"));
+					call.setCause(new Cause(agent.getComponentIdentifier().toString(), ((IService)ts).getServiceIdentifier().toString()));
 				}				
 				
 				System.out.println("call started with: "+CallAccess.getCurrentInvocation()+" "+Thread.currentThread());

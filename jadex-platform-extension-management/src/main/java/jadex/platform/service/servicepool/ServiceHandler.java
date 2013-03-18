@@ -289,9 +289,12 @@ public class ServiceHandler implements InvocationHandler
 		{
 			// Create new next invocation to preserve the non-func props
 			ServiceCall mcall = CallAccess.getInvocation();
-			for(String key: call.getProperties().keySet())
+			if(call!=null)
 			{
-				mcall.setProperty(key, call.getProperty(key));
+				for(String key: call.getProperties().keySet())
+				{
+					mcall.setProperty(key, call.getProperty(key));
+				}
 			}
 			IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
 			FutureFunctionality.connectDelegationFuture(ret, res);

@@ -1,5 +1,6 @@
 package jadex.platform.service.cms;
 
+import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
@@ -303,7 +304,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
-		final Tuple2<String, String> cause = sc==null? null: sc.getCause();
+		final Cause cause = sc==null? null: sc.getCause();
 		
 //		if(modelname.indexOf("Hello")!=-1)
 //			System.out.println("create: "+modelname);//+" "+info!=null? info.getResourceIdentifier(): "norid");

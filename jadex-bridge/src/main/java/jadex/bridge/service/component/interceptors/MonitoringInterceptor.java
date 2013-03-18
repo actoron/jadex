@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
@@ -10,6 +11,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -45,8 +47,12 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 	public boolean isApplicable(ServiceInvocationContext context)
 	{
 		// Do not monitor calls to the monitoring service itself and no constant calls
-		return !context.getMethod().getDeclaringClass().equals(IMonitoringService.class)
+		boolean ret = !context.getMethod().getDeclaringClass().equals(IMonitoringService.class)
 			&& SReflect.isSupertype(IFuture.class, context.getMethod().getReturnType());
+	
+//		System.out.println("isApp: "+context.getMethod()+" "+ret);
+		
+		return ret;
 	}
 	
 	/**
@@ -66,8 +72,9 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 					// todo: clock?
 					long start = System.currentTimeMillis();
 					ServiceCall sc = context.getServiceCall();
-					Tuple2<String, String> cause = sc==null? null: sc.getCause();
-					monser.publishEvent(new MonitoringEvent(component.getComponentIdentifier().getName(), 
+					Cause cause = sc==null? null: sc.getCause();
+					String src = component.getComponentIdentifier().getName()+"."+context.getMethod().getName();
+					monser.publishEvent(new MonitoringEvent(src, 
 						IMonitoringEvent.TYPE_SERVICECALL_START, cause, start));
 				}
 				context.invoke().addResultListener(new ReturnValueResultListener(ret, context));
@@ -102,6 +109,10 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 					ret.setResult(null);
 				}
 			}));
+		}
+		else
+		{
+			ret.setResult(monser);
 		}
 		
 		return ret;
@@ -142,11 +153,11 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 					if(monser!=null)
 					{
 						// todo: clock?
-						long start = System.currentTimeMillis();
+						long end = System.currentTimeMillis();
 						ServiceCall sc = sic.getServiceCall();
-						Tuple2<String, String> cause = sc==null? null: sc.getCause();
-						monser.publishEvent(new MonitoringEvent(component.getComponentIdentifier().getName(),
-							IMonitoringEvent.TYPE_SERVICECALL_END, cause, start));
+						Cause cause = sc==null? null: sc.getCause();
+						String src = component.getComponentIdentifier().getName()+"."+sic.getMethod().getName();
+						monser.publishEvent(new MonitoringEvent(src, IMonitoringEvent.TYPE_SERVICECALL_END, cause, end));
 					}
 					ReturnValueResultListener.super.customResultAvailable(null);
 				}
@@ -154,6 +165,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 				public void exceptionOccurred(Exception exception)
 				{
 					// never happens
+					ReturnValueResultListener.super.exceptionOccurred(exception);
 				}
 			});
 		}

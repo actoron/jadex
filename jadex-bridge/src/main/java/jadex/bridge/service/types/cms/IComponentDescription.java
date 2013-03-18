@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.cms;
 
+import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.commons.Tuple2;
@@ -99,7 +100,7 @@ public interface IComponentDescription
 	 *  Get the cause for creating the component.
 	 *  @return The cause.
 	 */
-	public Tuple2<String, String> getCause();
+	public Cause getCause();
 	
 	/**
 	 *  Get the enabled breakpoints (if any).

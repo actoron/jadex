@@ -1,8 +1,10 @@
 package jadex.bridge.service.component;
 
+import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SUtil;
@@ -139,7 +141,9 @@ public class ServiceInvocationContext
 	/**
 	 *  Create a new context.
 	 */
-	public ServiceInvocationContext(Object proxy, Method method, IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform, boolean realtime)
+	public ServiceInvocationContext(Object proxy, Method method, 
+		IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform, 
+		boolean realtime, IServiceIdentifier sid)
 	{
 		this.platform = platform;
 		this.proxy = proxy;
@@ -166,7 +170,8 @@ public class ServiceInvocationContext
 		{
 			props.put(ServiceCall.REALTIME, realtime ? Boolean.TRUE : Boolean.FALSE);
 		}
-		this.call	= CallAccess.createServiceCall(caller, props);
+		this.call	= CallAccess.getNextInvocation()!=null? 
+			CallAccess.getNextInvocation(): CallAccess.createServiceCall(caller, props);
 		
 		this.lastcall = CallAccess.getCurrentInvocation();
 		
@@ -174,12 +179,19 @@ public class ServiceInvocationContext
 //			System.out.println("ggggg");
 		
 		// Init the cause of the next call based on the last one
-		if(this.call.getCause()==null && lastcall!=null)
+		if(this.call.getCause()==null)
 		{
-			Tuple2<String, String> cause = lastcall.getCause();
+			Cause cause = lastcall!=null? lastcall.getCause(): null;
+//			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);
+			String target = sid.toString();
 			if(cause!=null)
 			{
-				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
+				this.call.setCause(new Cause(cause, target));
+//				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
+			}
+			else
+			{
+				this.call.setCause(new Cause((Cause)null, target));
 			}
 		}
 	}
