@@ -36,6 +36,7 @@ public class ManageDistributionPlan extends Plan
 		HashMap beliefbaseFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 
 		try {
+			long experimentStart = System.currentTimeMillis();
 			Collection<IRemoteSimulationExecutionService> services = null;
 
 			int counter = 0;
@@ -76,7 +77,9 @@ public class ManageDistributionPlan extends Plan
 //				});
 
 				 Map resMap = (Map) fut.get(this);
+				 long experimentEnd = System.currentTimeMillis();
 				 System.out.println("#StartSimulationExpPlan# RECEIVED res at Master...");
+				 System.out.println("#StartSimulationExpPlan# Simulation Time in ms: " + (experimentEnd - experimentStart));
 				 IGoal eval = (IGoal)
 				 getGoalbase().createGoal("EvaluateSingleResult");
 				 eval.getParameter("args").setValue(resMap);
