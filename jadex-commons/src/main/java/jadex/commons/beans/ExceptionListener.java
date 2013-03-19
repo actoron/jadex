@@ -17,7 +17,8 @@
 
 package jadex.commons.beans;
 
-public interface ExceptionListener {
+public interface ExceptionListener 
+{
 
     public void exceptionThrown(Exception e);
 }

@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceInvalidException;
@@ -71,6 +72,9 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 			BasicServiceInvocationHandler	handler	= (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
 			Object	service	= handler.getService();
 			IFuture<Boolean>	valid;
+			ServiceCall sc = CallAccess.getInvocation();
+			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
+			sc.setProperty(ServiceCall.INHERIT, true);
 			if(service instanceof IService)
 			{
 				valid	= ((IService)service).isValid();

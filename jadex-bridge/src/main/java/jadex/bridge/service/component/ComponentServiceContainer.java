@@ -15,6 +15,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
@@ -26,6 +27,7 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -448,11 +450,14 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		
 		if(cms!=null)
 		{
+//			final String id = SUtil.createUniqueId("abc", 3);
+//			System.out.println("getCh: "+id+" "+CallAccess.getNextInvocation());
 			cms.getChildren(adapter.getComponentIdentifier())
 				.addResultListener(new IResultListener<IComponentIdentifier[]>()
 			{
 				public void resultAvailable(IComponentIdentifier[] children)
 				{
+//					System.out.println("getEx: "+id+" "+CallAccess.getCurrentInvocation());
 					if(children!=null)
 					{
 	//					System.out.println("childs: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));

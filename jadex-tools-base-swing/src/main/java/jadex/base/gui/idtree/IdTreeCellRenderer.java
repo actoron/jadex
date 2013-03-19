@@ -39,6 +39,7 @@ public class IdTreeCellRenderer extends DefaultTreeCellRenderer
 			setLeafIcon(getDefaultLeafIcon());
 		}
 		
+//		System.out.println("tooltip: "+tooltip);
 		if(tooltip!=null)
 		{
 			setToolTipText(tooltip);

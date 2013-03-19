@@ -97,7 +97,7 @@ public class RemoteCMSListener	implements ICMSComponentListener
 	
 	/**
 	 *  Called when a new element has been added.
-	 *  @param id The identifier.
+	 *  @param chainid The identifier.
 	 */
 	public synchronized IFuture componentAdded(final IComponentDescription desc)
 	{
@@ -120,7 +120,7 @@ public class RemoteCMSListener	implements ICMSComponentListener
 	
 	/**
 	 *  Called when a component has changed its state.
-	 *  @param id The identifier.
+	 *  @param chainid The identifier.
 	 */
 	public IFuture componentChanged(IComponentDescription desc)
 	{
@@ -143,7 +143,7 @@ public class RemoteCMSListener	implements ICMSComponentListener
 	
 	/**
 	 *  Called when a new element has been removed.
-	 *  @param id The identifier.
+	 *  @param chainid The identifier.
 	 */
 	public synchronized IFuture componentRemoved(final IComponentDescription desc, Map results)
 	{

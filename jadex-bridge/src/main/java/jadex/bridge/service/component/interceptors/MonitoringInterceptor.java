@@ -3,6 +3,7 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
@@ -10,10 +11,10 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.beans.ExceptionListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -30,7 +31,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 	/** The monitoring service. */
 	protected IMonitoringService monser;
 	protected long lastsearch;
-	protected long delay = 10000;
+	protected long delay = 30000;
 	
 	/**
 	 * 
@@ -47,10 +48,29 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 	public boolean isApplicable(ServiceInvocationContext context)
 	{
 		// Do not monitor calls to the monitoring service itself and no constant calls
-		boolean ret = !context.getMethod().getDeclaringClass().equals(IMonitoringService.class)
+		
+		Boolean mon = (Boolean)context.getServiceCall().getProperty("monitoring");
+		
+		boolean ret;
+		
+		if(mon!=null)
+		{
+			ret = mon.booleanValue();
+		}
+		else
+		{
+			ret = !context.getMethod().getDeclaringClass().equals(IMonitoringService.class)
 			&& SReflect.isSupertype(IFuture.class, context.getMethod().getReturnType());
-	
+			//&& context.getMethod().getName().indexOf("getChildren")==-1;
+		}
+		
 //		System.out.println("isApp: "+context.getMethod()+" "+ret);
+//
+//		if(context.getMethod().getName().indexOf("getChildren")!=-1)
+//			System.out.println("gggggg");
+		
+//		if(ret)
+//			System.out.println("ok: "+context.getMethod().getDeclaringClass()+"."+context.getMethod().getName());
 		
 		return ret;
 	}
@@ -67,16 +87,29 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 		{
 			public void customResultAvailable(IMonitoringService monser)
 			{
+				// Publish event if monitoring service was found
 				if(monser!=null)
 				{
 					// todo: clock?
 					long start = System.currentTimeMillis();
 					ServiceCall sc = context.getServiceCall();
 					Cause cause = sc==null? null: sc.getCause();
-					String src = component.getComponentIdentifier().getName()+"."+context.getMethod().getName();
-					monser.publishEvent(new MonitoringEvent(src, 
-						IMonitoringEvent.TYPE_SERVICECALL_START, cause, start));
+					String src = component.getComponentIdentifier().getName()+"."+context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
+					MonitoringEvent ev = new MonitoringEvent(src, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start);
+					
+					if(context.getMethod().getName().indexOf("method")!=-1)
+						System.out.println("call method: "+ev.getCause().getChainId());
+					
+					monser.publishEvent(ev).addResultListener(new ExceptionResultListener<Void>()
+					{
+						public void exceptionOccurred(Exception e)
+						{
+							// Reset mon service if error on publish
+							MonitoringInterceptor.this.monser = null;
+						}
+					});
 				}
+				
 				context.invoke().addResultListener(new ReturnValueResultListener(ret, context));
 			}
 		});
@@ -90,25 +123,44 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 	protected IFuture<IMonitoringService> getMonitoringService()
 	{
 		final Future<IMonitoringService> ret = new Future<IMonitoringService>();
-		
-		if(lastsearch==0 || System.currentTimeMillis()>lastsearch+delay)
-		{
-			lastsearch = System.currentTimeMillis();
 
-			SServiceProvider.getService(component.getServiceContainer(), IMonitoringService.class)
-				.addResultListener(component.createResultListener(new IResultListener<IMonitoringService>()
+		if(monser==null)
+		{
+			if(lastsearch==0 || System.currentTimeMillis()>lastsearch+delay)
 			{
-				public void resultAvailable(IMonitoringService result)
-				{
-					monser = result;
-					ret.setResult(monser);
-				}
+				lastsearch = System.currentTimeMillis();
+	
+				final ServiceCall cur = CallAccess.getNextInvocation();
 				
-				public void exceptionOccurred(Exception exception)
+				ServiceCall sc = CallAccess.getInvocation();
+				sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
+				sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
+				// Hack, necessary because getService() is not a service call and the first contained
+				// service call (getChildren) will reset the call context afterwards :-(
+				CallAccess.setServiceCall(sc); 
+				
+				SServiceProvider.getService(component.getServiceContainer(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(component.createResultListener(new IResultListener<IMonitoringService>()
 				{
-					ret.setResult(null);
-				}
-			}));
+					public void resultAvailable(IMonitoringService result)
+					{
+						CallAccess.setServiceCall(cur); 
+						monser = result;
+						ret.setResult(monser);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+	//					exception.printStackTrace();
+						CallAccess.setServiceCall(cur); 
+						ret.setResult(null);
+					}
+				}));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		else
 		{
@@ -156,7 +208,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 						long end = System.currentTimeMillis();
 						ServiceCall sc = sic.getServiceCall();
 						Cause cause = sc==null? null: sc.getCause();
-						String src = component.getComponentIdentifier().getName()+"."+sic.getMethod().getName();
+						String src = component.getComponentIdentifier().getName()+"."+sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName();
 						monser.publishEvent(new MonitoringEvent(src, IMonitoringEvent.TYPE_SERVICECALL_END, cause, end));
 					}
 					ReturnValueResultListener.super.customResultAvailable(null);

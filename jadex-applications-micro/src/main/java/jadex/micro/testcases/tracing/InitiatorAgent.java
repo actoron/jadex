@@ -138,6 +138,14 @@ public class InitiatorAgent extends TestAgent
 		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 		
 //		System.out.println("root: "+root+" "+SUtil.arrayToString(root.getAddresses()));
+		
+//		ServiceCall call = ServiceCall.getInvocation();
+//		call.setProperty("extra", "extra");
+//		call.setCause(new Cause("abc"+testno, "a", "b", "a", "b"));
+//		CallAccess.setServiceCall(call);
+		
+		System.out.println("create component started with: "+CallAccess.getCurrentInvocation());
+		
 		createComponent("jadex/micro/testcases/tracing/ProviderAgent.class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
@@ -159,7 +167,7 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Call the service methods.
 	 */
-	protected IFuture<TestReport> callService(IComponentIdentifier cid, int testno, final long to)
+	protected IFuture<TestReport> callService(IComponentIdentifier cid, final int testno, final long to)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
@@ -172,21 +180,18 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(final ITestService ts)
 			{
 				// create a service call meta object and set the timeout
-				if(to!=-1)
-				{
-//					ServiceCall.setInvocationProperties(to, true);
-					ServiceCall call = ServiceCall.getInvocation();
-					call.setProperty("extra", "somval");
-					call.setCause(new Cause(agent.getComponentIdentifier().toString(), ((IService)ts).getServiceIdentifier().toString()));
-				}				
+//				ServiceCall call = ServiceCall.getInvocation();
+//				call.setProperty("extra", "extra");
+//				call.setCause(new Cause("abc"+testno, "a", "b", "a", "b"));
 				
-				System.out.println("call started with: "+CallAccess.getCurrentInvocation()+" "+Thread.currentThread());
+				System.out.println("call started with: "+CallAccess.getCurrentInvocation());
+//				System.out.println("call started with: "+CallAccess.getNextInvocation().getCause().getCallId());
 				ts.method("test1").addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
 						ServiceCall sc = CallAccess.getCurrentInvocation();
-						System.out.println("call returned with: "+sc+" "+Thread.currentThread());
+						System.out.println("call returned with: "+sc);
 						tr.setSucceeded(true);
 						ret.setResult(tr);
 					}

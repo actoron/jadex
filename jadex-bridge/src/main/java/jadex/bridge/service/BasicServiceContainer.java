@@ -120,7 +120,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	
 	/**
 	 *  Add a service to the container.
-	 *  @param id The name.
+	 *  @param chainid The name.
 	 *  @param service The service.
 	 */
 	public IFuture<Void>	addService(final IInternalService service, final ProvidedServiceInfo info)
@@ -181,7 +181,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 
 	/**
 	 *  Removes a service from the platform (shutdowns also the service).
-	 *  @param id The name.
+	 *  @param chainid The name.
 	 *  @param service The service.
 	 */
 	public IFuture<Void> removeService(final IServiceIdentifier sid)

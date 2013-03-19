@@ -205,6 +205,9 @@
 		
 		<!-- Flag to enable the Maven dependency service (requires Jadex Pro add-on). -->
 		<argument name="maven_dependencies" class="boolean">false</argument>
+		
+		<!-- Flag if global monitoring is turned on.  -->
+		<argument name="monitoring" class="boolean">false</argument>
 	</arguments>
 	
 	<componenttypes>
@@ -226,6 +229,7 @@
 		<componenttype filename="jadex/extension/rs/publish/RSPublishAgent.class" name="rspublish"/>
 		<componenttype filename="jadex/extension/ws/publish/WSPublishAgent.class" name="wspublish"/>
 		<componenttype filename="jadex/platform/service/cli/CliAgent.class" name="cli"/>
+		<componenttype filename="jadex/platform/service/monitoring/MonitoringAgent.class" name="monitor"/>
 		
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
 	</componenttypes>
@@ -367,6 +371,7 @@
 			</arguments>
 			
 			<components>
+				<component name="mon" type="monitor" daemon="true" number="$args.monitoring? 1 : 0"/>
 				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>

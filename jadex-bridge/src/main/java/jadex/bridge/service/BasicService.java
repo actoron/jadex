@@ -114,7 +114,7 @@ public class BasicService implements IInternalService
 	 */
 	public synchronized IFuture<Boolean> isValid()
 	{
-//		if(getServiceIdentifier().getServiceName().indexOf("Add")!=-1)
+//		if(getServiceIdentifier().getServiceName().indexOf("Decoupled")!=-1)
 //			System.out.println("isValid: "+getServiceIdentifier()+": "+(started && !shutdowned));
 		return new Future<Boolean>(started && !shutdowned? Boolean.TRUE: Boolean.FALSE);
 	}

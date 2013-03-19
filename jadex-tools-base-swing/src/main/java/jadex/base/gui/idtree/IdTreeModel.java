@@ -42,7 +42,10 @@ public class IdTreeModel<T> extends DefaultTreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
-		nodes.put(node.getId(), node);
+//		nodes.put(node.getId(), node);
+		registerAll(node);
+		
+//		System.out.println("current nodes: "+nodes.keySet());
 	}
 	
 	/**
@@ -54,6 +57,24 @@ public class IdTreeModel<T> extends DefaultTreeModel
 		assert SwingUtilities.isEventDispatchThread();
 		
 		deregisterAll(node);
+	}
+	
+	/**
+	 *  Register a node and all its children.
+	 *  @param node The node.
+	 */
+	protected void registerAll(IdTreeNode<T> node)
+	{
+		Object tst = nodes.get(node.getId());
+		if(tst!=null && tst!=node)
+			throw new RuntimeException("Node already contained: "+node+" "+nodes.get(node.getId()));
+			
+		nodes.put(node.getId(), node);
+		
+		for(int i=node.getChildCount()-1; i>=0; i--)
+		{
+			registerAll((IdTreeNode<T>)node.getChildAt(i));
+		}
 	}
 	
 	/**

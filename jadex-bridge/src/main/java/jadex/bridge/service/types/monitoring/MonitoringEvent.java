@@ -1,7 +1,6 @@
 package jadex.bridge.service.types.monitoring;
 
 import jadex.bridge.Cause;
-import jadex.commons.Tuple2;
 
 import java.util.HashMap;
 import java.util.Map;

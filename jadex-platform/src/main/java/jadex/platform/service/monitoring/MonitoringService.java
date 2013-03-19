@@ -50,15 +50,21 @@ public class MonitoringService implements IMonitoringService
 		this.max = max;
 		this.filter = filter;
 		
+		// Must pass filter to be added
 		this.filter = new IFilter<IMonitoringEvent>()
 		{
 			public boolean filter(IMonitoringEvent ev)
 			{
-				String tn = ev.getCause().getTargetName();
-				boolean ret = tn.indexOf("DecoupledComponentManagementService")!=-1
-					|| tn.indexOf("LibraryService")!=-1
-					|| tn.indexOf("MonitoringService")!=-1;
-				return ret;
+				String sn = ev.getCause().getSourceName();
+				String tn = ev.getSource();//ev.getCause().getTargetName();
+//				boolean srcjadex = sn!=null && sn.indexOf("jadex.bridge")!=-1;
+//				boolean trgjadex = tn.indexOf("jadex.bridge")!=-1;
+				
+//				boolean ret =  sn==null || tn.indexOf("jadex.bridge")!=-1;
+//					(tn.indexOf("DecoupledComponentManagementService")==-1
+//					&& tn.indexOf("LibraryService")==-1
+//					&& tn.indexOf("MonitoringService")==-1);
+				return true;
 			}
 		};
 	}
@@ -69,10 +75,14 @@ public class MonitoringService implements IMonitoringService
 	 */
 	public IFuture<Void> publishEvent(IMonitoringEvent event)
 	{
-		addEvent(event);
+//		if(event.getSource().indexOf("method")!=-1)
+//			System.out.println("sdgjsdfsdfjk");
 		
-		forwardEvent(event);
-		
+		if(filter==null || filter.filter(event))
+		{
+			addEvent(event);
+			forwardEvent(event);
+		}
 		return IFuture.DONE;
 	}
 	
@@ -101,9 +111,12 @@ public class MonitoringService implements IMonitoringService
 		addSubscription(ret, filter);
 		
 		// Forward all stored events initially
-		for(IMonitoringEvent event: events)
+		if(events!=null)
 		{
-			forwardEvent(event, ret);
+			for(IMonitoringEvent event: events)
+			{
+				forwardEvent(event, ret);
+			}
 		}
 		
 		return ret;
@@ -116,20 +129,17 @@ public class MonitoringService implements IMonitoringService
 	 */
 	protected void addEvent(IMonitoringEvent event)
 	{
-		if(filter!=null && !filter.filter(event))
+		if(events==null)
+			events = new LinkedList<IMonitoringEvent>();
+		events.add(event);
+			
+//		System.out.println("Added event: "+event);
+		
+		if(max>0)
 		{
-			if(events==null)
-				events = new LinkedList<IMonitoringEvent>();
-			events.add(event);
-			
-			System.out.println("Added event: "+event);
-			
-			if(max>0)
+			while(events.size()>=max)
 			{
-				while(max>=events.size())
-				{
-					events.remove(0);
-				}
+				events.remove(0);
 			}
 		}
 	}
@@ -181,6 +191,7 @@ public class MonitoringService implements IMonitoringService
 		{
 			if(fil==null || fil.filter(event))
 			{
+//				System.out.println("forward to: "+sub);
 				if(!sub.addIntermediateResultIfUndone(event))
 				{
 					subscriptions.remove(fil);

@@ -271,9 +271,16 @@ public class Starter
 		// Perform manual switch to allow users specify next call properties
 		ServiceCall sc = CallAccess.getCurrentInvocation();
 		ServiceCall scn = CallAccess.getNextInvocation();
-		if(sc==null && scn!=null)
+		if(sc==null)
 		{
-			CallAccess.setServiceCall(scn);
+			if(scn==null)
+			{
+				scn = CallAccess.getInvocation();
+				scn.setCause(new Cause((String)null, "createPlatform"));
+			}
+			
+			if(scn!=null)
+				CallAccess.setServiceCall(scn);
 		}
 		
 		try

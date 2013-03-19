@@ -136,6 +136,9 @@ public class ServiceInvocationContext
 	/** The flag if local timeouts should be realtime. */
 	protected boolean realtime;
 	
+	/** The creation (root) cause. */
+	protected Cause cause;
+	
 	//-------- constructors --------
 	
 	/**
@@ -143,7 +146,7 @@ public class ServiceInvocationContext
 	 */
 	public ServiceInvocationContext(Object proxy, Method method, 
 		IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform, 
-		boolean realtime, IServiceIdentifier sid)
+		boolean realtime, IServiceIdentifier sid, Cause crcause)
 	{
 		this.platform = platform;
 		this.proxy = proxy;
@@ -152,6 +155,7 @@ public class ServiceInvocationContext
 		this.method = new ArrayList<Method>();
 		this.arguments = new ArrayList<List<Object>>();
 		this.result = new ArrayList<Object>();
+		this.cause = crcause;
 		
 		this.used = new ArrayList<Integer>();
 		this.interceptors = interceptors;
@@ -159,21 +163,36 @@ public class ServiceInvocationContext
 		this.caller = IComponentIdentifier.LOCAL.get();
 		this.calleradapter	= IComponentAdapter.LOCAL.get();
 		
-		ServiceCall	call	= CallAccess.getNextInvocation();
-//		Map<String, Object> props = call!=null ? new HashMap<String, Object>(call.getProperties()) : new HashMap<String, Object>();
-		Map<String, Object> props = call!=null ? call.getProperties() : new HashMap<String, Object>();
-		if(!props.containsKey(ServiceCall.TIMEOUT))
-		{
-			props.put(ServiceCall.TIMEOUT, new Long(BasicServiceContainer.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall())));			
-		}
-		if(!props.containsKey(ServiceCall.REALTIME))
-		{
-			props.put(ServiceCall.REALTIME, realtime ? Boolean.TRUE : Boolean.FALSE);
-		}
-		this.call	= CallAccess.getNextInvocation()!=null? 
-			CallAccess.getNextInvocation(): CallAccess.createServiceCall(caller, props);
-		
 		this.lastcall = CallAccess.getCurrentInvocation();
+
+		// Is next call defined by user?
+		this.call = CallAccess.getNextInvocation(); 
+		if(call==null)
+		{
+	//		Map<String, Object> props = call!=null ? new HashMap<String, Object>(call.getProperties()) : new HashMap<String, Object>();
+			Map<String, Object> props = null;
+			
+			Boolean inh = lastcall!=null? (Boolean)lastcall.getProperty(ServiceCall.INHERIT): null;
+			if(inh!=null && inh.booleanValue())
+			{
+				props = new HashMap<String, Object>(lastcall.getProperties());
+				props.remove(ServiceCall.CAUSE); // remove cause as it has to be adapted
+			}
+			else
+			{
+				props = new HashMap<String, Object>();
+			}
+			this.call = CallAccess.createServiceCall(caller, props);
+		}
+		
+		if(!call.getProperties().containsKey(ServiceCall.TIMEOUT))
+		{
+			call.setProperty(ServiceCall.TIMEOUT, new Long(BasicServiceContainer.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall())));			
+		}
+		if(!call.getProperties().containsKey(ServiceCall.REALTIME))
+		{
+			call.setProperty(ServiceCall.REALTIME, realtime ? Boolean.TRUE : Boolean.FALSE);
+		}
 		
 //		if(method.getName().indexOf("method")!=-1)
 //			System.out.println("ggggg");
@@ -181,7 +200,7 @@ public class ServiceInvocationContext
 		// Init the cause of the next call based on the last one
 		if(this.call.getCause()==null)
 		{
-			Cause cause = lastcall!=null? lastcall.getCause(): null;
+			Cause cause = lastcall!=null? lastcall.getCause(): this.cause;
 //			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);
 			String target = sid.toString();
 			if(cause!=null)

@@ -29,7 +29,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			// a) the method is directly the business logic or
 			// b) the method jumps from required to provided interceptor chain
 				
-//			if(sic.getMethod().getName().indexOf("method")!=-1)
+//			if(sic.getMethod().getName().indexOf("getChildren")!=-1)
 //				System.out.println("ggggg");
 			
 			// Problem that the object could be an rmi proxy itself that delegates the call

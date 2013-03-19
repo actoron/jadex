@@ -133,7 +133,7 @@ import java.util.logging.Level;
 	
 	@Argument(name="maven_dependencies", clazz=boolean.class, defaultvalue="false"),
 	
-	@Argument(name="monitoring", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="monitoring", clazz=boolean.class, defaultvalue="false"),
 })
 
 @ComponentTypes({

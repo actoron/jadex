@@ -27,6 +27,12 @@ public class ServiceCall
 	/** The cause constant. */
 	public static final String CAUSE = "cause";
 	
+	/** The monitoring constant. */
+	public static final String MONITORING = "monitoring";
+	
+	/** The inherit constant. */
+	public static final String INHERIT = "inherit";
+	
 	/** The current service calls mapped to threads. */
 	protected static ThreadLocal<ServiceCall> CALLS	= new ThreadLocal<ServiceCall>();
 	

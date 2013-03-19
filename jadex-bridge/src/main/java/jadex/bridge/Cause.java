@@ -2,15 +2,13 @@ package jadex.bridge;
 
 import java.util.UUID;
 
-import jadex.commons.SUtil;
-
 /**
  * 
  */
 public class Cause
 {
-	/** The call id. Identical for all calls of the same origin. */
-	protected String callid;
+	/** The id. Identical for all calls of the same origin. */
+	protected String chainid;
 
 	/** The source id. */
 	protected String sourceid;
@@ -37,8 +35,7 @@ public class Cause
 	 */
 	public Cause(String sourcename, String targetname)
 	{
-		this(UUID.randomUUID().toString(), UUID.randomUUID().toString(), 
-			UUID.randomUUID().toString() , sourcename, targetname);
+		this(null, null, null, sourcename, targetname);
 	}
 	
 	/**
@@ -46,17 +43,21 @@ public class Cause
 	 */
 	public Cause(String sourceid, String targetid, String sourcename, String targetname)
 	{
-		this(UUID.randomUUID().toString(), sourceid, targetid, sourcename, targetname);
+		this(null, sourceid, targetid, sourcename, targetname);
 	}
 	
 	/**
 	 *  Create a new cause.
 	 */
-	public Cause(String callid, String sourceid, String targetid, String sourcename, String targetname)
+	public Cause(String chainid, String sourceid, String targetid, String sourcename, String targetname)
 	{
-		this.callid = callid;
-		this.sourceid = sourceid;
-		this.targetid = targetid;
+		this.sourceid = sourceid==null? UUID.randomUUID().toString(): sourceid;
+		this.targetid = targetid==null? UUID.randomUUID().toString(): targetid;
+		
+		// If chainid is null it will be set to sourceid
+		// This allows to check if an event is top-level
+		this.chainid = chainid==null? this.sourceid: chainid;
+		
 		this.sourcename = sourcename;
 		this.targetname = targetname;
 	}
@@ -66,8 +67,8 @@ public class Cause
 	 */
 	public Cause(Cause old, String targetname)
 	{
-		this.callid = old!=null? old.getCallId(): UUID.randomUUID().toString();
-		this.sourceid = old!=null? old.getTargetId(): null;
+		this.chainid = old!=null? old.getChainId(): UUID.randomUUID().toString();
+		this.sourceid = old!=null? old.getTargetId(): UUID.randomUUID().toString();
 		this.sourcename = old!=null? old.getTargetName(): null;
 		this.targetid = UUID.randomUUID().toString();
 		this.targetname = targetname;
@@ -86,21 +87,21 @@ public class Cause
 //	}
 	
 	/**
-	 *  Get the callid.
-	 *  @return The callid.
+	 *  Get the chain id.
+	 *  @return The chain id.
 	 */
-	public String getCallId()
+	public String getChainId()
 	{
-		return callid;
+		return chainid;
 	}
 
 	/**
-	 *  Set the callid.
-	 *  @param callid The callid to set.
+	 *  Set the chain id.
+	 *  @param chainid The chainid to set.
 	 */
-	public void setCallId(String callid)
+	public void setChainId(String callid)
 	{
-		this.callid = callid;
+		this.chainid = callid;
 	}
 
 	/**
@@ -180,7 +181,7 @@ public class Cause
 	 */
 	public String toString()
 	{
-		return "Cause(callid=" + callid + ", sourceid=" + sourceid
+		return "Cause(chainid=" + chainid + ", sourceid=" + sourceid
 			+ ", targetid=" + targetid + ", sourcename=" + sourcename
 			+ ", targetname=" + targetname + ")";
 	}

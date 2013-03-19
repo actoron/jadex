@@ -52,7 +52,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.kernelbase.IBootstrapFactory;
 
 import java.util.ArrayList;
@@ -304,7 +307,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
-		final Cause cause = sc==null? null: sc.getCause();
+		final Cause cause = sc==null? agent.getComponentDescription().getCause(): sc.getCause();
 		
 //		if(modelname.indexOf("Hello")!=-1)
 //			System.out.println("create: "+modelname);//+" "+info!=null? info.getResourceIdentifier(): "norid");
@@ -2119,6 +2122,62 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		
 		return ret;
 	}
+	
+//	/**
+//	 *  Get the children components of a component.
+//	 *  @param cid The component identifier.
+//	 *  @return The children component identifiers.
+//	 */
+//	public IIntermediateFuture<IComponentIdentifier> getChildren(final IComponentIdentifier cid)
+//	{
+//		final IntermediateFuture<IComponentIdentifier>	ret	= new IntermediateFuture<IComponentIdentifier>();
+//		
+//		if(isRemoteComponent(cid))
+//		{
+//			getRemoteCMS(cid).addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IComponentIdentifier>>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.getChildren(cid).addResultListener(createResultListener(new IntermediateDelegationResultListener<IComponentIdentifier>(ret)));
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					super.exceptionOccurred(exception);
+//				}
+//			}));
+//		}
+//		else
+//		{
+//	//		System.out.println("getChildren: "+this+" "+isValid());
+//			IComponentIdentifier[] tmp;
+//			CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+////			System.out.println("desc: "+desc.getName()+" "+desc.hashCode());
+//			tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+//			IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+////			System.out.println(getServiceIdentifier()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
+//			ret.setResult(tmp);
+//			
+//			// Nice style to check for valid?
+//	//		checkValid().addResultListener(new IResultListener()
+//	//		{
+//	//			public void resultAvailable(Object source, Object result)
+//	//			{
+//	//				CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+//	//				IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+//	//					IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+//	//				ret.setResult(tmp);
+//	//			}
+//	//			
+//	//			public void exceptionOccurred(Object source, Exception exception)
+//	//			{
+//	//				ret.setException(exception);
+//	//			}
+//	//		});
+//		}
+//		
+//		return ret;
+//	}
 
 	
 	/**

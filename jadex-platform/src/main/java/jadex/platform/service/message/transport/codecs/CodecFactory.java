@@ -187,7 +187,7 @@ public class CodecFactory
 	
 	/**
 	 *  Set the default decoder/encoder id. 
-	 *  @param id The id.
+	 *  @param chainid The id.
 	 */
 	public void setDefaultCodecIds(byte[] codecids)
 	{
@@ -196,7 +196,7 @@ public class CodecFactory
 	
 	/**
 	 *  Get the default decoder/encoder id. 
-	 *  @param id The id.
+	 *  @param chainid The id.
 	 */
 	public byte[] getDefaultCodecIds()
 	{
@@ -243,7 +243,7 @@ public class CodecFactory
 	
 	/**
 	 *  Remove a codec via its id.
-	 *  @param id The codec id.
+	 *  @param chainid The codec id.
 	 */
 	public void removeCodec(Class codec_class)
 	{

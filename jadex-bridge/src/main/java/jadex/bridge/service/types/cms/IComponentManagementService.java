@@ -9,6 +9,7 @@ import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.Collection;
@@ -171,6 +172,7 @@ public interface IComponentManagementService //extends IService
 	 *  @return The children component identifiers.
 	 */
 	public IFuture<IComponentIdentifier[]> getChildren(IComponentIdentifier cid);
+//	public IIntermediateFuture<IComponentIdentifier> getChildren(IComponentIdentifier cid);
 	
 	/**
 	 *  Get the children components of a component.

@@ -98,6 +98,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setResourceIdentifier(rid);
 		setCreationTime(creationtime);
 		setCreator(creator);
+		setCause(cause);
 	}
 
 	//-------- accessor methods --------

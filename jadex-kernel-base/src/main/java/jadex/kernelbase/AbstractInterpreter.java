@@ -107,6 +107,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.container = createServiceContainer();
 //		this.creationtime = System.currentTimeMillis();
 //		this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
+		
+//		System.out.println("hhh: "+desc.getName()+" "+desc.getCause());
 	}
 	
 	//-------- methods to be called by adapter --------

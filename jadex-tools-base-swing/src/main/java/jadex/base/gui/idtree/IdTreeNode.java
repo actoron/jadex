@@ -23,7 +23,7 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 	protected IdTreeModel<T> tm;
 	
 	/** Flag if is leaf. */
-	protected boolean leaf;
+	protected Boolean leaf;
 	
 	/** The icon. */
 	protected Icon icon;
@@ -39,7 +39,7 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 	/**
 	 *  Create a new node.
 	 */
-	public IdTreeNode(String key, String name, IdTreeModel<T> tm, boolean leaf,
+	public IdTreeNode(String key, String name, IdTreeModel<T> tm, Boolean leaf,
 		Icon icon, String tooltip, T object)
 	{
 		this.key = key;
@@ -59,10 +59,12 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
-		IdTreeNode<T> itn = (IdTreeNode<T>)child;
-		tm.addNode(itn);
-		super.add(itn);
-		tm.nodesWereInserted(this, new int[]{getChildCount()-1});
+        insert(child, getChildCount());
+        
+//		IdTreeNode<T> itn = (IdTreeNode<T>)child;
+//		tm.addNode(itn);
+//		super.add(itn);
+//		tm.nodesWereInserted(this, new int[]{getChildCount()-1});
 	}
 	
 	/**
@@ -73,10 +75,13 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
-		IdTreeNode<T> itn = (IdTreeNode<T>)child;
-		tm.addNode(itn);
-		super.insert(child, index);
-		tm.nodesWereInserted(this, new int[]{index});
+		if(child!=null && child.getParent()!=this)
+		{
+			IdTreeNode<T> itn = (IdTreeNode<T>)child;
+			tm.addNode(itn);
+			super.insert(child, index);
+			tm.nodesWereInserted(this, new int[]{index});
+		}
 	}
 
 	/**
@@ -94,12 +99,58 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 	}
 	
 	/**
+	 *  Remove a child.
+	 *  @param idx The index.
+	 */
+	public void remove(MutableTreeNode child)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		
+		int idx = getIndex(child);
+		tm.removeNode((IdTreeNode<T>)child);
+		super.remove(child);
+		tm.nodesWereRemoved(this, new int[]{idx}, new TreeNode[]{child});
+	}
+	
+	/**
+	 *  Get all children.
+	 *  @return An array of children.s
+	 */
+	public IdTreeNode<T>[] getChildren()
+	{
+		IdTreeNode<T>[] ret = (IdTreeNode<T>[])new IdTreeNode[getChildCount()];
+		for(int i=0; i<getChildCount(); i++)
+		{
+			ret[i] = (IdTreeNode<T>)getChildAt(i);
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get the id.
 	 *  @return The id.
 	 */
 	public String getId()
 	{
 		return key;
+	}
+	
+	/**
+	 *  Get the name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+	
+	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 	/**
@@ -108,7 +159,7 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 	 */
 	public boolean isLeaf()
 	{
-		return leaf;
+		return leaf!=null? leaf.booleanValue(): super.isLeaf();
 	}
 
 	/**
