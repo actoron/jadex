@@ -103,7 +103,7 @@
 				<Time value="17000" type="absolute" />
 			</TerminateCondition> -->
 		</General>
-		<Rows experiments="10">
+		<Rows experiments="1">
 			<TerminateCondition>
 				 <Time value="1600" type="tick_based" /><!-- relatively, absolute or tick_based -->
 				

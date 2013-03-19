@@ -226,7 +226,7 @@
 							</env:property>
 						</env:process>-->
 						<env:process type="manageTimeSlices">
-							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday.xml"</env:property>
+							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday_new.xml"</env:property>
 							<env:property name="clusterSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/stationCluster-4.xml"</env:property>
 						</env:process>
 					</env:processes>
@@ -235,10 +235,10 @@
 						<env:object type="SimInfo"> <env:property name="position">new	Vector2Double(2.0, 4.0)</env:property> </env:object>
 					</env:objects>
 
-					<env:observers>
+					<!-- <env:observers>
 						<env:observer name="world" dataview="view_all"
 							perspective="main" />
-					</env:observers>
+					</env:observers> -->
 				</env:envspace>
 				
 				<!-- The CoordinationSpace -->
