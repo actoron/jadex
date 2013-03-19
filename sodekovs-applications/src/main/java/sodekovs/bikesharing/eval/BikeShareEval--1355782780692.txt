@@ -1,0 +1,577 @@
+
+TIME SLICE: 	0
+
+Difference between 0%-10% 48 (31,37%)
+Difference between 11%-20% 50 (32,68%)
+Difference between 21%-30% 20 (13,07%)
+Difference between 31%-40% 21 (13,73%)
+Difference between 41%-50% 10 (6,54%)
+Difference between 51%-60% 0 (0,00%)
+Difference between 61%-70% 0 (0,00%)
+Difference between 71%-80% 2 (1,31%)
+Difference between 81%-90% 0 (0,00%)
+Difference between 91%-100% 2 (1,31%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 0(0,00%)
+ GREEN: 153(100,00%)
+ BLUE: 0(0,00%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	60
+
+Difference between 0%-10% 18 (11,76%)
+Difference between 11%-20% 20 (13,07%)
+Difference between 21%-30% 11 (7,19%)
+Difference between 31%-40% 3 (1,96%)
+Difference between 41%-50% 4 (2,61%)
+Difference between 51%-60% 3 (1,96%)
+Difference between 61%-70% 2 (1,31%)
+Difference between 71%-80% 3 (1,96%)
+Difference between 81%-90% 0 (0,00%)
+Difference between 91%-100% 89 (58,17%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 75(49,02%)
+ GREEN: 77(50,33%)
+ BLUE: 1(0,65%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	120
+
+Difference between 0%-10% 17 (11,11%)
+Difference between 11%-20% 13 (8,50%)
+Difference between 21%-30% 8 (5,23%)
+Difference between 31%-40% 7 (4,58%)
+Difference between 41%-50% 14 (9,15%)
+Difference between 51%-60% 7 (4,58%)
+Difference between 61%-70% 1 (0,65%)
+Difference between 71%-80% 2 (1,31%)
+Difference between 81%-90% 0 (0,00%)
+Difference between 91%-100% 84 (54,90%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 71(46,41%)
+ GREEN: 71(46,41%)
+ BLUE: 11(7,19%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	180
+
+Difference between 0%-10% 14 (9,15%)
+Difference between 11%-20% 16 (10,46%)
+Difference between 21%-30% 6 (3,92%)
+Difference between 31%-40% 4 (2,61%)
+Difference between 41%-50% 5 (3,27%)
+Difference between 51%-60% 11 (7,19%)
+Difference between 61%-70% 8 (5,23%)
+Difference between 71%-80% 4 (2,61%)
+Difference between 81%-90% 8 (5,23%)
+Difference between 91%-100% 77 (50,33%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 66(43,14%)
+ GREEN: 55(35,95%)
+ BLUE: 32(20,92%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	240
+
+Difference between 0%-10% 9 (5,88%)
+Difference between 11%-20% 15 (9,80%)
+Difference between 21%-30% 6 (3,92%)
+Difference between 31%-40% 6 (3,92%)
+Difference between 41%-50% 3 (1,96%)
+Difference between 51%-60% 4 (2,61%)
+Difference between 61%-70% 12 (7,84%)
+Difference between 71%-80% 12 (7,84%)
+Difference between 81%-90% 12 (7,84%)
+Difference between 91%-100% 74 (48,37%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 68(44,44%)
+ GREEN: 42(27,45%)
+ BLUE: 43(28,10%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	300
+
+Difference between 0%-10% 9 (5,88%)
+Difference between 11%-20% 10 (6,54%)
+Difference between 21%-30% 7 (4,58%)
+Difference between 31%-40% 8 (5,23%)
+Difference between 41%-50% 6 (3,92%)
+Difference between 51%-60% 1 (0,65%)
+Difference between 61%-70% 5 (3,27%)
+Difference between 71%-80% 13 (8,50%)
+Difference between 81%-90% 19 (12,42%)
+Difference between 91%-100% 75 (49,02%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 66(43,14%)
+ GREEN: 39(25,49%)
+ BLUE: 48(31,37%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	360
+
+Difference between 0%-10% 9 (5,88%)
+Difference between 11%-20% 11 (7,19%)
+Difference between 21%-30% 8 (5,23%)
+Difference between 31%-40% 6 (3,92%)
+Difference between 41%-50% 2 (1,31%)
+Difference between 51%-60% 4 (2,61%)
+Difference between 61%-70% 5 (3,27%)
+Difference between 71%-80% 10 (6,54%)
+Difference between 81%-90% 23 (15,03%)
+Difference between 91%-100% 75 (49,02%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 63(41,18%)
+ GREEN: 41(26,80%)
+ BLUE: 49(32,03%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	420
+
+Difference between 0%-10% 10 (6,54%)
+Difference between 11%-20% 9 (5,88%)
+Difference between 21%-30% 6 (3,92%)
+Difference between 31%-40% 4 (2,61%)
+Difference between 41%-50% 6 (3,92%)
+Difference between 51%-60% 4 (2,61%)
+Difference between 61%-70% 1 (0,65%)
+Difference between 71%-80% 12 (7,84%)
+Difference between 81%-90% 22 (14,38%)
+Difference between 91%-100% 79 (51,63%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 63(41,18%)
+ GREEN: 34(22,22%)
+ BLUE: 56(36,60%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	480
+
+Difference between 0%-10% 9 (5,88%)
+Difference between 11%-20% 7 (4,58%)
+Difference between 21%-30% 5 (3,27%)
+Difference between 31%-40% 6 (3,92%)
+Difference between 41%-50% 6 (3,92%)
+Difference between 51%-60% 2 (1,31%)
+Difference between 61%-70% 5 (3,27%)
+Difference between 71%-80% 9 (5,88%)
+Difference between 81%-90% 21 (13,73%)
+Difference between 91%-100% 83 (54,25%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 62(40,52%)
+ GREEN: 30(19,61%)
+ BLUE: 61(39,87%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	540
+
+Difference between 0%-10% 9 (5,88%)
+Difference between 11%-20% 7 (4,58%)
+Difference between 21%-30% 6 (3,92%)
+Difference between 31%-40% 2 (1,31%)
+Difference between 41%-50% 6 (3,92%)
+Difference between 51%-60% 4 (2,61%)
+Difference between 61%-70% 5 (3,27%)
+Difference between 71%-80% 9 (5,88%)
+Difference between 81%-90% 19 (12,42%)
+Difference between 91%-100% 86 (56,21%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 61(39,87%)
+ GREEN: 30(19,61%)
+ BLUE: 62(40,52%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	600
+
+Difference between 0%-10% 9 (5,88%)
+Difference between 11%-20% 7 (4,58%)
+Difference between 21%-30% 4 (2,61%)
+Difference between 31%-40% 4 (2,61%)
+Difference between 41%-50% 3 (1,96%)
+Difference between 51%-60% 7 (4,58%)
+Difference between 61%-70% 3 (1,96%)
+Difference between 71%-80% 9 (5,88%)
+Difference between 81%-90% 17 (11,11%)
+Difference between 91%-100% 90 (58,82%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 60(39,22%)
+ GREEN: 29(18,95%)
+ BLUE: 64(41,83%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	660
+
+Difference between 0%-10% 8 (5,23%)
+Difference between 11%-20% 8 (5,23%)
+Difference between 21%-30% 4 (2,61%)
+Difference between 31%-40% 2 (1,31%)
+Difference between 41%-50% 4 (2,61%)
+Difference between 51%-60% 6 (3,92%)
+Difference between 61%-70% 4 (2,61%)
+Difference between 71%-80% 7 (4,58%)
+Difference between 81%-90% 15 (9,80%)
+Difference between 91%-100% 95 (62,09%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 61(39,87%)
+ GREEN: 28(18,30%)
+ BLUE: 64(41,83%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	720
+
+Difference between 0%-10% 10 (6,54%)
+Difference between 11%-20% 6 (3,92%)
+Difference between 21%-30% 2 (1,31%)
+Difference between 31%-40% 2 (1,31%)
+Difference between 41%-50% 2 (1,31%)
+Difference between 51%-60% 5 (3,27%)
+Difference between 61%-70% 6 (3,92%)
+Difference between 71%-80% 8 (5,23%)
+Difference between 81%-90% 16 (10,46%)
+Difference between 91%-100% 96 (62,75%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 60(39,22%)
+ GREEN: 28(18,30%)
+ BLUE: 65(42,48%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	780
+
+Difference between 0%-10% 9 (5,88%)
+Difference between 11%-20% 7 (4,58%)
+Difference between 21%-30% 4 (2,61%)
+Difference between 31%-40% 1 (0,65%)
+Difference between 41%-50% 0 (0,00%)
+Difference between 51%-60% 2 (1,31%)
+Difference between 61%-70% 8 (5,23%)
+Difference between 71%-80% 7 (4,58%)
+Difference between 81%-90% 13 (8,50%)
+Difference between 91%-100% 102 (66,67%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 59(38,56%)
+ GREEN: 29(18,95%)
+ BLUE: 65(42,48%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	840
+
+Difference between 0%-10% 8 (5,23%)
+Difference between 11%-20% 11 (7,19%)
+Difference between 21%-30% 2 (1,31%)
+Difference between 31%-40% 0 (0,00%)
+Difference between 41%-50% 2 (1,31%)
+Difference between 51%-60% 1 (0,65%)
+Difference between 61%-70% 5 (3,27%)
+Difference between 71%-80% 8 (5,23%)
+Difference between 81%-90% 15 (9,80%)
+Difference between 91%-100% 101 (66,01%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 59(38,56%)
+ GREEN: 27(17,65%)
+ BLUE: 67(43,79%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	900
+
+Difference between 0%-10% 13 (8,50%)
+Difference between 11%-20% 4 (2,61%)
+Difference between 21%-30% 2 (1,31%)
+Difference between 31%-40% 3 (1,96%)
+Difference between 41%-50% 2 (1,31%)
+Difference between 51%-60% 3 (1,96%)
+Difference between 61%-70% 2 (1,31%)
+Difference between 71%-80% 8 (5,23%)
+Difference between 81%-90% 10 (6,54%)
+Difference between 91%-100% 106 (69,28%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 58(37,91%)
+ GREEN: 28(18,30%)
+ BLUE: 67(43,79%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	960
+
+Difference between 0%-10% 13 (8,50%)
+Difference between 11%-20% 4 (2,61%)
+Difference between 21%-30% 2 (1,31%)
+Difference between 31%-40% 2 (1,31%)
+Difference between 41%-50% 2 (1,31%)
+Difference between 51%-60% 1 (0,65%)
+Difference between 61%-70% 4 (2,61%)
+Difference between 71%-80% 5 (3,27%)
+Difference between 81%-90% 13 (8,50%)
+Difference between 91%-100% 107 (69,93%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 58(37,91%)
+ GREEN: 28(18,30%)
+ BLUE: 67(43,79%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	1020
+
+Difference between 0%-10% 11 (7,19%)
+Difference between 11%-20% 6 (3,92%)
+Difference between 21%-30% 1 (0,65%)
+Difference between 31%-40% 2 (1,31%)
+Difference between 41%-50% 2 (1,31%)
+Difference between 51%-60% 2 (1,31%)
+Difference between 61%-70% 2 (1,31%)
+Difference between 71%-80% 8 (5,23%)
+Difference between 81%-90% 9 (5,88%)
+Difference between 91%-100% 110 (71,90%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 58(37,91%)
+ GREEN: 28(18,30%)
+ BLUE: 67(43,79%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	1080
+
+Difference between 0%-10% 12 (7,84%)
+Difference between 11%-20% 5 (3,27%)
+Difference between 21%-30% 1 (0,65%)
+Difference between 31%-40% 2 (1,31%)
+Difference between 41%-50% 2 (1,31%)
+Difference between 51%-60% 2 (1,31%)
+Difference between 61%-70% 1 (0,65%)
+Difference between 71%-80% 8 (5,23%)
+Difference between 81%-90% 9 (5,88%)
+Difference between 91%-100% 111 (72,55%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 58(37,91%)
+ GREEN: 27(17,65%)
+ BLUE: 68(44,44%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	1140
+
+Difference between 0%-10% 13 (8,50%)
+Difference between 11%-20% 3 (1,96%)
+Difference between 21%-30% 1 (0,65%)
+Difference between 31%-40% 3 (1,96%)
+Difference between 41%-50% 5 (3,27%)
+Difference between 51%-60% 1 (0,65%)
+Difference between 61%-70% 0 (0,00%)
+Difference between 71%-80% 5 (3,27%)
+Difference between 81%-90% 9 (5,88%)
+Difference between 91%-100% 113 (73,86%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 59(38,56%)
+ GREEN: 28(18,30%)
+ BLUE: 66(43,14%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	1200
+
+Difference between 0%-10% 14 (9,15%)
+Difference between 11%-20% 3 (1,96%)
+Difference between 21%-30% 1 (0,65%)
+Difference between 31%-40% 3 (1,96%)
+Difference between 41%-50% 1 (0,65%)
+Difference between 51%-60% 3 (1,96%)
+Difference between 61%-70% 1 (0,65%)
+Difference between 71%-80% 5 (3,27%)
+Difference between 81%-90% 9 (5,88%)
+Difference between 91%-100% 113 (73,86%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 58(37,91%)
+ GREEN: 27(17,65%)
+ BLUE: 68(44,44%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	1260
+
+Difference between 0%-10% 13 (8,50%)
+Difference between 11%-20% 4 (2,61%)
+Difference between 21%-30% 2 (1,31%)
+Difference between 31%-40% 2 (1,31%)
+Difference between 41%-50% 1 (0,65%)
+Difference between 51%-60% 3 (1,96%)
+Difference between 61%-70% 1 (0,65%)
+Difference between 71%-80% 6 (3,92%)
+Difference between 81%-90% 6 (3,92%)
+Difference between 91%-100% 115 (75,16%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 57(37,25%)
+ GREEN: 28(18,30%)
+ BLUE: 68(44,44%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	1320
+
+Difference between 0%-10% 14 (9,15%)
+Difference between 11%-20% 4 (2,61%)
+Difference between 21%-30% 1 (0,65%)
+Difference between 31%-40% 2 (1,31%)
+Difference between 41%-50% 0 (0,00%)
+Difference between 51%-60% 1 (0,65%)
+Difference between 61%-70% 2 (1,31%)
+Difference between 71%-80% 5 (3,27%)
+Difference between 81%-90% 8 (5,23%)
+Difference between 91%-100% 116 (75,82%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 57(37,25%)
+ GREEN: 28(18,30%)
+ BLUE: 68(44,44%)
+*********************************************************************
+*********************************************************************
+TIME SLICE: 	1380
+
+Difference between 0%-10% 13 (8,50%)
+Difference between 11%-20% 5 (3,27%)
+Difference between 21%-30% 2 (1,31%)
+Difference between 31%-40% 3 (1,96%)
+Difference between 41%-50% 2 (1,31%)
+Difference between 51%-60% 0 (0,00%)
+Difference between 61%-70% 0 (0,00%)
+Difference between 71%-80% 6 (3,92%)
+Difference between 81%-90% 7 (4,58%)
+Difference between 91%-100% 115 (75,16%)
+*********************************************************************
+*********************************************************************
+******** Print the evaluation of the stock levels of the bikestations using following three buckets:
+ stock < 1 --> "red"
+ stock > 0 && stock < capacity  --> "green"
+ stock >= capacity --> "blue"
+
+ RED: 58(37,91%)
+ GREEN: 27(17,65%)
+ BLUE: 68(44,44%)
+*********************************************************************
+*********************************************************************
