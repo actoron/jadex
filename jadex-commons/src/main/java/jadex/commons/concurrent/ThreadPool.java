@@ -9,6 +9,7 @@ import jadex.commons.collection.IBlockingQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -146,7 +147,7 @@ public class ThreadPool implements IThreadPool
 //		this.tasks = new java.util.concurrent.LinkedBlockingQueue();
 		this.pool = new ArrayList();
 //		this.threads = new Hashtable();
-		this.enqueuetimes = Collections.synchronizedMap(new HashMap<Runnable, Long>());
+		this.enqueuetimes = Collections.synchronizedMap(new IdentityHashMap<Runnable, Long>());
 		this.maxparked = 500;
 		this.parked = new ArrayList<Thread>();
 		
@@ -179,7 +180,10 @@ public class ThreadPool implements IThreadPool
 		if(this.strategy.taskAdded())
 			addThreads(1);
 		
-		enqueuetimes.put(task, System.currentTimeMillis());
+		if (enqueuetimes.put(task, System.currentTimeMillis()) != null)
+		{
+			throw new RuntimeException("Task already scheduled: " + task);
+		}
 		tasks.enqueue(task);
 	}
 
@@ -363,12 +367,12 @@ public class ThreadPool implements IThreadPool
 					task = null;
 					exit = strategy.workerTimeoutOccurred();
 				}
-//				catch(Exception e)
-//				{
-////					task = null;
-////					terminate	= true;
-//					e.printStackTrace();
-//				}
+				catch(Exception e)
+				{
+//					task = null;
+//					terminate	= true;
+					e.printStackTrace();
+				}
 				
 				if(task!=null)
 				{

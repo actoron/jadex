@@ -219,7 +219,7 @@ public class MessagePerformanceAgent extends MicroAgent
 								String scontent	= "";
 								try
 								{
-									scontent = new String(content, "UTF-8");
+									scontent = new String(content, "ISO-8859-1");
 								}
 								catch(UnsupportedEncodingException e)
 								{
