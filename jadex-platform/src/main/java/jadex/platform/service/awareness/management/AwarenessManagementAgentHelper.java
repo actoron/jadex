@@ -254,7 +254,8 @@ public class AwarenessManagementAgentHelper
 				IFuture<Void> ret;
 				AwarenessManagementAgent agent = (AwarenessManagementAgent) ia;
 				DiscoveryInfo dif = agent.getDiscoveryInfo(cid);
-				if (create && dif != null) {
+				if(create && dif != null) 
+				{
 					final Future<Void> fut = new Future<Void>();
 					ret = fut;
 					agent.createProxy(dif).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
@@ -263,13 +264,23 @@ public class AwarenessManagementAgentHelper
 						{
 							fut.setResult(null);
 						}
+						public void exceptionOccurred(Exception exception)
+						{
+							System.out.println("hhhuuu: "+exception);
+							super.exceptionOccurred(exception);
+						}
 					});
-				} else if (dif != null) {
+				} 
+				else if(dif != null) 
+				{
 					ret = agent.deleteProxy(dif);
-				} else {
+				} 
+				else 
+				{
 					ret = IFuture.DONE;
 				}
 				return ret;
+//				return IFuture.DONE;
 			}
 		});
 	}

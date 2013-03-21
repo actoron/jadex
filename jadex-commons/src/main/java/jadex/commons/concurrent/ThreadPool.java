@@ -91,18 +91,18 @@ public class ThreadPool implements IThreadPool
 	protected IPoolStrategy strategy;
 	
 	/** The pool of service threads. */
-	protected List	pool;
+	protected List<ServiceThread>	pool;
 	
 	/** The list of threads not used. */
-	protected List<Thread> parked;
-
+	protected List<ServiceThread> parked;
+	
 	/** The tasks to execute. */
 	// Todo: fix blocking queue.
-	protected IBlockingQueue	tasks;
+	protected IBlockingQueue<Runnable>	tasks;
 //	protected BlockingQueue tasks;
 
 	/** The running flag. */
-	protected boolean	running;
+	protected volatile boolean	running;
 
 	/** The daemon flag. */
 	protected boolean daemon;
@@ -143,13 +143,13 @@ public class ThreadPool implements IThreadPool
 		this.strategy = strategy;
 		this.group = new ThreadGroup("strategy_thread_pool_"+poolcnt++);
 		this.running = true;
-		this.tasks	= new ArrayBlockingQueue();
+		this.tasks	= new ArrayBlockingQueue<Runnable>();
 //		this.tasks = new java.util.concurrent.LinkedBlockingQueue();
-		this.pool = new ArrayList();
+		this.pool = new ArrayList<ServiceThread>();
 //		this.threads = new Hashtable();
 		this.enqueuetimes = Collections.synchronizedMap(new IdentityHashMap<Runnable, Long>());
 		this.maxparked = 500;
-		this.parked = new ArrayList<Thread>();
+		this.parked = new ArrayList<ServiceThread>();
 		
 		addThreads(strategy.getWorkerCount());
 	
@@ -194,6 +194,26 @@ public class ThreadPool implements IThreadPool
 	{
 		this.running = false;
 		this.tasks.setClosed(true);
+		
+		while(!pool.isEmpty())
+		{
+			ServiceThread thread = (ServiceThread)pool.remove(0);
+			synchronized(thread)
+			{
+				thread.terminated = true;
+				thread.notify();
+			}
+		}
+		
+		while(!parked.isEmpty())
+		{
+			ServiceThread thread = (ServiceThread)parked.remove(0);
+			synchronized(thread)
+			{
+				thread.terminated = true;
+				thread.notify();
+			}
+		}
 		
 		// Todo: kill threads that don't terminate?
 		// How to find zombies???
@@ -249,7 +269,7 @@ public class ThreadPool implements IThreadPool
 //		System.out.println("parked: "+parked.size());
 		if(!parked.isEmpty())
 		{
-			Thread thread = parked.remove(0);
+			ServiceThread thread = parked.remove(0);
 			pool.add(thread);
 			synchronized(thread)
 			{
@@ -259,7 +279,7 @@ public class ThreadPool implements IThreadPool
 		}
 		else
 		{
-			Thread thread = new ServiceThread();
+			ServiceThread thread = new ServiceThread();
 			// Thread gets daemon state of parent, i.e. thread daemon state would
 			// depend on called thread, which is not desired.
 			thread.setDaemon(daemon);
@@ -387,31 +407,26 @@ public class ThreadPool implements IThreadPool
 					{
 						if(running && parked.size()<maxparked)
 						{
-							synchronized(ThreadPool.this)
-							{
-//								System.out.println("removed: "+this);
-								pool.remove(this);
-								parked.add(this);
-							}
+							park();
+							
 							synchronized(this)
 							{
 //								System.out.println("waiting for: "+strategy.getWorkerTimeout()*10);
-								wait(strategy.getWorkerTimeout());
-								if(notified)
+								if(running)
 								{
-									notified = false;
-									synchronized(ThreadPool.this)
-									{
-	//									System.out.println("readded: "+this);
-										pool.add(this);
-									}
+									wait(strategy.getWorkerTimeout());
 								}
-								else
-								{
-									terminated = true;
-									parked.remove(this);
-//									System.out.println("thread removed (nothing to do): "+parked.size());
-								}
+							}
+							
+							if(notified)
+							{
+								notified = false;
+								unpark();
+							}
+							else
+							{
+								terminated = true;
+//								System.out.println("thread removed (nothing to do): "+parked.size());
 							}
 						}
 						else
@@ -422,18 +437,55 @@ public class ThreadPool implements IThreadPool
 					catch(InterruptedException e)
 					{
 						terminated = true;
-						parked.remove(this);
 //						System.out.println("thread removed (nothing to do): "+parked.size());
 					}
 				}
 			}
 			
+			remove();
+		}
+		
+		/**
+		 * 
+		 */
+		protected void park()
+		{
 			synchronized(ThreadPool.this)
 			{
-//				System.out.println("removed: "+this);
+//				System.out.println("readded: "+this);
 				pool.remove(this);
+				parked.add(this);
 			}
 		}
+		
+		/**
+		 * 
+		 */
+		protected void unpark()
+		{
+			synchronized(ThreadPool.this)
+			{
+//				System.out.println("readded: "+this);
+				pool.add(this);
+				parked.remove(this);
+			}
+		}
+		
+		/**
+		 * 
+		 */
+		protected void remove()
+		{
+			terminated = true;
+			
+			synchronized(ThreadPool.this)
+			{
+//				System.out.println("readded: "+this);
+				pool.remove(this);
+				parked.remove(this);
+			}
+		}
+		
 
 		/**
 		 *  Get the runnable (the task).

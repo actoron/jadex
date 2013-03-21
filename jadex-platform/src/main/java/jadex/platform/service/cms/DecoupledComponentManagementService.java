@@ -326,6 +326,10 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		
 		if(cinfo.getParent()!=null)
 		{
+			// Check if parent is killing itself -> no new child component, exception
+			if(cfs.containsKey(cinfo.getParent()))
+				return new Future<IComponentIdentifier>(new RuntimeException("Parent is killing itself. Child component creation no allowed."));
+			
 			// Lock the parent while creating
 			final String lockkey = SUtil.createUniqueId("lock");
 			LockEntry kt = lockentries.get(cinfo.getParent());
@@ -1062,7 +1066,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
-		ServiceCall sc = ServiceCall.getCurrentInvocation();
+//		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		System.err.println("kill compo: "+cid+" "+(sc!=null? sc.getCaller(): "null"));
 		
 //		if(cid.toString().indexOf("MegaParallel")!=-1)
@@ -1130,6 +1134,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		}
 		else
 		{
+			System.out.println("Terminating component: "+cid.getName());
+			
 			InitInfo infos	= getInitInfo(cid);
 			IComponentAdapter adapter	= infos!=null ? infos.getAdapter() : (IComponentAdapter)adapters.get(cid);
 			
@@ -1157,56 +1163,50 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				// Kill subcomponents
 				logger.info("Terminating component structure: "+cid.getName());
 				final CMSComponentDescription	desc = (CMSComponentDescription)adapter.getDescription();
-				IComponentIdentifier[] achildren = desc.getChildren();
+				final IComponentIdentifier[] achildren = desc.getChildren();
 				
-//					System.out.println("kill childs: "+cid+" "+SUtil.arrayToString(achildren));
+				if(achildren.length>0)
+					System.out.println("kill childs start: "+cid+" "+achildren.length+" "+SUtil.arrayToString(achildren));
 				
 				destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(createResultListener(new IResultListener<List<Exception>>()
 				{
 					public void resultAvailable(List<Exception> result)
 					{
-//							if(cid.toString().indexOf("Mandelbrot")!=-1)
-//								System.out.println("Terminated component structure: "+cid.getName());
+						if(achildren.length>0)
+							System.out.println("kill childs end: "+cid);
+						
+//						if(cid.toString().indexOf("Mandelbrot")!=-1)
+//							System.out.println("Terminated component structure: "+cid.getName());
 						
 						logger.info("Terminated component structure: "+cid.getName());
 						CleanupCommand	cc	= null;
 						IFuture<Void>	fut	= null;
-						synchronized(adapters)
+						IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
+						// Component may be already killed (e.g. when autoshutdown).
+						if(adapter!=null)
 						{
-							try
-							{
-								IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
-								// Component may be already killed (e.g. when autoshutdown).
-								if(adapter!=null)
-								{
-//										if(cid.toString().indexOf("AutoTerminate")!=-1)
-//											System.out.println("destroy1: "+cid.getName());
+//							if(cid.toString().indexOf("AutoTerminate")!=-1)
+//								System.out.println("destroy1: "+cid.getName());
 //										
-									// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-									// todo: killcomponent should only be called once for each component?
-									if(!ccs.containsKey(cid))
-									{
-//											if(cid.toString().indexOf("AutoTerminate")!=-1)
-//												System.out.println("killing a: "+cid);
-										
-										cc	= new CleanupCommand(cid);
-										ccs.put(cid, cc);
-										logger.info("Terminating component: "+cid.getName());
-										fut	= killComponent(adapter);
-	//									component.killComponent(cc);	
-									}
-									else
-									{
-//											if(cid.toString().indexOf("AutoTerminate")!=-1)
-//												System.out.println("killing b: "+cid);
-										
-										cc = (CleanupCommand)ccs.get(cid);
-									}
-								}
-							}
-							catch(Throwable e)
+							// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+							// todo: killcomponent should only be called once for each component?
+							if(!ccs.containsKey(cid))
 							{
-								e.printStackTrace();
+//								if(cid.toString().indexOf("AutoTerminate")!=-1)
+//									System.out.println("killing a: "+cid);
+								
+								cc	= new CleanupCommand(cid);
+								ccs.put(cid, cc);
+								logger.info("Terminating component: "+cid.getName());
+								fut	= killComponent(adapter);
+//									component.killComponent(cc);	
+							}
+							else
+							{
+//								if(cid.toString().indexOf("AutoTerminate")!=-1)
+//									System.out.println("killing b: "+cid);
+								
+								cc = (CleanupCommand)ccs.get(cid);
 							}
 						}
 						
@@ -1258,6 +1258,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		ccs.remove(cid);
 		ret	= (Future<Map<String, Object>>)cfs.remove(cid);
 		
+		System.out.println("Terminated component: "+cid.getName());
+		
 		if(ret!=null)
 		{
 			if(ex!=null)
@@ -1277,6 +1279,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	protected IFuture<List<Exception>> destroyComponentLoop(final IComponentIdentifier cid, final IComponentIdentifier[] achildren, final int i)
 	{
 		final Future<List<Exception>> ret = new Future<List<Exception>>();
+		
+//		System.out.println("destroy loop: "+cid+" "+i+"/"+achildren.length);
 		
 		if(achildren.length>0)
 		{
@@ -2644,6 +2648,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	@ServiceShutdown
 	public IFuture<Void>	shutdownService()
 	{
+		System.out.println("shutdown cms: "+agent.getComponentIdentifier()+" "+adapters);
+		
 //		System.out.println(": "+this);
 //		this.adapters	= null;	// required for final cleanup command
 //		this.ccs	= null;	// required for final cleanup command

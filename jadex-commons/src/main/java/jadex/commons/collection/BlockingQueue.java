@@ -22,7 +22,7 @@ public class BlockingQueue implements IBlockingQueue
 	protected List	elems;
 
 	/** The queue state. */
-	protected boolean closed;
+	protected volatile boolean closed;
 
 	/** The monitor. */
 	protected Object	monitor;
