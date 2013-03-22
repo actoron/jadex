@@ -13,6 +13,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentSuspendable;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -601,7 +602,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			boolean extexecuted	= false;
 			try
 			{
-
 				extexecuted	= executeExternalEntries(false);
 			}
 			catch(Exception e)
@@ -692,6 +692,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			// Reset execution thread.
 			IComponentIdentifier.LOCAL.set(null);
 			IComponentAdapter.LOCAL.set(null);
+			// Must reset service call settings when thread retreats from components
+			CallAccess.resetServiceCall();
+			CallAccess.resetNextInvocation();
 			componentthread.setContextClassLoader(cl);
 			this.componentthread = null;
 			

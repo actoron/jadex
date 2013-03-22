@@ -28,6 +28,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -1139,4 +1140,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //		Map bindings = (Map)getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_bindings);
 //		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
 //	}
+	
+	/**
+	 *  Publish a monitoring event. This event is automatically send
+	 *  to the monitoring service of the platform (if any). 
+	 */
+	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event)
+	{
+		return getInterpreter().publishMonitoringEvent(event);
+	}
+
 }

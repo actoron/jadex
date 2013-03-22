@@ -24,6 +24,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
@@ -926,5 +927,14 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	public boolean isComponentThread()
 	{
 		return !getComponentAdapter().isExternalThread();
+	}
+	
+	/**
+	 *  Publish a monitoring event. This event is automatically send
+	 *  to the monitoring service of the platform (if any). 
+	 */
+	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event)
+	{
+		return interpreter.publishMonitoringEvent(event);
 	}
 }

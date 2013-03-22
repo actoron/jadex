@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.monitoring;
 
 import jadex.bridge.Cause;
+import jadex.bridge.ComponentChangeEvent;
 
 import java.util.Map;
 
@@ -9,13 +10,14 @@ import java.util.Map;
  */
 public interface IMonitoringEvent
 {
-	public static String TYPE_SERVICECALL_START = "servicecall_start";
+	public static String TYPE_SERVICECALL_START = ComponentChangeEvent.EVENT_TYPE_CREATION+"."+ComponentChangeEvent.SOURCE_CATEGORY_SERVICE;
 	
-	public static String TYPE_SERVICECALL_END = "servicecall_end";
+	public static String TYPE_SERVICECALL_END = ComponentChangeEvent.EVENT_TYPE_DISPOSAL+"."+ComponentChangeEvent.SOURCE_CATEGORY_SERVICE;
 
-	public static String TYPE_COMPONENT_CREATED = "component_created";
+	public static String TYPE_COMPONENT_CREATED = ComponentChangeEvent.EVENT_TYPE_CREATION+"."+ComponentChangeEvent.SOURCE_CATEGORY_COMPONENT; //"component_created";
+	
+	public static String TYPE_COMPONENT_DISPOSED = ComponentChangeEvent.EVENT_TYPE_DISPOSAL+"."+ComponentChangeEvent.SOURCE_CATEGORY_COMPONENT; //"component_created";
 
-	public static String TYPE_COMPONENT_KILLED = "component_killed";
 	
 	/**
 	 *  Get the source.
@@ -40,6 +42,12 @@ public interface IMonitoringEvent
 	 *  @return The cause.
 	 */
 	public Cause getCause();
+	
+	/**
+	 *  Set the cause.
+	 *  @param cause The cause to set.
+	 */
+	public void setCause(Cause cause);
 
 	/**
 	 *  Get a property.

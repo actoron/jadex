@@ -3,16 +3,22 @@ package jadex.bridge;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.util.Calendar;
 import java.util.Collection;
 
 /**
@@ -392,6 +398,10 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 				}
 			}
 		}
+		else
+		{
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}
@@ -428,7 +438,7 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 //				}
 //			});
 		}
-		
+				
 		return ret;
 	}
 	
@@ -466,4 +476,13 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 		
 		return ret;
 	}
+	
+//	/**
+//	 *  Convert a component change event to a monitoring event.
+//	 */
+//	public static IMonitoringEvent convertEvent(IComponentChangeEvent cce, Cause cause)
+//	{
+//		MonitoringEvent me = new MonitoringEvent(cce.getSourceName(), cce.getEventType()+"."+cce.getSourceCategory(), cause, cce.getTime());
+//		return me;
+//	}
 }

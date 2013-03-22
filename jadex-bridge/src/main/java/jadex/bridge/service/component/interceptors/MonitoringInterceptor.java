@@ -6,12 +6,10 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.SReflect;
-import jadex.commons.beans.ExceptionListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.ExceptionResultListener;
@@ -28,17 +26,16 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 	/** The component. */
 	protected IInternalAccess component;
 	
-	/** The monitoring service. */
-	protected IMonitoringService monser;
-	protected long lastsearch;
-	protected long delay = 30000;
+	/** The service getter. */
+	protected ServiceGetter<IMonitoringService> getter;
 	
 	/**
-	 * 
+	 *  Create a new interceptor.
 	 */
 	public MonitoringInterceptor(IInternalAccess component)
 	{
 		this.component = component;
+		this.getter = new ServiceGetter<IMonitoringService>(component, IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 	
 	/**
@@ -83,10 +80,24 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		getMonitoringService().addResultListener(new ExceptionDelegationResultListener<IMonitoringService, Void>(ret)
+		// Hack, necessary because getService() is not a service call and the first contained
+		// service call (getChildren) will reset the call context afterwards :-(
+		final ServiceCall cur = CallAccess.getCurrentInvocation();
+		final ServiceCall next = CallAccess.getNextInvocation();
+		
+		ServiceCall sc = CallAccess.getInvocation();
+		sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
+		sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
+		
+		CallAccess.setServiceCall(sc); 
+		
+		getter.getService().addResultListener(new ExceptionDelegationResultListener<IMonitoringService, Void>(ret)
 		{
 			public void customResultAvailable(IMonitoringService monser)
 			{
+				CallAccess.setServiceCall(cur); 
+				CallAccess.setNextInvocation(next);
+				
 				// Publish event if monitoring service was found
 				if(monser!=null)
 				{
@@ -105,7 +116,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 						public void exceptionOccurred(Exception e)
 						{
 							// Reset mon service if error on publish
-							MonitoringInterceptor.this.monser = null;
+							getter.resetService();
 						}
 					});
 				}
@@ -114,59 +125,6 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 			}
 		});
 	
-		return ret;
-	}
-	
-	/**
-	 *  Get or search the monitoring service.
-	 */
-	protected IFuture<IMonitoringService> getMonitoringService()
-	{
-		final Future<IMonitoringService> ret = new Future<IMonitoringService>();
-
-		if(monser==null)
-		{
-			if(lastsearch==0 || System.currentTimeMillis()>lastsearch+delay)
-			{
-				lastsearch = System.currentTimeMillis();
-	
-				final ServiceCall cur = CallAccess.getNextInvocation();
-				
-				ServiceCall sc = CallAccess.getInvocation();
-				sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
-				sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
-				// Hack, necessary because getService() is not a service call and the first contained
-				// service call (getChildren) will reset the call context afterwards :-(
-				CallAccess.setServiceCall(sc); 
-				
-				SServiceProvider.getService(component.getServiceContainer(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(component.createResultListener(new IResultListener<IMonitoringService>()
-				{
-					public void resultAvailable(IMonitoringService result)
-					{
-						CallAccess.setServiceCall(cur); 
-						monser = result;
-						ret.setResult(monser);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-	//					exception.printStackTrace();
-						CallAccess.setServiceCall(cur); 
-						ret.setResult(null);
-					}
-				}));
-			}
-			else
-			{
-				ret.setResult(null);
-			}
-		}
-		else
-		{
-			ret.setResult(monser);
-		}
-		
 		return ret;
 	}
 	
@@ -198,10 +156,22 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 		 */
 		public void customResultAvailable(Void result)
 		{
-			getMonitoringService().addResultListener(new IResultListener<IMonitoringService>()
+			// Hack, necessary because getService() is not a service call and the first contained
+			// service call (getChildren) will reset the call context afterwards :-(
+			final ServiceCall cur = CallAccess.getCurrentInvocation();
+			final ServiceCall next = CallAccess.getNextInvocation();
+			
+			ServiceCall sc = CallAccess.getInvocation();
+			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
+			sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
+
+			getter.getService().addResultListener(new IResultListener<IMonitoringService>()
 			{
 				public void resultAvailable(IMonitoringService monser)
 				{
+					CallAccess.setServiceCall(cur); 
+					CallAccess.setNextInvocation(next);
+
 					if(monser!=null)
 					{
 						// todo: clock?
@@ -216,6 +186,9 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 				
 				public void exceptionOccurred(Exception exception)
 				{
+					CallAccess.setServiceCall(cur); 
+					CallAccess.setNextInvocation(next);
+
 					// never happens
 					ReturnValueResultListener.super.exceptionOccurred(exception);
 				}

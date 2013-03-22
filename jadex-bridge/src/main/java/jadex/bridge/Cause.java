@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.commons.SUtil;
+
 import java.util.UUID;
 
 /**
@@ -51,12 +53,13 @@ public class Cause
 	 */
 	public Cause(String chainid, String sourceid, String targetid, String sourcename, String targetname)
 	{
-		this.sourceid = sourceid==null? UUID.randomUUID().toString(): sourceid;
-		this.targetid = targetid==null? UUID.randomUUID().toString(): targetid;
+		this.chainid = chainid==null? createUniqueId(): targetid;
+		this.sourceid = sourceid==null? createUniqueId(): sourceid;
+		this.targetid = targetid==null? createUniqueId(): targetid;
 		
 		// If chainid is null it will be set to sourceid
 		// This allows to check if an event is top-level
-		this.chainid = chainid==null? this.sourceid: chainid;
+//		this.chainid = chainid==null? this.sourceid: chainid;
 		
 		this.sourcename = sourcename;
 		this.targetname = targetname;
@@ -67,10 +70,10 @@ public class Cause
 	 */
 	public Cause(Cause old, String targetname)
 	{
-		this.chainid = old!=null? old.getChainId(): UUID.randomUUID().toString();
-		this.sourceid = old!=null? old.getTargetId(): UUID.randomUUID().toString();
+		this.chainid = old!=null? old.getChainId(): createUniqueId();
+		this.sourceid = old!=null? old.getTargetId(): createUniqueId();
 		this.sourcename = old!=null? old.getTargetName(): null;
-		this.targetid = UUID.randomUUID().toString();
+		this.targetid = createUniqueId();
 		this.targetname = targetname;
 	}
 	
@@ -85,6 +88,27 @@ public class Cause
 //		this.targetid = targedid;
 //		this.targetname = targetname;
 //	}
+	
+	/**
+	 * 
+	 */
+	protected String createUniqueId()
+	{
+		return createUniqueId(5);
+	}
+	
+	/**
+	 * 
+	 */
+	protected String createUniqueId(int len)
+	{
+		String ret = UUID.randomUUID().toString();
+		if(len>0)
+		{
+			ret = ret.substring(0, len);
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Get the chain id.

@@ -38,6 +38,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -45,6 +46,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -240,6 +242,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	
 	/** The result listener. */
 	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
+	
+	/** The monitoring service getter. */
+	protected ServiceGetter<IMonitoringService> getter;
 	
 	//-------- constructors --------
 	
@@ -1922,7 +1927,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Remove component listener.
 	 */
-	public IFuture	removeComponentListener(IComponentListener listener)
+	public IFuture<Void>	removeComponentListener(IComponentListener listener)
 	{
 		getState().removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
 		return IFuture.DONE;
@@ -1931,7 +1936,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Add component listener.
 	 */
-	public IFuture	addComponentListener(IComponentListener listener)
+	public IFuture<Void>	addComponentListener(IComponentListener listener)
 	{
 //		System.out.println("Added: "+listener+", "+getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state));
 		getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
@@ -2006,7 +2011,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Get the arguments.
 	 */
-	public Map getArguments()
+	public Map<String, Object> getArguments()
 	{
 		return arguments==null? Collections.EMPTY_MAP: arguments;
 	}
@@ -2015,7 +2020,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  Get the component listeners.
 	 *  @return The component listeners.
 	 */
-	public Collection getInternalComponentListeners()
+	public Collection<IComponentListener> getInternalComponentListeners()
 	{
 		// Todo: support this!?
 		return Collections.EMPTY_LIST;
@@ -2128,4 +2133,14 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			new GoalDelegationHandler(agent, gn));
 	}
 	
+	/**
+	 *  Get the monitoring service getter.
+	 *  @return The monitoring service getter.
+	 */
+	public ServiceGetter<IMonitoringService> getMonitoringServiceGetter()
+	{
+		if(getter==null)
+			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return getter;
+	}
 }

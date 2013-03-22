@@ -3,6 +3,7 @@ package jadex.bridge;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -160,4 +161,10 @@ public interface IInternalAccess
 	 *  @return True if the current thread is the component thread.
 	 */
 	public boolean isComponentThread();
+	
+	/**
+	 *  Publish a monitoring event. This event is automatically send
+	 *  to the monitoring service of the platform (if any). 
+	 */
+	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event);
 }

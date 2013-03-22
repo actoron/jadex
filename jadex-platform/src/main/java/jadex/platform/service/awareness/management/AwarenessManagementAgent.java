@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -161,6 +162,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	public IFuture<Void>	agentCreated()
 	{
 //		String[] test = new String[]{"test", "test2"};
+		System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
+
 		initArguments();
 		
 		this.discovered = new LinkedHashMap<IComponentIdentifier, DiscoveryInfo>();
@@ -217,6 +220,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 							args.put("includes", getIncludes());
 							args.put("excludes", getExcludes());
 							info.setArguments(args);
+							
+							System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
+							
 							while(stok.hasMoreTokens())
 							{
 	//							System.out.println("mecha: "+mechas[i]);

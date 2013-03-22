@@ -7,10 +7,13 @@ import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -54,18 +57,12 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The component adapter. */
 	protected IComponentAdapter	adapter;
 	
-//	/** The component creation time. */
-//	protected long creationtime;
-	
 	/** The value fetcher. */
 	protected IValueFetcher	fetcher;
 	
 	/** The service container. */
 	protected IServiceContainer container;
-	
-	/** The component listeners. */
-	protected List<IComponentListener> componentlisteners;
-	
+		
 	/** The external access (cached). */
 	protected IExternalAccess access;
 	
@@ -73,16 +70,24 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected RequiredServiceBinding[] bindings;
 	
 	/** The extension instances. */
-	protected Map<String, IExtensionInstance> extensions;
+	protected Map<String, IExtensionInstance> extensions;	
 
+	
 	/** The parameter copy allowed flag. */
 	protected boolean copy;
 
 	/** The flag if local timeouts should be realtime. */
 	protected boolean realtime;
 	
+	
+	/** The component listeners. */
+	protected List<IComponentListener> componentlisteners;
+
 	/** The result listener. */
 	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
+
+	/** The monitoring service getter. */
+	protected ServiceGetter<IMonitoringService> getter;
 	
 	//-------- constructors --------
 	
@@ -105,7 +110,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		if(factory != null)
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.container = createServiceContainer();
-//		this.creationtime = System.currentTimeMillis();
 //		this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
 		
 //		System.out.println("hhh: "+desc.getName()+" "+desc.getCause());
@@ -187,67 +191,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	public Map<String, Object> getProperties()
 	{
 		return properties;
-	}
-
-	/**
-	 *  Add an component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> addComponentListener(IComponentListener listener)
-	{
-		assert !getComponentAdapter().isExternalThread();
-		
-		if(componentlisteners==null)
-			componentlisteners = new ArrayList<IComponentListener>();
-		
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(getExternalAccess(), listener);
-		
-		componentlisteners.add(listener);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Remove a component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> removeComponentListener(IComponentListener listener)
-	{
-		assert !getComponentAdapter().isExternalThread();
-		
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(getExternalAccess(), listener);
-		
-		if(componentlisteners!=null)
-			componentlisteners.remove(listener);
-		
-//		System.out.println("cl: "+componentlisteners);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
-	 */
-	public IComponentListener[] getComponentListeners()
-	{
-		assert !getComponentAdapter().isExternalThread();
-		
-		return componentlisteners==null? new IComponentListener[0]: 
-			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
-	}
-	
-	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
-	 */
-	public Collection<IComponentListener> getInternalComponentListeners()
-	{
-		assert !getComponentAdapter().isExternalThread();
-		
-		return componentlisteners;	
 	}
 	
 	/**
@@ -470,4 +413,79 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	{
 		return realtime;
 	}
+	
+	//-------- component listeners --------
+	
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public IFuture<Void> addComponentListener(IComponentListener listener)
+	{
+		assert !getComponentAdapter().isExternalThread();
+		
+		if(componentlisteners==null)
+			componentlisteners = new ArrayList<IComponentListener>();
+		
+		// Hack! How to find out if remote listener?
+		if(Proxy.isProxyClass(listener.getClass()))
+			listener = new RemoteComponentListener(getExternalAccess(), listener);
+		
+		componentlisteners.add(listener);
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public IFuture<Void> removeComponentListener(IComponentListener listener)
+	{
+		assert !getComponentAdapter().isExternalThread();
+		
+		// Hack! How to find out if remote listener?
+		if(Proxy.isProxyClass(listener.getClass()))
+			listener = new RemoteComponentListener(getExternalAccess(), listener);
+		
+		if(componentlisteners!=null)
+			componentlisteners.remove(listener);
+		
+//		System.out.println("cl: "+componentlisteners);
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Get the component listeners.
+	 *  @return The component listeners.
+	 */
+	public IComponentListener[] getComponentListeners()
+	{
+		assert !getComponentAdapter().isExternalThread();
+		
+		return componentlisteners==null? new IComponentListener[0]: 
+			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
+	}
+	
+	/**
+	 *  Get the component listeners.
+	 *  @return The component listeners.
+	 */
+	public Collection<IComponentListener> getInternalComponentListeners()
+	{
+		assert !getComponentAdapter().isExternalThread();
+		
+		return componentlisteners;	
+	}
+	
+	/**
+	 *  Get the monitoring service getter.
+	 *  @return The monitoring service getter.
+	 */
+	public ServiceGetter<IMonitoringService> getMonitoringServiceGetter()
+	{
+		if(getter==null)
+			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return getter;
+	}
+
 }

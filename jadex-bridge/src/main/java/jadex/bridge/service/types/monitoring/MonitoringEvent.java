@@ -1,6 +1,11 @@
 package jadex.bridge.service.types.monitoring;
 
 import jadex.bridge.Cause;
+import jadex.bridge.service.component.interceptors.ServiceGetter;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +40,14 @@ public class MonitoringEvent implements IMonitoringEvent
 	public MonitoringEvent()
 	{
 		// bean constructor
+	}
+	
+	/**
+	 *  Create a new monitoring event.
+	 */
+	public MonitoringEvent(String source, String type, long time)
+	{
+		this(source, type, null, time, null);
 	}
 	
 	/**
@@ -181,6 +194,4 @@ public class MonitoringEvent implements IMonitoringEvent
 			+ ", time=" + time + ", cause=" + cause + ", properties="
 			+ properties + ")";
 	}
-
-	
 }

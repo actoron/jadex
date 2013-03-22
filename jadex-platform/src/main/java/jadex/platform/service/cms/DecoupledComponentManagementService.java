@@ -307,7 +307,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
-		final Cause cause = sc==null? agent.getComponentDescription().getCause(): sc.getCause();
+		final Cause curcause = sc==null? agent.getComponentDescription().getCause(): sc.getCause();
 		
 //		if(modelname.indexOf("Hello")!=-1)
 //			System.out.println("create: "+modelname);//+" "+info!=null? info.getResourceIdentifier(): "norid");
@@ -466,6 +466,9 @@ public class DecoupledComponentManagementService implements IComponentManagement
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 																	Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
+																	
+//																	Cause cause = new Cause(curcause, cid.getName());
+																	Cause cause = curcause;
 																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master, daemon, autosd, 
 																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause);
 																	

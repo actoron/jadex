@@ -23,6 +23,7 @@ import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -522,9 +523,9 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture addComponentListener(final IComponentListener listener)
+	public IFuture<Void> addComponentListener(final IComponentListener listener)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(getInterpreter().getAgentAdapter().isExternalThread())
 		{
@@ -534,7 +535,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run() 
 					{
-						ret.setResult(getInterpreter().addComponentListener(listener));
+						getInterpreter().addComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}
@@ -545,7 +546,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		}
 		else
 		{
-			ret.setResult(getInterpreter().addComponentListener(listener));
+			getInterpreter().addComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;
@@ -555,9 +556,9 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture removeComponentListener(final IComponentListener listener)
+	public IFuture<Void> removeComponentListener(final IComponentListener listener)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(getInterpreter().getAgentAdapter().isExternalThread())
 		{
@@ -567,7 +568,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run() 
 					{
-						ret.setResult(getInterpreter().removeComponentListener(listener));
+						getInterpreter().removeComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}
@@ -578,7 +579,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		}
 		else
 		{
-			ret.setResult(getInterpreter().removeComponentListener(listener));
+			getInterpreter().removeComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;
@@ -588,9 +589,9 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */
-	public IFuture getArguments()
+	public IFuture<Map<String, Object>> getArguments()
 	{
-		final Future ret = new Future();
+		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
 		if(getInterpreter().getAgentAdapter().isExternalThread())
 		{
@@ -621,9 +622,9 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 *  Get the component results.
 	 *  @return The results.
 	 */
-	public IFuture getResults()
+	public IFuture<Map<String, Object>> getResults()
 	{
-		final Future ret = new Future();
+		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
 		if(getInterpreter().getAgentAdapter().isExternalThread())
 		{

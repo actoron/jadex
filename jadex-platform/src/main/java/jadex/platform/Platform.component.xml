@@ -86,7 +86,8 @@
 	
 		<!-- ======== Arguments used by starter unless supplied from command line. ======== -->
 	
-		<!-- The name of the platform component (null for auto generation). -->	
+		<!-- The name of the platform component (null for auto generation). To use a custom prefix name 
+		     and an auto generated postfix the name should end with _* (3 digits) or with _ and an arbitrary number of +, e.g. _++++.  -->	
 		<argument name="platformname" class="String">"jadex"</argument>
 		<!-- The configuration to use. -->	
 		<argument name="configname" class="String">"auto"</argument>
