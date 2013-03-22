@@ -62,6 +62,9 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 
 	/** The HashMap with all ObservedEvents. **/
 	private ConcurrentHashMap<Long, ArrayList<ObservedEvent>> allObservedEventsMap;
+	
+	/** Denotes the clock type to be applied. **/
+	protected String clockType;
 
 	// -------- constructors--------
 
@@ -100,13 +103,13 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) getProperty("space");
 		final boolean tick = getProperty("tick") != null && ((Boolean) getProperty("tick")).booleanValue();
 		container = space.getExternalAccess().getServiceProvider();
-		
-//		clock = (IClockService) SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());		
+
+		// clock = (IClockService) SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());
 		SServiceProvider.getService(container, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener() {
 			public void resultAvailable(Object result) {
 				final IClockService clockservice = (IClockService) result;
 
-				timestamp = clockservice.getTime();
+				timestamp = clockservice.getTime();				
 
 				// Start the processes.
 				Object[] procs = space.getProcesses().toArray();
@@ -121,8 +124,9 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 						long currenttime = clockservice.getTime();
 						long progress = currenttime - timestamp;
 						timestamp = currenttime;
+						long currentTick = new Double (clockservice.getTick()).longValue();
 
-						// System.out.println("step: "+timestamp+" "+progress);
+//						 System.out.println("step: "+timestamp+" "+progress + " - clock: " + clockType);
 
 						synchronized (space.getMonitor()) {
 
@@ -155,35 +159,59 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 							// ITableDataConsumer consumer = (ITableDataConsumer)it.next();
 							// consumer.consumeData(currenttime, clockservice.getTick());
 							// }
-
-//							System.out.println("#DeltaTimeExecutor# Tick Size: " + clockservice.getTick());
+							clockType = (String) space.getProperty("CLOCK_TYPE");
+							System.out.println("#DeltaTimeExecutor# Tick Size: " + currentTick);
 							dilationCounter += progress;
+							
 
-//							if (dilationCounter >= 100) {
+							// Real time (= "relatively") should be applied. null because this should be the default
+							if (clockType == null || clockType.equals("relatively")) {
 
-								// consumer.consumeData(currenttime, clockservice.getTick());
-								// Hack: "tick" can not be used since the tick is not reseted when a new simulation is started. Instead, it continues to run once the platform and the ClockService have
-								// been started.
-																
+								if (dilationCounter >= 1000) {
+
+									// consumer.consumeData(currenttime, clockservice.getTick());
+									// Hack: "tick" can not be used since the tick is not reseted when a new simulation is started. Instead, it continues to run once the platform and the ClockService
+									// have
+									// been started.
+
+									if (space == null) {
+										System.out.println("***space is null");
+									}
+									if (space.getProperties() == null) {
+										System.out.println("***space properties are null");
+									}
+									if (space.getProperty("REAL_START_TIME_OF_SIMULATION") == null) {
+										// System.out.println("***space REAL_START_TIME_OF_SIMULATION is null");
+									} else {
+										// Make sure the property "REAL_START_TIME_OF_SIMULATION" is set!
+										// Execute the data consumers.
+										for (Iterator it = space.getDataConsumers().iterator(); it.hasNext();) {
+											ITableDataConsumer consumer = (ITableDataConsumer) it.next();
+											consumer.consumeData(currenttime, (currenttime - (Long) space.getProperty("REAL_START_TIME_OF_SIMULATION")) / 1000);
+										}
+									}
+									// reset dilationCounter
+									dilationCounter = 0;
+								}
+							}else{//clocktype == tick_based
 								if (space == null) {
 									System.out.println("***space is null");
 								}
 								if (space.getProperties() == null) {
 									System.out.println("***space properties are null");
 								}
-								if (space.getProperty("REAL_START_TIME_OF_SIMULATION") == null) {
-//									System.out.println("***space REAL_START_TIME_OF_SIMULATION is null");
+								if (space.getProperty("REAL_START_TICKTIME_OF_SIMULATION") == null) {
+									 System.out.println("***space REAL_START_TIME_OF_SIMULATION is null");
 								} else {
-									//Make sure the property "REAL_START_TIME_OF_SIMULATION" is set!
+									// Make sure the property "REAL_START_TICKTIME_OF_SIMULATION" is set!
 									// Execute the data consumers.
 									for (Iterator it = space.getDataConsumers().iterator(); it.hasNext();) {
 										ITableDataConsumer consumer = (ITableDataConsumer) it.next();
-										consumer.consumeData(currenttime, (currenttime - (Long) space.getProperty("REAL_START_TIME_OF_SIMULATION")) / 1000);
+//										System.out.println("#DeltaTimeExecutor# Tick Size: " + clockservice.getTick() + " start tick was: " + space.getProperty("REAL_START_TICKTIME_OF_SIMULATION"));
+										consumer.consumeData(currentTick, (currentTick - (Long) space.getProperty("REAL_START_TICKTIME_OF_SIMULATION")));
 									}
 								}
-								// reset dilationCounter
-								dilationCounter = 0;
-//							}
+							}
 
 							// Send the percepts to the components.
 							space.getPerceptList().processPercepts(null);
