@@ -8,6 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -187,7 +190,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 
 			// Store also the evaluation in a file
 			try {
-				BufferedWriter out = new BufferedWriter(new FileWriter("SimulationEVALUATIONResults" + "-" + String.valueOf(getClock().getTime()) + ".txt"));
+				BufferedWriter out = new BufferedWriter(new FileWriter("SimulationEVALUATIONResults" + "-" + getDateAsString() + ".txt"));
 				out.write(resultsAsString);
 				out.close();
 			} catch (IOException e) {
@@ -264,16 +267,47 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		return buffer.toString();
 	}
 	
-	//Application specific evaluation --> compare simulations results with real data
-	private void compareSimulationWithRealData(HashMap rowResults){
+	// Application specific evaluation --> compare simulations results with real data
+		private void compareSimulationWithRealData(HashMap rowResults) {
+
+			for (Iterator<String> it = rowResults.keySet().iterator(); it.hasNext();) {
+
+				BikeSharingEvaluation bikeSharEval = new BikeSharingEvaluation(((RowResult) rowResults.get(it.next())).getEvaluatedRowData());
+				bikeSharEval.compare();
+
+				System.out.println("\n\n\n Results: 1) Stock level eval. 2)Single Bike Stations eval.");
+				System.out.println(bikeSharEval.stockLevelResultsToString());
+				System.out.println(bikeSharEval.bikestationResultsToString());
+				
+				
+			//Persists result in file on disk
+				try {										
+//					BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-" + "-" + String.valueOf(getClock().getTime()) + ".txt"));
+					BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-" + "-" + getDateAsString() + ".txt"));
+					
+					
+					out.write("\n\n\n Results: 1) Stock level eval. 2)Single Bike Stations eval.");
+					out.write(bikeSharEval.stockLevelResultsToString());
+					out.write(bikeSharEval.bikestationResultsToString());
+									
+					out.close();
+				} catch (IOException e) {
+				}
+				
+			}
+		}
 		
-		
-		for (Iterator<String> it = rowResults.keySet().iterator(); it.hasNext();) {
-		
-			BikeSharingEvaluation bikeSharEval = new BikeSharingEvaluation(((RowResult) rowResults.get(it.next())).getEvaluatedRowData());
-			bikeSharEval.compare();
+		private String getDateAsString(){
+			Calendar cal = GregorianCalendar.getInstance();
+			cal.setTime(new Date(System.currentTimeMillis()));
+			String date = String.valueOf(cal.get(Calendar.DATE)) + "-";
+			date += String.valueOf(cal.get(Calendar.MONTH)+1)+ "-";
+			date += String.valueOf(cal.get(Calendar.YEAR))+ "--";
+			date += String.valueOf(cal.get(Calendar.HOUR_OF_DAY))+ "-";
+			date += String.valueOf(cal.get(Calendar.MINUTE))+ "-";
+			date += String.valueOf(cal.get(Calendar.SECOND));
 			
-			System.out.println(bikeSharEval.resultsToString());
+			return date;
 		}
 	}
-}
+

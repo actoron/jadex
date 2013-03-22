@@ -288,10 +288,12 @@ public class RuntimeManagerPlan extends Plan {
 		// Hack: Synchronize start time!
 		// System.out.println("-->StartTime at Client: " + startTime);
 		long startTime = clockservice.getTime();
+		long startTickTime = new Double (clockservice.getTick()).longValue();
 
 		fut = exta.getExtension(investigationConf.getNameOfSpace());
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
+		space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", startTickTime);
 
 		// (Hack?): add experiment-id to space
 		space.setProperty(GlobalConstants.EXPERIMENT_ID, (String) clientConf.get(GlobalConstants.EXPERIMENT_ID));
@@ -302,6 +304,7 @@ public class RuntimeManagerPlan extends Plan {
 		// Save initial facts of this simulation run.
 		Map facts = new HashMap();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(startTime));
+		facts.put(Constants.EXPERIMENT_STARTTICK_TIME, new Long(startTickTime));
 		// getBeliefbase().getBelief("simulationFacts").setFact(facts);
 		Map factsAboutAllExperiments = (HashMap<Integer, HashMap>) getBeliefbase().getBelief("factsAboutAllExperiments").getFact();
 		factsAboutAllExperiments.put(localExperimentCounter, facts);

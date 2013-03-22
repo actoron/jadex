@@ -13,7 +13,8 @@ public class Constants {
 	public static final String SIMULATION_END_TIME = "SimulationEndTime";
 	
 	//The Start/End Time of ONE Experiment
-	public static final String EXPERIMENT_START_TIME = "ExperimentStartTime";	
+	public static final String EXPERIMENT_START_TIME = "ExperimentStartTime";
+	public static final String EXPERIMENT_STARTTICK_TIME = "ExperimentStartTickTime";
 	public static final String EXPERIMENT_END_TIME = "ExperimentEndTime";
 	
 	public static final String TOTAL_EXPERIMENT_COUNTER = "Total_Experiment_Counter";
