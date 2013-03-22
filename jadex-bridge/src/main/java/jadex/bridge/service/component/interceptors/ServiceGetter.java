@@ -55,39 +55,57 @@ public class ServiceGetter<T>
 	 */
 	public IFuture<T> getService()
 	{
+//		System.out.println("getMon");
+		
 		final Future<T> ret = new Future<T>();
 
-		if(service==null)
+		SServiceProvider.getService(component.getServiceContainer(), type, scope)
+			.addResultListener(component.createResultListener(new IResultListener<T>()
 		{
-			if(lastsearch==0 || System.currentTimeMillis()>lastsearch+delay)
+			public void resultAvailable(T result)
 			{
-				lastsearch = System.currentTimeMillis();
-				
-				SServiceProvider.getService(component.getServiceContainer(), type, scope)
-					.addResultListener(component.createResultListener(new IResultListener<T>()
-				{
-					public void resultAvailable(T result)
-					{
-						service = result;
-						ret.setResult(service);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-	//					exception.printStackTrace();
-						ret.setResult(null);
-					}
-				}));
+				service = result;
+				ret.setResult(service);
 			}
-			else
+			
+			public void exceptionOccurred(Exception exception)
 			{
+	//			exception.printStackTrace();
 				ret.setResult(null);
 			}
-		}
-		else
-		{
-			ret.setResult(service);
-		}
+		}));
+		
+//		if(service==null)
+//		{
+//			if(lastsearch==0 || System.currentTimeMillis()>lastsearch+delay)
+//			{
+//				lastsearch = System.currentTimeMillis();
+//				
+//				SServiceProvider.getService(component.getServiceContainer(), type, scope)
+//					.addResultListener(component.createResultListener(new IResultListener<T>()
+//				{
+//					public void resultAvailable(T result)
+//					{
+//						service = result;
+//						ret.setResult(service);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//	//					exception.printStackTrace();
+//						ret.setResult(null);
+//					}
+//				}));
+//			}
+//			else
+//			{
+//				ret.setResult(null);
+//			}
+//		}
+//		else
+//		{
+//			ret.setResult(service);
+//		}
 		
 		return ret;
 	}

@@ -119,7 +119,6 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 								}
 								catch(ComponentTerminatedException e)
 								{
-									
 									// Special case: ignore reschedule failure when component has called cms.destroyComponent() for itself
 									if(sic.getMethod().getName().equals("destroyComponent")
 										&& sic.getArguments().size()==1 && caller!=null && caller.equals(sic.getArguments().get(0)))

@@ -233,16 +233,20 @@ public class BasicService implements IInternalService
 	 */
 	public IFuture<Void>	shutdownService()
 	{
+		if(sid.getProviderId().getParent()==null && getClass().getName().indexOf("ContextSer")!=-1)
+			System.out.println("shutdown service: "+getServiceIdentifier());
+
 		// Deregister pojo->sid mapping in shutdown.
 		BasicServiceInvocationHandler.removePojoServiceProxy(sid);
-		
-//		System.out.println("shutdown service: "+getServiceIdentifier());
 		
 		final Future<Void> ret = new Future<Void>();
 		isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
 		{
 			public void customResultAvailable(Boolean result)
 			{
+				if(sid.getProviderId().getParent()==null && getClass().getName().indexOf("ContextSer")!=-1)
+					System.out.println("shutdowned service: "+getServiceIdentifier());
+				
 				if(!result.booleanValue())
 				{
 					ret.setException(new RuntimeException("Not running."));

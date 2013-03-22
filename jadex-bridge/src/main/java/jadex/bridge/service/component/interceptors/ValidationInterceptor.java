@@ -75,6 +75,7 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 			ServiceCall sc = CallAccess.getInvocation();
 			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
 			sc.setProperty(ServiceCall.INHERIT, true);
+//			CallAccess.setServiceCall(sc);
 			if(service instanceof IService)
 			{
 				valid	= ((IService)service).isValid();

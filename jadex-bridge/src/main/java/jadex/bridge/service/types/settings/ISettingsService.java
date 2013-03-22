@@ -52,7 +52,8 @@ public interface ISettingsService
 	 *  Load the default platform properties.
 	 *  @return A future indicating when properties have been loaded.
 	 */
-	public IFuture<Properties>	loadProperties();
+//	public IFuture<Properties>	loadProperties();
+	public IFuture<Void>	loadProperties();
 	
 	/**
 	 *  Save the platform properties to the default location.

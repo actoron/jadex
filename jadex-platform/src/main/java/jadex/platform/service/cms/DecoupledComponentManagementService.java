@@ -1069,6 +1069,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
+		System.out.println("Terminating component1: "+cid.getName());
+		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		System.err.println("kill compo: "+cid+" "+(sc!=null? sc.getCaller(): "null"));
 		
@@ -1137,10 +1139,11 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		}
 		else
 		{
-			System.out.println("Terminating component: "+cid.getName());
-			
 			InitInfo infos	= getInitInfo(cid);
 			IComponentAdapter adapter	= infos!=null ? infos.getAdapter() : (IComponentAdapter)adapters.get(cid);
+			
+			if(adapter.getDescription().getModelName().indexOf("Proxy")==-1)
+				System.out.println("Terminating component: "+cid.getName());
 			
 			// Terminate component that is shut down during init.
 			if(infos!=null && !infos.getInitFuture().isDone())
@@ -2100,7 +2103,9 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		}
 		else
 		{
-	//		System.out.println("getChildren: "+this+" "+isValid());
+//			if(cid.getParent()==null)
+//				System.out.println("getChildren: "+cid);
+			
 			IComponentIdentifier[] tmp;
 			CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
 //			System.out.println("desc: "+desc.getName()+" "+desc.hashCode());

@@ -234,6 +234,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 //			|| sic.getMethod().getReturnType().equals(void.class);
 
+//		if(sic.getMethod().getName().indexOf("getChildren")!=-1)
+//			System.out.println("huhuhu");
 		
 		if(!adapter.isExternalThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{

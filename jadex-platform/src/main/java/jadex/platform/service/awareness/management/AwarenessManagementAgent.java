@@ -162,7 +162,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	public IFuture<Void>	agentCreated()
 	{
 //		String[] test = new String[]{"test", "test2"};
-		System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
+//		System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
 
 		initArguments();
 		
@@ -221,7 +221,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 							args.put("excludes", getExcludes());
 							info.setArguments(args);
 							
-							System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
+//							System.out.println("curcall awa: "+CallAccess.getCurrentInvocation().getCause());
 							
 							while(stok.hasMoreTokens())
 							{

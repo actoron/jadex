@@ -124,21 +124,20 @@ public class SNonAndroid
 		try
 		{
 			// Generate network identifiers
-			for (NetworkInterface ni : SUtil.getNetworkInterfaces())
+			for(NetworkInterface ni : SUtil.getNetworkInterfaces())
 			{
-				for (InterfaceAddress ifa : ni.getInterfaceAddresses())
+				for(InterfaceAddress ifa : ni.getInterfaceAddresses())
 				{
-					if (ifa != null) // Yes, there may be a null in the
-										// list. grrr.
+					if(ifa != null) // Yes, there may be a null in the list. grrr.
 					{
 						InetAddress addr = ifa.getAddress();
 						// System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
 
-						if (addr.isLoopbackAddress())
+						if(addr.isLoopbackAddress())
 						{
 							// ignore
 						}
-						else if (addr.isLinkLocalAddress())
+						else if(addr.isLinkLocalAddress())
 						{
 							// ignore
 						}
@@ -160,11 +159,11 @@ public class SNonAndroid
 				}
 			}
 		}
-		catch (RuntimeException e)
+		catch(RuntimeException e)
 		{
 			throw e;
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
 			throw new RuntimeException(e);
 		}

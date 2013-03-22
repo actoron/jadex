@@ -17,6 +17,15 @@ import junit.framework.TestCase;
 public class MultiPlatformsTest extends TestCase
 {
 	/**
+	 * 
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		MultiPlatformsTest t = new MultiPlatformsTest();
+		t.testMultiplePlatforms();
+	}
+	
+	/**
 	 *  Perform the test.
 	 * @throws Exception 
 	 */
@@ -25,7 +34,7 @@ public class MultiPlatformsTest extends TestCase
 //		for(int p=0; p<100; p++)
 		{
 //			long	time	= System.currentTimeMillis();
-		int number	= 25; // larger numbers cause timeout on toaster.
+		int number	= 10; // larger numbers cause timeout on toaster.
 		long timeout	= 120000;	// time required by toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
@@ -72,11 +81,11 @@ public class MultiPlatformsTest extends TestCase
 		
 		for(int i=0; i<number; i++)
 		{
-			if(i%10==0)
+//			if(i%10==0)
 			{
 				System.out.println("Killing platform "+i);
 			}
-			platforms[i].killComponent().get(sus, timeout);
+			platforms[i].killComponent().get(sus); // timeout
 		}
 		
 		

@@ -462,14 +462,19 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 		}
 		else
 		{
-			getTimeStamp(provider).addResultListener(new ExceptionDelegationResultListener<Long, Void>(ret)
+			getTimeStamp(provider).addResultListener(new IResultListener<Long>()
 			{
-				public void customResultAvailable(Long result)
+				public void resultAvailable(Long result)
 				{
 					ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_OCCURRENCE,
 						 IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT, model.getName(), adapter.getComponentIdentifier().getName(),
 						adapter.getComponentIdentifier(), creationtime, null, "terminating", result);
 					dispatchComponentChangeEvent(event, componentlisteners).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setResult(null);
 				}
 			});
 		}

@@ -243,17 +243,24 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
 	//					if(!terminated)
 	//					{
-	//						System.out.println("Terminating service: "+sid);
+//							if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
+								System.out.println("Terminating service: "+sid);
 							getLogger().info("Terminating service: "+sid);
 							final IInternalService fservice = service;
 							service.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 							{
 								public void customResultAvailable(Void result)
 								{
-	//								if(sid.toString().indexOf("MarshalService")!=-1)
-	//									System.out.println("Terminated service: "+sid);
+//									if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
+										System.out.println("Terminated service: "+sid);
 									getLogger().info("Terminated service: "+sid);
 									serviceShutdowned(fservice).addResultListener(new DelegationResultListener<Void>(ret));
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+									super.exceptionOccurred(exception);
 								}
 							});
 	//					}
@@ -444,7 +451,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		{
 			final IInternalService ser = services.next();
 			final IServiceIdentifier sid = ser.getServiceIdentifier();
-
+			
 //			removeService(sid).addResultListener(new DelegationResultListener<Void>(ret)
 //			{
 //				public void customResultAvailable(Void result)

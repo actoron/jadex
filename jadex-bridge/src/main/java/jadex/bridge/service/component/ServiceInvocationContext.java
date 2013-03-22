@@ -139,6 +139,10 @@ public class ServiceInvocationContext
 	/** The creation (root) cause. */
 	protected Cause cause;
 	
+	
+	protected IServiceIdentifier sid;
+//	public Exception ex;
+	
 	//-------- constructors --------
 	
 	/**
@@ -148,6 +152,9 @@ public class ServiceInvocationContext
 		IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform, 
 		boolean realtime, IServiceIdentifier sid, Cause crcause)
 	{
+//		this.ex = new RuntimeException();
+		this.sid = sid;
+		
 		this.platform = platform;
 		this.proxy = proxy;
 		this.realtime	= realtime;
@@ -220,6 +227,9 @@ public class ServiceInvocationContext
 	 */
 	public ServiceInvocationContext(ServiceInvocationContext context)
 	{
+		this.sid = context.sid;
+//		this.ex= context.ex;
+		
 		this.call	= context.call;
 		this.lastcall = context.lastcall;
 		this.realtime	= context.realtime;
@@ -235,6 +245,7 @@ public class ServiceInvocationContext
 		
 		this.caller = context.caller;
 		this.calleradapter = context.calleradapter;
+		this.cause = context.cause;
 	}
 	
 	/**
@@ -368,14 +379,15 @@ public class ServiceInvocationContext
 		
 		if(interceptor!=null)
 		{
-//			if(method.getName().equals("isValid"))
-//				System.out.println("interceptor1: "+interceptor);
+//			if(method.getName().equals("shutdownService") && sid.toString().indexOf("Context")!=-1 && sid.getProviderId().getParent()==null)
+			if(sid.getProviderId().getParent()==null && method.getName().indexOf("killComponent")!=-1)
+				System.out.println("invoke before: "+method.getName()+" "+interceptor);
 			interceptor.execute(this).addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
-//					if(method.getName().equals("getResult"))
-//						System.out.println("interceptor2: "+interceptor);
+//					if(sid.getProviderId().getParent()==null)// && method.getName().indexOf("getChildren")!=-1)
+//						System.out.println("invoke after: "+method.getName()+" "+interceptor);
 
 					pop();
 					ret.setResult(null);
@@ -383,6 +395,9 @@ public class ServiceInvocationContext
 				
 				public void exceptionOccurred(Exception exception)
 				{
+//					if(sid.getProviderId().getParent()==null)
+//						System.out.println("invoke after: "+method.getName()+" "+interceptor);
+
 //					if(method.getName().equals("isValid"))
 //						System.out.println("interceptor(ex): "+interceptor);
 

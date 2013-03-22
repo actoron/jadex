@@ -59,6 +59,8 @@ public class Executor implements Runnable
 	
 	/** The monitors of blocked threads that need to be reactivated. */
 	protected List<Object>	switchtos;
+	
+	protected Thread thread;
 		
 	//--------- constructors --------
 
@@ -92,6 +94,8 @@ public class Executor implements Runnable
 	 */
 	public void run()
 	{
+		thread = Thread.currentThread();
+		
 		synchronized(this)
 		{
 			exethreadcnt++;
@@ -178,6 +182,8 @@ public class Executor implements Runnable
 		{
 			exethreadcnt--;
 		}
+		
+		thread = null;
 	}
 
 	/**

@@ -257,35 +257,35 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	 */
 	public synchronized boolean workerTimeoutOccurred()
 	{
-		workercnt--;
-		capacity--;
-		return true;
-		
+//		workercnt--;
+//		capacity--;
+//		return true;
+//		
 //		boolean ret = false;
 //		
-//		boolean ok = false;
-//		if(capacity>=desfree)
-//		{
-//			int dt = workercnt/desfree;
-//			if(dt>2)
-//			{
-//				if(deferdec==0)
-//				{
-//					deferdectarget = Math.max(10, 1/dt*500);
-//				}
-//				deferdec++;
-//				if(deferdec==deferinctarget)
-//				{
-//					deferdec=0;
-//					ok = true;
-//				}
-//			}
-//			else
-//			{
-//				ok = true;
-//				deferinc = 0;
-//			}
-//		}
+		boolean ok = false;
+		if(capacity>=desfree)
+		{
+			int dt = workercnt/desfree;
+			if(dt>2)
+			{
+				if(deferdec==0)
+				{
+					deferdectarget = Math.max(10, 1/dt*500);
+				}
+				deferdec++;
+				if(deferdec==deferinctarget)
+				{
+					deferdec=0;
+					ok = true;
+				}
+			}
+			else
+			{
+				ok = true;
+				deferinc = 0;
+			}
+		}
 //		
 //		if(ok)
 //		{
@@ -305,7 +305,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 ////			System.out.println("Capacity: "+capacity+" "+workercnt);
 //		}
 //		
-//		return ret;
+		return ok;
 	}
 	
 	//-------- getter/setter --------

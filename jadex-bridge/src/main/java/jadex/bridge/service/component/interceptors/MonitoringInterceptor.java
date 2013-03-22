@@ -57,7 +57,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 		else
 		{
 			ret = !context.getMethod().getDeclaringClass().equals(IMonitoringService.class)
-			&& SReflect.isSupertype(IFuture.class, context.getMethod().getReturnType());
+				&& SReflect.isSupertype(IFuture.class, context.getMethod().getReturnType());
 			//&& context.getMethod().getName().indexOf("getChildren")==-1;
 		}
 		
@@ -68,6 +68,9 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 		
 //		if(ret)
 //			System.out.println("ok: "+context.getMethod().getDeclaringClass()+"."+context.getMethod().getName());
+				
+//		if(context.getMethod().getName().indexOf("getExternalAccess")!=-1)
+//			System.out.println("getExt");
 		
 		return ret;
 	}
@@ -91,10 +94,19 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 		
 		CallAccess.setServiceCall(sc); 
 		
+		if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
+			System.out.println("start shut in mon: "+context.getObject());
+		
+//		if(context.getMethod().getName().indexOf("getExternalAccess")!=-1)
+//			System.out.println("getExt");
+		
 		getter.getService().addResultListener(new ExceptionDelegationResultListener<IMonitoringService, Void>(ret)
 		{
 			public void customResultAvailable(IMonitoringService monser)
 			{
+				if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
+					System.out.println("end shut in mon: "+context.getObject());
+				
 				CallAccess.setServiceCall(cur); 
 				CallAccess.setNextInvocation(next);
 				
@@ -108,8 +120,8 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 					String src = component.getComponentIdentifier().getName()+"."+context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
 					MonitoringEvent ev = new MonitoringEvent(src, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start);
 					
-					if(context.getMethod().getName().indexOf("method")!=-1)
-						System.out.println("call method: "+ev.getCause().getChainId());
+//					if(context.getMethod().getName().indexOf("method")!=-1)
+//						System.out.println("call method: "+ev.getCause().getChainId());
 					
 					monser.publishEvent(ev).addResultListener(new ExceptionResultListener<Void>()
 					{
@@ -164,6 +176,8 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 			ServiceCall sc = CallAccess.getInvocation();
 			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
 			sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
+			
+			CallAccess.setServiceCall(sc); 
 
 			getter.getService().addResultListener(new IResultListener<IMonitoringService>()
 			{

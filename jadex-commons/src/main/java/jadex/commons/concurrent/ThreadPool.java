@@ -270,7 +270,6 @@ public class ThreadPool implements IThreadPool
 		if(!parked.isEmpty())
 		{
 			ServiceThread thread = parked.remove(0);
-			pool.add(thread);
 			synchronized(thread)
 			{
 				((ServiceThread)thread).notified = true;
@@ -379,8 +378,10 @@ public class ThreadPool implements IThreadPool
 				}
 				catch(IBlockingQueue.ClosedException e)
 				{
+//					e.printStackTrace();
+					
 					task = null;
-					exit	= true;
+					exit = true;
 				}
 				catch(TimeoutException e)
 				{
@@ -401,43 +402,42 @@ public class ThreadPool implements IThreadPool
 					exit = strategy.taskFinished();
 				}
 				
+//				System.out.println("exit: "+exit+" "+pool.size()+" "+parked.size()+" "+strategy);
 				if(exit)
 				{
-					try
+					if(running && parked.size()<maxparked)
 					{
-						if(running && parked.size()<maxparked)
+						park();
+						
+						synchronized(this)
 						{
-							park();
-							
-							synchronized(this)
+//							System.out.println("waiting for: "+strategy.getWorkerTimeout()*10);
+							if(running)
 							{
-//								System.out.println("waiting for: "+strategy.getWorkerTimeout()*10);
-								if(running)
+								try
 								{
 									wait(strategy.getWorkerTimeout());
 								}
+								catch(InterruptedException e)
+								{
+								}
 							}
-							
-							if(notified)
-							{
-								notified = false;
-								unpark();
-							}
-							else
-							{
-								terminated = true;
-//								System.out.println("thread removed (nothing to do): "+parked.size());
-							}
+						}
+						
+						if(notified)
+						{
+							notified = false;
+							unpark();
 						}
 						else
 						{
 							terminated = true;
+//							System.out.println("thread removed (nothing to do): "+parked.size());
 						}
 					}
-					catch(InterruptedException e)
+					else
 					{
 						terminated = true;
-//						System.out.println("thread removed (nothing to do): "+parked.size());
 					}
 				}
 			}
@@ -476,6 +476,8 @@ public class ThreadPool implements IThreadPool
 		 */
 		protected void remove()
 		{
+//			System.out.println("thread terminating: "+this);
+			
 			terminated = true;
 			
 			synchronized(ThreadPool.this)

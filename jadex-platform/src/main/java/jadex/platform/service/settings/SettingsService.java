@@ -12,6 +12,7 @@ import jadex.commons.Properties;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -50,7 +51,7 @@ public class SettingsService implements ISettingsService
 	protected Properties	props;
 	
 	/** The registered properties provider (id->provider). */
-	protected Map	providers;
+	protected Map<String, IPropertiesProvider>	providers;
 	
 	/** Save settings on exit?. */
 	protected boolean	saveonexit;
@@ -67,7 +68,7 @@ public class SettingsService implements ISettingsService
 	@ServiceStart
 	public IFuture<Void>	startService()
 	{
-		this.providers	= new LinkedHashMap();
+		this.providers	= new LinkedHashMap<String, IPropertiesProvider>();
 		Object	soe	= access.getArguments().get("saveonexit");
 		this.saveonexit	= soe instanceof Boolean && ((Boolean)soe).booleanValue();
 		this.filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
@@ -79,7 +80,7 @@ public class SettingsService implements ISettingsService
 			public void resultAvailable(IContextService result)
 			{
 				contextService = result;
-				loadProperties().addResultListener(new DelegationResultListener(ret));
+				loadProperties().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		
@@ -219,37 +220,58 @@ public class SettingsService implements ISettingsService
 	 *  Load the default platform properties.
 	 *  @return A future indicating when properties have been loaded.
 	 */
-	public IFuture<Properties> loadProperties()
+	public IFuture<Void> loadProperties()
 	{
-		final Future<Properties>	ret	= new Future<Properties>();
+		final Future<Void>	ret	= new Future<Void>();
 		
-		try
+		readOrCreateProperties().addResultListener(new ExceptionDelegationResultListener<Properties, Void>(ret)
 		{
-			props = readPropertiesFromStore();
-		}
-		catch(Exception e)
-		{
-			props	= new Properties();
-		}
+			public void customResultAvailable(Properties mprops)
+			{
+				props = mprops;
+				
+				final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(providers.size(),
+					access.createResultListener(new DelegationResultListener<Void>(ret)));
+				
+				for(Iterator<String> it=providers.keySet().iterator(); it.hasNext(); )
+				{
+					final String	id	= it.next();
+					IPropertiesProvider	provider = providers.get(id);
+					
+					Properties	sub	= props.getSubproperty(id);
+					if(sub!=null)
+					{
+						provider.setProperties(sub).addResultListener(access.createResultListener(crl));
+					}
+					else
+					{
+						crl.resultAvailable(null);
+					}
+				}
+			}
+		});
 		
-		final CounterResultListener	crl	= new CounterResultListener(providers.size(),
-			access.createResultListener(new DelegationResultListener(ret)));
-		for(Iterator it=providers.keySet().iterator(); it.hasNext(); )
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Properties> readOrCreateProperties()
+	{
+		final Future<Properties> ret = new Future<Properties>();
+		readPropertiesFromStore().addResultListener(new IResultListener<Properties>()
 		{
-			final String	id	= (String)it.next();
-			IPropertiesProvider	provider	= (IPropertiesProvider)providers.get(id);
+			public void resultAvailable(Properties result)
+			{
+				ret.setResult(result);
+			}
 			
-			Properties	sub	= props.getSubproperty(id);
-			if(sub!=null)
+			public void exceptionOccurred(Exception exception)
 			{
-				provider.setProperties(sub).addResultListener(access.createResultListener(crl));
+				ret.setResult(new Properties());
 			}
-			else
-			{
-				crl.resultAvailable(null);
-			}
-		}
-
+		});
 		return ret;
 	}
 	
@@ -260,14 +282,60 @@ public class SettingsService implements ISettingsService
 	 * @throws Exception
 	 * @throws IOException
 	 */
-	protected Properties readPropertiesFromStore() throws FileNotFoundException, IOException 
+	protected IFuture<Properties> readPropertiesFromStore() //throws FileNotFoundException, IOException 
 	{
-		Properties ret;
+		final Future<Properties> ret = new Future<Properties>();
+		
 		// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
-		File file = getFile(filename);
-		FileInputStream fis = new FileInputStream(file.exists() ? file : getFile("default"+SETTINGS_EXTENSION));
-		ret	= (Properties)PropertiesXMLHelper.read(fis, getClass().getClassLoader());
-		fis.close();
+		getFile(filename).addResultListener(new ExceptionDelegationResultListener<File, Properties>(ret)
+		{
+			public void customResultAvailable(File file)
+			{
+				if(!file.exists())
+				{
+					getFile("default"+SETTINGS_EXTENSION).addResultListener(new ExceptionDelegationResultListener<File, Properties>(ret)
+					{
+						public void customResultAvailable(File file)
+						{
+							proceed(file);
+						}
+					});
+				}
+				else
+				{
+					proceed(file);
+				}
+			}
+			
+			protected void proceed(File file)
+			{
+				FileInputStream fis = null;
+				try
+				{
+					fis = new FileInputStream(file);
+					Properties props = (Properties)PropertiesXMLHelper.read(fis, getClass().getClassLoader());
+					ret.setResult(props);
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+				finally
+				{
+					if(fis!=null)
+					{
+						try
+						{
+							fis.close();
+						}
+						catch(Exception e)
+						{
+						}
+					}
+				}
+			}
+		});
+		
 		return ret;
 	}
 
@@ -348,15 +416,44 @@ public class SettingsService implements ISettingsService
 	 * @throws Exception
 	 * @throws IOException
 	 */
-	protected void writePropertiesToStore(Properties props) throws FileNotFoundException,
-			Exception, IOException 
+	protected void writePropertiesToStore(final Properties props) //throws FileNotFoundException, Exception, IOException 
 	{
 		// Todo: Which class loader to use? library service unavailable, because
 		// it depends on settings service?
-		File file = getFile(filename);
-		FileOutputStream os = new FileOutputStream(file);
-		PropertiesXMLHelper.write(props, os, getClass().getClassLoader());
-		os.close();
+		getFile(filename).addResultListener(new IResultListener<File>()
+		{
+			public void resultAvailable(File file)
+			{
+				FileOutputStream os = null;
+				try
+				{
+					os = new FileOutputStream(file);
+					PropertiesXMLHelper.write(props, os, getClass().getClassLoader());
+				}
+				catch(Exception e)
+				{
+				}
+				finally
+				{
+					if(os!=null)
+					{
+						try
+						{
+							os.close();
+						}
+						catch(Exception e)
+						{
+						}
+					}
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				
+			}
+		});
+	
 	}
 	
 	/**
@@ -364,7 +461,8 @@ public class SettingsService implements ISettingsService
 	 * @param path Path to the file
 	 * @return The File Object for the given path.
 	 */
-	protected File getFile(String path) {
+	protected IFuture<File> getFile(String path) 
+	{
 		return contextService.getFile(path);
 	}
 }

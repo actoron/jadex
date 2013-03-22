@@ -78,7 +78,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected Future<Void>	killfuture;
 	
 	/** Flag for testing double execution. */
-	boolean executing;
+	protected volatile boolean executing;
 	
 	//-------- steppable attributes --------
 	
@@ -569,6 +569,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
+//		if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+//			System.out.println("Enter: "+getComponentIdentifier()+", "+Thread.currentThread());
+		
 		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(this));
 		
 		if(executing)
@@ -602,7 +605,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			boolean extexecuted	= false;
 			try
 			{
+//				if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+//					System.out.println("Ext Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
 				extexecuted	= executeExternalEntries(false);
+//				if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+//					System.out.println("Ext Not Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
 			}
 			catch(Exception e)
 			{
@@ -643,9 +650,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			{
 				try
 				{
-//					System.out.println("Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
+//					if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+//						System.out.println("Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
 					again	= component.executeStep();
-//					System.out.println("Not Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
+//					if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+//						System.out.println("Not Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
 				}
 				catch(Exception e)
 				{
@@ -698,6 +707,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			componentthread.setContextClassLoader(cl);
 			this.componentthread = null;
 			
+//			if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+//				System.out.println("Set to null: "+getComponentIdentifier()+", "+Thread.currentThread());
+			
 			ret	= (again && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState())) || extexecuted;
 		}
 		else
@@ -708,6 +720,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		executing	= false;
 		ISuspendable.SUSPENDABLE.set(null);
 
+//		if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+//			System.out.println("Leave: "+getComponentIdentifier()+", "+Thread.currentThread());
+		
 //		System.out.println("Again: "+getComponentIdentifier()+", "+ret+", "+Thread.currentThread());
 		
 		return ret;

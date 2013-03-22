@@ -141,6 +141,10 @@ public class SecurityService implements ISecurityService
 	/** The mappings of virtual names to platform names. */
 	protected Map<String, Set<String>> virtualsmap;
 	
+	
+	/** The network ips, cached for speed. */
+	protected List<InetAddress> networkips;
+	
 	//-------- setup --------
 	
 	/**
@@ -225,202 +229,213 @@ public class SecurityService implements ISecurityService
 			public void customResultAvailable(IContextService result)
 			{
 				contextser = result;
-				setTrustedLanMode(trustedlan);
-			
-				getSettingsService().addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
+				
+				contextser.getNetworkIps().addResultListener(new ExceptionDelegationResultListener<List<InetAddress>, Void>(ret)
 				{
-					public void customResultAvailable(final ISettingsService settings)
+					public void customResultAvailable(List<InetAddress> ips)
 					{
-						if(settings==null)
+						networkips = ips;
+						
+						setTrustedLanMode(trustedlan);
+					
+						getSettingsService().addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
 						{
-							// generate new password, if no security settings exist, yet.
-							password	= UUID.randomUUID().toString().substring(0, 12);
-	//						usepass	= true;
-							ret.setResult(null);
-						}
-						else
-						{
-							settings.getProperties(PROEPRTIES_ID)
-								.addResultListener(new ExceptionDelegationResultListener<Properties, Void>(ret)
+							public void customResultAvailable(final ISettingsService settings)
 							{
-								public void customResultAvailable(final Properties props)
+								if(settings==null)
 								{
 									// generate new password, if no security settings exist, yet.
-									final boolean	genpass	= props==null || props.getProperty("password")==null; 
-									if(genpass)
+									password	= UUID.randomUUID().toString().substring(0, 12);
+			//						usepass	= true;
+									ret.setResult(null);
+								}
+								else
+								{
+									settings.getProperties(PROEPRTIES_ID)
+										.addResultListener(new ExceptionDelegationResultListener<Properties, Void>(ret)
 									{
-										password	= UUID.randomUUID().toString().substring(0, 12);
-			//							usepass	= true;
-									}
-
-									if(props!=null)
-									{
-										selmech = props.getIntProperty("selected_mechanism"); 
-//										System.out.println("selm: "+selmech);
-										publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, new Integer(selmech)));
-									}
-									
-									final IExternalAccess	access	= component.getExternalAccess();
-									
-									settings.registerPropertiesProvider(PROEPRTIES_ID, new IPropertiesProvider()
-									{
-										public IFuture<Void> setProperties(final Properties props)
+										public void customResultAvailable(final Properties props)
 										{
-											return access.scheduleImmediate(new IComponentStep<Void>()
-											{
-												public IFuture<Void> execute(IInternalAccess ia)
-												{
-													String spa = props.getStringProperty("storepath");
-													if(spa!=null && spa.length()>0)
-														storepath = spa;
-													String sps = props.getStringProperty("storepass");
-													if(sps!=null && spa.length()>0)
-														storepass = sps;
-													String kp = props.getStringProperty("keypass");
-													if(kp!=null && kp.length()>0)
-														keypass = kp;
-													long vd = props.getLongProperty("validityduration");
-													if(vd>0)
-														valdur = vd;
-													
-													if(!argsusepass)
-													{
-														usepass = props.getBooleanProperty("usepass");
-			//											System.out.println("usepass: "+usepass);
-													}
-													password	= props.getStringProperty("password");
-													
-													if(!argstrustedlan)
-													{
-														setTrustedLanMode(props.getBooleanProperty("trustedlan"));
-													}
-													
-													Property[]	passes	= props.getProperties("passwords");
-			//										platformpasses	= new LinkedHashMap<String, String>();
-													for(int i=0; i<passes.length; i++)
-													{
-														String val = passes[i].getValue();
-														platformpasses.put(passes[i].getName(), val==null? "": val);
-													}
-													
-													// Not allowed to add internal trusted platforms if flag is false
-													List<InetAddress> addrs = contextser.getNetworkIps();
-													Set<String> trs = new HashSet<String>();
-													for(InetAddress addr: addrs)
-													{
-														trs.add(addr.getHostAddress());
-													}
-														
-													Property[]	networks	= props.getProperties("networks");
-			//										networkpasses	= new LinkedHashMap<String, String>();
-													for(int i=0; i<networks.length; i++)
-													{
-			//											System.out.println("value:"+networks[i].getValue()+".");
-														String val = networks[i].getValue();
-														if(trustedlan || !trs.contains(networks[i].getName()))
-														{
-															networkpasses.put(networks[i].getName(), val==null? "": val);
-														}
-													}
-													
-													selmech = props.getIntProperty("selmech");
-													
-													if(mechanisms!=null)
-													{
-														for(AAcquisitionMechanism mech: mechanisms)
-														{
-															Properties mps = props.getSubproperty(SReflect.getInnerClassName(mech.getClass()));
-															if(mps!=null)
-															{
-																mech.setProperties(mps);
-															}
-														}
-													}
-													
-													publishCurrentState();
-													
-													return IFuture.DONE;
-												}
-											});
-										}
-										
-										public IFuture<Properties> getProperties()
-										{
-											return access.scheduleImmediate(new IComponentStep<Properties>()
-											{
-												public IFuture<Properties> execute(IInternalAccess ia)
-												{
-													Properties	ret	= new Properties();
-													ret.addProperty(new Property("validityduration", ""+valdur));
-													ret.addProperty(new Property("usepass", ""+usepass));
-													ret.addProperty(new Property("password", password));
-													ret.addProperty(new Property("selected_mechanism", ""+selmech));
-													if(platformpasses!=null)
-													{
-														for(String platform: platformpasses.keySet())
-														{
-															ret.addProperty(new Property(platform, "passwords", platformpasses.get(platform)));
-														}
-													}
-													if(networkpasses!=null)
-													{
-														for(String network: networkpasses.keySet())
-														{
-															ret.addProperty(new Property(network, "networks", networkpasses.get(network)));
-														}
-													}
-													ret.addProperty(new Property("trustedlan", ""+trustedlan));
-													
-													ret.addProperty(new Property("storepath", storepath));
-													ret.addProperty(new Property("storepass", storepass));
-													ret.addProperty(new Property("keypass", keypass));
-													
-													ret.addProperty(new Property("selmech", ""+selmech));
-													
-													if(mechanisms!=null)
-													{
-														for(AAcquisitionMechanism mech: mechanisms)
-														{
-															ret.addSubproperties(SReflect.getInnerClassName(mech.getClass()), mech.getProperties());
-														}
-													}
-													
-//													System.out.println("fini2");
-													
-													return new Future<Properties>(ret);
-												}
-											});
-										}
-									}).addResultListener(new DelegationResultListener<Void>(ret)
-									{
-										public void customResultAvailable(Void result)
-										{
-											// If new password was generated, save settings such that new platform instances use it.
+											// generate new password, if no security settings exist, yet.
+											final boolean	genpass	= props==null || props.getProperty("password")==null; 
 											if(genpass)
 											{
-												if(printpass && usepass)
-												{
-													System.out.println("Generated platform password: "+password);
-												}
-												settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
+												password	= UUID.randomUUID().toString().substring(0, 12);
+					//							usepass	= true;
 											}
-											else
+	
+											if(props!=null)
 											{
-												if(printpass && usepass)
-												{
-													System.out.println("Using stored platform password: "+password);
-												}
-												super.customResultAvailable(result);
+												selmech = props.getIntProperty("selected_mechanism"); 
+	//											System.out.println("selm: "+selmech);
+												publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, new Integer(selmech)));
 											}
+											
+											final IExternalAccess	access	= component.getExternalAccess();
+											
+											settings.registerPropertiesProvider(PROEPRTIES_ID, new IPropertiesProvider()
+											{
+												public IFuture<Void> setProperties(final Properties props)
+												{
+													return access.scheduleImmediate(new IComponentStep<Void>()
+													{
+														public IFuture<Void> execute(IInternalAccess ia)
+														{
+															String spa = props.getStringProperty("storepath");
+															if(spa!=null && spa.length()>0)
+																storepath = spa;
+															String sps = props.getStringProperty("storepass");
+															if(sps!=null && spa.length()>0)
+																storepass = sps;
+															String kp = props.getStringProperty("keypass");
+															if(kp!=null && kp.length()>0)
+																keypass = kp;
+															long vd = props.getLongProperty("validityduration");
+															if(vd>0)
+																valdur = vd;
+															
+															if(!argsusepass)
+															{
+																usepass = props.getBooleanProperty("usepass");
+					//											System.out.println("usepass: "+usepass);
+															}
+															password	= props.getStringProperty("password");
+															
+															if(!argstrustedlan)
+															{
+																setTrustedLanMode(props.getBooleanProperty("trustedlan"));
+															}
+															
+															Property[]	passes	= props.getProperties("passwords");
+					//										platformpasses	= new LinkedHashMap<String, String>();
+															for(int i=0; i<passes.length; i++)
+															{
+																String val = passes[i].getValue();
+																platformpasses.put(passes[i].getName(), val==null? "": val);
+															}
+															
+															// Not allowed to add internal trusted platforms if flag is false
+//															List<InetAddress> addrs = contextser.getNetworkIps();
+															Set<String> trs = new HashSet<String>();
+															for(InetAddress addr: networkips)
+															{
+																trs.add(addr.getHostAddress());
+															}
+																
+															Property[]	networks	= props.getProperties("networks");
+					//										networkpasses	= new LinkedHashMap<String, String>();
+															for(int i=0; i<networks.length; i++)
+															{
+					//											System.out.println("value:"+networks[i].getValue()+".");
+																String val = networks[i].getValue();
+																if(trustedlan || !trs.contains(networks[i].getName()))
+																{
+																	networkpasses.put(networks[i].getName(), val==null? "": val);
+																}
+															}
+															
+															selmech = props.getIntProperty("selmech");
+															
+															if(mechanisms!=null)
+															{
+																for(AAcquisitionMechanism mech: mechanisms)
+																{
+																	Properties mps = props.getSubproperty(SReflect.getInnerClassName(mech.getClass()));
+																	if(mps!=null)
+																	{
+																		mech.setProperties(mps);
+																	}
+																}
+															}
+															
+															publishCurrentState();
+															
+															return IFuture.DONE;
+														}
+													});
+												}
+												
+												public IFuture<Properties> getProperties()
+												{
+													return access.scheduleImmediate(new IComponentStep<Properties>()
+													{
+														public IFuture<Properties> execute(IInternalAccess ia)
+														{
+															Properties	ret	= new Properties();
+															ret.addProperty(new Property("validityduration", ""+valdur));
+															ret.addProperty(new Property("usepass", ""+usepass));
+															ret.addProperty(new Property("password", password));
+															ret.addProperty(new Property("selected_mechanism", ""+selmech));
+															if(platformpasses!=null)
+															{
+																for(String platform: platformpasses.keySet())
+																{
+																	ret.addProperty(new Property(platform, "passwords", platformpasses.get(platform)));
+																}
+															}
+															if(networkpasses!=null)
+															{
+																for(String network: networkpasses.keySet())
+																{
+																	ret.addProperty(new Property(network, "networks", networkpasses.get(network)));
+																}
+															}
+															ret.addProperty(new Property("trustedlan", ""+trustedlan));
+															
+															ret.addProperty(new Property("storepath", storepath));
+															ret.addProperty(new Property("storepass", storepass));
+															ret.addProperty(new Property("keypass", keypass));
+															
+															ret.addProperty(new Property("selmech", ""+selmech));
+															
+															if(mechanisms!=null)
+															{
+																for(AAcquisitionMechanism mech: mechanisms)
+																{
+																	ret.addSubproperties(SReflect.getInnerClassName(mech.getClass()), mech.getProperties());
+																}
+															}
+															
+	//														System.out.println("fini2");
+															
+															return new Future<Properties>(ret);
+														}
+													});
+												}
+											}).addResultListener(new DelegationResultListener<Void>(ret)
+											{
+												public void customResultAvailable(Void result)
+												{
+													// If new password was generated, save settings such that new platform instances use it.
+													if(genpass)
+													{
+														if(printpass && usepass)
+														{
+															System.out.println("Generated platform password: "+password);
+														}
+														settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
+													}
+													else
+													{
+														if(printpass && usepass)
+														{
+															System.out.println("Using stored platform password: "+password);
+														}
+														super.customResultAvailable(result);
+													}
+												}
+											});
 										}
 									});
 								}
-							});
-						}
+							}
+						});
 					}
 				});
 			}
 		});
+		
+	
 		
 		return ret;
 	}
@@ -707,7 +722,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Void> setTrustedLanMode(boolean allowed)
 	{
-		List<InetAddress> addrs = contextser.getNetworkIps();
+		List<InetAddress> addrs = networkips;//contextser.getNetworkIps();
 		
 		if(allowed)
 		{
@@ -955,7 +970,7 @@ public class SecurityService implements ISecurityService
 		// Add trusted authentications (in case other has turned on lan trusted and this one not)
 		if(!trustedlan)
 		{
-			for(InetAddress addr: contextser.getNetworkIps())
+			for(InetAddress addr: networkips)//contextser.getNetworkIps())
 			{
 				authdata.add(getDigest(timestamp, prefix+addr.getHostAddress()));
 			}
