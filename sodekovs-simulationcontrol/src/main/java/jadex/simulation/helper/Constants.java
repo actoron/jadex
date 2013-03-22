@@ -15,6 +15,7 @@ public class Constants {
 
 	// The Start/End Time of ONE Experiment
 	public static final String EXPERIMENT_START_TIME = "ExperimentStartTime";
+	public static final String EXPERIMENT_STARTTICK_TIME = "ExperimentStartTickTime";
 	public static final String EXPERIMENT_END_TIME = "ExperimentEndTime";
 
 	public static final String TOTAL_EXPERIMENT_COUNTER = "Total_Experiment_Counter";
@@ -102,6 +103,9 @@ public class Constants {
 
 	// Mean values
 	public static final String MEAN_VALUE = "meanValue";
+	
+	// Mean values
+	public static final String VALUES_SEPARATED_BY_COMMA = "valuesSeparatedByComma";
 	
 	//How often this value has been accumulated? required for computing the correct quotient for the mean_value 
 	public static final String VALUE_COUNTER = "valueCounter";

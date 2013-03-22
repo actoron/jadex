@@ -51,9 +51,15 @@ public class ComputeSingleResultPlan extends Plan {
 		// application is initilazed the early events have to be deleted:
 		// "the official" start time -> StartTime at Executor != StartTime at
 		// application (is delayed)
-		deleteEventsBefore(sortedResultList, observedEventsMap, ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue());
-
-		ExperimentResult experimentRes = toExperimentResult(content, new ArrayList(observedEventsMap.values()), simConf);
+//		Denotes whether Simulation uses "Real time" or "Simualtion time"
+		String timeType = simConf.getRunConfiguration().getRows().getTerminateCondition().getTime().getType();
+		if(timeType.equals("tick_based")){
+			deleteEventsBefore(sortedResultList, observedEventsMap, ((Long) content.get(Constants.EXPERIMENT_STARTTICK_TIME)).longValue());
+		}else{//denotes  "default" -> real time is used
+			deleteEventsBefore(sortedResultList, observedEventsMap, ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue());	
+		}
+		
+		ExperimentResult experimentRes = toExperimentResult(content, new ArrayList(observedEventsMap.values()), simConf, timeType);
 
 		System.out.println("\n#Master# ************************* Received message:\n " + experimentRes.toString() + "\n\n");
 
@@ -109,9 +115,15 @@ public class ComputeSingleResultPlan extends Plan {
 
 	}
 
-	private ExperimentResult toExperimentResult(Map content, ArrayList<ArrayList<ObservedEvent>> events, SimulationConfiguration simConf) {
-
-		long startTime = ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue();
+	private ExperimentResult toExperimentResult(Map content, ArrayList<ArrayList<ObservedEvent>> events, SimulationConfiguration simConf, String timeType) {
+		
+		long startTime = 0;
+		if(timeType.equals("tick_based")){
+			startTime = ((Long) content.get(Constants.EXPERIMENT_STARTTICK_TIME)).longValue();
+		}else{//denotes "default" -> real time is used
+			startTime = ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue();	
+		}
+		
 		long endTime = ((Long) content.get(Constants.EXPERIMENT_END_TIME)).longValue();
 		String experimentId = (String) content.get(GlobalConstants.EXPERIMENT_ID);
 
