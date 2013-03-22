@@ -38,7 +38,8 @@ public class SuperStationPlan extends Plan {
 			while (true) {
 				// wait for some time
 				for (int i = 0; i < NO_TICKS; i++) {
-					waitFor(NO_TICKS);
+//					waitFor(NO_TICKS);
+					waitForTick();
 				}
 				IInternalEvent pollEvent = createInternalEvent("poll_cluster_stations");
 				

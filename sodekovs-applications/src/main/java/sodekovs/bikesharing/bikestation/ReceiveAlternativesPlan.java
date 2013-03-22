@@ -22,6 +22,7 @@ public class ReceiveAlternativesPlan extends Plan {
 		
 		System.out.println(getComponentDescription() + " ReceiveAlternativesPlan received " + receivedCoordData);
 		
+		// if there are no proposed alternatives calculated by the super station for this station then the values will explicitly be set to null!
 		String proposedArrivalStation = receivedCoordData.getProposedArrivalStations().get(stationID);
 		String proposedDepartureStation = receivedCoordData.getProposedDepartureStations().get(stationID);
 		

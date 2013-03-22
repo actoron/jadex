@@ -47,6 +47,7 @@ public class ClusterMechanism extends CoordinationMechanism {
 
 	@Override
 	public void start() {
+		// TODO Auto-generated method stub
 	}
 
 	@Override

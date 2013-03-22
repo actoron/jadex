@@ -55,14 +55,25 @@
 			</deco_link>
 			
 			<!-- The link where the super station informs its cluster stations about the alternative proposed stations. -->
-			<deco_link realization="inform_alternatives" type="POSITIVE" name="reply_cluster_stations" spaces="mycoordspace">
+			<deco_link realization="inform_alternatives" type="POSITIVE" name="inform_alternatives" spaces="mycoordspace">
 				<froms>
 					<from>super_station</from>
 				</froms>
 				<tos>
 					<to>cluster_station</to>
 				</tos>
-			</deco_link>				
+			</deco_link>	
+			
+			<!-- The link where cluster stations lay tupel information about their changed occupany in the mechanism
+				and the mechanism informs other cluster stations if the require alternative arrival and departure station information. -->
+			<deco_link realization="tuple_information" type="POSITIVE" name="tuple_information" spaces="mycoordspace">
+			    <froms>
+			        <from>cluster_station</from>
+			    </froms>
+			    <tos>
+			        <to>cluster_station</to>
+			    </tos>
+			</deco_link>			
 		</deco_links>
 
 		<!-- The detailed configuration of interdependency enactment. -->
@@ -88,6 +99,7 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
+				<active>false</active>
 			</realization>
 			
 			<!-- The link where the cluster stations informs the super station about its stocks and capacities. -->
@@ -111,6 +123,7 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
+				<active>false</active>
 			</realization>
 			
 			<!-- The link where the super station informs its cluster stations about the alternative proposed stations. -->
@@ -134,7 +147,42 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-			</realization>						
+				<active>false</active>
+			</realization>
+			
+			<!-- The link where cluster stations lay tupel information about their changed occupany in the mechanism
+				and the mechanism informs other cluster stations if the require alternative arrival and departure station information. -->
+			<realization id="tuple_information">
+			    <from>
+			        <agent_element element="changed_occupancy" agent_id="Bikestation" type="INTERNAL_EVENT">					
+						<parameter_mappings>
+							<mapping ref="tuple" name="tuple"/>
+						</parameter_mappings>
+					</agent_element>
+			    </from>
+			    <mechanism_configuration
+					mechanism_id="sodekovs.bikesharing.coordination.TupleBasedMechanism"
+					agent_type="JADEX">
+			        <properties>
+			        	<entry>
+							<key>FULL_THRESHOLD</key>
+							<value>0.75</value>
+						</entry>
+						<entry>
+							<key>EMPTY_THRESHOILD</key>
+							<value>0.1</value>
+						</entry>
+					</properties>
+				</mechanism_configuration>	
+			    <to>
+			        <agent_element element="inform_changed_occupancy" agent_id="Bikestation" type="INTERNAL_EVENT">
+			            <parameter_mappings>
+			                <mapping ref="tuple" name="tuple"/>
+			            </parameter_mappings>
+			        </agent_element>
+			    </to>
+			    <active>true</active>
+			</realization>
 		</deco-link-realizations>
 	</causalities>
 </MASDynamic>

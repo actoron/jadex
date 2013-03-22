@@ -105,6 +105,8 @@ public class MicroPedestrianAgent extends MicroAgent {
 
 								@Override
 								public void resultAvailable(Object result) {
+									//Kill Agent via ISpaceObject
+									environment.destroySpaceObject(myself.getId());
 									// get yourself killed
 									killAgent();
 								}
@@ -180,6 +182,8 @@ public class MicroPedestrianAgent extends MicroAgent {
 
 			@Override
 			public void resultAvailable(Object result) {
+				//Kill Agent via ISpaceObject
+				environment.destroySpaceObject(myself.getId());
 				// get yourself killed after returning
 				killAgent();
 			}
@@ -281,8 +285,5 @@ public class MicroPedestrianAgent extends MicroAgent {
 		props.put(ReturnBikeTask.ACTOR_ID, myself.getId());
 		Object taskid = environment.createObjectTask(ReturnBikeTask.PROPERTY_TYPENAME, props, myself.getId());
 		environment.addTaskListener(taskid, myself.getId(), res);
-		
-		//Kill Agent via ISpaceObject
-		environment.destroySpaceObject(myself.getId());
 	}
 }

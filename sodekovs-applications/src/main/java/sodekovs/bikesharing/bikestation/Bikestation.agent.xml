@@ -105,9 +105,28 @@
 		        <internalevent ref="receive_alternatives"/>
 		    </trigger>
 		</plan>
+		
+		<plan name="changed_occupancy">
+		    <body class="ChangedOccupancyPlan"/>
+		    <trigger>
+		        <factchanged ref="stock"/>
+		        <factchanged ref="capacity"/>
+		    </trigger>
+		</plan>
+		
+		<plan name="received_change_occupancy">
+		    <body class="ReceivedChangedOccupancy"/>
+		    <parameter name="tuple" class="OccupancyTuple">
+		        <internaleventmapping ref="inform_changed_occupancy.tuple"/>
+		    </parameter>
+		    <trigger>
+		        <internalevent ref="inform_changed_occupancy"/>
+		    </trigger>
+		</plan>
 	</plans>
 	
 	<events>
+	    <!-- DeCoMAS events for super station based cluster coordination -->
 	    <!-- DeCoMAS event -->
 	    <internalevent name="poll_cluster_stations">
 	        <parameter name="coordData" class="ClusterStationCoordData"/>
@@ -136,6 +155,17 @@
 	    <!-- DeCoMAS event -->
 	    <internalevent name="receive_alternatives">
 	        <parameter name="coordData" class="ClusterStationCoordData"/>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS events for tuple based coordination mechanism  -->
+	    <!-- DeCoMAS event -->
+	    <internalevent name="changed_occupancy">
+	        <parameter name="tuple" class="OccupancyTuple"></parameter>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS event -->
+	    <internalevent name="inform_changed_occupancy">
+	        <parameter name="tuple" class="OccupancyTuple"></parameter>
 	    </internalevent>
 	</events>
 	
