@@ -19,6 +19,10 @@ public class CoordinationStationData {
 	
 	private Vector2Double position = null;
 
+	public CoordinationStationData() {
+		super();
+	}
+	
 	public CoordinationStationData(String stationId, Integer capacity, Integer stock, Vector2Double position) {
 		this.stationID = stationId;
 		this.capacity = capacity;
@@ -137,5 +141,17 @@ public class CoordinationStationData {
 	@Override
 	public String toString() {
 		return "CoordinationStationData [stationID=" + stationID + ", stock=" + stock + ", capacity=" + capacity + ", position=" + position + "]";
+	}
+	
+	/**
+	 * Returns the occupancy for given capacity and stock values or <code>null</code> if one of the two given values if <code>null</code>
+	 * @return
+	 */
+	public Double getOccupancy() {
+		if (capacity != null && stock != null) {
+			return Double.valueOf(stock) / Double.valueOf(capacity);
+		}
+		
+		return null;
 	}
 }

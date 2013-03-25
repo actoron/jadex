@@ -5,7 +5,7 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.Vector2Double;
-import sodekovs.bikesharing.coordination.OccupancyTuple;
+import sodekovs.bikesharing.coordination.CoordinationStationData;
 import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
@@ -26,7 +26,7 @@ public class ReceivedChangedOccupancy extends Plan {
 		String proposedDepartureStation = (String) getBeliefbase().getBelief("proposed_departure_station").getFact();
 		String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
 
-		OccupancyTuple tuple = (OccupancyTuple) getParameter("tuple").getValue();
+		CoordinationStationData tuple = (CoordinationStationData) getParameter("tuple").getValue();
 
 		System.out.println("ReceivedChangedOccupancy called in " + stationID + " with " + tuple);
 		
@@ -44,12 +44,12 @@ public class ReceivedChangedOccupancy extends Plan {
 		Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
 
 		// if the updated station is full and is this stations proposed arrival station delete it
-		if (tuple.getOccupancy() >= fullThreshold && proposedArrivalStation.equals(tuple.getStationId())) {
+		if (tuple.getOccupancy() >= fullThreshold && proposedArrivalStation.equals(tuple.getStationID())) {
 			proposedArrivalStation = null;
 			getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
 		}
 		// if the updated station is empty and this stations proposed departure station delete it
-		if (tuple.getOccupancy() >= emptyThreshold && proposedDepartureStation.equals(tuple.getStationId())) {
+		if (tuple.getOccupancy() >= emptyThreshold && proposedDepartureStation.equals(tuple.getStationID())) {
 			proposedDepartureStation = null;
 			getBeliefbase().getBelief("proposed_departure_station").setFact(null);
 		}
@@ -58,12 +58,12 @@ public class ReceivedChangedOccupancy extends Plan {
 		if (occupancy >= fullThreshold && tuple.getOccupancy() < fullThreshold) {
 			// if there is no alternative just set it
 			if (proposedArrivalStation == null) {
-				getBeliefbase().getBelief("proposed_arrival_station").setFact(tuple.getStationId());
+				getBeliefbase().getBelief("proposed_arrival_station").setFact(tuple.getStationID());
 			}
 			// if there is a alternative check which one is nearer
 			else {
 				Vector2Double oldPosition = getPosition(proposedArrivalStation);
-				String nearestStation = getNearestStation(proposedArrivalStation, oldPosition, tuple.getStationId(), tuple.getPosition());
+				String nearestStation = getNearestStation(proposedArrivalStation, oldPosition, tuple.getStationID(), tuple.getPosition());
 				getBeliefbase().getBelief("proposed_arrival_station").setFact(nearestStation);
 			}
 		}
@@ -71,12 +71,12 @@ public class ReceivedChangedOccupancy extends Plan {
 		else if (occupancy <= emptyThreshold && tuple.getOccupancy() > emptyThreshold) {
 			// if there is no alternative just set it
 			if (proposedDepartureStation == null) {
-				getBeliefbase().getBelief("proposed_departure_station").setFact(tuple.getStationId());
+				getBeliefbase().getBelief("proposed_departure_station").setFact(tuple.getStationID());
 			}
 			// if there is a alternative check which one is nearer
 			else {
 				Vector2Double oldPosition = getPosition(proposedDepartureStation);
-				String nearestStation = getNearestStation(proposedDepartureStation, oldPosition, tuple.getStationId(), tuple.getPosition());
+				String nearestStation = getNearestStation(proposedDepartureStation, oldPosition, tuple.getStationID(), tuple.getPosition());
 				getBeliefbase().getBelief("proposed_departure_station").setFact(nearestStation);
 			}
 		}

@@ -40,7 +40,7 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 
 	private SuperCluster superCluster = null;
 
-	private Map<String, OccupancyTuple> occupancyTuples = null;
+	private Map<String, CoordinationStationData> occupancyTuples = null;
 
 	/** The number of published events */
 	protected Integer eventNumber = null;
@@ -53,7 +53,7 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 
 		this.superCluster = (SuperCluster) appSpace.getProperty("StationCluster");
 
-		this.occupancyTuples = new HashMap<String, OccupancyTuple>();
+		this.occupancyTuples = new HashMap<String, CoordinationStationData>();
 	}
 
 	@Override
@@ -70,18 +70,18 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 	public void perceiveCoordinationEvent(Object obj) {
 		CoordinationInfo coordInfo = (CoordinationInfo) obj;
 		// get the tuple from the coordination info
-		OccupancyTuple tuple = (OccupancyTuple) coordInfo.getValueByName(Constants.VALUE);
+		CoordinationStationData tuple = (CoordinationStationData) coordInfo.getValueByName(Constants.VALUE);
 		// get the old/previous stored tuple
-		OccupancyTuple oldTuple = occupancyTuples.get(tuple.getStationId());
+		CoordinationStationData oldTuple = occupancyTuples.get(tuple.getStationID());
 
 		// store the new tuple
-		occupancyTuples.put(tuple.getStationId(), tuple);
+		occupancyTuples.put(tuple.getStationID(), tuple);
 
 		// check if the state of the tuple has changed if the tuple was previously stored
 		if (oldTuple == null || getState(oldTuple) != getState(tuple)) {
 			// if the state has changed or it was not stored previously...
 			// ...inform the other cluster stations
-			Cluster cluster = superCluster.getCluster(tuple.getStationId());
+			Cluster cluster = superCluster.getCluster(tuple.getStationID());
 			List<String> stationIDs = superCluster.getStationIDs(cluster);
 			informStations(stationIDs, coordInfo);
 		}
@@ -112,7 +112,7 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 	 * @param tuple
 	 * @return
 	 */
-	private Integer getState(OccupancyTuple tuple) {
+	private Integer getState(CoordinationStationData tuple) {
 		Double fullThreshold = getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
 		Double emptyThreshold = getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOILD");
 		Double occupancy = tuple.getOccupancy();

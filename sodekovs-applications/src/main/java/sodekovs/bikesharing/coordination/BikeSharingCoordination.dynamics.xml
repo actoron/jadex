@@ -73,7 +73,27 @@
 			    <tos>
 			        <to>cluster_station</to>
 			    </tos>
-			</deco_link>			
+			</deco_link>
+			
+			<!-- The link where cluster stations request the occupancy of all other stations in the same cluster when their state has changed -->
+			<deco_link realization="decentralized_polling_request" type="POSITIVE" name="decentralized_polling_request" spaces="mycoordspace">
+			    <froms>
+			        <from>cluster_station</from>
+			    </froms>
+			    <tos>
+			        <to>cluster_station</to>
+			    </tos>
+			</deco_link>
+			
+			<!-- The according reply to the previous request -->
+			<deco_link realization="decentralized_polling_reply" type="POSITIVE" name="decentralized_polling_reply" spaces="mycoordspace">
+			    <froms>
+			        <from>cluster_station</from>
+			    </froms>
+			    <tos>
+			        <to>cluster_station</to>
+			    </tos>
+			</deco_link>
 		</deco_links>
 
 		<!-- The detailed configuration of interdependency enactment. -->
@@ -181,7 +201,53 @@
 			            </parameter_mappings>
 			        </agent_element>
 			    </to>
+			    <active>false</active>
+			</realization>
+			
+			<!-- The link where cluster stations request the occupancy of all other stations in the same cluster when their state has changed -->
+			<realization id="decentralized_polling_request">
+			    <from>
+			        <agent_element element="changed_state" agent_id="Bikestation" type="INTERNAL_EVENT">
+			            <parameter_mappings>
+			                <mapping ref="data" name="data"/>
+			            </parameter_mappings>
+			        </agent_element>
+			    </from>
+			    <mechanism_configuration
+			        mechanism_id="sodekovs.bikesharing.coordination.DecentralizedPollingMechanism"
+			        agent_type="JADEX">
+			    </mechanism_configuration>
+			    <to>
+			        <agent_element element="decentralized_polling_request" agent_id="Bikestation" type="INTERNAL_EVENT">
+			            <parameter_mappings>
+			                <mapping ref="data" name="data"/>
+			            </parameter_mappings>
+			        </agent_element>
+			    </to>
 			    <active>true</active>
+			</realization>
+			
+			<!-- The according reply to the previous request -->
+			<realization id="decentralized_polling_reply">
+			    <from>
+			        <agent_element element="decentralized_polling_reply" agent_id="Bikestation" type="INTERNAL_EVENT">
+			            <parameter_mappings>
+			                <mapping ref="data" name="data"/>
+			            </parameter_mappings>
+			        </agent_element>
+			    </from>
+			    <mechanism_configuration
+			        mechanism_id="sodekovs.bikesharing.coordination.DecentralizedPollingMechanism"
+			        agent_type="JADEX">
+			    </mechanism_configuration>
+			    <to>
+			        <agent_element element="decentralized_polling_result" agent_id="Bikestation" type="INTERNAL_EVENT">
+			            <parameter_mappings>
+			                <mapping ref="data" name="data"/>
+			            </parameter_mappings>
+			        </agent_element>
+			    </to>
+			     <active>true</active>
 			</realization>
 		</deco-link-realizations>
 	</causalities>

@@ -68,6 +68,19 @@
 		
 		<!-- Used for So. Stores the received replies from a poll request -->
 		<beliefset name="receivedCoordData" class="ClusterStationCoordData"/>
+		
+		<!-- Used for So. Stores the received replies from a decentralized poll request -->
+		<beliefset name="receivedDecentralizedCoordData" class="StateCoordinationStationData"/>
+		
+		<!-- Used for SO. Threshold for full stations -->
+		<belief name="full_threshold" class="Double">
+		    <fact>0.75</fact>
+		</belief>
+		
+		<!-- Used for SO. Threshold for empty stations -->
+		<belief name="empty_threshold" class="Double">
+		    <fact>0.1</fact>
+		</belief>
 	</beliefs>
 	
 	<plans>
@@ -116,11 +129,40 @@
 		
 		<plan name="received_change_occupancy">
 		    <body class="ReceivedChangedOccupancy"/>
-		    <parameter name="tuple" class="OccupancyTuple">
+		    <parameter name="tuple" class="CoordinationStationData">
 		        <internaleventmapping ref="inform_changed_occupancy.tuple"/>
 		    </parameter>
 		    <trigger>
 		        <internalevent ref="inform_changed_occupancy"/>
+		    </trigger>
+		</plan>
+		
+		<plan name="decentralized_changed_state">
+		    <body class="DecentralizedChangedStatePlan"/>
+		    <trigger>
+		        <factchanged ref="stock"/>
+		        <factchanged ref="capacity"/>
+		    </trigger>
+		</plan>
+		
+		<plan name="decentralized_polling_request">
+		    <body class="DecentralizedPollingRequestPlan"/>
+		    <parameter name="data" class="StateCoordinationStationData">
+		        <internaleventmapping ref="decentralized_polling_request.data"/>
+		    </parameter>
+		    <trigger>
+		        <internalevent ref="decentralized_polling_request"/>
+		    </trigger>
+		</plan>
+		
+		<plan name="decentralized_polling_result">
+		    <body class="DecentralizedPollingResultPlan"/>
+		    <parameter name="data" class="StateCoordinationStationData">
+		        <internaleventmapping ref="decentralized_polling_result.data"/>
+		    </parameter>
+		    
+		    <trigger>
+		        <internalevent ref="decentralized_polling_result"/>
 		    </trigger>
 		</plan>
 	</plans>
@@ -160,12 +202,33 @@
 	    <!-- DeCoMAS events for tuple based coordination mechanism  -->
 	    <!-- DeCoMAS event -->
 	    <internalevent name="changed_occupancy">
-	        <parameter name="tuple" class="OccupancyTuple"></parameter>
+	        <parameter name="tuple" class="CoordinationStationData"></parameter>
 	    </internalevent>
 	    
 	    <!-- DeCoMAS event -->
 	    <internalevent name="inform_changed_occupancy">
-	        <parameter name="tuple" class="OccupancyTuple"></parameter>
+	        <parameter name="tuple" class="CoordinationStationData"></parameter>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS events for decentralized polling coordination mechanism  -->
+	    <!-- DeCoMAS event -->
+	    <internalevent name="changed_state">
+	        <parameter name="data" class="StateCoordinationStationData"></parameter>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS event -->
+	    <internalevent name="decentralized_polling_request">
+	        <parameter name="data" class="StateCoordinationStationData"></parameter>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS event -->
+	    <internalevent name="decentralized_polling_reply">
+	        <parameter name="data" class="StateCoordinationStationData"></parameter>
+	    </internalevent>
+	    
+	    <!-- DeCoMAS event -->
+	    <internalevent name="decentralized_polling_result">
+	        <parameter name="data" class="StateCoordinationStationData"></parameter>
 	    </internalevent>
 	</events>
 	
