@@ -12,6 +12,32 @@ import javax.swing.JOptionPane;
 public class BetterFileChooser extends JFileChooser
 {
 	/**
+	 *  Creates a new file chooser.
+	 *  @param dir A suggested starting location (may be a file).
+	 */
+	public BetterFileChooser(File location)
+	{
+		while (location != null && !location.isDirectory())
+		{
+			location = location.getParentFile();
+		}
+		
+		if (location == null)
+		{
+			String locstr = System.getProperty("user.dir");
+			if (locstr != null)
+			{
+				location = new File(locstr);
+			}
+		}
+		
+		if (location != null)
+		{
+			setCurrentDirectory(location);
+		}
+	}
+	
+	/**
      * Called by the UI when the user hits the Approve button
      * (labeled "Open" or "Save", by default). This can also be
      * called by the programmer.

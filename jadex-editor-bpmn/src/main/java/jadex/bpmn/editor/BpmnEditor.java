@@ -12,9 +12,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-
 /**
  *  Class for starting the BPMN editor.
  *
@@ -22,7 +19,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 20;
+	public static final int BUILD = 21;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";

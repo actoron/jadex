@@ -179,7 +179,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				BetterFileChooser fc = new BetterFileChooser();
+				BetterFileChooser fc = new BetterFileChooser(modelcontainer.getFile());
 				FileFilter filter = new FileNameExtensionFilter("BPMN model file", "bpmn2");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
@@ -296,7 +296,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				BetterFileChooser fc = new BetterFileChooser();
+				BetterFileChooser fc = new BetterFileChooser(modelcontainer.getFile());
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("EPS file", "eps");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
@@ -404,7 +404,7 @@ public class BpmnMenuBar extends JMenuBar
 	 */
 	protected void saveWithDialog()
 	{
-		BetterFileChooser fc = new BetterFileChooser();
+		BetterFileChooser fc = new BetterFileChooser(modelcontainer.getFile());
 		FileFilter filter = new FileNameExtensionFilter("BPMN model file (*.bpmn2)", "bpmn2");
 		fc.addChoosableFileFilter(filter);
 		fc.setFileFilter(filter);

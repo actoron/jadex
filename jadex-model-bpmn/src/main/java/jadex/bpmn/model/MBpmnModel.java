@@ -805,7 +805,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	public String removePoolLane(String config)
 	{
-		return (String) configpoollanes.remove(config);
+		return configpoollanes != null? (String) configpoollanes.remove(config): null;
 	}
 
 //	/**

@@ -367,7 +367,7 @@ public class SBpmnModelWriter
 				}
 				else
 				{
-					out.print("\"/>");
+					out.println("\"/>");
 				}
 			}
 			
@@ -864,7 +864,7 @@ public class SBpmnModelWriter
 						}
 						else
 						{
-							out.println(" />");
+							out.println("/>");
 						}
 					}
 				}

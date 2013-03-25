@@ -544,7 +544,7 @@ public class SBpmnModelReader
 		
 		if ("description".equals(tag.getLocalPart()))
 		{
-			if ("extension".equals(tagstack.get(1)))
+			if (tagstack.size() > 0 && "extension".equals(tagstack.get(0).getLocalPart()))
 			{
 				((ModelInfo) model.getModelInfo()).setDescription(content);
 			}
