@@ -339,7 +339,7 @@ public class BikeSharingEvaluation {
 	public String stockLevelResultsToString() {
 		StringBuffer result = new StringBuffer();
 
-		result.append("Results of the evalation of the stock levels from the simulated data:\n");
+		result.append("\nResults of the evalation of the stock levels from the simulated data:\n");
 		result.append("\n The evaluation of the stock levels contains for each time slice following three buckets:");
 		result.append("\n stock < 1 --> \"red\"");
 		result.append("\n stock > 0 && stock < capacity  --> \"green\"");
