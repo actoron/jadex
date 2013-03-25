@@ -1,16 +1,6 @@
 package jadex.simulation.model.result;
 
-import jadex.simulation.helper.Constants;
-import jadex.simulation.model.Data;
-import jadex.simulation.model.Dataconsumer;
-import jadex.simulation.model.Dataprovider;
-import jadex.simulation.model.ObservedEvent;
-import jadex.simulation.model.Observer;
-import jadex.simulation.model.Property;
 import jadex.simulation.model.SimulationConfiguration;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Contains the intermediate results of an ensemble, i.e. the results of the

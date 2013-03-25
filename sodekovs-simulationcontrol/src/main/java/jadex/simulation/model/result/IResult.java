@@ -1,15 +1,7 @@
 package jadex.simulation.model.result;
 
-import java.util.ArrayList;
-
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import sodekovs.util.misc.XMLHandler;
-
-import jadex.simulation.model.ObservedEvent;
-import jadex.simulation.model.Observer;
 
 /**
  * Abstract class for any result to be persisted.
@@ -21,8 +13,9 @@ public abstract class IResult {
 	
 	protected String id = null;
 	protected String name = null;
+	protected String description = null;
 	protected long starttime = -1;
-	protected long endtime = -1;
+	protected long endtime = -1;	
 	
 	
 	
