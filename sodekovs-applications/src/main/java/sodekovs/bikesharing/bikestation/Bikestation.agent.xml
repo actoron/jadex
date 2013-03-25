@@ -37,11 +37,11 @@
  		    <fact class="IFuture">$beliefbase.myself.getProperty("stationID")</fact>
  		</belief>
  		
- 		<belief name="capacity" class="Integer">
+ 		<belief name="capacity" class="Integer" updaterate="100" evaluationmode="pull">
  		     <fact class="IFuture">$beliefbase.myself.getProperty("capacity")</fact>
  		</belief>
  		
- 		<belief name="stock" class="Integer">
+ 		<belief name="stock" class="Integer" updaterate="100" evaluationmode="pull">
  		     <fact class="IFuture">$beliefbase.myself.getProperty("stock")</fact>
  		</belief>
  		
