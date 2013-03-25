@@ -9,7 +9,8 @@
 <SimulationConfiguration name="BikeSharingWashington"
 	applicationReference="..\\sodekovs-applications\\target\\classes\\sodekovs\\bikesharing\\examples\\BikesharingSimulation.application.xml"
 	applicationConfiguration="Washington"
-	nameOfSpace="my2dspace">
+	nameOfSpace="my2dspace"
+	description="My Simulation Setup Description">
 
 	<Imports>
 		<Import>jadex.extension.envsupport.evaluation.*</Import>
