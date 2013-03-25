@@ -5,6 +5,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.simulation.evaluation.EvaluateExperiment;
 import jadex.simulation.evaluation.EvaluateRow;
 import jadex.simulation.evaluation.bikesharing.BikeSharingEvaluation;
+import jadex.simulation.evaluation.bikesharing.MapEntryConverter;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
@@ -22,8 +23,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import sodekovs.util.misc.XMLHandler;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Compute the results of one row of simulation experiments, e.g. experiments with the same setting but still different cause of non-determinism.
@@ -42,6 +46,9 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		int rowsDoTo = ((Integer) simulationFacts.get(Constants.ROWS_TO_DO)).intValue();
 		// IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
 		HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults").getFact();
+		
+		//New parameter exerimentDescription: Contains short description of the evaluation: settings etc.
+		String experimentDescription = simConf.getDescription() !=null ? simConf.getDescription() : "";
 
 		// 1. Evaluate Rows and their Experiments
 		evaluate(rowResults);
@@ -51,7 +58,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		System.out.println(resultsAsString);
 
 		// 3. Store results
-		storeResults(rowResults, simulationFacts, rowCounter, rowsDoTo, resultsAsString);
+		storeResults(rowResults, simulationFacts, rowCounter, rowsDoTo, resultsAsString, experimentDescription);
 
 		// Do application specific evaluation, if required
 		// compareSimulationWithRealData(rowResults);
@@ -105,8 +112,8 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		} else {
 			// Do application specific evaluation
 			if (simConf.getApplicationReference().indexOf("BikesharingSimulation") != -1) {
-				//Do specific evaluation for Bikesharing
-				compareSimulationWithRealData(rowResults);
+				// Do specific evaluation for Bikesharing
+				compareSimulationWithRealData(rowResults, experimentDescription);
 			}
 		}
 
@@ -175,7 +182,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		}
 	}
 
-	private void storeResults(HashMap rowResults, HashMap simFacts, int rowCounter, int rowsDoTo, String resultsAsString) {
+	private void storeResults(HashMap rowResults, HashMap simFacts, int rowCounter, int rowsDoTo, String resultsAsString, String experimentDescription) {
 
 		// Simulation has finished. Store final result
 		if (rowCounter == rowsDoTo) {
@@ -186,13 +193,15 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			result.setEndtime(getClock().getTime());
 			result.setName("missing");
 			result.setRowsResults(new ArrayList(rowResults.values()));
+			result.setDescription(experimentDescription);
 
 			System.out.println("\n\n#ComputeExperimentRowResultsPlan# Simulation finished. Write Results of Simulation to XML!");
-			XMLHandler.writeXMLToFile(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
+			XMLHandler.writeXMLToFile(result, "SimRes" + getDateAsString() + ".xml", SimulationResult.class);
 
 			// Store also the evaluation in a file
 			try {
 				BufferedWriter out = new BufferedWriter(new FileWriter("SimulationEVALUATIONResults" + "-" + getDateAsString() + ".txt"));
+				out.write("Experiment Description: " + experimentDescription + "\n");
 				out.write(resultsAsString);
 				out.close();
 			} catch (IOException e) {
@@ -270,45 +279,66 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	}
 
 	// Application specific evaluation --> compare simulations results with real data
-	private void compareSimulationWithRealData(HashMap rowResults) {
+	private void compareSimulationWithRealData(HashMap rowResults, String experimentDescription) {
 
 		for (Iterator<String> it = rowResults.keySet().iterator(); it.hasNext();) {
 
 			BikeSharingEvaluation bikeSharEval = new BikeSharingEvaluation(((RowResult) rowResults.get(it.next())).getEvaluatedRowData());
 			bikeSharEval.compare();
-
-			System.out.println("\n\n\n Results: 1) Stock level eval. 2)Single Bike Stations eval.");
+						
+			System.out.println("\n\n\nResults contain: \n1) Stock level eval. \n2)Single Bike Stations eval.");
+			System.out.println("\nExperiment Description: " + experimentDescription + "\n");
 			System.out.println(bikeSharEval.stockLevelResultsToString());
 			System.out.println(bikeSharEval.bikestationResultsToString());
-			
-			
-		//Persists result in file on disk
-			try {										
-//				BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-" + "-" + String.valueOf(getClock().getTime()) + ".txt"));
+
+			// Persists result in file on disk
+			try {
+				// BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-" + "-" + String.valueOf(getClock().getTime()) + ".txt"));
 				BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-" + "-" + getDateAsString() + ".txt"));
-				
-				
-				out.write("\n\n\n Results: 1) Stock level eval. 2)Single Bike Stations eval.");
+
+				out.write("Results contain: \n1) Stock level eval. \n2)Single Bike Stations eval.");
+				out.write("\nExperiment Description: " + experimentDescription + "\n");
 				out.write(bikeSharEval.stockLevelResultsToString());
 				out.write(bikeSharEval.bikestationResultsToString());
-								
+
 				out.close();
 			} catch (IOException e) {
 			}
-			
+
+			//Test. Serialize to XML
+//			bikesharingEvaltoXML(bikeSharEval);
+//			
+//
+//	        Map<String,String> map = new HashMap<String,String>();
+//	        map.put("name","chris");
+//	        map.put("island","faranga");
+//
+//	        XStream magicApi = new XStream();
+//	        magicApi.alias("root", Map.class);
+//	        magicApi.registerConverter(new MapEntryConverter());
+//
+//	        String xml = magicApi.toXML(map);
+//	        System.out.println("Result of tweaked XStream toXml()");
+//	        System.out.println(xml);
 		}
 	}
 	
-	private String getDateAsString(){
+//	private void bikesharingEvaltoXML(BikeSharingEvaluation bikeSharEval){
+//		
+//	}
+	
+	
+
+	private String getDateAsString() {
 		Calendar cal = GregorianCalendar.getInstance();
 		cal.setTime(new Date(System.currentTimeMillis()));
 		String date = String.valueOf(cal.get(Calendar.DATE)) + "-";
-		date += String.valueOf(cal.get(Calendar.MONTH)+1)+ "-";
-		date += String.valueOf(cal.get(Calendar.YEAR))+ "--";
-		date += String.valueOf(cal.get(Calendar.HOUR_OF_DAY))+ "-";
-		date += String.valueOf(cal.get(Calendar.MINUTE))+ "-";
+		date += String.valueOf(cal.get(Calendar.MONTH) + 1) + "-";
+		date += String.valueOf(cal.get(Calendar.YEAR)) + "--";
+		date += String.valueOf(cal.get(Calendar.HOUR_OF_DAY)) + "-";
+		date += String.valueOf(cal.get(Calendar.MINUTE)) + "-";
 		date += String.valueOf(cal.get(Calendar.SECOND));
-		
+
 		return date;
 	}
 }
