@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -140,7 +141,7 @@ public class BpmnMenuBar extends JMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 				JOptionPane.showMessageDialog(getParent(),
-					    BpmnEditor.APP_NAME + " Build " + BpmnEditor.BUILD,
+					    BpmnEditor.APP_NAME + " Build " + BpmnEditor.BUILD + "\nModel Build " + getModelBuild(),
 					    BpmnEditor.APP_NAME,
 					    JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -471,5 +472,28 @@ public class BpmnMenuBar extends JMenuBar
 		modelcontainer.setPropertyPanel(SPropertyPanelFactory.createPanel(null, modelcontainer));
 		
 		new DeletionController(modelcontainer);
+	}
+	
+	/**
+	 *  Returns the model build.
+	 *  
+	 *  @return The model build.
+	 */
+	public static int getModelBuild()
+	{
+		int build = 0;
+		try
+		{
+			Field buildfield = SBpmnModelWriter.class.getField("BUILD");
+			if (buildfield != null)
+			{
+				build = buildfield.getInt(null);
+			}
+		}
+		catch (Exception e)
+		{
+		}
+		
+		return build;
 	}
 }

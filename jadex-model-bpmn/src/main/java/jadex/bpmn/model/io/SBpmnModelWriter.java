@@ -29,11 +29,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *  Reader / Writer for BPMN models.
+ *  Writer for BPMN models.
  *
  */
 public class SBpmnModelWriter
 {
+	/** The build number */
+	public static final int BUILD = 1;
+	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
 	
