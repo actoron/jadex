@@ -11,7 +11,8 @@ import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
- * A plan...
+ * Plan is called whenever the stock or capacity of the station changes. The plan changes the alternative stations if they are not needed anymore and informs other stations about the changed
+ * occupancy using DeCoMAS if the state has changed (full, empty or normal).
  * 
  * @author Thomas Preisler
  */
@@ -30,6 +31,14 @@ public class DecentralizedChangedStatePlan extends Plan {
 		Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
 		Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
 		Double occupany = Double.valueOf(stock) / Double.valueOf(capacity);
+		
+		// reset alternative if they are not needed any more
+		if (occupany < fullThreshold) {
+			getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
+		}
+		if (occupany > emptyThreshold) {
+			getBeliefbase().getBelief("proposed_departure_station").setFact(null);
+		}
 
 		if (occupany >= fullThreshold || occupany <= emptyThreshold) {
 			StateCoordinationStationData data = new StateCoordinationStationData(stationID, capacity, stock, position, StateCoordinationStationData.REQUEST, stationID);

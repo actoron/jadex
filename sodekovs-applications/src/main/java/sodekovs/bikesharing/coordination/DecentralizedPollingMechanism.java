@@ -19,8 +19,9 @@ import deco4mas.distributed.mechanism.CoordinationInfo;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
- * @author thomas
- *
+ * Coordination mechanism for the decentralized polling coordination.
+ * 
+ * @author Thomas Preisler
  */
 public class DecentralizedPollingMechanism extends CoordinationMechanism {
 	

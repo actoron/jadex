@@ -18,8 +18,9 @@ import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
- * @author thomas
- *
+ * Plan is called when a decentralized polling reply was received. If all replies are received the station calculates alternative departure and arrival stations.	
+ * 
+ * @author Thomas Preisler
  */
 public class DecentralizedPollingResultPlan extends Plan {
 

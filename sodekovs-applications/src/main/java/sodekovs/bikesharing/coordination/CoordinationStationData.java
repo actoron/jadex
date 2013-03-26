@@ -6,8 +6,9 @@ package sodekovs.bikesharing.coordination;
 import jadex.extension.envsupport.math.Vector2Double;
 
 /**
- * @author thomas
- *
+ * DeCoMAS coordination data.
+ * 
+ * @author Thomas Preisler
  */
 public class CoordinationStationData {
 	

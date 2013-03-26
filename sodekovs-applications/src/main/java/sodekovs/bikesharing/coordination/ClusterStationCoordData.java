@@ -10,8 +10,9 @@ import java.util.Map;
 
 
 /**
- * @author thomas
- *
+ * DeCoMAS coordination data used for the cluster and super station based coordination.
+ * 
+ * @author Thomas Preisler
  */
 public class ClusterStationCoordData {
 	

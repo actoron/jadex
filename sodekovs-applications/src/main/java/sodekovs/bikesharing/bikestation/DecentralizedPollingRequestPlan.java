@@ -9,8 +9,9 @@ import jadex.extension.envsupport.math.Vector2Double;
 import sodekovs.bikesharing.coordination.StateCoordinationStationData;
 
 /**
- * @author thomas
- *
+ * Plan is called when a decentralized polling request was received over DeCoMAS and answer with the current occupancy in this station.
+ * 
+ * @author Thomas Preisler
  */
 public class DecentralizedPollingRequestPlan extends Plan {
 
