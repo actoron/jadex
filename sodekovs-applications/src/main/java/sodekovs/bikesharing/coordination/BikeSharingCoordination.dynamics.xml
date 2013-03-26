@@ -111,6 +111,16 @@
 				<mechanism_configuration
 					mechanism_id="sodekovs.bikesharing.coordination.ClusterMechanism"
 					agent_type="JADEX">
+					<properties>
+			        	<entry>
+							<key>FULL_THRESHOLD</key>
+							<value>0.75</value>
+						</entry>
+						<entry>
+							<key>EMPTY_THRESHOLD</key>
+							<value>0.1</value>
+						</entry>
+					</properties>
 				</mechanism_configuration>			
 				<to>		
 					 <agent_element element="gather_occupancy_rate" agent_id="Bikestation" type="INTERNAL_EVENT">
@@ -119,7 +129,7 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-				<active>false</active>
+				<active>true</active>
 			</realization>
 			
 			<!-- The link where the cluster stations informs the super station about its stocks and capacities. -->
@@ -135,6 +145,16 @@
 				<mechanism_configuration
 					mechanism_id="sodekovs.bikesharing.coordination.ClusterMechanism"
 					agent_type="JADEX">
+					<properties>
+			        	<entry>
+							<key>FULL_THRESHOLD</key>
+							<value>0.75</value>
+						</entry>
+						<entry>
+							<key>EMPTY_THRESHOLD</key>
+							<value>0.1</value>
+						</entry>
+					</properties>
 				</mechanism_configuration>			
 				<to>		
 					 <agent_element element="calculate_proposed_stations" agent_id="Bikestation" type="INTERNAL_EVENT">
@@ -143,7 +163,7 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-				<active>false</active>
+				<active>true</active>
 			</realization>
 			
 			<!-- The link where the super station informs its cluster stations about the alternative proposed stations. -->
@@ -159,6 +179,16 @@
 				<mechanism_configuration
 					mechanism_id="sodekovs.bikesharing.coordination.ClusterMechanism"
 					agent_type="JADEX">
+					<properties>
+			        	<entry>
+							<key>FULL_THRESHOLD</key>
+							<value>0.75</value>
+						</entry>
+						<entry>
+							<key>EMPTY_THRESHOLD</key>
+							<value>0.1</value>
+						</entry>
+					</properties>
 				</mechanism_configuration>			
 				<to>		
 					 <agent_element element="receive_alternatives" agent_id="Bikestation" type="INTERNAL_EVENT">
@@ -167,7 +197,7 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-				<active>false</active>
+				<active>true</active>
 			</realization>
 			
 			<!-- The link where cluster stations lay tupel information about their changed occupany in the mechanism
@@ -189,7 +219,7 @@
 							<value>0.75</value>
 						</entry>
 						<entry>
-							<key>EMPTY_THRESHOILD</key>
+							<key>EMPTY_THRESHOLD</key>
 							<value>0.1</value>
 						</entry>
 					</properties>
@@ -216,6 +246,16 @@
 			    <mechanism_configuration
 			        mechanism_id="sodekovs.bikesharing.coordination.DecentralizedPollingMechanism"
 			        agent_type="JADEX">
+			         <properties>
+			        	<entry>
+							<key>FULL_THRESHOLD</key>
+							<value>0.75</value>
+						</entry>
+						<entry>
+							<key>EMPTY_THRESHOLD</key>
+							<value>0.1</value>
+						</entry>
+					</properties>
 			    </mechanism_configuration>
 			    <to>
 			        <agent_element element="decentralized_polling_request" agent_id="Bikestation" type="INTERNAL_EVENT">
@@ -224,7 +264,7 @@
 			            </parameter_mappings>
 			        </agent_element>
 			    </to>
-			    <active>true</active>
+			    <active>false</active>
 			</realization>
 			
 			<!-- The according reply to the previous request -->
@@ -239,6 +279,16 @@
 			    <mechanism_configuration
 			        mechanism_id="sodekovs.bikesharing.coordination.DecentralizedPollingMechanism"
 			        agent_type="JADEX">
+			         <properties>
+			        	<entry>
+							<key>FULL_THRESHOLD</key>
+							<value>0.75</value>
+						</entry>
+						<entry>
+							<key>EMPTY_THRESHOLD</key>
+							<value>0.1</value>
+						</entry>
+					</properties>
 			    </mechanism_configuration>
 			    <to>
 			        <agent_element element="decentralized_polling_result" agent_id="Bikestation" type="INTERNAL_EVENT">
@@ -247,7 +297,7 @@
 			            </parameter_mappings>
 			        </agent_element>
 			    </to>
-			     <active>true</active>
+			     <active>false</active>
 			</realization>
 		</deco-link-realizations>
 	</causalities>

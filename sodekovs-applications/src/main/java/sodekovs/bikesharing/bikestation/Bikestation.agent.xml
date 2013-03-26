@@ -23,7 +23,7 @@
  			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
  		</belief>
  		
-				<!-- Environment. DO NOT CHANGE the name "env".-->
+		<!-- Environment. DO NOT CHANGE the name "env".-->
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)$scope.getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable())
 			</fact>
@@ -71,16 +71,6 @@
 		
 		<!-- Used for So. Stores the received replies from a decentralized poll request -->
 		<beliefset name="receivedDecentralizedCoordData" class="StateCoordinationStationData"/>
-		
-		<!-- Used for SO. Threshold for full stations -->
-		<belief name="full_threshold" class="Double">
-		    <fact>0.75</fact>
-		</belief>
-		
-		<!-- Used for SO. Threshold for empty stations -->
-		<belief name="empty_threshold" class="Double">
-		    <fact>0.1</fact>
-		</belief>
 	</beliefs>
 	
 	<plans>

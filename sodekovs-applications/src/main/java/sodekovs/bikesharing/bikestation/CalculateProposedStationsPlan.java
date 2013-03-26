@@ -11,6 +11,8 @@ import java.util.Map;
 
 import sodekovs.bikesharing.coordination.ClusterStationCoordData;
 import sodekovs.bikesharing.coordination.CoordinationStationData;
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
+import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
  * Plan is called when the internal event "calculate_proposed_stations" is fired by DeCoMAS when a super station receives a information about the stocks and capacities of its cluster stations.
@@ -20,9 +22,6 @@ import sodekovs.bikesharing.coordination.CoordinationStationData;
 public class CalculateProposedStationsPlan extends Plan {
 
 	private static final long serialVersionUID = 587076168340446686L;
-
-	private static final double FULL_THRESHOLD = 0.75;
-	private static final double EMPTY_THRESHOILD = 0.10;
 
 	public void body() {
 		ClusterStationCoordData receivedCoordData = (ClusterStationCoordData) getParameter("coordData").getValue();
@@ -45,6 +44,11 @@ public class CalculateProposedStationsPlan extends Plan {
 	}
 
 	private void calculateProposedStations(ClusterStationCoordData[] data) {
+		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
+		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("reply_cluster_stations");
+		Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
+		Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
+		
 		String superstationID = (String) getBeliefbase().getBelief("stationID").getFact();
 
 		List<CoordinationStationData> fullStations = new ArrayList<CoordinationStationData>();
@@ -57,9 +61,9 @@ public class CalculateProposedStationsPlan extends Plan {
 			Integer capacity = clusterStationCoordData.getStationData().getCapacity();
 
 			Double occupancy = Double.valueOf(stock) / Double.valueOf(capacity);
-			if (occupancy >= FULL_THRESHOLD) {
+			if (occupancy >= fullThreshold) {
 				fullStations.add(clusterStationCoordData.getStationData());
-			} else if (occupancy <= EMPTY_THRESHOILD) {
+			} else if (occupancy <= emptyThreshold) {
 				emptyStations.add(clusterStationCoordData.getStationData());
 			} else {
 				normalStations.add(clusterStationCoordData.getStationData());

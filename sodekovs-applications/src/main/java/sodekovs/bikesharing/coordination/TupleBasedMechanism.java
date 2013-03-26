@@ -114,7 +114,7 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 	 */
 	private Integer getState(CoordinationStationData tuple) {
 		Double fullThreshold = getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
-		Double emptyThreshold = getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOILD");
+		Double emptyThreshold = getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
 		Double occupancy = tuple.getOccupancy();
 
 		if (occupancy >= fullThreshold) {

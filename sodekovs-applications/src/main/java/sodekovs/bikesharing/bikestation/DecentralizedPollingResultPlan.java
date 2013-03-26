@@ -14,6 +14,8 @@ import java.util.List;
 import sodekovs.bikesharing.coordination.StateCoordinationStationData;
 import sodekovs.bikesharing.data.clustering.Cluster;
 import sodekovs.bikesharing.data.clustering.SuperCluster;
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
+import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
  * @author thomas
@@ -51,8 +53,10 @@ public class DecentralizedPollingResultPlan extends Plan {
 	}
 
 	private void calculateProposedStations(StateCoordinationStationData[] answers) {
-		Double emptyThreshold = (Double) getBeliefbase().getBelief("empty_threshold").getFact();
-		Double fullThreshold = (Double) getBeliefbase().getBelief("full_threshold").getFact();
+		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
+		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("decentralized_polling_reply");
+		Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
+		Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
 		Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
 		Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
 		Double occupancy = Double.valueOf(stock) / Double.valueOf(capacity);

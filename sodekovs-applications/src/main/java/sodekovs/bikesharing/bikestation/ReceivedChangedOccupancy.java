@@ -44,12 +44,12 @@ public class ReceivedChangedOccupancy extends Plan {
 		Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
 
 		// if the updated station is full and is this stations proposed arrival station delete it
-		if (tuple.getOccupancy() >= fullThreshold && proposedArrivalStation.equals(tuple.getStationID())) {
+		if (tuple.getOccupancy() >= fullThreshold && tuple.getStationID().equals(proposedArrivalStation)) {
 			proposedArrivalStation = null;
 			getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
 		}
 		// if the updated station is empty and this stations proposed departure station delete it
-		if (tuple.getOccupancy() >= emptyThreshold && proposedDepartureStation.equals(tuple.getStationID())) {
+		if (tuple.getOccupancy() <= emptyThreshold && tuple.getStationID().equals(proposedDepartureStation)) {
 			proposedDepartureStation = null;
 			getBeliefbase().getBelief("proposed_departure_station").setFact(null);
 		}
