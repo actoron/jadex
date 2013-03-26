@@ -85,7 +85,7 @@ public class MultiPlatformsTest extends TestCase
 			{
 				System.out.println("Killing platform "+i);
 			}
-			platforms[i].killComponent().get(sus); // timeout
+			platforms[i].killComponent().get(sus, timeout);
 		}
 		
 		
