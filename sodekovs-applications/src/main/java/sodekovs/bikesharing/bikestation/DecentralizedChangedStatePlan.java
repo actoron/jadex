@@ -23,12 +23,12 @@ public class DecentralizedChangedStatePlan extends Plan {
 	@Override
 	public void body() {
 		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
-		if (coordSpace != null) {
+		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("decentralized_polling_request");
+		if (coordSpace != null && mechanism != null) {
 			Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
 			Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
 			String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
 			Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
-			CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("decentralized_polling_request");
 			Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
 			Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
 			Double occupany = Double.valueOf(stock) / Double.valueOf(capacity);
