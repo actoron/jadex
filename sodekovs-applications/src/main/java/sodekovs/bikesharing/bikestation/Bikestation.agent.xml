@@ -25,8 +25,7 @@
  		
 		<!-- Environment. DO NOT CHANGE the name "env".-->
 		<belief name="env" class="CoordinationSpace">
-			<fact>(CoordinationSpace)$scope.getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable())
-			</fact>
+		    <fact class="IFuture">$scope.getParentAccess().getExtension("mycoordspace")</fact>
 		</belief>
  		 		
  		<belief name="myself" class="ISpaceObject"> 			

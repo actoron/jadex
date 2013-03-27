@@ -22,29 +22,32 @@ public class ChangedOccupancyPlan extends Plan {
 
 	@Override
 	public void body() {
-		Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
-		Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
-		String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
-		Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
 		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
-		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("decentralized_polling_request");
-		Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
-		Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
-		Double occupany = Double.valueOf(stock) / Double.valueOf(capacity);
-
-		CoordinationStationData tuple = new CoordinationStationData(stationID, capacity, stock, position);
-		System.out.println("Occupancy changed in " + stationID + " " + tuple);
-
-		// reset alternative if they are not needed any more
-		if (occupany < fullThreshold) {
-			getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
+		if (coordSpace != null) {
+			Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
+			Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
+			String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
+			Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
+			
+			CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("decentralized_polling_request");
+			Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
+			Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
+			Double occupany = Double.valueOf(stock) / Double.valueOf(capacity);
+	
+			CoordinationStationData tuple = new CoordinationStationData(stationID, capacity, stock, position);
+			System.out.println("Occupancy changed in " + stationID + " " + tuple);
+	
+			// reset alternative if they are not needed any more
+			if (occupany < fullThreshold) {
+				getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
+			}
+			if (occupany > emptyThreshold) {
+				getBeliefbase().getBelief("proposed_departure_station").setFact(null);
+			}
+	
+			IInternalEvent event = createInternalEvent("changed_occupancy");
+			event.getParameter("tuple").setValue(tuple);
+			dispatchInternalEvent(event);
 		}
-		if (occupany > emptyThreshold) {
-			getBeliefbase().getBelief("proposed_departure_station").setFact(null);
-		}
-
-		IInternalEvent event = createInternalEvent("changed_occupancy");
-		event.getParameter("tuple").setValue(tuple);
-		dispatchInternalEvent(event);
 	}
 }
