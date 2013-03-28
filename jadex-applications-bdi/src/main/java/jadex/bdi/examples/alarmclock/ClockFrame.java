@@ -4,13 +4,15 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.AWTException;
@@ -348,13 +350,22 @@ public class ClockFrame extends JFrame
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
+//				bia.addComponentListener(new TerminationAdapter()
+//				{
+//					public void componentTerminated()
+//					{
+//						dislis.exceptionOccurred(null);
+//					}
+//				});
+				
+				bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
-					public void componentTerminated()
+					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
 						dislis.exceptionOccurred(null);
 					}
-				});
+				}));
 				return IFuture.DONE;
 			}
 		}).addResultListener(dislis);

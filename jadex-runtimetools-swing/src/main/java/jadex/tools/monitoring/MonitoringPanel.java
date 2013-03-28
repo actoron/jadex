@@ -66,7 +66,7 @@ public class MonitoringPanel	implements IServiceViewerPanel
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		ToolTipManager.sharedInstance().registerComponent(tree);
 		
-		monservice.subscribetoEvents(null).addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
+		monservice.subscribeToEvents(null).addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent event)
 			{
@@ -121,6 +121,8 @@ public class MonitoringPanel	implements IServiceViewerPanel
 
 				// Add event on child
 				List<IMonitoringEvent> evs = child.getObject();
+				if(evs==null)
+					System.out.println("huch");
 				evs.add(event);
 				
 				// Add child on parent

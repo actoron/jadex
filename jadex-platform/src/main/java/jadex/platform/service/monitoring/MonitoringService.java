@@ -90,7 +90,7 @@ public class MonitoringService implements IMonitoringService
 	 *  Subscribe to monitoring events.
 	 *  @param filter An optional filter.
 	 */
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribetoEvents(IFilter<IMonitoringEvent> filter)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter)
 	{
 		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
 		

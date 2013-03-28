@@ -9,10 +9,12 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.Window;
@@ -135,19 +137,28 @@ public class DealerFrame extends GameStateFrame
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
+//				bia.addComponentListener(new TerminationAdapter()
+//				{
+//					public void componentTerminated()
+//					{
+//						SwingUtilities.invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//								DealerFrame.this.dispose();
+//							}
+//						});
+//					}
+//				});
+				
+				bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
-					public void componentTerminated()
+					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								DealerFrame.this.dispose();
-							}
-						});
+						DealerFrame.this.dispose();
 					}
-				});
+				}));
 				return IFuture.DONE;
 			}
 		}).addResultListener(new IResultListener<Void>()

@@ -1,18 +1,21 @@
 package jadex.extension.agr;
 
-import jadex.bridge.IComponentChangeEvent;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -128,36 +131,74 @@ public class AGRSpace	implements IExtensionInstance
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					ia.addComponentListener(new IComponentListener()
+//					ia.addComponentListener(new IComponentListener()
+//					{
+//						IFilter filter = new IFilter()
+//						{
+//							public boolean filter(Object obj)
+//							{
+//								IComponentChangeEvent event = (IComponentChangeEvent)obj;
+//								return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
+//							}
+//						};
+//						public IFilter getFilter()
+//						{
+//							return filter;
+//						}
+//						
+//						public IFuture<Void> eventOccured(IComponentChangeEvent cce)
+//						{
+//							if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+//							{
+////								System.out.println("add: "+cce.getDetails());
+//								componentAdded((IComponentDescription)cce.getDetails());
+//							}
+//							else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+//							{
+////								System.out.println("rem: "+cce.getComponent());
+//								componentRemoved((IComponentDescription)cce.getDetails());
+//							}
+//							return IFuture.DONE;
+//						}
+//					});
+					
+					final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = ia.subscribeToEvents(new IFilter<IMonitoringEvent>()
 					{
-						IFilter filter = new IFilter()
+						public boolean filter(IMonitoringEvent obj)
 						{
-							public boolean filter(Object obj)
-							{
-								IComponentChangeEvent event = (IComponentChangeEvent)obj;
-								return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
-							}
-						};
-						public IFilter getFilter()
+							return obj.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_COMPONENT);
+						}
+					}, false);
+					
+					sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
+					{
+						public void resultAvailable(Collection<IMonitoringEvent> result)
 						{
-							return filter;
 						}
 						
-						public IFuture<Void> eventOccured(IComponentChangeEvent cce)
+						public void intermediateResultAvailable(IMonitoringEvent result)
 						{
-							if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+							if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
 							{
 //								System.out.println("add: "+cce.getDetails());
-								componentAdded((IComponentDescription)cce.getDetails());
+								componentAdded((IComponentDescription)result.getProperty("details"));	
 							}
-							else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+							else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 							{
-//								System.out.println("rem: "+cce.getComponent());
-								componentRemoved((IComponentDescription)cce.getDetails());
+								componentRemoved((IComponentDescription)result.getProperty("details"));
 							}
-							return IFuture.DONE;
 						}
-					});
+						
+					    public void finished()
+					    {
+					    }
+					    
+					    public void exceptionOccurred(Exception e)
+					    {
+					    	e.printStackTrace();
+					    }
+					}));
+					
 					return IFuture.DONE;
 				}
 			}).addResultListener(new DelegationResultListener<Void>(ret));

@@ -4,7 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.IComponentChangeEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
@@ -46,7 +46,7 @@ public abstract class AbstractGatewayActivityHandler
 	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		// Notify listeners as gateways are not followed by step handler execution
-		instance.notifyListeners(instance.createActivityEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread, activity));
+		instance.publishEvent(instance.createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity));
 
 		List<MSequenceEdge>	incoming	= activity.getIncomingSequenceEdges();
 		List<MSequenceEdge>	outgoing	= activity.getOutgoingSequenceEdges();

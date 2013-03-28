@@ -1,18 +1,14 @@
 package jadex.tools.debugger.micro;
 
-import jadex.bridge.BulkComponentChangeEvent;
-import jadex.bridge.ComponentChangeEvent;
-import jadex.bridge.IComponentChangeEvent;
-import jadex.bridge.IComponentListener;
-import jadex.bridge.IComponentStep;
+import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.MicroAgent;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.micro.MicroAgentInterpreter;
 
 import java.awt.BorderLayout;
@@ -20,9 +16,6 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -36,7 +29,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -51,8 +43,9 @@ public class MicroAgentViewPanel extends JPanel
 //	protected MicroAgentInterpreter interpreter;
 	protected IExternalAccess agent;
 	
-	/** The change listener. */
-	protected IComponentListener listener;
+//	/** The change listener. */
+//	protected IComponentListener listener;
+	protected ISubscriptionIntermediateFuture<IMonitoringEvent> sub;
 	
 	/** The list of steps. */
 	protected DefaultListModel steps;
@@ -86,7 +79,7 @@ public class MicroAgentViewPanel extends JPanel
 			public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus)
 			{
-				value = ((IComponentChangeEvent)value).getSourceName();
+				value = ((IMonitoringEvent)value).getProperty("sourcename");
 				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			}
 		};
@@ -140,12 +133,12 @@ public class MicroAgentViewPanel extends JPanel
 //				System.out.println("sel: "+idx);
 				if(idx!=-1)
 				{
-					IComponentChangeEvent cce = (IComponentChangeEvent)steps.get(idx);
+					IMonitoringEvent cce = (IMonitoringEvent)steps.get(idx);
 					if(cce!=null && cce!=laststep)
 					{
 //						if(laststep!=null)
 //							step.removeJavaRootObject(laststep);
-						step.setText(cce.getDetails().toString());
+						step.setText(cce.getProperty("details").toString());
 						laststep = step;
 					}
 				}
@@ -181,12 +174,12 @@ public class MicroAgentViewPanel extends JPanel
 //				System.out.println("sel: "+idx);
 				if(idx!=-1)
 				{
-					IComponentChangeEvent cce = (IComponentChangeEvent)history.get(idx);
+					IMonitoringEvent cce = (IMonitoringEvent)history.get(idx);
 					if(cce!=null && cce!=laststep)
 					{
 //						if(laststep!=null)
 //							step.removeJavaRootObject(laststep);
-						step.setText(cce.getDetails().toString());
+						step.setText(cce.getProperty("details").toString());
 						laststep = step;
 					}
 				}
@@ -202,126 +195,205 @@ public class MicroAgentViewPanel extends JPanel
 		final JCheckBox hon = new JCheckBox("Store History");
 		hon.setSelected(true);
 
-		listener = new IComponentListener()
-		{
-			protected IFilter filter = new IFilter()
-			{
-				@Classname("filter")
-				public boolean filter(Object obj)
-				{
-					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
-					return cce.getSourceCategory().equals(MicroAgentInterpreter.TYPE_STEP);
-				}
-			};
-			
-			public IFilter getFilter()
-			{
-				return filter;
-			}
-			
-			public IFuture eventOccured(final IComponentChangeEvent cce)
-			{
-				// todo: hide decomposing bulk events
-				if(cce.getBulkEvents().length>0)
-				{
-					IComponentChangeEvent[] events = cce.getBulkEvents();
-					for(int i=0; i<events.length; i++)
-					{
-						eventOccured(events[i]);
-					}
-					return IFuture.DONE;
-				}
-				
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-//						System.out.println(cce);
-					
-//						if("initialState".equals(event.getType()))
+//		listener = new IComponentListener()
+//		{
+//			protected IFilter filter = new IFilter()
+//			{
+//				@Classname("filter")
+//				public boolean filter(Object obj)
+//				{
+//					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
+//					return cce.getSourceCategory().equals(MicroAgentInterpreter.TYPE_STEP);
+//				}
+//			};
+//			
+//			public IFilter getFilter()
+//			{
+//				return filter;
+//			}
+//			
+//			public IFuture eventOccured(final IComponentChangeEvent cce)
+//			{
+//				// todo: hide decomposing bulk events
+//				if(cce.getBulkEvents().length>0)
+//				{
+//					IComponentChangeEvent[] events = cce.getBulkEvents();
+//					for(int i=0; i<events.length; i++)
+//					{
+//						eventOccured(events[i]);
+//					}
+//					return IFuture.DONE;
+//				}
+//				
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+////						System.out.println(cce);
+//					
+////						if("initialState".equals(event.getType()))
+////						{
+////							Object[] scpy = (Object[])((Object[])event.getValue())[0];
+////							Object[] hcpy = (Object[])((Object[])event.getValue())[1];
+////						
+////							steps.removeAllElements();
+////							for(int i=0; i<scpy.length; i++)
+////								steps.addElement(scpy[i]);
+////							
+////							history.removeAllElements();
+////							for(int i=0; i<hcpy.length; i++)
+////								history.addElement(hcpy[i]);
+////							
+////							if(steps.size()>0)
+////								sl.setSelectedIndex(0);
+////						}
+//						if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
 //						{
-//							Object[] scpy = (Object[])((Object[])event.getValue())[0];
-//							Object[] hcpy = (Object[])((Object[])event.getValue())[1];
-//						
-//							steps.removeAllElements();
-//							for(int i=0; i<scpy.length; i++)
-//								steps.addElement(scpy[i]);
-//							
-//							history.removeAllElements();
-//							for(int i=0; i<hcpy.length; i++)
-//								history.addElement(hcpy[i]);
-//							
-//							if(steps.size()>0)
+//							steps.addElement(cce);
+//							if(laststep==null && steps.size()==1)
+//							{
 //								sl.setSelectedIndex(0);
+//							}
 //						}
-						if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
-						{
-							steps.addElement(cce);
-							if(laststep==null && steps.size()==1)
-							{
-								sl.setSelectedIndex(0);
-							}
-						}
-						else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
-						{
-//							steps.removeElementAt(((Integer)event.getValue()).intValue());
-							for(int i=0; i<steps.size(); i++)
-							{
-								IComponentChangeEvent tmp = (IComponentChangeEvent)steps.get(i);
-								if(cce.getSourceName().equals(tmp.getSourceName()))
-								{
-									steps.removeElementAt(i);
-									break;
-								}
-							}
-							if(hon.isSelected())
-							{
-								history.addElement(cce);
-								hl.ensureIndexIsVisible(history.size()-1);
-								hl.invalidate();
-								hl.repaint();
-							}
-						}
-					}
-				});
-				return IFuture.DONE;
-			}
-		};
+//						else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()) && MicroAgentInterpreter.TYPE_STEP.equals(cce.getSourceCategory()))
+//						{
+////							steps.removeElementAt(((Integer)event.getValue()).intValue());
+//							for(int i=0; i<steps.size(); i++)
+//							{
+//								IComponentChangeEvent tmp = (IComponentChangeEvent)steps.get(i);
+//								if(cce.getSourceName().equals(tmp.getSourceName()))
+//								{
+//									steps.removeElementAt(i);
+//									break;
+//								}
+//							}
+//							if(hon.isSelected())
+//							{
+//								history.addElement(cce);
+//								hl.ensureIndexIsVisible(history.size()-1);
+//								hl.invalidate();
+//								hl.repaint();
+//							}
+//						}
+//					}
+//				});
+//				return IFuture.DONE;
+//			}
+//		};
 
-		final IComponentListener lis = listener;
-		agent.scheduleImmediate(new IComponentStep<Void>()
+//		final IComponentListener lis = listener;
+//		agent.scheduleImmediate(new IComponentStep<Void>()
+//		{
+//			@Classname("installListener")
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				List	events	= new ArrayList();
+//				try
+//				{
+//					// Hack!!! Better way to access steps!?
+//					MicroAgent	ma	= (MicroAgent)ia;
+//					Field	fi	= MicroAgent.class.getDeclaredField("interpreter");
+//					fi.setAccessible(true);
+//					MicroAgentInterpreter	interpreter	= (MicroAgentInterpreter)fi.get(ma);
+//					Field	fs	= MicroAgentInterpreter.class.getDeclaredField("steps");
+//					fs.setAccessible(true);
+//					List	steps	= (List)fs.get(interpreter);
+//					for(int i=0; steps!=null && i<steps.size(); i++)
+//					{
+//						Object[]	step	= (Object[])steps.get(i);
+//						events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, MicroAgentInterpreter.TYPE_STEP, step[0].getClass().getName(),
+//							step[0].toString(), ma.getComponentIdentifier(), interpreter.getComponentDescription().getCreationTime(), interpreter.getStepDetails((IComponentStep)step[0])));
+//					}
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//				lis.eventOccured(new BulkMonitoringEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
+//				
+//				ia.addComponentListener(lis);
+//				return IFuture.DONE;
+//			}
+//		});
+		
+		sub = agent.subscribeToEvents(new IFilter<IMonitoringEvent>()
 		{
-			@Classname("installListener")
-			public IFuture<Void> execute(IInternalAccess ia)
+			public boolean filter(IMonitoringEvent ev)
 			{
-				List	events	= new ArrayList();
+				return ev.getType().endsWith(MicroAgentInterpreter.TYPE_STEP);	
+			}
+		}, true);
+		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
+		{
+			public void intermediateResultAvailable(IMonitoringEvent event)
+			{
 				try
 				{
-					// Hack!!! Better way to access steps!?
-					MicroAgent	ma	= (MicroAgent)ia;
-					Field	fi	= MicroAgent.class.getDeclaredField("interpreter");
-					fi.setAccessible(true);
-					MicroAgentInterpreter	interpreter	= (MicroAgentInterpreter)fi.get(ma);
-					Field	fs	= MicroAgentInterpreter.class.getDeclaredField("steps");
-					fs.setAccessible(true);
-					List	steps	= (List)fs.get(interpreter);
-					for(int i=0; steps!=null && i<steps.size(); i++)
+					// todo: hide decomposing bulk events
+					if(event instanceof BulkMonitoringEvent)
 					{
-						Object[]	step	= (Object[])steps.get(i);
-						events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, MicroAgentInterpreter.TYPE_STEP, step[0].getClass().getName(),
-							step[0].toString(), ma.getComponentIdentifier(), interpreter.getComponentDescription().getCreationTime(), interpreter.getStepDetails((IComponentStep)step[0])));
+						BulkMonitoringEvent bev = (BulkMonitoringEvent)event;
+						if(bev.getBulkEvents().length>0)
+						{
+							IMonitoringEvent[] events = bev.getBulkEvents();
+							for(int i=0; i<events.length; i++)
+							{
+								intermediateResultAvailable(events[i]);
+							}
+						}
+					}
+					
+//					if("initialState".equals(event.getType()))
+//					{
+//						Object[] scpy = (Object[])((Object[])event.getValue())[0];
+//						Object[] hcpy = (Object[])((Object[])event.getValue())[1];
+//					
+//						steps.removeAllElements();
+//						for(int i=0; i<scpy.length; i++)
+//							steps.addElement(scpy[i]);
+//						
+//						history.removeAllElements();
+//						for(int i=0; i<hcpy.length; i++)
+//							history.addElement(hcpy[i]);
+//						
+//						if(steps.size()>0)
+//							sl.setSelectedIndex(0);
+//					}
+					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION) && event.getType().endsWith(MicroAgentInterpreter.TYPE_STEP))
+					{
+						steps.addElement(event);
+						if(laststep==null && steps.size()==1)
+						{
+							sl.setSelectedIndex(0);
+						}
+					}
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL) && event.getType().endsWith(MicroAgentInterpreter.TYPE_STEP))
+					{
+	//					steps.removeElementAt(((Integer)event.getValue()).intValue());
+						for(int i=0; i<steps.size(); i++)
+						{
+							IMonitoringEvent tmp = (IMonitoringEvent)steps.get(i);
+							if(event.getProperty("sourcename").equals(tmp.getProperty("sourcename")))
+							{
+								steps.removeElementAt(i);
+								break;
+							}
+						}
+						if(hon.isSelected())
+						{
+							history.addElement(event);
+							hl.ensureIndexIsVisible(history.size()-1);
+							hl.invalidate();
+							hl.repaint();
+						}
 					}
 				}
 				catch(Exception e)
 				{
 					e.printStackTrace();
 				}
-				lis.eventOccured(new BulkComponentChangeEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
-				
-				ia.addComponentListener(lis);
-				return IFuture.DONE;
 			}
-		});
+		}));
 		
 		JButton clear = new JButton("Clear");
 		clear.addActionListener(new ActionListener()
@@ -357,16 +429,18 @@ public class MicroAgentViewPanel extends JPanel
 	 */
 	public void	dispose()
 	{
-		final IComponentListener lis = listener;
-		agent.scheduleImmediate(new IComponentStep<Void>()
-		{
-			@Classname("dispose")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				ia.removeComponentListener(lis);
-				return IFuture.DONE;
-			}
-		});
+		sub.terminate();
+		
+//		final IComponentListener lis = listener;
+//		agent.scheduleImmediate(new IComponentStep<Void>()
+//		{
+//			@Classname("dispose")
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				ia.removeComponentListener(lis);
+//				return IFuture.DONE;
+//			}
+//		});
 	}
 }
 

@@ -9,7 +9,7 @@ import java.util.UUID;
  */
 public class Cause
 {
-	/** The id. Identical for all calls of the same origin. */
+	/** The id. Identical for all events of the same origin. */
 	protected String chainid;
 
 	/** The source id. */
@@ -103,6 +103,7 @@ public class Cause
 	protected String createUniqueId(int len)
 	{
 		String ret = UUID.randomUUID().toString();
+//		String ret = SUtil.createUniqueId("cause");
 		if(len>0)
 		{
 			ret = ret.substring(0, len);

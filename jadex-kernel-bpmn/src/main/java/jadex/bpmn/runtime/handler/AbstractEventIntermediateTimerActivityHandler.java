@@ -31,7 +31,7 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 		long duration = dur==null? tick? TICK_TIMER: -1: dur.longValue(); 
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_TIME);
 		thread.setWaiting(true);
-		thread.setWaitFilter(new IFilter()
+		thread.setWaitFilter(new IFilter<Object>()
 		{
 			public boolean filter(Object event)
 			{

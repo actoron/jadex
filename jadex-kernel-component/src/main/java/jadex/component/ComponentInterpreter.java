@@ -1,34 +1,24 @@
 package jadex.component;
 
 import jadex.base.Starter;
-import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.kernelbase.AbstractInterpreter;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -191,8 +181,12 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			if(step!=null)
 			{
 				Future future = (Future)step[1];
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
+//					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+				
+				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
+					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+				
 				try
 				{
 					IFuture<?> res = ((IComponentStep<?>)step[0]).execute(this);
@@ -204,8 +198,10 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 					future.setExceptionIfUndone(e);
 					throw e;
 				}
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
+//					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
 			}
 			
 			boolean ret;

@@ -1,11 +1,8 @@
 package jadex.kernelbase;
 
-import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentResultListener;
-import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
@@ -31,6 +28,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInfo;
@@ -47,6 +45,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -59,6 +58,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -198,18 +198,18 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			public void customResultAvailable(final IClockService clock)
 			{
-				MonitoringEvent me = new MonitoringEvent(getComponentIdentifier().toString(), 
-					MonitoringEvent.TYPE_COMPONENT_DISPOSED, clock.getTime());
-				publishMonitoringEvent(me)
-					.addResultListener(new DelegationResultListener<Void>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
-						ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getComponentDescription().getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners())
-						.addResultListener(new DelegationResultListener<Void>(ret)
-						{
-							public void customResultAvailable(Void result)
-							{
+//				MonitoringEvent me = new MonitoringEvent(getComponentIdentifier().toString(), 
+//					MonitoringEvent.TYPE_COMPONENT_DISPOSED, clock.getTime());
+//				me.setProperty("details", getComponentDescription());
+//				publishEvent(me).addResultListener(new DelegationResultListener<Void>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
+//						ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getComponentDescription().getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners())
+//							.addResultListener(new DelegationResultListener<Void>(ret)
+//						{
+//							public void customResultAvailable(Void result)
+//							{
 								startEndSteps().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 								{
 									public void customResultAvailable(Void result)
@@ -218,28 +218,30 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 										{
 											public void customResultAvailable(Void result)
 											{
-												final Collection<IComponentListener> lis = getInternalComponentListeners();
+//												final Collection<IComponentListener> lis = getInternalComponentListeners();
 												IResultListener<Void> reslis	= new IResultListener<Void>()
 												{
 													public void resultAvailable(Void result)
 													{
-														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), getModel(), lis, clock)
-															.addResultListener(new DelegationResultListener<Void>(ret));
+//														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), getModel(), lis, clock)
+//															.addResultListener(new DelegationResultListener<Void>(ret));
+														ret.setResult(null);
 													}
 													public void exceptionOccurred(final Exception exception)
 													{
-														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), getModel(), lis, clock)
-															.addResultListener(new DelegationResultListener<Void>(ret)
-														{
-															public void customResultAvailable(Void result)
-															{
-																ret.setException(exception);
-															}
-															public void exceptionOccurred(Exception exception)
-															{
-																ret.setException(exception);
-															}
-														});
+														ret.setException(exception);
+//														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), getModel(), lis, clock)
+//															.addResultListener(new DelegationResultListener<Void>(ret)
+//														{
+//															public void customResultAvailable(Void result)
+//															{
+//																ret.setException(exception);
+//															}
+//															public void exceptionOccurred(Exception exception)
+//															{
+//																ret.setException(exception);
+//															}
+//														});
 													}
 												};
 												// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
@@ -251,11 +253,11 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 										}));
 									}
 								}));
-							}
-						});
+//							}
+//						});
 					}
-				});
-			}
+//				});
+//			}
 		}));
 		
 		return ret;
@@ -312,24 +314,28 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 //		// cannot use scheduleStep as it is not available in init phase of component.
 ////		return scheduleStep(new IComponentStep()
-//		return getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
-//		{
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-////				System.out.println("created: "+desc.getName());
+		
+		// Must throw component events here for extensions
+		
+		return getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+//				System.out.println("created: "+desc.getName());
 //				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), 
 //					desc.getName().getName(), getComponentIdentifier(), desc.getCreationTime(), desc);
 //				notifyListeners(event);
-//				
-//				MonitoringEvent me = new MonitoringEvent(desc.getName().toString(), 
-//					MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime());
-//				publishMonitoringEvent(me);
-////					.addResultListener(new DelegationResultListener<Void>(ret));
-//				
-//				return IFuture.DONE;
-//			}
-//		});
-		return IFuture.DONE;
+				
+				MonitoringEvent me = new MonitoringEvent(desc.getName().toString(), 
+					MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime());
+				me.setProperty("details", desc);
+				publishEvent(me);
+//					.addResultListener(new DelegationResultListener<Void>(ret));
+				
+				return IFuture.DONE;
+			}
+		});
+//		return IFuture.DONE;
 	}
 	
 	/**
@@ -345,10 +351,28 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				final Future<Void> ret = new Future<Void>();
 //				System.out.println("destroyed: "+desc.getName());
-				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_COMPONENT, desc.getModelName(), desc.getName().getName(), getComponentIdentifier(), getComponentDescription().getCreationTime(), desc);
-				notifyListeners(event);
-				return IFuture.DONE;
+//				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_COMPONENT, desc.getModelName(), desc.getName().getName(), getComponentIdentifier(), getComponentDescription().getCreationTime(), desc);
+//				notifyListeners(event);
+				
+				// todo: clock time? , creation time
+				MonitoringEvent event = new MonitoringEvent(desc.getName().getName(), IMonitoringEvent.TYPE_COMPONENT_DISPOSED, System.currentTimeMillis());
+				event.setProperty("details", getComponentDescription());
+				publishEvent(event).addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						ret.setResult(null);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setResult(null);
+					}
+				});
+				
+				return ret;
+//				return IFuture.DONE;
 			}
 		});
 	}
@@ -633,13 +657,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 											{
 												public void customResultAvailable(Void result)
 												{
-													ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), 
-														getComponentDescription().getName().getName(), getComponentIdentifier(), getComponentDescription().getCreationTime(), getComponentDescription());
-													notifyListeners(event);
+//													ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), 
+//														getComponentDescription().getName().getName(), getComponentIdentifier(), getComponentDescription().getCreationTime(), getComponentDescription());
+//													notifyListeners(event);
 													
 													MonitoringEvent me = new MonitoringEvent(getComponentDescription().getName().toString(), 
 														MonitoringEvent.TYPE_COMPONENT_CREATED, getComponentDescription().getCause(), getComponentDescription().getCreationTime());
-													publishMonitoringEvent(me);
+													me.setProperty("details", getComponentDescription());
+													publishEvent(me);
 //														.addResultListener(new DelegationResultListener<Void>(ret));
 
 													super.customResultAvailable(result);
@@ -1939,56 +1964,76 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	
 	//-------- component listeners --------
 	
-	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
-	 */
-	public abstract IComponentListener[] getComponentListeners();
+//	/**
+//	 *  Get the component listeners.
+//	 *  @return The component listeners.
+//	 */
+//	public abstract IComponentListener[] getComponentListeners();
+//	
+//	/**
+//	 *  Get the component listeners.
+//	 *  @return The component listeners.
+//	 */
+//	public abstract Collection<IComponentListener> getInternalComponentListeners();
+//
+//	/**
+//	 *  Add component listener.
+//	 */
+//	public abstract IFuture<Void> addComponentListener(IComponentListener listener);
+//
+//	/**
+//	 *  Remove component listener.
+//	 */
+//	public abstract IFuture<Void> removeComponentListener(IComponentListener listener);
+
+//	/**
+//	 *  Notify the component listeners.
+//	 */
+//	public void notifyListeners(IComponentChangeEvent event)
+//	{
+//		assert !getComponentAdapter().isExternalThread();
+//		
+//		IComponentListener[] componentlisteners = getComponentListeners();
+//		for(int i=0; i<componentlisteners.length; i++)
+//		{
+//			final IComponentListener lis = componentlisteners[i];
+//			if(lis.getFilter().filter(event))
+//			{
+//				lis.eventOccured(event).addResultListener(new IResultListener<Void>()
+//				{
+//					public void resultAvailable(Void result)
+//					{
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						//Print exception?
+//						removeComponentListener(lis);
+//					}
+//				});
+//			}
+//		}
+//	}
 	
 	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
+	 *  Subscribe to monitoring events.
+	 *  @param filter An optional filter.
 	 */
-	public abstract Collection<IComponentListener> getInternalComponentListeners();
-
+	@Timeout(Timeout.NONE)
+	public abstract ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial);
+	
 	/**
-	 *  Add component listener.
+	 *  Get the current state as events.
 	 */
-	public abstract IFuture<Void> addComponentListener(IComponentListener listener);
-
-	/**
-	 *  Remove component listener.
-	 */
-	public abstract IFuture<Void> removeComponentListener(IComponentListener listener);
-
-	/**
-	 *  Notify the component listeners.
-	 */
-	public void notifyListeners(IComponentChangeEvent event)
+	public IMonitoringEvent[] getCurrentStateEvents()
 	{
-		assert !getComponentAdapter().isExternalThread();
-		
-		IComponentListener[] componentlisteners = getComponentListeners();
-		for(int i=0; i<componentlisteners.length; i++)
-		{
-			final IComponentListener lis = componentlisteners[i];
-			if(lis.getFilter().filter(event))
-			{
-				lis.eventOccured(event).addResultListener(new IResultListener<Void>()
-				{
-					public void resultAvailable(Void result)
-					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						//Print exception?
-						removeComponentListener(lis);
-					}
-				});
-			}
-		}
+		return null;
 	}
+	
+	/**
+	 *  Forward event to all currently registered subscribers.
+	 */
+	public abstract void publishLocalEvent(IMonitoringEvent event);
 	
 	/**
 	 *  Get the monitoring service getter.
@@ -2000,7 +2045,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Publish a monitoring event. This event is automatically send
 	 *  to the monitoring service of the platform (if any). 
 	 */
-	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event)
+	public IFuture<Void> publishEvent(IMonitoringEvent event)
 	{
 		if(event.getCause()==null)
 		{
@@ -2015,14 +2060,20 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			}
 		}
 		
-		return publishMonitoringEvent(event, getMonitoringServiceGetter());
+		// Publish to local subscribers
+		publishLocalEvent(event);
+		
+		// Publish to monitoring service
+		return publishEvent(event, getMonitoringServiceGetter());
 	}
 	
 	/**
 	 *  Publish a monitoring event to the monitoring service.
 	 */
-	public static IFuture<Void> publishMonitoringEvent(final IMonitoringEvent event, final ServiceGetter<IMonitoringService> getter)
+	public static IFuture<Void> publishEvent(final IMonitoringEvent event, final ServiceGetter<IMonitoringService> getter)
 	{
+//		return IFuture.DONE;
+		
 		final Future<Void> ret = new Future<Void>();
 		
 		if(getter!=null)
@@ -2049,7 +2100,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 			});
 		}
+		else
+		{
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}
+
 }

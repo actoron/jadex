@@ -5,9 +5,11 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.EventQueue;
@@ -42,14 +44,23 @@ public class ManagerGuiUpdatePlan extends Plan
 			}
 		});
 
-		getScope().addComponentListener(new TerminationAdapter()
+//		getScope().addComponentListener(new TerminationAdapter()
+//		{
+//			public void componentTerminated()
+//			{
+//				closeGui();
+//			}
+//		}
+//		);
+		
+		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+			.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
-			public void componentTerminated()
+			public void intermediateResultAvailable(IMonitoringEvent result)
 			{
 				closeGui();
 			}
-		}
-		);
+		}));
 		
 //		waitFor(IFilter.NEVER);
 	}

@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.base.Starter;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -17,18 +18,19 @@ import jadex.bdi.runtime.impl.ServiceContainerProxy;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -37,6 +39,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -572,64 +577,108 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		return ret;
 	}
 
+//	/**
+//	 *  Add an component listener
+//	 *  @param listener The listener.
+//	 */
+//	public IFuture addComponentListener(IComponentListener listener)
+//	{
+//		final Future ret = new Future();
+//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		{
+//			new AgentInvocation(listener)
+//			{
+//				public void run()
+//				{
+//					getState().addAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_componentlisteners, (IComponentListener) arg);
+//					ret.setResult(null);
+//				}
+//			};
+//		}
+//		else
+//		{
+//			getState().addAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+//			ret.setResult(null);
+//		}
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Remove an agent listener
+//	 *  @param listener The listener.
+//	 */
+//	public IFuture removeComponentListener(IComponentListener listener)
+//	{
+//		final Future ret = new Future();
+//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		{
+//			new AgentInvocation(listener)
+//			{
+//				public void run()
+//				{
+//					removeComponentListener((IComponentListener) arg, getInterpreter().getAgent(), getState());
+//					ret.setResult(null);
+//				}
+//			};
+//		}
+//		else
+//		{
+//			removeComponentListener(listener, getInterpreter().getAgent(), getState());
+//			ret.setResult(null);
+//		}
+//		return ret;
+//	}
+//	
+//	protected static void removeComponentListener(IComponentListener listener, Object agent, IOAVState state)
+//	{
+//		Object le = state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+//		if (le == null)
+//			throw new RuntimeException("Listener not found: "+listener);
+//		state.removeAttributeValue(agent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+//	}
+	
 	/**
-	 *  Add an component listener
-	 *  @param listener The listener.
+	 *  Subscribe to component events.
+	 *  @param filter An optional filter.
 	 */
-	public IFuture addComponentListener(IComponentListener listener)
+	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(final IFilter<IMonitoringEvent> filter, final boolean initial)
 	{
-		final Future ret = new Future();
+		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
+		
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
-			new AgentInvocation(listener)
+			try
 			{
-				public void run()
+				getInterpreter().getComponentAdapter().invokeLater(new Runnable() 
 				{
-					getState().addAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_componentlisteners, (IComponentListener) arg);
-					ret.setResult(null);
-				}
-			};
+					public void run() 
+					{
+						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().subscribeToEvents(filter, initial);
+						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
+						fut.addResultListener(lis);
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(getInterpreter().getComponentAdapter().getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
+			}
 		}
 		else
 		{
-			getState().addAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
-			ret.setResult(null);
+			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().subscribeToEvents(filter, initial);
+			TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
+			fut.addResultListener(lis);
 		}
+		
 		return ret;
-	}
-	
-	/**
-	 *  Remove an agent listener
-	 *  @param listener The listener.
-	 */
-	public IFuture removeComponentListener(IComponentListener listener)
-	{
-		final Future ret = new Future();
-		if(getInterpreter().getComponentAdapter().isExternalThread())
-		{
-			new AgentInvocation(listener)
-			{
-				public void run()
-				{
-					removeComponentListener((IComponentListener) arg, getInterpreter().getAgent(), getState());
-					ret.setResult(null);
-				}
-			};
-		}
-		else
-		{
-			removeComponentListener(listener, getInterpreter().getAgent(), getState());
-			ret.setResult(null);
-		}
-		return ret;
-	}
-	
-	protected static void removeComponentListener(IComponentListener listener, Object agent, IOAVState state)
-	{
-		Object le = state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
-		if (le == null)
-			throw new RuntimeException("Listener not found: "+listener);
-		state.removeAttributeValue(agent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
 	}
 	
 	/**
@@ -1145,9 +1194,9 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Publish a monitoring event. This event is automatically send
 	 *  to the monitoring service of the platform (if any). 
 	 */
-	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event)
+	public IFuture<Void> publishEvent(IMonitoringEvent event)
 	{
-		return getInterpreter().publishMonitoringEvent(event);
+		return getInterpreter().publishEvent(event);
 	}
 
 }

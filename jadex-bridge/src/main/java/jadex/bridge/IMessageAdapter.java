@@ -16,7 +16,7 @@ public interface IMessageAdapter
      * the this interface. Need due to JavaFlow Bug:
      * http://issues.apache.org/jira/browse/SANDBOX-111
      */
-	public static final Class TYPE = IMessageAdapter.class;
+	public static final Class<?> TYPE = IMessageAdapter.class;
 	
 	/**
 	 *  Get the message type.
@@ -42,7 +42,7 @@ public interface IMessageAdapter
 	 *  Get the parameters as map.
 	 *  @return A map of parameters.
 	 */
-	public Map getParameterMap();
+	public Map<String, Object> getParameterMap();
 	
 	/** 
 	 *  Get the unique message id.

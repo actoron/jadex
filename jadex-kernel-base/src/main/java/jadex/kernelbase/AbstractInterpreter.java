@@ -1,8 +1,7 @@
 package jadex.kernelbase;
 
-import jadex.bridge.IComponentListener;
+import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.RemoteComponentListener;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
@@ -13,19 +12,20 @@ import jadex.bridge.service.component.interceptors.ServiceGetter;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -80,8 +80,11 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected boolean realtime;
 	
 	
-	/** The component listeners. */
-	protected List<IComponentListener> componentlisteners;
+//	/** The component listeners. */
+//	protected List<IComponentListener> componentlisteners;
+	
+	/** The subscriptions (subscription future -> subscription info). */
+	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>> subscriptions;
 
 	/** The result listener. */
 	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
@@ -416,66 +419,66 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	
 	//-------- component listeners --------
 	
-	/**
-	 *  Add an component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> addComponentListener(IComponentListener listener)
-	{
-		assert !getComponentAdapter().isExternalThread();
-		
-		if(componentlisteners==null)
-			componentlisteners = new ArrayList<IComponentListener>();
-		
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(getExternalAccess(), listener);
-		
-		componentlisteners.add(listener);
-		return IFuture.DONE;
-	}
+//	/**
+//	 *  Add an component listener.
+//	 *  @param listener The listener.
+//	 */
+//	public IFuture<Void> addComponentListener(IComponentListener listener)
+//	{
+//		assert !getComponentAdapter().isExternalThread();
+//		
+//		if(componentlisteners==null)
+//			componentlisteners = new ArrayList<IComponentListener>();
+//		
+//		// Hack! How to find out if remote listener?
+//		if(Proxy.isProxyClass(listener.getClass()))
+//			listener = new RemoteComponentListener(getExternalAccess(), listener);
+//		
+//		componentlisteners.add(listener);
+//		return IFuture.DONE;
+//	}
+//	
+//	/**
+//	 *  Remove a component listener.
+//	 *  @param listener The listener.
+//	 */
+//	public IFuture<Void> removeComponentListener(IComponentListener listener)
+//	{
+//		assert !getComponentAdapter().isExternalThread();
+//		
+//		// Hack! How to find out if remote listener?
+//		if(Proxy.isProxyClass(listener.getClass()))
+//			listener = new RemoteComponentListener(getExternalAccess(), listener);
+//		
+//		if(componentlisteners!=null)
+//			componentlisteners.remove(listener);
+//		
+////		System.out.println("cl: "+componentlisteners);
+//		return IFuture.DONE;
+//	}
 	
-	/**
-	 *  Remove a component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> removeComponentListener(IComponentListener listener)
-	{
-		assert !getComponentAdapter().isExternalThread();
-		
-		// Hack! How to find out if remote listener?
-		if(Proxy.isProxyClass(listener.getClass()))
-			listener = new RemoteComponentListener(getExternalAccess(), listener);
-		
-		if(componentlisteners!=null)
-			componentlisteners.remove(listener);
-		
-//		System.out.println("cl: "+componentlisteners);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
-	 */
-	public IComponentListener[] getComponentListeners()
-	{
-		assert !getComponentAdapter().isExternalThread();
-		
-		return componentlisteners==null? new IComponentListener[0]: 
-			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
-	}
-	
-	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
-	 */
-	public Collection<IComponentListener> getInternalComponentListeners()
-	{
-		assert !getComponentAdapter().isExternalThread();
-		
-		return componentlisteners;	
-	}
+//	/**
+//	 *  Get the component listeners.
+//	 *  @return The component listeners.
+//	 */
+//	public IComponentListener[] getComponentListeners()
+//	{
+//		assert !getComponentAdapter().isExternalThread();
+//		
+//		return componentlisteners==null? new IComponentListener[0]: 
+//			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
+//	}
+//	
+//	/**
+//	 *  Get the component listeners.
+//	 *  @return The component listeners.
+//	 */
+//	public Collection<IComponentListener> getInternalComponentListeners()
+//	{
+//		assert !getComponentAdapter().isExternalThread();
+//		
+//		return componentlisteners;	
+//	}
 	
 	/**
 	 *  Get the monitoring service getter.
@@ -487,5 +490,102 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		return getter;
 	}
-
+	
+	/**
+	 *  Forward event to all currently registered subscribers.
+	 */
+	public void publishLocalEvent(IMonitoringEvent event)
+	{
+		if(subscriptions!=null)
+		{
+			for(SubscriptionIntermediateFuture<IMonitoringEvent> sub: subscriptions.keySet().toArray(new SubscriptionIntermediateFuture[0]))
+			{
+				publishLocalEvent(event, sub);
+			}
+		}
+	}
+	
+	/**
+	 *  Forward event to one subscribers.
+	 */
+	protected void publishLocalEvent(IMonitoringEvent event, SubscriptionIntermediateFuture<IMonitoringEvent> sub)
+	{
+		IFilter<IMonitoringEvent> fil = subscriptions.get(sub);
+		try
+		{
+			if(fil==null || fil.filter(event))
+			{
+//				System.out.println("forward to: "+event+" "+sub);
+				if(!sub.addIntermediateResultIfUndone(event))
+				{
+					subscriptions.remove(fil);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			// catch filter exceptions
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Subscribe to monitoring events.
+	 *  @param filter An optional filter.
+	 */
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial)
+	{
+		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
+		
+		ITerminationCommand tcom = new ITerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				removeSubscription(ret);
+			}
+			
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
+			}
+		};
+		ret.setTerminationCommand(tcom);
+		
+		if(initial)
+		{
+			IMonitoringEvent[] evs = getCurrentStateEvents();
+			if(evs!=null && evs.length>0)
+			{
+				BulkMonitoringEvent bme = new BulkMonitoringEvent(evs);
+				ret.addIntermediateResult(bme);
+			}
+		}
+		
+		addSubscription(ret, filter);
+		
+		return ret;
+	}
+		
+	/**
+	 *  Add a new subscription.
+	 *  @param future The subscription future.
+	 *  @param si The subscription info.
+	 */
+	protected void addSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> future, IFilter<IMonitoringEvent> filter)
+	{
+		if(subscriptions==null)
+			subscriptions = new LinkedHashMap<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>>();
+		subscriptions.put(future, filter);
+	}
+	
+	/**
+	 *  Remove an existing subscription.
+	 *  @param fut The subscription future to remove.
+	 */
+	protected void removeSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> fut)
+	{
+		if(subscriptions==null || !subscriptions.containsKey(fut))
+			throw new RuntimeException("Subscriber not known: "+fut);
+		subscriptions.remove(fut);
+	}
 }

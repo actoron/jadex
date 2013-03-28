@@ -30,7 +30,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	protected ParameterSpecification[] conversationparams;
 	
 	/** The parameters by name (name -> parameter spec). */
-	protected Map parammap;
+	protected Map<String, ParameterSpecification> parammap;
 	
 	//-------- constructors --------
 
@@ -44,7 +44,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 		this.params	= params;
 		this.paramsets	= paramsets;
 		
-		this.parammap = new HashMap();
+		this.parammap = new HashMap<String, ParameterSpecification>();
 		for(int i=0; i<params.length; i++)
 			parammap.put(params[i].getName(), params[i]);
 		for(int i=0; i<paramsets.length; i++)
@@ -131,7 +131,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	{
 		if(conversationparams==null)
 		{
-			List tmp = new ArrayList();
+			List<ParameterSpecification> tmp = new ArrayList<ParameterSpecification>();
 			for(int i=0; i<params.length; i++)
 			{
 				if(params[i].isConversationIdentifier())
@@ -214,7 +214,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	 *  @param message	The message.
 	 *  @param param	The parameter to be (en/de)coded.
 	 */
-	public IContentCodec findContentCodec(IContentCodec[] codecs, Map message, String param)
+	public IContentCodec findContentCodec(IContentCodec[] codecs, Map<String, Object> message, String param)
 	{
 		IContentCodec	ret	= null;
 		String[] infos = getCodecInfos(param);
@@ -289,7 +289,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	 */
 	public Map<String, Object> createReply(Map<String, Object> msg)
 	{
-		Map reply = new HashMap();
+		Map<String, Object> reply = new HashMap<String, Object>();
 		
 		MessageType.ParameterSpecification[] params	= getParameters();
 		for(int i=0; i<params.length; i++)
@@ -314,7 +314,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 				Object sourceval = msg.get(sourcename);
 				if(sourceval!=null)
 				{
-					List tmp = new ArrayList();
+					List<Object> tmp = new ArrayList<Object>();
 					tmp.add(sourceval);
 					reply.put(paramsets[i].getName(), tmp);	
 				}
@@ -337,7 +337,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 		protected String name;
 
 		/** The parameter(set) class. */
-		protected Class	clazz;
+		protected Class<?>	clazz;
 
 		/** Default value expression of the parameter(set), if any. */
 //		protected String defaultvalue;
@@ -356,7 +356,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 		/**
 		 *  Create a parameter(set) specification.
 		 */
-		public ParameterSpecification(String name, Class clazz, boolean set)
+		public ParameterSpecification(String name, Class<?> clazz, boolean set)
 		{
 			this(name, clazz, null, false, set);
 		}
@@ -364,7 +364,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 		/**
 		 *  Create a parameter(set) specification.
 		 */
-		public ParameterSpecification(String name, Class clazz, String source, boolean convid, boolean set)
+		public ParameterSpecification(String name, Class<?> clazz, String source, boolean convid, boolean set)
 		{
 			// Conversation identifying parameters must have a source (to match against).
 			assert !convid || source!=null;
@@ -390,7 +390,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 		/**
 		 *  Get the clazz of the parameter(set).
 		 */
-		public Class	getClazz()
+		public Class<?>	getClazz()
 		{
 			return clazz;
 		}

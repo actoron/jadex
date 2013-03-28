@@ -1,7 +1,7 @@
 package jadex.bridge.service.types.monitoring;
 
 import jadex.bridge.Cause;
-import jadex.bridge.ComponentChangeEvent;
+import jadex.commons.IFilter;
 
 import java.util.Map;
 
@@ -10,13 +10,71 @@ import java.util.Map;
  */
 public interface IMonitoringEvent
 {
-	public static String TYPE_SERVICECALL_START = ComponentChangeEvent.EVENT_TYPE_CREATION+"."+ComponentChangeEvent.SOURCE_CATEGORY_SERVICE;
+	public static IFilter<IMonitoringEvent> TERMINATION_FILTER = new IFilter<IMonitoringEvent>()
+	{
+		public boolean filter(IMonitoringEvent obj)
+		{
+			return obj.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL)
+				&& obj.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_COMPONENT);
+		}
+	};
 	
-	public static String TYPE_SERVICECALL_END = ComponentChangeEvent.EVENT_TYPE_DISPOSAL+"."+ComponentChangeEvent.SOURCE_CATEGORY_SERVICE;
+	/** Event denoting creation of an element. */
+	public static final String EVENT_TYPE_CREATION		= "created";
+	
+	/** Event denoting disposal of an element. */
+	public static final String EVENT_TYPE_DISPOSAL		= "disposed";
+	
+	/** Event denoting modification of an element. */
+	public static final String EVENT_TYPE_MODIFICATION 	= "modified";
+	
+	/** Event denoting a single occurrence without temporal extension. */
+	public static final String EVENT_TYPE_OCCURRENCE	= "noticed";
+	
+	/** Bulk event composed of sub events. */
+	public static final String EVENT_TYPE_BULK = "bulk";
+	
+	
+	/** Events regarding the execution of a step. */
+	public static final String SOURCE_CATEGORY_EXECUTION = "Execution";
+	
+	/** Events regarding a component. */
+	public static final String SOURCE_CATEGORY_COMPONENT = "Component";
+	
+	/** Events regarding a service. */
+	public static final String SOURCE_CATEGORY_SERVICE = "Service";
 
-	public static String TYPE_COMPONENT_CREATED = ComponentChangeEvent.EVENT_TYPE_CREATION+"."+ComponentChangeEvent.SOURCE_CATEGORY_COMPONENT; //"component_created";
 	
-	public static String TYPE_COMPONENT_DISPOSED = ComponentChangeEvent.EVENT_TYPE_DISPOSAL+"."+ComponentChangeEvent.SOURCE_CATEGORY_COMPONENT; //"component_created";
+	// BPMN
+	
+	/** Events regarding a BPMN activity. */
+	public static final String SOURCE_CATEGORY_ACTIVITY	   = "Activity";
+
+	// BDI
+	
+	/** Events regarding a BDI plan. */
+	public static final String SOURCE_CATEGORY_PLAN	   = "Plan";
+	
+	/** Events regarding a BDI goal. */
+	public static final String SOURCE_CATEGORY_GOAL	   = "Goal";
+	
+	/** Events regarding a BDI fact. */
+	public static final String SOURCE_CATEGORY_FACT	   = "Fact";
+	
+	/** Events regarding a BDI internal event. */
+	public static final String SOURCE_CATEGORY_IEVENT	   = "Internal Event";
+	
+	/** Events regarding a message. */
+	public static final String SOURCE_CATEGORY_MESSAGE   = "Message";
+
+	
+	public static String TYPE_SERVICECALL_START = EVENT_TYPE_CREATION+"."+SOURCE_CATEGORY_SERVICE;
+	
+	public static String TYPE_SERVICECALL_END = EVENT_TYPE_DISPOSAL+"."+SOURCE_CATEGORY_SERVICE;
+
+	public static String TYPE_COMPONENT_CREATED = EVENT_TYPE_CREATION+"."+SOURCE_CATEGORY_COMPONENT; //"component_created";
+	
+	public static String TYPE_COMPONENT_DISPOSED = EVENT_TYPE_DISPOSAL+"."+SOURCE_CATEGORY_COMPONENT; //"component_created";
 
 	
 	/**

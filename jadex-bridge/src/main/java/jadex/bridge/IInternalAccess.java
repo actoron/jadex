@@ -2,12 +2,15 @@ package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 import java.util.Map;
 import java.util.logging.Logger;
@@ -95,18 +98,6 @@ public interface IInternalAccess
 	 *  @return The fetcher.
 	 */
 	public IValueFetcher getFetcher();
-	
-	/**
-	 *  Add an component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> addComponentListener(IComponentListener listener);
-	
-	/**
-	 *  Remove a component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> removeComponentListener(IComponentListener listener);
 		
 	/**
 	 *  Get the arguments.
@@ -163,8 +154,16 @@ public interface IInternalAccess
 	public boolean isComponentThread();
 	
 	/**
-	 *  Publish a monitoring event. This event is automatically send
-	 *  to the monitoring service of the platform (if any). 
+	 *  Subscribe to component events.
+	 *  @param filter An optional filter.
+	 *  @param initial True, for receiving the current state.
 	 */
-	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event);
+	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial);
+
+//	/**
+//	 *  Publish a monitoring event. This event is automatically send
+//	 *  to the monitoring service of the platform (if any). 
+//	 */
+//	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event);
 }

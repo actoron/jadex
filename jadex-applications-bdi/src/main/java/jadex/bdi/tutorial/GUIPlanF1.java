@@ -4,7 +4,9 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IInternalEventListener;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import javax.swing.SwingUtilities;
 
@@ -50,20 +52,29 @@ public class GUIPlanF1 extends Plan
 			}
 		});
 		
-		getScope().addComponentListener(new TerminationAdapter()
+//		getScope().addComponentListener(new TerminationAdapter()
+//		{
+//			public void componentTerminated()
+//			{
+////				System.out.println("terminating");
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						gui.dispose();
+//					}
+//				});
+//			}
+//		});
+		
+		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+			.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
-			public void componentTerminated()
+			public void intermediateResultAvailable(IMonitoringEvent result)
 			{
-//				System.out.println("terminating");
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						gui.dispose();
-					}
-				});
+				gui.dispose();
 			}
-		});
+		}));
 		
 //		while(true)
 //		{

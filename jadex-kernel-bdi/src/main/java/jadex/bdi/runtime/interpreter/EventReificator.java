@@ -4,7 +4,8 @@ import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
-import jadex.bridge.ComponentChangeEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -327,46 +328,183 @@ public class EventReificator implements IOAVStateListener
 			observed.remove(element);
 	}
 	
+//	protected void fireComponentChangeEvent(IOAVState state, Object element, Object scope, String type, Object value)
+//	{
+//		Collection componentlisteners = state.getAttributeValues(agent, OAVBDIRuntimeModel.agent_has_componentlisteners);
+//		if (componentlisteners != null && !componentlisteners.isEmpty())
+//		{
+//			BDIInterpreter bdiint = BDIInterpreter.getInterpreter(state);
+//			long time = bdiint.getClockService().getTime();
+//			ComponentChangeEvent event = new ComponentChangeEvent();
+//			event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
+//			if(scope == null)
+//				scope = bdiint.getAgent();
+//			
+//			event.setTime(time);
+//			event.setComponentCreationTime(bdiint.getComponentDescription().getCreationTime());
+//			
+//			if(OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(type) ||
+//				OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||
+//				OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(type))
+//			{
+//				event.setEventType(ComponentChangeEvent.EVENT_TYPE_CREATION);
+//			}
+//			else if(OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(type) ||
+//				 OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(type) ||
+//				 OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type) ||
+//				 OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED.equals(type))
+//			{
+//				event.setEventType(ComponentChangeEvent.EVENT_TYPE_DISPOSAL);
+//			}
+//			else if(OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED.equals(type) ||
+//				OAVBDIRuntimeModel.CHANGEEVENT_GOALCHANGED.equals(type) ||
+//				OAVBDIRuntimeModel.CHANGEEVENT_PLANCHANGED.equals(type))
+//			{
+//				event.setEventType(ComponentChangeEvent.EVENT_TYPE_MODIFICATION);
+//			}
+//			else if (OAVBDIRuntimeModel.CHANGEEVENT_INTERNALEVENTOCCURRED.equals(type) ||
+//					 OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(type) ||
+//					 OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTSENT.equals(type) ||
+//					 OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
+//			{		
+//				event.setEventType(ComponentChangeEvent.EVENT_TYPE_OCCURRENCE);
+//			}
+//			
+//			if (OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(type) ||
+//				OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED.equals(type) ||
+//				OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(type))
+//			{
+//				BeliefInfo	info	= BeliefInfo.createBeliefInfo(state, element, scope);
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_FACT);
+//				event.setSourceName(element.toString());
+//				event.setSourceType(info.getType());
+//				event.setDetails(info);
+//			}
+//			else if(OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(type) ||
+//				OAVBDIRuntimeModel.CHANGEEVENT_PLANCHANGED.equals(type) ||
+//				OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED.equals(type))
+//			{
+//				PlanInfo	info	= PlanInfo.createPlanInfo(state, element, scope);
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_PLAN);
+//				event.setSourceName(element.toString());
+//				event.setSourceType(info.getType());
+//				Object reason = state.getAttributeValue(element, OAVBDIRuntimeModel.plan_has_reason);
+//				if (reason != null)
+//					event.setParent(reason.toString());
+//				event.setDetails(info);
+//			}
+//			else if(OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||
+//				 OAVBDIRuntimeModel.CHANGEEVENT_GOALCHANGED.equals(type) ||
+//				 OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type))
+//			{
+//				GoalInfo	info	= GoalInfo.createGoalInfo(state, element, scope);
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_GOAL);
+//				event.setSourceName(element.toString());
+//				event.setSourceType(info.getType());
+//				event.setDetails(info);
+//				Object parentplan = state.getAttributeValue(element, OAVBDIRuntimeModel.goal_has_parentplan);
+//				if (parentplan != null)
+//				{
+//					event.setParent(parentplan.toString());
+//				}
+//				else
+//				{
+////					GoalFlyweight x = GoalFlyweight.getGoalFlyweight(state, scope, element);
+//					
+////					System.out.println("This goal has no parent plan: " + x.getType() + " " + type);
+//					//event.setParent(bdiint.getAgentAdapter().getComponentIdentifier().getName());
+//				}
+//				if (OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type))
+//				{
+//					GoalFlyweight gf = GoalFlyweight.getGoalFlyweight(state, scope, element);
+//					if (gf.isSucceeded())
+//					{
+//						event.setReason("Success");
+//					}
+//					else if (gf.getException() != null)
+//					{
+//						event.setReason(gf.getException().toString());
+////						gf.getException().printStackTrace();
+//					}
+//				}
+//			}
+//			else if (OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(type) ||
+//					 OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTSENT.equals(type))
+//			{
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_MESSAGE);
+//				MessageEventFlyweight mef = MessageEventFlyweight.getMessageEventFlyweight(state, scope, element);
+//				event.setSourceName(mef.getHandle().toString());
+//				event.setSourceType(mef.getType());
+//			}
+//			else if (OAVBDIRuntimeModel.CHANGEEVENT_INTERNALEVENTOCCURRED.equals(type))
+//			{
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_IEVENT);
+//				InternalEventFlyweight ief = InternalEventFlyweight.getInternalEventFlyweight(state, scope, element);
+//				event.setSourceName(ief.getHandle().toString());
+//				event.setSourceType(ief.getType());
+//			}
+//			else if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type) ||
+//					 OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(type))
+//			{
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
+//				CapabilityFlyweight cf = new CapabilityFlyweight(state, scope);
+//				event.setSourceName(cf.getComponentIdentifier().getName());
+//				event.setSourceType(cf.getAgentModel().getName());
+//				if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
+//					event.setDetails("Terminating");
+//			}
+//			
+//			bdiint.notifyListeners(event);
+//		}
+//	}
+	
 	protected void fireComponentChangeEvent(IOAVState state, Object element, Object scope, String type, Object value)
 	{
-		Collection componentlisteners = state.getAttributeValues(agent, OAVBDIRuntimeModel.agent_has_componentlisteners);
-		if (componentlisteners != null && !componentlisteners.isEmpty())
+//		Collection componentlisteners = state.getAttributeValues(agent, OAVBDIRuntimeModel.agent_has_componentlisteners);
+		BDIInterpreter bdiint = BDIInterpreter.getInterpreter(state);
+		
+//		if(componentlisteners != null && !componentlisteners.isEmpty())
+		
+		if((bdiint.subscriptions!=null && !bdiint.subscriptions.isEmpty()) || bdiint.getter.getLastService()!=null)
 		{
-			BDIInterpreter bdiint = BDIInterpreter.getInterpreter(state);
+//			BDIInterpreter bdiint = BDIInterpreter.getInterpreter(state);
 			long time = bdiint.getClockService().getTime();
-			ComponentChangeEvent event = new ComponentChangeEvent();
-			event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
+//			ComponentChangeEvent event = new ComponentChangeEvent();
+			MonitoringEvent event = new MonitoringEvent();
+//			event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
+			event.setSource(bdiint.getAgentAdapter().getComponentIdentifier().getName());
 			if(scope == null)
 				scope = bdiint.getAgent();
 			
 			event.setTime(time);
-			event.setComponentCreationTime(bdiint.getComponentDescription().getCreationTime());
+			// todo:
+//			event.setComponentCreationTime(bdiint.getComponentDescription().getCreationTime());
 			
 			if(OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(type))
 			{
-				event.setEventType(ComponentChangeEvent.EVENT_TYPE_CREATION);
+				event.setType(IMonitoringEvent.EVENT_TYPE_CREATION);
 			}
 			else if(OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED.equals(type))
 			{
-				event.setEventType(ComponentChangeEvent.EVENT_TYPE_DISPOSAL);
+				event.setType(IMonitoringEvent.EVENT_TYPE_DISPOSAL);
 			}
 			else if(OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_GOALCHANGED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_PLANCHANGED.equals(type))
 			{
-				event.setEventType(ComponentChangeEvent.EVENT_TYPE_MODIFICATION);
+				event.setType(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
 			}
 			else if (OAVBDIRuntimeModel.CHANGEEVENT_INTERNALEVENTOCCURRED.equals(type) ||
 					 OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(type) ||
 					 OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTSENT.equals(type) ||
 					 OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
 			{		
-				event.setEventType(ComponentChangeEvent.EVENT_TYPE_OCCURRENCE);
+				event.setType(IMonitoringEvent.EVENT_TYPE_OCCURRENCE);
 			}
 			
 			if (OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED.equals(type) ||
@@ -374,37 +512,55 @@ public class EventReificator implements IOAVStateListener
 				OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED.equals(type))
 			{
 				BeliefInfo	info	= BeliefInfo.createBeliefInfo(state, element, scope);
-				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_FACT);
-				event.setSourceName(element.toString());
-				event.setSourceType(info.getType());
-				event.setDetails(info);
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_FACT);
+//				event.setSourceName(element.toString());
+//				event.setSourceType(info.getType());
+//				event.setDetails(info);
+				event.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT);
+				event.setProperty("sourcename", element.toString());
+				event.setProperty("sourcetype", info.getType());
+				event.setProperty("details", info);
 			}
 			else if(OAVBDIRuntimeModel.CHANGEEVENT_PLANADDED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_PLANCHANGED.equals(type) ||
 				OAVBDIRuntimeModel.CHANGEEVENT_PLANREMOVED.equals(type))
 			{
 				PlanInfo	info	= PlanInfo.createPlanInfo(state, element, scope);
-				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_PLAN);
-				event.setSourceName(element.toString());
-				event.setSourceType(info.getType());
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_PLAN);
+//				event.setSourceName(element.toString());
+//				event.setSourceType(info.getType());
 				Object reason = state.getAttributeValue(element, OAVBDIRuntimeModel.plan_has_reason);
-				if (reason != null)
-					event.setParent(reason.toString());
-				event.setDetails(info);
+//				if(reason != null)
+//					event.setParent(reason.toString());
+//				event.setDetails(info);
+				
+				event.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN);
+				event.setProperty("sourcename", element.toString());
+				event.setProperty("sourcetype", info.getType());
+				event.setProperty("details", info);
+				if(reason != null)
+					event.setProperty("parent", reason.toString());
 			}
 			else if(OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_GOALCHANGED.equals(type) ||
 				 OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type))
 			{
 				GoalInfo	info	= GoalInfo.createGoalInfo(state, element, scope);
-				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_GOAL);
-				event.setSourceName(element.toString());
-				event.setSourceType(info.getType());
-				event.setDetails(info);
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_GOAL);
+//				event.setSourceName(element.toString());
+//				event.setSourceType(info.getType());
+//				event.setDetails(info);
+				
+				event.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL);
+				event.setProperty("sourcename", element.toString());
+				event.setProperty("sourcetype", info.getType());
+				event.setProperty("details", info);
+				
 				Object parentplan = state.getAttributeValue(element, OAVBDIRuntimeModel.goal_has_parentplan);
 				if (parentplan != null)
 				{
-					event.setParent(parentplan.toString());
+//					event.setParent(parentplan.toString());
+					event.setProperty("parent", parentplan.toString());
 				}
 				else
 				{
@@ -416,13 +572,15 @@ public class EventReificator implements IOAVStateListener
 				if (OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type))
 				{
 					GoalFlyweight gf = GoalFlyweight.getGoalFlyweight(state, scope, element);
-					if (gf.isSucceeded())
+					if(gf.isSucceeded())
 					{
-						event.setReason("Success");
+//						event.setReason("Success");
+						event.setProperty("reason", "Success");
 					}
-					else if (gf.getException() != null)
+					else if(gf.getException() != null)
 					{
-						event.setReason(gf.getException().toString());
+//						event.setReason(gf.getException().toString());
+						event.setProperty("reason", gf.getException().toString());
 //						gf.getException().printStackTrace();
 					}
 				}
@@ -430,30 +588,45 @@ public class EventReificator implements IOAVStateListener
 			else if (OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(type) ||
 					 OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTSENT.equals(type))
 			{
-				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_MESSAGE);
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_MESSAGE);
 				MessageEventFlyweight mef = MessageEventFlyweight.getMessageEventFlyweight(state, scope, element);
-				event.setSourceName(mef.getHandle().toString());
-				event.setSourceType(mef.getType());
+//				event.setSourceName(mef.getHandle().toString());
+//				event.setSourceType(mef.getType());
+				
+				event.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_MESSAGE);
+				event.setProperty("sourcename", mef.getHandle().toString());
+				event.setProperty("sourcetype", mef.getType());
 			}
 			else if (OAVBDIRuntimeModel.CHANGEEVENT_INTERNALEVENTOCCURRED.equals(type))
 			{
-				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_IEVENT);
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_IEVENT);
 				InternalEventFlyweight ief = InternalEventFlyweight.getInternalEventFlyweight(state, scope, element);
-				event.setSourceName(ief.getHandle().toString());
-				event.setSourceType(ief.getType());
+//				event.setSourceName(ief.getHandle().toString());
+//				event.setSourceType(ief.getType());
+				
+				event.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_IEVENT);
+				event.setProperty("sourcename", ief.getHandle().toString());
+				event.setProperty("sourcetype", ief.getType());
+
 			}
 			else if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type) ||
 					 OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(type))
 			{
-				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
+//				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_COMPONENT);
 				CapabilityFlyweight cf = new CapabilityFlyweight(state, scope);
-				event.setSourceName(cf.getComponentIdentifier().getName());
-				event.setSourceType(cf.getAgentModel().getName());
-				if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
-					event.setDetails("Terminating");
+//				event.setSourceName(cf.getComponentIdentifier().getName());
+//				event.setSourceType(cf.getAgentModel().getName());
+				if(OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
+					event.setProperty("details", "Terminating");
+//					event.setDetails("Terminating");
+				
+				event.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_COMPONENT);
+				event.setProperty("sourcename", cf.getComponentIdentifier().getName());
+				event.setProperty("sourcetype", cf.getAgentModel().getName());
 			}
 			
-			bdiint.notifyListeners(event);
+//			bdiint.notifyListeners(event);
+			bdiint.publishEvent(event);
 		}
 	}
 }

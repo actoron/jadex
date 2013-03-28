@@ -1,9 +1,8 @@
 package jadex.micro;
 
 import jadex.base.Starter;
-import jadex.bridge.ComponentChangeEvent;
+import jadex.bridge.Cause;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IConnection;
@@ -21,6 +20,8 @@ import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.FieldInfo;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -522,8 +523,12 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				Tuple3<IComponentStep<?>, Future<?>, ServiceCall> step = removeStep();
 				Future future = (Future)step.getSecondEntity();
 				
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
+//					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+
+				Cause cause = step.getThirdEntity()!=null? step.getThirdEntity().getCause(): null;
+				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
+					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, cause, System.currentTimeMillis()));
 				
 				// Correct to execute them in try catch?!
 				try
@@ -545,11 +550,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						{
 							CallAccess.setServiceCall(sc);
 						}
+						
 						IFuture<?>	res	= ((IComponentStep<?>)step.getFirstEntity()).execute(microagent);
-//						if(step[0].toString().indexOf("ListFiles")!=-1)
-//						{
-//							System.out.println("children: "+step[0]+", "+res.getClass());
-//						}
+
 						FutureFunctionality.connectDelegationFuture(future, res);
 					}
 				}
@@ -558,9 +561,12 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					future.setExceptionIfUndone(e);
 					throw e;
 				}
-				
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+
+//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
+//				IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+
+				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, cause, System.currentTimeMillis()));
 			}
 	
 			return steps!=null && !steps.isEmpty();
@@ -861,12 +867,17 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			if(steps==null)
 				steps	= new ArrayList();
 			steps.add(step);
-			if(componentlisteners!=null)
-			{
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step.getFirstEntity().getClass().getName(), 
-					step.getFirstEntity().toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)step.getFirstEntity())));
-			}
 			
+//			if(componentlisteners!=null)
+//			{
+//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step.getFirstEntity().getClass().getName(), 
+//					step.getFirstEntity().toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)step.getFirstEntity())));
+//			}
+			
+			MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, System.currentTimeMillis());
+			event.setProperty("sourcename", step.getFirstEntity().getClass().getName());
+			event.setProperty("details", getStepDetails((IComponentStep)step.getFirstEntity()));
+			publishEvent(event);
 		}
 	}
 	
@@ -879,12 +890,19 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		Tuple3<IComponentStep<?>, Future<?>, ServiceCall> ret = steps.remove(0);
 		if(steps.isEmpty())
 			steps	= null;
-		if(componentlisteners!=null)
-		{
-			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, ret.getFirstEntity().getClass().getName(),
-				ret.getFirstEntity().toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)ret.getFirstEntity())));
-		}
+		
+//		if(componentlisteners!=null)
+//		{
+//			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, ret.getFirstEntity().getClass().getName(),
+//				ret.getFirstEntity().toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)ret.getFirstEntity())));
+//		}
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
+		
+		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+TYPE_STEP, System.currentTimeMillis());
+		event.setProperty("sourcename", ret.getFirstEntity().getClass().getName());
+		event.setProperty("details", getStepDetails(ret.getFirstEntity()));
+		publishEvent(event);
+		
 		return ret;
 	}
 	

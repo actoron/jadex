@@ -3,19 +3,20 @@ package jadex.bdiv3.examples.puzzle;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 /**
  *  The board gui.
@@ -87,19 +88,29 @@ public class BoardGui extends JFrame
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.addComponentListener(new TerminationAdapter()
+//				ia.addComponentListener(new TerminationAdapter()
+//				{
+//					public void componentTerminated()
+//					{
+//						SwingUtilities.invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//								BoardGui.this.dispose();
+//							}
+//						});
+//					}
+//				});
+				
+				ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
-					public void componentTerminated()
+					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								BoardGui.this.dispose();
-							}
-						});
+						BoardGui.this.dispose();
 					}
-				});
+				}));
+				
 				return IFuture.DONE;
 			}
 		}).addResultListener(dislis);

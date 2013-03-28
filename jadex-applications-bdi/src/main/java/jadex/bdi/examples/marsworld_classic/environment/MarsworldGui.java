@@ -9,10 +9,12 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -113,21 +115,32 @@ public class MarsworldGui	extends JFrame
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
+//				bia.addComponentListener(new TerminationAdapter()
+//				{
+//					public void componentTerminated()
+//					{
+//						SwingUtilities.invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//								if(timer!=null)
+//									timer.stop();
+//								MarsworldGui.this.dispose();
+//							}
+//						});
+//					}
+//				});
+				
+				bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
-					public void componentTerminated()
+					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								if(timer!=null)
-									timer.stop();
-								MarsworldGui.this.dispose();
-							}
-						});
+						if(timer!=null)
+							timer.stop();
+						MarsworldGui.this.dispose();
 					}
-				});
+				}));
 				return IFuture.DONE;
 			}
 		}).addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()

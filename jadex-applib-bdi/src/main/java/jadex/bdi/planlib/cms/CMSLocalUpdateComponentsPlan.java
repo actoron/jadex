@@ -5,11 +5,12 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 /**
@@ -86,9 +87,18 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 		IComponentDescription[] descs = (IComponentDescription[])fut.get(this);
 		getBeliefbase().getBeliefSet("components").addFacts(descs);
 		
-		getScope().addComponentListener(new TerminationAdapter()
-		{	
-			public void componentTerminated()
+//		getScope().addComponentListener(new TerminationAdapter()
+//		{	
+//			public void componentTerminated()
+//			{
+//				ces.removeComponentListener(null, listener);
+//			}
+//		});
+		
+		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+			.addResultListener(new IntermediateDefaultResultListener<IMonitoringEvent>()
+		{
+			public void intermediateResultAvailable(IMonitoringEvent result)
 			{
 				ces.removeComponentListener(null, listener);
 			}

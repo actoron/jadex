@@ -9,9 +9,13 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
@@ -23,8 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -163,19 +165,28 @@ public class EnvironmentGui	extends JFrame
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
+//				bia.addComponentListener(new TerminationAdapter()
+//				{
+//					public void componentTerminated()
+//					{
+//						SwingUtilities.invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//								EnvironmentGui.this.dispose();
+//							}
+//						});
+//					}
+//				});
+				
+				bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
-					public void componentTerminated()
+					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								EnvironmentGui.this.dispose();
-							}
-						});
+						EnvironmentGui.this.dispose();
 					}
-				});
+				}));
 				return IFuture.DONE;
 			}
 		});

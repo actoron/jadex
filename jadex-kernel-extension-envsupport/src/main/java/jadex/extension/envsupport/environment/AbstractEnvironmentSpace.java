@@ -1,9 +1,7 @@
 package jadex.extension.envsupport.environment;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -14,6 +12,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
@@ -23,7 +22,10 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.extension.envsupport.IObjectCreator;
 import jadex.extension.envsupport.MEnvSpaceInstance;
@@ -39,8 +41,6 @@ import jadex.extension.envsupport.evaluation.IObjectSource;
 import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 import jadex.extension.envsupport.evaluation.ITableDataProvider;
 import jadex.extension.envsupport.evaluation.SpaceObjectSource;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.gui.IObserverCenter;
@@ -48,7 +48,6 @@ import jadex.extension.envsupport.observer.gui.ObserverCenter;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -2862,36 +2861,75 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		{
 			public void customResultAvailable(Void result)
 			{
-				ia.addComponentListener(new IComponentListener()
+//				ia.addComponentListener(new IComponentListener()
+//				{
+//					IFilter filter = new IFilter()
+//					{
+//						public boolean filter(Object obj)
+//						{
+//							IComponentChangeEvent event = (IComponentChangeEvent)obj;
+//							return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
+//						}
+//					};
+//					public IFilter getFilter()
+//					{
+//						return filter;
+//					}
+//					
+//					public IFuture eventOccured(IComponentChangeEvent cce)
+//					{
+//						if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+//						{
+////									System.out.println("add: "+cce.getDetails());
+//							componentAdded((IComponentDescription)cce.getDetails());
+//						}
+//						else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+//						{
+////									System.out.println("rem: "+cce.getComponent());
+//							componentRemoved((IComponentDescription)cce.getDetails());
+//						}
+//						return IFuture.DONE;
+//					}
+//				});
+				
+				final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = ia.subscribeToEvents(new IFilter<IMonitoringEvent>()
 				{
-					IFilter filter = new IFilter()
+					public boolean filter(IMonitoringEvent obj)
 					{
-						public boolean filter(Object obj)
-						{
-							IComponentChangeEvent event = (IComponentChangeEvent)obj;
-							return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
-						}
-					};
-					public IFilter getFilter()
+						return obj.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_COMPONENT);
+					}
+				}, false);
+				
+				sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
+				{
+					public void resultAvailable(Collection<IMonitoringEvent> result)
 					{
-						return filter;
 					}
 					
-					public IFuture eventOccured(IComponentChangeEvent cce)
+					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
-						if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+						if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
 						{
 //									System.out.println("add: "+cce.getDetails());
-							componentAdded((IComponentDescription)cce.getDetails());
+							componentAdded((IComponentDescription)result.getProperty("details"));	
 						}
-						else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+						else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 						{
-//									System.out.println("rem: "+cce.getComponent());
-							componentRemoved((IComponentDescription)cce.getDetails());
+							if((IComponentDescription)result.getProperty("details")==null)
+								System.out.println("huch2");
+							componentRemoved((IComponentDescription)result.getProperty("details"));
 						}
-						return IFuture.DONE;
 					}
-				});
+					
+				    public void finished()
+				    {
+				    }
+				    
+				    public void exceptionOccurred(Exception e)
+				    {
+				    	e.printStackTrace();
+				    }
+				}));
 				super.customResultAvailable(result);
 			}
 		}));	

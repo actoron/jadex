@@ -24,5 +24,5 @@ public interface IMonitoringService
 	 *  @param filter An optional filter.
 	 */
 	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribetoEvents(IFilter<IMonitoringEvent> filter);
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter);
 }

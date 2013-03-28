@@ -7,7 +7,11 @@ import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  The interface for accessing components from the outside.
@@ -108,19 +112,15 @@ public interface IExternalAccess //extends IRemotable
 	 *  @return The type of this component type.
 	 */
 	public String getLocalType();
-	
-	/**
-	 *  Add an component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> addComponentListener(IComponentListener listener);
-	
-	/**
-	 *  Remove a component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> removeComponentListener(IComponentListener listener);
 
+	/**
+	 *  Subscribe to component events.
+	 *  @param filter An optional filter.
+	 *  @param initial True, for receiving the current state.
+	 */
+	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial);
+	
 	/**
 	 *  Get the component results.
 	 *  @return The results.

@@ -19,12 +19,10 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.GoalDelegationHandler;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
-import jadex.bridge.ComponentChangeEvent;
+import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
-import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
@@ -46,7 +44,10 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -57,11 +58,11 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
 import jadex.rules.rulesystem.IRule;
@@ -74,7 +75,6 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,6 +83,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -165,6 +166,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The message service. */
 	//hack???
 	protected IMessageService	msgservice;
+	
+	/** The subscriptions (subscription future -> subscription info). */
+	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>> subscriptions;
 	
 	//-------- null on init --------
 	
@@ -274,7 +278,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.realtime = realtime;
 		this.resultlistener = resultlistener;
 		this.inited = inited;
-		
+				
 		// Hack! todo:
 		interpreters.put(state, this);
 		
@@ -353,6 +357,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 				init(getModel(), config).addResultListener(createResultListener(new DelegationResultListener(inited)));
 				return IFuture.DONE;
 			}
@@ -621,19 +626,24 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 	
 				if(!rulesystem.getAgenda().isEmpty())
-				{
-					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-							IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+				{					
+//					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
+//						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+					
+					publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+					
 					rulesystem.getAgenda().fireRule();
-	
 					act	= rulesystem.getAgenda().getLastActivation();
 		//			System.err.println("here: "+act+", "+rulesystem.getAgenda().getActivations());
 					state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 					state.expungeStaleObjects();
 					state.notifyEventListeners();
 					state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
-					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-							IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+					
+//					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
+//						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+
+					publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
 				}
 	
 				return !rulesystem.getAgenda().isEmpty();
@@ -1914,34 +1924,34 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return new CapabilityFlyweight(state, scope!=null ? scope : initcapa!=null ? findSubcapability(initcapa) : ragent);
 	}
 		
-	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
-	 */
-	public IComponentListener[]	getComponentListeners()
-	{
-		Collection	coll	= getState().getAttributeValues(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners);
-		return coll!=null ? (IComponentListener[])coll.toArray(new IComponentListener[coll.size()]) : new IComponentListener[0];
-	}
-	
-	/**
-	 *  Remove component listener.
-	 */
-	public IFuture<Void>	removeComponentListener(IComponentListener listener)
-	{
-		getState().removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Add component listener.
-	 */
-	public IFuture<Void>	addComponentListener(IComponentListener listener)
-	{
-//		System.out.println("Added: "+listener+", "+getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state));
-		getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
-		return IFuture.DONE;
-	}
+//	/**
+//	 *  Get the component listeners.
+//	 *  @return The component listeners.
+//	 */
+//	public IComponentListener[]	getComponentListeners()
+//	{
+//		Collection	coll	= getState().getAttributeValues(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners);
+//		return coll!=null ? (IComponentListener[])coll.toArray(new IComponentListener[coll.size()]) : new IComponentListener[0];
+//	}
+//	
+//	/**
+//	 *  Remove component listener.
+//	 */
+//	public IFuture<Void>	removeComponentListener(IComponentListener listener)
+//	{
+//		getState().removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+//		return IFuture.DONE;
+//	}
+//	
+//	/**
+//	 *  Add component listener.
+//	 */
+//	public IFuture<Void>	addComponentListener(IComponentListener listener)
+//	{
+////		System.out.println("Added: "+listener+", "+getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state));
+//		getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_componentlisteners, listener);
+//		return IFuture.DONE;
+//	}
 	
 	/**
 	 *  Add an extension instance.
@@ -2016,15 +2026,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return arguments==null? Collections.EMPTY_MAP: arguments;
 	}
 	
-	/**
-	 *  Get the component listeners.
-	 *  @return The component listeners.
-	 */
-	public Collection<IComponentListener> getInternalComponentListeners()
-	{
-		// Todo: support this!?
-		return Collections.EMPTY_LIST;
-	}
+//	/**
+//	 *  Get the component listeners.
+//	 *  @return The component listeners.
+//	 */
+//	public Collection<IComponentListener> getInternalComponentListeners()
+//	{
+//		// Todo: support this!?
+//		return Collections.EMPTY_LIST;
+//	}
 	
 	/**
 	 *  Get the service prefix.
@@ -2143,4 +2153,168 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		return getter;
 	}
+	
+	/**
+	 *  Subscribe to monitoring events.
+	 *  @param filter An optional filter.
+	 */
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial)
+	{
+		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
+		
+		ITerminationCommand tcom = new ITerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				removeSubscription(ret);
+			}
+			
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
+			}
+		};
+		ret.setTerminationCommand(tcom);
+		
+		if(initial)
+		{
+			IMonitoringEvent[] evs = getCurrentStateEvents();
+			if(evs!=null && evs.length>0)
+			{
+				BulkMonitoringEvent bme = new BulkMonitoringEvent(evs);
+				ret.addIntermediateResult(bme);
+			}
+		}
+		
+		addSubscription(ret, filter);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Forward event to all currently registered subscribers.
+	 */
+	public void publishLocalEvent(IMonitoringEvent event)
+	{
+		if(subscriptions!=null)
+		{
+			for(SubscriptionIntermediateFuture<IMonitoringEvent> sub: subscriptions.keySet().toArray(new SubscriptionIntermediateFuture[0]))
+			{
+				publishLocalEvent(event, sub);
+			}
+		}
+	}
+	
+	/**
+	 *  Forward event to one subscribers.
+	 */
+	protected void publishLocalEvent(IMonitoringEvent event, SubscriptionIntermediateFuture<IMonitoringEvent> sub)
+	{
+		IFilter<IMonitoringEvent> fil = subscriptions.get(sub);
+		try
+		{
+			if(fil==null || fil.filter(event))
+			{
+//				System.out.println("forward to: "+sub);
+				if(!sub.addIntermediateResultIfUndone(event))
+				{
+					subscriptions.remove(fil);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			// catch filter exceptions
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Add a new subscription.
+	 *  @param future The subscription future.
+	 *  @param si The subscription info.
+	 */
+	protected void addSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> future, IFilter<IMonitoringEvent> filter)
+	{
+		if(subscriptions==null)
+			subscriptions = new LinkedHashMap<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>>();
+		subscriptions.put(future, filter);
+	}
+	
+	/**
+	 *  Remove an existing subscription.
+	 *  @param fut The subscription future to remove.
+	 */
+	protected void removeSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> fut)
+	{
+		if(subscriptions==null || !subscriptions.containsKey(fut))
+			throw new RuntimeException("Subscriber not known: "+fut);
+		subscriptions.remove(fut);
+	}
+	
+//	/**
+//	 *  Generate added events for the current goals
+//	 */
+//	public List<IMonitoringEvent> getCurrentStateEvents(IInternalAccess ia, IOAVState state, Object capa)
+//	{
+//		List<IMonitoringEvent> events = new ArrayList<IMonitoringEvent>();
+//		
+//		// Beliefs of this capability.
+//		Collection	beliefs	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefs);
+//		if(beliefs!=null)
+//		{
+//			for(Iterator it=beliefs.iterator(); it.hasNext(); )
+//			{
+//				Object	belief	= it.next();
+//				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, belief, capa);
+//				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), belief.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
+//			}
+//		}
+//		
+//		// Belief sets of this capability.
+//		Collection	beliefsets	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefsets);
+//		if(beliefsets!=null)
+//		{
+//			for(Iterator it=beliefsets.iterator(); it.hasNext(); )
+//			{
+//				Object	beliefset	= it.next();
+//				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, beliefset, capa);
+//				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), beliefset.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
+//			}
+//		}
+//		
+//		// Goals of this capability.
+//		Collection	goals	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_goals);
+//		if(goals!=null)
+//		{
+//			for(Iterator it=goals.iterator(); it.hasNext(); )
+//			{
+//				Object	goal	= it.next();
+//				GoalInfo	info = GoalInfo.createGoalInfo(state, goal, capa);
+//				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_GOAL, info.getType(), goal.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
+//			}
+//		}
+//		
+//		// Plans of this capability.
+//		Collection	plans	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_plans);
+//		if(plans!=null)
+//		{
+//			for(Iterator it=plans.iterator(); it.hasNext(); )
+//			{
+//				Object	plan	= it.next();
+//				PlanInfo	info = PlanInfo.createPlanInfo(state, plan, capa);
+//				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_PLAN, info.getType(), plan.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
+//			}
+//		}
+//		
+//		// Recurse for sub capabilities.
+//		Collection	capas	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_subcapabilities);
+//		if(capas!=null)
+//		{
+//			for(Iterator it=capas.iterator(); it.hasNext(); )
+//			{
+//				getInitialEvents(ia, state, state.getAttributeValue(it.next(), OAVBDIRuntimeModel.capabilityreference_has_capability), events);
+//			}
+//		}
+//	}
 }

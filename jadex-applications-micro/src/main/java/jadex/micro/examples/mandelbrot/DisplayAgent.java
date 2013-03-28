@@ -3,13 +3,17 @@ package jadex.micro.examples.mandelbrot;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.commons.IFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
@@ -103,19 +107,28 @@ public class DisplayAgent extends MicroAgent
 					@Classname("dispose")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.addComponentListener(new TerminationAdapter()
+//						ia.addComponentListener(new TerminationAdapter()
+//						{
+//							public void componentTerminated()
+//							{
+//								SwingUtilities.invokeLater(new Runnable()
+//								{
+//									public void run()
+//									{
+//										frame.dispose();
+//									}
+//								});
+//							}
+//						});
+						
+						ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+							.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 						{
-							public void componentTerminated()
+							public void intermediateResultAvailable(IMonitoringEvent result)
 							{
-								SwingUtilities.invokeLater(new Runnable()
-								{
-									public void run()
-									{
-										frame.dispose();
-									}
-								});
+								frame.dispose();
 							}
-						});
+						}));
 						
 						return IFuture.DONE;
 					}

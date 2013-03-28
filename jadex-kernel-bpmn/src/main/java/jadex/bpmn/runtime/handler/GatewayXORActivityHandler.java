@@ -6,7 +6,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
-import jadex.bridge.IComponentChangeEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.IValueFetcher;
 import jadex.javaparser.IParsedExpression;
 
@@ -27,7 +27,7 @@ public class GatewayXORActivityHandler implements IActivityHandler
 	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		// Notify listeners as gateways are not followed by step handler execution
-		instance.notifyListeners(instance.createActivityEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread, activity));
+		instance.publishEvent(instance.createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity));
 		
 		List	incoming	= activity.getIncomingSequenceEdges();
 		List	outgoing	= activity.getOutgoingSequenceEdges();

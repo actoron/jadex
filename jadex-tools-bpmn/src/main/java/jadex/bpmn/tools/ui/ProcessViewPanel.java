@@ -1,20 +1,17 @@
 package jadex.bpmn.tools.ui;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.tools.ProcessThreadInfo;
-import jadex.bridge.BulkComponentChangeEvent;
-import jadex.bridge.IComponentChangeEvent;
-import jadex.bridge.IComponentListener;
-import jadex.bridge.IComponentStep;
+import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -34,7 +31,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -69,8 +65,9 @@ public class ProcessViewPanel extends JPanel
 	protected IBreakpointPanel	bpp;
 
 	/** The change listener. */
-	protected IComponentListener listener;
-
+//	protected IComponentListener listener;
+	protected ISubscriptionIntermediateFuture<IMonitoringEvent> sub;
+	
 
 	//------- constructors --------
 	
@@ -110,91 +107,146 @@ public class ProcessViewPanel extends JPanel
 		final JCheckBox hon = new JCheckBox("Store History");
 		hon.setSelected(true);
 			
-		listener = new IComponentListener()
+//		listener = new IComponentListener()
+//		{
+//			protected IFilter filter = new IFilter()
+//			{
+//				@Classname("filter")
+//				public boolean filter(Object obj)
+//				{
+////					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
+//					return true;//cce.getSourceCategory().equals(BpmnInterpreter.TYPE_THREAD);
+//				}
+//			};
+//			
+//			public IFilter getFilter()
+//			{
+//				return filter;
+//			}
+//			
+//			public IFuture eventOccured(final IComponentChangeEvent cce)
+//			{
+//				// todo: hide decomposing bulk events
+//				if(cce instanceof BulkMonitoringEvent)
+//				{
+//					IComponentChangeEvent[] events = cce.getBulkEvents();
+//					for(int i=0; events!=null && i<events.length; i++)
+//					{
+//						eventOccured(events[i]);
+//					}
+//					return IFuture.DONE;
+//				}
+//								
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						if(cce.getSourceCategory().equals(BpmnInterpreter.TYPE_THREAD))
+//						{
+//							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()))
+//							{
+//								threadinfos.add(cce.getDetails());
+//							}
+//							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
+//							{
+//								threadinfos.remove(cce.getDetails());
+//							}
+//							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()))
+//							{
+//								threadinfos.remove(cce.getDetails());
+//								threadinfos.add(cce.getDetails());
+//							}
+//						}
+//						else if(cce.getSourceCategory().equals(BpmnInterpreter.TYPE_ACTIVITY))
+//						{
+//							if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
+//							{
+//								historyinfos.add(0, cce.getDetails());
+//							}
+//						}
+////						System.out.println("ti: "+threadinfos.size()+" "+cce.getSourceName()+" "+cce.getSourceType()+" "+cce.getEventType());
+//						updateViews();
+//					}
+//				});
+//				return IFuture.DONE;
+//			}
+//		};
+		
+//		final IComponentListener lis = listener;
+//		access.scheduleImmediate(new IComponentStep<Void>()
+//		{
+//			@Classname("installListener")
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				// Post current state to remote listener
+//				BpmnInterpreter	interpreter	= (BpmnInterpreter)ia;
+//				final List	events	= new ArrayList();
+//				for(Iterator it=interpreter.getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+//				{
+//					events.add(interpreter.createThreadEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, (ProcessThread)it.next()));
+//				}
+//				lis.eventOccured(new BulkMonitoringEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
+//				
+//				ia.addComponentListener(lis);
+//				return IFuture.DONE;
+//			}
+//		});
+		
+		// todo: initial/current state
+		
+		sub = access.subscribeToEvents(new IFilter<IMonitoringEvent>()
 		{
-			protected IFilter filter = new IFilter()
+			public boolean filter(IMonitoringEvent ev)
 			{
-				@Classname("filter")
-				public boolean filter(Object obj)
-				{
-//					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
-					return true;//cce.getSourceCategory().equals(BpmnInterpreter.TYPE_THREAD);
-				}
-			};
-			
-			public IFilter getFilter()
-			{
-				return filter;
+				return true;	
 			}
-			
-			public IFuture eventOccured(final IComponentChangeEvent cce)
+		}, true);
+		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
+		{
+			public void intermediateResultAvailable(IMonitoringEvent event)
 			{
 				// todo: hide decomposing bulk events
-				if(cce instanceof BulkComponentChangeEvent)
+				if(event instanceof BulkMonitoringEvent)
 				{
-					IComponentChangeEvent[] events = cce.getBulkEvents();
-					for(int i=0; events!=null && i<events.length; i++)
+					BulkMonitoringEvent bev = (BulkMonitoringEvent)event;
+					if(bev.getBulkEvents().length>0)
 					{
-						eventOccured(events[i]);
-					}
-					return IFuture.DONE;
-				}
-								
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						if(cce.getSourceCategory().equals(BpmnInterpreter.TYPE_THREAD))
+						IMonitoringEvent[] events = bev.getBulkEvents();
+						for(int i=0; i<events.length; i++)
 						{
-							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()))
-							{
-								threadinfos.add(cce.getDetails());
-							}
-							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
-							{
-								threadinfos.remove(cce.getDetails());
-							}
-							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()))
-							{
-								threadinfos.remove(cce.getDetails());
-								threadinfos.add(cce.getDetails());
-							}
+							intermediateResultAvailable(events[i]);
 						}
-						else if(cce.getSourceCategory().equals(BpmnInterpreter.TYPE_ACTIVITY))
-						{
-							if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
-							{
-								historyinfos.add(0, cce.getDetails());
-							}
-						}
-//						System.out.println("ti: "+threadinfos.size()+" "+cce.getSourceName()+" "+cce.getSourceType()+" "+cce.getEventType());
-						updateViews();
 					}
-				});
-				return IFuture.DONE;
-			}
-		};
-
-		final IComponentListener lis = listener;
-		access.scheduleImmediate(new IComponentStep<Void>()
-		{
-			@Classname("installListener")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				// Post current state to remote listener
-				BpmnInterpreter	interpreter	= (BpmnInterpreter)ia;
-				final List	events	= new ArrayList();
-				for(Iterator it=interpreter.getThreadContext().getAllThreads().iterator(); it.hasNext(); )
-				{
-					events.add(interpreter.createThreadEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, (ProcessThread)it.next()));
 				}
-				lis.eventOccured(new BulkComponentChangeEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
 				
-				ia.addComponentListener(lis);
-				return IFuture.DONE;
+				if(event.getType().endsWith(BpmnInterpreter.TYPE_THREAD))
+				{
+					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
+					{
+						threadinfos.add(event.getProperty("details"));
+					}
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
+					{
+						threadinfos.remove(event.getProperty("details"));
+					}
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_MODIFICATION))
+					{
+						threadinfos.remove(event.getProperty("details"));
+						threadinfos.add(event.getProperty("details"));
+					}
+				}
+				else if(event.getType().endsWith(BpmnInterpreter.TYPE_ACTIVITY))
+				{
+					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
+					{
+						historyinfos.add(0, event.getProperty("details"));
+					}
+				}
+//				System.out.println("ti: "+threadinfos.size()+" "+cce.getSourceName()+" "+cce.getSourceType()+" "+cce.getEventType());
+				updateViews();
 			}
-		});
-		
+		}));
+						
 //		new IRemoteChangeListener()
 //		{
 //			public IFuture changeOccurred(final ChangeEvent event)
@@ -305,16 +357,18 @@ public class ProcessViewPanel extends JPanel
 	 */
 	public void	dispose()
 	{
-		final IComponentListener lis = listener;
-		access.scheduleImmediate(new IComponentStep<Void>()
-		{
-			@Classname("dispose")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				ia.removeComponentListener(lis);
-				return IFuture.DONE;
-			}
-		});
+		sub.terminate();
+		
+//		final IComponentListener lis = listener;
+//		access.scheduleImmediate(new IComponentStep<Void>()
+//		{
+//			@Classname("dispose")
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				ia.removeComponentListener(lis);
+//				return IFuture.DONE;
+//			}
+//		});
 	}
 	
 	//-------- helper methods --------

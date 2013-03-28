@@ -9,12 +9,14 @@ import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.IPojoMicroAgent;
 
@@ -104,21 +106,32 @@ public class EnvironmentGui	extends JFrame
 			{
 //				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				
-				ia.addComponentListener(new TerminationAdapter()
+//				ia.addComponentListener(new TerminationAdapter()
+//				{
+//					public void componentTerminated()
+//					{
+//						SwingUtilities.invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//								if(timer!=null)
+//									timer.stop();
+//								EnvironmentGui.this.dispose();
+//							}
+//						});
+//					}
+//				});
+				
+				ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
-					public void componentTerminated()
+					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								if(timer!=null)
-									timer.stop();
-								EnvironmentGui.this.dispose();
-							}
-						});
+						if(timer!=null)
+							timer.stop();
+						EnvironmentGui.this.dispose();
 					}
-				});
+				}));
 				
 //				System.out.println(((IPojoMicroAgent)ia).getPojoAgent().getClass().getClassLoader());
 							

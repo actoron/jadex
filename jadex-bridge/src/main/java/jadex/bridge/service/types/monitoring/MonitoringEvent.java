@@ -79,7 +79,7 @@ public class MonitoringEvent implements IMonitoringEvent
 	 */
 	public Object getProperty(String name)
 	{
-		return properties.get(name);
+		return properties==null? null: properties.get(name);
 	}
 	
 	/**

@@ -73,7 +73,7 @@ public class ProcessThread	implements ITaskContext
 	protected MSequenceEdge	edge;
 		
 	/** The data of the current or last activity. */
-	protected Map data;
+	protected Map<String, Object> data;
 	
 	/** The thread context. */
 	protected ThreadContext	context;
@@ -92,7 +92,7 @@ public class ProcessThread	implements ITaskContext
 	protected Object waitinfo;
 	
 	/** The wait filter. */
-	protected IFilter waitfilter;
+	protected IFilter<Object> waitfilter;
 	
 	/** The current task. */
 	protected ITask task;
@@ -285,7 +285,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Get the wait filter.
 	 *  @return The waitfilter.
 	 */
-	public IFilter getWaitFilter()
+	public IFilter<Object> getWaitFilter()
 	{
 		return this.waitfilter;
 	}
@@ -294,7 +294,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Set the wait filter.
 	 *  @param waitfilter The waitfilter to set.
 	 */
-	public void setWaitFilter(IFilter waitfilter)
+	public void setWaitFilter(IFilter<Object> waitfilter)
 	{
 		this.waitfilter = waitfilter;
 	}
@@ -324,7 +324,7 @@ public class ProcessThread	implements ITaskContext
 	{
 		ProcessThread	ret	= new ProcessThread(id+"."+idcnt++, activity, context, instance);
 		ret.edge	= edge;
-		ret.data	= data!=null? new HashMap(data): null;
+		ret.data	= data!=null? new HashMap<String, Object>(data): null;
 		ret.splitinfos	= splitinfos!=null ? new LinkedHashMap<String, SplitInfo>(splitinfos) : null;
 		return ret;
 	}
@@ -403,7 +403,7 @@ public class ProcessThread	implements ITaskContext
 		}
 			
 		if(data==null)
-			data = new HashMap();
+			data = new HashMap<String, Object>();
 		
 		if(key==null)
 		{
@@ -598,7 +598,7 @@ public class ProcessThread	implements ITaskContext
 		// Test lane
 		if(ret && lane!=null)
 		{
-			List	lanes	= new ArrayList();
+			List<MLane>	lanes	= new ArrayList<MLane>();
 			MLane	mlane	= getActivity().getLane();
 			while(mlane!=null)
 			{
@@ -628,8 +628,8 @@ public class ProcessThread	implements ITaskContext
 			|| getActivity() instanceof MSubProcess)
 		{
 			// Handle parameter passing in edge inscriptions.
-			Map	passedparams = null;
-			Set	indexparams	= null;
+			Map<String, Object>	passedparams = null;
+			Set<String>	indexparams	= null;
 			if(getLastEdge()!=null && getLastEdge().getParameterMappings()!=null)
 			{
 				IndexMap mappings = getLastEdge().getParameterMappings();
@@ -667,19 +667,19 @@ public class ProcessThread	implements ITaskContext
 						if(getActivity().hasParameter(name))
 						{
 							if(passedparams==null)
-								passedparams	= new HashMap();
+								passedparams	= new HashMap<String, Object>();
 							
 							if(iexp!=null)
 							{
 								if(!passedparams.containsKey(name))
 								{
-									passedparams.put(name, new ArrayList());
+									passedparams.put(name, new ArrayList<Object>());
 									if(indexparams==null)
-										indexparams	= new HashSet();
+										indexparams	= new HashSet<String>();
 									
 									indexparams.add(name);
 								}
-								((List)passedparams.get(name)).add(new Object[]{index, value});
+								((List<Object>)passedparams.get(name)).add(new Object[]{index, value});
 							}
 							else
 							{
@@ -717,7 +717,7 @@ public class ProcessThread	implements ITaskContext
 						
 			// todo: parameter direction / class
 			
-			Set before = data!=null? new HashSet(data.keySet()): Collections.EMPTY_SET;
+			Set<String> before = data!=null? new HashSet<String>(data.keySet()): Collections.EMPTY_SET;
 			before.remove(ProcessServiceInvocationHandler.THREAD_PARAMETER_SERVICE_RESULT);	// Hack!!! Keep future available locally for thread.
 			IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getFetcher());
 			IndexMap params = getActivity().getParameters();
@@ -731,7 +731,7 @@ public class ProcessThread	implements ITaskContext
 						if(indexparams!=null && indexparams.contains(param.getName()))
 						{
 							Object	array	= getParameterValue(param.getName());
-							List	values	= (List)passedparams.get(param.getName());
+							List<Object[]>	values	= (List<Object[]>)passedparams.get(param.getName());
 							for(int i=0; i<values.size(); i++)
 							{
 								Object[]	entry	= (Object[])values.get(i);
@@ -760,7 +760,7 @@ public class ProcessThread	implements ITaskContext
 			}
 			
 			// Remove old data (all values that have not been renewed).
-			for(Iterator it=before.iterator(); it.hasNext(); )
+			for(Iterator<String> it=before.iterator(); it.hasNext(); )
 			{
 				data.remove(it.next());
 			}
@@ -777,7 +777,7 @@ public class ProcessThread	implements ITaskContext
 //		System.out.println("after: "+act);
 		if(MBpmnModel.TASK.equals(activity.getActivityType()) || activity instanceof MSubProcess)
 		{
-			List params = activity.getParameters(new String[]{MParameter.DIRECTION_IN});
+			List<MParameter> params = activity.getParameters(new String[]{MParameter.DIRECTION_IN});
 			for(int i=0; i<params.size(); i++)
 			{
 				MParameter inp = (MParameter)params.get(i);

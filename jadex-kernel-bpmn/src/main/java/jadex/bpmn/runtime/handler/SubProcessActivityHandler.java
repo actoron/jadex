@@ -9,13 +9,12 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.ThreadContext;
-import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -247,9 +246,12 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //										newthread.setActivity(act);
 										newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
 										thread.getThreadContext().addThread(newthread);
-										ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-											thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
-										instance.notifyListeners(cce);
+										
+//										ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
+//											thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
+//										instance.notifyListeners(cce);
+										
+										instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread));
 									}
 								}
 							}

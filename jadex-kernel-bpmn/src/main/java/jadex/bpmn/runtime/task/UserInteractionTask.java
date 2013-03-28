@@ -5,14 +5,18 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.task.info.TaskMetaInfo;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -25,6 +29,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.JCheckBox;
@@ -60,23 +65,35 @@ public class UserInteractionTask implements ITask
 	{
 		final Future ret = new Future();
 		
-		final IComponentListener	lis	= new TerminationAdapter()
+//		final IComponentListener	lis	= new TerminationAdapter()
+//		{
+//			public void componentTerminated()
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						if(dialog!=null)
+//						{
+//							dialog.setVisible(false);
+//						}
+//					}
+//				});
+//			}
+//		};
+//		instance.addComponentListener(lis);
+
+		final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = instance.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false);
+		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
-			public void componentTerminated()
+			public void intermediateResultAvailable(IMonitoringEvent result)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				if(dialog!=null)
 				{
-					public void run()
-					{
-						if(dialog!=null)
-						{
-							dialog.setVisible(false);
-						}
-					}
-				});
+					dialog.setVisible(false);
+				}
 			}
-		};
-		instance.addComponentListener(lis);
+		}));
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -194,7 +211,8 @@ public class UserInteractionTask implements ITask
 		                	@Classname("rem")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								ia.removeComponentListener(lis);
+		                		sub.terminate();
+//								ia.removeComponentListener(lis);
 								return IFuture.DONE;
 							}
 						});

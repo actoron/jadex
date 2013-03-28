@@ -9,9 +9,8 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
-import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentChangeEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 
 import java.util.Iterator;
 import java.util.List;
@@ -54,10 +53,10 @@ public class DefaultStepHandler implements IStepHandler
 			remove = thread.getThreadContext().getSubcontext(thread);
 			
 			// Continue with timer edge.
-			List outedges = activity.getOutgoingSequenceEdges();
+			List<MSequenceEdge> outedges = activity.getOutgoingSequenceEdges();
 			if(outedges!=null && outedges.size()==1)
 			{
-				next = (MSequenceEdge)outedges.get(0);
+				next = outedges.get(0);
 			}
 			else if(outedges!=null && outedges.size()>1)
 			{
@@ -75,7 +74,7 @@ public class DefaultStepHandler implements IStepHandler
 				// Normal flow
 				if(ex==null)
 				{
-					List	outgoing	= activity.getOutgoingSequenceEdges();
+					List<MSequenceEdge>	outgoing	= activity.getOutgoingSequenceEdges();
 					if(outgoing!=null && outgoing.size()==1)
 					{
 						next	= (MSequenceEdge)outgoing.get(0);
@@ -90,10 +89,10 @@ public class DefaultStepHandler implements IStepHandler
 				// Exception flow.
 				else
 				{
-					List	handlers	= activity.getEventHandlers();
+					List<MActivity>	handlers	= activity.getEventHandlers();
 					for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
 					{
-						MActivity	handler	= (MActivity) handlers.get(i);
+						MActivity	handler	= handlers.get(i);
 						if(handler.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_ERROR))//"EventIntermediateError"))
 						{
 							// Todo: match exception types.
@@ -116,7 +115,7 @@ public class DefaultStepHandler implements IStepHandler
 						// Cancel subprocess handlers.
 						if(activity instanceof MSubProcess)
 						{
-							List	handlers	= activity.getEventHandlers();
+							List<MActivity>	handlers	= activity.getEventHandlers();
 							for(int i=0; handlers!=null && i<handlers.size(); i++)
 							{
 								MActivity handler = (MActivity)handlers.get(i);
@@ -144,18 +143,23 @@ public class DefaultStepHandler implements IStepHandler
 			// Todo: Callbacks for aborted threads (to abort external activities)
 			thread.getThreadContext().removeSubcontext(remove);
 			
-			for(Iterator it=remove.getAllThreads().iterator(); it.hasNext(); )
+			for(Iterator<ProcessThread> it=remove.getAllThreads().iterator(); it.hasNext(); )
 			{
-				ProcessThread	pt	= (ProcessThread)it.next();
-				ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, pt.getClass().getName(), 
-					pt.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(pt));
-				instance.notifyListeners(cce);
+				ProcessThread	pt	= it.next();
+//				ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, pt.getClass().getName(), 
+//					pt.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(pt));
+//				instance.notifyListeners(cce);
 //				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, (ProcessThread)it.next());
+				
+				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread));
+
 			}
-			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-				thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(thread));
-			instance.notifyListeners(cce);
+//			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
+//				thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(thread));
+//			instance.notifyListeners(cce);
 //			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_CHANGED, thread);
+			instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread));
+
 		}
 
 		if(ex!=null && next==null)

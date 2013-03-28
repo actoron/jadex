@@ -1,27 +1,21 @@
 package jadex.tools.debugger.bdi;
 
-import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.interpreter.AbstractBDIInfo;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefInfo;
 import jadex.bdi.runtime.interpreter.GoalInfo;
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanInfo;
-import jadex.bridge.BulkComponentChangeEvent;
-import jadex.bridge.ComponentChangeEvent;
-import jadex.bridge.IComponentChangeEvent;
-import jadex.bridge.IComponentListener;
-import jadex.bridge.IComponentStep;
+import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SortedList;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
-import jadex.commons.transformation.annotations.Classname;
-import jadex.rules.state.IOAVState;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -31,7 +25,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,7 +44,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.table.AbstractTableModel;
@@ -105,7 +97,8 @@ public class BDIViewerPanel extends JPanel
 	protected List	plans;
 	
 	/** The component listener. */
-	protected IComponentListener	listener;
+//	protected IComponentListener	listener;
+	protected ISubscriptionIntermediateFuture<IMonitoringEvent> sub;
 	
 	/** The known capabilities (full name). */
 	protected Set capas;
@@ -397,242 +390,368 @@ public class BDIViewerPanel extends JPanel
 			}
 		});
 		
-		listener = new IComponentListener()
+//		listener = new IComponentListener()
+//		{
+//			protected IFilter filter = new IFilter()
+//			{
+//				@Classname("filter")
+//				public boolean filter(Object obj)
+//				{
+//					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
+//					return cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_FACT)
+//						|| cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_GOAL)
+//						|| cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_PLAN);
+//				}
+//			};
+//			
+//			public IFilter getFilter()
+//			{
+//				return filter;
+//			}
+//			
+//			public IFuture eventOccured(final IComponentChangeEvent cce)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						List beliefsel = getTableSelection(belieftable, beliefs);
+//						List goalsel = getTableSelection(goaltable, goals);
+//						List plansel = getTableSelection(plantable, plans);
+//						
+//						handleEvent(cce);
+//						
+//						updateTable(belieftable, beliefs, beliefsel);
+//						updateTable(goaltable, goals, goalsel);
+//						updateTable(plantable, plans, plansel);
+//						
+//						updateSelectedBelief(belieftable, factmodel);
+//					}
+//					
+//					public void handleEvent(IComponentChangeEvent event)
+//					{
+//						// todo: hide decomposing bulk events
+//						if(cce.getBulkEvents().length>0)
+//						{
+//							IComponentChangeEvent[] events = cce.getBulkEvents();
+//							for(int i=0; i<events.length; i++)
+//							{
+//								eventOccured(events[i]);
+//							}
+//						}
+//						
+//						else if(cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_FACT))
+//						{
+//							// Hack!!! create/disposal only for facts, not for beliefs, just check for changes, removal not supported.
+//							int	index	= allbeliefs.indexOf(cce.getDetails());
+//							if(index!=-1)
+//							{
+//								BeliefInfo	newinfo	= (BeliefInfo)cce.getDetails();
+//								BeliefInfo	oldinfo	= (BeliefInfo)allbeliefs.remove(index);
+//								beliefs.remove(newinfo);
+//								newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
+//								allbeliefs.add(newinfo);
+//								if(checkCapa(newinfo.getType()))
+//									beliefs.add(newinfo);								
+//							}
+//							else
+//							{
+//								allbeliefs.add(cce.getDetails());
+//								if(checkCapa(((BeliefInfo)cce.getDetails()).getType()))
+//									beliefs.add(cce.getDetails());
+//							}
+//						}
+//						
+//						else if(cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_GOAL))
+//						{
+//							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()))
+//							{
+//								allgoals.add(cce.getDetails());
+//								if(checkCapa(((GoalInfo)cce.getDetails()).getType()))
+//									goals.add(cce.getDetails());
+//							}
+//							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
+//							{
+//								allgoals.remove(cce.getDetails());
+//								goals.remove(cce.getDetails());
+//							}
+//							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()))
+//							{
+//								int	index	= allgoals.indexOf(cce.getDetails());
+//								if(index!=-1)
+//								{
+//									GoalInfo	newinfo	= (GoalInfo)cce.getDetails();
+//									GoalInfo	oldinfo	= (GoalInfo)allgoals.remove(index);
+//									goals.remove(newinfo);
+//									newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
+//									allgoals.add(newinfo);
+//									if(checkCapa(newinfo.getType()))
+//										goals.add(newinfo);
+//								}
+//							}
+//						}
+//						
+//						else if(cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_PLAN))
+//						{
+//							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()))
+//							{
+//								allplans.add(cce.getDetails());
+//								if(checkCapa(((PlanInfo)cce.getDetails()).getType()))
+//									plans.add(cce.getDetails());
+//							}
+//							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
+//							{
+//								allplans.remove(cce.getDetails());
+//								plans.remove(cce.getDetails());
+//							}
+//							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()))
+//							{
+//								int	index	= allplans.indexOf(cce.getDetails());
+//								if(index!=-1)
+//								{
+//									PlanInfo	newinfo	= (PlanInfo)cce.getDetails();
+//									PlanInfo	oldinfo	= (PlanInfo)allplans.remove(index);
+//									plans.remove(newinfo);
+//									newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
+//									allplans.add(newinfo);
+//									if(checkCapa(newinfo.getType()))
+//										plans.add(newinfo);
+//								}
+//							}
+//						}
+//					}
+//				});
+//				return IFuture.DONE;
+//			}
+//		};
+//
+//		final IComponentListener lis = listener;
+//		access.scheduleImmediate(new IComponentStep<Void>()
+//		{
+//			@Classname("installListener")
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(((CapabilityFlyweight)ia).getState());
+//				
+//				// Post current state to remote listener
+//				List	events	= new ArrayList();
+//				getInitialEvents(ia, interpreter.getState(), interpreter.getAgent(), events);
+//				lis.eventOccured(new BulkMonitoringEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
+//				
+//				ia.addComponentListener(lis);
+//				return IFuture.DONE;
+//			}
+//		});
+		
+		
+		sub = access.subscribeToEvents(new IFilter<IMonitoringEvent>()
 		{
-			protected IFilter filter = new IFilter()
+			public boolean filter(IMonitoringEvent ev)
 			{
-				@Classname("filter")
-				public boolean filter(Object obj)
+				return ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_FACT)
+					|| ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_GOAL)
+					|| ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_PLAN);
+			}
+		}, true);
+		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
+		{
+			public void intermediateResultAvailable(IMonitoringEvent event)
+			{
+				// todo: hide decomposing bulk events
+				List beliefsel = getTableSelection(belieftable, beliefs);
+				List goalsel = getTableSelection(goaltable, goals);
+				List plansel = getTableSelection(plantable, plans);
+				
+				handleEvent(event);
+				
+				updateTable(belieftable, beliefs, beliefsel);
+				updateTable(goaltable, goals, goalsel);
+				updateTable(plantable, plans, plansel);
+				
+				updateSelectedBelief(belieftable, factmodel);
+			}
+			
+			public void handleEvent(IMonitoringEvent event)
+			{
+				// todo: hide decomposing bulk events
+				if(event instanceof BulkMonitoringEvent)
 				{
-					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
-					return cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_FACT)
-						|| cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_GOAL)
-						|| cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_PLAN);
+					BulkMonitoringEvent bev = (BulkMonitoringEvent)event;
+					if(bev.getBulkEvents().length>0)
+					{
+						IMonitoringEvent[] events = bev.getBulkEvents();
+						for(int i=0; i<events.length; i++)
+						{
+							intermediateResultAvailable(events[i]);
+						}
+					}
 				}
-			};
-			
-			public IFilter getFilter()
-			{
-				return filter;
-			}
-			
-			public IFuture eventOccured(final IComponentChangeEvent cce)
-			{
-				SwingUtilities.invokeLater(new Runnable()
+				else if(event.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_FACT))
 				{
-					public void run()
+					// Hack!!! create/disposal only for facts, not for beliefs, just check for changes, removal not supported.
+					int	index	= allbeliefs.indexOf(event.getProperty("details"));
+					if(index!=-1)
 					{
-						List beliefsel = getTableSelection(belieftable, beliefs);
-						List goalsel = getTableSelection(goaltable, goals);
-						List plansel = getTableSelection(plantable, plans);
-						
-						handleEvent(cce);
-						
-						updateTable(belieftable, beliefs, beliefsel);
-						updateTable(goaltable, goals, goalsel);
-						updateTable(plantable, plans, plansel);
-						
-						updateSelectedBelief(belieftable, factmodel);
+						BeliefInfo	newinfo	= (BeliefInfo)event.getProperty("details");
+						BeliefInfo	oldinfo	= (BeliefInfo)allbeliefs.remove(index);
+						beliefs.remove(newinfo);
+						newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
+						allbeliefs.add(newinfo);
+						if(checkCapa(newinfo.getType()))
+							beliefs.add(newinfo);								
 					}
-					
-					public void handleEvent(IComponentChangeEvent event)
+					else
 					{
-						// todo: hide decomposing bulk events
-						if(cce.getBulkEvents().length>0)
+						allbeliefs.add(event.getProperty("details"));
+						if(checkCapa(((BeliefInfo)event.getProperty("details")).getType()))
+							beliefs.add(event.getProperty("details"));
+					}
+				}
+				
+				else if(event.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_GOAL))
+				{
+					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
+					{
+						allgoals.add(event.getProperty("details"));
+						if(checkCapa(((GoalInfo)event.getProperty("details")).getType()))
+							goals.add(event.getProperty("details"));
+					}
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
+					{
+						allgoals.remove(event.getProperty("details"));
+						goals.remove(event.getProperty("details"));
+					}
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_MODIFICATION))
+					{
+						int	index	= allgoals.indexOf(event.getProperty("details"));
+						if(index!=-1)
 						{
-							IComponentChangeEvent[] events = cce.getBulkEvents();
-							for(int i=0; i<events.length; i++)
-							{
-								eventOccured(events[i]);
-							}
-						}
-						
-						else if(cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_FACT))
-						{
-							// Hack!!! create/disposal only for facts, not for beliefs, just check for changes, removal not supported.
-							int	index	= allbeliefs.indexOf(cce.getDetails());
-							if(index!=-1)
-							{
-								BeliefInfo	newinfo	= (BeliefInfo)cce.getDetails();
-								BeliefInfo	oldinfo	= (BeliefInfo)allbeliefs.remove(index);
-								beliefs.remove(newinfo);
-								newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
-								allbeliefs.add(newinfo);
-								if(checkCapa(newinfo.getType()))
-									beliefs.add(newinfo);								
-							}
-							else
-							{
-								allbeliefs.add(cce.getDetails());
-								if(checkCapa(((BeliefInfo)cce.getDetails()).getType()))
-									beliefs.add(cce.getDetails());
-							}
-						}
-						
-						else if(cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_GOAL))
-						{
-							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()))
-							{
-								allgoals.add(cce.getDetails());
-								if(checkCapa(((GoalInfo)cce.getDetails()).getType()))
-									goals.add(cce.getDetails());
-							}
-							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
-							{
-								allgoals.remove(cce.getDetails());
-								goals.remove(cce.getDetails());
-							}
-							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()))
-							{
-								int	index	= allgoals.indexOf(cce.getDetails());
-								if(index!=-1)
-								{
-									GoalInfo	newinfo	= (GoalInfo)cce.getDetails();
-									GoalInfo	oldinfo	= (GoalInfo)allgoals.remove(index);
-									goals.remove(newinfo);
-									newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
-									allgoals.add(newinfo);
-									if(checkCapa(newinfo.getType()))
-										goals.add(newinfo);
-								}
-							}
-						}
-						
-						else if(cce.getSourceCategory().equals(IComponentChangeEvent.SOURCE_CATEGORY_PLAN))
-						{
-							if(IComponentChangeEvent.EVENT_TYPE_CREATION.equals(cce.getEventType()))
-							{
-								allplans.add(cce.getDetails());
-								if(checkCapa(((PlanInfo)cce.getDetails()).getType()))
-									plans.add(cce.getDetails());
-							}
-							else if(IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(cce.getEventType()))
-							{
-								allplans.remove(cce.getDetails());
-								plans.remove(cce.getDetails());
-							}
-							else if(IComponentChangeEvent.EVENT_TYPE_MODIFICATION.equals(cce.getEventType()))
-							{
-								int	index	= allplans.indexOf(cce.getDetails());
-								if(index!=-1)
-								{
-									PlanInfo	newinfo	= (PlanInfo)cce.getDetails();
-									PlanInfo	oldinfo	= (PlanInfo)allplans.remove(index);
-									plans.remove(newinfo);
-									newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
-									allplans.add(newinfo);
-									if(checkCapa(newinfo.getType()))
-										plans.add(newinfo);
-								}
-							}
+							GoalInfo	newinfo	= (GoalInfo)event.getProperty("details");
+							GoalInfo	oldinfo	= (GoalInfo)allgoals.remove(index);
+							goals.remove(newinfo);
+							newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
+							allgoals.add(newinfo);
+							if(checkCapa(newinfo.getType()))
+								goals.add(newinfo);
 						}
 					}
-				});
-				return IFuture.DONE;
-			}
-		};
-
-		final IComponentListener lis = listener;
-		access.scheduleImmediate(new IComponentStep<Void>()
-		{
-			@Classname("installListener")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(((CapabilityFlyweight)ia).getState());
+				}
 				
-				// Post current state to remote listener
-				List	events	= new ArrayList();
-				getInitialEvents(ia, interpreter.getState(), interpreter.getAgent(), events);
-				lis.eventOccured(new BulkComponentChangeEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
-				
-				ia.addComponentListener(lis);
-				return IFuture.DONE;
+				else if(event.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_PLAN))
+				{
+					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
+					{
+						allplans.add(event.getProperty("details"));
+						if(checkCapa(((PlanInfo)event.getProperty("details")).getType()))
+							plans.add(event.getProperty("details"));
+					}
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
+					{
+						allplans.remove(event.getProperty("details"));
+						plans.remove(event.getProperty("details"));
+					}
+					else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_MODIFICATION))
+					{
+						int	index	= allplans.indexOf(event.getProperty("details"));
+						if(index!=-1)
+						{
+							PlanInfo	newinfo	= (PlanInfo)event.getProperty("details");
+							PlanInfo	oldinfo	= (PlanInfo)allplans.remove(index);
+							plans.remove(newinfo);
+							newinfo.setType(oldinfo.getType());	// Hack!!! Keep capability information which is unavailable for modified events.
+							allplans.add(newinfo);
+							if(checkCapa(newinfo.getType()))
+								plans.add(newinfo);
+						}
+					}
+				}
 			}
-		});
+		}));
 	}
 	
 	//-------- helper methods --------
 	
-	/**
-	 *  Generate added events for the current goals
-	 */
-	protected static void	getInitialEvents(IInternalAccess ia, IOAVState state, Object capa, List events)
-	{
-		// Beliefs of this capability.
-		Collection	beliefs	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefs);
-		if(beliefs!=null)
-		{
-			for(Iterator it=beliefs.iterator(); it.hasNext(); )
-			{
-				Object	belief	= it.next();
-				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, belief, capa);
-				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), belief.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-			}
-		}
-		
-		// Belief sets of this capability.
-		Collection	beliefsets	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefsets);
-		if(beliefsets!=null)
-		{
-			for(Iterator it=beliefsets.iterator(); it.hasNext(); )
-			{
-				Object	beliefset	= it.next();
-				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, beliefset, capa);
-				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), beliefset.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-			}
-		}
-		
-		// Goals of this capability.
-		Collection	goals	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_goals);
-		if(goals!=null)
-		{
-			for(Iterator it=goals.iterator(); it.hasNext(); )
-			{
-				Object	goal	= it.next();
-				GoalInfo	info = GoalInfo.createGoalInfo(state, goal, capa);
-				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_GOAL, info.getType(), goal.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-			}
-		}
-		
-		// Plans of this capability.
-		Collection	plans	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_plans);
-		if(plans!=null)
-		{
-			for(Iterator it=plans.iterator(); it.hasNext(); )
-			{
-				Object	plan	= it.next();
-				PlanInfo	info = PlanInfo.createPlanInfo(state, plan, capa);
-				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_PLAN, info.getType(), plan.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-			}
-		}
-		
-		// Recurse for sub capabilities.
-		Collection	capas	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_subcapabilities);
-		if(capas!=null)
-		{
-			for(Iterator it=capas.iterator(); it.hasNext(); )
-			{
-				getInitialEvents(ia, state, state.getAttributeValue(it.next(), OAVBDIRuntimeModel.capabilityreference_has_capability), events);
-			}
-		}
-	}
+//	/**
+//	 *  Generate added events for the current goals
+//	 */
+//	protected static void	getInitialEvents(IInternalAccess ia, IOAVState state, Object capa, List events)
+//	{
+//		// Beliefs of this capability.
+//		Collection	beliefs	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefs);
+//		if(beliefs!=null)
+//		{
+//			for(Iterator it=beliefs.iterator(); it.hasNext(); )
+//			{
+//				Object	belief	= it.next();
+//				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, belief, capa);
+//				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), belief.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
+//			}
+//		}
+//		
+//		// Belief sets of this capability.
+//		Collection	beliefsets	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefsets);
+//		if(beliefsets!=null)
+//		{
+//			for(Iterator it=beliefsets.iterator(); it.hasNext(); )
+//			{
+//				Object	beliefset	= it.next();
+//				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, beliefset, capa);
+//				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), beliefset.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
+//			}
+//		}
+//		
+//		// Goals of this capability.
+//		Collection	goals	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_goals);
+//		if(goals!=null)
+//		{
+//			for(Iterator it=goals.iterator(); it.hasNext(); )
+//			{
+//				Object	goal	= it.next();
+//				GoalInfo	info = GoalInfo.createGoalInfo(state, goal, capa);
+//				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_GOAL, info.getType(), goal.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
+//			}
+//		}
+//		
+//		// Plans of this capability.
+//		Collection	plans	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_plans);
+//		if(plans!=null)
+//		{
+//			for(Iterator it=plans.iterator(); it.hasNext(); )
+//			{
+//				Object	plan	= it.next();
+//				PlanInfo	info = PlanInfo.createPlanInfo(state, plan, capa);
+//				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_PLAN, info.getType(), plan.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
+//			}
+//		}
+//		
+//		// Recurse for sub capabilities.
+//		Collection	capas	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_subcapabilities);
+//		if(capas!=null)
+//		{
+//			for(Iterator it=capas.iterator(); it.hasNext(); )
+//			{
+//				getInitialEvents(ia, state, state.getAttributeValue(it.next(), OAVBDIRuntimeModel.capabilityreference_has_capability), events);
+//			}
+//		}
+//	}
 	
 	/**
 	 *  Dispose the panel.
 	 */
-	public IFuture	dispose()
+	public IFuture<Void>	dispose()
 	{
-		final IComponentListener lis = listener;
-		return access.scheduleImmediate(new IComponentStep<Void>()
-		{
-			@Classname("removeListener")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				ia.removeComponentListener(lis);
-				return IFuture.DONE;
-			}
-		});
-
+		sub.terminate();
+		return IFuture.DONE;
+//		final IComponentListener lis = listener;
+//		return access.scheduleImmediate(new IComponentStep<Void>()
+//		{
+//			@Classname("removeListener")
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				ia.removeComponentListener(lis);
+//				return IFuture.DONE;
+//			}
+//		});
 	}
 
 	/**

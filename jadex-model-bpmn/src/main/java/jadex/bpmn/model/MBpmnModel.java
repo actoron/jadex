@@ -940,7 +940,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get the declared context variables.
 	 *  @return A set of variable names.
 	 */
-	public Set getContextVariables()
+	public Set<String> getContextVariables()
 	{
 		return variables!=null ? variables.keySet() : Collections.EMPTY_SET;
 	}

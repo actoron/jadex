@@ -23,9 +23,7 @@ import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.task.ExecuteStepTask;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
@@ -46,6 +44,8 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -95,24 +95,24 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public static final String	TYPE_THREAD	= "thread";
 	
 	/** The activity execution handlers (activity type -> handler). */
-	public static final Map DEFAULT_ACTIVITY_HANDLERS;
+	public static final Map<String, IActivityHandler> DEFAULT_ACTIVITY_HANDLERS;
 	
 	/** The step execution handlers (activity type -> handler). */
-	public static final Map DEFAULT_STEP_HANDLERS;
+	public static final Map<String, IStepHandler> DEFAULT_STEP_HANDLERS;
 
 	/** The flag for all pools. */
 	public static final String ALL = "All";
 	
 	static
 	{
-		Map stephandlers = new HashMap();
+		Map<String, IStepHandler> stephandlers = new HashMap<String, IStepHandler>();
 		
 		stephandlers.put(IStepHandler.STEP_HANDLER, new DefaultStepHandler());
 		stephandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventMultipleStepHandler());
 		
 		DEFAULT_STEP_HANDLERS = Collections.unmodifiableMap(stephandlers);
 		
-		Map activityhandlers = new HashMap();
+		Map<String, IActivityHandler> activityhandlers = new HashMap<String, IActivityHandler>();
 		
 		// Task/Subprocess handler.
 		activityhandlers.put(MBpmnModel.TASK, new TaskActivityHandler());
@@ -173,25 +173,25 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	protected String lane;
 	
 	/** The activity handlers. */
-	protected Map activityhandlers;
+	protected Map<String, IActivityHandler> activityhandlers;
 	
 	/** The step handlers. */
-	protected Map stephandlers;
+	protected Map<String, IStepHandler> stephandlers;
 
 	/** The thread context. */
 	protected ThreadContext	context;
 	
 	/** The context variables. */
-	protected Map variables;
+	protected Map<String, Object> variables;
 	
 	/** The finishing flag marker. */
 	protected boolean finishing;
 	
 	/** The messages waitqueue. */
-	protected List messages;
+	protected List<Object> messages;
 
 	/** The streams waitqueue. */
-	protected List streams;
+	protected List<IConnection> streams;
 
 	/** The inited future. */
 	protected Future<Void> inited;
@@ -209,8 +209,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 *  @param adapter The adapter.
 	 */
 	// Constructor for bdi plan interpreter
-	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map arguments, 
-		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
+	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map<String, Object> arguments, 
+		String config, final IExternalAccess parent, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers, 
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container)
 	{
@@ -227,10 +227,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		initContextVariables();
 		
 		// Create initial thread(s). 
-		List startevents = model.getStartActivities(null, null);
+		List<MActivity> startevents = model.getStartActivities(null, null);
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
-			ProcessThread	thread	= new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+			ProcessThread	thread	= new ProcessThread(""+idcnt++, startevents.get(i), context, BpmnInterpreter.this);
 			context.addThread(thread);
 		}
 	}	
@@ -240,14 +240,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 *  @param adapter The adapter.
 	 */
 	// Constructor for self-contained bpmn components
-	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, final Map arguments, 
-		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
+	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, final Map<String, Object> arguments, 
+		String config, final IExternalAccess parent, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers, 
 		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
 		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, resultlistener, inited);
 		this.inited = inited;
-		this.variables	= new HashMap();
+		this.variables	= new HashMap<String, Object>();
 		construct(model, activityhandlers, stephandlers);
 		
 		scheduleStep(new IComponentStep<Void>()
@@ -258,9 +258,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				// Initialize context variables.
 				variables.put("$interpreter", this);
 				init(getModel(), getConfiguration(), arguments)
-					.addResultListener(createResultListener(new DelegationResultListener(inited)
+					.addResultListener(createResultListener(new DelegationResultListener<Void>(inited)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
 						// Notify cms that init is finished.
 						initContextVariables();
@@ -270,9 +270,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				}));
 				return IFuture.DONE;
 			}
-		}).addResultListener(new IResultListener()
+		}).addResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(Object result){}
+			public void resultAvailable(Void result){}
 			
 			public void exceptionOccurred(Exception exception)
 			{
@@ -300,7 +300,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	/**
 	 *  Init method holds constructor code for both implementations.
 	 */
-	protected void construct(final MBpmnModel model, Map activityhandlers, Map stephandlers)
+	protected void construct(final MBpmnModel model, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers)
 	{
 		this.model = model;
 		
@@ -333,9 +333,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 		this.context = new ThreadContext(model);
-		this.messages = new ArrayList();
-		this.streams = new ArrayList();
-		this.variables	= getArguments()!=null ? new HashMap(getArguments()) : new HashMap();
+		this.messages = new ArrayList<Object>();
+		this.streams = new ArrayList<IConnection>();
+		this.variables	= getArguments()!=null ? new HashMap<String, Object>(getArguments()) : new HashMap<String, Object>();
 	}
 	
 	//-------- IComponentInstance interface --------
@@ -360,11 +360,15 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		{
 			if(!isFinished(pool, lane) && isReady(pool, lane))
 			{
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
+//					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+				
 				executeStep(pool, lane);
-				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+				
+//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
+//					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
+				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
 			}
 			
 //			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
@@ -519,10 +523,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// eventtype, mactname, event
         Tuple3<String, String, Object> trigger = (Tuple3<String, String, Object>)getArguments().get(MBpmnModel.TRIGGER);
         // Create initial thread(s).
-        List startevents = model.getStartActivities(null, null);
+        List<MActivity> startevents = model.getStartActivities(null, null);
         for(int i=0; startevents!=null && i<startevents.size(); i++)
         {
-            MActivity mact = (MActivity)startevents.get(i);
+            MActivity mact = startevents.get(i);
             if(trigger!=null && MBpmnModel.EVENT_START_TIMER.equals(trigger.getFirstEntity()))
             {
             	// Must perform time pattern check via reflection to avoid dependency
@@ -596,10 +600,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	protected void initContextVariables()
 	{
-		Set	vars	= model.getContextVariables();
-		for(Iterator it=vars.iterator(); it.hasNext(); )
+		Set<String>	vars	= model.getContextVariables();
+		for(Iterator<String> it=vars.iterator(); it.hasNext(); )
 		{
-			String	name	= (String)it.next();
+			String	name	= it.next();
 			if(!variables.containsKey(name))	// Don't overwrite arguments.
 			{
 				Object	value	= null;
@@ -636,12 +640,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				// Iterate through process threads and dispatch message to first
 				// waiting and fitting one (filter check).
 				boolean processed = false;
-				for(Iterator it=context.getAllThreads().iterator(); it.hasNext() && !processed; )
+				for(Iterator<ProcessThread> it=context.getAllThreads().iterator(); it.hasNext() && !processed; )
 				{
-					ProcessThread pt = (ProcessThread)it.next();
+					ProcessThread pt = it.next();
 					if(pt.isWaiting())
 					{
-						IFilter filter = pt.getWaitFilter();
+						IFilter<Object> filter = pt.getWaitFilter();
 						if(filter!=null && filter.filter(message))
 						{
 							BpmnInterpreter.this.notify(pt.getActivity(), pt, message);
@@ -676,12 +680,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				// Iterate through process threads and dispatch message to first
 				// waiting and fitting one (filter check).
 				boolean processed = false;
-				for(Iterator it=context.getAllThreads().iterator(); it.hasNext() && !processed; )
+				for(Iterator<ProcessThread> it=context.getAllThreads().iterator(); it.hasNext() && !processed; )
 				{
 					ProcessThread pt = (ProcessThread)it.next();
 					if(pt.isWaiting())
 					{
-						IFilter filter = pt.getWaitFilter();
+						IFilter<Object> filter = pt.getWaitFilter();
 						if(filter!=null && filter.filter(con))
 						{
 							BpmnInterpreter.this.notify(pt.getActivity(), pt, con);
@@ -823,8 +827,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
 		boolean	isatbreakpoint	= false;
-		Set	bps	= new HashSet(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
-		for(Iterator it=context.getAllThreads().iterator(); !isatbreakpoint && it.hasNext(); )
+		Set<String>	bps	= new HashSet<String>(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
+		for(Iterator<ProcessThread> it=context.getAllThreads().iterator(); !isatbreakpoint && it.hasNext(); )
 		{
 			ProcessThread	pt	= (ProcessThread)it.next();
 			isatbreakpoint	= bps.contains(pt.getActivity().getBreakpointId());
@@ -1014,11 +1018,13 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 
 //			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity());
 			MActivity act = thread.getActivity();
-			notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
+			
+//			notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
+			publishEvent(createActivityEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
+
 //			thread = handler.execute(act, this, thread);
 			handler.execute(act, this, thread);
 
-			
 			// Moved to StepHandler
 //			thread.updateParametersAfterStep(act, this);
 			
@@ -1032,7 +1038,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				for(int i=0; i<messages.size() && !processed; i++)
 				{
 					Object message = messages.get(i);
-					IFilter filter = thread.getWaitFilter();
+					IFilter<Object> filter = thread.getWaitFilter();
 					if(filter!=null && filter.filter(message))
 					{
 						notify(thread.getActivity(), thread, message);
@@ -1048,7 +1054,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				for(int i=0; i<streams.size() && !processed; i++)
 				{
 					Object stream = streams.get(i);
-					IFilter filter = thread.getWaitFilter();
+					IFilter<Object> filter = thread.getWaitFilter();
 					if(filter!=null && filter.filter(stream))
 					{
 						notify(thread.getActivity(), thread, stream);
@@ -1060,7 +1066,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			}
 			
 			if(thread.getThreadContext()!=null)
-				notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
+				publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread));
+//				notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
 		}
 	}
 
@@ -1105,7 +1112,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 							step(activity, BpmnInterpreter.this, thread, event);
 							thread.setNonWaiting();
 							if(thread.getThreadContext()!=null)
-								notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
+								publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread));
 						}
 						else
 						{
@@ -1127,7 +1134,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				step(activity, BpmnInterpreter.this, thread, event);
 				thread.setNonWaiting();
 				if(thread.getThreadContext()!=null)
-					notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
+					publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread));
 			}
 			else
 			{
@@ -1149,19 +1156,19 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		boolean ret = thread.getActivity().equals(activity);
 		if(!ret && MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(thread.getActivity().getActivityType()))
 		{
-			List outedges = thread.getActivity().getOutgoingSequenceEdges();
+			List<MSequenceEdge> outedges = thread.getActivity().getOutgoingSequenceEdges();
 			for(int i=0; i<outedges.size() && !ret; i++)
 			{
-				MSequenceEdge edge = (MSequenceEdge)outedges.get(i);
+				MSequenceEdge edge = outedges.get(i);
 				ret = edge.getTarget().equals(activity);
 			}
 		}
 		if(!ret && MBpmnModel.SUBPROCESS.equals(thread.getActivity().getActivityType()))
 		{
-			List handlers = thread.getActivity().getEventHandlers();
+			List<MActivity> handlers = thread.getActivity().getEventHandlers();
 			for(int i=0; !ret && handlers!=null && i<handlers.size(); i++)
 			{
-				MActivity	handler	= (MActivity)handlers.get(i);
+				MActivity handler = handlers.get(i);
 				ret	= activity.equals(handler) && handler.getActivityType().equals("EventIntermediateTimer");
 			}
 		}
@@ -1198,7 +1205,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
 	{
 //		System.out.println("step: "+activity.getName());
-		notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread, activity));
+//		notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread, activity));
+		publishEvent(createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity));
 		
 		IStepHandler ret = (IStepHandler)stephandlers.get(activity.getActivityType());
 		if(ret==null) 
@@ -1585,13 +1593,13 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			ret	= fut;
 			Class<?>	type	= info.getType().getType(getClassLoader());
 			Method[]	meths	= type.getMethods();
-			Map	methods	= new HashMap(); // method -> event.
+			Map<Method, MActivity>	methods	= new HashMap<Method, MActivity>(); // method -> event.
 			for(int i=0; !fut.isDone() && i<meths.length; i++)
 			{
-				Collection	es	= events.getCollection(meths[i].getName());
-				for(Iterator it=es.iterator(); it.hasNext(); )
+				Collection<MActivity>	es	= events.getCollection(meths[i].getName());
+				for(Iterator<MActivity> it=es.iterator(); it.hasNext(); )
 				{
-					MActivity	event	= (MActivity)it.next();
+					MActivity	event	= it.next();
 					if(event.getPropertyNames().length==meths[i].getParameterTypes().length)
 					{
 						if(methods.containsKey(meths[i]))
@@ -1638,7 +1646,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 *  @param msgeventtype	The message event type.
 	 *  @return The reply event.
 	 */
-	public Map createReply(IMessageAdapter msg)
+	public Map<String, Object> createReply(IMessageAdapter msg)
 	{
 		return createReply(msg.getParameterMap(), msg.getMessageType());
 	}
@@ -1648,28 +1656,50 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 *  @param msgeventtype	The message event type.
 	 *  @return The reply event.
 	 */
-	public Map createReply(final Map msg, final MessageType mt)
+	public Map<String, Object> createReply(final Map<String, Object> msg, final MessageType mt)
 	{
 		return mt.createReply(msg);
 	}
 	
+//	/**
+//	 *  Create a thread event (creation, modification, termination).
+//	 */
+//	public IComponentChangeEvent createThreadEvent(String type, ProcessThread thread)
+//	{
+//		return new ComponentChangeEvent(type, TYPE_THREAD, thread.getClass().getName(), 
+//			thread.getId(), getComponentIdentifier(), getComponentDescription().getCreationTime(),
+//			IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(type) ? null : createProcessThreadInfo(thread));
+//	}
+	
 	/**
 	 *  Create a thread event (creation, modification, termination).
 	 */
-	public IComponentChangeEvent createThreadEvent(String type, ProcessThread thread)
+	public IMonitoringEvent createThreadEvent(String type, ProcessThread thread)
 	{
-		return new ComponentChangeEvent(type, TYPE_THREAD, thread.getClass().getName(), 
-			thread.getId(), getComponentIdentifier(), getComponentDescription().getCreationTime(),
-			IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(type) ? null : createProcessThreadInfo(thread));
+		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName(), type+"."+TYPE_THREAD, System.currentTimeMillis());
+		event.setProperty("thread_id", thread.getId());
+		if(!type.startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
+			event.setProperty("info", createProcessThreadInfo(thread));
+		return event;
+		
+//		return new ComponentChangeEvent(type, TYPE_THREAD, thread.getClass().getName(), 
+//			thread.getId(), getComponentIdentifier(), getComponentDescription().getCreationTime(),
+//			IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(type) ? null : createProcessThreadInfo(thread));
 	}
 	
 	/**
 	 *  Create an activity event (start, end).
 	 */
-	public IComponentChangeEvent createActivityEvent(String type, ProcessThread thread, MActivity activity)
+	public IMonitoringEvent createActivityEvent(String type, ProcessThread thread, MActivity activity)
 	{
-		return new ComponentChangeEvent(type, TYPE_ACTIVITY, activity.getName(), 
-			thread.getId(), getComponentIdentifier(), getComponentDescription().getCreationTime(), createProcessThreadInfo(thread));
+//		return new ComponentChangeEvent(type, TYPE_ACTIVITY, activity.getName(), 
+//			thread.getId(), getComponentIdentifier(), getComponentDescription().getCreationTime(), createProcessThreadInfo(thread));
+	
+		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis());
+		event.setProperty("thread_id", thread.getId());
+		event.setProperty("activity", activity.getName());
+		event.setProperty("info", createProcessThreadInfo(thread));
+		return event;
 	}
 	
 	/**

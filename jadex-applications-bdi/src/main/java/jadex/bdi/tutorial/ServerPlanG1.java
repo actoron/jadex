@@ -6,8 +6,10 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.io.IOException;
@@ -80,13 +82,22 @@ public class ServerPlanG1 extends Plan	implements Runnable
 		new Thread(this).start();
 
 		// When the agent dies the listener will shut down the server.
-		getScope().addComponentListener(new TerminationAdapter()
+//		getScope().addComponentListener(new TerminationAdapter()
+//		{
+//			public void componentTerminated()
+//			{
+//				close();
+//			}
+//		});
+		
+		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+			.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
-			public void componentTerminated()
+			public void intermediateResultAvailable(IMonitoringEvent result)
 			{
 				close();
 			}
-		});
+		}));
 	}
 	
 	/**

@@ -2,18 +2,17 @@ package jadex.micro;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -35,9 +34,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -726,23 +725,23 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 		return killAgent();
 	}
 	
-	/**
-	 *  Add an component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> addComponentListener(IComponentListener listener)
-	{
-		return interpreter.addComponentListener(listener);
-	}
-	
-	/**
-	 *  Remove a component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> removeComponentListener(IComponentListener listener)
-	{
-		return interpreter.removeComponentListener(listener);
-	}
+//	/**
+//	 *  Add an component listener.
+//	 *  @param listener The listener.
+//	 */
+//	public IFuture<Void> addComponentListener(IComponentListener listener)
+//	{
+//		return interpreter.addComponentListener(listener);
+//	}
+//	
+//	/**
+//	 *  Remove a component listener.
+//	 *  @param listener The listener.
+//	 */
+//	public IFuture<Void> removeComponentListener(IComponentListener listener)
+//	{
+//		return interpreter.removeComponentListener(listener);
+//	}
 	
 	/**
 	 *  Get a required service of a given name.
@@ -933,8 +932,19 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Publish a monitoring event. This event is automatically send
 	 *  to the monitoring service of the platform (if any). 
 	 */
-	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event)
+	public IFuture<Void> publishEvent(IMonitoringEvent event)
 	{
-		return interpreter.publishMonitoringEvent(event);
+		return interpreter.publishEvent(event);
 	}
+	
+	/**
+	 *  Subscribe to component events.
+	 *  @param filter An optional filter.
+	 */
+	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial)
+	{
+		return interpreter.subscribeToEvents(filter, initial);
+	}
+
 }

@@ -5,15 +5,17 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -115,13 +117,22 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-												bia.addComponentListener(new TerminationAdapter()
+//												bia.addComponentListener(new TerminationAdapter()
+//												{
+//													public void componentTerminated()
+//													{
+//														ongoing.removeAll(todo);
+//													}
+//												});
+												
+												bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+													.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 												{
-													public void componentTerminated()
+													public void intermediateResultAvailable(IMonitoringEvent result)
 													{
 														ongoing.removeAll(todo);
 													}
-												});
+												}));
 												return IFuture.DONE;
 											}
 										});

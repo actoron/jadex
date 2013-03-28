@@ -4,9 +4,9 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -14,16 +14,15 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.micro.MicroAgent;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -32,8 +31,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.ws.BindingType;
 
 /**
  *  Starts two agents a and b
@@ -88,11 +85,29 @@ public class DependendServicesAgent extends MicroAgent
                 for(int i=0; i<childs.length; i++)
                 {
                     final IExternalAccess child = childs[i];
-                    child.addComponentListener(new TerminationAdapter()
-                    {
-                        public void componentTerminated()
-                        {
-                            child.getResults().addResultListener(createResultListener(new DefaultResultListener()
+//                    child.addComponentListener(new TerminationAdapter()
+//                    {
+//                        public void componentTerminated()
+//                        {
+//                            child.getResults().addResultListener(createResultListener(new DefaultResultListener()
+//                            {
+//                                public void resultAvailable(Object result)
+//                                {
+////                                  System.out.println("del: "+child.getComponentIdentifier()+" "+result);
+//                                    Map res = (Map)result;
+//                                    List tests = (List)res.get("testcases");
+//                                    lis.resultAvailable(tests);
+//                                }
+//                            }));
+//                        }
+//                    });
+                    
+                    child.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+						.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
+					{
+						public void intermediateResultAvailable(IMonitoringEvent result)
+						{
+							child.getResults().addResultListener(createResultListener(new DefaultResultListener()
                             {
                                 public void resultAvailable(Object result)
                                 {
@@ -102,8 +117,8 @@ public class DependendServicesAgent extends MicroAgent
                                     lis.resultAvailable(tests);
                                 }
                             }));
-                        }
-                    });
+						}
+					}));
                 }
                 ret.setException(null);
             }

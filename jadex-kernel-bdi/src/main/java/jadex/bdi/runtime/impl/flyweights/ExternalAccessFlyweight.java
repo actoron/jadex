@@ -6,19 +6,24 @@ import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -519,67 +524,111 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		return getInterpreter().getLocalType();
 	}
 	
-	/**
-	 *  Add an component listener.
-	 *  @param listener The listener.
-	 */
-	public IFuture<Void> addComponentListener(final IComponentListener listener)
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		if(getInterpreter().getAgentAdapter().isExternalThread())
-		{
-			try
-			{
-				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						getInterpreter().addComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
-		}
-		else
-		{
-			getInterpreter().addComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Add an component listener.
+//	 *  @param listener The listener.
+//	 */
+//	public IFuture<Void> addComponentListener(final IComponentListener listener)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		
+//		if(getInterpreter().getAgentAdapter().isExternalThread())
+//		{
+//			try
+//			{
+//				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						getInterpreter().addComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//				});
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
+//		}
+//		else
+//		{
+//			getInterpreter().addComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
+//		}
+//		
+//		return ret;
+//	}
+//	
+//	/**
+//	 *  Remove a component listener.
+//	 *  @param listener The listener.
+//	 */
+//	public IFuture<Void> removeComponentListener(final IComponentListener listener)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		
+//		if(getInterpreter().getAgentAdapter().isExternalThread())
+//		{
+//			try
+//			{
+//				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+//				{
+//					public void run() 
+//					{
+//						getInterpreter().removeComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//				});
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setException(e);
+//			}
+//		}
+//		else
+//		{
+//			getInterpreter().removeComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
-	 *  Remove a component listener.
-	 *  @param listener The listener.
+	 *  Subscribe to component events.
+	 *  @param filter An optional filter.
 	 */
-	public IFuture<Void> removeComponentListener(final IComponentListener listener)
+	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(final IFilter<IMonitoringEvent> filter, final boolean initial)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
 		
-		if(getInterpreter().getAgentAdapter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			try
 			{
-				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				getInterpreter().getComponentAdapter().invokeLater(new Runnable() 
 				{
 					public void run() 
 					{
-						getInterpreter().removeComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
+						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().subscribeToEvents(filter, initial);
+						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
+						fut.addResultListener(lis);
 					}
 				});
 			}
-			catch(Exception e)
+			catch(final Exception e)
 			{
-				ret.setException(e);
+				Starter.scheduleRescueStep(getInterpreter().getComponentAdapter().getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
 			}
 		}
 		else
 		{
-			getInterpreter().removeComponentListener(listener).addResultListener(new DelegationResultListener<Void>(ret));
+			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().subscribeToEvents(filter, initial);
+			TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
+			fut.addResultListener(lis);
 		}
 		
 		return ret;
