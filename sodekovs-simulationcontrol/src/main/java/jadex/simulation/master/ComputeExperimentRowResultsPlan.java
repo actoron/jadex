@@ -5,7 +5,6 @@ import jadex.bdi.runtime.Plan;
 import jadex.simulation.evaluation.EvaluateExperiment;
 import jadex.simulation.evaluation.EvaluateRow;
 import jadex.simulation.evaluation.bikesharing.BikeSharingEvaluation;
-import jadex.simulation.evaluation.bikesharing.MapEntryConverter;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
@@ -23,11 +22,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import sodekovs.util.misc.XMLHandler;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Compute the results of one row of simulation experiments, e.g. experiments with the same setting but still different cause of non-determinism.
