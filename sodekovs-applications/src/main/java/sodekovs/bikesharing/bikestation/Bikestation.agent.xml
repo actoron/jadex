@@ -32,36 +32,36 @@
  			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
  		</belief> 
  		
- 		<belief name="stationID" class="String">
+ 		<belief name="stationID" class="String" argument="true">
  		    <fact class="IFuture">$beliefbase.myself.getProperty("stationID")</fact>
  		</belief>
  		
- 		<belief name="capacity" class="Integer" updaterate="100" evaluationmode="pull">
+ 		<belief name="capacity" class="Integer" updaterate="100" evaluationmode="pull" argument="true">
  		     <fact class="IFuture">$beliefbase.myself.getProperty("capacity")</fact>
  		</belief>
  		
- 		<belief name="stock" class="Integer" updaterate="100" evaluationmode="pull">
+ 		<belief name="stock" class="Integer" updaterate="100" evaluationmode="pull" argument="true">
  		     <fact class="IFuture">$beliefbase.myself.getProperty("stock")</fact>
  		</belief>
  		
- 		<belief name="position" class="Vector2Double">
+ 		<belief name="position" class="Vector2Double" argument="true">
  		    <fact class="IFuture">$beliefbase.myself.getProperty("position")</fact>
  		</belief>		
  		
  		<belief name="noClusterStations" class="Integer"/>
  		
 		<!-- Used for SO. Which alternative departure station is proposed? -->
-		<belief name="proposed_departure_station" class="String">
+		<belief name="proposed_departure_station" class="String" argument="true">
 			<fact class="IFuture">$beliefbase.myself.getProperty("proposed_departure_station")</fact>
 		</belief> 				
 		
 		<!-- Used for SO. Which alternative arrival station is proposed? -->
-		<belief name="proposed_arrival_station" class="String">
+		<belief name="proposed_arrival_station" class="String" argument="true">
 			<fact class="IFuture">$beliefbase.myself.getProperty("proposed_arrival_station")</fact>
 		</belief>
 		
 		<!-- Used for SO. Is it a SuperStation? They are used for DeCoMAS -->
-		<belief name="isSuperStation" class="Boolean">
+		<belief name="isSuperStation" class="Boolean" argument="true">
 			<fact class="IFuture">$beliefbase.myself.getProperty("isSuperStation")</fact>
 		</belief>
 		
@@ -154,6 +154,11 @@
 		        <internalevent ref="decentralized_polling_result"/>
 		    </trigger>
 		</plan>
+		
+		<!-- Test plan. -->
+		<plan name="test_plan">
+			<body class="TestPlan"/>			
+		</plan>		
 	</plans>
 	
 	<events>
@@ -224,7 +229,7 @@
 	<configurations>
 		<configuration name="default">		
 			<plans>
-				<initialplan ref="super_station_plan"/>
+				<initialplan ref="test_plan"/>
 			</plans>
 		</configuration>
 	</configurations>
