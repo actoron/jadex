@@ -45,22 +45,20 @@
 	</arguments>
 	
 	<extensiontypes>
-	    <env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">					
+	    <!-- <env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">					
 				<env:property name="dynamics_configuration">"sodekovs-applications/src/main/java/sodekovs/bikesharing/coordination/BikeSharingCoordination.dynamics.xml"</env:property>				
 			<env:spaceexecutor class="DeltaTimeExecutor">
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
-		</env:envspacetype>
+		</env:envspacetype>-->
 	    
 		<env:envspacetype name="MySimulation" width="100"
 			height="100" class="ContinuousSpace2D">
 
 			<env:processtypes>
-				<!-- <env:processtype name="init" class="CreateInitialSettingsProcess"> </env:processtype>-->				
-				<env:processtype name="manageTimeSlices" class="ManageTimeSlicesProcess">
-					<env:property name="simDataSetupFilePath">null</env:property>
-				</env:processtype>
+				<env:processtype name="initProcess" class="CreateInitialSettingsProcess"/>				
+				<env:processtype name="manageTimeSlices" class="ManageTimeSlicesProcess"/>			
 			</env:processtypes>
 
 			<env:objecttypes>
@@ -77,7 +75,7 @@
 					<env:property name="behaviour_strategy">2</env:property>
 				</env:objecttype>
 				
-				<env:objecttype name="bikestation">
+				 <env:objecttype name="bikestation">
 					<env:property name="stationID" class="String" />
 					<env:property name="stock" class="int" />
 					<env:property name="capacity" class="int" />
@@ -86,6 +84,13 @@
 					<env:property name="proposed_arrival_station" class="String" />
 					<env:property name="isSuperStation" class="Boolean" />
 				</env:objecttype>
+				
+					<!--<env:objecttype name="bikestation">
+					<env:property name="stationID">"apla"</env:property>
+					<env:property name="stock">-5</env:property>
+					<env:property name="capacity">-4</env:property>					
+				</env:objecttype>-->
+				
 				
 				<env:objecttype name="truck">
 					<env:property name="vision">0.15</env:property>
@@ -107,7 +112,7 @@
 			<env:avatarmappings>
 			<!-- USE createcomponent="true" ONLY if avatar is started first. If BDIAgent is started first, don't use it!!! -->
 				<env:avatarmapping componenttype="Pedestrian" objecttype="pedestrian" createcomponent="true"/>
-				<env:avatarmapping componenttype="Bikestation" 	objecttype="bikestation" createcomponent="true"/>									
+				<env:avatarmapping componenttype="Bikestation" 	objecttype="bikestation" createcomponent="false"/>									
 				<env:avatarmapping componenttype="Truck" 	objecttype="truck" createcomponent="true"/>
 			</env:avatarmappings>
 
@@ -179,7 +184,7 @@
 					</env:drawable>
 
 					<env:prelayers>
-						<env:tiledlayer width="100" height="100"
+						<env:tiledlayer width="1" height="1"
 							imagepath="sodekovs/bikesharing/bilder/WashingtonMap.png" />
 					</env:prelayers>
 				</env:perspective>
@@ -218,31 +223,30 @@
 	<configurations>
 		<configuration name="Washington">
 			<extension>
+			<!-- The CoordinationSpace -->				
+				<!-- <env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />-->
+			
 				<env:envspace name="my2dspace" type="MySimulation"
 					width="100" height="100">
 					<env:processes>
-						<!-- <env:process type="init">
-							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday.xml"
-							</env:property>
-						</env:process>-->
-						<env:process type="manageTimeSlices">
+						<env:process type="initProcess">
 							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonSimulation_Monday_new.xml"</env:property>
-							<env:property name="clusterSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/stationCluster-4.xml"</env:property>
+							<env:property name="clusterSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/stationCluster-4.xml"</env:property>							
 						</env:process>
+						<!-- <env:process type="manageTimeSlices"/>			-->										
 					</env:processes>
 
 					<env:objects>
 						<env:object type="SimInfo"> <env:property name="position">new	Vector2Double(2.0, 4.0)</env:property> </env:object>
 					</env:objects>
 
-					<!-- <env:observers>
+					<env:observers>
 						<env:observer name="world" dataview="view_all"
 							perspective="main" />
-					</env:observers> -->
+					</env:observers> 
 				</env:envspace>
 				
-				<!-- The CoordinationSpace -->
-				<!-- <env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" /> -->
+				
 			</extension>				
 		</configuration>
 		<configuration name="WashingtonTestEnv">
@@ -250,14 +254,11 @@
 				<env:envspace name="my2dspace" type="MySimulation"
 					width="100" height="100">
 					<env:processes>
-						<!-- <env:process type="init">
-							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonTestEnv.xml"
-							</env:property>
-						</env:process>-->
-						<env:process type="manageTimeSlices">
+						<env:process type="initProcess">
 							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonTestEnv.xml"</env:property>
 							<env:property name="clusterSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/stationCluster-Test.xml"</env:property>
-						</env:process> 
+						</env:process>
+						<!--  <env:process type="manageTimeSlices" />-->													 
 					</env:processes>
 
 					<env:objects>
