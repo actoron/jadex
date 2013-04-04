@@ -55,6 +55,8 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	private int totalDepartures = 0;
 	// Limit nr of created pedestrian. required for better debugging.
 	private int limitPedNr = 0;
+	
+	private boolean hasBeenInitialized = false;
 
 	// int counterTmp = 0;
 
@@ -78,20 +80,21 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	 *            The space this process is running in.
 	 */
 	public void start(IClockService clock, final IEnvironmentSpace space) {
-
+		System.out.println("#Start#Manage Time Slice started!");
 		// create
-		try {
-			createBikeStations((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+////			createBikeStations((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
+//			createBikeStationsAsBDIAgent((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
+//		} catch (ParserConfigurationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (SAXException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		init(space);
 
 		// *******************************************************************************
@@ -128,31 +131,36 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	 *            The space this process is running in.
 	 */
 	public void execute(IClockService clock, IEnvironmentSpace space) {
+		
+		if(!hasBeenInitialized){
+			System.out.println("#Execute#Manage Time Slice started!");
+			init(space);
+		}
 
 		if (tickDelta == -1) {
 			tickDelta = clock.getTick();
 		}
 
-//		if (limitPedNr < 30) {
-//			limitPedNr++;
+		// if (limitPedNr < 30) {
+		// limitPedNr++;
 
-			// if (counterTmp < 6) {
-			for (int i = 0; i < timeSlicesList.size(); i++) {
-				// avoid index out of bounds exception
-				if (i + 1 < timeSlicesList.size()) {
-					if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta)) && (timeSlicesList.get(i + 1).getStartTime() > (clock.getTick() - tickDelta))) {
-						executeTimeSlice(i, space);
-						// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
-						// counterTmp++;
-						break;
-					}
-				} else if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta))) {
+		// if (counterTmp < 6) {
+		for (int i = 0; i < timeSlicesList.size(); i++) {
+			// avoid index out of bounds exception
+			if (i + 1 < timeSlicesList.size()) {
+				if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta)) && (timeSlicesList.get(i + 1).getStartTime() > (clock.getTick() - tickDelta))) {
 					executeTimeSlice(i, space);
 					// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+					// counterTmp++;
+					break;
 				}
+			} else if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta))) {
+				executeTimeSlice(i, space);
+				// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
 			}
+		}
 
-//		}
+		// }
 
 		// printClockAndSimSettings();
 	}
@@ -191,6 +199,8 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 		// for(TimeSlice slice : timeSlicesList){
 		// System.out.println("Time SLice start time: " + slice.getStartTime());
 		// }
+		
+		hasBeenInitialized = true;
 	}
 
 	/**
@@ -224,8 +234,6 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			int destination = computeDestination(stationList.get(departureStation));
 			// System.out.println("##Start Event from: " + stationList.get(departureStation).getStationID() + "  to : " +
 			// stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination));
-//			createPedestrianAsBDIAgent(space, stationList.get(departureStation).getStationID(),
-//					stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
 			createPedestrianAsISpaceObject(space, stationList.get(departureStation).getStationID(),
 					stationList.get(departureStation).getDestinationProbabilities().getDestinationProbability().get(destination).getDestination());
 		}
@@ -321,7 +329,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 				HashMap<String, Object> properties = new HashMap<String, Object>();
 				properties.put("destination_station_pos", destPos);
 				cms.createComponent("Pedestrian-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml",
-				//HACK: Has to be started "suspended" in order to force start from DeparturePos. Otherwise componten will start from random pos that is computed by the avatar when it is intialized.
+				// HACK: Has to be started "suspended" in order to force start from DeparturePos. Otherwise componten will start from random pos that is computed by the avatar when it is intialized.
 						new CreationInfo(null, properties, space.getExternalAccess().getComponentIdentifier(), true, false), null).addResultListener(new DefaultResultListener() {
 					public void resultAvailable(Object result) {
 						final IComponentIdentifier cid = (IComponentIdentifier) result;
@@ -331,7 +339,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 								space.getAvatar((IComponentDescription) result).setProperty(ContinuousSpace2D.PROPERTY_POSITION, depPos);
 								cms.resumeComponent(cid).addResultListener(new DefaultResultListener() {
 									public void resultAvailable(Object result) {
-										
+
 									}
 								});
 							}
@@ -364,6 +372,8 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 		props.put(ContinuousSpace2D.PROPERTY_POSITION, depPos);
 		props.put("destination_station_pos", destPos);
 		space.createSpaceObject("pedestrian", props, null);
+
+		// System.out.println("Dep Pos: " + depPos);
 
 	}
 
@@ -436,17 +446,17 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			props.put("stationID", station.getStationID());
 			props.put("capacity", station.getNumberOfDocks());
 			props.put("stock", station.getNumberOfBikes());
-//			if ("23rd and Crystal Dr".equals(station.getStationID())) {
-//				props.put("proposed_departure_station", "16th and U St NW");
-//			} else {
-				props.put("proposed_departure_station", null);
-//			}
-
-//			if ("17th and K St NW [formerly 17th and L St NW]".equals(station.getStationID())) {
-//				props.put("proposed_arrival_station", "10th and U St NW");
-//			} else {
-				props.put("proposed_arrival_station", null);
-//			}
+			// if ("23rd and Crystal Dr".equals(station.getStationID())) {
+			// props.put("proposed_departure_station", "16th and U St NW");
+			// } else {
+			props.put("proposed_departure_station", null);
+			// }
+			//
+			// if ("17th and K St NW [formerly 17th and L St NW]".equals(station.getStationID())) {
+			// props.put("proposed_arrival_station", "10th and U St NW");
+			// } else {
+			props.put("proposed_arrival_station", null);
+			// }
 
 			// check if station is a super station
 			if (superStations.contains(station.getStationID())) {
@@ -461,6 +471,94 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 		// put it here, so it can be reused within the application without the need to parse again
 		space.setProperty("SimulationDescription", scenario);
 		space.setProperty("StationCluster", superCluster);
+	}
+
+	/**
+	 * 
+	 * Create bikestations according to the xml setup file.
+	 * 
+	 * @param path
+	 *            path of the xml file
+	 * @param clusterPath
+	 *            path of the cluster xml file
+	 * @param grid
+	 *            the used space
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	private void createBikeStationsAsBDIAgent(final String path, final String clusterPath, final IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
+
+		SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener() {
+			public void resultAvailable(Object result) {
+				final IComponentManagementService cms = (IComponentManagementService) result;
+
+				SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);
+				SuperCluster superCluster = (SuperCluster) XMLHandler.parseXMLFromXMLFile(clusterPath, SuperCluster.class);
+
+				// get all super station names (ids)
+				List<String> superStations = new ArrayList<String>();
+				for (Cluster cluster : superCluster.getCluster()) {
+					superStations.add(cluster.getSuperStation().getName());
+				}
+
+				for (Station station : scenario.getStations().getStation()) {
+
+					HashMap<String, Object> props = new HashMap<String, Object>();
+					double x = new Double(station.getLongitude());
+					double y = new Double(station.getLatitude());
+					props.put("position", new Vector2Double(x, y));
+					props.put("stationID", station.getStationID());
+					props.put("capacity", station.getNumberOfDocks());
+					props.put("stock", station.getNumberOfBikes());
+					props.put("testBelief", new String("wow-1"));					
+					// if ("23rd and Crystal Dr".equals(station.getStationID())) {
+					// props.put("proposed_departure_station", "16th and U St NW");
+					// } else {
+					props.put("proposed_departure_station", null);
+					// }
+					//
+					// if ("17th and K St NW [formerly 17th and L St NW]".equals(station.getStationID())) {
+					// props.put("proposed_arrival_station", "10th and U St NW");
+					// } else {
+					props.put("proposed_arrival_station", null);
+					// }
+
+					// check if station is a super station
+					if (superStations.contains(station.getStationID())) {
+						props.put("isSuperStation", true);
+					} else {
+						props.put("isSuperStation", false);
+					}
+
+					cms.createComponent("Bikestation-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/bikestation/Bikestation.agent.xml",
+					// HACK: Has to be started "suspended" in order to force start from DeparturePos. Otherwise componten will start from random pos that is computed by the avatar when it is
+					// intialized.
+							new CreationInfo(null, props, space.getExternalAccess().getComponentIdentifier(), true, false), null).addResultListener(new DefaultResultListener() {
+						public void resultAvailable(Object result) {
+							final IComponentIdentifier cid = (IComponentIdentifier) result;
+							cms.getComponentDescription(cid).addResultListener(new DefaultResultListener() {
+								public void resultAvailable(Object result) {
+									// add the start position to the agent/avatar
+									// space.getAvatar((IComponentDescription) result).setProperty(ContinuousSpace2D.PROPERTY_POSITION, depPos);
+									// cms.resumeComponent(cid).addResultListener(new DefaultResultListener() {
+									// public void resultAvailable(Object result) {
+									//
+									// }
+									// });
+								}
+							});
+						}
+					});
+				}
+				// put it here, so it can be reused within the application without the need to parse again
+				space.setProperty("SimulationDescription", scenario);
+				space.setProperty("StationCluster", superCluster);
+			}
+		});
+
+
+
 	}
 
 }
