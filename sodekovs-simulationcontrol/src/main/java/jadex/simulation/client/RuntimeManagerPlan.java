@@ -186,7 +186,7 @@ public class RuntimeManagerPlan extends Plan {
 
 		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = getResult(space);
 
-		prepareResult(results, (String) clientConfMap.get(GlobalConstants.EXPERIMENT_ID));
+		prepareResult(results, (String) clientConfMap.get(GlobalConstants.EXPERIMENT_ID), space);
 
 		System.out.println("#RuntimeManagerPlan# Killing executed application....");
 		vis.setExit();
@@ -226,7 +226,7 @@ public class RuntimeManagerPlan extends Plan {
 		// System.out.println("#RuntimeManagerPlan# Goal over???");
 	}
 
-	private void prepareResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents, String experimentID) {
+	private void prepareResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents, String experimentID, AbstractEnvironmentSpace space) {
 
 		Map factsAboutAllExperiments = (HashMap<Integer, HashMap>) getBeliefbase().getBelief("factsAboutAllExperiments").getFact();
 
@@ -241,8 +241,12 @@ public class RuntimeManagerPlan extends Plan {
 		// does not need to be send back to master agent
 		// facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
 
-		// System.out.println("GGG2: Size" + facts.size());
-
+		//HACK!!! Required for BikeSharingSimulation: The startTime there is later than by starting the application by this component
+		if(space.getProperty("UpdateTimeAtClientSimulator") != null && (Boolean) space.getProperty("UpdateTimeAtClientSimulator")){
+			facts.put(Constants.EXPERIMENT_START_TIME, space.getProperty("REAL_START_TIME_OF_SIMULATION"));
+			facts.put(Constants.EXPERIMENT_STARTTICK_TIME, (Long) space.getProperty("REAL_START_TICKTIME_OF_SIMULATION"));
+		}		
+						
 		// getBeliefbase().getBelief("simulationFacts").setFact(facts);
 		getBeliefbase().getBelief("factsAboutAllExperiments").setFact(factsAboutAllExperiments);
 	}
