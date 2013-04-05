@@ -80,6 +80,9 @@ public class Starter
 	/** The autoshutdown flag. */
 	public static final String AUTOSHUTDOWN = "autoshutdown";
 
+	/** The monitoring flag. */
+	public static final String MONITORING = "monitoring";
+
 	/** The welcome flag. */
 	public static final String WELCOME = "welcome";
 
@@ -464,8 +467,9 @@ public class Starter
 								Cause cause = sc==null? null: sc.getCause();
 								
 								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
+								Boolean moni = (Boolean)getArgumentValue(MONITORING, model, cmdargs, compargs);
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, 
-									autosd, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
+									autosd, moni, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
 								
 								Object	af = getArgumentValue(ADAPTER_FACTORY, model, cmdargs, compargs);
 								if(af==null)

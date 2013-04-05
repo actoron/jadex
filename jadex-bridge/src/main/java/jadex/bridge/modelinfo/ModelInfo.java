@@ -737,6 +737,22 @@ public class ModelInfo extends Startable implements IModelInfo
 	}
 	
 	/**
+	 *  Get the monitoring flag.
+	 *  @param configname The configname.
+	 *  @return The monitoring flag value.
+	 */
+	public Boolean getMonitoring(String configname)
+	{
+		Boolean ret = null;
+		ConfigurationInfo config = getConfiguration(configname);
+		if(config!=null)
+			ret = config.getMonitoring();
+		if(ret==null)
+			ret = super.getMonitoring();
+		return ret;
+	}
+	
+	/**
 	 *  Get the subcomponent names. 
 	 */
 	public SubcomponentTypeInfo[] getSubcomponentTypes()

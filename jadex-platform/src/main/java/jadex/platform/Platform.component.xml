@@ -208,7 +208,7 @@
 		<argument name="maven_dependencies" class="boolean">false</argument>
 		
 		<!-- Flag if global monitoring is turned on.  -->
-		<argument name="monitoring" class="boolean">false</argument>
+		<argument name="monitoringcomp" class="boolean">true</argument>
 	</arguments>
 	
 	<componenttypes>
@@ -372,7 +372,7 @@
 			</arguments>
 			
 			<components>
-				<component name="mon" type="monitor" daemon="true" number="$args.monitoring? 1 : 0"/>
+				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
 				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>

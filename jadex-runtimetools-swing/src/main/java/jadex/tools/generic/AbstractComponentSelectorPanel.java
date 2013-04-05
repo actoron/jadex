@@ -69,7 +69,7 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 		{
 			public void customResultAvailable(IComponentManagementService cms) 
 			{
-				IComponentDescription adesc = new CMSComponentDescription(null, null, null, null, null, getModelName(), null, null, -1, null, null);
+				IComponentDescription adesc = new CMSComponentDescription(null, null, null, null, null, null, getModelName(), null, null, -1, null, null);
 				cms.searchComponents(adesc, null, isRemote()).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>(AbstractComponentSelectorPanel.this)
 				{
 					public void customResultAvailable(IComponentDescription[] descs)

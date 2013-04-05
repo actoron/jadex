@@ -199,6 +199,13 @@ public interface IModelInfo
 	public Boolean getAutoShutdown(String configname);
 
 	/**
+	 *  Get the monitoring flag.
+	 *  @param monitoring The monitoring.
+	 *  @return The monitoring flag value.
+	 */
+	public Boolean getMonitoring(String configname);
+	
+	/**
 	 *  Get the subcomponent names. 
 	 */
 	public SubcomponentTypeInfo[] getSubcomponentTypes();

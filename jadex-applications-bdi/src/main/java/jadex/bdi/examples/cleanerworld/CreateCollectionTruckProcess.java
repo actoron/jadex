@@ -93,7 +93,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 					{
 						final IComponentManagementService cms	= (IComponentManagementService)result;
 						IFuture ret = cms.createComponent(null, "Truck",
-							new CreationInfo(null, params, space.getExternalAccess().getComponentIdentifier(), null, null, null, null, space.getExternalAccess().getModel().getAllImports(), null, null), null);
+							new CreationInfo(null, params, space.getExternalAccess().getComponentIdentifier(), null, null, null, null, null, space.getExternalAccess().getModel().getAllImports(), null, null), null);
 						
 						IResultListener lis = new IResultListener()
 						{

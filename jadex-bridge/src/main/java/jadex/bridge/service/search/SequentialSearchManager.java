@@ -121,7 +121,8 @@ public class SequentialSearchManager implements ISearchManager
 	protected void processNode(final IServiceProvider start, final IServiceProvider source, final IServiceProvider provider,
 		final SearchContext context, final IntermediateFuture ret, final boolean up, final int callstack, final boolean ischild)//, final List res)
 	{
-//		System.out.println("processNode: "+context+", "+source+", "+provider);
+//		if(start.getId().getName().indexOf("Hello")!=-1 && context.selector instanceof TypeResultSelector && ((TypeResultSelector)context.selector).getType().getName().indexOf("IMon")!=-1)
+//			System.out.println("processNode: "+context+", "+source+", "+provider);
 
 //		if(provider!=null && provider.getId().toString().startsWith("Lars-PC"))
 //			System.out.println("processing node: "+provider.getId());
@@ -355,6 +356,8 @@ public class SequentialSearchManager implements ISearchManager
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						// Continue processing children even if one is terminated ?
+//						processChildNodes(start, provi, context, ret, callstack+1);//, res);
 						ret.setException(exception);
 					}
 				});
@@ -368,6 +371,9 @@ public class SequentialSearchManager implements ISearchManager
 				}
 				catch(Exception exception)
 				{
+					// Continue processing children even if one is terminated
+//					System.out.println("exe: "+exception);
+//					processChildNodes(start, provi, context, ret, callstack+1);//, res);
 					ret.setException(exception);
 				}
 			}

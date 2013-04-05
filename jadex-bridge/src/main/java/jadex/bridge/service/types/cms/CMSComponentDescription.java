@@ -51,6 +51,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	
 	/** The auto shutdown flag. */
 	protected Boolean autoshutdown;
+
+	/** The monitoring flag. */
+	protected Boolean monitoring;
 	
 	/** The model name. */
 	protected String modelname;
@@ -81,7 +84,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Create a new CESComponentDescription.
 	 */
 	public CMSComponentDescription(IComponentIdentifier cid, String type, Boolean master, 
-		Boolean daemon, Boolean autoshutdown, String modelname, String localtype, IResourceIdentifier rid,
+		Boolean daemon, Boolean autoshutdown, Boolean monitoring, String modelname, String localtype, IResourceIdentifier rid,
 		long creationtime, IComponentIdentifier creator, Cause cause)
 	{
 //		System.out.println("created desc: "+cid+" "+hashCode());
@@ -93,6 +96,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setMaster(master);
 		setDaemon(daemon);
 		setAutoShutdown(autoshutdown);
+		setMonitoring(monitoring);
 		setModelName(modelname);
 		setLocalType(localtype);
 		setResourceIdentifier(rid);
@@ -413,6 +417,24 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	public void setCause(Cause cause)
 	{
 		this.cause = cause;
+	}
+
+	/**
+	 *  Get the monitoring.
+	 *  @return The monitoring.
+	 */
+	public Boolean getMonitoring()
+	{
+		return monitoring;
+	}
+
+	/**
+	 *  Set the monitoring.
+	 *  @param monitoring The monitoring to set.
+	 */
+	public void setMonitoring(Boolean monitoring)
+	{
+		this.monitoring = monitoring;
 	}
 
 	/**

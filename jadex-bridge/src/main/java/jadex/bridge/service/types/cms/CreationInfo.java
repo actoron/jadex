@@ -39,6 +39,9 @@ public class CreationInfo
 	
 	/** The auto shutdown flag (default: false). */
 	protected Boolean autoshutdown;
+
+	/** The monitoring flag (default: false). */
+	protected Boolean monitoring;
 	
 //	/** The platform classloader flag (default: false). */
 //	protected Boolean platformloader;
@@ -76,6 +79,7 @@ public class CreationInfo
 			this.master = info.getMaster();
 			this.daemon = info.getDaemon();
 			this.autoshutdown = info.getAutoShutdown();
+			this.monitoring = info.getMonitoring();
 			this.imports	= info.getImports();
 			this.bindings = info.getRequiredServiceBindings();
 			this.rid = info.getResourceIdentifier();
@@ -106,7 +110,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(IResourceIdentifier rid)
 	{
-		this(null, null, null, null, null, null, null, null, null, rid);
+		this(null, null, null, null, null, null, null, null, null, null, rid);
 	}
 	
 	/**
@@ -115,7 +119,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(IComponentIdentifier parent, IResourceIdentifier rid)
 	{
-		this(null, null, parent, null, null, null, null, null, null, rid);
+		this(null, null, parent, null, null, null, null, null, null, null, rid);
 	}
 	
 	/**
@@ -134,7 +138,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IResourceIdentifier rid)
 	{
-		this(config, args, null, null, null, null, null, null, null, rid);
+		this(config, args, null, null, null, null, null, null, null, null, rid);
 	}
 	
 
@@ -184,7 +188,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, String[] imports)
 	{
-		this(config, args, parent, suspend, null, null, null, imports, null, null);
+		this(config, args, parent, suspend, null, null, null, null, imports, null, null);
 	}
 	
 	/**
@@ -210,7 +214,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, Boolean master, Boolean daemon)
 	{
-		this(config, args, parent, suspend, master, daemon, null);
+		this(config, args, parent, suspend, master, daemon, null, null);
 	}
 	
 	/**
@@ -222,9 +226,9 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, 
-		Boolean master, Boolean daemon, Boolean autoshutdown)
+		Boolean master, Boolean daemon, Boolean autoshutdown, Boolean monitoring)
 	{
-		this(config, args, parent, suspend, master, daemon, autoshutdown, null, null, null);
+		this(config, args, parent, suspend, master, daemon, autoshutdown, monitoring, null, null, null);
 	}
 	
 	/**
@@ -237,7 +241,7 @@ public class CreationInfo
 	 *  @param imports	The imports.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, 
-		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, 
+		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, Boolean monitoring,
 		String[] imports, RequiredServiceBinding[] bindings, IResourceIdentifier rid)
 	{
 		this.config	= config;
@@ -247,6 +251,7 @@ public class CreationInfo
 		this.master = master;
 		this.daemon = daemon;
 		this.autoshutdown = autoshutdown;
+		this.monitoring = monitoring;
 		this.imports	= imports;
 		this.bindings = bindings;
 		this.rid = rid;
@@ -460,5 +465,23 @@ public class CreationInfo
 	public void setLocalType(String localtype)
 	{
 		this.localtype = localtype;
+	}
+
+	/**
+	 *  Get the monitoring.
+	 *  @return The monitoring.
+	 */
+	public Boolean getMonitoring()
+	{
+		return monitoring;
+	}
+
+	/**
+	 *  Set the monitoring.
+	 *  @param monitoring The monitoring to set.
+	 */
+	public void setMonitoring(Boolean monitoring)
+	{
+		this.monitoring = monitoring;
 	}
 }

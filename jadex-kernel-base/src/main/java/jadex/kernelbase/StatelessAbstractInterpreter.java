@@ -1534,12 +1534,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					Boolean	master = components[i].getMaster()!=null ? components[i].getMaster() : type.getMaster();
 					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();
 					Boolean	autoshutdown = components[i].getAutoShutdown()!=null ? components[i].getAutoShutdown() : type.getAutoShutdown();
+					Boolean	monitoring = components[i].getMonitoring()!=null ? components[i].getMonitoring() : type.getMonitoring();
 					RequiredServiceBinding[] bindings = components[i].getBindings();
 					// todo: rid
 //					System.out.println("curcall: "+getName(components[i], model, j+1)+" "+CallAccess.getCurrentInvocation().getCause());
 					cms.createComponent(getName(components[i], model, j+1), type.getName(),
 						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), getComponentAdapter().getComponentIdentifier(),
-						suspend, master, daemon, autoshutdown, model.getAllImports(), bindings, null), null).addResultListener(crl);
+						suspend, master, daemon, autoshutdown, monitoring, model.getAllImports(), bindings, null), null).addResultListener(crl);
 				}
 				else
 				{
@@ -2063,8 +2064,15 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		// Publish to local subscribers
 		publishLocalEvent(event);
 		
-		// Publish to monitoring service
-		return publishEvent(event, getMonitoringServiceGetter());
+		// Publish to monitoring service if monitoring is turned on
+		if(getComponentDescription().getMonitoring()!=null && getComponentDescription().getMonitoring().booleanValue())
+		{
+			return publishEvent(event, getMonitoringServiceGetter());
+		}
+		else
+		{
+			return IFuture.DONE;
+		}
 	}
 	
 	/**
@@ -2095,6 +2103,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					}
 					else
 					{
+						System.out.println("Could not publish: "+event);
 						ret.setResult(null);
 					}
 				}

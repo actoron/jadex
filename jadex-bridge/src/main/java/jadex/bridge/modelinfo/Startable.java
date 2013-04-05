@@ -21,6 +21,9 @@ public class Startable
 	
 	/** The autoshutdown flag. */
 	private Boolean autoshutdown;
+
+	/** The monitoring flag. */
+	private Boolean monitoring;
 	
 	//-------- methods --------
 	
@@ -112,5 +115,23 @@ public class Startable
 	public void setSuspend(Boolean suspend)
 	{
 		this.suspend = suspend;
+	}
+
+	/**
+	 *  Get the monitoring.
+	 *  @return The monitoring.
+	 */
+	public Boolean getMonitoring()
+	{
+		return monitoring;
+	}
+
+	/**
+	 *  Set the monitoring.
+	 *  @param monitoring The monitoring to set.
+	 */
+	public void setMonitoring(Boolean monitoring)
+	{
+		this.monitoring = monitoring;
 	}
 }

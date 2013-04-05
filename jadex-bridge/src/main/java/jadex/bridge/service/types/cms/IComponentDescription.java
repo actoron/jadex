@@ -128,6 +128,12 @@ public interface IComponentDescription
 	 *  @return	The flag.
 	 */
 	public Boolean getAutoShutdown();
+
+	/**
+	 *  Get the monitoring flag.
+	 *  @return	The monitoring flag.
+	 */
+	public Boolean getMonitoring();
 	
 	/**
 	 *  Get the local type name of a component (defined in the parent).

@@ -137,6 +137,7 @@ public class StarterPanel extends JLayeredPane
 	protected JCheckBox mastercb;
 	protected JCheckBox daemoncb;
 	protected JCheckBox autosdcb;
+	protected JCheckBox monicb;
 
 //	/** The application name. */
 //	protected JComboBox appname;
@@ -337,7 +338,9 @@ public class StarterPanel extends JLayeredPane
 										suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener, StarterPanel.this.parent, StarterPanel.this)
+										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+										monicb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+										killlistener, StarterPanel.this.parent, StarterPanel.this)
 									.addResultListener(new DelegationResultListener(fut));
 								}
 							}
@@ -349,7 +352,9 @@ public class StarterPanel extends JLayeredPane
 									suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-									autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener, StarterPanel.this.parent, StarterPanel.this)
+									autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+									monicb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+									killlistener, StarterPanel.this.parent, StarterPanel.this)
 								.addResultListener(new DelegationResultListener(fut));
 							}
 						}
@@ -442,11 +447,14 @@ public class StarterPanel extends JLayeredPane
 		autosdcb.setToolTipText("Auto shutdown terminates a composite components when all (non daemon) components have terminated");
 //		autosdcb.setPreferredSize(pd);
 //		autosdcb.setMinimumSize(md);
+		monicb = new JCheckBox("Monitor");
+		monicb.setToolTipText("Monitor the component. If turned on it will push events to the IMonitoringService of the platform.");
 		
 		flags.add(suspend);
 		flags.add(mastercb);
 		flags.add(daemoncb);
 		flags.add(autosdcb);
+		flags.add(monicb);
 		componentpanel.add(new JLabel("Flags"), new GridBagConstraints(0, 2, 1, 0, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(2, 2, 0, 2), 0, 0));
 		componentpanel.add(flags, new GridBagConstraints(1, 2, 4, 0, 0, 0, GridBagConstraints.WEST,
@@ -528,7 +536,6 @@ public class StarterPanel extends JLayeredPane
 		y++;
 		upper.add(buts, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.EAST,
 			GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
-
 		
 //		JSplitPanel sp = new JSplitPanel(JSplitPanel.VERTICAL_SPLIT);
 //		sp.add(upper);
@@ -730,6 +737,7 @@ public class StarterPanel extends JLayeredPane
 			daemoncb.setSelected(false);
 			mastercb.setSelected(false);
 			autosdcb.setSelected(false);
+			monicb.setSelected(false);
 			genname.setSelected(false);
 			numcomponents.setValue(new Integer(1));
 			
@@ -950,10 +958,12 @@ public class StarterPanel extends JLayeredPane
 			boolean m = model.getMaster(c)==null? mastercb.isSelected(): model.getMaster(c).booleanValue();
 			boolean d = model.getDaemon(c)==null? daemoncb.isSelected(): model.getDaemon(c).booleanValue();
 			boolean a = model.getAutoShutdown(c)==null? autosdcb.isSelected(): model.getAutoShutdown(c).booleanValue();
+			boolean mo = model.getMonitoring(c)==null? monicb.isSelected(): model.getMonitoring(c).booleanValue();
 			suspend.setSelected(s);
 			mastercb.setSelected(m);
 			daemoncb.setSelected(d);
 			autosdcb.setSelected(a); 
+			monicb.setSelected(a); 
 //			System.out.println("smda: "+s+" "+m+" "+d+" "+a);
 		}
 	}
@@ -1618,7 +1628,7 @@ public class StarterPanel extends JLayeredPane
 	 */
 	public static IFuture createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
 		final String configname, final Map arguments, final Boolean suspend, 
-		final Boolean master, final Boolean daemon, final Boolean autosd, 
+		final Boolean master, final Boolean daemon, final Boolean autosd, final Boolean moni,
 		final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future ret = new Future(); 
@@ -1627,7 +1637,7 @@ public class StarterPanel extends JLayeredPane
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, null, null, rid), killlistener)
+				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, moni, null, null, rid), killlistener)
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)

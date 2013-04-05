@@ -133,7 +133,7 @@ import java.util.logging.Level;
 	
 	@Argument(name="maven_dependencies", clazz=boolean.class, defaultvalue="false"),
 	
-	@Argument(name="monitoring", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="monitoringcomp", clazz=boolean.class, defaultvalue="true"),
 })
 
 @ComponentTypes({
@@ -193,7 +193,7 @@ import java.util.logging.Level;
 		@NameValue(name="ssltcpport", value="0"),
 		@NameValue(name="platformname", value="null")
 	}, components={
-		@Component(name="mon", type="monitor", daemon=true, number="$args.monitoring? 1 : 0"),
+		@Component(name="mon", type="monitor", daemon=true, number="$args.monitoringcomp? 1 : 0"),
 		@Component(name="extensions", type="extensions", daemon=true, number="$args.extensions!=null ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),
 		@Component(name="kernels", type="kernel_multi", daemon=true, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=true, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),

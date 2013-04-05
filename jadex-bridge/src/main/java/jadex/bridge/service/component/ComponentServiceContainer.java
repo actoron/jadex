@@ -444,6 +444,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			return new Future<Collection<IServiceProvider>>(new ComponentTerminatedException(id));
 		}
+		if(!started)
+		{
+			return new Future<Collection<IServiceProvider>>(Collections.EMPTY_LIST);
+		}
 
 		final Future<Collection<IServiceProvider>> ret = new Future<Collection<IServiceProvider>>();
 //		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
