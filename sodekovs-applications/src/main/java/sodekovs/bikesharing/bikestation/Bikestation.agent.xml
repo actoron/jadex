@@ -108,13 +108,13 @@
 		    </trigger>
 		</plan>
 		
-		<!-- <plan name="changed_occupancy">
+		<plan name="changed_occupancy">
 		    <body class="ChangedOccupancyPlan"/>
 		    <trigger>
 		        <factchanged ref="stock"/>
 		        <factchanged ref="capacity"/>
 		    </trigger>
-		</plan> -->
+		</plan>
 		
 		<plan name="received_change_occupancy">
 		    <body class="ReceivedChangedOccupancy"/>
@@ -126,13 +126,13 @@
 		    </trigger>
 		</plan>
 		
-		<!-- <plan name="decentralized_changed_state">
+		<plan name="decentralized_changed_state">
 		    <body class="DecentralizedChangedStatePlan"/>
 		    <trigger>
 		        <factchanged ref="stock"/>
 		        <factchanged ref="capacity"/>
 		    </trigger>
-		</plan> -->
+		</plan>
 		
 		<plan name="decentralized_polling_request">
 		    <body class="DecentralizedPollingRequestPlan"/>
@@ -229,7 +229,8 @@
 	<configurations>
 		<configuration name="default">		
 			<plans>
-				<initialplan ref="test_plan"/>
+				<!-- <initialplan ref="test_plan"/> -->
+				<initialplan ref="super_station_plan"/>
 			</plans>
 		</configuration>
 	</configurations>
