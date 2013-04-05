@@ -41,6 +41,10 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		int rowsDoTo = ((Integer) simulationFacts.get(Constants.ROWS_TO_DO)).intValue();
 		// IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
 		HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults").getFact();
+		
+		//New parameter exerimentDescription: Contains short description of the evaluation: settings etc.
+		//TODO: apply this to Investigation
+		String experimentDescription = simConf.getDescription() !=null ? simConf.getDescription() : "";
 
 		// 1. Evaluate Rows and their Experiments
 		evaluate(rowResults);
@@ -50,7 +54,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		System.out.println(resultsAsString);
 
 		// 3. Store results
-		storeResults(rowResults, simulationFacts, rowCounter, rowsDoTo, resultsAsString);
+		storeResults(rowResults, simulationFacts, rowCounter, rowsDoTo, resultsAsString,experimentDescription);
 
 
 		//Do application specific evaluation, if required
@@ -105,7 +109,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			dispatchTopLevelGoal(goal);
 		}else{			
 			//Do application specific evaluation
-			compareSimulationWithRealData(rowResults);
+			compareSimulationWithRealData(rowResults, experimentDescription);
 		}
 
 	}
@@ -173,7 +177,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		}
 	}
 
-	private void storeResults(HashMap rowResults, HashMap simFacts, int rowCounter, int rowsDoTo, String resultsAsString) {
+	private void storeResults(HashMap rowResults, HashMap simFacts, int rowCounter, int rowsDoTo, String resultsAsString, String experimentDescription) {
 
 		// Simulation has finished. Store final result
 		if (rowCounter == rowsDoTo) {
@@ -184,13 +188,15 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			result.setEndtime(getClock().getTime());
 			result.setName("missing");
 			result.setRowsResults(new ArrayList(rowResults.values()));
+			result.setDescription(experimentDescription);
 
 			System.out.println("\n\n#ComputeExperimentRowResultsPlan# Simulation finished. Write Results of Simulation to XML!");
-			XMLHandler.writeXMLToFile(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
+			XMLHandler.writeXMLToFile(result, "SimRes" + getDateAsString() + ".xml", SimulationResult.class);
 
 			// Store also the evaluation in a file
 			try {
 				BufferedWriter out = new BufferedWriter(new FileWriter("SimulationEVALUATIONResults" + "-" + getDateAsString() + ".txt"));
+				out.write("Experiment Description: " + experimentDescription + "\n");
 				out.write(resultsAsString);
 				out.close();
 			} catch (IOException e) {
@@ -268,14 +274,15 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	}
 	
 	// Application specific evaluation --> compare simulations results with real data
-		private void compareSimulationWithRealData(HashMap rowResults) {
+		private void compareSimulationWithRealData(HashMap rowResults, String experimentDescription) {
 
 			for (Iterator<String> it = rowResults.keySet().iterator(); it.hasNext();) {
 
 				BikeSharingEvaluation bikeSharEval = new BikeSharingEvaluation(((RowResult) rowResults.get(it.next())).getEvaluatedRowData());
 				bikeSharEval.compare();
 
-				System.out.println("\n\n\n Results: 1) Stock level eval. 2)Single Bike Stations eval.");
+				System.out.println("\n\n\nResults contain: \n1) Stock level eval. \n2)Single Bike Stations eval.");
+				System.out.println("\nExperiment Description: " + experimentDescription + "\n");
 				System.out.println(bikeSharEval.stockLevelResultsToString());
 				System.out.println(bikeSharEval.bikestationResultsToString());
 				
@@ -286,7 +293,8 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 					BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-" + "-" + getDateAsString() + ".txt"));
 					
 					
-					out.write("\n\n\n Results: 1) Stock level eval. 2)Single Bike Stations eval.");
+					out.write("Results contain: \n1) Stock level eval. \n2)Single Bike Stations eval.");
+					out.write("\nExperiment Description: " + experimentDescription + "\n");
 					out.write(bikeSharEval.stockLevelResultsToString());
 					out.write(bikeSharEval.bikestationResultsToString());
 									

@@ -44,5 +44,14 @@ private ArrayList<RowResult> rowsResults = new ArrayList<RowResult>();
 		return name;
 	}
 	
+	@XmlAttribute(name="Description")
+	public String getDescription() {
+		return description;
+	}
+		
+	public void setDescription(String value) {
+		description = value;
+	}
+	
 }
 

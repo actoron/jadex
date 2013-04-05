@@ -13,6 +13,7 @@ public abstract class IResult {
 	
 	protected String id = null;
 	protected String name = null;
+	protected String description = null;
 	protected long starttime = -1;
 	protected long endtime = -1;
 	
