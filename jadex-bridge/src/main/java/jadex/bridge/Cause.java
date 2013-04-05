@@ -1,11 +1,11 @@
 package jadex.bridge;
 
-import jadex.commons.SUtil;
-
 import java.util.UUID;
 
 /**
- * 
+ *  A cause is used to link events. It has a source and a target id that
+ *  can be used to chain the events. Events roll the causes by using the
+ *  target as source and creating a new target etc.
  */
 public class Cause
 {
@@ -90,7 +90,8 @@ public class Cause
 //	}
 
 	/**
-	 * 
+	 *  Create the next cause.
+	 *  @param targetname The new target name.
 	 */
 	public Cause createNext(String targetname)
 	{
@@ -98,15 +99,16 @@ public class Cause
 	}
 	
 	/**
-	 * 
+	 *  Create a unique id.
 	 */
 	protected String createUniqueId()
 	{
-		return createUniqueId(5);
+//		return createUniqueId(5);
+		return createUniqueId(-1);
 	}
 	
 	/**
-	 * 
+	 *  Create a unique id.
 	 */
 	protected String createUniqueId(int len)
 	{

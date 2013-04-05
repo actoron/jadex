@@ -5,6 +5,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.commons.future.CallMultiplexer;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -79,11 +80,14 @@ public class ServiceGetter<T>
 //			}
 //		}));
 		
+		Future<T> ret;
+
 		// Must use a call future to ensure that all calls get a result if one can be found
 		if(callfut==null)
 		{
 			callfut = new Future<T>();
-		
+			ret = callfut;
+			
 			if(service==null)
 			{
 				if(lastsearch==0 || System.currentTimeMillis()>lastsearch+delay)
@@ -97,29 +101,41 @@ public class ServiceGetter<T>
 						{
 							service = result;
 	//							ret.setResult(service);
-							callfut.setResult(service);
+							Future<T> fut = callfut;
+							callfut = null;
+							fut.setResult(service);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
 		//					exception.printStackTrace();
 	//							ret.setResult(null);
-							callfut.setResult(null);
+							Future<T> fut = callfut;
+							callfut = null;
+							fut.setResult(null);
 						}
 					}));
 				}
 				else
 				{
-					callfut.setResult(null);
+					Future<T> fut = callfut;
+					callfut = null;
+					fut.setResult(null);
 				}
 			}
 			else
 			{
-				callfut.setResult(service);
+				Future<T> fut = callfut;
+				callfut = null;
+				fut.setResult(service);
 			}
 		}
+		else
+		{
+			ret = callfut;
+		}
 		
-		return callfut;
+		return ret;
 	}
 	
 	/**

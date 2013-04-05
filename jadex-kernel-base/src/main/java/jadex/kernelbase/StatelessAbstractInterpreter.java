@@ -1252,8 +1252,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		assert !getComponentAdapter().isExternalThread();
 		final Future<IInternalService> ret = new Future<IInternalService>();
 		
+		boolean moni = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring().booleanValue(): false;
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier());
+			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier(), moni);
 		getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -2136,7 +2137,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					}
 					else
 					{
-						System.out.println("Could not publish: "+event);
+//						System.out.println("Could not publish: "+event);
 						ret.setResult(null);
 					}
 				}

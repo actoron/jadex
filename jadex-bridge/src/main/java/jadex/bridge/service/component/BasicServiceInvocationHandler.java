@@ -358,7 +358,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
 		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, 
-		boolean realtime, IResourceIdentifier rid)
+		boolean realtime, IResourceIdentifier rid, boolean monitoring)
 	{
 		IInternalService	ret;
 		
@@ -375,7 +375,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service, realtime);
-			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy);
+			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy, monitoring);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
@@ -529,19 +529,16 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Add the standard and custom interceptors.
 	 */
 	protected static void addInterceptors(BasicServiceInvocationHandler handler, Object service, 
-		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, boolean copy)
+		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, boolean copy, boolean monitoring)
 	{
 //		System.out.println("addI:"+service);
 
-		// todo:
-//		boolean monitoring = true;
-		
 		// Only add standard interceptors if not raw.
 		if(!PROXYTYPE_RAW.equals(proxytype))
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-//			if(monitoring)
-//				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
+			if(monitoring)
+				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
 			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia.getExternalAccess(), false));
 			handler.addFirstServiceInterceptor(new PrePostConditionInterceptor());
 			if(!(service instanceof IService))
