@@ -15,7 +15,6 @@ import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.ISpaceProcess;
-import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.Vector2Double;
 
 import java.io.IOException;
@@ -38,6 +37,13 @@ import sodekovs.util.misc.XMLHandler;
  */
 public class CreateInitialSettingsProcess extends SimplePropertyObject implements ISpaceProcess {
 	// -------- attributes --------
+	private String simDataSetupFilePath = null;
+	private String clusterSetupFilePath = null;
+	private SuperCluster superCluster = null;
+	private List<String> superStations = new ArrayList<String>();
+	private SimulationDescription scenario = null;
+	private double lastTick = 0;
+	private int stationIterationCounter = 0;
 
 	// -------- constructors --------
 
@@ -60,23 +66,36 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 */
 	public void start(IClockService clock, final IEnvironmentSpace space) {
 
-		try {			
-//			createBikeStations((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
-			createBikeStationsAsBDIAgent((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		clusterSetupFilePath = (String) getProperty("clusterSetupFilePath");
+		simDataSetupFilePath = (String) getProperty("simDataSetupFilePath");
+		superCluster = (SuperCluster) XMLHandler.parseXMLFromXMLFile(clusterSetupFilePath, SuperCluster.class);
+		scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(simDataSetupFilePath, SimulationDescription.class);
+
+		// get all super station names (ids)
+		for (Cluster cluster : superCluster.getCluster()) {
+			superStations.add(cluster.getSuperStation().getName());
 		}
-		HashMap<String,Object> props = new HashMap<String,Object>();
-		props.put("simDataSetupFilePath",(String) getProperty("simDataSetupFilePath"));
-		props.put("clusterSetupFilePath",(String) getProperty("clusterSetupFilePath") );
-		
-//		space.createSpaceProcess("manageTimeSlices", props);
-		space.removeSpaceProcess(getProperty(ISpaceProcess.ID));
-		
+
+		lastTick = clock.getTick();
+
+		// try {
+		// createBikeStations((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
+		// createBikeStationsAsBDIAgent((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
+		// } catch (ParserConfigurationException e) {
+		// e.printStackTrace();
+		// } catch (SAXException e) {
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+
+		// HashMap<String, Object> props = new HashMap<String, Object>();
+		// props.put("simDataSetupFilePath", (String) getProperty("simDataSetupFilePath"));
+		// props.put("clusterSetupFilePath", (String) getProperty("clusterSetupFilePath"));
+
+		// space.createSpaceProcess("manageTimeSlices", props);
+		// space.removeSpaceProcess(getProperty(ISpaceProcess.ID));
+
 	}
 
 	/**
@@ -101,6 +120,26 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 *            The space this process is running in.
 	 */
 	public void execute(IClockService clock, IEnvironmentSpace space) {
+		System.out.println("Executed ME: " + clock.getTick());
+
+		// Check if all stations have been created
+		if (stationIterationCounter < scenario.getStations().getStation().size()) {
+
+			if ((clock.getTick() - lastTick) > 3.0) {
+				createBikeStations(space);
+			}
+		} else {
+			HashMap<String, Object> props = new HashMap<String, Object>();
+			props.put("simDataSetupFilePath", simDataSetupFilePath);
+			props.put("clusterSetupFilePath", clusterSetupFilePath);
+
+			// put it here, so it can be reused within the application without the need to parse again
+			space.setProperty("SimulationDescription", scenario);
+			space.setProperty("StationCluster", superCluster);
+
+			space.createSpaceProcess("manageTimeSlices", props);
+			space.removeSpaceProcess(getProperty(ISpaceProcess.ID));
+		}
 	}
 
 	/**
@@ -117,52 +156,51 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	private void createBikeStations(String path, String clusterPath, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
-		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);
-		SuperCluster superCluster = (SuperCluster) XMLHandler.parseXMLFromXMLFile(clusterPath, SuperCluster.class);
+	private void createBikeStations(IEnvironmentSpace space) {
+		// SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);
+		// SuperCluster superCluster = (SuperCluster) XMLHandler.parseXMLFromXMLFile(clusterPath, SuperCluster.class);
+		//
+		// // get all super station names (ids)
+		// List<String> superStations = new ArrayList<String>();
+		// for (Cluster cluster : superCluster.getCluster()) {
+		// superStations.add(cluster.getSuperStation().getName());
+		// }
 
-		// get all super station names (ids)
-		List<String> superStations = new ArrayList<String>();
-		for (Cluster cluster : superCluster.getCluster()) {
-			superStations.add(cluster.getSuperStation().getName());
+		// for (Station station : scenario.getStations().getStation()) {
+		Station station = scenario.getStations().getStation().get(stationIterationCounter);
+
+		HashMap<String, Object> props = new HashMap<String, Object>();
+		double x = new Double(station.getLongitude());
+		double y = new Double(station.getLatitude());
+		props.put("position", new Vector2Double(x, y));
+		props.put("stationID", station.getStationID());
+		props.put("capacity", station.getNumberOfDocks());
+		props.put("stock", station.getNumberOfBikes());
+		// if ("23rd and Crystal Dr".equals(station.getStationID())) {
+		// props.put("proposed_departure_station", "16th and U St NW");
+		// } else {
+		props.put("proposed_departure_station", null);
+		// }
+		//
+		// if ("17th and K St NW [formerly 17th and L St NW]".equals(station.getStationID())) {
+		// props.put("proposed_arrival_station", "10th and U St NW");
+		// } else {
+		props.put("proposed_arrival_station", null);
+		// }
+
+		// check if station is a super station
+		if (superStations.contains(station.getStationID())) {
+			props.put("isSuperStation", true);
+		} else {
+			props.put("isSuperStation", false);
 		}
 
-		for (Station station : scenario.getStations().getStation()) {
+		space.createSpaceObject("bikestation", props, null);
+		// }
 
-			HashMap<String, Object> props = new HashMap<String, Object>();
-			double x = new Double(station.getLongitude());
-			double y = new Double(station.getLatitude());
-			props.put("position", new Vector2Double(x, y));
-			props.put("stationID", station.getStationID());
-			props.put("capacity", station.getNumberOfDocks());
-			props.put("stock", station.getNumberOfBikes());
-			// if ("23rd and Crystal Dr".equals(station.getStationID())) {
-			// props.put("proposed_departure_station", "16th and U St NW");
-			// } else {
-			props.put("proposed_departure_station", null);
-			// }
-			//
-			// if ("17th and K St NW [formerly 17th and L St NW]".equals(station.getStationID())) {
-			// props.put("proposed_arrival_station", "10th and U St NW");
-			// } else {
-			props.put("proposed_arrival_station", null);
-			// }
-
-			// check if station is a super station
-			if (superStations.contains(station.getStationID())) {
-				props.put("isSuperStation", true);
-			} else {
-				props.put("isSuperStation", false);
-			}
-
-			space.createSpaceObject("bikestation", props, null);
-		}
-
-		// put it here, so it can be reused within the application without the need to parse again
-		space.setProperty("SimulationDescription", scenario);
-		space.setProperty("StationCluster", superCluster);
+		stationIterationCounter++;
 	}
-	
+
 	/**
 	 * 
 	 * Create bikestations according to the xml setup file.
@@ -194,7 +232,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 							superStations.add(cluster.getSuperStation().getName());
 						}
 
-						final ArrayList<HashMap<String,Object>> masterProp = new ArrayList<HashMap<String,Object>>();
+						final ArrayList<HashMap<String, Object>> masterProp = new ArrayList<HashMap<String, Object>>();
 						for (Station station : scenario.getStations().getStation()) {
 
 							HashMap<String, Object> props = new HashMap<String, Object>();
@@ -204,7 +242,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 							props.put("stationID", station.getStationID());
 							props.put("capacity", station.getNumberOfDocks());
 							props.put("stock", station.getNumberOfBikes());
-							props.put("testBelief", new String("wow-1"));					
+							props.put("testBelief", new String("wow-1"));
 							// if ("23rd and Crystal Dr".equals(station.getStationID())) {
 							// props.put("proposed_departure_station", "16th and U St NW");
 							// } else {
@@ -223,80 +261,77 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 							} else {
 								props.put("isSuperStation", false);
 							}
-							
-							masterProp.add(props);
-							
-							
 
-//							cms.createComponent("Bikestation" , "sodekovs/bikesharing/bikestation/Bikestation.agent.xml",
+							masterProp.add(props);
+
+							// cms.createComponent("Bikestation" , "sodekovs/bikesharing/bikestation/Bikestation.agent.xml",
 							// HACK: Has to be started "suspended" in order to force start from DeparturePos. Otherwise componten will start from random pos that is computed by the avatar when it is
 							// intialized.
-//									new CreationInfo(null, null, space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(new DefaultResultListener() {
-//								public void resultAvailable(Object result) {
-//									System.out.println("Started: " + result);
-//									final IComponentIdentifier cid = (IComponentIdentifier) result;
-//									cms.getComponentDescription(cid).addResultListener(new DefaultResultListener() {
-//										public void resultAvailable(Object result) {
-											// add the start position to the agent/avatar
-//											 space.getAvatar((IComponentDescription) result).setProperty(ContinuousSpace2D.PROPERTY_POSITION, depPos);
-											// cms.resumeComponent(cid).addResultListener(new DefaultResultListener() {
-											// public void resultAvailable(Object result) {
-											//
-											// }
-											// });
-//										}
-//									});
-//								}
-//							});
+							// new CreationInfo(null, null, space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(new DefaultResultListener() {
+							// public void resultAvailable(Object result) {
+							// System.out.println("Started: " + result);
+							// final IComponentIdentifier cid = (IComponentIdentifier) result;
+							// cms.getComponentDescription(cid).addResultListener(new DefaultResultListener() {
+							// public void resultAvailable(Object result) {
+							// add the start position to the agent/avatar
+							// space.getAvatar((IComponentDescription) result).setProperty(ContinuousSpace2D.PROPERTY_POSITION, depPos);
+							// cms.resumeComponent(cid).addResultListener(new DefaultResultListener() {
+							// public void resultAvailable(Object result) {
+							//
+							// }
+							// });
+							// }
+							// });
+							// }
+							// });
 						}
-						
+
 						CounterResultListener<IComponentIdentifier> creslist = new CounterResultListener(masterProp.size(), new DefaultResultListener<IComponentIdentifier>() {
 							public void resultAvailable(IComponentIdentifier result) {
-								
+
 								final IComponentIdentifier cid = (IComponentIdentifier) result;
 								cms.getComponentDescription(cid).addResultListener(new DefaultResultListener() {
 									public void resultAvailable(Object result) {
-										ISpaceObject obj =  space.getAvatar((IComponentDescription) result);
+										ISpaceObject obj = space.getAvatar((IComponentDescription) result);
 										System.out.println("Obj: " + obj);
 									}
-									
+
 									public void exceptionOccurred(Exception exception) {
 										System.out.println("2" + exception.toString());
 									};
 								});
-																
+
 							};
-							
+
 							public void exceptionOccurred(Exception exception) {
 								System.out.println("1" + exception.toString());
 							};
-						})
-						{
+						}) {
 							public void resultAvailable(Object result) {
-								
+
 								super.resultAvailable(result);
-								if (!notified)
-								{
-//									bla[cnt+1]
-									cms.createComponent("Bikestation" , "sodekovs/bikesharing/bikestation/Bikestation.agent.xml",
-											// HACK: Has to be started "suspended" in order to force start from DeparturePos. Otherwise componten will start from random pos that is computed by the avatar when it is
-											// intialized.
-													new CreationInfo(null, masterProp.get(cnt), space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(this);
+								if (!notified) {
+									// bla[cnt+1]
+									cms.createComponent("Bikestation", "sodekovs/bikesharing/bikestation/Bikestation.agent.xml",
+									// HACK: Has to be started "suspended" in order to force start from DeparturePos. Otherwise componten will start from random pos that is computed by the avatar when
+									// it is
+									// intialized.
+											new CreationInfo(null, masterProp.get(cnt), space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(this);
 								}
-							}							
+							}
 						};
-//						bla[0]
-						cms.createComponent("Bikestation" , "sodekovs/bikesharing/bikestation/Bikestation.agent.xml",
-								// HACK: Has to be started "suspended" in order to force start from DeparturePos. Otherwise componten will start from random pos that is computed by the avatar when it is
-								// intialized.
-										new CreationInfo(null, masterProp.get(0), space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(creslist);
-						
+						// bla[0]
+						cms.createComponent("Bikestation", "sodekovs/bikesharing/bikestation/Bikestation.agent.xml",
+						// HACK: Has to be started "suspended" in order to force start from DeparturePos. Otherwise componten will start from random pos that is computed by the avatar when it is
+						// intialized.
+								new CreationInfo(null, masterProp.get(0), space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(creslist);
+
 						// put it here, so it can be reused within the application without the need to parse again
 						space.setProperty("SimulationDescription", scenario);
 						space.setProperty("StationCluster", superCluster);
 						return IFuture.DONE;
 					}
-				});				
+				});
 			}
 		});
 	}
