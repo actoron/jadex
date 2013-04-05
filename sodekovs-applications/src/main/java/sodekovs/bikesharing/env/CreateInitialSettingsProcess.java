@@ -12,6 +12,7 @@ import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.ISpaceProcess;
@@ -42,7 +43,6 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	private SuperCluster superCluster = null;
 	private List<String> superStations = new ArrayList<String>();
 	private SimulationDescription scenario = null;
-	private double lastTick = 0;
 	private int stationIterationCounter = 0;
 
 	// -------- constructors --------
@@ -76,7 +76,6 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 			superStations.add(cluster.getSuperStation().getName());
 		}
 
-		lastTick = clock.getTick();
 
 		// try {
 		// createBikeStations((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
@@ -120,14 +119,14 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 *            The space this process is running in.
 	 */
 	public void execute(IClockService clock, IEnvironmentSpace space) {
-		System.out.println("Executed ME: " + clock.getTick());
+//		System.out.println("Executed ME: " + clock.getTick());
 
 		// Check if all stations have been created
 		if (stationIterationCounter < scenario.getStations().getStation().size()) {
 
-			if ((clock.getTick() - lastTick) > 3.0) {
+//			if ((clock.getTick() - lastTick) > 3.0) {
 				createBikeStations(space);
-			}
+//			}
 		} else {
 			HashMap<String, Object> props = new HashMap<String, Object>();
 			props.put("simDataSetupFilePath", simDataSetupFilePath);
@@ -136,7 +135,14 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 			// put it here, so it can be reused within the application without the need to parse again
 			space.setProperty("SimulationDescription", scenario);
 			space.setProperty("StationCluster", superCluster);
-
+			
+			//HACK: Required for Simulation-Control!!! Make sure right start time is used for later evaluation
+			space.setProperty("REAL_START_TIME_OF_SIMULATION", clock.getTime());
+			space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", new Double (clock.getTick()).longValue());
+			//Hack: Inform Client Sim to update both times above
+			space.setProperty("UpdateTimeAtClientSimulator", true);
+			
+			
 			space.createSpaceProcess("manageTimeSlices", props);
 			space.removeSpaceProcess(getProperty(ISpaceProcess.ID));
 		}
