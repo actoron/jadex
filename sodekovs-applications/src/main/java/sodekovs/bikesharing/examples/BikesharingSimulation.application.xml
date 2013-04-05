@@ -112,7 +112,7 @@
 			<env:avatarmappings>
 			<!-- USE createcomponent="true" ONLY if avatar is started first. If BDIAgent is started first, don't use it!!! -->
 				<env:avatarmapping componenttype="Pedestrian" objecttype="pedestrian" createcomponent="true"/>
-				<env:avatarmapping componenttype="Bikestation" 	objecttype="bikestation" createcomponent="false"/>									
+				<env:avatarmapping componenttype="Bikestation" 	objecttype="bikestation" createcomponent="true"/>									
 				<env:avatarmapping componenttype="Truck" 	objecttype="truck" createcomponent="true"/>
 			</env:avatarmappings>
 
@@ -257,6 +257,7 @@
 						<env:process type="initProcess">
 							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonTestEnv.xml"</env:property>
 							<env:property name="clusterSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/stationCluster-Test.xml"</env:property>
+							<env:property name="rate">100</env:property>
 						</env:process>
 						<!--  <env:process type="manageTimeSlices" />-->													 
 					</env:processes>
