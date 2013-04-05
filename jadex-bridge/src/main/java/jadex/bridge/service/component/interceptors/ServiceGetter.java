@@ -32,6 +32,9 @@ public class ServiceGetter<T>
 	/** The delay between searches when no service was found. */
 	protected long delay = 30000;
 
+	/** Ongoing call future. */
+	protected Future<T> callfut;
+	
 	/**
 	 *  Create a new service getter.
 	 */
@@ -58,7 +61,7 @@ public class ServiceGetter<T>
 	{
 //		System.out.println("getMon");
 		
-		final Future<T> ret = new Future<T>();
+//		final Future<T> ret = new Future<T>();
 
 //		SServiceProvider.getService(component.getServiceContainer(), type, scope)
 //			.addResultListener(component.createResultListener(new IResultListener<T>()
@@ -76,39 +79,47 @@ public class ServiceGetter<T>
 //			}
 //		}));
 		
-		if(service==null)
+		// Must use a call future to ensure that all calls get a result if one can be found
+		if(callfut==null)
 		{
-			if(lastsearch==0 || System.currentTimeMillis()>lastsearch+delay)
+			callfut = new Future<T>();
+		
+			if(service==null)
 			{
-				lastsearch = System.currentTimeMillis();
-				
-				SServiceProvider.getService(component.getServiceContainer(), type, scope)
-					.addResultListener(component.createResultListener(new IResultListener<T>()
+				if(lastsearch==0 || System.currentTimeMillis()>lastsearch+delay)
 				{
-					public void resultAvailable(T result)
-					{
-						service = result;
-						ret.setResult(service);
-					}
+					lastsearch = System.currentTimeMillis();
 					
-					public void exceptionOccurred(Exception exception)
+					SServiceProvider.getService(component.getServiceContainer(), type, scope)
+						.addResultListener(component.createResultListener(new IResultListener<T>()
 					{
-	//					exception.printStackTrace();
-						ret.setResult(null);
-					}
-				}));
+						public void resultAvailable(T result)
+						{
+							service = result;
+	//							ret.setResult(service);
+							callfut.setResult(service);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+		//					exception.printStackTrace();
+	//							ret.setResult(null);
+							callfut.setResult(null);
+						}
+					}));
+				}
+				else
+				{
+					callfut.setResult(null);
+				}
 			}
 			else
 			{
-				ret.setResult(null);
+				callfut.setResult(service);
 			}
 		}
-		else
-		{
-			ret.setResult(service);
-		}
 		
-		return ret;
+		return callfut;
 	}
 	
 	/**

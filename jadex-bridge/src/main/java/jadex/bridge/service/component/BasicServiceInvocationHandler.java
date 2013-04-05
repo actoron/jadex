@@ -534,7 +534,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 //		System.out.println("addI:"+service);
 
 		// todo:
-		boolean monitoring = true;
+//		boolean monitoring = true;
 		
 		// Only add standard interceptors if not raw.
 		if(!PROXYTYPE_RAW.equals(proxytype))

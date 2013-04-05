@@ -39,7 +39,7 @@ public class HelloWorldAgent extends MicroAgent
 			{
 				System.out.println("Good bye world.");
 //				killAgent();
-//				ret.setResult(null);
+				ret.setResult(null);
 				return IFuture.DONE;
 			}
 		});

@@ -88,6 +88,14 @@ public class Cause
 //		this.targetid = targedid;
 //		this.targetname = targetname;
 //	}
+
+	/**
+	 * 
+	 */
+	public Cause createNext(String targetname)
+	{
+		return new Cause(this, targetname);
+	}
 	
 	/**
 	 * 

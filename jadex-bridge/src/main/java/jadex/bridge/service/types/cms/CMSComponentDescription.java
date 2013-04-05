@@ -483,4 +483,13 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 			throw new RuntimeException("Cannot clone: " + this);
 		}
 	}
+	
+//	public static void main(String[] args)
+//	{
+//		CMSComponentDescription desc = new CMSComponentDescription();
+//		desc.setMonitoring(Boolean.TRUE);
+//		
+//		CMSComponentDescription cl = (CMSComponentDescription)desc.clone();
+//		System.out.println(cl);
+//	}
 }

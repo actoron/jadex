@@ -60,7 +60,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	protected MicroAgent microagent;
 	
 	/** The scheduled steps of the agent. */
-	protected List<Tuple3<IComponentStep<?>, Future<?>, ServiceCall>> steps;
+	protected List<StepInfo> steps;
 	
 	/** Flag indicating that no steps may be scheduled any more. */
 	protected boolean nosteps;
@@ -97,8 +97,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			final Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
 
 			this.container = createMyServiceContainer(args);
-						
-			addStep((new Tuple3<IComponentStep<?>, Future<?>, ServiceCall>(new IComponentStep<Void>()
+					
+			IComponentStep<Void> st = new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
@@ -126,7 +126,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					
 					return IFuture.DONE;
 				}
-			}, new Future(), ServiceCall.getCurrentInvocation())));
+			};
+			
+			ServiceCall sc = ServiceCall.getCurrentInvocation();
+			Cause cause = sc!=null? sc.getCause().createNext(st.toString()): getComponentDescription().getCause().createNext(st.toString());
+			addStep(new StepInfo(st, new Future(), ServiceCall.getCurrentInvocation(), cause));
 		}
 		catch(Exception e)
 		{
@@ -520,38 +524,38 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		{
 			if(steps!=null && !steps.isEmpty())
 			{
-				Tuple3<IComponentStep<?>, Future<?>, ServiceCall> step = removeStep();
-				Future future = (Future)step.getSecondEntity();
+				StepInfo step = removeStep();
+				Future future = step.getFuture();
 				
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
 //					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 
-				Cause cause = step.getThirdEntity()!=null? step.getThirdEntity().getCause(): null;
-				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
-					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, cause, System.currentTimeMillis()));
+//				Cause cause = step.getCall()!=null? step.getCall().getCause(): null;
+				publishEvent(new MonitoringEvent(getComponentIdentifier().getName()+"_"+step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
+					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, step.getCause(), System.currentTimeMillis()));
 				
 				// Correct to execute them in try catch?!
 				try
 				{
 					boolean done = false;
-					if(step.getFirstEntity() instanceof IConditionalComponentStep)
+					if(step.getStep() instanceof IConditionalComponentStep)
 					{
-						if(!((IConditionalComponentStep<?>)step.getFirstEntity()).isValid())
+						if(!((IConditionalComponentStep<?>)step.getStep()).isValid())
 						{
-							future.setException(new RuntimeException("Step invalid: "+step.getFirstEntity()));
+							future.setException(new RuntimeException("Step invalid: "+step.getStep()));
 							done = true;
 						}
 					}
 					if(!done)
 					{
 						// Set again the service call context (if any) for dependent steps
-						ServiceCall sc = (ServiceCall)step.getThirdEntity();
+						ServiceCall sc = (ServiceCall)step.getCall();
 						if(sc!=null && ServiceCall.getCurrentInvocation()==null)
 						{
 							CallAccess.setServiceCall(sc);
 						}
 						
-						IFuture<?>	res	= ((IComponentStep<?>)step.getFirstEntity()).execute(microagent);
+						IFuture<?>	res	= ((IComponentStep<?>)step.getStep()).execute(microagent);
 
 						FutureFunctionality.connectDelegationFuture(future, res);
 					}
@@ -565,8 +569,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
 //				IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 
-				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
-					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, cause, System.currentTimeMillis()));
+				publishEvent(new MonitoringEvent(getComponentIdentifier().getName()+"_"+step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, step.getCause(), System.currentTimeMillis()));
 			}
 	
 			return steps!=null && !steps.isEmpty();
@@ -826,7 +830,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				{			
 					public void run()
 					{
-						addStep(new Tuple3<IComponentStep<?>, Future<?>, ServiceCall>(step, ret, null));
+						addStep(new StepInfo(step, ret, null, getComponentDescription().getCause().createNext(step.toString())));
 					}
 					
 					public String toString()
@@ -848,7 +852,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 		else
 		{
-			addStep(new Tuple3<IComponentStep<?>, Future<?>, ServiceCall>(step, ret, ServiceCall.getCurrentInvocation()));
+			ServiceCall sc = ServiceCall.getCurrentInvocation();
+			Cause cause = sc!=null? sc.getCause().createNext(step.toString()): getComponentDescription().getCause().createNext(step.toString());
+			addStep(new StepInfo(step, ret, sc, cause));
 		}
 		return ret;
 	}
@@ -856,11 +862,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Add a new step.
 	 */
-	protected void addStep(Tuple3<IComponentStep<?>, Future<?>, ServiceCall> step)
+	protected void addStep(StepInfo step)
 	{
 		if(nosteps)
 		{
-			((Future)step.getSecondEntity()).setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
+			step.getFuture().setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
 		}
 		else
 		{
@@ -874,9 +880,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //					step.getFirstEntity().toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)step.getFirstEntity())));
 //			}
 			
-			MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, System.currentTimeMillis());
-			event.setProperty("sourcename", step.getFirstEntity().getClass().getName());
-			event.setProperty("details", getStepDetails((IComponentStep)step.getFirstEntity()));
+			MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName()+"_"+step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, step.getCause(), System.currentTimeMillis());
+			event.setProperty("sourcename", step.getStep().getClass().getName());
+			event.setProperty("details", getStepDetails(step.getStep()));
 			publishEvent(event);
 		}
 	}
@@ -884,10 +890,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Add a new step.
 	 */
-	protected Tuple3<IComponentStep<?>, Future<?>, ServiceCall> removeStep()
+	protected StepInfo removeStep()
 	{
 		assert steps!=null && !steps.isEmpty();
-		Tuple3<IComponentStep<?>, Future<?>, ServiceCall> ret = steps.remove(0);
+		StepInfo ret = steps.remove(0);
 		if(steps.isEmpty())
 			steps	= null;
 		
@@ -898,9 +904,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //		}
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		
-		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+TYPE_STEP, System.currentTimeMillis());
-		event.setProperty("sourcename", ret.getFirstEntity().getClass().getName());
-		event.setProperty("details", getStepDetails(ret.getFirstEntity()));
+		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName()+"_"+ret.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+TYPE_STEP, ret.getCause(), System.currentTimeMillis());
+		event.setProperty("sourcename", ret.getStep().getClass().getName());
+		event.setProperty("details", getStepDetails(ret.getStep()));
 		publishEvent(event);
 		
 		return ret;
@@ -1081,8 +1087,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
 		while(steps!=null && !steps.isEmpty())
 		{
-			Tuple3<IComponentStep<?>, Future<?>, ServiceCall> step = removeStep();
-			Future<?> future = step.getSecondEntity();
+			StepInfo step = removeStep();
+			Future<?> future = step.getFuture();
 			future.setException(ex);
 //			System.out.println("Cleaning obsolete step: "+getAgentAdapter().getComponentIdentifier()+", "+step[0]);
 		}
@@ -1267,5 +1273,106 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public MicroModel getMicroModel()
 	{
 		return micromodel;
+	}
+	
+	/**
+	 *  Info struct for steps.
+	 */
+	public static class StepInfo
+	{
+		/** The component step. */
+		protected IComponentStep<?> step; 
+		
+		/** The result future. */
+		protected Future<?> future; 
+		
+		/** The service call. */
+		protected ServiceCall call;
+		
+		/** The cause. */
+		protected Cause cause;
+
+		/**
+		 *  Create a new StepInfo. 
+		 */
+		public StepInfo(IComponentStep<?> step, Future<?> future, ServiceCall call, Cause cause)
+		{
+			this.step = step;
+			this.future = future;
+			this.call = call;
+			this.cause = cause;
+		}
+
+		/**
+		 *  Get the step.
+		 *  @return The step.
+		 */
+		public IComponentStep< ? > getStep()
+		{
+			return step;
+		}
+
+		/**
+		 *  Set the step.
+		 *  @param step The step to set.
+		 */
+		public void setStep(IComponentStep< ? > step)
+		{
+			this.step = step;
+		}
+
+		/**
+		 *  Get the future.
+		 *  @return The future.
+		 */
+		public Future< ? > getFuture()
+		{
+			return future;
+		}
+
+		/**
+		 *  Set the future.
+		 *  @param future The future to set.
+		 */
+		public void setFuture(Future< ? > future)
+		{
+			this.future = future;
+		}
+
+		/**
+		 *  Get the call.
+		 *  @return The call.
+		 */
+		public ServiceCall getCall()
+		{
+			return call;
+		}
+
+		/**
+		 *  Set the call.
+		 *  @param call The call to set.
+		 */
+		public void setCall(ServiceCall call)
+		{
+			this.call = call;
+		}
+
+		/**
+		 *  Get the cause.
+		 *  @return The cause.
+		 */
+		public Cause getCause()
+		{
+			return cause;
+		}
+
+		/**
+		 *  Set the cause.
+		 *  @param cause The cause to set.
+		 */
+		public void setCause(Cause cause)
+		{
+			this.cause = cause;
+		}
 	}
 }
