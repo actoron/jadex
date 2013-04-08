@@ -117,7 +117,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 					long start = System.currentTimeMillis();
 					ServiceCall sc = context.getServiceCall();
 					Cause cause = sc==null? null: sc.getCause();
-					MonitoringEvent ev = new MonitoringEvent(component.getComponentIdentifier(), 
+					MonitoringEvent ev = new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
 						context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName(), 
 						IMonitoringEvent.TYPE_SERVICECALL_START, cause, start);
 					
@@ -193,7 +193,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 						long end = System.currentTimeMillis();
 						ServiceCall sc = sic.getServiceCall();
 						Cause cause = sc==null? null: sc.getCause();
-						monser.publishEvent(new MonitoringEvent(component.getComponentIdentifier(), 
+						monser.publishEvent(new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
 							sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end));
 					}
 					ReturnValueResultListener.super.customResultAvailable(null);

@@ -532,7 +532,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 
 //				Cause cause = step.getCall()!=null? step.getCall().getCause(): null;
-				publishEvent(new MonitoringEvent(getComponentIdentifier(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
+				publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
 					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, step.getCause(), System.currentTimeMillis()));
 				
 				// Correct to execute them in try catch?!
@@ -570,7 +570,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
 //				IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 
-				publishEvent(new MonitoringEvent(getComponentIdentifier(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+				publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
 					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, step.getCause(), System.currentTimeMillis()));
 			}
 	
@@ -882,7 +882,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //					step.getFirstEntity().toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)step.getFirstEntity())));
 //			}
 			
-			MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, step.getCause(), System.currentTimeMillis());
+			MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), step.getStep().toString(),  IMonitoringEvent.EVENT_TYPE_CREATION+"."+TYPE_STEP, step.getCause(), System.currentTimeMillis());
 			event.setProperty("sourcename", step.getStep().getClass().getName());
 			event.setProperty("details", getStepDetails(step.getStep()));
 			publishEvent(event);
@@ -906,7 +906,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //		}
 //		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		
-		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), ret.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+TYPE_STEP, ret.getCause(), System.currentTimeMillis());
+		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), ret.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+TYPE_STEP, ret.getCause(), System.currentTimeMillis());
 		event.setProperty("sourcename", ret.getStep().getClass().getName());
 		event.setProperty("details", getStepDetails(ret.getStep()));
 		publishEvent(event);

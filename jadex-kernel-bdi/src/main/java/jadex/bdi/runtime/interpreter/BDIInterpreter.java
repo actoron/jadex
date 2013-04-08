@@ -630,7 +630,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 //					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
 //						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 					
-					publishEvent(new MonitoringEvent(getComponentIdentifier(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
 					
 					rulesystem.getAgenda().fireRule();
 					act	= rulesystem.getAgenda().getLastActivation();
@@ -643,7 +643,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 //					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
 //						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 
-					publishEvent(new MonitoringEvent(getComponentIdentifier(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
 				}
 	
 				return !rulesystem.getAgenda().isEmpty();

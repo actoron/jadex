@@ -68,7 +68,7 @@ public class DefaultStepHandler implements IStepHandler
 		else
 		{
 			boolean	outside	= false;
-			ThreadContext	context	= thread.getThreadContext();
+			
 			while(next==null && !outside)
 			{
 				// Normal flow
@@ -102,32 +102,36 @@ public class DefaultStepHandler implements IStepHandler
 					}
 				}
 				
-				outside	= context.getParent()==null;
-				if(next==null && !outside)
+				ThreadContext	context	= thread.getThreadContext();
+				if(context!=null)
 				{
-					// When last thread or exception, mark current context for removal.
-					if(context.getThreads().size()==1 || ex!=null)
+					outside	= context.getParent()==null;
+					if(next==null && !outside)
 					{
-						activity = (MActivity)context.getModelElement();
-						remove	= context;
-						context	= context.getParent();
-						
-						// Cancel subprocess handlers.
-						if(activity instanceof MSubProcess)
+						// When last thread or exception, mark current context for removal.
+						if(context.getThreads().size()==1 || ex!=null)
 						{
-							List<MActivity>	handlers	= activity.getEventHandlers();
-							for(int i=0; handlers!=null && i<handlers.size(); i++)
+							activity = (MActivity)context.getModelElement();
+							remove	= context;
+							context	= context.getParent();
+							
+							// Cancel subprocess handlers.
+							if(activity instanceof MSubProcess)
 							{
-								MActivity handler = (MActivity)handlers.get(i);
-								instance.getActivityHandler(handler).cancel(handler, instance, remove.getInitiator());
+								List<MActivity>	handlers	= activity.getEventHandlers();
+								for(int i=0; handlers!=null && i<handlers.size(); i++)
+								{
+									MActivity handler = (MActivity)handlers.get(i);
+									instance.getActivityHandler(handler).cancel(handler, instance, remove.getInitiator());
+								}
 							}
 						}
-					}
-					
-					// If more threads are available in current context just exit loop.
-					else if(context.getThreads().size()>1)
-					{
-						outside	= true;
+						
+						// If more threads are available in current context just exit loop.
+						else if(context.getThreads().size()>1)
+						{
+							outside	= true;
+						}
 					}
 				}
 			}
