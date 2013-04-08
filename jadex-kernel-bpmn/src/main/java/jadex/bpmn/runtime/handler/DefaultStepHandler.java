@@ -134,10 +134,10 @@ public class DefaultStepHandler implements IStepHandler
 						}
 					}
 				}
-				else
-				{
-					throw new RuntimeException("Thread context nulls in process: "+activity, ex);
-				}
+//				else
+//				{
+//					throw new RuntimeException("Thread context nulls in process: "+activity, ex);
+//				}
 			}
 		}
 
