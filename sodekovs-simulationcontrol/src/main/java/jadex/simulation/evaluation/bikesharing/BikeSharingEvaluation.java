@@ -22,7 +22,7 @@ import sodekovs.util.misc.XMLHandler;
 public class BikeSharingEvaluation {
 
 	// private String realDataXMLFile = "E:\\Workspaces\\Jadex\\BikeSharing2\\Jadex\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
-	private String realDataXMLFile = "C:\\Users\\Thomas\\workspaces\\jadex-sodekovs\\trunk\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonSimulation_Monday_new.xml";
+	private String realDataXMLFile = "C:\\Users\\Thomas\\workspaces\\jadex-sodekovs\\trunk\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
 	// private String realDataXMLFile = "E:/Workspaces/Jadex/BikeSharing2/Jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonEvaluation_Monday_new.xml";
 	private SimulationDescription realData;
 	// conf. following method for understanding the data structure:
