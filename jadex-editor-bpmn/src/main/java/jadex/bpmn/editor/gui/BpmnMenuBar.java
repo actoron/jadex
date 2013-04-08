@@ -90,6 +90,7 @@ public class BpmnMenuBar extends JMenuBar
 				}
 			}
 		};
+//		Reflec
 		
 		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
 		{
@@ -260,6 +261,8 @@ public class BpmnMenuBar extends JMenuBar
 							mmodel = BpmnXMLReader.read(rinfo, BpmnMenuBar.class.getClassLoader(), new ResourceIdentifier(), null);
 							(new BpmnVisualModelGenerator(mmodel)).generateModel(graph);
 						}
+						
+						modelcontainer.setGraph(graph);
 						
 						modelcontainer.setFile(file);
 						editorwindow.getSettings().setLastFile(file);

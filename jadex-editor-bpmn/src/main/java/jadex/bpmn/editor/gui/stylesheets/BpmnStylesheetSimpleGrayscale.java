@@ -14,6 +14,9 @@ import jadex.bpmn.model.MBpmnModel;
  */
 public class BpmnStylesheetSimpleGrayscale extends BpmnStylesheetColor
 {
+	/** Style sheet name. */
+	public static String NAME = "Simple Grayscale";
+	
 	public BpmnStylesheetSimpleGrayscale()
 	{
 		String white = "#ffffff";

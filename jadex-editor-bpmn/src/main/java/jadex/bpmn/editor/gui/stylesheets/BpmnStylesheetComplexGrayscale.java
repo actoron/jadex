@@ -16,6 +16,9 @@ import jadex.commons.gui.SGUI;
  */
 public class BpmnStylesheetComplexGrayscale extends BpmnStylesheetColor
 {
+	/** Style sheet name. */
+	public static String NAME = "Complex Grayscale";
+	
 	public BpmnStylesheetComplexGrayscale()
 	{
 		styles.get(VPool.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#F0F0F0");

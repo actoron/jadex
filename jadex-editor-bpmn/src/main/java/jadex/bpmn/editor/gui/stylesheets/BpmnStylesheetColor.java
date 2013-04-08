@@ -40,6 +40,9 @@ import com.mxgraph.view.mxStylesheet;
  */
 public class BpmnStylesheetColor extends mxStylesheet
 {
+	/** Style sheet name. */
+	public static String NAME = "Color";
+	
 	/** The default font. */
 	public static final String FONT = "Bitstream Vera Sans";
 	

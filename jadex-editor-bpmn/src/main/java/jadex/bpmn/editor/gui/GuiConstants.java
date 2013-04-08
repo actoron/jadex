@@ -1,5 +1,9 @@
 package jadex.bpmn.editor.gui;
 
+import com.mxgraph.view.mxStylesheet;
+
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+
 
 /**
  *  This class containing constants for fine-tuning the GUI.
@@ -7,6 +11,9 @@ package jadex.bpmn.editor.gui;
  */
 public class GuiConstants
 {
+	/** The default style sheet. */
+	public static final mxStylesheet DEFAULT_STYLE_SHEET = new BpmnStylesheetColor();
+	
 	/** Constant 45 degree sine value. */
 	public static final double SINE_45 = Math.sin(0.25 * Math.PI);
 	
