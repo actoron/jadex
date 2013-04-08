@@ -233,8 +233,8 @@ public class BasicService implements IInternalService
 	 */
 	public IFuture<Void>	shutdownService()
 	{
-		if(sid.getProviderId().getParent()==null && getClass().getName().indexOf("ContextSer")!=-1)
-			System.out.println("shutdown service: "+getServiceIdentifier());
+//		if(sid.getProviderId().getParent()==null && getClass().getName().indexOf("ContextSer")!=-1)
+//			System.out.println("shutdown service: "+getServiceIdentifier());
 
 		// Deregister pojo->sid mapping in shutdown.
 		BasicServiceInvocationHandler.removePojoServiceProxy(sid);

@@ -244,7 +244,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	//					if(!terminated)
 	//					{
 //							if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
-								System.out.println("Terminating service: "+sid);
+//								System.out.println("Terminating service: "+sid);
 							getLogger().info("Terminating service: "+sid);
 							final IInternalService fservice = service;
 							service.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
@@ -252,7 +252,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 								public void customResultAvailable(Void result)
 								{
 //									if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
-										System.out.println("Terminated service: "+sid);
+//										System.out.println("Terminated service: "+sid);
 									getLogger().info("Terminated service: "+sid);
 									serviceShutdowned(fservice).addResultListener(new DelegationResultListener<Void>(ret));
 								}

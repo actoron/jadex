@@ -73,7 +73,7 @@ public class PlatformsTest extends TestCase
 	public static void main(String[] args)
 	{
 		System.out.println("guiclass: "+ jadex.commons.SReflect.classForName0("jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel",
-		    	jadex.platform.service.library.LibraryService.class.getClassLoader()));
+		   	jadex.platform.service.library.LibraryService.class.getClassLoader()));
 		
 		PlatformsTest test = new PlatformsTest();
 		for(int i=0; i<10000; i++)

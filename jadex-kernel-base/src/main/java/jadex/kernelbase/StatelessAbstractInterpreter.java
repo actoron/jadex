@@ -296,15 +296,15 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 //			System.out.println("sdkug sdib ");
 		final Future<Void> ret = new Future<Void>();
 		
-		if(getComponentIdentifier().getParent()==null)
-			System.out.println("start shudown service container of: "+getComponentIdentifier());
+//		if(getComponentIdentifier().getParent()==null)
+//			System.out.println("start shudown service container of: "+getComponentIdentifier());
 		
 		getServiceContainer().shutdown().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				if(getComponentIdentifier().getParent()==null)
-					System.out.println("end shudown service container of: "+getComponentIdentifier());
+//				if(getComponentIdentifier().getParent()==null)
+//					System.out.println("end shudown service container of: "+getComponentIdentifier());
 				
 				ret.setResult(null);
 //				listener.resultAvailable(this, getComponentIdentifier());
@@ -312,8 +312,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				if(getComponentIdentifier().getParent()==null)
-					System.out.println("end shudown service container of: "+getComponentIdentifier()+" "+exception);
+//				if(getComponentIdentifier().getParent()==null)
+//					System.out.println("end shudown service container of: "+getComponentIdentifier()+" "+exception);
 				
 //				exception.printStackTrace();
 //				getLogger().warning("Exception during service container shutdown: "+exception);

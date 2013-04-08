@@ -1076,7 +1076,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
-		System.out.println("Terminating component1: "+cid.getName());
+//		System.out.println("Terminating component1: "+cid.getName());
 		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		System.err.println("kill compo: "+cid+" "+(sc!=null? sc.getCaller(): "null"));
@@ -1149,8 +1149,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 			InitInfo infos	= getInitInfo(cid);
 			IComponentAdapter adapter	= infos!=null ? infos.getAdapter() : (IComponentAdapter)adapters.get(cid);
 			
-			if(adapter.getDescription().getModelName().indexOf("Proxy")==-1)
-				System.out.println("Terminating component: "+cid.getName());
+//			if(adapter!=null && adapter.getDescription().getModelName().indexOf("Proxy")==-1)
+//				System.out.println("Terminating component: "+cid.getName());
 			
 			// Terminate component that is shut down during init.
 			if(infos!=null && !infos.getInitFuture().isDone())
@@ -1178,15 +1178,15 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				final CMSComponentDescription	desc = (CMSComponentDescription)adapter.getDescription();
 				final IComponentIdentifier[] achildren = desc.getChildren();
 				
-				if(achildren.length>0)
-					System.out.println("kill childs start: "+cid+" "+achildren.length+" "+SUtil.arrayToString(achildren));
+//				if(achildren.length>0)
+//					System.out.println("kill childs start: "+cid+" "+achildren.length+" "+SUtil.arrayToString(achildren));
 				
 				destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(createResultListener(new IResultListener<List<Exception>>()
 				{
 					public void resultAvailable(List<Exception> result)
 					{
-						if(achildren.length>0)
-							System.out.println("kill childs end: "+cid);
+//						if(achildren.length>0)
+//							System.out.println("kill childs end: "+cid);
 						
 //						if(cid.toString().indexOf("Mandelbrot")!=-1)
 //							System.out.println("Terminated component structure: "+cid.getName());
@@ -1271,7 +1271,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		ccs.remove(cid);
 		ret	= (Future<Map<String, Object>>)cfs.remove(cid);
 		
-		System.out.println("Terminated component: "+cid.getName());
+//		System.out.println("Terminated component: "+cid.getName());
 		
 		if(ret!=null)
 		{
@@ -2663,7 +2663,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	@ServiceShutdown
 	public IFuture<Void>	shutdownService()
 	{
-		System.out.println("shutdown cms: "+agent.getComponentIdentifier()+" "+adapters);
+//		System.out.println("shutdown cms: "+agent.getComponentIdentifier()+" "+adapters);
 		
 //		System.out.println(": "+this);
 //		this.adapters	= null;	// required for final cleanup command

@@ -372,7 +372,6 @@
 			</arguments>
 			
 			<components>
-				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
 				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>
@@ -387,6 +386,7 @@
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<!-- <component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdiv3&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/> -->
+				<component name="mon" type="monitor" daemon="true" number="$args.monitoringcomp? 1 : 0"/>
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
