@@ -56,7 +56,7 @@ public class MonitoringService implements IMonitoringService
 			public boolean filter(IMonitoringEvent ev)
 			{
 				String sn = ev.getCause().getSourceName();
-				String tn = ev.getSource();//ev.getCause().getTargetName();
+				String tn = ev.getSourceIdentifier().toString();//ev.getCause().getTargetName();
 //				boolean srcjadex = sn!=null && sn.indexOf("jadex.bridge")!=-1;
 //				boolean trgjadex = tn.indexOf("jadex.bridge")!=-1;
 				

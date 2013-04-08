@@ -28,10 +28,29 @@ public class BulkMonitoringEvent implements IMonitoringEvent
 	}
 	
 	/**
-	 *  Get the source.
-	 *  @return The source.
+	 *  Get the caller.
+	 *  @return The caller.
 	 */
-	public String getSource()
+	public IComponentIdentifier getSourceIdentifier()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get the source description, e.g. if it is a service.
+	 *  @return The source description.
+	 */
+	public String getSourceDescription()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get the source creation time, i.e. the time 
+	 *  when the component was created.
+	 *  @return The creation time.
+	 */
+	public long getSourceCreationTime()
 	{
 		throw new UnsupportedOperationException();
 	}

@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.monitoring;
 
 import jadex.bridge.Cause;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFilter;
 
 import java.util.Map;
@@ -78,10 +79,23 @@ public interface IMonitoringEvent
 
 	
 	/**
-	 *  Get the source.
+	 *  Get the source component.
 	 *  @return The source.
 	 */
-	public String getSource();
+	public IComponentIdentifier getSourceIdentifier();
+	
+	/**
+	 *  Get the source description, e.g. if it is a service.
+	 *  @return The source description.
+	 */
+	public String getSourceDescription();
+	
+	/**
+	 *  Get the source creation time, i.e. the time 
+	 *  when the component was created.
+	 *  @return The creation time.
+	 */
+	public long getSourceCreationTime();
 	
 	/**
 	 *  Get the type.
@@ -90,7 +104,7 @@ public interface IMonitoringEvent
 	public String getType();
 
 	/**
-	 *  Get the time.
+	 *  Get the event occurrence time.
 	 *  @return The time.
 	 */
 	public long getTime();
@@ -107,6 +121,7 @@ public interface IMonitoringEvent
 	 */
 	public void setCause(Cause cause);
 
+	
 	/**
 	 *  Get a property.
 	 *  @param name The property name.

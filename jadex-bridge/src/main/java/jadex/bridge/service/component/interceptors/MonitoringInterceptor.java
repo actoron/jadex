@@ -117,8 +117,9 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 					long start = System.currentTimeMillis();
 					ServiceCall sc = context.getServiceCall();
 					Cause cause = sc==null? null: sc.getCause();
-					String src = component.getComponentIdentifier().getName()+"."+context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
-					MonitoringEvent ev = new MonitoringEvent(src, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start);
+					MonitoringEvent ev = new MonitoringEvent(component.getComponentIdentifier(), 
+						context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName(), 
+						IMonitoringEvent.TYPE_SERVICECALL_START, cause, start);
 					
 //					if(context.getMethod().getName().indexOf("method")!=-1)
 //						System.out.println("call method: "+ev.getCause().getChainId());
@@ -192,8 +193,8 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 						long end = System.currentTimeMillis();
 						ServiceCall sc = sic.getServiceCall();
 						Cause cause = sc==null? null: sc.getCause();
-						String src = component.getComponentIdentifier().getName()+"."+sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName();
-						monser.publishEvent(new MonitoringEvent(src, IMonitoringEvent.TYPE_SERVICECALL_END, cause, end));
+						monser.publishEvent(new MonitoringEvent(component.getComponentIdentifier(), 
+							sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end));
 					}
 					ReturnValueResultListener.super.customResultAvailable(null);
 				}

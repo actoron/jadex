@@ -99,7 +99,10 @@ public class MonitoringPanel	implements IServiceViewerPanel
 				{
 					// Parent not found, create parent and add parent on call level
 //					child = new MyIdTreeNode<List<IMonitoringEvent>>(trgid, event.getCause().getTargetName()+" "+trgid, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
-					child = new MyIdTreeNode<List<IMonitoringEvent>>(trgid, event.getSource(), tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
+					String desc = event.getSourceIdentifier().toString();
+					if(event.getSourceDescription()!=null)
+						desc += event.getSourceDescription();
+					child = new MyIdTreeNode<List<IMonitoringEvent>>(trgid, desc, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
 				}
 				else
 				{
@@ -258,7 +261,7 @@ class MyIdTreeNode<T> extends IdTreeNode<T>
 //					buf.append("chainid=").append(ev.getCause().getChainId()).append("<br>");
 //				}
 				
-				buf.append(ev.getSource()+" "+ev.getType());
+				buf.append(ev.getSourceIdentifier()+" "+ev.getType());
 //				buf.append(ev.getSource()+" "+ev.getType()+" "+ev.getCause().getSourceId()+" "+ev.getCause().getTargetId());
 				buf.append("<br>");
 			}

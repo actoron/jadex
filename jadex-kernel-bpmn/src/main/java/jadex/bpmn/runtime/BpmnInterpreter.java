@@ -362,13 +362,13 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			{
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
 //					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
-				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+				publishEvent(new MonitoringEvent(getComponentIdentifier(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
 				
 				executeStep(pool, lane);
 				
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
 //					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
-				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+				publishEvent(new MonitoringEvent(getComponentIdentifier(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
 			}
 			
 //			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
@@ -1676,7 +1676,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public IMonitoringEvent createThreadEvent(String type, ProcessThread thread)
 	{
-		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName(), type+"."+TYPE_THREAD, System.currentTimeMillis());
+		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), type+"."+TYPE_THREAD, System.currentTimeMillis());
 		event.setProperty("thread_id", thread.getId());
 		if(!type.startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 			event.setProperty("info", createProcessThreadInfo(thread));
@@ -1695,7 +1695,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //		return new ComponentChangeEvent(type, TYPE_ACTIVITY, activity.getName(), 
 //			thread.getId(), getComponentIdentifier(), getComponentDescription().getCreationTime(), createProcessThreadInfo(thread));
 	
-		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier().getName(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis());
+		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis());
 		event.setProperty("thread_id", thread.getId());
 		event.setProperty("activity", activity.getName());
 		event.setProperty("info", createProcessThreadInfo(thread));

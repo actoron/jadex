@@ -472,7 +472,7 @@ public class EventReificator implements IOAVStateListener
 //			ComponentChangeEvent event = new ComponentChangeEvent();
 			MonitoringEvent event = new MonitoringEvent();
 //			event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
-			event.setSource(bdiint.getAgentAdapter().getComponentIdentifier().getName());
+			event.setSourceIdentifier(bdiint.getAgentAdapter().getComponentIdentifier());
 			if(scope == null)
 				scope = bdiint.getAgent();
 			

@@ -248,7 +248,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 													
 													protected void proceed(final Exception ex)
 													{
-														MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName().getName(), IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis());
+														MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), 
+															IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis());
 														event.setProperty("details", getComponentDescription());
 														publishEvent(event).addResultListener(new DelegationResultListener<Void>(ret)
 														{
@@ -350,7 +351,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 //					desc.getName().getName(), getComponentIdentifier(), desc.getCreationTime(), desc);
 //				notifyListeners(event);
 				
-				MonitoringEvent me = new MonitoringEvent(desc.getName().toString(), 
+				MonitoringEvent me = new MonitoringEvent(desc.getName(), 
 					MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime());
 				me.setProperty("details", desc);
 				// for extensions only
@@ -383,7 +384,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 //				notifyListeners(event);
 				
 				// todo: clock time? , creation time
-				MonitoringEvent event = new MonitoringEvent(desc.getName().getName(), IMonitoringEvent.TYPE_COMPONENT_DISPOSED, desc.getCause(), System.currentTimeMillis());
+				MonitoringEvent event = new MonitoringEvent(desc.getName(), IMonitoringEvent.TYPE_COMPONENT_DISPOSED, desc.getCause(), System.currentTimeMillis());
 				event.setProperty("details", getComponentDescription());
 				// for extensions only
 				publishEvent(event, false).addResultListener(new IResultListener<Void>()
@@ -688,7 +689,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 //														getComponentDescription().getName().getName(), getComponentIdentifier(), getComponentDescription().getCreationTime(), getComponentDescription());
 //													notifyListeners(event);
 													
-													MonitoringEvent me = new MonitoringEvent(getComponentDescription().getName().toString(), 
+													MonitoringEvent me = new MonitoringEvent(getComponentDescription().getName(), 
 														MonitoringEvent.TYPE_COMPONENT_CREATED, getComponentDescription().getCause(), getComponentDescription().getCreationTime());
 													me.setProperty("details", getComponentDescription());
 													publishEvent(me);
@@ -2094,7 +2095,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			}
 			else
 			{
-				event.setCause(getComponentDescription().getCause().createNext(event.getSource()));
+				event.setCause(getComponentDescription().getCause().createNext(event.getSourceIdentifier().toString()));
 			}
 		}
 		

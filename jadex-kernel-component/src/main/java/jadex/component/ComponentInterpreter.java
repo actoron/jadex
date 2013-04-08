@@ -184,7 +184,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
 //					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 				
-				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
+				publishEvent(new MonitoringEvent(getComponentIdentifier(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
 					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
 				
 				try
@@ -200,7 +200,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 				}
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
 //					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
-				publishEvent(new MonitoringEvent(getComponentIdentifier().getName(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+				publishEvent(new MonitoringEvent(getComponentIdentifier(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
 					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
 			}
 			

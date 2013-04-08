@@ -1,11 +1,7 @@
 package jadex.bridge.service.types.monitoring;
 
 import jadex.bridge.Cause;
-import jadex.bridge.service.component.interceptors.ServiceGetter;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +14,14 @@ public class MonitoringEvent implements IMonitoringEvent
 	//-------- attributes --------
 	
 	/** The source. */
-	protected String source;
+	protected IComponentIdentifier source;
+	
+	/** The source description. */
+	protected String sourcedesc;
+	
+	/** The source creation time. */
+	protected long creationtime;
+	
 	
 	/** The type. */
 	protected String type;
@@ -45,25 +48,34 @@ public class MonitoringEvent implements IMonitoringEvent
 	/**
 	 *  Create a new monitoring event.
 	 */
-	public MonitoringEvent(String source, String type, long time)
+	public MonitoringEvent(IComponentIdentifier source, String type, long time)
 	{
-		this(source, type, null, time, null);
+		this(source, null, type, null, time, null);
 	}
 	
 	/**
 	 *  Create a new monitoring event.
 	 */
-	public MonitoringEvent(String source, String type, Cause cause, long time)
+	public MonitoringEvent(IComponentIdentifier source, String type, Cause cause, long time)
 	{
-		this(source, type, cause, time, null);
+		this(source, null, type, cause, time, null);
 	}
 	
 	/**
 	 *  Create a new monitoring event.
 	 */
-	public MonitoringEvent(String source, String type, Cause cause, long time, Map<String, Object> props)
+	public MonitoringEvent(IComponentIdentifier source, String sourcedesc, String type, Cause cause, long time)
+	{
+		this(source, sourcedesc, type, cause, time, null);
+	}
+	
+	/**
+	 *  Create a new monitoring event.
+	 */
+	public MonitoringEvent(IComponentIdentifier source, String sourcdesc, String type, Cause cause, long time, Map<String, Object> props)
 	{
 		this.source = source;
+		this.sourcedesc = sourcdesc;
 		this.type = type;
 		this.cause = cause;
 		this.time = time;
@@ -73,20 +85,10 @@ public class MonitoringEvent implements IMonitoringEvent
 	//-------- methods --------
 	
 	/**
-	 *  Get a property.
-	 *  @param name The property name.
-	 *  @return The property.
-	 */
-	public Object getProperty(String name)
-	{
-		return properties==null? null: properties.get(name);
-	}
-	
-	/**
 	 *  Get the caller.
 	 *  @return The caller.
 	 */
-	public String getSource()
+	public IComponentIdentifier getSourceIdentifier()
 	{
 		return source;
 	}
@@ -95,11 +97,47 @@ public class MonitoringEvent implements IMonitoringEvent
 	 *  Set the source.
 	 *  @param source The source to set.
 	 */
-	public void setSource(String source)
+	public void setSourceIdentifier(IComponentIdentifier source)
 	{
 		this.source = source;
 	}
 	
+	/**
+	 *  Get the source description, e.g. if it is a service.
+	 *  @return The source description.
+	 */
+	public String getSourceDescription()
+	{
+		return sourcedesc;
+	}
+	
+	/**
+	 *  Set the source description.
+	 */
+	public void setSourceDescription(String sourcedesc)
+	{
+		this.sourcedesc = sourcedesc;
+	}
+	
+	/**
+	 *  Get the source creation time, i.e. the time 
+	 *  when the component was created.
+	 *  @return The creation time.
+	 */
+	public long getSourceCreationTime()
+	{
+		return creationtime;
+	}
+	
+	/**
+	 *  Set the creation time.
+	 *  @param creation time The creation time to set.
+	 */
+	public void setCreationTime(long creationtime)
+	{
+		this.creationtime = creationtime;
+	}
+
 	/**
 	 *  Get the type.
 	 *  @return The type.
@@ -152,6 +190,16 @@ public class MonitoringEvent implements IMonitoringEvent
 	public void setCause(Cause cause)
 	{
 		this.cause = cause;
+	}
+	
+	/**
+	 *  Get a property.
+	 *  @param name The property name.
+	 *  @return The property.
+	 */
+	public Object getProperty(String name)
+	{
+		return properties==null? null: properties.get(name);
 	}
 
 	/**
