@@ -19,7 +19,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 */
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		if (thread.isCanceled())
+		if(thread.isCanceled())
 			return;
 		
 		Class taskimpl = activity.getClazz() != null? activity.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()) : null;

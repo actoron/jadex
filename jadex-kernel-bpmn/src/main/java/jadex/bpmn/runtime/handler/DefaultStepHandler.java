@@ -68,6 +68,7 @@ public class DefaultStepHandler implements IStepHandler
 		else
 		{
 			boolean	outside	= false;
+			ThreadContext	context	= thread.getThreadContext();
 			
 			while(next==null && !outside)
 			{
@@ -102,7 +103,6 @@ public class DefaultStepHandler implements IStepHandler
 					}
 				}
 				
-				ThreadContext	context	= thread.getThreadContext();
 				if(context!=null)
 				{
 					outside	= context.getParent()==null;
@@ -133,6 +133,10 @@ public class DefaultStepHandler implements IStepHandler
 							outside	= true;
 						}
 					}
+				}
+				else
+				{
+					break;
 				}
 //				else
 //				{
