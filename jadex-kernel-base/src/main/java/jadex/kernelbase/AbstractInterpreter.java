@@ -551,6 +551,11 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		};
 		ret.setTerminationCommand(tcom);
 		
+		// signal that subscription has been done
+		ret.addIntermediateResult(null);
+
+		addSubscription(ret, filter);
+		
 		if(initial)
 		{
 			IMonitoringEvent[] evs = getCurrentStateEvents();
@@ -560,8 +565,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 				ret.addIntermediateResult(bme);
 			}
 		}
-		
-		addSubscription(ret, filter);
 		
 		return ret;
 	}

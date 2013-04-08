@@ -2855,7 +2855,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 //		space = (ISpace)getClazz().newInstance();
 
-		Future<Void>	ret	= new Future<Void>();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		initSpace().addResultListener(ia.createResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -2900,7 +2900,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					}
 				}, false);
 				
-				sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
+				sub.addResultListener(new IIntermediateResultListener<IMonitoringEvent>()
 				{
 					public void resultAvailable(Collection<IMonitoringEvent> result)
 					{
@@ -2908,15 +2908,17 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					
 					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
-						if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
+						if(result==null)
 						{
-//									System.out.println("add: "+cce.getDetails());
+							ret.setResult(null);
+						}
+						else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
+						{
+//							System.out.println("add: "+result.getSource());
 							componentAdded((IComponentDescription)result.getProperty("details"));	
 						}
 						else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 						{
-							if((IComponentDescription)result.getProperty("details")==null)
-								System.out.println("huch2");
 							componentRemoved((IComponentDescription)result.getProperty("details"));
 						}
 					}
@@ -2929,8 +2931,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				    {
 				    	e.printStackTrace();
 				    }
-				}));
-				super.customResultAvailable(result);
+				});
 			}
 		}));	
 		return ret;

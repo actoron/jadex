@@ -165,7 +165,7 @@ public class ComponentResultListener<E> implements IResultListener<E>
 		}
 		else
 		{
-			if(adapter.isExternalThread())
+			if(adapter.isExternalThread() && !Starter.isRescueThread(adapter.getComponentIdentifier()))
 			{
 				try
 				{

@@ -334,12 +334,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture<Void>	componentCreated(final IComponentDescription desc, final IModelInfo model)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 //		// cannot use scheduleStep as it is not available in init phase of component.
 ////		return scheduleStep(new IComponentStep()
 		
 		// Must throw component events here for extensions
 		
-		return getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
+		getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -351,13 +353,15 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				MonitoringEvent me = new MonitoringEvent(desc.getName().toString(), 
 					MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime());
 				me.setProperty("details", desc);
-				publishEvent(me, false); // for extensions only
-//					.addResultListener(new DelegationResultListener<Void>(ret));
+				// for extensions only
+				publishEvent(me, false) 
+					.addResultListener(new DelegationResultListener<Void>(ret));
 				
 				return IFuture.DONE;
 			}
 		});
-//		return IFuture.DONE;
+		
+		return ret;
 	}
 	
 	/**
