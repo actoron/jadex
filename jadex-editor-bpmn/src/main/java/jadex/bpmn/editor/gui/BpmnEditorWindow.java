@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -42,12 +43,17 @@ public class BpmnEditorWindow extends JFrame
 	/** The tool bar. */
 	protected BpmnToolbar bpmntoolbar;
 	
-	/** The tabbed pane showing the models. */
+	/** The tab pane showing the models. */
 	protected JTabbedPane tabpane;
+	
+	/** The global settings. */
+	protected Settings settings;
 	
 	public BpmnEditorWindow()
 	{
 		super(BpmnEditor.APP_NAME);
+		
+		settings = Settings.load();
 		
 		getContentPane().setLayout(new BorderLayout());
 		
@@ -126,32 +132,6 @@ public class BpmnEditorWindow extends JFrame
 		getContentPane().doLayout();
 		statuspane.setDividerLocation(1.0);
 		statuspane.repaint();
-//		JSplitPane viewpane = (JSplitPane) tabpane.getSelectedComponent();
-//		if (viewpane != null)
-//		{
-//			((JSplitPane) tabpane.getComponentAt(0)).setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
-//			statuspane.getTopComponent().repaint();
-//		}
-		
-//		SwingUtilities.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				statuspane.repaint();
-//				statuspane.setDividerLocation(statuspane.getHeight());
-//				statuspane.setDividerLocation(1.0);
-//				statuspane.repaint();
-//				JSplitPane viewpane = (JSplitPane) tabpane.getSelectedComponent();
-//				if (viewpane != null)
-//				{
-//					viewpane.repaint();
-//					viewpane.setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
-//					viewpane.repaint();
-//				}
-//			}
-//		});
-		
-		
 	}
 	
 	/**
@@ -172,6 +152,16 @@ public class BpmnEditorWindow extends JFrame
 		return ret;
 	}
 	
+	/**
+	 *  Gets the settings.
+	 *
+	 *  @return The settings.
+	 */
+	public Settings getSettings()
+	{
+		return settings;
+	}
+
 	/**
 	 *  Adds a listener to the tab pane.
 	 *  
@@ -330,6 +320,11 @@ public class BpmnEditorWindow extends JFrame
 		return modelcontainer;
 	}
 	
+	/**
+	 *  Initializes a model (move to newModelTab()?)
+	 *  
+	 *  @param modelcontainer The model container.
+	 */
 	public void initializeNewModel(ModelContainer modelcontainer)
 	{
 		modelcontainer.getGraph().getSelectionModel().addListener(mxEvent.CHANGE, new SelectionController(modelcontainer));
@@ -354,6 +349,15 @@ public class BpmnEditorWindow extends JFrame
 		}
 		if (quit)
 		{
+			try
+			{
+				settings.save();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			
 			dispose();
 			System.exit(0);
 		}

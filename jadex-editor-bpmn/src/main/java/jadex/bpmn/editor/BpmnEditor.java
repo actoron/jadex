@@ -12,14 +12,10 @@ import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import java.awt.EventQueue;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.mxgraph.view.mxStylesheet;
 
@@ -30,7 +26,7 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 24;
+	public static final int BUILD = 25;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";

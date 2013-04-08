@@ -214,6 +214,10 @@ public class BpmnMenuBar extends JMenuBar
 				{
 					curfile = curcont.getFile();
 				}
+				if (curfile == null)
+				{
+					curfile = editorwindow.getSettings().getLastFile();
+				}
 				
 				BetterFileChooser fc = new BetterFileChooser(curfile);
 				FileFilter filter = new FileNameExtensionFilter("BPMN model file", "bpmn2");
@@ -258,6 +262,7 @@ public class BpmnMenuBar extends JMenuBar
 						}
 						
 						modelcontainer.setFile(file);
+						editorwindow.getSettings().setLastFile(file);
 						
 						editorwindow.newModelTab(modelcontainer);
 						editorwindow.initializeNewModel(modelcontainer);
@@ -292,6 +297,7 @@ public class BpmnMenuBar extends JMenuBar
 						try
 						{
 							SBpmnModelWriter.writeModel(modelcontainer.getFile(), modelcontainer.getBpmnModel(), new BpmnVisualModelWriter(modelcontainer.getGraph()));
+							editorwindow.getSettings().setLastFile(modelcontainer.getFile());
 							modelcontainer.setDirty(false);
 						}
 						catch (IOException e1)
@@ -396,9 +402,7 @@ public class BpmnMenuBar extends JMenuBar
 							g2d.translate(-x, -y);
 							Object[] selcells = modelcontainer.getGraph().getSelectionModel().getCells();
 							modelcontainer.getGraph().getSelectionModel().removeCells(selcells);
-				        	//modelcontainer.getGraphComponent().paint(g2d);
-				        	//modelcontainer.getGraphComponent().setSize(w, h);
-				        	//modelcontainer.getGraphComponent().paintComponents(g2d);
+				        	
 							modelcontainer.getGraphComponent().getGraphControl().paint(g2d);
 				        	modelcontainer.getGraph().setSelectionCells(selcells);
 				        	g2d.finish();
@@ -477,6 +481,7 @@ public class BpmnMenuBar extends JMenuBar
 					SBpmnModelWriter.writeModel(file, modelcontainer.getBpmnModel(), new BpmnVisualModelWriter(modelcontainer.getGraph()));
 					modelcontainer.setDirty(false);
 					modelcontainer.setFile(file);
+					editorwindow.getSettings().setLastFile(file);
 				}
 				catch (IOException e1)
 				{
