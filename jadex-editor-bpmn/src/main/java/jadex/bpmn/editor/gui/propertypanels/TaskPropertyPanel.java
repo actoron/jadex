@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
@@ -143,7 +144,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				atable.removeParameters(atable.getSelectedRows());
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getImageProvider(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
 		
 		Action setDefaultParametersAction = new AbstractAction()
 		{
@@ -153,7 +154,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			}
 		};
 		
-		Icon[] icons = modelcontainer.getImageProvider().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), "page", buttonpanel.getIconColor());
+		Icon[] icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), ImageProvider.EMPTY_FRAME_TYPE, "page", buttonpanel.getIconColor());
 		defaultParameterButton.setAction(setDefaultParametersAction);
 		defaultParameterButton.setIcon(icons[0]);
 		defaultParameterButton.setPressedIcon(icons[1]);

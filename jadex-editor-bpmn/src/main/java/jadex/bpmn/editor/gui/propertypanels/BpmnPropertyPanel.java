@@ -1,6 +1,8 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
+import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -26,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -249,7 +252,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getImageProvider(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -325,7 +328,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 			}
 		};
-		JPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getImageProvider(), addaction, removeaction);
+		JPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -380,7 +383,87 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 			}
 		};
-		JPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getImageProvider(), addaction, removeaction);
+		
+		MBpmnModel model = modelcontainer.getBpmnModel();
+		Set<String> cvs = model.getContextVariables();
+		for (String cvname : cvs)
+		{
+			String type = model.getContextVariableClass(cvname).getTypeName();
+			CachedParameter cparam = new CachedParameter(cvname, false, false, null, type);
+			
+			for (ConfigurationInfo conf : getModelInfo().getConfigurations())
+			{
+				UnparsedExpression exp = model.getContextVariableExpression(cvname, conf.getName());
+				if (exp != null)
+				{
+					cparam.inivals.put(conf.getName(), exp.getValue());
+				}
+			}
+			
+			UnparsedExpression exp = model.getContextVariableExpression(cvname, null);
+			if (exp != null)
+			{
+				cparam.inivals.put(null, exp.getValue());
+			}
+			
+			paramcche.put(cvname, cparam);
+		}
+		
+		IArgument[] args = getModelInfo().getArguments();
+		for (IArgument arg : args)
+		{
+			String type = arg.getClazz().getTypeName();
+			CachedParameter cparam = new CachedParameter(arg.getName(), true, false, arg.getDescription(), type);
+			
+			UnparsedExpression exp = arg.getDefaultValue();
+			if (exp != null)
+			{
+				cparam.inivals.put(null, exp.getValue());
+			}
+			
+			paramcche.put(arg.getName(), cparam);
+		}
+		
+		IArgument[] ress = getModelInfo().getResults();
+		for (IArgument res : ress)
+		{
+			CachedParameter cparam = (CachedParameter) paramcche.get(res.getName());
+			if (cparam != null)
+			{
+				cparam.res = true;
+			}
+			else
+			{
+				String type = res.getClazz().getTypeName();
+				cparam = new CachedParameter(res.getName(), true, false, res.getDescription(), type);
+				
+				UnparsedExpression exp = res.getDefaultValue();
+				if (exp != null)
+				{
+					cparam.inivals.put(null, exp.getValue());
+				}
+				
+				paramcche.put(res.getName(), cparam);
+			}
+		}
+		
+		ConfigurationInfo[] confs = getModelInfo().getConfigurations();
+		for (ConfigurationInfo conf : confs)
+		{
+			UnparsedExpression[] argexps = conf.getArguments();
+			for (UnparsedExpression argexp : argexps)
+			{
+				((CachedParameter) paramcche.get(argexp.getName())).inivals.put(conf.getName(), argexp.getValue());
+			}
+			
+			UnparsedExpression[] resexps = conf.getResults();
+			for (UnparsedExpression resexp : resexps)
+			{
+				((CachedParameter) paramcche.get(resexp.getName())).inivals.put(conf.getName(), resexp.getValue());
+			}
+		}
+		
+		JPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -435,7 +518,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getImageProvider(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -443,6 +526,12 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 0, 5, 5);
 		tablepanel.add(buttonpanel, gc);
 		tabpane.add(tablepanel, "Properties");
+		
+		for (Object expobj : getModelInfo().getProperties().values())
+		{
+			UnparsedExpression exp = (UnparsedExpression) expobj;
+			propertynames.add(exp.getName());
+		}
 	}
 	
 	/**
@@ -525,7 +614,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getImageProvider(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -902,11 +991,34 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			switch (columnIndex)
 			{
 				case 0:
-					ConfigurationInfo cinfo = confcache.remove(rowIndex);
-					String poollane = getModel().removePoolLane(cinfo.getName());
+					System.out.println("Change");
+					ConfigurationInfo cinfo = confcache.get(rowIndex);
+					String oldname = cinfo.getName();
+					String poollane = getModel().removePoolLane(oldname);
 					cinfo.setName(createFreeName((String) value, new ConfigurationContains(confcache)));
 					getModelInfo().setConfigurations((ConfigurationInfo[]) confcache.toArray(new ConfigurationInfo[confcache.size()]));
 					getModel().addPoolLane(cinfo.getName(), poollane);
+					
+					for (String cvname : getModel().getContextVariables())
+					{
+						UnparsedExpression exp = getModel().getContextVariableExpression(cvname, oldname);
+						if (exp != null)
+						{
+							getModel().setContextVariableExpression(cvname, oldname, null);
+							getModel().setContextVariableExpression(cvname, cinfo.getName(), exp);
+						}
+					}
+					
+					for (Object paramobj : paramcche.values())
+					{
+						CachedParameter param = (CachedParameter) paramobj;
+						String val = param.inivals.remove(oldname);
+						if (val != null)
+						{
+							param.inivals.put(cinfo.getName(), val);
+						}
+					}
+					
 					break;
 				case 2:
 					confcache.get(rowIndex).setSuspend((Boolean) value);

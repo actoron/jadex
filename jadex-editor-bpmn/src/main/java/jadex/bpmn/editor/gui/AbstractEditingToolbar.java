@@ -1,7 +1,6 @@
 package jadex.bpmn.editor.gui;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ import javax.swing.border.EmptyBorder;
 public abstract class AbstractEditingToolbar extends JPanel
 {
 	/** The model container. */
-	protected ModelContainer modelcontainer;
+	//protected ModelContainer modelcontainer;
 	
 	/** The tool button group. */
 	protected ButtonGroup toolgroup;
@@ -36,16 +35,14 @@ public abstract class AbstractEditingToolbar extends JPanel
 	
 	/**
 	 *  Creates a new tool bar for editing tools.
-	 *  
-	 *  @param modelcontainer The model container.
 	 */
-	public AbstractEditingToolbar(ModelContainer modelcontainer)
+	public AbstractEditingToolbar()
 	{
 		super();
 		BoxLayout mgr = new BoxLayout(this, BoxLayout.PAGE_AXIS);
 		setLayout(mgr);
-		this.modelcontainer = modelcontainer;
-		modelcontainer.setEditingToolbar(this);
+		//this.modelcontainer = modelcontainer;
+		//modelcontainer.setEditingToolbar(this);
 		toolgroup = new ButtonGroup();
 		this.toolbars = new ArrayList<JToolBar>();
 	}
@@ -90,7 +87,7 @@ public abstract class AbstractEditingToolbar extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				String mode = e.getActionCommand();
-				modelcontainer.setEditMode(mode);
+				setEditMode(mode);
 			}
 		});
 		

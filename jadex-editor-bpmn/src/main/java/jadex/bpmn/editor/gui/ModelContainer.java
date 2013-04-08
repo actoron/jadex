@@ -15,9 +15,11 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -28,6 +30,8 @@ import java.util.zip.ZipEntry;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.mxgraph.swing.mxGraphComponent;
 
@@ -206,6 +210,9 @@ public class ModelContainer
 	/** The graph component. */
 	protected mxGraphComponent graphcomponent;
 	
+	/** The graph (visual model) */
+	protected BpmnGraph graph;
+	
 	/** The current model. */
 	protected MBpmnModel model;
 	
@@ -231,7 +238,7 @@ public class ModelContainer
 	protected JPanel propertypanelcontainer;
 	
 	/** The image provider. */
-	protected ImageProvider imageprovider;
+	protected List<ChangeListener> changelisteners;
 	
 	/**
 	 *  Creates a new container.
@@ -239,8 +246,9 @@ public class ModelContainer
 	public ModelContainer()
 	{
 		this.idgen = new IdGenerator();
-		this.imageprovider = new ImageProvider();
+		//this.imageprovider = new ImageProvider();
 		this.projecttaskmetainfos = new HashMap<String, TaskMetaInfo>();
+		this.changelisteners = new ArrayList<ChangeListener>();
 	}
 	
 	/**
@@ -268,7 +276,7 @@ public class ModelContainer
 	 */
 	public BpmnGraph getGraph()
 	{
-		return (BpmnGraph) graphcomponent.getGraph();
+		return graph;
 	}
 	
 	/**
@@ -286,7 +294,7 @@ public class ModelContainer
 	 */
 	public void setGraph(BpmnGraph graph)
 	{
-		graphcomponent.setGraph(graph);
+		this.graph = graph;
 	}
 	
 	/**
@@ -316,6 +324,7 @@ public class ModelContainer
 	public void setDirty(boolean dirty)
 	{
 		this.dirty = dirty;
+		fireChangeEvent(new ChangeEvent(this));
 	}
 	
 	/**
@@ -589,10 +598,10 @@ public class ModelContainer
 	 *
 	 *  @return The image provider.
 	 */
-	public ImageProvider getImageProvider()
-	{
-		return imageprovider;
-	}
+//	public ImageProvider getImageProvider()
+//	{
+//		return imageprovider;
+//	}
 	
 	/**
 	 *  Handles unsaved model deletions.
@@ -664,5 +673,33 @@ public class ModelContainer
 		}
 		
 		setProjectRoot(new File(filepath));
+	}
+	
+	/**
+	 *  Adds a change listener. Currently only reports dirty events.
+	 *  
+	 *  @param listener The listener.
+	 */
+	public void addChangeListener(ChangeListener listener)
+	{
+		changelisteners.add(listener);
+	}
+	
+	public void removeChangeListener(ChangeListener listener)
+	{
+		changelisteners.remove(listener);
+	}
+	
+	/**
+	 *  Fires a change event.
+	 *  
+	 *  @param e The event.
+	 */
+	protected void fireChangeEvent(ChangeEvent e)
+	{
+		for (ChangeListener listener : changelisteners)
+		{
+			listener.stateChanged(e);
+		}
 	}
 }

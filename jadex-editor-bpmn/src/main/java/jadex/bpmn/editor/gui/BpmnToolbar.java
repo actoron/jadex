@@ -29,9 +29,9 @@ public class BpmnToolbar extends AbstractEditingToolbar
 	 *  
 	 *  @param modelcontainer The model container.
 	 */
-	public BpmnToolbar(int iconsize, ModelContainer modelcontainer)
+	public BpmnToolbar(int iconsize)
 	{
-		super(modelcontainer);
+		super();
 		this.iconsize = iconsize;
 		
 		addBpmnTools();
@@ -57,7 +57,7 @@ public class BpmnToolbar extends AbstractEditingToolbar
 	{
 		long ts = System.currentTimeMillis();
 		
-		ImageProvider imgprovider = modelcontainer.getImageProvider();
+		ImageProvider imgprovider = ImageProvider.getInstance();
 		
 		List<IconGenerationTask> tasks = getTaskList(imgprovider, iconsize);
 		

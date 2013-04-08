@@ -37,7 +37,7 @@ public class AddRemoveButtonPanel extends JPanel
 		
 		JButton addbutton = new JButton();
 		int iconsize = getIconSize();
-		Icon[] icons = imgprovider.generateGenericFlatImageIconSet(iconsize, "add_+", getIconColor());
+		Icon[] icons = imgprovider.generateGenericFlatImageIconSet(iconsize, ImageProvider.EMPTY_FRAME_TYPE, "add_+", getIconColor());
 		addbutton.setAction(addaction);
 		addbutton.setText(null);
 		addbutton.setIcon(icons[0]);
@@ -49,7 +49,7 @@ public class AddRemoveButtonPanel extends JPanel
 		addbutton.setToolTipText((String) addaction.getValue(Action.NAME));
 		
 		JButton removebutton = new JButton();
-		icons = imgprovider.generateGenericFlatImageIconSet(iconsize, "remove_-", getIconColor());
+		icons = imgprovider.generateGenericFlatImageIconSet(iconsize, ImageProvider.EMPTY_FRAME_TYPE, "remove_-", getIconColor());
 		removebutton.setAction(removeaction);
 		removebutton.setText(null);
 		removebutton.setIcon(icons[0]);

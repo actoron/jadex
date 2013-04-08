@@ -8,18 +8,27 @@ import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.model.MBpmnModel;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.font.LineMetrics;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.mxgraph.canvas.mxGraphics2DCanvas;
+import com.mxgraph.shape.mxDefaultTextShape;
 import com.mxgraph.shape.mxMarkerRegistry;
 import com.mxgraph.shape.mxSwimlaneShape;
 import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxStylesheet;
@@ -171,6 +180,99 @@ public class BpmnStylesheetColor extends mxStylesheet
 		mxGraphics2DCanvas.putShape(EventShape.class.getSimpleName(), new EventShape());
 		mxMarkerRegistry.registerMarker(StrokeMarker.class.getSimpleName(), new StrokeMarker());
 		
+		mxGraphics2DCanvas.putTextShape(mxGraphics2DCanvas.TEXT_SHAPE_DEFAULT, new mxDefaultTextShape()
+		{
+			public void paintShape(mxGraphics2DCanvas canvas, String text,
+					mxCellState state, Map<String, Object> style)
+			{
+				Rectangle rect = state.getLabelBounds().getRectangle();
+				Graphics2D g = canvas.getGraphics();
+
+				if (g.getClipBounds() == null || g.getClipBounds().intersects(rect))
+				{
+					double scale = canvas.getScale();
+
+					Color fontColor = mxUtils.getColor(style,
+							mxConstants.STYLE_FONTCOLOR, Color.black);
+					g.setColor(fontColor);
+					
+					Font scaledFont = mxUtils.getFont(style, scale);
+					g.setFont(scaledFont);
+					
+					String[] lines = text.split("\n");
+					FontMetrics fm = g.getFontMetrics(scaledFont);
+					LineMetrics[] lms = new LineMetrics[lines.length];
+					mxPoint fbounds = new mxPoint(0.0, 0.0);
+					for (int i = 0; i < lines.length; ++i)
+					{
+						lms[i] = fm.getLineMetrics(lines[i], g);
+						Rectangle2D tb = fm.getStringBounds(lines[i], g);
+						fbounds.setX(Math.max(fbounds.getX(), tb.getWidth()));
+						fbounds.setY(fbounds.getY() + lms[i].getAscent() + lms[i].getDescent());
+						if (i + 1 != lines.length)
+						{
+							fbounds.setY(fbounds.getY() + lms[i].getLeading());
+						}
+					}
+					
+					double ty = rect.y;
+					
+					Object vertAlign = mxUtils.getString(style,
+							mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
+
+					if (vertAlign.equals(mxConstants.ALIGN_BOTTOM))
+					{
+						ty += (rect.height - fbounds.getY());
+					}
+					else if (vertAlign.equals(mxConstants.ALIGN_MIDDLE))
+					{
+						ty += (rect.height - fbounds.getY()) * 0.5;
+					}
+					
+					Object align = mxUtils.getString(style, mxConstants.STYLE_ALIGN,
+							mxConstants.ALIGN_CENTER);
+					
+					double halignfac = 0.5;
+					if (align.equals(mxConstants.ALIGN_LEFT))
+					{
+						halignfac = 0.0;
+					}
+					else if (align.equals(mxConstants.ALIGN_RIGHT))
+					{
+						halignfac = 1.0;
+					}
+					
+					boolean hz = mxUtils.isTrue(style,
+							mxConstants.STYLE_HORIZONTAL, true);
+					
+					for (int i = 0; i < lines.length; ++i)
+					{
+						Rectangle2D linebounds = fm.getStringBounds(lines[i], g);
+						double tx = rect.x + (rect.width - linebounds.getWidth()) * halignfac;
+						TextLayout tl = new TextLayout(lines[i], scaledFont, g.getFontRenderContext());
+						
+						if (!hz)
+						{
+							AffineTransform oldtf = g.getTransform();
+							g.rotate(4.71238898038468985769, tx + tl.getVisibleAdvance() * 0.5, rect.y + lms[0].getHeight());
+							g.drawString(lines[i], (float) tx, (float) ty + lms[i].getAscent());
+							g.setTransform(oldtf);
+						}
+						else
+						{
+							g.drawString(lines[i], (float) tx, (float) ty + lms[i].getAscent());
+						}
+						
+						ty += lms[i].getHeight();
+						if (i + 1 != lines.length)
+						{
+							ty -= lms[i].getLeading();
+						}
+					}
+				}
+			}
+		});
+		
 		try
 		{
 			InputStream fontis = BpmnStylesheetColor.class.getClassLoader().getResourceAsStream("jadex/bpmn/editor/gui/fonts/Vera.ttf");
@@ -203,7 +305,9 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
 		style.put(mxConstants.STYLE_HORIZONTAL, Boolean.FALSE);
-		style.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_BOTTOM);
+		style.put(mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_CENTER);
+		style.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
+		style.put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_CENTER);
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		putCellStyle(VPool.class.getSimpleName(), style);
 		
@@ -224,6 +328,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_SHADOW, Boolean.TRUE);
 		style.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_CENTER);
+		style.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK, style);
 		
 		style = new HashMap<String, Object>(style);

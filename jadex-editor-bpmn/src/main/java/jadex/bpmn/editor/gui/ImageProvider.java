@@ -46,6 +46,9 @@ import javax.swing.ImageIcon;
 public class ImageProvider
 {
 	/** Thick frame type. */
+	public static final int EMPTY_FRAME_TYPE  = -1;
+	
+	/** Thick frame type. */
 	public static final int THICK_FRAME_TYPE  = 0;
 	
 	/** Thin frame type. */
@@ -153,6 +156,9 @@ public class ImageProvider
 		SHAPE_RECTANGLE = new Rectangle2D.Double(0.0, 0.0, BUTTON_SIZE, BUTTON_SIZE);
 	}
 	
+	/** The singleton instance */
+	protected static ImageProvider instance;
+	
 	/** The image cache. */
 	protected Map<Object, Image> imagecache = Collections.synchronizedMap(new HashMap<Object, Image>());
 	
@@ -165,7 +171,7 @@ public class ImageProvider
 	/** The icon font used. */
 	protected Font iconfont;
 	
-	public ImageProvider()
+	protected ImageProvider()
 	{
 		try
 		{
@@ -180,14 +186,50 @@ public class ImageProvider
 	}
 	
 	/**
+	 *  Gets the singleton instance.
+	 */
+	public static final ImageProvider getInstance()
+	{
+		ImageProvider ret = instance;
+		if (ret == null)
+		{
+			synchronized(ImageProvider.class)
+			{
+				if (instance == null)
+				{
+					instance = new ImageProvider();
+					ret = instance;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Generates a generic flat image icon set in the order off, on, highlight.
 	 *  
 	 *  @param iconsize The icon size.
+	 *  @param frametype The button frame type.
 	 * 	@param symbol Symbol name or text.
 	 *  @param symbolcolor Color of the symbol.
 	 *  @return The generated icons.
 	 */
-	public Icon[] generateGenericFlatImageIconSet(int iconsize, String symbol, Color symbolcolor)
+	public Icon[] generateGenericFlatImageIconSet(int iconsize, int frametype, String symbol, Color symbolcolor)
+	{
+		return generateGenericFlatImageIconSet(iconsize, frametype, symbol, symbolcolor, 0.8f);
+	}
+	
+	/**
+	 *  Generates a generic flat image icon set in the order off, on, highlight.
+	 *  
+	 *  @param iconsize The icon size.
+	 *  @param frametype The button frame type.
+	 * 	@param symbol Symbol name or text.
+	 *  @param symbolcolor Color of the symbol.
+	 *  @param darkeningfactor Factor by which to darken non-highlighted icons.
+	 *  @return The generated icons.
+	 */
+	public Icon[] generateGenericFlatImageIconSet(int iconsize, int frametype, String symbol, Color symbolcolor, float darkeningfactor)
 	{
 		Image offimage = imagecache.get(new Tuple3<String, Integer, String>("flat_off", iconsize, symbol));
 		Image onimage = imagecache.get(new Tuple3<String, Integer, String>("flat_on", iconsize, symbol));
@@ -197,14 +239,17 @@ public class ImageProvider
 			Image symimg = getSymbol(symbol, new Dimension(BASE_ICON_SIZE, BASE_ICON_SIZE), symbolcolor);
 			BufferedImage darksymimg = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = darksymimg.createGraphics();
-			g.setComposite(new ModulateComposite(new Color(0.8f, 0.8f, 0.8f, 1.0f), true));
+			g.setComposite(new ModulateComposite(new Color(darkeningfactor, darkeningfactor, darkeningfactor, 1.0f), true));
 			g.drawImage(symimg, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
 			g.dispose();
+			
+			Image frame = generateGenericFrame(frametype, SHAPE_RECTANGLE, new Dimension(iconsize, iconsize));
 			
 			offimage = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			g = ((BufferedImage) offimage).createGraphics();
 			g.setComposite(AlphaComposite.SrcOver);
 			g.drawImage(darksymimg, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+			g.drawImage(frame, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
 			g.dispose();
 			offimage = offimage.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
 			
@@ -217,14 +262,16 @@ public class ImageProvider
 			g.setComposite(AlphaComposite.SrcOver);
 			g.setColor(Color.WHITE);
 			g.drawImage(symimg, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+			g.drawImage(frame, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
 			g.dispose();
 			onimage = onimage.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
 			
 			highimage = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			g = ((BufferedImage) highimage).createGraphics();
-			g.setComposite(AlphaComposite.Src);
+			g.setComposite(AlphaComposite.SrcOver);
 			g.setColor(Color.WHITE);
 			g.drawImage(symimg, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
+			g.drawImage(frame, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
 			g.dispose();
 			highimage = highimage.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
 			
@@ -485,11 +532,14 @@ public class ImageProvider
 				framearea.subtract(new Area(st.createTransformedShape(baseshape)));
 			}
 			
-			g.setColor(Color.BLACK);
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			g.fill(framearea);
-			g.dispose();
+			if (EMPTY_FRAME_TYPE != frametype)
+			{
+				g.setColor(Color.BLACK);
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+				g.fill(framearea);
+				g.dispose();
+			}
 			
 			imagecache.put(new Tuple3<String, Integer, Shape>("frame", frametype, baseshape), ret);
 		}
@@ -652,7 +702,7 @@ public class ImageProvider
 			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.fill(GatewayShape.getXorShape(0, 0, size.width, size.height));
 		}
 		else if ("GW_O".equals(name))
@@ -660,7 +710,7 @@ public class ImageProvider
 			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();
 			
-			g.setColor(Color.BLACK);
+			g.setColor(color);
 			g.fill(GatewayShape.getOrShape(0, 0, size.width, size.height));
 		}
 		else if ("Pool".equals(name))

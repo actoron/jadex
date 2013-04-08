@@ -268,6 +268,8 @@ public class SCreationController
 		modelcontainer.getGraph().getModel().beginUpdate();
 		modelcontainer.getGraph().addCell(vactivity, (VNode) targetcell);
 		modelcontainer.getGraph().getModel().endUpdate();
+		
+		modelcontainer.setDirty(true);
 			
 		if (!ModelContainer.EDIT_MODE_TASK.equals(mode))
 		{

@@ -1,16 +1,27 @@
 package jadex.bpmn.editor;
 
-import jadex.bpmn.editor.gui.BpmnEditorWindow;
+import jadex.bpmn.editor.gui.BpmnEditorFrame;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetComplexGrayscale;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 
+import java.awt.EventQueue;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+
+import com.mxgraph.view.mxStylesheet;
 
 /**
  *  Class for starting the BPMN editor.
@@ -19,7 +30,7 @@ import java.util.logging.Logger;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 21;
+	public static final int BUILD = 23;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";
@@ -29,6 +40,14 @@ public class BpmnEditor
 	
 	/** Main Logger. */
 	public static final Logger LOGGER = Logger.getLogger(APP_NAME);
+	
+	/** The style sheets. */
+	public static final Tuple2<String, mxStylesheet>[] STYLE_SHEETS = new Tuple2[] 
+		{
+			new Tuple2<String, mxStylesheet>("Color", new BpmnStylesheetColor()),
+			new Tuple2<String, mxStylesheet>("Simple Grayscale", new BpmnStylesheetSimpleGrayscale()),
+			new Tuple2<String, mxStylesheet>("Complex Grayscale", new BpmnStylesheetComplexGrayscale())
+		};
 	
 	/** Standard task classes. */
 	protected static final String[] FALLBACK_TASK_NAMES = { "jadex.bpmn.runtime.task.PrintTask",
@@ -106,6 +125,7 @@ public class BpmnEditor
 //		{
 //			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
 //			{
+//				System.out.println(info.getName());
 //		        if ("Nimbus".equals(info.getName()))
 //		        {
 //		            UIManager.setLookAndFeel(info.getClassName());
@@ -117,6 +137,20 @@ public class BpmnEditor
 //		{
 //		}
 		
-		new BpmnEditorWindow();
+		EventQueue.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+//				Enumeration<Object> keys = UIManager.getDefaults().keys();
+//				while (keys.hasMoreElements())
+//				{
+//					Object key = keys.nextElement();
+//					if (key instanceof String && ((String) key).toLowerCase().matches(".*internalframe.*") &&
+//						((String) key).toLowerCase().matches(".*\\.close?[(icon)(button].*"))
+//						System.out.println(key);
+//				}
+				new BpmnEditorFrame();
+			}
+		});
 	}
 }
