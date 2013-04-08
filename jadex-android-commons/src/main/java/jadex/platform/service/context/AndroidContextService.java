@@ -11,6 +11,7 @@ import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.context.IPreferences;
 import jadex.android.commons.Logger;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.io.File;
@@ -111,10 +112,10 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 *            File name
 	 * @return {@link File}
 	 */
-	public File getFile(String name)
+	public IFuture<File> getFile(String name)
 	{
 		checkContext();
-		return context.getFileStreamPath(name);
+		return new Future<File>(context.getFileStreamPath(name));
 	}
 
 	/**
@@ -123,10 +124,10 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 * 
 	 * @param preferenceFileName
 	 */
-	public IPreferences getSharedPreferences(String name)
+	public IFuture<IPreferences> getSharedPreferences(String name)
 	{
 		checkContext();
-		return AndroidSharedPreferencesWrapper.wrap(context.getSharedPreferences(name, Context.MODE_PRIVATE));
+		return new Future<IPreferences>(AndroidSharedPreferencesWrapper.wrap(context.getSharedPreferences(name, Context.MODE_PRIVATE)));
 	}
 
 	/**
@@ -138,17 +139,20 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 * @return true, if at least one receiver was registered for this event and
 	 *         delivery was successful, else false.
 	 */
-	public boolean dispatchUiEvent(IJadexAndroidEvent event)
+	public IFuture<Boolean> dispatchUiEvent(IJadexAndroidEvent event)
 	{
+		Future<Boolean> result = new Future<Boolean>();
 		try
 		{
-			return androidContext.dispatchEvent(event);
+			result.setResult((androidContext.dispatchEvent(event)));
 		}
 		catch (WrongEventClassException e)
 		{
 			Log.e("AndroidContextService", e.getMessage());
-			return false;
+			result.setResult(false);
 		}
+		
+		return result;
 	}
 
 	/**
@@ -197,7 +201,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 * 
 	 * @return IP Address or -1, if none
 	 */
-	public List<InetAddress> getNetworkIps()
+	public IFuture<List<InetAddress>> getNetworkIps()
 	{
 		checkContext();
 		List<InetAddress> ret = new ArrayList<InetAddress>();
@@ -220,15 +224,16 @@ public class AndroidContextService extends BasicService implements AndroidContex
 			{
 			}
 		}
-		return ret;
+		return new Future<List<InetAddress>>(ret);
 	}
 
 	/**
 	 * Starts an intent to open the given file.
 	 * @param path
+	 * @return 
 	 * @throws IOException 
 	 */
-	public void openFile(String path) throws IOException
+	public IFuture<Void> openFile(String path) throws IOException
 	{
           Intent intent = new Intent();
           intent.setAction(android.content.Intent.ACTION_VIEW);
@@ -241,6 +246,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
        
           intent.setDataAndType(Uri.fromFile(file),type);
           androidContext.getAndroidContext().startActivity(intent); 
+          return Future.DONE;
 	}
 
 }
