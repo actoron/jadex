@@ -143,7 +143,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	//-------- added structures --------
 
 	/** The context variables (name -> [class, initexpression]). */
-	protected Map variables;
+	protected Map<String, Object[]> variables;
 	
 	/** The pool/names in configurations. */
 	protected Map configpoollanes;
