@@ -1,6 +1,6 @@
 package jadex.bpmn.editor;
 
-import jadex.bpmn.editor.gui.BpmnEditorFrame;
+import jadex.bpmn.editor.gui.BpmnEditorWindow;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetComplexGrayscale;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
@@ -30,7 +30,7 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 23;
+	public static final int BUILD = 24;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";
@@ -149,7 +149,7 @@ public class BpmnEditor
 //						((String) key).toLowerCase().matches(".*\\.close?[(icon)(button].*"))
 //						System.out.println(key);
 //				}
-				new BpmnEditorFrame();
+				new BpmnEditorWindow();
 			}
 		});
 	}

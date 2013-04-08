@@ -44,13 +44,18 @@ import com.mxgraph.view.mxStylesheet;
 
 public class BpmnMenuBar extends JMenuBar
 {
-	/** The editor frame. */
-	protected BpmnEditorFrame editorframe;
+	/** The editor window. */
+	protected BpmnEditorWindow editorwindow;
 	
-	public BpmnMenuBar(BpmnEditorFrame editrframe)
+	/**
+	 *  Creates the menu bar.
+	 *  
+	 *  @param editwindow The editor window.
+	 */
+	public BpmnMenuBar(BpmnEditorWindow editwindow)
 	{
 		
-		this.editorframe = editrframe;
+		this.editorwindow = editwindow;
 		
 		JMenu filemenu = new JMenu("File");
 		
@@ -75,7 +80,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				ModelContainer modelcontainer = editorframe.getSelectedModelContainer();
+				ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
 				if (modelcontainer != null)
 				{
 					JRadioButtonMenuItem button = (JRadioButtonMenuItem) e.getSource();
@@ -104,11 +109,11 @@ public class BpmnMenuBar extends JMenuBar
 		
 		viewmenu.add(stylemenu);
 		
-		editorframe.addTabListener(new ChangeListener()
+		editorwindow.addTabListener(new ChangeListener()
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				ModelContainer modelcontainer = editorframe.getSelectedModelContainer();
+				ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
 				if (modelcontainer != null)
 				{
 					mxStylesheet sheet = modelcontainer.getGraph().getStylesheet();
@@ -134,7 +139,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				ModelContainer modelcontainer = editorframe.getSelectedModelContainer();
+				ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
 				if (modelcontainer != null)
 				{
 					JRadioButtonMenuItem button = (JRadioButtonMenuItem) e.getSource();
@@ -185,7 +190,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				editorframe.initializeNewModel(editorframe.newModelTab(null));
+				editorwindow.initializeNewModel(editorwindow.newModelTab(null));
 			}
 		});
 		
@@ -204,7 +209,7 @@ public class BpmnMenuBar extends JMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 				File curfile = null;
-				ModelContainer curcont = editorframe.getSelectedModelContainer();
+				ModelContainer curcont = editorwindow.getSelectedModelContainer();
 				if (curcont != null)
 				{
 					curfile = curcont.getFile();
@@ -254,8 +259,8 @@ public class BpmnMenuBar extends JMenuBar
 						
 						modelcontainer.setFile(file);
 						
-						editorframe.newModelTab(modelcontainer);
-						editorframe.initializeNewModel(modelcontainer);
+						editorwindow.newModelTab(modelcontainer);
+						editorwindow.initializeNewModel(modelcontainer);
 					}
 					catch (Exception e1)
 					{
@@ -279,7 +284,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				ModelContainer modelcontainer = editorframe.getSelectedModelContainer();
+				ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
 				if (modelcontainer != null)
 				{
 					if (modelcontainer.getFile() != null && modelcontainer.getFile().getName().endsWith(".bpmn2"))
@@ -334,7 +339,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				ModelContainer modelcontainer = editorframe.getSelectedModelContainer();
+				ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
 				if (modelcontainer != null)
 				{
 					BetterFileChooser fc = new BetterFileChooser(modelcontainer.getFile());
@@ -431,7 +436,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				editorframe.terminate();
+				editorwindow.terminate();
 			}
 		});
 		
@@ -443,7 +448,7 @@ public class BpmnMenuBar extends JMenuBar
 	 */
 	protected void saveWithDialog()
 	{
-		ModelContainer modelcontainer = editorframe.getSelectedModelContainer();
+		ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
 		if (modelcontainer != null)
 		{
 			BetterFileChooser fc = new BetterFileChooser(modelcontainer.getFile());
@@ -495,17 +500,6 @@ public class BpmnMenuBar extends JMenuBar
 			    JOptionPane.ERROR_MESSAGE);
 		//e1.printStackTrace();
 	}
-	
-	/**
-	 *  Initializes a new model with the required controllers.
-	 *  
-	 *  @param graph New graph.
-	 *  @param model New BPMN model.
-	 */
-//	protected static void initializeNewModel(ModelContainer modelcontainer, BpmnGraph graph, MBpmnModel model)
-//	{
-//		
-//	}
 	
 	/**
 	 *  Returns the model build.

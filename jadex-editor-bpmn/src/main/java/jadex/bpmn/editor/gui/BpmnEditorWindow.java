@@ -37,7 +37,7 @@ import javax.swing.event.ChangeListener;
 
 import com.mxgraph.util.mxEvent;
 
-public class BpmnEditorFrame extends JFrame
+public class BpmnEditorWindow extends JFrame
 {
 	/** The tool bar. */
 	protected BpmnToolbar bpmntoolbar;
@@ -45,7 +45,7 @@ public class BpmnEditorFrame extends JFrame
 	/** The tabbed pane showing the models. */
 	protected JTabbedPane tabpane;
 	
-	public BpmnEditorFrame()
+	public BpmnEditorWindow()
 	{
 		super(BpmnEditor.APP_NAME);
 		
@@ -93,7 +93,7 @@ public class BpmnEditorFrame extends JFrame
 		});
 		
 		/* Menu */
-		JMenuBar menubar = new BpmnMenuBar(BpmnEditorFrame.this);
+		JMenuBar menubar = new BpmnMenuBar(BpmnEditorWindow.this);
 		setJMenuBar(menubar);
 		
 		pack();
@@ -243,7 +243,7 @@ public class BpmnEditorFrame extends JFrame
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						if (panel.getModelContainer().checkUnsaved(BpmnEditorFrame.this))
+						if (panel.getModelContainer().checkUnsaved(BpmnEditorWindow.this))
 						{
 							tabpane.remove(panel);
 						}
