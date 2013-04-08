@@ -277,7 +277,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 				ProcessThread thread = (ProcessThread)it.next();
 				try
 				{
-					if(thread.isWaiting() && thread.getWaitFilter().filter(dispelem))
+					if(thread.isWaiting() && thread.getWaitFilter()!=null && thread.getWaitFilter().filter(dispelem))
 					{
 						BpmnPlanBodyInstance.this.notify(thread.getActivity(), thread, getFlyweight(dispelem));
 					}

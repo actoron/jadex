@@ -129,7 +129,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			};
 			
 			ServiceCall sc = ServiceCall.getCurrentInvocation();
-			Cause cause = sc!=null? sc.getCause().createNext(st.toString()): getComponentDescription().getCause().createNext(st.toString());
+			Cause cause = sc!=null && sc.getCause()!=null? sc.getCause().createNext(st.toString()): 
+				desc.getCause()!=null? desc.getCause().createNext(st.toString()): null;
 			addStep(new StepInfo(st, new Future(), ServiceCall.getCurrentInvocation(), cause));
 		}
 		catch(Exception e)
@@ -853,7 +854,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		else
 		{
 			ServiceCall sc = ServiceCall.getCurrentInvocation();
-			Cause cause = sc!=null? sc.getCause().createNext(step.toString()): getComponentDescription().getCause().createNext(step.toString());
+			Cause cause = sc!=null && sc.getCause()!=null? sc.getCause().createNext(step.toString()): 
+				getComponentDescription().getCause()!=null? getComponentDescription().getCause().createNext(step.toString()): null;
 			addStep(new StepInfo(step, ret, sc, cause));
 		}
 		return ret;

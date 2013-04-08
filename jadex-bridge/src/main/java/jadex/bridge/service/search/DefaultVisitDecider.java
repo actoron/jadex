@@ -112,7 +112,7 @@ public class DefaultVisitDecider implements IVisitDecider
 			else if(RequiredServiceInfo.SCOPE_PARENT.equals(scope))
 			{
 				// True only for parent.
-				ret = !ischild && source.equals(start);
+				ret = !ischild && source!=null && source.equals(start);
 			}
 			else
 			{

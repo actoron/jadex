@@ -2093,7 +2093,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			{
 				event.setCause(call.getCause());
 			}
-			else
+			else if(getComponentDescription().getCause()!=null)
 			{
 				event.setCause(getComponentDescription().getCause().createNext(event.getSourceIdentifier().toString()));
 			}

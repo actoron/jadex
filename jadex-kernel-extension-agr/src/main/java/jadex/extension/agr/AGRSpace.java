@@ -178,7 +178,11 @@ public class AGRSpace	implements IExtensionInstance
 						
 						public void intermediateResultAvailable(IMonitoringEvent result)
 						{
-							if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
+							if(result==null)
+							{
+								ret.setResult(null);
+							}	
+							else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
 							{
 //								System.out.println("add: "+cce.getDetails());
 								componentAdded((IComponentDescription)result.getProperty("details"));	
@@ -201,7 +205,7 @@ public class AGRSpace	implements IExtensionInstance
 					
 					return IFuture.DONE;
 				}
-			}).addResultListener(new DelegationResultListener<Void>(ret));
+			});//.addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		catch(Exception e)
 		{

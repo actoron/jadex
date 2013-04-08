@@ -210,6 +210,9 @@ public class HttpReceiver
 	 */
 	protected void	postAwarenessInfo(final byte[] data, final int type, final Map<Byte, ICodec> codecs)
 	{
+		if(shutdown)
+			return;
+		
 		SServiceProvider.getService(access.getServiceProvider(), IAwarenessManagementService.class, Binding.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IAwarenessManagementService>()
 		{
