@@ -12,7 +12,6 @@ import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.ISpaceProcess;
@@ -121,6 +120,10 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	public void execute(IClockService clock, IEnvironmentSpace space) {
 //		System.out.println("Executed ME: " + clock.getTick());
 
+		// put it here, so it can be reused within the application without the need to parse again
+		space.setProperty("SimulationDescription", scenario);
+		space.setProperty("StationCluster", superCluster);
+		
 		// Check if all stations have been created
 		if (stationIterationCounter < scenario.getStations().getStation().size()) {
 
@@ -132,10 +135,6 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 			props.put("simDataSetupFilePath", simDataSetupFilePath);
 			props.put("clusterSetupFilePath", clusterSetupFilePath);
 
-			// put it here, so it can be reused within the application without the need to parse again
-			space.setProperty("SimulationDescription", scenario);
-			space.setProperty("StationCluster", superCluster);
-			
 			//HACK: Required for Simulation-Control!!! Make sure right start time is used for later evaluation
 			space.setProperty("REAL_START_TIME_OF_SIMULATION", clock.getTime());
 			space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", new Double (clock.getTick()).longValue());

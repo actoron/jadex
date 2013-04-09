@@ -21,7 +21,7 @@ public class SuperStationPlan extends Plan {
 
 	private static final long serialVersionUID = -1433197689807683447L;
 
-	private static final int NO_TICKS = 200;
+	private static final int NO_TICKS = 50;
 
 	public void body() {
 		Boolean isSuperStation = (Boolean) getBeliefbase().getBelief("isSuperStation").getFact();
@@ -36,9 +36,8 @@ public class SuperStationPlan extends Plan {
 			getBeliefbase().getBelief("noClusterStations").setFact(clusterStationIds.size());
 			
 			while (true) {
-				// wait for some time
+				// wait for some ticks
 				for (int i = 0; i < NO_TICKS; i++) {
-//					waitFor(NO_TICKS);
 					waitForTick();
 				}
 				IInternalEvent pollEvent = createInternalEvent("poll_cluster_stations");
