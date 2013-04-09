@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,12 +23,12 @@ import javax.xml.bind.ValidationException;
 import sodekovs.util.bikesharing.model.DestinationProbability;
 import sodekovs.util.bikesharing.model.ObjectFactory;
 import sodekovs.util.bikesharing.model.ProbabilitiesForStation;
-import sodekovs.util.bikesharing.model.SimulationDescription;
-import sodekovs.util.bikesharing.model.Station;
-import sodekovs.util.bikesharing.model.TimeSlice;
 import sodekovs.util.bikesharing.model.ProbabilitiesForStation.DestinationProbabilities;
+import sodekovs.util.bikesharing.model.SimulationDescription;
 import sodekovs.util.bikesharing.model.SimulationDescription.Stations;
 import sodekovs.util.bikesharing.model.SimulationDescription.TimeSlices;
+import sodekovs.util.bikesharing.model.Station;
+import sodekovs.util.bikesharing.model.TimeSlice;
 import sodekovs.util.bikesharing.model.TimeSlice.ProbabilitiesForStations;
 import de.jollyday.Holiday;
 import de.jollyday.HolidayCalendar;
@@ -40,6 +41,15 @@ import deco4mas.distributed.util.xml.XmlUtil;
  * @author Thomas Preisler
  */
 public class RealDataExtractor {
+
+	/*
+	 * The exlucded station ids
+	 */
+	public static final String[] EXCLUDE_STATIONS = { "Lincoln Park / 13th and East Capitol St NE", "Crystal City Metro / 18th and Bell St", "Braddock Rd Metro",
+			"Anacostia Ave and Benning Rd NE / River Terrace", "Utah St and 11th St N", "Lincoln Memorial", "Alta Warehouse Station", "1st and N St  SE", "Henry St and Pendleton St",
+			"Potomac Ave and 35th St S", "Arlington Blvd and N Queen St", "Alta Bicycle Share Demonstration Station", "Alta Bicycle Share Warehouse", "Commerce St and Fayette St",
+			"Prince St and Union St", "King St and Patrick St", "White House [17th and State Pl NW]", "Pentagon City Metro / 12th and Hayes St", "Barton St and 10th St N",
+			"Market Square / King St and Royal St", "Saint Asaph St and Pendleton  St", "King St Metro" };
 
 	/*
 	 * The weekdays
@@ -140,7 +150,7 @@ public class RealDataExtractor {
 					String xmlFile = "WashingtonSimulation_Monday.xml";
 					XmlUtil.saveAsXML(sd, xmlFile);
 					System.out.println(xmlFile + " written.");
-					
+
 					int runTotal = 0;
 					for (TimeSlice ts : sd.getTimeSlices().getTimeSlice()) {
 						runTotal += ts.getRunTotal();
@@ -305,6 +315,8 @@ public class RealDataExtractor {
 			}
 
 			ResultSet rs = stmt.executeQuery();
+			List<String> excludedStations = Arrays.asList(EXCLUDE_STATIONS);
+			int ignored = 0;
 			while (rs.next()) {
 				String bikeId = rs.getString("bikeId");
 				Timestamp start = rs.getTimestamp("start");
@@ -313,9 +325,15 @@ public class RealDataExtractor {
 				String endStation = rs.getString("endStation").trim();
 				int weekday = rs.getInt("weekday");
 
-				Rental rental = new Rental(bikeId, start, end, startStation, endStation, weekday, link, city);
-				rentals.add(rental);
+				if (!excludedStations.contains(startStation) && !excludedStations.contains(endStation)) {
+					Rental rental = new Rental(bikeId, start, end, startStation, endStation, weekday, link, city);
+					rentals.add(rental);
+				} else {
+//					System.out.println("Ignoring rental because " + startStation + " or " + endStation + " is in list of excluded stations");
+					ignored++;
+				}
 			}
+			System.out.println("Ignored " + ignored + " excluded stations.");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
