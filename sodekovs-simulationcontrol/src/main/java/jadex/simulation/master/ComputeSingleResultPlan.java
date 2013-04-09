@@ -53,7 +53,7 @@ public class ComputeSingleResultPlan extends Plan {
 		// application (is delayed)
 //		Denotes whether Simulation uses "Real time" or "Simualtion time"
 		String timeType = simConf.getRunConfiguration().getRows().getTerminateCondition().getTime().getType();
-		if(timeType.equals("tick_based")){
+		if(timeType.equals("tick_based")){														  
 			deleteEventsBefore(sortedResultList, observedEventsMap, ((Long) content.get(Constants.EXPERIMENT_STARTTICK_TIME)).longValue());
 		}else{//denotes  "default" -> real time is used
 			deleteEventsBefore(sortedResultList, observedEventsMap, ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue());	
