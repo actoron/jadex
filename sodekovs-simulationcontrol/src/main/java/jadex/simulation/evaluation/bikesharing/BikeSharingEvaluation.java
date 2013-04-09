@@ -21,9 +21,7 @@ import sodekovs.util.misc.XMLHandler;
  */
 public class BikeSharingEvaluation {
 
-	// private String realDataXMLFile = "E:\\Workspaces\\Jadex\\BikeSharing2\\Jadex\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
-	private String realDataXMLFile = "C:\\Users\\Thomas\\workspaces\\jadex-sodekovs\\trunk\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
-	// private String realDataXMLFile = "E:/Workspaces/Jadex/BikeSharing2/Jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonEvaluation_Monday_new.xml";
+	private String realDataXMLFile = "E:\\Workspaces\\Jadex\\Bikesharing\\V2\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
 	private SimulationDescription realData;
 	// conf. following method for understanding the data structure:
 	// EvaluateRow.evaluateRowData(preparedRowData)
@@ -237,7 +235,7 @@ public class BikeSharingEvaluation {
 				}
 			}
 		}
-//		System.out.println("#BikeSharingEval# Nr. of Eval Time Slices: " + resultMap.size());
+		// System.out.println("#BikeSharingEval# Nr. of Eval Time Slices: " + resultMap.size());
 
 		return resultMap;
 	}
@@ -268,7 +266,7 @@ public class BikeSharingEvaluation {
 				// create new Data Object that will contain the evaluated results
 				EvaluatedBikeStation station = new EvaluatedBikeStation(stationId);
 				EvaluatedBikeStationData simData = new EvaluatedBikeStationData();
-				simData.setSingleValues(stationPropertiesMap.get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST));
+				simData.setSingleValues(stationPropertiesMap.get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST));				
 				station.setSimulatedData(simData);
 				station.evalSimulatedData();
 
@@ -318,7 +316,7 @@ public class BikeSharingEvaluation {
 
 			evaluatedStockLevel.setStockLevelData(currentTimeSlice, evalStockLevelData);
 		}
-	}	
+	}
 
 	/**
 	 * Retrieve number of docks for a station
@@ -380,7 +378,13 @@ public class BikeSharingEvaluation {
 			for (Iterator<String> it2 = timeSlicesMap.keySet().iterator(); it2.hasNext();) {
 				String objectInstancesKey = it2.next();
 				EvaluatedBikeStation evalutedBikeStation = timeSlicesMap.get(objectInstancesKey);
-				result.append(evalutedBikeStation.resultsToString() + "\n");
+				try {
+					result.append(evalutedBikeStation.resultsToString() + "\n");
+				} catch (Exception e) {
+					// Happens, if station is not found in Simulation Data AND Real Data. Then evaluation fails in "EvaluatedBikeStation.compareSimulationVsReality()" and corresponding String is
+					// empty!
+					System.out.println(timeSliceKey + ": " + objectInstancesKey + " - " + evalutedBikeStation.getStationId());
+				}
 			}
 			result.append("\n########################################################################\n");
 		}

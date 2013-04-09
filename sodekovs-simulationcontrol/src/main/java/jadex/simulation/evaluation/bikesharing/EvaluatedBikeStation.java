@@ -1,8 +1,5 @@
 package jadex.simulation.evaluation.bikesharing;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
 
@@ -100,7 +97,7 @@ public class EvaluatedBikeStation {
 
 		result.append("StationId: " + stationId + "\n");
 		result.append("Real Data vs. Simulated: Deviation: " + comparedData.getDevation() + "\t Standard Deviation: " + +comparedData.getStandardDevation() + "\n");
-		result.append("Simulated Data: Mean Value" + simulatedData.getMeanValue() + "\n");
+		result.append("Simulated Data: Mean Value: " + simulatedData.getMeanValue() + "\n");
 
 		return result.toString();
 	}
