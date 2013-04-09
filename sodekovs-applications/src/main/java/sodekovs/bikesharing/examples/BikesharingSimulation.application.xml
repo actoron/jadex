@@ -254,8 +254,7 @@
 					<env:processes>
 						<env:process type="initProcess">
 							<env:property name="simDataSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/WashingtonTestEnv.xml"</env:property>
-							<env:property name="clusterSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/stationCluster-Test.xml"</env:property>
-							<env:property name="rate">100</env:property>
+							<env:property name="clusterSetupFilePath">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/stationCluster-Test.xml"</env:property>							
 						</env:process>
 						<!--  <env:process type="manageTimeSlices" />-->													 
 					</env:processes>
