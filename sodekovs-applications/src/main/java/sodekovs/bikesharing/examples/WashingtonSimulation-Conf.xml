@@ -5,7 +5,7 @@
 		17:25 Updated on: 15-1-10, 19h Author : vilenica Description: Purpose
 		of the document follows.
 	-->
-
+<!-- Do NOT Change Name of Configuration! -->
 <SimulationConfiguration name="BikeSharingWashington"
 	applicationReference="..\\sodekovs-applications\\target\\classes\\sodekovs\\bikesharing\\examples\\BikesharingSimulation.application.xml"
 	applicationConfiguration="Washington"
