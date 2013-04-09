@@ -104,6 +104,9 @@ public class RuntimeManagerPlan extends Plan {
 		IFuture fut = exta.getExtension(simConf.getNameOfSpace());
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 
+		// HACK for Bikesharing: Wait till setup is finished, then start checking the termination condition
+		checkSetupProcess(simConf, space);
+
 		// Determine terminate condition
 		// Time determines termination
 		if (simConf.getRunConfiguration().getRows().getTerminateCondition().getTime() != null) {
@@ -112,12 +115,12 @@ public class RuntimeManagerPlan extends Plan {
 			if (time.getType().equals(Constants.TICK_BASED_TIME_EXPRESSION)) {
 				double startTick = clockservice.getTick();
 				// Tick based termination condition
-//				System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
-				while (time.getValue() > (clockservice.getTick()-startTick)) {
+				// System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
+				while (time.getValue() > (clockservice.getTick() - startTick)) {
 					waitForTick();
-//				System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
-				}				
-//				System.out.println("StartTick: " + startTick + " vs. endTick" + (clockservice.getTick()-startTick));
+					// System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
+				}
+				// System.out.println("StartTick: " + startTick + " vs. endTick" + (clockservice.getTick()-startTick));
 			} else {
 
 				Long terminationTime = new Long(-1);
@@ -197,29 +200,26 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Decrement the number of currently running experiments on this agent
 		numberOfRunningExperiments(-1);
-//		try{
-//		cms.suspendComponent(exta.getComponentIdentifier()).addResultListener(new IResultListener()
-		cms.destroyComponent(exta.getComponentIdentifier()).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println("#RuntimeManager# Killed app. " );//+ result.toString());
-//				System.out.println("#RuntimeManager# Suspended app. ");// + result.toString());
+		// try{
+		// cms.suspendComponent(exta.getComponentIdentifier()).addResultListener(new IResultListener()
+		cms.destroyComponent(exta.getComponentIdentifier()).addResultListener(new IResultListener() {
+			public void resultAvailable(Object result) {
+				System.out.println("#RuntimeManager# Killed app. ");// + result.toString());
+				// System.out.println("#RuntimeManager# Suspended app. ");// + result.toString());
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
+
+			public void exceptionOccurred(Exception exception) {
 				exception.printStackTrace();
 			}
 		});
-//			
-//		}
-//		};
-//		
-//		}catch(Exception e){
-//			System.out.println("#RunTimeMgr.# Exception ");
-//			e.printStackTrace();
-//		}
+		//
+		// }
+		// };
+		//
+		// }catch(Exception e){
+		// System.out.println("#RunTimeMgr.# Exception ");
+		// e.printStackTrace();
+		// }
 		// delete *.application.xml from disk
 		FileHandler.deleteFile(directoryPath + simConf.getName() + ".application.xml");
 		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
@@ -241,12 +241,12 @@ public class RuntimeManagerPlan extends Plan {
 		// does not need to be send back to master agent
 		// facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
 
-		//HACK!!! Required for BikeSharingSimulation: The startTime there is later than by starting the application by this component
-		if(space.getProperty("UpdateTimeAtClientSimulator") != null && (Boolean) space.getProperty("UpdateTimeAtClientSimulator")){
+		// HACK!!! Required for BikeSharingSimulation: The startTime there is later than by starting the application by this component
+		if (space.getProperty("UpdateTimeAtClientSimulator") != null && (Boolean) space.getProperty("UpdateTimeAtClientSimulator")) {
 			facts.put(Constants.EXPERIMENT_START_TIME, space.getProperty("REAL_START_TIME_OF_SIMULATION"));
 			facts.put(Constants.EXPERIMENT_STARTTICK_TIME, (Long) space.getProperty("REAL_START_TICKTIME_OF_SIMULATION"));
-		}		
-						
+		}
+
 		// getBeliefbase().getBelief("simulationFacts").setFact(facts);
 		getBeliefbase().getBelief("factsAboutAllExperiments").setFact(factsAboutAllExperiments);
 	}
@@ -315,14 +315,14 @@ public class RuntimeManagerPlan extends Plan {
 		// Hack: Synchronize start time!
 		// System.out.println("-->StartTime at Client: " + startTime);
 		long startTime = clockservice.getTime();
-		long startTickTime = new Double (clockservice.getTick()).longValue(); 
+		long startTickTime = new Double(clockservice.getTick()).longValue();
 
 		fut = exta.getExtension(simConf.getNameOfSpace());
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
 		space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", startTickTime);
-		
-		//Denotes whether Simulation uses "Real time" or "Simualtion time"
+
+		// Denotes whether Simulation uses "Real time" or "Simulation time"
 		String timeType = simConf.getRunConfiguration().getRows().getTerminateCondition().getTime().getType();
 		space.setProperty("CLOCK_TYPE", timeType);
 
@@ -539,6 +539,20 @@ public class RuntimeManagerPlan extends Plan {
 		}
 		// directoryPath = System.getProperty("user.home", ".") + "\\SimulationExperiments\\";
 
+	}
+
+	/**
+	 * Check special condition for BikeSharing Simulation. Due to the long setup process of the bike stations start computation of the termination process AFTER setup has been completed
+	 * 
+	 * @param simConf
+	 */
+	private void checkSetupProcess(SimulationConfiguration simConf, AbstractEnvironmentSpace space) {
+		if (simConf.getName().startsWith("BikeSharingWashington")) {
+			while (space.getProperty("UpdateTimeAtClientSimulator") == null) {
+				waitForTick();
+			}
+			System.out.println("#RuntimeMngr# Finished waiting for setup process for Bikesharing!");
+		}
 	}
 
 	/***
