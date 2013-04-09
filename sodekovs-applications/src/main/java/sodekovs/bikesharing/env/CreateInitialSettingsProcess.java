@@ -75,7 +75,6 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 			superStations.add(cluster.getSuperStation().getName());
 		}
 
-
 		// try {
 		// createBikeStations((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
 		// createBikeStationsAsBDIAgent((String) getProperty("simDataSetupFilePath"), (String) getProperty("clusterSetupFilePath"), space);
@@ -118,30 +117,27 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 *            The space this process is running in.
 	 */
 	public void execute(IClockService clock, IEnvironmentSpace space) {
-//		System.out.println("Executed ME: " + clock.getTick());
+		// System.out.println("Executed ME: " + clock.getTick());
 
-		// put it here, so it can be reused within the application without the need to parse again
-		space.setProperty("SimulationDescription", scenario);
-		space.setProperty("StationCluster", superCluster);
-		
 		// Check if all stations have been created
 		if (stationIterationCounter < scenario.getStations().getStation().size()) {
-
-//			if ((clock.getTick() - lastTick) > 3.0) {
-				createBikeStations(space);
-//			}
+			createBikeStations(space);
 		} else {
 			HashMap<String, Object> props = new HashMap<String, Object>();
 			props.put("simDataSetupFilePath", simDataSetupFilePath);
 			props.put("clusterSetupFilePath", clusterSetupFilePath);
 
-			//HACK: Required for Simulation-Control!!! Make sure right start time is used for later evaluation
+			// put it here, so it can be reused within the application without the need to parse again
+			space.setProperty("SimulationDescription", scenario);
+			space.setProperty("StationCluster", superCluster);
+
+			// HACK: Required for Simulation-Control!!! Make sure right start time is used for later evaluation
 			space.setProperty("REAL_START_TIME_OF_SIMULATION", clock.getTime());
-			space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", new Double (clock.getTick()).longValue());
-			//Hack: Inform Client Sim to update both times above
+			space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", new Double(clock.getTick()).longValue());
+//			System.out.println("Setting new Start Tick Size: " + space.getProperty("REAL_START_TICKTIME_OF_SIMULATION"));
+			// Hack: Inform Client Sim to update both times above
 			space.setProperty("UpdateTimeAtClientSimulator", true);
-			
-			
+
 			space.createSpaceProcess("manageTimeSlices", props);
 			space.removeSpaceProcess(getProperty(ISpaceProcess.ID));
 		}
