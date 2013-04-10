@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.commons.SUtil;
 
 import java.io.File;
@@ -15,11 +16,9 @@ import java.util.Properties;
  */
 public class Settings
 {
-	/** The settings directory name. */
-	protected static final String SETTINGS_DIR_NAME = ".jadex-bpmn-editor";
 	
 	/** The settings file name. */
-	protected static final String SETTINGS_FILE_NAME = ".settings";
+	protected static final String SETTINGS_FILE_NAME = "settings.cfg";
 	
 	/** The last file opened or saved. */
 	protected File lastfile;
@@ -49,7 +48,7 @@ public class Settings
 	 */
 	public void save() throws IOException
 	{
-		File settingsdir = new File(System.getProperty("user.home") + File.separator + SETTINGS_DIR_NAME);
+		File settingsdir = new File(BpmnEditor.HOME_DIR);
 		if (!settingsdir.exists())
 		{
 			if (!settingsdir.mkdir())
@@ -59,7 +58,7 @@ public class Settings
 		}
 		
 		File settingsfile = new File(settingsdir.getAbsolutePath() + File.separator + SETTINGS_FILE_NAME);
-		File tmpfile = File.createTempFile(SETTINGS_DIR_NAME, SETTINGS_FILE_NAME);
+		File tmpfile = File.createTempFile(SETTINGS_FILE_NAME, ".cfg");
 		
 		Properties props = new Properties();
 		
@@ -85,7 +84,7 @@ public class Settings
 		Settings ret = new Settings();
 		try
 		{
-			File settingsfile = new File(System.getProperty("user.home") + File.separator + SETTINGS_DIR_NAME + File.separator + SETTINGS_FILE_NAME);
+			File settingsfile = new File(BpmnEditor.HOME_DIR + File.separator + SETTINGS_FILE_NAME);
 			
 			Properties props = new Properties();
 			InputStream is = new FileInputStream(settingsfile);

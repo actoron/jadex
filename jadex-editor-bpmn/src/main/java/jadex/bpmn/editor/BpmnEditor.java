@@ -1,6 +1,7 @@
 package jadex.bpmn.editor;
 
 import jadex.bpmn.editor.gui.BpmnEditorWindow;
+import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetComplexGrayscale;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
@@ -11,6 +12,8 @@ import jadex.commons.transformation.binaryserializer.BinarySerializer;
 
 import java.awt.EventQueue;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,10 +29,16 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 27;
+	public static final int BUILD = 29;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";
+	
+	/** The settings directory name. */
+	public static final String HOME_DIR = System.getProperty("user.home") + File.separator + ".jadex-bpmn-editor";
+	
+	/** The image cache file. */
+	public static final String IMAGE_CACHE = HOME_DIR + File.separator + "imagecache.dat";
 	
 	/** Log level for status area. */
 	public static final Level STATUS_AREA_LOG_LEVEL = Level.INFO;
@@ -116,7 +125,7 @@ public class BpmnEditor
 	public static void main(String[] args)
 	{
 		LOGGER.setUseParentHandlers(false);
-		
+
 //		try
 //		{
 //			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
@@ -145,6 +154,15 @@ public class BpmnEditor
 //						((String) key).toLowerCase().matches(".*\\.close?[(icon)(button].*"))
 //						System.out.println(key);
 //				}
+				LOGGER.setLevel(Level.FINEST);
+				try
+				{
+					ImageProvider.getInstance().loadCache(IMAGE_CACHE);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 				new BpmnEditorWindow();
 			}
 		});

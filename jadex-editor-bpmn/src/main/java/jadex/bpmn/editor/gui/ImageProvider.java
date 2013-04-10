@@ -2,8 +2,10 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.gui.stylesheets.EventShape;
 import jadex.bpmn.editor.gui.stylesheets.GatewayShape;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
+import jadex.commons.transformation.binaryserializer.BinarySerializer;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -30,6 +32,10 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
@@ -163,10 +169,10 @@ public class ImageProvider
 	protected Map<Object, Image> imagecache = Collections.synchronizedMap(new HashMap<Object, Image>());
 	
 	/** The generated image cache. */
-	protected Map<String, Image> genimagecache = Collections.synchronizedMap(new HashMap<String, Image>());
+//	protected Map<String, Image> genimagecache = Collections.synchronizedMap(new HashMap<String, Image>());
 	
 	/** The rendered text cache. */
-	protected Map<String, Image> textimagecache = Collections.synchronizedMap(new HashMap<String, Image>());
+//	protected Map<String, Image> textimagecache = Collections.synchronizedMap(new HashMap<String, Image>());
 	
 	/** The icon font used. */
 	protected Font iconfont;
@@ -391,6 +397,50 @@ public class ImageProvider
 		Image bgshape = generateGenericBackground(baseshape, basesize);
 		
 		return compositeImageIcon(basesize, size, symimg, bgshape, frame, glass, null, bgcolor, true);
+	}
+	
+	/**
+	 *  Loads the image cache from a file.
+	 *	 
+	 *	@param filepath Path to the file.
+	 * 	@throws IOException Exception on IO errors.
+	 */
+	public void loadCache(String filepath) throws IOException
+	{
+		File file = new File(filepath);
+		int size = (int) file.length();
+		byte[] data = new byte[size];
+		int pos = 0;
+		FileInputStream is = new FileInputStream(file);
+		while (pos < size)
+		{
+			pos += is.read(data, pos, size - pos);
+		}
+		is.close();
+		try
+		{
+			imagecache = (Map<Object, Image>) BinarySerializer.objectFromByteArray(data, null, null, ImageProvider.class.getClassLoader(), null);
+		}
+		catch (Exception e)
+		{
+			file.delete();
+		}
+	}
+	
+	/**
+	 *  Saves the image cache to a file.
+	 *	 
+	 *	@param filepath Path to the file.
+	 * 	@throws IOException Exception on IO errors.
+	 */
+	public void saveCache(String filepath) throws IOException
+	{
+		byte[] data = BinarySerializer.objectToByteArray(imagecache, ImageProvider.class.getClassLoader());
+		File tmpfile = File.createTempFile("imagecache", ".cfg");
+		FileOutputStream os = new FileOutputStream(tmpfile);
+		os.write(data);
+		os.close();
+		SUtil.moveFile(tmpfile, new File(filepath));
 	}
 	
 	/**
@@ -1090,27 +1140,20 @@ public class ImageProvider
 	 */
 	private Image generateTextImage(String text, float scaling, Dimension size, Color color)
 	{
-		Image ret = textimagecache.get(text);
+		Image ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		Graphics2D g = ((BufferedImage) ret).createGraphics();
+		g.setColor(Color.BLACK);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		
-		if (ret == null)
-		{
-			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-			Graphics2D g = ((BufferedImage) ret).createGraphics();
-			g.setColor(Color.BLACK);
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-			
-			Font font = iconfont.deriveFont(BASE_ICON_SIZE * 0.5625f * scaling);
-			Shape s = font.createGlyphVector(g.getFontRenderContext(), text).
-					getOutline(0f, 0f);
-			Rectangle b = s.getBounds();
-			
-			g.translate(size.width * 0.5 - b.getWidth() * 0.5 - b.getX(), size.height * 0.5 - b.getHeight() * 0.5 - b.getY());
-			g.fill(s);
-			g.dispose();
-			
-			textimagecache.put(text, ret);
-		}
+		Font font = iconfont.deriveFont(BASE_ICON_SIZE * 0.5625f * scaling);
+		Shape s = font.createGlyphVector(g.getFontRenderContext(), text).
+				getOutline(0f, 0f);
+		Rectangle b = s.getBounds();
+		
+		g.translate(size.width * 0.5 - b.getWidth() * 0.5 - b.getX(), size.height * 0.5 - b.getHeight() * 0.5 - b.getY());
+		g.fill(s);
+		g.dispose();
 		
 		return ret;
 	}
