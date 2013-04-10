@@ -1,5 +1,7 @@
 package jadex.simulation.evaluation.bikesharing;
 
+import jadex.simulation.evaluation.bikesharing.xml.EvaluatedBikeStationShort;
+import jadex.simulation.evaluation.bikesharing.xml.EvaluatedBikeStationShortList;
 import jadex.simulation.helper.Constants;
 
 import java.util.ArrayList;
@@ -266,7 +268,7 @@ public class BikeSharingEvaluation {
 				// create new Data Object that will contain the evaluated results
 				EvaluatedBikeStation station = new EvaluatedBikeStation(stationId);
 				EvaluatedBikeStationData simData = new EvaluatedBikeStationData();
-				simData.setSingleValues(stationPropertiesMap.get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST));				
+				simData.setSingleValues(stationPropertiesMap.get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST));
 				station.setSimulatedData(simData);
 				station.evalSimulatedData();
 
@@ -313,6 +315,7 @@ public class BikeSharingEvaluation {
 			evalStockLevelData.setRedLevelAbsolute(red);
 			evalStockLevelData.setGreenLevelAbsolute(green);
 			evalStockLevelData.computeRelativeValues();
+			evalStockLevelData.setTimeSliceKey(currentTimeSlice);
 
 			evaluatedStockLevel.setStockLevelData(currentTimeSlice, evalStockLevelData);
 		}
@@ -353,6 +356,15 @@ public class BikeSharingEvaluation {
 		return result.toString();
 	}
 
+	/**
+	 * Returns the same results as "stockLevelResultsToString", just as a ArrayList of EvalStockLevelData. Required for XML file storage of the results
+	 * 
+	 * @return
+	 */
+	public ArrayList<EvalStockLevelData> stockLevelResultsToList() {
+		return evaluatedStockLevel.resultsAsList();
+	}
+
 	public String bikestationResultsToString() {
 		StringBuffer result = new StringBuffer();
 
@@ -383,12 +395,51 @@ public class BikeSharingEvaluation {
 				} catch (Exception e) {
 					// Happens, if station is not found in Simulation Data AND Real Data. Then evaluation fails in "EvaluatedBikeStation.compareSimulationVsReality()" and corresponding String is
 					// empty!
-					System.out.println(timeSliceKey + ": " + objectInstancesKey + " - " + evalutedBikeStation.getStationId());
+					System.out.println("Exception@BikeSharingEvaluation.bikestationResultsToString()# Station not found in real data: " + objectInstancesKey);
 				}
 			}
 			result.append("\n########################################################################\n");
 		}
 
 		return result.toString();
+	}
+
+	/**
+	 * Return the result equivalent to the method "bikestationResultsToString()". Just formated differently to be stored as XML file.
+	 * 
+	 * @return
+	 */
+	public ArrayList<EvaluatedBikeStationShortList> bikestationResultsForXMLPersist() {
+		ArrayList<EvaluatedBikeStationShortList> res = new ArrayList<EvaluatedBikeStationShortList>();
+
+		// sort by time slice
+		SortedSet<Integer> timeSliceKeys = new TreeSet<Integer>(timeSlicesBikeStationMap.keySet());
+
+		// iterate through time slices
+		for (Integer timeSliceKey : timeSliceKeys) {
+			HashMap<String, EvaluatedBikeStation> timeSlicesMap = timeSlicesBikeStationMap.get(timeSliceKey);
+			EvaluatedBikeStationShortList timeSliceRes = new EvaluatedBikeStationShortList();
+			timeSliceRes.setTimeSliceKey(timeSliceKey);
+
+			// iterate through bikestations
+			for (Iterator<String> it2 = timeSlicesMap.keySet().iterator(); it2.hasNext();) {
+				String objectInstancesKey = it2.next();
+				EvaluatedBikeStation evalutedBikeStation = timeSlicesMap.get(objectInstancesKey);
+
+				// transform to new data structure
+				try {
+					timeSliceRes.getStationDataShort().add(
+							new EvaluatedBikeStationShort(evalutedBikeStation.getStationId(), evalutedBikeStation.getComparedData().getDevation(), evalutedBikeStation.getComparedData()
+									.getStandardDevation(), evalutedBikeStation.getSimulatedData().getMeanValue()));
+				} catch (Exception e) {
+					// Happens, if station is not found in Simulation Data AND Real Data. Then evaluation fails in "EvaluatedBikeStation.compareSimulationVsReality()" and corresponding String is
+					// empty!
+					System.out.println("##BikeShareEval.bikestationResultsForXMLPersist()# failed to create details for station. Station is probably missing in reald data: "
+							+ evalutedBikeStation.getStationId());
+				}
+			}
+			res.add(timeSliceRes);
+		}
+		return res;
 	}
 }

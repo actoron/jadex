@@ -2,6 +2,7 @@ package jadex.simulation.evaluation.bikesharing;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -42,5 +43,17 @@ public class EvalStockLevel {
 		
 		return result.toString();
 	}
-
+	
+	public ArrayList<EvalStockLevelData> resultsAsList(){
+		ArrayList<EvalStockLevelData> res = new ArrayList<EvalStockLevelData>();
+		
+		// Sort by Time Slice
+		SortedSet<Integer> timeSliceKeys = new TreeSet<Integer>(stockLevelByTimeSlice.keySet());
+		
+		for (Integer timeSliceKey : timeSliceKeys) {
+			
+			res.add(stockLevelByTimeSlice.get(timeSliceKey));						
+		}		
+		return res;
+	}
 }

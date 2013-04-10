@@ -101,4 +101,8 @@ public class EvaluatedBikeStation {
 
 		return result.toString();
 	}
+
+	public EvaluatedBikeStationData getComparedData() {
+		return comparedData;
+	}
 }
