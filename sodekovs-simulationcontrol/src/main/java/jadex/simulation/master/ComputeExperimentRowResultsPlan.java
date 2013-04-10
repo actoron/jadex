@@ -5,6 +5,8 @@ import jadex.bdi.runtime.Plan;
 import jadex.simulation.evaluation.EvaluateExperiment;
 import jadex.simulation.evaluation.EvaluateRow;
 import jadex.simulation.evaluation.bikesharing.BikeSharingEvaluation;
+import jadex.simulation.evaluation.bikesharing.EvalStockLevelData;
+import jadex.simulation.evaluation.bikesharing.xml.EvaluatedBikeStationShortList;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
@@ -25,6 +27,9 @@ import java.util.Iterator;
 
 import sodekovs.util.misc.XMLHandler;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+
 /**
  * Compute the results of one row of simulation experiments, e.g. experiments with the same setting but still different cause of non-determinism.
  * 
@@ -42,9 +47,9 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		int rowsDoTo = ((Integer) simulationFacts.get(Constants.ROWS_TO_DO)).intValue();
 		// IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
 		HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults").getFact();
-		
-		//New parameter exerimentDescription: Contains short description of the evaluation: settings etc.
-		String experimentDescription = simConf.getDescription() !=null ? simConf.getDescription() : "";
+
+		// New parameter exerimentDescription: Contains short description of the evaluation: settings etc.
+		String experimentDescription = simConf.getDescription() != null ? simConf.getDescription() : "";
 
 		// 1. Evaluate Rows and their Experiments
 		evaluate(rowResults);
@@ -281,16 +286,17 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 
 			BikeSharingEvaluation bikeSharEval = new BikeSharingEvaluation(((RowResult) rowResults.get(it.next())).getEvaluatedRowData());
 			bikeSharEval.compare();
-						
+
 			System.out.println("\n\n\nResults contain: \n1) Stock level eval. \n2)Single Bike Stations eval.");
 			System.out.println("\nExperiment Description: " + experimentDescription + "\n");
 			System.out.println(bikeSharEval.stockLevelResultsToString());
 			System.out.println(bikeSharEval.bikestationResultsToString());
 
-			// Persists result in file on disk
+			String id = getDateAsString();
+			// Persists result in file on disk as txt file
 			try {
 				// BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-" + "-" + String.valueOf(getClock().getTime()) + ".txt"));
-				BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-" + "-" + getDateAsString() + ".txt"));
+				BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-ALL" + "-" + id + ".txt"));
 
 				out.write("Results contain: \n1) Stock level eval. \n2)Single Bike Stations eval.");
 				out.write("\nExperiment Description: " + experimentDescription + "\n");
@@ -299,31 +305,37 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 
 				out.close();
 			} catch (IOException e) {
+				e.printStackTrace();
 			}
 
-			//Test. Serialize to XML
-//			bikesharingEvaltoXML(bikeSharEval);
-//			
-//
-//	        Map<String,String> map = new HashMap<String,String>();
-//	        map.put("name","chris");
-//	        map.put("island","faranga");
-//
-//	        XStream magicApi = new XStream();
-//	        magicApi.alias("root", Map.class);
-//	        magicApi.registerConverter(new MapEntryConverter());
-//
-//	        String xml = magicApi.toXML(map);
-//	        System.out.println("Result of tweaked XStream toXml()");
-//	        System.out.println(xml);
+			// Persists result in file on disk as XML file
+			// 1) The Stock Level Evaluation
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-StockLevel" + "-" + id + ".xml"));
+				XStream xstream = new XStream(new StaxDriver());
+				// add to arbitrary time slice experimentDescription
+				ArrayList<EvalStockLevelData> res = bikeSharEval.stockLevelResultsToList();
+				res.get(0).setExperimentDescription(experimentDescription);
+				out.write(xstream.toXML(res));
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			// 2) The Results for the single stations
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter("BikeShareEval-BikeStationResults" + "-" + id + ".xml"));
+				XStream xstream = new XStream(new StaxDriver());
+				// add to arbitrary time slice experimentDescription
+				ArrayList<EvaluatedBikeStationShortList> res = bikeSharEval.bikestationResultsForXMLPersist();
+				res.get(0).setExperimentDescription(experimentDescription);
+				out.write(xstream.toXML(res));
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
-	
-//	private void bikesharingEvaltoXML(BikeSharingEvaluation bikeSharEval){
-//		
-//	}
-	
-	
 
 	private String getDateAsString() {
 		Calendar cal = GregorianCalendar.getInstance();
