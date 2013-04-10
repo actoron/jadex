@@ -138,5 +138,10 @@
   			<artifactId>colt</artifactId>
   			<version>1.2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.xstream</groupId>
+			<artifactId>xstream14</artifactId>
+			<version>1.4.4</version>
+		</dependency>
 	</dependencies>	
 </project>
