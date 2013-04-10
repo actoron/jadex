@@ -154,15 +154,15 @@ public class BpmnEditor
 //						((String) key).toLowerCase().matches(".*\\.close?[(icon)(button].*"))
 //						System.out.println(key);
 //				}
-				LOGGER.setLevel(Level.FINEST);
-				try
-				{
-					ImageProvider.getInstance().loadCache(IMAGE_CACHE);
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
+//				LOGGER.setLevel(Level.FINEST);
+//				try
+//				{
+//					ImageProvider.getInstance().loadCache(IMAGE_CACHE);
+//				}
+//				catch (IOException e)
+//				{
+//					e.printStackTrace();
+//				}
 				new BpmnEditorWindow();
 			}
 		});

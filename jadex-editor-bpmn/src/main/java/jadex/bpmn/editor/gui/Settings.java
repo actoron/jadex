@@ -91,7 +91,11 @@ public class Settings
 			props.load(is);
 			is.close();
 			
-			ret.setLastFile(new File(props.getProperty("lastfile")));
+			String prop = props.getProperty("lastfile");
+			if (prop != null)
+			{
+				ret.setLastFile(new File(prop));
+			}
 		}
 		catch (IOException e)
 		{

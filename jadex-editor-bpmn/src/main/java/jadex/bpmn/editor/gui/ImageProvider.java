@@ -3,6 +3,7 @@ package jadex.bpmn.editor.gui;
 import jadex.bpmn.editor.gui.stylesheets.EventShape;
 import jadex.bpmn.editor.gui.stylesheets.GatewayShape;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
@@ -258,6 +259,11 @@ public class ImageProvider
 			g.drawImage(frame, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
 			g.dispose();
 			offimage = offimage.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
+			BufferedImage tmpimage = new BufferedImage(iconsize, iconsize, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			g = tmpimage.createGraphics();
+			g.setComposite(AlphaComposite.Src);
+			g.drawImage(offimage, 0, 0, iconsize, iconsize, null);
+			offimage = tmpimage;
 			
 			onimage = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			g = ((BufferedImage) onimage).createGraphics();
@@ -271,6 +277,11 @@ public class ImageProvider
 			g.drawImage(frame, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
 			g.dispose();
 			onimage = onimage.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
+			tmpimage = new BufferedImage(iconsize, iconsize, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			g = tmpimage.createGraphics();
+			g.setComposite(AlphaComposite.Src);
+			g.drawImage(onimage, 0, 0, iconsize, iconsize, null);
+			onimage = tmpimage;
 			
 			highimage = new BufferedImage(BASE_ICON_SIZE, BASE_ICON_SIZE, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			g = ((BufferedImage) highimage).createGraphics();
@@ -280,6 +291,11 @@ public class ImageProvider
 			g.drawImage(frame, 0, 0, BASE_ICON_SIZE, BASE_ICON_SIZE, null);
 			g.dispose();
 			highimage = highimage.getScaledInstance(iconsize, iconsize, Image.SCALE_AREA_AVERAGING);
+			tmpimage = new BufferedImage(iconsize, iconsize, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			g = tmpimage.createGraphics();
+			g.setComposite(AlphaComposite.Src);
+			g.drawImage(highimage, 0, 0, iconsize, iconsize, null);
+			highimage = tmpimage;
 			
 			imagecache.put(new Tuple3<String, Integer, String>("flat_off", iconsize, symbol), offimage);
 			imagecache.put(new Tuple3<String, Integer, String>("flat_on", iconsize, symbol), onimage);
@@ -435,6 +451,23 @@ public class ImageProvider
 	 */
 	public void saveCache(String filepath) throws IOException
 	{
+		Map<Object, Image> cache = imagecache;
+		Object[] keys = cache.keySet().toArray(new Object[cache.size()]);
+		for (Object key : keys)
+		{
+			if (key instanceof Tuple)
+			{
+				Tuple tuple = (Tuple) key;
+				for (int i = 0; i < tuple.getEntities().length; ++i)
+				{
+					if (tuple.getEntities()[i] instanceof Shape)
+					{
+						cache.remove(key);
+					}
+				}
+			}
+		}
+		
 		byte[] data = BinarySerializer.objectToByteArray(imagecache, ImageProvider.class.getClassLoader());
 		File tmpfile = File.createTempFile("imagecache", ".cfg");
 		FileOutputStream os = new FileOutputStream(tmpfile);

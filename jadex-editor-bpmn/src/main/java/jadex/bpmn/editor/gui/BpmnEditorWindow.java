@@ -57,13 +57,13 @@ public class BpmnEditorWindow extends JFrame
 		
 		getContentPane().setLayout(new BorderLayout());
 		
-		bpmntoolbar = new BpmnToolbar(GuiConstants.DEFAULT_ICON_SIZE);
-		getContentPane().add(bpmntoolbar, BorderLayout.PAGE_START);
-		
 		final JSplitPanel statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 		statuspane.setOneTouchExpandable(true);
 		statuspane.setBottomComponent(new StatusArea());
 		getContentPane().add(statuspane, BorderLayout.CENTER);
+		
+		bpmntoolbar = new BpmnToolbar(GuiConstants.DEFAULT_ICON_SIZE);
+		getContentPane().add(bpmntoolbar, BorderLayout.PAGE_START);
 		
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		
@@ -357,6 +357,15 @@ public class BpmnEditorWindow extends JFrame
 			{
 				e.printStackTrace();
 			}
+			
+//			try
+//			{
+//				ImageProvider.getInstance().saveCache(BpmnEditor.HOME_DIR + File.separator + "imagecache.dat");
+//			}
+//			catch (IOException e)
+//			{
+//				e.printStackTrace();
+//			}
 			
 			dispose();
 			System.exit(0);
