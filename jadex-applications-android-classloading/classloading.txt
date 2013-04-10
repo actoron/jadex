@@ -41,6 +41,6 @@ Nutzerservice "TimeService"
 
 http://stackoverflow.com/questions/10832029/custom-class-loader-for-android
 http://lsd.luminis.nl/osgi-on-google-android-using-apache-felix/
-
+https://groups.google.com/forum/?fromgroups=#!topic/android-developers/iwKmU-nWZxw
 
 

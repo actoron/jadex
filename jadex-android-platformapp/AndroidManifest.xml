@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="jadex.android.classloading"
+    package="jadex.android.platformapp"
     android:versionCode="2"
     android:versionName="2.3" >
 
@@ -14,20 +14,24 @@
         android:icon="@drawable/icon"
         android:label="classloading"
         android:screenOrientation="portrait" >
-        <uses-library android:name="jadex.android.classloading" android:required="false"/>
-        <activity android:name="jadex.android.classloading.MyApplication" >
+        <activity android:name=".JadexApplicationLoader" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="net.sourceforge.jadex.LOAD_APPLICATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
-<!--         <activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter" /> -->
+        <!-- <activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter" /> -->
 
-<!--         <service -->
-<!--             android:name="jadex.android.classloading.metaservice.JadexMetaService" -->
-<!--             android:label="JadexMetaService" > -->
-<!--         </service> -->
-        
+
+        <!-- <service -->
+        <!-- android:name="jadex.android.classloading.metaservice.JadexMetaService" -->
+        <!-- android:label="JadexMetaService" > -->
+        <!-- </service> -->
+
     </application>
 
 </manifest>

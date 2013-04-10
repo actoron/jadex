@@ -78,6 +78,13 @@ public class SystemActivity extends Activity
 //			startActivity(intent);
 		}
 	}
+	
+	@Override
+	public ClassLoader getClassLoader()
+	{
+		// TODO Auto-generated method stub
+		return super.getClassLoader();
+	}
 
 	private void copyDex()
 	{

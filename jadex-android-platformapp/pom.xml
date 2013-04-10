@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jadex-applications-android-classloading</artifactId>
+	<artifactId>jadex-android-platformapp</artifactId>
 	<packaging>apk</packaging>
-	<name>jadex-applications-android-classloading</name>
+	<name>jadex-android-platformapp</name>
 
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
@@ -23,13 +23,7 @@
 			<artifactId>jadex-android-classloading</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-			<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-platformapp</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
+
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -67,6 +61,12 @@
 			<artifactId>android</artifactId>
 			<version>2.2.1</version>
 			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>support-v4</artifactId>
+			<version>r7</version>
 		</dependency>
 
 	</dependencies>
