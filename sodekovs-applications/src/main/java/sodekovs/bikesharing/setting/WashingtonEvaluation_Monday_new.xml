@@ -16,7 +16,6 @@
                 <Station numberOfDocks="22" numberOfBikes="10" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="27" numberOfBikes="8" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="4" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="14" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="5" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="10th and Monroe St NE"/>
@@ -28,6 +27,7 @@
                 <Station numberOfDocks="19" numberOfBikes="10" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="7" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="12" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="11" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="4" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="6" stationID="Jefferson Dr and 14th St SW"/>
@@ -152,9 +152,9 @@
                 <Station numberOfDocks="22" numberOfBikes="9" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="15" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="14" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="9" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -169,7 +169,7 @@
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="6" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="7" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="10" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Key Blvd and N Quinn St"/>
@@ -209,7 +209,6 @@
                 <Station numberOfDocks="22" numberOfBikes="14" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="9" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="3" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="15" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="5" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -221,6 +220,7 @@
                 <Station numberOfDocks="19" numberOfBikes="9" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="7" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="9" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="12" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="4" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="5" stationID="Jefferson Dr and 14th St SW"/>
@@ -345,9 +345,9 @@
                 <Station numberOfDocks="22" numberOfBikes="9" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="18" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="15" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="10" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -362,7 +362,7 @@
                 <Station numberOfDocks="15" numberOfBikes="2" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="6" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="8" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="12" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Key Blvd and N Quinn St"/>
@@ -402,7 +402,6 @@
                 <Station numberOfDocks="22" numberOfBikes="16" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="11" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="4" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="16" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="5" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -414,6 +413,7 @@
                 <Station numberOfDocks="19" numberOfBikes="8" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="8" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="6" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="12" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="4" stationID="Jefferson Dr and 14th St SW"/>
@@ -538,9 +538,9 @@
                 <Station numberOfDocks="22" numberOfBikes="9" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="19" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="16" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="12" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -555,7 +555,7 @@
                 <Station numberOfDocks="15" numberOfBikes="1" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="8" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="12" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Key Blvd and N Quinn St"/>
@@ -595,7 +595,6 @@
                 <Station numberOfDocks="22" numberOfBikes="16" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="13" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="4" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="17" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="4" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -607,6 +606,7 @@
                 <Station numberOfDocks="19" numberOfBikes="8" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="8" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="4" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="12" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="4" stationID="Jefferson Dr and 14th St SW"/>
@@ -731,9 +731,9 @@
                 <Station numberOfDocks="22" numberOfBikes="8" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="2" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="21" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="17" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="13" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -748,7 +748,7 @@
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="13" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Key Blvd and N Quinn St"/>
@@ -788,7 +788,6 @@
                 <Station numberOfDocks="22" numberOfBikes="16" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="17" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="4" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="18" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="6" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -800,6 +799,7 @@
                 <Station numberOfDocks="19" numberOfBikes="7" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="4" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="12" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="5" stationID="Jefferson Dr and 14th St SW"/>
@@ -924,9 +924,9 @@
                 <Station numberOfDocks="22" numberOfBikes="6" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="2" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="21" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="18" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -941,7 +941,7 @@
                 <Station numberOfDocks="15" numberOfBikes="12" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Key Blvd and N Quinn St"/>
@@ -981,7 +981,6 @@
                 <Station numberOfDocks="22" numberOfBikes="16" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="20" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="3" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="18" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="7" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -993,6 +992,7 @@
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="3" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="12" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="6" stationID="Jefferson Dr and 14th St SW"/>
@@ -1117,9 +1117,9 @@
                 <Station numberOfDocks="22" numberOfBikes="6" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="2" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="21" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="18" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -1134,7 +1134,7 @@
                 <Station numberOfDocks="15" numberOfBikes="12" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Key Blvd and N Quinn St"/>
@@ -1174,7 +1174,6 @@
                 <Station numberOfDocks="22" numberOfBikes="17" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="21" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="3" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="19" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="9" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -1186,6 +1185,7 @@
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="2" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="13" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="7" stationID="Jefferson Dr and 14th St SW"/>
@@ -1310,9 +1310,9 @@
                 <Station numberOfDocks="22" numberOfBikes="7" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="2" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="21" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="19" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -1327,7 +1327,7 @@
                 <Station numberOfDocks="15" numberOfBikes="12" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="Key Blvd and N Quinn St"/>
@@ -1367,7 +1367,6 @@
                 <Station numberOfDocks="22" numberOfBikes="17" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="21" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="3" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="19" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="9" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="8" stationID="10th and Monroe St NE"/>
@@ -1379,6 +1378,7 @@
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="3" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="13" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="7" stationID="Jefferson Dr and 14th St SW"/>
@@ -1503,9 +1503,9 @@
                 <Station numberOfDocks="22" numberOfBikes="7" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="22" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="19" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -1520,7 +1520,7 @@
                 <Station numberOfDocks="15" numberOfBikes="12" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="Key Blvd and N Quinn St"/>
@@ -1560,7 +1560,6 @@
                 <Station numberOfDocks="22" numberOfBikes="17" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="21" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="3" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="19" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="9" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="8" stationID="10th and Monroe St NE"/>
@@ -1572,6 +1571,7 @@
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="3" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="13" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="7" stationID="Jefferson Dr and 14th St SW"/>
@@ -1696,9 +1696,9 @@
                 <Station numberOfDocks="22" numberOfBikes="7" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="22" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="19" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -1713,7 +1713,7 @@
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="Key Blvd and N Quinn St"/>
@@ -1753,7 +1753,6 @@
                 <Station numberOfDocks="22" numberOfBikes="17" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="21" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="3" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="19" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="9" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -1765,6 +1764,7 @@
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="3" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="13" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="7" stationID="Jefferson Dr and 14th St SW"/>
@@ -1889,9 +1889,9 @@
                 <Station numberOfDocks="22" numberOfBikes="7" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="22" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="19" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -1906,7 +1906,7 @@
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="Key Blvd and N Quinn St"/>
@@ -1946,7 +1946,6 @@
                 <Station numberOfDocks="22" numberOfBikes="17" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="21" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="3" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="18" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -1958,6 +1957,7 @@
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="3" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="13" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="7" stationID="Jefferson Dr and 14th St SW"/>
@@ -2082,9 +2082,9 @@
                 <Station numberOfDocks="22" numberOfBikes="7" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="25" numberOfBikes="21" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="18" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -2099,7 +2099,7 @@
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="Key Blvd and N Quinn St"/>
@@ -2139,7 +2139,6 @@
                 <Station numberOfDocks="21" numberOfBikes="17" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="20" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="3" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="21" numberOfBikes="17" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="16" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -2151,6 +2150,7 @@
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="3" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="12" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="7" stationID="Jefferson Dr and 14th St SW"/>
@@ -2275,9 +2275,9 @@
                 <Station numberOfDocks="22" numberOfBikes="7" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="21" stationID="13th and D St NE"/>
+                <Station numberOfDocks="21" numberOfBikes="17" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -2292,7 +2292,7 @@
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="Key Blvd and N Quinn St"/>
@@ -2332,7 +2332,6 @@
                 <Station numberOfDocks="21" numberOfBikes="16" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="19" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="3" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="16" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="16" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="10th and Monroe St NE"/>
@@ -2344,6 +2343,7 @@
                 <Station numberOfDocks="19" numberOfBikes="7" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="3" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="6" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="19" numberOfBikes="11" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="4" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="7" stationID="Jefferson Dr and 14th St SW"/>
@@ -2468,9 +2468,9 @@
                 <Station numberOfDocks="22" numberOfBikes="8" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="19" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="16" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="14" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="6" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -2485,7 +2485,7 @@
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="13" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="Key Blvd and N Quinn St"/>
@@ -2525,7 +2525,6 @@
                 <Station numberOfDocks="21" numberOfBikes="13" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="16" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="5" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="9" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="16" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="10th and Monroe St NE"/>
@@ -2537,6 +2536,7 @@
                 <Station numberOfDocks="19" numberOfBikes="10" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="5" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="6" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="9" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="6" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="6" stationID="Jefferson Dr and 14th St SW"/>
@@ -2661,9 +2661,9 @@
                 <Station numberOfDocks="22" numberOfBikes="10" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="6" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="14" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="9" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="12" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="6" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -2678,7 +2678,7 @@
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="11" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Key Blvd and N Quinn St"/>
@@ -2718,7 +2718,6 @@
                 <Station numberOfDocks="21" numberOfBikes="7" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="7" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="8" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="4" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="16" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="10th and Monroe St NE"/>
@@ -2731,6 +2730,7 @@
                 <Station numberOfDocks="15" numberOfBikes="2" stationID="1st St and Rhode Island Ave NW"/>
                 <Station numberOfDocks="15" numberOfBikes="6" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="12" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="6" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="4" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="9" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="7" stationID="Jefferson Dr and 14th St SW"/>
@@ -2855,9 +2855,9 @@
                 <Station numberOfDocks="22" numberOfBikes="14" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="7" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="4" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="7" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="6" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -2872,7 +2872,7 @@
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="6" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="8" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Key Blvd and N Quinn St"/>
@@ -2912,7 +2912,6 @@
                 <Station numberOfDocks="21" numberOfBikes="3" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="3" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="13" numberOfBikes="11" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="3" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="16" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="3" stationID="10th and Monroe St NE"/>
@@ -2925,6 +2924,7 @@
                 <Station numberOfDocks="15" numberOfBikes="2" stationID="1st St and Rhode Island Ave NW"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="21" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="19" numberOfBikes="2" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="9" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="9" stationID="Jefferson Dr and 14th St SW"/>
@@ -3049,9 +3049,9 @@
                 <Station numberOfDocks="22" numberOfBikes="12" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="13" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="4" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="3" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="2" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="6" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -3066,7 +3066,7 @@
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="8" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="3" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Key Blvd and N Quinn St"/>
@@ -3106,7 +3106,6 @@
                 <Station numberOfDocks="21" numberOfBikes="4" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="4" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="13" numberOfBikes="9" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="4" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="16" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="3" stationID="10th and Monroe St NE"/>
@@ -3119,6 +3118,7 @@
                 <Station numberOfDocks="15" numberOfBikes="0" stationID="1st St and Rhode Island Ave NW"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="23" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="20" numberOfBikes="2" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="7" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="8" stationID="Jefferson Dr and 14th St SW"/>
@@ -3242,9 +3242,9 @@
                 <Station numberOfDocks="23" numberOfBikes="12" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="5" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="4" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="4" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -3259,7 +3259,7 @@
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="3" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Key Blvd and N Quinn St"/>
@@ -3300,7 +3300,6 @@
                 <Station numberOfDocks="21" numberOfBikes="3" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="3" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="13" numberOfBikes="10" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="4" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="16" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="3" stationID="10th and Monroe St NE"/>
@@ -3313,6 +3312,7 @@
                 <Station numberOfDocks="15" numberOfBikes="0" stationID="1st St and Rhode Island Ave NW"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="24" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="4" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="19" numberOfBikes="2" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="9" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="9" stationID="Jefferson Dr and 14th St SW"/>
@@ -3437,9 +3437,9 @@
                 <Station numberOfDocks="22" numberOfBikes="12" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="12" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="5" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="4" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="4" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="4" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -3454,7 +3454,7 @@
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="6" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="2" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="3" stationID="Key Blvd and N Quinn St"/>
@@ -3494,7 +3494,6 @@
                 <Station numberOfDocks="21" numberOfBikes="4" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="4" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="13" numberOfBikes="8" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="5" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="10th and Monroe St NE"/>
@@ -3506,6 +3505,7 @@
                 <Station numberOfDocks="19" numberOfBikes="8" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="22" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="19" numberOfBikes="4" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="7" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="12" stationID="Jefferson Dr and 14th St SW"/>
@@ -3631,9 +3631,9 @@
                 <Station numberOfDocks="23" numberOfBikes="12" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="5" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="5" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="4" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -3648,7 +3648,7 @@
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="8" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="8" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="4" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Key Blvd and N Quinn St"/>
@@ -3688,7 +3688,6 @@
                 <Station numberOfDocks="21" numberOfBikes="4" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="3" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="8" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="5" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="16" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="10th and Monroe St NE"/>
@@ -3700,6 +3699,7 @@
                 <Station numberOfDocks="19" numberOfBikes="8" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="23" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="19" numberOfBikes="3" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="7" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="10" stationID="Jefferson Dr and 14th St SW"/>
@@ -3824,9 +3824,9 @@
                 <Station numberOfDocks="23" numberOfBikes="13" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="11" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="5" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="5" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="4" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="20th and Bell St"/>
@@ -3842,7 +3842,7 @@
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="4" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Key Blvd and N Quinn St"/>
@@ -3883,7 +3883,6 @@
                 <Station numberOfDocks="22" numberOfBikes="5" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="5" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="8" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="6" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="10th and Monroe St NE"/>
@@ -3895,6 +3894,7 @@
                 <Station numberOfDocks="19" numberOfBikes="8" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="22" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="8" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="11" stationID="Jefferson Dr and 14th St SW"/>
@@ -4019,9 +4019,9 @@
                 <Station numberOfDocks="23" numberOfBikes="12" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="6" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="6" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="5" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="20th and Bell St"/>
@@ -4036,7 +4036,7 @@
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="6" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="5" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Key Blvd and N Quinn St"/>
@@ -4076,7 +4076,6 @@
                 <Station numberOfDocks="21" numberOfBikes="5" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="25" numberOfBikes="5" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="8" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="6" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="10th and Monroe St NE"/>
@@ -4088,6 +4087,7 @@
                 <Station numberOfDocks="19" numberOfBikes="8" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="22" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="19" numberOfBikes="5" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="8" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="12" stationID="Jefferson Dr and 14th St SW"/>
@@ -4213,9 +4213,9 @@
                 <Station numberOfDocks="23" numberOfBikes="11" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="10" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="5" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="6" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="5" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="20th and Bell St"/>
@@ -4230,7 +4230,7 @@
                 <Station numberOfDocks="15" numberOfBikes="3" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="4" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Key Blvd and N Quinn St"/>
@@ -4270,7 +4270,6 @@
                 <Station numberOfDocks="22" numberOfBikes="5" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="7" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="14" numberOfBikes="6" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="10" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="7" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="10th and Monroe St NE"/>
@@ -4282,6 +4281,7 @@
                 <Station numberOfDocks="19" numberOfBikes="11" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="16" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="6" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="19" numberOfBikes="9" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="3" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="7" stationID="Jefferson Dr and 14th St SW"/>
@@ -4406,9 +4406,9 @@
                 <Station numberOfDocks="23" numberOfBikes="12" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="7" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="9" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="10" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="7" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="3" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="6" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="20th and Bell St"/>
@@ -4423,7 +4423,7 @@
                 <Station numberOfDocks="15" numberOfBikes="1" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="4" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="6" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="7" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Key Blvd and N Quinn St"/>
@@ -4463,7 +4463,6 @@
                 <Station numberOfDocks="22" numberOfBikes="4" stationID="11th and Kenyon St NW"/>
                 <Station numberOfDocks="26" numberOfBikes="5" stationID="16th and Harvard St NW"/>
                 <Station numberOfDocks="13" numberOfBikes="8" stationID="McPherson Square - 14th and H St NW"/>
-                <Station numberOfDocks="20" numberOfBikes="7" stationID="Lincoln Park / 13th and East Capitol St NE "/>
                 <Station numberOfDocks="17" numberOfBikes="8" stationID="Clarendon Metro / Wilson Blvd and N Highland St"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Branch and Pennsylvania Ave SE"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="10th and Monroe St NE"/>
@@ -4475,6 +4474,7 @@
                 <Station numberOfDocks="19" numberOfBikes="9" stationID="18th and Bell St"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Eastern Market / 7th and North Carolina Ave SE"/>
                 <Station numberOfDocks="29" numberOfBikes="20" stationID="Metro Center / 12th and G St NW"/>
+                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N"/>
                 <Station numberOfDocks="19" numberOfBikes="7" stationID="14th and Rhode Island Ave NW"/>
                 <Station numberOfDocks="12" numberOfBikes="7" stationID="US Dept of State / Virginia Ave and 21st St NW"/>
                 <Station numberOfDocks="23" numberOfBikes="11" stationID="Jefferson Dr and 14th St SW"/>
@@ -4599,9 +4599,9 @@
                 <Station numberOfDocks="23" numberOfBikes="12" stationID="Massachusetts Ave and Dupont Circle NW"/>
                 <Station numberOfDocks="15" numberOfBikes="9" stationID="17th and K St NW [formerly 17th and L St NW]"/>
                 <Station numberOfDocks="24" numberOfBikes="7" stationID="13th and D St NE"/>
+                <Station numberOfDocks="20" numberOfBikes="7" stationID="Lincoln Park / 13th and East Capitol St NE"/>
                 <Station numberOfDocks="19" numberOfBikes="5" stationID="California St and Florida Ave NW"/>
                 <Station numberOfDocks="11" numberOfBikes="3" stationID="34th St and Wisconsin Ave NW"/>
-                <Station numberOfDocks="11" numberOfBikes="5" stationID="Utah St and 11th St N "/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Anacostia Metro"/>
                 <Station numberOfDocks="11" numberOfBikes="5" stationID="Randle Circle and Minnesota Ave NE"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="20th and Bell St"/>
@@ -4616,7 +4616,7 @@
                 <Station numberOfDocks="15" numberOfBikes="2" stationID="Idaho Ave and Newark St NW [on 2nd District patio]"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="Wisconsin Ave and Macomb St NW"/>
                 <Station numberOfDocks="15" numberOfBikes="5" stationID="20th St and Florida Ave NW"/>
-                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace "/>
+                <Station numberOfDocks="16" numberOfBikes="9" stationID="Anacostia Ave and Benning Rd NE / River Terrace"/>
                 <Station numberOfDocks="15" numberOfBikes="6" stationID="Harvard St and Adams Mill Rd NW"/>
                 <Station numberOfDocks="19" numberOfBikes="6" stationID="5th St and K St NW"/>
                 <Station numberOfDocks="11" numberOfBikes="4" stationID="Key Blvd and N Quinn St"/>

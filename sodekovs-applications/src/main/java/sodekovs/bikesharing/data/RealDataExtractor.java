@@ -554,7 +554,7 @@ public class RealDataExtractor {
 			Map<String, List<Object[]>> stationData = new HashMap<String, List<Object[]>>();
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
-				String stationId = rs.getString("name");
+				String stationId = rs.getString("name").trim();
 				int nbBikes = rs.getInt("nbBikes");
 				int nbEmptyDocks = rs.getInt("nbEmptyDocks");
 				Date date = rs.getDate("date");
@@ -792,7 +792,7 @@ public class RealDataExtractor {
 			ResultSet rs = stmt.executeQuery();
 			Map<Integer, List<StationTimeData>> dataByHour = new HashMap<Integer, List<StationTimeData>>();
 			while (rs.next()) {
-				String stationId = rs.getString("name");
+				String stationId = rs.getString("name").trim();
 				int nbBikes = rs.getInt("nbBikes");
 				int nbEmptyDocks = rs.getInt("nbEmptyDocks");
 				Date date = rs.getDate("date");
