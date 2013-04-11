@@ -368,6 +368,8 @@ public class BikeSharingEvaluation {
 
 	public String bikestationResultsToString() {
 		StringBuffer result = new StringBuffer();
+		// Contains the ids of the stations that could not be evaluated because of some error.
+		ArrayList<String> faultStations = new ArrayList<String>();
 
 		result.append("Results of the evalation of the single bikestations :\n");
 		result.append("\n The evaluation is separated by time slice.\n");
@@ -396,10 +398,29 @@ public class BikeSharingEvaluation {
 				} catch (Exception e) {
 					// Happens, if station is not found in Simulation Data AND Real Data. Then evaluation fails in "EvaluatedBikeStation.compareSimulationVsReality()" and corresponding String is
 					// empty!
-					System.out.println("Exception@BikeSharingEvaluation.bikestationResultsToString()# Station not found in real data: " + objectInstancesKey);
+//					System.out.println("Exception@BikeSharingEvaluation.bikestationResultsToString()# Station not found in real data: " + objectInstancesKey);
+					boolean containsStationAlready = false;
+					for (String stationID : faultStations) {
+						if (stationID.equals(evalutedBikeStation.getStationId())) {
+							containsStationAlready = true;
+							break;
+						}
+					}
+					if (!containsStationAlready) {
+						faultStations.add(evalutedBikeStation.getStationId());
+					}
 				}
 			}
 			result.append("\n########################################################################\n");
+		}
+
+		if (faultStations.size() > 0) {
+			StringBuffer buf = new StringBuffer();
+			buf.append("Exception@BikeSharingEvaluation.bikestationResultsToString()# Station not found in real data: \n");
+			for (String station : faultStations) {
+				buf.append(station + "\n");
+			}
+			System.out.println(buf.toString());
 		}
 
 		return result.toString();
@@ -412,6 +433,8 @@ public class BikeSharingEvaluation {
 	 */
 	public ArrayList<EvaluatedBikeStationShortList> bikestationResultsForXMLPersist() {
 		ArrayList<EvaluatedBikeStationShortList> res = new ArrayList<EvaluatedBikeStationShortList>();
+		// Contains the ids of the stations that could not be evaluated because of some error.
+		ArrayList<String> faultStations = new ArrayList<String>();
 
 		// sort by time slice
 		SortedSet<Integer> timeSliceKeys = new TreeSet<Integer>(timeSlicesBikeStationMap.keySet());
@@ -431,15 +454,31 @@ public class BikeSharingEvaluation {
 				try {
 					timeSliceRes.getStationDataShort().add(
 							new EvaluatedBikeStationShort(evalutedBikeStation.getStationId(), evalutedBikeStation.getComparedData().getDevation(), evalutedBikeStation.getComparedData()
-									.getStandardDevation(), evalutedBikeStation.getSimulatedData().getMeanValue()));
+									.getStandardDevation(), evalutedBikeStation.getSimulatedData().getMeanValue(),evalutedBikeStation.getRealData().getMeanValue()));
 				} catch (Exception e) {
 					// Happens, if station is not found in Simulation Data AND Real Data. Then evaluation fails in "EvaluatedBikeStation.compareSimulationVsReality()" and corresponding String is
 					// empty!
-					System.out.println("##BikeShareEval.bikestationResultsForXMLPersist()# failed to create details for station. Station is probably missing in reald data: "
-							+ evalutedBikeStation.getStationId());
+					boolean containsStationAlready = false;
+					for (String stationID : faultStations) {
+						if (stationID.equals(evalutedBikeStation.getStationId())) {
+							containsStationAlready = true;
+							break;
+						}
+					}
+					if (!containsStationAlready) {
+						faultStations.add(evalutedBikeStation.getStationId());
+					}
 				}
 			}
 			res.add(timeSliceRes);
+		}
+		if (faultStations.size() > 0) {
+			StringBuffer buf = new StringBuffer();
+			buf.append("##BikeShareEval.bikestationResultsForXMLPersist()# failed to create details  for following stations. Station is probably missing in reald data: \n");
+			for (String station : faultStations) {
+				buf.append(station + "\n");
+			}
+			System.out.println(buf.toString());
 		}
 		return res;
 	}
