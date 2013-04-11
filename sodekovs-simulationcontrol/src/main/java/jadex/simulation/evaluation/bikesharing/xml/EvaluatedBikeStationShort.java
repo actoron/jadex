@@ -13,12 +13,14 @@ public class EvaluatedBikeStationShort {
 	private double realDataVsSimulated_Deviation;
 	private double realDataVsSimulated_StandardDeviation;
 	private double simulatedData_MeanValue;
+	private double realData_MeanValue;
 		
 
-	public EvaluatedBikeStationShort(String stationId, double realDataVsSimulated_Deviation, double realDataVsSimulated_StandardDeviation, double simulatedData_MeanValue) {
+	public EvaluatedBikeStationShort(String stationId, double realDataVsSimulated_Deviation, double realDataVsSimulated_StandardDeviation, double simulatedData_MeanValue,  double realData_MeanValue) {
 		this.stationId = stationId;
 		this.realDataVsSimulated_Deviation = realDataVsSimulated_Deviation;
 		this.realDataVsSimulated_StandardDeviation = realDataVsSimulated_StandardDeviation;
 		this.simulatedData_MeanValue = simulatedData_MeanValue;
+		this.realData_MeanValue = realData_MeanValue;
 	}
 }
