@@ -1,6 +1,7 @@
 package jadex.android.platformapp;
 
 import jadex.android.classloading.JadexApplication;
+import jadex.android.standalone.clientapp.JadexClientAppFragment;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -9,25 +10,22 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 
-import dalvik.system.DexClassLoader;
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.Toast;
+import dalvik.system.DexClassLoader;
 
 public class JadexApplicationLoader extends FragmentActivity
 {
 	public String entryActivityName;
 
-	public JadexUserFragment adapter;
-	
 	public JadexApplicationLoader()
 	{
 		entryActivityName = "jadex.android.platformapp.DefaultApplication";
@@ -37,8 +35,9 @@ public class JadexApplicationLoader extends FragmentActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.loaderlayout);
 		Intent intent = getIntent();
+		FragmentManager manager = getSupportFragmentManager();
+		FragmentTransaction ta = manager.beginTransaction();
 		if (intent.getAction().equals(JadexApplication.INTENT_ACTION_LOADAPP)) {
 			String appPath = intent.getStringExtra(JadexApplication.EXTRA_KEY_APPLICATIONPATH);
 			String className = intent.getStringExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
@@ -48,11 +47,9 @@ public class JadexApplicationLoader extends FragmentActivity
 			}
 			
 			if (appPath != null) {
-				JadexUserFragment act = loadAndCreateUserActivity(appPath, className);
-				FragmentManager manager = getSupportFragmentManager();
-				FragmentTransaction ta = manager.beginTransaction();
+				JadexClientAppFragment act = loadAndCreateUserActivity(appPath, className);
+				act.onPrepare(this);
 				ta.add(R.id.fragmentContainer, act);
-				ta.commit();
 //				setActivity(act);
 				
 			}
@@ -61,6 +58,8 @@ public class JadexApplicationLoader extends FragmentActivity
 			Toast.makeText(this, "Please start this application with action net.sourceforge.jadex.LOAD_APPLICATION", Toast.LENGTH_LONG)
 					.show();
 		}
+		setContentView(R.layout.loaderlayout);
+		ta.commit();
 	}
 	
 	@Override
@@ -75,15 +74,15 @@ public class JadexApplicationLoader extends FragmentActivity
 		super.onDestroy();
 	}
 
-	private JadexUserFragment loadAndCreateUserActivity(String appPath, String className)
+	private JadexClientAppFragment loadAndCreateUserActivity(String appPath, String className)
 	{
 		DexClassLoader cl = getClassLoaderForExternalDex(getClassLoader(), appPath);
 		try
 		{
-			Class<JadexUserFragment> actClass = (Class<JadexUserFragment>) cl.loadClass(className);
+			Class<JadexClientAppFragment> actClass = (Class<JadexClientAppFragment>) cl.loadClass(className);
 			
-			Constructor<JadexUserFragment> actCon = actClass.getConstructor(null);
-			JadexUserFragment act = actClass.newInstance();
+			Constructor<JadexClientAppFragment> actCon = actClass.getConstructor(null);
+			JadexClientAppFragment act = actClass.newInstance();
 			return act;
 		}
 		catch (ClassNotFoundException e)

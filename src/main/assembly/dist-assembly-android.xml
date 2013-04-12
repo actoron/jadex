@@ -17,6 +17,7 @@
 			<excludes>
 				<exclude>net.sourceforge.jadex:jadex-applications-android-demos</exclude>
 				<exclude>net.sourceforge.jadex:jadex-applications-android-chat</exclude>
+				<exclude>net.sourceforge.jadex:jadex-android-platformapp</exclude>
 				<exclude>net.sourceforge.jadex:jadex-android-example-project-maven</exclude>
 				<exclude>net.sourceforge.jadex:jadex-android-integration-test</exclude>
 			</excludes>
@@ -51,6 +52,7 @@
 			<includes>
 				<include>net.sourceforge.jadex:jadex-applications-android-demos</include>
 				<include>net.sourceforge.jadex:jadex-applications-android-chat</include>
+				<include>net.sourceforge.jadex:jadex-android-platformapp</include>
 			</includes>
 			<binaries>
 				<includes>

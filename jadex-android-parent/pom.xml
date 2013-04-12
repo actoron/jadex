@@ -16,6 +16,7 @@
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
 		<android-maven-plugin-version>3.4.1</android-maven-plugin-version>
 		<android-api-version>2.2.1</android-api-version>
+		<android-support-version>r7</android-support-version>
 		<munge-default-excludes>**/.svn/,**/ui/,**/gui/</munge-default-excludes>
 		<munge-default-includes>**/*.java,**/*.xml,**/*.bpmn,**/*.gpmn</munge-default-includes>
 		<munge-generated-sources-dir>src/gen/java</munge-generated-sources-dir>
@@ -89,6 +90,11 @@
 				<groupId>com.google.android</groupId>
 				<artifactId>android-test</artifactId>
 				<version>${android-api-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.android</groupId>
+				<artifactId>support-v4</artifactId>
+				<version>${android-support-version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

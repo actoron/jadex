@@ -167,6 +167,7 @@
 				<module>jadex-android-commons</module>
 				<module>jadex-android-antlr</module>	
 				<module>jadex-android-xmlpull</module>
+				<module>jadex-android-classloading</module>
 				<module>jadex-runtimetools-android</module>
 				<module>jadex-platform-extension-webservice-android</module>
 				<!-- Additional Jadex modules to include in dist -->
@@ -190,6 +191,7 @@
 
 				<module>jadex-applications-android-demos</module>
 				<module>jadex-applications-android-chat</module>
+				<module>jadex-android-platformapp</module>
 			</modules>
 		</profile>
 		

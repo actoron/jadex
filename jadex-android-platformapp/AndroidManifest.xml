@@ -27,10 +27,7 @@
         <!-- <activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter" /> -->
 
 
-        <!-- <service -->
-        <!-- android:name="jadex.android.classloading.metaservice.JadexMetaService" -->
-        <!-- android:label="JadexMetaService" > -->
-        <!-- </service> -->
+        <service android:name="jadex.android.service.JadexPlatformService" android:label="JadexPlatformService"></service>
 
     </application>
 

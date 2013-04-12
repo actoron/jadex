@@ -24,6 +24,10 @@
 			<artifactId>jadex-bridge</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>support-v4</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -44,5 +48,5 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 </project>
