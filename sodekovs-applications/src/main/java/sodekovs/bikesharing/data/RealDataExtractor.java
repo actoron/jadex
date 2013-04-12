@@ -45,11 +45,11 @@ public class RealDataExtractor {
 	/*
 	 * The exlucded station ids
 	 */
-	public static final String[] EXCLUDE_STATIONS = { "Lincoln Park / 13th and East Capitol St NE", "Crystal City Metro / 18th and Bell St", "Braddock Rd Metro",
-			"Anacostia Ave and Benning Rd NE / River Terrace", "Utah St and 11th St N", "Lincoln Memorial", "Alta Warehouse Station", "1st and N St  SE", "Henry St and Pendleton St",
-			"Potomac Ave and 35th St S", "Arlington Blvd and N Queen St", "Alta Bicycle Share Demonstration Station", "Alta Bicycle Share Warehouse", "Commerce St and Fayette St",
-			"Prince St and Union St", "King St and Patrick St", "White House [17th and State Pl NW]", "Pentagon City Metro / 12th and Hayes St", "Barton St and 10th St N",
-			"Market Square / King St and Royal St", "Saint Asaph St and Pendleton  St", "King St Metro" };
+	public static final String[] EXCLUDE_STATIONS = { "Lincoln Park / 13th and East Capitol St NE", "Crystal City Metro / 18th & Bell St", "Braddock Rd Metro",
+			"Anacostia Ave and Benning Rd NE / River Terrace", "Utah St and 11th St N", "Lincoln Memorial", "Alta Warehouse Station", "1st & N St  SE", "Henry St & Pendleton St",
+			"Potomac Ave & 35th St S", "Arlington Blvd & N Queen St", "Alta Bicycle Share Demonstration Station", "Alta Bicycle Share Warehouse", "Commerce St & Fayette St", "Prince St & Union St",
+			"King St & Patrick St", "White House [17th & State Pl NW]", "Pentagon City Metro / 12th & Hayes St", "Barton St & 10th St N", "Market Square / King St & Royal St",
+			"Saint Asaph St & Pendleton  St", "King St Metro", "Lincoln Park / 13th & East Capitol St NE", "Anacostia Ave & Benning Rd NE / River Terrace", "Utah St & 11th St N" };
 
 	/*
 	 * The weekdays
@@ -147,7 +147,7 @@ public class RealDataExtractor {
 
 				try {
 					System.out.println("Writing XML File for Simulation.");
-					String xmlFile = "WashingtonSimulation_Monday.xml";
+					String xmlFile = "WashingtonSimulation_Monday_new.xml";
 					XmlUtil.saveAsXML(sd, xmlFile);
 					System.out.println(xmlFile + " written.");
 
@@ -158,7 +158,7 @@ public class RealDataExtractor {
 					System.out.println("RunTotal: " + runTotal);
 
 					System.out.println("Writing XML File for Evaluation");
-					String xmlEvalFile = "WashingtonEvaluation_Monday.xml";
+					String xmlEvalFile = "WashingtonEvaluation_Monday_new.xml";
 					XmlUtil.saveAsXML(evalSd, xmlEvalFile);
 					System.out.println(xmlEvalFile + " written.");
 				} catch (FileNotFoundException e) {
@@ -325,12 +325,11 @@ public class RealDataExtractor {
 				String endStation = rs.getString("endStation").trim();
 				int weekday = rs.getInt("weekday");
 
-				if (!excludedStations.contains(startStation) && !excludedStations.contains(endStation)) {
+				if (excludedStations.contains(startStation) || excludedStations.contains(endStation)) {
+					ignored++;
+				} else {
 					Rental rental = new Rental(bikeId, start, end, startStation, endStation, weekday, link, city);
 					rentals.add(rental);
-				} else {
-//					System.out.println("Ignoring rental because " + startStation + " or " + endStation + " is in list of excluded stations");
-					ignored++;
 				}
 			}
 			System.out.println("Ignored " + ignored + " excluded stations.");
