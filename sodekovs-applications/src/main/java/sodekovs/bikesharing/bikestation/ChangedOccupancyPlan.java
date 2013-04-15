@@ -23,7 +23,7 @@ public class ChangedOccupancyPlan extends Plan {
 	@Override
 	public void body() {
 		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
-		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("decentralized_polling_request");
+		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("tuple_information");
 		if (coordSpace != null && mechanism != null) {
 			Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
 			Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
