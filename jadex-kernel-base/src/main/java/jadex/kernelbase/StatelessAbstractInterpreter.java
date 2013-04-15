@@ -1091,7 +1091,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					// TODO Auto-generated method stub
 					super.exceptionOccurred(exception);
 				}
 			}));
@@ -2055,7 +2054,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Get the current state as events.
 	 */
-	public IMonitoringEvent[] getCurrentStateEvents()
+	public List<IMonitoringEvent> getCurrentStateEvents()
 	{
 		return null;
 	}

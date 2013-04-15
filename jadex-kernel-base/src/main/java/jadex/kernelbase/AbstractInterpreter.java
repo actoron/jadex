@@ -26,6 +26,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -558,10 +559,10 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		
 		if(initial)
 		{
-			IMonitoringEvent[] evs = getCurrentStateEvents();
-			if(evs!=null && evs.length>0)
+			List<IMonitoringEvent> evs = getCurrentStateEvents();
+			if(evs!=null && evs.size()>0)
 			{
-				BulkMonitoringEvent bme = new BulkMonitoringEvent(evs);
+				BulkMonitoringEvent bme = new BulkMonitoringEvent(evs.toArray(new IMonitoringEvent[evs.size()]));
 				ret.addIntermediateResult(bme);
 			}
 		}

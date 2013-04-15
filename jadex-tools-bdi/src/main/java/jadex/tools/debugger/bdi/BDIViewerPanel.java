@@ -573,6 +573,9 @@ public class BDIViewerPanel extends JPanel
 			
 			public void handleEvent(IMonitoringEvent event)
 			{
+				if(event==null)
+					return;
+				
 				// todo: hide decomposing bulk events
 				if(event instanceof BulkMonitoringEvent)
 				{

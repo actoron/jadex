@@ -2178,10 +2178,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		if(initial)
 		{
-			IMonitoringEvent[] evs = getCurrentStateEvents();
-			if(evs!=null && evs.length>0)
+			List<IMonitoringEvent> evs = getCurrentStateEvents();
+			if(evs!=null && evs.size()>0)
 			{
-				BulkMonitoringEvent bme = new BulkMonitoringEvent(evs);
+				BulkMonitoringEvent bme = new BulkMonitoringEvent(evs.toArray(new IMonitoringEvent[evs.size()]));
 				ret.addIntermediateResult(bme);
 			}
 		}
@@ -2252,69 +2252,93 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		subscriptions.remove(fut);
 	}
 	
-//	/**
-//	 *  Generate added events for the current goals
-//	 */
-//	public List<IMonitoringEvent> getCurrentStateEvents(IInternalAccess ia, IOAVState state, Object capa)
-//	{
-//		List<IMonitoringEvent> events = new ArrayList<IMonitoringEvent>();
-//		
-//		// Beliefs of this capability.
-//		Collection	beliefs	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefs);
-//		if(beliefs!=null)
-//		{
-//			for(Iterator it=beliefs.iterator(); it.hasNext(); )
-//			{
-//				Object	belief	= it.next();
-//				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, belief, capa);
+	/**
+	 *  Generate added events for the current goals
+	 */
+	public List<IMonitoringEvent> getCurrentStateEvents()
+	{
+		List<IMonitoringEvent> events = new ArrayList<IMonitoringEvent>();
+		getCurrentStateEvents(getInternalAccess(), state, getAgent(), events);
+		return events;
+	}
+	
+	/**
+	 *  Generate added events for the current goals
+	 */
+	public void getCurrentStateEvents(IInternalAccess ia, IOAVState state, Object capa, List<IMonitoringEvent> events)
+	{
+		// Beliefs of this capability.
+		Collection	beliefs	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefs);
+		if(beliefs!=null)
+		{
+			for(Iterator it=beliefs.iterator(); it.hasNext(); )
+			{
+				Object	belief	= it.next();
+				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, belief, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), belief.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-//			}
-//		}
-//		
-//		// Belief sets of this capability.
-//		Collection	beliefsets	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefsets);
-//		if(beliefsets!=null)
-//		{
-//			for(Iterator it=beliefsets.iterator(); it.hasNext(); )
-//			{
-//				Object	beliefset	= it.next();
-//				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, beliefset, capa);
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis());
+				ev.setSourceDescription(belief.toString());
+				ev.setProperty("details", info);
+				events.add(ev);
+			}
+		}
+		
+		// Belief sets of this capability.
+		Collection	beliefsets	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_beliefsets);
+		if(beliefsets!=null)
+		{
+			for(Iterator it=beliefsets.iterator(); it.hasNext(); )
+			{
+				Object	beliefset	= it.next();
+				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, beliefset, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), beliefset.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-//			}
-//		}
-//		
-//		// Goals of this capability.
-//		Collection	goals	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_goals);
-//		if(goals!=null)
-//		{
-//			for(Iterator it=goals.iterator(); it.hasNext(); )
-//			{
-//				Object	goal	= it.next();
-//				GoalInfo	info = GoalInfo.createGoalInfo(state, goal, capa);
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis());
+				ev.setSourceDescription(beliefset.toString());
+				ev.setProperty("details", info);
+				events.add(ev);
+			}
+		}
+		
+		// Goals of this capability.
+		Collection	goals	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_goals);
+		if(goals!=null)
+		{
+			for(Iterator it=goals.iterator(); it.hasNext(); )
+			{
+				Object	goal	= it.next();
+				GoalInfo	info = GoalInfo.createGoalInfo(state, goal, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_GOAL, info.getType(), goal.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-//			}
-//		}
-//		
-//		// Plans of this capability.
-//		Collection	plans	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_plans);
-//		if(plans!=null)
-//		{
-//			for(Iterator it=plans.iterator(); it.hasNext(); )
-//			{
-//				Object	plan	= it.next();
-//				PlanInfo	info = PlanInfo.createPlanInfo(state, plan, capa);
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis());
+				ev.setSourceDescription(goal.toString());
+				ev.setProperty("details", info);
+				events.add(ev);
+			}
+		}
+		
+		// Plans of this capability.
+		Collection	plans	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_plans);
+		if(plans!=null)
+		{
+			for(Iterator it=plans.iterator(); it.hasNext(); )
+			{
+				Object	plan	= it.next();
+				PlanInfo	info = PlanInfo.createPlanInfo(state, plan, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_PLAN, info.getType(), plan.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-//			}
-//		}
-//		
-//		// Recurse for sub capabilities.
-//		Collection	capas	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_subcapabilities);
-//		if(capas!=null)
-//		{
-//			for(Iterator it=capas.iterator(); it.hasNext(); )
-//			{
-//				getInitialEvents(ia, state, state.getAttributeValue(it.next(), OAVBDIRuntimeModel.capabilityreference_has_capability), events);
-//			}
-//		}
-//	}
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis());
+				ev.setSourceDescription(plan.toString());
+				ev.setProperty("details", info);
+				events.add(ev);
+			}
+		}
+		
+		// Recurse for sub capabilities.
+		Collection	capas	= state.getAttributeValues(capa, OAVBDIRuntimeModel.capability_has_subcapabilities);
+		if(capas!=null)
+		{
+			for(Iterator it=capas.iterator(); it.hasNext(); )
+			{
+				getCurrentStateEvents(ia, state, state.getAttributeValue(it.next(), OAVBDIRuntimeModel.capabilityreference_has_capability), events);
+			}
+		}
+	}
 }
