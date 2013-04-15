@@ -1,4 +1,4 @@
-package jadex.android.classloading.metaservice;
+package jadex.android.standalone.metaservice;
 
 import android.app.Service;
 import android.content.Context;

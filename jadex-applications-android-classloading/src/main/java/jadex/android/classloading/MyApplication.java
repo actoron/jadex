@@ -1,5 +1,6 @@
 package jadex.android.classloading;
 
+import jadex.android.standalone.JadexApplication;
 import android.os.Bundle;
 
 public class MyApplication extends JadexApplication

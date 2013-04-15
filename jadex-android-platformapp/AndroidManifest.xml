@@ -12,9 +12,9 @@
     <application
         android:debuggable="true"
         android:icon="@drawable/icon"
-        android:label="classloading"
+        android:label="JadexPlatform"
         android:screenOrientation="portrait" >
-        <activity android:name=".JadexApplicationLoader" >
+        <activity android:name="jadex.android.standalone.platformapp.JadexApplicationLoader" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -28,6 +28,8 @@
 
 
         <service android:name="jadex.android.service.JadexPlatformService" android:label="JadexPlatformService"></service>
+        
+        <service android:name="jadex.android.standalone.clientapp.JadexClientAppService" android:label="JadexClientAppService"></service>
 
     </application>
 

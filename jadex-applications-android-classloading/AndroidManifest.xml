@@ -12,9 +12,9 @@
     <application
         android:debuggable="true"
         android:icon="@drawable/icon"
-        android:label="classloading"
+        android:label="ClientAppDemo"
         android:screenOrientation="portrait" >
-        <uses-library android:name="jadex.android.classloading" android:required="false"/>
+<!--         <uses-library android:name="jadex.android.classloading" android:required="false"/> -->
         <activity android:name="jadex.android.classloading.MyApplication" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,10 +23,10 @@
         </activity>
 <!--         <activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter" /> -->
 
-<!--         <service -->
-<!--             android:name="jadex.android.classloading.metaservice.JadexMetaService" -->
-<!--             android:label="JadexMetaService" > -->
-<!--         </service> -->
+        <service
+            android:name="jadex.android.classloading.MyService"
+            android:label="MyService" >
+        </service>
         
     </application>
 

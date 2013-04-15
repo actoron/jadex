@@ -1,7 +1,7 @@
 package jadex.android.standalone.clientapp;
 
 import jadex.android.IEventReceiver;
-import jadex.android.JadexAndroidActivity;
+import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.android.service.IJadexPlatformBinder;
 import jadex.android.service.JadexPlatformManager;
@@ -28,40 +28,32 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
 import android.view.Window;
 
 /**
- * This is an Android Activity Class which provides needed Functionality and
- * comfort Features for Jadex Android Activities. It uses the {@link JadexPlatformService}
- * internally, but takes care about service binding.
+ * This is an Android Fragment Class which provides needed Functionality and
+ * comfort Features for Fragments using the Jadex platform.
  * 
- * To have that Jadex Platform started at Activity startup, use the Extra
- * EXTRA_PLATFORM_AUTOSTART with boolean value <code>true</code>.
+ * Subclasses of this class can be used together with the jadex platformapp.
  * 
  * @author Julian Kalinowski
  */
-public class JadexClientAppFragment extends ActivityAdapterFragment implements ServiceConnection
+public class PlatformProvidingClientAppFragment extends ClientAppFragment implements ServiceConnection
 {
-	/**
-	 * Extra bundle key for a boolean to indicate whether the jadex platform
-	 * should be started on service creation.
-	 */
-	public static final String EXTRA_PLATFORM_AUTOSTART = "platform_autostart";
-	
+
 	private Intent serviceIntent;
 	private IJadexPlatformBinder platformService;
 	protected IComponentIdentifier platformId;
-	
+
 	private boolean platformAutostart;
 	private String[] platformKernels;
 	private String platformOptions;
 	private String platformName;
-
+	
 	/**
 	 * Constructor
 	 */
-	public JadexClientAppFragment()
+	public PlatformProvidingClientAppFragment()
 	{
 		super();
 		platformAutostart = false;
@@ -69,11 +61,8 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 		platformOptions = "";
 		platformName = JadexPlatformManager.getInstance().getRandomPlatformID();
 	}
-	
-	public void onPrepare(Activity mainActivity) {
-		mainActivity.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-	}
-	
+
+	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
@@ -81,6 +70,7 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 		bindService(serviceIntent, this, Service.BIND_AUTO_CREATE);
 	}
 	
+	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
@@ -88,70 +78,91 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 	}
 
 	/**
-	 * Sets the autostart parameter for this jadex platform.
-	 * If true, the platform will be started during onCreate.
+	 * Sets the autostart parameter for this jadex platform. If true, the
+	 * platform will be started during onCreate.
+	 * 
 	 * @param autostart
 	 */
-	protected void setPlatformAutostart(boolean autostart) {
-		if (!isJadexPlatformRunning()) {
+	protected void setPlatformAutostart(boolean autostart)
+	{
+		if (!isJadexPlatformRunning())
+		{
 			this.platformAutostart = autostart;
-		} else {
+		}
+		else
+		{
 			throw new IllegalStateException("Cannot set autostart, platform already running!");
 		}
 	}
-	
+
 	/**
-	 * Sets the Kernels.
-	 * See {@link JadexPlatformManager} Constants for available Kernels.
+	 * Sets the Kernels. See {@link JadexPlatformManager} Constants for
+	 * available Kernels.
+	 * 
 	 * @param kernels
 	 */
-	protected void setPlatformKernels(String ... kernels) {
+	protected void setPlatformKernels(String... kernels)
+	{
 		this.platformKernels = kernels;
 	}
-	
+
 	/**
 	 * Sets platform options.
+	 * 
 	 * @param options
 	 */
-	protected void setPlatformOptions(String options) {
+	protected void setPlatformOptions(String options)
+	{
 		this.platformOptions = options;
 	}
-	
+
 	/**
 	 * Sets the name of the platform that is started by this activity.
+	 * 
 	 * @param name
 	 */
-	protected void setPlatformName(String name) {
+	protected void setPlatformName(String name)
+	{
 		this.platformName = name;
 	}
 
 	protected boolean isJadexPlatformRunning()
 	{
-		if (platformService != null) {
+		if (platformService != null)
+		{
 			return platformService.isPlatformRunning(platformId);
-		} else {
+		}
+		else
+		{
 			return false;
 		}
 	}
-	
-	protected IExternalAccess getPlatformAccess() {
+
+	protected IExternalAccess getPlatformAccess()
+	{
 		checkIfJadexIsRunning("getPlatformAccess()");
 		return platformService.getExternalPlatformAccess(platformId);
 	}
 
 	protected boolean isJadexPlatformRunning(IComponentIdentifier platformId)
 	{
-		if (platformService != null) {
+		if (platformService != null)
+		{
 			return platformService.isPlatformRunning(platformId);
-		} else {
+		}
+		else
+		{
 			return false;
 		}
 	}
 
 	/**
 	 * Starts a Micro Agent.
-	 * @param name Name of the Micro Agent created
-	 * @param clazz Class which defines the Micro Agent
+	 * 
+	 * @param name
+	 *            Name of the Micro Agent created
+	 * @param clazz
+	 *            Class which defines the Micro Agent
 	 * @return IFuture<IComponentIdentifier>
 	 */
 	protected IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz)
@@ -165,38 +176,49 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 			{
 				HashMap<String, Object> args = new HashMap<String, Object>();
 
-				cms.createComponent(name, clazz.getName().replaceAll("\\.", "/") + ".class", new CreationInfo(args), null).addResultListener(
-						new DelegationResultListener<IComponentIdentifier>(ret));
+				cms.createComponent(name, clazz.getName().replaceAll("\\.", "/") + ".class", new CreationInfo(args), null)
+						.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 			}
 		});
 
 		return ret;
 	}
-	
+
 	/**
 	 * Starts a Component.
-	 * @param name Name of the Component created
-	 * @param modelPath Path to the Component XML definition file
+	 * 
+	 * @param name
+	 *            Name of the Component created
+	 * @param modelPath
+	 *            Path to the Component XML definition file
 	 * @return IFuture<IComponentIdentifier>
 	 */
-	protected IFuture<IComponentIdentifier> startBDIAgent(final String name, final String modelPath) {
+	protected IFuture<IComponentIdentifier> startBDIAgent(final String name, final String modelPath)
+	{
 		return startComponent(name, modelPath);
 	}
-	
+
 	/**
 	 * Starts a Component.
-	 * @param name Name of the Component created
-	 * @param modelPath Path to the Component XML definition file
-	 * @return IFuture<IComponentIdentifier>	 
+	 * 
+	 * @param name
+	 *            Name of the Component created
+	 * @param modelPath
+	 *            Path to the Component XML definition file
+	 * @return IFuture<IComponentIdentifier>
 	 */
-	protected IFuture<IComponentIdentifier> startBPMNAgent(final String name, final String modelPath) {
+	protected IFuture<IComponentIdentifier> startBPMNAgent(final String name, final String modelPath)
+	{
 		return startComponent(name, modelPath);
 	}
-	
+
 	/**
 	 * Starts a Component.
-	 * @param name Name of the Component created
-	 * @param modelPath Path to the Component XML definition file
+	 * 
+	 * @param name
+	 *            Name of the Component created
+	 * @param modelPath
+	 *            Path to the Component XML definition file
 	 * @return IFuture<IComponentIdentifier>
 	 */
 	protected IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath)
@@ -210,8 +232,9 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 			{
 				HashMap<String, Object> args = new HashMap<String, Object>();
 
-				args.put("androidContext", JadexClientAppFragment.this);
-				cms.createComponent(name, modelPath, new CreationInfo(args), null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+				args.put("androidContext", PlatformProvidingClientAppFragment.this);
+				cms.createComponent(name, modelPath, new CreationInfo(args), null).addResultListener(
+						new DelegationResultListener<IComponentIdentifier>(ret));
 			}
 		});
 
@@ -275,12 +298,12 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 			throw new JadexAndroidPlatformNotStartedError(caller);
 		}
 	}
-	
+
 	protected IFuture<IMessageService> getMS()
 	{
 		return platformService.getMS(platformId);
 	}
-	
+
 	protected IFuture<IComponentManagementService> getCMS()
 	{
 		return platformService.getCMS(platformId);
@@ -289,7 +312,8 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
 		platformService = (IJadexPlatformBinder) service;
-		if (platformAutostart) {
+		if (platformAutostart)
+		{
 			startPlatform();
 		}
 	}
@@ -299,32 +323,37 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 		platformService = null;
 	}
 
-	
 	/**
 	 * Terminates a given Jadex platform.
-	 * @param platformID Identifier of the platform to terminate
+	 * 
+	 * @param platformID
+	 *            Identifier of the platform to terminate
 	 */
-	public void shutdownJadexPlatform(IComponentIdentifier platformID) {
+	public void shutdownJadexPlatform(IComponentIdentifier platformID)
+	{
 		platformService.shutdownJadexPlatform(platformID);
 	}
-	
+
 	/**
 	 * Called right before the platform startup.
 	 */
-	protected void onPlatformStarting() {
+	protected void onPlatformStarting()
+	{
 		setProgressBarIndeterminateVisibility(true);
 	}
-	
+
 	/**
 	 * Called right after the platform is started.
-	 * @param result The external access to the platform
+	 * 
+	 * @param result
+	 *            The external access to the platform
 	 */
 	protected void onPlatformStarted(IExternalAccess result)
 	{
 		this.platformId = result.getComponentIdentifier();
 		runOnUiThread(new Runnable()
 		{
-			
+
 			@Override
 			public void run()
 			{
@@ -332,22 +361,22 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 			}
 		});
 	}
-	
+
 	/**
-	 * Starts the Jadex Platform.
-	 * To set Parameters, use setPlatformKernels(), setPlatformOptions() or setPlatformName() before
-	 * calling this Method.
+	 * Starts the Jadex Platform. To set Parameters, use setPlatformKernels(),
+	 * setPlatformOptions() or setPlatformName() before calling this Method.
 	 * 
-	 * Will be automatically called when setPlatformAutostart(true) was called in the Constructor.
+	 * Will be automatically called when setPlatformAutostart(true) was called
+	 * in the Constructor.
 	 * 
-	 * The Lifecycle methods onPlatformStarting() and onPlatformStarted() will be executed
-	 * during Startup.
+	 * The Lifecycle methods onPlatformStarting() and onPlatformStarted() will
+	 * be executed during Startup.
 	 */
 	final protected void startPlatform()
 	{
 		onPlatformStarting();
 		IFuture<IExternalAccess> platform = platformService.startJadexPlatform(platformKernels, platformName, platformOptions);
-		
+
 		platform.addResultListener(new DefaultResultListener<IExternalAccess>()
 		{
 
@@ -356,10 +385,20 @@ public class JadexClientAppFragment extends ActivityAdapterFragment implements S
 			{
 				onPlatformStarted(result);
 			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				Logger.e(exception);
+			}
 
 		});
+		
 	}
-	
+
+	/**
+	 * Stops all running jadex platforms.
+	 */
 	protected void stopPlatforms()
 	{
 		platformService.shutdownJadexPlatforms();

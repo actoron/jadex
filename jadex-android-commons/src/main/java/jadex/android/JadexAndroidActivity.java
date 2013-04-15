@@ -5,12 +5,8 @@ import jadex.android.service.IJadexPlatformBinder;
 import jadex.android.service.JadexPlatformManager;
 import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -19,7 +15,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.transformation.annotations.Classname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,19 +33,10 @@ import android.view.Window;
  * comfort Features for Jadex Android Activities. It uses the {@link JadexPlatformService}
  * internally, but takes care about service binding.
  * 
- * To have that Jadex Platform started at Activity startup, use the Extra
- * EXTRA_PLATFORM_AUTOSTART with boolean value <code>true</code>.
- * 
  * @author Julian Kalinowski
  */
 public class JadexAndroidActivity extends Activity implements ServiceConnection
 {
-	/**
-	 * Extra bundle key for a boolean to indicate whether the jadex platform
-	 * should be started on service creation.
-	 */
-	public static final String EXTRA_PLATFORM_AUTOSTART = "platform_autostart";
-	
 	private Intent serviceIntent;
 	private IJadexPlatformBinder platformService;
 	protected IComponentIdentifier platformId;
@@ -359,6 +345,9 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		});
 	}
 	
+	/**
+	 * Stops all running jadex platforms.
+	 */
 	protected void stopPlatforms()
 	{
 		platformService.shutdownJadexPlatforms();

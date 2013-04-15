@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status_label">Status: </string>
+    <string name="app_title">User App</string>
+    <string name="status_loading">Loading Platform...</string>
+    <string name="status_started">Platform started!</string>
+</resources>

@@ -1,4 +1,4 @@
-package jadex.android.classloading;
+package jadex.android.standalone;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -1,6 +1,6 @@
-package jadex.android.classloading.metaservice;
+package jadex.android.standalone.metaservice;
 
-import jadex.android.classloading.JadexClassLoading;
+import jadex.android.standalone.JadexClassLoading;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

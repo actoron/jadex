@@ -1,4 +1,4 @@
-package jadex.android.classloading;
+package jadex.android.standalone;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

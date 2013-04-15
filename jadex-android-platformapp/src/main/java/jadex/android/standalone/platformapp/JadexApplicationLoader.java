@@ -1,7 +1,9 @@
-package jadex.android.platformapp;
+package jadex.android.standalone.platformapp;
 
-import jadex.android.classloading.JadexApplication;
-import jadex.android.standalone.clientapp.JadexClientAppFragment;
+import jadex.android.platformapp.R;
+import jadex.android.standalone.JadexApplication;
+import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.android.standalone.clientapp.PlatformProvidingClientAppFragment;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -47,7 +49,7 @@ public class JadexApplicationLoader extends FragmentActivity
 			}
 			
 			if (appPath != null) {
-				JadexClientAppFragment act = loadAndCreateUserActivity(appPath, className);
+				ClientAppFragment act = loadAndCreateUserActivity(appPath, className);
 				act.onPrepare(this);
 				ta.add(R.id.fragmentContainer, act);
 //				setActivity(act);
@@ -74,15 +76,15 @@ public class JadexApplicationLoader extends FragmentActivity
 		super.onDestroy();
 	}
 
-	private JadexClientAppFragment loadAndCreateUserActivity(String appPath, String className)
+	private ClientAppFragment loadAndCreateUserActivity(String appPath, String className)
 	{
 		DexClassLoader cl = getClassLoaderForExternalDex(getClassLoader(), appPath);
 		try
 		{
-			Class<JadexClientAppFragment> actClass = (Class<JadexClientAppFragment>) cl.loadClass(className);
+			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
 			
-			Constructor<JadexClientAppFragment> actCon = actClass.getConstructor(null);
-			JadexClientAppFragment act = actClass.newInstance();
+			Constructor<ClientAppFragment> actCon = actClass.getConstructor(null);
+			ClientAppFragment act = actClass.newInstance();
 			return act;
 		}
 		catch (ClassNotFoundException e)

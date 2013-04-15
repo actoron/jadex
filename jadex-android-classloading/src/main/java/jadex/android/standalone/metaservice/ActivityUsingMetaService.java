@@ -1,6 +1,6 @@
-package jadex.android.classloading.metaservice;
+package jadex.android.standalone.metaservice;
 
-import jadex.android.classloading.metaservice.JadexMetaService.JadexMetaServiceStub;
+import jadex.android.standalone.metaservice.JadexMetaService.JadexMetaServiceStub;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;

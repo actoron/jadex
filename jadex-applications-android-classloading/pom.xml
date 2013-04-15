@@ -14,7 +14,9 @@
 	</parent>
 
 	<description>
-	This project contains an android application to demonstrate some jadex features.
+	This project contains a demo of a jadex clientapp.
+	The Jadex platform app must be installed prior to running this application!
+	Must be build with maven.
 	</description>
 
 	<dependencies>
@@ -23,13 +25,6 @@
 			<artifactId>jadex-android-classloading</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<!-- <dependency> -->
-		<!-- <groupId>net.sourceforge.jadex</groupId> -->
-		<!-- <artifactId>jadex-android-platformapp</artifactId> -->
-		<!-- <version>${project.version}</version> -->
-		<!-- <scope>provided</scope> -->
-		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -77,6 +72,13 @@
 
 	<build>
 		<resources>
+<!-- 			<resource> -->
+<!-- 				<directory>res</directory> -->
+<!-- 				<includes> -->
+<!-- 					<include>**/*.xml</include> -->
+<!-- 				</includes> -->
+<!-- 				<targetPath>userRes</targetPath> -->
+<!-- 			</resource> -->
 			<resource>
 				<directory>src/main/java</directory>
 				<excludes>

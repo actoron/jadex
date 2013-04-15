@@ -14,7 +14,8 @@
 	</parent>
 
 	<description>
-	This project contains an android application to demonstrate some jadex features.
+	This is the jadex platformapp. 
+	It has to be installed on the android device independently and can be used by creating JadexClientAppFragments.
 	</description>
 
 	<dependencies>
@@ -24,12 +25,10 @@
 			<version>${project.version}</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-commons</artifactId>
 			<version>${project.version}</version>
-			<!-- <scope>provided</scope> -->
 		</dependency>
 
 		<dependency>
@@ -59,6 +58,12 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools-android</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-xmlpull</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -96,24 +101,6 @@
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
 				<extensions>true</extensions>
-				<!-- <configuration> -->
-				<!-- <generateApk>true</generateApk> -->
-				<!-- <skip>true</skip> -->
-				<!-- </configuration> -->
-				<!-- <executions> -->
-				<!-- <execution> -->
-				<!-- <id>dex</id> -->
-				<!-- <goals> -->
-				<!-- <goal>dex</goal> -->
-				<!-- </goals> -->
-				<!-- </execution> -->
-				<!-- <execution> -->
-				<!-- <id>apk</id> -->
-				<!-- <goals> -->
-				<!-- <goal>apk</goal> -->
-				<!-- </goals> -->
-				<!-- </execution> -->
-				<!-- </executions> -->
 			</plugin>
 
 			<plugin>

@@ -1,4 +1,4 @@
-package jadex.android.classloading.metaservice;
+package jadex.android.standalone.metaservice;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;

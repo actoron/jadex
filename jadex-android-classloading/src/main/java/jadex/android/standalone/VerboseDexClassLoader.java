@@ -1,6 +1,6 @@
-package jadex.android.classloading;
+package jadex.android.standalone;
 
-import jadex.android.classloading.metaservice.ParentLastDexClassLoader;
+import jadex.android.standalone.metaservice.ParentLastDexClassLoader;
 
 public class VerboseDexClassLoader extends ParentLastDexClassLoader
 {

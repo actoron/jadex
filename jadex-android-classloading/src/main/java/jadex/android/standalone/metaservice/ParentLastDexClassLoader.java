@@ -1,4 +1,4 @@
-package jadex.android.classloading.metaservice;
+package jadex.android.standalone.metaservice;
 
 import java.security.AccessControlContext;
 import java.security.AccessController;
