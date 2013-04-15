@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -24,7 +25,7 @@ public class FourBaseClusterer {
 	/**
 	 * The level of recursive clustering, results in 4^LEVEL #quadrants
 	 */
-	private static final int LEVEL = 3;
+	private static final int LEVEL = 5;
 
 	/**
 	 * The database connection
@@ -117,11 +118,15 @@ public class FourBaseClusterer {
 				String name = rs.getString("name");
 				Double lat = rs.getDouble("lat");
 				Double lon = rs.getDouble("lon");
-
+				
 				Station station = new Station(lat, lon, name);
-				data.add(station);
-
-				System.out.println("fetchStations() - added " + station);
+				List<String> excludedStations = Arrays.asList(RealDataExtractor.EXCLUDE_STATIONS);
+				if (!excludedStations.contains(name)) {
+					data.add(station);
+					System.out.println("fetchStations() - added " + station);
+				} else {
+					System.out.println("fetchStations() - ignored exluded station " + station);
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
