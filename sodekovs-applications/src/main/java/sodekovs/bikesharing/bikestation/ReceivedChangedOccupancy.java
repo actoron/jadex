@@ -20,7 +20,7 @@ public class ReceivedChangedOccupancy extends Plan {
 
 	@Override
 	public void body() {
-		startAtomic();
+//		startAtomic();
 
 		String proposedArrivalStation = (String) getBeliefbase().getBelief("proposed_arrival_station").getFact();
 		String proposedDepartureStation = (String) getBeliefbase().getBelief("proposed_departure_station").getFact();
@@ -81,7 +81,7 @@ public class ReceivedChangedOccupancy extends Plan {
 			}
 		}
 
-		endAtomic();
+//		endAtomic();
 	}
 
 	/**
