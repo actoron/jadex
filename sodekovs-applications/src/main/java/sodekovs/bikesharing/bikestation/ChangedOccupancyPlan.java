@@ -29,14 +29,14 @@ public class ChangedOccupancyPlan extends Plan {
 			Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
 			String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
 			Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
-			
+
 			Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
 			Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
 			Double occupany = Double.valueOf(stock) / Double.valueOf(capacity);
-	
+
 			CoordinationStationData tuple = new CoordinationStationData(stationID, capacity, stock, position);
 			System.out.println("Occupancy changed in " + stationID + " " + tuple);
-	
+
 			// reset alternative if they are not needed any more
 			if (occupany < fullThreshold) {
 				getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
@@ -44,10 +44,12 @@ public class ChangedOccupancyPlan extends Plan {
 			if (occupany > emptyThreshold) {
 				getBeliefbase().getBelief("proposed_departure_station").setFact(null);
 			}
-	
-			IInternalEvent event = createInternalEvent("changed_occupancy");
-			event.getParameter("tuple").setValue(tuple);
-			dispatchInternalEvent(event);
+
+			if (occupany >= fullThreshold || occupany <= emptyThreshold) {
+				IInternalEvent event = createInternalEvent("changed_occupancy");
+				event.getParameter("tuple").setValue(tuple);
+				dispatchInternalEvent(event);
+			}
 		}
 	}
 }

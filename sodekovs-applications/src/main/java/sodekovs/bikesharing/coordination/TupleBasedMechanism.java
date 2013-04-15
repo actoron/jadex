@@ -78,13 +78,13 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 		occupancyTuples.put(tuple.getStationID(), tuple);
 
 		// check if the state of the tuple has changed if the tuple was previously stored
-		if (oldTuple == null || getState(oldTuple) != getState(tuple)) {
+//		if (oldTuple == null || getState(oldTuple) != getState(tuple)) {
 			// if the state has changed or it was not stored previously...
 			// ...inform the other cluster stations
 			Cluster cluster = superCluster.getCluster(tuple.getStationID());
 			List<String> stationIDs = superCluster.getStationIDs(cluster);
 			informStations(stationIDs, coordInfo);
-		}
+//		}
 	}
 
 	/**
