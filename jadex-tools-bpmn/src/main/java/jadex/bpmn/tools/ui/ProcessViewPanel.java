@@ -205,6 +205,9 @@ public class ProcessViewPanel extends JPanel
 		{
 			public void intermediateResultAvailable(IMonitoringEvent event)
 			{
+				if(event==null)
+					return;
+				
 				// todo: hide decomposing bulk events
 				if(event instanceof BulkMonitoringEvent)
 				{
@@ -218,8 +221,7 @@ public class ProcessViewPanel extends JPanel
 						}
 					}
 				}
-				
-				if(event.getType().endsWith(BpmnInterpreter.TYPE_THREAD))
+				else if(event.getType().endsWith(BpmnInterpreter.TYPE_THREAD))
 				{
 					if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
 					{

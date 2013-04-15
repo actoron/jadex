@@ -1679,7 +1679,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), type+"."+TYPE_THREAD, System.currentTimeMillis());
 		event.setProperty("thread_id", thread.getId());
 		if(!type.startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
-			event.setProperty("info", createProcessThreadInfo(thread));
+			event.setProperty("details", createProcessThreadInfo(thread));
 		return event;
 		
 //		return new ComponentChangeEvent(type, TYPE_THREAD, thread.getClass().getName(), 
@@ -1698,7 +1698,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis());
 		event.setProperty("thread_id", thread.getId());
 		event.setProperty("activity", activity.getName());
-		event.setProperty("info", createProcessThreadInfo(thread));
+		event.setProperty("details", createProcessThreadInfo(thread));
 		return event;
 	}
 	
@@ -1709,5 +1709,18 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public ClassLoader getClassLoader()
 	{
 		return model.getClassLoader();
+	}
+	
+	/**
+	 *  Get the current state as monitoring events.
+	 */
+	public List<IMonitoringEvent> getCurrentStateEvents()
+	{
+		final List<IMonitoringEvent>	events	= new ArrayList<IMonitoringEvent>();
+		for(Iterator<ProcessThread> it=getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+		{
+			events.add(createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, it.next()));
+		}
+		return events;
 	}
 }
