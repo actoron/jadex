@@ -3,261 +3,261 @@
     <cluster>
         <cluster west="-77.1191" south="38.9313" north="38.9713" east="-77.0677">
             <stations>
-                <station name="39th &amp; Veazey St NW" lon="-77.077078" lat="38.943837"/>
-                <station name="Fessenden St &amp; Wisconsin Ave NW" lon="-77.082426" lat="38.954812"/>
-                <station name="Idaho Ave &amp; Newark St NW [on 2nd District patio]" lon="-77.074647" lat="38.934751"/>
-                <station name="Tenleytown / Wisconsin Ave &amp; Albemarle St NW" lon="-77.079382" lat="38.947607"/>
+                <station name="39th and Veazey St NW" lon="-77.077078" lat="38.943837"/>
+                <station name="Fessenden St and Wisconsin Ave NW" lon="-77.082426" lat="38.954812"/>
+                <station name="Idaho Ave and Newark St NW [on 2nd District patio]" lon="-77.074647" lat="38.934751"/>
+                <station name="Tenleytown / Wisconsin Ave and Albemarle St NW" lon="-77.079382" lat="38.947607"/>
                 <station name="Ward Circle / American University" lon="-77.087171" lat="38.938736"/>
-                <station name="Wisconsin Ave &amp; Macomb St NW" lon="-77.0725" lat="38.934"/>
+                <station name="Wisconsin Ave and Macomb St NW" lon="-77.0725" lat="38.934"/>
             </stations>
-            <superStation name="Fessenden St &amp; Wisconsin Ave NW" lon="-77.082426" lat="38.954812"/>
+            <superStation name="Wisconsin Ave and Macomb St NW" lon="-77.0725" lat="38.934"/>
         </cluster>
         <cluster west="-77.0677" south="38.9313" north="38.9713" east="-77.0163">
             <stations>
-                <station name="14th St &amp; Spring Rd NW" lon="-77.0328" lat="38.9375"/>
-                <station name="14th St Heights / 14th &amp; Crittenden St NW" lon="-77.032818" lat="38.947774"/>
-                <station name="9th &amp; Upshur St NW" lon="-77.0251" lat="38.9418"/>
-                <station name="Connecticut Ave &amp; Newark St NW / Cleveland Park" lon="-77.057979" lat="38.934267"/>
-                <station name="Georgia &amp; New Hampshire Ave NW" lon="-77.024" lat="38.9365"/>
-                <station name="Lamont &amp; Mt Pleasant NW" lon="-77.0388" lat="38.9319"/>
+                <station name="14th St and Spring Rd NW" lon="-77.0328" lat="38.9375"/>
+                <station name="14th St Heights / 14th and Crittenden St NW" lon="-77.032818" lat="38.947774"/>
+                <station name="9th and Upshur St NW" lon="-77.0251" lat="38.9418"/>
+                <station name="Connecticut Ave and Newark St NW / Cleveland Park" lon="-77.057979" lat="38.934267"/>
+                <station name="Georgia and New Hampshire Ave NW" lon="-77.024" lat="38.9365"/>
+                <station name="Lamont and Mt Pleasant NW" lon="-77.0388" lat="38.9319"/>
                 <station name="Van Ness Metro / UDC" lon="-77.063896" lat="38.944551"/>
             </stations>
             <superStation name="Van Ness Metro / UDC" lon="-77.063896" lat="38.944551"/>
         </cluster>
         <cluster west="-77.1191" south="38.8913" north="38.9313" east="-77.0677">
             <stations>
-                <station name="34th St &amp; Wisconsin Ave NW" lon="-77.0682" lat="38.916442"/>
-                <station name="36th &amp; Calvert St NW / Glover Park" lon="-77.070432" lat="38.922249"/>
-                <station name="37th &amp; O St NW / Georgetown University" lon="-77.071652" lat="38.90774"/>
-                <station name="39th &amp; Calvert St NW / Stoddert" lon="-77.077271" lat="38.922649"/>
-                <station name="Clarendon Blvd &amp; Pierce St" lon="-77.076701" lat="38.893648"/>
-                <station name="Court House Metro / Wilson Blvd &amp; N Uhle St" lon="-77.0846" lat="38.891696"/>
-                <station name="Key Blvd &amp; N Quinn St" lon="-77.078107" lat="38.896015"/>
-                <station name="Lynn &amp; 19th St North" lon="-77.070993" lat="38.897315"/>
-                <station name="N Adams St &amp; Lee Hwy" lon="-77.089006" lat="38.89593"/>
-                <station name="N Rhodes &amp; 16th St N" lon="-77.079375" lat="38.892164"/>
-                <station name="N Veitch  &amp; 20th St N" lon="-77.086502" lat="38.896923"/>
-                <station name="N Veitch &amp; Key Blvd" lon="-77.086045" lat="38.893241"/>
-                <station name="Rosslyn Metro / Wilson Blvd &amp; Ft Myer Dr" lon="-77.072305" lat="38.8946"/>
+                <station name="34th St and Wisconsin Ave NW" lon="-77.0682" lat="38.916442"/>
+                <station name="36th and Calvert St NW / Glover Park" lon="-77.070432" lat="38.922249"/>
+                <station name="37th and O St NW / Georgetown University" lon="-77.071652" lat="38.90774"/>
+                <station name="39th and Calvert St NW / Stoddert" lon="-77.077271" lat="38.922649"/>
+                <station name="Clarendon Blvd and Pierce St" lon="-77.076701" lat="38.893648"/>
+                <station name="Court House Metro / Wilson Blvd and N Uhle St" lon="-77.0846" lat="38.891696"/>
+                <station name="Key Blvd and N Quinn St" lon="-77.078107" lat="38.896015"/>
+                <station name="Lynn and 19th St North" lon="-77.070993" lat="38.897315"/>
+                <station name="N Adams St and Lee Hwy" lon="-77.089006" lat="38.89593"/>
+                <station name="N Rhodes and 16th St N" lon="-77.079375" lat="38.892164"/>
+                <station name="N Veitch  and 20th St N" lon="-77.086502" lat="38.896923"/>
+                <station name="N Veitch and Key Blvd" lon="-77.086045" lat="38.893241"/>
+                <station name="Rosslyn Metro / Wilson Blvd and Ft Myer Dr" lon="-77.072305" lat="38.8946"/>
             </stations>
-            <superStation name="Clarendon Blvd &amp; Pierce St" lon="-77.076701" lat="38.893648"/>
+            <superStation name="37th and O St NW / Georgetown University" lon="-77.071652" lat="38.90774"/>
         </cluster>
         <cluster west="-77.0677" south="38.8913" north="38.9313" east="-77.0163">
             <stations>
-                <station name="10th &amp; E St NW" lon="-77.026064" lat="38.895914"/>
-                <station name="10th &amp; U St NW" lon="-77.0259" lat="38.9172"/>
-                <station name="10th St &amp; Constitution Ave NW" lon="-77.026013" lat="38.893028"/>
-                <station name="11th &amp; F St NW" lon="-77.026975" lat="38.897857"/>
-                <station name="11th &amp; K St NW" lon="-77.02674" lat="38.90268"/>
-                <station name="11th &amp; Kenyon St NW" lon="-77.027822" lat="38.929464"/>
-                <station name="12th &amp; L St NW" lon="-77.0284" lat="38.903819"/>
-                <station name="13th St &amp; New York Ave NW" lon="-77.029822" lat="38.900283"/>
-                <station name="14th &amp; D St NW / Ronald Reagan Building" lon="-77.031617" lat="38.894514"/>
-                <station name="14th &amp; G St NW" lon="-77.031823" lat="38.898069"/>
-                <station name="14th &amp; Harvard St NW" lon="-77.0322" lat="38.9268"/>
-                <station name="14th &amp; R St NW" lon="-77.031681" lat="38.912682"/>
-                <station name="14th &amp; Rhode Island Ave NW" lon="-77.0323" lat="38.9086"/>
-                <station name="14th &amp; V St NW" lon="-77.0321" lat="38.9176"/>
-                <station name="15th &amp; K St NW" lon="-77.03353" lat="38.902"/>
-                <station name="15th &amp; P St NW" lon="-77.034438" lat="38.90985"/>
-                <station name="16th &amp; Harvard St NW" lon="-77.036536" lat="38.926088"/>
-                <station name="16th &amp; U St NW" lon="-77.036841" lat="38.916656"/>
-                <station name="17th &amp; Corcoran St NW" lon="-77.0387" lat="38.9121"/>
-                <station name="17th &amp; K St NW / Farragut Square" lon="-77.038322" lat="38.902061"/>
-                <station name="17th &amp; K St NW [formerly 17th &amp; L St NW]" lon="-77.03863" lat="38.90276"/>
-                <station name="17th &amp; Rhode Island Ave NW" lon="-77.038785" lat="38.906602"/>
-                <station name="18th &amp; M St NW" lon="-77.041798" lat="38.9055"/>
-                <station name="18th St &amp; Pennsylvania Ave NW" lon="-77.041539" lat="38.89968"/>
-                <station name="19th &amp; E Street NW" lon="-77.0436" lat="38.8952"/>
-                <station name="19th &amp; K St NW" lon="-77.04337" lat="38.902204"/>
-                <station name="19th &amp; L St NW" lon="-77.043648" lat="38.903407"/>
-                <station name="19th St &amp; Constitution Ave NW" lon="-77.0436" lat="38.8923"/>
-                <station name="19th St &amp; Pennsylvania Ave NW" lon="-77.0429" lat="38.9003"/>
-                <station name="20th &amp; E St NW" lon="-77.045" lat="38.8963"/>
-                <station name="20th &amp; L St NW" lon="-77.044789" lat="38.903584"/>
-                <station name="20th &amp; O St NW / Dupont South" lon="-77.04478" lat="38.908905"/>
-                <station name="20th St &amp; Florida Ave NW" lon="-77.0446" lat="38.9154"/>
-                <station name="20th St &amp; Virginia Ave NW" lon="-77.045128" lat="38.894722"/>
-                <station name="21st &amp; I St NW" lon="-77.047" lat="38.9008"/>
-                <station name="21st &amp; M St NW" lon="-77.0471" lat="38.9054"/>
-                <station name="21st St &amp; Constitution Ave NW" lon="-77.046567" lat="38.892459"/>
-                <station name="21st St &amp; Pennsylvania Ave NW" lon="-77.046564" lat="38.901539"/>
-                <station name="22nd &amp; I St NW / Foggy Bottom" lon="-77.048911" lat="38.90088"/>
-                <station name="23rd &amp; E St NW" lon="-77.049882" lat="38.896104"/>
-                <station name="24th &amp; N St NW" lon="-77.05152" lat="38.9066"/>
-                <station name="25th St &amp; Pennsylvania Ave NW" lon="-77.053485" lat="38.903827"/>
+                <station name="10th and E St NW" lon="-77.026064" lat="38.895914"/>
+                <station name="10th and U St NW" lon="-77.0259" lat="38.9172"/>
+                <station name="10th St and Constitution Ave NW" lon="-77.026013" lat="38.893028"/>
+                <station name="11th and F St NW" lon="-77.026975" lat="38.897857"/>
+                <station name="11th and K St NW" lon="-77.02674" lat="38.90268"/>
+                <station name="11th and Kenyon St NW" lon="-77.027822" lat="38.929464"/>
+                <station name="12th and L St NW" lon="-77.0284" lat="38.903819"/>
+                <station name="13th St and New York Ave NW" lon="-77.029822" lat="38.900283"/>
+                <station name="14th and D St NW / Ronald Reagan Building" lon="-77.031617" lat="38.894514"/>
+                <station name="14th and G St NW" lon="-77.031823" lat="38.898069"/>
+                <station name="14th and Harvard St NW" lon="-77.0322" lat="38.9268"/>
+                <station name="14th and R St NW" lon="-77.031681" lat="38.912682"/>
+                <station name="14th and Rhode Island Ave NW" lon="-77.0323" lat="38.9086"/>
+                <station name="14th and V St NW" lon="-77.0321" lat="38.9176"/>
+                <station name="15th and K St NW" lon="-77.03353" lat="38.902"/>
+                <station name="15th and P St NW" lon="-77.034438" lat="38.90985"/>
+                <station name="16th and Harvard St NW" lon="-77.036536" lat="38.926088"/>
+                <station name="16th and U St NW" lon="-77.036841" lat="38.916656"/>
+                <station name="17th and Corcoran St NW" lon="-77.0387" lat="38.9121"/>
+                <station name="17th and K St NW / Farragut Square" lon="-77.038322" lat="38.902061"/>
+                <station name="17th and K St NW [formerly 17th and L St NW]" lon="-77.03863" lat="38.90276"/>
+                <station name="17th and Rhode Island Ave NW" lon="-77.038785" lat="38.906602"/>
+                <station name="18th and M St NW" lon="-77.041798" lat="38.9055"/>
+                <station name="18th St and Pennsylvania Ave NW" lon="-77.041539" lat="38.89968"/>
+                <station name="19th and E Street NW" lon="-77.0436" lat="38.8952"/>
+                <station name="19th and K St NW" lon="-77.04337" lat="38.902204"/>
+                <station name="19th and L St NW" lon="-77.043648" lat="38.903407"/>
+                <station name="19th St and Constitution Ave NW" lon="-77.0436" lat="38.8923"/>
+                <station name="19th St and Pennsylvania Ave NW" lon="-77.0429" lat="38.9003"/>
+                <station name="20th and E St NW" lon="-77.045" lat="38.8963"/>
+                <station name="20th and L St NW" lon="-77.044789" lat="38.903584"/>
+                <station name="20th and O St NW / Dupont South" lon="-77.04478" lat="38.908905"/>
+                <station name="20th St and Florida Ave NW" lon="-77.0446" lat="38.9154"/>
+                <station name="20th St and Virginia Ave NW" lon="-77.045128" lat="38.894722"/>
+                <station name="21st and I St NW" lon="-77.047" lat="38.9008"/>
+                <station name="21st and M St NW" lon="-77.0471" lat="38.9054"/>
+                <station name="21st St and Constitution Ave NW" lon="-77.046567" lat="38.892459"/>
+                <station name="21st St and Pennsylvania Ave NW" lon="-77.046564" lat="38.901539"/>
+                <station name="22nd and I St NW / Foggy Bottom" lon="-77.048911" lat="38.90088"/>
+                <station name="23rd and E St NW" lon="-77.049882" lat="38.896104"/>
+                <station name="24th and N St NW" lon="-77.05152" lat="38.9066"/>
+                <station name="25th St and Pennsylvania Ave NW" lon="-77.053485" lat="38.903827"/>
                 <station name="3000 Connecticut Ave NW / National Zoo" lon="-77.055599" lat="38.930282"/>
-                <station name="5th &amp; F St NW" lon="-77.019347" lat="38.897222"/>
-                <station name="5th St &amp; K St NW" lon="-77.019027" lat="38.90304"/>
-                <station name="7th &amp; F St NW / National Portrait Gallery" lon="-77.022322" lat="38.897324"/>
-                <station name="7th &amp; R St NW / Shaw Library" lon="-77.022155" lat="38.912719"/>
-                <station name="7th &amp; T St NW" lon="-77.0222" lat="38.9155"/>
-                <station name="8th &amp; H St NW" lon="-77.023086" lat="38.8997"/>
-                <station name="Adams Mill &amp; Columbia Rd NW" lon="-77.042581" lat="38.922925"/>
+                <station name="5th and F St NW" lon="-77.019347" lat="38.897222"/>
+                <station name="5th St and K St NW" lon="-77.019027" lat="38.90304"/>
+                <station name="7th and F St NW / National Portrait Gallery" lon="-77.022322" lat="38.897324"/>
+                <station name="7th and R St NW / Shaw Library" lon="-77.022155" lat="38.912719"/>
+                <station name="7th and T St NW" lon="-77.0222" lat="38.9155"/>
+                <station name="8th and H St NW" lon="-77.023086" lat="38.8997"/>
+                <station name="Adams Mill and Columbia Rd NW" lon="-77.042581" lat="38.922925"/>
                 <station name="Alta Wharehouse Station" lon="-77.053342" lat="38.903691"/>
-                <station name="C &amp; O Canal &amp; Wisconsin Ave NW" lon="-77.062697" lat="38.904036"/>
-                <station name="California St &amp; Florida Ave NW" lon="-77.04062" lat="38.917761"/>
-                <station name="Calvert St &amp; Woodley Pl NW" lon="-77.0501" lat="38.9236"/>
-                <station name="Columbia Rd &amp; Belmont St NW" lon="-77.04368" lat="38.920669"/>
-                <station name="Columbia Rd &amp; Georgia Ave NW" lon="-77.02344" lat="38.928156"/>
-                <station name="Convention Center / 7th &amp; M St NW" lon="-77.022264" lat="38.90572"/>
+                <station name="C and O Canal and Wisconsin Ave NW" lon="-77.062697" lat="38.904036"/>
+                <station name="California St and Florida Ave NW" lon="-77.04062" lat="38.917761"/>
+                <station name="Calvert St and Woodley Pl NW" lon="-77.0501" lat="38.9236"/>
+                <station name="Columbia Rd and Belmont St NW" lon="-77.04368" lat="38.920669"/>
+                <station name="Columbia Rd and Georgia Ave NW" lon="-77.02344" lat="38.928156"/>
+                <station name="Convention Center / 7th and M St NW" lon="-77.022264" lat="38.90572"/>
                 <station name="Georgetown Harbor / 30th St NW" lon="-77.059219" lat="38.9022212"/>
                 <station name="Georgia Ave and Fairmont St NW" lon="-77.0222" lat="38.9249"/>
-                <station name="Harvard St &amp; Adams Mill Rd NW" lon="-77.043358" lat="38.927872"/>
+                <station name="Harvard St and Adams Mill Rd NW" lon="-77.043358" lat="38.927872"/>
                 <station name="Kennedy Center" lon="-77.054845" lat="38.895184"/>
-                <station name="M St &amp; Pennsylvania Ave NW" lon="-77.056887" lat="38.905126"/>
-                <station name="Massachusetts Ave &amp; Dupont Circle NW" lon="-77.0444" lat="38.9101"/>
-                <station name="McPherson Square - 14th &amp; H St NW" lon="-77.032005" lat="38.899641"/>
-                <station name="McPherson Square / 14th &amp; H St NW" lon="-77.032005" lat="38.899641"/>
-                <station name="Metro Center / 12th &amp; G St NW" lon="-77.027869" lat="38.898364"/>
-                <station name="New Hampshire Ave &amp; T St NW [formerly 16th &amp; U St NW]" lon="-77.03818" lat="38.91554"/>
-                <station name="New York Ave &amp; 15th St NW" lon="-77.0337" lat="38.8991"/>
-                <station name="Park Rd &amp; Holmead Pl NW" lon="-77.0315" lat="38.9308"/>
+                <station name="M St and Pennsylvania Ave NW" lon="-77.056887" lat="38.905126"/>
+                <station name="Massachusetts Ave and Dupont Circle NW" lon="-77.0444" lat="38.9101"/>
+                <station name="McPherson Square - 14th and H St NW" lon="-77.032005" lat="38.899641"/>
+                <station name="McPherson Square / 14th and H St NW" lon="-77.032005" lat="38.899641"/>
+                <station name="Metro Center / 12th and G St NW" lon="-77.027869" lat="38.898364"/>
+                <station name="New Hampshire Ave and T St NW [formerly 16th and U St NW]" lon="-77.03818" lat="38.91554"/>
+                <station name="New York Ave and 15th St NW" lon="-77.0337" lat="38.8991"/>
+                <station name="Park Rd and Holmead Pl NW" lon="-77.0315" lat="38.9308"/>
                 <station name="Thomas Circle" lon="-77.0325" lat="38.9059"/>
-                <station name="US Dept of State / Virginia Ave &amp; 21st St NW" lon="-77.046587" lat="38.894919"/>
+                <station name="US Dept of State / Virginia Ave and 21st St NW" lon="-77.046587" lat="38.894919"/>
             </stations>
-            <superStation name="16th &amp; Harvard St NW" lon="-77.036536" lat="38.926088"/>
+            <superStation name="13th St and New York Ave NW" lon="-77.029822" lat="38.900283"/>
         </cluster>
         <cluster west="-77.0163" south="38.9313" north="38.9713" east="-76.9649">
             <stations>
-                <station name="10th &amp; Monroe St NE" lon="-76.992889" lat="38.932514"/>
-                <station name="12th &amp; Newton St NE" lon="-76.991016" lat="38.933668"/>
-                <station name="John McCormack Dr &amp; Michigan Ave NE" lon="-76.9955" lat="38.9346"/>
+                <station name="10th and Monroe St NE" lon="-76.992889" lat="38.932514"/>
+                <station name="12th and Newton St NE" lon="-76.991016" lat="38.933668"/>
+                <station name="John McCormack Dr and Michigan Ave NE" lon="-76.9955" lat="38.9346"/>
             </stations>
-            <superStation name="10th &amp; Monroe St NE" lon="-76.992889" lat="38.932514"/>
+            <superStation name="John McCormack Dr and Michigan Ave NE" lon="-76.9955" lat="38.9346"/>
         </cluster>
         <cluster west="-76.9649" south="38.9313" north="38.9713" east="-76.9135">
             <stations/>
         </cluster>
         <cluster west="-77.0163" south="38.8913" north="38.9313" east="-76.9649">
             <stations>
-                <station name="11th &amp; H St NE" lon="-76.991383" lat="38.899983"/>
-                <station name="13th &amp; D St NE" lon="-76.987633" lat="38.894832"/>
-                <station name="13th &amp; H St NE" lon="-76.9882" lat="38.9003"/>
-                <station name="1st &amp; M St NE" lon="-77.0056" lat="38.9057"/>
-                <station name="1st &amp; Rhode Island Ave NW" lon="-77.012289" lat="38.915417"/>
-                <station name="1st &amp; Washington Hospital Center NW" lon="-77.012457" lat="38.928743"/>
-                <station name="3rd &amp; H St NE" lon="-77.001967" lat="38.900017"/>
-                <station name="4th &amp; Adams St NE" lon="-77.000577" lat="38.920238"/>
-                <station name="4th &amp; D St NW / Judiciary Square" lon="-77.016106" lat="38.895344"/>
-                <station name="4th St &amp; Massachusetts Ave NW" lon="-77.016" lat="38.9003"/>
-                <station name="4th St &amp; Rhode Island Ave NE" lon="-77.000624" lat="38.919488"/>
-                <station name="6th &amp; H St NE" lon="-76.99831" lat="38.900384"/>
-                <station name="Bladensburg Rd &amp; Benning Rd NE" lon="-76.982872" lat="38.900413"/>
+                <station name="11th and H St NE" lon="-76.991383" lat="38.899983"/>
+                <station name="13th and D St NE" lon="-76.987633" lat="38.894832"/>
+                <station name="13th and H St NE" lon="-76.9882" lat="38.9003"/>
+                <station name="1st and M St NE" lon="-77.0056" lat="38.9057"/>
+                <station name="1st and Rhode Island Ave NW" lon="-77.012289" lat="38.915417"/>
+                <station name="1st and Washington Hospital Center NW" lon="-77.012457" lat="38.928743"/>
+                <station name="3rd and H St NE" lon="-77.001967" lat="38.900017"/>
+                <station name="4th and Adams St NE" lon="-77.000577" lat="38.920238"/>
+                <station name="4th and D St NW / Judiciary Square" lon="-77.016106" lat="38.895344"/>
+                <station name="4th St and Massachusetts Ave NW" lon="-77.016" lat="38.9003"/>
+                <station name="4th St and Rhode Island Ave NE" lon="-77.000624" lat="38.919488"/>
+                <station name="6th and H St NE" lon="-76.99831" lat="38.900384"/>
+                <station name="Bladensburg Rd and Benning Rd NE" lon="-76.982872" lat="38.900413"/>
                 <station name="Columbus Circle / Union Station" lon="-77.004962" lat="38.896999"/>
-                <station name="D St &amp; Maryland Ave NE" lon="-76.997114" lat="38.894758"/>
-                <station name="Eckington Pl &amp; Q St NE" lon="-77.00495" lat="38.910972"/>
-                <station name="Florida Ave &amp; R St NW" lon="-77.0135" lat="38.9126"/>
-                <station name="Gallaudet / 8th St &amp; Florida Ave NE" lon="-76.9941" lat="38.90509"/>
-                <station name="M St &amp; Delaware Ave NE" lon="-77.003041" lat="38.905707"/>
-                <station name="North Capitol St &amp; F St NW" lon="-77.009888" lat="38.897446"/>
+                <station name="D St and Maryland Ave NE" lon="-76.997114" lat="38.894758"/>
+                <station name="Eckington Pl and Q St NE" lon="-77.00495" lat="38.910972"/>
+                <station name="Florida Ave and R St NW" lon="-77.0135" lat="38.9126"/>
+                <station name="Gallaudet / 8th St and Florida Ave NE" lon="-76.9941" lat="38.90509"/>
+                <station name="M St and Delaware Ave NE" lon="-77.003041" lat="38.905707"/>
+                <station name="North Capitol St and F St NW" lon="-77.009888" lat="38.897446"/>
             </stations>
-            <superStation name="1st &amp; M St NE" lon="-77.0056" lat="38.9057"/>
+            <superStation name="13th and D St NE" lon="-76.987633" lat="38.894832"/>
         </cluster>
         <cluster west="-76.9649" south="38.8913" north="38.9313" east="-76.9135">
             <stations>
                 <station name="Benning Branch Library" lon="-76.947974" lat="38.894"/>
                 <station name="Minnesota Ave Metro/DOES" lon="-76.947446" lat="38.897063"/>
-                <station name="Nannie Helen Burroughs &amp; Minnesota Ave NE" lon="-76.9422" lat="38.9016"/>
+                <station name="Nannie Helen Burroughs and Minnesota Ave NE" lon="-76.9422" lat="38.9016"/>
             </stations>
             <superStation name="Minnesota Ave Metro/DOES" lon="-76.947446" lat="38.897063"/>
         </cluster>
         <cluster west="-77.1191" south="38.8513" north="38.8913" east="-77.0677">
             <stations>
-                <station name="15th &amp; N Scott St" lon="-77.08095" lat="38.89054"/>
-                <station name="Ballston Metro / N Stuart &amp; 9th St N" lon="-77.111768" lat="38.881044"/>
+                <station name="15th and N Scott St" lon="-77.08095" lat="38.89054"/>
+                <station name="Ballston Metro / N Stuart and 9th St N" lon="-77.111768" lat="38.881044"/>
                 <station name="Central Library" lon="-77.107887" lat="38.883751"/>
-                <station name="Central Library / N Quincy St &amp; 10th St N" lon="-77.10783" lat="38.88397"/>
-                <station name="Clarendon Blvd &amp; N Fillmore St" lon="-77.09308" lat="38.8881"/>
-                <station name="Clarendon Metro / Wilson Blvd &amp; N Highland St" lon="-77.094875" lat="38.88786"/>
-                <station name="Fairfax Dr &amp; Glebe Rd" lon="-77.115449" lat="38.882281"/>
-                <station name="Fairfax Dr &amp; Wilson Blvd" lon="-77.097745" lat="38.885801"/>
-                <station name="George Mason Dr &amp; Wilson Blvd" lon="-77.1191" lat="38.87887"/>
-                <station name="Glebe Rd &amp; 11th St N" lon="-77.116817" lat="38.883921"/>
-                <station name="N Fillmore St &amp; Clarendon Blvd" lon="-77.093124" lat="38.887843"/>
-                <station name="N Highland St &amp; Wilson Blvd" lon="-77.095002" lat="38.887392"/>
-                <station name="N Quincy St &amp; Glebe Rd" lon="-77.107735" lat="38.876393"/>
-                <station name="N Quincy St &amp; Wilson Blvd" lon="-77.107673" lat="38.880151"/>
-                <station name="N Randolph St &amp; Fairfax Dr" lon="-77.109366" lat="38.882629"/>
+                <station name="Central Library / N Quincy St and 10th St N" lon="-77.10783" lat="38.88397"/>
+                <station name="Clarendon Blvd and N Fillmore St" lon="-77.09308" lat="38.8881"/>
+                <station name="Clarendon Metro / Wilson Blvd and N Highland St" lon="-77.094875" lat="38.88786"/>
+                <station name="Fairfax Dr and Glebe Rd" lon="-77.115449" lat="38.882281"/>
+                <station name="Fairfax Dr and Wilson Blvd" lon="-77.097745" lat="38.885801"/>
+                <station name="George Mason Dr and Wilson Blvd" lon="-77.1191" lat="38.87887"/>
+                <station name="Glebe Rd and 11th St N" lon="-77.116817" lat="38.883921"/>
+                <station name="N Fillmore St and Clarendon Blvd" lon="-77.093124" lat="38.887843"/>
+                <station name="N Highland St and Wilson Blvd" lon="-77.095002" lat="38.887392"/>
+                <station name="N Quincy St and Glebe Rd" lon="-77.107735" lat="38.876393"/>
+                <station name="N Quincy St and Wilson Blvd" lon="-77.107673" lat="38.880151"/>
+                <station name="N Randolph St and Fairfax Dr" lon="-77.109366" lat="38.882629"/>
                 <station name="Virginia Square" lon="-77.103971" lat="38.883191"/>
-                <station name="Virginia Square Metro / N Monroe St &amp; 9th St N" lon="-77.103148" lat="38.882788"/>
-                <station name="Washington Blvd &amp; 10th St N" lon="-77.093485" lat="38.884734"/>
-                <station name="Washington Blvd &amp; 7th St N" lon="-77.091129" lat="38.880834"/>
-                <station name="Wilson Blvd &amp; Franklin Rd" lon="-77.0889" lat="38.8904"/>
-                <station name="Wilson Blvd &amp; N Edgewood St" lon="-77.0925" lat="38.889"/>
-                <station name="Wilson Blvd &amp; N Oakland St" lon="-77.10396" lat="38.8815"/>
+                <station name="Virginia Square Metro / N Monroe St and 9th St N" lon="-77.103148" lat="38.882788"/>
+                <station name="Washington Blvd and 10th St N" lon="-77.093485" lat="38.884734"/>
+                <station name="Washington Blvd and 7th St N" lon="-77.091129" lat="38.880834"/>
+                <station name="Wilson Blvd and Franklin Rd" lon="-77.0889" lat="38.8904"/>
+                <station name="Wilson Blvd and N Edgewood St" lon="-77.0925" lat="38.889"/>
+                <station name="Wilson Blvd and N Oakland St" lon="-77.10396" lat="38.8815"/>
             </stations>
-            <superStation name="Glebe Rd &amp; 11th St N" lon="-77.116817" lat="38.883921"/>
+            <superStation name="N Highland St and Wilson Blvd" lon="-77.095002" lat="38.887392"/>
         </cluster>
         <cluster west="-77.0677" south="38.8513" north="38.8913" east="-77.0163">
             <stations>
-                <station name="12th &amp; Army Navy Dr" lon="-77.0528" lat="38.8629"/>
-                <station name="12th &amp; Hayes St" lon="-77.05989" lat="38.862509"/>
-                <station name="15th &amp; Crystal Dr" lon="-77.050276" lat="38.860244"/>
-                <station name="15th &amp; Hayes St" lon="-77.0603" lat="38.8604"/>
-                <station name="18th &amp; Bell St" lon="-77.0511" lat="38.8573"/>
-                <station name="18th &amp; Hayes St" lon="-77.0574" lat="38.8573"/>
-                <station name="20th &amp; Bell St" lon="-77.0512" lat="38.8561"/>
-                <station name="20th &amp; Crystal Dr" lon="-77.0492" lat="38.8564"/>
-                <station name="23rd &amp; Crystal Dr" lon="-77.0498" lat="38.8533"/>
-                <station name="23rd &amp; Eads" lon="-77.053535" lat="38.853613"/>
-                <station name="26th &amp; Crystal Dr" lon="-77.0498" lat="38.8518"/>
-                <station name="4th &amp; E St SW" lon="-77.017445" lat="38.88412"/>
-                <station name="4th &amp; M St SW" lon="-77.0178" lat="38.8767"/>
-                <station name="7th &amp; Water St SW / SW Waterfront" lon="-77.024016" lat="38.878925"/>
-                <station name="Jefferson Dr &amp; 14th St SW" lon="-77.032429" lat="38.888553"/>
+                <station name="12th and Army Navy Dr" lon="-77.0528" lat="38.8629"/>
+                <station name="12th and Hayes St" lon="-77.05989" lat="38.862509"/>
+                <station name="15th and Crystal Dr" lon="-77.050276" lat="38.860244"/>
+                <station name="15th and Hayes St" lon="-77.0603" lat="38.8604"/>
+                <station name="18th and Bell St" lon="-77.0511" lat="38.8573"/>
+                <station name="18th and Hayes St" lon="-77.0574" lat="38.8573"/>
+                <station name="20th and Bell St" lon="-77.0512" lat="38.8561"/>
+                <station name="20th and Crystal Dr" lon="-77.0492" lat="38.8564"/>
+                <station name="23rd and Crystal Dr" lon="-77.0498" lat="38.8533"/>
+                <station name="23rd and Eads" lon="-77.053535" lat="38.853613"/>
+                <station name="26th and Crystal Dr" lon="-77.0498" lat="38.8518"/>
+                <station name="4th and E St SW" lon="-77.017445" lat="38.88412"/>
+                <station name="4th and M St SW" lon="-77.0178" lat="38.8767"/>
+                <station name="7th and Water St SW / SW Waterfront" lon="-77.024016" lat="38.878925"/>
+                <station name="Jefferson Dr and 14th St SW" lon="-77.032429" lat="38.888553"/>
                 <station name="Jefferson Memorial" lon="-77.037413" lat="38.879819"/>
-                <station name="L'Enfant Plaza / 7th &amp; C St SW" lon="-77.022241" lat="38.886266"/>
-                <station name="Maryland &amp; Independence Ave SW" lon="-77.018939" lat="38.887299"/>
-                <station name="Ohio Dr &amp; West Basin Dr SW / MLK &amp; FDR Memorials" lon="-77.04657" lat="38.88412"/>
-                <station name="S Joyce &amp; Army Navy Dr" lon="-77.0633" lat="38.8637"/>
-                <station name="Smithsonian / Jefferson Dr &amp; 12th St SW" lon="-77.02858" lat="38.888767"/>
-                <station name="USDA / 12th &amp; Independence Ave SW" lon="-77.028226" lat="38.887237"/>
+                <station name="L'Enfant Plaza / 7th and C St SW" lon="-77.022241" lat="38.886266"/>
+                <station name="Maryland and Independence Ave SW" lon="-77.018939" lat="38.887299"/>
+                <station name="Ohio Dr and West Basin Dr SW / MLK and FDR Memorials" lon="-77.04657" lat="38.88412"/>
+                <station name="S Joyce and Army Navy Dr" lon="-77.0633" lat="38.8637"/>
+                <station name="Smithsonian / Jefferson Dr and 12th St SW" lon="-77.02858" lat="38.888767"/>
+                <station name="USDA / 12th and Independence Ave SW" lon="-77.028226" lat="38.887237"/>
             </stations>
-            <superStation name="23rd &amp; Eads" lon="-77.053535" lat="38.853613"/>
+            <superStation name="23rd and Eads" lon="-77.053535" lat="38.853613"/>
         </cluster>
         <cluster west="-77.1191" south="38.8113" north="38.8513" east="-77.0677">
             <stations/>
         </cluster>
         <cluster west="-77.0677" south="38.8113" north="38.8513" east="-77.0163">
             <stations>
-                <station name="27th &amp; Crystal Dr" lon="-77.0513" lat="38.8489"/>
-                <station name="S Glebe &amp; Potomac Ave" lon="-77.0502" lat="38.8426"/>
+                <station name="27th and Crystal Dr" lon="-77.0513" lat="38.8489"/>
+                <station name="S Glebe and Potomac Ave" lon="-77.0502" lat="38.8426"/>
             </stations>
-            <superStation name="S Glebe &amp; Potomac Ave" lon="-77.0502" lat="38.8426"/>
+            <superStation name="S Glebe and Potomac Ave" lon="-77.0502" lat="38.8426"/>
         </cluster>
         <cluster west="-77.0163" south="38.8513" north="38.8913" east="-76.9649">
             <stations>
-                <station name="14th &amp; D St SE" lon="-76.9861" lat="38.884"/>
-                <station name="15th St &amp; Massachusetts Ave SE" lon="-76.983569" lat="38.88732"/>
-                <station name="19th &amp; East Capitol St SE" lon="-76.9769" lat="38.8896"/>
-                <station name="1st &amp; K St SE" lon="-77.006004" lat="38.87861"/>
-                <station name="1st &amp; N ST SE" lon="-77.0057" lat="38.8743"/>
-                <station name="3rd &amp; D St SE" lon="-77.0023" lat="38.8851"/>
-                <station name="3rd &amp; G St SE" lon="-77.001828" lat="38.881185"/>
-                <station name="4th &amp; East Capitol St NE" lon="-77.000349" lat="38.889955"/>
-                <station name="8th &amp; Eye St SE / Barracks Row" lon="-76.9953" lat="38.8792"/>
+                <station name="14th and D St SE" lon="-76.9861" lat="38.884"/>
+                <station name="15th St and Massachusetts Ave SE" lon="-76.983569" lat="38.88732"/>
+                <station name="19th and East Capitol St SE" lon="-76.9769" lat="38.8896"/>
+                <station name="1st and K St SE" lon="-77.006004" lat="38.87861"/>
+                <station name="1st and N ST SE" lon="-77.0057" lat="38.8743"/>
+                <station name="3rd and D St SE" lon="-77.0023" lat="38.8851"/>
+                <station name="3rd and G St SE" lon="-77.001828" lat="38.881185"/>
+                <station name="4th and East Capitol St NE" lon="-77.000349" lat="38.889955"/>
+                <station name="8th and Eye St SE / Barracks Row" lon="-76.9953" lat="38.8792"/>
                 <station name="Anacostia Library" lon="-76.9784" lat="38.865784"/>
                 <station name="Anacostia Metro" lon="-76.9949" lat="38.8624"/>
-                <station name="Eastern Market / 7th &amp; North Carolina Ave SE" lon="-76.996806" lat="38.886952"/>
-                <station name="Eastern Market Metro / Pennsylvania Ave &amp; 7th St SE" lon="-76.995397" lat="38.884"/>
-                <station name="Good Hope &amp; Naylor Rd SE" lon="-76.9672" lat="38.8601"/>
-                <station name="Good Hope Rd &amp; 14th St SE" lon="-76.985238" lat="38.866611"/>
-                <station name="Good Hope Rd &amp; MLK Ave SE" lon="-76.988039" lat="38.867373"/>
-                <station name="M St &amp; New Jersey Ave SE" lon="-77.0037" lat="38.8763"/>
-                <station name="Pennsylvania &amp; Minnesota Ave SE" lon="-76.971015" lat="38.873057"/>
-                <station name="Potomac &amp; Pennsylvania Ave SE" lon="-76.9862" lat="38.8803"/>
+                <station name="Eastern Market / 7th and North Carolina Ave SE" lon="-76.996806" lat="38.886952"/>
+                <station name="Eastern Market Metro / Pennsylvania Ave and 7th St SE" lon="-76.995397" lat="38.884"/>
+                <station name="Good Hope and Naylor Rd SE" lon="-76.9672" lat="38.8601"/>
+                <station name="Good Hope Rd and 14th St SE" lon="-76.985238" lat="38.866611"/>
+                <station name="Good Hope Rd and MLK Ave SE" lon="-76.988039" lat="38.867373"/>
+                <station name="M St and New Jersey Ave SE" lon="-77.0037" lat="38.8763"/>
+                <station name="Pennsylvania and Minnesota Ave SE" lon="-76.971015" lat="38.873057"/>
+                <station name="Potomac and Pennsylvania Ave SE" lon="-76.9862" lat="38.8803"/>
             </stations>
-            <superStation name="15th St &amp; Massachusetts Ave SE" lon="-76.983569" lat="38.88732"/>
+            <superStation name="Anacostia Metro" lon="-76.9949" lat="38.8624"/>
         </cluster>
         <cluster west="-76.9649" south="38.8513" north="38.8913" east="-76.9135">
             <stations>
-                <station name="Benning Rd &amp; East Capitol St NE / Benning Rd Metro" lon="-76.93723" lat="38.889935"/>
-                <station name="Branch &amp; Pennsylvania Ave SE" lon="-76.9599" lat="38.8692"/>
+                <station name="Benning Rd and East Capitol St NE / Benning Rd Metro" lon="-76.93723" lat="38.889935"/>
+                <station name="Branch and Pennsylvania Ave SE" lon="-76.9599" lat="38.8692"/>
                 <station name="Fairfax Village" lon="-76.952103" lat="38.86559"/>
-                <station name="Randle Circle &amp; Minnesota Ave NE" lon="-76.9607" lat="38.878"/>
+                <station name="Randle Circle and Minnesota Ave NE" lon="-76.9607" lat="38.878"/>
             </stations>
-            <superStation name="Branch &amp; Pennsylvania Ave SE" lon="-76.9599" lat="38.8692"/>
+            <superStation name="Benning Rd and East Capitol St NE / Benning Rd Metro" lon="-76.93723" lat="38.889935"/>
         </cluster>
         <cluster west="-77.0163" south="38.8113" north="38.8513" east="-76.9649">
             <stations>

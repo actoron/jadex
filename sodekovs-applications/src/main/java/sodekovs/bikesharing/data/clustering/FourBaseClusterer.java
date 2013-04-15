@@ -25,7 +25,7 @@ public class FourBaseClusterer {
 	/**
 	 * The level of recursive clustering, results in 4^LEVEL #quadrants
 	 */
-	private static final int LEVEL = 5;
+	private static final int LEVEL = 1;
 
 	/**
 	 * The database connection
@@ -122,6 +122,7 @@ public class FourBaseClusterer {
 				Station station = new Station(lat, lon, name);
 				List<String> excludedStations = Arrays.asList(RealDataExtractor.EXCLUDE_STATIONS);
 				if (!excludedStations.contains(name)) {
+					station.setName(station.getName().replace("&", "and"));
 					data.add(station);
 					System.out.println("fetchStations() - added " + station);
 				} else {
