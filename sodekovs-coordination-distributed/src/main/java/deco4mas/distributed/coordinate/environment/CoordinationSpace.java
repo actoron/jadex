@@ -9,7 +9,6 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.envsupport.MObjectType;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.EnvironmentEvent;
@@ -58,7 +57,7 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 
 	/** List of EventListener that should be informed when something on coordination mechanisms changes */
 	private EventListenerList coordinationEventListener = new EventListenerList();
-	
+
 	/** The coordination context id */
 	private String coordinationContextId = null;
 
@@ -94,9 +93,9 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 		// If it's a distributed application, then it has a contextID.
 		HashMap<String, Object> appArgs = (HashMap<String, Object>) applicationInterpreter.getArguments();
 		this.coordinationContextId = (String) appArgs.get("CoordinationContextID");
-		
+
 		startService();
-		
+
 		initSpaces();
 		initDeco4mas();
 		for (CoordinationMechanism icord : activeCoordinationMechanisms.values()) {
@@ -204,29 +203,32 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	 * percepts. The percept triggers a plan within the agents and initializes the "Agent-State-Interpreter" /"Agent Behaviour Observation Component".
 	 */
 	private void initParticipatingAgent(final IComponentDescription ai) {
-		// get the IComponentManagementService
-		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(this.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(
-				new ThreadSuspendable());
+		SServiceProvider.getServiceUpwards(this.getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(
+				new DefaultResultListener<IComponentManagementService>() {
 
-		// get the external access for the agent
-		IFuture<IExternalAccess> fut = cms.getExternalAccess(ai.getName());
-		fut.addResultListener(new DefaultResultListener<IExternalAccess>() {
+					@Override
+					public void resultAvailable(IComponentManagementService cms) {
+						// get the external access for the agent
+						IFuture<IExternalAccess> fut = cms.getExternalAccess(ai.getName());
+						fut.addResultListener(new DefaultResultListener<IExternalAccess>() {
 
-			@Override
-			public void resultAvailable(IExternalAccess externalAccess) {
-				// check if an external access for an BDI or Micro agent is
-				// needed
-				if (externalAccess instanceof IBDIExternalAccess) {
-					IBDIExternalAccess exta = (IBDIExternalAccess) externalAccess;
+							@Override
+							public void resultAvailable(IExternalAccess externalAccess) {
+								// check if an external access for an BDI or Micro agent is
+								// needed
+								if (externalAccess instanceof IBDIExternalAccess) {
+									IBDIExternalAccess exta = (IBDIExternalAccess) externalAccess;
 
-					new InitBDIAgentForCoordination().startInits(ai, exta, CoordinationSpace.this, masDnyModel);
-				} else if (externalAccess instanceof IMicroExternalAccess) {
-					IMicroExternalAccess exta = (IMicroExternalAccess) externalAccess;
+									new InitBDIAgentForCoordination().startInits(ai, exta, CoordinationSpace.this, masDnyModel);
+								} else if (externalAccess instanceof IMicroExternalAccess) {
+									IMicroExternalAccess exta = (IMicroExternalAccess) externalAccess;
 
-					new InitMicroAgentForCoordination().startInits(ai, exta, CoordinationSpace.this, masDnyModel);
-				}
-			}
-		});
+									new InitMicroAgentForCoordination().startInits(ai, exta, CoordinationSpace.this, masDnyModel);
+								}
+							}
+						});
+					}
+				});
 	}
 
 	/**

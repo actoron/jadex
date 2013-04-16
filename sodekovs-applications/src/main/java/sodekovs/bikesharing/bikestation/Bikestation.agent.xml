@@ -70,6 +70,10 @@
 		
 		<!-- Used for So. Stores the received replies from a decentralized poll request -->
 		<beliefset name="receivedDecentralizedCoordData" class="StateCoordinationStationData"/>
+		
+		<belief name="initial" class="Boolean">
+		    <fact>new Boolean(true)</fact>
+		</belief>
 	</beliefs>
 	
 	<plans>
@@ -112,18 +116,22 @@
 		    <body class="ChangedOccupancyPlan"/>
 		    <trigger>
 		        <factchanged ref="stock"/>
-		        <factchanged ref="capacity"/>
 		    </trigger>
 		</plan>
 		
 		<plan name="received_change_occupancy">
 		    <body class="ReceivedChangedOccupancy"/>
+		    <!--
 		    <parameter name="tuple" class="CoordinationStationData">
 		        <internaleventmapping ref="inform_changed_occupancy.tuple"/>
 		    </parameter>
 		    <trigger>
 		        <internalevent ref="inform_changed_occupancy"/>
 		    </trigger>
+		    -->
+		    <waitqueue>
+		        <internalevent ref="inform_changed_occupancy"/>
+		    </waitqueue>
 		</plan>
 		
 		<plan name="decentralized_changed_state">
@@ -231,6 +239,7 @@
 			<plans>
 				<!-- <initialplan ref="test_plan"/> -->
 				<initialplan ref="super_station_plan"/>
+				<initialplan ref="received_change_occupancy"/>
 			</plans>
 		</configuration>
 	</configurations>

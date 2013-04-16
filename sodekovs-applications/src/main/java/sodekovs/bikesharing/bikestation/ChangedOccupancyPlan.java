@@ -24,31 +24,36 @@ public class ChangedOccupancyPlan extends Plan {
 	public void body() {
 		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
 		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("tuple_information");
-		if (coordSpace != null && mechanism != null) {
-			Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
-			Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
-			String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
-			Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
+		Boolean initial = (Boolean) getBeliefbase().getBelief("initial").getFact();
+		if (initial) {
+			getBeliefbase().getBelief("initial").setFact(Boolean.FALSE);
+		} else {
+			if (coordSpace != null && mechanism != null) {
+				Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
+				Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
+				String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
+				Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
 
-			Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
-			Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
-			Double occupany = Double.valueOf(stock) / Double.valueOf(capacity);
+				// if (stationID.equals("4th St and Massachusetts Ave NW")) {
+				Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
+				Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
+				Double occupany = Double.valueOf(stock) / Double.valueOf(capacity);
 
-			CoordinationStationData tuple = new CoordinationStationData(stationID, capacity, stock, position);
-			System.out.println("Occupancy changed in " + stationID + " " + tuple);
+				CoordinationStationData tuple = new CoordinationStationData(stationID, capacity, stock, position);
+//				System.out.println("Occupancy changed in " + stationID + " " + tuple);
 
-			// reset alternative if they are not needed any more
-			if (occupany < fullThreshold) {
-				getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
-			}
-			if (occupany > emptyThreshold) {
-				getBeliefbase().getBelief("proposed_departure_station").setFact(null);
-			}
+				// reset alternative if they are not needed any more
+				if (occupany < fullThreshold) {
+					getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
+				}
+				if (occupany > emptyThreshold) {
+					getBeliefbase().getBelief("proposed_departure_station").setFact(null);
+				}
 
-			if (occupany >= fullThreshold || occupany <= emptyThreshold) {
 				IInternalEvent event = createInternalEvent("changed_occupancy");
 				event.getParameter("tuple").setValue(tuple);
 				dispatchInternalEvent(event);
+				// }
 			}
 		}
 	}
