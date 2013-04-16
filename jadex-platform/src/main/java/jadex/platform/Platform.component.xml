@@ -126,6 +126,9 @@
 		<argument name="realtimetimeout" class="boolean">true</argument>
 		<!-- Flag if CIDs may be reused (true for not). -->
 		<argument name="uniqueids" class="boolean">true</argument>
+		<!-- Flag for deferring thread creation/deletion in thread pool -->
+		<argument name="threadpooldefer", clazz=boolean.class>false</argument>
+		
 		
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
 		<argument name="libpath" class="String"></argument>
@@ -254,14 +257,14 @@
 		<providedservice class="jadex.bridge.service.types.threadpool.IThreadPoolService">
 			<implementation proxytype="raw">
 				new jadex.platform.service.threadpool.ThreadPoolService(
-					new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+					new jadex.commons.concurrent.ThreadPool(new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getServiceProvider())
 				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.threadpool.IDaemonThreadPoolService">
 			<implementation proxytype="raw">
 				new jadex.platform.service.threadpool.ThreadPoolService(
-					new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+					new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getServiceProvider())
 				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
