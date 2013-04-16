@@ -7,9 +7,11 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.STaskMetaInfoExtractor;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.awt.BorderLayout;
@@ -327,13 +329,26 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	protected TaskMetaInfo getTaskMetaInfo(String taskname)
 	{
 		TaskMetaInfo ret = null;
-		if (modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
+		if(modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
 		{
 			ret = modelcontainer.getProjectTaskMetaInfos().get(taskname);
 		}
-		if (ret == null)
+		if(ret == null)
 		{
 			ret = BpmnEditor.TASK_INFOS.get(taskname);
+		}
+		// try to extract
+		if(ret==null)
+		{
+			try
+			{
+				Class<?> clazz = SReflect.classForName(taskname, null);
+				ret = STaskMetaInfoExtractor.getMetaInfo(clazz);
+				modelcontainer.getProjectTaskMetaInfos().put(taskname, ret);
+			}
+			catch(Exception e)
+			{
+			}
 		}
 		return ret;
 	}

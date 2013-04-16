@@ -359,7 +359,7 @@ public class ModelContainer
 		{
 			String rootpath = root.getAbsolutePath();
 			File clroot = null;
-			if (rootpath.contains("src" + File.separator + "main" + File.separator + "java"))
+			if(rootpath.contains("src" + File.separator + "main" + File.separator + "java"))
 			{
 				String clpath = rootpath.replace("src" + File.separator + "main" + File.separator + "java",
 												 "target" + File.separator + "classes");
@@ -369,7 +369,7 @@ public class ModelContainer
 					clroot = null;
 				}
 			}
-			if (clroot == null && (rootpath.endsWith("src") || rootpath.endsWith("src" + File.separator)))
+			if(clroot == null && (rootpath.endsWith("src") || rootpath.endsWith("src" + File.separator)))
 			{
 				String clpath = rootpath.replace("src", "bin");
 				clroot = new File(clpath);
@@ -379,7 +379,7 @@ public class ModelContainer
 				}
 			}
 			
-			if (clroot != null)
+			if(clroot != null)
 			{
 				URL[] urls = new URL[] { clroot.toURI().toURL() };
 				projectclassloader = new URLClassLoader(urls, ModelContainer.class.getClassLoader());
@@ -415,7 +415,7 @@ public class ModelContainer
 					}
 				});
 				
-				for (Class<?> clazz : classes)
+				for(Class<?> clazz : classes)
 				{
 					projecttaskmetainfos.put(clazz.getCanonicalName(), STaskMetaInfoExtractor.getMetaInfo(clazz));
 				}
