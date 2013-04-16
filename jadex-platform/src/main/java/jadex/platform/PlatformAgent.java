@@ -87,7 +87,7 @@ import java.util.logging.Level;
 	@Argument(name="logging_level", clazz=Level.class, defaultvalue="java.util.logging.Level.SEVERE"),
 	@Argument(name="simulation", clazz=Boolean.class),
 	@Argument(name="asyncexecution", clazz=Boolean.class),
-	@Argument(name="threadpooldefer", clazz=boolean.class, defaultvalue="false"),
+	@Argument(name="threadpooldefer", clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name="parametercopy", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="realtimetimeout", clazz=boolean.class, defaultvalue="true"),

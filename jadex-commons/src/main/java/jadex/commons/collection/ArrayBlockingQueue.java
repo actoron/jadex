@@ -1,5 +1,6 @@
 package jadex.commons.collection;
 
+import jadex.commons.collection.IBlockingQueue.ClosedException;
 import jadex.commons.concurrent.TimeoutException;
 
 import java.util.Arrays;
@@ -139,6 +140,24 @@ public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
             return (T)ret;
         }
     }
+    
+	/**
+	 *  Peek the topmost element without dequeuing it.
+	 *  @return The element. When queue is empty
+	 *  the methods blocks until an element is added.
+	 */
+	public T peek()	throws ClosedException
+	{
+		if(closed)
+			throw new IBlockingQueue.ClosedException("Queue closed.");
+
+		T ret;
+		synchronized(monitor)
+        {
+			ret = size>0? (T)elements[start]: null;
+        }
+		return ret;
+	}
     
     /**
      *  Remove an object from the queue

@@ -12,6 +12,12 @@ public interface IPoolStrategy
 	public boolean taskAdded();
 	
 	/**
+	 *  Called when a new worker was added proactively to the pool.
+	 *  @param cnt The number of new workers.
+	 */
+	public void workersAdded(int cnt);
+	
+	/**
 	 *  Called when a new task was served from the pool.
 	 *  @param waitdur The waiting time of the task.
 	 */

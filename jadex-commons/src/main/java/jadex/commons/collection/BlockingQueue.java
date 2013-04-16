@@ -14,12 +14,12 @@ import java.util.List;
  *  elements. It blocks, when it is tried to dequeue
  *  an element, but the queue is empty.
  */
-public class BlockingQueue implements IBlockingQueue
+public class BlockingQueue<T> implements IBlockingQueue<T>
 {
 	//-------- attributes --------
 
 	/** The element storage. */
-	protected List	elems;
+	protected List<T>	elems;
 
 	/** The queue state. */
 	protected volatile boolean closed;
@@ -34,7 +34,7 @@ public class BlockingQueue implements IBlockingQueue
 	 */
 	public BlockingQueue()
 	{
-		this.elems	= new LinkedList();
+		this.elems	= new LinkedList<T>();
 		this.monitor	= new Object();
 	}
 
@@ -44,7 +44,7 @@ public class BlockingQueue implements IBlockingQueue
 	 *  Enqueue an element.
 	 *  @param element The element.
 	 */
-	public void enqueue(Object element)
+	public void enqueue(T element)
 	{
 		if(closed)
 			throw new IBlockingQueue.ClosedException("Queue closed.");
@@ -62,7 +62,7 @@ public class BlockingQueue implements IBlockingQueue
 	 *  @return The element. When queue is empty
 	 *  the methods blocks until an element is added or the timeout occurs.
 	 */
-    public Object dequeue(long timeout) throws ClosedException, TimeoutException
+    public T dequeue(long timeout) throws ClosedException, TimeoutException
     {
 		if(closed)
 			throw new IBlockingQueue.ClosedException("Queue closed.");
@@ -104,13 +104,31 @@ public class BlockingQueue implements IBlockingQueue
 			return elems.remove(0);
 		}
 	}
+    
+    /**
+	 *  Peek the topmost element without dequeuing it.
+	 *  @return The element. When queue is empty
+	 *  the methods blocks until an element is added.
+	 */
+	public T peek()	throws ClosedException
+	{
+		if(closed)
+			throw new IBlockingQueue.ClosedException("Queue closed.");
+
+		T ret;
+		synchronized(monitor)
+        {
+			ret = !elems.isEmpty()? elems.get(0): null;
+        }
+		return ret;
+	}
 
    	/**
 	 *  Dequeue an element.
 	 *  @return The element. When queue is empty
 	 *  the methods blocks until an element is added.
 	 */
-	public Object dequeue()	throws ClosedException
+	public T dequeue()	throws ClosedException
 	{
 		return dequeue(-1);
 	}

@@ -127,7 +127,7 @@
 		<!-- Flag if CIDs may be reused (true for not). -->
 		<argument name="uniqueids" class="boolean">true</argument>
 		<!-- Flag for deferring thread creation/deletion in thread pool -->
-		<argument name="threadpooldefer" class="boolean">false</argument>
+		<argument name="threadpooldefer" class="boolean">true</argument>
 		
 		
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->

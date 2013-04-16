@@ -23,6 +23,13 @@ public interface IBlockingQueue<T>
 	public T dequeue()	throws ClosedException;
 
 	/**
+	 *  Peek the topmost element without dequeuing it.
+	 *  @return The element. When queue is empty
+	 *  the methods blocks until an element is added.
+	 */
+	public T peek()	throws ClosedException;
+	
+	/**
 	 *  Dequeue an element.
 	 *  @param timeout	the time to wait (in millis) or -1 for no timeout.
 	 *  @return The element. When queue is empty

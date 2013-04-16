@@ -115,6 +115,12 @@ public class ThreadPool implements IThreadPool
 	
 	/** The maximum number of parked threads. */
 	protected int maxparked;
+
+	/** Rescur timer that checks if progress is made and tasks are scheduled. */
+	protected Timer timer; 
+	
+	/** The time a task should maximum wait. */
+	protected long maxwait;
 	
 	//-------- constructors --------
 
@@ -138,6 +144,14 @@ public class ThreadPool implements IThreadPool
 	 *  Create a new thread pool.
 	 */
 	public ThreadPool(boolean daemon, IPoolStrategy strategy)
+	{	
+		this(daemon, strategy, 500);
+	}
+	
+	/**
+	 *  Create a new thread pool.
+	 */
+	public ThreadPool(boolean daemon, IPoolStrategy strategy, long maxwait)
 	{		
 		this.daemon = daemon;
 		this.strategy = strategy;
@@ -150,6 +164,8 @@ public class ThreadPool implements IThreadPool
 		this.enqueuetimes = Collections.synchronizedMap(new IdentityHashMap<Runnable, Long>());
 		this.maxparked = 500;
 		this.parked = new ArrayList<ServiceThread>();
+		this.timer = new Timer(true);
+		this.maxwait = maxwait;
 		
 		addThreads(strategy.getWorkerCount());
 	
@@ -184,6 +200,26 @@ public class ThreadPool implements IThreadPool
 			throw new RuntimeException("Task already scheduled: " + task);
 		
 		tasks.enqueue(task);
+		timer.scheduleAtFixedRate(new TimerTask()
+		{
+			public void run()
+			{
+				synchronized(ThreadPool.this)
+				{
+					// If there are tasks and the last served task is too long ago
+					if(running && tasks.size()>0)
+					{
+						Long start = enqueuetimes.get(tasks.peek());
+						if(start!=null && start.longValue()+maxwait<System.currentTimeMillis())
+						{
+							addThreads(5);
+							strategy.workersAdded(5);
+//							System.out.println("Added threads due to starving task in queue.");
+						}
+					}
+				}
+			}
+		}, maxwait, maxwait);
 	}
 
 	/**
@@ -193,6 +229,8 @@ public class ThreadPool implements IThreadPool
 	{
 		this.running = false;
 		this.tasks.setClosed(true);
+
+		this.timer.cancel();
 		
 		while(!pool.isEmpty())
 		{
@@ -353,7 +391,8 @@ public class ThreadPool implements IThreadPool
 				{
 					this.task = ((Runnable)tasks.dequeue(strategy.getWorkerTimeout()));
 					Long start = enqueuetimes.remove(task);
-					strategy.taskServed(System.currentTimeMillis()-start);
+					long now = System.currentTimeMillis();
+					strategy.taskServed(now-start);
 					
 //					System.out.println("throuput: "+throughput);
 					
@@ -587,5 +626,10 @@ public class ThreadPool implements IThreadPool
 				}
 			});
 		}
+	}
+	
+	class TPTimerTask
+	{
+		
 	}
 }
