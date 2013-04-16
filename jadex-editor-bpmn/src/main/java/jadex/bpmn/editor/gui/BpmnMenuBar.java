@@ -263,6 +263,7 @@ public class BpmnMenuBar extends JMenuBar
 						}
 						
 						modelcontainer.setGraph(graph);
+						modelcontainer.setBpmnModel(mmodel);
 						
 						modelcontainer.setFile(file);
 						editorwindow.getSettings().setLastFile(file);
