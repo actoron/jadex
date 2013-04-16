@@ -1,7 +1,6 @@
 package jadex.bpmn.editor;
 
 import jadex.bpmn.editor.gui.BpmnEditorWindow;
-import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetComplexGrayscale;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
@@ -13,7 +12,6 @@ import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import java.awt.EventQueue;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
