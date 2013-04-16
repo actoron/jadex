@@ -180,10 +180,9 @@ public class ThreadPool implements IThreadPool
 		if(this.strategy.taskAdded())
 			addThreads(1);
 		
-		if (enqueuetimes.put(task, System.currentTimeMillis()) != null)
-		{
+		if(enqueuetimes.put(task, System.currentTimeMillis()) != null)
 			throw new RuntimeException("Task already scheduled: " + task);
-		}
+		
 		tasks.enqueue(task);
 	}
 
