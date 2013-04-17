@@ -15,91 +15,97 @@ import deco4mas.distributed.mechanism.CoordinationMechanism;
  * 
  * @author Thomas Preisler
  */
-public class ReceivedChangedOccupancy extends Plan {
+public class ReceivedChangedOccupancyQueuePlan extends Plan {
 
 	private static final long serialVersionUID = -8242825974497308907L;
-	
+
 	@Override
 	public void body() {
 		System.out.println("ReceivedChangedOccupancyPlan started in " + getComponentName());
-		
-		while(true) {
+
+		while (true) {
 			waitForTick();
-			IInternalEvent event = (IInternalEvent) getWaitqueue().removeNextElement();
-			
-			if (event != null) {
-				CoordinationStationData tuple = (CoordinationStationData) event.getParameter("tuple").getValue();
-				
-				String proposedArrivalStation = (String) getBeliefbase().getBelief("proposed_arrival_station").getFact();
-				String proposedDepartureStation = (String) getBeliefbase().getBelief("proposed_departure_station").getFact();
-				String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
-				System.out.println("ReceivedChangedOccupancy called in " + stationID + " with " + tuple);
-				
-				// get the occupancy of the station
-				Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
-				Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
-				Double occupancy = Double.valueOf(stock) / Double.valueOf(capacity);
+			Object[] elements = getWaitqueue().getElements();
+			// IInternalEvent event = (IInternalEvent) getWaitqueue().removeNextElement();
 
-				// get the coordination space
-				CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
-				// and the mechanism for this coordination process
-				CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("tuple_information");
-				// to get the global coordination parameters
-				Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
-				Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
+			if (elements != null) {
+				for (Object element : elements) {
+					IInternalEvent event = (IInternalEvent) element;
+					CoordinationStationData tuple = (CoordinationStationData) event.getParameter("tuple").getValue();
 
-				// if the updated station is full and is this stations proposed arrival station delete it
-				if (tuple.getOccupancy() >= fullThreshold && tuple.getStationID().equals(proposedArrivalStation)) {
-					proposedArrivalStation = null;
-					getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
-				}
-				// if the updated station is empty and this stations proposed departure station delete it
-				if (tuple.getOccupancy() <= emptyThreshold && tuple.getStationID().equals(proposedDepartureStation)) {
-					proposedDepartureStation = null;
-					getBeliefbase().getBelief("proposed_departure_station").setFact(null);
-				}
+					String proposedArrivalStation = (String) getBeliefbase().getBelief("proposed_arrival_station").getFact();
+					String proposedDepartureStation = (String) getBeliefbase().getBelief("proposed_departure_station").getFact();
+					String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
+					System.out.println("ReceivedChangedOccupancy called in " + stationID + " with " + tuple);
 
-				// if the station is full and the remote station is not full
-				if (occupancy >= fullThreshold && tuple.getOccupancy() < fullThreshold) {
-					// if there is no alternative just set it
-					if (proposedArrivalStation == null) {
-						getBeliefbase().getBelief("proposed_arrival_station").setFact(tuple.getStationID());
+					// get the occupancy of the station
+					Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
+					Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
+					Double occupancy = Double.valueOf(stock) / Double.valueOf(capacity);
+
+					// get the coordination space
+					CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
+					// and the mechanism for this coordination process
+					CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("tuple_information");
+					// to get the global coordination parameters
+					Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
+					Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
+
+					// if the updated station is full and is this stations proposed arrival station delete it
+					if (tuple.getOccupancy() >= fullThreshold && tuple.getStationID().equals(proposedArrivalStation)) {
+						proposedArrivalStation = null;
+						getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
 					}
-					// if there is a alternative check which one is nearer
-					else {
-						Vector2Double oldPosition = getPosition(proposedArrivalStation);
-						String nearestStation = getNearestStation(proposedArrivalStation, oldPosition, tuple.getStationID(), tuple.getPosition());
-						getBeliefbase().getBelief("proposed_arrival_station").setFact(nearestStation);
+					// if the updated station is empty and this stations proposed departure station delete it
+					if (tuple.getOccupancy() <= emptyThreshold && tuple.getStationID().equals(proposedDepartureStation)) {
+						proposedDepartureStation = null;
+						getBeliefbase().getBelief("proposed_departure_station").setFact(null);
 					}
-				}
-				// or if the station is empty and the remote station is not empty
-				else if (occupancy <= emptyThreshold && tuple.getOccupancy() > emptyThreshold) {
-					// if there is no alternative just set it
-					if (proposedDepartureStation == null) {
-						getBeliefbase().getBelief("proposed_departure_station").setFact(tuple.getStationID());
+
+					// if the station is full and the remote station is not full
+					if (occupancy >= fullThreshold && tuple.getOccupancy() < fullThreshold) {
+						// if there is no alternative just set it
+						if (proposedArrivalStation == null) {
+							getBeliefbase().getBelief("proposed_arrival_station").setFact(tuple.getStationID());
+						}
+						// if there is a alternative check which one is nearer
+						else {
+							Vector2Double oldPosition = getPosition(proposedArrivalStation);
+							String nearestStation = getNearestStation(proposedArrivalStation, oldPosition, tuple.getStationID(), tuple.getPosition());
+							getBeliefbase().getBelief("proposed_arrival_station").setFact(nearestStation);
+						}
 					}
-					// if there is a alternative check which one is nearer
-					else {
-						Vector2Double oldPosition = getPosition(proposedDepartureStation);
-						String nearestStation = getNearestStation(proposedDepartureStation, oldPosition, tuple.getStationID(), tuple.getPosition());
-						getBeliefbase().getBelief("proposed_departure_station").setFact(nearestStation);
+					// or if the station is empty and the remote station is not empty
+					else if (occupancy <= emptyThreshold && tuple.getOccupancy() > emptyThreshold) {
+						// if there is no alternative just set it
+						if (proposedDepartureStation == null) {
+							getBeliefbase().getBelief("proposed_departure_station").setFact(tuple.getStationID());
+						}
+						// if there is a alternative check which one is nearer
+						else {
+							Vector2Double oldPosition = getPosition(proposedDepartureStation);
+							String nearestStation = getNearestStation(proposedDepartureStation, oldPosition, tuple.getStationID(), tuple.getPosition());
+							getBeliefbase().getBelief("proposed_departure_station").setFact(nearestStation);
+						}
 					}
+					
+					getWaitqueue().removeElement(element);
 				}
 			}
 		}
 	}
 
 	public void oldBody() {
-//		startAtomic();
+		// startAtomic();
 
 		String proposedArrivalStation = (String) getBeliefbase().getBelief("proposed_arrival_station").getFact();
 		String proposedDepartureStation = (String) getBeliefbase().getBelief("proposed_departure_station").getFact();
 		String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
-//
+		//
 		CoordinationStationData tuple = (CoordinationStationData) getParameter("tuple").getValue();
-//
+		//
 		System.out.println("ReceivedChangedOccupancy called in " + stationID + " with " + tuple);
-		
+
 		// get the occupancy of the station
 		Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
 		Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
@@ -151,7 +157,7 @@ public class ReceivedChangedOccupancy extends Plan {
 			}
 		}
 
-//		endAtomic();
+		// endAtomic();
 	}
 
 	/**

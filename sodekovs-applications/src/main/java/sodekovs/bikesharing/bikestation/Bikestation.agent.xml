@@ -84,32 +84,47 @@
 		
 		<plan name="gather_occupancy_plan">
 		    <body class="GatherOccupancyPlan"/>
+		    <!--
 		    <parameter name="coordData" class="ClusterStationCoordData">
 		        <internaleventmapping ref="gather_occupancy_rate.coordData"/>
 		    </parameter>
 		    <trigger>
 		        <internalevent ref="gather_occupancy_rate"/>
 		    </trigger>
+		     -->
+		     <waitqueue>
+		         <internalevent ref="gather_occupancy_rate"/>
+		     </waitqueue>
 		</plan>
 		
 		<plan name="calculate_proposed_stations">
 		    <body class="CalculateProposedStationsPlan"/>
+		    <!-- 
 		    <parameter name="coordData" class="ClusterStationCoordData">
 		        <internaleventmapping ref="calculate_proposed_stations.coordData"/>
 		    </parameter>
 		    <trigger>
 		        <internalevent ref="calculate_proposed_stations"/>
 		    </trigger>
+		     -->
+		     <waitqueue>
+		         <internalevent ref="calculate_proposed_stations"/>
+		     </waitqueue>
 		</plan>
 		
 		<plan name="receive_alternatives">
 		    <body class="ReceiveAlternativesPlan"/>
-		    <parameter name="coordData" class="ClusterStationCoordData">
+		   <!-- 
+		   <parameter name="coordData" class="ClusterStationCoordData">
 		        <internaleventmapping ref="receive_alternatives.coordData"/>
 		    </parameter>
 		    <trigger>
 		        <internalevent ref="receive_alternatives"/>
 		    </trigger>
+		     --> 
+			<waitqueue>
+			    <internalevent ref="receive_alternatives"/>
+			</waitqueue>
 		</plan>
 		
 		<plan name="changed_occupancy">
@@ -119,17 +134,21 @@
 		    </trigger>
 		</plan>
 		
+		<!--
 		<plan name="received_change_occupancy">
-		    <body class="ReceivedChangedOccupancy"/>
-		    <!--
+		    <body class="ReceivedChangedOccupancyPlan"/>
 		    <parameter name="tuple" class="CoordinationStationData">
 		        <internaleventmapping ref="inform_changed_occupancy.tuple"/>
 		    </parameter>
 		    <trigger>
 		        <internalevent ref="inform_changed_occupancy"/>
 		    </trigger>
-		    -->
-		    <waitqueue>
+		</plan>
+		-->
+		
+		<plan name="received_change_occupancy_queue">
+		    <body class="ReceivedChangedOccupancyQueuePlan"/>
+		  	 <waitqueue>
 		        <internalevent ref="inform_changed_occupancy"/>
 		    </waitqueue>
 		</plan>
@@ -239,7 +258,10 @@
 			<plans>
 				<!-- <initialplan ref="test_plan"/> -->
 				<initialplan ref="super_station_plan"/>
-				<initialplan ref="received_change_occupancy"/>
+				<initialplan ref="gather_occupancy_plan"/>
+				<initialplan ref="calculate_proposed_stations"/>
+				<initialplan ref="receive_alternatives"/>
+				<initialplan ref="received_change_occupancy_queue"/>
 			</plans>
 		</configuration>
 	</configurations>

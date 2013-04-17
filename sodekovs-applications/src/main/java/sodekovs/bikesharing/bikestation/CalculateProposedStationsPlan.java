@@ -2,6 +2,7 @@ package sodekovs.bikesharing.bikestation;
 
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector1;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 import sodekovs.bikesharing.coordination.ClusterStationCoordData;
 import sodekovs.bikesharing.coordination.CoordinationStationData;
+import sodekovs.bikesharing.data.clustering.SuperCluster;
 import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
@@ -24,31 +26,59 @@ public class CalculateProposedStationsPlan extends Plan {
 	private static final long serialVersionUID = 587076168340446686L;
 
 	public void body() {
-		ClusterStationCoordData receivedCoordData = (ClusterStationCoordData) getParameter("coordData").getValue();
-		Integer noClusterStations = (Integer) getBeliefbase().getBelief("noClusterStations").getFact();
+		Boolean isSuperStation = (Boolean) getBeliefbase().getBelief("isSuperStation").getFact();
 
-		System.out.println(getComponentDescription() + " CalculateProposedStationsPlan received " + receivedCoordData);
+		if (isSuperStation) {
+			ContinuousSpace2D environment = (ContinuousSpace2D) getBeliefbase().getBelief("environment").getFact();
+			String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
+			SuperCluster superCluster = (SuperCluster) environment.getProperty("StationCluster");
+			List<String> clusterStationIds = superCluster.getClusterStationIDs(stationID);
+			int noClusterStations = clusterStationIds.size();
 
-		// only one plan instance should do the actual calculation when all answer have been received
-		startAtomic();
-		getBeliefbase().getBeliefSet("receivedCoordData").addFact(receivedCoordData);
+			while (true) {
+				waitForTick();
+				if (getWaitqueue().size() == noClusterStations) {
+					System.out.println("CalculateProposedStationsPlan in " + getComponentName() + " received all " + noClusterStations + " answers");
+					Object[] elements = getWaitqueue().getElements();
 
-		if (getBeliefbase().getBeliefSet("receivedCoordData").getFacts().length == noClusterStations) {
-			System.out.println(getComponentDescription() + " CalculateProposedStationsPlan MASTER!");
+					List<ClusterStationCoordData> clusterStationCoordData = new ArrayList<ClusterStationCoordData>();
+					for (Object element : elements) {
+						IInternalEvent event = (IInternalEvent) element;
+						ClusterStationCoordData coordData = (ClusterStationCoordData) event.getParameter("coordData").getValue();
+						clusterStationCoordData.add(coordData);
+						getWaitqueue().removeElement(element);
+					}
 
-			ClusterStationCoordData[] data = (ClusterStationCoordData[]) getBeliefbase().getBeliefSet("receivedCoordData").getFacts();
-			getBeliefbase().getBeliefSet("receivedCoordData").removeFacts();
-			calculateProposedStations(data);
+					calculateProposedStations(clusterStationCoordData);
+
+					// ClusterStationCoordData receivedCoordData = (ClusterStationCoordData) getParameter("coordData").getValue();
+					// Integer noClusterStations = (Integer) getBeliefbase().getBelief("noClusterStations").getFact();
+					//
+					// System.out.println(getComponentDescription() + " CalculateProposedStationsPlan received " + receivedCoordData);
+					//
+					// // only one plan instance should do the actual calculation when all answer have been received
+					// startAtomic();
+					// getBeliefbase().getBeliefSet("receivedCoordData").addFact(receivedCoordData);
+					//
+					// if (getBeliefbase().getBeliefSet("receivedCoordData").getFacts().length == noClusterStations) {
+					// System.out.println(getComponentDescription() + " CalculateProposedStationsPlan MASTER!");
+					//
+					// ClusterStationCoordData[] data = (ClusterStationCoordData[]) getBeliefbase().getBeliefSet("receivedCoordData").getFacts();
+					// getBeliefbase().getBeliefSet("receivedCoordData").removeFacts();
+					// calculateProposedStations(data);
+					// }
+					// endAtomic();
+				}
+			}
 		}
-		endAtomic();
 	}
 
-	private void calculateProposedStations(ClusterStationCoordData[] data) {
+	private void calculateProposedStations(List<ClusterStationCoordData> data) {
 		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
 		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("reply_cluster_stations");
 		Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
 		Double emptyThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("EMPTY_THRESHOLD");
-		
+
 		String superstationID = (String) getBeliefbase().getBelief("stationID").getFact();
 
 		List<CoordinationStationData> fullStations = new ArrayList<CoordinationStationData>();
@@ -94,19 +124,20 @@ public class CalculateProposedStationsPlan extends Plan {
 
 		// the answer
 		IInternalEvent event = createInternalEvent("inform_alternatives");
-		
+
 		ClusterStationCoordData coordData = new ClusterStationCoordData();
 		coordData.setState(ClusterStationCoordData.STATE_ALTERNATIVES);
 		coordData.setSuperStationId(superstationID);
 		coordData.setProposedArrivalStations(proposedArrivalStations);
 		coordData.setProposedDepartureStations(proposedDepartureStations);
-		
+
 		event.getParameter("coordData").setValue(coordData);
 		dispatchInternalEvent(event);
 	}
 
 	/**
 	 * Returns the nearest of the given List of suitable stations. Does not prioritize among the suitable stations, only returns the nearest.
+	 * 
 	 * @param stationData
 	 * @param suitableStations
 	 * @return

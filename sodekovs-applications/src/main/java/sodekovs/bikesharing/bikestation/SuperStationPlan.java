@@ -21,7 +21,7 @@ public class SuperStationPlan extends Plan {
 
 	private static final long serialVersionUID = -1433197689807683447L;
 
-	private static final int NO_TICKS = 50;
+	private static final int NO_TICKS = 20;
 
 	public void body() {
 		Boolean isSuperStation = (Boolean) getBeliefbase().getBelief("isSuperStation").getFact();

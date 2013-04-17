@@ -3,6 +3,7 @@
  */
 package sodekovs.bikesharing.bikestation;
 
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import sodekovs.bikesharing.coordination.ClusterStationCoordData;
 
@@ -17,16 +18,31 @@ public class ReceiveAlternativesPlan extends Plan {
 
 	@Override
 	public void body() {
-		ClusterStationCoordData receivedCoordData = (ClusterStationCoordData) getParameter("coordData").getValue();
-		String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
-		
-		System.out.println(getComponentDescription() + " ReceiveAlternativesPlan received " + receivedCoordData);
-		
-		// if there are no proposed alternatives calculated by the super station for this station then the values will explicitly be set to null!
-		String proposedArrivalStation = receivedCoordData.getProposedArrivalStations().get(stationID);
-		String proposedDepartureStation = receivedCoordData.getProposedDepartureStations().get(stationID);
-		
-		getBeliefbase().getBelief("proposed_arrival_station").setFact(proposedArrivalStation);
-		getBeliefbase().getBelief("proposed_departure_station").setFact(proposedDepartureStation);
+		System.out.println("ReceiveAlternativesPlan started in " + getComponentName());
+
+		while (true) {
+			waitForTick();
+			Object[] elements = getWaitqueue().getElements();
+			// IInternalEvent event = (IInternalEvent) getWaitqueue().removeNextElement();
+
+			if (elements != null) {
+				for (Object element : elements) {
+					IInternalEvent event = (IInternalEvent) element;
+					ClusterStationCoordData receivedCoordData = (ClusterStationCoordData) event.getParameter("coordData").getValue();
+					String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
+
+					System.out.println(getComponentName() + " ReceiveAlternativesPlan received " + receivedCoordData);
+
+					// if there are no proposed alternatives calculated by the super station for this station then the values will explicitly be set to null!
+					String proposedArrivalStation = receivedCoordData.getProposedArrivalStations().get(stationID);
+					String proposedDepartureStation = receivedCoordData.getProposedDepartureStations().get(stationID);
+
+					getBeliefbase().getBelief("proposed_arrival_station").setFact(proposedArrivalStation);
+					getBeliefbase().getBelief("proposed_departure_station").setFact(proposedDepartureStation);
+
+					getWaitqueue().removeElement(element);
+				}
+			}
+		}
 	}
 }
