@@ -16,11 +16,4 @@ public class MyApplication extends JadexApplication
 	{
 		return "jadex.android.classloading.MyActivity";
 	}
-	
-	@Override
-	protected String getAppPath()
-	{
-		return getApplicationInfo().sourceDir;
-	}
-
 }

@@ -21,14 +21,12 @@ import jadex.commons.future.IFuture;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.Window;
 
 /**
  * This is an Android Fragment Class which provides needed Functionality and

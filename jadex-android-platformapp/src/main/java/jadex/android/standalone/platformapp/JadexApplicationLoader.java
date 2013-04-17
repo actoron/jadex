@@ -1,9 +1,9 @@
 package jadex.android.standalone.platformapp;
 
+import jadex.android.commons.Logger;
 import jadex.android.platformapp.R;
 import jadex.android.standalone.JadexApplication;
 import jadex.android.standalone.clientapp.ClientAppFragment;
-import jadex.android.standalone.clientapp.PlatformProvidingClientAppFragment;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -16,26 +16,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
 import android.widget.Toast;
 import dalvik.system.DexClassLoader;
 
 public class JadexApplicationLoader extends FragmentActivity
 {
-	public String entryActivityName;
-
-	public JadexApplicationLoader()
-	{
-		entryActivityName = "jadex.android.platformapp.DefaultApplication";
-	}
+	private static String defaultEntryActivityName = "jadex.android.platformapp.DefaultApplication";
+	private LayoutInflater userAppInflater;
+	private String userAppPackage;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		// set default layout inflater during onCreate()
+		userAppInflater = super.getLayoutInflater();
 		super.onCreate(savedInstanceState);
 		Intent intent = getIntent();
 		FragmentManager manager = getSupportFragmentManager();
@@ -43,27 +43,54 @@ public class JadexApplicationLoader extends FragmentActivity
 		if (intent.getAction().equals(JadexApplication.INTENT_ACTION_LOADAPP)) {
 			String appPath = intent.getStringExtra(JadexApplication.EXTRA_KEY_APPLICATIONPATH);
 			String className = intent.getStringExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
+			userAppPackage = intent.getStringExtra(JadexApplication.EXTRA_KEY_APPLICATIONPACKAGE);
 			if (className == null)
 			{
-				className = entryActivityName;
+				className = defaultEntryActivityName;
 			}
 			
 			if (appPath != null) {
 				ClientAppFragment act = loadAndCreateUserActivity(appPath, className);
 				act.onPrepare(this);
 				ta.add(R.id.fragmentContainer, act);
-//				setActivity(act);
-				
+			} else {
+				Logger.e("Please specify an Activity class to start with EXTRA_KEY_ACTIVITYCLASS!");
+				finish();
 			}
+			
 		} else {
-			System.err.println("Please start this application with action net.sourceforge.jadex.LOAD_APPLICATION");
-			Toast.makeText(this, "Please start this application with action net.sourceforge.jadex.LOAD_APPLICATION", Toast.LENGTH_LONG)
-					.show();
+			Logger.e("Please start this application with action net.sourceforge.jadex.LOAD_APPLICATION");
+			finish();
 		}
 		setContentView(R.layout.loaderlayout);
+		// set custom layout inflater during user app lifetime
+		userAppInflater = createUserAppInflater(userAppPackage);
 		ta.commit();
 	}
 	
+	private LayoutInflater createUserAppInflater(String userApplicationPackage)
+	{
+		Context userAppContext = null;
+		try
+		{
+			userAppContext = getApplicationContext().createPackageContext(userApplicationPackage, Context.CONTEXT_IGNORE_SECURITY);
+		}
+		catch (NameNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		
+		LayoutInflater inflater = LayoutInflater.from(userAppContext);
+		return inflater;
+	}
+	
+	@Override
+	public Context getApplicationContext()
+	{
+		System.out.println("getApplicationContext called");
+		return super.getApplicationContext();
+	}
+
 	@Override
 	protected void onResume()
 	{
@@ -75,6 +102,13 @@ public class JadexApplicationLoader extends FragmentActivity
 	{
 		super.onDestroy();
 	}
+	
+	@Override
+	public LayoutInflater getLayoutInflater()
+	{
+		System.out.println("getLayoutInflater called");
+		return userAppInflater;
+	}
 
 	private ClientAppFragment loadAndCreateUserActivity(String appPath, String className)
 	{
@@ -82,7 +116,6 @@ public class JadexApplicationLoader extends FragmentActivity
 		try
 		{
 			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
-			
 			Constructor<ClientAppFragment> actCon = actClass.getConstructor(null);
 			ClientAppFragment act = actClass.newInstance();
 			return act;
