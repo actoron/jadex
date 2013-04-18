@@ -217,20 +217,25 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			text.append("<h2>");
 			text.append(shortname);
 			text.append("</h2>");
-			text.append("<p>");
-			text.append(info.getDescription());
-			text.append("</p>\n");
+			
+			if(info.getDescription()!=null && info.getDescription().length()>0)
+			{
+				text.append("<p>");
+				text.append(info.getDescription());
+				text.append("</p>\n");
+			}
 			
 			ParameterMetaInfo[] pmis = info.getParameterMetaInfos();
-			if (pmis != null && pmis.length > 0)
+			if(pmis != null && pmis.length > 0)
 			{
+				text.append("Parameters:");
 				text.append("<ul>\n");
 				for (int i = 0; i < pmis.length; ++i)
 				{
 					text.append("<li><b>");
 					text.append(pmis[i].getName());
 					text.append("</b> - ");
-					text.append(pmis[i].getDescription()==null? "n/a": pmis[i].getDescription());
+					text.append(pmis[i].getDescription()==null || pmis[i].getDescription().length()==0? "n/a": pmis[i].getDescription());
 					text.append("</li>\n");
 				}
 				text.append("</ul>\n");
