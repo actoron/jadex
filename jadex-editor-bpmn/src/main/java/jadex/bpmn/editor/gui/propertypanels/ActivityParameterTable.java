@@ -88,7 +88,6 @@ public class ActivityParameterTable extends JTable
 	 */
 	protected class ParameterTableModel extends AbstractTableModel
 	{
-		
 		/**
 		 *  Gets the column name.
 		 *  

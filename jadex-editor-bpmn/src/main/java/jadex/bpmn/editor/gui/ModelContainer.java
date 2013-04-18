@@ -381,9 +381,10 @@ public class ModelContainer
 			
 			if(clroot != null)
 			{
-				URL[] urls = new URL[] { clroot.toURI().toURL() };
+				URL[] urls = new URL[]{clroot.toURI().toURL()};
 				projectclassloader = new URLClassLoader(urls, ModelContainer.class.getClassLoader());
-				Class<?>[] classes = SReflect.scanForClasses(urls, projectclassloader,
+//				Class<?>[] classes = SReflect.scanForClasses(urls, projectclassloader,
+				Class<?>[] classes = SReflect.scanForClasses(projectclassloader,
 				new IFilter<Object>()
 				{
 					public boolean filter(Object obj)

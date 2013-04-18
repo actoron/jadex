@@ -230,7 +230,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 					text.append("<li><b>");
 					text.append(pmis[i].getName());
 					text.append("</b> - ");
-					text.append(pmis[i].getDescription());
+					text.append(pmis[i].getDescription()==null? "n/a": pmis[i].getDescription());
 					text.append("</li>\n");
 				}
 				text.append("</ul>\n");
@@ -259,29 +259,29 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	{
 		TaskMetaInfo info = getTaskMetaInfo(taskname);
 		
-		if (info != null)
+		if(info != null)
 		{
 			ParameterMetaInfo[] pmis = info.getParameterMetaInfos();
-			if (pmis != null && pmis.length > 0)
+			if(pmis != null && pmis.length > 0)
 			{
 				Set<String> validparams = new HashSet<String>();
 				MActivity mact = (MActivity) task.getBpmnElement();
-				for (int i = 0; i < pmis.length; ++i)
+				for(int i = 0; i < pmis.length; ++i)
 				{
 					validparams.add(pmis[i].getName());
-					if (mact.hasParameter(pmis[i].getName()))
+					if(mact.hasParameter(pmis[i].getName()))
 					{
 						int ind = -1;
-						for (int j = 0; j < mact.getParameters().size(); ++j)
+						for(int j = 0; j < mact.getParameters().size(); ++j)
 						{
-							if (pmis[i].getName().equals(mact.getParameters().getKey(j)))
+							if(pmis[i].getName().equals(mact.getParameters().getKey(j)))
 							{
 								ind = j;
 								break;
 							}
 						}
 						MParameter param = (MParameter) mact.getParameters().get(ind);
-						atable.removeParameters(new int[] { ind });
+						atable.removeParameters(new int[]{ind});
 						param.setClazz(new ClassInfo(pmis[i].getClazz().getTypeName()));
 						param.setDirection(pmis[i].getDirection());
 						atable.addParameter(param);
@@ -292,10 +292,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 						ClassInfo clazz = new ClassInfo(pmis[i].getClazz().getTypeName());
 						String value = pmis[i].getInitialValue() != null? pmis[i].getInitialValue() : "";
 						UnparsedExpression inival = new UnparsedExpression(name, clazz.getTypeName(), value, null);
-						MParameter param = new MParameter(pmis[i].getDirection(),
-														  clazz,
-														  name,
-														  inival);
+						MParameter param = new MParameter(pmis[i].getDirection(), clazz, name, inival);
 						atable.addParameter(param);
 					}
 				}
