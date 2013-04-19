@@ -16,6 +16,8 @@ public class GlobalConstants {
 	public static final String EXPERIMENT_ID = "Experiment_id";
 	// Current Configuration of the parameter values to be iterated
 	public static final String CURRENT_PARAMETER_CONFIGURATION = "CurrentParameterConfiguration";
+	// Denotes the current tick that can be used for event based simulation
+	public static final String TICK_COUNTER_4_EVENT_BASED_SIMULATION = "TickCounter4EventBasedSimulation";
 	
 	//GUNPLOT
 	public static final String DB_GNUPLOT_SCHEMA = "Gnuplot";
