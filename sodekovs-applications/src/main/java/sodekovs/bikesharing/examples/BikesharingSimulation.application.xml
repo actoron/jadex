@@ -36,7 +36,7 @@
 		<import>sodekovs.bikesharing.truck.movement.*</import>
 		<import>sodekovs.bikesharing.env.*</import>
 		<import>jadex.simulation.environment.DeltaTimeExecutor4Simulation</import>
-		<import>deco4mas.distributed.coordinate.environment.*</import>
+		<import>deco4mas.distributed.coordinate.environment.*</import>		
 	</imports>
 
 	<arguments>
@@ -194,12 +194,13 @@
 				<env:dataview name="view_all" class="GeneralDataView2D" />
 			</env:dataviews>
 
-			<!-- <env:spaceexecutor class="RoundBasedExecutor"> <env:property name="space">$space</env:property> 
-				</env:spaceexecutor> -->
-			<env:spaceexecutor class="DeltaTimeExecutor4Simulation">
+			
+			<env:spaceexecutor class="RoundBasedExecutor4Simulation"> <env:property name="space">$space</env:property> 
+				</env:spaceexecutor>
+			<!-- <env:spaceexecutor class="DeltaTimeExecutor4Simulation">
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
-			</env:spaceexecutor>
+			</env:spaceexecutor>-->
 
 		</env:envspacetype>
 	</extensiontypes>
