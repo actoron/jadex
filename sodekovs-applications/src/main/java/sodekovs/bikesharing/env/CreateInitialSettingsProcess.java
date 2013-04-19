@@ -30,6 +30,7 @@ import sodekovs.bikesharing.data.clustering.Cluster;
 import sodekovs.bikesharing.data.clustering.SuperCluster;
 import sodekovs.util.bikesharing.model.SimulationDescription;
 import sodekovs.util.bikesharing.model.Station;
+import sodekovs.util.misc.GlobalConstants;
 import sodekovs.util.misc.XMLHandler;
 
 /**
@@ -132,7 +133,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 
 			// HACK: Required for Simulation-Control!!! Make sure right start time is used for later evaluation
 			space.setProperty("REAL_START_TIME_OF_SIMULATION", clock.getTime());
-			space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", new Double(clock.getTick()).longValue());
+			space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", (Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION));
 //			System.out.println("Setting new Start Tick Size: " + space.getProperty("REAL_START_TICKTIME_OF_SIMULATION"));
 			// Hack: Inform Client Sim to update both times above
 			space.setProperty("UpdateTimeAtClientSimulator", true);
