@@ -7,7 +7,9 @@ import jadex.commons.collection.IndexMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,16 +36,23 @@ public class MActivity extends MAssociationTarget
 
 	
 	/** The outgoing sequence edges. */
-	protected List outseqedges;
+	protected List<MSequenceEdge> outseqedges;
 	
 	/** The incoming sequence edges. */
-	protected List inseqedges;
+	protected List<MSequenceEdge> inseqedges;
 
 	/** The outgoing message edges. */
-	protected List outmsgedges;
+	protected List<MMessagingEdge> outmsgedges;
 	
 	/** The incoming message edges. */
-	protected List inmsgedges;
+	protected List<MMessagingEdge> inmsgedges;
+	
+	/** The outgoing data edges. */
+	protected List<MDataEdge> outdataedges;
+	
+	/** The incoming data edges. */
+	protected List<MDataEdge> indataedges;
+	
 	
 	/** The type. */
 	protected String type;
@@ -58,7 +67,7 @@ public class MActivity extends MAssociationTarget
 	protected boolean throwing;
 
 	/** The event handlers. */
-	protected List eventhandlers;
+	protected List<MActivity> eventhandlers;
 	
 	/** The pool. */
 	protected MPool pool;
@@ -72,7 +81,7 @@ public class MActivity extends MAssociationTarget
 	//-------- added --------
 	
 	/** The parameters (name -> MParameter). */
-	protected IndexMap	parameters;
+	protected IndexMap<String, MParameter>	parameters;
 	
 	/** The class. */
 	protected ClassInfo clazz;
@@ -210,7 +219,7 @@ public class MActivity extends MAssociationTarget
 	public void addOutgoingSequenceEdge(MSequenceEdge edge)
 	{
 		if(outseqedges==null)
-			outseqedges = new ArrayList();
+			outseqedges = new ArrayList<MSequenceEdge>();
 		outseqedges.add(edge);
 	}
 	
@@ -240,7 +249,7 @@ public class MActivity extends MAssociationTarget
 	public void addIncomingSequenceEdge(MSequenceEdge edge)
 	{
 		if(inseqedges==null)
-			inseqedges = new ArrayList();
+			inseqedges = new ArrayList<MSequenceEdge>();
 		inseqedges.add(edge);
 	}
 	
@@ -258,7 +267,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get the outgoing message edges.
 	 *  @return The outgoing message edges.
 	 */
-	public List getOutgoingMessagingEdges()
+	public List<MMessagingEdge> getOutgoingMessagingEdges()
 	{
 		return outmsgedges;
 	}
@@ -270,7 +279,7 @@ public class MActivity extends MAssociationTarget
 	public void addOutgoingMessagingEdge(MMessagingEdge edge)
 	{
 		if(outmsgedges==null)
-			outmsgedges = new ArrayList();
+			outmsgedges = new ArrayList<MMessagingEdge>();
 		outmsgedges.add(edge);
 	}
 	
@@ -288,7 +297,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get the inconimg message edges.
 	 *  @return the incoming message edges.
 	 */
-	public List getIncomingMessagingEdges()
+	public List<MMessagingEdge> getIncomingMessagingEdges()
 	{
 		return inmsgedges;
 	}
@@ -300,7 +309,7 @@ public class MActivity extends MAssociationTarget
 	public void addIncomingMessagingEdge(MMessagingEdge edge)
 	{
 		if(inmsgedges==null)
-			inmsgedges = new ArrayList();
+			inmsgedges = new ArrayList<MMessagingEdge>();
 		inmsgedges.add(edge);
 	}
 	
@@ -312,6 +321,66 @@ public class MActivity extends MAssociationTarget
 	{
 		if(inmsgedges!=null)
 			inmsgedges.remove(edge);
+	}
+	
+	/**
+	 *  Add an outgoing edge.
+	 *  @param edge The edge.
+	 */
+	public void addOutgoingDataEdge(MDataEdge edge)
+	{
+		if(outdataedges==null)
+			outdataedges = new ArrayList<MDataEdge>();
+		outdataedges.add(edge);
+	}
+	
+	/**
+	 *  Remove an outgoing edge.
+	 *  @param edge The edge.
+	 */
+	public void removeOutgoingDataEdge(MDataEdge edge)
+	{
+		if(outdataedges!=null)
+			outdataedges.remove(edge);
+	}
+	
+	/**
+	 *  Add an incoming edge.
+	 *  @param edge The edge.
+	 */
+	public void addIncomingDataEdge(MDataEdge edge)
+	{
+		if(indataedges==null)
+			indataedges = new ArrayList<MDataEdge>();
+		indataedges.add(edge);
+	}
+	
+	/**
+	 *  Remove an outgoing edge.
+	 *  @param edge The edge.
+	 */
+	public void removeIncomingDataEdge(MDataEdge edge)
+	{
+		if(indataedges!=null)
+			indataedges.remove(edge);
+	}
+	
+	/**
+	 *  Get the incoming data edges.
+	 *  @return the incoming data edges.
+	 */
+	public List<MDataEdge> getIncomingDataEdges()
+	{
+		return indataedges;
+	}
+	
+	/**
+	 *  Get the outgoing data edges.
+	 *  @return the outgoing data edges.
+	 */
+	public List<MDataEdge> getOutgoingDataEdges()
+	{
+		return outdataedges;
 	}
 
 	/**
@@ -403,7 +472,7 @@ public class MActivity extends MAssociationTarget
 	public void addEventHandler(MActivity eventhandler)
 	{
 		if(eventhandlers==null)
-			eventhandlers = new ArrayList();
+			eventhandlers = new ArrayList<MActivity>();
 		eventhandlers.add(eventhandler);
 	}
 	
@@ -421,7 +490,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get the parameters.
 	 *  @return The parameters.
 	 */
-	public IndexMap	getParameters()
+	public IndexMap<String, MParameter>	getParameters()
 	{
 		return parameters;
 	}
@@ -476,7 +545,7 @@ public class MActivity extends MAssociationTarget
 	 */
 	public List<MParameter> getParameters(String[] dirs)
 	{
-		Set test = new HashSet();
+		Set<String> test = new HashSet<String>();
 		if(dirs!=null)
 		{
 			for(int i=0; i<dirs.length; i++)
@@ -484,10 +553,10 @@ public class MActivity extends MAssociationTarget
 				test.add(dirs[i]);
 			}
 		}
-		List inparams = new ArrayList();
+		List<MParameter> inparams = new ArrayList<MParameter>();
 		if(parameters!=null)
 		{
-			for(Iterator it=parameters.values().iterator(); it.hasNext(); )
+			for(Iterator<MParameter> it=parameters.values().iterator(); it.hasNext(); )
 			{
 				MParameter param = (MParameter)it.next();
 				if(test.contains(param.getDirection()))
@@ -514,7 +583,7 @@ public class MActivity extends MAssociationTarget
 	public void addParameter(MParameter param)
 	{
 		if(parameters==null)
-			parameters = new IndexMap();
+			parameters = new IndexMap<String, MParameter>();
 		parameters.put(param.getName(), param);
 	}
 	
@@ -525,7 +594,7 @@ public class MActivity extends MAssociationTarget
 	public void removeParameter(MParameter param)
 	{
 		if(parameters!=null)
-			parameters.removeKey(param.getName());
+			parameters.removeValue(param.getName());
 	}
 	
 	/**

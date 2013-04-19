@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -277,9 +278,12 @@ public class TaskPropertyPanel extends BasePropertyPanel
 					if(mact.hasParameter(pmis[i].getName()))
 					{
 						int ind = -1;
-						for(int j = 0; j < mact.getParameters().size(); ++j)
+//						for(int j = 0; j < mact.getParameters().size(); ++j)
+						Iterator<String> it=mact.getParameters().keySet().iterator();
+						for(int j = 0; it.hasNext(); ++j)
 						{
-							if(pmis[i].getName().equals(mact.getParameters().getKey(j)))
+							String key = it.next();
+							if(pmis[i].getName().equals(key))
 							{
 								ind = j;
 								break;
@@ -303,17 +307,18 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				}
 				
 				List<Integer> lind = new ArrayList<Integer>();
-				for (int i = 0; i < mact.getParameters().size(); ++i)
+				int i = 0;
+				for(String pname: mact.getParameters().keySet())
 				{
-					Object pname = mact.getParameters().getKey(i);
-					if (!validparams.contains(pname))
+					if(!validparams.contains(pname))
 					{
 						lind.add(i);
 					}
+					i++;
 				}
 				
 				int[] ind = new int[lind.size()];
-				for (int i = 0; i < ind.length; ++i)
+				for(i = 0; i < ind.length; ++i)
 				{
 					ind[i] = lind.get(i).intValue();
 				}

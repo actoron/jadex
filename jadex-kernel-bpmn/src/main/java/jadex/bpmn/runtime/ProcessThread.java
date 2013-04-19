@@ -630,6 +630,7 @@ public class ProcessThread	implements ITaskContext
 			// Handle parameter passing in edge inscriptions.
 			Map<String, Object>	passedparams = null;
 			Set<String>	indexparams	= null;
+			
 			if(getLastEdge()!=null && getLastEdge().getParameterMappings()!=null)
 			{
 				IndexMap mappings = getLastEdge().getParameterMappings();
@@ -720,7 +721,7 @@ public class ProcessThread	implements ITaskContext
 			Set<String> before = data!=null? new HashSet<String>(data.keySet()): Collections.EMPTY_SET;
 			before.remove(ProcessServiceInvocationHandler.THREAD_PARAMETER_SERVICE_RESULT);	// Hack!!! Keep future available locally for thread.
 			IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getFetcher());
-			IndexMap params = getActivity().getParameters();
+			IndexMap<String, MParameter> params = getActivity().getParameters();
 			if(params!=null)
 			{
 				for(Iterator it=params.values().iterator(); it.hasNext(); )

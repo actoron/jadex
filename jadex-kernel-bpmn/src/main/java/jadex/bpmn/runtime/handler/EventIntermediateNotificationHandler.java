@@ -8,6 +8,7 @@ import jadex.commons.collection.IndexMap;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  *  Wait for an external notification (could be a signal or a fired rule).
@@ -34,7 +35,7 @@ public class EventIntermediateNotificationHandler extends DefaultActivityHandler
 		
 		// Create a shallow copy of properties.
 		HashMap props = new HashMap();
-		IndexMap params = thread.getActivity().getParameters();
+		IndexMap<String, MParameter> params = thread.getActivity().getParameters();
 		if(params!=null)
 		{
 			for(Iterator it=params.values().iterator(); it.hasNext(); )

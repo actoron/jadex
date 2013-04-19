@@ -23,8 +23,10 @@ public class A extends AbstractTask
 	 */
 	public void doExecute(ITaskContext context, IInternalAccess instance)
 	{
-		int a = ((Integer)context.getParameterValue("a")).intValue();
-		int b = ((Integer)context.getParameterValue("b")).intValue();
+		Integer ia = (Integer)context.getParameterValue("a");
+		Integer ib = (Integer)context.getParameterValue("b");
+		int a = ia!=null? ia.intValue(): 0;
+		int b = ib!=null? ib.intValue(): 0;
 		
 		context.setParameterValue("c", new Integer(a+b));
 		context.setParameterValue("d", ""+a+b);

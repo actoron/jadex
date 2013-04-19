@@ -2,6 +2,7 @@ package jadex.bpmn.model.io;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
@@ -194,13 +195,13 @@ public class SBpmnModelReader
 											  Map<String, Object> buffer,
 											  IBpmnVisualModelReader vreader)
 	{
-		if (buffer.get("semantic").equals(tag.getPrefix()))
+		if(buffer.get("semantic").equals(tag.getPrefix()))
 		{
 			handleSemanticElement(model, emap, lanemap, laneparents, tag, tagstack, attrs, content, buffer);
 		}
-		else if ("jadex".equals(tag.getPrefix()))
+		else if("jadex".equals(tag.getPrefix()))
 		{
-			handleJadexElement(model, tag, tagstack, attrs, content, buffer);
+			handleJadexElement(model, tag, tagstack, attrs, content, buffer, emap);
 		}
 		else if (vreader != null && (buffer.get("bpmndi").equals(tag.getPrefix()) || buffer.get("dc").equals(tag.getPrefix()) || buffer.get("di").equals(tag.getPrefix())))
 		{
@@ -241,7 +242,7 @@ public class SBpmnModelReader
 		}*/
 		ClassLoader cl = model.getClassLoader();
 		
-		if ("lane".equals(tag.getLocalPart()))
+		if("lane".equals(tag.getLocalPart()))
 		{
 			MLane lane = new MLane();
 			lane.setName(attrs.get("name"));
@@ -259,7 +260,7 @@ public class SBpmnModelReader
 			}
 			laneparents.put(lane.getId(), pool.getId());
 		}
-		else if ("flowNodeRef".equals(tag.getLocalPart()))
+		else if("flowNodeRef".equals(tag.getLocalPart()))
 		{
 			List<String> noderefs = (List<String>) buffer.get("flownoderefs");
 			if (noderefs == null)
@@ -419,7 +420,7 @@ public class SBpmnModelReader
 				evttypes.add(new Tuple2("Cancel", null));
 			}
 		}
-		else if ("sequenceFlow".equals(tag.getLocalPart()))
+		else if("sequenceFlow".equals(tag.getLocalPart()))
 		{
 			MSequenceEdge edge = new MSequenceEdge();
 			edge.setId(attrs.get("id"));
@@ -539,7 +540,8 @@ public class SBpmnModelReader
 												   LinkedList<QName> tagstack,
 												   Map<String, String> attrs,
 												   String content,
-												   Map<String, Object> buffer)
+												   Map<String, Object> buffer,  
+												   Map<String, MIdElement> emap)
 	{
 		ClassLoader cl = model.getClassLoader();
 		
@@ -780,6 +782,37 @@ public class SBpmnModelReader
 				((ModelInfo) model.getModelInfo()).addConfiguration(conf);
 			}
 		}
+		else if("dataFlow".equals(tag.getLocalPart()))
+		{
+			MDataEdge edge = new MDataEdge();
+			edge.setId(attrs.get("id"));
+			MActivity src = (MActivity)emap.get(attrs.get("sourceRef"));
+			MActivity tgt = (MActivity)emap.get(attrs.get("targetRef"));
+			edge.setSource(src);
+			edge.setTarget(tgt);
+			edge.setSourceParameter(attrs.get("sourceParam"));
+			edge.setTargetParameter(attrs.get("targetParam"));
+			
+			String expstr = attrs.get("mapping");
+			if(expstr!=null && expstr.length()>0)
+			{
+				UnparsedExpression exp = new UnparsedExpression(
+				edge.getSourceParameter()+"-"+edge.getTargetParameter(), "java.lang.Object", expstr, null);
+				parseExp(exp, model.getModelInfo().getAllImports(), cl);
+				edge.setParameterMapping(exp, null);
+			}
+			
+			if(src != null)
+			{
+				src.addOutgoingDataEdge(edge);
+			}
+			if(tgt != null)
+			{
+				tgt.addIncomingDataEdge(edge);
+			}
+			
+			emap.put(edge.getId(), edge);
+		}
 	}
 	
 	/**
@@ -877,7 +910,7 @@ public class SBpmnModelReader
 	 */
 	protected static final UnparsedExpression parseExp(UnparsedExpression exp, String[] imports, ClassLoader cl)
 	{
-		if (cl != null)
+		if(cl != null)
 		{
 			SJavaParser.parseExpression(exp, imports, cl);
 		}

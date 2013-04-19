@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.model.visual;
 
 import jadex.bpmn.model.MIdElement;
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
@@ -39,14 +40,14 @@ public class VExternalSubProcess extends VActivity
 			{
 				MSubProcess msp = (MSubProcess) getBpmnElement();
 				String ret;
-				if (msp.hasParameter("file"))
+				if(msp.hasPropertyValue("file"))
 				{
-					UnparsedExpression fileexp = (UnparsedExpression) msp.getParameters().get("file");
-					ret = fileexp.getValue();
+					UnparsedExpression mp = (UnparsedExpression)msp.getPropertyValue("file");
+					ret = mp.getValue();
 				}
 				else
 				{
-					ret = (String) msp.getParameters().get("filename");
+					ret = (String)msp.getPropertyValue("filename");
 				}
 				return ret != null? ret : "";
 			}
@@ -71,7 +72,7 @@ public class VExternalSubProcess extends VActivity
 			else
 			{
 				MSubProcess msp = (MSubProcess) getBpmnElement();
-				if (msp.hasParameter("file"))
+				if (msp.hasPropertyValue("file"))
 				{
 					UnparsedExpression exp = new UnparsedExpression("file", String.class, (String) value, null);
 					msp.setPropertyValue("file", exp);

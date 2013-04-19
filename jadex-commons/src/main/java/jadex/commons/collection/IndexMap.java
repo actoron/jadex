@@ -25,21 +25,21 @@ import java.util.Set;
  *  Methods are provided to get a map instance and a list instance
  *  of an index map.
  */
-public class IndexMap	implements Serializable, Cloneable
+public class IndexMap<K, V>	implements Serializable, Cloneable
 {
 	//-------- attributes --------
 
 	/** The key list. */
-	protected List	list;
+	protected List<K>	list;
 
 	/** The key/value map. */
-	protected Map	map; 
+	protected Map<K, V>	map; 
 
 	/** The index map as java.util.Map. */
-	protected Map	asmap;
+	protected Map<K, V>	asmap;
 
 	/** The index map as java.util.List. */
-	protected List	aslist;
+	protected List<V>	aslist;
 
 	//-------- Constructors --------
 
@@ -48,7 +48,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 */
 	public IndexMap()
 	{
-		this(new ArrayList(), new HashMap());
+		this(new ArrayList<K>(), new HashMap<K, V>());
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *  @param list	The key list.
 	 *  @param map	The key/value map.
 	 */
-	public IndexMap(List list, Map map)
+	public IndexMap(List<K> list, Map<K, V> map)
 	{
 		this.list	= list;
 		this.map	= map;
@@ -67,11 +67,11 @@ public class IndexMap	implements Serializable, Cloneable
 	 */
 	public Object clone()
 	{
-		ArrayList listcopy = SCollection.createArrayList();
+		ArrayList<K> listcopy = SCollection.createArrayList();
 		listcopy.addAll(list);
-		HashMap mapcopy = SCollection.createHashMap();
+		Map<K, V> mapcopy = SCollection.createHashMap();
 		mapcopy.putAll(map);
-		return new IndexMap(listcopy, mapcopy);
+		return new IndexMap<K, V>(listcopy, mapcopy);
 	}
 
 	//-------- Map methods --------
@@ -114,7 +114,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @throws NullPointerException if the key is <tt>null</tt> and this map
 	 *            does not not permit <tt>null</tt> keys (optional).
 	 */
-	public boolean containsKey(Object key)
+	public boolean containsKey(Object key)  // not V because of Map interface
 	{
 		return map.containsKey(key);
 	}
@@ -135,7 +135,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @throws NullPointerException if the value is <tt>null</tt> and this map
 	 *            does not not permit <tt>null</tt> values (optional).
 	 */
-	public boolean containsValue(Object value)
+	public boolean containsValue(Object value) // not V because of Map interface
 	{
 		return map.containsValue(value);
 	}
@@ -164,7 +164,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 * 
 	 * @see #containsKey(Object)
 	 */
-	public Object get(Object key)
+	public V get(Object key)  // not K because of Map interface
 	{
 		return map.get(key);
 	}
@@ -197,7 +197,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *            keys or values, and the specified key or value is
 	 *            <tt>null</tt>.
 	 */
-	public Object put(Object key, Object value)
+	public V put(K key, V value)
 	{
 		list.remove(key);
 		list.add(key);
@@ -229,12 +229,12 @@ public class IndexMap	implements Serializable, Cloneable
 	 *         this map does not permit <tt>null</tt> keys or values, and the
 	 *         specified map contains <tt>null</tt> keys or values.
 	 */
-	public void putAll(Map t)
+	public void putAll(Map<? extends K, ? extends V> t)
 	{
-		Iterator	it	= t.keySet().iterator();
+		Iterator<? extends K>	it	= t.keySet().iterator();
 		while(it.hasNext())
 		{
-			Object	key	= it.next();
+			K key	= it.next();
 			put(key, t.get(key));
 		}
 	}
@@ -261,7 +261,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *
 	 * @return a set view of the keys contained in this map.
 	 */
-	public Set keySet()
+	public Set<K> keySet()
 	{
 		return new KeySetWrapper();
 	}
@@ -275,7 +275,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *
 	 * @return a collection view of the values contained in this map.
 	 */
-	public Collection values()
+	public Collection<V> values()
 	{
 		return getAsList();
 	}
@@ -291,7 +291,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *
 	 * @return a set view of the mappings contained in this map.
 	 */
-	public Set entrySet()
+	public Set<Map.Entry<K, V>> entrySet()
 	{
 		return Collections.unmodifiableSet(map.entrySet());
 	}
@@ -362,18 +362,18 @@ public class IndexMap	implements Serializable, Cloneable
 	 *
 	 * @return an iterator over the elements in this list in proper sequence.
 	 */
-	public Iterator	iterator()
+	public Iterator<V>	iterator()
 	{
-		return new Iterator()
+		return new Iterator<V>()
 		{
-			Iterator	i	= list.iterator();
+			Iterator<K>	i	= list.iterator();
 
 			public boolean	hasNext()
 			{
 				return i.hasNext();
 			}
 
-			public Object	next()
+			public V	next()
 			{
 				return map.get(i.next());
 			}
@@ -456,9 +456,9 @@ public class IndexMap	implements Serializable, Cloneable
 	 *         <tt>null</tt>.
 	 * @see #contains(Object)
 	 */
-	public boolean containsAll(Collection c)
+	public boolean containsAll(Collection<?> c)
 	{
-		Iterator i= c.iterator();
+		Iterator<?> i= c.iterator();
 		while(i.hasNext())
 		{
 			if(!contains(i.next()))
@@ -488,10 +488,10 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @see #removeValue(Object)
 	 * @see #contains(Object)
 	 */
-	public boolean removeAll(Collection c)
+	public boolean removeAll(Collection<?> c)
 	{
 		boolean	removed	= false;
-		Iterator	i	=	c.iterator();
+		Iterator<?>	i	=	c.iterator();
 		while(i.hasNext())
 		{
 			removeValue(i.next());
@@ -522,16 +522,16 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @see #removeValue(Object)
 	 * @see #contains(Object)
 	 */
-	public boolean retainAll(Collection c)
+	public boolean retainAll(Collection<?> c)
 	{
 		boolean	removed	= false;
-		Iterator	i	= iterator();
+		Iterator<?>	i	= iterator();
 		while(i.hasNext())
 		{
-			Object	key	= i.next();
-			if(!c.contains(map.get(key)))
+			Object val = i.next();
+			if(!c.contains(val))
 			{
-				removeKey(key);
+				removeValue(val);
 				removed	= true;
 			}
 		}
@@ -549,7 +549,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @throws IndexOutOfBoundsException if the index is out of range (index
 	 * 		  &lt; 0 || index &gt;= size()).
 	 */
-	public Object	get(int index)
+	public V	get(int index)
 	{
 		return map.get(list.get(index));
 	}
@@ -571,7 +571,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @throws    IndexOutOfBoundsException if the index is out of range
 	 *		  (index &lt; 0 || index &gt;= size()).
 	 */
-	public Object set(int index, Object element)
+	public V set(int index, V element)
 	{
 		return map.put(list.get(index), element);
 	}
@@ -588,9 +588,9 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @throws IndexOutOfBoundsException if the index is out of range (index
 	 *            &lt; 0 || index &gt;= size()).
 	 */
-	public Object	remove(int index)
+	public V	remove(int index)
 	{
-		Object del	= map.remove(list.get(index));
+		V del	= map.remove(list.get(index));
 		list.remove(index);
 		return del;
 	}
@@ -616,7 +616,7 @@ public class IndexMap	implements Serializable, Cloneable
 	{
 		for(int i=0; i<list.size(); i++)
 		{
-			Object key	= list.get(i);
+			K key	= list.get(i);
 			if(map.get(key).equals(o))
 			{
 				return i;
@@ -644,7 +644,7 @@ public class IndexMap	implements Serializable, Cloneable
 	{
 		for(int i=list.size()-1; i>=0; i--)
 		{
-			Object key	= list.get(i);
+			K key	= list.get(i);
 			if(map.get(key).equals(o))
 			{
 				return i;
@@ -662,7 +662,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @return a list iterator of the elements in this list (in proper
 	 * 	       sequence).
 	 */
-	public ListIterator	listIterator()
+	public ListIterator<V>	listIterator()
 	{
 		return listIterator(0);
 	}
@@ -682,9 +682,9 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @throws IndexOutOfBoundsException if the index is out of range (index
 	 *         &lt; 0 || index &gt; size()).
 	 */
-	public ListIterator	listIterator(final int index)
+	public ListIterator<V>	listIterator(final int index)
 	{
-		return new ListIterator()
+		return new ListIterator<V>()
 		{
 			int i	= index;
 
@@ -693,7 +693,7 @@ public class IndexMap	implements Serializable, Cloneable
 				return i<size();
 			}
 
-			public Object	next()
+			public V	next()
 			{
 				return get(i++);
 			}
@@ -703,7 +703,7 @@ public class IndexMap	implements Serializable, Cloneable
 				return i>0;
 			}
 
-			public Object	previous()
+			public V	previous()
 			{
 				return get(--i);
 			}
@@ -807,7 +807,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 * @throws NullPointerException if the key is <tt>null</tt> and this map
 	 *            does not not permit <tt>null</tt> keys (optional).
 	 */
-	public Object	removeKey(Object key)
+	public V	removeKey(K key)
 	{
 		list.remove(key);
 		return map.remove(key);
@@ -848,7 +848,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *  @param key	The key.
 	 *  @param o	The object.
 	 */
-	public void	add(Object key, Object o)
+	public void	add(K key, V o)
 	{
 		add(list.size(), key, o);
 	}
@@ -860,7 +860,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *  @param o	The object.
 	 *  @return The old value for the key.
 	 */
-	public Object	replace(Object key, Object o)
+	public V	replace(K key, V o)
 	{
 		if(map.get(key)==null)
 		{
@@ -874,7 +874,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *	@param index	The index.
 	 *	@return	The key.
 	 */
-	public Object	getKey(int index)
+	public K	getKey(int index)
 	{
 		return list.get(index);
 	}
@@ -885,7 +885,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *  @param key The key.
 	 *  @param o The object.
 	 */
-	public void	add(int index, Object key, Object o)
+	public void	add(int index, K key, V o)
 	{
 		if(map.get(key)!=null)
 		{
@@ -898,17 +898,17 @@ public class IndexMap	implements Serializable, Cloneable
 	/**
 	 *  Return an instance of this index map accessible via map interface.
 	 */
-	public Map	getAsMap()
+	public Map<K, V>	getAsMap()
 	{
-		return asmap!=null ? asmap : (asmap=new MapIndexMap(list, map));
+		return asmap!=null ? asmap : (asmap=new MapIndexMap<K, V>(list, map));
 	}
 
 	/**
 	 *  Return an instance of this index map accessible via list interface.
 	 */
-	public List	getAsList()
+	public List<V>	getAsList()
 	{
-		return aslist!=null ? aslist : (aslist=new ListIndexMap(list, map));
+		return aslist!=null ? aslist : (aslist=new ListIndexMap<K, V>(list, map));
 	}
 
 	/**
@@ -944,7 +944,7 @@ public class IndexMap	implements Serializable, Cloneable
 	 *  @param type	The component type of the array.
 	 *  @return The array of keys.
 	 */
-	public Object[]	getKeys(Class type)
+	public Object[]	getKeys(Class<?> type)
 	{
 		return list.toArray((Object[])Array.newInstance(type, list.size()));
 	}
@@ -954,7 +954,7 @@ public class IndexMap	implements Serializable, Cloneable
 	/**
 	 *  Provide access to the index map via map interface.
 	 */
-	public static class MapIndexMap	extends IndexMap	implements Map
+	public static class MapIndexMap<K, V>	extends IndexMap<K, V>	implements Map<K, V>
 	{
 		//-------- constructor --------
 
@@ -971,7 +971,7 @@ public class IndexMap	implements Serializable, Cloneable
 		 *  @param list	The list.
 		 *  @param map	The map.
 		 */
-		public MapIndexMap(List list, Map map)
+		public MapIndexMap(List<K> list, Map<K, V> map)
 		{
 			super(list, map);
 		}
@@ -1001,9 +1001,9 @@ public class IndexMap	implements Serializable, Cloneable
 		 * @throws NullPointerException if the key is <tt>null</tt> and this map
 		 *            does not not permit <tt>null</tt> keys (optional).
 		 */
-		public Object	remove(Object key)
+		public V	remove(Object key)
 		{
-			return removeKey(key);
+			return removeKey((K)key);
 		}
 
 		/**
@@ -1022,7 +1022,7 @@ public class IndexMap	implements Serializable, Cloneable
 	/**
 	 *  Provide access to the index map via list interface.
 	 */
-	public static class ListIndexMap	extends IndexMap	implements List
+	public static class ListIndexMap<K, V>	extends IndexMap<K, V>	implements List<V>
 	{
 		//-------- constructor --------
 
@@ -1039,7 +1039,7 @@ public class IndexMap	implements Serializable, Cloneable
 		 *  @param list	The list.
 		 *  @param map	The map.
 		 */
-		public ListIndexMap(List list, Map map)
+		public ListIndexMap(List<K> list, Map<K, V> map)
 		{
 			super(list, map);
 		}
@@ -1081,7 +1081,7 @@ public class IndexMap	implements Serializable, Cloneable
 	/**
 	 *  Provide set access to the key list, while preserving ordering.
 	 */
-	class KeySetWrapper	implements Set
+	class KeySetWrapper	implements Set<K>
 	{
 		// Query Operations
 
@@ -1132,7 +1132,7 @@ public class IndexMap	implements Serializable, Cloneable
 		 *
 		 * @return an iterator over the elements in this set.
 		 */
-		public Iterator iterator()
+		public Iterator<K> iterator()
 		{
 			return list.iterator();
 		}

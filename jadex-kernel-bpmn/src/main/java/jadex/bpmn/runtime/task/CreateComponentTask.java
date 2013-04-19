@@ -84,7 +84,7 @@ public class CreateComponentTask implements ITask
 				if(args==null)
 				{
 					args = new HashMap<String, Object>();
-					IndexMap params = context.getActivity().getParameters();
+					IndexMap<String, MParameter> params = context.getActivity().getParameters();
 					if(params!=null)
 					{
 						for(Iterator it=params.values().iterator(); it.hasNext(); )

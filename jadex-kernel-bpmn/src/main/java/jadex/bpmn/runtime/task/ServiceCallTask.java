@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Call a service.
@@ -64,7 +65,7 @@ public class ServiceCallTask implements ITask
 		// Collect arguments and settings.
 		final List	args	= new ArrayList();
 		final List	argtypes	= new ArrayList();
-		IndexMap	mparams	= context.getActivity().getParameters();
+		IndexMap<String, MParameter>	mparams	= context.getActivity().getParameters();
 		for(Iterator it=mparams.values().iterator(); it.hasNext(); )
 		{
 			MParameter	param	= (MParameter)it.next();

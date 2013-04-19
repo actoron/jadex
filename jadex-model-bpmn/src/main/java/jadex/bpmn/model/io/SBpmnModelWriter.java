@@ -849,10 +849,10 @@ public class SBpmnModelWriter
 				
 				if (hastaskparams)
 				{
-					IndexMap params = activity.getParameters();
-					for (int i = 0; i < params.size(); ++i)
+					IndexMap<String, MParameter> params = activity.getParameters();
+					for (String key: params.keySet())
 					{
-						MParameter param = (MParameter) params.get(i);
+						MParameter param = params.get(key);
 						out.print(getIndent(baseind + 2) + "<jadex:parameter direction=\"");
 						out.print(param.getDirection());
 						out.print("\" name=\"");
@@ -930,17 +930,18 @@ public class SBpmnModelWriter
 				}
 			}
 			
+//			Map<String, Tuple2<UnparsedExpression, UnparsedExpression>> mappings = edge.getParameterMappings();
 			IndexMap mappings = edge.getParameterMappings();
-			if (mappings != null && mappings.size() > 0)
+			if(mappings != null && mappings.size() > 0)
 			{
 				out.println(getIndent(baseind + 1) + "<semantic:extensionElements>");
 				
-				for (int i = 0; i < mappings.size(); ++i)
+				for(Object key: mappings.keySet())
 				{
 					out.print(getIndent(baseind + 2) + "<jadex:parametermapping name=\"");
-					out.print(mappings.getKey(i));
+					out.print(key);
 					out.print("\">");
-					out.print(((Tuple2<UnparsedExpression, UnparsedExpression>) mappings.get(i)).getFirstEntity().getValue());
+					out.print(((Tuple2<UnparsedExpression, UnparsedExpression>)mappings.get(key)).getFirstEntity().getValue());
 					out.println("</jadex:parametermapping>");
 				}
 				

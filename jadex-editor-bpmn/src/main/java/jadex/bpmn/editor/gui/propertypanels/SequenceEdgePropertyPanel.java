@@ -223,7 +223,7 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
 			Object ret = null;
-			if (columnIndex == 0)
+			if(columnIndex == 0)
 			{
 				ret = getBpmnSequenceEdge().getParameterMappings().getKey(rowIndex);
 			}

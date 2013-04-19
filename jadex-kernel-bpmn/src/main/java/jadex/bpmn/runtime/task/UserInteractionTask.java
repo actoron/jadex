@@ -31,6 +31,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -102,7 +103,7 @@ public class UserInteractionTask implements ITask
 				final JOptionPane	pane;
 				JComponent	message;
 				MActivity	task	= context.getModelElement();
-				IndexMap	parameters	= task.getParameters();
+				IndexMap<String, MParameter>	parameters	= task.getParameters();
 				
 				if(parameters!=null && !parameters.isEmpty())
 				{

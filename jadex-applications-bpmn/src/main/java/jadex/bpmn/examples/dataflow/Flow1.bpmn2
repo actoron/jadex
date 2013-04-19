@@ -9,13 +9,10 @@
   <semantic:extension>
     <jadex:modelname>Flow1</jadex:modelname>
   </semantic:extension>
-  
   <semantic:process name="Pool" id="K3nFIuOK+YpMMVVn">
-    
     <semantic:startEvent id="EKuSv0suF++YVmMD">
       <semantic:outgoing>ttTOjueYeXuMaLGQ</semantic:outgoing>
     </semantic:startEvent>
-    
     <semantic:task name="A" id="2fQU660/vHV3AksA">
       <semantic:incoming>ttTOjueYeXuMaLGQ</semantic:incoming>
       <semantic:outgoing>buL7iCrSo1gcunPg</semantic:outgoing>
@@ -27,7 +24,6 @@
         <jadex:parameter direction="out" name="d" type="java.lang.String">null</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
-    
     <semantic:task name="B " id="LHEmvR3ToYirPJk2">
       <semantic:incoming>buL7iCrSo1gcunPg</semantic:incoming>
       <semantic:outgoing>Fh0pUC/2RXEUtMeH</semantic:outgoing>
@@ -37,29 +33,16 @@
         <jadex:parameter direction="out" name="b" type="java.lang.String">null</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
-    
     <semantic:endEvent id="ys2KHcoP3v0jlpo0">
       <semantic:incoming>Fh0pUC/2RXEUtMeH</semantic:incoming>
     </semantic:endEvent>
-    
     <semantic:sequenceFlow sourceRef="EKuSv0suF++YVmMD" targetRef="2fQU660/vHV3AksA" id="ttTOjueYeXuMaLGQ">
     </semantic:sequenceFlow>
-    
     <semantic:sequenceFlow sourceRef="2fQU660/vHV3AksA" targetRef="LHEmvR3ToYirPJk2" id="buL7iCrSo1gcunPg">
     </semantic:sequenceFlow>
-    
     <semantic:sequenceFlow sourceRef="LHEmvR3ToYirPJk2" targetRef="ys2KHcoP3v0jlpo0" id="Fh0pUC/2RXEUtMeH">
     </semantic:sequenceFlow>
-    
-    <!-- <semantic:extension> -->
-    <semantic:extensionElements>
-    	<jadex:dataFlow sourceRef="2fQU660/vHV3AksA" sourceParam="c" targetRef="LHEmvR3ToYirPJk2" targetParam="a"> <!-- todo: mapping -->
-    	</jadex:dataFlow>
-    </semantic:extensionElements>
-  	<!--</semantic:extension>-->
-  
   </semantic:process>
-  
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="K3nFIuOK+YpMMVVn">
