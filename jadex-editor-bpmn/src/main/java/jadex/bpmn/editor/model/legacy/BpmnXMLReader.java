@@ -42,7 +42,6 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
-//import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
@@ -58,10 +57,13 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
-import jadex.xml.reader.IObjectReaderHandler;
-import jadex.xml.reader.AReader;
 import jadex.xml.reader.AReadContext;
+import jadex.xml.reader.AReader;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.XMLReaderFactory;
+import jadex.xml.stax.ILocation;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.XMLReporter;
 
 import java.io.File;
 import java.net.URL;
@@ -76,9 +78,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import jadex.xml.stax.QName;
-import jadex.xml.stax.ILocation;
-import jadex.xml.stax.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 
 /**

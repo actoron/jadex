@@ -9,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -22,6 +24,29 @@ public class Settings
 	
 	/** The last file opened or saved. */
 	protected File lastfile;
+	
+	/** Files that were opened when editor was closed. */
+	protected File[] openedfiles;
+	
+	/**
+	 *  Gets the opened files.
+	 *
+	 *  @return The opened files.
+	 */
+	public File[] getOpenedFiles()
+	{
+		return openedfiles;
+	}
+
+	/**
+	 *  Sets the opened files.
+	 *
+	 *  @param openedfiles The opened files.
+	 */
+	public void setOpenedFiles(File[] openedfiles)
+	{
+		this.openedfiles = openedfiles;
+	}
 
 	/**
 	 *  Gets the last file.
@@ -67,6 +92,15 @@ public class Settings
 			props.put("lastfile", lastfile.getAbsolutePath());
 		}
 		
+		if (openedfiles != null)
+		{
+			int counter = 0;
+			for (File file : openedfiles)
+			{
+				props.put("openfile" + ++counter, file.getAbsolutePath());
+			}
+		}
+		
 		OutputStream os = new FileOutputStream(tmpfile);
 		props.store(os, "Jadex BPMN Editor Settings");
 		os.close();
@@ -91,11 +125,24 @@ public class Settings
 			props.load(is);
 			is.close();
 			
-			String prop = props.getProperty("lastfile");
-			if (prop != null)
+			List<File> openfiles = new ArrayList<File>();
+			for (Object okey : props.keySet())
 			{
-				ret.setLastFile(new File(prop));
+				if (okey instanceof String)
+				{
+					String key = (String) okey;
+					if ("lastfile".equals(key))
+					{
+						ret.setLastFile(new File(props.getProperty((String) key)));
+					}
+					
+					if (key.startsWith("openfile"))
+					{
+						openfiles.add(new File(props.getProperty(key)));
+					}
+				}
 			}
+			ret.setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
 		}
 		catch (IOException e)
 		{

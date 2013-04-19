@@ -1,20 +1,12 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.model.legacy.BpmnXMLReader;
-import jadex.bpmn.editor.model.visual.BpmnVisualModelGenerator;
-import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bpmn.model.io.SBpmnModelWriter;
-import jadex.bridge.ResourceIdentifier;
-import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -232,44 +224,7 @@ public class BpmnMenuBar extends JMenuBar
 					try
 					{
 						File file = fc.getSelectedFile();
-						if (!file.getName().endsWith(".bpmn2") &&
-							!file.getName().endsWith(".bpmn"))
-						{
-							File tmpfile = new File(file.getAbsolutePath() + ".bpmn2");
-							if (tmpfile.exists())
-							{
-								file = tmpfile;
-							}
-							else
-							{
-								file = new File(file.getAbsolutePath() + ".bpmn");
-							}
-						}
-						
-						ModelContainer modelcontainer = new ModelContainer();
-						BpmnGraph graph = new BpmnGraph(modelcontainer, BpmnEditor.STYLE_SHEETS[0].getSecondEntity());
-						
-						MBpmnModel mmodel = null;
-						if (file.getName().endsWith("bpmn2"))
-						{
-							BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
-							mmodel = SBpmnModelReader.readModel(file, vreader);
-						}
-						else
-						{
-							ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), new FileInputStream(file), file.lastModified());
-							mmodel = BpmnXMLReader.read(rinfo, BpmnMenuBar.class.getClassLoader(), new ResourceIdentifier(), null);
-							(new BpmnVisualModelGenerator(mmodel)).generateModel(graph);
-						}
-						
-						modelcontainer.setGraph(graph);
-						modelcontainer.setBpmnModel(mmodel);
-						
-						modelcontainer.setFile(file);
-						editorwindow.getSettings().setLastFile(file);
-						
-						editorwindow.newModelTab(modelcontainer);
-						editorwindow.initializeNewModel(modelcontainer);
+						editorwindow.loadModel(file);
 					}
 					catch (Exception e1)
 					{

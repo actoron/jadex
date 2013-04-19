@@ -4,7 +4,13 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.DeletionController;
 import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
+import jadex.bpmn.editor.model.legacy.BpmnXMLReader;
+import jadex.bpmn.editor.model.visual.BpmnVisualModelGenerator;
+import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.io.SBpmnModelReader;
+import jadex.bridge.ResourceIdentifier;
+import jadex.commons.ResourceInfo;
 import jadex.commons.gui.JSplitPanel;
 
 import java.awt.BorderLayout;
@@ -19,7 +25,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -121,7 +130,26 @@ public class BpmnEditorWindow extends JFrame
 						statuspane.setDividerLocation(statuspane.getHeight());
 						statuspane.setDividerLocation(1.0);
 						statuspane.repaint();
-						initializeNewModel(newModelTab(null));
+						
+						File[] openedfiles = settings.getOpenedFiles();
+						if (openedfiles != null && openedfiles.length > 0)
+						{
+							for (File file : openedfiles)
+							{
+								try
+								{
+									loadModel(file);
+								}
+								catch(Exception e)
+								{
+								}
+							}
+						}
+						
+						if (tabpane.getTabCount() < 1)
+						{
+							initializeNewModel(newModelTab(null));
+						}
 					}
 				});
 				removeWindowListener(this);
@@ -333,9 +361,52 @@ public class BpmnEditorWindow extends JFrame
 		new DeletionController(modelcontainer);
 	}
 	
+	public void loadModel(File file) throws Exception
+	{
+		if (!file.getName().endsWith(".bpmn2") &&
+				!file.getName().endsWith(".bpmn"))
+		{
+			File tmpfile = new File(file.getAbsolutePath() + ".bpmn2");
+			if (tmpfile.exists())
+			{
+				file = tmpfile;
+			}
+			else
+			{
+				file = new File(file.getAbsolutePath() + ".bpmn");
+			}
+		}
+		
+		ModelContainer modelcontainer = new ModelContainer();
+		BpmnGraph graph = new BpmnGraph(modelcontainer, BpmnEditor.STYLE_SHEETS[0].getSecondEntity());
+		
+		MBpmnModel mmodel = null;
+		if (file.getName().endsWith("bpmn2"))
+		{
+			BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
+			mmodel = SBpmnModelReader.readModel(file, vreader);
+		}
+		else
+		{
+			ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), new FileInputStream(file), file.lastModified());
+			mmodel = BpmnXMLReader.read(rinfo, BpmnMenuBar.class.getClassLoader(), new ResourceIdentifier(), null);
+			(new BpmnVisualModelGenerator(mmodel)).generateModel(graph);
+		}
+		
+		modelcontainer.setGraph(graph);
+		modelcontainer.setBpmnModel(mmodel);
+		
+		modelcontainer.setFile(file);
+		getSettings().setLastFile(file);
+		
+		newModelTab(modelcontainer);
+		initializeNewModel(modelcontainer);
+	}
+	
 	public void terminate()
 	{
 		boolean quit = true;
+		List<File> openfiles = new ArrayList<File>();
 		for (int i = 0; i < tabpane.getTabCount(); ++i)
 		{
 			BpmnEditorPanel panel = (BpmnEditorPanel) tabpane.getComponentAt(i);
@@ -346,11 +417,17 @@ public class BpmnEditorWindow extends JFrame
 				quit = false;
 				break;
 			}
+			
+			if (modelcontainer.getFile() != null)
+			{
+				openfiles.add(modelcontainer.getFile());
+			}
 		}
 		if (quit)
 		{
 			try
 			{
+				settings.setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
 				settings.save();
 			}
 			catch (IOException e)
@@ -358,7 +435,7 @@ public class BpmnEditorWindow extends JFrame
 				e.printStackTrace();
 			}
 			
-//			try
+//			trys
 //			{
 //				ImageProvider.getInstance().saveCache(BpmnEditor.HOME_DIR + File.separator + "imagecache.dat");
 //			}
