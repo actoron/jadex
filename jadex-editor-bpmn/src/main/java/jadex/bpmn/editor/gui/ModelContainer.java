@@ -409,9 +409,9 @@ public class ModelContainer
 				{
 					public boolean filter(Class<?> clazz)
 					{
-						System.out.print(clazz.getCanonicalName());
-						System.out.print(": ");
-						System.out.println(SReflect.isSupertype(ITask.class, clazz));
+//						System.out.print(clazz.getCanonicalName());
+//						System.out.print(": ");
+//						System.out.println(SReflect.isSupertype(ITask.class, clazz));
 						return SReflect.isSupertype(ITask.class, clazz);
 					}
 				});

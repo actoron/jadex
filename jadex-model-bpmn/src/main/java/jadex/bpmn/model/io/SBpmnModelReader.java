@@ -2,6 +2,7 @@ package jadex.bpmn.model.io;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
@@ -703,9 +704,11 @@ public class SBpmnModelReader
 			{
 				String name = attrs.get("name");
 				ClassInfo clazz = new ClassInfo(attrs.get("type"));
-				UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), (String) buffer.remove("value"), null);
-				parseExp(exp, model.getModelInfo().getAllImports(), cl);
-				model.addContextVariable(name, clazz, exp, null);
+				//UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), (String) buffer.remove("value"), null);
+				MContextVariable var = new MContextVariable(name, clazz.getTypeName(), (String) buffer.remove("value"), null);
+				parseExp(var, model.getModelInfo().getAllImports(), cl);
+				//model.addContextVariable(name, clazz, exp, null);
+				model.addContextVariable(var);
 			}
 			else if ("configuration".equals(tag.getLocalPart()))
 			{
@@ -765,10 +768,13 @@ public class SBpmnModelReader
 				{
 					UnparsedExpression exp = new UnparsedExpression();
 					exp.setName(entry.getKey());
-					exp.setClazz(model.getContextVariableClass(entry.getKey()));
+					//exp.setClazz(model.getContextVariableClass(entry.getKey()));
+					MContextVariable contextvar = model.getContextVariable(entry.getKey());
+					exp.setClazz(contextvar.getClazz());
 					exp.setValue(entry.getValue());
 					parseExp(exp, model.getModelInfo().getAllImports(), cl);
-					model.setContextVariableExpression(entry.getKey(), conf.getName(), exp);
+					//model.setContextVariableExpression(entry.getKey(), conf.getName(), exp);
+					contextvar.setValue(conf.getName(), exp);
 				}
 				
 				((ModelInfo) model.getModelInfo()).addConfiguration(conf);

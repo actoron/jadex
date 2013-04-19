@@ -2,6 +2,7 @@ package jadex.bpmn.model.io;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
@@ -335,33 +336,34 @@ public class SBpmnModelWriter
 	{
 		int ind = 2;
 		
-		Set<String> ctvnames = mmodel.getContextVariables();
-		if (ctvnames.size() > 0)
+		List<MContextVariable> ctvs = mmodel.getContextVariables();
+		if (ctvs.size() > 0)
 		{
 			out.print(getIndent(ind));
 			out.println("<jadex:contextvariables>");
 			++ind;
 			
-			for (String ctvname : ctvnames)
+			for (MContextVariable ctv : ctvs)
 			{
-				ClassInfo ci = mmodel.getContextVariableClass(ctvname);
+				ClassInfo ci = ctv.getClazz();
 				String cn = ci != null? ci.getTypeName() : "";
 				
 				out.print(getIndent(ind));
 				out.print("<jadex:contextvariable name=\"");
-				out.print(ctvname);
+				out.print(ctv.getName());
 				out.print("\" type=\"");
 				out.print(cn);
 				
-				UnparsedExpression exp = mmodel.getContextVariableExpression(ctvname, null);
-				if (exp != null && exp.getValue() != null && exp.getValue().length() > 0)
+				//UnparsedExpression exp = mmodel.getContextVariableExpression(ctvname, null);
+				//if (exp != null && exp.getValue() != null && exp.getValue().length() > 0)
+				if (ctv.getValue() != null && ctv.getValue().length() > 0)
 				{
 					out.println("\">");
 					++ind;
 					
 					out.print(getIndent(ind));
 					out.print("<jadex:value>");
-					out.print(exp.getValue());
+					out.print(ctv.getValue());
 					out.println("</jadex:value>");
 					
 					--ind;
@@ -390,13 +392,14 @@ public class SBpmnModelWriter
 	{
 		if (configurations.length > 0)
 		{
-			Set<String> ctvnames = mmodel.getContextVariables();
+			List<MContextVariable> ctvs = mmodel.getContextVariables();
 			Map<String, Map<String, String>> ctvconfexp = new HashMap<String, Map<String, String>>();
-			for (String ctvname : ctvnames)
+			for (MContextVariable ctv : ctvs)
 			{
 				for (int i = 0; i < configurations.length; ++i)
 				{
-					UnparsedExpression cexp = mmodel.getContextVariableExpression(ctvname, configurations[i].getName());
+					//UnparsedExpression cexp = mmodel.getContextVariableExpression(ctvname, configurations[i].getName());
+					UnparsedExpression cexp = ctv.getValue(configurations[i].getName());
 					if (cexp != null && cexp.getValue() != null && cexp.getValue().length() > 0)
 					{
 						Map<String, String> confctvs = ctvconfexp.get(configurations[i].getName());
@@ -405,7 +408,7 @@ public class SBpmnModelWriter
 							confctvs = new HashMap<String, String>();
 							ctvconfexp.put(configurations[i].getName(), confctvs);
 						}
-						confctvs.put(ctvname, cexp.getValue());
+						confctvs.put(ctv.getName(), cexp.getValue());
 					}
 				}
 			}

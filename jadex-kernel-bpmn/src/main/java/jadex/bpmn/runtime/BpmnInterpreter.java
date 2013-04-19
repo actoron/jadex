@@ -2,6 +2,7 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
@@ -600,26 +601,28 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	protected void initContextVariables()
 	{
-		Set<String>	vars	= model.getContextVariables();
-		for(Iterator<String> it=vars.iterator(); it.hasNext(); )
+		List<MContextVariable>	vars	= model.getContextVariables();
+		for(Iterator<MContextVariable> it=vars.iterator(); it.hasNext(); )
 		{
-			String	name	= it.next();
-			if(!variables.containsKey(name))	// Don't overwrite arguments.
+			MContextVariable	cv	= it.next();
+			if(!variables.containsKey(cv.getName()))	// Don't overwrite arguments.
 			{
 				Object	value	= null;
-				UnparsedExpression	exp	= model.getContextVariableExpression(name, getConfiguration());
+				UnparsedExpression	exp	= cv.getValue(getConfiguration());
 				if(exp!=null)
 				{
 					try
 					{
-						value = ((IParsedExpression) exp.getParsed()).getValue(getFetcher());
+						IParsedExpression parsed = (IParsedExpression) exp.getParsed();
+						value = parsed != null? parsed.getValue(getFetcher()) : null;
 					}
 					catch(RuntimeException e)
 					{
-						throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
+						e.printStackTrace();
+						throw new RuntimeException("Error parsing context variable: "+this+", "+cv.getName()+", "+exp, e);
 					}
 				}
-				variables.put(name, value);
+				variables.put(cv.getName(), value);
 			}
 		}
 	}

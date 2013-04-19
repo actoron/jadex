@@ -7,6 +7,7 @@ import jadex.bpmn.model.MArtifact;
 import jadex.bpmn.model.MAssociation;
 import jadex.bpmn.model.MAssociationTarget;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MNamedIdElement;
@@ -221,6 +222,7 @@ public class BpmnXMLReader
 		ret.setResourceIdentifier(rid);
 		
 		ret.initModelInfo();
+		((ModelInfo) ret.getModelInfo()).getProperties().remove("debugger.breakpoints");
 		rinfo.getInputStream().close();
 		
 		if(!((ModelInfo)ret.getModelInfo()).checkName())
@@ -1539,13 +1541,19 @@ public class BpmnXMLReader
 							}
 							if(!argi && !resu)
 							{
-								UnparsedExpression exp = null;
+								//UnparsedExpression exp = null;
+								MContextVariable cv = new MContextVariable();
+								cv.setName(name);
+								cv.setClazz(new ClassInfo(typename));
+								
 								if(val!=null && val.length()>0)
 								{
 //									exp = parser.parseExpression(val, model.getModelInfo().getAllImports(), null, context.getClassLoader());
-									exp = new UnparsedExpression(name, typename, val, null);
+									//exp = new UnparsedExpression(name, typename, val, null);
+									cv.setValue(val);
 								}
-								model.addContextVariable(name, new ClassInfo(SReflect.findClass0(typename, model.getModelInfo().getAllImports(), context.getClassLoader())), exp, inivals);
+								//model.addContextVariable(name, new ClassInfo(SReflect.findClass0(typename, model.getModelInfo().getAllImports(), context.getClassLoader())), exp, inivals);
+								model.addContextVariable(cv);
 							}
 						
 //							System.out.println("Argument: "+arg);
@@ -1850,7 +1858,11 @@ public class BpmnXMLReader
 										}
 										if(!argi && !resu)
 										{
-											model.addContextVariable(name, new ClassInfo(arg.getClazz().getType(getClass().getClassLoader(), model.getModelInfo().getAllImports())), exp, null);
+											//model.addContextVariable(name, new ClassInfo(arg.getClazz().getType(getClass().getClassLoader(), model.getModelInfo().getAllImports())), exp, null);
+											MContextVariable cv = new MContextVariable();
+											cv.setName(name);
+											cv.setClazz(new ClassInfo(arg.getClazz().getTypeName()));
+											model.addContextVariable(cv);
 										}
 	//									System.out.println("Argument: "+arg);
 									}
@@ -1977,14 +1989,19 @@ public class BpmnXMLReader
 							if(clazz!=null)
 							{
 								String name = stok2.nextToken();
-								UnparsedExpression exp = null;
+								//UnparsedExpression exp = null;
+								MContextVariable cv = new MContextVariable();
+								cv.setName(name);
+								cv.setClazz(new ClassInfo(clazz));
 								if(init!=null)
 								{
 //									exp = parser.parseExpression(init, mi.getAllImports(), null, context.getClassLoader());
-									exp = new UnparsedExpression(name, clazz, init, null);
+									//exp = new UnparsedExpression(name, clazz, init, null);
+									cv.setValue(init);
 								}
 								
-								model.addContextVariable(name, new ClassInfo(clazz), exp, null);
+								//model.addContextVariable(name, new ClassInfo(clazz), exp, null);
+								model.addContextVariable(cv);
 							}
 						}
 					}

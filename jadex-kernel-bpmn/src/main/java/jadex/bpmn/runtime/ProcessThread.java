@@ -753,6 +753,7 @@ public class ProcessThread	implements ITaskContext
 						}
 						catch(RuntimeException e)
 						{
+							e.printStackTrace();
 							throw new RuntimeException("Error parsing parameter value: "+instance+", "+this+", "+param.getName()+", "+param.getInitialValue(), e);
 						}
 					}

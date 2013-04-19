@@ -3,6 +3,7 @@ package jadex.bpmn.editor.gui.propertypanels;
 import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MContextVariable;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -385,28 +386,30 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		};
 		
 		MBpmnModel model = modelcontainer.getBpmnModel();
-		Set<String> cvs = model.getContextVariables();
-		for (String cvname : cvs)
+		List<MContextVariable> cvs = model.getContextVariables();
+		for (MContextVariable cv : cvs)
 		{
-			String type = model.getContextVariableClass(cvname).getTypeName();
-			CachedParameter cparam = new CachedParameter(cvname, false, false, null, type);
+			String type = cv.getClazz().getTypeName();
+			CachedParameter cparam = new CachedParameter(cv.getName(), false, false, null, type);
 			
 			for (ConfigurationInfo conf : getModelInfo().getConfigurations())
 			{
-				UnparsedExpression exp = model.getContextVariableExpression(cvname, conf.getName());
+				//UnparsedExpression exp = model.getContextVariableExpression(cvname, conf.getName());
+				UnparsedExpression exp = cv.getValue(conf.getName());
 				if (exp != null)
 				{
 					cparam.inivals.put(conf.getName(), exp.getValue());
 				}
 			}
 			
-			UnparsedExpression exp = model.getContextVariableExpression(cvname, null);
-			if (exp != null)
-			{
-				cparam.inivals.put(null, exp.getValue());
-			}
+			//UnparsedExpression exp = model.getContextVariableExpression(cvname, null);
+//			if (exp != null)
+//			{
+//				cparam.inivals.put(null, exp.getValue());
+//			}
+			cparam.inivals.put(null, cv.getValue());
 			
-			paramcche.put(cvname, cparam);
+			paramcche.put(cv.getName(), cparam);
 		}
 		
 		IArgument[] args = getModelInfo().getArguments();
@@ -674,7 +677,9 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		
 		if (!param.arg && !param.res)
 		{
-			getModel().addContextVariable(param.name, new ClassInfo(param.type), new UnparsedExpression(param.name, param.type, defval, null), param.inivals);
+			MContextVariable cv = new MContextVariable(param.name, param.desc, param.type, defval);
+			getModel().addContextVariable(cv);
+			//getModel().addContextVariable(param.name, new ClassInfo(param.type), new UnparsedExpression(param.name, param.type, defval, null), param.inivals);
 		}
 		
 		if (index != null)
@@ -991,7 +996,6 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			switch (columnIndex)
 			{
 				case 0:
-					System.out.println("Change");
 					ConfigurationInfo cinfo = confcache.get(rowIndex);
 					String oldname = cinfo.getName();
 					String poollane = getModel().removePoolLane(oldname);
@@ -999,14 +1003,19 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					getModelInfo().setConfigurations((ConfigurationInfo[]) confcache.toArray(new ConfigurationInfo[confcache.size()]));
 					getModel().addPoolLane(cinfo.getName(), poollane);
 					
-					for (String cvname : getModel().getContextVariables())
+					for (MContextVariable cv : getModel().getContextVariables())
 					{
-						UnparsedExpression exp = getModel().getContextVariableExpression(cvname, oldname);
-						if (exp != null)
-						{
-							getModel().setContextVariableExpression(cvname, oldname, null);
-							getModel().setContextVariableExpression(cvname, cinfo.getName(), exp);
-						}
+						//UnparsedExpression exp = getModel().getContextVariableExpression(cvname, oldname);
+//						if (exp != null)
+//						{
+							//getModel().setContextVariableExpression(cvname, oldname, null);
+							UnparsedExpression exp = cv.removeValue(oldname);
+							if (exp != null)
+							{
+								cv.setValue(cinfo.getName(), exp);
+							}
+							//getModel().setContextVariableExpression(cvname, cinfo.getName(), exp);
+//						}
 					}
 					
 					for (Object paramobj : paramcche.values())

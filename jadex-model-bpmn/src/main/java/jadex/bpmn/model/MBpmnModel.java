@@ -143,7 +143,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	//-------- added structures --------
 
 	/** The context variables (name -> [class, initexpression]). */
-	protected Map<String, Object[]> variables;
+	protected Map<String, MContextVariable> variabls;
 	
 	/** The pool/names in configurations. */
 	protected Map configpoollanes;
@@ -906,17 +906,14 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 
 	/**
 	 *  Add a context variable declaration.
-	 *  @param name	The variable name.
-	 *  @param clazz	The type of the variable
-	 *  @param exp	Default initialization expression (if any).
-	 *  @param inivals	Initialization expressions for configurations.
+	 *  @param variable The variable.
 	 */
-	public void addContextVariable(String name, ClassInfo clazz, UnparsedExpression exp, Map inivals)
+	public void addContextVariable(MContextVariable variable)
 	{
-		if(variables==null)
-			variables	= new HashMap();
+		if(variabls==null)
+			variabls	= new HashMap<String, MContextVariable>();
 		
-		variables.put(name, new Object[]{clazz, exp, inivals});
+		variabls.put(variable.getName(), variable);
 	}
 
 	/**
@@ -925,34 +922,43 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	public void removeContextVariable(String name)
 	{
-		if(variables!=null)
+		if(variabls!=null)
 		{
-			variables.remove(name);
+			variabls.remove(name);
 			
-			if(variables.isEmpty())
+			if(variabls.isEmpty())
 			{
-				variables	= null;
+				variabls	= null;
 			}
 		}
+	}
+	
+	/**
+	 *  Remove a context variable declaration.
+	 *  @param variable	The variable.
+	 */
+	public void removeContextVariable(MContextVariable variable)
+	{
+		removeContextVariable(variable.getName());
 	}
 
 	/**
 	 *  Get the declared context variables.
 	 *  @return A set of variable names.
 	 */
-	public Set<String> getContextVariables()
+	public List<MContextVariable> getContextVariables()
 	{
-		return variables!=null ? variables.keySet() : Collections.EMPTY_SET;
+		return variabls!=null ? new ArrayList<MContextVariable>(variabls.values()) : Collections.EMPTY_LIST;
 	}
 
 	/**
-	 *  Get the class of a declared context variable.
+	 *  Get a declared context variable.
 	 *  @param name	The variable name.
-	 *  @return The class of the variable.
+	 *  @return The variable.
 	 */
-	public ClassInfo getContextVariableClass(String name)
+	public MContextVariable getContextVariable(String name)
 	{
-		return (ClassInfo)((Object[])variables.get(name))[0];
+		return variabls != null? variabls.get(name) : null;
 	}
 
 	/**
@@ -962,26 +968,27 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	public UnparsedExpression getContextVariableExpression(String name, String config)
 	{
-		Object[]	var	= (Object[])variables.get(name);
-		return config!=null && var[2]!=null && ((Map)var[2]).containsKey(config)
-			? (UnparsedExpression)((Map)var[2]).get(config)
-			: (UnparsedExpression)var[1];
+		MContextVariable variable = getContextVariable(name);
+		return config != null? variable.getValue(config) : variable;
 	}
 	
 	/**
 	 *  Set the initialization expression of a declared context variable.
 	 *  @param name	The variable name.
 	 */
-	public void setContextVariableExpression(String name, String config, UnparsedExpression exp)
+	public void setContextVariableExpression(String config, UnparsedExpression exp)
 	{
-		Object[]	var	= (Object[])variables.get(name);
-		if (config!=null)
+		if (config == null && exp instanceof MContextVariable)
 		{
-			((Map)var[2]).put(config, exp);
+			variabls.put(exp.getName(), (MContextVariable) exp);
 		}
-		else
+		else if (config != null)
 		{
-			var[1] = exp;
+			MContextVariable var =  getContextVariable(exp.getName());
+			if (var != null)
+			{
+				var.setValue(config, exp);
+			}
 		}
 	}
 
