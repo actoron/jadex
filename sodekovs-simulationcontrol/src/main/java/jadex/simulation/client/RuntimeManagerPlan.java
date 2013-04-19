@@ -311,14 +311,15 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Start Online Visualization
 		startOnlineVisualization(simConf);
+		
+		fut = exta.getExtension(simConf.getNameOfSpace());
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 
 		// Hack: Synchronize start time!
 		// System.out.println("-->StartTime at Client: " + startTime);
 		long startTime = clockservice.getTime();
-		long startTickTime = new Double(clockservice.getTick()).longValue();
-
-		fut = exta.getExtension(simConf.getNameOfSpace());
-		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+		long startTickTime = (Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION);
+		
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
 		space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", startTickTime);
 
