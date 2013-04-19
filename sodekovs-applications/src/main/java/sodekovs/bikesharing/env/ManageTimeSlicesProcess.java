@@ -35,6 +35,7 @@ import sodekovs.util.bikesharing.model.SimulationDescription;
 import sodekovs.util.bikesharing.model.Station;
 import sodekovs.util.bikesharing.model.TimeSlice;
 import sodekovs.util.math.GetRandom;
+import sodekovs.util.misc.GlobalConstants;
 import sodekovs.util.misc.XMLHandler;
 
 /**
@@ -48,7 +49,7 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 	private HashMap<String, Station> stationsMap;
 	// the difference between the time the start of the simulation time according to the plattform and when this process is executed for the first time
 	// required in order to synchronize these to "times"
-	private double tickDelta = -1;
+	private long startTick = -1;
 	private Random rand = new java.util.Random();
 	private IClockService clockservice;
 	private ISimulationService simulationservice;
@@ -137,32 +138,42 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 			init(space);
 		}
 
-		if (tickDelta == -1) {
-			tickDelta = clock.getTick();
+		if (startTick == -1) {
+			startTick = (Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION);
 		}
 
 		// if (limitPedNr < 30) {
-		// limitPedNr++;
+		// limitPedNr++; space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION)
 
 		// if (counterTmp < 6) {
 		for (int i = 0; i < timeSlicesList.size(); i++) {
 			// avoid index out of bounds exception
-			if (i + 1 < timeSlicesList.size()) {
-				if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta)) && (timeSlicesList.get(i + 1).getStartTime() > (clock.getTick() - tickDelta))) {
+			if (i + 1 < timeSlicesList.size()) {				
+				if ((timeSlicesList.get(i).getStartTime() <= ((Long)space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick)) && (timeSlicesList.get(i + 1).getStartTime() > ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick))) {
 					executeTimeSlice(i, space);
-					// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+//					 System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - tickDelta));
 					// counterTmp++;
 					break;
 				}
-			} else if ((timeSlicesList.get(i).getStartTime() <= (clock.getTick() - tickDelta))) {
+			} else if ((timeSlicesList.get(i).getStartTime() <= ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick))) {
 				executeTimeSlice(i, space);
-				// System.out.println("Time Slice executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + (clock.getTick() - tickDelta));
+//				 System.out.println("Time Slice (2) executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - tickDelta));
 			}
 		}
 
 		// }
 
 		// printClockAndSimSettings();
+		
+//		int a = 0, b = 1, c = 0;
+////		System.out.println(a + " " + b);
+//		for (double i = 1; i <= 1000000000; i++) {
+//			c = a + b;
+////			System.out.println(c + " ");
+//			a = b;
+//			b = c;
+//		}
+//		System.out.println("FIBONACCI FINISHED ");
 	}
 
 	// }
