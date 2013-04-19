@@ -247,9 +247,9 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 			switch (columnIndex)
 			{
 				case 0:
-					Object rem = getBpmnSequenceEdge().getParameterMappings().remove(rowIndex);
+					Tuple2<UnparsedExpression, UnparsedExpression> rem = getBpmnSequenceEdge().getParameterMappings().remove(rowIndex);
 					getBpmnSequenceEdge().getParameterMappings().add(rowIndex,
-						createFreeName((String) value, new BasePropertyPanel.IndexMapContains(getBpmnSequenceEdge().getParameterMappings())),
+						createFreeName((String)value, new BasePropertyPanel.IndexMapContains(getBpmnSequenceEdge().getParameterMappings())),
 						rem);
 					break;
 				case 1:

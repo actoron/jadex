@@ -1,8 +1,5 @@
 package jadex.bpmn.model;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
@@ -33,7 +30,7 @@ public class MSequenceEdge extends MAssociationTarget
 	protected UnparsedExpression condition; //IParameterExpression
 	
 	/** The parameter mappings. */
-	protected IndexMap parametermappings;
+	protected IndexMap<String, Tuple2<UnparsedExpression, UnparsedExpression>> parametermappings;
 //	protected Map<String, Tuple2<UnparsedExpression, UnparsedExpression>> parametermappings;
 	
 	//-------- methods --------
@@ -148,7 +145,7 @@ public class MSequenceEdge extends MAssociationTarget
 	{
 		if(parametermappings == null)
 //			parametermappings = new LinkedHashMap<String, Tuple2<UnparsedExpression,UnparsedExpression>>();
-			parametermappings = new IndexMap();
+			parametermappings = new IndexMap<String, Tuple2<UnparsedExpression, UnparsedExpression>>();
 		
 		parametermappings.put(name, new Tuple2<UnparsedExpression, UnparsedExpression>(exp, iexp));
 	}
@@ -157,7 +154,7 @@ public class MSequenceEdge extends MAssociationTarget
 	 *  Get the parameter mappings map.
 	 *  @return The parameter mappings.
 	 */
-	public IndexMap getParameterMappings()
+	public IndexMap<String, Tuple2<UnparsedExpression, UnparsedExpression>> getParameterMappings()
 	{
 		return parametermappings;
 	}

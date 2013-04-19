@@ -2,6 +2,7 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
@@ -631,91 +632,123 @@ public class ProcessThread	implements ITaskContext
 			Map<String, Object>	passedparams = null;
 			Set<String>	indexparams	= null;
 			
-			if(getLastEdge()!=null && getLastEdge().getParameterMappings()!=null)
+			if(getLastEdge()!=null)
 			{
-				IndexMap mappings = getLastEdge().getParameterMappings();
-				if(mappings!=null)
+				if(getLastEdge().getParameterMappings()!=null)
 				{
-					IValueFetcher fetcher = new ProcessThreadValueFetcher(this, false, instance.getFetcher());
-					for(Iterator it=mappings.keySet().iterator(); it.hasNext(); )
+					IndexMap<String, Tuple2<UnparsedExpression, UnparsedExpression>> mappings = getLastEdge().getParameterMappings();
+					if(mappings!=null)
 					{
-						boolean	found	= false;
-						String	name	= (String)it.next();
-//						IParsedExpression exp = (IParsedExpression)((Object[])mappings.get(name))[0];
-//						IParsedExpression iexp = (IParsedExpression)((Object[])mappings.get(name))[1];
-						IParsedExpression exp = (IParsedExpression)((Tuple2<UnparsedExpression, UnparsedExpression>)mappings.get(name)).getFirstEntity().getParsed();
-						UnparsedExpression uiexp = ((Tuple2<UnparsedExpression, UnparsedExpression>)mappings.get(name)).getSecondEntity();
-						IParsedExpression iexp = uiexp != null? (IParsedExpression) uiexp.getParsed() : null;
-						Object value;
-						Object index;
-						try
+						IValueFetcher fetcher = new ProcessThreadValueFetcher(this, false, instance.getFetcher());
+						for(Iterator<String> it=mappings.keySet().iterator(); it.hasNext(); )
 						{
-							value	= exp.getValue(fetcher);
-						}
-						catch(RuntimeException e)
-						{
-							throw new RuntimeException("Error parsing parameter value: "+instance+", "+this+", "+name+", "+exp, e);
-						}
-						try
-						{
-							index	= iexp!=null ? iexp.getValue(fetcher) : null;
-						}
-						catch(RuntimeException e)
-						{
-							throw new RuntimeException("Error parsing parameter index: "+instance+", "+this+", "+name+", "+iexp, e);
-						}
-												
-						if(getActivity().hasParameter(name))
-						{
-							if(passedparams==null)
-								passedparams	= new HashMap<String, Object>();
-							
-							if(iexp!=null)
+							boolean	found	= false;
+							String	name	= (String)it.next();
+	//						IParsedExpression exp = (IParsedExpression)((Object[])mappings.get(name))[0];
+	//						IParsedExpression iexp = (IParsedExpression)((Object[])mappings.get(name))[1];
+							IParsedExpression exp = (IParsedExpression)((Tuple2<UnparsedExpression, UnparsedExpression>)mappings.get(name)).getFirstEntity().getParsed();
+							UnparsedExpression uiexp = ((Tuple2<UnparsedExpression, UnparsedExpression>)mappings.get(name)).getSecondEntity();
+							IParsedExpression iexp = uiexp != null? (IParsedExpression)uiexp.getParsed(): null;
+							Object value;
+							Object index;
+							try
 							{
-								if(!passedparams.containsKey(name))
-								{
-									passedparams.put(name, new ArrayList<Object>());
-									if(indexparams==null)
-										indexparams	= new HashSet<String>();
+								value	= exp.getValue(fetcher);
+							}
+							catch(RuntimeException e)
+							{
+								throw new RuntimeException("Error parsing parameter value: "+instance+", "+this+", "+name+", "+exp, e);
+							}
+							try
+							{
+								index	= iexp!=null ? iexp.getValue(fetcher) : null;
+							}
+							catch(RuntimeException e)
+							{
+								throw new RuntimeException("Error parsing parameter index: "+instance+", "+this+", "+name+", "+iexp, e);
+							}
 									
-									indexparams.add(name);
+							// if activity has parameter with name save it in passedparams
+							if(getActivity().hasParameter(name))
+							{
+								if(passedparams==null)
+									passedparams	= new HashMap<String, Object>();
+								
+								// If indexed param, create name, list and add (index, value) entry
+								if(iexp!=null)
+								{
+									if(!passedparams.containsKey(name))
+									{
+										passedparams.put(name, new ArrayList<Object>());
+										if(indexparams==null)
+											indexparams	= new HashSet<String>();
+										
+										indexparams.add(name);
+									}
+									((List<Object>)passedparams.get(name)).add(new Object[]{index, value});
 								}
-								((List<Object>)passedparams.get(name)).add(new Object[]{index, value});
+								// else save name, value
+								else
+								{
+									passedparams.put(name, value);
+								}
+								found	= true;
 							}
-							else
+							
+							// else if process thread has parameter, set it in thread 
+							if(!found && hasParameterValue(name))
 							{
-								passedparams.put(name, value);
+								setParameterValue(name, index, value);
+								found	= true;
 							}
-							found	= true;
+							
+							// else if bpmn instance has context variable
+							if(!found && instance.hasContextVariable(name))
+							{
+								if(iexp!=null)
+								{
+									Object	array	= instance.getContextVariable(name);
+									Array.set(array, ((Number)index).intValue(), value);
+								}
+								else
+								{
+									instance.setContextVariable(name, value);
+								}
+								found	= true;
+							}
+							else if(!found)
+							{
+								throw new RuntimeException("Unknown parameter or context variable: "+name+", "+this);
+							}
 						}
+					}
+				}
+				else 
+				{
+					// Try to find data edges
+					List<MDataEdge> ds = getActivity().getIncomingDataEdges();
+					if(ds!=null)
+					{
+						passedparams = new HashMap<String, Object>();
 						
-						if(!found && hasParameterValue(name))
+						for(MDataEdge de: ds)
 						{
-							setParameterValue(name, index, value);
-							found	= true;
-						}
-						
-						if(!found && instance.hasContextVariable(name))
-						{
-							if(iexp!=null)
+							if(data.containsKey(de.getId()))
 							{
-								Object	array	= instance.getContextVariable(name);
-								Array.set(array, ((Number)index).intValue(), value);
+								String pname = de.getTargetParameter();
+								Object val = data.get(de.getId());
+								
+								// if already contains value must be identical
+								if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
+									throw new RuntimeException("Different edges have different values");
+								
+								passedparams.put(pname, val);
 							}
-							else
-							{
-								instance.setContextVariable(name, value);
-							}
-							found	= true;
-						}
-						else if(!found)
-						{
-							throw new RuntimeException("Unknown parameter or context variable: "+name+", "+this);
 						}
 					}
 				}
 			}
-						
+			
 			// todo: parameter direction / class
 			
 			Set<String> before = data!=null? new HashSet<String>(data.keySet()): Collections.EMPTY_SET;
