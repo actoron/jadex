@@ -113,10 +113,10 @@ public class RuntimeManagerPlan extends Plan {
 
 			Time time = simConf.getRunConfiguration().getRows().getTerminateCondition().getTime();
 			if (time.getType().equals(Constants.TICK_BASED_TIME_EXPRESSION)) {
-				double startTick = clockservice.getTick();
+				long startTick = (Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION);
 				// Tick based termination condition
 				// System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
-				while (time.getValue() > (clockservice.getTick() - startTick)) {
+				while (time.getValue() > ((Long)space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick)) {
 					waitForTick();
 					// System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
 				}
