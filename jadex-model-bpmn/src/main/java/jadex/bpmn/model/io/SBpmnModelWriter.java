@@ -307,6 +307,7 @@ public class SBpmnModelWriter
 						}
 						
 						--ind;
+						out.print(getIndent(ind));
 						out.print("</jadex:");
 						out.print(prefix);
 						out.println(">");
