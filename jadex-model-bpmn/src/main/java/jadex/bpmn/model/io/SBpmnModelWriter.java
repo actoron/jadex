@@ -36,7 +36,7 @@ import java.util.Set;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 1;
+	public static final int BUILD = 2;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -285,7 +285,7 @@ public class SBpmnModelWriter
 					String type = arg.getClazz() != null? arg.getClazz().getTypeName() != null? arg.getClazz().getTypeName() : "" : "";
 					out.print(type);
 					
-					if (hasdesc && hasval)
+					if (hasdesc || hasval)
 					{
 						out.println("\">");
 						++ind;

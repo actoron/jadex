@@ -618,7 +618,7 @@ public class SBpmnModelReader
 		}
 		else if ("value".equals(tag.getLocalPart()))
 		{
-			if (attrs.containsKey("name"))
+			if (attrs != null && attrs.containsKey("name"))
 			{
 				Map<String, String> vals = (Map<String, String>) buffer.get("values");
 				if (vals == null)
