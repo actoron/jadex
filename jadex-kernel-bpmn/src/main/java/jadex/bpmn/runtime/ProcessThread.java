@@ -736,7 +736,7 @@ public class ProcessThread	implements ITaskContext
 							if(data.containsKey(de.getId()))
 							{
 								String pname = de.getTargetParameter();
-								Object val = data.get(de.getId());
+								Object val = data.remove(de.getId());
 								
 								// if already contains value must be identical
 								if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
@@ -808,17 +808,32 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public  void updateParametersAfterStep(MActivity activity, BpmnInterpreter instance)
 	{
-		// Remove all in paramters
 //		System.out.println("after: "+act);
 		if(MBpmnModel.TASK.equals(activity.getActivityType()) || activity instanceof MSubProcess)
 		{
+			// Add parameter value for each out edge using the edge id
+			List<DataEdge> des = activity.getOutgoingDataEdges();
+			if(des!=null && des.size()>0)
+			{
+				for(DataEdge de: des)
+				{
+					String pname = de.getSourceParameter();
+					Object value = getParameterValue(pname);
+					
+					if(data==null)
+						data = new HashMap<String, Object>();
+					data.put(de.getId(), value);	
+				}
+			}
+			
+			// Remove all in paramters
 			List<MParameter> params = activity.getParameters(new String[]{MParameter.DIRECTION_IN});
 			for(int i=0; i<params.size(); i++)
 			{
 				MParameter inp = (MParameter)params.get(i);
 				removeParameterValue(inp.getName());
 //				System.out.println("Removed thread param value: "+inp.getName());
-			}
+			}			
 		}
 	}
 	
