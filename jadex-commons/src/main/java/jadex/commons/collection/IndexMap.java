@@ -420,17 +420,17 @@ public class IndexMap<K, V>	implements Serializable, Cloneable
 	 * 		  this list.
 	 * @throws NullPointerException if the specified array is <tt>null</tt>.
 	 */
-	public Object[] toArray(Object[] array)
+	public <T> T[] toArray(T[] array)
 	{
 		if(array.length<list.size())
 		{
-			array	= (Object[])Array.newInstance(
+			array	= (T[])Array.newInstance(
 				array.getClass().getComponentType(), list.size());
 		}
 
 		for(int i=0; i<list.size(); i++)
 		{
-			array[i]	= map.get(list.get(i));
+			array[i]	= (T)map.get(list.get(i));
 		}
 
 		return array;
@@ -1045,7 +1045,7 @@ public class IndexMap<K, V>	implements Serializable, Cloneable
 		}
 
 		//-------- List interface --------
-
+		
 		/**
 		 * Removes the first occurrence in this list of the specified element.
 		 * If this list does not contain the element, it is
