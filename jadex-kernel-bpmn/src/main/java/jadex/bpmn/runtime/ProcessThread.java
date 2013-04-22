@@ -18,6 +18,9 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.IObjectStringConverter;
+import jadex.commons.transformation.IStringObjectConverter;
 import jadex.javaparser.IParsedExpression;
 
 import java.lang.reflect.Array;
@@ -823,14 +826,41 @@ public class ProcessThread	implements ITaskContext
 					if(value!=null)
 					{
 						// Test if parameter value type fits
-						MParameter mparam = activity.getParameters().get(pname);
-						Class<?> clz = mparam.getClazz().getType(instance.getClassLoader());
-						if(!SReflect.isSupertype(clz, value.getClass()))
+						MParameter mparam = de.getTarget().getParameters().get(de.getTargetParameter());
+						Class<?> mpclz = mparam.getClazz().getType(instance.getClassLoader());
+						if(!SReflect.isSupertype(mpclz, value.getClass()))
 						{
-							// Autoconvert from string
-							if(value.getClass().equals(String.class))
+							// Autoconvert basic from string
+							if(value instanceof String)
 							{
-								
+								IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(mpclz);
+								if(conv!=null)
+								{
+									try
+									{
+										value = conv.convertString((String)value, null);
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
+								}
+							}
+							// Autoconvert basic to string
+							else if(mpclz.equals(String.class))
+							{
+								IObjectStringConverter conv = BasicTypeConverter.getBasicObjectConverter(value.getClass());
+								if(conv!=null)
+								{
+									try
+									{
+										value = conv.convertObject(value, null);
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
+								}
 							}
 						}
 					

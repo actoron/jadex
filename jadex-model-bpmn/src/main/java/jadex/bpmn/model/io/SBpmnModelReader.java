@@ -488,16 +488,6 @@ public class SBpmnModelReader
 		{
 			buffer.put("condition", content);
 		}
-		else if ("parametermapping".equals(tag.getLocalPart()))
-		{
-			Map<String, String> mappings = (Map<String, String>) buffer.get("parametermappings");
-			if (mappings == null)
-			{
-				mappings = new HashMap<String, String>();
-				buffer.put("parametermappings", mappings);
-			}
-			mappings.put(attrs.get("name"), content);
-		}
 		else if ("timeDuration".equals(tag.getLocalPart()))
 		{
 			buffer.put("duration", content);
@@ -559,6 +549,16 @@ public class SBpmnModelReader
 		else if ("poollane".equals(tag.getLocalPart()))
 		{
 			buffer.put(tag.getLocalPart(), content);
+		}
+		else if ("parametermapping".equals(tag.getLocalPart()))
+		{
+			Map<String, String> mappings = (Map<String, String>) buffer.get("parametermappings");
+			if (mappings == null)
+			{
+				mappings = new HashMap<String, String>();
+				buffer.put("parametermappings", mappings);
+			}
+			mappings.put(attrs.get("name"), content);
 		}
 		else if ("taskclass".equals(tag.getLocalPart()))
 		{

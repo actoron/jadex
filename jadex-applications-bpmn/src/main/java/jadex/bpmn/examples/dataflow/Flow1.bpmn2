@@ -9,8 +9,12 @@
   <semantic:extension>
     <jadex:modelname>Flow1</jadex:modelname>
     <jadex:arguments>
-      <jadex:argument name="b" type="java.lang.Integer" value="13"/>
-      <jadex:argument name="a" type="java.lang.Integer" value="12"/>
+      <jadex:argument name="a" type="java.lang.Integer">
+        <jadex:value>12</jadex:value>
+      </jadex:argument>
+      <jadex:argument name="b" type="java.lang.Integer">
+        <jadex:value>11</jadex:value>
+      </jadex:argument>
     </jadex:arguments>
   </semantic:extension>
   <semantic:process name="Pool" id="K3nFIuOK+YpMMVVn">
