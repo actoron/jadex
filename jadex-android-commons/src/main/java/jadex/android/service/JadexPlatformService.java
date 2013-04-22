@@ -85,6 +85,12 @@ public class JadexPlatformService extends Service
 			{
 				return JadexPlatformService.this.startJadexPlatform(kernels, platformId, options);
 			}
+			
+			@Override
+			public void setPlatformClassLoader(ClassLoader classLoader)
+			{
+				jadexPlatformManager.setPlatformClassLoader(classLoader);
+			}
 
 		};
 	}

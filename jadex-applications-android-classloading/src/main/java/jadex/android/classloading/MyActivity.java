@@ -1,9 +1,12 @@
 package jadex.android.classloading;
 
+import jadex.android.service.JadexPlatformManager;
 import jadex.android.standalone.clientapp.JadexClientAppService;
 import jadex.android.standalone.clientapp.PlatformProvidingClientAppFragment;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.StreamCopy;
+import jadex.commons.future.DefaultResultListener;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,6 +34,7 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 	{
 		setPlatformAutostart(true);
 		setPlatformName("classloadingtest");
+		setPlatformKernels(KERNEL_COMPONENT, KERNEL_MICRO, KERNEL_BDI);
 	}
 
 	@Override
@@ -87,6 +91,13 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 	{
 		super.onPause();
 	}
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+//		unbindService(this);
+	}
 
 	@Override
 	public void onAttach(Activity activity)
@@ -128,9 +139,24 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 			public void onServiceConnected(ComponentName name, IBinder service)
 			{
 				System.out.println("MyActivity.onServiceConnected()");
-
 			}
 		}, BIND_AUTO_CREATE);
+		
+		ClassLoader classLoader = this.getClass().getClassLoader();
+		URL resource = classLoader.getResource("jadex/android/classloading/bditest/HelloWorld.agent.xml");
+		System.out.println(resource);
+		
+		startBDIAgent("myAgent", "jadex/android/classloading/bditest/HelloWorld.agent.xml").addResultListener(new DefaultResultListener<IComponentIdentifier>()
+		{
+
+			@Override
+			public void resultAvailable(IComponentIdentifier result)
+			{
+				System.out.println("Agent Started");
+				
+			}
+			
+		});
 	}
 
 	@Override
@@ -147,4 +173,5 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 			}
 		});
 	}
+	
 }

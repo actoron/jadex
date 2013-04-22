@@ -36,7 +36,7 @@ import android.os.IBinder;
  * 
  * @author Julian Kalinowski
  */
-public class PlatformProvidingClientAppFragment extends ClientAppFragment implements ServiceConnection
+public class PlatformProvidingClientAppFragment extends ClientAppFragment implements ServiceConnection, JadexPlatformOptions
 {
 
 	private Intent serviceIntent;
@@ -372,6 +372,7 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	 */
 	final protected void startPlatform()
 	{
+		platformService.setPlatformClassLoader(getClass().getClassLoader());
 		onPlatformStarting();
 		IFuture<IExternalAccess> platform = platformService.startJadexPlatform(platformKernels, platformName, platformOptions);
 

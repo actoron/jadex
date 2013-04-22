@@ -1,10 +1,8 @@
 package jadex.android.service;
 
 import jadex.android.AndroidContextManager;
-import jadex.android.IEventReceiver;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
-import jadex.android.exception.WrongEventClassException;
-import jadex.base.Starter;
+import jadex.android.standalone.clientapp.JadexPlatformOptions;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -12,7 +10,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -23,9 +20,7 @@ import jadex.commons.transformation.annotations.Classname;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -35,49 +30,34 @@ import android.util.Log;
 /**
  * Singleton to manage all running jadex platforms and start new ones.
  */
-public class JadexPlatformManager
+public class JadexPlatformManager implements JadexPlatformOptions
 {
-
-	// --------- static fields -----------
-	public static final String KERNEL_COMPONENT = "component";
-	public static final String KERNEL_MICRO = "micro";
-	public static final String KERNEL_BPMN = "bpmn";
-	public static final String KERNEL_BDI = "bdi";
-	public static final String KERNEL_BDIBPMN = "bdibpmn";
-	
-	public static final String[] DEFAULT_KERNELS = new String[]
-	{ KERNEL_COMPONENT, KERNEL_MICRO, KERNEL_BPMN };
-	
-	public static final String DEFAULT_OPTIONS = 
-			"-logging_level java.util.logging.Level.INFO" + 
-			" -extensions null" + 
-			" -awareness false" + 
-			" -wspublish false" + 
-			" -rspublish false" + 
-			" -android true" +  
-			" -binarymessages true" +
-			" -conf jadex.platform.PlatformAgent" +
+	public static final String DEFAULT_OPTIONS = "-logging_level java.util.logging.Level.INFO" + " -extensions null" + " -awareness false"
+			+ " -wspublish false" + " -rspublish false" + " -android true" + " -binarymessages true"
+			+ " -conf jadex.platform.PlatformAgent" +
 			// " -tcptransport false" +
 			// " -niotcptransport false" +
 			// " -relaytransport true" +
 			// " -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\""
 			// +
-			" -autoshutdown false" + 
-			" -saveonexit true" +
-			" -gui false";
+			" -autoshutdown false" + " -saveonexit true" + " -gui false";
 
 	// --------- attributes -----------
 	private Map<IComponentIdentifier, IExternalAccess> runningPlatforms;
-	
+
+	private ClassLoader platformClassLoader;
+
 	private static JadexPlatformManager instance = new JadexPlatformManager();
-	
-	public static JadexPlatformManager getInstance() {
+
+	public static JadexPlatformManager getInstance()
+	{
 		return instance;
 	}
 
 	private JadexPlatformManager()
 	{
 		runningPlatforms = new HashMap<IComponentIdentifier, IExternalAccess>();
+		platformClassLoader = this.getClass().getClassLoader();
 		instance = this;
 	}
 
@@ -101,7 +81,16 @@ public class JadexPlatformManager
 		return runningPlatforms.containsKey(platformID);
 	}
 
-	
+	/**
+	 * Sets a custom classLoader that will load the Jadex Platform upon startup.
+	 * 
+	 * @param cl
+	 */
+	public void setPlatformClassLoader(ClassLoader cl)
+	{
+		this.platformClassLoader = cl;
+	}
+
 	/**
 	 * Retrieves the CMS of the Platform with the given ID.
 	 */
@@ -113,14 +102,15 @@ public class JadexPlatformManager
 			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
 			{
 				Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
-				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-						ia.createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
+				SServiceProvider
+						.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(ia.createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
 
 				return ret;
 			}
 		});
 	}
-	
+
 	/**
 	 * Retrieves the MS of the Platform with the given ID.
 	 */
@@ -132,35 +122,38 @@ public class JadexPlatformManager
 			public IFuture<IMessageService> execute(IInternalAccess ia)
 			{
 				Future<IMessageService> ret = new Future<IMessageService>();
-				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-						ia.createResultListener(new DelegationResultListener<IMessageService>(ret)));
+				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(ia.createResultListener(new DelegationResultListener<IMessageService>(ret)));
 
 				return ret;
 			}
 		});
 	}
-	
 
-//	public IFuture<IExternalAccess> startJadexPlatform()
-//	{
-//		return startJadexPlatform(DEFAULT_KERNELS);
-//	}
-//
-//	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels)
-//	{
-//		return startJadexPlatform(kernels, getRandomPlatformID());
-//	}
-//
-//	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId)
-//	{
-//		return startJadexPlatform(kernels, platformId, "");
-//	}
-	
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options) {
+	// public IFuture<IExternalAccess> startJadexPlatform()
+	// {
+	// return startJadexPlatform(DEFAULT_KERNELS);
+	// }
+	//
+	// public IFuture<IExternalAccess> startJadexPlatform(final String[]
+	// kernels)
+	// {
+	// return startJadexPlatform(kernels, getRandomPlatformID());
+	// }
+	//
+	// public IFuture<IExternalAccess> startJadexPlatform(final String[]
+	// kernels, final String platformId)
+	// {
+	// return startJadexPlatform(kernels, platformId, "");
+	// }
+
+	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options)
+	{
 		return startJadexPlatform(kernels, platformId, options, true);
 	}
 
-	public synchronized IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options, final boolean chat)
+	public synchronized IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options,
+			final boolean chat)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		new Thread(new Runnable()
@@ -176,13 +169,12 @@ public class JadexPlatformManager
 					sep = ",";
 				}
 				kernelString.append("\"");
-				
-				final String usedOptions = DEFAULT_OPTIONS 
-						+ " -kernels " + kernelString.toString() 
-						+ " -platformname " + (platformId != null ? platformId : getRandomPlatformID()) 
-						+ (options == null ? "" : " " + options); 
-				
-				IFuture<IExternalAccess> future = Starter.createPlatform((usedOptions).split("\\s+"));
+
+				final String usedOptions = DEFAULT_OPTIONS + " -kernels " + kernelString.toString() + " -platformname "
+						+ (platformId != null ? platformId : getRandomPlatformID()) + (options == null ? "" : " " + options);
+
+				IFuture<IExternalAccess> future = createPlatformWithClassloader((usedOptions).split("\\s+"), platformClassLoader);
+
 				future.addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess result)
@@ -198,22 +190,38 @@ public class JadexPlatformManager
 				});
 			}
 		}).start();
-		
-//		if (chat) {
-//			ret.addResultListener(new DefaultResultListener<IExternalAccess>()
-//			{
-//
-//				@Override
-//				public void resultAvailable(IExternalAccess result)
-//				{
-//					JadexChat jadexChat = new JadexChat(result);
-//					jadexChat.start();
-//				}
-//				
-//			});
-//		}
+
+		// if (chat) {
+		// ret.addResultListener(new DefaultResultListener<IExternalAccess>()
+		// {
+		//
+		// @Override
+		// public void resultAvailable(IExternalAccess result)
+		// {
+		// JadexChat jadexChat = new JadexChat(result);
+		// jadexChat.start();
+		// }
+		//
+		// });
+		// }
 
 		return ret;
+	}
+
+	protected static IFuture<IExternalAccess> createPlatformWithClassloader(String[] options, ClassLoader cl)
+	{
+		try
+		{
+			Class<?> starter = cl.loadClass("jadex.base.Starter");
+			Method createPlatform = starter.getMethod("createPlatform", String[].class); // =
+																							// Starter.createPlatform();
+			return (IFuture<IExternalAccess>) createPlatform.invoke(null, (Object) options);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -239,13 +247,13 @@ public class JadexPlatformManager
 	{
 		Log.d("jadex-android", "Starting platform shutdown: " + platformID.toString());
 		ThreadSuspendable sus = new ThreadSuspendable();
-//		long start = System.currentTimeMillis();
-//		long timeout = 4500;
+		// long start = System.currentTimeMillis();
+		// long timeout = 4500;
 		runningPlatforms.get(platformID).killComponent().get(sus);
 		runningPlatforms.remove(platformID);
 		Log.d("jadex-android", "Platform shutdown completed: " + platformID.toString());
 	}
-	
+
 	public String getRandomPlatformID()
 	{
 		StringBuilder sb = new StringBuilder(AndroidContextManager.getInstance().getUniqueDeviceName());
@@ -254,13 +262,17 @@ public class JadexPlatformManager
 		sb.append(randomUUID.toString().substring(0, 3));
 		return sb.toString();
 	}
-	
-	public IComponentIdentifier getFirstRunningPlatformId() {
+
+	public IComponentIdentifier getFirstRunningPlatformId()
+	{
 		Set<IComponentIdentifier> platformIds = runningPlatforms.keySet();
-		if (!platformIds.isEmpty()) {
+		if (!platformIds.isEmpty())
+		{
 			IComponentIdentifier next = platformIds.iterator().next();
 			return next;
-		} else {
+		}
+		else
+		{
 			throw new JadexAndroidPlatformNotStartedError("getCMS()");
 		}
 	}

@@ -30,6 +30,7 @@ public class JadexApplicationLoader extends FragmentActivity
 	private static String defaultEntryActivityName = "jadex.android.platformapp.DefaultApplication";
 	private LayoutInflater userAppInflater;
 	private String userAppPackage;
+	private Context userAppContext;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -56,11 +57,13 @@ public class JadexApplicationLoader extends FragmentActivity
 			} else {
 				Logger.e("Please specify an Activity class to start with EXTRA_KEY_ACTIVITYCLASS!");
 				finish();
+				return;
 			}
 			
 		} else {
 			Logger.e("Please start this application with action net.sourceforge.jadex.LOAD_APPLICATION");
 			finish();
+			return;
 		}
 		setContentView(R.layout.loaderlayout);
 		// set custom layout inflater during user app lifetime
@@ -70,7 +73,6 @@ public class JadexApplicationLoader extends FragmentActivity
 	
 	private LayoutInflater createUserAppInflater(String userApplicationPackage)
 	{
-		Context userAppContext = null;
 		try
 		{
 			userAppContext = getApplicationContext().createPackageContext(userApplicationPackage, Context.CONTEXT_IGNORE_SECURITY);
@@ -87,8 +89,12 @@ public class JadexApplicationLoader extends FragmentActivity
 	@Override
 	public Context getApplicationContext()
 	{
-		System.out.println("getApplicationContext called");
-		return super.getApplicationContext();
+		if (userAppContext == null) {
+			return super.getApplicationContext();
+		} else {
+			System.out.println("Custom context returned");
+			return userAppContext;
+		}
 	}
 
 	@Override
@@ -106,7 +112,6 @@ public class JadexApplicationLoader extends FragmentActivity
 	@Override
 	public LayoutInflater getLayoutInflater()
 	{
-		System.out.println("getLayoutInflater called");
 		return userAppInflater;
 	}
 

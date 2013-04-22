@@ -146,4 +146,6 @@ public interface IJadexPlatformBinder
 	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassException;
 
 	public boolean unregisterEventListener(String eventName, IEventReceiver<?> rec);
+
+	public void setPlatformClassLoader(ClassLoader classLoader);
 }
