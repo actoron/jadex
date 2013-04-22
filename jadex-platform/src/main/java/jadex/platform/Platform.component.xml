@@ -239,21 +239,6 @@
 	</componenttypes>
 	
 	<services>
-		<providedservice class="jadex.bridge.service.types.marshal.IMarshalService">
-			<implementation proxytype="raw">
-				new jadex.platform.service.marshal.MarshalService($component.getExternalAccess())
-			</implementation>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.context.IContextService">
-			<implementation>
-				jadex.commons.SReflect.isAndroid()
-				? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
-				: jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
-			</implementation>
-		</providedservice>
-		<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
-			<implementation class="jadex.platform.service.settings.SettingsService"/>
-		</providedservice>
 		<providedservice class="jadex.bridge.service.types.threadpool.IThreadPoolService">
 			<implementation proxytype="raw">
 				new jadex.platform.service.threadpool.ThreadPoolService(
@@ -267,6 +252,21 @@
 					new jadex.commons.concurrent.ThreadPool(true, new jadex.commons.DefaultPoolStrategy(0, 20, 30000, 0, $args.threadpooldefer)), $component.getServiceProvider())
 				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
 			</implementation>
+		</providedservice>
+	    <providedservice class="jadex.bridge.service.types.marshal.IMarshalService">
+			<implementation proxytype="raw">
+				new jadex.platform.service.marshal.MarshalService($component.getExternalAccess())
+			</implementation>
+		</providedservice>
+		<providedservice class="jadex.bridge.service.types.context.IContextService">
+			<implementation>
+				jadex.commons.SReflect.isAndroid()
+				? jadex.platform.service.context.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
+				: jadex.platform.service.context.ContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
+			</implementation>
+		</providedservice>
+		<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
+			<implementation class="jadex.platform.service.settings.SettingsService"/>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.execution.IExecutionService">
 			<implementation proxytype="raw">

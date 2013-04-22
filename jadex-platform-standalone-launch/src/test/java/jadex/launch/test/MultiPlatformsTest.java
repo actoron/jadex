@@ -14,8 +14,7 @@ import junit.framework.TestCase;
 /**
  *  Test if the platform terminates itself.
  */
-//excluded as long as termination / startup problem is not solved
-public class MultiPlatformsTest //extends TestCase 
+public class MultiPlatformsTest extends TestCase 
 {
 	/**
 	 * 
@@ -35,7 +34,7 @@ public class MultiPlatformsTest //extends TestCase
 //		for(int p=0; p<100; p++)
 		{
 //			long	time	= System.currentTimeMillis();
-		int number	= 10; // larger numbers cause timeout on toaster.
+		int number	= 25; // larger numbers cause timeout on toaster.
 		long timeout	= 120000;	// time required by toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
@@ -78,11 +77,11 @@ public class MultiPlatformsTest //extends TestCase
 			}
 		}
 		
-		Thread.sleep(10000);
+//		Thread.sleep(10000);
 		
 		for(int i=0; i<number; i++)
 		{
-//			if(i%10==0)
+			if(i%10==0)
 			{
 				System.out.println("Killing platform "+i);
 			}
