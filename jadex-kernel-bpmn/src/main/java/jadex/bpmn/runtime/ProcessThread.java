@@ -812,10 +812,10 @@ public class ProcessThread	implements ITaskContext
 		if(MBpmnModel.TASK.equals(activity.getActivityType()) || activity instanceof MSubProcess)
 		{
 			// Add parameter value for each out edge using the edge id
-			List<DataEdge> des = activity.getOutgoingDataEdges();
+			List<MDataEdge> des = activity.getOutgoingDataEdges();
 			if(des!=null && des.size()>0)
 			{
-				for(DataEdge de: des)
+				for(MDataEdge de: des)
 				{
 					String pname = de.getSourceParameter();
 					Object value = getParameterValue(pname);
