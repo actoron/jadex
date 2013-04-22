@@ -65,7 +65,7 @@ public class ActivityParameterTable extends JTable
 		((ParameterTableModel) getModel()).fireTableRowsInserted(row, row);
 		
 		getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(new JComboBox(new Object[] { MParameter.DIRECTION_IN, MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT })));
-		activity.refreshParameterObjects();
+		activity.addedParameter(param);
 	}
 	
 	/**
@@ -79,10 +79,10 @@ public class ActivityParameterTable extends JTable
 		
 		for (int i = ind.length - 1; i >= 0; --i)
 		{
-			getBpmnActivity().getParameters().remove(ind[i]);
+			MParameter param = getBpmnActivity().getParameters().remove(ind[i]);
 			((ParameterTableModel) getModel()).fireTableRowsDeleted(ind[i], ind[i]);
+			activity.removedParameter(param);
 		}
-		activity.refreshParameterObjects();
 	}
 	
 	/**

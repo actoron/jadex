@@ -27,7 +27,7 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 32;
+	public static final int BUILD = 33;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";

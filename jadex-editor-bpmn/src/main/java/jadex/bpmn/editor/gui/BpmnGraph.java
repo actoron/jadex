@@ -4,8 +4,10 @@ import jadex.bpmn.editor.gui.controllers.SValidation;
 import jadex.bpmn.editor.gui.layouts.EventHandlerLayout;
 import jadex.bpmn.editor.gui.layouts.LaneLayout;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
@@ -84,7 +86,8 @@ public class BpmnGraph extends mxGraph
 	 */
 	public String getToolTipForCell(Object cell)
 	{
-		if (cell instanceof VOutParameter)
+		if (cell instanceof VOutParameter ||
+			cell instanceof VInParameter)
 		{
 			return super.getToolTipForCell(cell);
 		}
@@ -202,6 +205,10 @@ public class BpmnGraph extends mxGraph
 			if (edge instanceof VSequenceEdge)
 			{
 				error = SValidation.getSequenceEdgeValidationError(source, target);
+			}
+			else if (edge instanceof VDataEdge)
+			{
+				error = SValidation.getDataEdgeValidationError(source, target);
 			}
 		}
 		

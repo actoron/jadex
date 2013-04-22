@@ -4,15 +4,19 @@ import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VNode;
+import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
@@ -331,6 +335,29 @@ public class SCreationController
 //			vedge.getGeometry().setPoints(points);
 			
 			modelcontainer.setDirty(true);
+			ret = vedge;
+		}
+		else if (source instanceof VOutParameter && target instanceof VInParameter)
+		{
+			VOutParameter vsparam = (VOutParameter) source;
+			VInParameter vtparam = (VInParameter) target;
+			
+			MActivity sactivity = (MActivity) ((VActivity) vsparam.getParent()).getBpmnElement();
+			MActivity tactivity = (MActivity) ((VActivity) vtparam.getParent()).getBpmnElement();
+			
+			MDataEdge dedge = new MDataEdge();
+			dedge.setSource(sactivity);
+			dedge.setSourceParameter(vsparam.getParameter().getName());
+			dedge.setTarget(tactivity);
+			dedge.setTargetParameter(vtparam.getParameter().getName());
+			sactivity.addOutgoingDataEdge(dedge);
+			tactivity.addIncomingDataEdge(dedge);
+			
+			VDataEdge vedge = new VDataEdge(graph);
+			vedge.setBpmnElement(dedge);
+			vedge.setSource(vsparam);
+			vedge.setTarget(vtparam);
+			
 			ret = vedge;
 		}
 		

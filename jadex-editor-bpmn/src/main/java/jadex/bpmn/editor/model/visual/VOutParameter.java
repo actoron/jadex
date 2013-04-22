@@ -31,4 +31,9 @@ public class VOutParameter extends VNamedNode
 	public void setValue(Object value)
 	{
 	}
+	
+	public MParameter getParameter()
+	{
+		return parameter;
+	}
 }

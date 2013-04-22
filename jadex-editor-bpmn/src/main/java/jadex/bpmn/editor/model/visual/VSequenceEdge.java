@@ -6,6 +6,10 @@ import jadex.bpmn.model.MSequenceEdge;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
 
+/**
+ *  Visual representation of a sequence edge.
+ *
+ */
 public class VSequenceEdge extends VEdge
 {
 	/**

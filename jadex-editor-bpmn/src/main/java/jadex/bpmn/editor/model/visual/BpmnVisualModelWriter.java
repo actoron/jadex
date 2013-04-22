@@ -102,8 +102,20 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 		
 		for (VEdge edge : edges)
 		{
+			String ns = "bpmndi";
+			String tagname = "BPMNEdge";
+			String refname = "bpmnElement";
+			String typestring = "";
+			if (edge instanceof VDataEdge)
+			{
+				ns = "di";
+				tagname = "Edge";
+				refname = "jadexElement";
+				typestring = " type=\"data\"";
+			}
+			
 			out.print(SBpmnModelWriter.getIndent(3));
-			out.print("<bpmndi:BPMNEdge bpmnElement=\"");
+			out.print("<" + ns + ":" + tagname + typestring + " " + refname + "=\"");
 			out.print(edge.getBpmnElement().getId());
 			out.println("\">");
 			
@@ -130,7 +142,7 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 //			out.println("<bpmndi:BPMNLabel/>");
 			
 			out.print(SBpmnModelWriter.getIndent(3));
-			out.println("</bpmndi:BPMNEdge>");
+			out.println("</" + ns + ":" + tagname + ">");
 		}
 		
 		out.println(SBpmnModelWriter.getIndent(2) + "</bpmndi:BPMNPlane>");
@@ -148,7 +160,11 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 	{
 		if (parent instanceof VNode)
 		{
-			nodes.add((VNode) parent);
+			if (!(parent instanceof VInParameter) &&
+				!(parent instanceof VOutParameter))
+			{
+				nodes.add((VNode) parent);
+			}
 		}
 		else if (parent instanceof VEdge)
 		{

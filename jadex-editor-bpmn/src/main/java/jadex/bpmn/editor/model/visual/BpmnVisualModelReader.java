@@ -2,6 +2,7 @@ package jadex.bpmn.editor.model.visual;
 
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
@@ -245,6 +246,36 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			graph.addCell(vedge, vedge.getSource().getParent());
 			graph.getModel().endUpdate();
 			
+		}
+		else if ("Edge".equals(tag.getLocalPart()))
+		{
+			if (attrs != null)
+			{
+				if  ("data".equals(attrs.get("type")))
+				{
+					String id = attrs.get("jadexElement");
+					MDataEdge dedge = (MDataEdge) emap.get(id);
+					VDataEdge vedge = new VDataEdge(graph);
+					VActivity sact = (VActivity) vmap.get(dedge.getSource().getId());
+					VActivity tact = (VActivity) vmap.get(dedge.getTarget().getId());
+					vedge.setSource(sact.getOutputParameterPort(dedge.getSourceParameter()));
+					vedge.setTarget(tact.getInputParameterPort(dedge.getTargetParameter()));
+					vedge.setBpmnElement(dedge);
+					
+					List<mxPoint> waypoints = (List<mxPoint>) buffer.remove("waypoints");
+					if (waypoints != null)
+					{
+						mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
+						geo.setPoints(waypoints);
+						geo.setRelative(false);
+						vedge.setGeometry(geo);
+					}
+					
+					graph.getModel().beginUpdate();
+					graph.addCell(vedge, vedge.getSource().getParent().getParent());
+					graph.getModel().endUpdate();
+				}
+			}
 		}
 		else if ("waypoint".equals(tag.getLocalPart()))
 		{

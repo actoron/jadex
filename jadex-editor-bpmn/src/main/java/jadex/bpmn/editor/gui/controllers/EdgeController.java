@@ -5,6 +5,9 @@ import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.EdgeDragContextMenu;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VDataEdge;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VOutParameter;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -58,14 +61,22 @@ public class EdgeController extends mxConnectionHandler
 	public String validateConnection(Object source, Object target)
 	{
 		String ret = super.validateConnection(source, target);
+		
 		if (ret == null)
 		{
-			if ((source instanceof VActivity && target instanceof VActivity))
+			if (source instanceof VInParameter ||
+				source instanceof VOutParameter)
+			{
+				ret = SValidation.getDataEdgeValidationError(source, target);
+			}
+		}
+		
+		if (ret == null)
+		{
+			if (source instanceof VActivity)
 			{
 				ret = SValidation.getSequenceEdgeValidationError(source, target);
 			}
-			
-			
 		}
 		
 		if (ret != null && ret.length() > 0)
@@ -82,7 +93,10 @@ public class EdgeController extends mxConnectionHandler
 	 */
 	public void mouseReleased(final MouseEvent e)
 	{
-		if (connectPreview != null && connectPreview.getPreviewState() != null && ((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(false) == null)
+		if (connectPreview != null &&
+			connectPreview.getPreviewState() != null &&
+			((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(false) == null &&
+			((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(true) instanceof VActivity)
 		{
 			graphComponent.getGraph().getModel().beginUpdate();
 			final EdgeDragContextMenu[] edcmc = new EdgeDragContextMenu[1];
@@ -184,6 +198,10 @@ public class EdgeController extends mxConnectionHandler
 					if (commit || reallycommit)
 					{
 						result = graph.addCell(cell, ((mxICell) src).getParent(), null, src, trg);
+						if (cell instanceof VDataEdge)
+						{
+							((BpmnGraph) graph).refreshCellView(((VDataEdge) cell).getTarget().getParent());
+						}
 					}
 					
 					if (points != null)

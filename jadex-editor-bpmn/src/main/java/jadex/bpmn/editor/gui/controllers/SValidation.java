@@ -1,7 +1,9 @@
 package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
@@ -104,7 +106,7 @@ public class SValidation
 	public static String getSequenceEdgeValidationError(Object source, Object target)
 	{
 		String error = null;
-		if (!(source instanceof VActivity) && !(target instanceof VActivity))
+		if (!(source instanceof VActivity) || !(target instanceof VActivity))
 		{
 			error = "Sequence edges can only connect activities.";
 		}
@@ -152,6 +154,24 @@ public class SValidation
 			{
 				error = "No direct sequence edges allowed across subprocesses.";
 			}
+		}
+		
+		return error;
+	}
+	
+	/**
+	 *  Validates a data edge connection.
+	 *  
+	 *  @param source The proposed source of the edge.
+	 *  @param target The proposed target of the edge.
+	 *  @return Error message explaining why the connection is invalid or null if valid.
+	 */
+	public static String getDataEdgeValidationError(Object source, Object target)
+	{
+		String error = null;
+		if (!(source instanceof VOutParameter) || !(target instanceof VInParameter))
+		{
+			error = "Data edges can only connect an output parameter with an input parameter.";
 		}
 		
 		return error;

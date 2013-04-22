@@ -3,6 +3,7 @@ package jadex.bpmn.model.io;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
@@ -587,13 +588,34 @@ public class SBpmnModelWriter
 				}
 				
 				List<MActivity> activities = getPoolActivities(pool);
-				writeActivitySemantics(out, activities, null, 2);
+				List<MDataEdge> dataedges = writeActivitySemantics(out, activities, null, 2);
 				
 				List<MSequenceEdge> seqedges = pool.getSequenceEdges();
 				if (seqedges != null)
 				{
 					writeSequenceEdgeSemantics(out, seqedges, 2);
 				}
+				
+				int ind = 2;
+				out.println(getIndent(ind) + "<semantic:extensionElements>");
+				++ind;
+				for (MDataEdge dedge : dataedges)
+				{
+					out.print(getIndent(ind));
+					out.print("<jadex:dataFlow id=\"");
+					out.print(dedge.getId());
+					out.print("\" sourceRef=\"");
+					out.print(dedge.getSource().getId());
+					out.print("\" sourceParam=\"");
+					out.print(dedge.getSourceParameter());
+					out.print("\" targetRef=\"");
+					out.print(dedge.getTarget().getId());
+					out.print("\" targetParam=\"");
+					out.print(dedge.getTargetParameter());
+					out.println("\"/>");
+				}
+				--ind;
+				out.println(getIndent(ind) + "</semantic:extensionElements>");
 				
 				out.println(getIndent(1) + "</semantic:process>");
 			}
@@ -661,10 +683,16 @@ public class SBpmnModelWriter
 	 *  @param out The output.
 	 *  @param activities The activities.
 	 */
-	protected static final void writeActivitySemantics(PrintStream out, List<MActivity> activities, String evthandlerref, int baseind)
+	protected static final List<MDataEdge> writeActivitySemantics(PrintStream out, List<MActivity> activities, String evthandlerref, int baseind)
 	{
+		List<MDataEdge> dataedges = new ArrayList<MDataEdge>();
 		for (MActivity activity : activities)
 		{
+			if (activity.getOutgoingDataEdges() != null)
+			{
+				dataedges.addAll(activity.getOutgoingDataEdges());
+			}
+			
 			out.print(getIndent(baseind) + "<semantic:");
 			String mappedacttype = ACT_TYPE_MAPPING.get(activity.getActivityType());
 			
@@ -897,6 +925,8 @@ public class SBpmnModelWriter
 				writeActivitySemantics(out, activity.getEventHandlers(), activity.getId(), baseind);
 			}
 		}
+		
+		return dataedges;
 	}
 	
 	/**

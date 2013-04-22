@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui.stylesheets;
 
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
@@ -339,6 +340,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
 		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_RESIZABLE, Boolean.FALSE);
 		putCellStyle(VOutParameter.class.getSimpleName(), style);
 		
 		style = new HashMap<String, Object>();
@@ -349,7 +351,12 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
 		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_RESIZABLE, Boolean.FALSE);
 		putCellStyle(VInParameter.class.getSimpleName(), style);
+		
+		style = new HashMap<String, Object>(style);
+		style.put(mxConstants.STYLE_FILLCOLOR, OUTPUT_PARAMETER_COLOR);
+		putCellStyle(VInParameter.class.getSimpleName() + "_Connected", style);
 		
 		style = new HashMap<String, Object>();
 		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
@@ -447,5 +454,23 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STARTARROW, StrokeMarker.class.getSimpleName());
 		style.put(mxConstants.STYLE_STARTSIZE, 18);
 		putCellStyle(VSequenceEdge.class.getSimpleName() + "_DEFAULT", style);
+		
+		style = new HashMap<String, Object>();
+		style.put(mxConstants.STYLE_STARTARROW, mxConstants.NONE);
+		style.put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_OPEN);
+		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
+		//style.put(mxConstants.STYLE_DASH_PATTERN, new float[] {1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f});
+		style.put(mxConstants.STYLE_ROUNDED, Boolean.TRUE);
+		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
+		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
+		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
+		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
+//		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_ORTHOGONAL);
+//		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_SIDETOSIDE);
+//		style.put(mxConstants.STYLE_EDGE, new SequenceEdgeStyleFunction());
+		//style.put(mxConstants.STYLE_LOOP, mxConstants.EDGESTYLE_LOOP);
+		putCellStyle(VDataEdge.class.getSimpleName(), style);
 	}
 }

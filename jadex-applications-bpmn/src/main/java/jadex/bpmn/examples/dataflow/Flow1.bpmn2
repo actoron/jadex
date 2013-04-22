@@ -84,6 +84,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="Fh0pUC/2RXEUtMeH">
       </bpmndi:BPMNEdge>
+      <di:Edge type="data" jadexElement="ttTOjueYeXuaabb">
+      </di:Edge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </semantic:definitions>

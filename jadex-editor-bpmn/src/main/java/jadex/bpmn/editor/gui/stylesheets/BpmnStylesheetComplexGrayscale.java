@@ -1,16 +1,17 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
-import java.awt.Color;
-
-import com.mxgraph.util.mxConstants;
-
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.commons.gui.SGUI;
+
+import java.awt.Color;
+
+import com.mxgraph.util.mxConstants;
 
 /**
  *  Complex grayscale style.
@@ -26,6 +27,7 @@ public class BpmnStylesheetComplexGrayscale extends BpmnStylesheetColor
 		styles.get(VLane.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#F3F3F3");
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK).put(mxConstants.STYLE_FILLCOLOR, "#AAAAAA");
 		styles.get(VOutParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF");
+		styles.get(VInParameter.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF");
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS).put(mxConstants.STYLE_FILLCOLOR, "#AAAAAA");
 		styles.get(VExternalSubProcess.class.getSimpleName()).put(mxConstants.STYLE_FILLCOLOR, SGUI.colorToHTML(Color.LIGHT_GRAY));
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE).put(mxConstants.STYLE_FILLCOLOR, SGUI.colorToHTML(Color.WHITE));

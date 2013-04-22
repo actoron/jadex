@@ -3,12 +3,13 @@ package jadex.bpmn.editor.gui.stylesheets;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VEdge;
+import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.model.MActivity;
 
 import java.util.List;
 
 import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxICell;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxEdgeStyle.mxEdgeStyleFunction;
@@ -25,25 +26,28 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 	 */
 	public void apply(mxCellState state, mxCellState source, mxCellState target, List<mxPoint> points, List<mxPoint> result)
 	{
-		if (source == null || target == null)
+		VActivity sourcenode = getVActivity(source.getCell());
+		VActivity targetnode = getVActivity(target.getCell());
+		
+		if (sourcenode == null || targetnode == null)
 		{
 			return;
 		}
 		
 		double scale = state.getView().getScale();
 		double adjedgedist = GuiConstants.MIN_EDGE_DIST * scale;
-		mxGeometry sgeo = ((mxICell) source.getCell()).getGeometry();
+		mxGeometry sgeo = sourcenode.getGeometry();
 		mxPoint spos = new mxPoint(sgeo.getX() * scale, sgeo.getY() * scale);
-		if (((mxICell) source.getCell()).getParent() != null)
+		if (sourcenode.getParent() != null)
 		{
-			spos = adjustPoint(state.getView().getGraph(), ((mxICell) source.getCell()).getParent(), spos);
+			spos = adjustPoint(state.getView().getGraph(), sourcenode.getParent(), spos);
 		}
 		sgeo = new mxGeometry(spos.getX(), spos.getY(), sgeo.getWidth() * scale, sgeo.getHeight() * scale);
-		mxGeometry tgeo = ((mxICell) target.getCell()).getGeometry();
+		mxGeometry tgeo = targetnode.getGeometry();
 		mxPoint tpos = new mxPoint(tgeo.getX() * scale, tgeo.getY() * scale);
-		if (((mxICell) target.getCell()).getParent() != null)
+		if (targetnode.getParent() != null)
 		{
-			tpos = adjustPoint(state.getView().getGraph(), ((mxICell) target.getCell()).getParent(), tpos);
+			tpos = adjustPoint(state.getView().getGraph(), targetnode.getParent(), tpos);
 		}
 //		tpos.setX(tpos.getX() * scale);
 //		tpos.setY(tpos.getY() * scale);
@@ -54,9 +58,8 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 			//int gwoutedgecount = 0;
 			boolean gw = false;
 			
-			if (source.getCell() instanceof VActivity &&
-					((VActivity) source.getCell()).getBpmnElement() != null &&
-					((MActivity) ((VActivity) source.getCell()).getBpmnElement()).getActivityType().startsWith("Gateway"))
+			if (sourcenode.getBpmnElement() != null &&
+				((MActivity) sourcenode.getBpmnElement()).getActivityType().startsWith("Gateway"))
 			{
 				gw = true;
 //				VActivity vact = (VActivity) source.getCell();
@@ -100,16 +103,14 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 					}
 				}
 			}
-			else if (source.getCell() instanceof VActivity &&
-					 ((VActivity) source.getCell()).getBpmnElement() != null &&
-					 ((MActivity) ((VActivity) source.getCell()).getBpmnElement()).isEventHandler())
+			else if (sourcenode.getBpmnElement() != null &&
+					 ((MActivity) sourcenode.getBpmnElement()).isEventHandler())
 			{
-				VActivity vevthndlr = (VActivity) source.getCell();
-				mxGeometry pgeo = vevthndlr.getParent().getGeometry();
+				mxGeometry pgeo = sourcenode.getParent().getGeometry();
 				mxPoint ppos = new mxPoint(pgeo.getX() * scale, pgeo.getY() * scale);
-				if (vevthndlr.getParent().getParent() != null)
+				if (sourcenode.getParent().getParent() != null)
 				{
-					ppos = adjustPoint(state.getView().getGraph(), vevthndlr.getParent().getParent(), ppos);
+					ppos = adjustPoint(state.getView().getGraph(), sourcenode.getParent().getParent(), ppos);
 				}
 				pgeo = new mxGeometry(ppos.getX(), ppos.getY(), pgeo.getWidth() * scale, pgeo.getHeight() * scale);
 				
@@ -277,6 +278,26 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 		}
 		
 		return p;
+	}
+	
+	public static final VActivity getVActivity(Object cell)
+	{
+		VActivity ret = null;
+		
+		if (cell instanceof VActivity)
+		{
+			ret = (VActivity) cell;
+		}
+		else if (cell instanceof VInParameter)
+		{
+			ret = (VActivity) ((VInParameter) cell).getParent();
+		}
+		else if (cell instanceof VOutParameter)
+		{
+			ret = (VActivity) ((VOutParameter) cell).getParent();
+		}
+		
+		return ret;
 	}
 	
 	/**

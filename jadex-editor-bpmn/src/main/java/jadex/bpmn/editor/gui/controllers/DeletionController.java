@@ -1,9 +1,11 @@
 package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
@@ -77,6 +79,14 @@ public class DeletionController implements mxIEventListener
 				}
 				medge.getSource().removeOutgoingSequenceEdge(medge);
 				medge.getTarget().removeIncomingSequenceEdge(medge);
+			}
+			else if (cells[i] instanceof VDataEdge)
+			{
+				VDataEdge vedge = (VDataEdge) cells[i];
+				MDataEdge medge = (MDataEdge) vedge.getBpmnElement();
+				
+				medge.getSource().removeOutgoingDataEdge(medge);
+				medge.getTarget().removeIncomingDataEdge(medge);
 			}
 //			else if (cells[i] instanceof VActivity)
 //			{
