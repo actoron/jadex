@@ -705,9 +705,9 @@ public class SBpmnModelReader
 			else if ("contextvariable".equals(tag.getLocalPart()))
 			{
 				String name = attrs.get("name");
-				ClassInfo clazz = new ClassInfo(attrs.get("type"));
+				String type = attrs.get("type");
 				//UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), (String) buffer.remove("value"), null);
-				MContextVariable var = new MContextVariable(name, clazz.getTypeName(), (String) buffer.remove("value"), null);
+				MContextVariable var = new MContextVariable(name, null, type, (String) buffer.remove("value"));
 				parseExp(var, model.getModelInfo().getAllImports(), cl);
 				//model.addContextVariable(name, clazz, exp, null);
 				model.addContextVariable(var);
