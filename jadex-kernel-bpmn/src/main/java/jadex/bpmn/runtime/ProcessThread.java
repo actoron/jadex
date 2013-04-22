@@ -820,9 +820,24 @@ public class ProcessThread	implements ITaskContext
 					String pname = de.getSourceParameter();
 					Object value = getParameterValue(pname);
 					
-					if(data==null)
-						data = new HashMap<String, Object>();
-					data.put(de.getId(), value);	
+					if(value!=null)
+					{
+						// Test if parameter value type fits
+						MParameter mparam = activity.getParameters().get(pname);
+						Class<?> clz = mparam.getClazz().getType(instance.getClassLoader());
+						if(!SReflect.isSupertype(clz, value.getClass()))
+						{
+							// Autoconvert from string
+							if(value.getClass().equals(String.class))
+							{
+								
+							}
+						}
+					
+						if(data==null)
+							data = new HashMap<String, Object>();
+						data.put(de.getId(), value);	
+					}
 				}
 			}
 			

@@ -8,6 +8,10 @@
                       xmlns:jadex="http://www.activecomponents.org/bpmnextensions">
   <semantic:extension>
     <jadex:modelname>Flow1</jadex:modelname>
+    <jadex:arguments>
+      <jadex:argument name="b" type="java.lang.Integer" value="13"/>
+      <jadex:argument name="a" type="java.lang.Integer" value="12"/>
+    </jadex:arguments>
   </semantic:extension>
   <semantic:process name="Pool" id="K3nFIuOK+YpMMVVn">
     <semantic:startEvent id="EKuSv0suF++YVmMD">
@@ -37,11 +41,21 @@
       <semantic:incoming>Fh0pUC/2RXEUtMeH</semantic:incoming>
     </semantic:endEvent>
     <semantic:sequenceFlow sourceRef="EKuSv0suF++YVmMD" targetRef="2fQU660/vHV3AksA" id="ttTOjueYeXuMaLGQ">
+      <semantic:extensionElements>
+        <jadex:parametermapping name="a">$args.a</jadex:parametermapping>
+        <jadex:parametermapping name="b">$args.b</jadex:parametermapping>
+      </semantic:extensionElements>
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="2fQU660/vHV3AksA" targetRef="LHEmvR3ToYirPJk2" id="buL7iCrSo1gcunPg">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="LHEmvR3ToYirPJk2" targetRef="ys2KHcoP3v0jlpo0" id="Fh0pUC/2RXEUtMeH">
     </semantic:sequenceFlow>
+    
+    <semantic:extensionElements>
+    	<jadex:dataFlow id="ttTOjueYeXuaabb" sourceRef="2fQU660/vHV3AksA" sourceParam="c" targetRef="LHEmvR3ToYirPJk2" targetParam="a">
+    	</jadex:dataFlow>
+    </semantic:extensionElements>
+    
   </semantic:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
