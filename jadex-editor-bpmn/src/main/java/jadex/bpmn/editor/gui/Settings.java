@@ -28,6 +28,29 @@ public class Settings
 	/** Files that were opened when editor was closed. */
 	protected File[] openedfiles;
 	
+	/** The selected style sheet */
+	protected String selectedsheet = BpmnEditor.STYLE_SHEETS[0].getFirstEntity();
+	
+	/**
+	 *  Gets the selected style sheet.
+	 *
+	 *  @return The selected sheet.
+	 */
+	public String getSelectedSheet()
+	{
+		return selectedsheet;
+	}
+
+	/**
+	 *  Sets the selected style sheet.
+	 *
+	 *  @param selectedsheet The selected sheet.
+	 */
+	public void setSelectedSheet(String selectedsheet)
+	{
+		this.selectedsheet = selectedsheet;
+	}
+
 	/**
 	 *  Gets the opened files.
 	 *
@@ -92,6 +115,11 @@ public class Settings
 			props.put("lastfile", lastfile.getAbsolutePath());
 		}
 		
+		if (selectedsheet != null)
+		{
+			props.put("stylesheet", selectedsheet);
+		}
+		
 		if (openedfiles != null)
 		{
 			int counter = 0;
@@ -125,17 +153,24 @@ public class Settings
 			props.load(is);
 			is.close();
 			
+			String prop = props.getProperty("lastfile");
+			if (prop != null)
+			{
+				ret.setLastFile(new File(prop));
+			}
+			
+			prop = props.getProperty("stylesheet");
+			if (prop != null)
+			{
+				ret.setSelectedSheet(prop);
+			}
+			
 			List<File> openfiles = new ArrayList<File>();
 			for (Object okey : props.keySet())
 			{
 				if (okey instanceof String)
 				{
 					String key = (String) okey;
-					if ("lastfile".equals(key))
-					{
-						ret.setLastFile(new File(props.getProperty((String) key)));
-					}
-					
 					if (key.startsWith("openfile"))
 					{
 						openfiles.add(new File(props.getProperty(key)));

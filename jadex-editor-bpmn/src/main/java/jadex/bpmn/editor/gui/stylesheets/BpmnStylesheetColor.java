@@ -3,7 +3,9 @@ package jadex.bpmn.editor.gui.stylesheets;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.model.MBpmnModel;
@@ -76,11 +78,20 @@ public class BpmnStylesheetColor extends mxStylesheet
 	/** BPMN End Event Color */
 	public static final String BOUNDARY_EVENT_COLOR = "#eaef53";
 	
+	/** Optional Input Parameter Color */
+	public static final String INPUT_PARAMETER_COLOR = "#eaef53";
+	
+	/** Output Parameter Color */
+	public static final String OUTPUT_PARAMETER_COLOR = "#45fa3b";
+	
 	/** Default Pool Width */
 	public static final int DEFAULT_POOL_WIDTH = 3000;
 	
 	/** Default Pool Height */
 	public static final int DEFAULT_POOL_HEIGHT = 600;
+	
+	/** Parameter port size */
+	public static final double PARAMETER_PORT_SIZE = 10;
 	
 	/** Default Activity Sizes */
 	public static final Map<String, Dimension> DEFAULT_ACTIVITY_SIZES = new HashMap<String, Dimension>();
@@ -110,6 +121,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 	{
 		//mxGraphics2DCanvas.putShape(VPool.class.getSimpleName(), new PoolLaneShape(true));
 		//mxGraphics2DCanvas.putShape(VLane.class.getSimpleName(), new PoolLaneShape(false));
+		mxConstants.RECTANGLE_ROUNDING_FACTOR = 0.05;
 		mxGraphics2DCanvas.putShape(mxConstants.SHAPE_SWIMLANE, new mxSwimlaneShape()
 		{
 			/**
@@ -318,6 +330,26 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_FILLCOLOR, LANE_COLOR);
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.TRUE);
 		putCellStyle(VLane.class.getSimpleName(), style);
+		
+		style = new HashMap<String, Object>();
+		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
+		style.put(mxConstants.STYLE_FILLCOLOR, OUTPUT_PARAMETER_COLOR);
+		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
+		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
+		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
+		putCellStyle(VOutParameter.class.getSimpleName(), style);
+		
+		style = new HashMap<String, Object>();
+		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
+		style.put(mxConstants.STYLE_FILLCOLOR, INPUT_PARAMETER_COLOR);
+		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
+		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
+		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
+		putCellStyle(VInParameter.class.getSimpleName(), style);
 		
 		style = new HashMap<String, Object>();
 		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);

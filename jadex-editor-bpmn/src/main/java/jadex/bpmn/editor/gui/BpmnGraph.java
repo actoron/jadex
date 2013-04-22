@@ -7,6 +7,7 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.editor.model.visual.VSubProcess;
@@ -74,6 +75,20 @@ public class BpmnGraph extends mxGraph
 			ret = true;
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Gets the tool tip for a cell.
+	 *  @param cell The cell.
+	 *  @return The tool tip.
+	 */
+	public String getToolTipForCell(Object cell)
+	{
+		if (cell instanceof VOutParameter)
+		{
+			return super.getToolTipForCell(cell);
+		}
+		return null;
 	}
 	
 	/*protected mxGraphView createGraphView()
@@ -160,10 +175,8 @@ public class BpmnGraph extends mxGraph
 		
 		getView().clear(cell, true, false);
 		getView().invalidate(cell);
-		Object[] selcells = getSelectionModel().getCells();
-		getSelectionModel().removeCells(selcells);
 		getView().validate();
-		setSelectionCells(selcells);
+		refresh();
 	}
 	
 	/**

@@ -138,6 +138,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				atable.addParameter();
+				modelcontainer.setDirty(true);
 			}
 		};
 		Action removeaction = new AbstractAction("Remove Parameters")
@@ -145,6 +146,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				atable.removeParameters(atable.getSelectedRows());
+				modelcontainer.setDirty(true);
 			}
 		};
 		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
@@ -154,6 +156,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				processTaskParameters((String) cbox.getSelectedItem(), atable);
+				modelcontainer.setDirty(true);
 			}
 		};
 		

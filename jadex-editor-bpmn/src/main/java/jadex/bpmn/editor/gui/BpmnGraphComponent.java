@@ -93,6 +93,8 @@ public class BpmnGraphComponent extends mxGraphComponent
 		g.fill(frame);
 		g.dispose();
 		collapseimageicon = new ImageIcon(img);
+		
+		setToolTips(true);
 	}
 	
 	/**

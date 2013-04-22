@@ -46,6 +46,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.mxgraph.util.mxEvent;
+import com.mxgraph.view.mxStylesheet;
 
 public class BpmnEditorWindow extends JFrame
 {
@@ -163,6 +164,22 @@ public class BpmnEditorWindow extends JFrame
 	}
 	
 	/**
+	 *  Gets model containers.
+	 *  
+	 *  @return The model containers.
+	 */
+	public List<ModelContainer> getModelContainers()
+	{
+		List<ModelContainer> ret = new ArrayList<ModelContainer>();
+		for (int i = 0; i < tabpane.getTabCount(); ++i)
+		{
+			BpmnEditorPanel panel = (BpmnEditorPanel) tabpane.getComponentAt(i);
+			ret.add(panel.getModelContainer());
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Gets the current model container.
 	 *  
 	 *  @return The selected model container (may be null if none is selected).
@@ -223,7 +240,17 @@ public class BpmnEditorWindow extends JFrame
 		
 		if (modelcontainer.getGraph() == null)
 		{
-			modelcontainer.setGraph(new BpmnGraph(modelcontainer, BpmnEditor.STYLE_SHEETS[0].getSecondEntity()));
+			mxStylesheet sheet = null;
+			for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
+			{
+				sheet = BpmnEditor.STYLE_SHEETS[i].getSecondEntity();
+				if (BpmnEditor.STYLE_SHEETS[i].getFirstEntity().equals(settings.getSelectedSheet()))
+				{
+					break;
+				}
+			}
+			
+			modelcontainer.setGraph(new BpmnGraph(modelcontainer, sheet));
 		}
 		
 		if (modelcontainer.getBpmnModel() == null)
@@ -378,7 +405,17 @@ public class BpmnEditorWindow extends JFrame
 		}
 		
 		ModelContainer modelcontainer = new ModelContainer();
-		BpmnGraph graph = new BpmnGraph(modelcontainer, BpmnEditor.STYLE_SHEETS[0].getSecondEntity());
+		mxStylesheet sheet = null;
+		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
+		{
+			sheet = BpmnEditor.STYLE_SHEETS[i].getSecondEntity();
+			if (BpmnEditor.STYLE_SHEETS[i].getFirstEntity().equals(settings.getSelectedSheet()))
+			{
+				break;
+			}
+		}
+		
+		BpmnGraph graph = new BpmnGraph(modelcontainer, sheet);
 		
 		MBpmnModel mmodel = null;
 		if (file.getName().endsWith("bpmn2"))

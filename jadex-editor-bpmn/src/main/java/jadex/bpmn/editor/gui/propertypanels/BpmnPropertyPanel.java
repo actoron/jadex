@@ -437,7 +437,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			else
 			{
 				String type = res.getClazz().getTypeName();
-				cparam = new CachedParameter(res.getName(), true, false, res.getDescription(), type);
+				cparam = new CachedParameter(res.getName(), false, true, res.getDescription(), type);
 				
 				UnparsedExpression exp = res.getDefaultValue();
 				if (exp != null)

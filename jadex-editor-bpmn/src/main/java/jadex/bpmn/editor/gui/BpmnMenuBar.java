@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -72,24 +73,27 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
-				if (modelcontainer != null)
+				List<ModelContainer> containers = editorwindow.getModelContainers();
+				for (ModelContainer modelcontainer : containers)
 				{
-					JRadioButtonMenuItem button = (JRadioButtonMenuItem) e.getSource();
-					mxStylesheet sheet = (mxStylesheet) button.getClientProperty("sheet");
-					modelcontainer.getGraph().setStylesheet(sheet);
-					modelcontainer.getGraph().refresh();
+					if (modelcontainer != null)
+					{
+						JRadioButtonMenuItem button = (JRadioButtonMenuItem) e.getSource();
+						mxStylesheet sheet = (mxStylesheet) button.getClientProperty("sheet");
+						modelcontainer.getGraph().setStylesheet(sheet);
+						modelcontainer.getGraph().refresh();
+						editorwindow.getSettings().setSelectedSheet(button.getText());
+					}
 				}
 			}
 		};
-//		Reflec
 		
 		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
 		{
 			JRadioButtonMenuItem view = new JRadioButtonMenuItem(styleaction);
 			view.putClientProperty("sheet", BpmnEditor.STYLE_SHEETS[i].getSecondEntity());
 			
-			if (i == 0)
+			if (BpmnEditor.STYLE_SHEETS[i].getFirstEntity().equals(editwindow.getSettings().getSelectedSheet()))
 			{
 				view.setSelected(true);
 			}
