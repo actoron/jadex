@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimulationConfiguration name="MarsWorldExperiments"
+	applicationReference="../sodekovs-applications/target/classes/sodekovs/marsworld/MarsWorld4SimulationExperimentsANDCoordSpace.application.xml"
+	applicationConfiguration="StandardConfiguation"	 
+	nameOfSpace="my2dspace"
+	description="My Simulation">
+
+
+	<Imports>		
+		<Import>jadex.extension.envsupport.evaluation.XYChartDataConsumer</Import>		
+		<Import>jadex.extension.envsupport.environment.*</Import>
+		<Import>jadex.simulation.evaluation.*</Import>
+	</Imports>
+
+	<Dataproviders>
+		<Dataprovider name="homebaselogger">
+			<Source name="$homebase" sourcetype="ISpaceObject" objecttype="homebase"/> 						
+			<Data name="ore_amount">$homebase.ore</Data>
+			<Data name="time">$tick</Data>				
+		</Dataprovider>
+		<Dataprovider name="energycostslogger">
+			<Source name="$energyCosts" sourcetype="ISpaceObject" objecttype="energyCosts"/> 						
+			<Data name="energy_costs">$energyCosts.costs</Data>
+			<Data name="time">$tick</Data>				
+		</Dataprovider>
+	</Dataproviders>
+
+	<Dataconsumers>
+		<Dataconsumer name="homebaseConsumer" clazz="XYChartDataConsumer">
+				<Property name="dataprovider">"homebaselogger"</Property>
+				<Property name="title">"Evaluation of homebase"</Property>
+				<Property name="labelx">"Time"</Property>
+				<Property name="labely">"Collected Ore"</Property>							
+				<Property name="seriesname_0">"Collected Ore"</Property>
+				<Property name="valuex_0">"time"</Property>
+				<Property name="valuey_0">"ore_amount"</Property>
+		</Dataconsumer>
+		<Dataconsumer name="energycostsConsumer" clazz="XYChartDataConsumer">
+				<Property name="dataprovider">"energycostslogger"</Property>
+				<Property name="title">"Evaluation of energy costs"</Property>				
+				<Property name="labelx">"Time"</Property>			
+				<Property name="labely">"Energy Costs"</Property>				
+				<Property name="seriesname_0">"Energy Costs"</Property>				
+				<Property name="valuex_0">"time"</Property>
+				<Property name="valuey_0">"energy_costs"</Property>
+		</Dataconsumer>
+		<Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">		
+				<Property name="dataprovider">"homebaselogger"</Property>
+				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. --> 
+		</Dataconsumer>
+		 
+		<!--<Dataconsumer name="homebaseConsumer" clazz="SimulationLogger">
+				<Property name="dataprovider">"homebaselogger2"</Property>
+				<Property name="title">"Logging Simulation"</Property>
+				<Property name="filelocation">"C:\simulation\marsworld.log"</Property>
+		</Dataconsumer>-->		
+	</Dataconsumers>
+
+	<DataVisualization>
+		<Input>Reference to a data-field of the observers</Input>
+		<Function name="MeanValue" aggregate="all" />
+		<!-- DiagramType, Aggregation of different data, text on x/y-axis-->
+	</DataVisualization>
+
+	<!-- Optional: -->
+	<Persist>
+		<!-- Options: Which filenName, Type, DB-Connector etc.-->
+		<!--  type="file"/"DB" -->
+		<!-- File Location -->
+	</Persist>
+
+	<Optimization/>
+
+	<RunConfiguration>
+		<General rows="1" parallelRuns="1" delta="true"/>
+		<Rows experiments="2">
+			<TerminateCondition>
+				    <Time value="300000" type="relative" />
+					<TargetFunction function="$object.getProperty(&quot;ore&quot;) >= 55">
+					    <ObjectSource type="ISpaceObject" name="homebase"/>
+					</TargetFunction>
+					<!--
+					<TargetFunction function="$beliefbase.tmpCounter>= 13">
+					<ObjectSource type="BDIAGENT" name="Sentry" /> </TargetFunction>
+					-->
+			</TerminateCondition>
+		</Rows>
+	</RunConfiguration>
+</SimulationConfiguration>
