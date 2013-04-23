@@ -312,6 +312,10 @@
 							<env:property name="strategy">$args.walkingStrategy</env:property>
 						</env:object>
 
+						<env:object type="energyCosts">
+							<env:property name="costs">new Double(0.0)</env:property>
+							<env:property name="factor">new Double(1.0)</env:property>
+						</env:object>
 					</env:objects>
 
 					<env:observers>

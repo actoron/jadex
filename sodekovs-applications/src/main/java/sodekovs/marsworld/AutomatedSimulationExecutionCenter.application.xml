@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!--
+		<H3>This application shows how the automated simulation management
+		works.</H3>
+	-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="AutomatedSimulationExecutionCenter" package="sodekovs.marsworld">
+
+	
+	<componenttypes>
+		<componenttype name="SimulationManager"
+			filename="jadex/simulation/master/SimulationManager.agent.xml" />
+			<componenttype name="RemoteSimulationClient"
+			filename="jadex/simulation/remote/RemoteClientSimulator.agent.xml" />
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Mars World">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/marsworld/MarsWorldWithCoordSpace.xml"</argument>			
+					</arguments>
+				</component>
+				<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</configuration>
+	</configurations>
+</applicationtype>
