@@ -571,15 +571,17 @@ public class SBpmnModelWriter
 	 */
 	protected static final void writePoolSemantics(PrintStream out, List<MPool> pools)
 	{
+		int ind = 1;
 		if (pools != null && pools.size() > 0)
 		{
 			for (MPool pool : pools)
 			{
-				out.print(getIndent(1) + "<semantic:process name=\"");
+				out.print(getIndent(ind) + "<semantic:process name=\"");
 				out.print(pool.getName());
 				out.print("\" id=\"");
 				out.print(pool.getId());
 				out.println("\">");
+				++ind;
 				
 				List<MLane> lanes = pool.getLanes();
 				if (lanes != null && lanes.size() > 0)
@@ -588,34 +590,13 @@ public class SBpmnModelWriter
 				}
 				
 				List<MActivity> activities = getPoolActivities(pool);
-				List<MDataEdge> dataedges = writeActivitySemantics(out, activities, null, 2);
 				
-				List<MSequenceEdge> seqedges = pool.getSequenceEdges();
-				if (seqedges != null)
-				{
-					writeSequenceEdgeSemantics(out, seqedges, 2);
-				}
+				List<MSequenceEdge> seqedges = new ArrayList<MSequenceEdge>();
+				List<MDataEdge> dataedges = new ArrayList<MDataEdge>();
+				writeActivitySemantics(out, activities, null, ind, seqedges, dataedges);
+				writeSequenceEdgeSemantics(out, seqedges, ind);
 				
-				int ind = 2;
-				out.println(getIndent(ind) + "<semantic:extensionElements>");
-				++ind;
-				for (MDataEdge dedge : dataedges)
-				{
-					out.print(getIndent(ind));
-					out.print("<jadex:dataFlow id=\"");
-					out.print(dedge.getId());
-					out.print("\" sourceRef=\"");
-					out.print(dedge.getSource().getId());
-					out.print("\" sourceParam=\"");
-					out.print(dedge.getSourceParameter());
-					out.print("\" targetRef=\"");
-					out.print(dedge.getTarget().getId());
-					out.print("\" targetParam=\"");
-					out.print(dedge.getTargetParameter());
-					out.println("\"/>");
-				}
 				--ind;
-				out.println(getIndent(ind) + "</semantic:extensionElements>");
 				
 				out.println(getIndent(1) + "</semantic:process>");
 			}
@@ -640,6 +621,35 @@ public class SBpmnModelWriter
 			out.println("\"/>");
 		}
 		out.println(getIndent(1) + "</semantic:collaboration>");
+	}
+	
+	/**
+	 *  Writes the pool extension elements (e.g. data edges).
+	 *  
+	 *  @param out The output.
+	 *  @param seqedges The sequence edges.
+	 */
+	protected static final void writePoolExtensions(PrintStream out, List<MDataEdge> dataedges, int ind)
+	{
+		out.println(getIndent(ind) + "<semantic:extensionElements>");
+		++ind;
+		for (MDataEdge dedge : dataedges)
+		{
+			out.print(getIndent(ind));
+			out.print("<jadex:dataFlow id=\"");
+			out.print(dedge.getId());
+			out.print("\" sourceRef=\"");
+			out.print(dedge.getSource().getId());
+			out.print("\" sourceParam=\"");
+			out.print(dedge.getSourceParameter());
+			out.print("\" targetRef=\"");
+			out.print(dedge.getTarget().getId());
+			out.print("\" targetParam=\"");
+			out.print(dedge.getTargetParameter());
+			out.println("\"/>");
+		}
+		--ind;
+		out.println(getIndent(ind) + "</semantic:extensionElements>");
 	}
 	
 	/**
@@ -683,14 +693,18 @@ public class SBpmnModelWriter
 	 *  @param out The output.
 	 *  @param activities The activities.
 	 */
-	protected static final List<MDataEdge> writeActivitySemantics(PrintStream out, List<MActivity> activities, String evthandlerref, int baseind)
+	protected static final void writeActivitySemantics(PrintStream out, List<MActivity> activities, String evthandlerref, int baseind, List<MSequenceEdge> seqedges, List<MDataEdge> dataedges)
 	{
-		List<MDataEdge> dataedges = new ArrayList<MDataEdge>();
 		for (MActivity activity : activities)
 		{
 			if (activity.getOutgoingDataEdges() != null)
 			{
 				dataedges.addAll(activity.getOutgoingDataEdges());
+			}
+			
+			if (activity.getOutgoingSequenceEdges() != null)
+			{
+				seqedges.addAll(activity.getOutgoingSequenceEdges());
 			}
 			
 			out.print(getIndent(baseind) + "<semantic:");
@@ -847,7 +861,7 @@ public class SBpmnModelWriter
 					List<MActivity> subactivities = subproc.getActivities();
 					if (subactivities != null && subactivities.size() > 0)
 					{
-						writeActivitySemantics(out, subactivities, null, baseind + 1);
+						writeActivitySemantics(out, subactivities, null, baseind + 1, seqedges, dataedges);
 					}
 					
 					List<MSequenceEdge> subseqedges = subproc.getSequenceEdges();
@@ -922,11 +936,9 @@ public class SBpmnModelWriter
 			
 			if (activity.getEventHandlers() != null && activity.getEventHandlers().size() > 0)
 			{
-				writeActivitySemantics(out, activity.getEventHandlers(), activity.getId(), baseind);
+				writeActivitySemantics(out, activity.getEventHandlers(), activity.getId(), baseind, seqedges, dataedges);
 			}
 		}
-		
-		return dataedges;
 	}
 	
 	/**
@@ -979,6 +991,8 @@ public class SBpmnModelWriter
 			out.println(getIndent(baseind) + "</semantic:sequenceFlow>");
 		}
 	}
+	
+	
 	
 	/**
 	 *  Gets all activities in a pool.
