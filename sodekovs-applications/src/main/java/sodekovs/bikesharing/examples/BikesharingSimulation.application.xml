@@ -238,10 +238,10 @@
 						<env:object type="SimInfo"> <env:property name="position">new	Vector2Double(2.0, 4.0)</env:property> </env:object>
 					</env:objects>
 
-					<env:observers>
+					<!-- <env:observers>
 						<env:observer name="world" dataview="view_all"
 							perspective="main" />
-					</env:observers> 
+					</env:observers>--> 
 				</env:envspace>
 				
 				<!-- The CoordinationSpace -->				

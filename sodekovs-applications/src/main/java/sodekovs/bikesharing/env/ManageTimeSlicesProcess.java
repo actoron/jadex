@@ -155,9 +155,9 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 					// counterTmp++;
 					break;
 				}
-			} else if ((timeSlicesList.get(i).getStartTime() <= ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick))) {
+			} else if ((timeSlicesList.get(i).getStartTime() <= ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick)) && ((timeSlicesList.get(i).getStartTime() + 60) > ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick))) {
 				executeTimeSlice(i, space);
-//				 System.out.println("Time Slice (2) executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - tickDelta));
+//				 System.out.println("Time Slice (2) executed:  " + timeSlicesList.get(i).getStartTime() + " tickTime: " + ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick));
 			}
 		}
 
@@ -237,6 +237,8 @@ public class ManageTimeSlicesProcess extends SimplePropertyObject implements ISp
 
 		// Create number of pedestrians according to the "Andrang"
 		long congestion = Math.round((timeSlicesList.get(currentTimeSlice).getRunRelative() * totalDepartures) / 60);
+		
+//		congestion = Math.round(congestion/10);
 		// System.out.println("#Congestion: # " + cong);
 		for (int i = 0; i < congestion; i++) {
 			int departureStation = computeDeparture(stationList);
