@@ -24,6 +24,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -130,9 +131,11 @@ public class BpmnEditorWindow extends JFrame
 					public void run()
 					{
 						statuspane.repaint();
+						statuspane.revalidate();
 						statuspane.setDividerLocation(statuspane.getHeight());
 						statuspane.setDividerLocation(1.0);
 						statuspane.repaint();
+						statuspane.revalidate();
 						
 						File[] openedfiles = settings.getOpenedFiles();
 						if (openedfiles != null && openedfiles.length > 0)
@@ -272,6 +275,7 @@ public class BpmnEditorWindow extends JFrame
 		
 		int index = tabpane.getTabCount();
 		final BpmnEditorPanel panel = new BpmnEditorPanel(modelcontainer);
+		
 		tabpane.addTab(tabname, panel);
 		final JPanel tabtitlecomponent = new JPanel()
 		{
@@ -360,21 +364,49 @@ public class BpmnEditorWindow extends JFrame
 		
 		tabpane.setSelectedIndex(index);
 		
+		panel.getModelContainer().setPropertyPanel(SPropertyPanelFactory.createPanel(null, panel.getModelContainer()));
+		panel.setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
+		
 		// More Swing Bugness
-		SwingUtilities.invokeLater(new Runnable()
+		final Runnable fixsplitpane = new Runnable()
 		{
 			public void run()
 			{
-				JSplitPane viewpane = (JSplitPane) tabpane.getSelectedComponent();
+				final JSplitPane viewpane = (JSplitPane) tabpane.getSelectedComponent();
 				if (viewpane != null)
 				{
 					viewpane.repaint();
+					viewpane.revalidate();
 					viewpane.setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
-					viewpane.repaint();
-					panel.getModelContainer().setPropertyPanel(SPropertyPanelFactory.createPanel(null, panel.getModelContainer()));
+					viewpane.doLayout();
+					panel.doLayout();
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							viewpane.revalidate();
+							viewpane.repaint();
+						}
+					});
 				}
 			}
-		});
+		};
+		SwingUtilities.invokeLater(fixsplitpane);
+		
+		ActionListener fixlistener =  new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				fixsplitpane.run();
+			}
+		};
+		
+		for (int i = 1; i < 5; ++i)
+		{
+			javax.swing.Timer timer = new javax.swing.Timer(i * 250, fixlistener);
+			timer.setRepeats(false);
+			timer.start();
+		}
 		
 		if (createpool)
 		{
