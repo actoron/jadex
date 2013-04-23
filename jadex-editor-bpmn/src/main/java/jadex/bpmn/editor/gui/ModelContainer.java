@@ -204,7 +204,10 @@ public class ModelContainer
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EXTERNAL_SUBPROCESS, MBpmnModel.SUBPROCESS);
 	}
 	
-	/** The mode file. */
+	/** The global settings. */
+	protected Settings settings;
+	
+	/** The model file. */
 	protected File file;
 	
 	/** The graph component. */
@@ -243,8 +246,9 @@ public class ModelContainer
 	/**
 	 *  Creates a new container.
 	 */
-	public ModelContainer()
+	public ModelContainer(Settings settings)
 	{
+		this.settings = settings;
 		this.idgen = new IdGenerator();
 		//this.imageprovider = new ImageProvider();
 		this.projecttaskmetainfos = new HashMap<String, TaskMetaInfo>();
@@ -427,6 +431,15 @@ public class ModelContainer
 			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING,
 				"Identified project root, unable to generate classloader: " + e.getMessage());
 		}
+	}
+	
+	/**
+	 *  Gets the global settings.
+	 *  @return The settings
+	 */
+	public Settings getSettings()
+	{
+		return settings;
 	}
 	
 	/**

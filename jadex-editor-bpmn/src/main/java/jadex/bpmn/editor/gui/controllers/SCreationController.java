@@ -19,6 +19,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
@@ -322,46 +323,74 @@ public class SCreationController
 			vedge.setSource(source);
 			vedge.setTarget(target);
 			
-//			List<mxPoint> points = new ArrayList<mxPoint>();
-//			double sx = source.getGeometry().getX() + source.getGeometry().getWidth() - 1;
-//			double tx = target.getGeometry().getX();
-//			double dx3 = (target.getGeometry().getX() - sx) / 3.0;
-//			double sy = source.getGeometry().getCenterY();
-//			double ty = target.getGeometry().getCenterY();
-////			points.add(new mxPoint(sx, sy));
-//			points.add(new mxPoint(sx + dx3, sy));
-//			points.add(new mxPoint(sx + dx3 + dx3, ty));
-////			points.add(new mxPoint(tx, ty));
-//			vedge.getGeometry().setPoints(points);
+			VActivity vsrc = (VActivity) source;
+			VActivity vtgt = (VActivity) target;
+			
+			List<VOutParameter> unconnectedsrc = new ArrayList<VOutParameter>();
+			for (int i = 0; i < vsrc.getChildCount(); ++i)
+			{
+				if (vsrc.getChildAt(i) instanceof VOutParameter && vsrc.getChildAt(i).getEdgeCount() == 0)
+				{
+					unconnectedsrc.add((VOutParameter) vsrc.getChildAt(i));
+				}
+			}
+			
+			List<VInParameter> unconnectedtgt = new ArrayList<VInParameter>();
+			for (int i = 0; i < vtgt.getChildCount(); ++i)
+			{
+				if (vtgt.getChildAt(i) instanceof VInParameter && vtgt.getChildAt(i).getEdgeCount() == 0)
+				{
+					unconnectedtgt.add((VInParameter) vtgt.getChildAt(i));
+				}
+			}
+			
+			for (VOutParameter voutparam : unconnectedsrc)
+			{
+				for (VInParameter vinparam : unconnectedtgt)
+				{
+					MParameter outparam = voutparam.getParameter();
+					MParameter inparam = vinparam.getParameter();
+					
+					if (outparam.getName() != null && outparam.getName().equals(inparam.getName()) &&
+						outparam.getClazz() != null && outparam.getClazz().getTypeName().equals(inparam.getClazz().getTypeName()))
+					{
+						VDataEdge vdataedge = createDataEdge(graph, voutparam, vinparam);
+						graph.addCell(vdataedge);
+						break;
+					}
+				}
+			}
 			
 			modelcontainer.setDirty(true);
 			ret = vedge;
 		}
 		else if (source instanceof VOutParameter && target instanceof VInParameter)
 		{
-			VOutParameter vsparam = (VOutParameter) source;
-			VInParameter vtparam = (VInParameter) target;
-			
-			MActivity sactivity = (MActivity) ((VActivity) vsparam.getParent()).getBpmnElement();
-			MActivity tactivity = (MActivity) ((VActivity) vtparam.getParent()).getBpmnElement();
-			
-			MDataEdge dedge = new MDataEdge();
-			dedge.setSource(sactivity);
-			dedge.setSourceParameter(vsparam.getParameter().getName());
-			dedge.setTarget(tactivity);
-			dedge.setTargetParameter(vtparam.getParameter().getName());
-			sactivity.addOutgoingDataEdge(dedge);
-			tactivity.addIncomingDataEdge(dedge);
-			
-			VDataEdge vedge = new VDataEdge(graph);
-			vedge.setBpmnElement(dedge);
-			vedge.setSource(vsparam);
-			vedge.setTarget(vtparam);
-			
-			ret = vedge;
+			ret = createDataEdge(graph, (VOutParameter) source, (VInParameter) target);
 		}
 		
 		return ret;
+	}
+	
+	protected static final VDataEdge createDataEdge(BpmnGraph graph, VOutParameter source, VInParameter target)
+	{
+		MActivity sactivity = (MActivity) ((VActivity) source.getParent()).getBpmnElement();
+		MActivity tactivity = (MActivity) ((VActivity) target.getParent()).getBpmnElement();
+		
+		MDataEdge dedge = new MDataEdge();
+		dedge.setSource(sactivity);
+		dedge.setSourceParameter(source.getParameter().getName());
+		dedge.setTarget(tactivity);
+		dedge.setTargetParameter(target.getParameter().getName());
+		sactivity.addOutgoingDataEdge(dedge);
+		tactivity.addIncomingDataEdge(dedge);
+		
+		VDataEdge vedge = new VDataEdge(graph);
+		vedge.setBpmnElement(dedge);
+		vedge.setSource(source);
+		vedge.setTarget(target);
+		
+		return vedge;
 	}
 	
 	/**

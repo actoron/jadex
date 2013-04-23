@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.DeletionController;
+import jadex.bpmn.editor.gui.controllers.SCreationController;
 import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.legacy.BpmnXMLReader;
@@ -20,6 +21,7 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
@@ -232,9 +234,11 @@ public class BpmnEditorWindow extends JFrame
 	 */
 	public ModelContainer newModelTab(ModelContainer modelcontainer)
 	{
+		boolean createpool = false;
 		if (modelcontainer == null)
 		{
-			modelcontainer = new ModelContainer();
+			modelcontainer = new ModelContainer(settings);
+			createpool = true;
 		}
 		modelcontainer.setEditingToolbar(bpmntoolbar);
 		
@@ -372,6 +376,11 @@ public class BpmnEditorWindow extends JFrame
 			}
 		});
 		
+		if (createpool)
+		{
+			SCreationController.createPool(modelcontainer, new Point());
+		}
+		
 		return modelcontainer;
 	}
 	
@@ -404,7 +413,7 @@ public class BpmnEditorWindow extends JFrame
 			}
 		}
 		
-		ModelContainer modelcontainer = new ModelContainer();
+		ModelContainer modelcontainer = new ModelContainer(settings);
 		mxStylesheet sheet = null;
 		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
 		{
