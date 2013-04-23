@@ -279,6 +279,14 @@ public class BasePropertyPanel extends JPanel
 	}
 	
 	/**
+	 *  Turns empty strings to null.
+	 */
+	public static final String nullifyString(Object value)
+	{
+		return value != null && ((String) value).length() == 0? null : ((String) value);
+	}
+	
+	/**
 	 *  Index Map containment filter.
 	 */
 	public static final class IndexMapContains implements IFilter<String>

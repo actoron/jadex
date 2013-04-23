@@ -75,7 +75,7 @@ public class BpmnEditorWindow extends JFrame
 		statuspane.setBottomComponent(new StatusArea());
 		getContentPane().add(statuspane, BorderLayout.CENTER);
 		
-		bpmntoolbar = new BpmnToolbar(GuiConstants.DEFAULT_ICON_SIZE);
+		bpmntoolbar = new BpmnToolbar(settings.getToolbarIconSize());
 		getContentPane().add(bpmntoolbar, BorderLayout.PAGE_START);
 		
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);

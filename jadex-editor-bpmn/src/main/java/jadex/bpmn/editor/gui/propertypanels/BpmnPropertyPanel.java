@@ -8,10 +8,13 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
@@ -45,6 +48,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
 
 /**
  *  BPMN process property panel.
@@ -68,7 +72,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected String[] PROVIDED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Proxytype", "Implementation" };
 	
 	/** The column names for the required services table. */
-	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Multiple", "Binding" };
+	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Multiplex", "Binding" };
 	
 	/** The proxy types. */
 	protected String[] PROXY_TYPES = { BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,
@@ -549,9 +553,20 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.weighty = 1.0;
 		gc.fill = GridBagConstraints.BOTH;
 		gc.insets = new Insets(0, 5, 5, 0);
-		final JTable pstable = new JTable(new ProvidedServicesTableModel());
 		JComboBox proxybox = new JComboBox(PROXY_TYPES);
-		pstable.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(proxybox));
+		final DefaultCellEditor proxyeditor = new DefaultCellEditor(proxybox);
+		final JTable pstable = new JTable(new ProvidedServicesTableModel())
+		{
+			public TableCellEditor getCellEditor(int row, int column)
+			{
+				if (column == 2)
+				{
+					return proxyeditor;
+				}
+				return super.getCellEditor(row, column);
+			}
+		};
+		
 		JScrollPane tablescrollpane = new JScrollPane(pstable);
 		tablepanel.add(tablescrollpane, gc);
 		
@@ -567,35 +582,17 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				final ProvidedServiceInfo[] services = ((ProvidedServicesTableModel) pstable.getModel()).getSelectedServices();
 				ProvidedServiceImplementation psimpl = new ProvidedServiceImplementation();
 				psimpl.setProxytype(BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
-				psimpl.setClazz(new ClassInfo(""));
-				String name = createFreeName("name",
-					new IFilter<String>()
-					{
-						public boolean filter(String obj)
-						{
-							for (int i = 0; i < services.length; ++i)
-							{
-								if (obj.equals(services[i].getName()))
-								{
-									return true;
-								}
-							}
-							return false;
-						}
-					});
+				String name = createFreeName("name", new PSContains());
 				ProvidedServiceInfo ps = new ProvidedServiceInfo();
 				ps.setName(name);
-				ps.setType(new ClassInfo("class"));
+				ps.setType(null);
 				ps.setImplementation(psimpl);
+				int row = getModelInfo().getProvidedServices().length;
+				getModelInfo().addProvidedService(ps);
 				
-				ProvidedServiceInfo[] newservices = new ProvidedServiceInfo[services.length + 1];
-				System.arraycopy(services, 0, newservices, 0, services.length);
-				newservices[services.length] = ps;
-				((ProvidedServicesTableModel) pstable.getModel()).setSelectedServices(newservices);
-				((ProvidedServicesTableModel) pstable.getModel()).fireTableRowsInserted(services.length, services.length);
+				((ProvidedServicesTableModel) pstable.getModel()).fireTableRowsInserted(row, row);
 			}
 		};
 		Action removeaction = new AbstractAction("Remove Provided Services")
@@ -608,11 +605,16 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				
 				for (int i = ind.length - 1; i >= 0; --i)
 				{
-					ProvidedServicesTableModel model = (ProvidedServicesTableModel) pstable.getModel();
-					List<ProvidedServiceInfo> services = SUtil.arrayToList(model.getSelectedServices());
+					List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
 					services.remove(i);
-					model.setSelectedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
-					model.fireTableRowsDeleted(ind[i], ind[i]);
+					getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+					for (ConfigurationInfo conf : getModelInfo().getConfigurations())
+					{
+						services = SUtil.arrayToList(conf.getProvidedServices());
+						services.remove(i);
+						conf.setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+					}
+					((ProvidedServicesTableModel) pstable.getModel()).fireTableRowsDeleted(ind[i], ind[i]);
 				}
 			}
 		};
@@ -1322,6 +1324,207 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			String ret = PROVIDED_SERVICES_COLUMN_NAMES[column];
 			String confname = getSelectedConfigurationName();
+			if (confname != null && column > 1)
+			{
+				ret += " [" + confname + "]";
+			}
+			return ret;
+		}
+		
+		/**
+	     *  Returns whether a cell is editable.
+	     *
+	     *  @param  rowIndex The row being queried.
+	     *  @param  columnIndex The column being queried.
+	     *  @return If a cell is editable.
+	     */
+		public boolean isCellEditable(int rowIndex, int columnIndex)
+		{
+			return true;
+		}
+		
+		/**
+		 *  Returns the row count.
+		 *  
+		 *  @return The row count.
+		 */
+		public int getRowCount()
+		{
+			return getModelInfo().getProvidedServices().length;
+		}
+		
+		/**
+		 *  Returns the column count.
+		 *  
+		 *  @return The column count.
+		 */
+		public int getColumnCount()
+		{
+			return PROVIDED_SERVICES_COLUMN_NAMES.length;
+		}
+		
+		/**
+		 *  Gets the value.
+		 *  
+		 *  @param rowIndex The row.
+		 *  @param columnIndex The column.
+		 *  @return The value.
+		 */
+		public Object getValueAt(int rowIndex, int columnIndex)
+		{
+			ProvidedServiceInfo ps = getModelInfo().getProvidedServices()[rowIndex];
+			ProvidedServiceInfo cs = getProvService(ps.getName(), getSelectedConfiguration());
+			switch (columnIndex)
+			{
+				case 0:
+				default:
+					return ps.getName();
+				case 1:
+					return ps.getType() != null? ps.getType().getTypeName() : null;
+				case 2:
+				{
+					Object ret = null;
+					if (cs != null)
+					{
+						ps = cs;
+					}
+					if (ps != null && ps.getImplementation() != null)
+					{
+						ret = ps.getImplementation().getProxytype();
+					}
+					return ret;
+				}
+				case 3:
+				{
+					Object ret = null;
+					if (cs != null)
+					{
+						ps = cs;
+					}
+					if (ps != null && ps.getImplementation() != null && ps.getImplementation().getClazz() != null)
+					{
+						ret = ps.getImplementation().getClazz().getTypeName();
+					}
+					return ret;
+				}
+			}
+		}
+		
+		/**
+		 *  Sets the value.
+		 *  
+		 *  @param rowIndex The row.
+		 *  @param columnIndex The column.
+		 *  @return The value.
+		 */
+		public void setValueAt(Object value, int rowIndex, int columnIndex)
+		{
+			ProvidedServiceInfo ps = getModelInfo().getProvidedServices()[rowIndex];
+			ConfigurationInfo conf = getSelectedConfiguration();
+			ProvidedServiceInfo cs = getProvService(ps.getName(), getSelectedConfiguration());
+			if ((columnIndex == 2 ||
+				columnIndex == 3) &&
+				cs == null &&
+				conf != null)
+			{
+				cs = new ProvidedServiceInfo();
+				cs.setName(ps.getName());
+				conf.addProvidedService(cs);
+			}
+			switch (columnIndex)
+			{
+				case 0:
+				default:
+					String newname = createFreeName((String) value, new PSContains());
+					ConfigurationInfo[] confs = getModelInfo().getConfigurations();
+					for (ConfigurationInfo itconf : confs)
+					{
+						ProvidedServiceInfo itcs = getProvService(ps.getName(), itconf);
+						itcs.setName(newname);
+					}
+					ps.setName(newname);
+					break;
+				case 1:
+					value = nullifyString(value);
+					if (value != null)
+					{
+						ps.setType(new ClassInfo(nullifyString(value)));
+					}
+					break;
+				case 2:
+					if (cs != null)
+					{
+						createImplementation(cs);
+						cs.getImplementation().setProxytype(nullifyString(value));
+						if (compareService(ps, cs))
+						{
+							List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
+							services.remove(cs);
+							getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+						}
+					}
+					else
+					{
+						createImplementation(ps);
+						ps.getImplementation().setProxytype(nullifyString(value));
+						for (ConfigurationInfo itconf : getModelInfo().getConfigurations())
+						{
+							cs = getProvService(ps.getName(), itconf);
+							if (compareService(ps, cs))
+							{
+								List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
+								services.remove(cs);
+								getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+							}
+						}
+					}
+					break;
+				case 3:
+						ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
+						if (cs != null)
+						{
+							createImplementation(cs);
+							cs.getImplementation().setClazz(type);
+							if (compareService(ps, cs))
+							{
+								List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
+								services.remove(cs);
+								getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+							}
+						}
+						else
+						{
+							createImplementation(ps);
+							ps.getImplementation().setClazz(type);
+							for (ConfigurationInfo itconf : getModelInfo().getConfigurations())
+							{
+								cs = getProvService(ps.getName(), itconf);
+								if (compareService(ps, cs))
+								{
+									List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
+									services.remove(cs);
+									getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+								}
+							}
+						}
+			}
+		}
+	}
+	
+	/**
+	 *  Table model for required services.
+	 */
+	protected class RequiredServicesTableModel extends AbstractTableModel
+	{
+		/**
+		 *  Gets the column name.
+		 *  
+		 *  @return The column name.
+		 */
+		public String getColumnName(int column)
+		{
+			String ret = REQUIRED_SERVICES_COLUMN_NAMES[column];
+			String confname = getSelectedConfigurationName();
 			if (confname != null)
 			{
 				ret += " [" + confname + "]";
@@ -1429,6 +1632,22 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		}
 	}
 	
+	protected class PSContains implements IFilter<String>
+	{
+		public boolean filter(String obj)
+		{
+			ProvidedServiceInfo[] psi = getModelInfo().getProvidedServices();
+			for (int i = 0; i < psi.length; ++i)
+			{
+				if (obj.equals(psi[i].getName()))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+	
 	/**
 	 *  Configuration containment filter.
 	 */
@@ -1495,5 +1714,123 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			this.type = type;
 			this.inivals = new HashMap<String, String>();
 		}
+	}
+	
+	/**
+	 * Creates the service implementation if null. 
+	 * @param s The service.
+	 */
+	private static final void createImplementation(ProvidedServiceInfo s)
+	{
+		if (s.getImplementation() == null)
+		{
+			s.setImplementation(new ProvidedServiceImplementation());
+		}
+	}
+	
+	/**
+	 *  Compares regular service with configuration service.
+	 *  
+	 *  @param s Regular service.
+	 *  @param cs Configuration service.
+	 *  @return True, if equal.
+	 */
+	private static final boolean compareService(ProvidedServiceInfo s, ProvidedServiceInfo cs)
+	{
+		if (s == null || cs == null)
+		{
+			return s == cs;
+		}
+		
+		if (s.getImplementation() == null || cs.getImplementation() == null)
+		{
+			return s.getImplementation() == cs.getImplementation();
+		}
+		
+		if (s.getImplementation().getProxytype() == null || cs.getImplementation().getProxytype() == null)
+		{
+			return s.getImplementation().getProxytype() == cs.getImplementation().getProxytype();
+		}
+		
+		if (!(s.getImplementation().getProxytype().equals(cs.getImplementation().getProxytype())))
+		{
+			return false;
+		}
+		
+		if (s.getImplementation().getClazz() == null || cs.getImplementation().getClazz() == null)
+		{
+			return s.getImplementation().getClazz() == cs.getImplementation().getClazz();
+		}
+		
+		if (s.getImplementation().getClazz().getTypeName() == null || cs.getImplementation().getClazz().getTypeName() == null)
+		{
+			return s.getImplementation().getClazz().getTypeName() == cs.getImplementation().getClazz().getTypeName();
+		}
+		
+		return s.getImplementation().getClazz().getTypeName().equals(cs.getImplementation().getClazz().getTypeName());
+	}
+	
+	/**
+	 *  Finds a service.
+	 *  
+	 * 	@param name The name.
+	 * 	@param conf The configuration.
+	 * 	@return The service.
+	 */
+	private static final ProvidedServiceInfo getProvService(String name, ConfigurationInfo conf)
+	{
+		if (conf == null)
+		{
+			return null;
+		}
+		
+		ProvidedServiceInfo[] services = conf.getProvidedServices();
+		
+		if (services == null)
+		{
+			return null;
+		}
+		
+		for (int i = 0; i < services.length; ++i)
+		{
+			if (name.equals(services[i].getName()))
+			{
+				return services[i];
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 *  Finds a service.
+	 *  
+	 * 	@param name The name.
+	 * 	@param conf The configuration.
+	 * 	@return The service.
+	 */
+	private static final RequiredServiceInfo getReqService(String name, ConfigurationInfo conf)
+	{
+		if (conf == null)
+		{
+			return null;
+		}
+		
+		RequiredServiceInfo[] services = conf.getRequiredServices();
+		
+		if (services == null)
+		{
+			return null;
+		}
+		
+		for (int i = 0; i < services.length; ++i)
+		{
+			if (name.equals(services[i].getName()))
+			{
+				return services[i];
+			}
+		}
+		
+		return null;
 	}
 }

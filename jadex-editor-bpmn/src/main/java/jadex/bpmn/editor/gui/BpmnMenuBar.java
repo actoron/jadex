@@ -145,6 +145,7 @@ public class BpmnMenuBar extends JMenuBar
 					JRadioButtonMenuItem button = (JRadioButtonMenuItem) e.getSource();
 					int iconsize = (Integer) button.getClientProperty("size");
 					((BpmnToolbar) modelcontainer.getEditingToolbar()).setIconSize(iconsize);
+					editorwindow.getSettings().setToolbarIconSize(iconsize);
 				}
 			}
 		};
@@ -153,7 +154,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			JRadioButtonMenuItem isbutton = new JRadioButtonMenuItem(iconaction);
 			isbutton.putClientProperty("size", GuiConstants.ICON_SIZES[i]);
-			if (GuiConstants.ICON_SIZES[i] == GuiConstants.DEFAULT_ICON_SIZE)
+			if (GuiConstants.ICON_SIZES[i] == editorwindow.getSettings().getToolbarIconSize())
 			{
 				isbutton.setSelected(true);
 			}

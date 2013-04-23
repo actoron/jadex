@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +13,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import com.mxgraph.view.mxStylesheet;
 
 /**
  *  The editor settings.
@@ -27,6 +30,12 @@ public class Settings
 	
 	/** Files that were opened when editor was closed. */
 	protected File[] openedfiles;
+	
+	/** The last file opened or saved. */
+	protected int toolbariconsize = GuiConstants.DEFAULT_ICON_SIZE;
+	
+	/** Flag if simple data edge auto-connect is enabled. */
+	protected boolean simpledataautoconncect = true;
 	
 	/** The selected style sheet */
 	protected String selectedsheet = BpmnEditor.STYLE_SHEETS[0].getFirstEntity();
@@ -69,6 +78,18 @@ public class Settings
 	public void setOpenedFiles(File[] openedfiles)
 	{
 		this.openedfiles = openedfiles;
+	}
+	
+	
+
+	public int getToolbarIconSize()
+	{
+		return toolbariconsize;
+	}
+
+	public void setToolbarIconSize(int toolbariconsize)
+	{
+		this.toolbariconsize = toolbariconsize;
 	}
 
 	/**
@@ -120,6 +141,8 @@ public class Settings
 			props.put("stylesheet", selectedsheet);
 		}
 		
+		props.put("toolbariconsize", String.valueOf(toolbariconsize));
+		
 		if (openedfiles != null)
 		{
 			int counter = 0;
@@ -162,7 +185,34 @@ public class Settings
 			prop = props.getProperty("stylesheet");
 			if (prop != null)
 			{
-				ret.setSelectedSheet(prop);
+				for (Tuple2<String, mxStylesheet> sheet : BpmnEditor.STYLE_SHEETS)
+				{
+					if (sheet.getFirstEntity().equals(prop))
+					{
+						ret.setSelectedSheet(prop);
+						break;
+					}
+				}
+			}
+			
+			prop = props.getProperty("toolbariconsize");
+			if (prop != null)
+			{
+				try
+				{
+					int size = Integer.parseInt(prop);
+					for (int i = 0; i < GuiConstants.ICON_SIZES.length; ++i)
+					{
+						if (GuiConstants.ICON_SIZES[i] == size)
+						{
+							ret.setToolbarIconSize(size);
+							break;
+						}
+					}
+				}
+				catch (NumberFormatException e)
+				{
+				}
 			}
 			
 			List<File> openfiles = new ArrayList<File>();

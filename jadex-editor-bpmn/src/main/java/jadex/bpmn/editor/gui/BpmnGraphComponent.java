@@ -9,13 +9,18 @@ import jadex.bpmn.model.MActivity;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 
@@ -25,6 +30,10 @@ import com.mxgraph.swing.handler.mxGraphHandler;
 import com.mxgraph.swing.handler.mxPanningHandler;
 import com.mxgraph.swing.view.mxCellEditor;
 import com.mxgraph.swing.view.mxICellEditor;
+import com.mxgraph.swing.view.mxInteractiveCanvas;
+import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxRectangle;
+import com.mxgraph.util.mxUtils;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxCellState;
 
@@ -203,6 +212,81 @@ public class BpmnGraphComponent extends mxGraphComponent
 	protected mxGraphControl createGraphControl()
 	{
 		return new BpmnGraphControl();
+	}
+	
+	public mxInteractiveCanvas createCanvas()
+	{
+		return new mxInteractiveCanvas()
+		{
+			@Override
+			public Paint createFillPaint(mxRectangle bounds,
+					Map<String, Object> style)
+			{
+				Color fillColor = mxUtils.getColor(style, mxConstants.STYLE_FILLCOLOR);
+				Paint fillPaint = null;
+
+				if (fillColor != null)
+				{
+					Color gradientColor = mxUtils.getColor(style,
+							mxConstants.STYLE_GRADIENTCOLOR);
+
+					if (gradientColor != null)
+					{
+						String gradientDirection = mxUtils.getString(style,
+								mxConstants.STYLE_GRADIENT_DIRECTION);
+
+						float x1 = (float) bounds.getX();
+						float y1 = (float) bounds.getY();
+						float x2 = (float) bounds.getX();
+						float y2 = (float) bounds.getY();
+
+						if (gradientDirection == null
+								|| gradientDirection
+										.equals(mxConstants.DIRECTION_SOUTH))
+						{
+							y2 = (float) (bounds.getY() + bounds.getHeight());
+						}
+						else if (gradientDirection.equals(mxConstants.DIRECTION_EAST))
+						{
+							x2 = (float) (bounds.getX() + bounds.getWidth());
+						}
+						else if (gradientDirection.equals(mxConstants.DIRECTION_NORTH))
+						{
+							y1 = (float) (bounds.getY() + bounds.getHeight());
+						}
+						else if (gradientDirection.equals(mxConstants.DIRECTION_WEST))
+						{
+							x1 = (float) (bounds.getX() + bounds.getWidth());
+						}
+						else if (gradientDirection.equals("northeast"))
+						{
+							x2 = (float) (bounds.getX() + bounds.getWidth());
+							y1 = (float) (bounds.getY() + bounds.getHeight());
+						}
+						else if (gradientDirection.equals("southwest"))
+						{
+							y2 = (float) (bounds.getY() + bounds.getHeight());
+							x1 = (float) (bounds.getX() + bounds.getWidth());
+						}
+						else if (gradientDirection.equals("northwest"))
+						{
+							x2 = (float) (bounds.getX() + bounds.getWidth());
+							y2 = (float) (bounds.getY() + bounds.getHeight());
+							System.out.println(x1);
+							System.out.println(x2);
+//							fillPaint = new GradientPaint(x1+30, y1+30, gradientColor, x2, y2,
+//									fillColor, true);
+							fillPaint = new LinearGradientPaint(new Point2D.Double(x1, y1), new Point2D.Double(x2, y1), new float[] {0.0f, 1.0f}, new Color[] {gradientColor, fillColor});
+						}
+
+//						fillPaint = new GradientPaint(x1, y1, fillColor, x2, y2,
+//								gradientColor, false);
+					}
+				}
+
+				return fillPaint;
+			}
+		};
 	}
 	
 	public void extendComponent(Rectangle rect)

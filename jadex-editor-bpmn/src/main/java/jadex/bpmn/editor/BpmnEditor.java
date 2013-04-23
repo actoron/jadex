@@ -2,6 +2,7 @@ package jadex.bpmn.editor;
 
 import jadex.bpmn.editor.gui.BpmnEditorWindow;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
+import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColorGradient;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetComplexGrayscale;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
 import jadex.bpmn.task.info.TaskMetaInfo;
@@ -48,6 +49,7 @@ public class BpmnEditor
 	public static final Tuple2<String, mxStylesheet>[] STYLE_SHEETS = new Tuple2[] 
 		{
 			new Tuple2<String, mxStylesheet>("Color", new BpmnStylesheetColor()),
+//			new Tuple2<String, mxStylesheet>("Color Gradient", new BpmnStylesheetColorGradient()),
 			new Tuple2<String, mxStylesheet>("Simple Grayscale", new BpmnStylesheetSimpleGrayscale()),
 			new Tuple2<String, mxStylesheet>("Complex Grayscale", new BpmnStylesheetComplexGrayscale())
 		};
