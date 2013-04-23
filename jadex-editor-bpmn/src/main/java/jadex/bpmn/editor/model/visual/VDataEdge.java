@@ -1,5 +1,9 @@
 package jadex.bpmn.editor.model.visual;
 
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MDataEdge;
+
+import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
 
 /**
@@ -16,5 +20,49 @@ public class VDataEdge extends VEdge
 	public VDataEdge(mxGraph graph)
 	{
 		super(graph, VDataEdge.class.getSimpleName());
+	}
+	
+	/**
+	 *  Sets the source.
+	 */
+	public void setSource(mxICell source)
+	{
+		MDataEdge dedge = (MDataEdge) getBpmnElement();
+		if (getSource() != null)
+		{
+			VActivity vsrc = (VActivity) getSource().getParent();
+			((MActivity) vsrc.getBpmnElement()).removeOutgoingDataEdge(dedge);
+		}
+		super.setSource(source);
+		if (source != null)
+		{
+			VActivity vsrc = (VActivity) getSource().getParent();
+			((MActivity) vsrc.getBpmnElement()).addIncomingDataEdge(dedge);
+			dedge.setSource((MActivity) vsrc.getBpmnElement());
+			String paramname = ((VOutParameter) getSource()).getParameter().getName();
+			dedge.setSourceParameter(paramname);
+		}
+	}
+	
+	/**
+	 *  Sets the target.
+	 */
+	public void setTarget(mxICell target)
+	{
+		MDataEdge dedge = (MDataEdge) getBpmnElement();
+		if (getTarget() != null)
+		{
+			VActivity vtgt = (VActivity) getTarget().getParent();
+			((MActivity) vtgt.getBpmnElement()).removeIncomingDataEdge(dedge);
+		}
+		super.setTarget(target);
+		if (target != null)
+		{
+			VActivity vtgt = (VActivity) getTarget().getParent();
+			((MActivity) vtgt.getBpmnElement()).addIncomingDataEdge(dedge);
+			dedge.setTarget((MActivity) vtgt.getBpmnElement());
+			String paramname = ((VInParameter) getTarget()).getParameter().getName();
+			dedge.setTargetParameter(paramname);
+		}
 	}
 }
