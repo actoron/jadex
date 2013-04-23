@@ -108,44 +108,15 @@ public class RuntimeManagerPlan extends Plan {
 		checkSetupProcess(simConf, space);
 
 		// Determine terminate condition
-		// Time determines termination
-		if (simConf.getRunConfiguration().getRows().getTerminateCondition().getTime() != null) {
-
-			Time time = simConf.getRunConfiguration().getRows().getTerminateCondition().getTime();
-			if (time.getType().equals(Constants.TICK_BASED_TIME_EXPRESSION)) {
-				long startTick = (Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION);
-				// Tick based termination condition
-				// System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
-				while (time.getValue() > ((Long)space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick)) {
-					waitForTick();
-					// System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
-				}
-				 System.out.println("Terminatting experiment at: StartTick: " + startTick + " vs. endTick" + (Long)space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) + "  - diff:  " + ((Long)space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick));
-			} else {
-
-				Long terminationTime = new Long(-1);
-				if (time.getType().equals(Constants.RELATIVE_TIME_EXPRESSION)) {
-					terminationTime = getTerminationTime(0, time.getValue());
-				} else if (time.getType().equals(Constants.ABSOLUTE_TIME_EXPRESSION)) {
-					terminationTime = getTerminationTime(1, time.getValue());
-				} else {
-					System.err.println("#RunTimeManagerPlan# Time type missing " + simConf);
-				}
-				if (terminationTime.longValue() > -1) {
-					waitFor(terminationTime);
-				} else {
-					System.err.println("#RunTimeManagerPlan# Error on setting termination time " + simConf);
-				}
-			}
-			// Application semantic determines termination, e.g.
-			// $homebase.NumberOfOre > 100
-		} else if (simConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction() != null) {
+		// Application semantic determines termination, e.g.
+		// $homebase.NumberOfOre > 100
+		if (simConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction() != null) {
 
 			TargetFunction targetFunct = simConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction();
 
 			// HACK: Need a observer / listener instead evaluating expression every 1000ms
 			while (true) {
-				waitFor(1000);
+				waitForTick();
 
 				// Hack: Works right now only for single objects but not for all
 				// of that type...
@@ -162,6 +133,8 @@ public class RuntimeManagerPlan extends Plan {
 						System.out.println("#RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
 						// Experiment has reached Target Function. Terminate
 						break;
+					} else {
+						System.out.println("#RuntimeManagerPlan# Do not terminate yet!!!");
 					}
 				} else {
 					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());
@@ -183,6 +156,36 @@ public class RuntimeManagerPlan extends Plan {
 				}
 			}
 
+			// Time determines termination
+		} else if (simConf.getRunConfiguration().getRows().getTerminateCondition().getTime() != null) {
+
+			Time time = simConf.getRunConfiguration().getRows().getTerminateCondition().getTime();
+			if (time.getType().equals(Constants.TICK_BASED_TIME_EXPRESSION)) {
+				long startTick = (Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION);
+				// Tick based termination condition
+				// System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
+				while (time.getValue() > ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick)) {
+					waitForTick();
+					// System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
+				}
+				System.out.println("Terminatting experiment at: StartTick: " + startTick + " vs. endTick" + (Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION)
+						+ "  - diff:  " + ((Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick));
+			} else {
+
+				Long terminationTime = new Long(-1);
+				if (time.getType().equals(Constants.RELATIVE_TIME_EXPRESSION)) {
+					terminationTime = getTerminationTime(0, time.getValue());
+				} else if (time.getType().equals(Constants.ABSOLUTE_TIME_EXPRESSION)) {
+					terminationTime = getTerminationTime(1, time.getValue());
+				} else {
+					System.err.println("#RunTimeManagerPlan# Time type missing " + simConf);
+				}
+				if (terminationTime.longValue() > -1) {
+					waitFor(terminationTime);
+				} else {
+					System.err.println("#RunTimeManagerPlan# Error on setting termination time " + simConf);
+				}
+			}
 		} else {
 			System.err.println("#RunTimeManagerPlan# Terminate Condition missing " + simConf);
 		}
@@ -311,7 +314,7 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Start Online Visualization
 		startOnlineVisualization(simConf);
-		
+
 		fut = exta.getExtension(simConf.getNameOfSpace());
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 
@@ -319,7 +322,7 @@ public class RuntimeManagerPlan extends Plan {
 		// System.out.println("-->StartTime at Client: " + startTime);
 		long startTime = clockservice.getTime();
 		long startTickTime = (Long) space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION);
-		
+
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
 		space.setProperty("REAL_START_TICKTIME_OF_SIMULATION", startTickTime);
 
