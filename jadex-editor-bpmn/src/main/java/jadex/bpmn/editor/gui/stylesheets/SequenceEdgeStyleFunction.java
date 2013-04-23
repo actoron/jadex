@@ -26,8 +26,8 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 	 */
 	public void apply(mxCellState state, mxCellState source, mxCellState target, List<mxPoint> points, List<mxPoint> result)
 	{
-		VActivity sourcenode = getVActivity(source.getCell());
-		VActivity targetnode = getVActivity(target.getCell());
+		VActivity sourcenode = source != null? getVActivity(source.getCell()) : null;
+		VActivity targetnode = target != null? getVActivity(target.getCell()) : null;
 		
 		if (sourcenode == null || targetnode == null)
 		{
