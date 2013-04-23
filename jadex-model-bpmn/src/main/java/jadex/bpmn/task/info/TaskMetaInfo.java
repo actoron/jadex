@@ -1,5 +1,8 @@
 package jadex.bpmn.task.info;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jadex.commons.transformation.annotations.IncludeFields;
 
 /**
@@ -16,7 +19,8 @@ public class TaskMetaInfo
 	protected String description;
 	
 	/** The parameter descriptions. */
-	protected ParameterMetaInfo[] parammetainfos;
+//	protected ParameterMetaInfo[] parammetainfos;
+	protected List<ParameterMetaInfo> parameterinfos;
 	
 	//-------- constructors --------
 	
@@ -27,13 +31,35 @@ public class TaskMetaInfo
 	{
 	}
 	
+//	/**
+//	 *  Create a task meta info.
+//	 */
+//	public TaskMetaInfo(TaskMetaInfo orig)
+//	{
+//		this(orig.getDescription(), orig.getParameterMetaInfos());
+//	}
+	
 	/**
 	 *  Create a task meta info.
 	 */
-	public TaskMetaInfo(String description, ParameterMetaInfo[] parammetainfos)
+//	public TaskMetaInfo(String description, ParameterMetaInfo[] parammetainfos)
+	public TaskMetaInfo(String description, List<ParameterMetaInfo> parameterinfos)
 	{
 		this.description = description;
-		this.parammetainfos = parammetainfos;
+		this.parameterinfos = parameterinfos;
+	}
+	
+	/**
+	 *  Create a task meta info.
+	 */
+	public TaskMetaInfo(String description, ParameterMetaInfo[] parameterinfos)
+	{
+		this.description = description;
+		this.parameterinfos = new ArrayList<ParameterMetaInfo>();
+		for(ParameterMetaInfo pmi: parameterinfos)
+		{
+			this.parameterinfos.add(pmi);
+		}
 	}
 	
 	//-------- methods --------
@@ -58,21 +84,39 @@ public class TaskMetaInfo
 	}
 
 	/**
-	 *  Get the parameters.
-	 *  @return The parameters.
+	 *  Get the parameterinfos.
+	 *  @return The parameterinfos.
 	 */
-	public ParameterMetaInfo[] getParameterMetaInfos()
+	public List<ParameterMetaInfo> getParameterInfos()
 	{
-		return this.parammetainfos;
+		return parameterinfos;
 	}
 
 	/**
-	 *  Set the parameters.
-	 *
-	 *  @param parammetainfos The parameters.
+	 *  Set the parameterinfos.
+	 *  @param parameterinfos The parameterinfos to set.
 	 */
-	public void setParameterMetaInfos(ParameterMetaInfo[] parammetainfos)
+	public void setParameterInfos(List<ParameterMetaInfo> parameterinfos)
 	{
-		this.parammetainfos = parammetainfos;
+		this.parameterinfos = parameterinfos;
 	}
+
+//	/**
+//	 *  Get the parameters.
+//	 *  @return The parameters.
+//	 */
+//	public ParameterMetaInfo[] getParameterMetaInfos()
+//	{
+//		return this.parammetainfos;
+//	}
+//
+//	/**
+//	 *  Set the parameters.
+//	 *
+//	 *  @param parammetainfos The parameters.
+//	 */
+//	public void setParameterMetaInfos(ParameterMetaInfo[] parammetainfos)
+//	{
+//		this.parammetainfos = parammetainfos;
+//	}
 }

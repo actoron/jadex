@@ -4,6 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -286,6 +287,6 @@ public class UserInteractionTask implements ITask
 			"via an interactive user interface dialog. The task automatically uses all declared" +
 			"in parameters.";
 		
-		return new TaskMetaInfo(desc, null); 
+		return new TaskMetaInfo(desc, (ParameterMetaInfo[])null); 
 	}
 }

@@ -46,20 +46,17 @@
     </semantic:endEvent>
     <semantic:sequenceFlow sourceRef="EKuSv0suF++YVmMD" targetRef="2fQU660/vHV3AksA" id="ttTOjueYeXuMaLGQ">
       <semantic:extensionElements>
-        <jadex:parametermapping name="a">$args.a</jadex:parametermapping>
         <jadex:parametermapping name="b">$args.b</jadex:parametermapping>
+        <jadex:parametermapping name="a">$args.a</jadex:parametermapping>
       </semantic:extensionElements>
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="2fQU660/vHV3AksA" targetRef="LHEmvR3ToYirPJk2" id="buL7iCrSo1gcunPg">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="LHEmvR3ToYirPJk2" targetRef="ys2KHcoP3v0jlpo0" id="Fh0pUC/2RXEUtMeH">
     </semantic:sequenceFlow>
-    
     <semantic:extensionElements>
-    	<jadex:dataFlow id="ttTOjueYeXuaabb" sourceRef="2fQU660/vHV3AksA" sourceParam="c" targetRef="LHEmvR3ToYirPJk2" targetParam="a">
-    	</jadex:dataFlow>
+      <jadex:dataFlow id="ttTOjueYeXuaabb" sourceRef="2fQU660/vHV3AksA" sourceParam="c" targetRef="LHEmvR3ToYirPJk2" targetParam="a"/>
     </semantic:extensionElements>
-    
   </semantic:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>

@@ -10,6 +10,7 @@ import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.STaskMetaInfoExtractor;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -20,11 +21,13 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -229,17 +232,17 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				text.append("</p>\n");
 			}
 			
-			ParameterMetaInfo[] pmis = info.getParameterMetaInfos();
-			if(pmis != null && pmis.length > 0)
+			List <ParameterMetaInfo> pmis = info.getParameterInfos();
+			if(pmis!=null && !pmis.isEmpty())
 			{
 				text.append("Parameters:");
 				text.append("<ul>\n");
-				for (int i = 0; i < pmis.length; ++i)
+				for (int i = 0; i < pmis.size(); ++i)
 				{
 					text.append("<li><b>");
-					text.append(pmis[i].getName());
+					text.append(pmis.get(i).getName());
 					text.append("</b> - ");
-					text.append(pmis[i].getDescription()==null || pmis[i].getDescription().length()==0? "n/a": pmis[i].getDescription());
+					text.append(pmis.get(i).getDescription()==null || pmis.get(i).getDescription().length()==0? "n/a": pmis.get(i).getDescription());
 					text.append("</li>\n");
 				}
 				text.append("</ul>\n");
@@ -270,15 +273,15 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		if(info != null)
 		{
-			ParameterMetaInfo[] pmis = info.getParameterMetaInfos();
-			if(pmis != null && pmis.length > 0)
+			List<ParameterMetaInfo> pmis = info.getParameterInfos();
+			if(pmis != null && pmis.size() > 0)
 			{
 				Set<String> validparams = new HashSet<String>();
 				MActivity mact = (MActivity) task.getBpmnElement();
-				for(int i = 0; i < pmis.length; ++i)
+				for(int i = 0; i < pmis.size(); ++i)
 				{
-					validparams.add(pmis[i].getName());
-					if(mact.hasParameter(pmis[i].getName()))
+					validparams.add(pmis.get(i).getName());
+					if(mact.hasParameter(pmis.get(i).getName()))
 					{
 						int ind = -1;
 //						for(int j = 0; j < mact.getParameters().size(); ++j)
@@ -286,7 +289,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 						for(int j = 0; it.hasNext(); ++j)
 						{
 							String key = it.next();
-							if(pmis[i].getName().equals(key))
+							if(pmis.get(i).getName().equals(key))
 							{
 								ind = j;
 								break;
@@ -294,17 +297,17 @@ public class TaskPropertyPanel extends BasePropertyPanel
 						}
 						MParameter param = (MParameter) mact.getParameters().get(ind);
 						atable.removeParameters(new int[]{ind});
-						param.setClazz(new ClassInfo(pmis[i].getClazz().getTypeName()));
-						param.setDirection(pmis[i].getDirection());
+						param.setClazz(new ClassInfo(pmis.get(i).getClazz().getTypeName()));
+						param.setDirection(pmis.get(i).getDirection());
 						atable.addParameter(param);
 					}
 					else
 					{
-						String name = pmis[i].getName();
-						ClassInfo clazz = new ClassInfo(pmis[i].getClazz().getTypeName());
-						String value = pmis[i].getInitialValue() != null? pmis[i].getInitialValue() : "";
+						String name = pmis.get(i).getName();
+						ClassInfo clazz = new ClassInfo(pmis.get(i).getClazz().getTypeName());
+						String value = pmis.get(i).getInitialValue() != null? pmis.get(i).getInitialValue() : "";
 						UnparsedExpression inival = new UnparsedExpression(name, clazz.getTypeName(), value, null);
-						MParameter param = new MParameter(pmis[i].getDirection(), clazz, name, inival);
+						MParameter param = new MParameter(pmis.get(i).getDirection(), clazz, name, inival);
 						atable.addParameter(param);
 					}
 				}
@@ -339,27 +342,50 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	protected TaskMetaInfo getTaskMetaInfo(String taskname)
 	{
 		TaskMetaInfo ret = null;
-		if(modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
+		
+		try
 		{
-			ret = modelcontainer.getProjectTaskMetaInfos().get(taskname);
-		}
-		if(ret == null)
-		{
-			ret = BpmnEditor.TASK_INFOS.get(taskname);
-		}
-		// try to extract
-		if(ret==null)
-		{
-			try
+			Class<?> clazz = SReflect.classForName(taskname, null);
+
+			if(modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
 			{
-				Class<?> clazz = SReflect.classForName(taskname, null);
-				ret = STaskMetaInfoExtractor.getMetaInfo(clazz);
-				modelcontainer.getProjectTaskMetaInfos().put(taskname, ret);
+				ret = modelcontainer.getProjectTaskMetaInfos().get(taskname);
 			}
-			catch(Exception e)
+			if(ret == null)
 			{
+				ret = BpmnEditor.TASK_INFOS.get(taskname);
 			}
+			// try to extract
+			if(ret==null)
+			{
+				try
+				{
+					ret = STaskMetaInfoExtractor.getMetaInfo(clazz);
+					modelcontainer.getProjectTaskMetaInfos().put(taskname, ret);
+				}
+				catch(Exception e)
+				{
+				}
+			}
+
+			TaskMetaInfo copy = new TaskMetaInfo();
+			Method m = clazz.getMethod("getExtraParameters", new Class[]{Map.class, IModelInfo.class, ClassLoader.class});
+			// todo: use classloader of tool!
+			List<ParameterMetaInfo> pis = new ArrayList<ParameterMetaInfo>();
+			if(ret.getParameterInfos()!=null && !ret.getParameterInfos().isEmpty())
+			{
+				pis.addAll(ret.getParameterInfos());
+			}
+			List<ParameterMetaInfo> params = (List<ParameterMetaInfo>)m.invoke(null, new Object[]{getBpmnTask().getParameters().getAsMap(), modelcontainer.getBpmnModel().getModelInfo(), modelcontainer.getBpmnModel().getClassLoader()});
+			pis.addAll(params);
+			ret = new TaskMetaInfo(ret!=null? ret.getDescription(): null, pis);
 		}
+		catch(Exception e)
+		{
+			// ignore
+		}
+		
+		
 		return ret;
 	}
 }

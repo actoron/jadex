@@ -22,6 +22,7 @@ import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IObjectStringConverter;
 import jadex.commons.transformation.IStringObjectConverter;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -825,6 +826,33 @@ public class ProcessThread	implements ITaskContext
 					
 					if(value!=null)
 					{
+						if(de.getParameterMapping()!=null)
+						{
+							SimpleValueFetcher sf = new SimpleValueFetcher(instance.getFetcher());
+							sf.setValue("$value", value);
+							sf.setValue(pname, value);
+							IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, sf);
+							IParsedExpression exp = (IParsedExpression)de.getParameterMapping().getFirstEntity().getParsed();
+//							UnparsedExpression uiexp =  de.getParameterMapping().getSecondEntity();
+//							IParsedExpression iexp = uiexp!=null? (IParsedExpression)uiexp.getParsed(): null;
+							try
+							{
+								value	= exp.getValue(fetcher);
+							}
+							catch(RuntimeException e)
+							{
+								throw new RuntimeException("Error parsing parameter value: "+instance+", "+this+", "+pname+", "+exp, e);
+							}
+//							try
+//							{
+//								index	= iexp!=null ? iexp.getValue(fetcher) : null;
+//							}
+//							catch(RuntimeException e)
+//							{
+//								throw new RuntimeException("Error parsing parameter index: "+instance+", "+this+", "+name+", "+iexp, e);
+//							}
+						}
+						
 						// Test if parameter value type fits
 						MParameter mparam = de.getTarget().getParameters().get(de.getTargetParameter());
 						Class<?> mpclz = mparam.getClazz().getType(instance.getClassLoader());

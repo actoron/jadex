@@ -50,6 +50,18 @@ public class IndexMap<K, V>	implements Serializable, Cloneable
 	{
 		this(new ArrayList<K>(), new HashMap<K, V>());
 	}
+	
+	/**
+	 *	Create a new index map. 
+	 */
+	public IndexMap(IndexMap<K, V> imap)
+	{
+		this();
+		for(K key: imap.keySet())
+		{
+			put(key, imap.get(key));
+		}
+	}
 
 	/**
 	 *	Create a new index map using the specified collections as backup.

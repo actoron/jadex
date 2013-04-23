@@ -1,9 +1,12 @@
 package jadex.bpmn.model;
 
+import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -493,6 +496,36 @@ public class MActivity extends MAssociationTarget
 	public IndexMap<String, MParameter>	getParameters()
 	{
 		return parameters;
+	}
+	
+	/**
+	 *  Get the parameters.
+	 *  @return The parameters.
+	 */
+	public IndexMap<String, MParameter>	getAllParameters(Map<String, Object> params, IModelInfo model, ClassLoader cl)
+	{
+		IndexMap<String, MParameter> ret = new IndexMap<String, MParameter>(parameters);
+		
+		if(clazz!=null)
+		{
+			Class<?> task = clazz.getType(cl);
+			try
+			{
+				Method m = task.getMethod("getExtraParameters", new Class[]{Map.class});
+				ParameterMetaInfo[] ps = (ParameterMetaInfo[])m.invoke(null, new Object[]{params});
+				for(ParameterMetaInfo pmi: ps)
+				{
+					MParameter mp = new MParameter(pmi.getDirection(), pmi.getClazz(), pmi.getName(), null); // has no initial value
+					ret.put(mp.getName(), mp);
+				}
+			}
+			catch(Exception e)
+			{
+				// ignore
+			}
+		}
+		
+		return ret;
 	}
 		
 	/**
