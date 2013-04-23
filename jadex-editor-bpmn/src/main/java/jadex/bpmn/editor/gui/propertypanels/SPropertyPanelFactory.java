@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui.propertypanels;
 
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
@@ -44,6 +45,10 @@ public class SPropertyPanelFactory
 			else if (velement instanceof VSequenceEdge)
 			{
 				ret = new SequenceEdgePropertyPanel(container, (VSequenceEdge) velement);
+			}
+			else if (velement instanceof VDataEdge)
+			{
+				ret = new DataEdgePropertyPanel(container, (VDataEdge) velement);
 			}
 		}
 		else if (selection == null)
