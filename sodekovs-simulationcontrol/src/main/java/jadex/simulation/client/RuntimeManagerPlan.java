@@ -120,7 +120,7 @@ public class RuntimeManagerPlan extends Plan {
 					waitForTick();
 					// System.out.println(startTick + " vs. " + (clockservice.getTick()-startTick));
 				}
-				// System.out.println("StartTick: " + startTick + " vs. endTick" + (clockservice.getTick()-startTick));
+				 System.out.println("Terminatting experiment at: StartTick: " + startTick + " vs. endTick" + (Long)space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) + "  - diff:  " + ((Long)space.getProperty(GlobalConstants.TICK_COUNTER_4_EVENT_BASED_SIMULATION) - startTick));
 			} else {
 
 				Long terminationTime = new Long(-1);

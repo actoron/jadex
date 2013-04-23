@@ -5,6 +5,8 @@ import jadex.simulation.evaluation.bikesharing.xml.EvaluatedBikeStationShortList
 import jadex.simulation.helper.Constants;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -41,6 +43,9 @@ public class BikeSharingEvaluation {
 	public void compare() {
 
 		realData = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(realDataXMLFile, SimulationDescription.class);
+		
+		//sort the time slices in the real data: real evaluation data have to be sorted ascendingly!!!
+		sortData();
 
 		// 1.Compute tick size, e.g. the "length" of the observed simulation
 		int tickSize = computeTickSize();
@@ -482,4 +487,22 @@ public class BikeSharingEvaluation {
 		}
 		return res;
 	}
+	
+	/**
+	 * sort the time slices in the real data: real evaluation data have to be sorted ascendingly!!!
+	 */
+	private void sortData(){	
+		Collections.sort(realData.getTimeSlices().getTimeSlice(), new Comparator() {
+			public int compare(Object arg0, Object arg1) {
+				return Long.valueOf(((TimeSlice) arg0).getStartTime()).compareTo(Long.valueOf(((TimeSlice) arg1).getStartTime()));
+			}
+		});
+		
+//		StringBuffer buf = new StringBuffer();
+//		for(TimeSlice ts : realData.getTimeSlices().getTimeSlice()){
+//			buf.append(ts.getStartTime() + " - ");
+//		}
+//		
+//		System.out.println("ORDERED TS? : " + buf.toString());
+	}	
 }
