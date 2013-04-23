@@ -140,7 +140,7 @@
 		</General>
 		<Rows experiments="3">
 			<TerminateCondition>
-				    <!-- <Time value="30000" type="relative" />-->
+				    <Time value="30000" type="relative" />
 				  				
 			 		<TargetFunction function="$object.getProperty(&quot;ore&quot;) >=
 					55">	<ObjectSource type="ISpaceObject" name="homebase" /> </TargetFunction> 

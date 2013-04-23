@@ -19,11 +19,21 @@
 	</componenttypes>
 	
 	<configurations>
-		<configuration name="Mars World">
+		<configuration name="Mars World - ORG.">
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
 						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/marsworld/MarsWorldWithCoordSpace.xml"</argument>			
+					</arguments>
+				</component>
+				<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</configuration>
+		<configuration name="Mars World - Energy">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/marsworld/MarsWorldWithCoordSpaceAndEnergy.xml"</argument>			
 					</arguments>
 				</component>
 				<component type="RemoteSimulationClient" master="false"/>
