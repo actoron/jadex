@@ -5,7 +5,10 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
+import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;
@@ -182,5 +185,51 @@ public class ServiceCallTask implements ITask
 	{
 		// Todo: how to compensate service call!?
 		return IFuture.DONE;
+	}
+	
+	/**
+	 * 
+	 */
+	public static List<ParameterMetaInfo> getExtraParameters(Map<String, MParameter> params, IModelInfo mi, ClassLoader cl)
+	{
+		List<ParameterMetaInfo> ret = new ArrayList<ParameterMetaInfo>();
+		
+		try
+		{
+			MParameter msparam = params.get(PARAMETER_SERVICE);
+			String reqname = (String)msparam.getInitialValue().getParsed();
+			RequiredServiceInfo reqser = mi.getRequiredService(reqname);
+			Class<?> type = reqser.getType().getType(cl);
+			
+			MParameter mmparam = params.get(PARAMETER_METHOD);
+			String methodname = (String)mmparam.getInitialValue().getParsed();
+			
+			Method[] ms = type.getMethods();
+			// todo check parameter types?
+			for(Method m: ms)
+			{
+				if(m.getName().equals(methodname))
+				{
+					Class<?>[] ptypes = m.getParameterTypes();
+					Class<?> pret = m.getReturnType();
+					
+					for(int j=0; j<ptypes.length; j++)
+					{
+						ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], "param"+j, null, null));
+					}
+					if(!pret.equals(Void.class) && !pret.equals(void.class))
+					{
+						ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, pret, "return", null, null));
+					}
+				}
+			}
+			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	
+		return ret;
 	}
 }
