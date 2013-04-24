@@ -33,7 +33,10 @@ public class GuiConstants
 	public static final int[] ICON_SIZES = new int[] { 16, 24, 32, 48, 64, 96, 128 };
 	
 	/** The default zoom. */
-	public static final double DEFAULT_ZOOM = 0.8;
+	public static final double DEFAULT_ZOOM = 0.75;
+	
+	/** The standard zoom levels. */
+	public static final String[] STANDARD_ZOOM_LEVELS = { "20%", "50%", "75%", "100%", "125%", "150%", "200%", "400%" };
 	
 	/** Factor by which the mouse shifts the view during zoom. */
 	public static final double ZOOM_MOUSE_DIRECTION_FACTOR = 2.5;

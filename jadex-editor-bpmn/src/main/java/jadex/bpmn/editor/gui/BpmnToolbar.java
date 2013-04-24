@@ -132,6 +132,7 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		
 		Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "Icon generation time: " + String.valueOf(System.currentTimeMillis() - ts));
 		//System.out.println("Icon generation time: " + (System.currentTimeMillis() - ts));
+		//toolbars.get(toolbars.size() - 1).
 	}
 	
 	/**

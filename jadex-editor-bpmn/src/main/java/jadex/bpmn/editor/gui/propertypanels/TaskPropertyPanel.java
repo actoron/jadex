@@ -386,7 +386,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 			// ignore
 		}
 		

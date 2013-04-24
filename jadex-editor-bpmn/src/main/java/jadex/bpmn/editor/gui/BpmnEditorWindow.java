@@ -17,6 +17,7 @@ import jadex.commons.gui.JSplitPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -77,6 +79,7 @@ public class BpmnEditorWindow extends JFrame
 		getContentPane().add(statuspane, BorderLayout.CENTER);
 		
 		bpmntoolbar = new BpmnToolbar(settings.getToolbarIconSize());
+		//bpmntoolbar.getInfoPanel().setLayout(new BoxLayout(bpmntoolbar.getInfoPanel(), BoxLayout.LINE_AXIS));
 		getContentPane().add(bpmntoolbar, BorderLayout.PAGE_START);
 		
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -103,6 +106,9 @@ public class BpmnEditorWindow extends JFrame
 //			}
 //		};
 		statuspane.setTopComponent(tabpane);
+		
+		bpmntoolbar.getInfoPanel().setLayout(new FlowLayout(FlowLayout.LEFT));
+		bpmntoolbar.getInfoPanel().add(new ZoomBox(this));
 		
 		addWindowListener(new WindowAdapter()
 		{
@@ -157,6 +163,8 @@ public class BpmnEditorWindow extends JFrame
 						{
 							initializeNewModel(newModelTab(null));
 						}
+						
+						getSelectedModelContainer().getGraphComponent().requestFocusInWindow();
 					}
 				});
 				removeWindowListener(this);

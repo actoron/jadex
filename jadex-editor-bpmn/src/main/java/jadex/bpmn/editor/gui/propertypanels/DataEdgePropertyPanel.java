@@ -1,34 +1,14 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
-import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MDataEdge;
-import jadex.bpmn.model.MSequenceEdge;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.Tuple2;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
-import javax.swing.table.AbstractTableModel;
 
 public class DataEdgePropertyPanel extends BasePropertyPanel
 {

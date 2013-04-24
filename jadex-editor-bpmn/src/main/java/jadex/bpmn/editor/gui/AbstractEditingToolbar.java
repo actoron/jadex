@@ -1,6 +1,9 @@
 package jadex.bpmn.editor.gui;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -24,8 +27,8 @@ import javax.swing.border.EmptyBorder;
  */
 public abstract class AbstractEditingToolbar extends JPanel
 {
-	/** The model container. */
-	//protected ModelContainer modelcontainer;
+	/** The info panel. */
+	protected JPanel infopanel;
 	
 	/** The tool button group. */
 	protected ButtonGroup toolgroup;
@@ -45,6 +48,13 @@ public abstract class AbstractEditingToolbar extends JPanel
 		//modelcontainer.setEditingToolbar(this);
 		toolgroup = new ButtonGroup();
 		this.toolbars = new ArrayList<JToolBar>();
+		
+		//toppanel = new JPanel(new GridBagLayout());
+		
+		infopanel = new JPanel();
+		infopanel.setMinimumSize(new Dimension(0, 0));
+		infopanel.setBorder(new EmptyBorder(0, 0, 0, 0));
+		add(infopanel);
 	}
 	
 	/**
@@ -65,9 +75,21 @@ public abstract class AbstractEditingToolbar extends JPanel
 	 */
 	public void removeAll()
 	{
+		//toppanel.removeAll();
 		super.removeAll();
+		add(infopanel);
 		this.toolbars = new ArrayList<JToolBar>();
 		this.toolgroup = new ButtonGroup();
+	}
+	
+	/**
+	 *  Gets the info panel.
+	 *  
+	 *  @return
+	 */
+	public JPanel getInfoPanel()
+	{
+		return infopanel;
 	}
 	
 	/**
@@ -163,8 +185,31 @@ public abstract class AbstractEditingToolbar extends JPanel
 			newbar.setFloatable(false);
 			newbar.setAlignmentX(Component.LEFT_ALIGNMENT);
 			newbar.setMargin(new Insets(2, 2, 2, 2));
-			add(new JScrollPane(newbar));
 			toolbars.add(newbar);
+			
+			JScrollPane sp = new JScrollPane(newbar);
+			sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+			sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			sp.setMinimumSize(newbar.getPreferredSize());
+			
+			add(sp);
+			
+//			if (row == 0)
+//			{
+//				GridBagConstraints c = new GridBagConstraints();
+//				c.weightx = 1.0;
+//				c.weighty = 1.0;
+//				c.fill = GridBagConstraints.BOTH;
+//				toppanel.add(sp, c);
+//				c = new GridBagConstraints();
+//				c.gridx = 1;
+//				toppanel.add(infopanel, c);
+//				add(toppanel);
+//			}
+//			else
+//			{
+//				add(sp);
+//			}
 		}
 		
 		return toolbars.get(row);

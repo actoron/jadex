@@ -235,7 +235,7 @@ public class MouseController extends MouseAdapter
 					double scale = view.getScale();
 					double oldscale = scale;
 					
-					mxPoint center = new mxPoint(0.5, 0.5);
+					mxPoint center = null;
 					Point mp = modelcontainer.getGraphComponent().getMousePosition();
 					if (mp != null)
 					{
@@ -260,36 +260,7 @@ public class MouseController extends MouseAdapter
 						scale = (targetscale - zoomdist) + (zoomdist * (Math.log(zoomstep++) / Math.log(steps)));
 					}
 					
-					double rat = scale / oldscale;
-					JScrollBar vbar = gc.getVerticalScrollBar();
-					JScrollBar hbar = gc.getHorizontalScrollBar();
-					
-					Dimension grapharea = new Dimension(gc.getGraphControl().getMinimumSize());
-					//System.out.println("In: " + grapharea + " " + rat);
-					
-					grapharea.width = (int) Math.round(grapharea.width * rat);
-					grapharea.height = (int) Math.round(grapharea.height * rat);
-					
-					//System.out.println("Out: " + grapharea + " " + rat);
-					//view.setEventsEnabled(false);
-					//view.scaleAndTranslate(scale, 0, 0);
-					view.setScale(scale);
-					//gc.refresh();
-					//System.out.println(gc.getBounds());
-					
-					//gc.setMinimumSize(grapharea);
-					//gc.setPreferredSize(grapharea);
-					((BpmnGraphControl) gc.getGraphControl()).doSetPreferredSize(grapharea);
-					((BpmnGraphControl) gc.getGraphControl()).doSetMinimumSize(grapharea);
-					gc.getGraphControl().revalidate();
-					
-					int px = (int) Math.round(hbar.getModel().getValue() * rat + hbar.getModel().getExtent() * (rat - 1.0) * center.getX());
-					int py = (int) Math.round(vbar.getModel().getValue() * rat + vbar.getModel().getExtent() * (rat - 1.0) * center.getY());
-					
-					hbar.getModel().setValue(Math.max(0, px));
-					vbar.getModel().setValue(Math.max(0, py));
-					
-					
+					setScale(modelcontainer, oldscale, scale, center);
 					
 					//gc.extendComponent(grapharea);
 					
@@ -300,5 +271,46 @@ public class MouseController extends MouseAdapter
 		}
 	}
 	
-	
+	/**
+	 *  Sets the scale around a center.
+	 *  
+	 *  @param modelcontainer Model container.
+	 *  @param oldscale The old scale.
+	 *  @param scale The new scale.
+	 *  @param center The center point.
+	 */
+	public static final void setScale(ModelContainer modelcontainer, double oldscale, double scale, mxPoint center)
+	{
+		center = center != null? center: new mxPoint(0.5, 0.5);
+		
+		mxGraphComponent gc = modelcontainer.getGraphComponent();
+		double rat = scale / oldscale;
+		JScrollBar vbar = gc.getVerticalScrollBar();
+		JScrollBar hbar = gc.getHorizontalScrollBar();
+		
+		Dimension grapharea = new Dimension(gc.getGraphControl().getMinimumSize());
+		//System.out.println("In: " + grapharea + " " + rat);
+		
+		grapharea.width = (int) Math.round(grapharea.width * rat);
+		grapharea.height = (int) Math.round(grapharea.height * rat);
+		
+		//System.out.println("Out: " + grapharea + " " + rat);
+		//view.setEventsEnabled(false);
+		//view.scaleAndTranslate(scale, 0, 0);
+		modelcontainer.getGraph().getView().setScale(scale);
+		//gc.refresh();
+		//System.out.println(gc.getBounds());
+		
+		//gc.setMinimumSize(grapharea);
+		//gc.setPreferredSize(grapharea);
+		((BpmnGraphControl) gc.getGraphControl()).doSetPreferredSize(grapharea);
+		((BpmnGraphControl) gc.getGraphControl()).doSetMinimumSize(grapharea);
+		gc.getGraphControl().revalidate();
+		
+		int px = (int) Math.round(hbar.getModel().getValue() * rat + hbar.getModel().getExtent() * (rat - 1.0) * center.getX());
+		int py = (int) Math.round(vbar.getModel().getValue() * rat + vbar.getModel().getExtent() * (rat - 1.0) * center.getY());
+		
+		hbar.getModel().setValue(Math.max(0, px));
+		vbar.getModel().setValue(Math.max(0, py));
+	}
 }
