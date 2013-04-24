@@ -26,6 +26,11 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -132,6 +137,14 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		label = new JLabel("Package");
 		JTextField textfield = new JTextField();
 		textfield.setText(getModelInfo().getPackage() != null? getModelInfo().getPackage() : "");
+		textfield.getDocument().addDocumentListener(new DocumentAdapter()
+		{
+			public void update(DocumentEvent e)
+			{
+				getModelInfo().setPackage(getText(e.getDocument()));
+				modelcontainer.setDirty(true);
+			}
+		});
 		configureAndAddInputLine(column, label, textfield, y++);
 		//textarea = new JTextArea();
 		//textarea.setText(getModelInfo().getPackage() != null? getModelInfo().getPackage() : "");
