@@ -73,6 +73,7 @@ public class BpmnEditorWindow extends JFrame
 		final JSplitPanel statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
 		statuspane.setOneTouchExpandable(true);
 		statuspane.setBottomComponent(new StatusArea());
+		BpmnEditor.initialize();
 		getContentPane().add(statuspane, BorderLayout.CENTER);
 		
 		bpmntoolbar = new BpmnToolbar(settings.getToolbarIconSize());
@@ -259,6 +260,7 @@ public class BpmnEditorWindow extends JFrame
 			
 			modelcontainer.setGraph(new BpmnGraph(modelcontainer, sheet));
 		}
+		modelcontainer.getGraph().getView().setScale(GuiConstants.DEFAULT_ZOOM);
 		
 		if (modelcontainer.getBpmnModel() == null)
 		{
@@ -410,7 +412,7 @@ public class BpmnEditorWindow extends JFrame
 		
 		if (createpool)
 		{
-			SCreationController.createPool(modelcontainer, new Point());
+			SCreationController.createPool(modelcontainer, new Point(50, 50));
 		}
 		
 		return modelcontainer;

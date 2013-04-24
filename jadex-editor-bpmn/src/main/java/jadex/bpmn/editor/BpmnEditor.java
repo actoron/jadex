@@ -2,7 +2,6 @@ package jadex.bpmn.editor;
 
 import jadex.bpmn.editor.gui.BpmnEditorWindow;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
-import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColorGradient;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetComplexGrayscale;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetSimpleGrayscale;
 import jadex.bpmn.task.info.TaskMetaInfo;
@@ -77,45 +76,6 @@ public class BpmnEditor
 	
 	/** Task informations. */
 	public static Map<String, TaskMetaInfo> TASK_INFOS;
-	static
-	{
-		InputStream is = SUtil.getResource0("/jadex/bpmn/editor/task_infos.bin", BpmnEditor.class.getClassLoader());
-		if (is != null)
-		{
-			try
-			{
-				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-				int r;
-				do
-				{
-					r = is.read();
-					if (r != -1)
-					{
-						bytes.write(r);
-					}
-				}
-				while (r != -1);
-				
-				TASK_INFOS = (Map<String, TaskMetaInfo>) BinarySerializer.objectFromByteArray(bytes.toByteArray(), null, null, BpmnEditor.class.getClassLoader(), null);
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-		
-		if (TASK_INFOS == null)
-		{
-			System.out.println("Could not load task information, using fallback...");
-			TASK_INFOS = new HashMap<String, TaskMetaInfo>();
-			for (int i = 0; i < FALLBACK_TASK_NAMES.length; ++i)
-			{
-				TASK_INFOS.put(FALLBACK_TASK_NAMES[i], null);
-			}
-		}
-		
-		TASK_INFOS.put("", null);
-	}
 	
 	/**
 	 *  Starts the BPMN editor.
@@ -166,5 +126,48 @@ public class BpmnEditor
 				new BpmnEditorWindow();
 			}
 		});
+	}
+	
+	/**
+	 *  Initializes static information, after logging has been set up.
+	 */
+	public static final void initialize()
+	{
+		InputStream is = SUtil.getResource0("/jadex/bpmn/editor/task_infos.bin", BpmnEditor.class.getClassLoader());
+		if (is != null)
+		{
+			try
+			{
+				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+				int r;
+				do
+				{
+					r = is.read();
+					if (r != -1)
+					{
+						bytes.write(r);
+					}
+				}
+				while (r != -1);
+				
+				TASK_INFOS = (Map<String, TaskMetaInfo>) BinarySerializer.objectFromByteArray(bytes.toByteArray(), null, null, BpmnEditor.class.getClassLoader(), null);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		if (TASK_INFOS == null)
+		{
+			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Could not load task information, using fallback...");
+			TASK_INFOS = new HashMap<String, TaskMetaInfo>();
+			for (int i = 0; i < FALLBACK_TASK_NAMES.length; ++i)
+			{
+				TASK_INFOS.put(FALLBACK_TASK_NAMES[i], null);
+			}
+		}
+		
+		TASK_INFOS.put("", null);
 	}
 }

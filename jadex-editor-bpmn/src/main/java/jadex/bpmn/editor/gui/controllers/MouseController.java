@@ -138,7 +138,7 @@ public class MouseController extends MouseAdapter
 		}
 		else if (MouseEvent.BUTTON2 == e.getButton())
 		{
-			setTargetScale(1.0);
+			setTargetScale(GuiConstants.DEFAULT_ZOOM);
 		}
 		else if (MouseEvent.BUTTON3 == e.getButton() && e.getClickCount() == 2)
 		{

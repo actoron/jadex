@@ -174,7 +174,12 @@ public class ActivityParameterTable extends JTable
 					break;
 				case 1:
 				default:
-					param.setName(BasePropertyPanel.createFreeName((String) value, new BasePropertyPanel.IndexMapContains(getBpmnActivity().getParameters())));
+					if (!value.equals(getValueAt(rowIndex, columnIndex)))
+					{
+						getBpmnActivity().getParameters().remove(rowIndex);
+						param.setName(BasePropertyPanel.createFreeName((String) value, new BasePropertyPanel.IndexMapContains(getBpmnActivity().getParameters())));
+						getBpmnActivity().getParameters().add(rowIndex, param.getName(), param);
+					}
 					break;
 				case 2:
 					param.setClazz(new ClassInfo((String) value));

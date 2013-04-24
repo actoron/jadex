@@ -28,19 +28,26 @@ public class VDataEdge extends VEdge
 	public void setSource(mxICell source)
 	{
 		MDataEdge dedge = (MDataEdge) getBpmnElement();
-		if (getSource() != null)
+		if (dedge != null)
 		{
-			VActivity vsrc = (VActivity) getSource().getParent();
-			((MActivity) vsrc.getBpmnElement()).removeOutgoingDataEdge(dedge);
+			if (getSource() != null)
+			{
+				VActivity vsrc = (VActivity) getSource().getParent();
+				((MActivity) vsrc.getBpmnElement()).removeOutgoingDataEdge(dedge);
+			}
+			super.setSource(source);
+			if (source != null)
+			{
+				VActivity vsrc = (VActivity) getSource().getParent();
+				((MActivity) vsrc.getBpmnElement()).addIncomingDataEdge(dedge);
+				dedge.setSource((MActivity) vsrc.getBpmnElement());
+				String paramname = ((VOutParameter) getSource()).getParameter().getName();
+				dedge.setSourceParameter(paramname);
+			}
 		}
-		super.setSource(source);
-		if (source != null)
+		else
 		{
-			VActivity vsrc = (VActivity) getSource().getParent();
-			((MActivity) vsrc.getBpmnElement()).addIncomingDataEdge(dedge);
-			dedge.setSource((MActivity) vsrc.getBpmnElement());
-			String paramname = ((VOutParameter) getSource()).getParameter().getName();
-			dedge.setSourceParameter(paramname);
+			super.setSource(source);
 		}
 	}
 	
@@ -50,19 +57,26 @@ public class VDataEdge extends VEdge
 	public void setTarget(mxICell target)
 	{
 		MDataEdge dedge = (MDataEdge) getBpmnElement();
-		if (getTarget() != null)
+		if (dedge != null)
 		{
-			VActivity vtgt = (VActivity) getTarget().getParent();
-			((MActivity) vtgt.getBpmnElement()).removeIncomingDataEdge(dedge);
+			if (getTarget() != null)
+			{
+				VActivity vtgt = (VActivity) getTarget().getParent();
+				((MActivity) vtgt.getBpmnElement()).removeIncomingDataEdge(dedge);
+			}
+			super.setTarget(target);
+			if (target != null)
+			{
+				VActivity vtgt = (VActivity) getTarget().getParent();
+				((MActivity) vtgt.getBpmnElement()).addIncomingDataEdge(dedge);
+				dedge.setTarget((MActivity) vtgt.getBpmnElement());
+				String paramname = ((VInParameter) getTarget()).getParameter().getName();
+				dedge.setTargetParameter(paramname);
+			}
 		}
-		super.setTarget(target);
-		if (target != null)
+		else
 		{
-			VActivity vtgt = (VActivity) getTarget().getParent();
-			((MActivity) vtgt.getBpmnElement()).addIncomingDataEdge(dedge);
-			dedge.setTarget((MActivity) vtgt.getBpmnElement());
-			String paramname = ((VInParameter) getTarget()).getParameter().getName();
-			dedge.setTargetParameter(paramname);
+			super.setTarget(target);
 		}
 	}
 }

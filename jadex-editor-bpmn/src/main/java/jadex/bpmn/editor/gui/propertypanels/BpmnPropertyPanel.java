@@ -8,12 +8,10 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IFilter;
@@ -21,6 +19,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -40,10 +39,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -110,6 +111,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		
 		JLabel label = new JLabel("Description");
 		JTextArea textarea = new JTextArea();
+		textarea.setWrapStyleWord(true);
+		textarea.setLineWrap(true);
 		textarea.setText(getModelInfo().getDescription() != null? getModelInfo().getDescription() : "");
 		textarea.getDocument().addDocumentListener(new DocumentAdapter()
 		{
@@ -119,20 +122,28 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		});
-		configureAndAddInputLine(column, label, textarea, y++);
+		JScrollPane sp =  new JScrollPane(textarea);
+		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		configureAndAddInputLine(column, label, sp, y++);
+		textarea.setRows(3);
+		sp.setMinimumSize(textarea.getPreferredSize());
 		
 		label = new JLabel("Package");
-		textarea = new JTextArea();
-		textarea.setText(getModelInfo().getPackage() != null? getModelInfo().getPackage() : "");
-		textarea.getDocument().addDocumentListener(new DocumentAdapter()
-		{
-			public void update(DocumentEvent e)
-			{
-				getModelInfo().setPackage(getText(e.getDocument()));
-				modelcontainer.setDirty(true);
-			}
-		});
-		configureAndAddInputLine(column, label, textarea, y++);
+		JTextField textfield = new JTextField();
+		textfield.setText(getModelInfo().getPackage() != null? getModelInfo().getPackage() : "");
+		configureAndAddInputLine(column, label, textfield, y++);
+		//textarea = new JTextArea();
+		//textarea.setText(getModelInfo().getPackage() != null? getModelInfo().getPackage() : "");
+//		textarea.getDocument().addDocumentListener(new DocumentAdapter()
+//		{
+//			public void update(DocumentEvent e)
+//			{
+//				getModelInfo().setPackage(getText(e.getDocument()));
+//				modelcontainer.setDirty(true);
+//			}
+//		});
+//		configureAndAddInputLine(column, label, textarea, y++);
 		
 		addVerticalFiller(column, y);
 		
@@ -997,38 +1008,40 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			switch (columnIndex)
 			{
 				case 0:
-					ConfigurationInfo cinfo = confcache.get(rowIndex);
-					String oldname = cinfo.getName();
-					String poollane = getModel().removePoolLane(oldname);
-					cinfo.setName(createFreeName((String) value, new ConfigurationContains(confcache)));
-					getModelInfo().setConfigurations((ConfigurationInfo[]) confcache.toArray(new ConfigurationInfo[confcache.size()]));
-					getModel().addPoolLane(cinfo.getName(), poollane);
-					
-					for (MContextVariable cv : getModel().getContextVariables())
+					if (!value.equals(getValueAt(rowIndex, columnIndex)))
 					{
-						//UnparsedExpression exp = getModel().getContextVariableExpression(cvname, oldname);
-//						if (exp != null)
-//						{
-							//getModel().setContextVariableExpression(cvname, oldname, null);
-							UnparsedExpression exp = cv.removeValue(oldname);
-							if (exp != null)
-							{
-								cv.setValue(cinfo.getName(), exp);
-							}
-							//getModel().setContextVariableExpression(cvname, cinfo.getName(), exp);
-//						}
-					}
-					
-					for (Object paramobj : paramcche.values())
-					{
-						CachedParameter param = (CachedParameter) paramobj;
-						String val = param.inivals.remove(oldname);
-						if (val != null)
+						ConfigurationInfo cinfo = confcache.get(rowIndex);
+						String oldname = cinfo.getName();
+						String poollane = getModel().removePoolLane(oldname);
+						cinfo.setName(createFreeName((String) value, new ConfigurationContains(confcache)));
+						getModelInfo().setConfigurations((ConfigurationInfo[]) confcache.toArray(new ConfigurationInfo[confcache.size()]));
+						getModel().addPoolLane(cinfo.getName(), poollane);
+						
+						for (MContextVariable cv : getModel().getContextVariables())
 						{
-							param.inivals.put(cinfo.getName(), val);
+							//UnparsedExpression exp = getModel().getContextVariableExpression(cvname, oldname);
+	//						if (exp != null)
+	//						{
+								//getModel().setContextVariableExpression(cvname, oldname, null);
+								UnparsedExpression exp = cv.removeValue(oldname);
+								if (exp != null)
+								{
+									cv.setValue(cinfo.getName(), exp);
+								}
+								//getModel().setContextVariableExpression(cvname, cinfo.getName(), exp);
+	//						}
+						}
+						
+						for (Object paramobj : paramcche.values())
+						{
+							CachedParameter param = (CachedParameter) paramobj;
+							String val = param.inivals.remove(oldname);
+							if (val != null)
+							{
+								param.inivals.put(cinfo.getName(), val);
+							}
 						}
 					}
-					
 					break;
 				case 2:
 					confcache.get(rowIndex).setSuspend((Boolean) value);
@@ -1181,7 +1194,10 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			{
 				case 0:
 				default:
-					param.name = createFreeName((String) value, new BasePropertyPanel.IndexMapContains(paramcche));
+					if (!value.equals(getValueAt(rowIndex, columnIndex)))
+					{
+						param.name = createFreeName((String) value, new BasePropertyPanel.IndexMapContains(paramcche));
+					}
 					break;
 				case 1:
 					param.arg = convBool(value);
@@ -1294,10 +1310,13 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			{
 				case 0:
 				default:
-					getModelInfo().getProperties().remove(prop.getName());
-					prop.setName(createFreeName((String) value, new MapContains(getModelInfo().getProperties())));
-					getModelInfo().getProperties().put(prop.getName(), prop);
-					propertynames.set(rowIndex, prop.getName());
+					if (!value.equals(getValueAt(rowIndex, columnIndex)))
+					{
+						getModelInfo().getProperties().remove(prop.getName());
+						prop.setName(createFreeName((String) value, new MapContains(getModelInfo().getProperties())));
+						getModelInfo().getProperties().put(prop.getName(), prop);
+						propertynames.set(rowIndex, prop.getName());
+					}
 					break;
 				case 1:
 					prop.setClazz(new ClassInfo(((String) value)));
@@ -1435,14 +1454,17 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			{
 				case 0:
 				default:
-					String newname = createFreeName((String) value, new PSContains());
-					ConfigurationInfo[] confs = getModelInfo().getConfigurations();
-					for (ConfigurationInfo itconf : confs)
+					if (!value.equals(getValueAt(rowIndex, columnIndex)))
 					{
-						ProvidedServiceInfo itcs = getProvService(ps.getName(), itconf);
-						itcs.setName(newname);
+						String newname = createFreeName((String) value, new PSContains());
+						ConfigurationInfo[] confs = getModelInfo().getConfigurations();
+						for (ConfigurationInfo itconf : confs)
+						{
+							ProvidedServiceInfo itcs = getProvService(ps.getName(), itconf);
+							itcs.setName(newname);
+						}
+						ps.setName(newname);
 					}
-					ps.setName(newname);
 					break;
 				case 1:
 					value = nullifyString(value);

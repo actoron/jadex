@@ -32,6 +32,9 @@ public class GuiConstants
 	/** The available icon sizes. */
 	public static final int[] ICON_SIZES = new int[] { 16, 24, 32, 48, 64, 96, 128 };
 	
+	/** The default zoom. */
+	public static final double DEFAULT_ZOOM = 0.8;
+	
 	/** Factor by which the mouse shifts the view during zoom. */
 	public static final double ZOOM_MOUSE_DIRECTION_FACTOR = 2.5;
 	
