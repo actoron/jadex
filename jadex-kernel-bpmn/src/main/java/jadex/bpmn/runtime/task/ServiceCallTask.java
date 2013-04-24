@@ -4,7 +4,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
-import jadex.bpmn.model.task.annotation.TaskParameter;
+import jadex.bpmn.model.task.annotation.TaskProperty;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -31,10 +31,10 @@ import java.util.Map;
  *  Service name may alternatively supplied as name of lane and
  *  method name as name of activity. 
  */
-@Task(description="The print task can be used for calling a component service.", parameters={
-	@TaskParameter(name="service", clazz=String.class, direction=TaskParameter.DIRECTION_IN, description="The required service name."),
-	@TaskParameter(name="method", clazz=String.class, direction=TaskParameter.DIRECTION_IN, description="The required method name."),
-	@TaskParameter(name="rebind", clazz=boolean.class, direction=TaskParameter.DIRECTION_IN, description="The rebind flag (forces a frsh search).")
+@Task(description="The print task can be used for calling a component service.", properties={
+	@TaskProperty(name="service", clazz=String.class, description="The required service name."),
+	@TaskProperty(name="method", clazz=String.class, description="The required method name."),
+	@TaskProperty(name="rebind", clazz=boolean.class, description="The rebind flag (forces a frsh search).")
 })
 public class ServiceCallTask implements ITask
 {
@@ -188,7 +188,7 @@ public class ServiceCallTask implements ITask
 	}
 	
 	/**
-	 * 
+	 *  Get the extra parameters that depend on the property settings of the task.
 	 */
 	public static List<ParameterMetaInfo> getExtraParameters(Map<String, MParameter> params, IModelInfo mi, ClassLoader cl)
 	{
@@ -197,33 +197,39 @@ public class ServiceCallTask implements ITask
 		try
 		{
 			MParameter msparam = params.get(PARAMETER_SERVICE);
-			String reqname = (String)msparam.getInitialValue().getParsed();
-			RequiredServiceInfo reqser = mi.getRequiredService(reqname);
-			Class<?> type = reqser.getType().getType(cl);
-			
 			MParameter mmparam = params.get(PARAMETER_METHOD);
-			String methodname = (String)mmparam.getInitialValue().getParsed();
 			
-			Method[] ms = type.getMethods();
-			// todo check parameter types?
-			for(Method m: ms)
+			if(msparam!=null && mmparam!=null)
 			{
-				if(m.getName().equals(methodname))
+				String reqname = (String)msparam.getInitialValue().getParsed();
+				String methodname = (String)mmparam.getInitialValue().getParsed();
+				
+				if(reqname!=null && methodname!=null)
 				{
-					Class<?>[] ptypes = m.getParameterTypes();
-					Class<?> pret = m.getReturnType();
+					RequiredServiceInfo reqser = mi.getRequiredService(reqname);
+					Class<?> type = reqser.getType().getType(cl);
 					
-					for(int j=0; j<ptypes.length; j++)
+					Method[] ms = type.getMethods();
+					// todo check parameter types?
+					for(Method m: ms)
 					{
-						ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], "param"+j, null, null));
-					}
-					if(!pret.equals(Void.class) && !pret.equals(void.class))
-					{
-						ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, pret, "return", null, null));
+						if(m.getName().equals(methodname))
+						{
+							Class<?>[] ptypes = m.getParameterTypes();
+							Class<?> pret = m.getReturnType();
+							
+							for(int j=0; j<ptypes.length; j++)
+							{
+								ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], "param"+j, null, null));
+							}
+							if(!pret.equals(Void.class) && !pret.equals(void.class))
+							{
+								ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, pret, "return", null, null));
+							}
+						}
 					}
 				}
-			}
-			
+			}	
 		}
 		catch(Exception e)
 		{

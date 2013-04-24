@@ -23,4 +23,9 @@ public @interface Task
 	 *  The parameters of the task.
 	 */
 	public TaskParameter[] parameters() default {};
+	
+	/**
+	 *  The properties of the task.
+	 */
+	public TaskProperty[] properties() default {};
 }

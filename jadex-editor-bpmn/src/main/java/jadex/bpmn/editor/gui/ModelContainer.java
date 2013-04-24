@@ -482,6 +482,10 @@ public class ModelContainer
 		return projectclassloader;
 	}
 	
+	/**
+	 *  Get the project task meta infos.
+	 *  @return The meta infos.
+	 */
 	public Map<String, TaskMetaInfo> getProjectTaskMetaInfos()
 	{
 		return projecttaskmetainfos;

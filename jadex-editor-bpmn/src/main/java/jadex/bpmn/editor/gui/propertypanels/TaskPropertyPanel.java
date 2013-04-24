@@ -376,12 +376,17 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			{
 				pis.addAll(ret.getParameterInfos());
 			}
-			List<ParameterMetaInfo> params = (List<ParameterMetaInfo>)m.invoke(null, new Object[]{getBpmnTask().getParameters().getAsMap(), modelcontainer.getBpmnModel().getModelInfo(), modelcontainer.getBpmnModel().getClassLoader()});
-			pis.addAll(params);
+			if(getBpmnTask().getParameters()!=null)
+			{
+				Map<String, MParameter> ps = getBpmnTask().getParameters().getAsMap();
+				List<ParameterMetaInfo> params = (List<ParameterMetaInfo>)m.invoke(null, new Object[]{ps, modelcontainer.getBpmnModel().getModelInfo(), modelcontainer.getBpmnModel().getClassLoader()});
+				pis.addAll(params);
+			}
 			ret = new TaskMetaInfo(ret!=null? ret.getDescription(): null, pis);
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			// ignore
 		}
 		
