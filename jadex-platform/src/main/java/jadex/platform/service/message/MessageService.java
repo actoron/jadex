@@ -2016,11 +2016,11 @@ public class MessageService extends BasicService implements IMessageService
 //			System.out.println("Received message: "+SUtil.arrayToString(receivers));
 			final MessageType	messagetype	= getMessageType(type);
 			
-			if(msg.get(SFipa.X_NONFUNCTIONAL)!=null
-				&& ((Map)msg.get(SFipa.X_NONFUNCTIONAL)).get("cause") instanceof String)
-			{
-				System.out.println("sdklvugi: "+msg.get(SFipa.SENDER));
-			}
+//			if(msg.get(SFipa.X_NONFUNCTIONAL)!=null
+//				&& ((Map)msg.get(SFipa.X_NONFUNCTIONAL)).get("cause") instanceof String)
+//			{
+//				System.out.println("sdklvugi: "+msg.get(SFipa.SENDER));
+//			}
 			
 			// Announce receiver to message awareness
 			IComponentIdentifier sender = (IComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
