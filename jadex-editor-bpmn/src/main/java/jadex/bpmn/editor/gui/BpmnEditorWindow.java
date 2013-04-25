@@ -512,14 +512,17 @@ public class BpmnEditorWindow extends JFrame
 		}
 		if (quit)
 		{
-			try
+			if (settings.isSaveSettingsOnExit())
 			{
-				settings.setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
-				settings.save();
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
+				try
+				{
+					settings.setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
+					settings.save();
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
 			
 //			trys

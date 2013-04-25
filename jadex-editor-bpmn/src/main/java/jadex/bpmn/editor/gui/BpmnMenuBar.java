@@ -14,11 +14,14 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -61,6 +64,35 @@ public class BpmnMenuBar extends JMenuBar
 		filemenu.add(createSaveMenuItem());
 		filemenu.add(createSaveAsMenuItem());
 		filemenu.add(createExportMenuItem());
+		filemenu.addSeparator();
+		
+		JMenuItem item = new JMenuItem(new AbstractAction("Save Settings")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					editorwindow.getSettings().save();
+				}
+				catch (IOException e1)
+				{
+					Logger.getLogger(BpmnEditor.APP_NAME).log(Level.SEVERE, e1.toString());
+				}
+			}
+		});
+		filemenu.add(item);
+		
+		JCheckBoxMenuItem saveonexititem = new JCheckBoxMenuItem(new AbstractAction("Save Settings on Exit")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JCheckBoxMenuItem saveonexititem = (JCheckBoxMenuItem) e.getSource();
+				editorwindow.getSettings().setSaveSettingsOnExit(saveonexititem.getState());
+			}
+		});
+		saveonexititem.setState(editorwindow.getSettings().isSaveSettingsOnExit());
+		filemenu.add(saveonexititem);
+		
 		filemenu.addSeparator();
 		filemenu.add(createExitMenuItem());
 		add(filemenu);

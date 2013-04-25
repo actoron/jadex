@@ -37,6 +37,9 @@ public class Settings
 	/** Flag if simple data edge auto-connect is enabled. */
 	protected boolean simpledataautoconncect = true;
 	
+	/** Flag if save settings on exit is enable. */
+	protected boolean savesettingsonexit = true;
+	
 	/** The selected style sheet */
 	protected String selectedsheet = BpmnEditor.STYLE_SHEETS[0].getFirstEntity();
 	
@@ -112,6 +115,28 @@ public class Settings
 		this.lastfile = lastfile;
 	}
 	
+	
+	
+	/**
+	 *  Gets the save settings on exit setting.
+	 *
+	 *  @return The save settings on exit setting.
+	 */
+	public boolean isSaveSettingsOnExit()
+	{
+		return savesettingsonexit;
+	}
+
+	/**
+	 *  Sets the save settings on exit setting.
+	 *
+	 *  @param savesettingsonexit The save settings on exit setting.
+	 */
+	public void setSaveSettingsOnExit(boolean savesettingsonexit)
+	{
+		this.savesettingsonexit = savesettingsonexit;
+	}
+
 	/**
 	 *  Save the settings.
 	 */
@@ -140,6 +165,8 @@ public class Settings
 		{
 			props.put("stylesheet", selectedsheet);
 		}
+		
+		props.put("savesettingsonexit", String.valueOf(savesettingsonexit));
 		
 		props.put("toolbariconsize", String.valueOf(toolbariconsize));
 		
@@ -180,6 +207,12 @@ public class Settings
 			if (prop != null)
 			{
 				ret.setLastFile(new File(prop));
+			}
+			
+			prop = props.getProperty("savesettingsonexit");
+			if (prop != null)
+			{
+				ret.setSaveSettingsOnExit(Boolean.parseBoolean(prop));
 			}
 			
 			prop = props.getProperty("stylesheet");
