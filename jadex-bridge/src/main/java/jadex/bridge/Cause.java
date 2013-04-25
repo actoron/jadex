@@ -53,7 +53,7 @@ public class Cause
 	 */
 	public Cause(String chainid, String sourceid, String targetid, String sourcename, String targetname)
 	{
-		this.chainid = chainid==null? createUniqueId(): targetid;
+		this.chainid = chainid==null? createUniqueId(): chainid;
 		this.sourceid = sourceid==null? createUniqueId(): sourceid;
 		this.targetid = targetid==null? createUniqueId(): targetid;
 		
