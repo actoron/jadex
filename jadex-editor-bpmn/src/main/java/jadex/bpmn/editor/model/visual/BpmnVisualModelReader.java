@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.model.visual;
 
+import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MDataEdge;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -113,138 +116,146 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			
 			if (vnode == null)
 			{
-				System.err.println("Unknown Element ID: " + bpmnid);
-				return;
+				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown Object ID " + bpmnid);
 			}
-			
-			String exp = attrs.get("isExpanded");
-			if (exp != null)
+			else
 			{
-				vnode.setCollapsed(!Boolean.parseBoolean(exp));
-			}
-			
-			mxGeometry geo = (mxGeometry) buffer.remove("bounds");
-			mxGeometry oldgeo = vnode.getGeometry();
-			if (geo != null)
-			{
-				vnode.setGeometry(geo);
-			}
-			
-			if (e instanceof MActivity)
-			{
-				MActivity act = (MActivity) e;
-				VNode parent = null;
-				
-				if (act.isEventHandler())
+				String exp = attrs.get("isExpanded");
+				if (exp != null)
 				{
-					// Geometry is handled by layout manager.
-					vnode.setGeometry(oldgeo);
-					Map<String, String> ehpm = (Map<String, String>) buffer.get("eventhandlerparentmap");
-					parent = (VNode) vmap.get(ehpm.get(act.getId()));
+					vnode.setCollapsed(!Boolean.parseBoolean(exp));
 				}
 				
-				if (parent == null)
+				mxGeometry geo = (mxGeometry) buffer.remove("bounds");
+				mxGeometry oldgeo = vnode.getGeometry();
+				if (geo != null)
 				{
-					Map<String, MSubProcess> spem = (Map<String, MSubProcess>) buffer.get("subprocesselementmap");
-					if (spem.containsKey(act.getId()))
+					vnode.setGeometry(geo);
+				}
+				
+				if (e instanceof MActivity)
+				{
+					MActivity act = (MActivity) e;
+					VNode parent = null;
+					
+					if (act.isEventHandler())
 					{
-						parent = (VNode) vmap.get(spem.get(act.getId()).getId());
+						// Geometry is handled by layout manager.
+						vnode.setGeometry(oldgeo);
+						Map<String, String> ehpm = (Map<String, String>) buffer.get("eventhandlerparentmap");
+						parent = (VNode) vmap.get(ehpm.get(act.getId()));
 					}
-				}
-				
-				if (parent == null)
-				{
-					parent = act.getLane() != null? (VNode) vmap.get(act.getLane().getId()) : (VNode) vmap.get(act.getPool().getId());
-				}
-				
-				if (parent != null)
-				{
-					graph.getModel().beginUpdate();
-					graph.addCell(vnode, parent);
-					graph.getModel().endUpdate();
-				}
-				else
-				{
-					List<VNode> children = childmap.get(act.getPool().getId());
-					if (children == null)
+					
+					if (parent == null)
 					{
-						children = new ArrayList<VNode>();
-						childmap.put(act.getPool().getId(), children);
+						Map<String, MSubProcess> spem = (Map<String, MSubProcess>) buffer.get("subprocesselementmap");
+						if (spem.containsKey(act.getId()))
+						{
+							parent = (VNode) vmap.get(spem.get(act.getId()).getId());
+						}
 					}
-					children.add(vnode);
-				}
-				vnode.setBpmnElement(e);
-			}
-			else if (e instanceof MPool)
-			{
-				graph.getModel().beginUpdate();
-				graph.addCell(vnode);
-				graph.getModel().endUpdate();
-				
-				List<VNode> children = childmap.remove(e.getId());
-				if (children != null)
-				{
-					for (VNode child : children)
+					
+					if (parent == null)
+					{
+						parent = act.getLane() != null? (VNode) vmap.get(act.getLane().getId()) : (VNode) vmap.get(act.getPool().getId());
+					}
+					
+					if (parent != null)
 					{
 						graph.getModel().beginUpdate();
-						graph.addCell(child, vnode);
+						graph.addCell(vnode, parent);
 						graph.getModel().endUpdate();
 					}
+					else
+					{
+						List<VNode> children = childmap.get(act.getPool().getId());
+						if (children == null)
+						{
+							children = new ArrayList<VNode>();
+							childmap.put(act.getPool().getId(), children);
+						}
+						children.add(vnode);
+					}
+					vnode.setBpmnElement(e);
 				}
-				vnode.setBpmnElement(e);
-			}
-			else if (e instanceof MLane)
-			{
-				VPool parent = (VPool) vmap.get(laneparents.get(e.getId()));
-				
-				if (parent != null)
+				else if (e instanceof MPool)
 				{
 					graph.getModel().beginUpdate();
-					graph.addCell(vnode, parent);
+					graph.addCell(vnode);
 					graph.getModel().endUpdate();
-				}
-				else
-				{
-					List<VNode> children = childmap.get(laneparents.get(e.getId()));
-					if (children == null)
+					
+					List<VNode> children = childmap.remove(e.getId());
+					if (children != null)
 					{
-						children = new ArrayList<VNode>();
-						childmap.put(laneparents.get(e.getId()), children);
+						for (VNode child : children)
+						{
+							graph.getModel().beginUpdate();
+							graph.addCell(child, vnode);
+							graph.getModel().endUpdate();
+						}
 					}
-					children.add(vnode);
+					vnode.setBpmnElement(e);
 				}
-				vnode.setBpmnElement(e);
+				else if (e instanceof MLane)
+				{
+					VPool parent = (VPool) vmap.get(laneparents.get(e.getId()));
+					
+					if (parent != null)
+					{
+						graph.getModel().beginUpdate();
+						graph.addCell(vnode, parent);
+						graph.getModel().endUpdate();
+					}
+					else
+					{
+						List<VNode> children = childmap.get(laneparents.get(e.getId()));
+						if (children == null)
+						{
+							children = new ArrayList<VNode>();
+							childmap.put(laneparents.get(e.getId()), children);
+						}
+						children.add(vnode);
+					}
+					vnode.setBpmnElement(e);
+				}
+				
+				vmap.put(bpmnid, vnode);
 			}
-			
-			vmap.put(bpmnid, vnode);
 		}
 		else if ("BPMNEdge".equals(tag.getLocalPart()))
 		{
 			String bpmnid = attrs.get("bpmnElement");
 			MIdElement medge = emap.get(bpmnid);
 			
-			VEdge vedge = null;
-			if (medge instanceof MSequenceEdge)
+			if (medge != null)
 			{
-				MSequenceEdge mseqedge = (MSequenceEdge) medge;
-				vedge = new VSequenceEdge(graph, VSequenceEdge.class.getSimpleName());
-				vedge.setSource(vmap.get(mseqedge.getSource().getId()));
-				vedge.setTarget(vmap.get(mseqedge.getTarget().getId()));
+				VEdge vedge = null;
+				if (medge instanceof MSequenceEdge)
+				{
+					MSequenceEdge mseqedge = (MSequenceEdge) medge;
+					vedge = new VSequenceEdge(graph, VSequenceEdge.class.getSimpleName());
+					vedge.setSource(vmap.get(mseqedge.getSource().getId()));
+					vedge.setTarget(vmap.get(mseqedge.getTarget().getId()));
+				}
+				vedge.setBpmnElement(medge);
+				
+				List<mxPoint> waypoints = (List<mxPoint>) buffer.remove("waypoints");
+				if (waypoints != null)
+				{
+					mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
+					geo.setPoints(waypoints);
+					geo.setRelative(false);
+					vedge.setGeometry(geo);
+				}
+				
+				graph.getModel().beginUpdate();
+				graph.addCell(vedge, vedge.getSource().getParent());
+				graph.getModel().endUpdate();
 			}
-			vedge.setBpmnElement(medge);
-			
-			List<mxPoint> waypoints = (List<mxPoint>) buffer.remove("waypoints");
-			if (waypoints != null)
+			else
 			{
-				mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
-				geo.setPoints(waypoints);
-				geo.setRelative(false);
-				vedge.setGeometry(geo);
+				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown BPMN edge ID " + bpmnid);
 			}
-			
-			graph.getModel().beginUpdate();
-			graph.addCell(vedge, vedge.getSource().getParent());
-			graph.getModel().endUpdate();
 			
 		}
 		else if ("Edge".equals(tag.getLocalPart()))
@@ -255,25 +266,32 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				{
 					String id = attrs.get("jadexElement");
 					MDataEdge dedge = (MDataEdge) emap.get(id);
-					VDataEdge vedge = new VDataEdge(graph);
-					VActivity sact = (VActivity) vmap.get(dedge.getSource().getId());
-					VActivity tact = (VActivity) vmap.get(dedge.getTarget().getId());
-					vedge.setSource(sact.getOutputParameterPort(dedge.getSourceParameter()));
-					vedge.setTarget(tact.getInputParameterPort(dedge.getTargetParameter()));
-					vedge.setBpmnElement(dedge);
-					
-					List<mxPoint> waypoints = (List<mxPoint>) buffer.remove("waypoints");
-					if (waypoints != null)
+					if (dedge != null)
 					{
-						mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
-						geo.setPoints(waypoints);
-						geo.setRelative(false);
-						vedge.setGeometry(geo);
+						VDataEdge vedge = new VDataEdge(graph);
+						VActivity sact = (VActivity) vmap.get(dedge.getSource().getId());
+						VActivity tact = (VActivity) vmap.get(dedge.getTarget().getId());
+						vedge.setSource(sact.getOutputParameterPort(dedge.getSourceParameter()));
+						vedge.setTarget(tact.getInputParameterPort(dedge.getTargetParameter()));
+						vedge.setBpmnElement(dedge);
+						
+						List<mxPoint> waypoints = (List<mxPoint>) buffer.remove("waypoints");
+						if (waypoints != null)
+						{
+							mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
+							geo.setPoints(waypoints);
+							geo.setRelative(false);
+							vedge.setGeometry(geo);
+						}
+						
+						graph.getModel().beginUpdate();
+						graph.addCell(vedge, vedge.getSource().getParent().getParent());
+						graph.getModel().endUpdate();
 					}
-					
-					graph.getModel().beginUpdate();
-					graph.addCell(vedge, vedge.getSource().getParent().getParent());
-					graph.getModel().endUpdate();
+					else
+					{
+						Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown data edge ID " + id);
+					}
 				}
 			}
 		}
