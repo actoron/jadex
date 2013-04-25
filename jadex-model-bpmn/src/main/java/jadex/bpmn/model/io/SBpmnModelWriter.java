@@ -414,8 +414,12 @@ public class SBpmnModelWriter
 				out.print("<jadex:providedservice name=\"");
 				out.print(ps.getName());
 				
-				out.print("\" interface=\"");
-				out.print(ps.getType().getTypeName());
+				String iface = ps.getType() != null? ps.getType().getTypeName() : null;
+				if (iface != null)
+				{
+					out.print("\" interface=\"");
+					out.print(ps.getType().getTypeName());
+				}
 				
 				if (ps.getImplementation() != null)
 				{
@@ -464,8 +468,12 @@ public class SBpmnModelWriter
 				out.print("<jadex:requiredservice name=\"");
 				out.print(rs.getName());
 				
-				out.print("\" interface=\"");
-				out.print(rs.getType().getTypeName());
+				String iface = rs.getType() != null? rs.getType().getTypeName() : null;
+				if (iface != null)
+				{
+					out.print("\" interface=\"");
+					out.print(iface);
+				}
 				
 				if (rs.isMultiple())
 				{
