@@ -34,8 +34,8 @@ public class MultiPlatformsTest extends TestCase
 //		for(int p=0; p<100; p++)
 		{
 //			long	time	= System.currentTimeMillis();
-		int number	= 35; // larger numbers cause timeout on toaster.
-		long timeout	= 120000;	// time required by toaster.
+		int	number	= 25;	// larger numbers cause timeout on toaster.
+		long	timeout	= 120000;	// time required by toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)

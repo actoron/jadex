@@ -2019,7 +2019,7 @@ public class MessageService extends BasicService implements IMessageService
 			if(msg.get(SFipa.X_NONFUNCTIONAL)!=null
 				&& ((Map)msg.get(SFipa.X_NONFUNCTIONAL)).get("cause") instanceof String)
 			{
-				System.out.println("sdklvugi");
+				System.out.println("sdklvugi: "+msg.get(SFipa.SENDER));
 			}
 			
 			// Announce receiver to message awareness

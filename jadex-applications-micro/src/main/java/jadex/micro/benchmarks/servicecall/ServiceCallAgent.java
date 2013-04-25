@@ -37,7 +37,7 @@ import java.util.Map;
 })
 @Agent
 @Arguments(replace=false,
-	value=@Argument(name="max", clazz=int.class, defaultvalue="100"))
+	value=@Argument(name="max", clazz=int.class, defaultvalue="10"))
 public class ServiceCallAgent	extends TestAgent
 {
 	//-------- attributes --------

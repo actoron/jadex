@@ -136,12 +136,12 @@ public class ExternalAccess implements IExternalAccess
 //					System.out.println("platform e: "+adapter.getComponentIdentifier().getName());
 //					Thread.dumpStack();
 //				}
-				System.out.println("ext kill: "+getComponentIdentifier());
+//				System.out.println("ext kill: "+getComponentIdentifier());
 				adapter.invokeLater(new Runnable() 
 				{
 					public void run() 
 					{
-						System.out.println("int kill");
+//						System.out.println("int kill");
 						interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 					}
 					

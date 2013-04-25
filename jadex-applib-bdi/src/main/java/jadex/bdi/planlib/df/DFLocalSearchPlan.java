@@ -17,7 +17,7 @@ public class DFLocalSearchPlan extends Plan
 	 */
 	public void body()
 	{
-		System.out.println("searching: "+getComponentName());
+//		System.out.println("searching: "+getComponentName());
 		
 		// Todo: support other parameters!?
 		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
