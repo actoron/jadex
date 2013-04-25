@@ -33,8 +33,8 @@ import java.util.Map;
  */
 @Task(description="The print task can be used for calling a component service.", properties={
 	@TaskProperty(name="service", clazz=String.class, description="The required service name."),
-	@TaskProperty(name="method", clazz=String.class, description="The required method name."),
-	@TaskProperty(name="rebind", clazz=boolean.class, description="The rebind flag (forces a frsh search).")
+	@TaskProperty(name="method", clazz=String.class, description="The required method name.")
+//	@TaskProperty(name="rebind", clazz=boolean.class, description="The rebind flag (forces a frsh search).")
 })
 public class ServiceCallTask implements ITask
 {

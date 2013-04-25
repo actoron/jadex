@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,6 +84,9 @@ public class MActivity extends MAssociationTarget
 	
 	/** The parameters (name -> MParameter). */
 	protected IndexMap<String, MParameter>	parameters;
+	
+	/** The properties (name -> MProperty). */
+	protected IndexMap<String, MProperty> properties;
 	
 	/** The class. */
 	protected ClassInfo clazz;
@@ -602,7 +604,7 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
-	 *  Test if a parameter exists.
+	 *  Test if a prop exists.
 	 */
 	public boolean hasParameter(String name)
 	{
@@ -628,6 +630,44 @@ public class MActivity extends MAssociationTarget
 	{
 		if(parameters!=null)
 			parameters.removeValue(param.getName());
+	}
+	
+	/**
+	 *  Get the properties.
+	 *  @return The properties.
+	 */
+	public IndexMap<String, MProperty>	getProperties()
+	{
+		return properties;
+	}
+	
+	/**
+	 *  Test if a property exists.
+	 */
+	public boolean hasProperty(String name)
+	{
+		return properties!=null && properties.containsKey(name);
+	}
+	
+	/**
+	 *  Add a property.
+	 *  @param prop The property.
+	 */
+	public void addProperty(MProperty prop)
+	{
+		if(properties==null)
+			properties = new IndexMap<String, MProperty>();
+		properties.put(prop.getName(), prop);
+	}
+	
+	/**
+	 *  Remove a property.
+	 *  @param prop The property.
+	 */
+	public void removeProperty(MProperty prop)
+	{
+		if(properties!=null)
+			properties.removeValue(prop.getName());
 	}
 	
 	/**

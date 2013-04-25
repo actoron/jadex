@@ -3,72 +3,44 @@ package jadex.bpmn.model;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
-
 /**
  *  A parameter model element.
  */
-public class MParameter extends MProperty
+public class MProperty extends MAnnotationElement
 {
-	//-------- constants --------
-	
-	/** The constant for direction in. */
-	public static String DIRECTION_IN = "in";
-	
-	/** The constant for direction out. */
-	public static String DIRECTION_OUT = "out";
-
-	/** The constant for direction inout. */
-	public static String DIRECTION_INOUT = "inout";
-
 	//-------- attributes --------
 	
-	/** The direction. */
-	protected String direction;
+	/** The clazz. */
+	protected ClassInfo clazz;
 	
+	/** The name. */
+	protected String name;
+	
+	/** The initial value. */
+	protected UnparsedExpression initialval; // IParsedExpression
+
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new parameter.
 	 */
-	public MParameter()
+	public MProperty()
 	{
 	}
 	
 	/**
 	 *  Create a new parameter.
 	 */
-	public MParameter(String direction, ClassInfo clazz, String name, 
+	public MProperty(ClassInfo clazz, String name, 
 		UnparsedExpression initialval)
 	{
-		super(clazz, name, initialval);
-		this.direction = direction;
+		this.clazz = clazz;
+		this.name = name;
+		this.initialval = initialval;
 	}
 	
 	//-------- methods --------
 	
-	/**
-	 *  Get the direction.
-	 *  @return The direction.
-	 */
-	public String getDirection()
-	{
-		return this.direction;
-	}
-
-	/**
-	 *  Set the direction.
-	 *  @param direction The direction to set.
-	 */
-	public void setDirection(String direction)
-	{
-		if(!direction.equals(DIRECTION_IN) && !direction.equals(DIRECTION_OUT) 
-			&& !direction.equals(DIRECTION_INOUT))
-		{
-			throw new RuntimeException("Unknown direction: "+direction);
-		}
-		this.direction = direction;
-	}
-
 	/**
 	 *  Get the clazz.
 	 *  @return The clazz.
@@ -129,8 +101,8 @@ public class MParameter extends MProperty
 	 */
 	public String toString()
 	{
-		return "MParameter(clazz=" + this.clazz + ", direction="
-			+ this.direction + ", initialval=" + this.initialval
+		return "MParameter(clazz=" + this.clazz + ", initialval=" + this.initialval
 			+ ", name=" + this.name + ")";
 	}	
 }
+

@@ -9,6 +9,7 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
+import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
@@ -307,17 +308,26 @@ public class SBpmnModelReader
 			
 			act.setActivityType(ACT_TYPE_MAPPING.get(tag.getLocalPart()));
 			
-			if (buffer.containsKey("taskclass"))
+			if(buffer.containsKey("taskclass"))
 			{
 				act.setClazz(new ClassInfo((String) buffer.remove("taskclass")));
 			}
 			
-			if (buffer.containsKey("parameters"))
+			if(buffer.containsKey("parameters"))
 			{
 				List<MParameter> params = (List<MParameter>) buffer.remove("parameters");
-				for (MParameter param : params)
+				for(MParameter param : params)
 				{
 					act.addParameter(param);
+				}
+			}
+			
+			if(buffer.containsKey("properties"))
+			{
+				List<MProperty> props = (List<MProperty>) buffer.remove("properties");
+				for(MProperty prop : props)
+				{
+					act.addProperty(prop);
 				}
 			}
 			
@@ -582,7 +592,7 @@ public class SBpmnModelReader
 			UnparsedExpression fileexp = new UnparsedExpression("file", String.class, content.trim(), null);
 			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("file", fileexp);
 		}
-		else if ("parameter".equals(tag.getLocalPart()))
+		else if("parameter".equals(tag.getLocalPart()))
 		{
 			List<MParameter> params = (List<MParameter>) buffer.get("parameters");
 			if (params == null)
@@ -596,6 +606,21 @@ public class SBpmnModelReader
 			parseExp(exp, model.getModelInfo().getAllImports(), cl);
 			MParameter param = new MParameter(attrs.get("direction"), clazz, name, exp);
 			params.add(param);
+		}
+		else if("property".equals(tag.getLocalPart()))
+		{
+			List<MProperty> props = (List<MProperty>)buffer.get("properties");
+			if(props == null)
+			{
+				props = new ArrayList<MProperty>();
+				buffer.put("properties", props);
+			}
+			ClassInfo clazz = new ClassInfo(attrs.get("type"));
+			String name = attrs.get("name");
+			UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), content, null);
+			parseExp(exp, model.getModelInfo().getAllImports(), cl);
+			MProperty prop = new MProperty(clazz, name, exp);
+			props.add(prop);
 		}
 		else if ("argumentvalues".equals(tag.getLocalPart()))
 		{

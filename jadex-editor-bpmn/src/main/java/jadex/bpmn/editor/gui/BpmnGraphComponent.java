@@ -317,6 +317,11 @@ public class BpmnGraphComponent extends mxGraphComponent
 						}
 						else if (gradientDirection.equals("radnorthwest"))
 						{
+							double min = Math.min(bounds.getWidth(), bounds.getHeight());
+							double max = Math.max(bounds.getWidth(), bounds.getHeight());
+							double length = (max - min) * 0.5 + min;
+							x1 = (float) (bounds.getX() + length);
+							y1 = (float) (bounds.getY() + length);
 							double sqlength = Math.min(bounds.getWidth(), bounds.getHeight());
 //							double diffx2 = (bounds.getWidth() - sqlength) * 0.5;
 //							double diffy2 = (bounds.getHeight() - sqlength) * 0.5;

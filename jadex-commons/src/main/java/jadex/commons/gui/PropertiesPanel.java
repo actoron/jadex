@@ -134,9 +134,17 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public JTextField createTextField(String name, String defvalue, boolean editable, double weighty)
 	{
+		return createTextField(name, defvalue, editable, weighty, null);
+	}
+	
+	/**
+	 *  Create a text field and add it to the panel.
+	 */
+	public JTextField createTextField(String name, String defvalue, boolean editable, double weighty, String tooltip)
+	{
 		JTextField	tf	= new JTextField(defvalue);
 		tf.setEditable(editable);
-		addComponent(name, tf, weighty, -1);
+		addComponent(name, tf, weighty, -1, -1, tooltip);
 		return tf;
 	}
 	
@@ -161,11 +169,19 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public JCheckBox createCheckBox(String name, boolean selected, boolean enabled, double weighty)
 	{
+		return createCheckBox(name, selected, enabled, weighty, null);
+	}
+	
+	/**
+	 *  Create a check box and add it to the panel.
+	 */
+	public JCheckBox createCheckBox(String name, boolean selected, boolean enabled, double weighty, String tooltip)
+	{
 		// Todo: checkbox name vs. checkbox label!?
 		JCheckBox cb = new JCheckBox("", selected);
 		cb.setMargin(new Insets(0,0,0,0));
 		cb.setEnabled(enabled);
-		addComponent(name, cb, weighty, -1);
+		addComponent(name, cb, weighty, -1, -1, tooltip);
 		return cb;
 	}
 	
@@ -203,7 +219,7 @@ public class PropertiesPanel	extends	JPanel
 	{
 		JButton b = new JButton(text);
 //		addComponent(name, b, weighty, GridBagConstraints.NONE);
-		addComponent(name, b, weighty, GridBagConstraints.NONE, GridBagConstraints.WEST);
+		addComponent(name, b, weighty, GridBagConstraints.NONE, GridBagConstraints.WEST, null);
 		return b;
 	}
 	
@@ -267,13 +283,13 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public void	addComponent(String name, JComponent comp, double weighty, int fill)
 	{
-		addComponent(name, comp, weighty, fill, -1);
+		addComponent(name, comp, weighty, fill, -1, null);
 	}
 	
 	/**
 	 *  Add a component
 	 */
-	public void	addComponent(String name, JComponent comp, double weighty, int fill, int anchor)
+	public void	addComponent(String name, JComponent comp, double weighty, int fill, int anchor, String tooltip)
 	{
 		components.put(name, comp);
 
@@ -286,7 +302,10 @@ public class PropertiesPanel	extends	JPanel
 		gbc.gridwidth	= 1;
 		gbc.anchor = anchor!=-1? anchor: GridBagConstraints.EAST;
 		gbc.fill = GridBagConstraints.BOTH;
-		add(new JLabel(name), gbc);
+		JLabel lab = new JLabel(name);
+		if(tooltip!=null)
+			lab.setToolTipText(tooltip);
+		add(lab, gbc);
 		
 		if(weighty==0)
 		{
@@ -299,6 +318,8 @@ public class PropertiesPanel	extends	JPanel
 		
 		gbc.weightx	= 1;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
+		if(tooltip!=null)
+			comp.setToolTipText(tooltip);
 		add(comp, gbc);
 		gbc.gridy++;
 		

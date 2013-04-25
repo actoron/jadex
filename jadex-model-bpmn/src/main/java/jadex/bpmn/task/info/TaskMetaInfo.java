@@ -22,6 +22,9 @@ public class TaskMetaInfo
 //	protected ParameterMetaInfo[] parammetainfos;
 	protected List<ParameterMetaInfo> parameterinfos;
 	
+	/** The property descriptions. */
+	protected List<PropertyMetaInfo> propertyinfos;
+	
 	//-------- constructors --------
 	
 	/**
@@ -43,10 +46,12 @@ public class TaskMetaInfo
 	 *  Create a task meta info.
 	 */
 //	public TaskMetaInfo(String description, ParameterMetaInfo[] parammetainfos)
-	public TaskMetaInfo(String description, List<ParameterMetaInfo> parameterinfos)
+	public TaskMetaInfo(String description, List<ParameterMetaInfo> parameterinfos,
+		List<PropertyMetaInfo> propertyinfos)
 	{
 		this.description = description;
 		this.parameterinfos = parameterinfos;
+		this.propertyinfos = propertyinfos;
 	}
 	
 	/**
@@ -54,11 +59,24 @@ public class TaskMetaInfo
 	 */
 	public TaskMetaInfo(String description, ParameterMetaInfo[] parameterinfos)
 	{
+		this(description, parameterinfos, null);
+	}
+	
+	/**
+	 *  Create a task meta info.
+	 */
+	public TaskMetaInfo(String description, ParameterMetaInfo[] parameterinfos, PropertyMetaInfo[] propertyinfos)
+	{
 		this.description = description;
 		this.parameterinfos = new ArrayList<ParameterMetaInfo>();
 		for(ParameterMetaInfo pmi: parameterinfos)
 		{
 			this.parameterinfos.add(pmi);
+		}
+		this.propertyinfos = new ArrayList<PropertyMetaInfo>();
+		for(PropertyMetaInfo pmi: propertyinfos)
+		{
+			this.propertyinfos.add(pmi);
 		}
 	}
 	
@@ -99,6 +117,24 @@ public class TaskMetaInfo
 	public void setParameterInfos(List<ParameterMetaInfo> parameterinfos)
 	{
 		this.parameterinfos = parameterinfos;
+	}
+
+	/**
+	 *  Get the propertyinfos.
+	 *  @return The propertyinfos.
+	 */
+	public List<PropertyMetaInfo> getPropertyInfos()
+	{
+		return propertyinfos;
+	}
+
+	/**
+	 *  Set the propertyinfos.
+	 *  @param propertyinfos The propertyinfos to set.
+	 */
+	public void setPropertyInfos(List<PropertyMetaInfo> propertyinfos)
+	{
+		this.propertyinfos = propertyinfos;
 	}
 
 //	/**

@@ -7,6 +7,7 @@ import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
+import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
@@ -1065,21 +1066,22 @@ public class SBpmnModelWriter
 			}
 			
 			boolean istask = MBpmnModel.TASK.equals(activity.getActivityType()) || issubproc;
-			boolean hastaskclass = istask && activity.getClazz() != null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
-			boolean hastaskparams = istask && activity.getParameters() != null && activity.getParameters().size() > 0;
+			boolean hastaskclass = istask && activity.getClazz()!=null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
+			boolean hastaskparams = istask && activity.getParameters()!=null && activity.getParameters().size()>0;
+			boolean hastaskprops = istask && activity.getProperties()!=null && activity.getProperties().size()>0;
 			
-			if (hastaskclass || hastaskparams || procref != null)
+			if(hastaskclass || hastaskparams || hastaskprops || procref != null)
 			{
 				out.println(getIndent(baseind + 1) + "<semantic:extensionElements>");
 				
-				if (hastaskclass)
+				if(hastaskclass)
 				{
 					out.print(getIndent(baseind + 2) + "<jadex:taskclass>");
 					out.print(activity.getClazz().getTypeName());
 					out.println("</jadex:taskclass>");
 				}
 				
-				if (hastaskparams)
+				if(hastaskparams)
 				{
 					IndexMap<String, MParameter> params = activity.getParameters();
 					for (String key: params.keySet())
@@ -1107,7 +1109,33 @@ public class SBpmnModelWriter
 					}
 				}
 				
-				if (procref != null)
+				if(hastaskprops)
+				{
+					IndexMap<String, MProperty> props = activity.getProperties();
+					for(String key: props.keySet())
+					{
+						MProperty prop = props.get(key);
+						out.print(getIndent(baseind + 2) + "<jadex:property name=\"");
+						out.print(prop.getName());
+						out.print("\" type=\"");
+						out.print(prop.getClazz().getTypeName());
+						out.print("\"");
+						
+						String inival = prop.getInitialValue().getValue();
+						if(inival != null && inival.length() > 0)
+						{
+							out.print(">");
+							out.print(inival);
+							out.println("</jadex:property>");
+						}
+						else
+						{
+							out.println("/>");
+						}
+					}
+				}
+				
+				if(procref != null)
 				{
 					String tagpart = "jadex:subprocessref>";
 					if (isprocrefexp)

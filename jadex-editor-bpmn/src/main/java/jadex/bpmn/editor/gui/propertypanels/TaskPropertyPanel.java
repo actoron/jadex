@@ -6,7 +6,9 @@ import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MProperty;
 import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bpmn.task.info.PropertyMetaInfo;
 import jadex.bpmn.task.info.STaskMetaInfoExtractor;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
@@ -14,6 +16,9 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.collection.IndexMap;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.javaparser.SJavaParser;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -21,6 +26,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +46,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -71,7 +78,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		JLabel label = new JLabel("Class");
 		Set<String> tasknameset = new HashSet<String>(BpmnEditor.TASK_INFOS.keySet());
 		
-		if (modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
+		if(modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
 		{
 			tasknameset.addAll(modelcontainer.getProjectTaskMetaInfos().keySet());
 		}
@@ -113,7 +120,27 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				String taskname = (String) ((JComboBox)e.getSource()).getSelectedItem();
+				
+				// change task class
 				getBpmnTask().setClazz(new ClassInfo(taskname));
+
+				// and renew properties
+				IndexMap<String, MProperty> props = getBpmnTask().getProperties();
+				if(props!=null)
+					props.clear();
+
+				TaskMetaInfo info = getTaskMetaInfo(taskname);
+				List<PropertyMetaInfo> pmis = info.getPropertyInfos();
+				if(pmis!=null)
+				{
+					for(PropertyMetaInfo pmi: pmis)
+					{
+						UnparsedExpression uexp = new UnparsedExpression(null, 
+							pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), pmi.getInitialValue(), null);
+						MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
+						getBpmnTask().addProperty(mprop);
+					}
+				}
 				
 				processTaskInfos(taskname, descarea);
 				
@@ -123,9 +150,67 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		//addVerticalFiller(column, y);
 		
+		// Property panel
+		
+		JPanel proppanel = new JPanel(new GridBagLayout());
+		final PropertiesPanel pp = new PropertiesPanel();
+		JButton refresh = new JButton("Refresh");
+		refresh.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				pp.removeAll();
+				String taskname = getBpmnTask().getClazz().getTypeName();
+				TaskMetaInfo info = getTaskMetaInfo(taskname);
+				List<PropertyMetaInfo> props = info.getPropertyInfos();
+				
+				if(props!=null)
+				{
+					IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
+					
+					for(final PropertyMetaInfo pmi: props)
+					{
+						String lab = pmi.getName();
+						if(pmi.getClazz()!=null)
+							lab += " ("+pmi.getClazz().getTypeName()+")";
+						
+						String valtxt = "";
+						if(mprops!=null && mprops.containsKey(pmi.getName()))
+						{
+							MProperty mprop = mprops.get(pmi.getName());
+							valtxt = mprop.getInitialValue().getValue();
+						}
+						
+						final JTextField tf = pp.createTextField(lab, valtxt, true, 0, pmi.getDescription().length()>0? pmi.getDescription(): null);
+						tf.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								String val = tf.getText();
+								IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
+								MProperty mprop = mprops.get(pmi.getName());
+								UnparsedExpression uexp = new UnparsedExpression(null, 
+									pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), val, null);
+								mprop.setInitialValue(uexp);
+							}
+						});
+					}
+					
+					pp.invalidate();
+					pp.doLayout();
+					pp.repaint();
+				}
+			}
+		});
+
+		proppanel.add(pp, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+		proppanel.add(refresh, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHEAST, 
+			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
+		
+		// Parameter panel
 		
 		JPanel parameterpanel = new JPanel(new GridBagLayout());
-		
 		gc = new GridBagConstraints();
 		gc.gridy = 1;
 		gc.gridheight = 2;
@@ -135,7 +220,6 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 5, 5, 0);
 		JScrollPane tablescrollpane = new JScrollPane(atable);
 		parameterpanel.add(tablescrollpane, gc);
-		
 		Action addaction = new AbstractAction("Add Parameter")
 		{
 			public void actionPerformed(ActionEvent e)
@@ -153,7 +237,6 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			}
 		};
 		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
-		
 		Action setDefaultParametersAction = new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -162,7 +245,6 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		};
-		
 		Icon[] icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), ImageProvider.EMPTY_FRAME_TYPE, "page", buttonpanel.getIconColor());
 		defaultParameterButton.setAction(setDefaultParametersAction);
 		defaultParameterButton.setIcon(icons[0]);
@@ -174,7 +256,6 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		defaultParameterButton.setToolTipText("Enter default parameters appropriate for the selected task.");
 		((GridLayout) buttonpanel.getLayout()).setRows(3);
 		buttonpanel.add(defaultParameterButton);
-		
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -182,6 +263,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 0, 5, 5);
 		parameterpanel.add(buttonpanel, gc);
 		
+		tabpane.addTab("Properties", proppanel);
 		tabpane.addTab("Parameters", parameterpanel);
 		
 		add(tabpane, BorderLayout.CENTER);
@@ -305,8 +387,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 					{
 						String name = pmis.get(i).getName();
 						ClassInfo clazz = new ClassInfo(pmis.get(i).getClazz().getTypeName());
-						String value = pmis.get(i).getInitialValue() != null? pmis.get(i).getInitialValue() : "";
-						UnparsedExpression inival = new UnparsedExpression(name, clazz.getTypeName(), value, null);
+						UnparsedExpression inival = new UnparsedExpression(name, clazz.getTypeName(), pmis.get(i).getInitialValue(), null);
 						MParameter param = new MParameter(pmis.get(i).getDirection(), clazz, name, inival);
 						atable.addParameter(param);
 					}
@@ -378,11 +459,11 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			}
 			if(getBpmnTask().getParameters()!=null)
 			{
-				Map<String, MParameter> ps = getBpmnTask().getParameters().getAsMap();
+				Map<String, MProperty> ps = getBpmnTask().getProperties().getAsMap();
 				List<ParameterMetaInfo> params = (List<ParameterMetaInfo>)m.invoke(null, new Object[]{ps, modelcontainer.getBpmnModel().getModelInfo(), modelcontainer.getBpmnModel().getClassLoader()});
 				pis.addAll(params);
 			}
-			ret = new TaskMetaInfo(ret!=null? ret.getDescription(): null, pis);
+			ret = new TaskMetaInfo(ret!=null? ret.getDescription(): null, pis, ret!=null? ret.getPropertyInfos(): null);
 		}
 		catch(Exception e)
 		{

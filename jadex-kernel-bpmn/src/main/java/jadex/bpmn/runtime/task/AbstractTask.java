@@ -52,4 +52,5 @@ public abstract class AbstractTask implements ITask
 	 *  @throws	Exception When task execution fails.
 	 */
 	public abstract void doExecute(ITaskContext context, IInternalAccess instance)	throws Exception;
+
 }
