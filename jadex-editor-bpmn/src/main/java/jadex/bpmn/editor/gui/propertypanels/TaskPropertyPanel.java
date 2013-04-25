@@ -449,7 +449,6 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				}
 			}
 
-			TaskMetaInfo copy = new TaskMetaInfo();
 			Method m = clazz.getMethod("getExtraParameters", new Class[]{Map.class, IModelInfo.class, ClassLoader.class});
 			// todo: use classloader of tool!
 			List<ParameterMetaInfo> pis = new ArrayList<ParameterMetaInfo>();
@@ -457,12 +456,9 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			{
 				pis.addAll(ret.getParameterInfos());
 			}
-			if(getBpmnTask().getParameters()!=null)
-			{
-				Map<String, MProperty> ps = getBpmnTask().getProperties().getAsMap();
-				List<ParameterMetaInfo> params = (List<ParameterMetaInfo>)m.invoke(null, new Object[]{ps, modelcontainer.getBpmnModel().getModelInfo(), modelcontainer.getBpmnModel().getClassLoader()});
-				pis.addAll(params);
-			}
+			Map<String, MProperty> ps = getBpmnTask().getProperties().getAsMap();
+			List<ParameterMetaInfo> params = (List<ParameterMetaInfo>)m.invoke(null, new Object[]{ps, modelcontainer.getBpmnModel().getModelInfo(), modelcontainer.getProjectClassLoader()});
+			pis.addAll(params);
 			ret = new TaskMetaInfo(ret!=null? ret.getDescription(): null, pis, ret!=null? ret.getPropertyInfos(): null);
 		}
 		catch(Exception e)
