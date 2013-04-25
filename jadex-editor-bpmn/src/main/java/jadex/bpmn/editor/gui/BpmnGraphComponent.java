@@ -7,17 +7,27 @@ import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
+import java.awt.PaintContext;
+import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
+import java.awt.Transparency;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.Raster;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -216,7 +226,46 @@ public class BpmnGraphComponent extends mxGraphComponent
 	{
 		return new mxInteractiveCanvas()
 		{
-			@Override
+			/**
+			 *  Bug-fixed method.
+			 */
+			public Stroke createStroke(Map<String, Object> style)
+			{
+				float strokewidth = mxUtils.getFloat(style, mxConstants.STYLE_STROKEWIDTH, 1);
+				
+				if (mxUtils.isTrue(style, mxConstants.STYLE_DASHED))
+				{
+					float[] dashpattern = null;
+					if (style.get(mxConstants.STYLE_DASH_PATTERN) != null &&
+						float[].class.isInstance(style.get(mxConstants.STYLE_DASH_PATTERN)))
+					{
+						dashpattern = (float[]) style.get(mxConstants.STYLE_DASH_PATTERN);
+					}
+					else
+					{
+						dashpattern = mxUtils.getFloatArray(style,
+							mxConstants.STYLE_DASH_PATTERN,
+							mxConstants.DEFAULT_DASHED_PATTERN, " ");
+					}
+					float[] scaleddashpattern = new float[dashpattern.length];
+
+					for (int i = 0; i < dashpattern.length; i++)
+					{
+						scaleddashpattern[i] = (float) (dashpattern[i]* strokewidth * scale);
+					}
+
+					return new BasicStroke(strokewidth, BasicStroke.CAP_ROUND,
+							BasicStroke.JOIN_ROUND, 10.0f, scaleddashpattern, 0.0f);
+				}
+				else
+				{
+					return new BasicStroke(strokewidth);
+				}
+			}
+			
+			/**
+			 *  Bug-fixed/enhanced method.
+			 */
 			public Paint createFillPaint(mxRectangle bounds,
 					Map<String, Object> style)
 			{
@@ -266,19 +315,58 @@ public class BpmnGraphComponent extends mxGraphComponent
 							y2 = (float) (bounds.getY() + bounds.getHeight());
 							x1 = (float) (bounds.getX() + bounds.getWidth());
 						}
-						else if (gradientDirection.equals("northwest"))
+						else if (gradientDirection.equals("radnorthwest"))
 						{
-							x2 = (float) (bounds.getX() + bounds.getWidth());
-							y2 = (float) (bounds.getY() + bounds.getHeight());
+							double sqlength = Math.min(bounds.getWidth(), bounds.getHeight());
+//							double diffx2 = (bounds.getWidth() - sqlength) * 0.5;
+//							double diffy2 = (bounds.getHeight() - sqlength) * 0.5;
+//							x2 = (float) (bounds.getX() + diffx2);
+//							y2 = (float) (bounds.getY() + diffy2);
+//							x1 = (float) (x1 + sqlength);
+//							y1 = (float) (y1 + sqlength);
+//							
+//							System.out.println(x1 + " " + y1 + " " + x2 + " " + y2 + " " + " " + diffx2 + " " + diffy2 + " " + " " + bounds.getWidth() + " " + bounds.getHeight() + sqlength);
 //							System.out.println(x1);
 //							System.out.println(x2);
 //							fillPaint = new GradientPaint(x1+30, y1+30, gradientColor, x2, y2,
 //									fillColor, true);
 //							fillPaint = new LinearGradientPaint(new Point2D.Double(x1, y1), new Point2D.Double(x2, y1), new float[] {0.0f, 1.0f}, new Color[] {gradientColor, fillColor});
+							//fillPaint = new RadialGradientPaint((float) bounds.getX(), (float) bounds.getY(), (float) sqlength, new float[] {0.0f, 1.0f}, new Color[] { gradientColor, fillColor });
+//							fillPaint = new Paint()
+//							{
+//								public int getTransparency()
+//								{
+//									return Transparency.TRANSLUCENT;
+//								}
+//								
+//								public PaintContext createContext(ColorModel cm, Rectangle deviceBounds,
+//										Rectangle2D userBounds, AffineTransform xform, RenderingHints hints)
+//								{
+//									return new PaintContext()
+//									{
+//										
+//										public Raster getRaster(int x, int y, int w, int h)
+//										{
+//											return null;
+//										}
+//										
+//										public ColorModel getColorModel()
+//										{
+//											return null;
+//										}
+//										
+//										public void dispose()
+//										{
+//										}
+//									};
+//								}
+//							};
 						}
-
-						fillPaint = new GradientPaint(x1, y1, fillColor, x2, y2,
-								gradientColor, false);
+						
+						if (fillPaint == null)
+						{
+							fillPaint = new GradientPaint(x1, y1, fillColor, x2, y2, gradientColor, false);
+						}
 					}
 				}
 

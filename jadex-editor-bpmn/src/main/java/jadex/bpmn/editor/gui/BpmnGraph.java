@@ -179,6 +179,7 @@ public class BpmnGraph extends mxGraph
 		getView().clear(cell, true, false);
 		getView().invalidate(cell);
 		getView().validate();
+		
 		refresh();
 	}
 	

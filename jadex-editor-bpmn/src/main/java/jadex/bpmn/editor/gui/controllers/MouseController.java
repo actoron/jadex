@@ -179,8 +179,12 @@ public class MouseController extends MouseAdapter
 							vactivity.getGeometry().setAlternateBounds(new mxRectangle(alt.getX(), alt.getY(),
 																					   ads.width, ads.height));
 						}
+						vactivity.refreshParameterObjectGeometry();
 						
+						// TODO: Fix this selection hack.
+						Object[] scells = modelcontainer.getGraph().getSelectionCells();
 						modelcontainer.getGraph().refreshCellView(vactivity);
+						modelcontainer.getGraph().setSelectionCells(scells);
 						modelcontainer.setDirty(true);
 					}
 				}

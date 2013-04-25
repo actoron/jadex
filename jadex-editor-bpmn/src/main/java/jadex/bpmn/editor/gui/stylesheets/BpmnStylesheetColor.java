@@ -25,7 +25,6 @@ import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import com.mxgraph.canvas.mxGraphics2DCanvas;
 import com.mxgraph.shape.mxDefaultTextShape;
@@ -458,9 +457,9 @@ public class BpmnStylesheetColor extends mxStylesheet
 		
 		style = new HashMap<String, Object>();
 		style.put(mxConstants.STYLE_STARTARROW, mxConstants.NONE);
-		style.put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_OPEN);
+		style.put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_DIAMOND);
 		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
-		//style.put(mxConstants.STYLE_DASH_PATTERN, new float[] {1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f});
+		style.put(mxConstants.STYLE_DASH_PATTERN, new float[] { 5.0f, 5.0f });
 		style.put(mxConstants.STYLE_ROUNDED, Boolean.TRUE);
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);

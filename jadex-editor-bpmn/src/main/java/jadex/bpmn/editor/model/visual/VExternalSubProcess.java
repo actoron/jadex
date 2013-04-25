@@ -1,7 +1,6 @@
 package jadex.bpmn.editor.model.visual;
 
 import jadex.bpmn.model.MIdElement;
-import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 

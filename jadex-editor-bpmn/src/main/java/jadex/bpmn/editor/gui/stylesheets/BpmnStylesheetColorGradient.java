@@ -1,8 +1,5 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MBpmnModel;
 
@@ -20,7 +17,7 @@ public class BpmnStylesheetColorGradient extends BpmnStylesheetColor
 	public BpmnStylesheetColorGradient()
 	{
 		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK).put(mxConstants.STYLE_GRADIENTCOLOR, "#ffffff");
-		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK).put(mxConstants.STYLE_GRADIENT_DIRECTION, "northwest");
+		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK).put(mxConstants.STYLE_GRADIENT_DIRECTION, "radnorthwest");
 	}
 	
 //	@Override
