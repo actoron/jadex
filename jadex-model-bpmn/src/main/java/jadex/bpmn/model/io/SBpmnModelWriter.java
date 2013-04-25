@@ -13,6 +13,8 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
@@ -34,7 +36,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 2;
+	public static final int BUILD = 3;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -95,11 +97,13 @@ public class SBpmnModelWriter
 		
 		writeInitialBoilerPlate(out);
 		
-		writeJadexModelInfo(out, mmodel);
+		int ind = 1;
+		
+		writeJadexModelInfo(out, ind, mmodel);
 		
 		List<MPool> pools = mmodel.getPools();
 		
-		writePoolSemantics(out, pools);
+		writePoolSemantics(out, ind, pools);
 		
 		//writePoolCollaborations(out, pools);
 		
@@ -146,17 +150,19 @@ public class SBpmnModelWriter
 	 *  Writes the Jadex-specific model information
 	 *  
 	 *  @param out The output.
+	 *  @param ind The indentation level.
 	 *  @param mmodel The model.
 	 */
-	protected static final void writeJadexModelInfo(PrintStream out, MBpmnModel mmodel)
+	protected static final void writeJadexModelInfo(PrintStream out, int ind, MBpmnModel mmodel)
 	{
-		out.print(getIndent(1));
+		out.print(getIndent(ind));
 		out.println("<semantic:extension>");
+		++ind;
 		
 		String name = mmodel.getModelInfo().getName();
 		if (name != null && name.length() > 0)
 		{
-			out.print(getIndent(2));
+			out.print(getIndent(ind));
 			out.print("<jadex:modelname>");
 			out.print(name);
 			out.println("</jadex:modelname>");
@@ -165,7 +171,7 @@ public class SBpmnModelWriter
 		String desc = mmodel.getModelInfo().getDescription();
 		if (desc != null && desc.length() > 0)
 		{
-			out.print(getIndent(2));
+			out.print(getIndent(ind));
 			out.print("<jadex:description>");
 			out.print(desc);
 			out.println("</jadex:description>");
@@ -174,7 +180,7 @@ public class SBpmnModelWriter
 		String pkg = mmodel.getModelInfo().getPackage();
 		if (pkg != null && pkg.length() > 0)
 		{
-			out.print(getIndent(2));
+			out.print(getIndent(ind));
 			out.print("<jadex:package>");
 			out.print(pkg);
 			out.println("</jadex:package>");
@@ -188,7 +194,7 @@ public class SBpmnModelWriter
 		
 		if (suspend || master || daemon || autoshutdown || keepalive)
 		{
-			out.print(getIndent(2));
+			out.print(getIndent(ind));
 			out.print("<jadex:componentflags suspend=\"");
 			out.print(suspend);
 			out.print("\" master=\"");
@@ -202,19 +208,24 @@ public class SBpmnModelWriter
 			out.println("\"/>");
 		}
 		
-		writeImports(out, mmodel.getModelInfo().getImports());
+		writeImports(out, ind, mmodel.getModelInfo().getImports());
 		
-		writeArguments(out, false, mmodel.getModelInfo().getArguments());
+		writeArguments(out, ind, false, mmodel.getModelInfo().getArguments());
 		
-		writeArguments(out, true, mmodel.getModelInfo().getResults());
+		writeArguments(out, ind, true, mmodel.getModelInfo().getResults());
 		
-		writeContextVariables(out, mmodel);
+		writeContextVariables(out, ind, mmodel);
 		
-		writeConfigurations(out, mmodel, mmodel.getModelInfo().getConfigurations());
+		writeProvidedServices(out, ind, mmodel);
+		
+		writeRequiredServices(out, ind, mmodel);
+		
+		writeConfigurations(out, ind, mmodel, mmodel.getModelInfo().getConfigurations());
 		
 		mmodel.getModelInfo().getProperties();
 		
-		out.print(getIndent(1));
+		--ind;
+		out.print(getIndent(ind));
 		out.println("</semantic:extension>");
 	}
 	
@@ -222,24 +233,27 @@ public class SBpmnModelWriter
 	 *  Writes the imports.
 	 *  
 	 *  @param out The output.
+	 *  @param ind The indentation level.
 	 *  @param imports The imports.
 	 */
-	protected static final void writeImports(PrintStream out, String[] imports)
+	protected static final void writeImports(PrintStream out, int ind, String[] imports)
 	{
 		if (imports.length > 0)
 		{
-			out.print(getIndent(2));
+			out.print(getIndent(ind));
 			out.println("<jadex:imports>");
+			++ind;
 			
 			for (int i = 0; i < imports.length; ++i)
 			{
-				out.print(getIndent(3));
+				out.print(getIndent(ind));
 				out.print("<jadex:import>");
 				out.print(imports[i]);
 				out.println("</jadex:import>");
 			}
 			
-			out.print(getIndent(2));
+			--ind;
+			out.print(getIndent(ind));
 			out.println("</jadex:imports>");
 		}
 	}
@@ -248,14 +262,13 @@ public class SBpmnModelWriter
 	 *  Writes the arguments or results.
 	 *  
 	 *  @param out The output.
+	 *  @param ind The indentation level.
 	 *  @param results Set true for writing results.
 	 *  @param args The arguments or results.
 	 */
-	protected static final void writeArguments(PrintStream out, boolean results, IArgument[] args)
+	protected static final void writeArguments(PrintStream out, int ind, boolean results, IArgument[] args)
 	{
 		String prefix = results? "result" : "argument";
-		
-		int ind = 2;
 		
 		if (args.length > 0)
 		{
@@ -329,12 +342,11 @@ public class SBpmnModelWriter
 	 *  Writes the context variables.
 	 *  
 	 *  @param out The output.
+	 *  @param ind The indentation level.
 	 *  @param mmodel The BPMN model.
 	 */
-	protected static final void writeContextVariables(PrintStream out, MBpmnModel mmodel)
+	protected static final void writeContextVariables(PrintStream out, int ind, MBpmnModel mmodel)
 	{
-		int ind = 2;
-		
 		List<MContextVariable> ctvs = mmodel.getContextVariables();
 		if (ctvs.size() > 0)
 		{
@@ -382,12 +394,112 @@ public class SBpmnModelWriter
 	}
 	
 	/**
+	 *  Writes the provided services.
+	 *  
+	 *  @param out The output.
+	 *  @param mmodel The BPMN model.
+	 */
+	protected static final void writeProvidedServices(PrintStream out, int ind, MBpmnModel mmodel)
+	{
+		ProvidedServiceInfo[] pss = mmodel.getModelInfo().getProvidedServices();
+		if (pss != null && pss.length > 0)
+		{
+			out.print(getIndent(ind));
+			out.println("<jadex:providedservices>");
+			++ind;
+			
+			for (ProvidedServiceInfo ps : pss)
+			{
+				out.print(getIndent(ind));
+				out.print("<jadex:providedservice name=\"");
+				out.print(ps.getName());
+				
+				out.print("\" interface=\"");
+				out.print(ps.getType().getTypeName());
+				
+				if (ps.getImplementation() != null)
+				{
+					ClassInfo implclass = ps.getImplementation().getClazz();
+					if (implclass != null && implclass.getTypeName() != null && implclass.getTypeName().length() > 0)
+					{
+						out.print("\" class=\"");
+						out.print(implclass.getTypeName());
+					}
+					
+					String proxytype = ps.getImplementation().getProxytype();
+					if (proxytype != null && proxytype.length() > 0)
+					{
+						out.print("\" proxytype=\"");
+						out.print(proxytype);
+					}
+				}
+				
+				out.println("\"/>");
+			}
+			
+			--ind;
+			out.print(getIndent(ind));
+			out.println("</jadex:providedservices>");
+		}
+	}
+	
+	/**
+	 *  Writes the required services.
+	 *  
+	 *  @param out The output.
+	 *  @param mmodel The BPMN model.
+	 */
+	protected static final void writeRequiredServices(PrintStream out, int ind, MBpmnModel mmodel)
+	{
+		RequiredServiceInfo[] rss = mmodel.getModelInfo().getRequiredServices();
+		if (rss != null && rss.length > 0)
+		{
+			out.print(getIndent(ind));
+			out.println("<jadex:requiredservices>");
+			++ind;
+			
+			for (RequiredServiceInfo rs : rss)
+			{
+				out.print(getIndent(ind));
+				out.print("<jadex:requiredservice name=\"");
+				out.print(rs.getName());
+				
+				out.print("\" interface=\"");
+				out.print(rs.getType().getTypeName());
+				
+				if (rs.isMultiple())
+				{
+					out.print("\" multi=\"");
+					out.print(String.valueOf(rs.isMultiple()));
+				}
+				
+				if (rs.getDefaultBinding() != null)
+				{
+					String scope = rs.getDefaultBinding().getScope();
+					if (scope != null && scope.length() > 0)
+					{
+						out.print("\" scope=\"");
+						out.print(scope);
+					}
+				}
+				
+				out.println("\"/>");
+			}
+			
+			--ind;
+			out.print(getIndent(ind));
+			out.println("</jadex:requiredservices>");
+		}
+	}
+	
+	/**
 	 *  Writes the configurations.
 	 *  
 	 *  @param out The output.
+	 *  @param ind The indentation level.
 	 *  @param configurations The configurations.
 	 */
-	protected static final void writeConfigurations(PrintStream out, MBpmnModel mmodel, ConfigurationInfo[] configurations)
+	protected static final void writeConfigurations(PrintStream out, int ind, MBpmnModel mmodel, ConfigurationInfo[] configurations)
 	{
 		if (configurations.length > 0)
 		{
@@ -412,17 +524,15 @@ public class SBpmnModelWriter
 				}
 			}
 			
-			int indent = 2;
-			
-			out.print(getIndent(indent));
+			out.print(getIndent(ind));
 			out.println("<jadex:configurations>");
 			
-			++indent;
+			++ind;
 			for (int i = 0; i < configurations.length; ++i)
 			{
 				ConfigurationInfo conf = configurations[i];
 				
-				out.print(getIndent(indent));
+				out.print(getIndent(ind));
 				out.print("<jadex:configuration name=\"");
 				out.print(conf.getName());
 				out.print("\"");
@@ -455,11 +565,11 @@ public class SBpmnModelWriter
 					out.print("\"");
 				}
 				out.println(">");
-				++indent;
+				++ind;
 				
 				if (conf.getDescription() != null && conf.getDescription().length() > 0)
 				{
-					out.print(getIndent(indent));
+					out.print(getIndent(ind));
 					out.print("<jadex:description>");
 					out.print(conf.getDescription());
 					out.println("</jadex:description>");
@@ -468,7 +578,7 @@ public class SBpmnModelWriter
 				String poollane = mmodel.getPoolLane(conf.getName());
 				if (poollane != null && poollane.length() > 0)
 				{
-					out.print(getIndent(indent));
+					out.print(getIndent(ind));
 					out.print("<jadex:poollane>");
 					out.print(poollane);
 					out.println("</jadex:poollane>");
@@ -479,15 +589,15 @@ public class SBpmnModelWriter
 					UnparsedExpression[] args = conf.getArguments();
 					if (args.length > 0)
 					{
-						out.print(getIndent(indent));
+						out.print(getIndent(ind));
 						out.println("<jadex:argumentvalues>");
-						++indent;
+						++ind;
 						
 						for (int j = 0; j < args.length; ++j)
 						{
 							if (args[j].getValue() != null && args[j].getValue().length() > 0)
 							{
-								out.print(getIndent(indent));
+								out.print(getIndent(ind));
 								out.print("<jadex:value name=\"");
 								out.print(args[j].getName());
 								out.print("\">");
@@ -496,23 +606,23 @@ public class SBpmnModelWriter
 							}
 						}
 						
-						--indent;
-						out.print(getIndent(indent));
+						--ind;
+						out.print(getIndent(ind));
 						out.println("<jadex:argumentvalues>");
 					}
 					
 					UnparsedExpression[] res = conf.getResults();
 					if (res.length > 0)
 					{
-						out.print(getIndent(indent));
+						out.print(getIndent(ind));
 						out.println("<jadex:resultvalues>");
-						++indent;
+						++ind;
 						
 						for (int j = 0; j < res.length; ++j)
 						{
 							if (res[j].getValue() != null && res[j].getValue().length() > 0)
 							{
-								out.print(getIndent(indent));
+								out.print(getIndent(ind));
 								out.print("<jadex:value name=\"");
 								out.print(res[j].getName());
 								out.print("\">");
@@ -521,23 +631,23 @@ public class SBpmnModelWriter
 							}
 						}
 						
-						--indent;
-						out.print(getIndent(indent));
+						--ind;
+						out.print(getIndent(ind));
 						out.println("<jadex:resultvalues>");
 					}
 					
 					Map<String, String> confctvmap = ctvconfexp.get(conf.getName());
 					if (confctvmap != null && confctvmap.size() > 0)
 					{
-						out.print(getIndent(indent));
+						out.print(getIndent(ind));
 						out.println("<jadex:contextvariablevalues>");
-						++indent;
+						++ind;
 						
 						for (Map.Entry<String, String> entry : confctvmap.entrySet())
 						{
 							if (entry.getValue() != null && entry.getValue().length() > 0)
 							{
-								out.print(getIndent(indent));
+								out.print(getIndent(ind));
 								out.print("<jadex:value name=\"");
 								out.print(entry.getKey());
 								out.print("\">");
@@ -546,19 +656,86 @@ public class SBpmnModelWriter
 							}
 						}
 						
-						--indent;
-						out.print(getIndent(indent));
+						--ind;
+						out.print(getIndent(ind));
 						out.println("</jadex:contextvariablevalues>");
 					}
 				}
 				
-				--indent;
-				out.print(getIndent(indent));
+				ProvidedServiceInfo[] pss = conf.getProvidedServices();
+				if (pss != null && pss.length > 0)
+				{
+					out.print(getIndent(ind));
+					out.println("<jadex:providedserviceconfigurations>");
+					++ind;
+					
+					for (ProvidedServiceInfo ps : pss)
+					{
+						if (ps.getImplementation() != null)
+						{
+							out.print(getIndent(ind));
+							out.print("<jadex:providedserviceconfiguration name=\"");
+							out.print(ps.getName());
+							
+							if (ps.getImplementation().getClazz() != null && ps.getImplementation().getClazz().getTypeName() != null && ps.getImplementation().getClazz().getTypeName().length() > 0)
+							{
+								out.print("\" class=\"");
+								out.print(ps.getImplementation().getClazz().getTypeName());
+							}
+							
+							if (ps.getImplementation().getProxytype() != null && ps.getImplementation().getProxytype().length() > 0)
+							{
+								out.print("\" proxytype=\"");
+								out.print(ps.getImplementation().getProxytype());
+							}
+							
+							out.println("\"/>");
+						}
+					}
+					
+					--ind;
+					out.print(getIndent(ind));
+					out.println("</jadex:providedserviceconfigurations>");
+				}
+				
+				RequiredServiceInfo[] rss = conf.getRequiredServices();
+				if (rss != null && rss.length > 0)
+				{
+					out.print(getIndent(ind));
+					out.println("<jadex:requiredserviceconfigurations>");
+					++ind;
+					
+					for (RequiredServiceInfo rs : rss)
+					{
+						if (rs.getDefaultBinding() != null)
+						{
+							out.print(getIndent(ind));
+							out.print("<jadex:requiredserviceconfiguration name=\"");
+							out.print(rs.getName());
+							
+							if (rs.getDefaultBinding().getScope() != null &&
+								rs.getDefaultBinding().getScope().length() > 0)
+							{
+								out.print("\" scope=\"");
+								out.print(rs.getDefaultBinding().getScope());
+							}
+							
+							out.println("\"/>");
+						}
+					}
+					
+					--ind;
+					out.print(getIndent(ind));
+					out.println("</jadex:requiredserviceconfigurations>");
+				}
+				
+				--ind;
+				out.print(getIndent(ind));
 				out.println("</jadex:configuration>");
 			}
-			--indent;
+			--ind;
 			
-			out.print(getIndent(indent));
+			out.print(getIndent(ind));
 			out.println("</jadex:configurations>");
 		}
 	}
@@ -567,11 +744,11 @@ public class SBpmnModelWriter
 	 *  Writes the pools of the semantics sections.
 	 *  
 	 *  @param out The output.
+	 *  @param ind The indentation level.
 	 *  @param pools The pools.
 	 */
-	protected static final void writePoolSemantics(PrintStream out, List<MPool> pools)
+	protected static final void writePoolSemantics(PrintStream out, int ind, List<MPool> pools)
 	{
-		int ind = 1;
 		if (pools != null && pools.size() > 0)
 		{
 			for (MPool pool : pools)
@@ -586,7 +763,7 @@ public class SBpmnModelWriter
 				List<MLane> lanes = pool.getLanes();
 				if (lanes != null && lanes.size() > 0)
 				{
-					writeLaneSemantics(out, lanes);
+					writeLaneSemantics(out, ind, lanes);
 				}
 				
 				List<MActivity> activities = getPoolActivities(pool);
@@ -594,11 +771,12 @@ public class SBpmnModelWriter
 				List<MSequenceEdge> seqedges = new ArrayList<MSequenceEdge>();
 				List<MDataEdge> dataedges = new ArrayList<MDataEdge>();
 				writeActivitySemantics(out, activities, null, ind, seqedges, dataedges);
+				
 				writeSequenceEdgeSemantics(out, seqedges, ind);
+				writePoolExtensions(out, ind, dataedges);
 				
 				--ind;
-				
-				out.println(getIndent(1) + "</semantic:process>");
+				out.println(getIndent(ind) + "</semantic:process>");
 			}
 		}
 	}
@@ -609,27 +787,28 @@ public class SBpmnModelWriter
 	 *  @param out The output.
 	 *  @param pools The pools.
 	 */
-	protected static final void writePoolCollaborations(PrintStream out, List<MPool> pools)
-	{
-		out.println(getIndent(1) + "<semantic:collaboration>");
-		for (MPool pool : pools)
-		{
-			out.print(getIndent(2) + "<semantic:participant name=\"");
-			out.print(pool.getName());
-			out.print("\" processRef=\"");
-			out.print(pool.getId());
-			out.println("\"/>");
-		}
-		out.println(getIndent(1) + "</semantic:collaboration>");
-	}
+//	protected static final void writePoolCollaborations(PrintStream out, List<MPool> pools)
+//	{
+//		out.println(getIndent(1) + "<semantic:collaboration>");
+//		for (MPool pool : pools)
+//		{
+//			out.print(getIndent(2) + "<semantic:participant name=\"");
+//			out.print(pool.getName());
+//			out.print("\" processRef=\"");
+//			out.print(pool.getId());
+//			out.println("\"/>");
+//		}
+//		out.println(getIndent(1) + "</semantic:collaboration>");
+//	}
 	
 	/**
 	 *  Writes the pool extension elements (e.g. data edges).
 	 *  
 	 *  @param out The output.
+	 *  @param ind The indentation level.
 	 *  @param seqedges The sequence edges.
 	 */
-	protected static final void writePoolExtensions(PrintStream out, List<MDataEdge> dataedges, int ind)
+	protected static final void writePoolExtensions(PrintStream out, int ind, List<MDataEdge> dataedges)
 	{
 		out.println(getIndent(ind) + "<semantic:extensionElements>");
 		++ind;
@@ -656,35 +835,40 @@ public class SBpmnModelWriter
 	 *  Writes the lanes of the semantics sections.
 	 *  
 	 *  @param out The output.
+	 *  @param ind The indentation level.
 	 *  @param lanes The lanes.
 	 */
-	protected static final void writeLaneSemantics(PrintStream out, List<MLane> lanes)
+	protected static final void writeLaneSemantics(PrintStream out, int ind, List<MLane> lanes)
 	{
-		out.println(getIndent(2) + "<semantic:laneSet>");
+		out.println(getIndent(ind) + "<semantic:laneSet>");
+		++ind;
 		
 		//TODO: Child lane sets
 		
 		for (MLane lane : lanes)
 		{
-			out.print(getIndent(3) + "<semantic:lane name=\"");
+			out.print(getIndent(ind) + "<semantic:lane name=\"");
 			out.print(lane.getName());
 			out.print("\" id=\"");
 			out.print(lane.getId());
 			out.println("\">");
+			++ind;
 			
 			// Write activity references
 			List<MActivity> activities = lane.getActivities();
 			for (MActivity activity : activities)
 			{
-				out.print(getIndent(4) + "<semantic:flowNodeRef>");
+				out.print(getIndent(ind) + "<semantic:flowNodeRef>");
 				out.print(activity.getId());
 				out.println("</semantic:flowNodeRef>");
 			}
 			
-			out.println(getIndent(3) + "</semantic:lane>");
+			--ind;
+			out.println(getIndent(ind) + "</semantic:lane>");
 		}
 		
-		out.println(getIndent(2) + "</semantic:laneSet>");
+		--ind;
+		out.println(getIndent(ind) + "</semantic:laneSet>");
 	}
 	
 	/**

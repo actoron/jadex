@@ -6,6 +6,7 @@ import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
@@ -15,6 +16,10 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.Tuple2;
 import jadex.javaparser.SJavaParser;
 
@@ -712,6 +717,75 @@ public class SBpmnModelReader
 				//model.addContextVariable(name, clazz, exp, null);
 				model.addContextVariable(var);
 			}
+			else if ("providedservice".equals(tag.getLocalPart()))
+			{
+				String name = attrs.get("name");
+				ClassInfo itrface = attrs.get("interface") != null? new ClassInfo(attrs.get("interface")) : null;
+				ClassInfo clazz = attrs.get("class") != null? new ClassInfo(attrs.get("class")) : null;
+				String proxytype = attrs.get("proxytype");
+				
+				ProvidedServiceInfo ps = new ProvidedServiceInfo();
+				ps.setName(name);
+				ps.setType(itrface);
+				ps.setImplementation(new ProvidedServiceImplementation());
+				ps.getImplementation().setClazz(clazz);
+				ps.getImplementation().setProxytype(proxytype);
+				((ModelInfo) model.getModelInfo()).addProvidedService(ps);
+			}
+			else if ("providedserviceconfiguration".equals(tag.getLocalPart()))
+			{
+				List<ProvidedServiceInfo> vals = (List<ProvidedServiceInfo>) buffer.get("psconfs");
+				if (vals == null)
+				{
+					vals = new ArrayList<ProvidedServiceInfo>();
+					buffer.put("psconfs", vals);
+				}
+				String name = attrs.get("name");
+				ClassInfo clazz = attrs.get("class") != null? new ClassInfo(attrs.get("class")) : null;
+				String proxytype = attrs.get("proxytype");
+				
+				ProvidedServiceInfo ps = new ProvidedServiceInfo();
+				ps.setName(name);
+				ps.setImplementation(new ProvidedServiceImplementation());
+				ps.getImplementation().setClazz(clazz);
+				ps.getImplementation().setProxytype(proxytype);
+				vals.add(ps);
+			}
+			else if ("requiredservice".equals(tag.getLocalPart()))
+			{
+				String name = attrs.get("name");
+				ClassInfo itrface = attrs.get("interface") != null? new ClassInfo(attrs.get("interface")) : null;
+				Boolean multi = attrs.get("multi") != null? Boolean.parseBoolean(attrs.get("multi")) : null;
+				String scope = attrs.get("scope");
+				
+				RequiredServiceInfo rs = new RequiredServiceInfo();
+				rs.setName(name);
+				rs.setType(itrface);
+				if (multi != null)
+				{
+					rs.setMultiple(multi.booleanValue());
+				}
+				rs.setDefaultBinding(new RequiredServiceBinding());
+				rs.getDefaultBinding().setScope(scope);
+				((ModelInfo) model.getModelInfo()).addRequiredService(rs);
+			}
+			else if ("requiredserviceconfiguration".equals(tag.getLocalPart()))
+			{
+				List<RequiredServiceInfo> vals = (List<RequiredServiceInfo>) buffer.get("rsconfs");
+				if (vals == null)
+				{
+					vals = new ArrayList<RequiredServiceInfo>();
+					buffer.put("rsconfs", vals);
+				}
+				String name = attrs.get("name");
+				String scope = attrs.get("scope");
+				
+				RequiredServiceInfo rs = new RequiredServiceInfo();
+				rs.setName(name);
+				rs.setDefaultBinding(new RequiredServiceBinding());
+				rs.getDefaultBinding().setScope(scope);
+				vals.add(rs);
+			}
 			else if ("configuration".equals(tag.getLocalPart()))
 			{
 				ConfigurationInfo conf = new ConfigurationInfo(attrs.get("name"));
@@ -744,39 +818,60 @@ public class SBpmnModelReader
 				}
 				
 				Map<String, String> vals = (Map<String, String>) buffer.remove("argvalues");
-				for (Map.Entry<String, String> entry : vals.entrySet())
+				if (vals != null)
 				{
-					UnparsedExpression exp = new UnparsedExpression();
-					exp.setName(entry.getKey());
-					exp.setClazz(model.getModelInfo().getArgument(exp.getName()).getClazz());
-					exp.setValue(entry.getValue());
-					parseExp(exp, model.getModelInfo().getAllImports(), cl);
-					conf.addArgument(exp);
+					for (Map.Entry<String, String> entry : vals.entrySet())
+					{
+						UnparsedExpression exp = new UnparsedExpression();
+						exp.setName(entry.getKey());
+						exp.setClazz(model.getModelInfo().getArgument(exp.getName()).getClazz());
+						exp.setValue(entry.getValue());
+						parseExp(exp, model.getModelInfo().getAllImports(), cl);
+						conf.addArgument(exp);
+					}
 				}
 				
 				vals = (Map<String, String>) buffer.remove("resvalues");
-				for (Map.Entry<String, String> entry : vals.entrySet())
+				if (vals != null)
 				{
-					UnparsedExpression exp = new UnparsedExpression();
-					exp.setName(entry.getKey());
-					exp.setClazz(model.getModelInfo().getResult(exp.getName()).getClazz());
-					exp.setValue(entry.getValue());
-					parseExp(exp, model.getModelInfo().getAllImports(), cl);
-					conf.addResult(exp);
+					for (Map.Entry<String, String> entry : vals.entrySet())
+					{
+						UnparsedExpression exp = new UnparsedExpression();
+						exp.setName(entry.getKey());
+						exp.setClazz(model.getModelInfo().getResult(exp.getName()).getClazz());
+						exp.setValue(entry.getValue());
+						parseExp(exp, model.getModelInfo().getAllImports(), cl);
+						conf.addResult(exp);
+					}
 				}
 				
 				vals = (Map<String, String>) buffer.remove("ctvvalues");
-				for (Map.Entry<String, String> entry : vals.entrySet())
+				if (vals != null)
 				{
-					UnparsedExpression exp = new UnparsedExpression();
-					exp.setName(entry.getKey());
-					//exp.setClazz(model.getContextVariableClass(entry.getKey()));
-					MContextVariable contextvar = model.getContextVariable(entry.getKey());
-					exp.setClazz(contextvar.getClazz());
-					exp.setValue(entry.getValue());
-					parseExp(exp, model.getModelInfo().getAllImports(), cl);
-					//model.setContextVariableExpression(entry.getKey(), conf.getName(), exp);
-					contextvar.setValue(conf.getName(), exp);
+					for (Map.Entry<String, String> entry : vals.entrySet())
+					{
+						UnparsedExpression exp = new UnparsedExpression();
+						exp.setName(entry.getKey());
+						//exp.setClazz(model.getContextVariableClass(entry.getKey()));
+						MContextVariable contextvar = model.getContextVariable(entry.getKey());
+						exp.setClazz(contextvar.getClazz());
+						exp.setValue(entry.getValue());
+						parseExp(exp, model.getModelInfo().getAllImports(), cl);
+						//model.setContextVariableExpression(entry.getKey(), conf.getName(), exp);
+						contextvar.setValue(conf.getName(), exp);
+					}
+				}
+				
+				List<ProvidedServiceInfo> psconfs = (List<ProvidedServiceInfo>) buffer.get("psconfs");
+				if (psconfs != null)
+				{
+					conf.setProvidedServices(psconfs.toArray(new ProvidedServiceInfo[psconfs.size()]));
+				}
+				
+				List<RequiredServiceInfo> rsconfs = (List<RequiredServiceInfo>) buffer.get("rsconfs");
+				if (rsconfs != null)
+				{
+					conf.setRequiredServices(rsconfs.toArray(new RequiredServiceInfo[rsconfs.size()]));
 				}
 				
 				((ModelInfo) model.getModelInfo()).addConfiguration(conf);

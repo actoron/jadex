@@ -12,6 +12,7 @@ import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IFilter;
@@ -71,12 +72,21 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected String[] PROVIDED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Proxytype", "Implementation" };
 	
 	/** The column names for the required services table. */
-	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Multiplex", "Binding" };
+	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Multiplex", "Scope" };
 	
 	/** The proxy types. */
 	protected String[] PROXY_TYPES = { BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,
 									   BasicServiceInvocationHandler.PROXYTYPE_DIRECT,
 									   BasicServiceInvocationHandler.PROXYTYPE_RAW };
+	
+	/** The scope types. */
+	protected String[] SCOPE_TYPES = { RequiredServiceInfo.SCOPE_APPLICATION,
+									   RequiredServiceInfo.SCOPE_COMPONENT,
+									   RequiredServiceInfo.SCOPE_PARENT,
+									   RequiredServiceInfo.SCOPE_LOCAL,
+									   RequiredServiceInfo.SCOPE_PLATFORM,
+									   RequiredServiceInfo.SCOPE_GLOBAL,
+									   RequiredServiceInfo.SCOPE_UPWARDS };
 	
 	/** Cache for handling configurations. */
 	protected List<ConfigurationInfo> confcache;
@@ -226,6 +236,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		
 		setupProvidedServicesTable(tabpane);
 		
+		setupRequiredServicesTable(tabpane);
+		
 		add(tabpane, BorderLayout.CENTER);
 	}
 	
@@ -271,6 +283,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					getModelInfo().setImports((String[]) imports.toArray(new String[imports.size()]));
 					((ImportTableModel) importtable.getModel()).fireTableRowsDeleted(ind[i], ind[i]);
 				}
+				modelcontainer.setDirty(true);
 			}
 		};
 		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
@@ -330,6 +343,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					ConfigurationInfo conf = confcache.remove(ind[i]);
 					getModelInfo().setConfigurations((ConfigurationInfo[]) confcache.toArray(new ConfigurationInfo[confcache.size()]));
 					getModel().removePoolLane(conf.getName());
+					modelcontainer.setDirty(true);
 					((ConfigurationTableModel) conftable.getModel()).fireTableRowsDeleted(ind[i], ind[i]);
 					
 					for (int j = 0; j < paramcche.size(); ++j)
@@ -343,7 +357,6 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 							
 							addParameter(param, j);
 							//TODO Update param model?
-							modelcontainer.setDirty(true);
 						}
 					}
 				}
@@ -522,6 +535,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				getModelInfo().addProperty(new UnparsedExpression(name, "", "", null));
 				propertynames.add(name);
 				((PropertyTableModel) proptable.getModel()).fireTableRowsInserted(row, row);
+				modelcontainer.setDirty(true);
 			}
 		};
 		Action removeaction = new AbstractAction("Remove Properties")
@@ -538,6 +552,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					String name = propertynames.remove(i);
 					props.remove(name);
 					((PropertyTableModel) proptable.getModel()).fireTableRowsDeleted(ind[i], ind[i]);
+					modelcontainer.setDirty(true);
 				}
 			}
 		};
@@ -608,6 +623,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				ps.setImplementation(psimpl);
 				int row = getModelInfo().getProvidedServices().length;
 				getModelInfo().addProvidedService(ps);
+				modelcontainer.setDirty(true);
 				
 				((ProvidedServicesTableModel) pstable.getModel()).fireTableRowsInserted(row, row);
 			}
@@ -620,19 +636,17 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				
 				Arrays.sort(ind);
 				
+				ProvidedServiceInfo[] services = getModelInfo().getProvidedServices();
 				for (int i = ind.length - 1; i >= 0; --i)
 				{
-					List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
-					services.remove(i);
-					getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+					getModelInfo().removeProvidedService(services[i]);
 					for (ConfigurationInfo conf : getModelInfo().getConfigurations())
 					{
-						services = SUtil.arrayToList(conf.getProvidedServices());
-						services.remove(i);
-						conf.setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+						conf.removeProvidedService(services[i]);
 					}
 					((ProvidedServicesTableModel) pstable.getModel()).fireTableRowsDeleted(ind[i], ind[i]);
 				}
+				modelcontainer.setDirty(true);
 			}
 		};
 		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
@@ -643,6 +657,95 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 0, 5, 5);
 		tablepanel.add(buttonpanel, gc);
 		tabpane.add(tablepanel, "Provided Services");
+	}
+	
+	/**
+	 *  Initializes the required services table.
+	 */
+	protected void setupRequiredServicesTable(JTabbedPane tabpane)
+	{
+		JPanel tablepanel = new JPanel(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridy = 1;
+		gc.gridheight = 2;
+		gc.weightx = 1.0;
+		gc.weighty = 1.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.insets = new Insets(0, 5, 5, 0);
+		String[] scopeboxscopes = new String[SCOPE_TYPES.length];
+		for (int i = 0; i < SCOPE_TYPES.length; ++i)
+		{
+			String firstchar = SCOPE_TYPES[i].substring(0, 1);
+			scopeboxscopes[i] = SCOPE_TYPES[i].replaceFirst(firstchar, firstchar.toUpperCase());
+		}
+		JComboBox scopebox = new JComboBox(scopeboxscopes);
+		final DefaultCellEditor scopeeditor = new DefaultCellEditor(scopebox);
+		final JTable rstable = new JTable(new RequiredServicesTableModel())
+		{
+			public TableCellEditor getCellEditor(int row, int column)
+			{
+				if (column == 3)
+				{
+					return scopeeditor;
+				}
+				return super.getCellEditor(row, column);
+			}
+		};
+		
+		JScrollPane tablescrollpane = new JScrollPane(rstable);
+		tablepanel.add(tablescrollpane, gc);
+		
+		conftable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				((RequiredServicesTableModel) rstable.getModel()).fireTableStructureChanged();
+			}
+		});
+		
+		Action addaction = new AbstractAction("Add Required Service")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String name = createFreeName("name", new RSContains());
+				RequiredServiceInfo rs = new RequiredServiceInfo();
+				rs.setName(name);
+				int row = getModelInfo().getRequiredServices().length;
+				getModelInfo().addRequiredService(rs);
+				modelcontainer.setDirty(true);
+				
+				((RequiredServicesTableModel) rstable.getModel()).fireTableRowsInserted(row, row);
+			}
+		};
+		Action removeaction = new AbstractAction("Remove Required Services")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				int[] ind = rstable.getSelectedRows();
+				
+				Arrays.sort(ind);
+				
+				RequiredServiceInfo[] services = getModelInfo().getRequiredServices();
+				for (int i = ind.length - 1; i >= 0; --i)
+				{
+					getModelInfo().removeRequiredService(services[i]);
+					for (ConfigurationInfo conf : getModelInfo().getConfigurations())
+					{
+						conf.removeRequiredService(services[i]);
+					}
+					((RequiredServicesTableModel) rstable.getModel()).fireTableRowsDeleted(ind[i], ind[i]);
+				}
+				modelcontainer.setDirty(true);
+			}
+		};
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		gc = new GridBagConstraints();
+		gc.gridx = 1;
+		gc.gridy = 1;
+		gc.fill = GridBagConstraints.NONE;
+		gc.insets = new Insets(0, 0, 5, 5);
+		tablepanel.add(buttonpanel, gc);
+		tabpane.add(tablepanel, "Required Services");
 	}
 	
 	/**
@@ -1460,6 +1563,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			{
 				case 0:
 				default:
+				{
 					if (!value.equals(getValueAt(rowIndex, columnIndex)))
 					{
 						String newname = createFreeName((String) value, new PSContains());
@@ -1472,23 +1576,22 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 						ps.setName(newname);
 					}
 					break;
+				}
 				case 1:
-					value = nullifyString(value);
-					if (value != null)
-					{
-						ps.setType(new ClassInfo(nullifyString(value)));
-					}
+				{
+					ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
+					ps.setType(type);
 					break;
+				}
 				case 2:
+				{
 					if (cs != null)
 					{
 						createImplementation(cs);
 						cs.getImplementation().setProxytype(nullifyString(value));
 						if (compareService(ps, cs))
 						{
-							List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
-							services.remove(cs);
-							getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+							conf.removeProvidedService(cs);
 						}
 					}
 					else
@@ -1500,47 +1603,45 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 							cs = getProvService(ps.getName(), itconf);
 							if (compareService(ps, cs))
 							{
-								List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
-								services.remove(cs);
-								getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+								itconf.removeProvidedService(cs);
 							}
 						}
 					}
 					break;
+				}
 				case 3:
-						ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
-						if (cs != null)
+				{
+					ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
+					if (cs != null)
+					{
+						createImplementation(cs);
+						cs.getImplementation().setClazz(type);
+						if (compareService(ps, cs))
 						{
-							createImplementation(cs);
-							cs.getImplementation().setClazz(type);
+							conf.removeProvidedService(cs);
+						}
+					}
+					else
+					{
+						createImplementation(ps);
+						ps.getImplementation().setClazz(type);
+						for (ConfigurationInfo itconf : getModelInfo().getConfigurations())
+						{
+							cs = getProvService(ps.getName(), itconf);
 							if (compareService(ps, cs))
 							{
-								List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
-								services.remove(cs);
-								getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
+								itconf.removeProvidedService(cs);
 							}
 						}
-						else
-						{
-							createImplementation(ps);
-							ps.getImplementation().setClazz(type);
-							for (ConfigurationInfo itconf : getModelInfo().getConfigurations())
-							{
-								cs = getProvService(ps.getName(), itconf);
-								if (compareService(ps, cs))
-								{
-									List<ProvidedServiceInfo> services = SUtil.arrayToList(getModelInfo().getProvidedServices());
-									services.remove(cs);
-									getModelInfo().setProvidedServices((ProvidedServiceInfo[]) services.toArray(new ProvidedServiceInfo[services.size()]));
-								}
-							}
-						}
+					}
+					break;
+				}
 			}
 		}
 	}
 	
 	/**
-	 *  Table model for required services.
+	 *  Table model for provided services.
 	 */
 	protected class RequiredServicesTableModel extends AbstractTableModel
 	{
@@ -1553,11 +1654,23 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			String ret = REQUIRED_SERVICES_COLUMN_NAMES[column];
 			String confname = getSelectedConfigurationName();
-			if (confname != null)
+			if (confname != null && column == 3)
 			{
 				ret += " [" + confname + "]";
 			}
 			return ret;
+		}
+		
+		/**
+		 *  Returns the column class.
+		 */
+		public Class<?> getColumnClass(int columnIndex)
+		{
+			if (columnIndex == 2)
+			{
+				return Boolean.class;
+			}
+			return super.getColumnClass(columnIndex);
 		}
 		
 		/**
@@ -1579,7 +1692,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public int getRowCount()
 		{
-			return getSelectedServices().length;
+			return getModelInfo().getRequiredServices().length;
 		}
 		
 		/**
@@ -1589,7 +1702,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public int getColumnCount()
 		{
-			return PROVIDED_SERVICES_COLUMN_NAMES.length;
+			return REQUIRED_SERVICES_COLUMN_NAMES.length;
 		}
 		
 		/**
@@ -1601,62 +1714,130 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-			ProvidedServiceInfo ps = getSelectedServices()[rowIndex];
+			RequiredServiceInfo rs = getModelInfo().getRequiredServices()[rowIndex];
+			RequiredServiceInfo cs = getReqService(rs.getName(), getSelectedConfiguration());
 			switch (columnIndex)
 			{
 				case 0:
 				default:
-					return ps.getName();
+					return rs.getName();
 				case 1:
-					return ps.getType().getTypeName();
+					return rs.getType() != null? rs.getType().getTypeName() : null;
 				case 2:
-					return ps.getImplementation().getProxytype();
+				{
+					return rs.isMultiple();
+				}
 				case 3:
-					return ps.getImplementation().getClazz().getTypeName();
+				{
+					String ret = RequiredServiceInfo.SCOPE_COMPONENT;
+					if (cs != null)
+					{
+						rs = cs;
+					}
+					if (rs != null && rs.getDefaultBinding() != null && rs.getDefaultBinding().getScope() != null)
+					{
+						ret = rs.getDefaultBinding().getScope();
+					}
+					String firstchar = ret.substring(0, 1);
+					ret = ret.replaceFirst(firstchar, firstchar.toUpperCase());
+					return ret;
+				}
 			}
 		}
 		
-		
-		
 		/**
-		 *  Gets the currently selected services.
+		 *  Sets the value.
 		 *  
-		 *  @return The services.
+		 *  @param rowIndex The row.
+		 *  @param columnIndex The column.
+		 *  @return The value.
 		 */
-		protected ProvidedServiceInfo[] getSelectedServices()
+		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
+			RequiredServiceInfo rs = getModelInfo().getRequiredServices()[rowIndex];
 			ConfigurationInfo conf = getSelectedConfiguration();
-			ProvidedServiceInfo[] ret = null;
-			
-			if (conf == null)
+			RequiredServiceInfo cs = getReqService(rs.getName(), getSelectedConfiguration());
+			if (columnIndex == 3 &&
+				cs == null &&
+				conf != null)
 			{
-				ret = getModelInfo().getProvidedServices();
+				cs = new RequiredServiceInfo();
+				cs.setName(rs.getName());
+				conf.addRequiredService(cs);
 			}
-			else
+			switch (columnIndex)
 			{
-				ret = conf.getProvidedServices();
+				case 0:
+				default:
+				{
+					if (!value.equals(getValueAt(rowIndex, columnIndex)))
+					{
+						String newname = createFreeName((String) value, new RSContains());
+						ConfigurationInfo[] confs = getModelInfo().getConfigurations();
+						for (ConfigurationInfo itconf : confs)
+						{
+							RequiredServiceInfo itcs = getReqService(rs.getName(), itconf);
+							itcs.setName(newname);
+						}
+						rs.setName(newname);
+					}
+					break;
+				}
+				case 1:
+				{
+					ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
+					rs.setType(type);
+					break;
+				}
+				case 2:
+				{
+					rs.setMultiple((Boolean) value);
+					break;
+				}
+				case 3:
+				{
+					String val = ((String) value).substring(0, 1);
+					val = ((String) value).replaceFirst(val, val.toLowerCase());
+					if (cs != null)
+					{
+						createBinding(cs);
+						cs.getDefaultBinding().setScope(val);
+						if (compareService(rs, cs))
+						{
+							conf.removeRequiredService(cs);
+						}
+					}
+					else
+					{
+						createBinding(rs);
+						rs.getDefaultBinding().setScope(val);
+						for (ConfigurationInfo itconf : getModelInfo().getConfigurations())
+						{
+							cs = getReqService(rs.getName(), itconf);
+							if (compareService(rs, cs))
+							{
+								itconf.removeRequiredService(cs);
+							}
+						}
+					}
+				}
 			}
-			
-			return ret;
 		}
-		
-		/**
-		 *  Sets the currently selected services.
-		 *  
-		 *  @param services The services.
-		 */
-		protected void setSelectedServices(ProvidedServiceInfo[] services)
+	}
+	
+	protected class RSContains implements IFilter<String>
+	{
+		public boolean filter(String obj)
 		{
-			ConfigurationInfo conf = getSelectedConfiguration();
-			
-			if (conf == null)
+			RequiredServiceInfo[] rsi = getModelInfo().getRequiredServices();
+			for (int i = 0; i < rsi.length; ++i)
 			{
-				getModelInfo().setProvidedServices(services);
+				if (obj.equals(rsi[i].getName()))
+				{
+					return true;
+				}
 			}
-			else
-			{
-				conf.setProvidedServices(services);
-			}
+			return false;
 		}
 	}
 	
@@ -1754,6 +1935,45 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			s.setImplementation(new ProvidedServiceImplementation());
 		}
+	}
+	
+	/**
+	 * Creates the service binding if null. 
+	 * @param s The service.
+	 */
+	private static final void createBinding(RequiredServiceInfo s)
+	{
+		if (s.getDefaultBinding() == null)
+		{
+			s.setDefaultBinding(new RequiredServiceBinding());
+		}
+	}
+	
+	/**
+	 *  Compares regular service with configuration service.
+	 *  
+	 *  @param s Regular service.
+	 *  @param cs Configuration service.
+	 *  @return True, if equal.
+	 */
+	private static final boolean compareService(RequiredServiceInfo s, RequiredServiceInfo cs)
+	{
+		if (s == null || cs == null)
+		{
+			return s == cs;
+		}
+		
+		if (s.getDefaultBinding() == null || cs.getDefaultBinding() == null)
+		{
+			return s.getDefaultBinding() == cs.getDefaultBinding();
+		}
+		
+		if (s.getDefaultBinding().getScope() == null || cs.getDefaultBinding().getScope() == null)
+		{
+			return s.getDefaultBinding() == cs.getDefaultBinding();
+		}
+		
+		return s.getDefaultBinding().getScope().equals(cs.getDefaultBinding().getScope());
 	}
 	
 	/**

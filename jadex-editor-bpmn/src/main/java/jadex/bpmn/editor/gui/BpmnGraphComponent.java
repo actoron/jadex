@@ -11,13 +11,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
-import java.awt.LinearGradientPaint;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Map;
@@ -32,9 +30,9 @@ import com.mxgraph.swing.view.mxCellEditor;
 import com.mxgraph.swing.view.mxICellEditor;
 import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxCellState;
 
 /**
@@ -272,15 +270,15 @@ public class BpmnGraphComponent extends mxGraphComponent
 						{
 							x2 = (float) (bounds.getX() + bounds.getWidth());
 							y2 = (float) (bounds.getY() + bounds.getHeight());
-							System.out.println(x1);
-							System.out.println(x2);
+//							System.out.println(x1);
+//							System.out.println(x2);
 //							fillPaint = new GradientPaint(x1+30, y1+30, gradientColor, x2, y2,
 //									fillColor, true);
-							fillPaint = new LinearGradientPaint(new Point2D.Double(x1, y1), new Point2D.Double(x2, y1), new float[] {0.0f, 1.0f}, new Color[] {gradientColor, fillColor});
+//							fillPaint = new LinearGradientPaint(new Point2D.Double(x1, y1), new Point2D.Double(x2, y1), new float[] {0.0f, 1.0f}, new Color[] {gradientColor, fillColor});
 						}
 
-//						fillPaint = new GradientPaint(x1, y1, fillColor, x2, y2,
-//								gradientColor, false);
+						fillPaint = new GradientPaint(x1, y1, fillColor, x2, y2,
+								gradientColor, false);
 					}
 				}
 

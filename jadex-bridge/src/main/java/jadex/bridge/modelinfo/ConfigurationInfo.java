@@ -216,6 +216,18 @@ public class ConfigurationInfo extends Startable
 	}
 	
 	/**
+	 *  Remove a provided service.
+	 *  @param providedservice The provided service.
+	 */
+	public void removeProvidedService(ProvidedServiceInfo providedservice)
+	{
+		if (providedservices!=null)
+		{
+			providedservices.remove(providedservice);
+		}
+	}
+	
+	/**
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
@@ -243,6 +255,18 @@ public class ConfigurationInfo extends Startable
 		if(requiredservices==null)
 			requiredservices = new ArrayList<RequiredServiceInfo>();
 		requiredservices.add(requiredservice);
+	}
+	
+	/**
+	 *  Remove a required service.
+	 *  @param requiredservice The required service.
+	 */
+	public void removeRequiredService(RequiredServiceInfo requiredservice)
+	{
+		if(requiredservices!=null)
+		{
+			requiredservices.remove(requiredservice.getName());
+		}
 	}
 	
 	/**

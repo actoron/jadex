@@ -633,6 +633,18 @@ public class ModelInfo extends Startable implements IModelInfo
 			requiredservices = new HashMap<String, RequiredServiceInfo>();
 		requiredservices.put(requiredservice.getName(), requiredservice);
 	}
+	
+	/**
+	 *  Remove a required service.
+	 *  @param requiredservice The required service.
+	 */
+	public void removeRequiredService(RequiredServiceInfo requiredservice)
+	{
+		if(requiredservices!=null)
+		{
+			requiredservices.remove(requiredservice.getName());
+		}
+	}
 
 	/**
 	 *  Get the provided services.
@@ -662,6 +674,18 @@ public class ModelInfo extends Startable implements IModelInfo
 		if(providedservices==null)
 			providedservices = new ArrayList<ProvidedServiceInfo>();
 		providedservices.add(providedservice);
+	}
+	
+	/**
+	 *  Remove a provided service.
+	 *  @param providedservice The provided service.
+	 */
+	public void removeProvidedService(ProvidedServiceInfo providedservice)
+	{
+		if (providedservices!=null)
+		{
+			providedservices.remove(providedservice);
+		}
 	}
 	
 	/**

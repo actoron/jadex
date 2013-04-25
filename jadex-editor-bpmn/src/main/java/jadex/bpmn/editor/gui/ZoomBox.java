@@ -1,6 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
 import jadex.bpmn.editor.gui.controllers.MouseController;
 
 import java.awt.event.ActionEvent;
