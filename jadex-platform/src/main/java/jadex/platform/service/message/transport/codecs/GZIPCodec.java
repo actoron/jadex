@@ -2,6 +2,7 @@ package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -52,7 +53,7 @@ public class GZIPCodec implements ICodec
 	 *  @return The decoded object.
 	 *  @throws IOException
 	 */
-	public Object decode(Object bytes, ClassLoader classloader)
+	public Object decode(Object bytes, ClassLoader classloader, IErrorReporter rep)
 	{
 		return decodeBytes(bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (ByteArrayInputStream)bytes, classloader);
 	}

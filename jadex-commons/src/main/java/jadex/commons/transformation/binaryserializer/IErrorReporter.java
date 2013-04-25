@@ -5,6 +5,15 @@ package jadex.commons.transformation.binaryserializer;
  */
 public interface IErrorReporter
 {
+	/** A default error reporter that ignores errors. */
+	public static IErrorReporter	IGNORE	= new IErrorReporter()
+	{
+		public void exceptionOccurred(Exception e)
+		{
+			// ignore.
+		}
+	};
+	
 	/**
 	 *  Method called when a decoding error occurs.
 	 *  

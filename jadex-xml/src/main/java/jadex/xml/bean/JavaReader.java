@@ -7,6 +7,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.transformation.IStringObjectConverter;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -24,6 +25,7 @@ import jadex.xml.XMLInfo;
 import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.XMLReaderFactory;
+import jadex.xml.stax.ILocation;
 import jadex.xml.stax.QName;
 import jadex.xml.stax.XMLReporter;
 
@@ -928,9 +930,9 @@ public class JavaReader
 	 *  @param classloader The class loader.
 	 *  @return The decoded object.
 	 */
-	public static Object objectFromByteArray(byte[] val, ClassLoader classloader)
+	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, IErrorReporter rep)
 	{
-		return objectFromByteArray(val, classloader, null, null);
+		return objectFromByteArray(val, classloader, null, null, rep);
 	}
 	
 	/**
@@ -939,9 +941,9 @@ public class JavaReader
 	 *  @param classloader The class loader.
 	 *  @return The decoded object.
 	 */
-	public static Object objectFromInputStream(InputStream val, ClassLoader classloader)
+	public static Object objectFromInputStream(InputStream val, ClassLoader classloader, IErrorReporter rep)
 	{
-		return AReader.objectFromInputStream(getInstance(), val, classloader, getPathManager(), getObjectHandler());
+		return objectFromInputStream(val, classloader, null, null, rep);
 	}
 	
 	/**
@@ -962,10 +964,20 @@ public class JavaReader
 	 *  @return The decoded object.
 	 */
 	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, 
-		TypeInfoPathManager manager, IObjectReaderHandler handler)
+		TypeInfoPathManager manager, IObjectReaderHandler handler, final IErrorReporter rep)
 	{
-		return AReader.objectFromByteArray(getInstance(), val, classloader, 
-			manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
+		return rep!=null
+			? AReader.objectFromByteArray(getReader(new XMLReporter()
+			{
+				public void report(String message, String errorType,
+					Object relatedInformation, ILocation location) throws Exception
+				{
+					rep.exceptionOccurred(new RuntimeException(message));
+				}
+			}), val, classloader, 
+				 manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler)
+			: AReader.objectFromByteArray(getInstance(), val, classloader, 
+				manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
 	}
 	
 	/**
@@ -975,10 +987,20 @@ public class JavaReader
 	 *  @return The decoded object.
 	 */
 	public static Object objectFromInputStream(InputStream val, ClassLoader classloader,
-		TypeInfoPathManager manager, IObjectReaderHandler handler)
+		TypeInfoPathManager manager, IObjectReaderHandler handler, final IErrorReporter rep)
 	{
-		return AReader.objectFromInputStream(getInstance(), val, classloader, 
-			manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
+		return rep!=null
+			? AReader.objectFromInputStream(getReader(new XMLReporter()
+			{
+				public void report(String message, String errorType,
+					Object relatedInformation, ILocation location) throws Exception
+				{
+					rep.exceptionOccurred(new RuntimeException(message));
+				}
+			}), val, classloader, 
+				 manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler)
+			: AReader.objectFromInputStream(getInstance(), val, classloader, 
+				manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
 	}
 	
 	/**

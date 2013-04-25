@@ -12,11 +12,11 @@ import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -33,10 +33,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.message.MapSendTask;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -477,7 +474,7 @@ public abstract class DiscoveryAgent
 	public static Object decodeObject(byte[] data, Map<Byte, ICodec> codecs, ClassLoader classloader)
 	{
 //		System.out.println("size: "+data.length);
-		return MapSendTask.decodeMessage(data, codecs, classloader);
+		return MapSendTask.decodeMessage(data, codecs, classloader, IErrorReporter.IGNORE);
 //		return JavaReader.objectFromByteArray(GZIPCodec.decodeBytes(data, 
 //			classloader), classloader);
 //		return Reader.objectFromByteArray(reader, GZIPCodec.decodeBytes(data, 

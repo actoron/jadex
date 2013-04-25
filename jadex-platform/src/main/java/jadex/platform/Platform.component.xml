@@ -152,6 +152,9 @@
 		<!-- Use a compact binary message format instead of XML by default. -->
 		<argument name="binarymessages" class="boolean">true</argument>
 		
+		<!-- Fail on recoverable message decoding errors instead of ignoring. -->
+		<argument name="strictcom" class="boolean">false</argument>
+				
 		<!-- Flag if the platform should be protected with password.
 		     If a value is provided this value overrides the settings value. -->
 		<argument name="usepass" class="Boolean"/>
@@ -305,20 +308,22 @@
 		<providedservice class="jadex.bridge.service.types.message.IMessageService">
 			<implementation proxytype="raw">
 				new jadex.platform.service.message.MessageService($component.getExternalAccess(), $component.getLogger(),
-				new jadex.platform.service.message.transport.ITransport[]
-				{
-					$args.localtransport? new jadex.platform.service.message.transport.localmtp.LocalTransport($component.getServiceProvider()): null,
-					$args.tcptransport? new jadex.platform.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null,
-					$args.niotcptransport? new jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,
-					$args.ssltcptransport? jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport.create($component.getServiceProvider(), $args.ssltcpport): null,
-					$args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress): null
-				},
-				new jadex.bridge.service.types.message.MessageType[]
-				{
-					new jadex.bridge.fipa.FIPAMessageType()
-				}, null, 
+					new jadex.platform.service.message.transport.ITransport[]
+					{
+						$args.localtransport? new jadex.platform.service.message.transport.localmtp.LocalTransport($component.getServiceProvider()): null,
+						$args.tcptransport? new jadex.platform.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null,
+						$args.niotcptransport? new jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,
+						$args.ssltcptransport? jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport.create($component.getServiceProvider(), $args.ssltcpport): null,
+						$args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress): null
+					},
+					new jadex.bridge.service.types.message.MessageType[]
+					{
+						new jadex.bridge.fipa.FIPAMessageType()
+					},
+					null, 
 					$args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, 
-					$args.binarymessages? new jadex.platform.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.platform.service.message.transport.codecs.JadexBinaryCodec.class, jadex.platform.service.message.transport.codecs.GZIPCodec.class} ): new jadex.platform.service.message.transport.codecs.CodecFactory()
+					$args.binarymessages? new jadex.platform.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.platform.service.message.transport.codecs.JadexBinaryCodec.class, jadex.platform.service.message.transport.codecs.GZIPCodec.class} ): new jadex.platform.service.message.transport.codecs.CodecFactory(),
+					$args.strictcom
 				)
 			</implementation>
 		</providedservice>

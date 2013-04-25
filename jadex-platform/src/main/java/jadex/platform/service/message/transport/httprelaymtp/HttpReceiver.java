@@ -15,6 +15,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.micro.annotation.Binding;
 import jadex.platform.service.message.MapSendTask;
 
@@ -220,7 +221,7 @@ public class HttpReceiver
 			{
 				try
 				{
-					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, codecs, getClass().getClassLoader());
+					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 					awa.addAwarenessInfo(info);
 				}
 				catch(Exception e)

@@ -25,7 +25,7 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public Object doRead(Object ro)
 	{
-		return JavaReader.objectFromByteArray((byte[])ro, null);
+		return JavaReader.objectFromByteArray((byte[])ro, null, null);
 	}
 
 	/**

@@ -1,5 +1,7 @@
 package jadex.bridge.service.types.message;
 
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
+
 /**
  *  Encode and decode an object from a string representation.
  */
@@ -28,6 +30,6 @@ public interface ICodec
 	 *  @return The decoded object or byte array (for intermediate codecs).
 	 */
 //	public Object decode(byte[] bytes, ClassLoader classloader);
-	public Object decode(Object bytes, ClassLoader classloader);
+	public Object decode(Object bytes, ClassLoader classloader, IErrorReporter rep);
 	
 }

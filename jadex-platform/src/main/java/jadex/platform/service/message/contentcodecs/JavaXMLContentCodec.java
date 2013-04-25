@@ -4,6 +4,8 @@ import jadex.bridge.service.types.message.IContentCodec;
 import jadex.commons.beans.ExceptionListener;
 import jadex.commons.beans.XMLDecoder;
 import jadex.commons.beans.XMLEncoder;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
@@ -59,7 +61,7 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public synchronized Object decode(final byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info)
+	public synchronized Object decode(final byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info, final IErrorReporter rep)
 	{
 		assert val != null;
 
@@ -68,8 +70,15 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 		{
 			public void exceptionThrown(Exception e)
 			{
-				System.err.println("XML decoding ERROR: "+val);
-				e.printStackTrace();
+				if(rep!=null)
+				{
+					rep.exceptionOccurred(e);
+				}
+				else
+				{
+					System.err.println("XML decoding ERROR: "+val);
+					e.printStackTrace();
+				}
 			}
 		});
 		Thread.currentThread().setContextClassLoader(classloader);

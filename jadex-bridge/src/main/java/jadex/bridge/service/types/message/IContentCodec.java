@@ -1,5 +1,7 @@
 package jadex.bridge.service.types.message;
 
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
+
 import java.util.Map;
 import java.util.Properties;
 
@@ -27,5 +29,5 @@ public interface IContentCodec
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info);
+	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info, IErrorReporter rep);
 }

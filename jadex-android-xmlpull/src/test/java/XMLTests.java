@@ -53,7 +53,7 @@ public class XMLTests extends TestCase
 	 */
 	public Object doRead(Object ro)
 	{
-		return JavaReader.objectFromByteArray((byte[]) ro, null);
+		return JavaReader.objectFromByteArray((byte[]) ro, null, null);
 	}
 
 	// -------- test methods --------

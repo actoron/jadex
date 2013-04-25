@@ -3,6 +3,7 @@ package jadex.platform.service.message.contentcodecs;
 import jadex.bridge.service.types.message.IContentCodec;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.xml.writer.IObjectWriterHandler;
 
@@ -54,11 +55,11 @@ public class JadexBinaryContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info)
+	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info, IErrorReporter rep)
 	{
 		Object[] infos = info==null? null: info.get(getClass());
-		List<IDecoderHandler> postprocessors = (List<IDecoderHandler>)(infos!=null? infos[0]: null);
-		Object ret = BinarySerializer.objectFromByteArray(val, postprocessors, null, classloader, null);
+		List<IDecoderHandler> postprocessors = (List<IDecoderHandler>)(infos!=null? infos[0]: rep);
+		Object ret = BinarySerializer.objectFromByteArray(val, postprocessors, null, classloader, rep);
 		if(DEBUG)
 			System.out.println("decode content: "+ret);
 		return ret;

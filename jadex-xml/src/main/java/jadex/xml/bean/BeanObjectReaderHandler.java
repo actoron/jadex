@@ -194,7 +194,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				String clazzname = pck.length()>0? pck+"."+tag.getLocalPart().replace("-", "$"): tag.getLocalPart().replace("-", "$");
 //				System.out.println("Clazzname: "+clazzname);
 	
-//				if(clazzname.indexOf("AgentCreationAgent")!=-1)
+//				if(clazzname.indexOf("jadex.bridge.Cause")!=-1)
 //					System.out.println("hererer");
 				
 				// Special case array
@@ -212,66 +212,63 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					len = Integer.parseInt((String)rawattributes.get(SXML.ARRAYLEN));
 				}
 				
-				Class clazz = SReflect.classForName0(clazzname, context.getClassLoader());
+				Class clazz = SReflect.classForName(clazzname, context.getClassLoader());
 				
-				if(clazz!=null)
+				if(dim>0)
 				{
-					if(dim>0)
+					ret = Array.newInstance(clazz, len);
+				}
+				else if(!BasicTypeConverter.isBuiltInType(clazz))
+				{
+					if(clazz.isAnonymousClass())
 					{
-						ret = Array.newInstance(clazz, len);
-					}
-					else if(!BasicTypeConverter.isBuiltInType(clazz))
-					{
-						if(clazz.isAnonymousClass())
-						{
-							// Create anonymous class object by supplying null values
+						// Create anonymous class object by supplying null values
 //							System.out.println("Anonymous: "+clazz);
+						
+						// Problem: 
+						clazz = getCorrectAnonymousInnerClass(clazz, rawattributes, context.getClassLoader());
 							
-							// Problem: 
-							clazz = getCorrectAnonymousInnerClass(clazz, rawattributes, context.getClassLoader());
-								
-							if(clazz!=null)
+						if(clazz!=null)
+						{
+							try
 							{
-								try
+								Constructor	c	= clazz.getDeclaredConstructors()[0];
+								c.setAccessible(true);
+								Class[] paramtypes = c.getParameterTypes();
+								Object[] paramvalues = new Object[paramtypes.length];
+								for(int i=0; i<paramtypes.length; i++)
 								{
-									Constructor	c	= clazz.getDeclaredConstructors()[0];
-									c.setAccessible(true);
-									Class[] paramtypes = c.getParameterTypes();
-									Object[] paramvalues = new Object[paramtypes.length];
-									for(int i=0; i<paramtypes.length; i++)
+									if(paramtypes[i].equals(boolean.class))
 									{
-										if(paramtypes[i].equals(boolean.class))
-										{
-											paramvalues[i] = Boolean.FALSE;
-										}
-										else if(SReflect.isBasicType(paramtypes[i]))
-										{
-											paramvalues[i] = 0;
-										}
+										paramvalues[i] = Boolean.FALSE;
 									}
-									
-									ret	= c.newInstance(paramvalues);
+									else if(SReflect.isBasicType(paramtypes[i]))
+									{
+										paramvalues[i] = 0;
+									}
 								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-								}
+								
+								ret	= c.newInstance(paramvalues);
 							}
-							else
+							catch(Exception e)
 							{
-								context.getReporter().report("Anonymous class problem.", "Creation problem.", context, context.getLocation());
+								e.printStackTrace();
 							}
 						}
 						else
 						{
-							// Must have empty constructor.
-							ret = clazz.newInstance();
+							context.getReporter().report("Anonymous class problem.", "Creation problem.", context, context.getLocation());
 						}
 					}
-					else if(String.class.equals(clazz))
+					else
 					{
-						ret = AReader.STRING_MARKER;
+						// Must have empty constructor.
+						ret = clazz.newInstance();
 					}
+				}
+				else if(String.class.equals(clazz))
+				{
+					ret = AReader.STRING_MARKER;
 				}
 			}
 		}

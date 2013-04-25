@@ -298,7 +298,7 @@ public class JobManagementService implements IJobManagementService
 			if(fs.exists())
 			{
 				fis = new FileInputStream(fs);
-				Collection<Job> jobs = (Collection<Job>)JavaReader.objectFromInputStream(fis, null);
+				Collection<Job> jobs = (Collection<Job>)JavaReader.objectFromInputStream(fis, null, null);
 				addJobs(jobs.iterator()).addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)

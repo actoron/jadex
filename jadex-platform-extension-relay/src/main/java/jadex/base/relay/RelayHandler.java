@@ -14,6 +14,7 @@ import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.platform.service.message.MapSendTask;
 import jadex.platform.service.message.transport.codecs.CodecFactory;
 import jadex.platform.service.message.transport.httprelaymtp.RelayConnectionManager;
@@ -363,7 +364,7 @@ public class RelayHandler
 		
 		// Read message and extract awareness info content.
 		byte[] buffer = readData(in, length-1);
-		MessageEnvelope	msg	= (MessageEnvelope)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader());
+		MessageEnvelope	msg	= (MessageEnvelope)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 		AwarenessInfo	info;
 		if(SFipa.JADEX_RAW.equals(msg.getMessage().get(SFipa.LANGUAGE)))
@@ -372,7 +373,7 @@ public class RelayHandler
 		}
 		else if(SFipa.JADEX_XML.equals(msg.getMessage().get(SFipa.LANGUAGE)))
 		{
-			info = (AwarenessInfo)JavaReader.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), getClass().getClassLoader());
+			info = (AwarenessInfo)JavaReader.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), getClass().getClassLoader(), IErrorReporter.IGNORE);
 		}
 		else //if(SFipa.JADEX_BINARY.equals(msg.getMessage().get(SFipa.LANGUAGE)))
 		{
@@ -448,7 +449,7 @@ public class RelayHandler
 		
 		// Read message and extract platform info content.
 		byte[] buffer = readData(in, length-1);
-		PlatformInfo	info	= (PlatformInfo)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader());
+		PlatformInfo	info	= (PlatformInfo)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 		
 		PeerEntry	peer	= peers.addPeer(id, false);
@@ -474,7 +475,7 @@ public class RelayHandler
 		
 		// Read message and extract platform info content.
 		byte[] buffer = readData(in, length-1);
-		PlatformInfo[]	infos	= (PlatformInfo[])MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader());
+		PlatformInfo[]	infos	= (PlatformInfo[])MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
 		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 		
 		PeerEntry	peer	= peers.addPeer(id, false);

@@ -1,8 +1,6 @@
 package jadex.bridge;
 
 import jadex.bridge.service.annotation.Timeout;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +59,10 @@ public class ServiceCall
 				
 //		if(props!=null)
 //			properties.putAll(props);
+		if(props!=null && props.get(CAUSE) instanceof String)
+		{
+			System.out.println("sdgouh287418");
+		}
 		
 //		System.err.println("call: "+this);
 //		Thread.dumpStack();
@@ -199,6 +201,10 @@ public class ServiceCall
 	 */
 	public Cause getCause()
 	{
+		if(properties.get(CAUSE)!=null && !(properties.get(CAUSE) instanceof Cause))
+		{
+			System.out.println("sdmyb");
+		}
 		return (Cause)properties.get(CAUSE);
 	}
 	

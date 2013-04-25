@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.platform.service.message.transport.ITransport;
 import jadex.platform.service.message.transport.codecs.CodecFactory;
 
@@ -158,7 +159,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Decode a message.
 	 */
-	public static Object decodeMessage(byte[] rawmsg, Map<Byte, ICodec> codecs, ClassLoader cl)
+	public static Object decodeMessage(byte[] rawmsg, Map<Byte, ICodec> codecs, ClassLoader cl, IErrorReporter rep)
 	{
 		int	idx	= 1;	// Skip message type.
 		byte[] codec_ids = new byte[rawmsg[idx++]];
@@ -174,7 +175,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 			if (dec == null) {
 				throw new RuntimeException(CodecFactory.CODEC_NAMES[codec_ids[i]] + " not available!");
 			}
-			tmp = dec.decode(tmp, cl);
+			tmp = dec.decode(tmp, cl, rep);
 		}
 		
 		return tmp;

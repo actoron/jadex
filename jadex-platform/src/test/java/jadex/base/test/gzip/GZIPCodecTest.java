@@ -11,7 +11,7 @@ public class GZIPCodecTest extends TestCase
 		ICodec	codec	= new GZIPCodec();
 		String	input	= "Hello World!";
 		byte[]	encoded	= (byte[])codec.encode(input.getBytes(), null);
-		byte[]	decoded	= (byte[])codec.decode(encoded, null);
+		byte[]	decoded	= (byte[])codec.decode(encoded, null, null);
 		String	result	= new String(decoded);
 		assertEquals(input, result);
 	}

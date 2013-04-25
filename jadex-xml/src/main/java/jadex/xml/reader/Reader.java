@@ -377,6 +377,8 @@ public class Reader extends AReader
 					{
 //						e.printStackTrace();
 						readcontext.getReporter().report(e.toString(), "creation error", readcontext, StaxLocationWrapper.fromLocation(parser.getLocation()));
+						readcontext.removeStackElement();	// remove ignored element info from stack. otherwise parser would be confused.
+						readcontext.setReadIgnore(1);
 					}
 					
 					if(DEBUG && object==null)

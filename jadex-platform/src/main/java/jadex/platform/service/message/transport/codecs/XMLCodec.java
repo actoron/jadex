@@ -5,6 +5,8 @@ import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.beans.ExceptionListener;
 import jadex.commons.beans.XMLDecoder;
 import jadex.commons.beans.XMLEncoder;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -65,7 +67,7 @@ public class XMLCodec implements ICodec
 	 *  @throws IOException
 	 */
 //	public Object decode(byte[] bytes, ClassLoader classloader)
-	public Object decode(Object bytes, ClassLoader classloader)
+	public Object decode(Object bytes, ClassLoader classloader, IErrorReporter rep)
 	{
 		final InputStream bais = bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (InputStream)bytes;
 		

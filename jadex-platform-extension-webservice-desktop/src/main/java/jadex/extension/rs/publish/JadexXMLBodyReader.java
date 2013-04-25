@@ -42,7 +42,7 @@ public class JadexXMLBodyReader implements MessageBodyReader<Object>
 	{
 		try
 		{
-			return JavaReader.objectFromInputStream(entitystream, Thread.currentThread().getContextClassLoader());
+			return JavaReader.objectFromInputStream(entitystream, Thread.currentThread().getContextClassLoader(), null);
 		}
 		catch(Exception e)
 		{

@@ -1,6 +1,7 @@
 package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -55,11 +56,11 @@ public class JadexXMLCodec implements ICodec
 	 *  @throws IOException
 	 */
 //	public Object decode(byte[] bytes, ClassLoader classloader)
-	public Object decode(Object bytes, ClassLoader classloader)
+	public Object decode(Object bytes, ClassLoader classloader, IErrorReporter rep)
 	{
 		Object ret = bytes instanceof byte[]
-			? JavaReader.objectFromByteArray((byte[])bytes, classloader)
-			: JavaReader.objectFromInputStream((InputStream)bytes, classloader);
+			? JavaReader.objectFromByteArray((byte[])bytes, classloader, rep)
+			: JavaReader.objectFromInputStream((InputStream)bytes, classloader, rep);
 		if(DEBUG)
 			System.out.println("decode message: "+(new String((byte[])bytes)));
 		return ret;

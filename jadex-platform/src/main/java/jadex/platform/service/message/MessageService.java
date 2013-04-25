@@ -49,6 +49,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.awareness.discovery.message.IMessageAwarenessService;
@@ -187,6 +188,9 @@ public class MessageService extends BasicService implements IMessageService
 	/** The map of content codec infos. */
 	protected Map<IComponentIdentifier, Map<Class<?>, Object[]>> contentcodecinfos;
 	
+	/** Enable strict communication (i.e. fail on recoverable decoding errors). */
+	protected boolean	strictcom;
+	
 	//-------- constructors --------
 
 	/**
@@ -196,7 +200,7 @@ public class MessageService extends BasicService implements IMessageService
 	public MessageService(IExternalAccess component, Logger logger, ITransport[] transports, 
 		MessageType[] messagetypes)
 	{
-		this(component, logger, transports, messagetypes, null, null, null);
+		this(component, logger, transports, messagetypes, null, null, null, false);
 	}
 	
 	/**
@@ -204,10 +208,11 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param platform
 	 */
 	public MessageService(IExternalAccess component, Logger logger, ITransport[] transports, 
-		MessageType[] messagetypes, IContentCodec[] contentcodecs, String deflanguage, CodecFactory codecfactory)
+		MessageType[] messagetypes, IContentCodec[] contentcodecs, String deflanguage, CodecFactory codecfactory, boolean strictcom)
 	{
 		super(component.getServiceProvider().getId(), IMessageService.class, null);
 
+		this.strictcom	= strictcom;
 		this.component = component;
 		this.transports = SCollection.createArrayList();
 		for(int i=0; i<transports.length; i++)
@@ -1714,7 +1719,7 @@ public class MessageService extends BasicService implements IMessageService
 					for(int i=codec_ids.length-1; i>-1; i--)
 					{
 						ICodec dec = codecfactory.getCodec(codec_ids[i]);
-						tmp = dec.decode(tmp, classloader);
+						tmp = dec.decode(tmp, classloader, null);
 					}
 					data = tmp;
 				}
@@ -1973,7 +1978,20 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			else
 			{
-				me = (MessageEnvelope)MapSendTask.decodeMessage((byte[])obj, codecfactory.getAllCodecs(), classloader);
+				final List<Exception>	errors	= new ArrayList<Exception>();
+				IErrorReporter	rep	= strictcom ? null :new IErrorReporter()
+				{
+					public void exceptionOccurred(Exception e)
+					{
+						errors.add(e);
+					}
+				};
+				me = (MessageEnvelope)MapSendTask.decodeMessage((byte[])obj, codecfactory.getAllCodecs(), classloader, rep);
+				
+				if(!errors.isEmpty())
+				{
+					logger.warning("Ignored errors during message decoding: "+errors);
+				}
 //				byte[]	rawmsg	= (byte[])obj;
 //				int	idx	= 0;
 //				byte rmt = rawmsg[idx++];
@@ -1997,6 +2015,12 @@ public class MessageService extends BasicService implements IMessageService
 			final IComponentIdentifier[] receivers	= me.getReceivers();
 //			System.out.println("Received message: "+SUtil.arrayToString(receivers));
 			final MessageType	messagetype	= getMessageType(type);
+			
+			if(msg.get(SFipa.X_NONFUNCTIONAL)!=null
+				&& ((Map)msg.get(SFipa.X_NONFUNCTIONAL)).get("cause") instanceof String)
+			{
+				System.out.println("sdklvugi");
+			}
 			
 			// Announce receiver to message awareness
 			IComponentIdentifier sender = (IComponentIdentifier)msg.get(messagetype.getSenderIdentifier());
@@ -2184,7 +2208,20 @@ public class MessageService extends BasicService implements IMessageService
 //												System.out.println("dec2: "+codec+fmessage);
 												try
 												{
-													Object val = codec.decode((byte[])value, cl, getContentCodecInfo(component.getComponentIdentifier()));
+													final List<Exception>	errors	= new ArrayList<Exception>();
+													IErrorReporter	rep	= strictcom ? null :new IErrorReporter()
+													{
+														public void exceptionOccurred(Exception e)
+														{
+															errors.add(e);
+														}
+													};
+													Object val = codec.decode((byte[])value, cl, getContentCodecInfo(component.getComponentIdentifier()), rep);
+													
+													if(!errors.isEmpty())
+													{
+														logger.warning("Ignored errors during message decoding: "+errors);
+													}
 													fmessage.put(name, val);
 												}
 												catch(Exception e)
@@ -2205,6 +2242,11 @@ public class MessageService extends BasicService implements IMessageService
 													}
 													fmessage.put(name, e);
 												}
+											}
+											
+											if(fmessage.get(name) instanceof byte[])
+											{
+												System.out.println("sfjkdghfkld\n"+new String((byte[])fmessage.get(name)));
 											}
 										}
 									}
