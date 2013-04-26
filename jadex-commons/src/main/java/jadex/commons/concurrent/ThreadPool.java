@@ -151,7 +151,7 @@ public class ThreadPool implements IThreadPool
 	/**
 	 *  Create a new thread pool.
 	 */
-	public ThreadPool(boolean daemon, IPoolStrategy strategy, long maxwait)
+	public ThreadPool(boolean daemon, final IPoolStrategy strategy, final long maxwait)
 	{		
 		this.daemon = daemon;
 		this.strategy = strategy;
@@ -166,6 +166,28 @@ public class ThreadPool implements IThreadPool
 		this.parked = new ArrayList<ServiceThread>();
 		this.timer = new Timer(true);
 		this.maxwait = maxwait;
+		
+		timer.scheduleAtFixedRate(new TimerTask()
+		{
+			public void run()
+			{
+				synchronized(ThreadPool.this)
+				{
+					// If there are tasks and the last served task is too long ago
+					if(running && tasks.size()>0)
+					{
+						Long start = enqueuetimes.get(tasks.peek());
+						if(start!=null && start.longValue()+maxwait<System.currentTimeMillis())
+						{
+							addThreads(5);
+							strategy.workersAdded(5);
+//							System.out.println("Added threads due to starving task in queue.");
+						}
+					}
+				}
+			}
+		}, maxwait, maxwait);
+
 		
 		addThreads(strategy.getWorkerCount());
 	
@@ -200,26 +222,6 @@ public class ThreadPool implements IThreadPool
 			throw new RuntimeException("Task already scheduled: " + task);
 		
 		tasks.enqueue(task);
-		timer.scheduleAtFixedRate(new TimerTask()
-		{
-			public void run()
-			{
-				synchronized(ThreadPool.this)
-				{
-					// If there are tasks and the last served task is too long ago
-					if(running && tasks.size()>0)
-					{
-						Long start = enqueuetimes.get(tasks.peek());
-						if(start!=null && start.longValue()+maxwait<System.currentTimeMillis())
-						{
-							addThreads(5);
-							strategy.workersAdded(5);
-//							System.out.println("Added threads due to starving task in queue.");
-						}
-					}
-				}
-			}
-		}, maxwait, maxwait);
 	}
 
 	/**
