@@ -2,11 +2,10 @@ package jadex.bpmn.model.io;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MContextVariable;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
-import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
@@ -103,6 +102,7 @@ public class SBpmnModelReader
 		
 		String sempre = null;
 		
+		String text = null;
 		while (reader.hasNext())
 		{
 		    reader.next();
@@ -119,6 +119,8 @@ public class SBpmnModelReader
 		    }
 		    if (reader.getEventType() == XMLStreamConstants.START_ELEMENT)
 		    {
+		    	text = null;
+		    	
 		    	tagstack.push(reader.getName());
 		    	
 		    	Map<String, String> attrs = null;
@@ -148,10 +150,21 @@ public class SBpmnModelReader
 		    }
 		    else if (reader.getEventType() == XMLStreamConstants.CHARACTERS)
 		    {
-		    	contentstack.push(reader.getText());
+		    	String moretext = reader.getText();
+		    	if (moretext != null)
+		    	{
+		    		text = text != null? text + moretext : moretext;
+		    	}
 		    }
 		    else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT)
 		    {
+		    	contentstack.push(text);
+		    	if (text != null)
+		    	{
+		    		System.out.println(text);
+		    	}
+		    	text = null;
+		    	
 		    	if ("extension".equals(reader.getName().getLocalPart()) && sempre.equals(reader.getName().getPrefix()))
 	    		{
 	    			buffer.remove("extension");

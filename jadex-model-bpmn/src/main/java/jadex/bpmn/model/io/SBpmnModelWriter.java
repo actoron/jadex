@@ -165,7 +165,7 @@ public class SBpmnModelWriter
 		{
 			out.print(getIndent(ind));
 			out.print("<jadex:modelname>");
-			out.print(name);
+			out.print(escapeString(name));
 			out.println("</jadex:modelname>");
 		}
 		
@@ -174,7 +174,7 @@ public class SBpmnModelWriter
 		{
 			out.print(getIndent(ind));
 			out.print("<jadex:description>");
-			out.print(desc);
+			out.print(escapeString(desc));
 			out.println("</jadex:description>");
 		}
 		
@@ -183,7 +183,7 @@ public class SBpmnModelWriter
 		{
 			out.print(getIndent(ind));
 			out.print("<jadex:package>");
-			out.print(pkg);
+			out.print(escapeString(pkg));
 			out.println("</jadex:package>");
 		}
 		
@@ -197,15 +197,15 @@ public class SBpmnModelWriter
 		{
 			out.print(getIndent(ind));
 			out.print("<jadex:componentflags suspend=\"");
-			out.print(suspend);
+			out.print(escapeString(String.valueOf(suspend)));
 			out.print("\" master=\"");
-			out.print(master);
+			out.print(escapeString(String.valueOf(master)));
 			out.print("\" daemon=\"");
-			out.print(daemon);
+			out.print(escapeString(String.valueOf(daemon)));
 			out.print("\" autoshutdown=\"");
-			out.print(autoshutdown);
+			out.print(escapeString(String.valueOf(autoshutdown)));
 			out.print("\" keepalive=\"");
-			out.print(keepalive);
+			out.print(escapeString(String.valueOf(keepalive)));
 			out.println("\"/>");
 		}
 		
@@ -222,8 +222,6 @@ public class SBpmnModelWriter
 		writeRequiredServices(out, ind, mmodel);
 		
 		writeConfigurations(out, ind, mmodel, mmodel.getModelInfo().getConfigurations());
-		
-		mmodel.getModelInfo().getProperties();
 		
 		--ind;
 		out.print(getIndent(ind));
@@ -249,7 +247,7 @@ public class SBpmnModelWriter
 			{
 				out.print(getIndent(ind));
 				out.print("<jadex:import>");
-				out.print(imports[i]);
+				out.print(escapeString(imports[i]));
 				out.println("</jadex:import>");
 			}
 			
@@ -292,10 +290,10 @@ public class SBpmnModelWriter
 					out.print("<jadex:");
 					out.print(prefix);
 					out.print(" name=\"");
-					out.print(arg.getName());
+					out.print(escapeString(arg.getName()));
 					out.print("\" type=\"");
 					String type = arg.getClazz() != null? arg.getClazz().getTypeName() != null? arg.getClazz().getTypeName() : "" : "";
-					out.print(type);
+					out.print(escapeString(type));
 					
 					if (hasdesc || hasval)
 					{
@@ -306,7 +304,7 @@ public class SBpmnModelWriter
 						{
 							out.print(getIndent(ind));
 							out.print("<jadex:description>");
-							out.print(arg.getDescription());
+							out.print(escapeString(arg.getDescription()));
 							out.println("</jadex:description>");
 						}
 						
@@ -314,7 +312,7 @@ public class SBpmnModelWriter
 						{
 							out.print(getIndent(ind));
 							out.print("<jadex:value>");
-							out.print(arg.getDefaultValue().getValue());
+							out.print(escapeString(arg.getDefaultValue().getValue()));
 							out.println("</jadex:value>");
 						}
 						
@@ -362,9 +360,9 @@ public class SBpmnModelWriter
 				
 				out.print(getIndent(ind));
 				out.print("<jadex:contextvariable name=\"");
-				out.print(ctv.getName());
+				out.print(escapeString(ctv.getName()));
 				out.print("\" type=\"");
-				out.print(cn);
+				out.print(escapeString(cn));
 				
 				//UnparsedExpression exp = mmodel.getContextVariableExpression(ctvname, null);
 				//if (exp != null && exp.getValue() != null && exp.getValue().length() > 0)
@@ -375,7 +373,7 @@ public class SBpmnModelWriter
 					
 					out.print(getIndent(ind));
 					out.print("<jadex:value>");
-					out.print(ctv.getValue());
+					out.print(escapeString(ctv.getValue()));
 					out.println("</jadex:value>");
 					
 					--ind;
@@ -413,13 +411,13 @@ public class SBpmnModelWriter
 			{
 				out.print(getIndent(ind));
 				out.print("<jadex:providedservice name=\"");
-				out.print(ps.getName());
+				out.print(escapeString(ps.getName()));
 				
 				String iface = ps.getType() != null? ps.getType().getTypeName() : null;
 				if (iface != null)
 				{
 					out.print("\" interface=\"");
-					out.print(ps.getType().getTypeName());
+					out.print(escapeString(ps.getType().getTypeName()));
 				}
 				
 				if (ps.getImplementation() != null)
@@ -428,14 +426,14 @@ public class SBpmnModelWriter
 					if (implclass != null && implclass.getTypeName() != null && implclass.getTypeName().length() > 0)
 					{
 						out.print("\" class=\"");
-						out.print(implclass.getTypeName());
+						out.print(escapeString(implclass.getTypeName()));
 					}
 					
 					String proxytype = ps.getImplementation().getProxytype();
 					if (proxytype != null && proxytype.length() > 0)
 					{
 						out.print("\" proxytype=\"");
-						out.print(proxytype);
+						out.print(escapeString(proxytype));
 					}
 				}
 				
@@ -467,19 +465,19 @@ public class SBpmnModelWriter
 			{
 				out.print(getIndent(ind));
 				out.print("<jadex:requiredservice name=\"");
-				out.print(rs.getName());
+				out.print(escapeString(rs.getName()));
 				
 				String iface = rs.getType() != null? rs.getType().getTypeName() : null;
 				if (iface != null)
 				{
 					out.print("\" interface=\"");
-					out.print(iface);
+					out.print(escapeString(iface));
 				}
 				
 				if (rs.isMultiple())
 				{
 					out.print("\" multi=\"");
-					out.print(String.valueOf(rs.isMultiple()));
+					out.print(escapeString(String.valueOf(rs.isMultiple())));
 				}
 				
 				if (rs.getDefaultBinding() != null)
@@ -488,7 +486,7 @@ public class SBpmnModelWriter
 					if (scope != null && scope.length() > 0)
 					{
 						out.print("\" scope=\"");
-						out.print(scope);
+						out.print(escapeString(scope));
 					}
 				}
 				
@@ -543,7 +541,7 @@ public class SBpmnModelWriter
 				
 				out.print(getIndent(ind));
 				out.print("<jadex:configuration name=\"");
-				out.print(conf.getName());
+				out.print(escapeString(conf.getName()));
 				out.print("\"");
 				
 				if (conf.getSuspend() != null)
@@ -580,7 +578,7 @@ public class SBpmnModelWriter
 				{
 					out.print(getIndent(ind));
 					out.print("<jadex:description>");
-					out.print(conf.getDescription());
+					out.print(escapeString(conf.getDescription()));
 					out.println("</jadex:description>");
 				}
 				
@@ -589,7 +587,7 @@ public class SBpmnModelWriter
 				{
 					out.print(getIndent(ind));
 					out.print("<jadex:poollane>");
-					out.print(poollane);
+					out.print(escapeString(poollane));
 					out.println("</jadex:poollane>");
 				}
 				
@@ -608,9 +606,9 @@ public class SBpmnModelWriter
 							{
 								out.print(getIndent(ind));
 								out.print("<jadex:value name=\"");
-								out.print(args[j].getName());
+								out.print(escapeString(args[j].getName()));
 								out.print("\">");
-								out.print(args[j].getValue());
+								out.print(escapeString(args[j].getValue()));
 								out.println("</jadex:value>");
 							}
 						}
@@ -633,9 +631,9 @@ public class SBpmnModelWriter
 							{
 								out.print(getIndent(ind));
 								out.print("<jadex:value name=\"");
-								out.print(res[j].getName());
+								out.print(escapeString(res[j].getName()));
 								out.print("\">");
-								out.print(res[j].getValue());
+								out.print(escapeString(res[j].getValue()));
 								out.println("</jadex:value>");
 							}
 						}
@@ -658,9 +656,9 @@ public class SBpmnModelWriter
 							{
 								out.print(getIndent(ind));
 								out.print("<jadex:value name=\"");
-								out.print(entry.getKey());
+								out.print(escapeString(entry.getKey()));
 								out.print("\">");
-								out.print(entry.getValue());
+								out.print(escapeString(entry.getValue()));
 								out.println("</jadex:value>");
 							}
 						}
@@ -684,18 +682,18 @@ public class SBpmnModelWriter
 						{
 							out.print(getIndent(ind));
 							out.print("<jadex:providedserviceconfiguration name=\"");
-							out.print(ps.getName());
+							out.print(escapeString(ps.getName()));
 							
 							if (ps.getImplementation().getClazz() != null && ps.getImplementation().getClazz().getTypeName() != null && ps.getImplementation().getClazz().getTypeName().length() > 0)
 							{
 								out.print("\" class=\"");
-								out.print(ps.getImplementation().getClazz().getTypeName());
+								out.print(escapeString(ps.getImplementation().getClazz().getTypeName()));
 							}
 							
 							if (ps.getImplementation().getProxytype() != null && ps.getImplementation().getProxytype().length() > 0)
 							{
 								out.print("\" proxytype=\"");
-								out.print(ps.getImplementation().getProxytype());
+								out.print(escapeString(ps.getImplementation().getProxytype()));
 							}
 							
 							out.println("\"/>");
@@ -720,13 +718,13 @@ public class SBpmnModelWriter
 						{
 							out.print(getIndent(ind));
 							out.print("<jadex:requiredserviceconfiguration name=\"");
-							out.print(rs.getName());
+							out.print(escapeString(rs.getName()));
 							
 							if (rs.getDefaultBinding().getScope() != null &&
 								rs.getDefaultBinding().getScope().length() > 0)
 							{
 								out.print("\" scope=\"");
-								out.print(rs.getDefaultBinding().getScope());
+								out.print(escapeString(rs.getDefaultBinding().getScope()));
 							}
 							
 							out.println("\"/>");
@@ -765,7 +763,7 @@ public class SBpmnModelWriter
 				out.print(getIndent(ind) + "<semantic:process name=\"");
 				out.print(pool.getName());
 				out.print("\" id=\"");
-				out.print(pool.getId());
+				out.print(escapeString(pool.getId()));
 				out.println("\">");
 				++ind;
 				
@@ -825,15 +823,15 @@ public class SBpmnModelWriter
 		{
 			out.print(getIndent(ind));
 			out.print("<jadex:dataFlow id=\"");
-			out.print(dedge.getId());
+			out.print(escapeString(dedge.getId()));
 			out.print("\" sourceRef=\"");
-			out.print(dedge.getSource().getId());
+			out.print(escapeString(dedge.getSource().getId()));
 			out.print("\" sourceParam=\"");
-			out.print(dedge.getSourceParameter());
+			out.print(escapeString(dedge.getSourceParameter()));
 			out.print("\" targetRef=\"");
-			out.print(dedge.getTarget().getId());
+			out.print(escapeString(dedge.getTarget().getId()));
 			out.print("\" targetParam=\"");
-			out.print(dedge.getTargetParameter());
+			out.print(escapeString(dedge.getTargetParameter()));
 			out.println("\"/>");
 		}
 		--ind;
@@ -859,7 +857,7 @@ public class SBpmnModelWriter
 			out.print(getIndent(ind) + "<semantic:lane name=\"");
 			out.print(lane.getName());
 			out.print("\" id=\"");
-			out.print(lane.getId());
+			out.print(escapeString(lane.getId()));
 			out.println("\">");
 			++ind;
 			
@@ -868,7 +866,7 @@ public class SBpmnModelWriter
 			for (MActivity activity : activities)
 			{
 				out.print(getIndent(ind) + "<semantic:flowNodeRef>");
-				out.print(activity.getId());
+				out.print(escapeString(activity.getId()));
 				out.println("</semantic:flowNodeRef>");
 			}
 			
@@ -929,7 +927,7 @@ public class SBpmnModelWriter
 			if (activity.getName() != null && activity.getName().length() > 0)
 			{
 				out.print(" name=\"");
-				out.print(activity.getName());
+				out.print(escapeString(activity.getName()));
 				out.print("\"");
 			}
 			out.print(" id=\"");
@@ -943,7 +941,7 @@ public class SBpmnModelWriter
 					if (edge.isDefault())
 					{
 						out.print("\" default=\"");
-						out.print(edge.getId());
+						out.print(escapeString(edge.getId()));
 						break;
 					}
 				}
@@ -952,7 +950,7 @@ public class SBpmnModelWriter
 			if (activity.isEventHandler())
 			{
 				out.print("\" attachedToRef=\"");
-				out.print(evthandlerref);
+				out.print(escapeString(evthandlerref));
 			}
 			
 			out.println("\">");
@@ -963,7 +961,7 @@ public class SBpmnModelWriter
 				for (MSequenceEdge edge : edges)
 				{
 					out.print(getIndent(baseind + 1) + "<semantic:incoming>");
-					out.print(edge.getId());
+					out.print(escapeString(edge.getId()));
 					out.println("</semantic:incoming>");
 				}
 			}
@@ -974,7 +972,7 @@ public class SBpmnModelWriter
 				for (MSequenceEdge edge : edges)
 				{
 					out.print(getIndent(baseind + 1) + "<semantic:outgoing>");
-					out.print(edge.getId());
+					out.print(escapeString(edge.getId()));
 					out.println("</semantic:outgoing>");
 				}
 			}
@@ -996,7 +994,7 @@ public class SBpmnModelWriter
 						out.println(">");
 						out.print(getIndent(baseind + 2));
 						out.print("<semantic:timeDuration>");
-						out.print(((UnparsedExpression) activity.getPropertyValue("duration")).getValue());
+						out.print(escapeString(((UnparsedExpression) activity.getPropertyValue("duration")).getValue()));
 						out.println("</semantic:timeDuration>");
 						out.print(getIndent(baseind + 1));
 						out.println("</semantic:timerEventDefinition>");
@@ -1077,7 +1075,7 @@ public class SBpmnModelWriter
 				if(hastaskclass)
 				{
 					out.print(getIndent(baseind + 2) + "<jadex:taskclass>");
-					out.print(activity.getClazz().getTypeName());
+					out.print(escapeString(activity.getClazz().getTypeName()));
 					out.println("</jadex:taskclass>");
 				}
 				
@@ -1088,18 +1086,18 @@ public class SBpmnModelWriter
 					{
 						MParameter param = params.get(key);
 						out.print(getIndent(baseind + 2) + "<jadex:parameter direction=\"");
-						out.print(param.getDirection());
+						out.print(escapeString(param.getDirection()));
 						out.print("\" name=\"");
-						out.print(param.getName());
+						out.print(escapeString(param.getName()));
 						out.print("\" type=\"");
-						out.print(param.getClazz().getTypeName());
+						out.print(escapeString(param.getClazz().getTypeName()));
 						out.print("\"");
 						
 						String inival = param.getInitialValue().getValue();
 						if (inival != null && inival.length() > 0)
 						{
 							out.print(">");
-							out.print(inival);
+							out.print(escapeString(inival));
 							out.println("</jadex:parameter>");
 						}
 						else
@@ -1116,16 +1114,16 @@ public class SBpmnModelWriter
 					{
 						MProperty prop = props.get(key);
 						out.print(getIndent(baseind + 2) + "<jadex:property name=\"");
-						out.print(prop.getName());
+						out.print(escapeString(prop.getName()));
 						out.print("\" type=\"");
-						out.print(prop.getClazz().getTypeName());
+						out.print(escapeString(prop.getClazz().getTypeName()));
 						out.print("\"");
 						
 						String inival = prop.getInitialValue().getValue();
 						if(inival != null && inival.length() > 0)
 						{
 							out.print(">");
-							out.print(inival);
+							out.print(escapeString(inival));
 							out.println("</jadex:property>");
 						}
 						else
@@ -1143,7 +1141,7 @@ public class SBpmnModelWriter
 						tagpart = "jadex:subprocessexpressionref>";
 					}
 					out.print(getIndent(baseind + 2) + "<" + tagpart);
-					out.print(procref);
+					out.print(escapeString(procref));
 					out.println("</" + tagpart);
 				}
 				
@@ -1172,11 +1170,11 @@ public class SBpmnModelWriter
 		for (MSequenceEdge edge : seqedges)
 		{
 			out.print(getIndent(baseind) + "<semantic:sequenceFlow sourceRef=\"");
-			out.print(edge.getSource().getId());
+			out.print(escapeString(edge.getSource().getId()));
 			out.print("\" targetRef=\"");
-			out.print(edge.getTarget().getId());
+			out.print(escapeString(edge.getTarget().getId()));
 			out.print("\" id=\"");
-			out.print(edge.getId());
+			out.print(escapeString(edge.getId()));
 			out.println("\">");
 			
 			if (edge.getCondition() != null)
@@ -1185,7 +1183,7 @@ public class SBpmnModelWriter
 				if (cond != null && cond.length() > 0)
 				{
 					out.print(getIndent(baseind + 1) + "<semantic:conditionExpression>");
-					out.print(cond);
+					out.print(escapeString(cond));
 					out.println("</semantic:conditionExpression>");
 				}
 			}
@@ -1199,9 +1197,9 @@ public class SBpmnModelWriter
 				for(Object key: mappings.keySet())
 				{
 					out.print(getIndent(baseind + 2) + "<jadex:parametermapping name=\"");
-					out.print(key);
+					out.print(escapeString((String) key));
 					out.print("\">");
-					out.print(((Tuple2<UnparsedExpression, UnparsedExpression>)mappings.get(key)).getFirstEntity().getValue());
+					out.print(escapeString(((Tuple2<UnparsedExpression, UnparsedExpression>)mappings.get(key)).getFirstEntity().getValue()));
 					out.println("</jadex:parametermapping>");
 				}
 				
@@ -1258,5 +1256,18 @@ public class SBpmnModelWriter
 			sb.append(INDENT_STRING);
 		}
 		return sb.toString();
+	}
+	
+	/**
+	 *  Escapes strings for xml.
+	 */
+	private static final String escapeString(String string)
+	{
+		string = string.replaceAll("&", "&amp;");
+		string = string.replaceAll("\"", "&quot;");
+		string = string.replaceAll("'", "&apos;");
+		string = string.replaceAll("<", "&lt;");
+		string = string.replaceAll(">", "&gt;");
+		return string;
 	}
 }
