@@ -6,11 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Specify that a public field should be included in serialization.
+ *  Specify an alias for the class
+ *  (e.g. the old name for compatibility after the class was renamed or moved to a different package).
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-public @interface Include
+@Target({ElementType.TYPE})
+public @interface Alias
 {
+	/**
+	 *  The alias name.
+	 */
+	public String value();
 }
-
