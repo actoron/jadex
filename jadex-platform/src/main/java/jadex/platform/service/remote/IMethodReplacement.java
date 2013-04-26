@@ -1,4 +1,4 @@
-package jadex.base.service.remote;
+package jadex.platform.service.remote;
 
 /**
  *  Interface to be implemented by the user

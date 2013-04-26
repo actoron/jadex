@@ -1,4 +1,4 @@
-package jadex.base.service.remote.commands;
+package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -15,6 +15,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
 import jadex.platform.service.remote.RemoteReferenceModule;
 import jadex.platform.service.remote.RemoteServiceManagementService;
@@ -28,6 +29,7 @@ import java.util.List;
 /**
  *  Command for performing a remote service search.
  */
+@Alias("jadex.base.service.remote.commands.RemoteSearchCommand")
 public class RemoteSearchCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------

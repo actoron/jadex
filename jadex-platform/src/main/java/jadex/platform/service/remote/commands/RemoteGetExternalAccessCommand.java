@@ -1,6 +1,5 @@
-package jadex.base.service.remote.commands;
+package jadex.platform.service.remote.commands;
 
-import jadex.base.service.remote.IRemoteCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Security;
@@ -9,12 +8,15 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
+import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 
 /**
  *  Command for getting a remote external access.
  */
+@Alias("jadex.base.service.remote.commands.RemoteGetExternalAccessCommand")
 public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------

@@ -1,8 +1,9 @@
-package jadex.base.service.remote;
+package jadex.platform.service.remote;
 
 import jadex.bridge.service.BasicService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.annotations.Alias;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Set;
  *  cannot be directly created on the remote side and then sent 
  *  per message to the calling side.
  */
+@Alias("jadex.base.service.remote.ProxyInfo")
 public class ProxyInfo
 {
 	//-------- attributes --------

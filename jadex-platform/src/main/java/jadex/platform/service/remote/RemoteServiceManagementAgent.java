@@ -1,9 +1,5 @@
 package jadex.platform.service.remote;
 
-import jadex.base.service.remote.IRemoteCommand;
-import jadex.base.service.remote.commands.AbstractRemoteCommand;
-import jadex.base.service.remote.commands.RemoteIntermediateResultCommand;
-import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
@@ -29,11 +25,23 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.transformation.STransformation;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
+import jadex.platform.service.remote.commands.AbstractRemoteCommand;
+import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
+import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
+import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
+import jadex.platform.service.remote.commands.RemoteGetExternalAccessCommand;
+import jadex.platform.service.remote.commands.RemoteIntermediateResultCommand;
+import jadex.platform.service.remote.commands.RemoteMethodInvocationCommand;
+import jadex.platform.service.remote.commands.RemoteResultCommand;
+import jadex.platform.service.remote.commands.RemoteSearchCommand;
+import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
+import jadex.platform.service.remote.replacements.DefaultHashcodeMethodReplacement;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -64,6 +72,21 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	public IFuture<Void>	agentCreated()
 	{
 		final Future<Void>	ret	= new Future<Void>();
+		
+		// Register communication classes that have aliases.
+		STransformation.registerClass(ProxyInfo.class);
+		STransformation.registerClass(ProxyReference.class);
+		STransformation.registerClass(RemoteReference.class);
+		STransformation.registerClass(RemoteDGCAddReferenceCommand.class);
+		STransformation.registerClass(RemoteDGCRemoveReferenceCommand.class);
+		STransformation.registerClass(RemoteFutureTerminationCommand.class);
+		STransformation.registerClass(RemoteGetExternalAccessCommand.class);
+		STransformation.registerClass(RemoteIntermediateResultCommand.class);
+		STransformation.registerClass(RemoteMethodInvocationCommand.class);
+		STransformation.registerClass(RemoteResultCommand.class);
+		STransformation.registerClass(DefaultEqualsMethodReplacement.class);
+		STransformation.registerClass(DefaultHashcodeMethodReplacement.class);
+		
 		SServiceProvider.getService(getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{

@@ -1,10 +1,11 @@
-package jadex.base.service.message.streams;
+package jadex.platform.service.message.streams;
+
+import jadex.commons.transformation.annotations.Alias;
 
 /**
  * 
  */
-//legacy package for jadex 2.1
-//todo: implement alias names for XML/binary classes
+@Alias("jadex.base.service.message.streams.AckInfo")
 public class AckInfo
 {
 	/** The start seqno. */

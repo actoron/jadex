@@ -1,8 +1,5 @@
 package jadex.platform.service.message;
 
-import jadex.base.service.message.streams.AckInfo;
-import jadex.base.service.message.streams.InitInfo;
-import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
@@ -48,6 +45,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -55,12 +53,15 @@ import jadex.commons.transformation.traverser.Traverser;
 import jadex.platform.service.awareness.discovery.message.IMessageAwarenessService;
 import jadex.platform.service.cms.AbstractComponentAdapter;
 import jadex.platform.service.message.streams.AbstractConnectionHandler;
+import jadex.platform.service.message.streams.AckInfo;
+import jadex.platform.service.message.streams.InitInfo;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.InputConnectionHandler;
 import jadex.platform.service.message.streams.OutputConnection;
 import jadex.platform.service.message.streams.OutputConnectionHandler;
 import jadex.platform.service.message.streams.StreamSendTask;
 import jadex.platform.service.message.transport.ITransport;
+import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.platform.service.message.transport.codecs.CodecFactory;
 
 import java.io.BufferedInputStream;
@@ -210,6 +211,11 @@ public class MessageService extends BasicService implements IMessageService
 		MessageType[] messagetypes, IContentCodec[] contentcodecs, String deflanguage, CodecFactory codecfactory, boolean strictcom)
 	{
 		super(component.getServiceProvider().getId(), IMessageService.class, null);
+		
+		// Register communication classes with aliases
+		STransformation.registerClass(MessageEnvelope.class);
+		STransformation.registerClass(AckInfo.class);
+		STransformation.registerClass(InitInfo.class);
 
 		this.strictcom	= strictcom;
 		this.component = component;

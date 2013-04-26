@@ -1,16 +1,18 @@
-package jadex.base.service.remote.commands;
+package jadex.platform.service.remote.commands;
 
-import jadex.base.service.remote.IRemoteCommand;
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
+import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 
 /**
  *  Command for executing a remote method.
  */
+@Alias("jadex.base.service.remote.commands.RemoteFutureTerminationCommand")
 public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------

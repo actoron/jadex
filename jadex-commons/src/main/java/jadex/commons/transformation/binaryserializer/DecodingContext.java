@@ -1,6 +1,8 @@
 package jadex.commons.transformation.binaryserializer;
 
 
+import jadex.commons.transformation.STransformation;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -283,6 +285,8 @@ public class DecodingContext
 			ret = classnamepool.get(classid);
 		}
 		
+		ret	= STransformation.getClassname(ret);
+			
 		currentclassname = ret;
 		return ret;
 	}

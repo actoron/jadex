@@ -1,7 +1,5 @@
-package jadex.base.service.remote.commands;
+package jadex.platform.service.remote.commands;
 
-import jadex.base.service.remote.IRemoteCommand;
-import jadex.base.service.remote.RemoteReference;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
@@ -19,7 +17,10 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
+import jadex.platform.service.remote.IRemoteCommand;
+import jadex.platform.service.remote.RemoteReference;
 import jadex.platform.service.remote.RemoteReferenceModule;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 
@@ -34,6 +35,7 @@ import java.util.Map;
 /**
  *  Command for executing a remote method.
  */
+@Alias("jadex.base.service.remote.commands.RemoteMethodInvocationCommand")
 public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------

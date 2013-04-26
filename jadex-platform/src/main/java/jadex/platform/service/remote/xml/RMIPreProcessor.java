@@ -1,8 +1,8 @@
 package jadex.platform.service.remote.xml;
 
-import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.platform.service.remote.RemoteReferenceModule;
+import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 import jadex.xml.IContext;
 import jadex.xml.IPreProcessor;
 

@@ -68,7 +68,7 @@ public class ClassCodec extends AbstractCodec
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
 		//ec.writeString(SReflect.getClassName((Class) object));
-		ec.writeClassname(SReflect.getClassName(((Class) object)));
+		ec.writeClass((Class<?>)object);
 		
 		return object;
 	}

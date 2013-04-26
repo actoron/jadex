@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Specify an alias for the class
+ *  Specify an alias for a class
  *  (e.g. the old name for compatibility after the class was renamed or moved to a different package).
  */
 @Retention(RetentionPolicy.RUNTIME)

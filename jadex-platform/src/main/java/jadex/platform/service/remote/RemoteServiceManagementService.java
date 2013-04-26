@@ -1,9 +1,5 @@
 package jadex.platform.service.remote;
 
-import jadex.base.service.remote.ProxyReference;
-import jadex.base.service.remote.commands.AbstractRemoteCommand;
-import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
-import jadex.base.service.remote.commands.RemoteSearchCommand;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
@@ -60,6 +56,9 @@ import jadex.platform.service.message.contentcodecs.JadexBinaryContentCodec;
 import jadex.platform.service.message.contentcodecs.JadexXMLContentCodec;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.OutputConnection;
+import jadex.platform.service.remote.commands.AbstractRemoteCommand;
+import jadex.platform.service.remote.commands.RemoteGetExternalAccessCommand;
+import jadex.platform.service.remote.commands.RemoteSearchCommand;
 import jadex.platform.service.remote.xml.RMIPostProcessor;
 import jadex.platform.service.remote.xml.RMIPreProcessor;
 import jadex.xml.AccessInfo;

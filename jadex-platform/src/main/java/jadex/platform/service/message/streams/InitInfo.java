@@ -1,14 +1,14 @@
-package jadex.base.service.message.streams;
+package jadex.platform.service.message.streams;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.transformation.annotations.Alias;
 
 import java.util.Map;
 
 /**
  *  Info sent as content of the init message.
  */
-//legacy package for jadex 2.1
-//todo: implement alias names for XML/binary classes
+@Alias("jadex.base.service.message.streams.InitInfo")
 public class InitInfo
 {
 	/** The initiator. */

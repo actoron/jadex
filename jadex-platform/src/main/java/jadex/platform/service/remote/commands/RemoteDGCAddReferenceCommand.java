@@ -1,17 +1,19 @@
-package jadex.base.service.remote.commands;
+package jadex.platform.service.remote.commands;
 
-import jadex.base.service.remote.IRemoteCommand;
-import jadex.base.service.remote.RemoteReference;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
+import jadex.platform.service.remote.IRemoteCommand;
+import jadex.platform.service.remote.RemoteReference;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 
 /**
  *  Distributed garbage collection 'addRef(rr)' command.
  */
+@Alias("jadex.base.service.remote.commands.RemoteDGCAddReferenceCommand")
 public class RemoteDGCAddReferenceCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------

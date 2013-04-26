@@ -1,6 +1,8 @@
 package jadex.commons.transformation.binaryserializer;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.STransformation;
+import jadex.commons.transformation.annotations.Alias;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 import java.io.UnsupportedEncodingException;
@@ -17,7 +19,7 @@ import java.util.StringTokenizer;
 public class EncodingContext
 {	
 	/** Cache for class names. */
-	protected Map<Class, String> classnamecache = new HashMap<Class, String>();
+	protected Map<Class<?>, String> classnamecache = new HashMap<Class<?>, String>();
 	
 	/** The binary output */
 	protected GrowableByteBuffer buffer;
@@ -26,7 +28,7 @@ public class EncodingContext
 	protected Map<String, Integer> stringpool;
 	
 	/** Cache for class IDs. */
-	protected Map<Class, Integer> classidcache;
+	protected Map<Class<?>, Integer> classidcache;
 	
 	/** The class name pool. */
 	protected Map<String, Integer> classnamepool;
@@ -69,7 +71,7 @@ public class EncodingContext
 		this.classloader = classloader;
 		this.writeclass = true;
 		buffer = new GrowableByteBuffer();
-		classidcache = new HashMap<Class, Integer>();
+		classidcache = new HashMap<Class<?>, Integer>();
 		stringpool = new HashMap<String, Integer>();
 		//for (int i = 0; i < BinarySerializer.DEFAULT_STRINGS.size(); ++i)
 			//stringpool.put(BinarySerializer.DEFAULT_STRINGS.get(i), i);
@@ -179,15 +181,16 @@ public class EncodingContext
 	 * 
 	 * @param clazz
 	 */
-	public void writeClass(Class clazz)
+	public void writeClass(Class<?> clazz)
 	{
 
-		if (writeclass)
+		if(writeclass)
 		{
 			Integer classid = classidcache.get(clazz);
 			if (classid == null)
 			{
-				classid = writeClassname(SReflect.getClassName(clazz));
+				String	classname	= STransformation.registerClass(clazz);
+				classid = writeClassname(classname);
 				classidcache.put(clazz, classid);
 			}
 			else

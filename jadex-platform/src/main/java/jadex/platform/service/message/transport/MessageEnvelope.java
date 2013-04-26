@@ -1,8 +1,9 @@
-package jadex.base.service.message.transport;
+package jadex.platform.service.message.transport;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.annotations.Alias;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,8 +13,7 @@ import java.util.Map;
  *  The message envelope holding the native message,
  *  the receivers and the message type.
  */
-// legacy package for jadex 2.1
-// todo: implement alias names for XML/binary classes
+@Alias("jadex.base.service.message.transport.MessageEnvelope")
 public class MessageEnvelope
 {
 	//-------- attributes --------

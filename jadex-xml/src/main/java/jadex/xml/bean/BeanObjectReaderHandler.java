@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.BasicTypeConverter;
 import jadex.commons.transformation.IStringObjectConverter;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
@@ -205,11 +206,16 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				{
 					String strlens = clazzname.substring(idx+2);
 					clazzname = clazzname.substring(0, idx);
+					clazzname	= STransformation.getClassname(clazzname);
 					StringTokenizer stok = new StringTokenizer(strlens, "__");
 					dim = Integer.parseInt(stok.nextToken());	
 					for(int i=0; i<dim-1; i++)
 						clazzname+="[]";
 					len = Integer.parseInt((String)rawattributes.get(SXML.ARRAYLEN));
+				}
+				else
+				{
+					clazzname	= STransformation.getClassname(clazzname);
 				}
 				
 				Class clazz = SReflect.classForName(clazzname, context.getClassLoader());

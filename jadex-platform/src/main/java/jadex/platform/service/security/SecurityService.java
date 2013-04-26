@@ -1,6 +1,5 @@
 package jadex.platform.service.security;
 
-import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -37,6 +36,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
+import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 import jadex.xml.bean.JavaWriter;
 
 import java.net.InetAddress;

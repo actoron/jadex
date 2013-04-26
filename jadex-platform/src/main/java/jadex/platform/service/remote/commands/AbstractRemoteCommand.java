@@ -1,6 +1,5 @@
-package jadex.base.service.remote.commands;
+package jadex.platform.service.remote.commands;
 
-import jadex.base.service.remote.IRemoteCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -11,6 +10,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteReferenceModule;
 
 import java.util.Map;

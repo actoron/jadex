@@ -4,6 +4,7 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.BasicTypeConverter;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
@@ -192,7 +193,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		if(object!=null)
 		{
 			Class clazz = object.getClass();
-			String clazzname = SReflect.getClassName(clazz);
+			String clazzname = STransformation.registerClass(clazz);
 //			if(clazzname.indexOf("IRemoteMessageListener")!=-1)
 //			{
 //				System.out.println("sdilfugkl");

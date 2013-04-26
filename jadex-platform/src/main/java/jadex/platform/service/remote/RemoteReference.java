@@ -1,12 +1,14 @@
-package jadex.base.service.remote;
+package jadex.platform.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.annotations.Alias;
 
 /**
  *  Remote reference for locating a specific target object in another platform.
  */
+@Alias("jadex.base.service.remote.RemoteReference")
 public class RemoteReference //implements Comparable
 {
 	//-------- attributes --------

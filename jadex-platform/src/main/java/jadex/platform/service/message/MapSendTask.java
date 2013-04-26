@@ -1,12 +1,12 @@
 package jadex.platform.service.message;
 
-import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.platform.service.message.transport.ITransport;
+import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.platform.service.message.transport.codecs.CodecFactory;
 
 import java.io.ByteArrayInputStream;

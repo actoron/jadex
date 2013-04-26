@@ -1,10 +1,5 @@
 package jadex.platform.service.remote;
 
-import jadex.base.service.remote.IMethodReplacement;
-import jadex.base.service.remote.ProxyInfo;
-import jadex.base.service.remote.ProxyReference;
-import jadex.base.service.remote.commands.RemoteFutureTerminationCommand;
-import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -26,6 +21,8 @@ import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
+import jadex.platform.service.remote.commands.RemoteMethodInvocationCommand;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

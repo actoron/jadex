@@ -1,4 +1,4 @@
-package jadex.base.service.remote.commands;
+package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -8,6 +8,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
 import jadex.platform.service.remote.RemoteReferenceModule;
 import jadex.platform.service.remote.RemoteServiceManagementService;
@@ -19,6 +20,7 @@ import java.util.Map;
  *  Command that represents the result(s) of a remote command.
  *  Notifies the caller about the result.
  */
+@Alias("jadex.base.service.remote.commands.RemoteResultCommand")
 public class RemoteResultCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------

@@ -1,12 +1,14 @@
-package jadex.base.service.remote.replacements;
+package jadex.platform.service.remote.replacements;
 
-import jadex.base.service.remote.IMethodReplacement;
+import jadex.commons.transformation.annotations.Alias;
+import jadex.platform.service.remote.IMethodReplacement;
 
 import java.lang.reflect.Proxy;
 
 /**
  *  Default replacement code for hashCode() method. 
  */
+@Alias("jadex.base.service.remote.replacements.DefaultHashcodeMethodReplacement")
 public class DefaultHashcodeMethodReplacement implements IMethodReplacement
 {
 	/**

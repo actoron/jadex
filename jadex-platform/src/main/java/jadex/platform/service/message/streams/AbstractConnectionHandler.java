@@ -1,6 +1,5 @@
 package jadex.platform.service.message.streams;
 
-import jadex.base.service.message.streams.InitInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;

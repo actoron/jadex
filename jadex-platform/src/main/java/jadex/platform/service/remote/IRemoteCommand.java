@@ -1,9 +1,9 @@
-package jadex.base.service.remote;
+package jadex.platform.service.remote;
 
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
-import jadex.platform.service.remote.RemoteServiceManagementService;
 
 
 /**
