@@ -1,9 +1,8 @@
 package jadex.bpmn.editor.gui;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -19,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.OverlayLayout;
+import javax.swing.ScrollPaneLayout;
 import javax.swing.border.EmptyBorder;
 
 /**
@@ -27,9 +28,6 @@ import javax.swing.border.EmptyBorder;
  */
 public abstract class AbstractEditingToolbar extends JPanel
 {
-	/** The info panel. */
-	protected JPanel infopanel;
-	
 	/** The tool button group. */
 	protected ButtonGroup toolgroup;
 	
@@ -42,19 +40,10 @@ public abstract class AbstractEditingToolbar extends JPanel
 	public AbstractEditingToolbar()
 	{
 		super();
-		BoxLayout mgr = new BoxLayout(this, BoxLayout.PAGE_AXIS);
+		BoxLayout mgr = new BoxLayout(this, BoxLayout.Y_AXIS);
 		setLayout(mgr);
-		//this.modelcontainer = modelcontainer;
-		//modelcontainer.setEditingToolbar(this);
 		toolgroup = new ButtonGroup();
 		this.toolbars = new ArrayList<JToolBar>();
-		
-		//toppanel = new JPanel(new GridBagLayout());
-		
-		infopanel = new JPanel();
-		infopanel.setMinimumSize(new Dimension(0, 0));
-		infopanel.setBorder(new EmptyBorder(0, 0, 0, 0));
-		add(infopanel);
 	}
 	
 	/**
@@ -75,21 +64,15 @@ public abstract class AbstractEditingToolbar extends JPanel
 	 */
 	public void removeAll()
 	{
-		//toppanel.removeAll();
-		super.removeAll();
-		add(infopanel);
-		this.toolbars = new ArrayList<JToolBar>();
+		//super.removeAll();
+		//this.toolbars = new ArrayList<JToolBar>();
+		
+		for (JToolBar toolbar : toolbars)
+		{
+			((JPanel) ((JScrollPane) toolbar.getComponent(0)).getViewport().getComponent(0)).removeAll();
+		}
+		
 		this.toolgroup = new ButtonGroup();
-	}
-	
-	/**
-	 *  Gets the info panel.
-	 *  
-	 *  @return
-	 */
-	public JPanel getInfoPanel()
-	{
-		return infopanel;
 	}
 	
 	/**
@@ -127,7 +110,12 @@ public abstract class AbstractEditingToolbar extends JPanel
 		
 		toolgroup.add(tool);
 		JToolBar tb = getToolBar(row);
-		tb.add(tool);
+		JScrollPane sp = (JScrollPane) tb.getComponent(0);
+		JPanel tbpanel = (JPanel) sp.getViewport().getComponent(0);
+		tbpanel.add(tool);
+		
+		
+		//tb.add(tool);
 		
 		//tb.addSeparator(new Dimension(2, 0));
 	}
@@ -182,34 +170,37 @@ public abstract class AbstractEditingToolbar extends JPanel
 		while (row >= toolbars.size())
 		{
 			JToolBar newbar = new JToolBar();
-			newbar.setFloatable(false);
+			newbar.setLayout(new OverlayLayout(newbar));
+			newbar.setFloatable(true);
 			newbar.setAlignmentX(Component.LEFT_ALIGNMENT);
-			newbar.setMargin(new Insets(2, 2, 2, 2));
-			toolbars.add(newbar);
+			newbar.setMargin(new Insets(0, 0, 0, 0));
 			
-			JScrollPane sp = new JScrollPane(newbar);
+			JPanel tbpanel = new JPanel();
+			tbpanel.setLayout(new BoxLayout(tbpanel, BoxLayout.X_AXIS));
+			
+			JScrollPane sp = new JScrollPane(tbpanel);
+			// Scroll pane bug fix. Thanks Java.
+			sp.setLayout(new ScrollPaneLayout()
+			{
+				public Dimension preferredLayoutSize(Container parent)
+				{
+					Dimension ret =  super.preferredLayoutSize(parent);
+			        JScrollPane sp = (JScrollPane) parent;
+			        if (sp.getViewport().getExtentSize().width <
+			        	sp.getViewport().getView().getPreferredSize().width)
+			        {
+			            ret.height += sp.getHorizontalScrollBar().getPreferredSize().height;
+			        }
+			        return ret;
+				}
+			});
 			sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 			sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			sp.setMinimumSize(newbar.getPreferredSize());
 			
-			add(sp);
+			newbar.add(sp);
+			toolbars.add(newbar);
 			
-//			if (row == 0)
-//			{
-//				GridBagConstraints c = new GridBagConstraints();
-//				c.weightx = 1.0;
-//				c.weighty = 1.0;
-//				c.fill = GridBagConstraints.BOTH;
-//				toppanel.add(sp, c);
-//				c = new GridBagConstraints();
-//				c.gridx = 1;
-//				toppanel.add(infopanel, c);
-//				add(toppanel);
-//			}
-//			else
-//			{
-//				add(sp);
-//			}
+			add(newbar);
 		}
 		
 		return toolbars.get(row);

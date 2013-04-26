@@ -315,57 +315,13 @@ public class BpmnGraphComponent extends mxGraphComponent
 							y2 = (float) (bounds.getY() + bounds.getHeight());
 							x1 = (float) (bounds.getX() + bounds.getWidth());
 						}
-						else if (gradientDirection.equals("radnorthwest"))
+						else if (gradientDirection.equals("northwest"))
 						{
 							double min = Math.min(bounds.getWidth(), bounds.getHeight());
 							double max = Math.max(bounds.getWidth(), bounds.getHeight());
 							double length = (max - min) * 0.5 + min;
 							x1 = (float) (bounds.getX() + length);
 							y1 = (float) (bounds.getY() + length);
-							double sqlength = Math.min(bounds.getWidth(), bounds.getHeight());
-//							double diffx2 = (bounds.getWidth() - sqlength) * 0.5;
-//							double diffy2 = (bounds.getHeight() - sqlength) * 0.5;
-//							x2 = (float) (bounds.getX() + diffx2);
-//							y2 = (float) (bounds.getY() + diffy2);
-//							x1 = (float) (x1 + sqlength);
-//							y1 = (float) (y1 + sqlength);
-//							
-//							System.out.println(x1 + " " + y1 + " " + x2 + " " + y2 + " " + " " + diffx2 + " " + diffy2 + " " + " " + bounds.getWidth() + " " + bounds.getHeight() + sqlength);
-//							System.out.println(x1);
-//							System.out.println(x2);
-//							fillPaint = new GradientPaint(x1+30, y1+30, gradientColor, x2, y2,
-//									fillColor, true);
-//							fillPaint = new LinearGradientPaint(new Point2D.Double(x1, y1), new Point2D.Double(x2, y1), new float[] {0.0f, 1.0f}, new Color[] {gradientColor, fillColor});
-							//fillPaint = new RadialGradientPaint((float) bounds.getX(), (float) bounds.getY(), (float) sqlength, new float[] {0.0f, 1.0f}, new Color[] { gradientColor, fillColor });
-//							fillPaint = new Paint()
-//							{
-//								public int getTransparency()
-//								{
-//									return Transparency.TRANSLUCENT;
-//								}
-//								
-//								public PaintContext createContext(ColorModel cm, Rectangle deviceBounds,
-//										Rectangle2D userBounds, AffineTransform xform, RenderingHints hints)
-//								{
-//									return new PaintContext()
-//									{
-//										
-//										public Raster getRaster(int x, int y, int w, int h)
-//										{
-//											return null;
-//										}
-//										
-//										public ColorModel getColorModel()
-//										{
-//											return null;
-//										}
-//										
-//										public void dispose()
-//										{
-//										}
-//									};
-//								}
-//							};
 						}
 						
 						if (fillPaint == null)

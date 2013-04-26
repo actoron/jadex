@@ -1,8 +1,5 @@
 package jadex.bpmn.editor.gui.stylesheets;
 
-import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.model.MBpmnModel;
-
 import com.mxgraph.util.mxConstants;
 
 /**
@@ -16,25 +13,14 @@ public class BpmnStylesheetColorGradient extends BpmnStylesheetColor
 	
 	public BpmnStylesheetColorGradient()
 	{
-		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK).put(mxConstants.STYLE_GRADIENTCOLOR, "#ffffff");
-		styles.get(VActivity.class.getSimpleName() + "_" + MBpmnModel.TASK).put(mxConstants.STYLE_GRADIENT_DIRECTION, "radnorthwest");
+		for (String key : styles.keySet())
+		{
+			String lkey = key.toLowerCase();
+			if (lkey.contains("activity") || lkey.contains("task"))
+			{
+				styles.get(key).put(mxConstants.STYLE_GRADIENTCOLOR, "#ffffff");
+				styles.get(key).put(mxConstants.STYLE_GRADIENT_DIRECTION, "northwest");
+			}
+		}
 	}
-	
-//	@Override
-//	public Map<String, Object> getCellStyle(String name,
-//			Map<String, Object> defaultStyle)
-//	{
-//		// TODO Auto-generated method stub
-//		return new HashMap<String, Object>(super.getCellStyle(name, defaultStyle))
-//		{
-//			public Object get(Object arg0)
-//			{
-//				if (mxConstants.STYLE_GRADIENT_DIRECTION.equals(arg0))
-//				{
-//					System.out.println("grax");
-//				}
-//				return super.get(arg0);
-//			};
-//		};
-//	}
 }

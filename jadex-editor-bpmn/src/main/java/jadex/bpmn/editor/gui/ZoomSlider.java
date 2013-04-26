@@ -2,10 +2,13 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.gui.controllers.MouseController;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.Hashtable;
 
-import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -17,7 +20,7 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
  *  Box for zoom setting.
  *
  */
-public class ZoomBox extends JComboBox
+public class ZoomSlider extends JPanel
 {
 	/** The editor window. */
 	protected BpmnEditorWindow editorwindow;
@@ -25,34 +28,30 @@ public class ZoomBox extends JComboBox
 	/** Current model container */
 	protected ModelContainer currentcontainer;
 	
-	/** Action listener. */
-	protected ActionListener actionlistener;
+	/** Change listener. */
+	protected ChangeListener changelistener;
+	
+	/** The slider. */
+	protected JSlider slider;
 	
 	/**
 	 *  Creates the box
 	 *  @param window The editor window.
 	 */
-	public ZoomBox(BpmnEditorWindow window)
+	public ZoomSlider(BpmnEditorWindow window)
 	{
-		super(GuiConstants.STANDARD_ZOOM_LEVELS);
-		this.editorwindow = window;
-		setEditable(true);
+		setLayout(new GridBagLayout());
 		
-		actionlistener =  new ActionListener()
+		slider = new JSlider(GuiConstants.MIN_ZOOM_LEVEL, GuiConstants.MAX_ZOOM_LEVEL);
+		
+		this.editorwindow = window;
+		
+		changelistener = new ChangeListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			public void stateChanged(ChangeEvent e)
 			{
-				String valstr = (String) getSelectedItem();
-				valstr = valstr.replaceAll("[^0123456789]", "").trim();
-				try
-				{
-					int val = Math.max(20, Math.min(400, Integer.parseInt(valstr)));
-					MouseController.setScale(currentcontainer, currentcontainer.getGraph().getView().getScale(), val * 0.01, null);
-				}
-				catch (Exception e1)
-				{
-				}
-				System.out.println("A");
+				int val = slider.getValue();
+				MouseController.setScale(currentcontainer, currentcontainer.getGraph().getView().getScale(), val * 0.01, null);
 			}
 		};
 		
@@ -86,7 +85,27 @@ public class ZoomBox extends JComboBox
 			}
 		});
 		
-		addActionListener(actionlistener);
+		
+		
+		slider.addChangeListener(changelistener);
+		
+		final JLabel label = new JLabel();
+		slider.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				label.setText(String.valueOf(slider.getValue()) + "%");
+			}
+		});
+		
+		GridBagConstraints g = new GridBagConstraints();
+		g.fill = GridBagConstraints.NONE;
+		add(label, g);
+		g = new GridBagConstraints();
+		g.fill = GridBagConstraints.HORIZONTAL;
+		g.weightx = 1.0;
+		g.gridx = 1;
+		add(slider, g);
 	}
 	
 	/**
@@ -96,8 +115,8 @@ public class ZoomBox extends JComboBox
 	 */
 	protected void setZoomText(double scale)
 	{
-		removeActionListener(actionlistener);
-		setSelectedItem(String.valueOf(Math.round(scale * 100.0)) + "%");
-		addActionListener(actionlistener);
+		slider.removeChangeListener(changelistener);
+		slider.setValue((int) Math.round(scale * 100.0));
+		slider.addChangeListener(changelistener);
 	}
 }

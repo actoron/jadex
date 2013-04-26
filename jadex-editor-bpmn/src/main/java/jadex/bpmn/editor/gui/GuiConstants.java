@@ -35,8 +35,11 @@ public class GuiConstants
 	/** The default zoom. */
 	public static final double DEFAULT_ZOOM = 0.75;
 	
-	/** The standard zoom levels. */
-	public static final String[] STANDARD_ZOOM_LEVELS = { "20%", "50%", "75%", "100%", "125%", "150%", "200%", "400%" };
+	/** The minimum zoom level. */
+	public static final int MIN_ZOOM_LEVEL = 20;
+	
+	/** The maximum zoom level. */
+	public static final int MAX_ZOOM_LEVEL = 400;
 	
 	/** Factor by which the mouse shifts the view during zoom. */
 	public static final double ZOOM_MOUSE_DIRECTION_FACTOR = 2.5;

@@ -17,7 +17,6 @@ import jadex.commons.gui.JSplitPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -43,6 +42,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
@@ -106,9 +106,6 @@ public class BpmnEditorWindow extends JFrame
 //		};
 		statuspane.setTopComponent(tabpane);
 		
-		bpmntoolbar.getInfoPanel().setLayout(new FlowLayout(FlowLayout.LEFT));
-		bpmntoolbar.getInfoPanel().add(new ZoomBox(this));
-		
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
@@ -120,6 +117,19 @@ public class BpmnEditorWindow extends JFrame
 		/* Menu */
 		JMenuBar menubar = new BpmnMenuBar(BpmnEditorWindow.this);
 		setJMenuBar(menubar);
+		
+		JToolBar statusbar = new JToolBar();
+		statusbar.setLayout(new GridBagLayout());
+		statusbar.setFloatable(false);
+		add(statusbar, BorderLayout.PAGE_END);
+		GridBagConstraints g = new GridBagConstraints();
+		g.fill = GridBagConstraints.HORIZONTAL;
+		g.weightx = 1.0;
+		statusbar.add(new JPanel(), g);
+		g = new GridBagConstraints();
+		g.gridx = 1;
+		g.fill = GridBagConstraints.NONE;
+		statusbar.add(new ZoomSlider(this), g);
 		
 		pack();
 		Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();
