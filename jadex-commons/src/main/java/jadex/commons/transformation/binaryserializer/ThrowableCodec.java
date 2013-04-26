@@ -75,7 +75,10 @@ public class ThrowableCodec extends AbstractCodec
 			}
 		}
 		
-		BeanCodec.readBeanProperties(ret, clazz, context, intro);
+		if(ret!=null)
+		{
+			BeanCodec.readBeanProperties(ret, clazz, context, intro);
+		}
 		
 		return ret;
 	}

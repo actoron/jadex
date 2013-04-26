@@ -288,6 +288,19 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
 						ChatUser cu = (ChatUser)value;
 						this.setText(cu.getNick()+" ["+cu.getComponentIdentifier()+"]");
+						if(cu.getComponentIdentifier()==null)
+						{
+							System.out.println("CU.CID is null");
+						}
+						if(getService()==null)
+						{
+							System.out.println("service is null");
+						}
+						if(((IService)getService()).getServiceIdentifier()==null)
+						{
+							System.out.println("service.SID is null");
+						}
+							
 						if(!cu.getComponentIdentifier().equals(((IService)getService()).getServiceIdentifier().getProviderId()))
 						{
 							this.setToolTipText("Select to send private message.\nRight-click to send file.");

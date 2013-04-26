@@ -220,5 +220,4 @@ public class Cause
 			+ ", targetid=" + targetid + ", sourcename=" + sourcename
 			+ ", targetname=" + targetname + ")";
 	}
-	
 }

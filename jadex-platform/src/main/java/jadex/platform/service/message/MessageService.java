@@ -48,6 +48,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.E;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
@@ -1991,6 +1992,10 @@ public class MessageService extends BasicService implements IMessageService
 				if(!errors.isEmpty())
 				{
 					logger.warning("Ignored errors during message decoding: "+errors);
+//					for(Exception e: errors)
+//					{
+//						e.printStackTrace();
+//					}
 				}
 //				byte[]	rawmsg	= (byte[])obj;
 //				int	idx	= 0;
@@ -2221,6 +2226,10 @@ public class MessageService extends BasicService implements IMessageService
 													if(!errors.isEmpty())
 													{
 														logger.warning("Ignored errors during message decoding: "+errors);
+//														for(Exception e: errors)
+//														{
+//															e.printStackTrace();
+//														}
 													}
 													fmessage.put(name, val);
 												}
