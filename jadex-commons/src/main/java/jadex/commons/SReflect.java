@@ -1270,7 +1270,7 @@ public class SReflect
 //			System.out.println("Scanning: "+entry);
 			try
 			{
-				System.out.println("url: "+urls[i].toURI());
+//				System.out.println("url: "+urls[i].toURI());
 				File f = new File(urls[i].toURI());
 				if(f.getName().endsWith(".jar"))
 				{
