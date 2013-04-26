@@ -16,8 +16,13 @@
     <semantic:task name="Task" id="Dybp29fTdmSrIgJz">
       <semantic:extensionElements>
         <jadex:taskclass>jadex.bpmn.runtime.task.ServiceCallTask</jadex:taskclass>
+        <jadex:parameter direction="in" name="time" type="long">1000</jadex:parameter>
+        <jadex:parameter direction="in" name="param1" type="jadex.bridge.service.types.clock.ITimedObject">
+        </jadex:parameter>
+        <jadex:parameter direction="out" name="return" type="jadex.bridge.service.types.clock.ITimer">
+        </jadex:parameter>
         <jadex:property name="service" type="java.lang.String">"clockser"</jadex:property>
-        <jadex:property name="method" type="java.lang.String">null</jadex:property>
+        <jadex:property name="method" type="java.lang.String">"createTimer"</jadex:property>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:extensionElements>

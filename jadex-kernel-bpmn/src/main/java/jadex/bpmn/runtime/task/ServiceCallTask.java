@@ -337,24 +337,27 @@ public class ServiceCallTask implements ITask
 				if(reqname!=null && methodname!=null)
 				{
 					RequiredServiceInfo reqser = mi.getRequiredService(reqname);
-					Class<?> type = reqser.getType().getType(cl);
+					Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
 					
-					Method[] ms = type.getMethods();
-					// todo check parameter types?
-					for(Method m: ms)
+					if(type!=null)
 					{
-						if(m.getName().equals(methodname))
+						Method[] ms = type.getMethods();
+						// todo check parameter types?
+						for(Method m: ms)
 						{
-							Class<?>[] ptypes = m.getParameterTypes();
-							Class<?> pret = m.getReturnType();
-							
-							for(int j=0; j<ptypes.length; j++)
+							if(m.getName().equals(methodname))
 							{
-								ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], "param"+j, null, null));
-							}
-							if(!pret.equals(Void.class) && !pret.equals(void.class))
-							{
-								ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, pret, "return", null, null));
+								Class<?>[] ptypes = m.getParameterTypes();
+								Class<?> pret = m.getReturnType();
+								
+								for(int j=0; j<ptypes.length; j++)
+								{
+									ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], "param"+j, null, null));
+								}
+								if(!pret.equals(Void.class) && !pret.equals(void.class))
+								{
+									ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, pret, "return", null, null));
+								}
 							}
 						}
 					}
