@@ -1,7 +1,14 @@
 package jadex.commons;
 
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -11,6 +18,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1260,9 +1268,9 @@ public class SReflect
 		for(int i=0; i<urls.length; i++)
 		{
 //			System.out.println("Scanning: "+entry);
-//			System.out.println("url: "+urls[i].toURI());
 			try
 			{
+				System.out.println("url: "+urls[i].toURI());
 				File f = new File(urls[i].toURI());
 				if(f.getName().endsWith(".jar"))
 				{
@@ -1351,10 +1359,329 @@ public class SReflect
 		}
 	}
 	
-//	public static void main(String[] args)
-//	{
+	/**
+	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
+	 */
+	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(ClassLoader classloader, IFilter filefilter, IFilter classfilter)
+	{
+		return asyncScanForClasses(SUtil.getClasspathURLs(classloader).toArray(new URL[0]), classloader, filefilter, classfilter);
+	}
+	
+	/**
+	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
+	 */
+	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(final URL[] urls, 
+		final ClassLoader classloader, final IFilter filefilter, final IFilter classfilter)
+	{
+		final SubscriptionIntermediateFuture<Class<?>>	ret	= new SubscriptionIntermediateFuture<Class<?>>();
+		
+		final ClassLoader[] newcl = new ClassLoader[1];
+		final int[] cnt = new int[1];
+		
+		asyncScanForFiles(urls, filefilter).addResultListener(new IIntermediateResultListener<String>()
+		{
+			public void intermediateResultAvailable(String file)
+			{
+				try
+				{
+					String	clname	= file.substring(0, file.length()-6).replace('/', '.');
+	//				System.out.println("Found candidate: "+clname);
+					
+					if(newcl[0]==null || cnt[0]++%1000==0)
+						newcl[0] = new URLClassLoader(urls, null);
+//					
+					Class<?> tmpcl = Class.forName(clname, false, newcl[0]);
+					
+					if(tmpcl!=null && classfilter.filter(tmpcl))
+					{
+						ret.addIntermediateResult(SReflect.findClass0(clname, null, classloader));
+					}
+				}
+				catch(Throwable t)
+				{
+//					e.printStackTrace();
+					System.out.println(file);
+				}
+			}
+			
+			public void resultAvailable(Collection<String> result)
+			{
+				for(String res: result)
+				{
+					intermediateResultAvailable(res);
+				}
+				finished();
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+			
+			public void finished()
+			{
+				ret.setFinished();
+			}
+		});
+		
+		return ret;
+	}
+
+	/**
+	 *  Scan for files in a given list of urls.
+	 */
+	public static ISubscriptionIntermediateFuture<String> asyncScanForFiles(URL[] urls, IFilter filter)
+	{
+		final SubscriptionIntermediateFuture<String>	ret	= new SubscriptionIntermediateFuture<String>();
+		
+		if(urls.length==0)
+		{
+			ret.setFinished();
+			return ret;
+		}
+		
+		final CounterResultListener<Void> lis = new CounterResultListener<Void>(urls.length, true, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				ret.setFinished();
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		for(int i=0; i<urls.length; i++)
+		{
+//			System.out.println("Scanning: "+entry);
+			try
+			{
+//				System.out.println("url: "+urls[i].toURI());
+				File f = new File(urls[i].toURI());
+				if(f.getName().endsWith(".jar"))
+				{
+					JarFile	jar = null;
+					try
+					{
+						jar	= new JarFile(f);
+						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
+						{
+							JarEntry	je	= e.nextElement();
+							if(filter.filter(je))	
+							{
+								ret.addIntermediateResult(je.getName());
+							}
+						}
+						jar.close();
+					}
+					catch(Exception e)
+					{
+						lis.exceptionOccurred(e);
+						System.out.println("Error opening jar: "+urls[i]+" "+e.getMessage());
+					}
+					finally
+					{
+						if(jar!=null)
+						{
+							jar.close();
+						}
+					}
+					lis.resultAvailable(null);
+				}
+				else if(f.isDirectory())
+				{
+					asyncScanDir(urls, f, filter, new ArrayList<String>()).addResultListener(new IIntermediateResultListener<String>()
+					{
+						public void intermediateResultAvailable(String result)
+						{
+							ret.addIntermediateResult(result);
+						}
+						
+						public void finished()
+						{
+							lis.resultAvailable(null);
+						}
+						
+						public void resultAvailable(Collection<String> result)
+						{
+							for(String res: result)
+							{
+								intermediateResultAvailable(res);
+							}
+							finished();
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							lis.exceptionOccurred(exception);
+						}
+					});
+//					throw new UnsupportedOperationException("Currently only jar files supported: "+f);
+				}
+			}
+			catch(Exception e)
+			{
+				lis.exceptionOccurred(e);
+				System.out.println("scan problem with: "+urls[i]);
+//				e.printStackTrace();
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Scan directories.
+	 */
+	public static ISubscriptionIntermediateFuture<String> asyncScanDir(URL[] urls, File file, IFilter filter, List<String> donedirs)
+	{
+		final SubscriptionIntermediateFuture<String>	ret	= new SubscriptionIntermediateFuture<String>();
+		
+		File[] files = file.listFiles(new FileFilter()
+		{
+			public boolean accept(File f)
+			{
+				return !f.isDirectory();
+			}
+		});
+		for(File fi: files)
+		{
+			if(fi.getName().endsWith(".class") && filter.filter(fi))
+			{
+				String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
+//				System.out.println("fn: "+fi.getName());
+				ret.addIntermediateResult(fn+"."+fi.getName());
+			}
+		}
+		
+		if(file.isDirectory())
+		{
+			donedirs.add(file.getAbsolutePath());
+			File[] sudirs = file.listFiles(new FileFilter()
+			{
+				public boolean accept(File f)
+				{
+					return f.isDirectory();
+				}
+			});
+			
+			if(sudirs.length>0)
+			{
+				final CounterResultListener<Void> lis = new CounterResultListener<Void>(sudirs.length, new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						ret.setFinished();
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+				
+				for(File dir: sudirs)
+				{
+					if(!donedirs.contains(dir.getAbsolutePath()))
+					{
+						asyncScanDir(urls, dir, filter, donedirs)
+							.addResultListener(new IIntermediateResultListener<String>()
+						{
+							public void intermediateResultAvailable(String result)
+							{
+								ret.addIntermediateResult(result);
+							}
+							
+							public void finished()
+							{
+								lis.resultAvailable(null);
+							}
+							
+							public void resultAvailable(Collection<String> result)
+							{
+								for(String res: result)
+								{
+									intermediateResultAvailable(res);
+								}
+								finished();
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								lis.exceptionOccurred(exception);
+							}
+						});
+					}
+				}
+			}
+			else
+			{
+				ret.setFinished();
+			}
+		}
+		else
+		{
+			ret.setFinished();
+		}
+		
+		return ret;
+	}
+	
+	public static void main(String[] args)
+	{
 //		System.out.println(getMethodName());
-//	}
+	
+		IFilter<Object> filefilter = new IFilter<Object>()
+		{
+			public boolean filter(Object obj)
+			{
+				String	fn	= "";
+				if(obj instanceof File)
+				{
+					File	f	= (File)obj;
+					fn	= f.getName();
+				}
+				else if(obj instanceof JarEntry)
+				{
+					JarEntry	je	= (JarEntry)obj;
+					fn	= je.getName();
+				}
+				return fn.indexOf("$")==-1;// && fn.endsWith(".class");
+			}
+		};
+		final int[] cnt = new int[1]; 
+		IFilter<Class<?>> classfilter = new IFilter<Class<?>>()
+		{
+			public boolean filter(Class<?> clazz)
+			{
+//				System.out.println("testing class: "+(cnt[0]++)+clazz);
+						
+//							Class<?> cl = (Class<?>)obj;
+				boolean ret = SReflect.getInnerClassName(clazz).startsWith("Mouse");
+//							boolean ret = SReflect.isSupertype(IControlCenterPlugin.class, cl) && !(cl.isInterface() || Modifier.isAbstract(cl.getModifiers()));
+				
+				return ret;
+			}
+		};
+		
+		asyncScanForClasses(null, filefilter, classfilter).addResultListener(new IIntermediateResultListener<Class<?>>()
+		{
+			public void intermediateResultAvailable(Class<?> result)
+			{
+				System.out.println("found: "+result);
+			}
+			public void finished()
+			{
+				System.out.println("fini");
+			}
+			public void resultAvailable(Collection<Class<?>> result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
+	}
 	
 	/** Cached flag for android check. */
 	protected static Boolean isandroid;

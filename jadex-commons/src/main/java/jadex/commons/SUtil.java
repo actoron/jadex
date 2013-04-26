@@ -1522,6 +1522,37 @@ public class SUtil
 			{
 			}
 		}
+		
+		stok = new StringTokenizer(System.getProperty("sun.boot.class.path"), System.getProperty("path.separator"));
+		while(stok.hasMoreTokens())
+		{
+			try
+			{
+				String entry = stok.nextToken();
+				File file = new File(entry);
+				cps.add(file.getCanonicalFile().toURI().toURL());
+				
+				// Code below does not work for paths with spaces in it.
+				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
+//				if(file.isDirectory()
+//						&& !entry
+//								.endsWith(System.getProperty("file.separator")))
+//				{
+//					// Normalize, that directories end with "/".
+//					entry += System.getProperty("file.separator");
+//				}
+//				cps.add(new URL("file:///" + entry));
+			}
+			catch(MalformedURLException e)
+			{
+				// Maybe invalid classpath entries --> just ignore.
+				// Hack!!! Print warning?
+				// e.printStackTrace();
+			}
+			catch(IOException e)
+			{
+			}
+		}
 
 		if(classloader instanceof URLClassLoader)
 		{
@@ -3588,8 +3619,15 @@ public class SUtil
 	 */
 	public static void main(String[] args)
 	{
-		System.out.println(log2(8));
-		System.out.println(log2(800000000000L));
+//		List<URL> urls = getClasspathURLs(null);
+		Properties props = System.getProperties();
+		for(Object key: props.keySet())
+		{
+			System.out.println(key+" "+props.get(key));
+		}
+		
+//		System.out.println(log2(8));
+//		System.out.println(log2(800000000000L));
 		
 		
 //		System.out.println("Here: " + createUniqueId("test", 3));

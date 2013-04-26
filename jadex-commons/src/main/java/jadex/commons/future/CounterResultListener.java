@@ -59,7 +59,7 @@ public class CounterResultListener<E> implements IResultListener<E>
 	 */
 	public void resultAvailable(E result)
 	{
-//		System.out.println("here: "+cnt+" "+num);
+//		System.out.println("here: "+hashCode()+" "+cnt+" "+num);
 		boolean	notify	= false;
 		synchronized(this)
 		{
