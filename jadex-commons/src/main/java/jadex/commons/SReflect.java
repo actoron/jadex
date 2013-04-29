@@ -1378,7 +1378,8 @@ public class SReflect
 		final ClassLoader[] newcl = new ClassLoader[1];
 		final int[] cnt = new int[1];
 		
-		asyncScanForFiles(urls, filefilter).addResultListener(new IIntermediateResultListener<String>()
+		final ISubscriptionIntermediateFuture<String> fut = asyncScanForFiles(urls, filefilter);
+		fut.addResultListener(new IIntermediateResultListener<String>()
 		{
 			public void intermediateResultAvailable(String file)
 			{
@@ -1394,14 +1395,17 @@ public class SReflect
 					
 					if(tmpcl!=null && classfilter.filter(tmpcl))
 					{
-						ret.addIntermediateResult(tmpcl);
+						if(!ret.addIntermediateResultIfUndone(tmpcl))
+						{
+							fut.terminate();
+						}
 //						ret.addIntermediateResult(SReflect.findClass0(clname, null, classloader));
 					}
 				}
 				catch(Throwable t)
 				{
 //					e.printStackTrace();
-					System.out.println(file);
+//					System.out.println(file);
 				}
 			}
 			
@@ -1445,15 +1449,15 @@ public class SReflect
 		{
 			public void resultAvailable(Void result)
 			{
-				ret.setFinished();
+				ret.setFinishedIfUndone();
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 		});
 		
-		for(int i=0; i<urls.length; i++)
+		for(int i=0; i<urls.length && !ret.isDone(); i++)
 		{
 //			System.out.println("Scanning: "+entry);
 			try
@@ -1466,20 +1470,19 @@ public class SReflect
 					try
 					{
 						jar	= new JarFile(f);
-						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
+						for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements() && !ret.isDone(); )
 						{
 							JarEntry	je	= e.nextElement();
 							if(filter.filter(je))	
 							{
-								ret.addIntermediateResult(je.getName());
+								ret.addIntermediateResultIfUndone(je.getName());
 							}
 						}
-						jar.close();
 					}
 					catch(Exception e)
 					{
 						lis.exceptionOccurred(e);
-						System.out.println("Error opening jar: "+urls[i]+" "+e.getMessage());
+//						System.out.println("Error opening jar: "+urls[i]+" "+e.getMessage());
 					}
 					finally
 					{
@@ -1492,11 +1495,15 @@ public class SReflect
 				}
 				else if(f.isDirectory())
 				{
-					asyncScanDir(urls, f, filter, new ArrayList<String>()).addResultListener(new IIntermediateResultListener<String>()
+					final ISubscriptionIntermediateFuture<String> fut = asyncScanDir(urls, f, filter, new ArrayList<String>());
+					fut.addResultListener(new IIntermediateResultListener<String>()
 					{
 						public void intermediateResultAvailable(String result)
 						{
-							ret.addIntermediateResult(result);
+							if(!ret.addIntermediateResultIfUndone(result))
+							{
+								fut.terminate();
+							}
 						}
 						
 						public void finished()
@@ -1552,11 +1559,14 @@ public class SReflect
 			{
 				String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
 //				System.out.println("fn: "+fi.getName());
-				ret.addIntermediateResult(fn+"."+fi.getName());
+				if(!ret.addIntermediateResultIfUndone(fn+"."+fi.getName()))
+				{
+					break;
+				}
 			}
 		}
 		
-		if(file.isDirectory())
+		if(file.isDirectory() && !ret.isDone())
 		{
 			donedirs.add(file.getAbsolutePath());
 			File[] sudirs = file.listFiles(new FileFilter()
@@ -1573,11 +1583,11 @@ public class SReflect
 				{
 					public void resultAvailable(Void result)
 					{
-						ret.setFinished();
+						ret.setFinishedIfUndone();
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setException(exception);
+						ret.setExceptionIfUndone(exception);
 					}
 				});
 				
@@ -1585,12 +1595,15 @@ public class SReflect
 				{
 					if(!donedirs.contains(dir.getAbsolutePath()))
 					{
-						asyncScanDir(urls, dir, filter, donedirs)
-							.addResultListener(new IIntermediateResultListener<String>()
+						final ISubscriptionIntermediateFuture<String> fut = asyncScanDir(urls, dir, filter, donedirs);
+						fut.addResultListener(new IIntermediateResultListener<String>()
 						{
 							public void intermediateResultAvailable(String result)
 							{
-								ret.addIntermediateResult(result);
+								if(!ret.addIntermediateResultIfUndone(result))
+								{
+									fut.terminate();
+								}
 							}
 							
 							public void finished()
@@ -1617,12 +1630,12 @@ public class SReflect
 			}
 			else
 			{
-				ret.setFinished();
+				ret.setFinishedIfUndone();
 			}
 		}
 		else
 		{
-			ret.setFinished();
+			ret.setFinishedIfUndone();
 		}
 		
 		return ret;

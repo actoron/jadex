@@ -6,6 +6,9 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.TerminableFuture;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
@@ -14,13 +17,10 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -111,6 +111,7 @@ public class ClassSearchPanel extends JPanel
 			protected Timer t;
 			
 			{
+				// Swing timer
 				t = new Timer(500, new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
@@ -254,6 +255,7 @@ public class ClassSearchPanel extends JPanel
 		return SUtil.equals(this.curquery, curquery);
 	}
 	
+	protected TerminableFuture<Void> lastsearch;
 	/**
 	 *  Perform a search using a search expression.
 	 */
@@ -261,9 +263,32 @@ public class ClassSearchPanel extends JPanel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
+		final ISubscriptionIntermediateFuture<Class<?>>[] fut = new ISubscriptionIntermediateFuture[1];
+		
+		if(lastsearch!=null)
+			lastsearch.terminate();
+		
+		final TerminableFuture<Void> ret = new TerminableFuture<Void>(new ITerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+//				System.out.println("terminating: "+exp);
+				if(fut[0]!=null)
+					fut[0].terminate();
+			}
+			
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
+			}
+		});
+		
+		lastsearch = ret;
+		
 		if(exp==null || exp.length()==0)
 		{
 			status.setText("idle");
+			lastsearch.setResultIfUndone(null);
 			return;
 		}
 		
@@ -272,7 +297,7 @@ public class ClassSearchPanel extends JPanel
 		setCurrentQuery(exp);
 //		System.out.println("perform search: "+exp);
 		
-		ctm.clear();
+//		ctm.clear();
 		
 		if(exp!=null && exp.length()>0)
 			status.setText("searching '"+exp+"'");
@@ -342,23 +367,36 @@ public class ClassSearchPanel extends JPanel
 					}
 				};
 				
-				SReflect.asyncScanForClasses(cl, filefilter, classfilter)
-					.addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
+				fut[0] = SReflect.asyncScanForClasses(cl, filefilter, classfilter);
+				
+				fut[0].addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
 				{
+					List<Class<?>> res = new ArrayList<Class<?>>();
+					
 					public void intermediateResultAvailable(Class<?> result)
 					{
-						ctm.addEntry(result);
+						if(!ret.isDone())
+							res.add(result);
+//						ctm.addEntry(result);
 					}
 					
 					public void finished()
 					{
-						if(ctm.size()>0)
+						if(!ret.isDone())
 						{
-			                results.changeSelection(0, 0, false, false);
-							results.requestFocus();
+							ctm.clear();
+							for(Class<?> cl: res)
+								ctm.addEntry(cl);
+							if(ctm.size()>0)
+							{
+				                results.changeSelection(0, 0, false, false);
+								results.requestFocus();
+							}
+							
+							status.setText("searching '"+exp+"' ("+ctm.size()+") finished");
+							
+							ret.setResultIfUndone(null);
 						}
-						
-						status.setText("searching '"+exp+"' ("+ctm.size()+") finished");
 					}
 					
 					public void resultAvailable(Collection<Class<?>> result)
@@ -373,10 +411,14 @@ public class ClassSearchPanel extends JPanel
 					public void exceptionOccurred(Exception exception)
 					{
 						status.setText("idle '"+exp+"'");
+						
+						lastsearch.setExceptionIfUndone(exception);
 					}
 				}));
 			}
 		});
+		
+		return;
 	}
 	
 	/**

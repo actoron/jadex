@@ -106,14 +106,14 @@ public class TaskPropertyPanel extends BasePropertyPanel
 //			}
 //		});
 		
-		column.add(label, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST, 
-			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
-		column.add(cbox, new GridBagConstraints(1, y, 1, 1, 1, 1, GridBagConstraints.WEST, 
-			GridBagConstraints.HORIZONTAL, new Insets(2,2,2,2), 0, 0));
+//		column.add(label, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST, 
+//			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
+//		column.add(cbox, new GridBagConstraints(1, y, 1, 1, 1, 1, GridBagConstraints.WEST, 
+//			GridBagConstraints.HORIZONTAL, new Insets(2,2,2,2), 0, 0));
 //		column.add(sel, new GridBagConstraints(2, y++, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 //			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
 		
-//		configureAndAddInputLine(column, label, cbox, y++, SUtil.createHashMap(new String[]{"second_fill"}, new Object[]{GridBagConstraints.HORIZONTAL}));
+		configureAndAddInputLine(column, label, cbox, y++, SUtil.createHashMap(new String[]{"second_fill"}, new Object[]{GridBagConstraints.HORIZONTAL}));
 		
 		final JEditorPane descarea = new JEditorPane("text/html", "");
 		final JScrollPane descpane = new JScrollPane(descarea);
@@ -135,6 +135,65 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		final JButton defaultParameterButton = new JButton();
 		defaultParameterButton.setEnabled(getTaskMetaInfo((String) cbox.getSelectedItem()) != null);
 		
+		
+		// Property panel
+		
+		JPanel proppanel = new JPanel(new GridBagLayout());
+		final PropertiesPanel pp = new PropertiesPanel();
+		JButton refresh = new JButton("Refresh");
+		final ActionListener al = new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				pp.removeAll();
+				String taskname = getBpmnTask().getClazz().getTypeName();
+				TaskMetaInfo info = getTaskMetaInfo(taskname);
+				List<PropertyMetaInfo> props = info!=null? info.getPropertyInfos(): null;
+				
+				if(props!=null)
+				{
+					IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
+					
+					for(final PropertyMetaInfo pmi: props)
+					{
+						String lab = pmi.getName();
+						if(pmi.getClazz()!=null)
+							lab += " ("+pmi.getClazz().getTypeName()+")";
+						
+						String valtxt = "";
+						if(mprops!=null && mprops.containsKey(pmi.getName()))
+						{
+							MProperty mprop = mprops.get(pmi.getName());
+							if(SJavaParser.evaluateExpression(mprop.getInitialValue().getValue(), null)!=null)
+								valtxt = mprop.getInitialValue().getValue();
+						}
+						
+						final JTextField tf = pp.createTextField(lab, valtxt, true, 0, pmi.getDescription().length()>0? pmi.getDescription(): null);
+						tf.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								String val = tf.getText();
+								if(val.length()>0)
+								{
+									IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
+									MProperty mprop = mprops.get(pmi.getName());
+									UnparsedExpression uexp = new UnparsedExpression(null, 
+										pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), val, null);
+									mprop.setInitialValue(uexp);
+								}
+							}
+						});
+					}
+					
+					pp.invalidate();
+					pp.doLayout();
+					pp.repaint();
+				}
+			}
+		};
+		refresh.addActionListener(al);
+
 		cbox.addActionListener(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -168,68 +227,17 @@ public class TaskPropertyPanel extends BasePropertyPanel
 					
 					defaultParameterButton.setEnabled(getTaskMetaInfo(taskname) != null);
 				}
+				
+				al.actionPerformed(null);
 			}
 		});
 		
 		//addVerticalFiller(column, y);
 		
-		// Property panel
-		
-		JPanel proppanel = new JPanel(new GridBagLayout());
-		final PropertiesPanel pp = new PropertiesPanel();
-		JButton refresh = new JButton("Refresh");
-		refresh.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				pp.removeAll();
-				String taskname = getBpmnTask().getClazz().getTypeName();
-				TaskMetaInfo info = getTaskMetaInfo(taskname);
-				List<PropertyMetaInfo> props = info!=null? info.getPropertyInfos(): null;
-				
-				if(props!=null)
-				{
-					IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
-					
-					for(final PropertyMetaInfo pmi: props)
-					{
-						String lab = pmi.getName();
-						if(pmi.getClazz()!=null)
-							lab += " ("+pmi.getClazz().getTypeName()+")";
-						
-						String valtxt = "";
-						if(mprops!=null && mprops.containsKey(pmi.getName()))
-						{
-							MProperty mprop = mprops.get(pmi.getName());
-							valtxt = mprop.getInitialValue().getValue();
-						}
-						
-						final JTextField tf = pp.createTextField(lab, valtxt, true, 0, pmi.getDescription().length()>0? pmi.getDescription(): null);
-						tf.addActionListener(new ActionListener()
-						{
-							public void actionPerformed(ActionEvent e)
-							{
-								String val = tf.getText();
-								IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
-								MProperty mprop = mprops.get(pmi.getName());
-								UnparsedExpression uexp = new UnparsedExpression(null, 
-									pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), val, null);
-								mprop.setInitialValue(uexp);
-							}
-						});
-					}
-					
-					pp.invalidate();
-					pp.doLayout();
-					pp.repaint();
-				}
-			}
-		});
-
 		proppanel.add(pp, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
-		proppanel.add(refresh, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHEAST, 
-			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
+//		proppanel.add(refresh, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHEAST, 
+//			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
 		
 		// Parameter panel
 		
@@ -290,6 +298,8 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		tabpane.addTab("Parameters", parameterpanel);
 		
 		add(tabpane, BorderLayout.CENTER);
+		
+		al.actionPerformed(null);
 	}
 	
 	/**
