@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions">
+  <semantic:extension>
+    <jadex:modelname>Flow2</jadex:modelname>
+  </semantic:extension>
+  <semantic:process name="Pool" id="tQ7GtiqRSsU66fi2">
+    <semantic:startEvent id="Cq/85Tim2tti2Odn">
+      <semantic:outgoing>+tPLsbOaRzxn/Hqv</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:task name="Task" id="z4VkNQkKmWLMN5JC">
+      <semantic:incoming>+tPLsbOaRzxn/Hqv</semantic:incoming>
+      <semantic:outgoing>3AQluLkDKtGWn+k/</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:taskclass>jadex.bpmn.runtime.task.ServiceCallTask2</jadex:taskclass>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:endEvent id="PzOumm8xTtN+hML4">
+      <semantic:incoming>3AQluLkDKtGWn+k/</semantic:incoming>
+    </semantic:endEvent>
+    <semantic:sequenceFlow sourceRef="Cq/85Tim2tti2Odn" targetRef="z4VkNQkKmWLMN5JC" id="+tPLsbOaRzxn/Hqv">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="z4VkNQkKmWLMN5JC" targetRef="PzOumm8xTtN+hML4" id="3AQluLkDKtGWn+k/">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="tQ7GtiqRSsU66fi2">
+        <dc:Bounds height="600.0" width="3000.0" x="30.0" y="40.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Cq/85Tim2tti2Odn">
+        <dc:Bounds height="40.0" width="40.0" x="60.0" y="60.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="z4VkNQkKmWLMN5JC">
+        <dc:Bounds height="100.0" width="160.0" x="140.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="PzOumm8xTtN+hML4">
+        <dc:Bounds height="40.0" width="40.0" x="350.0" y="60.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="+tPLsbOaRzxn/Hqv">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="3AQluLkDKtGWn+k/">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+

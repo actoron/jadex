@@ -57,6 +57,7 @@ import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -3612,6 +3613,15 @@ public class SUtil
 		}
 		
 		return mac.equals(NULL)? null: mac;
+	}
+	
+	/**
+	 *  Create a regex from a normal bnf pattern.
+	 */
+	public static Pattern createRegexFromGlob(String glob)
+	{
+		 return Pattern.compile("^\\Q" 
+			+glob.replace("*", "\\E.*\\Q").replace("?", "\\E.\\Q")+"\\E$");
 	}
 	
 	/**

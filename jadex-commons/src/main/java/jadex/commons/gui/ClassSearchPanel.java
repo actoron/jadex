@@ -10,21 +10,31 @@ import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,10 +42,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *  Panel that allows for searching artifacts from maven repositories.
@@ -45,8 +57,9 @@ public class ClassSearchPanel extends JPanel
 	/** The icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"jar", SGUI.makeIcon(ClassSearchPanel.class, "/jadex/base/gui/images/jar.png"),
-		"folder", SGUI.makeIcon(ClassSearchPanel.class, "/jadex/base/gui/images/folder4.png")
+		"class", SGUI.makeIcon(ClassSearchPanel.class, "/jadex/commons/gui/images/class.png"),
+		"abstractclass", SGUI.makeIcon(ClassSearchPanel.class, "/jadex/commons/gui/images/abstractclass.png"),
+		"interface", SGUI.makeIcon(ClassSearchPanel.class, "/jadex/commons/gui/images/interface.png")
 	});
 	
 	//-------- attributes --------
@@ -69,6 +82,9 @@ public class ClassSearchPanel extends JPanel
 	
 	/** The checkbox for interfaces. */
 	protected JCheckBox cbif;
+	protected JCheckBox cbac;
+	protected JCheckBox cbc;
+	protected JCheckBox cbic;
 	
 	//-------- constructors --------
 	
@@ -77,7 +93,16 @@ public class ClassSearchPanel extends JPanel
 	 */
 	public ClassSearchPanel(ClassLoader cl, IThreadPool tp)
 	{
-		this.tp = tp;
+		this(cl, tp, true, true, true, false);
+	}
+	
+	/**
+	 *  Create a new search panel.
+	 */
+	public ClassSearchPanel(ClassLoader cl, IThreadPool tp, 
+		boolean interfaces, boolean absclasses, boolean classes, boolean innerclasses)
+	{
+		this.tp = tp==null? new ThreadPool(): tp;
 		
 		final JTextField tfsearch = new JTextField();
 		tfsearch.addKeyListener(new KeyListener()
@@ -128,6 +153,32 @@ public class ClassSearchPanel extends JPanel
 		
 		ctm = new ClassTableModel();
 		results = new JTable(ctm);
+		results.setDefaultRenderer(ClassInfo.class, new ClassCellRenderer());
+		results.setTableHeader(null);
+		
+		cbif = new JCheckBox("Interfaces", interfaces);
+		cbac = new JCheckBox("Abstract Classes", absclasses);
+		cbc = new JCheckBox("Classes", classes);
+		cbic = new JCheckBox("Inner Classes", innerclasses);
+		
+		ActionListener al = new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				performSearch(tfsearch.getText());
+			}
+		};
+		
+		cbif.addActionListener(al);
+		cbac.addActionListener(al);
+		cbc.addActionListener(al);
+		cbic.addActionListener(al);
+		
+		JPanel cbp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		cbp.add(cbif);
+		cbp.add(cbac);
+		cbp.add(cbc);
+		cbp.add(cbic);
 		
 		setLayout(new GridBagLayout());
 		
@@ -138,6 +189,9 @@ public class ClassSearchPanel extends JPanel
 		
 		add(tfsearch, new GridBagConstraints(0,y++,2,1,1,0,
 			GridBagConstraints.NORTH, GridBagConstraints.BOTH, new Insets(2,2,2,2),0,0));
+		
+		add(cbp, new GridBagConstraints(0,y++,
+			2,1,0,0,GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(2,2,2,2),0,0));
 		
 		add(new JLabel("Search Results:"), new GridBagConstraints(0,y++,
 			2,1,0,0,GridBagConstraints.NORTHWEST, GridBagConstraints.VERTICAL, new Insets(2,2,2,2),0,0));
@@ -209,9 +263,11 @@ public class ClassSearchPanel extends JPanel
 		
 		if(exp==null || exp.length()==0)
 		{
-			status.setText("idle '"+exp+"'");
+			status.setText("idle");
 			return;
 		}
+		
+		final Pattern pat = SUtil.createRegexFromGlob(exp+"*");
 		
 		setCurrentQuery(exp);
 //		System.out.println("perform search: "+exp);
@@ -240,7 +296,20 @@ public class ClassSearchPanel extends JPanel
 							JarEntry	je	= (JarEntry)obj;
 							fn	= je.getName();
 						}
-						return fn.indexOf("$")==-1  && fn.indexOf(exp)!=-1;
+						
+						if(!cbic.isSelected() && fn.indexOf("$")!=-1)
+						{
+							return false;
+						}
+						
+						StringTokenizer stok = new StringTokenizer(exp, "*?");
+						boolean ret = true;
+						while(ret && stok.hasMoreElements())
+						{
+							String tst = stok.nextToken();
+							ret = fn.indexOf(tst)!=-1;
+						}
+						return ret;
 					}
 				};
 				IFilter<Class<?>> classfilter = new IFilter<Class<?>>()
@@ -248,10 +317,26 @@ public class ClassSearchPanel extends JPanel
 					public boolean filter(Class<?> clazz)
 					{
 //						System.out.println("found: "+clazz);
-								
-//							Class<?> cl = (Class<?>)obj;
-						boolean ret = SReflect.getInnerClassName(clazz).startsWith(exp);
-//							boolean ret = SReflect.isSupertype(IControlCenterPlugin.class, cl) && !(cl.isInterface() || Modifier.isAbstract(cl.getModifiers()));
+						boolean in = clazz.isInterface();
+						boolean abs = Modifier.isAbstract(clazz.getModifiers()); 
+						boolean ret = (in && cbif.isSelected())
+							|| (!in && abs && cbac.isSelected())
+							|| (!in && !abs && cbc.isSelected());
+						
+						if(ret)
+						{
+							String clname = SReflect.getInnerClassName(clazz);
+							
+							if(exp.indexOf("*")==-1 && exp.indexOf("?")==-1)
+							{
+								ret = clname.startsWith(exp);
+							}
+							else
+							{
+								Matcher m = pat.matcher(clname);
+								ret = m.matches(); 
+							}
+						}
 						
 						return ret;
 					}
@@ -267,6 +352,12 @@ public class ClassSearchPanel extends JPanel
 					
 					public void finished()
 					{
+						if(ctm.size()>0)
+						{
+			                results.changeSelection(0, 0, false, false);
+							results.requestFocus();
+						}
+						
 						status.setText("searching '"+exp+"' ("+ctm.size()+") finished");
 					}
 					
@@ -319,7 +410,8 @@ public class ClassSearchPanel extends JPanel
 		int sel = results.getSelectedRow();
 		if(sel>0)
 		{
-			ret = ctm.getClass(sel);
+			ClassInfo ci = ctm.getClass(sel);
+			ret = SReflect.findClass0(ci.getPkg()+"."+ci.getName(), null, cl);
 		}
 		return ret;
 	}
@@ -353,7 +445,7 @@ public class ClassSearchPanel extends JPanel
 		assert SwingUtilities.isEventDispatchThread();
 
 		Class<?> ret = null;
-		ClassSearchPanel pan = new ClassSearchPanel(cl, tp!=null? tp: new ThreadPool());		
+		ClassSearchPanel pan = new ClassSearchPanel(cl, tp!=null? tp: new ThreadPool());
 
 		final JDialog dia = new JDialog((JFrame)null, "Type Selection", true);
 		
@@ -383,6 +475,18 @@ public class ClassSearchPanel extends JPanel
 				dia.dispose();
 			}
 		});
+		
+		pan.results.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+			.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
+		pan.results.getActionMap().put("Enter", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ok[0] = true;
+				dia.dispose();
+			}
+		});
+		
 		dia.pack();
 		dia.setLocation(SGUI.calculateMiddlePosition(parent!=null? SGUI.getWindowParent(parent): null, dia));
 		dia.setVisible(true);
@@ -405,14 +509,15 @@ public class ClassSearchPanel extends JPanel
 	 */
 	class ClassTableModel extends AbstractTableModel
 	{
-		protected List<Class<?>> entries;
+//		protected List<Class<?>> entries;
+		protected List<ClassInfo> entries;
 		
 		/**
 		 *  Get the column count.
 		 */
 		public int getColumnCount()
 		{
-			return 2;
+			return 1;
 		}
 
 		/**
@@ -421,9 +526,32 @@ public class ClassSearchPanel extends JPanel
 		public void addEntry(Class<?> clazz)
 		{
 			if(entries==null)
-				entries = new ArrayList<Class<?>>();
-			entries.add(clazz);
-			fireTableRowsInserted(entries.size()-1, entries.size()-1);
+				entries = new ArrayList<ClassInfo>();
+			
+			ClassInfo ci = new ClassInfo(clazz);
+			
+			int done = -1;
+			int cnt = entries.size();
+			if(cnt>0)
+			{
+				for(int i=0; i<cnt && done==-1; i++)
+				{
+					ClassInfo tmp = entries.get(i);
+					if(tmp.getName().compareTo(ci.getName())>=0)
+					{
+						entries.add(i, ci);
+						done = i;
+					}
+				}
+			}
+			
+			if(done==-1)
+			{
+				entries.add(ci);
+				done = entries.size()-1;
+			}
+			
+			fireTableRowsInserted(done, done);
 		}
 		
 		/**
@@ -448,11 +576,7 @@ public class ClassSearchPanel extends JPanel
 			{
 				if(columnIndex==0)
 				{
-					ret = "";
-				}
-				else if(columnIndex==1)
-				{
-					ret = entries.get(rowIndex).toString();
+					ret = entries.get(rowIndex);
 				}
 			}
 
@@ -466,14 +590,7 @@ public class ClassSearchPanel extends JPanel
 		 */
 		public String getColumnName(int columnIndex)
 		{
-			switch(columnIndex)
-			{
-				case 0:
-					return "";
-				case 1:
-					return "Name";
-			}
-			return null;
+			return "Name";
 		}
 
 		/**
@@ -483,20 +600,13 @@ public class ClassSearchPanel extends JPanel
 		 */
 		public Class<?> getColumnClass(int columnIndex)
 		{
-			switch(columnIndex)
-			{
-				case 0:
-					return String.class;
-				case 1:
-					return String.class;
-			}
-			return null;
+			return ClassInfo.class;
 		}
 
 		/**
 		 *  Get the class.
 		 */
-		public Class<?> getClass(int i)
+		public ClassInfo getClass(int i)
 		{
 			return entries!=null? entries.get(i): null;
 		}
@@ -506,8 +616,12 @@ public class ClassSearchPanel extends JPanel
 		 */
 		public void clear()
 		{
-			if(entries!=null)
+			if(entries!=null && !entries.isEmpty())
+			{
+				int size = entries.size();
 				entries.clear();
+				fireTableRowsDeleted(0, size-1);
+			}
 		}
 		
 		/**
@@ -519,4 +633,145 @@ public class ClassSearchPanel extends JPanel
 		}
 	}
 
+	/**
+	 * 
+	 */
+	static class ClassCellRenderer extends DefaultTableCellRenderer
+	{
+		/**
+		 * 
+		 */
+		public Component getTableCellRendererComponent(JTable table, Object value,
+			boolean isSelected, boolean hasFocus, int row, int column) 
+		{
+			ClassInfo clazz = (ClassInfo)value;
+			int sel = table.getSelectedRow();
+			
+			String clname = SReflect.getUnqualifiedTypeName(clazz.getName());
+			
+			String val;
+			if(sel==row)
+			{
+				val = clname+" - "+clazz.getPkg();
+			}
+			else
+			{
+				val = clname;
+			}
+			
+			if(clazz.getType().equals(ClassInfo.Type.INTERFACE))
+			{
+				setIcon(icons.getIcon("interface"));
+			}
+			else if(clazz.getType().equals(ClassInfo.Type.ABSTRACTCLASS))
+			{
+				setIcon(icons.getIcon("abstractclass"));
+			}
+			else
+			{
+				setIcon(icons.getIcon("class"));
+			}
+			
+			return super.getTableCellRendererComponent(table, val, isSelected, hasFocus, row, column);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	static class ClassInfo
+	{
+		public static enum Type{INTERFACE, ABSTRACTCLASS, CLASS};
+
+		protected String name;
+		
+		protected String pkg;
+		
+		protected Type type;
+
+		/**
+		 *  Create a new class info.
+		 */
+		public ClassInfo(Class<?> clazz)
+		{
+			this.name = SReflect.getUnqualifiedClassName(clazz);
+			this.pkg = clazz.getPackage().getName();
+			if(clazz.isInterface())
+			{
+				type = Type.INTERFACE;
+			}
+			else if(Modifier.isAbstract(clazz.getModifiers()))
+			{
+				type = Type.ABSTRACTCLASS;
+			}
+			else
+			{
+				type = Type.CLASS;
+			}
+		}
+		
+		/**
+		 *  Create a new class info.
+		 */
+		public ClassInfo(String name, Type type)
+		{
+			this.name = name;
+			this.type = type;
+		}
+
+		/**
+		 *  Get the name.
+		 *  @return The name.
+		 */
+		public String getName()
+		{
+			return name;
+		}
+
+		/**
+		 *  Set the name.
+		 *  @param name The name to set.
+		 */
+		public void setName(String name)
+		{
+			this.name = name;
+		}
+
+		/**
+		 *  Get the type.
+		 *  @return The type.
+		 */
+		public Type getType()
+		{
+			return type;
+		}
+
+		/**
+		 *  Set the type.
+		 *  @param type The type to set.
+		 */
+		public void setType(Type type)
+		{
+			this.type = type;
+		}
+
+		/**
+		 *  Get the pkg.
+		 *  @return The pkg.
+		 */
+		public String getPkg()
+		{
+			return pkg;
+		}
+
+		/**
+		 *  Set the pkg.
+		 *  @param pkg The pkg to set.
+		 */
+		public void setPkg(String pkg)
+		{
+			this.pkg = pkg;
+		}
+		
+	}
 }

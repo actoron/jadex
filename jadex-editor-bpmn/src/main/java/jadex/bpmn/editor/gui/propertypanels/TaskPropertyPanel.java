@@ -17,6 +17,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.gui.ClassSearchPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.javaparser.SJavaParser;
 
@@ -88,12 +89,31 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		final JComboBox cbox = new JComboBox(tasknames);
 		
 		cbox.setEditable(true);
-		if (getBpmnTask().getClazz() != null)
+		if(getBpmnTask().getClazz() != null)
 		{
 			cbox.setSelectedItem(getBpmnTask().getClazz().getTypeName());
 		}
 		
-		configureAndAddInputLine(column, label, cbox, y++, SUtil.createHashMap(new String[] { "second_fill" }, new Object[] { GridBagConstraints.HORIZONTAL }));
+//		JButton sel = new JButton("...");
+//		sel.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				Class<?> clazz = ClassSearchPanel.showDialog(modelcontainer.getProjectClassLoader(), null, TaskPropertyPanel.this);
+//				if(clazz!=null)
+//					cbox.setSelectedItem(clazz.getName());
+////				cbox.addItem(clazz.getName());
+//			}
+//		});
+		
+		column.add(label, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST, 
+			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
+		column.add(cbox, new GridBagConstraints(1, y, 1, 1, 1, 1, GridBagConstraints.WEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(2,2,2,2), 0, 0));
+//		column.add(sel, new GridBagConstraints(2, y++, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+//			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
+		
+//		configureAndAddInputLine(column, label, cbox, y++, SUtil.createHashMap(new String[]{"second_fill"}, new Object[]{GridBagConstraints.HORIZONTAL}));
 		
 		final JEditorPane descarea = new JEditorPane("text/html", "");
 		final JScrollPane descpane = new JScrollPane(descarea);
@@ -130,21 +150,24 @@ public class TaskPropertyPanel extends BasePropertyPanel
 					props.clear();
 
 				TaskMetaInfo info = getTaskMetaInfo(taskname);
-				List<PropertyMetaInfo> pmis = info.getPropertyInfos();
-				if(pmis!=null)
+				if(info!=null)
 				{
-					for(PropertyMetaInfo pmi: pmis)
+					List<PropertyMetaInfo> pmis = info.getPropertyInfos();
+					if(pmis!=null)
 					{
-						UnparsedExpression uexp = new UnparsedExpression(null, 
-							pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), pmi.getInitialValue(), null);
-						MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
-						getBpmnTask().addProperty(mprop);
+						for(PropertyMetaInfo pmi: pmis)
+						{
+							UnparsedExpression uexp = new UnparsedExpression(null, 
+								pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), pmi.getInitialValue(), null);
+							MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
+							getBpmnTask().addProperty(mprop);
+						}
 					}
+					
+					processTaskInfos(taskname, descarea);
+					
+					defaultParameterButton.setEnabled(getTaskMetaInfo(taskname) != null);
 				}
-				
-				processTaskInfos(taskname, descarea);
-				
-				defaultParameterButton.setEnabled(getTaskMetaInfo(taskname) != null);
 			}
 		});
 		
@@ -162,7 +185,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				pp.removeAll();
 				String taskname = getBpmnTask().getClazz().getTypeName();
 				TaskMetaInfo info = getTaskMetaInfo(taskname);
-				List<PropertyMetaInfo> props = info.getPropertyInfos();
+				List<PropertyMetaInfo> props = info!=null? info.getPropertyInfos(): null;
 				
 				if(props!=null)
 				{

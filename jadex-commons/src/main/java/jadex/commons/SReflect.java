@@ -1394,7 +1394,8 @@ public class SReflect
 					
 					if(tmpcl!=null && classfilter.filter(tmpcl))
 					{
-						ret.addIntermediateResult(SReflect.findClass0(clname, null, classloader));
+						ret.addIntermediateResult(tmpcl);
+//						ret.addIntermediateResult(SReflect.findClass0(clname, null, classloader));
 					}
 				}
 				catch(Throwable t)
