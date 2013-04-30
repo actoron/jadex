@@ -4,7 +4,6 @@ import jadex.bpmn.editor.gui.controllers.MouseController;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.Hashtable;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;

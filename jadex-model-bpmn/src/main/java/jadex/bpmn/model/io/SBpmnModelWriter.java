@@ -24,6 +24,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +95,23 @@ public class SBpmnModelWriter
 	public static final void writeModel(File outputfile, MBpmnModel mmodel, IBpmnVisualModelWriter vmodelwriter) throws IOException
 	{
 		File file = File.createTempFile(outputfile.getName(), ".bpmn2");
-		PrintStream out = new PrintStream(new BufferedOutputStream(new FileOutputStream(file)), false, "UTF-8");
+		OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+		writeModel(os, mmodel, vmodelwriter);
+		os.close();
+		
+		SUtil.moveFile(file, outputfile);
+	}
+	
+	/**
+	 *  Writes a BPMN model.
+	 *  
+	 *  @param os The output stream.
+	 *  @param mmodel The BPMN model.
+	 *  @param vmodelwriter The visual model writer, can be null.
+	 */
+	public static final void writeModel(OutputStream os, MBpmnModel mmodel, IBpmnVisualModelWriter vmodelwriter) throws IOException
+	{
+		PrintStream out = new PrintStream(os, false, "UTF-8");
 		
 		writeInitialBoilerPlate(out);
 		
@@ -116,9 +133,7 @@ public class SBpmnModelWriter
 		out.println("</semantic:definitions>");
 		out.println();
 		
-		out.close();
-		
-		SUtil.moveFile(file, outputfile);
+		out.flush();
 	}
 	
 	/**
