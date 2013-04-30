@@ -575,7 +575,9 @@ public class BpmnXMLReader
 					msg.setTarget(act);
 					
 					// Set mode to throwing. Hack!!! BPMN editor does not set isThrowing property when using message edges.
-					act.setPropertyValue("isThrowing", Boolean.TRUE);
+					//act.setPropertyValue("isThrowing", Boolean.TRUE);
+					
+					act.setThrowing(true);
 				}
 			}
 			

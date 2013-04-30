@@ -32,7 +32,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	//-------- constants --------
 	
 	/** The isThrowing property name (distinguishes send/receive events). */
-	public static final String	PROPERTY_THROWING = "isThrowing";	
+	//public static final String	PROPERTY_THROWING = "isThrowing";	
 	
 	/** The type property message type identifies the meta type (e.g. fipa). */
 	public static final String	PROPERTY_MESSAGETYPE = "messagetype";
@@ -56,9 +56,9 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 */
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
-				
-		if(send)
+		//boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
+		
+		if(activity.isThrowing())
 		{
 			sendMessage(activity, instance, thread);
 		}
