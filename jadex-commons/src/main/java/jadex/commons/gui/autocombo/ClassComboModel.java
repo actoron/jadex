@@ -31,26 +31,29 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 	protected boolean inclasses;
 	protected boolean classes;
 	
+	protected IFilter<Class<?>> classfilter;
+	
 	
 	/**
 	 *  Create a new ClassComboModel. 
 	 */
 	public ClassComboModel(AutoCompleteCombo combo, int max)
 	{
-		this(combo, max, true, false, false, true);
+		this(combo, max, true, false, false, true, null);
 	}
 	
 	/**
 	 *  Create a new ClassComboModel. 
 	 */
 	public ClassComboModel(AutoCompleteCombo combo, int max, 
-		boolean inter, boolean absclasses, boolean inclasses, boolean classes)
+		boolean inter, boolean absclasses, boolean inclasses, boolean classes, IFilter<Class<?>> classfilter)
 	{
 		super(combo, max);
 		this.inter = inter;
 		this.absclasses = absclasses;
 		this.inclasses = inclasses;
 		this.classes = classes;
+		this.classfilter = classfilter;
 	}
 	
 	/**
@@ -221,16 +224,24 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 						
 						if(ret)
 						{
-							String clname = SReflect.getInnerClassName(clazz);
-							
-							if(exp.indexOf("*")==-1 && exp.indexOf("?")==-1)
+							if(ClassComboModel.this.classfilter!=null)
 							{
-								ret = clname.startsWith(exp);
+								ret = ClassComboModel.this.classfilter.filter(clazz);
 							}
-							else
+							
+							if(ret)
 							{
-								Matcher m = pat.matcher(clname);
-								ret = m.matches(); 
+								String clname = SReflect.getInnerClassName(clazz);
+								
+								if(exp.indexOf("*")==-1 && exp.indexOf("?")==-1)
+								{
+									ret = clname.startsWith(exp);
+								}
+								else
+								{
+									Matcher m = pat.matcher(clname);
+									ret = m.matches(); 
+								}
 							}
 						}
 						
