@@ -14,7 +14,7 @@ import javax.swing.ComboBoxModel;
 /**
  * 
  */
-public abstract class AbstractAutoComboModel<T> extends AbstractListModel<T> implements ComboBoxModel<T>
+public abstract class AbstractAutoComboModel<T> extends AbstractListModel implements ComboBoxModel
 {
 	protected T selected;
 

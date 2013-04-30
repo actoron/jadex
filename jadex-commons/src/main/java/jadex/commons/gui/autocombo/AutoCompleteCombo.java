@@ -35,7 +35,7 @@ import javax.swing.text.PlainDocument;
  * 
  * @author Exterminator13
  */
-public class AutoCompleteCombo<T> extends JComboBox<T>
+public class AutoCompleteCombo<T> extends JComboBox
 {
 	private boolean updatepopup;
 

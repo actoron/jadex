@@ -38,6 +38,13 @@ public class SPropertyPanelFactory
 			{
 				ret = new TimerEventPropertyPanel(container, (VActivity) velement);
 			}
+			if (velement instanceof VActivity &&
+				(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(((MActivity) velement.getBpmnElement()).getActivityType()) ||
+				 MBpmnModel.EVENT_START_MESSAGE.equals(((MActivity) velement.getBpmnElement()).getActivityType()) ||
+				 MBpmnModel.EVENT_END_MESSAGE.equals(((MActivity) velement.getBpmnElement()).getActivityType())))
+			{
+				ret = new MessageEventPropertyPanel(container, (VActivity) velement);
+			}
 			else if (velement instanceof VExternalSubProcess)
 			{
 				ret = new ExternalSubProcessPropertyPanel(container, (VExternalSubProcess) velement);

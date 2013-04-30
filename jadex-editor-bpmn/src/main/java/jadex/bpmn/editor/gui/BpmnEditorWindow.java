@@ -25,6 +25,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -76,6 +78,16 @@ public class BpmnEditorWindow extends JFrame
 		statuspane.setBottomComponent(new StatusArea());
 		BpmnEditor.initialize();
 		getContentPane().add(statuspane, BorderLayout.CENTER);
+		
+//		statuspane.addComponentListener(new ComponentAdapter()
+//		{
+//			public void componentResized(ComponentEvent e)
+//			{
+//				JSplitPanel panel = (JSplitPanel) e.getSource();
+//				System.out.println(panel.getProportionalDividerLocation());
+//				panel.setDividerLocation(panel.getProportionalDividerLocation());
+//			}
+//		});
 		
 		bpmntoolbar = new BpmnToolbar(settings.getToolbarIconSize());
 		//bpmntoolbar.getInfoPanel().setLayout(new BoxLayout(bpmntoolbar.getInfoPanel(), BoxLayout.LINE_AXIS));
