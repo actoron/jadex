@@ -49,7 +49,7 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	 */
 	public void addToTop(String val)
 	{
-		addToTop(convertFromString(val));
+		addValToTop(convertFromString(val));
 	}
 	
 	/**
@@ -57,13 +57,13 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	 */
 	public boolean contains(String val)
 	{
-		return contains(convertFromString(val));
+		return containsVal(convertFromString(val));
 	}
 		
 	/**
 	 * 
 	 */
-	public void addToTop(T val)
+	public void addValToTop(T val)
 	{
 		if(val == null || entries.contains(val))
 			return;
@@ -130,7 +130,7 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	/**
 	 * 
 	 */
-	public boolean contains(T val)
+	public boolean containsVal(T val)
 	{
 		if(val == null)// || val.trim().isEmpty())
 			return true;

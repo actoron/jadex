@@ -1647,6 +1647,9 @@ public class SReflect
 		return ret;
 	}
 	
+	/**
+	 *  Main for testing.
+	 */
 	public static void main(String[] args)
 	{
 //		System.out.println(getMethodName());

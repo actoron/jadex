@@ -1,6 +1,7 @@
 package jadex.commons.gui.autocombo;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -14,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
@@ -371,7 +373,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 			{
 				JFrame frame = new JFrame();
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				frame.setLayout(new GridLayout(1, 1));
+				frame.setLayout(new GridLayout(2, 1));
 				
 				final AutoCompleteCombo combo = new AutoCompleteCombo(null);
 				final ClassComboModel model = new ClassComboModel(combo, 20);
@@ -395,8 +397,14 @@ public class AutoCompleteCombo<T> extends JComboBox
 						return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
 					}
 				});
-
 				frame.add(combo);
+				
+				List<String> vals = SUtil.createArrayList(new String[]{"a", "aa", "aaa", "aab", "b", "bb", "abc"});
+				final AutoCompleteCombo combo2 = new AutoCompleteCombo(null);
+				final StringComboModel model2 = new StringComboModel(combo2, 20, vals);
+				combo2.setModel(model2);
+				frame.add(combo2);
+				
 				frame.pack();
 				frame.setSize(500, frame.getHeight());
 				frame.setLocationRelativeTo(null);
