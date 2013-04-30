@@ -367,7 +367,7 @@ public class ClassSearchPanel extends JPanel
 					}
 				};
 				
-				fut[0] = SReflect.asyncScanForClasses(cl, filefilter, classfilter);
+				fut[0] = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1);
 				
 				fut[0].addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
 				{

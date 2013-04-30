@@ -1362,16 +1362,16 @@ public class SReflect
 	/**
 	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
 	 */
-	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(ClassLoader classloader, IFilter filefilter, IFilter classfilter)
+	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(ClassLoader classloader, IFilter filefilter, IFilter classfilter, int max)
 	{
-		return asyncScanForClasses(SUtil.getClasspathURLs(classloader).toArray(new URL[0]), classloader, filefilter, classfilter);
+		return asyncScanForClasses(SUtil.getClasspathURLs(classloader).toArray(new URL[0]), classloader, filefilter, classfilter, max);
 	}
 	
 	/**
 	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
 	 */
 	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(final URL[] urls, 
-		final ClassLoader classloader, final IFilter filefilter, final IFilter classfilter)
+		final ClassLoader classloader, final IFilter filefilter, final IFilter classfilter, final int max)
 	{
 		final SubscriptionIntermediateFuture<Class<?>>	ret	= new SubscriptionIntermediateFuture<Class<?>>();
 		
@@ -1379,8 +1379,11 @@ public class SReflect
 		final int[] cnt = new int[1];
 		
 		final ISubscriptionIntermediateFuture<String> fut = asyncScanForFiles(urls, filefilter);
+		
 		fut.addResultListener(new IIntermediateResultListener<String>()
 		{
+			int resultcnt = 0;
+			
 			public void intermediateResultAvailable(String file)
 			{
 				try
@@ -1395,10 +1398,12 @@ public class SReflect
 					
 					if(tmpcl!=null && classfilter.filter(tmpcl))
 					{
-						if(!ret.addIntermediateResultIfUndone(tmpcl))
+						if((max>0 && ++resultcnt>max) || !ret.addIntermediateResultIfUndone(tmpcl))
 						{
+//							System.out.println("term: "+resultcnt);
 							fut.terminate();
 						}
+						
 //						ret.addIntermediateResult(SReflect.findClass0(clname, null, classloader));
 					}
 				}
@@ -1420,12 +1425,12 @@ public class SReflect
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 			
 			public void finished()
 			{
-				ret.setFinished();
+				ret.setFinishedIfUndone();
 			}
 		});
 		
@@ -1459,7 +1464,7 @@ public class SReflect
 		
 		for(int i=0; i<urls.length && !ret.isDone(); i++)
 		{
-//			System.out.println("Scanning: "+entry);
+//			System.out.println("Scanning: "+urls[i]+" "+ret.isDone());
 			try
 			{
 //				System.out.println("url: "+urls[i].toURI());
@@ -1475,6 +1480,7 @@ public class SReflect
 							JarEntry	je	= e.nextElement();
 							if(filter.filter(je))	
 							{
+//								System.out.println("add: "+je.getName());
 								ret.addIntermediateResultIfUndone(je.getName());
 							}
 						}
@@ -1678,7 +1684,7 @@ public class SReflect
 			}
 		};
 		
-		asyncScanForClasses(null, filefilter, classfilter).addResultListener(new IIntermediateResultListener<Class<?>>()
+		asyncScanForClasses(null, filefilter, classfilter, 5).addResultListener(new IIntermediateResultListener<Class<?>>()
 		{
 			public void intermediateResultAvailable(Class<?> result)
 			{
