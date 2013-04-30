@@ -146,7 +146,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				pp.removeAll();
-				String taskname = getBpmnTask().getClazz().getTypeName();
+				String taskname = getBpmnTask().getClazz() != null? getBpmnTask().getClazz().getTypeName() : null;
 				TaskMetaInfo info = getTaskMetaInfo(taskname);
 				List<PropertyMetaInfo> props = info!=null? info.getPropertyInfos(): null;
 				
