@@ -11,6 +11,8 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.model.io.IBpmnVisualModelReader;
 
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +24,6 @@ import javax.xml.namespace.QName;
 
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
 
 /**
  *  Reader for the visual BPMN model.
@@ -62,253 +63,7 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 	 */
 	public void readElement(QName tag, Map<String, String> attrs, Map<String, String> laneparents, Map<String, MIdElement> emap, Map<String, Object> buffer)
 	{
-		if ("Bounds".equals(tag.getLocalPart()))
-		{
-			if (buffer.containsKey("bounds"))
-			{
-				mxRectangle alt = new mxRectangle();
-				alt.setWidth(Double.parseDouble(attrs.get("width")));
-				alt.setHeight(Double.parseDouble(attrs.get("height")));
-				alt.setX(Double.parseDouble(attrs.get("x")));
-				alt.setY(Double.parseDouble(attrs.get("y")));
-				mxGeometry geo = (mxGeometry) buffer.get("bounds");
-				geo.setAlternateBounds(alt);
-			}
-			else
-			{
-				mxGeometry geo = new mxGeometry();
-				geo.setWidth(Double.parseDouble(attrs.get("width")));
-				geo.setHeight(Double.parseDouble(attrs.get("height")));
-				geo.setX(Double.parseDouble(attrs.get("x")));
-				geo.setY(Double.parseDouble(attrs.get("y")));
-				buffer.put("bounds", geo);
-			}
-		}
-		else if ("BPMNShape".equals(tag.getLocalPart()))
-		{
-			String bpmnid = attrs.get("bpmnElement");
-			MIdElement e = emap.get(bpmnid);
-			VNamedNode vnode = null;
-			
-			if (e instanceof MSubProcess)
-			{
-				if (((MSubProcess) e).hasPropertyValue("file"))
-				{
-					vnode = new VExternalSubProcess(graph);
-				}
-				else
-				{
-					vnode = new VSubProcess(graph);
-				}
-			}
-			else if (e instanceof MActivity)
-			{
-				vnode = new VActivity(graph);
-			}
-			else if (e instanceof MPool)
-			{
-				vnode = new VPool(graph);
-			}
-			else if (e instanceof MLane)
-			{
-				vnode = new VLane(graph);
-			}
-			
-			if (vnode == null)
-			{
-				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown Object ID " + bpmnid);
-			}
-			else
-			{
-				String exp = attrs.get("isExpanded");
-				if (exp != null)
-				{
-					vnode.setCollapsed(!Boolean.parseBoolean(exp));
-				}
-				
-				mxGeometry geo = (mxGeometry) buffer.remove("bounds");
-				mxGeometry oldgeo = vnode.getGeometry();
-				if (geo != null)
-				{
-					vnode.setGeometry(geo);
-				}
-				
-				if (e instanceof MActivity)
-				{
-					MActivity act = (MActivity) e;
-					VNode parent = null;
-					
-					if (act.isEventHandler())
-					{
-						// Geometry is handled by layout manager.
-						vnode.setGeometry(oldgeo);
-						Map<String, String> ehpm = (Map<String, String>) buffer.get("eventhandlerparentmap");
-						parent = (VNode) vmap.get(ehpm.get(act.getId()));
-					}
-					
-					if (parent == null)
-					{
-						Map<String, MSubProcess> spem = (Map<String, MSubProcess>) buffer.get("subprocesselementmap");
-						if (spem.containsKey(act.getId()))
-						{
-							parent = (VNode) vmap.get(spem.get(act.getId()).getId());
-						}
-					}
-					
-					if (parent == null)
-					{
-						parent = act.getLane() != null? (VNode) vmap.get(act.getLane().getId()) : (VNode) vmap.get(act.getPool().getId());
-					}
-					
-					if (parent != null)
-					{
-						graph.getModel().beginUpdate();
-						graph.addCell(vnode, parent);
-						graph.getModel().endUpdate();
-					}
-					else
-					{
-						List<VNode> children = childmap.get(act.getPool().getId());
-						if (children == null)
-						{
-							children = new ArrayList<VNode>();
-							childmap.put(act.getPool().getId(), children);
-						}
-						children.add(vnode);
-					}
-					vnode.setBpmnElement(e);
-				}
-				else if (e instanceof MPool)
-				{
-					graph.getModel().beginUpdate();
-					graph.addCell(vnode);
-					graph.getModel().endUpdate();
-					
-					List<VNode> children = childmap.remove(e.getId());
-					if (children != null)
-					{
-						for (VNode child : children)
-						{
-							graph.getModel().beginUpdate();
-							graph.addCell(child, vnode);
-							graph.getModel().endUpdate();
-						}
-					}
-					vnode.setBpmnElement(e);
-				}
-				else if (e instanceof MLane)
-				{
-					VPool parent = (VPool) vmap.get(laneparents.get(e.getId()));
-					
-					if (parent != null)
-					{
-						graph.getModel().beginUpdate();
-						graph.addCell(vnode, parent);
-						graph.getModel().endUpdate();
-					}
-					else
-					{
-						List<VNode> children = childmap.get(laneparents.get(e.getId()));
-						if (children == null)
-						{
-							children = new ArrayList<VNode>();
-							childmap.put(laneparents.get(e.getId()), children);
-						}
-						children.add(vnode);
-					}
-					vnode.setBpmnElement(e);
-				}
-				
-				vmap.put(bpmnid, vnode);
-			}
-		}
-		else if ("BPMNEdge".equals(tag.getLocalPart()))
-		{
-			String bpmnid = attrs.get("bpmnElement");
-			MIdElement medge = emap.get(bpmnid);
-			
-			if (medge != null)
-			{
-				VEdge vedge = null;
-				if (medge instanceof MSequenceEdge)
-				{
-					MSequenceEdge mseqedge = (MSequenceEdge) medge;
-					vedge = new VSequenceEdge(graph, VSequenceEdge.class.getSimpleName());
-					vedge.setSource(vmap.get(mseqedge.getSource().getId()));
-					vedge.setTarget(vmap.get(mseqedge.getTarget().getId()));
-				}
-				vedge.setBpmnElement(medge);
-				
-				List<mxPoint> waypoints = (List<mxPoint>) buffer.remove("waypoints");
-				if (waypoints != null)
-				{
-					mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
-					geo.setPoints(waypoints);
-					geo.setRelative(false);
-					vedge.setGeometry(geo);
-				}
-				
-				graph.getModel().beginUpdate();
-				graph.addCell(vedge, vedge.getSource().getParent());
-				graph.getModel().endUpdate();
-			}
-			else
-			{
-				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown BPMN edge ID " + bpmnid);
-			}
-			
-		}
-		else if ("Edge".equals(tag.getLocalPart()))
-		{
-			if (attrs != null)
-			{
-				if  ("data".equals(attrs.get("type")))
-				{
-					String id = attrs.get("jadexElement");
-					MDataEdge dedge = (MDataEdge) emap.get(id);
-					if (dedge != null)
-					{
-						VDataEdge vedge = new VDataEdge(graph);
-						VActivity sact = (VActivity) vmap.get(dedge.getSource().getId());
-						VActivity tact = (VActivity) vmap.get(dedge.getTarget().getId());
-						vedge.setSource(sact.getOutputParameterPort(dedge.getSourceParameter()));
-						vedge.setTarget(tact.getInputParameterPort(dedge.getTargetParameter()));
-						vedge.setBpmnElement(dedge);
-						
-						List<mxPoint> waypoints = (List<mxPoint>) buffer.remove("waypoints");
-						if (waypoints != null)
-						{
-							mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
-							geo.setPoints(waypoints);
-							geo.setRelative(false);
-							vedge.setGeometry(geo);
-						}
-						
-						graph.getModel().beginUpdate();
-						graph.addCell(vedge, vedge.getSource().getParent().getParent());
-						graph.getModel().endUpdate();
-					}
-					else
-					{
-						Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown data edge ID " + id);
-					}
-				}
-			}
-		}
-		else if ("waypoint".equals(tag.getLocalPart()))
-		{
-			List<mxPoint> waypoints = (List<mxPoint>) buffer.get("waypoints");
-			if (waypoints == null)
-			{
-				waypoints = new ArrayList<mxPoint>();
-				buffer.put("waypoints", waypoints);
-			}
-			
-			mxPoint point = new mxPoint();
-			point.setX(Double.parseDouble(attrs.get("x")));
-			point.setY(Double.parseDouble(attrs.get("y")));
-			waypoints.add(point);
-		}
+		
 		
 		/*if (ve != null)
 		{
@@ -319,5 +74,241 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			graph.getView().validate();
 			//graph.setSelectionCells(selcells);
 		}*/
+	}
+	
+	/**
+	 *  Process the visual part of a standard BPMN shape.
+	 * 
+	 * 	@param bpmnid The referenced ID of the shape.
+	 * 	@param e The semantic shape, if found, null otherwise.
+	 *  @param expanded Flag whether the shape should be collapsed (false), expanded (true) or default (null).
+	 * 	@param bounds Bounds of the shape.
+	 * 	@param altbounds Alternative bounds.
+	 * 	@param eventparentid The parent ID if the shape is an event with a parent.
+	 * 	@param subprocessparentid The parent subprocess ID if the shape is part of a subprocess.
+	 * 	@param laneparentid ID if the parent if the shape is a lane.
+	 */
+	public void processBpmnShape(String bpmnid, MIdElement e, Boolean expanded, Rectangle2D bounds, Rectangle2D altbounds, String eventparentid, String subprocessparentid, String laneparentid)
+	{
+		VNamedNode vnode = null;
+		
+		if (e instanceof MSubProcess)
+		{
+			if (((MSubProcess) e).hasPropertyValue("file"))
+			{
+				vnode = new VExternalSubProcess(graph);
+			}
+			else
+			{
+				vnode = new VSubProcess(graph);
+			}
+		}
+		else if (e instanceof MActivity)
+		{
+			vnode = new VActivity(graph);
+		}
+		else if (e instanceof MPool)
+		{
+			vnode = new VPool(graph);
+		}
+		else if (e instanceof MLane)
+		{
+			vnode = new VLane(graph);
+		}
+		
+		if (vnode == null)
+		{
+			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown Object ID " + bpmnid);
+		}
+		else
+		{
+			if (expanded != null)
+			{
+				vnode.setCollapsed(!expanded);
+			}
+			
+			mxGeometry geo = new mxGeometry(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());;
+			mxGeometry oldgeo = vnode.getGeometry();
+			if (geo != null)
+			{
+				vnode.setGeometry(geo);
+			}
+			
+			if (e instanceof MActivity)
+			{
+				MActivity act = (MActivity) e;
+				VNode parent = null;
+				
+				if (act.isEventHandler())
+				{
+					// Geometry is handled by layout manager.
+					vnode.setGeometry(oldgeo);
+					parent = (VNode) vmap.get(eventparentid);
+				}
+				
+				if (parent == null)
+				{
+					parent = (VNode) vmap.get(subprocessparentid);
+				}
+				
+				if (parent == null)
+				{
+					parent = act.getLane() != null? (VNode) vmap.get(act.getLane().getId()) : (VNode) vmap.get(act.getPool().getId());
+				}
+				
+				if (parent != null)
+				{
+					graph.getModel().beginUpdate();
+					graph.addCell(vnode, parent);
+					graph.getModel().endUpdate();
+				}
+				else
+				{
+					List<VNode> children = childmap.get(act.getPool().getId());
+					if (children == null)
+					{
+						children = new ArrayList<VNode>();
+						childmap.put(act.getPool().getId(), children);
+					}
+					children.add(vnode);
+				}
+				vnode.setBpmnElement(e);
+			}
+			else if (e instanceof MPool)
+			{
+				graph.getModel().beginUpdate();
+				graph.addCell(vnode);
+				graph.getModel().endUpdate();
+				
+				List<VNode> children = childmap.remove(e.getId());
+				if (children != null)
+				{
+					for (VNode child : children)
+					{
+						graph.getModel().beginUpdate();
+						graph.addCell(child, vnode);
+						graph.getModel().endUpdate();
+					}
+				}
+				vnode.setBpmnElement(e);
+			}
+			else if (e instanceof MLane)
+			{
+				VPool parent = (VPool) vmap.get(laneparentid);
+				
+				if (parent != null)
+				{
+					graph.getModel().beginUpdate();
+					graph.addCell(vnode, parent);
+					graph.getModel().endUpdate();
+				}
+				else
+				{
+					List<VNode> children = childmap.get(laneparentid);
+					if (children == null)
+					{
+						children = new ArrayList<VNode>();
+						childmap.put(laneparentid, children);
+					}
+					children.add(vnode);
+				}
+				vnode.setBpmnElement(e);
+			}
+			
+			vmap.put(bpmnid, vnode);
+		}
+	}
+	
+	/**
+	 *  Process the visual part of a standard BPMN edge.
+	 *  
+	 *  @param bpmnid The referenced ID of the edge.
+	 *  @param medge The semantic edge, if found.
+	 *  @param waypoints The way points of the edge.
+	 */
+	public void processBpmnEdge(String bpmnid, MIdElement medge, List<Point2D> waypoints)
+	{
+		if (medge != null)
+		{
+			VEdge vedge = null;
+			if (medge instanceof MSequenceEdge)
+			{
+				MSequenceEdge mseqedge = (MSequenceEdge) medge;
+				vedge = new VSequenceEdge(graph, VSequenceEdge.class.getSimpleName());
+				vedge.setSource(vmap.get(mseqedge.getSource().getId()));
+				vedge.setTarget(vmap.get(mseqedge.getTarget().getId()));
+			}
+			vedge.setBpmnElement(medge);
+			
+			if (waypoints != null)
+			{
+				List<mxPoint> mxpoints = new ArrayList<mxPoint>();
+				for (Point2D point : waypoints)
+				{
+					mxpoints.add(new mxPoint(point));
+				}
+				
+				mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
+				geo.setPoints(mxpoints);
+				geo.setRelative(false);
+				vedge.setGeometry(geo);
+			}
+			
+			graph.getModel().beginUpdate();
+			graph.addCell(vedge, vedge.getSource().getParent());
+			graph.getModel().endUpdate();
+		}
+		else
+		{
+			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown BPMN edge ID " + bpmnid);
+		}
+	}
+	
+	/**
+	 *  Process the visual part of a generic (non-standard) edge.
+	 * 	
+	 * 	@param type Type of the edge, if found.
+	 *	@param waypoints The way points of the edge.
+	 * 	@param attrs XML attributes for the edge.
+	 * 	@param emap Map from element IDs to semantic elements.
+	 */
+	public void processGenericEdge(String type, List<Point2D> waypoints, Map<String, String> attrs, Map<String, MIdElement> emap)
+	{
+		if  ("data".equals(type))
+		{
+			String id = attrs.get("jadexElement");
+			MDataEdge dedge = (MDataEdge) emap.get(id);
+			if (dedge != null)
+			{
+				VDataEdge vedge = new VDataEdge(graph);
+				VActivity sact = (VActivity) vmap.get(dedge.getSource().getId());
+				VActivity tact = (VActivity) vmap.get(dedge.getTarget().getId());
+				vedge.setSource(sact.getOutputParameterPort(dedge.getSourceParameter()));
+				vedge.setTarget(tact.getInputParameterPort(dedge.getTargetParameter()));
+				vedge.setBpmnElement(dedge);
+				
+				if (waypoints != null)
+				{
+					List<mxPoint> mxpoints = new ArrayList<mxPoint>();
+					for (Point2D point : waypoints)
+					{
+						mxpoints.add(new mxPoint(point));
+					}
+					
+					mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
+					geo.setPoints(mxpoints);
+					geo.setRelative(false);
+					vedge.setGeometry(geo);
+				}
+				
+				graph.getModel().beginUpdate();
+				graph.addCell(vedge, vedge.getSource().getParent().getParent());
+				graph.getModel().endUpdate();
+			}
+			else
+			{
+				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown data edge ID " + id);
+			}
+		}
 	}
 }

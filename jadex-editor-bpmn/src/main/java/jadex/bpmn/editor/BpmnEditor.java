@@ -28,7 +28,7 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 36;
+	public static final int BUILD = 37;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";
@@ -48,8 +48,8 @@ public class BpmnEditor
 	/** The style sheets. */
 	public static final Tuple2<String, mxStylesheet>[] STYLE_SHEETS = new Tuple2[] 
 		{
-			new Tuple2<String, mxStylesheet>("Color", new BpmnStylesheetColor()),
 			new Tuple2<String, mxStylesheet>("Color Gradient", new BpmnStylesheetColorGradient()),
+			new Tuple2<String, mxStylesheet>("Color", new BpmnStylesheetColor()),
 			new Tuple2<String, mxStylesheet>("Simple Grayscale", new BpmnStylesheetSimpleGrayscale()),
 			new Tuple2<String, mxStylesheet>("Complex Grayscale", new BpmnStylesheetComplexGrayscale())
 		};
