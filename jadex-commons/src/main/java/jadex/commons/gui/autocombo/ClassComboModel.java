@@ -26,12 +26,31 @@ import javax.swing.SwingUtilities;
  */
 public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 {
+	protected boolean inter;
+	protected boolean absclasses;
+	protected boolean inclasses;
+	protected boolean classes;
+	
+	
 	/**
 	 *  Create a new ClassComboModel. 
 	 */
 	public ClassComboModel(AutoCompleteCombo combo, int max)
 	{
+		this(combo, max, true, false, false, true);
+	}
+	
+	/**
+	 *  Create a new ClassComboModel. 
+	 */
+	public ClassComboModel(AutoCompleteCombo combo, int max, 
+		boolean inter, boolean absclasses, boolean inclasses, boolean classes)
+	{
 		super(combo, max);
+		this.inter = inter;
+		this.absclasses = absclasses;
+		this.inclasses = inclasses;
+		this.classes = classes;
 	}
 	
 	/**
@@ -71,8 +90,8 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 		{				
 			entries.clear();
 
-			ret = performSearch(pattern, true, false, 
-				true, false, max);
+			ret = performSearch(pattern, inter, absclasses, 
+				classes, inclasses, max);
 			final ISubscriptionIntermediateFuture<Class<?>> fret = ret;
 			
 			ret.addResultListener(new IIntermediateResultListener<Class<?>>()
