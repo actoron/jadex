@@ -569,7 +569,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
-//		if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+//		if(getComponentIdentifier().toString().indexOf("mon")!=-1)
 //			System.out.println("Enter: "+getComponentIdentifier()+", "+Thread.currentThread());
 		
 		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(this));
@@ -999,6 +999,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			if(desc.getName().getLocalName().indexOf("AutoTerminate")!=-1)
 //				System.out.println("killComponent last: "+getComponentIdentifier());
 
+			cleanup();
 			clock	= null;
 			cms	= null;
 //			component	= null;	// Required by getResults()
@@ -1017,4 +1018,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  Wake up this component.
 	 */
 	protected abstract void	doWakeup();
+	
+	/**
+	 *  Clean up this component.
+	 */
+	protected abstract void	cleanup();
 }

@@ -4,19 +4,17 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.DebugException;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *  Component adapter for built-in standalone platform. 
@@ -31,6 +29,12 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	/** The execution service (cached for speed). */
 	protected IExecutionService	exeservice;
 	
+	/** The parent adapter (cached for speed). */
+	protected StandaloneComponentAdapter	parenta;
+	
+	/** The synchronous subcomponents (if any). */
+	protected Set<StandaloneComponentAdapter>	subcomponents;
+	
 	//-------- constructors --------
 
 	/**
@@ -43,13 +47,69 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	}
 	
 	//-------- AbstractComponentAdapter methods --------
+	
+	/**
+	 *  Execute the component and its synchronous subcomponents (if any).
+	 */
+	public boolean execute()
+	{
+//		System.out.println("execute0: "+getComponentIdentifier());
+		boolean	ret	= super.execute();
+		
+		if(subcomponents!=null)
+		{
+			for(StandaloneComponentAdapter sub:	subcomponents)
+			{
+//				System.out.println("execute1: "+sub.getComponentIdentifier());
+				ret	= sub.execute() || ret;
+			}
+		}
+		
+		return ret;
+	}
 
 	/**
 	 *  Wake up this component.
 	 */
 	protected void	doWakeup()
 	{
-		if(exeservice==null)
+//		if(parent!=null)
+		if(desc.getSynchronous()!=null && desc.getSynchronous().booleanValue())
+		{
+			// Add to parent and wake up parent.
+			if(parenta==null)
+			{
+				SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DefaultResultListener<IComponentManagementService>()
+				{
+					public void resultAvailable(IComponentManagementService cms)
+					{
+						cms.getComponentAdapter(getComponentIdentifier().getParent())
+							.addResultListener(new DefaultResultListener<IComponentAdapter>()
+						{
+							public void resultAvailable(IComponentAdapter result)
+							{
+								parenta	= (StandaloneComponentAdapter)result;
+								parenta.addSubcomponent(StandaloneComponentAdapter.this);
+								parenta.wakeup();
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								exception.printStackTrace();
+							}
+						});
+					}
+				});
+			}
+			else
+			{
+				parenta.addSubcomponent(this);
+				parenta.wakeup();
+			}
+		}
+		
+		else if(exeservice==null)
 		{
 			SServiceProvider.getService(getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DefaultResultListener<IExecutionService>()
@@ -80,21 +140,72 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 			}
 		}
 	}
+
+	/**
+	 *  Add a synchronous subcomponent that will run on its parent's thread.
+	 */
+	protected void	addSubcomponent(StandaloneComponentAdapter sub)
+	{
+		if(subcomponents==null)
+		{
+			subcomponents	= new HashSet<StandaloneComponentAdapter>();
+		}
+		subcomponents.add(sub);
+	}
+
+	/**
+	 *  Remove a synchronous subcomponent.
+	 */
+	protected void	removeSubcomponent(StandaloneComponentAdapter sub)
+	{
+		if(subcomponents!=null)
+		{
+			subcomponents.remove(sub);
+		}
+	}
+
+	/**
+	 *  Block the current thread and allow execution on other threads.
+	 *  @param monitor	The monitor to wait for.
+	 */
+	public void block(Object monitor)
+	{
+		if(parenta!=null)
+		{
+			parenta.block(monitor);
+		}
+		else
+		{
+			super.block(monitor);
+		}
+	}
 	
-//	/**
-//	 *  Kill the component.
-//	 */
-//	public IFuture<Void> killComponent()
-//	{
-//		Future<Void>	ret	= new Future<Void>();
-//		super.killComponent().addResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				exeservice	= null;
-//				super.customResultAvailable(result);
-//			}
-//		});
-//		return ret;
-//	}
+	/**
+	 *  Unblock the thread waiting for the given monitor
+	 *  and cease execution on the current thread.
+	 *  @param monitor	The monitor to notify.
+	 */
+	public void unblock(Object monitor)
+	{
+		if(parenta!=null)
+		{
+			parenta.unblock(monitor);
+		}
+		else
+		{
+			super.unblock(monitor);
+		}
+	}
+	
+	/**
+	 *  Clean up this component.
+	 */
+	protected void	cleanup()
+	{
+		if(parenta!=null)
+		{
+			parenta.removeSubcomponent(this);
+		}
+	}
+
 }

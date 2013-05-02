@@ -95,6 +95,5 @@ public interface IComponentAdapter
 	 *  @return The exception.
 	 */
 	public Exception getException();
-
 }
 

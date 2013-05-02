@@ -4,7 +4,6 @@ import jadex.bridge.Cause;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
-import jadex.commons.Tuple2;
 
 import java.io.Serializable;
 import java.util.LinkedHashSet;
@@ -54,6 +53,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 
 	/** The monitoring flag. */
 	protected Boolean monitoring;
+	
+	/** The synchronous flag. */
+	protected Boolean synchronous;
 	
 	/** The model name. */
 	protected String modelname;
@@ -436,6 +438,26 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	{
 		this.monitoring = monitoring;
 	}
+	
+	/**
+	 *  Get the synchronous flag.
+	 *  @return	The synchronous flag.
+	 */
+	public Boolean getSynchronous()
+	{
+		return synchronous;
+	}
+	
+	/**
+	 *  Set the synchronous flag.
+	 *  @param synchronous	The synchronous flag.
+	 */
+	public void	getSynchronous(Boolean synchronous)
+	{
+		this.synchronous = synchronous;
+	}
+
+	
 
 	/**
 	 *  Test if this description equals another description.

@@ -136,6 +136,12 @@ public interface IComponentDescription
 	public Boolean getMonitoring();
 	
 	/**
+	 *  Get the synchronous flag.
+	 *  @return	The synchronous flag.
+	 */
+	public Boolean getSynchronous();
+	
+	/**
 	 *  Get the local type name of a component (defined in the parent).
 	 *  @return The local type.
 	 */
