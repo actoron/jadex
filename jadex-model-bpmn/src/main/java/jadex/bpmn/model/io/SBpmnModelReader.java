@@ -170,10 +170,6 @@ public class SBpmnModelReader
 		    else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT)
 		    {
 		    	contentstack.push(text);
-		    	if (text != null)
-		    	{
-		    		System.out.println(text);
-		    	}
 		    	text = null;
 		    	
 		    	if ("extension".equals(reader.getName().getLocalPart()) && sempre.equals(reader.getName().getPrefix()))
