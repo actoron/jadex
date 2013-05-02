@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Object serializer for encoding to and decoding from a compact binary format.
@@ -270,6 +271,24 @@ public class BinarySerializer
 				IDecoderHandler pp = context.getPostProcessors().get(i);
 				if (pp.isApplicable(clazz))
 					context.setLastObject(pp.decode(clazz, context));
+			}
+		}
+		
+		//TODO: Do this with BiHashMap?
+		if (context.getLastObject() != dobject)
+		{
+			int ref = -1;
+			for (Map.Entry<Integer, Object> entry : context.getKnownObjects().entrySet())
+			{
+				if (entry.getValue() == dobject)
+				{
+					ref = entry.getKey();
+					break;
+				}
+			}
+			if (ref > -1)
+			{
+				context.getKnownObjects().put(ref, context.getKnownObjects());
 			}
 		}
 		
