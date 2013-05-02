@@ -13,7 +13,6 @@ import java.awt.Component;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxRubberband;
@@ -42,6 +41,7 @@ public class BpmnEditorPanel extends JSplitPanel
 		super(JSplitPane.VERTICAL_SPLIT);
 		
 		setOneTouchExpandable(true);
+		setResizeWeight(1.0);
 		
 		modelcontainer = mcontainer;
 		
@@ -106,20 +106,5 @@ public class BpmnEditorPanel extends JSplitPanel
 	public ModelContainer getModelContainer()
 	{
 		return modelcontainer;
-	}
-	
-	/** Bug fix goodness for Swing. */
-	@SuppressWarnings("deprecation")
-	public void reshape(int x, int y, int w, int h)
-	{
-		final double divloc = getProportionalDividerLocation();
-		super.reshape(x, y, w, h);
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				setDividerLocation(divloc);
-			}
-		});
 	}
 }
