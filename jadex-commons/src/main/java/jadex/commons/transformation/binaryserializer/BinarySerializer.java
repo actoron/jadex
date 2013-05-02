@@ -264,6 +264,12 @@ public class BinarySerializer
 		
 		context.setLastObject(dobject);
 		
+//		if(dobject!=null && dobject.getClass().getName().indexOf("ProxyReference")!=-1)
+////			&& clazz.getName().indexOf("ProxyReference")==-1)
+//		{
+//			System.out.println("sdghsdgrk");
+//		}
+		
 		if (context.getPostProcessors() != null)
 		{
 			for (int i = 0; i < context.getPostProcessors().size(); ++i)
@@ -288,7 +294,7 @@ public class BinarySerializer
 			}
 			if (ref > -1)
 			{
-				context.getKnownObjects().put(ref, context.getKnownObjects());
+				context.getKnownObjects().put(ref, context.getLastObject());
 			}
 		}
 		

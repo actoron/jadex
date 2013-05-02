@@ -5,7 +5,6 @@ import jadex.bpmn.editor.gui.controllers.IdGenerator;
 import jadex.bpmn.editor.gui.propertypanels.TaskPropertyPanel;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.task.ITask;
-import jadex.bpmn.task.info.STaskMetaInfoExtractor;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
@@ -33,7 +32,6 @@ import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -478,42 +476,42 @@ public class ModelContainer
 				URL[] urls = new URL[]{clroot.toURI().toURL()};
 				projectclassloader = new URLClassLoader(urls, ModelContainer.class.getClassLoader());
 //				Class<?>[] classes = SReflect.scanForClasses(urls, projectclassloader,
-				Class<?>[] classes = SReflect.scanForClasses(projectclassloader,
-				new IFilter<Object>()
-				{
-					public boolean filter(Object obj)
-					{
-						String name = null;
-						if (obj instanceof ZipEntry)
-						{
-							name = ((ZipEntry) obj).getName();
-						}
-						else if (obj instanceof File)
-						{
-							name = ((File) obj).getName();
-						}
-						if (name != null)
-						{
-							return name.endsWith(".class") && !(name.contains("$"));
-						}
-						return false;
-					}
-				},
-				new IFilter<Class<?>>()
-				{
-					public boolean filter(Class<?> clazz)
-					{
-//						System.out.print(clazz.getCanonicalName());
-//						System.out.print(": ");
-//						System.out.println(SReflect.isSupertype(ITask.class, clazz));
-						return SReflect.isSupertype(ITask.class, clazz);
-					}
-				});
-				
-				for(Class<?> clazz : classes)
-				{
-					projecttaskmetainfos.put(clazz.getCanonicalName(), STaskMetaInfoExtractor.getMetaInfo(clazz));
-				}
+//				Class<?>[] classes = SReflect.scanForClasses(projectclassloader,
+//				new IFilter<Object>()
+//				{
+//					public boolean filter(Object obj)
+//					{
+//						String name = null;
+//						if (obj instanceof ZipEntry)
+//						{
+//							name = ((ZipEntry) obj).getName();
+//						}
+//						else if (obj instanceof File)
+//						{
+//							name = ((File) obj).getName();
+//						}
+//						if (name != null)
+//						{
+//							return name.endsWith(".class") && !(name.contains("$"));
+//						}
+//						return false;
+//					}
+//				},
+//				new IFilter<Class<?>>()
+//				{
+//					public boolean filter(Class<?> clazz)
+//					{
+////						System.out.print(clazz.getCanonicalName());
+////						System.out.print(": ");
+////						System.out.println(SReflect.isSupertype(ITask.class, clazz));
+//						return SReflect.isSupertype(ITask.class, clazz);
+//					}
+//				});
+//				
+//				for(Class<?> clazz : classes)
+//				{
+//					projecttaskmetainfos.put(clazz.getCanonicalName(), STaskMetaInfoExtractor.getMetaInfo(clazz));
+//				}
 			}
 		}
 		catch (MalformedURLException e)
