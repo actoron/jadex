@@ -32,6 +32,7 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 	protected boolean classes;
 	
 	protected IFilter<Class<?>> classfilter;
+	protected IFilter<String> filefilter;
 	
 	
 	/**
@@ -39,20 +40,22 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 	 */
 	public ClassComboModel(AutoCompleteCombo combo, int max)
 	{
-		this(combo, max, true, false, false, true, null);
+		this(combo, max, true, false, false, true, null, null);
 	}
 	
 	/**
 	 *  Create a new ClassComboModel. 
 	 */
 	public ClassComboModel(AutoCompleteCombo combo, int max, 
-		boolean inter, boolean absclasses, boolean inclasses, boolean classes, IFilter<Class<?>> classfilter)
+		boolean inter, boolean absclasses, boolean inclasses, boolean classes, 
+		IFilter<String> filefilter, IFilter<Class<?>> classfilter)
 	{
 		super(combo, max);
 		this.inter = inter;
 		this.absclasses = absclasses;
 		this.inclasses = inclasses;
 		this.classes = classes;
+		this.filefilter = filefilter;
 		this.classfilter = classfilter;
 	}
 	
@@ -109,7 +112,7 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 				
 				public void finished()
 				{
-					getCombo().setSelectedItem(pattern);
+//					getCombo().setSelectedItem(pattern);
 					getCombo().updatePopup();
 				}
 				
@@ -199,6 +202,12 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 						if(!incla && fn.indexOf("$")!=-1)
 						{
 							return false;
+						}
+						
+						if(ClassComboModel.this.filefilter!=null)
+						{
+							if(!ClassComboModel.this.filefilter.filter(fn))
+								return false;
 						}
 						
 						StringTokenizer stok = new StringTokenizer(exp, "*?");

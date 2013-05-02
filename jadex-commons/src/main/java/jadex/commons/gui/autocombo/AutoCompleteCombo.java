@@ -34,8 +34,6 @@ import javax.swing.text.PlainDocument;
 
 /**
  * Autocomplete combobox with filtering and text inserting of new text
- * 
- * @author Exterminator13
  */
 public class AutoCompleteCombo<T> extends JComboBox
 {
@@ -58,12 +56,12 @@ public class AutoCompleteCombo<T> extends JComboBox
 		this.tp = tp==null? new ThreadPool(): tp;
 		setEditable(true);
 
-		setPattern(null);
+//		setPattern(null);
 		updatepopup = false;
 
 		
 //		setModel(model);
-		setSelectedItem(null);
+//		setSelectedItem(null);
 
 		new Timer(200, new ActionListener()
 		{
@@ -146,7 +144,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 	 */
 	public String getText()
 	{
-		return getEditor().getItem().toString();
+		return getEditor().getItem()!=null? getEditor().getItem().toString(): "";
 	}
 
 	/**
@@ -252,7 +250,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 							else
 							{
 								t.stop();
-								updateModel();
+//								updateModel();
 							}
 						}
 					});
@@ -327,11 +325,11 @@ public class AutoCompleteCombo<T> extends JComboBox
 			{
 				arrowkey = false;
 			}
-//			else
-//			{
-//				updateModel();
-//			}
-			clearSelection();
+			else
+			{
+				updateModel();
+			}
+//			clearSelection();
 		}
 
 		/**
@@ -347,18 +345,18 @@ public class AutoCompleteCombo<T> extends JComboBox
 			// insert the string into the document
 			super.insertString(offs, str, a);
 
-			String text = getText(0, getLength());
-//			if(arrowkey)
-//			{
+//			String text = getText(0, getLength());
+			if(arrowkey)
+			{
 //				getAutoModel().setSelectedItem(text);
-//				arrowkey = false;
-//			}
-//			else if(!text.equals(getSelectedItem()))
-//			{
-//				updateModel();
-//			}
+				arrowkey = false;
+			}
+			else //if(!text.equals(getSelectedItem()))
+			{
+				updateModel();
+			}
 
-			clearSelection();
+//			clearSelection();
 		}
 	}
 
@@ -375,29 +373,29 @@ public class AutoCompleteCombo<T> extends JComboBox
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				frame.setLayout(new GridLayout(2, 1));
 				
-				final AutoCompleteCombo combo = new AutoCompleteCombo(null);
-				final ClassComboModel model = new ClassComboModel(combo, 20);
-				combo.setModel(model);
-//				System.out.println(combo.getEditor().getClass());
-//				MetalComboBoxEditor
-				combo.setEditor(new MetalComboBoxEditor()//BasicComboBoxEditor()
-				{
-					public void setItem(Object obj)
-					{
-						super.setItem(obj instanceof Class? model.convertToString((Class<?>)obj): obj);
-					}
-				});
-				combo.setRenderer(new BasicComboBoxRenderer()
-				{
-					public Component getListCellRendererComponent(JList list, Object value,
-						int index, boolean isSelected, boolean cellHasFocus)
-					{
-						Class<?> cl = (Class)value;
-						String txt = SReflect.getInnerClassName(cl)+" - "+cl.getPackage().getName();
-						return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
-					}
-				});
-				frame.add(combo);
+//				final AutoCompleteCombo combo = new AutoCompleteCombo(null);
+//				final ClassComboModel model = new ClassComboModel(combo, 20);
+//				combo.setModel(model);
+////				System.out.println(combo.getEditor().getClass());
+////				MetalComboBoxEditor
+//				combo.setEditor(new MetalComboBoxEditor()//BasicComboBoxEditor()
+//				{
+//					public void setItem(Object obj)
+//					{
+//						super.setItem(obj instanceof Class? model.convertToString((Class<?>)obj): obj);
+//					}
+//				});
+//				combo.setRenderer(new BasicComboBoxRenderer()
+//				{
+//					public Component getListCellRendererComponent(JList list, Object value,
+//						int index, boolean isSelected, boolean cellHasFocus)
+//					{
+//						Class<?> cl = (Class)value;
+//						String txt = SReflect.getInnerClassName(cl)+" - "+cl.getPackage().getName();
+//						return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
+//					}
+//				});
+//				frame.add(combo);
 				
 				List<String> vals = SUtil.createArrayList(new String[]{"a", "aa", "aaa", "aab", "b", "bb", "abc"});
 				final AutoCompleteCombo combo2 = new AutoCompleteCombo(null);

@@ -35,6 +35,10 @@ public class StringComboModel extends AbstractAutoComboModel<String>
 	{
 		super(combo, max);
 		this.allentries = allentries;
+		for(int i=0; i<allentries.size() && (max==-1 || i<max); i++)
+		{
+			this.entries.add(allentries.get(i));
+		}
 	}
 	
 	/**
@@ -66,8 +70,6 @@ public class StringComboModel extends AbstractAutoComboModel<String>
 		{
 			if(entries.size()>0)
 				getCombo().setSelectedItem(getElementAt(0));
-			
-			
 		}
 		else
 		{				

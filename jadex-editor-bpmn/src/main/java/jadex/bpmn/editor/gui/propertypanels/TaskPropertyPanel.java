@@ -7,6 +7,7 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
+import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.PropertyMetaInfo;
 import jadex.bpmn.task.info.STaskMetaInfoExtractor;
@@ -14,28 +15,38 @@ import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
-import jadex.commons.gui.ClassSearchPanel;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.ClassComboModel;
+import jadex.commons.gui.autocombo.FixedClassComboModel;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.javaparser.SJavaParser;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.jar.JarEntry;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -44,15 +55,18 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import javax.swing.plaf.metal.MetalComboBoxEditor;
 
 /**
  *  Property panel for task activities.
- *
  */
 public class TaskPropertyPanel extends BasePropertyPanel
 {
@@ -66,6 +80,9 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	public TaskPropertyPanel(ModelContainer container, VActivity task)
 	{
 		super(null, container);
+		
+		assert SwingUtilities.isEventDispatchThread();
+		
 		setLayout(new BorderLayout());
 		
 		this.task = task;
@@ -77,22 +94,138 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		tabpane.addTab("Task", column);
 		
 		JLabel label = new JLabel("Class");
-		Set<String> tasknameset = new HashSet<String>(BpmnEditor.TASK_INFOS.keySet());
+//		Set<String> tasknameset = new HashSet<String>(BpmnEditor.TASK_INFOS.keySet());
+//		if(modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
+//		{
+//			tasknameset.addAll(modelcontainer.getProjectTaskMetaInfos().keySet());
+//		}
+//		String[] tasknames = tasknameset.toArray(new String[BpmnEditor.TASK_INFOS.size()]);
+//		Arrays.sort(tasknames);
+//		final AutoCompleteCombo<String> cbox = new AutoCompleteCombo<String>(null);
+//		StringComboModel model = new StringComboModel(cbox, 20, SUtil.createArrayList(tasknames));
+//		cbox.setModel(model);
 		
-		if(modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
+		ClassLoader cl = modelcontainer.getProjectClassLoader()!=null? modelcontainer.getProjectClassLoader()
+			: TaskPropertyPanel.class.getClassLoader();
+		final List<Class<?>> clazzes = new ArrayList<Class<?>>();
+		
+		SReflect.asyncScanForClasses(cl, new IFilter<Object>()
 		{
-			tasknameset.addAll(modelcontainer.getProjectTaskMetaInfos().keySet());
-		}
-		
-		String[] tasknames = tasknameset.toArray(new String[BpmnEditor.TASK_INFOS.size()]);
-		Arrays.sort(tasknames);
-		final JComboBox cbox = new JComboBox(tasknames);
-		
-		cbox.setEditable(true);
-		if(getBpmnTask().getClazz() != null)
+			public boolean filter(Object obj)
+			{
+				String	fn	= "";
+				if(obj instanceof File)
+				{
+					File	f	= (File)obj;
+					fn	= f.getName();
+				}
+				else if(obj instanceof JarEntry)
+				{
+					JarEntry	je	= (JarEntry)obj;
+					fn	= je.getName();
+				}
+				
+				return fn.indexOf("Task")!=-1;
+			}
+		}, new IFilter<Class<?>>()
 		{
-			cbox.setSelectedItem(getBpmnTask().getClazz().getTypeName());
-		}
+			public boolean filter(Class<?> obj)
+			{
+				boolean ret = false;
+				try
+				{
+					ClassLoader cl = obj.getClassLoader();
+					Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+					return SReflect.isSupertype(taskcl, obj);
+				}
+				catch(Exception e)
+				{
+				}
+				return ret;
+			}
+		}, -1).addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
+		{
+			public void intermediateResultAvailable(Class<?> result)
+			{
+				clazzes.add(result);
+			}
+			public void finished()
+			{
+				System.out.println("fini");
+			}
+			public void resultAvailable(Collection<Class<?>> result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		}));
+		
+		
+		final AutoCompleteCombo cbox = new AutoCompleteCombo(null);
+		final FixedClassComboModel model = new FixedClassComboModel(cbox, -1, new ArrayList<Class<?>>(clazzes));
+		
+//		final ClassComboModel model = new ClassComboModel(cbox, 20, false, false, true, true, null,// null);
+//			new IFilter<Class<?>>()
+//		{
+//			public boolean filter(Class<?> obj)
+//			{
+//				boolean ret = false;
+//				try
+//				{
+//					ClassLoader cl = obj.getClassLoader();
+//					Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+//					return SReflect.isSupertype(taskcl, obj);
+//				}
+//				catch(Exception e)
+//				{
+//				}
+//				return ret;
+//			}
+//		});
+		cbox.setModel(model);
+//		System.out.println(combo.getEditor().getClass());
+//		MetalComboBoxEditor
+		cbox.setEditor(new MetalComboBoxEditor()//BasicComboBoxEditor()
+		{
+			Object val;
+			public void setItem(Object obj)
+			{
+				if(obj==null)
+					return;
+				
+				super.setItem(obj);
+				
+				String text = obj instanceof Class? model.convertToString((Class<?>)obj): "";
+			    if(!text.equals(editor.getText())) 
+			    {
+			    	val = obj;
+			    	editor.setText(text);
+			    }
+			}
+			
+			public Object getItem()
+			{
+				return val;
+			}
+		});
+		cbox.setRenderer(new BasicComboBoxRenderer()
+		{
+			public Component getListCellRendererComponent(JList list, Object value,
+				int index, boolean isSelected, boolean cellHasFocus)
+			{
+				Class<?> cl = (Class)value;
+				String txt = SReflect.getInnerClassName(cl)+" - "+cl.getPackage().getName();
+				return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
+			}
+		});
+		
+		
+//		cbox.setEditable(true);
+//		if(getBpmnTask().getClazz() != null)
+//		{
+//			cbox.setSelectedItem(getBpmnTask().getClazz().getTypeName());
+//		}
 		
 //		JButton sel = new JButton("...");
 //		sel.addActionListener(new ActionListener()
@@ -198,10 +331,15 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				String taskname = (String) ((JComboBox)e.getSource()).getSelectedItem();
+//				String taskname = (String) ((JComboBox)e.getSource()).getSelectedItem();
+				Class<?> taskcl = (Class<?>)((JComboBox)e.getSource()).getSelectedItem();
+				if(taskcl==null)
+					return;
+				
+				String taskname = taskcl.getName();
 				
 				// change task class
-				getBpmnTask().setClazz(new ClassInfo(taskname));
+				getBpmnTask().setClazz(new ClassInfo(taskcl));
 
 				// and renew properties
 				IndexMap<String, MProperty> props = getBpmnTask().getProperties();

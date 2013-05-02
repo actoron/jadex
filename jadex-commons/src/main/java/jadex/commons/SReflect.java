@@ -1362,7 +1362,8 @@ public class SReflect
 	/**
 	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
 	 */
-	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(ClassLoader classloader, IFilter filefilter, IFilter classfilter, int max)
+	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(ClassLoader classloader, 
+		IFilter<Object> filefilter, IFilter<Class<?>> classfilter, int max)
 	{
 		return asyncScanForClasses(SUtil.getClasspathURLs(classloader).toArray(new URL[0]), classloader, filefilter, classfilter, max);
 	}
@@ -1371,7 +1372,7 @@ public class SReflect
 	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
 	 */
 	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(final URL[] urls, 
-		final ClassLoader classloader, final IFilter filefilter, final IFilter classfilter, final int max)
+		final ClassLoader classloader, final IFilter<Object> filefilter, final IFilter<Class<?>> classfilter, final int max)
 	{
 		final SubscriptionIntermediateFuture<Class<?>>	ret	= new SubscriptionIntermediateFuture<Class<?>>();
 		
@@ -1389,9 +1390,9 @@ public class SReflect
 				try
 				{
 					String	clname	= file.substring(0, file.length()-6).replace('/', '.');
-	//				System.out.println("Found candidate: "+clname);
+					System.out.println("Found candidate: "+clname+" "+cnt[0]);
 					
-					if(newcl[0]==null || cnt[0]++%1000==0)
+					if(newcl[0]==null || cnt[0]++%500==0)
 						newcl[0] = new URLClassLoader(urls, null);
 //					
 					Class<?> tmpcl = Class.forName(clname, false, newcl[0]);
@@ -1440,7 +1441,7 @@ public class SReflect
 	/**
 	 *  Scan for files in a given list of urls.
 	 */
-	public static ISubscriptionIntermediateFuture<String> asyncScanForFiles(URL[] urls, IFilter filter)
+	public static ISubscriptionIntermediateFuture<String> asyncScanForFiles(URL[] urls, IFilter<Object> filter)
 	{
 		final SubscriptionIntermediateFuture<String>	ret	= new SubscriptionIntermediateFuture<String>();
 		

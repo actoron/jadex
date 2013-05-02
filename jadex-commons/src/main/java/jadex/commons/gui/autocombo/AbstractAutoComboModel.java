@@ -31,7 +31,7 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	{
 		this.combo = combo;
 		this.max = max;
-		this.entries = new ArrayList<T>(max);
+		this.entries = new ArrayList<T>();
 	}
 	
 	/**
@@ -83,8 +83,8 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 			entries.remove(index);
 		}
 
-		setPattern(null);
-		setSelectedItem(val);
+//		setPattern(null);
+//		setSelectedItem(val);
 	}
 
 	/**
@@ -100,8 +100,8 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	 */
 	public void setSelectedItem(Object obj)
 	{
-//		if(obj instanceof String)
-//			System.out.println("herer");
+		if(obj instanceof String)
+			System.out.println("herer");
 		
 		if((selected != null && !selected.equals(obj))
 			|| selected == null && obj != null)
