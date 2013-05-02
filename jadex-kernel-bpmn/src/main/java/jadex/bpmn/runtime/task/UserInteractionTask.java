@@ -4,17 +4,16 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
@@ -30,9 +29,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -48,6 +45,9 @@ import javax.swing.SwingUtilities;
  *  Opens a dialog for the task and lets the user enter
  *  result parameters.
  */
+@Task(description="The user interaction task can be used for fetching in parameter values " +
+	"via an interactive user interface dialog. The task automatically uses all declared" +
+	"in parameters.")
 public class UserInteractionTask implements ITask
 {
 	//-------- attributes --------

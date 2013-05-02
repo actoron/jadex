@@ -28,6 +28,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.plaf.metal.MetalComboBoxEditor;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
@@ -156,13 +157,13 @@ public class AutoCompleteCombo<T> extends JComboBox
 		if(pattern != null && pattern.trim().isEmpty())
 			pattern = null;
 
-		if(lastpattern == null && pattern == null || pattern != null && pattern.equals(lastpattern))
-		{
-			SubscriptionIntermediateFuture<T> fut = new SubscriptionIntermediateFuture<T>();
-			fut.setResult(null);
-			ret = fut;
-		}
-		else
+//		if(lastpattern == null && pattern == null || pattern != null && pattern.equals(lastpattern))
+//		{
+//			SubscriptionIntermediateFuture<T> fut = new SubscriptionIntermediateFuture<T>();
+//			fut.setResult(null);
+//			ret = fut;
+//		}
+//		else
 		{
 			lastpattern = pattern;
 
@@ -304,8 +305,8 @@ public class AutoCompleteCombo<T> extends JComboBox
 		{
 			try
 			{
-				String textToMatch = getText(0, getLength());
-				setPattern(textToMatch);
+				String text = getText(0, getLength());
+				setPattern(text);
 			}
 			catch(Exception e)
 			{
@@ -320,12 +321,16 @@ public class AutoCompleteCombo<T> extends JComboBox
 			if(current!=null && !current.isDone())
 				return;
 
+			String beftext = getText(0, getLength());
+			
 			super.remove(offs, len);
+			
+			String text = getText(0, getLength());
 			if(arrowkey)
 			{
 				arrowkey = false;
 			}
-			else
+			else if(!text.equals(beftext))
 			{
 				updateModel();
 			}
@@ -342,21 +347,51 @@ public class AutoCompleteCombo<T> extends JComboBox
 
 //			System.out.println("insert: "+str);
 			
+			String beftext = getText(0, getLength());
+			
 			// insert the string into the document
 			super.insertString(offs, str, a);
 
-//			String text = getText(0, getLength());
+			String text = getText(0, getLength());
 			if(arrowkey)
 			{
 //				getAutoModel().setSelectedItem(text);
 				arrowkey = false;
 			}
-			else //if(!text.equals(getSelectedItem()))
+			else if(!text.equals(beftext))
 			{
 				updateModel();
 			}
 
 //			clearSelection();
+		}
+		
+		public void replace(int offset, int length, String text,
+				AttributeSet attrs) throws BadLocationException
+		{
+			if(length == 0 && (text == null || text.length() == 0))
+			{
+				return;
+			}
+
+			writeLock();
+			try
+			{
+				boolean ark = arrowkey;
+				if(length > 0)
+				{
+					remove(offset, length);
+				}
+				arrowkey = ark;
+				if(text != null && text.length() > 0)
+				{
+					insertString(offset, text, attrs);
+				}
+			}
+			finally
+			{
+				writeUnlock();
+			}
 		}
 	}
 

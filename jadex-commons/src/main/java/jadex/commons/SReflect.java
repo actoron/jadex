@@ -1390,7 +1390,7 @@ public class SReflect
 				try
 				{
 					String	clname	= file.substring(0, file.length()-6).replace('/', '.');
-					System.out.println("Found candidate: "+clname+" "+cnt[0]);
+//					System.out.println("Found candidate: "+clname+" "+cnt[0]);
 					
 					if(newcl[0]==null || cnt[0]++%500==0)
 						newcl[0] = new URLClassLoader(urls, null);

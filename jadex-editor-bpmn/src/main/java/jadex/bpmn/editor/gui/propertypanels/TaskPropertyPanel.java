@@ -105,65 +105,8 @@ public class TaskPropertyPanel extends BasePropertyPanel
 //		StringComboModel model = new StringComboModel(cbox, 20, SUtil.createArrayList(tasknames));
 //		cbox.setModel(model);
 		
-		ClassLoader cl = modelcontainer.getProjectClassLoader()!=null? modelcontainer.getProjectClassLoader()
-			: TaskPropertyPanel.class.getClassLoader();
-		final List<Class<?>> clazzes = new ArrayList<Class<?>>();
-		
-		SReflect.asyncScanForClasses(cl, new IFilter<Object>()
-		{
-			public boolean filter(Object obj)
-			{
-				String	fn	= "";
-				if(obj instanceof File)
-				{
-					File	f	= (File)obj;
-					fn	= f.getName();
-				}
-				else if(obj instanceof JarEntry)
-				{
-					JarEntry	je	= (JarEntry)obj;
-					fn	= je.getName();
-				}
-				
-				return fn.indexOf("Task")!=-1;
-			}
-		}, new IFilter<Class<?>>()
-		{
-			public boolean filter(Class<?> obj)
-			{
-				boolean ret = false;
-				try
-				{
-					ClassLoader cl = obj.getClassLoader();
-					Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
-					return SReflect.isSupertype(taskcl, obj);
-				}
-				catch(Exception e)
-				{
-				}
-				return ret;
-			}
-		}, -1).addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
-		{
-			public void intermediateResultAvailable(Class<?> result)
-			{
-				clazzes.add(result);
-			}
-			public void finished()
-			{
-				System.out.println("fini");
-			}
-			public void resultAvailable(Collection<Class<?>> result)
-			{
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-		}));
-		
-		
 		final AutoCompleteCombo cbox = new AutoCompleteCombo(null);
-		final FixedClassComboModel model = new FixedClassComboModel(cbox, -1, new ArrayList<Class<?>>(clazzes));
+		final FixedClassComboModel model = new FixedClassComboModel(cbox, -1, new ArrayList<Class<?>>(modelcontainer.getTaskClasses()));
 		
 //		final ClassComboModel model = new ClassComboModel(cbox, 20, false, false, true, true, null,// null);
 //			new IFilter<Class<?>>()
@@ -191,10 +134,8 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			Object val;
 			public void setItem(Object obj)
 			{
-				if(obj==null)
+				if(obj==null || SUtil.equals(val, obj))
 					return;
-				
-				super.setItem(obj);
 				
 				String text = obj instanceof Class? model.convertToString((Class<?>)obj): "";
 			    if(!text.equals(editor.getText())) 
@@ -339,7 +280,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				String taskname = taskcl.getName();
 				
 				// change task class
-				getBpmnTask().setClazz(new ClassInfo(taskcl));
+				getBpmnTask().setClazz(new ClassInfo(taskcl.getName()));
 
 				// and renew properties
 				IndexMap<String, MProperty> props = getBpmnTask().getProperties();

@@ -2,20 +2,27 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.IdGenerator;
+import jadex.bpmn.editor.gui.propertypanels.TaskPropertyPanel;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.task.info.STaskMetaInfoExtractor;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.jar.JarEntry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -243,6 +251,9 @@ public class ModelContainer
 	/** The image provider. */
 	protected List<ChangeListener> changelisteners;
 	
+	/** The task classes. */
+	protected List<Class<?>> taskclasses;
+	
 	/**
 	 *  Creates a new container.
 	 */
@@ -253,8 +264,87 @@ public class ModelContainer
 		//this.imageprovider = new ImageProvider();
 		this.projecttaskmetainfos = new HashMap<String, TaskMetaInfo>();
 		this.changelisteners = new ArrayList<ChangeListener>();
+		this.taskclasses = scanForTaskClasses();
 	}
 	
+	/**
+	 *  Scan for task classes.
+	 */
+	public List<Class<?>> scanForTaskClasses()
+	{
+		final List<Class<?>> taskclasses = new ArrayList<Class<?>>();
+		ClassLoader cl = getProjectClassLoader()!=null? getProjectClassLoader()
+			: TaskPropertyPanel.class.getClassLoader();
+		
+		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, new IFilter<Object>()
+		{
+			public boolean filter(Object obj)
+			{
+				String	fn	= "";
+				if(obj instanceof File)
+				{
+					File	f	= (File)obj;
+					fn	= f.getName();
+				}
+				else if(obj instanceof JarEntry)
+				{
+					JarEntry	je	= (JarEntry)obj;
+					fn	= je.getName();
+				}
+				
+				return fn.indexOf("Task")!=-1;
+			}
+		}, new IFilter<Class<?>>()
+		{
+			public boolean filter(Class<?> obj)
+			{
+				boolean ret = false;
+				try
+				{
+					if(!obj.isInterface() && !Modifier.isAbstract(obj.getModifiers()))
+					{
+						ClassLoader cl = obj.getClassLoader();
+						Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+						ret = SReflect.isSupertype(taskcl, obj);
+					}
+				}
+				catch(Exception e)
+				{
+				}
+				return ret;
+			}
+		}, -1);
+		fut.addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
+		{
+			public void intermediateResultAvailable(Class<?> result)
+			{
+				taskclasses.add(result);
+			}
+			public void finished()
+			{
+				System.out.println("fini");
+			}
+			public void resultAvailable(Collection<Class<?>> result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		}));
+		fut.get(new ThreadSuspendable());
+		
+		return taskclasses;
+	}
+	
+	/**
+	 *  Get the taskclasses.
+	 *  @return The taskclasses.
+	 */
+	public List<Class<?>> getTaskClasses()
+	{
+		return taskclasses;
+	}
+
 	/**
 	 *  Returns the ID generator.
 	 *  

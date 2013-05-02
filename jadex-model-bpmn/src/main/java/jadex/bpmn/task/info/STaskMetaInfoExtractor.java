@@ -22,8 +22,8 @@ public class STaskMetaInfoExtractor
 		TaskMetaInfo ret = null;
 		
 		Task taskanon = (Task)taskclass.getAnnotation(Task.class);
-//		if(taskanon == null)
-//		{
+		if(taskanon != null)
+		{
 //			try
 //			{
 //				Method getMetaInfo = taskclass.getMethod("getMetaInfo", (Class[]) null);
@@ -59,7 +59,7 @@ public class STaskMetaInfoExtractor
 			}
 			
 			ret = new TaskMetaInfo(desc, pmis, prmis);
-//		}
+		}
 		
 		return ret;
 	}

@@ -170,15 +170,19 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 			{
 				int size2 = getSize();
 
+//				System.out.println("sizes: "+size1+" "+size2);
+				
+//				fireContentsChanged(AbstractAutoComboModel.this, 0, size2-1);
+				
 				if(size1<size2)
 				{
-					fireIntervalAdded(this, size1, size2 - 1);
-					fireContentsChanged(this, 0, size1 - 1);
+					fireIntervalAdded(AbstractAutoComboModel.this, size1, size2 - 1);
+					fireContentsChanged(AbstractAutoComboModel.this, 0, size1 - 1);
 				}
 				else if(size1>size2)
 				{
-					fireIntervalRemoved(this, size2, size1 - 1);
-					fireContentsChanged(this, 0, size2 - 1);
+					fireIntervalRemoved(AbstractAutoComboModel.this, size2, size1 - 1);
+					fireContentsChanged(AbstractAutoComboModel.this, 0, size2 - 1);
 				}
 			}
 			

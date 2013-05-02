@@ -3,16 +3,22 @@ package jadex.bpmn.editor.gui.propertypanels;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.task.ITask;
 import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.JarEntry;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -48,7 +54,7 @@ public class BasePropertyPanel extends JPanel
 			setBorder(new TitledBorder(title));
 		}
 	}
-	
+
 	/**
 	 *  Returns the graph.
 	 *  

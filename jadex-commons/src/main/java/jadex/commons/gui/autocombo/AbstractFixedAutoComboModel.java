@@ -24,10 +24,24 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 	{
 		super(combo, max);
 		this.allentries = allentries;
+		copyEntries();
+	}
+	
+	/**
+	 * 
+	 */
+	protected void copyEntries()
+	{
+		int size1 = entries.size();
+		entries.clear();
 		for(int i=0; i<allentries.size() && (max==-1 || i<max); i++)
 		{
 			this.entries.add(allentries.get(i));
 		}
+		int size2 = entries.size();
+		
+		fireIntervalAdded(this, size1, size2 - 1);
+		fireContentsChanged(this, 0, size1 - 1);
 	}
 	
 	/**
@@ -41,6 +55,7 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 		
 		if(pattern==null)
 		{
+			copyEntries();
 //			if(entries.size()>0)
 //				getCombo().setSelectedItem(getElementAt(0));
 		}
