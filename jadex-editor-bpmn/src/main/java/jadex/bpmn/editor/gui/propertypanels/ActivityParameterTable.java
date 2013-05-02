@@ -24,7 +24,6 @@ public class ActivityParameterTable extends JTable
 	
 	public ActivityParameterTable(ModelContainer modelcontainer, VActivity activity)
 	{
-		super();
 		this.activity = activity;
 		setModel(new ParameterTableModel());
 		
@@ -70,19 +69,33 @@ public class ActivityParameterTable extends JTable
 	
 	/**
 	 *  Removes parameters.
-	 *  
 	 *  @param ind Indices of parameters.
 	 */
 	public void removeParameters(int[] ind)
 	{
 		Arrays.sort(ind);
 		
-		for (int i = ind.length - 1; i >= 0; --i)
+		for(int i = ind.length - 1; i >= 0; --i)
 		{
 			MParameter param = getBpmnActivity().getParameters().remove(ind[i]);
 			((ParameterTableModel) getModel()).fireTableRowsDeleted(ind[i], ind[i]);
 			activity.removedParameter(param);
 		}
+	}
+	
+	/**
+	 *  Removes parameters.
+	 *  @param ind Indices of parameters.
+	 */
+	public void removeAllParameters()
+	{
+		int length = getBpmnActivity().getParameters().size();
+		for(int i=0; i<length; i++)
+		{
+			MParameter param = getBpmnActivity().getParameters().remove(0);
+			activity.removedParameter(param);
+		}
+		((ParameterTableModel)getModel()).fireTableRowsDeleted(0, length-1);
 	}
 	
 	/**

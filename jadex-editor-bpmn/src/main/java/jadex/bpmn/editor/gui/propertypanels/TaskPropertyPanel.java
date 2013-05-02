@@ -8,6 +8,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.task.ITask;
+import jadex.bpmn.model.task.ITaskPropertyGui;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.PropertyMetaInfo;
 import jadex.bpmn.task.info.STaskMetaInfoExtractor;
@@ -53,6 +54,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -77,13 +79,16 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public TaskPropertyPanel(ModelContainer container, VActivity task)
+	public TaskPropertyPanel(final ModelContainer container, VActivity task)
 	{
 		super(null, container);
 		
 		assert SwingUtilities.isEventDispatchThread();
 		
 		setLayout(new BorderLayout());
+		
+		final ClassLoader cl = container.getProjectClassLoader()!=null? container.getProjectClassLoader()
+			: TaskPropertyPanel.class.getClassLoader();
 		
 		this.task = task;
 		
@@ -163,10 +168,10 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		
 //		cbox.setEditable(true);
-//		if(getBpmnTask().getClazz() != null)
-//		{
-//			cbox.setSelectedItem(getBpmnTask().getClazz().getTypeName());
-//		}
+		if(getBpmnTask().getClazz()!=null)
+		{
+			cbox.setSelectedItem(getBpmnTask().getClazz().getType(cl));
+		}
 		
 //		JButton sel = new JButton("...");
 //		sel.addActionListener(new ActionListener()
@@ -204,65 +209,85 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		final ActivityParameterTable atable = new ActivityParameterTable(container, task);
 		
-		processTaskInfos((String) cbox.getSelectedItem(), descarea);
+		processTaskInfos((Class<?>)cbox.getSelectedItem(), descarea);
 		
 		final JButton defaultParameterButton = new JButton();
-		defaultParameterButton.setEnabled(getTaskMetaInfo((String) cbox.getSelectedItem()) != null);
-		
+		defaultParameterButton.setEnabled(getTaskMetaInfo((Class<?>)cbox.getSelectedItem()) != null);
 		
 		// Property panel
 		
 		JPanel proppanel = new JPanel(new GridBagLayout());
-		final PropertiesPanel pp = new PropertiesPanel();
+		final JPanel propsp = new JPanel(new BorderLayout());
 		JButton refresh = new JButton("Refresh");
 		final ActionListener al = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				pp.removeAll();
+				propsp.removeAll();
+				
 				String taskname = getBpmnTask().getClazz() != null? getBpmnTask().getClazz().getTypeName() : null;
 				TaskMetaInfo info = getTaskMetaInfo(taskname);
 				List<PropertyMetaInfo> props = info!=null? info.getPropertyInfos(): null;
 				
 				if(props!=null)
-				{
-					IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
-					
-					for(final PropertyMetaInfo pmi: props)
+				{					
+					ClassInfo cinfo = info.getGuiClassInfo();
+		
+					if(cinfo!=null)
 					{
-						String lab = pmi.getName();
-						if(pmi.getClazz()!=null)
-							lab += " ("+pmi.getClazz().getTypeName()+")";
-						
-						String valtxt = "";
-						if(mprops!=null && mprops.containsKey(pmi.getName()))
+						Class<?> clazz = cinfo.getType(cl);
+						if(clazz!=null)
 						{
-							MProperty mprop = mprops.get(pmi.getName());
-							if(SJavaParser.evaluateExpression(mprop.getInitialValue().getValue(), null)!=null)
-								valtxt = mprop.getInitialValue().getValue();
-						}
-						
-						final JTextField tf = pp.createTextField(lab, valtxt, true, 0, pmi.getDescription().length()>0? pmi.getDescription(): null);
-						tf.addActionListener(new ActionListener()
-						{
-							public void actionPerformed(ActionEvent e)
+							try
 							{
-								String val = tf.getText();
-								if(val.length()>0)
-								{
-									IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
-									MProperty mprop = mprops.get(pmi.getName());
-									UnparsedExpression uexp = new UnparsedExpression(null, 
-										pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), val, null);
-									mprop.setInitialValue(uexp);
-								}
+								ITaskPropertyGui gui = (ITaskPropertyGui)clazz.newInstance();
+								gui.init(container.getBpmnModel().getModelInfo(), getBpmnTask(), cl);
+								JComponent comp = gui.getComponent();
+								propsp.add(comp, BorderLayout.CENTER);
 							}
-						});
+							catch(Exception ex)
+							{
+								ex.printStackTrace();
+							}
+						}
 					}
-					
-					pp.invalidate();
-					pp.doLayout();
-					pp.repaint();
+					else
+					{
+						final PropertiesPanel pp = new PropertiesPanel();
+						IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
+						for(final PropertyMetaInfo pmi: props)
+						{
+							String lab = pmi.getName();
+							if(pmi.getClazz()!=null)
+								lab += " ("+pmi.getClazz().getTypeName()+")";
+							
+							String valtxt = "";
+							if(mprops!=null && mprops.containsKey(pmi.getName()))
+							{
+								MProperty mprop = mprops.get(pmi.getName());
+								if(SJavaParser.evaluateExpression(mprop.getInitialValue().getValue(), null)!=null)
+									valtxt = mprop.getInitialValue().getValue();
+							}
+							
+							final JTextField tf = pp.createTextField(lab, valtxt, true, 0, pmi.getDescription().length()>0? pmi.getDescription(): null);
+							tf.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									String val = tf.getText();
+									if(val.length()>0)
+									{
+										IndexMap<String, MProperty> mprops = getBpmnTask().getProperties();
+										MProperty mprop = mprops.get(pmi.getName());
+										UnparsedExpression uexp = new UnparsedExpression(null, 
+											pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), val, null);
+										mprop.setInitialValue(uexp);
+									}
+								}
+							});
+						}
+						propsp.add(pp, BorderLayout.CENTER);
+					}
 				}
 			}
 		};
@@ -313,7 +338,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		//addVerticalFiller(column, y);
 		
-		proppanel.add(pp, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, 
+		proppanel.add(propsp, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 //		proppanel.add(refresh, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHEAST, 
 //			GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));
@@ -351,7 +376,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				processTaskParameters((String) cbox.getSelectedItem(), atable);
+				processTaskParameters((Class<?>)cbox.getSelectedItem(), atable);
 				modelcontainer.setDirty(true);
 			}
 		};
@@ -389,6 +414,19 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	protected MActivity getBpmnTask()
 	{
 		return (MActivity) task.getBpmnElement();
+	}
+	
+	/**
+	 *  Processes the task infos.
+	 *  
+	 *  @param taskname The task name.
+	 *  @param descarea The description area.
+	 *  @param atable The parameter table.
+	 */
+	protected void processTaskInfos(Class<?> task, JEditorPane descarea)
+	{
+		if(task!=null)
+			processTaskInfos(task.getName(), descarea);
 	}
 	
 	/**
@@ -461,6 +499,18 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 *  @param taskname The selected task.
 	 *  @param atable The activity parameter table.
 	 */
+	protected void processTaskParameters(Class<?> task, ActivityParameterTable atable)
+	{
+		if(task!=null)
+			processTaskParameters(task.getName(), atable);
+	}
+	
+	/**
+	 *  Processes the task parameters to match the selected task class.
+	 *  
+	 *  @param taskname The selected task.
+	 *  @param atable The activity parameter table.
+	 */
 	protected void processTaskParameters(String taskname, ActivityParameterTable atable)
 	{
 		TaskMetaInfo info = getTaskMetaInfo(taskname);
@@ -523,7 +573,22 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				}
 				atable.removeParameters(ind);
 			}
+			else
+			{
+				atable.removeAllParameters();
+			}
 		}
+	}
+	
+	/**
+	 *  Gets the task meta information.
+	 *  
+	 *  @param taskname Name of the task.
+	 *  @return The info, null if not found.
+	 */
+	protected TaskMetaInfo getTaskMetaInfo(Class<?> task)
+	{
+		return task==null? null: getTaskMetaInfo(task.getName());
 	}
 	
 	/**
@@ -571,7 +636,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			Map<String, MProperty> ps = getBpmnTask().getProperties().getAsMap();
 			List<ParameterMetaInfo> params = (List<ParameterMetaInfo>)m.invoke(null, new Object[]{ps, modelcontainer.getBpmnModel().getModelInfo(), modelcontainer.getProjectClassLoader()});
 			pis.addAll(params);
-			ret = new TaskMetaInfo(ret!=null? ret.getDescription(): null, pis, ret!=null? ret.getPropertyInfos(): null);
+			ret = new TaskMetaInfo(ret!=null? ret.getDescription(): null, pis, ret!=null? ret.getPropertyInfos(): null, ret!=null? ret.getGuiClassInfo(): null);
 		}
 		catch(Exception e)
 		{

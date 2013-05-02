@@ -1,29 +1,44 @@
 package jadex.bpmn.runtime.task;
 
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.ITaskPropertyGui;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskProperty;
+import jadex.bpmn.model.task.annotation.TaskPropertyGui;
+import jadex.bpmn.runtime.task.ServiceCallTask.ServiceCallTaskGui;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.PropertiesPanel;
 import jadex.javaparser.SJavaParser;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
  *  Call a service.
@@ -36,9 +51,10 @@ import java.util.Map;
  */
 @Task(description="The print task can be used for calling a component service.", properties={
 	@TaskProperty(name="service", clazz=String.class, description="The required service name."),
-	@TaskProperty(name="method", clazz=String.class, description="The required method name.")
+	@TaskProperty(name="method", clazz=String.class, description="The required method name.")},
+	gui=@TaskPropertyGui(ServiceCallTaskGui.class)
 //	@TaskProperty(name="rebind", clazz=boolean.class, description="The rebind flag (forces a frsh search).")
-})
+)
 public class ServiceCallTask implements ITask
 {
 	//-------- constants --------
@@ -370,5 +386,126 @@ public class ServiceCallTask implements ITask
 		}
 	
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static class ServiceCallTaskGui implements ITaskPropertyGui
+	{
+		/** The panel. */
+		protected JPanel panel;
+		
+		/** The model. */
+		protected IModelInfo model;
+		
+		/** The combo box for the service name. */
+		protected JComboBox cbsername;
+		
+		/** The combo box for the method name. */
+		protected JComboBox cbmethodname;
+		
+		/**
+		 *  Once called to init the component.
+		 */
+		public void init(final IModelInfo model, final MActivity task, final ClassLoader cl)
+		{
+			this.model = model;
+			PropertiesPanel pp = new PropertiesPanel();
+			
+			cbsername = pp.createComboBox("Required service name:", null);
+			cbmethodname = pp.createComboBox("Method name", null);
+			cbmethodname.setRenderer(new BasicComboBoxRenderer()
+			{
+				public Component getListCellRendererComponent(JList list, Object value,
+					int index, boolean isSelected, boolean cellHasFocus)
+				{
+					Method method = (Method)value;
+					String txt = method.getName();
+					return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
+				}
+			});
+			
+			cbsername.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					String reqname = (String)cbsername.getSelectedItem();
+					
+					MProperty mprop = task.getProperties().get(PARAMETER_SERVICE);
+					UnparsedExpression uexp = new UnparsedExpression(null, 
+						String.class, "\""+reqname+"\"", null);
+					mprop.setInitialValue(uexp);
+					
+					if(reqname!=null && model.getRequiredService(reqname)!=null)
+					{
+						RequiredServiceInfo reqser = model.getRequiredService(reqname);
+						Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
+						
+						if(type!=null)
+						{
+							DefaultComboBoxModel mo = ((DefaultComboBoxModel)cbmethodname.getModel());
+							mo.removeAllElements();
+							
+							Method[] ms = type.getMethods();
+							for(Method m: ms)
+							{
+								mo.addElement(m);
+							}
+						}
+					}
+				}
+			});
+			
+			cbmethodname.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					Method method = (Method)cbmethodname.getSelectedItem();
+					MProperty mprop = task.getProperties().get(PARAMETER_METHOD);
+					UnparsedExpression uexp = new UnparsedExpression(null, 
+						String.class, method!=null? "\""+method.getName()+"\"": "null", null);
+					mprop.setInitialValue(uexp);
+				}
+			});
+			
+			refresh();
+			
+			panel = pp;
+		}
+		
+		/**
+		 * 
+		 */
+		protected void refresh()
+		{
+			DefaultComboBoxModel mo = ((DefaultComboBoxModel)cbsername.getModel());
+			mo.removeAllElements();
+			
+			RequiredServiceInfo[] reqs = model.getRequiredServices();
+			if(reqs!=null)
+			{
+				for(int i=0; i<reqs.length; i++)
+				{
+					mo.addElement(reqs[i].getName());
+				}
+			}
+		}
+		
+		/**
+		 *  Informs the panel that it should stop all its computation.
+		 */
+		public void shutdown()
+		{
+		}
+		
+		/**
+		 *  The component to be shown in the gui.
+		 *  @return	The component to be displayed.
+		 */
+		public JComponent getComponent()
+		{
+			return panel;
+		}
 	}
 }

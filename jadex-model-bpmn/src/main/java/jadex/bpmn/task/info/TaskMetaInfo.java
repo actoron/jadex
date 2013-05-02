@@ -3,6 +3,7 @@ package jadex.bpmn.task.info;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.bridge.ClassInfo;
 import jadex.commons.transformation.annotations.IncludeFields;
 
 /**
@@ -24,6 +25,9 @@ public class TaskMetaInfo
 	
 	/** The property descriptions. */
 	protected List<PropertyMetaInfo> propertyinfos;
+	
+	/** The gui class. */
+	protected ClassInfo guicl;
 	
 	//-------- constructors --------
 	
@@ -47,11 +51,12 @@ public class TaskMetaInfo
 	 */
 //	public TaskMetaInfo(String description, ParameterMetaInfo[] parammetainfos)
 	public TaskMetaInfo(String description, List<ParameterMetaInfo> parameterinfos,
-		List<PropertyMetaInfo> propertyinfos)
+		List<PropertyMetaInfo> propertyinfos, ClassInfo guicl)
 	{
 		this.description = description;
 		this.parameterinfos = parameterinfos;
 		this.propertyinfos = propertyinfos;
+		this.guicl = guicl;
 	}
 	
 	/**
@@ -136,6 +141,26 @@ public class TaskMetaInfo
 	{
 		this.propertyinfos = propertyinfos;
 	}
+
+	/**
+	 *  Get the guicl.
+	 *  @return The guicl.
+	 */
+	public ClassInfo getGuiClassInfo()
+	{
+		return guicl;
+	}
+
+	/**
+	 *  Set the guicl.
+	 *  @param guicl The guicl to set.
+	 */
+	public void setGuiClassInfo(ClassInfo guicl)
+	{
+		this.guicl = guicl;
+	}
+	
+	
 
 //	/**
 //	 *  Get the parameters.

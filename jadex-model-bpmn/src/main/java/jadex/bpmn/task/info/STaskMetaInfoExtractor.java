@@ -3,6 +3,9 @@ package jadex.bpmn.task.info;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.model.task.annotation.TaskProperty;
+import jadex.bpmn.model.task.annotation.TaskPropertyGui;
+import jadex.bridge.ClassInfo;
+import jadex.commons.SReflect;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -58,7 +61,18 @@ public class STaskMetaInfoExtractor
 					props[i].name(), props[i].initialvalue(), props[i].description()));
 			}
 			
-			ret = new TaskMetaInfo(desc, pmis, prmis);
+			TaskPropertyGui gui = taskanon.gui();
+			ClassInfo guicl = null;
+			if(!gui.value().equals(Object.class))
+			{
+				guicl = new ClassInfo(gui.value());
+			}
+			else if(gui.classname().length()>0)
+			{
+				guicl = new ClassInfo(gui.classname());
+			}
+			
+			ret = new TaskMetaInfo(desc, pmis, prmis, guicl);
 		}
 		
 		return ret;

@@ -28,4 +28,9 @@ public @interface Task
 	 *  The properties of the task.
 	 */
 	public TaskProperty[] properties() default {};
+	
+	/**
+	 *  The gui.
+	 */
+	public TaskPropertyGui gui() default @TaskPropertyGui();
 }

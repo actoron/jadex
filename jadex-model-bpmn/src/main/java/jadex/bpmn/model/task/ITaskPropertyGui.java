@@ -1,0 +1,29 @@
+package jadex.bpmn.model.task;
+
+import javax.swing.JComponent;
+
+import jadex.bpmn.model.MActivity;
+import jadex.bridge.modelinfo.IModelInfo;
+import jadex.commons.future.IFuture;
+
+/**
+ * 
+ */
+public interface ITaskPropertyGui
+{
+	/**
+	 *  Once called to init the component.
+	 */
+	public void init(IModelInfo model, MActivity task, ClassLoader cl);
+	
+	/**
+	 *  Informs the panel that it should stop all its computation.
+	 */
+	public void shutdown();
+	
+	/**
+	 *  The component to be shown in the gui.
+	 *  @return	The component to be displayed.
+	 */
+	public JComponent getComponent();
+}
