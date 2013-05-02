@@ -73,7 +73,23 @@ public class BpmnEditorWindow extends JFrame
 		
 		getContentPane().setLayout(new BorderLayout());
 		
-		final JSplitPanel statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT);
+		final JSplitPanel statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT)
+		{
+			/* Bug fix goodness for Swing. */
+			@SuppressWarnings("deprecation")
+			public void reshape(int x, int y, int w, int h)
+			{
+				final double divloc = getProportionalDividerLocation();
+				super.reshape(x, y, w, h);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						setDividerLocation(divloc);
+					}
+				});
+			}
+		};
 		statuspane.setOneTouchExpandable(true);
 		statuspane.setBottomComponent(new StatusArea());
 		BpmnEditor.initialize();

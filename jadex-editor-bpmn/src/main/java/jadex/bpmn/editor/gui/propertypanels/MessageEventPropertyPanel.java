@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 
@@ -46,10 +47,12 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 				setMessageTypeString((String) ((JComboBox) e.getSource()).getSelectedItem());
 			}
 		});
-		configureAndAddInputLine(column, label, cbox, y++);
+		//configureAndAddInputLine(column, label, cbox, y++);
 		
 		label = new JLabel("Message");
 		JTextArea textarea = new JTextArea();
+		textarea.setWrapStyleWord(true);
+		textarea.setLineWrap(true);
 		String strval = (String) getMEvent().getPropertyValue("message");
 		textarea.setText(strval != null? strval : "");
 		textarea.getDocument().addDocumentListener(new DocumentAdapter()
@@ -61,7 +64,12 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 				getMEvent().setPropertyValue("message", msgval);
 			}
 		});
-		configureAndAddInputLine(column, label, textarea, y++);
+		JScrollPane sp =  new JScrollPane(textarea);
+		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		configureAndAddInputLine(column, label, sp, y++);
+		textarea.setRows(3);
+		sp.setMinimumSize(textarea.getPreferredSize());
 		
 		addVerticalFiller(column, y);
 	}

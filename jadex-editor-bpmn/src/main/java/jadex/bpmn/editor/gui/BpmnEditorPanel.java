@@ -5,6 +5,7 @@ import jadex.bpmn.editor.gui.controllers.KeyboardController;
 import jadex.bpmn.editor.gui.controllers.MouseController;
 import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
+import jadex.commons.gui.JSplitPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,12 +13,13 @@ import java.awt.Component;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxRubberband;
 import com.mxgraph.util.mxEvent;
 
-public class BpmnEditorPanel extends JSplitPane
+public class BpmnEditorPanel extends JSplitPanel
 {
 	/** The pane containing the graph and the property view. */
 	//protected JSplitPanel viewpane;
@@ -104,5 +106,20 @@ public class BpmnEditorPanel extends JSplitPane
 	public ModelContainer getModelContainer()
 	{
 		return modelcontainer;
+	}
+	
+	/** Bug fix goodness for Swing. */
+	@SuppressWarnings("deprecation")
+	public void reshape(int x, int y, int w, int h)
+	{
+		final double divloc = getProportionalDividerLocation();
+		super.reshape(x, y, w, h);
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				setDividerLocation(divloc);
+			}
+		});
 	}
 }
