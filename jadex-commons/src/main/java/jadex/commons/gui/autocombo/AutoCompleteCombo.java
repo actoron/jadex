@@ -1,34 +1,26 @@
 package jadex.commons.gui.autocombo;
 
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPool;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JTextField;
 import javax.swing.Timer;
-import javax.swing.plaf.basic.BasicComboBoxEditor;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import javax.swing.plaf.metal.MetalComboBoxEditor;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
@@ -251,7 +243,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 							else
 							{
 								t.stop();
-//								updateModel();
+								updateModel();
 							}
 						}
 					});
@@ -306,7 +298,17 @@ public class AutoCompleteCombo<T> extends JComboBox
 			try
 			{
 				String text = getText(0, getLength());
-				setPattern(text);
+				setPattern(text).addResultListener(new IResultListener<Collection<T>>()
+				{
+					public void resultAvailable(Collection<T> result) 
+					{
+						clearSelection();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
 			}
 			catch(Exception e)
 			{
