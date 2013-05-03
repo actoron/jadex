@@ -29,7 +29,6 @@ import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.LocalInputConnectionHandler;
 import jadex.platform.service.message.streams.LocalOutputConnectionHandler;
 import jadex.platform.service.message.streams.OutputConnection;
-import jadex.xml.TypeInfo;
 
 import java.lang.reflect.Proxy;
 import java.net.Inet4Address;
@@ -72,7 +71,11 @@ public class MarshalService extends BasicService implements IMarshalService
 		refs.put(Inet6Address.class, tf);
 		refs.put(IComponentIdentifier.class, tf);
 		refs.put(ComponentIdentifier.class, tf);
-		refs.put(TypeInfo.class, tf);
+		Class<?>	ti	= SReflect.classForName0("jadex.xml.TypeInfo", MarshalService.class.getClassLoader());
+		if(ti!=null)
+		{
+			refs.put(ti, tf);
+		}
 		
 		REFERENCES = Collections.unmodifiableMap(refs);
 	}

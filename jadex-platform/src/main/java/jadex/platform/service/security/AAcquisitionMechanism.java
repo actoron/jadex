@@ -2,7 +2,6 @@ package jadex.platform.service.security;
 
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.commons.Properties;
-import jadex.commons.Property;
 import jadex.commons.future.IFuture;
 
 import java.security.cert.Certificate;

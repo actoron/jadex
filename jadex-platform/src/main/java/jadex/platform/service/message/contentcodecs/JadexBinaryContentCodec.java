@@ -5,7 +5,6 @@ import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.xml.writer.IObjectWriterHandler;
 
 import java.io.Serializable;
 import java.util.List;

@@ -1,6 +1,5 @@
 package jadex.platform.service.security;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -20,7 +19,6 @@ import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.security.KeyStoreEntry;
 import jadex.bridge.service.types.security.MechanismInfo;
 import jadex.bridge.service.types.settings.ISettingsService;
-import jadex.commons.Base64;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
@@ -36,8 +34,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.platform.service.remote.commands.AbstractRemoteCommand;
-import jadex.xml.bean.JavaWriter;
 
 import java.net.InetAddress;
 import java.security.Key;
@@ -1589,45 +1585,45 @@ public class SecurityService implements ISecurityService
 //		{
 //			ts >>>= 1;
 //		}
+//		
+//		// Test performance of algorithms
+//		// See http://download.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#MessageDigest
+//		String[]	names	= new String[]
+//		{
+//			"MD2",
+//			"MD5",
+//			"SHA-1",
+//			"SHA-256",
+//			"SHA-384",
+//			"SHA-512"
+//		};
 		
-		// Test performance of algorithms
-		// See http://download.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#MessageDigest
-		String[]	names	= new String[]
-		{
-			"MD2",
-			"MD5",
-			"SHA-1",
-			"SHA-256",
-			"SHA-384",
-			"SHA-512"
-		};
-		
-		String	pw	= "platformpass";
-		IComponentIdentifier	cid	= new ComponentIdentifier("platform_xyz", new String[]{"hasfgjdlah", "t4qohnc37rtcb0q479tfb", "3t7qh90c3tq0dch9347qgbz0234", "w34q256vz348956qfhz03489fh6c"});
-		byte[]	cidbytes	= JavaWriter.objectToByteArray(cid, AbstractRemoteCommand.class.getClassLoader());
-		for(int runs=0; runs<3; runs++)
-		{
-			for(int i=0; i<names.length; i++)
-			{
-				MessageDigest	md	= MessageDigest.getInstance(names[i]);
-				long	start	= System.nanoTime();
-				for(long time=0; time<100000; time++)
-				{
-					byte[]	input	= (byte[])SUtil.joinArrays(pw.getBytes(), SUtil.longToBytes(time));
-//					input	= (byte[])SUtil.joinArrays(input, JavaWriter.objectToByteArray(cid, AbstractRemoteCommand.class.getClassLoader()));
-					input	= (byte[])SUtil.joinArrays(input, cidbytes);
-					byte[]	output	= md.digest(input);
-					if(runs==0 && (time==0 || time==1))
-					{
-						System.out.println("digest ("+names[i]+"): "+new String(Base64.encode(output)));
-					}
-				}
-				if(runs==2)
-				{
-					System.out.println(names[i]+" took: "+((System.nanoTime()-start)/100000000)/10.0+" ms per 1000 messages");
-				}
-			}
-		}
+//		String	pw	= "platformpass";
+//		IComponentIdentifier	cid	= new ComponentIdentifier("platform_xyz", new String[]{"hasfgjdlah", "t4qohnc37rtcb0q479tfb", "3t7qh90c3tq0dch9347qgbz0234", "w34q256vz348956qfhz03489fh6c"});
+//		byte[]	cidbytes	= JavaWriter.objectToByteArray(cid, AbstractRemoteCommand.class.getClassLoader());
+//		for(int runs=0; runs<3; runs++)
+//		{
+//			for(int i=0; i<names.length; i++)
+//			{
+//				MessageDigest	md	= MessageDigest.getInstance(names[i]);
+//				long	start	= System.nanoTime();
+//				for(long time=0; time<100000; time++)
+//				{
+//					byte[]	input	= (byte[])SUtil.joinArrays(pw.getBytes(), SUtil.longToBytes(time));
+////					input	= (byte[])SUtil.joinArrays(input, JavaWriter.objectToByteArray(cid, AbstractRemoteCommand.class.getClassLoader()));
+//					input	= (byte[])SUtil.joinArrays(input, cidbytes);
+//					byte[]	output	= md.digest(input);
+//					if(runs==0 && (time==0 || time==1))
+//					{
+//						System.out.println("digest ("+names[i]+"): "+new String(Base64.encode(output)));
+//					}
+//				}
+//				if(runs==2)
+//				{
+//					System.out.println(names[i]+" took: "+((System.nanoTime()-start)/100000000)/10.0+" ms per 1000 messages");
+//				}
+//			}
+//		}
 	}
 	
 //	public static void main(String[] args)
