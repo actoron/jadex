@@ -518,7 +518,7 @@ public class ModelContainer
 	 */
 	public ClassLoader getProjectClassLoader()
 	{
-		return model != null? model.getClassLoader() : null;
+		return model != null? model.getClassLoader() : settings!= null? settings.getHomeClassLoader() != null? settings.getHomeClassLoader() : Settings.class.getClassLoader() : Settings.class.getClassLoader();
 	}
 	
 	/**
