@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.model.io.SBpmnModelWriter;
 import jadex.commons.SUtil;
@@ -65,6 +66,38 @@ public class BpmnMenuBar extends JMenuBar
 		filemenu.add(createSaveAsMenuItem());
 		filemenu.add(createExportMenuItem());
 		filemenu.addSeparator();
+		
+		JMenuItem optionsitem = new JMenuItem(new AbstractAction("Settings...")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				final SettingsPanel spanel = new SettingsPanel(editorwindow.getSettings());
+				OptionDialog od = new OptionDialog(editorwindow, "Settings", true, spanel, new AbstractAction()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						spanel.applySettings();
+						List<ModelContainer> containers = editorwindow.getModelContainers();
+						for (ModelContainer cont : containers)
+						{
+							if (cont.getGraph().getSelectionCount() == 1)
+							{
+								cont.setPropertyPanel(SPropertyPanelFactory.createPanel(cont.getGraph().getSelectionCell(), cont));
+							}
+							else
+							{
+								cont.setPropertyPanel(SPropertyPanelFactory.createPanel(null, cont));
+							}
+						}
+					}
+				});
+				
+				od.setSize(600, 400);
+				od.setLocationRelativeTo(null);
+				od.setVisible(true);
+			}
+		});
+		filemenu.add(optionsitem);
 		
 		JMenuItem item = new JMenuItem(new AbstractAction("Save Settings")
 		{
@@ -195,29 +228,6 @@ public class BpmnMenuBar extends JMenuBar
 			iconmenu.add(isbutton);
 		}
 		viewmenu.add(iconmenu);
-		
-		JMenu toolsmenu = new JMenu("Tools");
-		add(toolsmenu);
-		
-		JMenuItem optionsitem = new JMenuItem(new AbstractAction("Options...")
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				final SettingsPanel spanel = new SettingsPanel(editorwindow.getSettings());
-				OptionDialog od = new OptionDialog(editorwindow, "Options", true, spanel, new AbstractAction()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						spanel.applySettings();
-					}
-				});
-				
-				od.setSize(600, 400);
-				od.setLocationRelativeTo(null);
-				od.setVisible(true);
-			}
-		});
-		toolsmenu.add(optionsitem);
 		
 		JMenu helpmenu = new JMenu("Help");
 		add(helpmenu);
