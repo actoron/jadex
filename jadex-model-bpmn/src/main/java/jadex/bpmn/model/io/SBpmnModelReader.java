@@ -569,6 +569,8 @@ public class SBpmnModelReader
 												   Map<String, MIdElement> emap)
 	{
 		ClassLoader cl = model.getClassLoader();
+
+		content = content!=null && content.trim().length()>0? content.trim(): null;
 		
 		if ("description".equals(tag.getLocalPart()))
 		{
@@ -622,7 +624,7 @@ public class SBpmnModelReader
 			}
 			ClassInfo clazz = new ClassInfo(attrs.get("type"));
 			String name = attrs.get("name");
-			UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), content, null);
+			UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), content.trim(), null);
 			parseExp(exp, model.getModelInfo().getAllImports(), cl);
 			MParameter param = new MParameter(attrs.get("direction"), clazz, name, exp);
 			params.add(param);
