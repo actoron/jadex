@@ -7,6 +7,7 @@
     <string name="app_name">Jadex Android Demos</string>
     <string name="main_launchBPMNDemo">Launch BPMN Demo</string>
     <string name="main_launchBDIDemo">Launch BDI Demo</string>
+    <string name="main_launchBDIV3Demo">Launch BDI V3 Demo</string>
     <string name="main_launchBenchmarkDemo">Launch Benchmark Demo</string>
     <string name="main_launchEventDemo">Launch Event Demo</string>
     <string name="main_launchRestDemo">Launch Rest Demo</string>
@@ -19,6 +20,7 @@
     <string name="benchmark_openMenuButton">Choose Benchmark</string>
     <string name="bdi_demoDescription">This Activity demonstrates the usage of BDI Agents in Jadex-Android.
          Please wait until the platform is started.</string>
+    <string name="bdiv3_demoDescription">This Activity demonstrates the usage of BDI V3 Agents in Jadex-Android.</string>
     <string name="rest_demoDescription">This Activity uses a Jadex Component to encapsulate a call to the Google Chart REST API.</string>
     <string name="controlCenter_demoDescription">Control Center</string>
      

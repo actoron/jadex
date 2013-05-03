@@ -224,7 +224,7 @@
 		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>
 		<componenttype filename="jadex/micro/KernelMicro.component.xml" name="kernel_micro"/>
 		<componenttype filename="jadex/bdi/KernelBDI.component.xml" name="kernel_bdi"/>
-		<componenttype filename="jadex/bdiv3/KernelBDI.component.xml" name="kernel_bdiv3"/>
+		<componenttype filename="jadex/bdiv3/KernelBDIV3.component.xml" name="kernel_bdiv3"/>
 		<componenttype filename="jadex/bdibpmn/KernelBDIBPMN.component.xml" name="kernel_bdibpmn"/>
 		<componenttype filename="jadex/bpmn/KernelBPMN.component.xml" name="kernel_bpmn"/>
 		<componenttype filename="jadex/gpmn/KernelGPMN.component.xml" name="kernel_gpmn"/>
@@ -389,6 +389,7 @@
 				<component name="kernel_component" type="kernel_component" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;component&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_application" type="kernel_application" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;applications&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;micro&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
+				<component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;v3&quot;)!=-1 ? 1 : 0"/>
 				<component name="kernel_bdi" type="kernel_bdi" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdi&quot;)!=-1 &amp;&amp; $args.get(&quot;kernels&quot;).indexOf(&quot;bdibpmn&quot;)==-1? 1 : 0"/>
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdi&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
@@ -433,7 +434,8 @@
 				<component name="kernel_component" type="kernel_component" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;component&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_application" type="kernel_application" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;applications&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;micro&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
-				<!-- <component type="kernel_bdi" daemon="true"/> -->
+				<component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;v3&quot;)!=-1 ? 1 : 0"/>
+								<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdi&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>

@@ -1169,7 +1169,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected boolean isLocal(IResourceIdentifier rid)
 	{
 //		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot());		
-		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getHostIdentifier().equals(SUtil.getMacAddress());		
+		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getHostIdentifier().equals(
+			SUtil.getMacAddress()!=null ? SUtil.getMacAddress() : rootrid.getLocalIdentifier().getComponentIdentifier().getName());
 	}
 	
 	/**

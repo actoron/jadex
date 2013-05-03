@@ -33,9 +33,7 @@ import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -51,7 +49,6 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.jar.Attributes;
@@ -3572,7 +3569,7 @@ public class SUtil
 	
 	/** Cached for speed. */
 	public static String mac;
-	
+
 	/**
 	 *  Get the mac address.
 	 *  @return The mac address.
@@ -3581,38 +3578,13 @@ public class SUtil
 	{
 		if(mac==null)
 		{
-			TreeSet<String> res = new TreeSet<String>(new Comparator<String>()
+			if(!SReflect.isAndroid() || SReflect.getAndroidVersion() > 8)
 			{
-				public int compare(String o1, String o2)
-				{
-					return o1.compareTo(o2);
-				}
-			});
-			
-			try
-			{
-				List<NetworkInterface> nis = SUtil.getNetworkInterfaces();
-				for(NetworkInterface ni: nis)
-				{
-					byte[] hwa = ni.getHardwareAddress();
-					if(hwa!=null && hwa.length>0)
-					{
-						String mac = Arrays.toString(hwa);
-						if(!res.contains(mac))
-						{
-							res.add(mac);
-						}
-					}
-				}
+				mac	= SNonAndroid.getMacAddress();
 			}
-			catch(Exception e)
-			{
-	//			e.printStackTrace();
-			}
-			mac = res.isEmpty()? SUtil.NULL: res.first();
 		}
 		
-		return mac.equals(NULL)? null: mac;
+		return SUtil.NULL.equals(mac)? null: mac;
 	}
 	
 	/**

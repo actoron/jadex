@@ -59,7 +59,7 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 		}
 		if(hostid==null)
 		{
-			hostid = url.toString(); // in case no mac is available use url (strict as before)
+			hostid = cid.getName(); // in case no mac is available use cid (strict as before)
 		}
 		if(url.toString().indexOf("..")!=-1)
 		{

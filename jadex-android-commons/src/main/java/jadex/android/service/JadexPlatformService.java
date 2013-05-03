@@ -12,6 +12,7 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -68,7 +69,7 @@ public class JadexPlatformService extends Service
 
 			public IFuture<IExternalAccess> startJadexPlatform()
 			{
-				return startJadexPlatform(jadexPlatformManager.DEFAULT_KERNELS);
+				return startJadexPlatform(JadexPlatformManager.DEFAULT_KERNELS);
 			}
 
 			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
@@ -191,10 +192,10 @@ public class JadexPlatformService extends Service
 	{
 		checkIfPlatformIsRunning(platformId, "startMicroAgent()");
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		jadexPlatformManager.getCMS(platformId).addResultListener(new DefaultResultListener<IComponentManagementService>()
+		jadexPlatformManager.getCMS(platformId)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
-
-			public void resultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
 				HashMap<String, Object> args = new HashMap<String, Object>();
 
@@ -236,15 +237,16 @@ public class JadexPlatformService extends Service
 	{
 		checkIfPlatformIsRunning(platformId, "startBPMNAgent()");
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		jadexPlatformManager.getCMS(platformId).addResultListener(new DefaultResultListener<IComponentManagementService>()
+		jadexPlatformManager.getCMS(platformId)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
-
-			public void resultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
 				HashMap<String, Object> args = new HashMap<String, Object>();
 
 				args.put("androidContext", JadexPlatformService.this);
-				cms.createComponent(name, modelPath, new CreationInfo(args), null).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+				cms.createComponent(name, modelPath, new CreationInfo(args), null)
+					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 			}
 		});
 
@@ -309,9 +311,9 @@ public class JadexPlatformService extends Service
 
 		final Future<Void> ret = new Future<Void>();
 
-		jadexPlatformManager.getMS(platform).addResultListener(new DefaultResultListener<IMessageService>()
+		jadexPlatformManager.getMS(platform).addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
-			public void resultAvailable(IMessageService ms)
+			public void customResultAvailable(IMessageService ms)
 			{
 				ms.sendMessage(message, type, jadexPlatformManager.getExternalPlatformAccess(platform).getComponentIdentifier(), null, receiver, null)
 						.addResultListener(new DelegationResultListener<Void>(ret));
@@ -329,10 +331,15 @@ public class JadexPlatformService extends Service
 		IFuture<IExternalAccess> fut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
 		fut.addResultListener(new DefaultResultListener<IExternalAccess>()
 		{
-			@Override
 			public void resultAvailable(IExternalAccess result)
 			{
 				JadexPlatformService.this.onPlatformStarted(result);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+//				super.exceptionOccurred(exception);
 			}
 		});
 		return fut;

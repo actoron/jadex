@@ -3,16 +3,18 @@ package jadex.commons;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.TreeSet;
 
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
@@ -221,5 +223,43 @@ public class SNonAndroid
 	public static File[]	getFiles(File file, boolean hiding)
 	{
 		return FileSystemView.getFileSystemView().getFiles(file, hiding);
-	}	
+	}
+	
+	/**
+	 *  Get the mac address.
+	 *  @return The mac address.
+	 */
+	public static String getMacAddress()
+	{
+		TreeSet<String> res = new TreeSet<String>(new Comparator<String>()
+		{
+			public int compare(String o1, String o2)
+			{
+				return o1.compareTo(o2);
+			}
+		});
+		
+		try
+		{
+			List<NetworkInterface> nis = SUtil.getNetworkInterfaces();
+			for(NetworkInterface ni: nis)
+			{
+				byte[] hwa = ni.getHardwareAddress();
+				if(hwa!=null && hwa.length>0)
+				{
+					String mac = Arrays.toString(hwa);
+					if(!res.contains(mac))
+					{
+						res.add(mac);
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+		}
+			
+		return res.isEmpty()? SUtil.NULL: res.first();
+	}
 }
