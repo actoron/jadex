@@ -83,6 +83,9 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 			entries.remove(index);
 		}
 
+//		fireIntervalAdded(AbstractAutoComboModel.this, size1, size2 - 1);
+		fireContentsChanged(AbstractAutoComboModel.this, 0, entries.size() - 1);
+		
 //		setPattern(null);
 //		setSelectedItem(val);
 	}

@@ -3,6 +3,8 @@ package jadex.bdibpmn.task;
 import jadex.bdibpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -22,17 +24,28 @@ import java.util.Map;
 /**
  *  Dispatch a subprocess and by default wait for the result.
  */
+@Task(description= "The dispatch subprocess task can be used for dipatching subprocess " +
+		" (any component) and optionally wait for the result.",
+parameters={@TaskParameter(name="processref", clazz=String.class, direction=TaskParameter.DIRECTION_IN,
+	description="The process reference that identifies process model."),
+	@TaskParameter(name="parameters", clazz=Map.class, direction=TaskParameter.DIRECTION_IN,
+		description="The 'parameter' parameter allows to specify the process parameters."),
+	@TaskParameter(name="wait", clazz=boolean.class, direction=TaskParameter.DIRECTION_IN,
+		description="The wait parameter to wait for the results."),
+	@TaskParameter(name="resultfuture", clazz=IFuture.class, direction=TaskParameter.DIRECTION_OUT,
+		description="The future for results to be retrieved later.")}
+)
 public class DispatchSubprocessTask	implements ITask
 {
 	/** Future to indicate creation completion. */
-	protected Future creationFuture;
+	protected Future creationfut;
 	
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture execute(final ITaskContext context, IInternalAccess instance)
+	public IFuture<Void> execute(final ITaskContext context, IInternalAccess instance)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		try
 		{
@@ -51,7 +64,7 @@ public class DispatchSubprocessTask	implements ITask
 			ResultFuture rf = new ResultFuture();
 			if (params == null)
 				params = new HashMap();
-			cms.createComponent(null, processref, new CreationInfo(params), rf).addResultListener(instance.createResultListener(new DelegationResultListener(creationFuture)));
+			cms.createComponent(null, processref, new CreationInfo(params), rf).addResultListener(instance.createResultListener(new DelegationResultListener(creationfut)));
 			
 			if(context.getModelElement().hasParameter("resultfuture"))
 				context.setParameterValue("resultfuture", rf);
@@ -63,7 +76,7 @@ public class DispatchSubprocessTask	implements ITask
 					ret.setException((Exception)result);
 //					listener.exceptionOccurred(DispatchSubprocessTask.this, (Exception)result);
 				else
-					ret.setResult(result);
+					ret.setResult(null);
 //					listener.resultAvailable(DispatchSubprocessTask.this, null);
 			}
 			else
@@ -86,7 +99,7 @@ public class DispatchSubprocessTask	implements ITask
 	public IFuture cancel(final IInternalAccess instance)
 	{
 		final Future ret = new Future();
-		creationFuture.addResultListener(instance.createResultListener(new IResultListener()
+		creationfut.addResultListener(instance.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

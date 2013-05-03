@@ -30,8 +30,6 @@ import javax.swing.text.PlainDocument;
  */
 public class AutoCompleteCombo<T> extends JComboBox
 {
-	private boolean updatepopup;
-
 	protected ClassLoader cl;
 	
 	protected IThreadPool tp;
@@ -41,36 +39,12 @@ public class AutoCompleteCombo<T> extends JComboBox
 	protected ISubscriptionIntermediateFuture<T> current;
 	
 	/**
-	 * 
+	 *  Create a new combo box.
 	 */
 	public AutoCompleteCombo(ThreadPool tp)
 	{
-//		this.model = model;
 		this.tp = tp==null? new ThreadPool(): tp;
 		setEditable(true);
-
-//		setPattern(null);
-		updatepopup = false;
-
-		
-//		setModel(model);
-//		setSelectedItem(null);
-
-		new Timer(200, new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(updatepopup && isDisplayable())
-				{
-					setPopupVisible(false);
-					if(getAutoModel()!=null && getAutoModel().getSize() > 0)
-					{
-						setPopupVisible(true);
-					}
-					updatepopup = false;
-				}
-			}
-		}).start();
 	}
 	
 	/**
@@ -210,7 +184,9 @@ public class AutoCompleteCombo<T> extends JComboBox
 	 */
 	public void updatePopup()
 	{
-		updatepopup = true;
+		setPopupVisible(false);
+		setPopupVisible(true);
+		clearSelection();
 	}
 	
 	/**
@@ -220,6 +196,8 @@ public class AutoCompleteCombo<T> extends JComboBox
 	{
 		protected boolean arrowkey = false;
 		protected Timer t;
+		
+		protected String lasttext;
 		
 		/**
 		 *  Create a new AutoCompleteDocument.
@@ -232,7 +210,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 				
 				{
 					// Swing timer
-					t = new Timer(500, new ActionListener()
+					t = new Timer(1000, new ActionListener()
 					{
 						public void actionPerformed(ActionEvent e)
 						{
@@ -251,6 +229,9 @@ public class AutoCompleteCombo<T> extends JComboBox
 				
 				public void keyTyped(KeyEvent e)
 				{
+//					int key = e.getKeyCode();
+//					System.out.println("typed: "+key);
+					
 					if(!t.isRunning())
 					{
 						t.start();
@@ -264,6 +245,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 				public void keyPressed(KeyEvent e)
 				{
 					int key = e.getKeyCode();
+//					System.out.println("pressed: "+key);
 					if(key == KeyEvent.VK_ENTER)
 					{
 						// there is no such element in the model for now
@@ -276,6 +258,11 @@ public class AutoCompleteCombo<T> extends JComboBox
 					else if(key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN)
 					{
 						arrowkey = true;
+						
+						if(t.isRunning())
+						{
+							t.stop();
+						}
 					}
 				}
 			});
@@ -298,17 +285,23 @@ public class AutoCompleteCombo<T> extends JComboBox
 			try
 			{
 				String text = getText(0, getLength());
-				setPattern(text).addResultListener(new IResultListener<Collection<T>>()
+				
+				if(lasttext==null || !text.equals(lasttext))
 				{
-					public void resultAvailable(Collection<T> result) 
+					lasttext = text;
+					setPattern(text).addResultListener(new IResultListener<Collection<T>>()
 					{
-						clearSelection();
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-					}
-				});
+						public void resultAvailable(Collection<T> result) 
+						{
+							clearSelection();
+							updatePopup();
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+					});
+				}
 			}
 			catch(Exception e)
 			{
@@ -368,8 +361,11 @@ public class AutoCompleteCombo<T> extends JComboBox
 //			clearSelection();
 		}
 		
+		/**
+		 * 
+		 */
 		public void replace(int offset, int length, String text,
-				AttributeSet attrs) throws BadLocationException
+			AttributeSet attrs) throws BadLocationException
 		{
 			if(length == 0 && (text == null || text.length() == 0))
 			{

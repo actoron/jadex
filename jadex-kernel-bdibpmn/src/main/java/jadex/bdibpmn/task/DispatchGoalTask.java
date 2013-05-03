@@ -7,6 +7,8 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.bdibpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IInternalAccess;
@@ -20,6 +22,17 @@ import java.util.Map;
 /**
  *  Dispatch a goal and by default wait for the result.
  */
+@Task(description= "The dispatch goal task can be used for dipatching a goal as top-level " +
+		" or subgoal and optinally wait for the result.",
+parameters={@TaskParameter(name="type", clazz=String.class, direction=TaskParameter.DIRECTION_IN,
+	description="The type parameter identifies the user goal type."),
+	@TaskParameter(name="parameters", clazz=Map.class, direction=TaskParameter.DIRECTION_IN,
+		description="The 'parameter' parameter allows to specify the goal parameters."),
+	@TaskParameter(name="subgoal", clazz=boolean.class, direction=TaskParameter.DIRECTION_IN,
+		description="The subgoal parameter for dispatching as top-level or subgoal."),
+	@TaskParameter(name="wait", clazz=boolean.class, direction=TaskParameter.DIRECTION_IN,
+		description="The wait parameter to wait for the results.")}
+)
 public class DispatchGoalTask	implements ITask
 {
 	/** Future to indicate creation completion. */
@@ -133,23 +146,23 @@ public class DispatchGoalTask	implements ITask
 	
 	//-------- static methods --------
 	
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static TaskMetaInfo getMetaInfo()
-	{
-		String desc = "The dispatch goal task can be used for dipatching a goal as top-level " +
-			" or subgoal and optinally wait for the result.";
-		
-		ParameterMetaInfo typemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
-			String.class, "type", null, "The type parameter identifies the user goal type.");
-		ParameterMetaInfo paramsmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
-			Map.class, "parameters", null, "The 'parameter' parameter allows to specify the goal parameters.");
-		ParameterMetaInfo subgoal = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
-			boolean.class, "subgoal", null, "The subgoal parameter for dispatching as top-level or subgoal.");
-		ParameterMetaInfo waitmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
-			boolean.class, "wait", null, "The wait parameter to wait for the results.");
-
-		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{typemi, paramsmi, subgoal, waitmi}); 
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static TaskMetaInfo getMetaInfo()
+//	{
+//		String desc = "The dispatch goal task can be used for dipatching a goal as top-level " +
+//			" or subgoal and optinally wait for the result.";
+//		
+//		ParameterMetaInfo typemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+//			String.class, "type", null, "The type parameter identifies the user goal type.");
+//		ParameterMetaInfo paramsmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+//			Map.class, "parameters", null, "The 'parameter' parameter allows to specify the goal parameters.");
+//		ParameterMetaInfo subgoal = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+//			boolean.class, "subgoal", null, "The subgoal parameter for dispatching as top-level or subgoal.");
+//		ParameterMetaInfo waitmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+//			boolean.class, "wait", null, "The wait parameter to wait for the results.");
+//
+//		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{typemi, paramsmi, subgoal, waitmi}); 
+//	}
 }

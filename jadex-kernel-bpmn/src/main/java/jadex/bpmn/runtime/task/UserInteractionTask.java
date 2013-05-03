@@ -46,7 +46,7 @@ import javax.swing.SwingUtilities;
  *  result parameters.
  */
 @Task(description="The user interaction task can be used for fetching in parameter values " +
-	"via an interactive user interface dialog. The task automatically uses all declared" +
+	"via an interactive user interface dialog. The task automatically uses all declared " +
 	"in parameters.")
 public class UserInteractionTask implements ITask
 {
@@ -63,9 +63,9 @@ public class UserInteractionTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @listener	To be notified, when the task has completed.
 	 */
-	public IFuture execute(final ITaskContext context, final IInternalAccess instance)
+	public IFuture<Void> execute(final ITaskContext context, final IInternalAccess instance)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 //		final IComponentListener	lis	= new TerminationAdapter()
 //		{
@@ -262,9 +262,9 @@ public class UserInteractionTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final IInternalAccess instance)
+	public IFuture<Void> cancel(final IInternalAccess instance)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -276,17 +276,17 @@ public class UserInteractionTask implements ITask
 		return ret;
 	}
 	
-	//-------- static methods --------
-	
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static TaskMetaInfo getMetaInfo()
-	{
-		String desc = "The user interaction task can be used for fetching in parameter values " +
-			"via an interactive user interface dialog. The task automatically uses all declared" +
-			"in parameters.";
-		
-		return new TaskMetaInfo(desc, (ParameterMetaInfo[])null); 
-	}
+//	//-------- static methods --------
+//	
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static TaskMetaInfo getMetaInfo()
+//	{
+//		String desc = "The user interaction task can be used for fetching in parameter values " +
+//			"via an interactive user interface dialog. The task automatically uses all declared" +
+//			"in parameters.";
+//		
+//		return new TaskMetaInfo(desc, (ParameterMetaInfo[])null); 
+//	}
 }

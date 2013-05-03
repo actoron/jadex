@@ -1,14 +1,20 @@
 package jadex.bpmn.runtime.task;
 
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.task.info.ParameterMetaInfo;
-import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IInternalAccess;
 
 /**
  *  Writes values to context variables.
  */
+@Task(description="The write context task can be used to write values to context variables.",
+	parameters={@TaskParameter(name="name", clazz=String.class, direction=TaskParameter.DIRECTION_IN,
+		description="The name of the context variable that is the target of the write operation."),
+		@TaskParameter(name="value", clazz=Object.class, direction=TaskParameter.DIRECTION_IN,
+		description="The value that is written to the context variable.")}
+)
 public class WriteContextTask extends AbstractTask
 {
 	/**
@@ -40,18 +46,18 @@ public class WriteContextTask extends AbstractTask
 		}
 	}
 	
-	/**
-	 *  Get the meta-info.
-	 *  @return The meta-info.
-	 */
-	public static TaskMetaInfo getMetaInfo()
-	{
-		String desc = "The write context task can be used to write values to context variables.";
-		ParameterMetaInfo vnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
-			String.class, "name", null, "The name of the context variable that is the target of the write operation.");
-		ParameterMetaInfo valuemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
-				Object.class, "value", null, "The value that is written to the context variable.");
-		
-		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{vnamemi, valuemi}); 
-	}
+//	/**
+//	 *  Get the meta-info.
+//	 *  @return The meta-info.
+//	 */
+//	public static TaskMetaInfo getMetaInfo()
+//	{
+//		String desc = "The write context task can be used to write values to context variables.";
+//		ParameterMetaInfo vnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+//			String.class, "name", null, "The name of the context variable that is the target of the write operation.");
+//		ParameterMetaInfo valuemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+//				Object.class, "value", null, "The value that is written to the context variable.");
+//		
+//		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{vnamemi, valuemi}); 
+//	}
 }
