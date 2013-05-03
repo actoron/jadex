@@ -4,6 +4,7 @@ import jadex.bpmn.editor.gui.propertypanels.DocumentAdapter;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -13,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 
@@ -29,6 +31,7 @@ public class SettingsPanel extends JPanel
 		super(new GridBagLayout());
 		
 		JTabbedPane tabpane = new JTabbedPane();
+		tabpane.setBorder(new EmptyBorder(10, 5, 10, 5));
 		GridBagConstraints g = new GridBagConstraints();
 		g.weightx = 1.0;
 		g.weighty = 1.0;
@@ -74,6 +77,7 @@ public class SettingsPanel extends JPanel
 		});
 		
 		g = new GridBagConstraints();
+		g.insets = new Insets(0, 5, 0, 10);
 		generalpanel.add(label, g);
 		
 		g = new GridBagConstraints();
@@ -84,6 +88,7 @@ public class SettingsPanel extends JPanel
 		
 		g = new GridBagConstraints();
 		g.gridx = 2;
+		g.insets = new Insets(0, 10, 0, 5);
 		generalpanel.add(button, g);
 		
 		g = new GridBagConstraints();
