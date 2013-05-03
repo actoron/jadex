@@ -10,6 +10,7 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 
 import java.awt.Dimension;
@@ -18,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import javax.swing.JScrollBar;
 import javax.swing.Timer;
 
 import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
@@ -71,7 +74,7 @@ public class MouseController extends MouseAdapter
 		if (MouseEvent.BUTTON1 == e.getButton())
 		{
 			mxPoint mxp = modelcontainer.getGraphComponent().getPointForEvent(e);
-			Point p = mxp.getPoint();
+			Point2D p = new Point2D.Double(mxp.getX(), mxp.getY());
 			String mode = modelcontainer.getEditMode();
 			
 			Object cell = modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY());
@@ -81,6 +84,11 @@ public class MouseController extends MouseAdapter
 					modelcontainer.getGraph().getSelectionCount() == 1 &&
 					modelcontainer.getGraph().getSelectionCell() instanceof VEdge)
 				{
+					boolean gridstate = modelcontainer.getGraph().isGridEnabled();
+					modelcontainer.getGraph().setGridEnabled(false);
+					mxp = modelcontainer.getGraphComponent().getPointForEvent(e, false);
+					p = new Point2D.Double(mxp.getX(), mxp.getY());
+					
 					VEdge vedge = (VEdge) cell;
 					mxGeometry geo = vedge.getGeometry();
 					List<mxPoint> points = (List<mxPoint>) geo.getPoints();
@@ -90,7 +98,18 @@ public class MouseController extends MouseAdapter
 //					mxp.setY(mxp.getY() * scale);
 					if (vedge.getSource() != null && vedge.getSource().getParent() != null)
 					{
-						mxp = SequenceEdgeStyleFunction.unAdjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
+						mxICell parent = vedge.getSource().getParent();
+						while (parent != null &&
+							   !(parent instanceof VSubProcess) &&
+							   !(parent instanceof VLane) &&
+							   !(parent instanceof VPool))
+						{
+							parent = parent.getParent();
+						}
+						
+						mxp = SequenceEdgeStyleFunction.unAdjustPoint(modelcontainer.getGraph(), parent, mxp);
+						//p = SequenceEdgeStyleFunction.unAdjustPoint(modelcontainer.getGraph(), parent, p);
+//						mxp = SequenceEdgeStyleFunction.unAdjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
 //						mxp = SCreationController.adjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
 					}
 					
@@ -106,12 +125,17 @@ public class MouseController extends MouseAdapter
 					}
 					else
 					{
+						System.out.println(p);
 						int i = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), p.getX(), p.getY());;
+						System.out.println(i);
 						points.add(i, mxp);
 					}
 					
 					modelcontainer.getGraph().refreshCellView((VEdge) cell);
+					modelcontainer.getGraph().setSelectionCell(cell);
 					modelcontainer.setDirty(true);
+					
+					modelcontainer.getGraph().setGridEnabled(gridstate);
 					
 					modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
 				}

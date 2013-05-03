@@ -115,7 +115,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 	static
 	{
 		COLLAPSED_SIZES.put(ModelContainer.EDIT_MODE_SUBPROCESS, new Dimension(160, 100));
-		COLLAPSED_SIZES.put(ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, COLLAPSED_SIZES.get(ModelContainer.EDIT_MODE_SUBPROCESS));
+//		COLLAPSED_SIZES.put(ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, COLLAPSED_SIZES.get(ModelContainer.EDIT_MODE_SUBPROCESS));
 	}
 	
 	static
@@ -376,7 +376,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		
 		style = new HashMap<String, Object>(style);
 		style.put(mxConstants.STYLE_FILLCOLOR, EXTERNAL_SUBPROCESS_COLOR);
-		style.put(mxConstants.STYLE_FOLDABLE, Boolean.TRUE);
+		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		putCellStyle(VExternalSubProcess.class.getSimpleName(), style);
 		
 		style = new HashMap<String, Object>(style);

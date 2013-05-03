@@ -112,7 +112,7 @@ public class BpmnGraphComponent extends mxGraphComponent
 	 */
 	public ImageIcon getFoldingIcon(mxCellState state)
 	{
-		if (state.getCell() instanceof VSubProcess || state.getCell() instanceof VExternalSubProcess)
+		if (state.getCell() instanceof VSubProcess)
 		{
 			if (graph.isCellCollapsed(state.getCell()))
 			{
@@ -134,7 +134,7 @@ public class BpmnGraphComponent extends mxGraphComponent
 	 */
 	public Rectangle getFoldingIconBounds(mxCellState state, ImageIcon icon)
 	{
-		if (state.getCell() instanceof VSubProcess || state.getCell() instanceof VExternalSubProcess)
+		if (state.getCell() instanceof VSubProcess)
 		{
 			double scale = getGraph().getView().getScale();
 			

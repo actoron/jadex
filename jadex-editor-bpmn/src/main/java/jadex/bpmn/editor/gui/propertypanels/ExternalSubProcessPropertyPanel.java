@@ -13,6 +13,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 
@@ -48,6 +49,8 @@ public class ExternalSubProcessPropertyPanel extends BasePropertyPanel
 		
 		final JLabel label = new JLabel(FILE_NAME_TEXT);
 		final JTextArea filearea = new JTextArea();
+		filearea.setWrapStyleWord(true);
+		filearea.setLineWrap(true);
 		MSubProcess msp = (MSubProcess) subprocess.getBpmnElement();
 		String filename = (String) msp.getPropertyValue("filename");
 		if (filename != null)
@@ -89,7 +92,9 @@ public class ExternalSubProcessPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		});
-		
+		JScrollPane sp =  new JScrollPane(filearea);
+		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		expbox.setAction(new AbstractAction("Expression")
 		{
@@ -116,8 +121,11 @@ public class ExternalSubProcessPropertyPanel extends BasePropertyPanel
 		JPanel expentrypanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.weightx = 1.0;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		expentrypanel.add(filearea, gbc);
+		gbc.fill = GridBagConstraints.HORIZONTAL;	
+		expentrypanel.add(sp, gbc);
+		filearea.setRows(3);
+		sp.setMinimumSize(filearea.getPreferredSize());
+		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		expentrypanel.add(expbox, gbc);

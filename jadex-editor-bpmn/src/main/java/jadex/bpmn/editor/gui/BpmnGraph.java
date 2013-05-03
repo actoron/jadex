@@ -72,7 +72,8 @@ public class BpmnGraph extends mxGraph
 	public boolean isCellFoldable(Object cell, boolean collapse)
 	{
 		boolean ret = super.isCellFoldable(cell, collapse);
-		if (cell instanceof VExternalSubProcess || cell instanceof VSubProcess)
+		if (cell instanceof VSubProcess)
+//			|| cell instanceof VExternalSubProcess)
 		{
 			ret = true;
 		}

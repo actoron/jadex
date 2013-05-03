@@ -47,7 +47,7 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 				setMessageTypeString((String) ((JComboBox) e.getSource()).getSelectedItem());
 			}
 		});
-		//configureAndAddInputLine(column, label, cbox, y++);
+		configureAndAddInputLine(column, label, cbox, y++);
 		
 		label = new JLabel("Message");
 		JTextArea textarea = new JTextArea();

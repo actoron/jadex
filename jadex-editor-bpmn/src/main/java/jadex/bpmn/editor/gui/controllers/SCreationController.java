@@ -27,6 +27,7 @@ import jadex.bridge.ClassInfo;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,17 +50,19 @@ public class SCreationController
 	 *  @param targetpoint The targeted point for the pool.
 	 *  @return The created pool.
 	 */
-	public static final VPool createPool(ModelContainer modelcontainer, Point targetpoint)
+	public static final VPool createPool(ModelContainer modelcontainer, Point2D targetpoint)
 	{
 		VPool vpool = new VPool(modelcontainer.getGraph());
 		
+		double x = targetpoint.getX();
+		double y = targetpoint.getY();
 		if (modelcontainer.getGraph().isGridEnabled())
 		{
-			targetpoint.x -= targetpoint.x % modelcontainer.getGraph().getGridSize();
-			targetpoint.y -= targetpoint.y % modelcontainer.getGraph().getGridSize();
+			x -= targetpoint.getX() % modelcontainer.getGraph().getGridSize();
+			y -= targetpoint.getY() % modelcontainer.getGraph().getGridSize();
 		}
 		
-		vpool.setGeometry(new mxGeometry(targetpoint.getX(), targetpoint.getY(), BpmnStylesheetColor.DEFAULT_POOL_WIDTH, BpmnStylesheetColor.DEFAULT_POOL_HEIGHT));
+		vpool.setGeometry(new mxGeometry(x, y, BpmnStylesheetColor.DEFAULT_POOL_WIDTH, BpmnStylesheetColor.DEFAULT_POOL_HEIGHT));
 		MPool mpool = new MPool();
 		mpool.setId(modelcontainer.getIdGenerator().generateId());
 		mpool.setName("Pool");
@@ -156,7 +159,7 @@ public class SCreationController
 	 *  @param targetpoint The targeted point for the activity.
 	 *  @return The created activity.
 	 */
-	public static VActivity createActivity(ModelContainer modelcontainer, String mode, Object targetcell, Point targetpoint, boolean xcenter)
+	public static VActivity createActivity(ModelContainer modelcontainer, String mode, Object targetcell, Point2D tp, boolean xcenter)
 	{
 		if (mode.endsWith(ModelContainer.BOUNDARY_EVENT))
 		{
@@ -222,7 +225,7 @@ public class SCreationController
 		
 		if (!mode.endsWith(ModelContainer.BOUNDARY_EVENT))
 		{
-			p = adjustPoint(modelcontainer.getGraph(), targetcell, new mxPoint(targetpoint)).getPoint();
+			p = adjustPoint(modelcontainer.getGraph(), targetcell, new mxPoint(tp.getX(), tp.getY())).getPoint();
 			
 			if (xcenter)
 			{
