@@ -8,6 +8,8 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
@@ -74,13 +76,14 @@ public class ActivityParameterTable extends JTable
 	public void removeParameters(int[] ind)
 	{
 		Arrays.sort(ind);
-		
+		Set<MParameter> params = new HashSet<MParameter>();
 		for(int i = ind.length - 1; i >= 0; --i)
 		{
 			MParameter param = getBpmnActivity().getParameters().remove(ind[i]);
 			((ParameterTableModel) getModel()).fireTableRowsDeleted(ind[i], ind[i]);
-			activity.removedParameter(param);
+			params.add(param);
 		}
+		activity.removedParameter(params);
 	}
 	
 	/**
@@ -90,11 +93,13 @@ public class ActivityParameterTable extends JTable
 	public void removeAllParameters()
 	{
 		int length = getBpmnActivity().getParameters().size();
+		Set<MParameter> params = new HashSet<MParameter>();
 		for(int i=0; i<length; i++)
 		{
 			MParameter param = getBpmnActivity().getParameters().remove(0);
-			activity.removedParameter(param);
+			params.add(param);
 		}
+		activity.removedParameter(params);
 		((ParameterTableModel)getModel()).fireTableRowsDeleted(0, length-1);
 	}
 	

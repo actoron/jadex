@@ -5,6 +5,7 @@ import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.model.io.SBpmnModelWriter;
 import jadex.commons.SUtil;
 
+import java.awt.BorderLayout;
 import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -20,13 +21,16 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
@@ -195,6 +199,28 @@ public class BpmnMenuBar extends JMenuBar
 			iconmenu.add(isbutton);
 		}
 		viewmenu.add(iconmenu);
+		
+		JMenu toolsmenu = new JMenu("Tools");
+		add(toolsmenu);
+		
+		JMenuItem optionsitem = new JMenuItem(new AbstractAction("Options...")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				final SettingsPanel spanel = new SettingsPanel(editorwindow.getSettings());
+				OptionDialog od = new OptionDialog(editorwindow, "Options", true, spanel, new AbstractAction()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						spanel.applySettings();
+					}
+				});
+				
+				od.setSize(600, 400);
+				od.setVisible(true);
+			}
+		});
+		toolsmenu.add(optionsitem);
 		
 		JMenu helpmenu = new JMenu("Help");
 		add(helpmenu);

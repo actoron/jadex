@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
@@ -299,11 +300,11 @@ public class VActivity extends VNamedNode
 	}
 	
 	/**
-	 *  Called when a parameter is removed.
+	 *  Called when a parameters are removed.
 	 *  
-	 *  @param param The parameter.
+	 *  @param param The parameters.
 	 */
-	public void removedParameter(MParameter param)
+	public void removedParameter(Set<MParameter> params)
 	{
 		for (int i = 0; i < getChildCount(); ++i)
 		{
@@ -321,7 +322,7 @@ public class VActivity extends VNamedNode
 					cparam = ((VInParameter) child).getParameter();
 				}
 				
-				if (param.equals(cparam))
+				if (params.contains(cparam))
 				{
 					List<mxICell> edges = new ArrayList<mxICell>();
 					for (int ei = 0; ei < child.getEdgeCount(); ++ei)
@@ -335,6 +336,7 @@ public class VActivity extends VNamedNode
 				}
 			}
 		}
+		((BpmnGraph) graph).refreshCellView(this);
 	}
 	
 	protected void createParameterObjects()

@@ -231,8 +231,8 @@ public class ModelContainer
 	/** The project root. */
 	protected File projectroot;
 	
-	/** The project classloader. */
-	protected ClassLoader projectclassloader;
+	/** The class loader root. */
+	protected File classloaderroot;
 	
 	/** The infos of tasks in the project. */
 	protected Map<String, TaskMetaInfo> projecttaskmetainfos;
@@ -405,7 +405,7 @@ public class ModelContainer
 	public void setBpmnModel(MBpmnModel model)
 	{
 		this.model = model;
-		
+		generateClassLoader();
 	}
 
 	/** 
@@ -447,78 +447,29 @@ public class ModelContainer
 	public void setProjectRoot(File root)
 	{
 		projectroot = root;
-		try
+
+		String rootpath = root.getAbsolutePath();
+		if(rootpath.contains("src" + File.separator + "main" + File.separator + "java"))
 		{
-			String rootpath = root.getAbsolutePath();
-			File clroot = null;
-			if(rootpath.contains("src" + File.separator + "main" + File.separator + "java"))
+			String clpath = rootpath.replace("src" + File.separator + "main" + File.separator + "java",
+											 "target" + File.separator + "classes");
+			classloaderroot = new File(clpath);
+			if (!classloaderroot.exists())
 			{
-				String clpath = rootpath.replace("src" + File.separator + "main" + File.separator + "java",
-												 "target" + File.separator + "classes");
-				clroot = new File(clpath);
-				if (!clroot.exists())
-				{
-					clroot = null;
-				}
-			}
-			if(clroot == null && (rootpath.endsWith("src") || rootpath.endsWith("src" + File.separator)))
-			{
-				String clpath = rootpath.replace("src", "bin");
-				clroot = new File(clpath);
-				if (!clroot.exists())
-				{
-					clroot = null;
-				}
-			}
-			
-			if(clroot != null)
-			{
-				URL[] urls = new URL[]{clroot.toURI().toURL()};
-				projectclassloader = new URLClassLoader(urls, ModelContainer.class.getClassLoader());
-//				Class<?>[] classes = SReflect.scanForClasses(urls, projectclassloader,
-//				Class<?>[] classes = SReflect.scanForClasses(projectclassloader,
-//				new IFilter<Object>()
-//				{
-//					public boolean filter(Object obj)
-//					{
-//						String name = null;
-//						if (obj instanceof ZipEntry)
-//						{
-//							name = ((ZipEntry) obj).getName();
-//						}
-//						else if (obj instanceof File)
-//						{
-//							name = ((File) obj).getName();
-//						}
-//						if (name != null)
-//						{
-//							return name.endsWith(".class") && !(name.contains("$"));
-//						}
-//						return false;
-//					}
-//				},
-//				new IFilter<Class<?>>()
-//				{
-//					public boolean filter(Class<?> clazz)
-//					{
-////						System.out.print(clazz.getCanonicalName());
-////						System.out.print(": ");
-////						System.out.println(SReflect.isSupertype(ITask.class, clazz));
-//						return SReflect.isSupertype(ITask.class, clazz);
-//					}
-//				});
-//				
-//				for(Class<?> clazz : classes)
-//				{
-//					projecttaskmetainfos.put(clazz.getCanonicalName(), STaskMetaInfoExtractor.getMetaInfo(clazz));
-//				}
+				classloaderroot = null;
 			}
 		}
-		catch (MalformedURLException e)
+		if(classloaderroot == null && (rootpath.endsWith("src") || rootpath.endsWith("src" + File.separator)))
 		{
-			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING,
-				"Identified project root, unable to generate classloader: " + e.getMessage());
+			String clpath = rootpath.replace("src", "bin");
+			classloaderroot = new File(clpath);
+			if (!classloaderroot.exists())
+			{
+				classloaderroot = null;
+			}
 		}
+		
+		generateClassLoader();
 	}
 	
 	/**
@@ -551,7 +502,7 @@ public class ModelContainer
 		try
 		{
 			projecttaskmetainfos.clear();
-			projectclassloader = null;
+			classloaderroot = null;
 			projectroot = null;
 			findProjectRoot();
 		}
@@ -567,7 +518,7 @@ public class ModelContainer
 	 */
 	public ClassLoader getProjectClassLoader()
 	{
-		return projectclassloader;
+		return model != null? model.getClassLoader() : null;
 	}
 	
 	/**
@@ -794,6 +745,39 @@ public class ModelContainer
 	public void removeChangeListener(ChangeListener listener)
 	{
 		changelisteners.remove(listener);
+	}
+	
+	/**
+	 *  Generates the class loader.
+	 */
+	public void generateClassLoader()
+	{
+		ClassLoader parent = settings.getHomeClassLoader();
+		if (parent == null)
+		{
+			parent = ModelContainer.class.getClassLoader();
+		}
+		
+		if (classloaderroot != null)
+		{
+			URL[] urls;
+			try
+			{
+				urls = new URL[]{classloaderroot.toURI().toURL()};
+				model.setClassLoader(new URLClassLoader(urls, parent));
+			}
+			catch (MalformedURLException e)
+			{
+				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING,
+						"Identified project root, unable to generate classloader: " + e.getMessage());
+				model.setClassLoader(parent);
+			}
+		}
+		else
+		{
+			model.setClassLoader(parent);
+		}
+		taskclasses = scanForTaskClasses();
 	}
 	
 	/**

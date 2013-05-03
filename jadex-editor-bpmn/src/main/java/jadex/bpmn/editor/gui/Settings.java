@@ -10,6 +10,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -42,6 +45,12 @@ public class Settings
 	
 	/** The selected style sheet */
 	protected String selectedsheet = BpmnEditor.STYLE_SHEETS[0].getFirstEntity();
+	
+	/** The library home. */
+	protected File libraryhome;
+	
+	/** The home class loader. */
+	protected ClassLoader homeclassloader;
 	
 	/**
 	 *  Gets the selected style sheet.
@@ -118,6 +127,101 @@ public class Settings
 	
 	
 	/**
+	 *  Gets the library home.
+	 *
+	 *  @return The library home.
+	 */
+	public File getLibraryHome()
+	{
+		return libraryhome;
+	}
+
+	/**
+	 *  Sets the library home.
+	 *
+	 *  @param libraryhome The library home.
+	 */
+	public void setLibraryHome(File libraryhome)
+	{
+//		if (libraryhome != null && libraryhome.exists() && libraryhome.isDirectory())
+//		{
+//			this.libraryhome = libraryhome;
+//			
+//			File libdir = new File(libraryhome.getAbsolutePath() + File.separator + "lib");
+//			if (!libdir.exists() || !libdir.isDirectory())
+//			{
+//				libdir = libraryhome;
+//			}
+//			
+//			File[] files = libdir.listFiles();
+//			List<URL> urls = new ArrayList<URL>();
+//			if (files != null)
+//			{
+//				for (File file : files)
+//				{
+//					if (file.getAbsolutePath().endsWith(".jar"))
+//					{
+//						try
+//						{
+//							urls.add(file.toURI().toURL());
+//						}
+//						catch (MalformedURLException e)
+//						{
+//						}
+//					}
+//				}
+//			}
+//			
+//			homeclassloader = new URLClassLoader(urls.toArray(new URL[urls.size()]), Settings.class.getClassLoader());
+//		}
+//		else
+//		{
+//			if (libraryhome == null || libraryhome.getPath().length() == 0)
+//			{
+//				this.libraryhome = null;
+//				homeclassloader = Settings.class.getClassLoader();
+//			}
+//		}
+		
+		if (libraryhome != null && libraryhome.getPath().length() > 0)
+		{
+			this.libraryhome = libraryhome;
+			
+			File libdir = new File(libraryhome.getAbsolutePath() + File.separator + "lib");
+			if (!libdir.exists() || !libdir.isDirectory())
+			{
+				libdir = libraryhome;
+			}
+			
+			File[] files = libdir.listFiles();
+			List<URL> urls = new ArrayList<URL>();
+			if (files != null)
+			{
+				for (File file : files)
+				{
+					if (file.getAbsolutePath().endsWith(".jar"))
+					{
+						try
+						{
+							urls.add(file.toURI().toURL());
+						}
+						catch (MalformedURLException e)
+						{
+						}
+					}
+				}
+			}
+			
+			homeclassloader = new URLClassLoader(urls.toArray(new URL[urls.size()]), Settings.class.getClassLoader());
+		}
+		else
+		{
+			this.libraryhome = null;
+			homeclassloader = Settings.class.getClassLoader();
+		}
+	}
+
+	/**
 	 *  Gets the save settings on exit setting.
 	 *
 	 *  @return The save settings on exit setting.
@@ -135,6 +239,18 @@ public class Settings
 	public void setSaveSettingsOnExit(boolean savesettingsonexit)
 	{
 		this.savesettingsonexit = savesettingsonexit;
+	}
+	
+	
+	
+	/**
+	 *  Gets the home class loader.
+	 *
+	 *  @return The home class loader.
+	 */
+	public ClassLoader getHomeClassLoader()
+	{
+		return homeclassloader;
 	}
 
 	/**
@@ -164,6 +280,11 @@ public class Settings
 		if (selectedsheet != null)
 		{
 			props.put("stylesheet", selectedsheet);
+		}
+		
+		if (libraryhome != null)
+		{
+			props.put("homepath", libraryhome.getPath());
 		}
 		
 		props.put("savesettingsonexit", String.valueOf(savesettingsonexit));
@@ -213,6 +334,12 @@ public class Settings
 			if (prop != null)
 			{
 				ret.setSaveSettingsOnExit(Boolean.parseBoolean(prop));
+			}
+			
+			prop = props.getProperty("homepath");
+			if (prop != null)
+			{
+				ret.setLibraryHome(new File(prop));
 			}
 			
 			prop = props.getProperty("stylesheet");

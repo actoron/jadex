@@ -4,12 +4,12 @@ import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.DebugException;
 import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -606,7 +606,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	{
 		if(requiredservices!=null && requiredservices.length>0)
 		{
-			this.requiredservices = new HashMap<String, RequiredServiceInfo>();
+			this.requiredservices = new LinkedHashMap<String, RequiredServiceInfo>();
 			for(int i=0; i<requiredservices.length; i++)
 			{
 				this.requiredservices.put(requiredservices[i].getName(), requiredservices[i]);
@@ -630,7 +630,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void addRequiredService(RequiredServiceInfo requiredservice)
 	{
 		if(requiredservices==null)
-			requiredservices = new HashMap<String, RequiredServiceInfo>();
+			requiredservices = new LinkedHashMap<String, RequiredServiceInfo>();
 		requiredservices.put(requiredservice.getName(), requiredservice);
 	}
 	
