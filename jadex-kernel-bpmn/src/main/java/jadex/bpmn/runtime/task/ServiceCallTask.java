@@ -421,7 +421,7 @@ public class ServiceCallTask implements ITask
 					int index, boolean isSelected, boolean cellHasFocus)
 				{
 					Method method = (Method)value;
-					String txt = method.getName();
+					String txt = method!=null? method.getName(): null;
 					return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
 				}
 			});

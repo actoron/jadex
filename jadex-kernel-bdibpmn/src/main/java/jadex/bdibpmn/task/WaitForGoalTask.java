@@ -6,8 +6,8 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
-import jadex.bpmn.task.info.ParameterMetaInfo;
-import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -15,14 +15,19 @@ import jadex.commons.future.IFuture;
 /**
  *  Dispatch a goal and by default wait for the result.
  */
+@Task(description="The wait for goal task can be used to wait for an existing goal.",
+parameters={
+	@TaskParameter(name="goal", clazz=IGoal.class, direction=TaskParameter.DIRECTION_IN, 
+		description="The goal parameter identifies the goal to be waited for.")
+})
 public class WaitForGoalTask	implements ITask
 {
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture execute(final ITaskContext context, IInternalAccess instance)
+	public IFuture<Void> execute(final ITaskContext context, IInternalAccess instance)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		try
 		{
@@ -79,23 +84,23 @@ public class WaitForGoalTask	implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final IInternalAccess instance)
+	public IFuture<Void> cancel(final IInternalAccess instance)
 	{
 		return IFuture.DONE;
 	}
 	
-	//-------- static methods --------
-	
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static TaskMetaInfo getMetaInfo()
-	{
-		String desc = "The wait for goal task can be used to wait for an existing goal.";
-		
-		ParameterMetaInfo goalmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
-			IGoal.class, "goal", null, "The goal parameter identifies the goal to be waited for.");
-
-		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{goalmi}); 
-	}
+//	//-------- static methods --------
+//	
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static TaskMetaInfo getMetaInfo()
+//	{
+//		String desc = "The wait for goal task can be used to wait for an existing goal.";
+//		
+//		ParameterMetaInfo goalmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+//			IGoal.class, "goal", null, "The goal parameter identifies the goal to be waited for.");
+//
+//		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{goalmi}); 
+//	}
 }

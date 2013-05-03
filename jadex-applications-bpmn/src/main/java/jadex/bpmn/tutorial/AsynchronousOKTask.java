@@ -2,6 +2,8 @@ package jadex.bpmn.tutorial;
 
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -18,6 +20,11 @@ import javax.swing.SwingUtilities;
 /**
  *  A task that displays a message using a JOptionPane.
  */
+@Task(description="A task that displays a message using a JOptionPane.", parameters={
+	@TaskParameter(name="message", clazz=String.class, direction=TaskParameter.DIRECTION_IN, description="The message to be shown."),
+	@TaskParameter(name="title", clazz=String.class, direction=TaskParameter.DIRECTION_IN, description="The title of the dialog."),
+	@TaskParameter(name="y_offset", clazz=int.class, direction=TaskParameter.DIRECTION_IN, description="The y offset.")
+})
 public class AsynchronousOKTask	 implements ITask
 {
 	protected JDialog	dialog;

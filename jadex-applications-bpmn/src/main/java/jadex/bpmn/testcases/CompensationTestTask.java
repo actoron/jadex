@@ -4,6 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -12,10 +13,11 @@ import jadex.commons.future.IFuture;
 /**
  *  Task for testing task compensation.
  */
+@Task(description="Task that tests if compensation works.")
 public class CompensationTestTask implements ITask
 {
 	/** Future used during execution. */
-	protected Future executionFuture;
+	protected Future<Void> exefut;
 	
 	/**
 	 *  Execute the task.
@@ -23,12 +25,12 @@ public class CompensationTestTask implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @return	To be notified, when the task has completed.
 	 */
-	public IFuture execute(ITaskContext context, IInternalAccess process)
+	public IFuture<Void> execute(ITaskContext context, IInternalAccess process)
 	{
 		((BpmnInterpreter) process).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", false, "Compensation did not occur.")}));
-		executionFuture = new Future();
+		exefut = new Future<Void>();
 		process.killComponent();
-		return executionFuture;
+		return exefut;
 	}
 	
 	// Todo: Provide cancel() method for tasks no longer required
@@ -38,10 +40,10 @@ public class CompensationTestTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(IInternalAccess instance)
+	public IFuture<Void> cancel(IInternalAccess instance)
 	{
 		((BpmnInterpreter) instance).setContextVariable("testresults", new Testcase(1, new TestReport[]{new TestReport("#1", "Compensation test.", true, null)}));
-		executionFuture.setResult(null);
+		exefut.setResult(null);
 		return IFuture.DONE;
 	}
 }

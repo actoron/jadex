@@ -30,12 +30,16 @@ import javax.swing.text.PlainDocument;
  */
 public class AutoCompleteCombo<T> extends JComboBox
 {
+	/** The cloassloader. */
 	protected ClassLoader cl;
 	
+	/** The thread pool. */
 	protected IThreadPool tp;
 
+	/** The last pattern. */
 	protected String lastpattern;
 
+	/** The current call. */
 	protected ISubscriptionIntermediateFuture<T> current;
 	
 	/**
@@ -197,8 +201,6 @@ public class AutoCompleteCombo<T> extends JComboBox
 		protected boolean arrowkey = false;
 		protected Timer t;
 		
-		protected String lasttext;
-		
 		/**
 		 *  Create a new AutoCompleteDocument.
 		 */
@@ -286,22 +288,20 @@ public class AutoCompleteCombo<T> extends JComboBox
 			{
 				String text = getText(0, getLength());
 				
-				if(lasttext==null || !text.equals(lasttext))
+				setPattern(text).addResultListener(new IResultListener<Collection<T>>()
 				{
-					lasttext = text;
-					setPattern(text).addResultListener(new IResultListener<Collection<T>>()
+					public void resultAvailable(Collection<T> result) 
 					{
-						public void resultAvailable(Collection<T> result) 
-						{
-							clearSelection();
-							updatePopup();
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
-				}
+						clearSelection();
+						updatePopup();
+						JTextComponent comp = (JTextComponent)getEditor().getEditorComponent();
+						comp.setCaretPosition(getLength());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+					}
+				});
 			}
 			catch(Exception e)
 			{

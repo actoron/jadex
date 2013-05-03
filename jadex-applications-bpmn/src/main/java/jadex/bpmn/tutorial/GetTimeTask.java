@@ -2,6 +2,8 @@ package jadex.bpmn.tutorial;
 
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
@@ -13,6 +15,8 @@ import jadex.commons.future.IResultListener;
 /**
  *  A task that provides the current platform time in the 'time' parameter.
  */
+@Task(description="Task that delivers the current time in parameter 'time'.",
+	parameters=@TaskParameter(name="time", clazz=Long.class, direction=TaskParameter.DIRECTION_OUT))
 public class GetTimeTask	 implements ITask
 {
 	/**

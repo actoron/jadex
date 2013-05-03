@@ -320,7 +320,6 @@ public class ModelContainer
 			}
 			public void finished()
 			{
-				System.out.println("fini");
 			}
 			public void resultAvailable(Collection<Class<?>> result)
 			{
