@@ -6,6 +6,7 @@ import jadex.bpmn.editor.gui.propertypanels.TaskPropertyPanel;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.task.info.TaskMetaInfo;
+import jadex.bridge.ClassInfo;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.future.IIntermediateResultListener;
@@ -250,7 +251,8 @@ public class ModelContainer
 	protected List<ChangeListener> changelisteners;
 	
 	/** The task classes. */
-	protected List<Class<?>> taskclasses;
+//	protected List<Class<?>> taskclasses;
+	protected List<ClassInfo> taskclasses;
 	
 	/**
 	 *  Creates a new container.
@@ -262,7 +264,21 @@ public class ModelContainer
 		//this.imageprovider = new ImageProvider();
 		this.projecttaskmetainfos = new HashMap<String, TaskMetaInfo>();
 		this.changelisteners = new ArrayList<ChangeListener>();
-		this.taskclasses = scanForTaskClasses();
+		this.taskclasses = scanForTaskClassInfos();
+	}
+	
+	/**
+	 *  Scan for task classes.
+	 */
+	public List<ClassInfo> scanForTaskClassInfos()
+	{
+		List<Class<?>> taskclasses = scanForTaskClasses();
+		List<ClassInfo> ret = new ArrayList<ClassInfo>();
+		for(Class<?> cl: taskclasses)
+		{
+			ret.add(new ClassInfo(cl));
+		}
+		return ret;
 	}
 	
 	/**
@@ -333,11 +349,20 @@ public class ModelContainer
 		return taskclasses;
 	}
 	
+//	/**
+//	 *  Get the taskclasses.
+//	 *  @return The taskclasses.
+//	 */
+//	public List<Class<?>> getTaskClasses()
+//	{
+//		return taskclasses;
+//	}
+	
 	/**
 	 *  Get the taskclasses.
 	 *  @return The taskclasses.
 	 */
-	public List<Class<?>> getTaskClasses()
+	public List<ClassInfo> getTaskClasses()
 	{
 		return taskclasses;
 	}
@@ -351,7 +376,7 @@ public class ModelContainer
 	{
 		return idgen;
 	}
-	
+
 	/**
 	 *  Returns the current visual graph component.
 	 *  @return The graph.
@@ -752,12 +777,12 @@ public class ModelContainer
 	public void generateClassLoader()
 	{
 		ClassLoader parent = settings.getHomeClassLoader();
-		if (parent == null)
+		if(parent == null)
 		{
 			parent = ModelContainer.class.getClassLoader();
 		}
 		
-		if (classloaderroot != null)
+		if(classloaderroot != null)
 		{
 			URL[] urls;
 			try
@@ -776,7 +801,7 @@ public class ModelContainer
 		{
 			model.setClassLoader(parent);
 		}
-		taskclasses = scanForTaskClasses();
+		taskclasses = scanForTaskClassInfos();
 	}
 	
 	/**

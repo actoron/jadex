@@ -77,7 +77,7 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 			entries.add(0, val);
 		}
 		
-		while(entries.size()>max)
+		while(max!=-1 && entries.size()>max)
 		{
 			int index = entries.size() - 1;
 			entries.remove(index);

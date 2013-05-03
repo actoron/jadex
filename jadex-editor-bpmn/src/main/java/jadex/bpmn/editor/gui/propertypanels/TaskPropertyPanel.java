@@ -26,6 +26,7 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
 import jadex.commons.gui.autocombo.ClassComboModel;
 import jadex.commons.gui.autocombo.FixedClassComboModel;
+import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.javaparser.SJavaParser;
 
@@ -111,8 +112,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 //		cbox.setModel(model);
 		
 		final AutoCompleteCombo cbox = new AutoCompleteCombo(null);
-		final FixedClassComboModel model = new FixedClassComboModel(cbox, -1, new ArrayList<Class<?>>(modelcontainer.getTaskClasses()));
-		
+		final FixedClassInfoComboModel model = new FixedClassInfoComboModel(cbox, -1, new ArrayList<ClassInfo>(modelcontainer.getTaskClasses()));
 //		final ClassComboModel model = new ClassComboModel(cbox, 20, false, false, true, true, null,// null);
 //			new IFilter<Class<?>>()
 //		{
@@ -142,7 +142,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				if(obj==null || SUtil.equals(val, obj))
 					return;
 				
-				String text = obj instanceof Class? model.convertToString((Class<?>)obj): "";
+				String text = obj instanceof ClassInfo? model.convertToString((ClassInfo)obj): "";
 			    if(!text.equals(editor.getText())) 
 			    {
 			    	val = obj;
@@ -160,8 +160,11 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus)
 			{
-				Class<?> cl = (Class)value;
-				String txt = SReflect.getInnerClassName(cl)+" - "+cl.getPackage().getName();
+				ClassInfo ci = (ClassInfo)value;
+				Class<?> cl = ci.getType(modelcontainer.getProjectClassLoader());
+				String txt = null;
+				if(cl!=null)
+					txt = SReflect.getInnerClassName(cl)+" - "+cl.getPackage().getName();
 				return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
 			}
 		});
@@ -209,10 +212,10 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		final ActivityParameterTable atable = new ActivityParameterTable(container, task);
 		
-		processTaskInfos((Class<?>)cbox.getSelectedItem(), descarea);
+		processTaskInfos((ClassInfo)cbox.getSelectedItem(), descarea);
 		
 		final JButton defaultParameterButton = new JButton();
-		defaultParameterButton.setEnabled(getTaskMetaInfo((Class<?>)cbox.getSelectedItem()) != null);
+		defaultParameterButton.setEnabled(getTaskMetaInfo((ClassInfo)cbox.getSelectedItem()) != null);
 		
 		// Property panel
 		
@@ -298,14 +301,14 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			public void actionPerformed(ActionEvent e)
 			{
 //				String taskname = (String) ((JComboBox)e.getSource()).getSelectedItem();
-				Class<?> taskcl = (Class<?>)((JComboBox)e.getSource()).getSelectedItem();
+				ClassInfo taskcl = (ClassInfo)((JComboBox)e.getSource()).getSelectedItem();
 				if(taskcl==null)
 					return;
 				
-				String taskname = taskcl.getName();
+				String taskname = taskcl.getTypeName();
 				
 				// change task class
-				getBpmnTask().setClazz(new ClassInfo(taskcl.getName()));
+				getBpmnTask().setClazz(taskcl);
 
 				// and renew properties
 				IndexMap<String, MProperty> props = getBpmnTask().getProperties();
@@ -376,7 +379,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				processTaskParameters((Class<?>)cbox.getSelectedItem(), atable);
+				processTaskParameters((ClassInfo)cbox.getSelectedItem(), atable);
 				modelcontainer.setDirty(true);
 			}
 		};
@@ -423,10 +426,10 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 *  @param descarea The description area.
 	 *  @param atable The parameter table.
 	 */
-	protected void processTaskInfos(Class<?> task, JEditorPane descarea)
+	protected void processTaskInfos(ClassInfo task, JEditorPane descarea)
 	{
 		if(task!=null)
-			processTaskInfos(task.getName(), descarea);
+			processTaskInfos(task.getTypeName(), descarea);
 	}
 	
 	/**
@@ -499,10 +502,10 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 *  @param taskname The selected task.
 	 *  @param atable The activity parameter table.
 	 */
-	protected void processTaskParameters(Class<?> task, ActivityParameterTable atable)
+	protected void processTaskParameters(ClassInfo task, ActivityParameterTable atable)
 	{
 		if(task!=null)
-			processTaskParameters(task.getName(), atable);
+			processTaskParameters(task.getTypeName(), atable);
 	}
 	
 	/**
@@ -586,9 +589,9 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 *  @param taskname Name of the task.
 	 *  @return The info, null if not found.
 	 */
-	protected TaskMetaInfo getTaskMetaInfo(Class<?> task)
+	protected TaskMetaInfo getTaskMetaInfo(ClassInfo task)
 	{
-		return task==null? null: getTaskMetaInfo(task.getName());
+		return task==null? null: getTaskMetaInfo(task.getTypeName());
 	}
 	
 	/**
