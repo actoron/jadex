@@ -15,7 +15,6 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
@@ -27,7 +26,6 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -39,11 +37,12 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -757,7 +756,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customResultAvailable(Class<?> result)
 			{
 				// todo: cache results
-				List<Class<?>> res = new ArrayList<Class<?>>();
+				Set<Class<?>> res = new LinkedHashSet<Class<?>>();
 				res.add(result);
 				
 				Class<?>[] sins = SReflect.getSuperInterfaces(new Class[]{result});

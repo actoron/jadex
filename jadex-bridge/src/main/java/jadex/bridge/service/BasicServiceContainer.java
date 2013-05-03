@@ -83,6 +83,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //			}
 			return new IntermediateFuture<IService>(new ComponentTerminatedException(id));
 		}
+		
 		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
 	}
 	
@@ -133,7 +134,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		{
 			public void customResultAvailable(Collection<Class<?>> servicetypes)
 			{
-//				System.out.println("Adding service: " + info.getName() + " " + service);
 				synchronized(this)
 				{
 					if(services==null)
