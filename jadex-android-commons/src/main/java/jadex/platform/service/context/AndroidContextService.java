@@ -2,15 +2,14 @@ package jadex.platform.service.context;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.AndroidContextManager.AndroidContextChangeListener;
+import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidContextNotFoundError;
 import jadex.android.exception.WrongEventClassException;
-import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.context.IPreferences;
-import jadex.android.commons.Logger;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 

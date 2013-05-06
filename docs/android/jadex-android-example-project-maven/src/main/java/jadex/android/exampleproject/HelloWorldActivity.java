@@ -2,11 +2,11 @@ package jadex.android.exampleproject;
 
 import jadex.android.JadexAndroidActivity;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
-import jadex.android.service.IJadexPlatformBinder;
 import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

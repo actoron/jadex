@@ -1,8 +1,8 @@
 package jadex.android.service;
 
 import jadex.android.AndroidContextManager;
+import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
-import jadex.android.standalone.clientapp.JadexPlatformOptions;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -10,16 +10,22 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.platform.IJadexPlatformManager;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.platform.service.library.DelegationClassLoader;
+import jadex.platform.service.library.DelegationURLClassLoader;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +36,7 @@ import android.util.Log;
 /**
  * Singleton to manage all running jadex platforms and start new ones.
  */
-public class JadexPlatformManager implements JadexPlatformOptions
+public class JadexPlatformManager implements IJadexPlatformManager
 {
 	public static final String DEFAULT_OPTIONS = "-logging_level java.util.logging.Level.INFO" + " -extensions null" + " -awareness false"
 			+ " -wspublish false" + " -rspublish false" + " -android true" + " -binarymessages true"
@@ -177,10 +183,26 @@ public class JadexPlatformManager implements JadexPlatformOptions
 
 				future.addResultListener(new IResultListener<IExternalAccess>()
 				{
-					public void resultAvailable(IExternalAccess result)
+					public void resultAvailable(final IExternalAccess platformAccess)
 					{
-						runningPlatforms.put(result.getComponentIdentifier(), result);
-						ret.setResult(result);
+						// set custom class loader
+						IFuture<ILibraryService> service = SServiceProvider.getService(platformAccess.getServiceProvider(), ILibraryService.class);
+						service.addResultListener(new DefaultResultListener<ILibraryService>()
+						{
+
+							@Override
+							public void resultAvailable(ILibraryService result)
+							{
+								Logger.d("Setting base class loader...");
+								DelegationClassLoader delegationClassLoader = new DelegationClassLoader(platformClassLoader);
+//								DelegationURLClassLoader delegationURLClassLoader = new DelegationURLClassLoader(platformClassLoader, null);
+								result.setBaseLoaderDelegate(delegationClassLoader);
+								
+								runningPlatforms.put(platformAccess.getComponentIdentifier(), platformAccess);
+								ret.setResult(platformAccess);
+							}
+						});
+						
 					}
 
 					public void exceptionOccurred(Exception exception)
@@ -208,6 +230,7 @@ public class JadexPlatformManager implements JadexPlatformOptions
 		return ret;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected static IFuture<IExternalAccess> createPlatformWithClassloader(String[] options, ClassLoader cl)
 	{
 		try

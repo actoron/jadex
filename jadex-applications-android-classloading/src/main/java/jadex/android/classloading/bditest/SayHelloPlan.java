@@ -1,7 +1,7 @@
 package jadex.android.classloading.bditest;
 
+import jadex.android.classloading.MyActivity;
 import jadex.bdi.runtime.Plan;
-import android.app.Activity;
 import android.widget.Toast;
 
 /**
@@ -17,7 +17,7 @@ public class SayHelloPlan extends Plan
 	{
 		final String	message = (String)getBeliefbase().getBelief("HelloMessage").getFact();
 		
-		final Activity	act = (Activity)getBeliefbase().getBelief("androidContext").getFact();
+		final MyActivity	act = (MyActivity)getBeliefbase().getBelief("androidContext").getFact();
 		
 		act.runOnUiThread(new Runnable()
 		{
@@ -25,7 +25,7 @@ public class SayHelloPlan extends Plan
 			@Override
 			public void run()
 			{
-				Toast.makeText(act, message, Toast.LENGTH_LONG).show();
+				Toast.makeText(act.getActivity(), message, Toast.LENGTH_LONG).show();
 			}
 		});
 		

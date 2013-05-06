@@ -20,7 +20,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform</artifactId>
+			<artifactId>jadex-platform-android</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

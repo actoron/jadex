@@ -1,6 +1,5 @@
 package jadex.android.classloading;
 
-import jadex.android.service.JadexPlatformManager;
 import jadex.android.standalone.clientapp.JadexClientAppService;
 import jadex.android.standalone.clientapp.PlatformProvidingClientAppFragment;
 import jadex.bridge.IComponentIdentifier;

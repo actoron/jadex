@@ -1,4 +1,4 @@
-package jadex.android.service;
+package jadex.bridge.service.types.platform;
 
 import jadex.android.IEventReceiver;
 import jadex.android.exception.WrongEventClassException;

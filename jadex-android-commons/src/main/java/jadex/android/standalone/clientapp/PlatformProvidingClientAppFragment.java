@@ -3,9 +3,6 @@ package jadex.android.standalone.clientapp;
 import jadex.android.IEventReceiver;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
-import jadex.android.service.IJadexPlatformBinder;
-import jadex.android.service.JadexPlatformManager;
-import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -13,6 +10,8 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.service.types.platform.IJadexPlatformBinder;
+import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -55,16 +54,16 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	{
 		super();
 		platformAutostart = false;
-		platformKernels = JadexPlatformManager.DEFAULT_KERNELS;
+		platformKernels = JadexPlatformOptions.DEFAULT_KERNELS;
 		platformOptions = "";
-		platformName = JadexPlatformManager.getInstance().getRandomPlatformID();
+//		platformName = JadexPlatformManager.getInstance().getRandomPlatformID();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		serviceIntent = new Intent(getActivity(), JadexPlatformService.class);
+		serviceIntent = new Intent(getActivity(), SReflect.classForName0("jadex.android.service.JadexPlatformService", this.getClass().getClassLoader()));
 		bindService(serviceIntent, this, Service.BIND_AUTO_CREATE);
 	}
 	

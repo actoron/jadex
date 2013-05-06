@@ -60,7 +60,7 @@
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>

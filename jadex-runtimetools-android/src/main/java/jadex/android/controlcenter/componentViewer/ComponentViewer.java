@@ -3,40 +3,33 @@ package jadex.android.controlcenter.componentViewer;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
 import jadex.android.controlcenter.MetaActivity;
 import jadex.android.controlcenter.SubActivity;
-import jadex.android.controlcenter.componentViewer.properties.ComponentPropertyActivity;
 import jadex.android.controlcenter.componentViewer.tree.ComponentTreeNode;
 import jadex.android.controlcenter.componentViewer.tree.IAndroidTreeNode;
-import jadex.android.controlcenter.componentViewer.tree.RequiredServiceNode;
-import jadex.android.service.IJadexPlatformBinder;
 import jadex.android.service.JadexPlatformService;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.io.Serializable;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.res.ColorStateList;
 import android.database.DataSetObserver;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class ComponentViewer extends MetaActivity implements ServiceConnection
 {

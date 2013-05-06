@@ -41,7 +41,7 @@ public class JadexApplicationLoader extends FragmentActivity
 		Intent intent = getIntent();
 		FragmentManager manager = getSupportFragmentManager();
 		FragmentTransaction ta = manager.beginTransaction();
-		if (intent.getAction().equals(JadexApplication.INTENT_ACTION_LOADAPP)) {
+		if (intent != null && JadexApplication.INTENT_ACTION_LOADAPP.equals(intent.getAction())) {
 			String appPath = intent.getStringExtra(JadexApplication.EXTRA_KEY_APPLICATIONPATH);
 			String className = intent.getStringExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
 			userAppPackage = intent.getStringExtra(JadexApplication.EXTRA_KEY_APPLICATIONPACKAGE);
@@ -150,40 +150,6 @@ public class JadexApplicationLoader extends FragmentActivity
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	private void copyDex()
-	{
-		ApplicationInfo applicationInfo = this.getApplicationInfo();
-		String ownDexDir = applicationInfo.sourceDir;
-		
-		String[] list = new File(ownDexDir).list();
-		
-		
-		System.out.println("COPYING DEX");
-		File dexInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE), "jadex.jar");
-		BufferedInputStream bis = null;
-		OutputStream dexWriter = null;
-
-		final int BUF_SIZE = 8 * 1024;
-		try
-		{
-			bis = new BufferedInputStream(getAssets().open("jadex.jar"));
-			dexWriter = new BufferedOutputStream(new FileOutputStream(dexInternalStoragePath));
-			byte[] buf = new byte[BUF_SIZE];
-			int len;
-			while ((len = bis.read(buf, 0, BUF_SIZE)) > 0)
-			{
-				dexWriter.write(buf, 0, len);
-			}
-			dexWriter.close();
-			bis.close();
-
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	private DexClassLoader getClassLoaderForExternalDex(ClassLoader parent, String appPath)

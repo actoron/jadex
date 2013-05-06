@@ -605,6 +605,7 @@
 				<module>jadex-android-commons</module>
 				<module>jadex-android-antlr</module>
 				<module>jadex-android-xmlpull</module>
+				<module>jadex-platform-android</module>
 				<module>jadex-runtimetools-android</module>
 				<module>jadex-platform-extension-webservice-android</module>
 				<module>jadex-applications-android-demos</module>

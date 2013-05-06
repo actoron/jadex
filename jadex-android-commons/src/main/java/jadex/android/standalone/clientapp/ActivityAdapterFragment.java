@@ -45,7 +45,7 @@ class ActivityAdapterFragment extends android.support.v4.app.Fragment
 	/**
 	 * Calls getActivity().runOnUiThread()
 	 */
-	protected void runOnUiThread(Runnable runnable)
+	public void runOnUiThread(Runnable runnable)
 	{
 		getActivity().runOnUiThread(runnable);
 	}

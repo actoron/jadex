@@ -17,10 +17,12 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.bridge.service.types.library.ISimpleDelegationClassLoader;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
@@ -32,6 +34,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -172,8 +175,23 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		this.clfuts = new HashMap<IResourceIdentifier, Future<DelegationURLClassLoader>>();
 		this.listeners	= new LinkedHashSet<ILibraryServiceListener>();
 		this.initurls = urls!=null? urls.clone(): urls;
-		this.baseloader = baseloader!=null? new ChangeableURLClassLoader(null, baseloader)
+		if (SReflect.isAndroid()) {
+			try
+			{
+				@SuppressWarnings("unchecked")
+				Class<ChangeableURLClassLoader> clClass= SReflect.classForName0("jadex.platform.service.library.DelegationClassLoader", this.baseloader);
+				Constructor<ChangeableURLClassLoader> constructor = clClass.getConstructor(ClassLoader.class);
+				ChangeableURLClassLoader androidBaseLoader = constructor.newInstance(baseloader!=null? baseloader : getClass().getClassLoader());
+				this.baseloader = androidBaseLoader;
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		} else {
+			this.baseloader = baseloader!=null? new ChangeableURLClassLoader(null, baseloader)
 			: new ChangeableURLClassLoader(null, getClass().getClassLoader());
+		}
 		this.rootloader = new DelegationURLClassLoader(this.baseloader, null);
 		this.addedlinks = new HashSet<Tuple2<IResourceIdentifier,IResourceIdentifier>>();
 		this.removedlinks = new HashSet<Tuple2<IResourceIdentifier,IResourceIdentifier>>();
@@ -181,6 +199,17 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 * Sets the delegation which will replace the Top-most ClassLoader
+	 * @param cl The ClassLoader
+	 */
+	public void setBaseLoaderDelegate(ISimpleDelegationClassLoader cl) {
+		((ISimpleDelegationClassLoader)baseloader).setDelegate(cl);
+//		rootloader.addDelegateClassLoader((DelegationURLClassLoader)cl);
+//		ISimpleDelegationClassLoader dexcl = (ISimpleDelegationClassLoader)this.baseloader;
+//		dexcl.setDelegate(cl);
+	}
 	
 	/**
 	 *  Add a new resource identifier.

@@ -1,7 +1,7 @@
 package jadex.android.applications.chat;
 
-import jadex.android.applications.chat.filetransfer.TransferActivity;
 import jadex.android.service.JadexPlatformManager;
+import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -24,10 +24,8 @@ import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Binding;
-import jadex.platform.service.chat.ChatService;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,23 +37,17 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.widget.Toast;
 
 /**
  * Android service for running the Jadex platform.
  */
-public class AndroidChatService extends jadex.android.service.JadexPlatformService
+public class AndroidChatService extends JadexPlatformService
 {
 	// -------- attributes --------
 
