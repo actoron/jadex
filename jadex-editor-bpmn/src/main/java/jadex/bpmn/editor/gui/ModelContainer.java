@@ -254,7 +254,6 @@ public class ModelContainer
 	protected List<ChangeListener> changelisteners;
 	
 	/** The task classes. */
-//	protected List<Class<?>> taskclasses;
 	protected List<ClassInfo> taskclasses;
 	
 	/**
@@ -276,91 +275,64 @@ public class ModelContainer
 	 */
 	public List<ClassInfo> scanForTaskClassInfos()
 	{
-		List<Class<?>> taskclasses = scanForTaskClasses();
-		List<ClassInfo> ret = new ArrayList<ClassInfo>();
-		for(Class<?> cl: taskclasses)
-		{
-			ret.add(new ClassInfo(cl));
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Scan for task classes.
-	 */
-	public List<Class<?>> scanForTaskClasses()
-	{
-		final List<Class<?>> taskclasses = new ArrayList<Class<?>>();
-		ClassLoader cl = getProjectClassLoader()!=null? getProjectClassLoader()
-			: TaskPropertyPanel.class.getClassLoader();
+		List<ClassInfo> globs = new ArrayList<ClassInfo>(globalcache.getGlobalTaskClasses());
 		
-		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, new IFilter<Object>()
+		if(classloaderroot!=null)
 		{
-			public boolean filter(Object obj)
+			try
 			{
-				String	fn	= "";
-				if(obj instanceof File)
+				ClassLoader cl = getProjectClassLoader();
+				Class<?>[] locals = SReflect.scanForClasses(new URL[]{classloaderroot.toURI().toURL()}, cl, new IFilter<Object>()
 				{
-					File	f	= (File)obj;
-					fn	= f.getName();
-				}
-				else if(obj instanceof JarEntry)
-				{
-					JarEntry	je	= (JarEntry)obj;
-					fn	= je.getName();
-				}
-				
-				return fn.indexOf("Task")!=-1;
-			}
-		}, new IFilter<Class<?>>()
-		{
-			public boolean filter(Class<?> obj)
-			{
-				boolean ret = false;
-				try
-				{
-					if(!obj.isInterface() && !Modifier.isAbstract(obj.getModifiers()))
+					public boolean filter(Object obj)
 					{
-						ClassLoader cl = obj.getClassLoader();
-						Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
-						ret = SReflect.isSupertype(taskcl, obj);
+						String	fn	= "";
+						if(obj instanceof File)
+						{
+							File	f	= (File)obj;
+							fn	= f.getName();
+						}
+						else if(obj instanceof JarEntry)
+						{
+							JarEntry	je	= (JarEntry)obj;
+							fn	= je.getName();
+						}
+						
+						return fn.indexOf("Task")!=-1;
 					}
-				}
-				catch(Exception e)
+				}, new IFilter<Class<?>>()
 				{
-				}
-				return ret;
+					public boolean filter(Class<?> obj)
+					{
+						boolean ret = false;
+						try
+						{
+							if(!obj.isInterface() && !Modifier.isAbstract(obj.getModifiers()))
+							{
+								ClassLoader cl = obj.getClassLoader();
+								Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+								ret = SReflect.isSupertype(taskcl, obj);
+							}
+						}
+						catch(Exception e)
+						{
+						}
+						return ret;
+					}
+				});
+				
+				for(Class<?> cla: locals)
+				{
+					globs.add(new ClassInfo(cla));
+				}				
 			}
-		}, -1);
-		fut.addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
-		{
-			public void intermediateResultAvailable(Class<?> result)
+			catch(Exception e)
 			{
-				taskclasses.add(result);
+				// nop
 			}
-			public void finished()
-			{
-			}
-			public void resultAvailable(Collection<Class<?>> result)
-			{
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-		}));
-		fut.get(new ThreadSuspendable());
-		
-		return taskclasses;
+		}
+		return globs;
 	}
-	
-//	/**
-//	 *  Get the taskclasses.
-//	 *  @return The taskclasses.
-//	 */
-//	public List<Class<?>> getTaskClasses()
-//	{
-//		return taskclasses;
-//	}
 	
 	/**
 	 *  Get the taskclasses.

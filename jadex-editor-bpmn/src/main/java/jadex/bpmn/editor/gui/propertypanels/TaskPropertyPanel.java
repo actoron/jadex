@@ -111,7 +111,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 //		StringComboModel model = new StringComboModel(cbox, 20, SUtil.createArrayList(tasknames));
 //		cbox.setModel(model);
 		
-		final AutoCompleteCombo cbox = new AutoCompleteCombo(null);
+		final AutoCompleteCombo cbox = new AutoCompleteCombo(null, cl);
 		final FixedClassInfoComboModel model = new FixedClassInfoComboModel(cbox, -1, new ArrayList<ClassInfo>(modelcontainer.getTaskClasses()));
 //		final ClassComboModel model = new ClassComboModel(cbox, 20, false, false, true, true, null,// null);
 //			new IFilter<Class<?>>()
@@ -143,7 +143,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 					return;
 				
 				String text = obj instanceof ClassInfo? model.convertToString((ClassInfo)obj): "";
-			    if(!text.equals(editor.getText())) 
+			    if(text!=null && !text.equals(editor.getText())) 
 			    {
 			    	val = obj;
 			    	editor.setText(text);
@@ -169,11 +169,9 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			}
 		});
 		
-		
-//		cbox.setEditable(true);
 		if(getBpmnTask().getClazz()!=null)
 		{
-			cbox.setSelectedItem(getBpmnTask().getClazz().getType(cl));
+			cbox.setSelectedItem(getBpmnTask().getClazz());
 		}
 		
 //		JButton sel = new JButton("...");

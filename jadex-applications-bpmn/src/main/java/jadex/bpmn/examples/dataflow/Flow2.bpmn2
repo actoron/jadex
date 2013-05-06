@@ -8,6 +8,10 @@
                       xmlns:jadex="http://www.activecomponents.org/bpmnextensions">
   <semantic:extension>
     <jadex:modelname>Flow2</jadex:modelname>
+    <jadex:requiredservices>
+      <jadex:requiredservice name="clockser" interface="jadex.bridge.service.types.clock.IClockService" scope="platform"/>
+      <jadex:requiredservice name="threadpoolser" interface="jadex.bridge.service.types.threadpool.IThreadPoolService" scope="platform"/>
+    </jadex:requiredservices>
   </semantic:extension>
   <semantic:process name="Pool" id="tQ7GtiqRSsU66fi2">
     <semantic:startEvent id="Cq/85Tim2tti2Odn">
@@ -17,7 +21,9 @@
       <semantic:incoming>+tPLsbOaRzxn/Hqv</semantic:incoming>
       <semantic:outgoing>3AQluLkDKtGWn+k/</semantic:outgoing>
       <semantic:extensionElements>
-        <jadex:taskclass>jadex.bpmn.runtime.task.ServiceCallTask2</jadex:taskclass>
+        <jadex:taskclass>jadex.bpmn.runtime.task.ServiceCallTask</jadex:taskclass>
+        <jadex:property name="service" type="java.lang.String">&quot;clockser&quot;</jadex:property>
+        <jadex:property name="method" type="java.lang.String">&quot;start&quot;</jadex:property>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:endEvent id="PzOumm8xTtN+hML4">

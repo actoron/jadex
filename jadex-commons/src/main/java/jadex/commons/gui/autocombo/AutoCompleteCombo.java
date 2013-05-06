@@ -45,9 +45,10 @@ public class AutoCompleteCombo<T> extends JComboBox
 	/**
 	 *  Create a new combo box.
 	 */
-	public AutoCompleteCombo(ThreadPool tp)
+	public AutoCompleteCombo(ThreadPool tp, ClassLoader cl)
 	{
 		this.tp = tp==null? new ThreadPool(): tp;
+		this.cl = cl==null? AutoCompleteCombo.class.getClassLoader(): cl;
 		setEditable(true);
 	}
 	
@@ -431,7 +432,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 //				frame.add(combo);
 				
 				List<String> vals = SUtil.createArrayList(new String[]{"a", "aa", "aaa", "aab", "b", "bb", "abc"});
-				final AutoCompleteCombo combo2 = new AutoCompleteCombo(null);
+				final AutoCompleteCombo combo2 = new AutoCompleteCombo(null, null);
 				final StringComboModel model2 = new StringComboModel(combo2, 20, vals);
 				combo2.setModel(model2);
 				frame.add(combo2);
