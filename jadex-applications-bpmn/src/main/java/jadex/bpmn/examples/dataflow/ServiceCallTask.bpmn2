@@ -18,10 +18,8 @@
       <semantic:extensionElements>
         <jadex:taskclass>jadex.bpmn.runtime.task.ServiceCallTask</jadex:taskclass>
         <jadex:parameter direction="in" name="time" type="long">1000</jadex:parameter>
-        <jadex:parameter direction="in" name="param1" type="jadex.bridge.service.types.clock.ITimedObject">
-        </jadex:parameter>
-        <jadex:parameter direction="out" name="return" type="jadex.bridge.service.types.clock.ITimer">
-        </jadex:parameter>
+        <jadex:parameter direction="in" name="param1" type="jadex.bridge.service.types.clock.ITimedObject">null</jadex:parameter>
+        <jadex:parameter direction="out" name="return" type="jadex.bridge.service.types.clock.ITimer">null</jadex:parameter>
         <jadex:property name="service" type="java.lang.String">&quot;threadser&quot;</jadex:property>
         <jadex:property name="method" type="java.lang.String">&quot;execute&quot;</jadex:property>
       </semantic:extensionElements>
