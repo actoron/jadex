@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
@@ -105,6 +106,16 @@ public class BpmnMenuBar extends JMenuBar
 			{
 				try
 				{
+					List<File> openfiles = new ArrayList<File>();
+					List<ModelContainer> modelcontainers = editorwindow.getModelContainers();
+					for (ModelContainer modelcontainer : modelcontainers)
+					{
+						if (modelcontainer.getFile() != null)
+						{
+							openfiles.add(modelcontainer.getFile());
+						}
+					}
+					editorwindow.getSettings().setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
 					editorwindow.getSettings().save();
 				}
 				catch (IOException e1)
