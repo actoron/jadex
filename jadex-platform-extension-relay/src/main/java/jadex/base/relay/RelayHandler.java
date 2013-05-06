@@ -12,6 +12,7 @@ import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.platform.service.message.MapSendTask;
@@ -102,6 +103,9 @@ public class RelayHandler
 		this.codecs	= cfac.getAllCodecs();
 		this.defcodecs	= cfac.getDefaultCodecs();
 		this.peers	= new PeerList();
+		
+		// Register communication classes with aliases
+		STransformation.registerClass(MessageEnvelope.class);
 		
 		peers.addChangeListener(new IChangeListener<PeerEntry>()
 		{
@@ -364,7 +368,7 @@ public class RelayHandler
 		
 		// Read message and extract awareness info content.
 		byte[] buffer = readData(in, length-1);
-		MessageEnvelope	msg	= (MessageEnvelope)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
+		MessageEnvelope	msg	= (MessageEnvelope)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader(), null);//IErrorReporter.IGNORE);
 		ICodec[]	pcodecs	= MapSendTask.getCodecs(buffer, codecs);
 		AwarenessInfo	info;
 		if(SFipa.JADEX_RAW.equals(msg.getMessage().get(SFipa.LANGUAGE)))

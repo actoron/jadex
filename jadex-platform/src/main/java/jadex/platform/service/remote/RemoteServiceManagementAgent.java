@@ -84,6 +84,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		STransformation.registerClass(RemoteIntermediateResultCommand.class);
 		STransformation.registerClass(RemoteMethodInvocationCommand.class);
 		STransformation.registerClass(RemoteResultCommand.class);
+		STransformation.registerClass(RemoteSearchCommand.class);
 		STransformation.registerClass(DefaultEqualsMethodReplacement.class);
 		STransformation.registerClass(DefaultHashcodeMethodReplacement.class);
 		
