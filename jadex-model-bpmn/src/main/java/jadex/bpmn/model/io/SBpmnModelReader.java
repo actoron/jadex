@@ -607,11 +607,11 @@ public class SBpmnModelReader
 		}
 		else if ("subprocessref".equals(tag.getLocalPart()))
 		{
-			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("filename", content.trim());
+			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("filename", content);
 		}
 		else if ("subprocessexpressionref".equals(tag.getLocalPart()))
 		{
-			UnparsedExpression fileexp = new UnparsedExpression("file", String.class, content.trim(), null);
+			UnparsedExpression fileexp = new UnparsedExpression("file", String.class, content, null);
 			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("file", fileexp);
 		}
 		else if("parameter".equals(tag.getLocalPart()))
@@ -624,7 +624,7 @@ public class SBpmnModelReader
 			}
 			ClassInfo clazz = new ClassInfo(attrs.get("type"));
 			String name = attrs.get("name");
-			UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), content.trim(), null);
+			UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), content, null);
 			parseExp(exp, model.getModelInfo().getAllImports(), cl);
 			MParameter param = new MParameter(attrs.get("direction"), clazz, name, exp);
 			params.add(param);
