@@ -251,6 +251,17 @@ public class BpmnEditorWindow extends JFrame
 		return ret;
 	}
 	
+	
+	/**
+	 *  Gets the global cache.
+	 *
+	 *  @return The global cache.
+	 */
+	public GlobalCache getGlobalCache()
+	{
+		return globalcache;
+	}
+
 	/**
 	 *  Gets the settings.
 	 *

@@ -72,7 +72,7 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				final SettingsPanel spanel = new SettingsPanel(editorwindow.getSettings());
+				final SettingsPanel spanel = new SettingsPanel(editorwindow.getGlobalCache(), editorwindow.getSettings());
 				OptionDialog od = new OptionDialog(editorwindow, "Settings", true, spanel, new AbstractAction()
 				{
 					public void actionPerformed(ActionEvent e)

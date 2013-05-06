@@ -23,12 +23,16 @@ public class SettingsPanel extends JPanel
 	/** The library path field. */
 	protected JTextField libpathfield;
 	
+	/** The global cache. */
+	protected GlobalCache globalcache;
+	
 	/** The settings */
 	protected Settings settings;
 	
-	public SettingsPanel(Settings settings)
+	public SettingsPanel(GlobalCache globalcache, Settings settings)
 	{
 		super(new GridBagLayout());
+		this.globalcache = globalcache;
 		
 		JTabbedPane tabpane = new JTabbedPane();
 		tabpane.setBorder(new EmptyBorder(10, 5, 10, 5));
@@ -106,5 +110,7 @@ public class SettingsPanel extends JPanel
 	public void applySettings()
 	{
 		settings.setLibraryHome(new File(libpathfield.getText()));
+		globalcache.getGlobalTaskClasses().clear();
+		globalcache.getGlobalTaskClasses().addAll(GlobalCache.scanForTaskClasses(settings.getHomeClassLoader()));
 	}
 }
