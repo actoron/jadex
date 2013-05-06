@@ -248,6 +248,7 @@ public class MouseController extends MouseAdapter
 	
 	protected void setTargetScale(double scale)
 	{
+		modelcontainer.getGraphComponent().stopEditing(true);
 		targetscale = scale;
 		zoomdist = targetscale - modelcontainer.getGraph().getView().getScale();
 		zoomstep = 1;

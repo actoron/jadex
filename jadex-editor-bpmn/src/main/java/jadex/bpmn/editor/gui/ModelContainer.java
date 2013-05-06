@@ -211,6 +211,9 @@ public class ModelContainer
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EXTERNAL_SUBPROCESS, MBpmnModel.SUBPROCESS);
 	}
 	
+	/** The global cache. */
+	protected GlobalCache globalcache;
+	
 	/** The global settings. */
 	protected Settings settings;
 	
@@ -257,8 +260,9 @@ public class ModelContainer
 	/**
 	 *  Creates a new container.
 	 */
-	public ModelContainer(Settings settings)
+	public ModelContainer(GlobalCache globalcache, Settings settings)
 	{
+		this.globalcache = globalcache;
 		this.settings = settings;
 		this.idgen = new IdGenerator();
 		//this.imageprovider = new ImageProvider();
@@ -494,6 +498,15 @@ public class ModelContainer
 		}
 		
 		generateClassLoader();
+	}
+	
+	/**
+	 *  Returns the root for the project class loader.
+	 *  @return The root of the project class loader.
+	 */
+	public File getProjectClassLoaderRoot()
+	{
+		return classloaderroot;
 	}
 	
 	/**
@@ -779,7 +792,7 @@ public class ModelContainer
 		ClassLoader parent = settings.getHomeClassLoader();
 		if(parent == null)
 		{
-			parent = ModelContainer.class.getClassLoader();
+			parent = Settings.class.getClassLoader();
 		}
 		
 		if(classloaderroot != null)

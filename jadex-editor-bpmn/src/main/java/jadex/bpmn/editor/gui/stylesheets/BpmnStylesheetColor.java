@@ -368,7 +368,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
 		style.put(mxConstants.STYLE_SHADOW, Boolean.TRUE);
-		style.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
+//		style.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_CENTER);
 		style.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);

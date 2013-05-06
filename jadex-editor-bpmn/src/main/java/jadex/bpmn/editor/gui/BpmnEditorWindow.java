@@ -60,6 +60,9 @@ public class BpmnEditorWindow extends JFrame
 	/** The tab pane showing the models. */
 	protected JTabbedPane tabpane;
 	
+	/** The global cache. */
+	protected GlobalCache globalcache;
+	
 	/** The global settings. */
 	protected Settings settings;
 	
@@ -68,6 +71,8 @@ public class BpmnEditorWindow extends JFrame
 		super(BpmnEditor.APP_NAME);
 		
 		settings = Settings.load();
+		globalcache = new GlobalCache();
+		globalcache.getGlobalTaskClasses().addAll(GlobalCache.scanForTaskClasses(settings.getHomeClassLoader()));
 		
 		getContentPane().setLayout(new BorderLayout());
 		
@@ -284,7 +289,7 @@ public class BpmnEditorWindow extends JFrame
 		boolean createpool = false;
 		if (modelcontainer == null)
 		{
-			modelcontainer = new ModelContainer(settings);
+			modelcontainer = new ModelContainer(globalcache, settings);
 			createpool = true;
 		}
 		modelcontainer.setEditingToolbar(bpmntoolbar);
@@ -490,7 +495,7 @@ public class BpmnEditorWindow extends JFrame
 			}
 		}
 		
-		ModelContainer modelcontainer = new ModelContainer(settings);
+		ModelContainer modelcontainer = new ModelContainer(globalcache, settings);
 		mxStylesheet sheet = null;
 		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
 		{

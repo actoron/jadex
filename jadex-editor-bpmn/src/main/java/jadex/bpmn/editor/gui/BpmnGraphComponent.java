@@ -61,6 +61,8 @@ public class BpmnGraphComponent extends mxGraphComponent
 	{
 		super(graph);
 		
+		((mxCellEditor) getCellEditor()).setMinimumEditorScale(0.0);
+		
 		int width = 16;
 		int height = 16;
 		double dx = width / 16.0;
@@ -218,6 +220,12 @@ public class BpmnGraphComponent extends mxGraphComponent
 	{
 		return new mxInteractiveCanvas()
 		{
+
+			public void setScale(double scale)
+			{
+				super.setScale(scale);
+			}
+			
 			/**
 			 *  Bug-fixed method.
 			 */

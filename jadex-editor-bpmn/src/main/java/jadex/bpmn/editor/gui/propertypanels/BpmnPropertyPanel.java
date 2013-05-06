@@ -238,6 +238,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		
 		setupRequiredServicesTable(tabpane);
 		
+		tabpane.add("Subcomponents", new SubcomponentTab(container));
+		
 		add(tabpane, BorderLayout.CENTER);
 	}
 	
@@ -248,8 +250,6 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	{
 		JPanel tablepanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
-		gc.gridy = 1;
-		gc.gridheight = 2;
 		gc.weightx = 1.0;
 		gc.weighty = 1.0;
 		gc.fill = GridBagConstraints.BOTH;
@@ -289,7 +289,6 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
-		gc.gridy = 1;
 		gc.fill = GridBagConstraints.NONE;
 		gc.insets = new Insets(0, 0, 5, 5);
 		tablepanel.add(buttonpanel, gc);
@@ -1780,6 +1779,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 							itcs.setName(newname);
 						}
 						rs.setName(newname);
+						getModelInfo().setRequiredServices(getModelInfo().getRequiredServices());
 					}
 					break;
 				}
