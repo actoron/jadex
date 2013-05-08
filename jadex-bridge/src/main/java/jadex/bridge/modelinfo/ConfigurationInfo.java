@@ -81,7 +81,7 @@ public class ConfigurationInfo extends Startable
 	}
 	
 	/**
-	 *  Add an component.
+	 *  Add a component.
 	 *  @param component The component.
 	 */
 	public void addComponentInstance(ComponentInstanceInfo component)
@@ -89,6 +89,18 @@ public class ConfigurationInfo extends Startable
 		if(components==null)
 			components = new ArrayList<ComponentInstanceInfo>();
 		this.components.add(component);
+	}
+	
+	/**
+	 *  Removes a component.
+	 *  @param component The component.
+	 */
+	public void removeComponentInstance(ComponentInstanceInfo component)
+	{
+		if(components!=null)
+		{
+			this.components.remove(component);
+		}
 	}
 	
 	/**
