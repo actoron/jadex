@@ -3,7 +3,6 @@ package jadex.bpmn.editor.gui;
 import jadex.bpmn.editor.gui.controllers.EdgeController;
 import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
 import jadex.bpmn.editor.model.visual.VActivity;
-import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 
@@ -208,7 +207,7 @@ public class BpmnGraphComponent extends mxGraphComponent
 	
 	protected mxConnectionHandler createConnectionHandler()
 	{
-		return new EdgeController(this);
+		return new EdgeController(this, ((BpmnGraph) getGraph()).getModelContainer());
 	}
 	
 	protected mxGraphControl createGraphControl()

@@ -6,11 +6,13 @@ import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VMessagingEdge;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.model.MBpmnModel;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -21,13 +23,19 @@ import java.awt.Rectangle;
 import java.awt.font.LineMetrics;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.mxgraph.canvas.mxGraphics2DCanvas;
+import com.mxgraph.shape.mxConnectorShape;
 import com.mxgraph.shape.mxDefaultTextShape;
+import com.mxgraph.shape.mxIMarker;
 import com.mxgraph.shape.mxMarkerRegistry;
 import com.mxgraph.shape.mxSwimlaneShape;
 import com.mxgraph.util.mxConstants;
@@ -48,6 +56,9 @@ public class BpmnStylesheetColor extends mxStylesheet
 	
 	/** The default font. */
 	public static final String FONT = "Bitstream Vera Sans";
+	
+	/** Arrow size. */
+	public static final int ARROW_SIZE = 10;
 	
 	/** BPMN Pool Color */
 	public static final String POOL_COLOR = "#cfdcf1";
@@ -120,6 +131,64 @@ public class BpmnStylesheetColor extends mxStylesheet
 	
 	static
 	{
+		mxGraphics2DCanvas.putShape(mxConstants.SHAPE_CONNECTOR, new mxConnectorShape()
+		{
+			/**
+			 * 
+			 */
+			public void paintShape(mxGraphics2DCanvas canvas, mxCellState state)
+			{
+				if (state.getAbsolutePointCount() > 1
+						&& configureGraphics(canvas, state, false))
+				{
+					List<mxPoint> pts = new ArrayList<mxPoint>(
+							state.getAbsolutePoints());
+					Map<String, Object> style = state.getStyle();
+
+					// Paints the markers and updates the points
+					// Switch off any dash pattern for markers
+					boolean dashed = mxUtils.isTrue(style, mxConstants.STYLE_DASHED);
+					Object dashedValue = style.get(mxConstants.STYLE_DASHED);
+
+					if (dashed)
+					{
+						style.remove(mxConstants.STYLE_DASHED);
+						canvas.getGraphics().setStroke(canvas.createStroke(style));
+					}
+					
+					if (dashed)
+					{
+						// Replace the dash pattern
+						style.put(mxConstants.STYLE_DASHED, dashedValue);
+						canvas.getGraphics().setStroke(canvas.createStroke(style));
+					}
+
+					paintPolyline(canvas, pts, state.getStyle());
+					
+					translatePoint(pts, 0,
+							paintMarker(canvas, state, true));
+					translatePoint(
+							pts,
+							pts.size() - 1,
+							paintMarker(canvas, state, false));
+				}
+			}
+			
+			/**
+			 * 
+			 */
+			protected void translatePoint(List<mxPoint> points, int index, mxPoint offset)
+			{
+				if (offset != null)
+				{
+					mxPoint pt = (mxPoint) points.get(index).clone();
+					pt.setX(pt.getX() + offset.getX());
+					pt.setY(pt.getY() + offset.getY());
+					points.set(index, pt);
+				}
+			}
+		});
+		
 		//mxGraphics2DCanvas.putShape(VPool.class.getSimpleName(), new PoolLaneShape(true));
 		//mxGraphics2DCanvas.putShape(VLane.class.getSimpleName(), new PoolLaneShape(false));
 		mxConstants.RECTANGLE_ROUNDING_FACTOR = 0.05;
@@ -195,6 +264,29 @@ public class BpmnStylesheetColor extends mxStylesheet
 		mxGraphics2DCanvas.putShape(MBpmnModel.GATEWAY_DATABASED_INCLUSIVE, new GatewayShape(GatewayShape.GATEWAY_SHAPE_TYPE_OR));
 		mxGraphics2DCanvas.putShape(EventShape.class.getSimpleName(), new EventShape());
 		mxMarkerRegistry.registerMarker(StrokeMarker.class.getSimpleName(), new StrokeMarker());
+		mxMarkerRegistry.registerMarker("Empty Arrow", new mxIMarker()
+		{
+			public mxPoint paintMarker(mxGraphics2DCanvas canvas,
+					mxCellState state, String type, mxPoint pe, double nx,
+					double ny, double size, boolean source)
+			{
+				GeneralPath gp = new GeneralPath();
+				gp.moveTo(Math.round(pe.getX() - nx - ny / 2),
+						  Math.round(pe.getY() - ny + nx / 2));
+				gp.lineTo(Math.round(pe.getX() - nx / 6),
+						  Math.round(pe.getY() - ny / 6));
+				gp.lineTo(Math.round(pe.getX() + ny / 2 - nx),
+						  Math.round(pe.getY() - ny - nx / 2));
+				gp.closePath();
+				canvas.getGraphics().setColor(Color.WHITE);
+				canvas.getGraphics().fill(gp);
+				canvas.getGraphics().setColor(Color.BLACK);
+				canvas.getGraphics().setStroke(new BasicStroke());
+				canvas.getGraphics().draw(gp);
+				
+				return new mxPoint(-nx / 2, -ny / 2);
+			}
+		});
 		
 		mxGraphics2DCanvas.putTextShape(mxGraphics2DCanvas.TEXT_SHAPE_DEFAULT, new mxDefaultTextShape()
 		{
@@ -414,6 +506,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style = new HashMap<String, Object>(style);
 		style.put(mxConstants.STYLE_SHAPE, EventShape.class.getSimpleName());
 		style.put(mxConstants.STYLE_FILLCOLOR, START_EVENT_COLOR);
+		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_ELLIPSE);
 		putCellStyle(VActivity.class.getSimpleName() + "_" + EventShape.class.getSimpleName() + "_START", style);
 		
 		style = new HashMap<String, Object>(style);
@@ -437,6 +530,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style = new HashMap<String, Object>();
 		style.put(mxConstants.STYLE_STARTARROW, mxConstants.NONE);
 		style.put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_CLASSIC);
+		style.put(mxConstants.STYLE_ENDSIZE, ARROW_SIZE);
 		style.put(mxConstants.STYLE_ROUNDED, Boolean.TRUE);
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
@@ -457,9 +551,10 @@ public class BpmnStylesheetColor extends mxStylesheet
 		
 		style = new HashMap<String, Object>();
 		style.put(mxConstants.STYLE_STARTARROW, mxConstants.NONE);
-		style.put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_DIAMOND);
+		style.put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_OVAL);
+		style.put(mxConstants.STYLE_ENDSIZE, ARROW_SIZE);
 		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
-		style.put(mxConstants.STYLE_DASH_PATTERN, new float[] { 5.0f, 5.0f });
+		style.put(mxConstants.STYLE_DASH_PATTERN, new float[] { 10.0f, 10.0f });
 		style.put(mxConstants.STYLE_ROUNDED, Boolean.TRUE);
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
@@ -472,5 +567,20 @@ public class BpmnStylesheetColor extends mxStylesheet
 //		style.put(mxConstants.STYLE_EDGE, new SequenceEdgeStyleFunction());
 		//style.put(mxConstants.STYLE_LOOP, mxConstants.EDGESTYLE_LOOP);
 		putCellStyle(VDataEdge.class.getSimpleName(), style);
+		
+		style = new HashMap<String, Object>();
+		style.put(mxConstants.STYLE_STARTARROW, mxConstants.NONE);
+		style.put(mxConstants.STYLE_ENDARROW, "Empty Arrow");
+		style.put(mxConstants.STYLE_ENDSIZE, ARROW_SIZE);
+		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
+		style.put(mxConstants.STYLE_DASH_PATTERN, new float[] { 5.0f, 5.0f });
+		style.put(mxConstants.STYLE_ROUNDED, Boolean.TRUE);
+		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
+		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
+		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
+		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
+		putCellStyle(VMessagingEdge.class.getSimpleName(), style);
 	}
 }

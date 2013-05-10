@@ -12,7 +12,6 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.ResourceInfo;
-import jadex.commons.gui.JSplitPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -76,27 +75,27 @@ public class BpmnEditorWindow extends JFrame
 		
 		getContentPane().setLayout(new BorderLayout());
 		
-		final JSplitPanel statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT)
-		{
-			/* Bug fix goodness for Swing. */
-			@SuppressWarnings("deprecation")
-			public void reshape(int x, int y, int w, int h)
-			{
-				final double divloc = getProportionalDividerLocation();
-				super.reshape(x, y, w, h);
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						setDividerLocation(divloc);
-					}
-				});
-			}
-		};
-		statuspane.setOneTouchExpandable(true);
-		statuspane.setBottomComponent(new StatusArea());
+//		final JSplitPanel statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT)
+//		{
+//			/* Bug fix goodness for Swing. */
+//			@SuppressWarnings("deprecation")
+//			public void reshape(int x, int y, int w, int h)
+//			{
+//				final double divloc = getProportionalDividerLocation();
+//				super.reshape(x, y, w, h);
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						setDividerLocation(divloc);
+//					}
+//				});
+//			}
+//		};
+//		statuspane.setOneTouchExpandable(true);
+//		statuspane.setBottomComponent(new StatusArea());
 		BpmnEditor.initialize();
-		getContentPane().add(statuspane, BorderLayout.CENTER);
+//		getContentPane().add(statuspane, BorderLayout.CENTER);
 		
 //		statuspane.addComponentListener(new ComponentAdapter()
 //		{
@@ -135,7 +134,8 @@ public class BpmnEditorWindow extends JFrame
 //				return ret;
 //			}
 //		};
-		statuspane.setTopComponent(tabpane);
+//		statuspane.setTopComponent(tabpane);
+		getContentPane().add(tabpane, BorderLayout.CENTER);
 		
 		addWindowListener(new WindowAdapter()
 		{
@@ -177,12 +177,12 @@ public class BpmnEditorWindow extends JFrame
 				{
 					public void run()
 					{
-						statuspane.repaint();
-						statuspane.revalidate();
-						statuspane.setDividerLocation(statuspane.getHeight());
-						statuspane.setDividerLocation(1.0);
-						statuspane.repaint();
-						statuspane.revalidate();
+//						statuspane.repaint();
+//						statuspane.revalidate();
+//						statuspane.setDividerLocation(statuspane.getHeight());
+//						statuspane.setDividerLocation(1.0);
+//						statuspane.repaint();
+//						statuspane.revalidate();
 						
 						File[] openedfiles = settings.getOpenedFiles();
 						if (openedfiles != null && openedfiles.length > 0)
@@ -213,8 +213,8 @@ public class BpmnEditorWindow extends JFrame
 		
 		setVisible(true);
 		getContentPane().doLayout();
-		statuspane.setDividerLocation(1.0);
-		statuspane.repaint();
+//		statuspane.setDividerLocation(1.0);
+//		statuspane.repaint();
 	}
 	
 	/**

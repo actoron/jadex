@@ -2,17 +2,12 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.IdGenerator;
-import jadex.bpmn.editor.gui.propertypanels.TaskPropertyPanel;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -22,7 +17,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -53,6 +47,9 @@ public class ModelContainer
 	
 	/** Edit mode for adding control points. */
 	public static final String EDIT_MODE_ADD_CONTROL_POINT = "AddControlPoint";
+	
+	/** Edit mode for message edges. */
+	public static final String EDIT_MODE_MESSAGING_EDGE = "MessagingEdge";
 	
 	/** Edit mode for adding pools. */
 	public static final String EDIT_MODE_POOL = "Pool";

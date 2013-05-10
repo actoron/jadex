@@ -5,7 +5,6 @@ import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
-import jadex.bpmn.editor.gui.stylesheets.SequenceEdgeStyleFunction;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VLane;
@@ -33,6 +32,7 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
+import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraphView;
 
 /**
@@ -93,12 +93,10 @@ public class MouseController extends MouseAdapter
 					mxGeometry geo = vedge.getGeometry();
 					List<mxPoint> points = (List<mxPoint>) geo.getPoints();
 					
-//					double scale = modelcontainer.getGraph().getView().getScale();
-//					mxp.setX(mxp.getX() * scale);
-//					mxp.setY(mxp.getY() * scale);
+					mxICell parent = null;
 					if (vedge.getSource() != null && vedge.getSource().getParent() != null)
 					{
-						mxICell parent = vedge.getSource().getParent();
+						parent = vedge.getSource().getParent();
 						while (parent != null &&
 							   !(parent instanceof VSubProcess) &&
 							   !(parent instanceof VLane) &&
@@ -107,10 +105,15 @@ public class MouseController extends MouseAdapter
 							parent = parent.getParent();
 						}
 						
-						mxp = SequenceEdgeStyleFunction.unAdjustPoint(modelcontainer.getGraph(), parent, mxp);
-						//p = SequenceEdgeStyleFunction.unAdjustPoint(modelcontainer.getGraph(), parent, p);
-//						mxp = SequenceEdgeStyleFunction.unAdjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
-//						mxp = SCreationController.adjustPoint(modelcontainer.getGraph(), vedge.getSource().getParent(), mxp);
+						if (parent != null)
+						{
+							mxCellState pstate = modelcontainer.getGraph().getView().getState(parent, true);
+							if (pstate != null)
+							{
+								mxp.setX(p.getX() - pstate.getOrigin().getX());
+								mxp.setY(p.getY() - pstate.getOrigin().getY());
+							}
+						}
 					}
 					
 					if (points == null)
@@ -119,16 +122,17 @@ public class MouseController extends MouseAdapter
 						geo.setPoints(points);
 					}
 					
+					double scale = modelcontainer.getGraph().getView().getScale();
+					mxPoint amxp = (new mxPoint(p.getX() * scale, p.getY() * scale));
+					
 					if (points.size() == 0)
 					{
 						points.add(mxp);
 					}
 					else
 					{
-						System.out.println(p);
-						int i = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), p.getX(), p.getY());;
-						System.out.println(i);
-						points.add(i, mxp);
+						int ind = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), amxp.getX(), amxp.getY());;
+						points.add(ind, mxp);
 					}
 					
 					modelcontainer.getGraph().refreshCellView((VEdge) cell);

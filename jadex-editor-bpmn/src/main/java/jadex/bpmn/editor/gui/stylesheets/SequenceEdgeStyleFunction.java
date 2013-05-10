@@ -257,29 +257,6 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 		return p;
 	}
 	
-	/**
-	 *  Adjusts a point for absolute positioning.
-	 *  
-	 *  @param modelcontainer The model container.
-	 *  @param parent The parent cell.
-	 *  @param point The unadjusted targeted point.
-	 *  @return The adjusted point.
-	 */
-	public static final mxPoint unAdjustPoint(mxGraph graph, Object parent, mxPoint point)
-	{
-		mxPoint p = point;
-		double scale = graph.getView().getScale();
-		
-		mxCellState pstate = graph.getView().getState(parent);
-		if (pstate != null)
-		{
-			p.setX(p.getX() - pstate.getOrigin().getX() * scale);
-			p.setY(p.getY() - pstate.getOrigin().getY() * scale);
-		}
-		
-		return p;
-	}
-	
 	public static final VActivity getVActivity(Object cell)
 	{
 		VActivity ret = null;

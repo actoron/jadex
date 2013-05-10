@@ -156,7 +156,10 @@ public abstract class AbstractEditingToolbar extends JPanel
 	 */
 	protected void addSeparator(int row)
 	{
-		getToolBar(row).addSeparator();
+		JToolBar tb = getToolBar(row);
+		JScrollPane sp = (JScrollPane) tb.getComponent(0);
+		JPanel tbpanel = (JPanel) sp.getViewport().getComponent(0);
+		tbpanel.add(new JToolBar.Separator());
 	}
 	
 	/**
@@ -169,7 +172,7 @@ public abstract class AbstractEditingToolbar extends JPanel
 	{
 		while (row >= toolbars.size())
 		{
-			JToolBar newbar = new JToolBar();
+			JToolBar newbar = new JToolBar(JToolBar.HORIZONTAL);
 			newbar.setLayout(new OverlayLayout(newbar));
 			newbar.setFloatable(true);
 			newbar.setAlignmentX(Component.LEFT_ALIGNMENT);

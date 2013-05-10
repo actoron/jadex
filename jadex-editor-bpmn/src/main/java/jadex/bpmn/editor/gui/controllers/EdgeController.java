@@ -2,8 +2,8 @@ package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.EdgeDragContextMenu;
+import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VInParameter;
@@ -34,6 +34,9 @@ import com.mxgraph.view.mxGraph;
  */
 public class EdgeController extends mxConnectionHandler
 {
+	/** The model container */
+	protected ModelContainer modelcontainer;
+	
 	/** Really commit flag. Hack? */
 	protected boolean reallycommit = false;
 	
@@ -41,9 +44,10 @@ public class EdgeController extends mxConnectionHandler
 	 *  Creates the edge controller.
 	 *  @param graphcomponent The graph component.
 	 */
-	public EdgeController(BpmnGraphComponent graphcomponent)
+	public EdgeController(mxGraphComponent graphcomponent, ModelContainer modelcontainer)
 	{
 		super(graphcomponent);
+		this.modelcontainer = modelcontainer;
 		marker.setHotspot(0.1);
 	}
 	
@@ -60,22 +64,34 @@ public class EdgeController extends mxConnectionHandler
 	 */
 	public String validateConnection(Object source, Object target)
 	{
+		if (source != null && target != null && target != source)
+		{
+			System.out.println("");
+		}
 		String ret = super.validateConnection(source, target);
 		
-		if (ret == null)
+		String mode = modelcontainer.getEditMode();
+		if (ModelContainer.EDIT_MODE_MESSAGING_EDGE.equals(mode))
 		{
-			if (source instanceof VInParameter ||
-				source instanceof VOutParameter)
-			{
-				ret = SValidation.getDataEdgeValidationError(source, target);
-			}
+			ret = SValidation.getMessagingEdgeValidationError(source, target);
 		}
-		
-		if (ret == null)
+		else
 		{
-			if (source instanceof VActivity)
+			if (ret == null)
 			{
-				ret = SValidation.getSequenceEdgeValidationError(source, target);
+				if (source instanceof VInParameter ||
+					source instanceof VOutParameter)
+				{
+					ret = SValidation.getDataEdgeValidationError(source, target);
+				}
+			}
+			
+			if (ret == null)
+			{
+				if (source instanceof VActivity)
+				{
+					ret = SValidation.getSequenceEdgeValidationError(source, target);
+				}
 			}
 		}
 		
@@ -96,7 +112,8 @@ public class EdgeController extends mxConnectionHandler
 		if (connectPreview != null &&
 			connectPreview.getPreviewState() != null &&
 			((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(false) == null &&
-			((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(true) instanceof VActivity)
+			((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(true) instanceof VActivity &&
+			!ModelContainer.EDIT_MODE_MESSAGING_EDGE.equals(modelcontainer.getEditMode()))
 		{
 			graphComponent.getGraph().getModel().beginUpdate();
 			final EdgeDragContextMenu[] edcmc = new EdgeDragContextMenu[1];
@@ -188,7 +205,8 @@ public class EdgeController extends mxConnectionHandler
 						((mxICell) trg).removeEdge(cell, false);
 					}
 					
-					cell = SCreationController.createConnection((BpmnGraph) graph, src, trg, ((BpmnConnectPreview) connectPreview).timestamp);
+					String mode = modelcontainer.getEditMode();
+					cell = SCreationController.createConnection((BpmnGraph) graph, mode, src, trg, ((BpmnConnectPreview) connectPreview).timestamp);
 					List<mxPoint> points = null;
 					if (cell != null && cell.getGeometry() != null)
 					{

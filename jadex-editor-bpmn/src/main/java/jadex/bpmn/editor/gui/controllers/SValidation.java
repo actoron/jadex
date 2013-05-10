@@ -126,7 +126,6 @@ public class SValidation
 			mxICell tp = ta;
 			if (tp != null)
 			{
-				tp = ta;
 				while (!(tp instanceof VPool))
 				{
 					tp = tp.getParent();
@@ -160,6 +159,32 @@ public class SValidation
 	}
 	
 	/**
+	 *  Validates a messaging edge connection.
+	 *  
+	 *  @param source The proposed source of the edge.
+	 *  @param target The proposed target of the edge.
+	 *  @return Error message explaining why the connection is invalid or null if valid.
+	 */
+	public static String getMessagingEdgeValidationError(Object source, Object target)
+	{
+		if (source instanceof VActivity && target instanceof VActivity)
+		{
+			MActivity sact = (MActivity) ((VActivity) source).getBpmnElement();
+			MActivity tact = (MActivity) ((VActivity) target).getBpmnElement();
+			if (sact.getActivityType().startsWith("Event") &&
+				sact.getActivityType().endsWith("Message") &&
+				sact.isThrowing() &&
+				tact.getActivityType().startsWith("Event") &&
+				tact.getActivityType().endsWith("Message") &&
+				!tact.isThrowing())
+			{
+				return null;
+			}
+		}
+		return "Message edges can only be drawn between throwing message events and non-throwing message events.";
+	}
+	
+	/**
 	 *  Validates a data edge connection.
 	 *  
 	 *  @param source The proposed source of the edge.
@@ -172,6 +197,27 @@ public class SValidation
 		if (!(source instanceof VOutParameter) || !(target instanceof VInParameter))
 		{
 			error = "Data edges can only connect an output parameter with an input parameter.";
+		}
+		
+		if (error == null)
+		{
+			mxICell sp = (mxICell) source;
+			while (!(sp instanceof VPool))
+			{
+				sp = sp.getParent();
+			}
+			mxICell tp = (mxICell) target;
+			if (tp != null)
+			{
+				while (!(tp instanceof VPool))
+				{
+					tp = tp.getParent();
+				}
+			}
+			if (!tp.equals(sp))
+			{
+				error = "No data edges allowed between pools.";
+			}
 		}
 		
 		return error;

@@ -6,9 +6,9 @@ import jadex.bpmn.editor.gui.layouts.LaneLayout;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VElement;
-import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VMessagingEdge;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
@@ -211,6 +211,10 @@ public class BpmnGraph extends mxGraph
 			else if (edge instanceof VDataEdge)
 			{
 				error = SValidation.getDataEdgeValidationError(source, target);
+			}
+			else if (edge instanceof VMessagingEdge)
+			{
+				error = SValidation.getMessagingEdgeValidationError(source, target);
 			}
 		}
 		

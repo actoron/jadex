@@ -61,7 +61,8 @@ public class EdgeDragContextMenu extends JPopupMenu
 					ModelContainer.EDIT_MODE_LANE.equals(task.mode) ||
 					ModelContainer.EDIT_MODE_ADD_CONTROL_POINT.equals(task.mode) ||
 					ModelContainer.EDIT_MODE_SELECTION.equals(task.mode) ||
-					task.mode.endsWith(ModelContainer.BOUNDARY_EVENT))
+					task.mode.endsWith(ModelContainer.BOUNDARY_EVENT) ||
+					task.mode.equals(ModelContainer.EDIT_MODE_EVENT_BOUNDARY_MESSAGE))
 				{
 				}
 				else if (task.mode.startsWith("EventIntermediate"))

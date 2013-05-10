@@ -734,7 +734,39 @@ public class ImageProvider
 	{
 		BufferedImage ret = null;
 		
-		if ("GW_+".equals(name))
+		if ("MessagingEdge".equals(name))
+		{
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			
+			double w = size.width * 0.7;
+			double h = size.height * 0.7;
+			double x = (size.width - w) * 0.5;
+			double y = (size.height - h) * 0.5;
+			double lw = size.width * 0.05;
+			double aw = size.width * 0.1;
+			g.setColor(color);
+			Font font = iconfont.deriveFont(Math.max(size.width, size.height) * 0.45f);
+			Shape s = font.createGlyphVector(g.getFontRenderContext(), "M").
+					getOutline(0.0f, 0.0f);
+			float sw2 = (float) (s.getBounds2D().getWidth() * 0.5);
+			float sh2 = (float) (s.getBounds2D().getHeight() * 0.5);
+			s = font.createGlyphVector(g.getFontRenderContext(), "M").
+					getOutline((float) x + (float) w * 0.5f - sw2, (float) y + (float) h * 0.78f - sh2);
+			g.fill(s);
+//			g.drawLine((int) x, (int) (y + h * 0.8), (int) (x + w * 0.7), (int) (y + h * 0.8));
+			GeneralPath gp = new GeneralPath();
+			double lyp = y + h * 0.85;
+			gp.moveTo(x, lyp);
+			gp.lineTo(x + w * 0.7, lyp);
+			gp.lineTo(x + w * 0.7, lyp - aw);
+			gp.lineTo(x + w, lyp);
+			gp.lineTo(x + w * 0.7, lyp + aw);
+			gp.lineTo(x + w * 0.7, lyp);
+			g.setStroke(new BasicStroke((float) lw));
+			g.draw(gp);
+		}
+		else if ("GW_+".equals(name))
 		{
 			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 			Graphics2D g = ((BufferedImage) ret).createGraphics();

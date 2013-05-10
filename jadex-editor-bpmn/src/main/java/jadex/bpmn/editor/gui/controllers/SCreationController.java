@@ -9,6 +9,7 @@ import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VMessagingEdge;
 import jadex.bpmn.editor.model.visual.VNode;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
@@ -19,6 +20,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
@@ -294,13 +296,32 @@ public class SCreationController
 	 *  @param tgt Target object.
 	 *  @return Created edge.
 	 */
-	public static final mxICell createConnection(BpmnGraph graph, Object src, Object tgt, long timestamp)
+	public static final mxICell createConnection(BpmnGraph graph, String mode, Object src, Object tgt, long timestamp)
 	{
 		ModelContainer modelcontainer = graph.getModelContainer();
 		mxICell ret = null;
 		mxICell source = (mxICell) src;
 		mxICell target = (mxICell) tgt;
-		if (source instanceof VActivity && target instanceof VActivity)
+		if (ModelContainer.EDIT_MODE_MESSAGING_EDGE.equals(mode))
+		{
+			if (SValidation.getMessagingEdgeValidationError(source, target) == null)
+			{
+				MMessagingEdge medge = new MMessagingEdge();
+				medge.setId(modelcontainer.getIdGenerator().generateId());
+				medge.setSource((MActivity) ((VActivity) source).getBpmnElement());
+				medge.setTarget((MActivity) ((VActivity) target).getBpmnElement());
+				
+				VMessagingEdge vedge = new VMessagingEdge(graph);
+				vedge.setSource(source);
+				vedge.setTarget(target);
+				vedge.setBpmnElement(medge);
+				
+				ret = vedge;
+			}
+			
+			modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+		}
+		else if (source instanceof VActivity && target instanceof VActivity)
 		{
 			if (src.equals(tgt) &&
 				System.currentTimeMillis() - timestamp < 2000)

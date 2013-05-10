@@ -17,7 +17,7 @@ import javax.swing.JTextArea;
  */
 public class StatusArea extends JPanel
 {
-	public StatusArea()
+	public StatusArea(int x)
 	{
 		setLayout(new BorderLayout());
 		final JTextArea logarea = new JTextArea();

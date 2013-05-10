@@ -153,6 +153,10 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_ADD_CONTROL_POINT, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(GuiConstants.CONTROL_POINT_COLOR),
 				"Add Control Point", iconsize));
 		
+		sym = "MessagingEdge";
+		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_MESSAGING_EDGE, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(GuiConstants.MESSAGE_EDGE_COLOR),
+				"Create Message Edge", iconsize));
+		
 		sym = "Pool";
 		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_POOL, ImageProvider.SHAPE_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.POOL_COLOR),
 				"Pool", iconsize));
