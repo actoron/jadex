@@ -308,8 +308,12 @@ public class SCreationController
 			{
 				MMessagingEdge medge = new MMessagingEdge();
 				medge.setId(modelcontainer.getIdGenerator().generateId());
-				medge.setSource((MActivity) ((VActivity) source).getBpmnElement());
-				medge.setTarget((MActivity) ((VActivity) target).getBpmnElement());
+				MActivity sact = (MActivity) ((VActivity) source).getBpmnElement();
+				MActivity tact = (MActivity) ((VActivity) target).getBpmnElement();
+				medge.setSource(sact);
+				medge.setTarget(tact);
+				sact.addOutgoingMessagingEdge(medge);
+				tact.addIncomingMessagingEdge(medge);
 				
 				VMessagingEdge vedge = new VMessagingEdge(graph);
 				vedge.setSource(source);

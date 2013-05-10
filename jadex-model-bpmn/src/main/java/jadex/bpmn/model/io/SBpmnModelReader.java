@@ -6,6 +6,7 @@ import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
@@ -516,6 +517,20 @@ public class SBpmnModelReader
 			{
 				sps.peek().addSequenceEdge(edge);
 			}
+			
+			emap.put(edge.getId(), edge);
+		}
+		else if("messageFlow".equals(tag.getLocalPart()))
+		{
+			MMessagingEdge edge = new MMessagingEdge();
+			edge.setId(attrs.get("id"));
+			MActivity src = (MActivity) emap.get(attrs.get("sourceRef"));
+			MActivity tgt = (MActivity) emap.get(attrs.get("targetRef"));
+			edge.setSource(src);
+			edge.setTarget(tgt);
+			
+			src.addOutgoingMessagingEdge(edge);
+			tgt.addIncomingMessagingEdge(edge);
 			
 			emap.put(edge.getId(), edge);
 		}

@@ -30,7 +30,7 @@ public class VMessagingEdge extends VEdge
 			if (source != null)
 			{
 				VActivity vsrc = (VActivity) getSource();
-				((MActivity) vsrc.getBpmnElement()).addIncomingMessagingEdge(medge);
+				((MActivity) vsrc.getBpmnElement()).addOutgoingMessagingEdge(medge);
 				medge.setSource((MActivity) vsrc.getBpmnElement());
 			}
 		}

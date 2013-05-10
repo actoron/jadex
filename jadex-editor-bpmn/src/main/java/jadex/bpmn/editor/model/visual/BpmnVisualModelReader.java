@@ -6,6 +6,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
@@ -237,6 +238,13 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				vedge = new VSequenceEdge(graph, VSequenceEdge.class.getSimpleName());
 				vedge.setSource(vmap.get(mseqedge.getSource().getId()));
 				vedge.setTarget(vmap.get(mseqedge.getTarget().getId()));
+			}
+			else if (medge instanceof MMessagingEdge)
+			{
+				MMessagingEdge mmedge = (MMessagingEdge) medge;
+				vedge = new VMessagingEdge(graph);
+				vedge.setSource(vmap.get(mmedge.getSource().getId()));
+				vedge.setTarget(vmap.get(mmedge.getTarget().getId()));
 			}
 			vedge.setBpmnElement(medge);
 			

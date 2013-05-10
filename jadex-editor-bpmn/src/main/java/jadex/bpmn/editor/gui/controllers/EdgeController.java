@@ -64,10 +64,6 @@ public class EdgeController extends mxConnectionHandler
 	 */
 	public String validateConnection(Object source, Object target)
 	{
-		if (source != null && target != null && target != source)
-		{
-			System.out.println("");
-		}
 		String ret = super.validateConnection(source, target);
 		
 		String mode = modelcontainer.getEditMode();

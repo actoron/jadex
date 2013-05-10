@@ -5,6 +5,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
@@ -38,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 5;
+	public static final int BUILD = 6;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -791,10 +792,12 @@ public class SBpmnModelWriter
 				List<MActivity> activities = getPoolActivities(pool);
 				
 				List<MSequenceEdge> seqedges = new ArrayList<MSequenceEdge>();
+				List<MMessagingEdge> medges = new ArrayList<MMessagingEdge>();
 				List<MDataEdge> dataedges = new ArrayList<MDataEdge>();
-				writeActivitySemantics(out, activities, null, ind, seqedges, dataedges);
+				writeActivitySemantics(out, activities, null, ind, seqedges, medges, dataedges);
 				
 				writeSequenceEdgeSemantics(out, seqedges, ind);
+				writeMessagingEdgeSemantics(out, medges, ind);
 				writePoolExtensions(out, ind, dataedges);
 				
 				--ind;
@@ -899,7 +902,7 @@ public class SBpmnModelWriter
 	 *  @param out The output.
 	 *  @param activities The activities.
 	 */
-	protected static final void writeActivitySemantics(PrintStream out, List<MActivity> activities, String evthandlerref, int baseind, List<MSequenceEdge> seqedges, List<MDataEdge> dataedges)
+	protected static final void writeActivitySemantics(PrintStream out, List<MActivity> activities, String evthandlerref, int baseind, List<MSequenceEdge> seqedges, List<MMessagingEdge> medges, List<MDataEdge> dataedges)
 	{
 		for (MActivity activity : activities)
 		{
@@ -911,6 +914,11 @@ public class SBpmnModelWriter
 			if (activity.getOutgoingSequenceEdges() != null)
 			{
 				seqedges.addAll(activity.getOutgoingSequenceEdges());
+			}
+			
+			if (activity.getOutgoingMessagingEdges() != null)
+			{
+				medges.addAll(activity.getOutgoingMessagingEdges());
 			}
 			
 			out.print(getIndent(baseind) + "<semantic:");
@@ -1067,14 +1075,14 @@ public class SBpmnModelWriter
 					List<MActivity> subactivities = subproc.getActivities();
 					if (subactivities != null && subactivities.size() > 0)
 					{
-						writeActivitySemantics(out, subactivities, null, baseind + 1, seqedges, dataedges);
+						writeActivitySemantics(out, subactivities, null, baseind + 1, seqedges, medges, dataedges);
 					}
 					
-					List<MSequenceEdge> subseqedges = subproc.getSequenceEdges();
-					if (subseqedges != null && subseqedges.size() > 0)
-					{
-						writeSequenceEdgeSemantics(out, subseqedges, baseind + 1);
-					}
+//					List<MSequenceEdge> subseqedges = subproc.getSequenceEdges();
+//					if (subseqedges != null && subseqedges.size() > 0)
+//					{
+//						writeSequenceEdgeSemantics(out, subseqedges, baseind + 1);
+//					}
 				}
 			}
 			
@@ -1169,7 +1177,7 @@ public class SBpmnModelWriter
 			
 			if (activity.getEventHandlers() != null && activity.getEventHandlers().size() > 0)
 			{
-				writeActivitySemantics(out, activity.getEventHandlers(), activity.getId(), baseind, seqedges, dataedges);
+				writeActivitySemantics(out, activity.getEventHandlers(), activity.getId(), baseind, seqedges, medges, dataedges);
 			}
 		}
 	}
@@ -1222,6 +1230,28 @@ public class SBpmnModelWriter
 			}
 			
 			out.println(getIndent(baseind) + "</semantic:sequenceFlow>");
+		}
+	}
+	
+	/**
+	 *  Writes the messaging edges of the semantics sections.
+	 *  
+	 *  @param out The output.
+	 *  @param seqedges The messaging edges.
+	 */
+	protected static final void writeMessagingEdgeSemantics(PrintStream out, List<MMessagingEdge> medges, int baseind)
+	{
+		for (MMessagingEdge edge : medges)
+		{
+			out.print(getIndent(baseind) + "<semantic:messageFlow sourceRef=\"");
+			out.print(escapeString(edge.getSource().getId()));
+			out.print("\" targetRef=\"");
+			out.print(escapeString(edge.getTarget().getId()));
+			out.print("\" id=\"");
+			out.print(escapeString(edge.getId()));
+			out.println("\">");
+			
+			out.println(getIndent(baseind) + "</semantic:messageFlow>");
 		}
 	}
 	
