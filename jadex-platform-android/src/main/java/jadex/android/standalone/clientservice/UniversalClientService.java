@@ -11,8 +11,6 @@ import android.os.IBinder;
 
 public class UniversalClientService extends Service 
 {
-
-	
 	private Service clientService;
 	
 	private boolean isCreate;
@@ -37,27 +35,15 @@ public class UniversalClientService extends Service
 	public IBinder onBind(Intent intent)
 	{
 		ComponentName clientServiceComponent = intent.getParcelableExtra(UniversalClientBinder.CLIENT_SERVICE_COMPONENT);
-		intent.removeExtra(UniversalClientBinder.CLIENT_SERVICE_COMPONENT);
+		clientService = createClientService(clientServiceComponent.getClassName());
 		
-		ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(null);
-		Class<Service> clientServiceClass = SReflect.classForName0(clientServiceComponent.getClassName(), cl);
-		try
-		{
-			clientService = clientServiceClass.newInstance();
-			// re-set component info:
-			intent.setComponent(clientServiceComponent);
-			if (isCreate){
-				clientService.onCreate();
-			}
-			clientBinder = clientService.onBind(intent);
+		if (isCreate){
+			clientService.onCreate();
+			isCreate = false;
 		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			return null;
-		}
-		isCreate = false;
-		return new ClientBinder(clientBinder);
+		clientBinder = clientService.onBind(createClientIntent(intent));
+		UniversalClientBinder binderProxy = new UniversalClientBinder(clientBinder);
+		return binderProxy;
 	}
 	
 	@Override
@@ -76,21 +62,32 @@ public class UniversalClientService extends Service
 		clientBinder = null;
 	}
 	
-	
-	static class ClientBinder extends Binder implements UniversalClientBinder {
-
-		private IBinder clientBinder;
-
-		public ClientBinder(IBinder clientBinder)
+	private static Service createClientService(String className)
+	{
+		Service result;
+		ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(null);
+		@SuppressWarnings("unchecked")
+		Class<Service> clientServiceClass = SReflect.classForName0(className, cl);
+		try
 		{
-			this.clientBinder = clientBinder;
+			result = clientServiceClass.newInstance();
 		}
-
-		public IBinder getClientBinder()
+		catch (Exception e)
 		{
-			return clientBinder;
+			e.printStackTrace();
+			return null;
 		}
-
+		return result;
 	}
 
+	private static Intent createClientIntent(Intent intent)
+	{
+		Intent result = new Intent();
+		ComponentName clientServiceComponent = intent.getParcelableExtra(UniversalClientBinder.CLIENT_SERVICE_COMPONENT);
+		result.setComponent(clientServiceComponent);
+		result.putExtras(intent.getExtras());
+		result.removeExtra(UniversalClientBinder.CLIENT_SERVICE_COMPONENT);
+		return result;
+	}
+	
 }

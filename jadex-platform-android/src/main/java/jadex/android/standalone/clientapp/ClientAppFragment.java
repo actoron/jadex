@@ -18,7 +18,7 @@ public class ClientAppFragment extends ActivityAdapterFragment
 {
 	private ServiceConnectionProxy serviceConnectionProxy;
 	
-	private Map<ComponentName, ServiceConnection> serviceConnections = new HashMap<ComponentName, ServiceConnection>();
+	private Map<ComponentName, ServiceConnectionProxy> serviceConnections = new HashMap<ComponentName, ServiceConnectionProxy>();
 
 	public ClientAppFragment() {
 		super();
@@ -52,11 +52,11 @@ public class ClientAppFragment extends ActivityAdapterFragment
 			return super.bindService(service, conn, flags);
 		} else {
 			// individual user service requested
-			service = convertIntent(service);
-			serviceConnections.put(originalComponent, conn);
+			Intent universalServiceIntent = convertIntent(service);
 			
 			serviceConnectionProxy = new ServiceConnectionProxy(conn, originalComponent);
-			return super.bindService(service, serviceConnectionProxy, flags);
+			serviceConnections.put(originalComponent, serviceConnectionProxy);
+			return super.bindService(universalServiceIntent, serviceConnectionProxy, flags);
 		}
 	}
 	
@@ -64,7 +64,6 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	public void unbindService(ServiceConnection conn)
 	{
 		super.unbindService(serviceConnectionProxy);
-		serviceConnections.values().remove(conn);
 	}
 	
 	@Override
@@ -83,9 +82,13 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	private Intent convertIntent(Intent service) {
 		ComponentName originalComponent = service.getComponent();
 		service.putExtra(UniversalClientBinder.CLIENT_SERVICE_COMPONENT, originalComponent);
-		ComponentName universalComponent = new ComponentName(this.getActivity(), UniversalClientService.class);
-		service.setComponent(universalComponent);
-		return service;
+//		ComponentName universalComponent = new ComponentName(this.getActivity(), UniversalClientService.class);
+//		service.setComponent(universalComponent);
+		
+		Intent newIntent = new Intent(getActivity(), UniversalClientService.class);
+		newIntent.putExtras(service.getExtras());
+		newIntent.putExtra(UniversalClientBinder.CLIENT_SERVICE_COMPONENT, originalComponent);
+		return newIntent;
 	}
 	
 	

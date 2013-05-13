@@ -23,7 +23,9 @@ class ActivityAdapterFragment extends android.support.v4.app.Fragment
 	 */
 	public boolean bindService(Intent service, ServiceConnection conn, int flags)
 	{
-		return getActivity().bindService(service, conn, flags);
+		boolean success = getActivity().bindService(service, conn, flags);
+		System.out.println("Bind success: " + success);
+		return success;
 	}
 
 	/**

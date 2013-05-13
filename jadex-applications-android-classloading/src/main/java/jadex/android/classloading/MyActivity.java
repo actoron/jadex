@@ -1,5 +1,6 @@
 package jadex.android.classloading;
 
+import jadex.android.classloading.MyService.MyBinder;
 import jadex.android.standalone.clientapp.JadexClientAppService;
 import jadex.android.standalone.clientapp.PlatformProvidingClientAppFragment;
 import jadex.bridge.IComponentIdentifier;
@@ -28,6 +29,8 @@ import android.widget.TextView;
 public class MyActivity extends PlatformProvidingClientAppFragment
 {
 	private TextView statusTextView;
+	
+	private MyBinder service;
 
 	public MyActivity()
 	{
@@ -124,8 +127,9 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 
 		System.out.println("MyActivity binding service...");
 
-		Intent intent2 = new Intent(getActivity(), MyService.class);
-		bindService(intent2, new ServiceConnection()
+		Intent intent = new Intent(getActivity(), MyService.class);
+		intent.putExtra("myExtra", "myValue");
+		boolean bindService = bindService(intent, new ServiceConnection()
 		{
 
 			@Override
@@ -135,9 +139,11 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 			}
 
 			@Override
-			public void onServiceConnected(ComponentName name, IBinder service)
+			public void onServiceConnected(ComponentName name, IBinder binder)
 			{
 				System.out.println("MyActivity.onServiceConnected()");
+				service = (MyBinder) binder;
+				System.out.println(service.getResultObject().result);
 			}
 		}, BIND_AUTO_CREATE);
 		

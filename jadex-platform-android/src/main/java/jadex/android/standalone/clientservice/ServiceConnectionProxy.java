@@ -20,6 +20,7 @@ public class ServiceConnectionProxy implements ServiceConnection
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
 		UniversalClientBinder binder = (UniversalClientBinder) service;
+		System.out.println("ServiceConnectionProxy:onServiceConnected");
 		conn.onServiceConnected(originalComponent, binder.getClientBinder());
 	}
 
