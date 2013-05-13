@@ -3,7 +3,7 @@ package jadex.android.applications.demos.event;
 import jadex.android.IEventReceiver;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
-import jadex.android.service.JadexPlatformManager;
+import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -34,7 +34,7 @@ public class EventDemoActivity extends JadexAndroidActivity
 	public EventDemoActivity()
 	{
 		super();
-		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
+		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
 		setPlatformName("eventDemoPlatform");
 		setPlatformAutostart(true);
 	}

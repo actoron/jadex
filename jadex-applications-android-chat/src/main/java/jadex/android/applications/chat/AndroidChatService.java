@@ -1,5 +1,6 @@
 package jadex.android.applications.chat;
 
+import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.service.JadexPlatformManager;
 import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
@@ -88,9 +89,10 @@ public class AndroidChatService extends JadexPlatformService
 		newMessages = new LinkedList<ChatEvent>();
 
 		setPlatformAutostart(true);
-		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
+		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
 		setPlatformOptions(
 			"-awareness true " +
+			"-chat true " +
 			"-niotcptransport false " +
 			"-networkname jadexnetwork " +
 			"-networkpass laxlax");

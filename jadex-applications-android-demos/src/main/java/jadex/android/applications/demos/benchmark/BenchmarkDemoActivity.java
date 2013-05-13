@@ -2,7 +2,7 @@ package jadex.android.applications.demos.benchmark;
 
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
-import jadex.android.service.JadexPlatformManager;
+import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -54,7 +54,7 @@ public class BenchmarkDemoActivity extends JadexAndroidActivity
 	public BenchmarkDemoActivity()
 	{
 		super();
-		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
+		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
 		setPlatformName("benchmarkDemoPlatform");
 		setPlatformAutostart(true);
 	}

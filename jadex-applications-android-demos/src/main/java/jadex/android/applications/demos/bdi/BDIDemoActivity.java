@@ -2,7 +2,7 @@ package jadex.android.applications.demos.bdi;
 
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
-import jadex.android.service.JadexPlatformManager;
+import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
@@ -26,7 +26,7 @@ public class BDIDemoActivity extends JadexAndroidActivity
 	{
 		super();
 		setPlatformAutostart(true);
-		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO, JadexPlatformManager.KERNEL_COMPONENT, JadexPlatformManager.KERNEL_BDI);
+		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BDI);
 		setPlatformName("bdiDemoPlatform");
 	}
 

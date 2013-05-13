@@ -2,7 +2,7 @@ package jadex.android.applications.demos.bdiv3;
 
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
-import jadex.android.service.JadexPlatformManager;
+import jadex.android.commons.JadexPlatformOptions;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -20,7 +20,7 @@ public class BDIV3DemoActivity extends JadexAndroidActivity
 	{
 		super();
 		setPlatformAutostart(true);
-		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);//, JadexPlatformManager.KERNEL_BDIV3);
+		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);//, JadexPlatformOptions.KERNEL_BDIV3);
 		setPlatformName("bdiV3DemoPlatform");
 	}
 

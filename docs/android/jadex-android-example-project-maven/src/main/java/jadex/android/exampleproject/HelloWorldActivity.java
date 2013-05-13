@@ -1,6 +1,7 @@
 package jadex.android.exampleproject;
 
 import jadex.android.JadexAndroidActivity;
+import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
 import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.ComponentIdentifier;
@@ -45,7 +46,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 	public HelloWorldActivity()
 	{
 		super();
-		setPlatformKernels(JadexPlatformManager.KERNEL_MICRO);
+		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
 	}
 
 	/** Called when the activity is first created. */

@@ -1,18 +1,18 @@
 package jadex.android.applications.demos.controlcenter;
 
-import android.content.Intent;
 import jadex.android.JadexAndroidActivity;
+import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
-import jadex.android.service.JadexPlatformManager;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import android.content.Intent;
 
 public class ControlCenterDemoActivity extends JadexAndroidActivity
 {
 	public ControlCenterDemoActivity()
 	{
 		setPlatformAutostart(true);
-		setPlatformKernels(JadexPlatformManager.DEFAULT_KERNELS);
+		setPlatformKernels(JadexPlatformOptions.DEFAULT_KERNELS);
 		setPlatformOptions("-awareness true");
 	}
 	
