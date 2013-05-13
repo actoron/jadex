@@ -3,6 +3,8 @@ package jadex.bpmn.editor.gui.propertypanels;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MProperty;
 import jadex.bridge.fipa.FIPAMessageType;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.types.message.MessageType;
@@ -11,7 +13,9 @@ import jadex.commons.collection.IndexMap;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComboBox;
@@ -24,33 +28,36 @@ import javax.swing.table.AbstractTableModel;
 
 public class MessageEventPropertyPanel extends BasePropertyPanel
 {
+	/** Names for the parameter table columns. */
+	protected static final String[] PARAMETER_COLUMN_NAMES = new String[] {"Name", "Value" };
+	
 	//FIXME: Copied from EventIntermediateMessageActivityHandler, probably
 	//		  has to be moved to model.
 	/** The type property message type identifies the meta type (e.g. fipa). */
-	public static final String	PROPERTY_MESSAGETYPE = "messagetype";
+	protected static final String	PROPERTY_MESSAGETYPE = "messagetype";
 	
 	/** The property message is the message to be sent. */
-	public static final String	PROPERTY_MESSAGE = "message";
+	protected static final String	PROPERTY_MESSAGE = "message";
 	
 	/** The property message is the message to be sent. */
-	public static final String	PROPERTY_CODECIDS = "codecids";
+	protected static final String	PROPERTY_CODECIDS = "codecids";
 	
 	/** Message name mapping. */
-	public static final BiHashMap<String, String> MESSAGE_NAME_MAPPING = new BiHashMap<String, String>();
+	protected static final BiHashMap<String, String> MESSAGE_NAME_MAPPING = new BiHashMap<String, String>();
 	static
 	{
 		MESSAGE_NAME_MAPPING.put("FIPA", "fipa");
 	}
 	
 	/** Message type mapping. */
-	public static final Map<String, MessageType> MESSAGE_TYPE_MAPPING = new HashMap<String, MessageType>();
+	protected static final Map<String, MessageType> MESSAGE_TYPE_MAPPING = new HashMap<String, MessageType>();
 	{
 		MessageType fmt = new FIPAMessageType();
 		MESSAGE_TYPE_MAPPING.put("fipa", fmt);
 	}
 	
 	/** The parameter cache */
-	protected IndexMap<String, UnparsedExpression> parametercache;
+	protected IndexMap<String, MProperty> parametercache;
 	
 	/** The visual event */
 	protected VActivity vevent;
@@ -60,9 +67,16 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 		super("Message Event", container);
 		this.vevent = vmsgevent;
 		
-		parametercache = new IndexMap<String, UnparsedExpression>();
-		getMEvent().getProperties().entrySet();
-		
+		parametercache = new IndexMap<String, MProperty>();
+		for (MProperty prop : getMEvent().getProperties().values())
+		{
+			if (!PROPERTY_MESSAGETYPE.equals(prop.getName()) &&
+				!PROPERTY_MESSAGE.equals(prop.getName()) &&
+				!PROPERTY_CODECIDS.equals(prop.getName()))
+			{
+				parametercache.put(prop.getName(), prop);
+			}
+		}
 		
 		int y = 0;
 		int colnum = 0;
@@ -151,22 +165,30 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 	{
 		public int getRowCount()
 		{
-			// TODO Auto-generated method stub
-			return 0;
+			return parametercache.size();
 		}
 
-		@Override
 		public int getColumnCount()
 		{
-			// TODO Auto-generated method stub
-			return 0;
+			return PARAMETER_COLUMN_NAMES.length;
 		}
 
-		@Override
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-			// TODO Auto-generated method stub
-			return null;
+			MProperty prop = parametercache.get(rowIndex);
+			
+			switch(columnIndex)
+			{
+				case 1:
+				{
+					return prop.getInitialValue().getValue();
+				}
+				case 0:
+				default:
+				{
+					return prop.getName();
+				}
+			}
 		}
 		
 	}
