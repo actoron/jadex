@@ -22,7 +22,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-classloading</artifactId>
+			<artifactId>jadex-android-platformclient</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

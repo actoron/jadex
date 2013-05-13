@@ -136,6 +136,7 @@
 				<module>jadex-android-antlr</module>	
 				<module>jadex-android-xmlpull</module>
 				<module>jadex-platform-android</module>
+				<module>jadex-android-platformclient</module>
 				<module>jadex-runtimetools-android</module>
 				<module>jadex-platform-extension-webservice-android</module>
 			</modules>
@@ -169,7 +170,7 @@
 				<module>jadex-android-commons</module>
 				<module>jadex-android-antlr</module>	
 				<module>jadex-android-xmlpull</module>
-				<module>jadex-android-classloading</module>
+				<module>jadex-android-platformclient</module>
 				<module>jadex-platform-android</module>
 				<module>jadex-runtimetools-android</module>
 				<module>jadex-platform-extension-webservice-android</module>
