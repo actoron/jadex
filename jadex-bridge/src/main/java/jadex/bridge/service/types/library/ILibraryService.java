@@ -20,13 +20,6 @@ import java.util.Set;
 @GuiClassName("jadex.tools.libtool.LibServiceBrowser")
 public interface ILibraryService
 {
-	
-	/**
-	 * Sets the delegation which will replace the Top-most ClassLoader
-	 * @param cl The ClassLoader
-	 */
-	public void setBaseLoaderDelegate(ISimpleDelegationClassLoader cl);
-		
 	//-------- rid handling --------
 	
 	/**

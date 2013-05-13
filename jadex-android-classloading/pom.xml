@@ -12,19 +12,14 @@
 		<version>2.4-SNAPSHOT</version>
 		<relativePath>../jadex-android-parent/pom.xml</relativePath>
 	</parent>
-	
+
 	<description>
-	This project contains an android application to demonstrate some jadex features.
+	The jadex-android-classloading project contains classes that are required 
+	by client apps for android that make use of the jadex platformapp.
+	No other dependencies except for the android framework should be used.
 	</description>
 
 	<dependencies>
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-android-commons</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>support-v4</artifactId>

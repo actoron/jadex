@@ -124,7 +124,7 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 
 		System.out.println("MyActivity binding service...");
 
-		Intent intent2 = new Intent(getActivity(), JadexClientAppService.class);
+		Intent intent2 = new Intent(getActivity(), MyService.class);
 		bindService(intent2, new ServiceConnection()
 		{
 

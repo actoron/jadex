@@ -33,6 +33,23 @@ class ActivityAdapterFragment extends android.support.v4.app.Fragment
 	{
 		getActivity().unbindService(conn);
 	}
+	
+	/**
+	 * Calls getActivity().startService();
+	 */
+	public void startService(Intent service) {
+		getActivity().startService(service);
+	}
+	
+	/**
+	 * Calls getActivity().stopService();
+	 * @return 
+	 */
+	public boolean stopService(Intent service) {
+		return getActivity().stopService(service);
+	}
+	
+	
 
 	/**
 	 * Calls getActivity().setProgressBarIndeterminateVisibility()

@@ -133,6 +133,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 		{
 			startAgentButton.setEnabled(false);
 			startPlatformButton.setText("Start Platform");
+			textView.setText(R.string.stopped);
 		}
 	}
 
@@ -149,7 +150,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 				{
 					startPlatformButton.setEnabled(false);
 					stopPlatforms();
-					textView.setText(R.string.stopped);
+					refreshButtons();
 					startPlatformButton.setEnabled(true);
 				} else
 				{

@@ -147,5 +147,4 @@ public interface IJadexPlatformBinder
 
 	public boolean unregisterEventListener(String eventName, IEventReceiver<?> rec);
 
-	public void setPlatformClassLoader(ClassLoader classLoader);
 }

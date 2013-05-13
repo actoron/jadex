@@ -29,7 +29,7 @@
 
         <service android:name="jadex.android.service.JadexPlatformService" android:label="JadexPlatformService"></service>
         
-        <service android:name="jadex.android.standalone.clientapp.JadexClientAppService" android:label="JadexClientAppService"></service>
+        <service android:name="jadex.android.standalone.clientservice.UniversalClientService" android:label="UniversalClientservice"></service>
 
     </application>
 

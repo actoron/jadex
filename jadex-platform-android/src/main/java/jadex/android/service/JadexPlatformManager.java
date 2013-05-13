@@ -20,8 +20,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.platform.service.library.DelegationClassLoader;
-import jadex.platform.service.library.DelegationURLClassLoader;
 
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -51,7 +49,9 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	// --------- attributes -----------
 	private Map<IComponentIdentifier, IExternalAccess> runningPlatforms;
 
-	private ClassLoader platformClassLoader;
+	private Map<String,ClassLoader> platformClassLoaders;
+	
+	private String defaultAppPath;
 
 	private static JadexPlatformManager instance = new JadexPlatformManager();
 
@@ -63,7 +63,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	private JadexPlatformManager()
 	{
 		runningPlatforms = new HashMap<IComponentIdentifier, IExternalAccess>();
-		platformClassLoader = this.getClass().getClassLoader();
+		platformClassLoaders = new HashMap<String, ClassLoader>();
 		instance = this;
 	}
 
@@ -88,15 +88,24 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	}
 
 	/**
-	 * Sets a custom classLoader that will load the Jadex Platform upon startup.
+	 * Sets a classLoader that will be used to load custom Jadex Components.
 	 * 
 	 * @param cl
 	 */
-	public void setPlatformClassLoader(ClassLoader cl)
+	public void setAppClassLoader(String appPath, ClassLoader cl)
 	{
-		this.platformClassLoader = cl;
+		platformClassLoaders.put(appPath, cl);
+		defaultAppPath = appPath;
 	}
-
+	
+	public ClassLoader getClassLoader(String apkPath)
+	{
+		if (apkPath == null) {
+			apkPath = defaultAppPath;
+		}
+		return platformClassLoaders.get(apkPath);
+	}
+	
 	/**
 	 * Retrieves the CMS of the Platform with the given ID.
 	 */
@@ -136,23 +145,6 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		});
 	}
 
-	// public IFuture<IExternalAccess> startJadexPlatform()
-	// {
-	// return startJadexPlatform(DEFAULT_KERNELS);
-	// }
-	//
-	// public IFuture<IExternalAccess> startJadexPlatform(final String[]
-	// kernels)
-	// {
-	// return startJadexPlatform(kernels, getRandomPlatformID());
-	// }
-	//
-	// public IFuture<IExternalAccess> startJadexPlatform(final String[]
-	// kernels, final String platformId)
-	// {
-	// return startJadexPlatform(kernels, platformId, "");
-	// }
-
 	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options)
 	{
 		return startJadexPlatform(kernels, platformId, options, true);
@@ -179,7 +171,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 				final String usedOptions = DEFAULT_OPTIONS + " -kernels " + kernelString.toString() + " -platformname "
 						+ (platformId != null ? platformId : getRandomPlatformID()) + (options == null ? "" : " " + options);
 
-				IFuture<IExternalAccess> future = createPlatformWithClassloader((usedOptions).split("\\s+"), platformClassLoader);
+				IFuture<IExternalAccess> future = createPlatformWithClassloader((usedOptions).split("\\s+"), this.getClass().getClassLoader());
 
 				future.addResultListener(new IResultListener<IExternalAccess>()
 				{
@@ -194,13 +186,30 @@ public class JadexPlatformManager implements IJadexPlatformManager
 							public void resultAvailable(ILibraryService result)
 							{
 								Logger.d("Setting base class loader...");
-								DelegationClassLoader delegationClassLoader = new DelegationClassLoader(platformClassLoader);
-//								DelegationURLClassLoader delegationURLClassLoader = new DelegationURLClassLoader(platformClassLoader, null);
-								result.setBaseLoaderDelegate(delegationClassLoader);
+								if (defaultAppPath !=null) {
+									try
+									{
+										URL url = new URL("file", "localhost,", defaultAppPath);
+										result.addTopLevelURL(url);
+									}
+									catch (MalformedURLException e)
+									{
+										e.printStackTrace();
+									}
+								}
 								
 								runningPlatforms.put(platformAccess.getComponentIdentifier(), platformAccess);
 								ret.setResult(platformAccess);
 							}
+
+							@Override
+							public void exceptionOccurred(Exception exception)
+							{
+								super.exceptionOccurred(exception);
+								exception.printStackTrace();
+							}
+							
+							
 						});
 						
 					}
@@ -299,4 +308,5 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			throw new JadexAndroidPlatformNotStartedError("getCMS()");
 		}
 	}
+
 }

@@ -1,6 +1,7 @@
 package jadex.android.standalone.clientapp;
 
 import jadex.android.IEventReceiver;
+import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
@@ -371,7 +372,7 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	 */
 	final protected void startPlatform()
 	{
-		platformService.setPlatformClassLoader(getClass().getClassLoader());
+//		platformService.setPlatformClassLoader(getClass().getClassLoader());
 		onPlatformStarting();
 		IFuture<IExternalAccess> platform = platformService.startJadexPlatform(platformKernels, platformName, platformOptions);
 

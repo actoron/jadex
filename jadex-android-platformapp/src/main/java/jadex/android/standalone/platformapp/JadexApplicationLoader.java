@@ -2,15 +2,11 @@ package jadex.android.standalone.platformapp;
 
 import jadex.android.commons.Logger;
 import jadex.android.platformapp.R;
+import jadex.android.service.JadexPlatformManager;
 import jadex.android.standalone.JadexApplication;
 import jadex.android.standalone.clientapp.ClientAppFragment;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +18,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
-import android.widget.Toast;
 import dalvik.system.DexClassLoader;
 
 public class JadexApplicationLoader extends FragmentActivity
@@ -118,10 +113,11 @@ public class JadexApplicationLoader extends FragmentActivity
 	private ClientAppFragment loadAndCreateUserActivity(String appPath, String className)
 	{
 		DexClassLoader cl = getClassLoaderForExternalDex(getClassLoader(), appPath);
+		JadexPlatformManager.getInstance().setAppClassLoader(appPath, cl);
 		try
 		{
 			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
-			Constructor<ClientAppFragment> actCon = actClass.getConstructor(null);
+//			Constructor<ClientAppFragment> actCon = actClass.getConstructor();
 			ClientAppFragment act = actClass.newInstance();
 			return act;
 		}
@@ -134,17 +130,17 @@ public class JadexApplicationLoader extends FragmentActivity
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		catch (NoSuchMethodException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		catch (IllegalAccessException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (InstantiationException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IllegalArgumentException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();

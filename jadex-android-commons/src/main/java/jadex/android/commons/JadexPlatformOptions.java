@@ -1,4 +1,4 @@
-package jadex.android.standalone.clientapp;
+package jadex.android.commons;
 
 
 public interface JadexPlatformOptions
