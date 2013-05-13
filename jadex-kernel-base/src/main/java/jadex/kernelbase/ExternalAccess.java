@@ -338,6 +338,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
+		if(step==null)
+		{
+			throw new NullPointerException("No step. Maybe decoding error?");
+		}
+		
 		boolean im = false;
 		try
 		{
