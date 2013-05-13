@@ -23,9 +23,11 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
+import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -209,7 +211,9 @@ public class SCreationController
 		else if (ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS.equals(mode))
 		{
 			mactivity.setName("External Sub-Process");
-			mactivity.setPropertyValue("filename", "");
+			UnparsedExpression exp = new UnparsedExpression("filename", String.class, "\"\"", null);
+			MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+			mactivity.addProperty(mprop);
 			vactivity = new VExternalSubProcess(modelcontainer.getGraph());
 			vactivity.setCollapsed(true);
 		}

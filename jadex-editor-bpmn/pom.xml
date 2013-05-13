@@ -157,6 +157,12 @@
 			<artifactId>jadex-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-bridge</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>

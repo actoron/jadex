@@ -1068,7 +1068,12 @@ public class SBpmnModelWriter
 				}
 				else if (subproc.hasPropertyValue("filename"))
 				{
-					procref = (String) subproc.getPropertyValue("filename");
+					procref = subproc.getPropertyValue("filename").getValue();
+					if (procref != null && procref.length() >= 2)
+					{
+						procref = procref.substring(1);
+						procref = procref.substring(0, procref.length() - 1);
+					}
 				}
 				else
 				{

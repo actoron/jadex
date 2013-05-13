@@ -42,6 +42,7 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
@@ -1299,19 +1300,21 @@ public class BpmnXMLReader
 					int	idx	= prop.indexOf("=");
 					if(idx!=-1)
 					{
-						String propname = prop.substring(0, idx).trim();
-						String proptext = prop.substring(idx+1).trim();
-						try
+						if (namedelem instanceof MActivity)
 						{
-							Object propval = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(), 
-								null, context.getClassLoader()).getValue(null);
-							namedelem.setPropertyValue(propname, propval);
-						}
-						catch(RuntimeException e)
-						{
-							throw new RuntimeException("Error parsing property: "+dia+", "+propname+", "+proptext, e);
-						}
-							
+							String propname = prop.substring(0, idx).trim();
+							String proptext = prop.substring(idx+1).trim();
+							try
+							{
+								IParsedExpression propval = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(), 
+									null, context.getClassLoader());
+								((MActivity) namedelem).setPropertyValue(propname, propval);
+							}
+							catch(RuntimeException e)
+							{
+								throw new RuntimeException("Error parsing property: "+dia+", "+propname+", "+proptext, e);
+							}
+						}	
 					}
 					else
 					{

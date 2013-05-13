@@ -3,8 +3,12 @@ package jadex.bpmn.model;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -633,6 +637,99 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Legacy conversion from unparsed expression.
+	 * 
+	 *  @param name Name
+	 *  @param exp
+	 */
+	public void setPropertyValue(String name, UnparsedExpression exp)
+	{
+		MProperty mprop = new MProperty();
+		mprop.setName(name);
+		mprop.setInitialValue(exp); 
+		addProperty(mprop);
+	}
+	
+	/**
+	 *  Legacy conversion to unparsed expression.
+	 * 
+	 *  @param name Name
+	 *  @param exp
+	 */
+	public void setPropertyValue(String name, IParsedExpression exp)
+	{
+		if (exp != null)
+		{
+			MProperty mprop = new MProperty();
+			mprop.setName(name);
+			UnparsedExpression uexp = new UnparsedExpression(name, (String) null, exp.getExpressionText(), null);
+			uexp.setParsedExp(exp);
+			mprop.setInitialValue(uexp); 
+			addProperty(mprop);
+		}
+		else
+		{
+			MProperty mprop = new MProperty();
+			mprop.setName(name);
+			UnparsedExpression uexp = new UnparsedExpression(name, (String) null, null, null);
+			SJavaParser.parseExpression(uexp, null, MActivity.class.getClassLoader());
+			mprop.setInitialValue(uexp); 
+			addProperty(mprop);
+		}
+	}
+	
+	/**
+	 *  Get a property value from the model.
+	 *  @param name The name.
+	 */
+	public UnparsedExpression getPropertyValue(String name)
+	{
+		UnparsedExpression ret = null;
+		if(properties!=null)
+		{
+			MProperty mprop = properties.get(name);
+			ret = mprop != null? mprop.getInitialValue() : null;
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get a property value from the model.
+	 *  @param name The name.
+	 */
+	public Object getParsedPropertyValue(String name)
+	{
+		Object val	= getPropertyValue(name);
+		
+		if(val instanceof UnparsedExpression)
+		{
+			val = ((IParsedExpression) ((UnparsedExpression)val).getParsed()).getValue(null);
+		}
+		
+		return val;
+	}
+	
+	/**
+	 *  Returns the property names.
+	 *  
+	 *  @return The property names.
+	 */
+	public String[] getPropertyNames()
+	{
+		return properties != null? properties.keySet().toArray(new String[properties.size()]) : SUtil.EMPTY_STRING_ARRAY;
+	}
+	
+	/**
+	 *  Test, if a property is declared.
+	 *  @param name	The property name.
+	 *  @return True, if the property is declared.
+	 */
+	public boolean hasPropertyValue(String name)
+	{
+		return properties!=null && properties.containsKey(name);
+	}
+	
+	/**
 	 *  Get the properties.
 	 *  @return The properties.
 	 */
@@ -661,13 +758,38 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Add a simple string-based property.
+	 *  @param name Property name.
+	 *  @param value The string value.
+	 */
+	public void addProperty(String name, String value)
+	{
+		MProperty mprop = new MProperty();
+		mprop.setName(name);
+		UnparsedExpression uexp = new UnparsedExpression(name, String.class, "\"" + value + "\"", null);
+		SJavaParser.parseExpression(uexp, null, MActivity.class.getClassLoader());
+		mprop.setInitialValue(uexp); 
+		addProperty(mprop);
+	}
+	
+	/**
+	 *  Remove a property.
+	 *  @param propname Name of the property.
+	 */
+	public void removeProperty(String propname)
+	{
+		if (properties != null)
+			properties.removeKey(propname);
+	}
+	
+	/**
 	 *  Remove a property.
 	 *  @param prop The property.
 	 */
 	public void removeProperty(MProperty prop)
 	{
 		if(properties!=null)
-			properties.removeValue(prop.getName());
+			removeProperty(prop.getName());
 	}
 	
 	/**

@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
@@ -52,10 +53,12 @@ public class ExternalSubProcessPropertyPanel extends BasePropertyPanel
 		filearea.setWrapStyleWord(true);
 		filearea.setLineWrap(true);
 		MSubProcess msp = (MSubProcess) subprocess.getBpmnElement();
-		String filename = (String) msp.getPropertyValue("filename");
-		if (filename != null)
+		String filename = null;
+		if (msp.hasProperty("filename"))
 		{
-			filename = filename != null? filename : "";
+			UnparsedExpression exp = msp.getPropertyValue("filename");
+			filename = exp != null? exp.getValue() : null;
+			filename = filename != null? filename.substring(1, filename.length() - 2) : "";
 			filearea.setText(filename);
 			expbox.setSelected(false);
 		}
@@ -78,11 +81,14 @@ public class ExternalSubProcessPropertyPanel extends BasePropertyPanel
 					if (expbox.isSelected())
 					{
 						UnparsedExpression exp = new UnparsedExpression("file", String.class, val, null);
-						((MSubProcess) subprocess.getBpmnElement()).setPropertyValue("file", exp);
+						MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+						((MSubProcess) subprocess.getBpmnElement()).addProperty(mprop);
 					}
 					else
 					{
-						((MSubProcess) subprocess.getBpmnElement()).setPropertyValue("filename", val);
+						UnparsedExpression exp = new UnparsedExpression("filename", String.class, "\"" + val + "\"", null);
+						MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+						((MSubProcess) subprocess.getBpmnElement()).addProperty(mprop);
 					}
 				}
 				else
@@ -107,13 +113,16 @@ public class ExternalSubProcessPropertyPanel extends BasePropertyPanel
 					msp.removeProperty("filename");
 					label.setText(FILE_EXPRESSION_TEXT);
 					UnparsedExpression exp = new UnparsedExpression("file", String.class, val, null);
-					msp.setPropertyValue("file", exp);
+					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+					msp.addProperty(mprop);
 				}
 				else
 				{
 					msp.removeProperty("file");
 					label.setText(FILE_NAME_TEXT);
-					msp.setPropertyValue("filename", val);
+					UnparsedExpression exp = new UnparsedExpression("filename", String.class, "\"" + val + "\"", null);
+					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+					msp.addProperty(mprop);
 				}
 			}
 		});

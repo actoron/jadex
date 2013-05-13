@@ -409,7 +409,9 @@ public class SBpmnModelReader
 			String dur = (String) buffer.remove("duration");
 			if (dur != null)
 			{
-				evt.setPropertyValue("duration", parseExp(new UnparsedExpression("duration", "java.lang.Number", dur, null),model.getModelInfo().getAllImports(), cl));
+				UnparsedExpression exp = parseExp(new UnparsedExpression("duration", "java.lang.Number", dur, null),model.getModelInfo().getAllImports(), cl);
+				MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+				evt.addProperty(mprop);
 			}
 			
 			evt.setActivityType(acttype);
@@ -622,12 +624,13 @@ public class SBpmnModelReader
 		}
 		else if ("subprocessref".equals(tag.getLocalPart()))
 		{
-			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("filename", content);
+			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().addProperty("filename", content);
 		}
 		else if ("subprocessexpressionref".equals(tag.getLocalPart()))
 		{
 			UnparsedExpression fileexp = new UnparsedExpression("file", String.class, content, null);
-			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().setPropertyValue("file", fileexp);
+			MProperty mprop = new MProperty(fileexp.getClazz(), fileexp.getName(), fileexp);
+			((LinkedList<MSubProcess>) buffer.get("subprocessstack")).peek().addProperty(mprop);
 		}
 		else if("parameter".equals(tag.getLocalPart()))
 		{
