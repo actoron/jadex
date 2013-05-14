@@ -136,6 +136,15 @@ public interface IVector2
 	 */
 	public IVector2 normalize();
 	
+	/**
+	 *  Redirects the vector to a new direction,
+	 *  maintaining the magnitude.
+	 *  
+	 *  @param angle The new direction.
+	 *  @return The vector.
+	 */
+	public IVector2 redirect(double angle);
+	
 	/** Returns the length (magnitude) of the vector.
 	 *
 	 *  @return vector length

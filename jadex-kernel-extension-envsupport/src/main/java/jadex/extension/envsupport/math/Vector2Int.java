@@ -279,6 +279,22 @@ public class Vector2Int implements IVector2
 		return this;
 	}
 	
+	/**
+	 *  Redirects the vector to a new direction,
+	 *  maintaining the magnitude.
+	 *  
+	 *  @param angle The new direction.
+	 *  @return The vector.
+	 */
+	public IVector2 redirect(double angle)
+	{
+		double length = Math.sqrt((x_ * x_) + (y_ * y_));
+		x_ = (int) Math.round(Math.cos(angle) * length);
+		y_ = (int) Math.round(Math.sin(angle) * length);
+		
+		return this;
+	}
+	
 	/** Returns the length (magnitude) of the vector.
 	 *
 	 *  @return vector length

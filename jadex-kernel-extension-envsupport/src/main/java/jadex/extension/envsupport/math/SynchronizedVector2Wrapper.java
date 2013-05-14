@@ -214,6 +214,18 @@ public class SynchronizedVector2Wrapper implements IVector2
 		return this;
 	}
 	
+	/**
+	 *  Redirects the vector to a new direction,
+	 *  maintaining the magnitude.
+	 *  
+	 *  @param angle The new direction.
+	 *  @return The vector.
+	 */
+	public synchronized IVector2 redirect(double angle)
+	{
+		return vector_.redirect(angle);
+	}
+	
 	/** Returns the length (magnitude) of the vector.
 	 *
 	 *  @return vector length
