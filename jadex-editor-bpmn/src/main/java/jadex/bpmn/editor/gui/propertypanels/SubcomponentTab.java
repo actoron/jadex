@@ -80,11 +80,11 @@ public class SubcomponentTab extends JPanel
 					for (ConfigurationInfo cinfo : confinfos)
 					{
 						ComponentInstanceInfo[] ciinfos = cinfo.getComponentInstances();
-						for (ComponentInstanceInfo ciinfo : ciinfos)
+						for(ComponentInstanceInfo ciinfo : ciinfos)
 						{
-							if (!rmname.equals(ciinfo.getTypeName()))
+							if(!rmname.equals(ciinfo.getTypeName()))
 							{
-								cinfo.removeComponentInstance(ciinfo);
+//								cinfo.removeComponentInstance(ciinfo);
 							}
 						}
 					}

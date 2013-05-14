@@ -116,7 +116,7 @@ public class CliShell extends ACliShell
 					return !cl.isInterface() && !Modifier.isAbstract(cl.getModifiers()) 
 						&& ICliCommand.class.isAssignableFrom(cl);
 				}
-			});
+			}, false);
 			
 			for(int i=0; i<cmds.length; i++)
 			{

@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.IdGenerator;
+import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.task.info.TaskMetaInfo;
@@ -40,7 +41,7 @@ import com.mxgraph.swing.mxGraphComponent;
  * Container for the current model.
  *
  */
-public class ModelContainer
+public class ModelContainer implements IModelContainer
 {
 	/** Edit mode for selection. */
 	public static final String EDIT_MODE_SELECTION = "Select";
@@ -252,6 +253,10 @@ public class ModelContainer
 	
 	/** The task classes. */
 	protected List<ClassInfo> taskclasses;
+
+	/** The interface classes. */
+	protected List<ClassInfo> interclasses;
+
 	
 	/**
 	 *  Creates a new container.
@@ -264,15 +269,84 @@ public class ModelContainer
 		//this.imageprovider = new ImageProvider();
 		this.projecttaskmetainfos = new HashMap<String, TaskMetaInfo>();
 		this.changelisteners = new ArrayList<ChangeListener>();
-		this.taskclasses = scanForTaskClassInfos();
+		
+		// Scan additional model container dependent classes
+		List<ClassInfo>[] tmp = scanForClassInfos();
+		this.taskclasses = tmp[0];
+		this.interclasses = tmp[1];
 	}
+	
+//	/**
+//	 *  Scan for task classes.
+//	 */
+//	public List<ClassInfo> scanForTaskClassInfos()
+//	{
+//		List<ClassInfo> globs = new ArrayList<ClassInfo>(globalcache.getGlobalTaskClasses());
+//		
+//		if(classloaderroot!=null)
+//		{
+//			try
+//			{
+//				ClassLoader cl = getProjectClassLoader();
+//				Class<?>[] locals = SReflect.scanForClasses(new URL[]{classloaderroot.toURI().toURL()}, cl, new IFilter<Object>()
+//				{
+//					public boolean filter(Object obj)
+//					{
+//						String	fn	= "";
+//						if(obj instanceof File)
+//						{
+//							File	f	= (File)obj;
+//							fn	= f.getName();
+//						}
+//						else if(obj instanceof JarEntry)
+//						{
+//							JarEntry	je	= (JarEntry)obj;
+//							fn	= je.getName();
+//						}
+//						
+//						return fn.indexOf("Task")!=-1;
+//					}
+//				}, new IFilter<Class<?>>()
+//				{
+//					public boolean filter(Class<?> obj)
+//					{
+//						boolean ret = false;
+//						try
+//						{
+//							if(!obj.isInterface() && !Modifier.isAbstract(obj.getModifiers()))
+//							{
+//								ClassLoader cl = obj.getClassLoader();
+//								Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+//								ret = SReflect.isSupertype(taskcl, obj);
+//							}
+//						}
+//						catch(Exception e)
+//						{
+//						}
+//						return ret;
+//					}
+//				});
+//				
+//				for(Class<?> cla: locals)
+//				{
+//					globs.add(new ClassInfo(cla));
+//				}				
+//			}
+//			catch(Exception e)
+//			{
+//				// nop
+//			}
+//		}
+//		return globs;
+//	}
 	
 	/**
 	 *  Scan for task classes.
 	 */
-	public List<ClassInfo> scanForTaskClassInfos()
+	public List<ClassInfo>[] scanForClassInfos()
 	{
-		List<ClassInfo> globs = new ArrayList<ClassInfo>(globalcache.getGlobalTaskClasses());
+		final List<ClassInfo> gtasks = new ArrayList<ClassInfo>(globalcache.getGlobalTaskClasses());
+		final List<ClassInfo> ginter = new ArrayList<ClassInfo>(globalcache.getGlobalInterfaces());
 		
 		if(classloaderroot!=null)
 		{
@@ -294,8 +368,10 @@ public class ModelContainer
 							JarEntry	je	= (JarEntry)obj;
 							fn	= je.getName();
 						}
-						
-						return fn.indexOf("Task")!=-1;
+//						
+//						return fn.indexOf("Task")!=-1;
+//						return fn.endsWith(".class");
+						return true;
 					}
 				}, new IFilter<Class<?>>()
 				{
@@ -304,11 +380,22 @@ public class ModelContainer
 						boolean ret = false;
 						try
 						{
-							if(!obj.isInterface() && !Modifier.isAbstract(obj.getModifiers()))
+							if(!obj.isInterface())
 							{
-								ClassLoader cl = obj.getClassLoader();
-								Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
-								ret = SReflect.isSupertype(taskcl, obj);
+								if(!Modifier.isAbstract(obj.getModifiers()))
+								{
+									ClassLoader cl = obj.getClassLoader();
+									Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+									ret = SReflect.isSupertype(taskcl, obj);
+									if(ret)
+									{
+										gtasks.add(new ClassInfo(obj.getName()));
+									}
+								}
+							}
+							else 
+							{
+								ginter.add(new ClassInfo(obj.getName()));
 							}
 						}
 						catch(Exception e)
@@ -318,17 +405,17 @@ public class ModelContainer
 					}
 				});
 				
-				for(Class<?> cla: locals)
-				{
-					globs.add(new ClassInfo(cla));
-				}				
+//				for(Class<?> cla: locals)
+//				{
+//					globs.add(new ClassInfo(cla));
+//				}				
 			}
 			catch(Exception e)
 			{
 				// nop
 			}
 		}
-		return globs;
+		return new List[]{gtasks, ginter};
 	}
 	
 	/**
@@ -338,6 +425,15 @@ public class ModelContainer
 	public List<ClassInfo> getTaskClasses()
 	{
 		return taskclasses;
+	}
+	
+	/**
+	 *  Get the interfaces.
+	 *  @return The interfaces.
+	 */
+	public List<ClassInfo> getInterfaces()
+	{
+		return interclasses;
 	}
 
 	/**
@@ -783,7 +879,9 @@ public class ModelContainer
 		{
 			model.setClassLoader(parent);
 		}
-		taskclasses = scanForTaskClassInfos();
+		List<ClassInfo>[] tmp = scanForClassInfos();
+		taskclasses = tmp[0];
+		interclasses = tmp[1];
 	}
 	
 	/**

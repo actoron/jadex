@@ -1,5 +1,6 @@
 package jadex.platform.service.servicepool;
 
+import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
@@ -7,7 +8,6 @@ import jadex.bpmn.model.task.ITaskPropertyGui;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskProperty;
 import jadex.bpmn.model.task.annotation.TaskPropertyGui;
-import jadex.bpmn.runtime.task.ServiceCallTask.ServiceCallTaskGui;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -20,7 +20,8 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.platform.service.servicepool.ServicePoolTask.ServicePoolTaskGui.MappingsTableModel;
+import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -33,7 +34,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -41,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
 
 /**
  */
@@ -118,7 +120,7 @@ public class ServicePoolTask implements ITask
 	}
 	
 	/**
-	 * 
+	 *  The swing gui for the service task.
 	 */
 	public static class ServicePoolTaskGui implements ITaskPropertyGui
 	{
@@ -131,13 +133,40 @@ public class ServicePoolTask implements ITask
 		/**
 		 *  Once called to init the component.
 		 */
-		public void init(final IModelInfo model, final MActivity task, final ClassLoader cl)
+		public void init(final IModelContainer container, final MActivity task, final ClassLoader cl)
 		{
 			panel = new JPanel(new GridBagLayout());
 			
 			final MappingsTableModel tm = new MappingsTableModel();
 			final JTable table = new JTable(tm);
 			panel.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHEAST, GridBagConstraints.BOTH, new Insets(0,5,5,0), 0, 0));
+			TableColumn col = table.getColumnModel().getColumn(0);
+			final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
+			FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, container.getInterfaces());
+			acc.setModel(accm);
+//			JComboBox box = new JComboBox(container.getInterfaces().toArray());
+//			box.setEditable(true);
+//			AutoCompleteSupport support = AutoCompleteSupport.install(c, GlazedLists.eventListOf(elements));
+//			support.setSelectsTextOnFocusGain(false);
+//			support.setHidesPopupOnFocusLost(false);
+//			support.setStrict(false);
+//			ComboBoxCellEditor combo = new ComboBoxCellEditor(c);
+//			TableColumn column = myTable.getColumnModel().getColumn(2);
+//			ComboTableCellRenderer renderer = new ComboTableCellRenderer();
+//			column.setCellRenderer(renderer);
+//			column.setCellEditor(combo);
+	
+			col.setCellEditor(new DefaultCellEditor(acc));
+//			col.setCellRenderer(new DefaultTableCellRenderer()
+//			{
+//				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+//				{
+//					super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
+//					ClassInfo ci = (ClassInfo)value;
+//					setText(ci==null? "": ci.getTypeName());
+//					return acc.getEditorComponent();
+//				}
+//			});
 			
 			Action addaction = new AbstractAction("Add")
 			{

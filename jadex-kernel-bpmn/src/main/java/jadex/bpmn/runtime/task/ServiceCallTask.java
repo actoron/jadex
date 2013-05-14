@@ -1,5 +1,6 @@
 package jadex.bpmn.runtime.task;
 
+import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
@@ -408,9 +409,9 @@ public class ServiceCallTask implements ITask
 		/**
 		 *  Once called to init the component.
 		 */
-		public void init(final IModelInfo model, final MActivity task, final ClassLoader cl)
+		public void init(final IModelContainer container, final MActivity task, final ClassLoader cl)
 		{
-			this.model = model;
+			this.model = container.getBpmnModel().getModelInfo();
 			PropertiesPanel pp = new PropertiesPanel();
 			
 			cbsername = pp.createComboBox("Required service name:", null);

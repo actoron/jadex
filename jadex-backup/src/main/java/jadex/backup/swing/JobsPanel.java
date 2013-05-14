@@ -184,7 +184,7 @@ public class JobsPanel extends JPanel
 				return !cl.isInterface() && !Modifier.isAbstract(cl.getModifiers()) 
 					&& Job.class.isAssignableFrom(cl);
 			}
-		});
+		}, false);
 
 		// todo: allow refresh for adding new job types just by adding jar at runtime
 		final JComboBox jobtypecb = new JComboBox(jobcls);

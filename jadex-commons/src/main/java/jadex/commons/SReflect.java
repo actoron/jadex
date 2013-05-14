@@ -35,6 +35,8 @@ import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javax.swing.text.html.InlineView;
+
 /**
  *  This class provides several useful static reflection methods.
  */
@@ -1218,9 +1220,9 @@ public class SReflect
 	/**
 	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
 	 */
-	public static Class<?>[] scanForClasses(ClassLoader classloader, IFilter filefilter, IFilter classfilter)
+	public static Class<?>[] scanForClasses(ClassLoader classloader, IFilter filefilter, IFilter classfilter, boolean includebootpath)
 	{
-		return scanForClasses(SUtil.getClasspathURLs(classloader).toArray(new URL[0]), classloader, filefilter, classfilter);
+		return scanForClasses(SUtil.getClasspathURLs(classloader, includebootpath).toArray(new URL[0]), classloader, filefilter, classfilter);
 	}
 	
 	/**
@@ -1363,16 +1365,17 @@ public class SReflect
 	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
 	 */
 	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(ClassLoader classloader, 
-		IFilter<Object> filefilter, IFilter<Class<?>> classfilter, int max)
+		IFilter<Object> filefilter, IFilter<Class<?>> classfilter, int max, boolean includebootpath)
 	{
-		return asyncScanForClasses(SUtil.getClasspathURLs(classloader).toArray(new URL[0]), classloader, filefilter, classfilter, max);
+		return asyncScanForClasses(SUtil.getClasspathURLs(classloader, includebootpath).toArray(new URL[0]), classloader, filefilter, classfilter, max);
 	}
 	
 	/**
 	 *  Scan for classes that fulfill certain criteria as specified by the file and classfilters.
 	 */
 	public static ISubscriptionIntermediateFuture<Class<?>> asyncScanForClasses(final URL[] urls, 
-		final ClassLoader classloader, final IFilter<Object> filefilter, final IFilter<Class<?>> classfilter, final int max)
+		final ClassLoader classloader, final IFilter<Object> filefilter, final IFilter<Class<?>> classfilter, 
+		final int max)
 	{
 		final SubscriptionIntermediateFuture<Class<?>>	ret	= new SubscriptionIntermediateFuture<Class<?>>();
 		
@@ -1431,6 +1434,7 @@ public class SReflect
 			
 			public void finished()
 			{
+//				System.out.println("finiiii");
 				ret.setFinishedIfUndone();
 			}
 		});
@@ -1469,6 +1473,8 @@ public class SReflect
 			try
 			{
 //				System.out.println("url: "+urls[i].toURI());
+				final URL url = urls[i];
+				final int fi = i;
 				File f = new File(urls[i].toURI());
 				if(f.getName().endsWith(".jar"))
 				{
@@ -1481,7 +1487,7 @@ public class SReflect
 							JarEntry	je	= e.nextElement();
 							if(filter.filter(je))	
 							{
-//								System.out.println("add: "+je.getName());
+//								System.out.println("add: "+urls[i]+" "+je.getName());
 								ret.addIntermediateResultIfUndone(je.getName());
 							}
 						}
@@ -1533,6 +1539,10 @@ public class SReflect
 						}
 					});
 //					throw new UnsupportedOperationException("Currently only jar files supported: "+f);
+				}
+				else
+				{
+					lis.resultAvailable(null);
 				}
 			}
 			catch(Exception e)
@@ -1688,7 +1698,7 @@ public class SReflect
 			}
 		};
 		
-		asyncScanForClasses(null, filefilter, classfilter, 5).addResultListener(new IIntermediateResultListener<Class<?>>()
+		asyncScanForClasses(null, filefilter, classfilter, 5, true).addResultListener(new IIntermediateResultListener<Class<?>>()
 		{
 			public void intermediateResultAvailable(Class<?> result)
 			{

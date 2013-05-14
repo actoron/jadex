@@ -10,8 +10,10 @@ import jadex.bpmn.editor.model.visual.BpmnVisualModelGenerator;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.ResourceInfo;
+import jadex.commons.SReflect;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,6 +32,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -51,6 +55,9 @@ import javax.swing.event.ChangeListener;
 import com.mxgraph.util.mxEvent;
 import com.mxgraph.view.mxStylesheet;
 
+/**
+ * 
+ */
 public class BpmnEditorWindow extends JFrame
 {
 	/** The tool bar. */
@@ -65,13 +72,50 @@ public class BpmnEditorWindow extends JFrame
 	/** The global settings. */
 	protected Settings settings;
 	
+	/**
+	 * 
+	 */
 	public BpmnEditorWindow()
 	{
 		super(BpmnEditor.APP_NAME);
 		
 		settings = Settings.load();
+		
 		globalcache = new GlobalCache();
-		globalcache.getGlobalTaskClasses().addAll(GlobalCache.scanForTaskClasses(settings.getHomeClassLoader()));
+	
+		Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
+		{
+			public int compare(ClassInfo o1, ClassInfo o2)
+			{
+				String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
+				String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
+				return str1.compareTo(str2);
+			}
+		};
+		
+		if(settings.getGlobalInterfaces()==null || settings.getGlobalInterfaces().size()==0)// || true)
+		{
+			System.out.println("Scanning classes start...");
+			long start = System.currentTimeMillis();
+			List<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
+			globalcache.getGlobalTaskClasses().addAll(tmp[0]);
+			globalcache.getGlobalInterfaces().addAll(tmp[1]);
+			Collections.sort(globalcache.getGlobalTaskClasses(), comp);
+			Collections.sort(globalcache.getGlobalInterfaces(), comp);
+			settings.setGlobalTaskClasses(tmp[0]);
+			settings.setGlobalInterfaces(tmp[1]);
+			long needed = System.currentTimeMillis()-start;
+			System.out.println("... scanning classes end, needed: "+needed/1000+" secs");
+		}
+		else
+		{
+			globalcache.getGlobalTaskClasses().clear();
+			globalcache.getGlobalTaskClasses().addAll(settings.getGlobalTaskClasses());
+			globalcache.getGlobalInterfaces().clear();
+			globalcache.getGlobalInterfaces().addAll(settings.getGlobalInterfaces());
+			Collections.sort(globalcache.getGlobalTaskClasses(), comp);
+			Collections.sort(globalcache.getGlobalInterfaces(), comp);
+		}
 		
 		getContentPane().setLayout(new BorderLayout());
 		

@@ -17,15 +17,49 @@ import java.util.List;
 import java.util.jar.JarEntry;
 
 /**
- * 
  * A global cache.
- *
  */
 public class GlobalCache
 {
+//	public static IFilter<Object> TASKFILEFILTER = new FileFilter("Task");
+//	
+//	public static IFilter<Class<?>> TASKCLASSFILTER = new IFilter<Class<?>>()
+//	{
+//		public boolean filter(Class<?> obj)
+//		{
+//			boolean ret = false;
+//			try
+//			{
+//				if(!obj.isInterface() && !Modifier.isAbstract(obj.getModifiers()))
+//				{
+//					ClassLoader cl = obj.getClassLoader();
+//					Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+//					ret = SReflect.isSupertype(taskcl, obj);
+//				}
+//			}
+//			catch(Exception e)
+//			{
+//			}
+//			return ret;
+//		}
+//	};
+	
 	/** Global task classes */
 	protected List<ClassInfo> globaltaskclasses = new ArrayList<ClassInfo>();
+
+	/** Global interfaces */
+	protected List<ClassInfo> globalinterfaces = new ArrayList<ClassInfo>();
+
 	
+	/**
+	 *  Get the globalinterfaces.
+	 *  @return The globalinterfaces.
+	 */
+	public List<ClassInfo> getGlobalInterfaces()
+	{
+		return globalinterfaces;
+	}
+
 	/**
 	 *  Returns the global task classes.
 	 *  @return The global task classes.
@@ -35,43 +69,51 @@ public class GlobalCache
 		return globaltaskclasses;
 	}
 	
+//	/**
+//	 *  Scan for task classes.
+//	 */
+//	public static final List<ClassInfo> scanForInterfaces(ClassLoader cl)
+//	{
+//		return scanForTaskClasses(cl, new FileFilter(".class"), new IFilter<Class<?>>()
+//		{
+//			public boolean filter(Class<?> obj)
+//			{
+//				return obj.isInterface();
+//			}
+//		});
+//	}
+	
 	/**
 	 *  Scan for task classes.
 	 */
-	public static final List<ClassInfo> scanForTaskClasses(ClassLoader cl)
+	public static final List<ClassInfo>[] scanForClasses(ClassLoader cl)
 	{
-		final List<ClassInfo> taskclasses = new ArrayList<ClassInfo>();
+		final List<ClassInfo> res1 = new ArrayList<ClassInfo>();
+		final List<ClassInfo> res2 = new ArrayList<ClassInfo>();
 		
-		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, new IFilter<Object>()
+		scanForClasses(cl, new FileFilter("$", false), new IFilter<Class<?>>()
 		{
-			public boolean filter(Object obj)
-			{
-				String	fn	= "";
-				if(obj instanceof File)
-				{
-					File	f	= (File)obj;
-					fn	= f.getName();
-				}
-				else if(obj instanceof JarEntry)
-				{
-					JarEntry	je	= (JarEntry)obj;
-					fn	= je.getName();
-				}
-				
-				return fn.indexOf("Task")!=-1;
-			}
-		}, new IFilter<Class<?>>()
-		{
-			public boolean filter(Class<?> obj)
+			public boolean filter(final Class<?> obj)
 			{
 				boolean ret = false;
 				try
 				{
-					if(!obj.isInterface() && !Modifier.isAbstract(obj.getModifiers()))
+					if(!obj.isInterface())
 					{
-						ClassLoader cl = obj.getClassLoader();
-						Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
-						ret = SReflect.isSupertype(taskcl, obj);
+						if(!Modifier.isAbstract(obj.getModifiers()))
+						{
+							ClassLoader cl = obj.getClassLoader();
+							Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+							ret = SReflect.isSupertype(taskcl, obj);
+							if(ret)
+							{
+								res1.add(new ClassInfo(obj.getName()));
+							}
+						}
+					}
+					else
+					{
+						res2.add(new ClassInfo(obj.getName()));
 					}
 				}
 				catch(Exception e)
@@ -79,7 +121,50 @@ public class GlobalCache
 				}
 				return ret;
 			}
-		}, -1);
+		});
+		
+		return new List[]{res1, res2};
+	}
+	
+	/**
+	 *  Scan for task classes.
+	 */
+	public static final List<ClassInfo> scanForClasses(ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter)
+	{
+		final List<ClassInfo> taskclasses = new ArrayList<ClassInfo>();
+		
+		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, false);
+		fut.addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
+		{
+			public void intermediateResultAvailable(Class<?> result)
+			{
+//				System.out.println("Found: "+result.getName());
+				taskclasses.add(new ClassInfo(result));
+			}
+			public void finished()
+			{
+			}
+			public void resultAvailable(Collection<Class<?>> result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		}));
+		fut.get(new ThreadSuspendable());
+		
+		return taskclasses;
+	}
+	
+
+	/**
+	 *  Scan for task classes.
+	 */
+	public static final List<ClassInfo> asyncScanForClasses(ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter)
+	{
+		final List<ClassInfo> taskclasses = new ArrayList<ClassInfo>();
+		
+		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, false);
 		fut.addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
 		{
 			public void intermediateResultAvailable(Class<?> result)
@@ -99,5 +184,49 @@ public class GlobalCache
 		fut.get(new ThreadSuspendable());
 		
 		return taskclasses;
+	}
+	
+	/**
+	 * 
+	 */
+	public static class FileFilter implements IFilter<Object>
+	{
+		/** The filename. */
+		protected String filename;
+		
+		/** The contains flag. */
+		protected boolean contains;
+		
+		/**
+		 * 
+		 */
+		public FileFilter(String filename, boolean contains)
+		{
+			this.filename = filename;
+			this.contains = contains;
+		}
+		
+		/**
+		 * 
+		 */
+		public boolean filter(Object obj)
+		{
+			if(filename==null)
+				return true;
+			
+			String	fn	= "";
+			if(obj instanceof File)
+			{
+				File	f	= (File)obj;
+				fn	= f.getName();
+			}
+			else if(obj instanceof JarEntry)
+			{
+				JarEntry	je	= (JarEntry)obj;
+				fn	= je.getName();
+			}
+			
+			return contains? fn.indexOf(filename)!=-1: fn.indexOf(filename)==-1;
+		}
 	}
 }

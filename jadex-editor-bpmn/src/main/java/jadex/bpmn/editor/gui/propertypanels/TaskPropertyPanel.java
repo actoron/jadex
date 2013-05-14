@@ -242,7 +242,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 							try
 							{
 								ITaskPropertyGui gui = (ITaskPropertyGui)clazz.newInstance();
-								gui.init(container.getBpmnModel().getModelInfo(), getBpmnTask(), cl);
+								gui.init(container, getBpmnTask(), cl);
 								JComponent comp = gui.getComponent();
 								propsp.add(comp, BorderLayout.CENTER);
 							}

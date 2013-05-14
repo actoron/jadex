@@ -121,4 +121,14 @@ public class ClassInfo
 	{
 		this.type = type;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return typename!=null? typename: type!=null? type.getName(): "n/a";
+	}
+	
+	
 }

@@ -1,12 +1,14 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.gui.propertypanels.DocumentAdapter;
+import jadex.bridge.ClassInfo;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -111,6 +113,9 @@ public class SettingsPanel extends JPanel
 	{
 		settings.setLibraryHome(new File(libpathfield.getText()));
 		globalcache.getGlobalTaskClasses().clear();
-		globalcache.getGlobalTaskClasses().addAll(GlobalCache.scanForTaskClasses(settings.getHomeClassLoader()));
+		globalcache.getGlobalInterfaces().clear();
+		List<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
+		globalcache.getGlobalTaskClasses().addAll(tmp[0]);
+		globalcache.getGlobalInterfaces().addAll(tmp[1]);
 	}
 }

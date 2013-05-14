@@ -93,7 +93,7 @@ public class BDIClassReader extends MicroClassReader
 	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
 	{
 		// use dummy classloader that will not be visisble outside
-		List<URL> urls = SUtil.getClasspathURLs(classloader);
+		List<URL> urls = SUtil.getClasspathURLs(classloader, false);
 		DummyClassLoader cl = new DummyClassLoader((URL[])urls.toArray(new URL[urls.size()]), null, classloader);
 		return super.read(model, imports, cl, rid, root);
 	}

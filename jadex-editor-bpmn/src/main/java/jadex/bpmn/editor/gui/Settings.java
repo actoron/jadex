@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.bridge.ClassInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 
@@ -52,6 +53,12 @@ public class Settings
 	/** The home class loader. */
 	protected ClassLoader homeclassloader;
 	
+	/** Global task classes */
+	protected List<ClassInfo> globaltaskclasses;
+
+	/** Global interfaces */
+	protected List<ClassInfo> globalinterfaces;
+	
 	/**
 	 *  Gets the selected style sheet.
 	 *
@@ -92,13 +99,18 @@ public class Settings
 		this.openedfiles = openedfiles;
 	}
 	
-	
-
+	/**
+	 * 
+	 * @return
+	 */
 	public int getToolbarIconSize()
 	{
 		return toolbariconsize;
 	}
 
+	/**
+	 * @param toolbariconsize
+	 */
 	public void setToolbarIconSize(int toolbariconsize)
 	{
 		this.toolbariconsize = toolbariconsize;
@@ -220,6 +232,42 @@ public class Settings
 			homeclassloader = Settings.class.getClassLoader();
 		}
 	}
+	
+	/**
+	 *  Get the globaltaskclasses.
+	 *  @return The globaltaskclasses.
+	 */
+	public List<ClassInfo> getGlobalTaskClasses()
+	{
+		return globaltaskclasses;
+	}
+
+	/**
+	 *  Set the globaltaskclasses.
+	 *  @param globaltaskclasses The globaltaskclasses to set.
+	 */
+	public void setGlobalTaskClasses(List<ClassInfo> globaltaskclasses)
+	{
+		this.globaltaskclasses = globaltaskclasses;
+	}
+
+	/**
+	 *  Get the globalinterfaces.
+	 *  @return The globalinterfaces.
+	 */
+	public List<ClassInfo> getGlobalInterfaces()
+	{
+		return globalinterfaces;
+	}
+
+	/**
+	 *  Set the globalinterfaces.
+	 *  @param globalinterfaces The globalinterfaces to set.
+	 */
+	public void setGlobalInterfaces(List<ClassInfo> globalinterfaces)
+	{
+		this.globalinterfaces = globalinterfaces;
+	}
 
 	/**
 	 *  Gets the save settings on exit setting.
@@ -240,8 +288,6 @@ public class Settings
 	{
 		this.savesettingsonexit = savesettingsonexit;
 	}
-	
-	
 	
 	/**
 	 *  Gets the home class loader.
@@ -299,6 +345,25 @@ public class Settings
 				props.put("openfile" + ++counter, file.getAbsolutePath());
 			}
 		}
+		
+		if(globalinterfaces!=null && globalinterfaces.size()>0)
+		{
+			for(int i=0; i<globalinterfaces.size(); i++)
+			{
+				ClassInfo inter = globalinterfaces.get(i);
+				props.put("gi"+i, inter.getTypeName());
+			}
+		}
+		
+		if(globaltaskclasses!=null && globaltaskclasses.size()>0)
+		{
+			for(int i=0; i<globaltaskclasses.size(); i++)
+			{
+				ClassInfo gt = globaltaskclasses.get(i);
+				props.put("gt"+i, gt.getTypeName());
+			}
+		}
+		
 		
 		OutputStream os = new FileOutputStream(tmpfile);
 		props.store(os, "Jadex BPMN Editor Settings");
@@ -376,17 +441,29 @@ public class Settings
 			}
 			
 			List<File> openfiles = new ArrayList<File>();
-			for (Object okey : props.keySet())
+			List<ClassInfo> gis = new ArrayList<ClassInfo>();
+			List<ClassInfo> gts = new ArrayList<ClassInfo>();
+			for(Object okey: props.keySet())
 			{
-				if (okey instanceof String)
+				if(okey instanceof String)
 				{
 					String key = (String) okey;
 					if (key.startsWith("openfile"))
 					{
 						openfiles.add(new File(props.getProperty(key)));
 					}
+					else if(key.startsWith("gi"))
+					{
+						gis.add(new ClassInfo(props.getProperty(key)));
+					}
+					else if(key.startsWith("gt"))
+					{
+						gts.add(new ClassInfo(props.getProperty(key)));
+					}
 				}
 			}
+			ret.setGlobalInterfaces(gis);
+			ret.setGlobalTaskClasses(gts);
 			ret.setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
 		}
 		catch (IOException e)

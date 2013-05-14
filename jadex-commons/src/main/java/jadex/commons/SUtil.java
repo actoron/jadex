@@ -1483,7 +1483,7 @@ public class SUtil
 	/**
 	 * Get the current classpath as a list of URLs
 	 */
-	public static List<URL> getClasspathURLs(ClassLoader classloader)
+	public static List<URL> getClasspathURLs(ClassLoader classloader, boolean includebootpath)
 	{
 		if(classloader == null)
 			classloader = SUtil.class.getClassLoader();
@@ -1521,37 +1521,40 @@ public class SUtil
 			}
 		}
 		
-		stok = new StringTokenizer(System.getProperty("sun.boot.class.path"), System.getProperty("path.separator"));
-		while(stok.hasMoreTokens())
+		if(includebootpath)
 		{
-			try
+			stok = new StringTokenizer(System.getProperty("sun.boot.class.path"), System.getProperty("path.separator"));
+			while(stok.hasMoreTokens())
 			{
-				String entry = stok.nextToken();
-				File file = new File(entry);
-				cps.add(file.getCanonicalFile().toURI().toURL());
-				
-				// Code below does not work for paths with spaces in it.
-				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
-//				if(file.isDirectory()
-//						&& !entry
-//								.endsWith(System.getProperty("file.separator")))
-//				{
-//					// Normalize, that directories end with "/".
-//					entry += System.getProperty("file.separator");
-//				}
-//				cps.add(new URL("file:///" + entry));
-			}
-			catch(MalformedURLException e)
-			{
-				// Maybe invalid classpath entries --> just ignore.
-				// Hack!!! Print warning?
-				// e.printStackTrace();
-			}
-			catch(IOException e)
-			{
+				try
+				{
+					String entry = stok.nextToken();
+					File file = new File(entry);
+					cps.add(file.getCanonicalFile().toURI().toURL());
+					
+					// Code below does not work for paths with spaces in it.
+					// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
+	//				if(file.isDirectory()
+	//						&& !entry
+	//								.endsWith(System.getProperty("file.separator")))
+	//				{
+	//					// Normalize, that directories end with "/".
+	//					entry += System.getProperty("file.separator");
+	//				}
+	//				cps.add(new URL("file:///" + entry));
+				}
+				catch(MalformedURLException e)
+				{
+					// Maybe invalid classpath entries --> just ignore.
+					// Hack!!! Print warning?
+					// e.printStackTrace();
+				}
+				catch(IOException e)
+				{
+				}
 			}
 		}
-
+		
 		if(classloader instanceof URLClassLoader)
 		{
 			URL[] urls = ((URLClassLoader)classloader).getURLs();
