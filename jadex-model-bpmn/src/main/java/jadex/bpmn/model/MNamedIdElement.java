@@ -1,11 +1,5 @@
 package jadex.bpmn.model;
 
-import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.SUtil;
-import jadex.javaparser.IParsedExpression;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  *  Base class for named id elements.

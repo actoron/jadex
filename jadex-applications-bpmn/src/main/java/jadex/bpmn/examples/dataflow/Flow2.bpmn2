@@ -29,6 +29,12 @@
     <semantic:endEvent id="PzOumm8xTtN+hML4">
       <semantic:incoming>3AQluLkDKtGWn+k/</semantic:incoming>
     </semantic:endEvent>
+    <semantic:task name="Task" id="KpBOK9C1BjLJwJDO">
+      <semantic:extensionElements>
+        <jadex:taskclass>jadex.platform.service.servicepool.ServicePoolTask</jadex:taskclass>
+        <jadex:property name="mappings" type="java.util.List">new String[]{&quot;com.sun.crypto.provider.AESConstants&quot;,&quot;test.bpmn&quot;,&quot;org.glassfish.gmbal.AMXMetadata&quot;,&quot;test2.bpmn&quot;}</jadex:property>
+      </semantic:extensionElements>
+    </semantic:task>
     <semantic:sequenceFlow sourceRef="Cq/85Tim2tti2Odn" targetRef="z4VkNQkKmWLMN5JC" id="+tPLsbOaRzxn/Hqv">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="z4VkNQkKmWLMN5JC" targetRef="PzOumm8xTtN+hML4" id="3AQluLkDKtGWn+k/">
@@ -49,6 +55,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="PzOumm8xTtN+hML4">
         <dc:Bounds height="40.0" width="40.0" x="350.0" y="60.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="KpBOK9C1BjLJwJDO">
+        <dc:Bounds height="100.0" width="160.0" x="430.0" y="40.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="+tPLsbOaRzxn/Hqv">
       </bpmndi:BPMNEdge>

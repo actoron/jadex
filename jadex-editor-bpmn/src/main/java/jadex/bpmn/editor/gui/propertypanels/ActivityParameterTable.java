@@ -92,15 +92,18 @@ public class ActivityParameterTable extends JTable
 	 */
 	public void removeAllParameters()
 	{
-		int length = getBpmnActivity().getParameters().size();
-		Set<MParameter> params = new HashSet<MParameter>();
-		for(int i=0; i<length; i++)
+		if(getBpmnActivity()!=null && getBpmnActivity().getParameters()!=null)
 		{
-			MParameter param = getBpmnActivity().getParameters().remove(0);
-			params.add(param);
+			int length = getBpmnActivity().getParameters().size();
+			Set<MParameter> params = new HashSet<MParameter>();
+			for(int i=0; i<length; i++)
+			{
+				MParameter param = getBpmnActivity().getParameters().remove(0);
+				params.add(param);
+			}
+			activity.removedParameter(params);
+			((ParameterTableModel)getModel()).fireTableRowsDeleted(0, length-1);
 		}
-		activity.removedParameter(params);
-		((ParameterTableModel)getModel()).fireTableRowsDeleted(0, length-1);
 	}
 	
 	/**
