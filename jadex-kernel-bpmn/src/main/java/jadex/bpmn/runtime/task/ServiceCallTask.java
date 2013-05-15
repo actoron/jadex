@@ -60,14 +60,11 @@ public class ServiceCallTask implements ITask
 {
 	//-------- constants --------
 	
-	/** Parameter for service name. */
-	public static final String PARAMETER_SERVICE	= "service"; 
+	/** Property for service name. */
+	public static final String PROPERTY_SERVICE	= "service"; 
 	
-	/** Parameter for method name. */
-	public static final String PARAMETER_METHOD	= "method"; 
-	
-	/** Parameter for rebind flag. */
-	public static final String PARAMETER_REBIND	= "rebind"; 
+	/** Property for method name. */
+	public static final String PROPERTY_METHOD	= "method"; 
 	
 	//-------- ITask interface --------
 	
@@ -81,51 +78,48 @@ public class ServiceCallTask implements ITask
 	public IFuture<Void> execute(final ITaskContext context, final IInternalAccess process)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		String	service	= null;
-		String	method	= null;
+		String	service	= (String)context.getPropertyValue(PROPERTY_SERVICE);
+		String	method	= (String)context.getPropertyValue(PROPERTY_METHOD);
 		String	resultparam	= null;
-		boolean	rebind	= false;
 		
 		// Collect arguments and settings.
 		final List<Object>	args = new ArrayList<Object>();
 		final List<Class<?>> argtypes = new ArrayList<Class<?>>();
 		IndexMap<String, MParameter>	mparams	= context.getActivity().getParameters();
-		for(Iterator<MParameter> it=mparams.values().iterator(); it.hasNext(); )
+		if(mparams!=null)
 		{
-			MParameter	param	= (MParameter)it.next();
-			if(PARAMETER_SERVICE.equals(param.getName()))
+			for(Iterator<MParameter> it=mparams.values().iterator(); it.hasNext(); )
 			{
-				service	= (String)context.getParameterValue(param.getName());
-			}
-			else if(PARAMETER_METHOD.equals(param.getName()))
-			{
-				method	= (String)context.getParameterValue(param.getName());		
-			}
-			else if(PARAMETER_REBIND.equals(param.getName()))
-			{
-				Object	val	= context.getParameterValue(param.getName());
-				rebind	= val!=null ? ((Boolean)val).booleanValue() : false;
-			}
-			else if(MParameter.DIRECTION_IN.equals(param.getDirection()))
-			{
-				args.add(context.getParameterValue(param.getName()));
-				argtypes.add(param.getClazz().getType(process.getClassLoader(), process.getModel().getAllImports()));
-			}
-			else if(MParameter.DIRECTION_INOUT.equals(param.getDirection()))
-			{
-				if(resultparam!=null)
-					throw new RuntimeException("Only one 'out' parameter allowed for ServiceCallTask: "+context);
-				
-				resultparam	= param.getName();
-				args.add(context.getParameterValue(param.getName()));
-				argtypes.add(param.getClazz().getType(process.getClassLoader(), process.getModel().getAllImports()));
-			}
-			else if(MParameter.DIRECTION_OUT.equals(param.getDirection()))
-			{
-				if(resultparam!=null)
-					throw new RuntimeException("Only one 'out' parameter allowed for ServiceCallTask: "+context);
-				
-				resultparam	= param.getName();
+				MParameter	param	= (MParameter)it.next();
+				if(PROPERTY_SERVICE.equals(param.getName()))
+				{
+					service	= (String)context.getParameterValue(param.getName());
+				}
+				else if(PROPERTY_METHOD.equals(param.getName()))
+				{
+					method	= (String)context.getParameterValue(param.getName());		
+				}
+				else if(MParameter.DIRECTION_IN.equals(param.getDirection()))
+				{
+					args.add(context.getParameterValue(param.getName()));
+					argtypes.add(param.getClazz().getType(process.getClassLoader(), process.getModel().getAllImports()));
+				}
+				else if(MParameter.DIRECTION_INOUT.equals(param.getDirection()))
+				{
+					if(resultparam!=null)
+						throw new RuntimeException("Only one 'out' parameter allowed for ServiceCallTask: "+context);
+					
+					resultparam	= param.getName();
+					args.add(context.getParameterValue(param.getName()));
+					argtypes.add(param.getClazz().getType(process.getClassLoader(), process.getModel().getAllImports()));
+				}
+				else if(MParameter.DIRECTION_OUT.equals(param.getDirection()))
+				{
+					if(resultparam!=null)
+						throw new RuntimeException("Only one 'out' parameter allowed for ServiceCallTask: "+context);
+					
+					resultparam	= param.getName();
+				}
 			}
 		}
 		
@@ -152,7 +146,7 @@ public class ServiceCallTask implements ITask
 		final String	fservice	= service;
 		final String	fmethod	= method;
 		final String	fresultparam	= resultparam;
-		process.getServiceContainer().getRequiredService(service, rebind)
+		process.getServiceContainer().getRequiredService(service)
 			.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -343,8 +337,8 @@ public class ServiceCallTask implements ITask
 		
 		try
 		{
-			MProperty msparam = params.get(PARAMETER_SERVICE);
-			MProperty mmparam = params.get(PARAMETER_METHOD);
+			MProperty msparam = params.get(PROPERTY_SERVICE);
+			MProperty mmparam = params.get(PROPERTY_METHOD);
 			
 			if(msparam!=null && mmparam!=null)
 			{
@@ -433,7 +427,7 @@ public class ServiceCallTask implements ITask
 				{
 					String reqname = (String)cbsername.getSelectedItem();
 					
-					MProperty mprop = task.getProperties().get(PARAMETER_SERVICE);
+					MProperty mprop = task.getProperties().get(PROPERTY_SERVICE);
 					UnparsedExpression uexp = new UnparsedExpression(null, 
 						String.class, "\""+reqname+"\"", null);
 					mprop.setInitialValue(uexp);
@@ -463,7 +457,7 @@ public class ServiceCallTask implements ITask
 				public void actionPerformed(ActionEvent e)
 				{
 					Method method = (Method)cbmethodname.getSelectedItem();
-					MProperty mprop = task.getProperties().get(PARAMETER_METHOD);
+					MProperty mprop = task.getProperties().get(PROPERTY_METHOD);
 					UnparsedExpression uexp = new UnparsedExpression(null, 
 						String.class, method!=null? "\""+method.getName()+"\"": "null", null);
 					mprop.setInitialValue(uexp);

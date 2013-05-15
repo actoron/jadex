@@ -55,6 +55,9 @@
 			<parameter name="belief" class="String">
 				<value>"result"</value>
 			</parameter>
+			<parameter name="wait" class="long">
+				<value>10</value>
+			</parameter>
 			<body class="ResultPlan"/>
 			<trigger>
 				<goalfinished ref="testgoal"/>
