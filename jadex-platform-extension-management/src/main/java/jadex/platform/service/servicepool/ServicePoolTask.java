@@ -48,6 +48,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 /**
@@ -156,6 +157,7 @@ public class ServicePoolTask implements ITask
 			panel.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHEAST, GridBagConstraints.BOTH, new Insets(0,5,5,0), 0, 0));
 			TableColumn col = table.getColumnModel().getColumn(0);
 			final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
+			acc.setEditable(true);
 			final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, container.getInterfaces());
 			acc.setModel(accm);
 //			final JComboBox box = new JComboBox(container.getInterfaces().toArray());
@@ -183,7 +185,7 @@ public class ServicePoolTask implements ITask
 //			{
 //				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
 //				{
-//					super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
+////					super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
 //					ClassInfo ci = (ClassInfo)value;
 //					setText(ci==null? "": ci.getTypeName());
 //					return acc.getEditorComponent();
@@ -312,7 +314,8 @@ public class ServicePoolTask implements ITask
 			 */
 			public void setValueAt(Object value, int rowIndex, int columnIndex)
 			{
-				System.out.println("setValue: "+value);
+				if(value!=null)
+					System.out.println("setValue: "+value+" "+value.getClass());
 				
 				Object[] val;
 				if(rowIndex<entries.size())

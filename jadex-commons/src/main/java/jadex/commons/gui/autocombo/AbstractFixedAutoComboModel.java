@@ -53,27 +53,32 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 		
 		ISubscriptionIntermediateFuture<T> ret;
 		
-		if(pattern==null)
+		if(pattern==null && entries.size()==0)
 		{
 			copyEntries();
 //			if(entries.size()>0)
 //				getCombo().setSelectedItem(getElementAt(0));
 		}
 		else
-		{				
-			entries.clear();
-
-			final Pattern pat = SUtil.createRegexFromGlob(pattern+"*");
+		{		
+//			int size1 = entries.size();
+//			entries.clear();
+//
+//			final Pattern pat = SUtil.createRegexFromGlob(pattern+"*");
+//			
+//			for(T tst: allentries)
+//			{
+//				String str = convertToString(tst);
+//				Matcher m = pat.matcher(str);
+//				if(m.matches())
+//				{
+//					entries.add(tst);
+//				}
+//			}
+//			int size2 = entries.size();
 			
-			for(T tst: allentries)
-			{
-				String str = convertToString(tst);
-				Matcher m = pat.matcher(str);
-				if(m.matches())
-				{
-					entries.add(tst);
-				}
-			}
+//			fireIntervalAdded(this, size1, size2 - 1);
+//			fireContentsChanged(this, 0, size2 - 1);
 			
 //			getCombo().setSelectedItem(pattern);
 			getCombo().updatePopup();
