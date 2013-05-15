@@ -14,6 +14,7 @@ import jadex.commons.future.DefaultResultListener;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -32,7 +33,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	/** The parent adapter (cached for speed). */
 	protected StandaloneComponentAdapter	parenta;
 	
-	/** The synchronous subcomponents (if any). */
+	/** The synchronous subcomponents that want to be executed (if any). */
 	protected Set<StandaloneComponentAdapter>	subcomponents;
 	
 	//-------- constructors --------
@@ -58,10 +59,15 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 		
 		if(subcomponents!=null)
 		{
-			for(StandaloneComponentAdapter sub:	subcomponents)
+			for(Iterator<StandaloneComponentAdapter> it=subcomponents.iterator(); it.hasNext(); )
 			{
 //				System.out.println("execute1: "+sub.getComponentIdentifier());
-				ret	= sub.execute() || ret;
+				boolean	again	= it.next().execute();
+				if(!again)
+				{
+					it.remove();
+				}
+				ret	= again || ret;
 			}
 		}
 		
@@ -73,6 +79,8 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 */
 	protected void	doWakeup()
 	{
+//		System.out.println("dowakeup: "+getComponentIdentifier());
+		
 //		if(parent!=null)
 		if(desc.getSynchronous()!=null && desc.getSynchronous().booleanValue())
 		{

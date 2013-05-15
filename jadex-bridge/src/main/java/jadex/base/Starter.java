@@ -549,7 +549,16 @@ public class Starter
 										ISuspendable.SUSPENDABLE.set(sus);
 										
 										// Start normal execution of root component (i.e. platform) unless an error occurred during init.
-										if(!ret.isDone())
+										boolean	wakeup	= false;
+										try
+										{
+											wakeup	= !ret.isDone() || ret.get(null)!=null;
+										}
+										catch(Exception e)
+										{
+										}
+										
+										if(wakeup)
 										{
 //											try
 //											{
