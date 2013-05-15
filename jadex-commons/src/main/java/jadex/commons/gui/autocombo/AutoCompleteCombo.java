@@ -189,9 +189,15 @@ public class AutoCompleteCombo<T> extends JComboBox
 	 */
 	public void updatePopup()
 	{
-		setPopupVisible(false);
-		setPopupVisible(true);
-		clearSelection();
+		try
+		{
+			setPopupVisible(false);
+			setPopupVisible(true);
+			clearSelection();
+		}
+		catch(Exception e)
+		{
+		}
 	}
 	
 	/**

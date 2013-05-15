@@ -16,6 +16,9 @@ import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * 
+ */
 public class ActivityParameterTable extends JTable
 {
 	/** The column names. */
@@ -24,6 +27,9 @@ public class ActivityParameterTable extends JTable
 	/** The activity. */
 	protected VActivity activity;
 	
+	/**
+	 *  Create a new ActivityParameterTable.
+	 */
 	public ActivityParameterTable(ModelContainer modelcontainer, VActivity activity)
 	{
 		this.activity = activity;
@@ -38,7 +44,6 @@ public class ActivityParameterTable extends JTable
 	
 	/**
 	 *  Gets the BPMN model activity.
-	 *	
 	 *	@return The BPMN model activity.
 	 */
 	protected MActivity getBpmnActivity()

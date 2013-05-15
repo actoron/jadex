@@ -23,9 +23,12 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 import jadex.javaparser.SJavaParser;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -38,14 +41,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
+import javax.swing.JTree;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
@@ -154,10 +155,10 @@ public class ServicePoolTask implements ITask
 			final JTable table = new JTable(tm);
 			panel.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHEAST, GridBagConstraints.BOTH, new Insets(0,5,5,0), 0, 0));
 			TableColumn col = table.getColumnModel().getColumn(0);
-//			final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
-//			final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, container.getInterfaces());
-//			acc.setModel(accm);
-			final JComboBox box = new JComboBox(container.getInterfaces().toArray());
+			final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
+			final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, container.getInterfaces());
+			acc.setModel(accm);
+//			final JComboBox box = new JComboBox(container.getInterfaces().toArray());
 //			box.setEditable(true);
 //			AutoCompleteSupport support = AutoCompleteSupport.install(c, GlazedLists.eventListOf(elements));
 //			support.setSelectsTextOnFocusGain(false);
@@ -169,7 +170,15 @@ public class ServicePoolTask implements ITask
 //			column.setCellRenderer(renderer);
 //			column.setCellEditor(combo);
 	
-			col.setCellEditor(new DefaultCellEditor(box));
+			col.setCellEditor(new DefaultCellEditor(acc)
+			{
+				public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected,
+					boolean expanded, boolean leaf, int row) {
+//					String         stringValue = tree.convertValueToText(value, isSelected, expanded, leaf, row, false);
+					delegate.setValue(value);
+					return editorComponent;
+				}
+			});
 //			col.setCellRenderer(new DefaultTableCellRenderer()
 //			{
 //				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
