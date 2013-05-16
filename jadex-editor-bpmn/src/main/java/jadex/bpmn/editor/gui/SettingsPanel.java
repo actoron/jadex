@@ -2,12 +2,15 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.gui.propertypanels.DocumentAdapter;
 import jadex.bridge.ClassInfo;
+import jadex.commons.SReflect;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -112,10 +115,21 @@ public class SettingsPanel extends JPanel
 	public void applySettings()
 	{
 		settings.setLibraryHome(new File(libpathfield.getText()));
-		globalcache.getGlobalTaskClasses().clear();
-		globalcache.getGlobalInterfaces().clear();
+		Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
+		{
+			public int compare(ClassInfo o1, ClassInfo o2)
+			{
+				String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
+				String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
+				return str1.compareTo(str2);
+			}
+		};
 		List<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
 		globalcache.getGlobalTaskClasses().addAll(tmp[0]);
 		globalcache.getGlobalInterfaces().addAll(tmp[1]);
+		Collections.sort(globalcache.getGlobalTaskClasses(), comp);
+		Collections.sort(globalcache.getGlobalInterfaces(), comp);
+		settings.setGlobalTaskClasses(tmp[0]);
+		settings.setGlobalInterfaces(tmp[1]);
 	}
 }

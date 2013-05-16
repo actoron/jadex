@@ -679,6 +679,16 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Get a property value string from the model.
+	 *  @param name The name.
+	 */
+	public String getPropertyValueString(String name)
+	{
+		UnparsedExpression exp = getPropertyValue(name);
+		return exp != null? exp.getValue() : null;
+	}
+	
+	/**
 	 *  Get a property value from the model.
 	 *  @param name The name.
 	 */

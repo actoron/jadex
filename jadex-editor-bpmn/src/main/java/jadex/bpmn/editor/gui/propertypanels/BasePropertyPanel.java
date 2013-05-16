@@ -164,7 +164,10 @@ public class BasePropertyPanel extends JPanel
 		}
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.NONE;
-		column.add(first, gbc);
+		if (first != second)
+		{
+			column.add(first, gbc);
+		}
 		
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -185,6 +188,11 @@ public class BasePropertyPanel extends JPanel
 		if (properties.containsKey("second_fill"))
 		{
 			gbc.fill = (Integer) properties.get("second_fill");
+		}
+		if (first == second)
+		{
+			gbc.gridx = 0;
+			gbc.gridwidth = 2;
 		}
 		column.add(second, gbc);
 	}

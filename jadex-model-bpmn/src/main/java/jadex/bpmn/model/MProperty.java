@@ -85,6 +85,16 @@ public class MProperty extends MAnnotationElement
 	{
 		return this.initialval;
 	}
+	
+	/**
+	 *  Get the initialval.
+	 *  @return The initialval.
+	 */
+	public String getInitialValueString()
+	{
+		UnparsedExpression exp = getInitialValue();
+		return exp != null? exp.getValue() : null;
+	}
 
 	/**
 	 *  Set the initial value.
@@ -93,6 +103,26 @@ public class MProperty extends MAnnotationElement
 	public void setInitialValue(UnparsedExpression initialval)
 	{
 		this.initialval = initialval;
+	}
+	
+	/**
+	 *  Set the initial value.
+	 *  @param initialval The initial value to set.
+	 */
+	public void setInitialValue(String initialval)
+	{
+		if (initialval == null)
+		{
+			this.initialval.setValue(null);
+		}
+		else
+		{
+			if (this.initialval == null)
+			{
+				this.initialval = new UnparsedExpression(name, clazz.getTypeName(), null, null);
+			}
+			this.initialval.setValue(initialval);
+		}
 	}
 
 	/**

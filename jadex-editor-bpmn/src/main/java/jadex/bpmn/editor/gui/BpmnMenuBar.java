@@ -4,6 +4,7 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.model.io.SBpmnModelWriter;
+import jadex.bridge.ClassInfo;
 import jadex.commons.SUtil;
 
 import java.awt.Event;
@@ -89,6 +90,8 @@ public class BpmnMenuBar extends JMenuBar
 							{
 								cont.setPropertyPanel(SPropertyPanelFactory.createPanel(null, cont));
 							}
+							
+							cont.generateClassLoader();
 						}
 					}
 				});

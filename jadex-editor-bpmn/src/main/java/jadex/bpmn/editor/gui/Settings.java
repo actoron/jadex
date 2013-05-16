@@ -29,6 +29,9 @@ public class Settings
 	/** The settings file name. */
 	protected static final String SETTINGS_FILE_NAME = "settings.cfg";
 	
+	/** The class cache file name. */
+	protected static final String CLASS_CACHE_FILE_NAME = "classes.cache";
+	
 	/** The last file opened or saved. */
 	protected File lastfile;
 	
@@ -155,46 +158,6 @@ public class Settings
 	 */
 	public void setLibraryHome(File libraryhome)
 	{
-//		if (libraryhome != null && libraryhome.exists() && libraryhome.isDirectory())
-//		{
-//			this.libraryhome = libraryhome;
-//			
-//			File libdir = new File(libraryhome.getAbsolutePath() + File.separator + "lib");
-//			if (!libdir.exists() || !libdir.isDirectory())
-//			{
-//				libdir = libraryhome;
-//			}
-//			
-//			File[] files = libdir.listFiles();
-//			List<URL> urls = new ArrayList<URL>();
-//			if (files != null)
-//			{
-//				for (File file : files)
-//				{
-//					if (file.getAbsolutePath().endsWith(".jar"))
-//					{
-//						try
-//						{
-//							urls.add(file.toURI().toURL());
-//						}
-//						catch (MalformedURLException e)
-//						{
-//						}
-//					}
-//				}
-//			}
-//			
-//			homeclassloader = new URLClassLoader(urls.toArray(new URL[urls.size()]), Settings.class.getClassLoader());
-//		}
-//		else
-//		{
-//			if (libraryhome == null || libraryhome.getPath().length() == 0)
-//			{
-//				this.libraryhome = null;
-//				homeclassloader = Settings.class.getClassLoader();
-//			}
-//		}
-		
 		if (libraryhome != null && libraryhome.getPath().length() > 0)
 		{
 			this.libraryhome = libraryhome;
@@ -219,6 +182,29 @@ public class Settings
 						}
 						catch (MalformedURLException e)
 						{
+						}
+					}
+				}
+			}
+			
+			if (urls.isEmpty())
+			{
+				// Attempt developer-mode search.
+				File[] dirs = libdir.listFiles();
+				for (File dir : dirs)
+				{
+					if (dir.isDirectory())
+					{
+						File targetdir = new File(dir.getAbsolutePath() + File.separator + "target" + File.separator + "classes");
+						if (targetdir.exists() && targetdir.isDirectory())
+						{
+							try
+							{
+								urls.add(targetdir.toURI().toURL());
+							}
+							catch (MalformedURLException e)
+							{
+							}
 						}
 					}
 				}
@@ -346,12 +332,13 @@ public class Settings
 			}
 		}
 		
+		Properties ccprops = new Properties();
 		if(globalinterfaces!=null && globalinterfaces.size()>0)
 		{
 			for(int i=0; i<globalinterfaces.size(); i++)
 			{
 				ClassInfo inter = globalinterfaces.get(i);
-				props.put("gi"+i, inter.getTypeName());
+				ccprops.put("gi"+i, inter.getTypeName());
 			}
 		}
 		
@@ -360,7 +347,7 @@ public class Settings
 			for(int i=0; i<globaltaskclasses.size(); i++)
 			{
 				ClassInfo gt = globaltaskclasses.get(i);
-				props.put("gt"+i, gt.getTypeName());
+				ccprops.put("gt"+i, gt.getTypeName());
 			}
 		}
 		
@@ -370,6 +357,14 @@ public class Settings
 		os.close();
 		
 		SUtil.moveFile(tmpfile, settingsfile);
+		
+		tmpfile = File.createTempFile(CLASS_CACHE_FILE_NAME, ".cache");
+		os = new FileOutputStream(tmpfile);
+		ccprops.store(os, "Jadex BPMN Editor Class Cache");
+		os.close();
+		
+		File classcachefile = new File(settingsdir.getAbsolutePath() + File.separator + CLASS_CACHE_FILE_NAME);
+		SUtil.moveFile(tmpfile, classcachefile);
 	}
 	
 	/**
@@ -441,8 +436,6 @@ public class Settings
 			}
 			
 			List<File> openfiles = new ArrayList<File>();
-			List<ClassInfo> gis = new ArrayList<ClassInfo>();
-			List<ClassInfo> gts = new ArrayList<ClassInfo>();
 			for(Object okey: props.keySet())
 			{
 				if(okey instanceof String)
@@ -452,7 +445,25 @@ public class Settings
 					{
 						openfiles.add(new File(props.getProperty(key)));
 					}
-					else if(key.startsWith("gi"))
+				}
+			}
+			ret.setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
+			
+			File classcachefile = new File(BpmnEditor.HOME_DIR + File.separator + CLASS_CACHE_FILE_NAME);
+			
+			props = new Properties();
+			is = new FileInputStream(classcachefile);
+			props.load(is);
+			is.close();
+			
+			List<ClassInfo> gis = new ArrayList<ClassInfo>();
+			List<ClassInfo> gts = new ArrayList<ClassInfo>();
+			for(Object okey: props.keySet())
+			{
+				if(okey instanceof String)
+				{
+					String key = (String) okey;
+					if(key.startsWith("gi"))
 					{
 						gis.add(new ClassInfo(props.getProperty(key)));
 					}
@@ -464,7 +475,6 @@ public class Settings
 			}
 			ret.setGlobalInterfaces(gis);
 			ret.setGlobalTaskClasses(gts);
-			ret.setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
 		}
 		catch (IOException e)
 		{
