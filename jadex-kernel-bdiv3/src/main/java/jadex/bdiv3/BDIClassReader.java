@@ -388,8 +388,9 @@ public class BDIClassReader extends MicroClassReader
 		ClassLoader classloader = ((DummyClassLoader)cl).getOriginal();
 		for(Class<?> agcl: agtcls)
 		{
+//			Class<?> acl =
+			gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
 //			System.out.println("genclazz: "+acl.hashCode()+" "+acl.getClassLoader());
-			Class<?> acl = gen.generateBDIClass(agcl.getName(), bdimodel, classloader);
 		}
 		
 //		System.out.println("genclazz: "+genclazz);
@@ -446,6 +447,7 @@ public class BDIClassReader extends MicroClassReader
 		String name = null;
 		Body body = p.body();
 		ServicePlan sp = body.service();
+		String	component	= body.component();
 		if(mi!=null)
 		{
 			name = mi.getName();
@@ -461,6 +463,18 @@ public class BDIClassReader extends MicroClassReader
 		else if(sp.name().length()>0)
 		{
 			name = sp.name()+"_"+sp.method();
+		}
+		else if(component.length()>0)
+		{
+			name = component;
+			if(name.indexOf("/")!=-1)
+			{
+				name	= name.substring(name.lastIndexOf("/")+1);
+			}
+			if(name.indexOf(".")!=-1)
+			{
+				name	= name.substring(0, name.lastIndexOf("."));
+			}
 		}
 		else
 		{
@@ -498,7 +512,8 @@ public class BDIClassReader extends MicroClassReader
 				ci = Object.class.equals(body.value())? null: new ClassInfo(body.value().getName());
 			Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.equals(sp.mapper())? null: sp.mapper());
 			MBody mbody = new MBody(mi, ci, sp.name().length()==0? null: sp.name(), sp.method().length()==0? null: sp.method(), 
-				(Object.class.equals(sp.mapper())? null: new ClassInfo(sp.mapper().getName())));
+				Object.class.equals(sp.mapper())? null: new ClassInfo(sp.mapper().getName()),
+				body.component().length()==0 ? null : body.component());
 			mplan = new MPlan(name, mbody, mtr, wmtr, p.priority());
 		}
 		

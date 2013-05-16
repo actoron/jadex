@@ -18,6 +18,7 @@ import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -29,6 +30,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -103,20 +105,26 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					init(model.getModelInfo(), MicroAgentInterpreter.this.config, args)
-						.addResultListener(createResultListener(new DelegationResultListener(inited)
+						.addResultListener(createResultListener(new DelegationResultListener<Void>(inited)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Void result)
 						{
-							injectArguments(agent, model).addResultListener(new DelegationResultListener(inited)
+							injectArguments(agent, model).addResultListener(new DelegationResultListener<Void>(inited)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(Void result)
 								{
-									injectServices(agent, model).addResultListener(new DelegationResultListener(inited)
+									injectServices(agent, model).addResultListener(new DelegationResultListener<Void>(inited)
 									{
-										public void customResultAvailable(Object result)
+										public void customResultAvailable(Void result)
 										{
-											// Call user code init.
-											microagent.agentCreated().addResultListener(new DelegationResultListener(inited));
+											injectParent(agent, model).addResultListener(new DelegationResultListener<Void>(inited)
+											{
+												public void customResultAvailable(Void result)
+												{
+													// Call user code init.
+													microagent.agentCreated().addResultListener(new DelegationResultListener<Void>(inited));
+												}
+											});
 										}
 									});
 								}
@@ -372,6 +380,112 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Inject the parent to the annotated fields.
+	 */
+	protected IFuture<Void> injectParent(final Object agent, final MicroModel model)
+	{
+		Future<Void> ret = new Future<Void>();
+		FieldInfo[]	pis	= model.getParentInjections();
+		
+		if(pis.length>0)
+		{
+			CounterResultListener<Void> lis = new CounterResultListener<Void>(pis.length, 
+				new DelegationResultListener<Void>(ret));
+	
+			for(int i=0; i<pis.length; i++)
+			{
+				final Future<Void>	fut	= new Future<Void>();
+				fut.addResultListener(lis);
+				
+				final Field	f	= pis[i].getField(getClassLoader());
+				getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut)
+				{
+					public void customResultAvailable(IComponentManagementService cms)
+					{
+						cms.getExternalAccess(getComponentIdentifier().getParent())
+							.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(fut)
+						{
+							public void customResultAvailable(IExternalAccess exta)
+							{
+								if(IExternalAccess.class.equals(f.getType()))
+								{
+									try
+									{
+										f.setAccessible(true);
+										f.set(agent, exta);
+										fut.setResult(null);
+									}
+									catch(Exception e)
+									{
+										exceptionOccurred(e);
+									}
+								}
+								else if(Boolean.TRUE.equals(getComponentDescription().getSynchronous()))
+								{
+									exta.scheduleStep(new IComponentStep<Void>()
+									{
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											if(SReflect.isSupertype(f.getType(), ia.getClass()))
+											{
+												try
+												{
+													f.setAccessible(true);
+													f.set(agent, ia);
+												}
+												catch(Exception e)
+												{
+													throw new RuntimeException(e);
+												}
+											}
+											else if(ia instanceof IPojoMicroAgent)
+											{
+												Object	pagent	= ((IPojoMicroAgent)ia).getPojoAgent();
+												if(SReflect.isSupertype(f.getType(), pagent.getClass()))
+												{
+													try
+													{
+														f.setAccessible(true);
+														f.set(agent, pagent);
+													}
+													catch(Exception e)
+													{
+														exceptionOccurred(e);
+													}
+												}
+												else
+												{
+													throw new RuntimeException("Incompatible types for parent injection: "+pagent+", "+f);													
+												}
+											}
+											else
+											{
+												throw new RuntimeException("Incompatible types for parent injection: "+ia+", "+f);													
+											}
+											return IFuture.DONE;
+										}
+									}).addResultListener(new DelegationResultListener<Void>(fut));
+								}
+								else
+								{
+									exceptionOccurred(new RuntimeException("Non-external parent injection for non-synchronous subcomponent not allowed: "+f));
+								}
+							}
+						});
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+
+		return	ret;
 	}
 	
 	/**

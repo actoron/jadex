@@ -70,7 +70,9 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 			for(StandaloneComponentAdapter sub: subs)
 			{
 //				System.out.println("execute1: "+sub.getComponentIdentifier());
+				this.componentthread	= Thread.currentThread();
 				boolean	again	= sub.execute();
+				this.componentthread	= null;
 				if(again)
 				{
 					addSubcomponent(sub);

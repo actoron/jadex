@@ -23,6 +23,9 @@ public class MicroModel extends CacheableKernelModel
 	/** The agent injection targets. */
 	protected List<FieldInfo> agentinjections;
 
+	/** The parent injection targets. */
+	protected List<FieldInfo> parentinjections;
+
 	/** The argument injection targets. */
 	protected Map<String, Tuple2<FieldInfo, String>> argumentinjections;
 
@@ -64,6 +67,26 @@ public class MicroModel extends CacheableKernelModel
 	public FieldInfo[] getAgentInjections()
 	{
 		return agentinjections==null? new FieldInfo[0]: (FieldInfo[])agentinjections.toArray(new FieldInfo[agentinjections.size()]);
+	}
+	
+	/**
+	 *  Add an injection field.
+	 *  @param field The field. 
+	 */
+	public void addParentInjection(FieldInfo field)
+	{
+		if(parentinjections==null)
+			parentinjections = new ArrayList<FieldInfo>();
+		parentinjections.add(field);
+	}
+	
+	/**
+	 *  Get the parentinjections fields.
+	 *  @return The fields.
+	 */
+	public FieldInfo[] getParentInjections()
+	{
+		return parentinjections==null? new FieldInfo[0]: (FieldInfo[])parentinjections.toArray(new FieldInfo[parentinjections.size()]);
 	}
 	
 	/**

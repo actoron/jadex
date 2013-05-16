@@ -140,6 +140,11 @@ public class RPlan extends RElement implements IPlan
 				throw new RuntimeException(e);
 			}
 		}
+		else if(mbody.getComponent()!=null)
+		{
+			body	= new ComponentPlanBody(mbody.getComponent(), ia);
+		}
+		
 		if(body==null)
 			throw new RuntimeException("Plan body not created: "+rplan);
 		

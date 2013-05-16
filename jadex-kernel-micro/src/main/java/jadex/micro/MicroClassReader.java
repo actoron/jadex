@@ -42,6 +42,7 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Parent;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -642,6 +643,10 @@ public class MicroClassReader
 				if(isAnnotationPresent(fields[i], Agent.class, cl))
 				{
 					micromodel.addAgentInjection(new FieldInfo(fields[i]));
+				}
+				if(isAnnotationPresent(fields[i], Parent.class, cl))
+				{
+					micromodel.addParentInjection(new FieldInfo(fields[i]));
 				}
 				else if(isAnnotationPresent(fields[i], AgentService.class, cl))
 				{
@@ -1546,6 +1551,10 @@ public class MicroClassReader
 									Array.set(nret, i, getProxyAnnotation((Annotation)Array.get(ret, i), cl));
 								}
 								ret = nret;
+							}
+							else if(ret.getClass().isEnum())
+							{
+								ret	= Enum.valueOf((Class<Enum>) SReflect.classForName(ret.getClass().getName(), cl), ret.toString());
 							}
 						}
 						return ret;

@@ -11,6 +11,11 @@ public @interface Body
 	public Class<?> value() default Object.class;
 
 	/**
+	 *  The body as component type.
+	 */
+	public String component() default "";
+
+	/**
 	 *  The body as required service.
 	 */
 	public ServicePlan service() default @ServicePlan(name="");

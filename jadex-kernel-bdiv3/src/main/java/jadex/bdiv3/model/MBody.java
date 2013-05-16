@@ -33,6 +33,9 @@ public class MBody
 	/** The parameter mapper. */
 	protected ClassInfo mapperclass;
 	
+	/** The body as component type. */
+	protected String component;
+	
 	
 	/** The body method cached for speed. */
 	protected MethodInfo bodymethod;
@@ -57,13 +60,14 @@ public class MBody
 	 *  Create a new mbody.
 	 */
 	public MBody(MethodInfo method, ClassInfo clazz, String servicename,
-		String servicemethodname, ClassInfo mapperclass)
+		String servicemethodname, ClassInfo mapperclass, String component)
 	{
 		this.method = method;
 		this.clazz = clazz;
 		this.servicename = servicename;
 		this.servicemethodname = servicemethodname;
 		this.mapperclass = mapperclass;
+		this.component	= component;
 	}
 
 	/**
@@ -155,6 +159,26 @@ public class MBody
 	{
 		this.mapperclass = mapperclass;
 	}
+	
+	/**
+	 *  Get the component.
+	 *  @return The component.
+	 */
+	public String getComponent()
+	{
+		return component;
+	}
+
+	/**
+	 *  Set the component.
+	 *  @param component The component to set.
+	 */
+	public void setComponent(String component)
+	{
+		this.component = component;
+	}
+
+
 
 	/**
 	 * 

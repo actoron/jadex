@@ -10,7 +10,6 @@ import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchievePickupWaste;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.QueryWastebin;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.impl.PlanAbortedException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
