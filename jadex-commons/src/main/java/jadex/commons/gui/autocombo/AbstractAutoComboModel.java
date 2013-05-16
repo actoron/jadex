@@ -4,6 +4,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingResultListener;
 
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -87,7 +88,7 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 		fireContentsChanged(AbstractAutoComboModel.this, 0, entries.size() - 1);
 		
 //		setPattern(null);
-//		setSelectedItem(val);
+		setSelectedItem(val);
 	}
 
 	/**
@@ -103,8 +104,8 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	 */
 	public void setSelectedItem(Object obj)
 	{
-		if(obj instanceof String)
-			System.out.println("herer");
+//		if(obj instanceof String)
+//			System.out.println("herer");
 		
 		if((selected != null && !selected.equals(obj))
 			|| selected == null && obj != null)
@@ -112,6 +113,14 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 			selected = (T)obj;
 			fireContentsChanged(this, -1, -1);
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void setSelectedItemQuiet(Object obj)
+	{
+		selected = (T)obj;
 	}
 
 	/**
@@ -175,18 +184,7 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 
 //				System.out.println("sizes: "+size1+" "+size2);
 				
-//				fireContentsChanged(AbstractAutoComboModel.this, 0, size2-1);
-				
-//				if(size1<size2)
-//				{
-//					fireIntervalAdded(AbstractAutoComboModel.this, size1, size2 - 1);
-//					fireContentsChanged(AbstractAutoComboModel.this, 0, size1 - 1);
-//				}
-//				else if(size1>size2)
-//				{
-//					fireIntervalRemoved(AbstractAutoComboModel.this, size2, size1 - 1);
-//					fireContentsChanged(AbstractAutoComboModel.this, 0, size2 - 1);
-//				}
+				fireChangeEvents(size1, size2);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -201,4 +199,23 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	 * 
 	 */
 	public abstract ISubscriptionIntermediateFuture<T> doSetPattern(final String pattern);
+	
+	/**
+	 * 
+	 */
+	protected void fireChangeEvents(int size1, int size2)
+	{
+		fireContentsChanged(this, 0, size2-1);
+		
+		if(size1<size2)
+		{
+			fireIntervalAdded(this, size1, size2 - 1);
+			fireContentsChanged(this, 0, size1 - 1);
+		}
+		else if(size1>size2)
+		{
+			fireIntervalRemoved(this, size2, size1 - 1);
+			fireContentsChanged(this, 0, size2 - 1);
+		}
+	}
 }

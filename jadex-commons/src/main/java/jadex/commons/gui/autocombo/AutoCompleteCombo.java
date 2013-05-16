@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.List;
 
@@ -42,6 +44,9 @@ public class AutoCompleteCombo<T> extends JComboBox
 	/** The current call. */
 	protected ISubscriptionIntermediateFuture<T> current;
 	
+	/** The flag that the model is modified. */
+	protected boolean updating;
+	
 	/**
 	 *  Create a new combo box.
 	 */
@@ -50,6 +55,17 @@ public class AutoCompleteCombo<T> extends JComboBox
 		this.tp = tp==null? new ThreadPool(): tp;
 		this.cl = cl==null? AutoCompleteCombo.class.getClassLoader(): cl;
 		setEditable(true);
+		
+		addPropertyChangeListener(new PropertyChangeListener()
+		{
+			public void propertyChange(PropertyChangeEvent evt)
+			{
+				if("JComboBox.isTableCellEditor".equals(evt.getPropertyName()) && Boolean.TRUE.equals(evt.getNewValue()))
+				{
+					putClientProperty("JComboBox.isTableCellEditor", Boolean.FALSE);
+				}
+			}
+		});
 	}
 	
 	/**
@@ -86,6 +102,24 @@ public class AutoCompleteCombo<T> extends JComboBox
 //		comp.setDocument(new AutoCompleteDocument());
 //	}
 	
+	public void actionPerformed(ActionEvent e) 
+	{	
+//		System.out.println("box updating: "+isUpdating()+" "+e);
+//		if(!isUpdating())
+//		{
+//			super.actionPerformed(e);
+//		}
+	}
+	
+	/**
+	 *  Get the updating.
+	 *  @return The updating.
+	 */
+	public boolean isUpdating()
+	{
+		return updating;
+	}
+
 	/**
 	 * 
 	 */
@@ -240,6 +274,8 @@ public class AutoCompleteCombo<T> extends JComboBox
 				{
 //					int key = e.getKeyCode();
 //					System.out.println("typed: "+key);
+				
+					getAutoModel().setSelectedItemQuiet(null);
 					
 					if(!t.isRunning())
 					{
@@ -253,6 +289,8 @@ public class AutoCompleteCombo<T> extends JComboBox
 				
 				public void keyPressed(KeyEvent e)
 				{
+					getAutoModel().setSelectedItemQuiet(null);
+					
 					int key = e.getKeyCode();
 //					System.out.println("pressed: "+key);
 					if(key == KeyEvent.VK_ENTER)
@@ -268,6 +306,11 @@ public class AutoCompleteCombo<T> extends JComboBox
 					{
 						arrowkey = true;
 						
+//						T newItem = (T)getEditor().getItem();
+//						System.out.println(newItem);
+//				        setSelectedItem(newItem);
+//				        getEditorComponent().setText(getAutoModel().convertToString(newItem));
+				        
 						if(t.isRunning())
 						{
 							t.stop();
@@ -291,6 +334,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 		 */
 		protected void updateModel() //throws BadLocationException
 		{
+			updating = true;
 			try
 			{
 				String text = getText(0, getLength());
@@ -299,19 +343,23 @@ public class AutoCompleteCombo<T> extends JComboBox
 				{
 					public void resultAvailable(Collection<T> result) 
 					{
-//						clearSelection();
-//						updatePopup();
-//						JTextComponent comp = (JTextComponent)getEditor().getEditorComponent();
-//						comp.setCaretPosition(getLength());
+						clearSelection();
+						updatePopup();
+						JTextComponent comp = (JTextComponent)getEditor().getEditorComponent();
+						comp.setCaretPosition(getLength());
+						
+						updating = false;
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						updating = false;
 					}
 				});
 			}
 			catch(Exception e)
 			{
+				updating = false;
 			}
 		}
 
@@ -374,11 +422,15 @@ public class AutoCompleteCombo<T> extends JComboBox
 		public void replace(int offset, int length, String text,
 			AttributeSet attrs) throws BadLocationException
 		{
-			if(length == 0 && (text == null || text.length() == 0))
+			if(text == null || text.length()==0)
+//			if(length == 0 && (text == null || text.length() == 0))
+//			if(length == 0 || text == null || text.length() == 0)
 			{
 				return;
 			}
 
+//			System.out.println("replace: "+text);
+			
 			writeLock();
 			try
 			{

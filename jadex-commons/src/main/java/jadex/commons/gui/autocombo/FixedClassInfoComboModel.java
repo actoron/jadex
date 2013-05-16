@@ -31,6 +31,6 @@ public class FixedClassInfoComboModel extends AbstractFixedAutoComboModel<ClassI
 	 */
 	public String convertToString(ClassInfo val)
 	{
-		return val==null || val.getTypeName().length()==0? null: SReflect.getInnerClassName(val.getType(getCombo().getClassLoader()));
+		return val==null || val.getTypeName().length()==0? null: SReflect.getUnqualifiedTypeName(val.getTypeName());
 	}
 }

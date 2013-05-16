@@ -18,6 +18,8 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -33,20 +35,28 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import javax.swing.plaf.metal.MetalComboBoxEditor;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -157,40 +167,137 @@ public class ServicePoolTask implements ITask
 			panel.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHEAST, GridBagConstraints.BOTH, new Insets(0,5,5,0), 0, 0));
 			TableColumn col = table.getColumnModel().getColumn(0);
 			final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
-			acc.setEditable(true);
 			final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, container.getInterfaces());
+			
+			acc.setEditor(new MetalComboBoxEditor()//BasicComboBoxEditor()
+			{
+				Object val;
+				public void setItem(Object obj)
+				{
+					if(SUtil.equals(val, obj) || obj==null)
+						return;
+					
+					ClassInfo ci = (ClassInfo)obj;
+					
+					String text = ci!=null && ci.getTypeName()!=null && ci.getTypeName().length()>0? accm.convertToString((ClassInfo)obj): "";
+				    if(text!=null && !text.equals(editor.getText())) 
+				    {
+				    	val = obj;
+				    	if(text.length()>0)
+				    		editor.setText(text);
+				    }
+				}
+				
+				public Object getItem()
+				{
+					return accm.convertFromString(editor.getText());
+				}
+			
+			});
+			 
+//			acc.setRenderer(new BasicComboBoxRenderer()
+//			{
+//				public Component getListCellRendererComponent(JList list, Object value,
+//					int index, boolean isSelected, boolean cellHasFocus)
+//				{
+//					ClassInfo cl = (ClassInfo)value;
+//					String txt = SReflect.getUnqualifiedTypeName(cl.getTypeName());//+" - "+cl.getPackage().getName();
+//					return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
+//				}
+//			});
+			
+			acc.setEditable(true);
 			acc.setModel(accm);
 //			final JComboBox box = new JComboBox(container.getInterfaces().toArray());
 //			box.setEditable(true);
-//			AutoCompleteSupport support = AutoCompleteSupport.install(c, GlazedLists.eventListOf(elements));
-//			support.setSelectsTextOnFocusGain(false);
-//			support.setHidesPopupOnFocusLost(false);
-//			support.setStrict(false);
-//			ComboBoxCellEditor combo = new ComboBoxCellEditor(c);
-//			TableColumn column = myTable.getColumnModel().getColumn(2);
-//			ComboTableCellRenderer renderer = new ComboTableCellRenderer();
-//			column.setCellRenderer(renderer);
-//			column.setCellEditor(combo);
 	
 			col.setCellEditor(new DefaultCellEditor(acc)
 			{
+				final DefaultCellEditor self = this;
+				{
+					final JComboBox box = (JComboBox)editorComponent;
+					box.removeActionListener(delegate);
+					
+					delegate = new EditorDelegate()
+					{
+						public void setValue(Object value)
+						{
+							box.setSelectedItem(value);
+						}
+
+						public Object getCellEditorValue()
+						{
+							return box.getSelectedItem();
+						}
+
+						public boolean shouldSelectCell(EventObject anEvent)
+						{
+							if(anEvent instanceof MouseEvent)
+							{
+								MouseEvent e = (MouseEvent)anEvent;
+								return e.getID() != MouseEvent.MOUSE_DRAGGED;
+							}
+							return true;
+						}
+
+						public boolean stopCellEditing()
+						{
+							if(box.isEditable())
+							{
+								// Commit edited value.
+								box.actionPerformed(new ActionEvent(self, 0, ""));
+							}
+							return super.stopCellEditing();
+						}
+						
+						public void actionPerformed(ActionEvent e) 
+						{
+//							System.out.println(acc.isUpdating()+" "+e);
+//							if(!acc.isUpdating())
+//							{
+//								super.actionPerformed(e);
+//							}
+						}
+					};
+					
+					box.addActionListener(delegate);
+					
+					box.getEditor().getEditorComponent().addKeyListener(new KeyAdapter()
+					{
+						public void keyTyped(KeyEvent e)
+						{
+						}
+						
+						public void keyPressed(KeyEvent e)
+						{
+							if(e.getKeyCode() == KeyEvent.VK_ENTER)
+							{
+								stopCellEditing();
+							}
+						}
+					});
+				}
+				
 				public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected,
-					boolean expanded, boolean leaf, int row) {
+					boolean expanded, boolean leaf, int row) 
+				{
 //					String         stringValue = tree.convertValueToText(value, isSelected, expanded, leaf, row, false);
 					delegate.setValue(value);
 					return editorComponent;
 				}
 			});
-//			col.setCellRenderer(new DefaultTableCellRenderer()
-//			{
-//				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-//				{
-////					super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-//					ClassInfo ci = (ClassInfo)value;
-//					setText(ci==null? "": ci.getTypeName());
-//					return acc.getEditorComponent();
-//				}
-//			});
+			col.setCellRenderer(new DefaultTableCellRenderer()
+			{
+				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+				{
+					super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+					
+					ClassInfo ci = (ClassInfo)value;
+					setText(ci==null? "": SReflect.getUnqualifiedTypeName(ci.getTypeName()));
+					
+					return this;
+				}
+			});
 			
 			MProperty mprop = task.getProperties().get(PROPERTY_MAPPINGS);
 			if(mprop.getInitialValue()!=null)
@@ -314,8 +421,8 @@ public class ServicePoolTask implements ITask
 			 */
 			public void setValueAt(Object value, int rowIndex, int columnIndex)
 			{
-				if(value!=null)
-					System.out.println("setValue: "+value+" "+value.getClass());
+//				if(value!=null)
+//					System.out.println("setValue: "+value+" "+value.getClass());
 				
 				Object[] val;
 				if(rowIndex<entries.size())

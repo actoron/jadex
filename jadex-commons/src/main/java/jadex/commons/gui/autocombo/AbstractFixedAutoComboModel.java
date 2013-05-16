@@ -40,6 +40,8 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 		}
 		int size2 = entries.size();
 		
+		fireChangeEvents(size1, size2);
+		
 //		fireIntervalAdded(this, size1, size2 - 1);
 //		fireContentsChanged(this, 0, size1 - 1);
 	}
@@ -61,7 +63,7 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 		}
 		else
 		{		
-//			int size1 = entries.size();
+			int size1 = entries.size();
 			entries.clear();
 //
 			final Pattern pat = SUtil.createRegexFromGlob(pattern+"*");
@@ -77,8 +79,7 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 			}
 			int size2 = entries.size();
 			
-//			fireIntervalAdded(this, size1, size2 - 1);
-//			fireContentsChanged(this, 0, size2 - 1);
+//			fireChangeEvents(size1, size2);
 			
 //			getCombo().setSelectedItem(pattern);
 			getCombo().updatePopup();
@@ -88,5 +89,6 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 		((SubscriptionIntermediateFuture<T>)ret).setResult(null);
 		return ret;
 	}
+
 }
 
