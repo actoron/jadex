@@ -40,8 +40,8 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 		}
 		int size2 = entries.size();
 		
-		fireIntervalAdded(this, size1, size2 - 1);
-		fireContentsChanged(this, 0, size1 - 1);
+//		fireIntervalAdded(this, size1, size2 - 1);
+//		fireContentsChanged(this, 0, size1 - 1);
 	}
 	
 	/**
@@ -62,20 +62,20 @@ public abstract class AbstractFixedAutoComboModel<T> extends AbstractAutoComboMo
 		else
 		{		
 //			int size1 = entries.size();
-//			entries.clear();
+			entries.clear();
 //
-//			final Pattern pat = SUtil.createRegexFromGlob(pattern+"*");
-//			
-//			for(T tst: allentries)
-//			{
-//				String str = convertToString(tst);
-//				Matcher m = pat.matcher(str);
-//				if(m.matches())
-//				{
-//					entries.add(tst);
-//				}
-//			}
-//			int size2 = entries.size();
+			final Pattern pat = SUtil.createRegexFromGlob(pattern+"*");
+			
+			for(T tst: allentries)
+			{
+				String str = convertToString(tst);
+				Matcher m = pat.matcher(str);
+				if(m.matches())
+				{
+					entries.add(tst);
+				}
+			}
+			int size2 = entries.size();
 			
 //			fireIntervalAdded(this, size1, size2 - 1);
 //			fireContentsChanged(this, 0, size2 - 1);

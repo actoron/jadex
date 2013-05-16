@@ -213,68 +213,68 @@ public class AutoCompleteCombo<T> extends JComboBox
 		 */
 		public AutoCompleteDocument()
 		{
-//			getEditorComponent().addKeyListener(new KeyAdapter()
-//			{
-//				protected boolean dirty = false;
-//				
-//				{
-//					// Swing timer
-//					t = new Timer(1000, new ActionListener()
-//					{
-//						public void actionPerformed(ActionEvent e)
-//						{
-//							if(dirty)
-//							{
-//								dirty = false;
-//							}
-//							else
-//							{
-//								t.stop();
-//								updateModel();
-//							}
-//						}
-//					});
-//				}
-//				
-//				public void keyTyped(KeyEvent e)
-//				{
-////					int key = e.getKeyCode();
-////					System.out.println("typed: "+key);
-//					
-//					if(!t.isRunning())
-//					{
-//						t.start();
-//					}
-//					else
-//					{
-//						dirty = true;
-//					}
-//				}
-//				
-//				public void keyPressed(KeyEvent e)
-//				{
+			getEditorComponent().addKeyListener(new KeyAdapter()
+			{
+				protected boolean dirty = false;
+				
+				{
+					// Swing timer
+					t = new Timer(1000, new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							if(dirty)
+							{
+								dirty = false;
+							}
+							else
+							{
+								t.stop();
+								updateModel();
+							}
+						}
+					});
+				}
+				
+				public void keyTyped(KeyEvent e)
+				{
 //					int key = e.getKeyCode();
-////					System.out.println("pressed: "+key);
-//					if(key == KeyEvent.VK_ENTER)
-//					{
-//						// there is no such element in the model for now
-//						String text = getEditorComponent().getText();
-//						if(!getAutoModel().contains(text))
-//						{
-//							getAutoModel().addToTop(text);
-//						}
-//					}
-//					else if(key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN)
-//					{
-//						arrowkey = true;
-//						
-//						if(t.isRunning())
-//						{
-//							t.stop();
-//						}
-//					}
-//				}
-//			});
+//					System.out.println("typed: "+key);
+					
+					if(!t.isRunning())
+					{
+						t.start();
+					}
+					else
+					{
+						dirty = true;
+					}
+				}
+				
+				public void keyPressed(KeyEvent e)
+				{
+					int key = e.getKeyCode();
+//					System.out.println("pressed: "+key);
+					if(key == KeyEvent.VK_ENTER)
+					{
+						// there is no such element in the model for now
+						String text = getEditorComponent().getText();
+						if(!getAutoModel().contains(text))
+						{
+							getAutoModel().addToTop(text);
+						}
+					}
+					else if(key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN)
+					{
+						arrowkey = true;
+						
+						if(t.isRunning())
+						{
+							t.stop();
+						}
+					}
+				}
+			});
 		}
 
 		/**

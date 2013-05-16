@@ -177,16 +177,16 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 				
 //				fireContentsChanged(AbstractAutoComboModel.this, 0, size2-1);
 				
-				if(size1<size2)
-				{
-					fireIntervalAdded(AbstractAutoComboModel.this, size1, size2 - 1);
-					fireContentsChanged(AbstractAutoComboModel.this, 0, size1 - 1);
-				}
-				else if(size1>size2)
-				{
-					fireIntervalRemoved(AbstractAutoComboModel.this, size2, size1 - 1);
-					fireContentsChanged(AbstractAutoComboModel.this, 0, size2 - 1);
-				}
+//				if(size1<size2)
+//				{
+//					fireIntervalAdded(AbstractAutoComboModel.this, size1, size2 - 1);
+//					fireContentsChanged(AbstractAutoComboModel.this, 0, size1 - 1);
+//				}
+//				else if(size1>size2)
+//				{
+//					fireIntervalRemoved(AbstractAutoComboModel.this, size2, size1 - 1);
+//					fireContentsChanged(AbstractAutoComboModel.this, 0, size2 - 1);
+//				}
 			}
 			
 			public void exceptionOccurred(Exception exception)
