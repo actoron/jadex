@@ -797,12 +797,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public IFuture<Void>	startEndSteps()
 	{
+//		System.err.println("End Steps: "+getComponentIdentifier());
+		
 		final Future<Void> ret = new Future<Void>(); 
 		
-		getComponentAdapter().invokeLater(new Runnable()
-		{
-			public void run()
-			{	
+//		getComponentAdapter().invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{	
 				// Remove all threads (calls cancel on running activities)
 				if(getThreadContext().getThreads()!=null)
 				{
@@ -814,8 +816,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				}
 				
 				BpmnInterpreter.super.startEndSteps().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
-			}
-		});
+//			}
+//		});
 		
 		return ret;
 	}

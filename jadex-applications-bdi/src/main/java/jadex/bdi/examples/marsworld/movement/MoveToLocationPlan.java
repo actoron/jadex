@@ -45,6 +45,7 @@ public class MoveToLocationPlan extends Plan
 	@Override
 	public void failed() {
 		super.failed();
-		System.out.println("failed?");
+		System.out.println("failed: "+getException());
+		getException().printStackTrace();
 	}
 }

@@ -86,7 +86,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Create a new CESComponentDescription.
 	 */
 	public CMSComponentDescription(IComponentIdentifier cid, String type, Boolean master, 
-		Boolean daemon, Boolean autoshutdown, Boolean monitoring, String modelname, String localtype, IResourceIdentifier rid,
+		Boolean daemon, Boolean autoshutdown, Boolean monitoring, Boolean synchronous, String modelname, String localtype, IResourceIdentifier rid,
 		long creationtime, IComponentIdentifier creator, Cause cause)
 	{
 //		System.out.println("created desc: "+cid+" "+hashCode());
@@ -99,6 +99,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setDaemon(daemon);
 		setAutoShutdown(autoshutdown);
 		setMonitoring(monitoring);
+		setSynchronous(synchronous);
 		setModelName(modelname);
 		setLocalType(localtype);
 		setResourceIdentifier(rid);
@@ -452,7 +453,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the synchronous flag.
 	 *  @param synchronous	The synchronous flag.
 	 */
-	public void	getSynchronous(Boolean synchronous)
+	public void	setSynchronous(Boolean synchronous)
 	{
 		this.synchronous = synchronous;
 	}

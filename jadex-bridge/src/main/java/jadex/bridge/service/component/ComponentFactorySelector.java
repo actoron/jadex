@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  *  Result selector for finding a component factory. 
  */
-public class ComponentFactorySelector<T> extends BasicResultSelector<T>
+public class ComponentFactorySelector extends BasicResultSelector<IComponentFactory>
 {	
 	//-------- constructors --------
 	

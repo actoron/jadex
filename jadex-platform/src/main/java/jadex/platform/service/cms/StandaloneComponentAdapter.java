@@ -14,7 +14,6 @@ import jadex.commons.future.DefaultResultListener;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -56,16 +55,25 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	{
 //		System.out.println("execute0: "+getComponentIdentifier());
 		boolean	ret	= super.execute();
-		
-		if(subcomponents!=null)
+
+		StandaloneComponentAdapter[]	subs	= null;
+		synchronized(this)
 		{
-			for(Iterator<StandaloneComponentAdapter> it=subcomponents.iterator(); it.hasNext(); )
+			if(subcomponents!=null)
+			{
+				subs	= subcomponents.toArray(new StandaloneComponentAdapter[subcomponents.size()]);
+				subcomponents	= null;
+			}
+		}
+		if(subs!=null)
+		{
+			for(StandaloneComponentAdapter sub: subs)
 			{
 //				System.out.println("execute1: "+sub.getComponentIdentifier());
-				boolean	again	= it.next().execute();
-				if(!again)
+				boolean	again	= sub.execute();
+				if(again)
 				{
-					it.remove();
+					addSubcomponent(sub);
 				}
 				ret	= again || ret;
 			}
@@ -81,7 +89,6 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	{
 //		System.out.println("dowakeup: "+getComponentIdentifier());
 		
-//		if(parent!=null)
 		if(desc.getSynchronous()!=null && desc.getSynchronous().booleanValue())
 		{
 			// Add to parent and wake up parent.
@@ -154,11 +161,14 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 */
 	protected void	addSubcomponent(StandaloneComponentAdapter sub)
 	{
-		if(subcomponents==null)
+		synchronized(this)
 		{
-			subcomponents	= new HashSet<StandaloneComponentAdapter>();
+			if(subcomponents==null)
+			{
+				subcomponents	= new HashSet<StandaloneComponentAdapter>();
+			}
+			subcomponents.add(sub);
 		}
-		subcomponents.add(sub);
 	}
 
 	/**
@@ -166,9 +176,12 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 */
 	protected void	removeSubcomponent(StandaloneComponentAdapter sub)
 	{
-		if(subcomponents!=null)
+		synchronized(this)
 		{
-			subcomponents.remove(sub);
+			if(subcomponents!=null)
+			{
+				subcomponents.remove(sub);
+			}
 		}
 	}
 

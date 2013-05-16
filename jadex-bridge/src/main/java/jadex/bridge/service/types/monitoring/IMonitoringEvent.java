@@ -69,13 +69,15 @@ public interface IMonitoringEvent
 	public static final String SOURCE_CATEGORY_MESSAGE   = "Message";
 
 	
-	public static String TYPE_SERVICECALL_START = EVENT_TYPE_CREATION+"."+SOURCE_CATEGORY_SERVICE;
+	public static final String TYPE_SUBSCRIPTION_START		= EVENT_TYPE_CREATION+".subscription";
 	
-	public static String TYPE_SERVICECALL_END = EVENT_TYPE_DISPOSAL+"."+SOURCE_CATEGORY_SERVICE;
+	public static final String TYPE_SERVICECALL_START = EVENT_TYPE_CREATION+"."+SOURCE_CATEGORY_SERVICE;
+	
+	public static final String TYPE_SERVICECALL_END = EVENT_TYPE_DISPOSAL+"."+SOURCE_CATEGORY_SERVICE;
 
-	public static String TYPE_COMPONENT_CREATED = EVENT_TYPE_CREATION+"."+SOURCE_CATEGORY_COMPONENT; //"component_created";
+	public static final String TYPE_COMPONENT_CREATED = EVENT_TYPE_CREATION+"."+SOURCE_CATEGORY_COMPONENT; //"component_created";
 	
-	public static String TYPE_COMPONENT_DISPOSED = EVENT_TYPE_DISPOSAL+"."+SOURCE_CATEGORY_COMPONENT; //"component_created";
+	public static final String TYPE_COMPONENT_DISPOSED = EVENT_TYPE_DISPOSAL+"."+SOURCE_CATEGORY_COMPONENT; //"component_created";
 
 	
 	/**

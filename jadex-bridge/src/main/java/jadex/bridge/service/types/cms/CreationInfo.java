@@ -43,6 +43,9 @@ public class CreationInfo
 	/** The monitoring flag (default: false). */
 	protected Boolean monitoring;
 	
+	/** The synchronous flag (default: false). */
+	protected Boolean synchronous;
+	
 //	/** The platform classloader flag (default: false). */
 //	protected Boolean platformloader;
 	
@@ -80,6 +83,7 @@ public class CreationInfo
 			this.daemon = info.getDaemon();
 			this.autoshutdown = info.getAutoShutdown();
 			this.monitoring = info.getMonitoring();
+			this.synchronous = info.getSynchronous();
 			this.imports	= info.getImports();
 			this.bindings = info.getRequiredServiceBindings();
 			this.rid = info.getResourceIdentifier();
@@ -483,5 +487,23 @@ public class CreationInfo
 	public void setMonitoring(Boolean monitoring)
 	{
 		this.monitoring = monitoring;
+	}
+
+	/**
+	 *  Get the synchronous.
+	 *  @return The synchronous.
+	 */
+	public Boolean getSynchronous()
+	{
+		return synchronous;
+	}
+
+	/**
+	 *  Set the synchronous.
+	 *  @param synchronous The synchronous to set.
+	 */
+	public void setSynchronous(Boolean synchronous)
+	{
+		this.synchronous = synchronous;
 	}
 }

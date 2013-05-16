@@ -206,6 +206,13 @@ public interface IModelInfo
 	public Boolean getMonitoring(String configname);
 	
 	/**
+	 *  Get the synchronous flag.
+	 *  @param synchronous The synchronous.
+	 *  @return The synchronous flag value.
+	 */
+	public Boolean getSynchronous(String configname);
+	
+	/**
 	 *  Get the subcomponent names. 
 	 */
 	public SubcomponentTypeInfo[] getSubcomponentTypes();

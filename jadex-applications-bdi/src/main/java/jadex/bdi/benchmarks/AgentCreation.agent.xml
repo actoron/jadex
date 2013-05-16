@@ -9,7 +9,8 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-bdi-2.4.xsd"
 	name="AgentCreation"
-	package="jadex.bdi.benchmarks">
+	package="jadex.bdi.benchmarks"
+	synchronous="false">
 
 	<imports>
 		<import>jadex.bridge.service.types.cms.*</import>

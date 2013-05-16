@@ -5,12 +5,14 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Boolean3;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 
@@ -23,6 +25,7 @@ import java.util.Map;
 @Arguments({
 	@Argument(name="max", defaultvalue="20000", clazz=int.class)
 })
+@Agent(synchronous=Boolean3.FALSE)
 public class MegaParallelStarterAgent extends MicroAgent 
 {
 	protected String subname;

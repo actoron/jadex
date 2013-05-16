@@ -2,9 +2,11 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Configuration;
@@ -28,6 +30,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@Configuration(name="default"),
 	@Configuration(name="long lived", arguments={@NameValue(name="delay", value="-1")})
 })
+@Agent(synchronous=Boolean3.FALSE)
 public class CalculateAgent extends MicroAgent
 {
 	//-------- attributes --------

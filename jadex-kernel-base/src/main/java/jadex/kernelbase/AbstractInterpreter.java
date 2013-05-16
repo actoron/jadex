@@ -14,6 +14,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
@@ -553,7 +554,19 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		ret.setTerminationCommand(tcom);
 		
 		// signal that subscription has been done
-		ret.addIntermediateResult(null);
+		MonitoringEvent	subscribed	= new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis());
+		boolean	post	= false;
+		try
+		{
+			post	= filter==null || filter.filter(subscribed);
+		}
+		catch(Exception e)
+		{
+		}
+		if(post)
+		{
+			ret.addIntermediateResult(subscribed);
+		}
 
 		addSubscription(ret, filter);
 		

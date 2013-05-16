@@ -391,16 +391,18 @@ public class CallbackPlan extends Plan
 //			}
 //		});
 		
+		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr16);
 		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
 			.addResultListener(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)
 			{
+//				System.out.println("termination invoked: "+result);
+				
 				logger.info("Agent terminating invoked");
 //				getExternalAccess().removeAgentListener(this);
 				logger.info("Agent died invoked");
 				tr16.setSucceeded(true);
-				getBeliefbase().getBeliefSet("testcap.reports").addFact(tr16);
 			}
 		});
 		

@@ -777,6 +777,23 @@ public class ModelInfo extends Startable implements IModelInfo
 	}
 	
 	/**
+	 *  Get the synchronous flag.
+	 *  @param synchronous The synchronous.
+	 *  @return The synchronous flag value.
+	 */
+	public Boolean getSynchronous(String configname)
+	{
+		Boolean ret = null;
+		ConfigurationInfo config = getConfiguration(configname);
+		if(config!=null)
+			ret = config.getSynchronous();
+		if(ret==null)
+			ret = super.getSynchronous();
+		return ret;
+		
+	}
+
+	/**
 	 *  Get the subcomponent names. 
 	 */
 	public SubcomponentTypeInfo[] getSubcomponentTypes()

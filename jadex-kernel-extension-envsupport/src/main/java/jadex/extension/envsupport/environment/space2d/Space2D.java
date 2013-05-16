@@ -39,6 +39,9 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	/** Border strict mode. */
 	public static final String BORDER_STRICT = "strict";
 
+	/** Border relaxed mode. */
+	public static final String BORDER_RELAXED = "relaxed";
+
 	/** Border torus behavior. */
 	public static final String BORDER_TORUS = "torus";
 
@@ -258,6 +261,10 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				{
 					throw new RuntimeException("Position out of areasize: "+pos+" "+areasize);
 				}
+				ret = pos;
+			}
+			else if(BORDER_RELAXED.equals(getBorderMode()))
+			{
 				ret = pos;
 			}
 			else

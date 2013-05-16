@@ -467,6 +467,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 																	Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
 																	Boolean moni = cinfo.getMonitoring()!=null? cinfo.getMonitoring(): lmodel.getMonitoring(cinfo.getConfiguration());
+																	Boolean sync = cinfo.getSynchronous()!=null? cinfo.getSynchronous(): lmodel.getSynchronous(cinfo.getConfiguration());
 																	// Inherit monitoring from parent if null
 																	if(moni==null && cinfo.getParent()!=null)
 																	{
@@ -476,7 +477,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 																	
 //																	Cause cause = new Cause(curcause, cid.getName());
 																	Cause cause = curcause;
-																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master, daemon, autosd, moni,
+																	final CMSComponentDescription ad = new CMSComponentDescription(cid, lmodel.getType(), master, daemon, autosd, moni, sync,
 																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime(), creator, cause);
 																	
 																	logger.info("Starting component: "+cid.getName());

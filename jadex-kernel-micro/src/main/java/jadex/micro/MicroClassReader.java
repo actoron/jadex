@@ -103,7 +103,8 @@ public class MicroClassReader
 	 *  Load the model.
 	 */
 	protected MicroModel read(String model, Class<?> cma, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
-	{		ModelInfo modelinfo = new ModelInfo();
+	{
+		ModelInfo modelinfo = new ModelInfo();
 		MicroModel ret = new MicroModel(modelinfo);
 		
 //		System.out.println("read micro: "+cma);
@@ -123,6 +124,7 @@ public class MicroClassReader
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
+		
 		if(rid==null)
 		{
 			URL url	= null;
@@ -239,19 +241,52 @@ public class MicroClassReader
 		
 		while(cma!=null && !cma.equals(Object.class) && !cma.equals(getClass(MicroAgent.class, cl)))
 		{
+			if(isAnnotationPresent(cma, Agent.class, cl))
+			{
+				Agent	val	= getAnnotation(cma, Agent.class, cl);
+				Boolean	susp	= val.suspend().toBoolean();
+				Boolean	mast	= val.master().toBoolean();
+				Boolean	daem	= val.daemon().toBoolean();
+				Boolean	auto	= val.autoshutdown().toBoolean();
+				Boolean	moni	= val.monitoring().toBoolean();
+				Boolean	sync	= val.synchronous().toBoolean();
+				if(susp!=null)
+				{
+					modelinfo.setSuspend(susp);
+				}
+				if(mast!=null)
+				{
+					modelinfo.setMaster(mast);
+				}
+				if(daem!=null)
+				{
+					modelinfo.setDaemon(daem);
+				}
+				if(auto!=null)
+				{
+					modelinfo.setAutoShutdown(auto);
+				}
+				if(moni!=null)
+				{
+					modelinfo.setMonitoring(moni);
+				}
+				if(sync!=null)
+				{
+					modelinfo.setSynchronous(sync);
+				}
+			}
+			
 			// Description is set only once from upper most element.
 			if(isAnnotationPresent(cma, Description.class, cl) && modelinfo.getDescription()==null)
 			{
-				Description val = (Description)getAnnotation(cma, Description.class, cl);
-//				Description val = (Description)cma.getAnnotation(Description.class);
+				Description val = getAnnotation(cma, Description.class, cl);
 				modelinfo.setDescription(val.value());
 			}
 			
 			// Take all, duplicates are eleminated
 			if(isAnnotationPresent(cma, Imports.class, cl))
 			{
-				String[] tmp = ((Imports)getAnnotation(cma, Imports.class, cl)).value();
-//				String[] tmp = ((Imports)cma.getAnnotation(Imports.class)).value();
+				String[] tmp = getAnnotation(cma, Imports.class, cl).value();
 				Set<String> imports = (Set<String>)toset.get("imports");
 				if(imports==null)
 				{

@@ -470,7 +470,7 @@ public class Starter
 								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
 								Boolean moni = (Boolean)getArgumentValue(MONITORING, model, cmdargs, compargs);
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, 
-									autosd, moni, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
+									autosd, moni, null, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
 								
 								Object	af = getArgumentValue(ADAPTER_FACTORY, model, cmdargs, compargs);
 								if(af==null)

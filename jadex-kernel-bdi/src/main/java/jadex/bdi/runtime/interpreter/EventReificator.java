@@ -97,11 +97,13 @@ public class EventReificator implements IOAVStateListener
 //					System.out.println("agent dying: "+newvalue+" "+id);
 					createChangeEvent(id, id, OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING, null);
 				}
-				else if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(newvalue))
-				{
-//					System.out.println("agent died: "+newvalue+" "+id);
-					createChangeEvent(id, id, OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED, null);
-				}
+				
+				// Now done in abstract interpreter
+//				else if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(newvalue))
+//				{
+////					System.out.println("agent died: "+newvalue+" "+id);
+//					createChangeEvent(id, id, OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED, null);
+//				}
 			}
 			else if(OAVBDIRuntimeModel.belief_has_fact.equals(attr))
 			{

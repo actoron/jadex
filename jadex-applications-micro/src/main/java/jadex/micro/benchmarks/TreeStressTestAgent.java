@@ -40,13 +40,7 @@ public class TreeStressTestAgent extends MicroAgent
 					CreationInfo	ci	= new CreationInfo(args, getComponentIdentifier());
 					for(int i=0; i<depth; i++)
 					{
-						cms.createComponent(null, TreeStressTestAgent.this.getClass().getName()+".class", ci, null)
-							.addResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-							}
-						});
+						cms.createComponent(null, TreeStressTestAgent.this.getClass().getName()+".class", ci, null);
 					}
 				}
 			}

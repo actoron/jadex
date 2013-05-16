@@ -2896,7 +2896,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				{
 					public boolean filter(IMonitoringEvent obj)
 					{
-						return obj.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_COMPONENT);
+						return obj.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_COMPONENT)
+							|| obj.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START);
 					}
 				}, false);
 				
@@ -2908,7 +2909,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					
 					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
-						if(result==null)
+						if(result.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START))
 						{
 							ret.setResult(null);
 						}

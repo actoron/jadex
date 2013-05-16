@@ -1,6 +1,7 @@
 package jadex.micro.benchmarks;
 
 import jadex.bridge.IInternalAccess;
+import jadex.commons.Boolean3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -18,7 +19,7 @@ import jadex.micro.annotation.Description;
 	@Argument(name="num", defaultvalue="1", clazz=int.class)
 })
 @Description("Peer agent started from MegaParallelStarterAgent.")
-@Agent
+@Agent(synchronous=Boolean3.FALSE)
 public class MegaParallelCreationAgent
 {
 	//-------- attributes --------

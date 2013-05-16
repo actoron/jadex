@@ -9,7 +9,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,18 +46,18 @@ public class ChatServiceD2 implements IChatService
 	@ServiceStart
 	public IFuture<Void> startService()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		this.format = new SimpleDateFormat("hh:mm:ss");
 		final IExternalAccess exta = agent.getExternalAccess();
 		IFuture<IClockService>	clockservice	= agent.getServiceContainer().getRequiredService("clockservice");
-		clockservice.addResultListener(new SwingDelegationResultListener<IClockService>(ret)
+		clockservice.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
 			public void customResultAvailable(IClockService result)
 			{
 				ChatServiceD2.this.clock = result;
 				ChatServiceD2.this.gui = createGui(exta);
-				super.customResultAvailable(null);
+				ret.setResult(null);
 			}
 		});
 		return ret;

@@ -122,13 +122,13 @@ public class DisplayAgent extends MicroAgent
 //						});
 						
 						ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
-							.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
+							.addResultListener(/*new SwingIntermediateResultListener<IMonitoringEvent>(*/new IntermediateDefaultResultListener<IMonitoringEvent>()
 						{
 							public void intermediateResultAvailable(IMonitoringEvent result)
 							{
 								frame.dispose();
 							}
-						}));
+						}/*)*/);
 						
 						return IFuture.DONE;
 					}

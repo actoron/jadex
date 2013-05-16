@@ -25,6 +25,9 @@ public class Startable
 	/** The monitoring flag. */
 	private Boolean monitoring;
 	
+	/** The synchronous flag. */
+	private Boolean synchronous;
+	
 	//-------- methods --------
 	
 	/**
@@ -133,5 +136,23 @@ public class Startable
 	public void setMonitoring(Boolean monitoring)
 	{
 		this.monitoring = monitoring;
+	}
+
+	/**
+	 *  Get the synchronous.
+	 *  @return The synchronous.
+	 */
+	public Boolean getSynchronous()
+	{
+		return synchronous;
+	}
+
+	/**
+	 *  Set the synchronous.
+	 *  @param synchronous The synchronous to set.
+	 */
+	public void setSynchronous(Boolean synchronous)
+	{
+		this.synchronous = synchronous;
 	}
 }
