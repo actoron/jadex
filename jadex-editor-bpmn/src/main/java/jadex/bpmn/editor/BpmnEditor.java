@@ -28,7 +28,10 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 40;
+	public static final int BUILD = 41;
+	
+	/** Console logging flag. */
+	public static final boolean CONSOLE_LOGGING = false;
 	
 	/** The name of the application. */
 	public static final String APP_NAME = "Jadex BPMN Editor";
@@ -85,7 +88,8 @@ public class BpmnEditor
 	 */
 	public static void main(String[] args)
 	{
-		LOGGER.setUseParentHandlers(false);
+		LOGGER.setUseParentHandlers(CONSOLE_LOGGING);
+		LOGGER.setLevel(Level.ALL);
 
 //		try
 //		{

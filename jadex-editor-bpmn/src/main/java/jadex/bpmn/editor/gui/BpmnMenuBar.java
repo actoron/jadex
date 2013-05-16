@@ -4,9 +4,9 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.model.io.SBpmnModelWriter;
-import jadex.bridge.ClassInfo;
 import jadex.commons.SUtil;
 
+import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -31,6 +31,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -257,6 +258,17 @@ public class BpmnMenuBar extends JMenuBar
 			}
 		});
 		helpmenu.add(aboutitem);
+		
+		JMenuItem errorlogitem = new JMenuItem(new AbstractAction("Debug Log")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JScrollPane sp = new JScrollPane(editorwindow.getStatusArea());
+				sp.setPreferredSize(new Dimension(400, 300));
+				JOptionPane.showMessageDialog(getParent(), sp, "Debug Log", JOptionPane.PLAIN_MESSAGE);
+			}
+		});
+		helpmenu.add(errorlogitem);
 	}
 	
 	/**

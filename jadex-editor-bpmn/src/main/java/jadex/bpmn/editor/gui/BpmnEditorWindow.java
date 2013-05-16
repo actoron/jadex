@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -72,12 +74,18 @@ public class BpmnEditorWindow extends JFrame
 	/** The global settings. */
 	protected Settings settings;
 	
+	/** The status area. */
+	protected StatusArea statusarea;
+	
 	/**
 	 * 
 	 */
 	public BpmnEditorWindow()
 	{
 		super(BpmnEditor.APP_NAME);
+		
+		statusarea = new StatusArea();
+		BpmnEditor.initialize();
 		
 		settings = Settings.load();
 		
@@ -95,7 +103,7 @@ public class BpmnEditorWindow extends JFrame
 		
 		if(settings.getGlobalInterfaces()==null || settings.getGlobalInterfaces().size()==0)// || true)
 		{
-			System.out.println("Scanning classes start...");
+			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "Scanning classes start...");
 			long start = System.currentTimeMillis();
 			List<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
 			globalcache.getGlobalTaskClasses().addAll(tmp[0]);
@@ -105,7 +113,7 @@ public class BpmnEditorWindow extends JFrame
 			settings.setGlobalTaskClasses(tmp[0]);
 			settings.setGlobalInterfaces(tmp[1]);
 			long needed = System.currentTimeMillis()-start;
-			System.out.println("... scanning classes end, needed: "+needed/1000+" secs");
+			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "... scanning classes end, needed: "+needed/1000+" secs");
 		}
 		else
 		{
@@ -138,7 +146,7 @@ public class BpmnEditorWindow extends JFrame
 //		};
 //		statuspane.setOneTouchExpandable(true);
 //		statuspane.setBottomComponent(new StatusArea());
-		BpmnEditor.initialize();
+		
 //		getContentPane().add(statuspane, BorderLayout.CENTER);
 		
 //		statuspane.addComponentListener(new ComponentAdapter()
@@ -314,6 +322,16 @@ public class BpmnEditorWindow extends JFrame
 	public Settings getSettings()
 	{
 		return settings;
+	}
+	
+	/**
+	 *  Gets the status area.
+	 *
+	 *  @return The status area.
+	 */
+	public StatusArea getStatusArea()
+	{
+		return statusarea;
 	}
 
 	/**
