@@ -1,12 +1,7 @@
 package jadex.android.standalone.clientapp;
 
-import jadex.android.standalone.clientservice.ServiceConnectionProxy;
-import jadex.android.standalone.clientservice.UniversalClientBinder;
-import jadex.android.standalone.clientservice.UniversalClientService;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import jadex.android.standalone.clientservice.ClientBinderProxy;
+import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,9 +11,7 @@ import android.view.Window;
 
 public class ClientAppFragment extends ActivityAdapterFragment
 {
-	private ServiceConnectionProxy serviceConnectionProxy;
-	
-	private Map<ComponentName, ServiceConnectionProxy> serviceConnections = new HashMap<ComponentName, ServiceConnectionProxy>();
+	private UniversalClientServiceBinder universalService;
 
 	public ClientAppFragment() {
 		super();
@@ -52,43 +45,53 @@ public class ClientAppFragment extends ActivityAdapterFragment
 			return super.bindService(service, conn, flags);
 		} else {
 			// individual user service requested
-			Intent universalServiceIntent = convertIntent(service);
-			
-			serviceConnectionProxy = new ServiceConnectionProxy(conn, originalComponent);
-			serviceConnections.put(originalComponent, serviceConnectionProxy);
-			return super.bindService(universalServiceIntent, serviceConnectionProxy, flags);
+			ClientBinderProxy binderProxy = universalService.bindClientService(service, conn);
+			conn.onServiceConnected(originalComponent, binderProxy.getClientBinder());
+//			ServiceConnectionProxy serviceConnectionProxy = new ServiceConnectionProxy(conn, originalComponent);
+//			serviceConnectionProxy.onServiceConnected(originalComponent, binderProxy);
+
+			return true;
 		}
 	}
 	
 	@Override
 	public void unbindService(ServiceConnection conn)
 	{
-		super.unbindService(serviceConnectionProxy);
+		if (universalService.isClientServiceConnection(conn)) {
+			boolean unbindClientService = universalService.unbindClientService(conn);
+		} else {
+			super.unbindService(conn);
+		}
 	}
 	
 	@Override
 	public void startService(Intent service)
 	{
-		super.startService(convertIntent(service));
+		super.startService(service);
 	}
 	
 	@Override
 	public boolean stopService(Intent service)
 	{
-		return super.stopService(convertIntent(service));
+		return super.stopService(service);
 	}
 	
 	
-	private Intent convertIntent(Intent service) {
-		ComponentName originalComponent = service.getComponent();
-		service.putExtra(UniversalClientBinder.CLIENT_SERVICE_COMPONENT, originalComponent);
-//		ComponentName universalComponent = new ComponentName(this.getActivity(), UniversalClientService.class);
-//		service.setComponent(universalComponent);
-		
-		Intent newIntent = new Intent(getActivity(), UniversalClientService.class);
-		newIntent.putExtras(service.getExtras());
-		newIntent.putExtra(UniversalClientBinder.CLIENT_SERVICE_COMPONENT, originalComponent);
-		return newIntent;
+//	private Intent convertIntent(Intent service) {
+//		ComponentName originalComponent = service.getComponent();
+//		service.putExtra(ClientBinderProxy.CLIENT_SERVICE_COMPONENT, originalComponent);
+////		ComponentName universalComponent = new ComponentName(this.getActivity(), UniversalClientService.class);
+////		service.setComponent(universalComponent);
+//		
+//		Intent newIntent = new Intent(getActivity(), UniversalClientService.class);
+//		newIntent.putExtras(service.getExtras());
+//		newIntent.putExtra(ClientBinderProxy.CLIENT_SERVICE_COMPONENT, originalComponent);
+//		return newIntent;
+//	}
+
+	public void setUniversalClientService(UniversalClientServiceBinder service)
+	{
+		this.universalService = service;
 	}
 	
 	

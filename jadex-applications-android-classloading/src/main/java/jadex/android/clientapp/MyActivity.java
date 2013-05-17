@@ -1,6 +1,8 @@
-package jadex.android.classloading;
+package jadex.android.clientapp;
 
-import jadex.android.classloading.MyService.MyBinder;
+import jadex.android.clientapp.CalcService.CalcBinder;
+import jadex.android.clientapp.CalcService.CalcResult;
+import jadex.android.clientapp.MyService.MyBinder;
 import jadex.android.standalone.clientapp.JadexClientAppService;
 import jadex.android.standalone.clientapp.PlatformProvidingClientAppFragment;
 import jadex.bridge.IComponentIdentifier;
@@ -23,14 +25,24 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class MyActivity extends PlatformProvidingClientAppFragment
 {
 	private TextView statusTextView;
 	
-	private MyBinder service;
+	private MyBinder service1;
+
+	private Button callServicesButton;
+
+	protected CalcBinder service2;
+
+	private ServiceConnection sc1;
+
+	private ServiceConnection sc2;
 
 	public MyActivity()
 	{
@@ -67,19 +79,44 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 		int userlayout = R.layout.mylayout2;
 		View view = inflater.inflate(userlayout, container, false);
 		statusTextView = (TextView) view.findViewById(R.id.statusTextView);
+		callServicesButton = (Button) view.findViewById(R.id.callServicesButton);
+		callServicesButton.setOnClickListener(new OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+				if (service1 != null){
+					final String result = service1.getResultObject().result;
+					runOnUiThread(new Runnable()
+					{
+						
+						@Override
+						public void run()
+						{
+							System.out.println("Service 1 says: " + result);
+						}
+					});
+				}
+				if (service2 != null){
+					final CalcResult add = service2.add(3, 4);
+					runOnUiThread(new Runnable()
+					{
+						
+						@Override
+						public void run()
+						{
+							System.out.println("Service 2 says: " + add.result);
+						}
+					});
+					
+					unbindService(sc1);
+				}
+			}
+		});
 		return view;
 	}
 
-	private void copyLayouts() throws IOException
-	{
-		URL resource = getClass().getClassLoader().getResource("res/layout/mylayout2.xml");
-		InputStream input = resource.openStream();
-		File internalStoragePath = new File(getActivity().getDir("layout", Context.MODE_PRIVATE), "mylayout2.xml");
-		FileOutputStream fileOutputStream = new FileOutputStream(internalStoragePath);
-
-		StreamCopy streamCopy = new StreamCopy(input, fileOutputStream);
-		streamCopy.run();
-	}
 
 	@Override
 	public void onResume()
@@ -125,43 +162,70 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 			}
 		});
 
-		System.out.println("MyActivity binding service...");
-
-		Intent intent = new Intent(getActivity(), MyService.class);
-		intent.putExtra("myExtra", "myValue");
-		boolean bindService = bindService(intent, new ServiceConnection()
-		{
-
-			@Override
-			public void onServiceDisconnected(ComponentName name)
-			{
-				System.out.println("MyActivity.onServiceDisconnected()");
-			}
-
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder binder)
-			{
-				System.out.println("MyActivity.onServiceConnected()");
-				service = (MyBinder) binder;
-				System.out.println(service.getResultObject().result);
-			}
-		}, BIND_AUTO_CREATE);
+		bindServices();
 		
-		ClassLoader classLoader = this.getClass().getClassLoader();
-		URL resource = classLoader.getResource("jadex/android/classloading/bditest/HelloWorld.agent.xml");
-		System.out.println(resource);
+//		ClassLoader classLoader = this.getClass().getClassLoader();
+//		URL resource = classLoader.getResource("jadex/android/classloading/bditest/HelloWorld.agent.xml");
+//		System.out.println(resource);
 		
-		startBDIAgent("myAgent", "jadex/android/classloading/bditest/HelloWorld.agent.xml").addResultListener(new DefaultResultListener<IComponentIdentifier>()
+		startBDIAgent("myAgent", "jadex/android/clientapp/bditest/HelloWorld.agent.xml").addResultListener(new DefaultResultListener<IComponentIdentifier>()
 		{
 
 			@Override
 			public void resultAvailable(IComponentIdentifier result)
 			{
 				System.out.println("Agent Started");
-				
 			}
-			
 		});
+	}
+
+	private void bindServices()
+	{
+		System.out.println("MyActivity binding service 1...");
+
+		Intent intent = new Intent(getActivity(), MyService.class);
+		intent.putExtra("myExtra", "myValue");
+		
+		sc1 = new ServiceConnection()
+		{
+
+			@Override
+			public void onServiceDisconnected(final ComponentName name)
+			{
+				System.out.println("MyActivity.onServiceDisconnected() 1");
+			}
+
+			@Override
+			public void onServiceConnected(final ComponentName name, final IBinder binder)
+			{
+				System.out.println("MyActivity.onServiceConnected() 1");
+				service1 = (MyBinder) binder;
+			}
+		};
+		boolean bindService = bindService(intent, sc1, BIND_AUTO_CREATE);		
+		
+		System.out.println("MyActivity binding service 2...");
+
+		Intent intent2 = new Intent(getActivity(), CalcService.class);
+		intent2.putExtra("myExtra", "myValue");
+		
+		sc2 = new ServiceConnection()
+		{
+
+			@Override
+			public void onServiceDisconnected(ComponentName name)
+			{
+				System.out.println("MyActivity.onServiceDisconnected() 2");
+			}
+
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder binder)
+			{
+				System.out.println("MyActivity.onServiceConnected() 2");
+				service2 = (CalcBinder) binder;
+			}
+		};
+		boolean bindService2 = bindService(intent2, sc2, BIND_AUTO_CREATE);		
 	}
 
 	@Override

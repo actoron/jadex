@@ -1,4 +1,4 @@
-package jadex.android.classloading.bditest;
+package jadex.android.clientapp.bditest;
 
 import jadex.bdi.model.IMPlan;
 import jadex.bdi.model.IMPlanbase;

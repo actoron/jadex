@@ -39,7 +39,12 @@ public abstract class JadexApplication extends Activity
 	}
 	
 	
-	
+	/**
+	 * Please provide the name of the class which represents your main
+	 * activity here.
+	 * The given Class should inherit from ClientAppFragment.
+	 * @return the class name
+	 */
 	protected abstract String getClassName();
 	
 	protected String getAppPackage() {

@@ -1,6 +1,6 @@
-package jadex.android.classloading.bditest;
+package jadex.android.clientapp.bditest;
 
-import jadex.android.classloading.MyActivity;
+import jadex.android.clientapp.MyActivity;
 import jadex.bdi.runtime.Plan;
 import android.widget.Toast;
 

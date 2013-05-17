@@ -12,6 +12,11 @@
         android:text="@string/app_title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
     
+    <Button android:id="@+id/callServicesButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Call Services"/>
+    
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">

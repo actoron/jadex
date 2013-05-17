@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="jadex.android.classloading"
+    package="jadex.android.clientapp"
     android:versionCode="2"
     android:versionName="2.3" >
 
@@ -15,7 +15,7 @@
         android:label="ClientAppDemo"
         android:screenOrientation="portrait" >
 <!--         <uses-library android:name="jadex.android.classloading" android:required="false"/> -->
-        <activity android:name="jadex.android.classloading.MyApplication" >
+        <activity android:name="jadex.android.clientapp.MyApplication" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -24,7 +24,7 @@
 <!--         <activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter" /> -->
 
         <service
-            android:name="jadex.android.classloading.MyService"
+            android:name="jadex.android.clientapp.MyService"
             android:label="MyService" >
         </service>
         
