@@ -18,6 +18,10 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.gui.autocombo.AutoComboTableCellEditor;
+import jadex.commons.gui.autocombo.AutoComboTableCellRenderer;
+import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -49,6 +53,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
 
 /**
  *  BPMN process property panel.
@@ -69,7 +74,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected String[] PROPERTIES_COLUMN_NAMES = { "Name", "Type", "Value" };
 	
 	/** The column names for the provided services table. */
-	protected String[] PROVIDED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Proxytype", "Implementation" };
+	protected String[] PROVIDED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Proxytype", "Implementation Class", "Implementation Expression" };
 	
 	/** The column names for the required services table. */
 	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Multiplex", "Scope" };
@@ -389,6 +394,14 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		JScrollPane tablescrollpane = new JScrollPane(paramtable);
 		tablepanel.add(tablescrollpane, gc);
 		
+		
+		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
+		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getAllClasses());
+		acc.setModel(accm);
+		TableColumn col = paramtable.getColumnModel().getColumn(4);
+		col.setCellEditor(new AutoComboTableCellEditor(acc));
+		col.setCellRenderer(new AutoComboTableCellRenderer(acc));
+		
 		Action addaction = new AbstractAction("Add Parameter")
 		{
 			public void actionPerformed(ActionEvent e)
@@ -525,6 +538,13 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		JScrollPane tablescrollpane = new JScrollPane(proptable);
 		tablepanel.add(tablescrollpane, gc);
 		
+		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
+		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getAllClasses());
+		acc.setModel(accm);
+		TableColumn col = proptable.getColumnModel().getColumn(1);
+		col.setCellEditor(new AutoComboTableCellEditor(acc));
+		col.setCellRenderer(new AutoComboTableCellRenderer(acc));
+		
 		Action addaction = new AbstractAction("Add Property")
 		{
 			public void actionPerformed(ActionEvent e)
@@ -597,6 +617,20 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				return super.getCellEditor(row, column);
 			}
 		};
+		
+		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
+		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getInterfaces());
+		acc.setModel(accm);
+		TableColumn col = pstable.getColumnModel().getColumn(1);
+		col.setCellEditor(new AutoComboTableCellEditor(acc));
+		col.setCellRenderer(new AutoComboTableCellRenderer(acc));
+		
+		final AutoCompleteCombo acc2 = new AutoCompleteCombo(null, null);
+		final FixedClassInfoComboModel accm2 = new FixedClassInfoComboModel(acc2, 20, modelcontainer.getAllClasses());
+		acc2.setModel(accm2);
+		TableColumn col2 = pstable.getColumnModel().getColumn(3);
+		col2.setCellEditor(new AutoComboTableCellEditor(acc2));
+		col2.setCellRenderer(new AutoComboTableCellRenderer(acc2));
 		
 		JScrollPane tablescrollpane = new JScrollPane(pstable);
 		tablepanel.add(tablescrollpane, gc);
@@ -690,6 +724,13 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				return super.getCellEditor(row, column);
 			}
 		};
+		
+		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
+		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getInterfaces());
+		acc.setModel(accm);
+		TableColumn col = rstable.getColumnModel().getColumn(1);
+		col.setCellEditor(new AutoComboTableCellEditor(acc));
+		col.setCellRenderer(new AutoComboTableCellRenderer(acc));
 		
 		JScrollPane tablescrollpane = new JScrollPane(rstable);
 		tablepanel.add(tablescrollpane, gc);
@@ -1266,7 +1307,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-			CachedParameter param = (CachedParameter) paramcche.get(rowIndex);
+			CachedParameter param = (CachedParameter)paramcche.get(rowIndex);
 			switch(columnIndex)
 			{
 				case 0:
@@ -1279,7 +1320,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				case 3:
 					return param.desc;
 				case 4:
-					return param.type;
+					return new ClassInfo(param.type);
 				case 5:
 					String confname = getSelectedConfigurationName();
 					Object ret = param.inivals.get(confname);
@@ -1317,7 +1358,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					param.desc = (String) value;
 					break;
 				case 4:
-					param.type = (String) value;
+					param.type = value!=null? ((ClassInfo)value).getTypeName(): null;
 					break;
 				case 5:
 					String confname = getSelectedConfigurationName();
@@ -1396,7 +1437,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					ret = prop.getName();
 					break;
 				case 1:
-					ret = prop.getClazz().getTypeName();
+					ret = prop.getClazz();
 					break;
 				case 2:
 					ret = prop.getValue();
@@ -1427,7 +1468,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					}
 					break;
 				case 1:
-					prop.setClazz(new ClassInfo(((String) value)));
+					prop.setClazz((ClassInfo)value);
 					break;
 				case 2:
 					prop.setValue(((String) value));
@@ -1507,7 +1548,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				default:
 					return ps.getName();
 				case 1:
-					return ps.getType() != null? ps.getType().getTypeName() : null;
+					return ps.getType();
 				case 2:
 				{
 					Object ret = null;
@@ -1530,7 +1571,20 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					}
 					if (ps != null && ps.getImplementation() != null && ps.getImplementation().getClazz() != null)
 					{
-						ret = ps.getImplementation().getClazz().getTypeName();
+						ret = ps.getImplementation().getClazz();
+					}
+					return ret;
+				}
+				case 4:
+				{
+					Object ret = null;
+					if (cs != null)
+					{
+						ps = cs;
+					}
+					if (ps != null && ps.getImplementation() != null && ps.getImplementation().getValue() != null)
+					{
+						ret = ps.getImplementation().getValue();
 					}
 					return ret;
 				}
@@ -1578,8 +1632,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 				case 1:
 				{
-					ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
-					ps.setType(type);
+//					ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
+					ps.setType((ClassInfo)value);
 					break;
 				}
 				case 2:
@@ -1610,7 +1664,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 				case 3:
 				{
-					ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
+					ClassInfo type = (ClassInfo)value;
 					if (cs != null)
 					{
 						createImplementation(cs);
@@ -1624,6 +1678,33 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					{
 						createImplementation(ps);
 						ps.getImplementation().setClazz(type);
+						for (ConfigurationInfo itconf : getModelInfo().getConfigurations())
+						{
+							cs = getProvService(ps.getName(), itconf);
+							if (compareService(ps, cs))
+							{
+								itconf.removeProvidedService(cs);
+							}
+						}
+					}
+					break;
+				}
+				case 4:
+				{
+//					ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
+					if (cs != null)
+					{
+						createImplementation(cs);
+						cs.getImplementation().setValue((String)value);
+						if (compareService(ps, cs))
+						{
+							conf.removeProvidedService(cs);
+						}
+					}
+					else
+					{
+						createImplementation(ps);
+						ps.getImplementation().setValue((String)value);
 						for (ConfigurationInfo itconf : getModelInfo().getConfigurations())
 						{
 							cs = getProvService(ps.getName(), itconf);
@@ -1721,7 +1802,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				default:
 					return rs.getName();
 				case 1:
-					return rs.getType() != null? rs.getType().getTypeName() : null;
+					return rs.getType();
 				case 2:
 				{
 					return rs.isMultiple();
@@ -1785,8 +1866,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 				case 1:
 				{
-					ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
-					rs.setType(type);
+//					ClassInfo type = nullifyString(value) != null? new ClassInfo(nullifyString(value)) : null;
+					rs.setType((ClassInfo)value);
 					break;
 				}
 				case 2:

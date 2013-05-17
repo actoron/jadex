@@ -33,4 +33,50 @@ public class FixedClassInfoComboModel extends AbstractFixedAutoComboModel<ClassI
 	{
 		return val==null || val.getTypeName().length()==0? null: SReflect.getUnqualifiedTypeName(val.getTypeName());
 	}
+	
+	/**
+	 * 
+	 */
+	public boolean containsVal(ClassInfo val)
+	{
+		boolean ret = false;
+		if(val == null)// || val.trim().isEmpty())
+		{	
+			ret = true;
+		}
+		else
+		{
+			String tn = val.getTypeName();
+			boolean	suffix = tn.indexOf(".")==-1;
+			for(ClassInfo item : entries)
+			{
+				if(item.equals(val) || (suffix && item.getTypeName().endsWith(tn)))
+				{
+					ret = true;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public ClassInfo getModelValue(String val)
+	{
+		ClassInfo ret = null;
+		
+		boolean	suffix = val.indexOf(".")==-1;
+		for(ClassInfo item : entries)
+		{
+			if(item.equals(val) || (suffix && item.getTypeName().endsWith(val)))
+			{
+				ret = item;
+				break;
+			}
+		}
+		
+		return ret;
+	}
 }

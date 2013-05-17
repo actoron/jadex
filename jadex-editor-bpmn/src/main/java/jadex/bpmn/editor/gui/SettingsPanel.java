@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -124,12 +124,13 @@ public class SettingsPanel extends JPanel
 				return str1.compareTo(str2);
 			}
 		};
-		List<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
+		Set<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
 		globalcache.getGlobalTaskClasses().addAll(tmp[0]);
 		globalcache.getGlobalInterfaces().addAll(tmp[1]);
 		Collections.sort(globalcache.getGlobalTaskClasses(), comp);
 		Collections.sort(globalcache.getGlobalInterfaces(), comp);
-		settings.setGlobalTaskClasses(tmp[0]);
-		settings.setGlobalInterfaces(tmp[1]);
+		settings.setGlobalTaskClasses(globalcache.getGlobalTaskClasses());
+		settings.setGlobalInterfaces(globalcache.getGlobalInterfaces());
+		settings.setGlobalAllClasses(globalcache.getGlobalAllClasses());
 	}
 }

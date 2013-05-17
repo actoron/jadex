@@ -300,7 +300,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 //					int key = e.getKeyCode();
 //					System.out.println("typed: "+key);
 				
-					getAutoModel().setSelectedItemQuiet(null);
+//					getAutoModel().setSelectedItemQuiet(null);
 					
 					if(!t.isRunning())
 					{
@@ -314,7 +314,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 				
 				public void keyPressed(KeyEvent e)
 				{
-					getAutoModel().setSelectedItemQuiet(null);
+//					getAutoModel().setSelectedItemQuiet(null);
 					
 					int key = e.getKeyCode();
 //					System.out.println("pressed: "+key);
@@ -326,6 +326,15 @@ public class AutoCompleteCombo<T> extends JComboBox
 						{
 							getAutoModel().addToTop(text);
 						}
+						else if(getSelectedItem()==null)
+						{
+							System.out.println("setting manually");
+							T obj = getAutoModel().getModelValue(text);
+							if(obj!=null)
+								getAutoModel().setSelectedItem(obj);
+						}
+						
+//						System.out.println(getSelectedItem());
 					}
 					else if(key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN)
 					{

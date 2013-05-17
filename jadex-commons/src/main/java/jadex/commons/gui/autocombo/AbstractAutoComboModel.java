@@ -104,11 +104,13 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	 */
 	public void setSelectedItem(Object obj)
 	{
+		System.out.println("sel obj is: "+obj);
+		
 //		if(obj instanceof String)
 //			System.out.println("herer");
 		
 		if((selected != null && !selected.equals(obj))
-			|| selected == null && obj != null)
+			|| (selected == null && obj != null))
 		{
 			selected = (T)obj;
 			fireContentsChanged(this, -1, -1);
@@ -120,6 +122,7 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	 */
 	public void setSelectedItemQuiet(Object obj)
 	{
+		System.out.println("sel quiet is: "+obj);
 		selected = (T)obj;
 	}
 
@@ -199,6 +202,23 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	 * 
 	 */
 	public abstract ISubscriptionIntermediateFuture<T> doSetPattern(final String pattern);
+	
+	/**
+	 *  Get value from model that equals converted value.
+	 */
+	public T getModelValue(String text)
+	{
+		T ret = null;
+		T o = convertFromString(text);
+		for(T tmp: entries)
+		{
+			if(tmp.equals(o))
+			{
+				ret = tmp;
+			}
+		}
+		return ret;
+	}
 	
 	/**
 	 * 

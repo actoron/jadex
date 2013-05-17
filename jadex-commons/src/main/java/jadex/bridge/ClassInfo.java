@@ -122,6 +122,34 @@ public class ClassInfo
 		this.type = type;
 	}
 
+	/** 
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((getTypeName() == null) ? 0 : getTypeName().hashCode());
+		return result;
+	}
+
+	/** 
+	 *  Test if object is equal to this.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		
+		if(obj instanceof ClassInfo)
+		{
+			ClassInfo ci = (ClassInfo)obj;
+			ret = getTypeName().equals(ci.getTypeName());
+		}
+		
+		return ret;
+	}
+
 	/**
 	 *  Get the string representation.
 	 */
@@ -129,6 +157,4 @@ public class ClassInfo
 	{
 		return typename!=null? typename: type!=null? type.getName(): "n/a";
 	}
-	
-	
 }

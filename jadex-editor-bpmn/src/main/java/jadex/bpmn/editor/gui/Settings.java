@@ -62,6 +62,9 @@ public class Settings
 	/** Global interfaces */
 	protected List<ClassInfo> globalinterfaces;
 	
+	/** Global allclasses */
+	protected List<ClassInfo> globalallclasses;
+	
 	/**
 	 *  Gets the selected style sheet.
 	 *
@@ -254,7 +257,25 @@ public class Settings
 	{
 		this.globalinterfaces = globalinterfaces;
 	}
+	
+	/**
+	 *  Get the allclasses.
+	 *  @return The allclasses.
+	 */
+	public List<ClassInfo> getGlobalAllClasses()
+	{
+		return globalallclasses;
+	}
 
+	/**
+	 *  Set all classes.
+	 *  @param allclasses The classes to set.
+	 */
+	public void setGlobalAllClasses(List<ClassInfo> allclasses)
+	{
+		this.globalallclasses = allclasses;
+	}
+	
 	/**
 	 *  Gets the save settings on exit setting.
 	 *
@@ -351,6 +372,14 @@ public class Settings
 			}
 		}
 		
+		if(globalallclasses!=null && globalallclasses.size()>0)
+		{
+			for(int i=0; i<globalallclasses.size(); i++)
+			{
+				ClassInfo gt = globalallclasses.get(i);
+				ccprops.put("ac"+i, gt.getTypeName());
+			}
+		}
 		
 		OutputStream os = new FileOutputStream(tmpfile);
 		props.store(os, "Jadex BPMN Editor Settings");
@@ -458,6 +487,7 @@ public class Settings
 			
 			List<ClassInfo> gis = new ArrayList<ClassInfo>();
 			List<ClassInfo> gts = new ArrayList<ClassInfo>();
+			List<ClassInfo> ac = new ArrayList<ClassInfo>();
 			for(Object okey: props.keySet())
 			{
 				if(okey instanceof String)
@@ -471,10 +501,15 @@ public class Settings
 					{
 						gts.add(new ClassInfo(props.getProperty(key)));
 					}
+					else if(key.startsWith("ac"))
+					{
+						ac.add(new ClassInfo(props.getProperty(key)));
+					}
 				}
 			}
 			ret.setGlobalInterfaces(gis);
 			ret.setGlobalTaskClasses(gts);
+			ret.setGlobalAllClasses(ac);
 		}
 		catch (IOException e)
 		{

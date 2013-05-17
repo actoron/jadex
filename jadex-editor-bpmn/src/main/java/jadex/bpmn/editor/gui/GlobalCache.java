@@ -13,7 +13,9 @@ import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarEntry;
 
 /**
@@ -50,6 +52,9 @@ public class GlobalCache
 	/** Global interfaces */
 	protected List<ClassInfo> globalinterfaces = new ArrayList<ClassInfo>();
 
+	/** All classes (without inner and abstract ones) */
+	protected List<ClassInfo> allclasses = new ArrayList<ClassInfo>();
+	
 	
 	/**
 	 *  Get the globalinterfaces.
@@ -69,6 +74,15 @@ public class GlobalCache
 		return globaltaskclasses;
 	}
 	
+	/**
+	 *  Returns all classes.
+	 *  @return The set of all classes.
+	 */
+	public List<ClassInfo> getGlobalAllClasses()
+	{
+		return allclasses;
+	}
+	
 //	/**
 //	 *  Scan for task classes.
 //	 */
@@ -86,10 +100,11 @@ public class GlobalCache
 	/**
 	 *  Scan for task classes.
 	 */
-	public static final List<ClassInfo>[] scanForClasses(ClassLoader cl)
+	public static final Set<ClassInfo>[] scanForClasses(ClassLoader cl)
 	{
-		final List<ClassInfo> res1 = new ArrayList<ClassInfo>();
-		final List<ClassInfo> res2 = new ArrayList<ClassInfo>();
+		final Set<ClassInfo> res1 = new HashSet<ClassInfo>();
+		final Set<ClassInfo> res2 = new HashSet<ClassInfo>();
+		final Set<ClassInfo> res3 = new HashSet<ClassInfo>();
 		
 		scanForClasses(cl, new FileFilter("$", false), new IFilter<Class<?>>()
 		{
@@ -100,20 +115,28 @@ public class GlobalCache
 				{
 					if(!obj.isInterface())
 					{
-						if(!Modifier.isAbstract(obj.getModifiers()))
+						if(!Modifier.isAbstract(obj.getModifiers()) && Modifier.isPublic(obj.getModifiers()))
 						{
-							ClassLoader cl = obj.getClassLoader();
-							Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
-							ret = SReflect.isSupertype(taskcl, obj);
-							if(ret)
+							ClassInfo ci = new ClassInfo(obj.getName());
+							res3.add(ci);
+							if(!res1.contains(ci))
 							{
-								res1.add(new ClassInfo(obj.getName()));
+								ClassLoader cl = obj.getClassLoader();
+								Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+								ret = SReflect.isSupertype(taskcl, obj);
+								if(ret)
+								{
+									res1.add(ci);
+								}
 							}
 						}
 					}
 					else
 					{
-						res2.add(new ClassInfo(obj.getName()));
+						// collect interfaces
+						ClassInfo ci = new ClassInfo(obj.getName());
+						res2.add(ci);
+						res3.add(ci);
 					}
 				}
 				catch(Exception e)
@@ -123,7 +146,7 @@ public class GlobalCache
 			}
 		});
 		
-		return new List[]{res1, res2};
+		return new Set[]{res1, res2, res3};
 	}
 	
 	/**

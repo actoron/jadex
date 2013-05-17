@@ -6,15 +6,23 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.gui.autocombo.AutoComboTableCellEditor;
+import jadex.commons.gui.autocombo.AutoComboTableCellRenderer;
+import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
 
 /**
  * 
@@ -40,6 +48,16 @@ public class ActivityParameterTable extends JTable
 		{
 			getColumnModel().getColumn(i).setPreferredWidth(3000);
 		}
+		
+//		System.out.println("size: "+modelcontainer.getAllClasses().size());
+		
+		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
+		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getAllClasses());
+		acc.setModel(accm);
+		
+		TableColumn col = getColumnModel().getColumn(2);
+		col.setCellEditor(new AutoComboTableCellEditor(acc));
+		col.setCellRenderer(new AutoComboTableCellRenderer(acc));
 	}
 	
 	/**
@@ -177,7 +195,7 @@ public class ActivityParameterTable extends JTable
 				default:
 					return param.getName();
 				case 2:
-					return param.getClazz().getTypeName();
+					return param.getClazz();
 				case 3:
 					return param.getInitialValue() != null? param.getInitialValue().getValue() : "";
 			}
@@ -208,7 +226,7 @@ public class ActivityParameterTable extends JTable
 					}
 					break;
 				case 2:
-					param.setClazz(new ClassInfo((String) value));
+					param.setClazz((ClassInfo)value);
 					break;
 				case 3:
 					param.getInitialValue().setValue((String) value);

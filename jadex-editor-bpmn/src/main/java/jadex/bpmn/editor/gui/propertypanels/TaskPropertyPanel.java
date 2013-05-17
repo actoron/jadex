@@ -213,6 +213,8 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+//				System.out.println("pressed");
+				
 				propsp.removeAll();
 				
 				String taskname = getBpmnTask().getClazz() != null? getBpmnTask().getClazz().getTypeName() : null;
@@ -403,7 +405,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 */
 	protected MActivity getBpmnTask()
 	{
-		return (MActivity) task.getBpmnElement();
+		return (MActivity)task.getBpmnElement();
 	}
 	
 	/**

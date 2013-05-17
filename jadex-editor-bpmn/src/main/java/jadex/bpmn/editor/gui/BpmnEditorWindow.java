@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -105,13 +106,16 @@ public class BpmnEditorWindow extends JFrame
 		{
 			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "Scanning classes start...");
 			long start = System.currentTimeMillis();
-			List<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
+			Set<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
 			globalcache.getGlobalTaskClasses().addAll(tmp[0]);
 			globalcache.getGlobalInterfaces().addAll(tmp[1]);
+			globalcache.getGlobalAllClasses().addAll(tmp[2]);
 			Collections.sort(globalcache.getGlobalTaskClasses(), comp);
 			Collections.sort(globalcache.getGlobalInterfaces(), comp);
-			settings.setGlobalTaskClasses(tmp[0]);
-			settings.setGlobalInterfaces(tmp[1]);
+			Collections.sort(globalcache.getGlobalAllClasses(), comp);
+			settings.setGlobalTaskClasses(globalcache.getGlobalTaskClasses());
+			settings.setGlobalInterfaces(globalcache.getGlobalInterfaces());
+			settings.setGlobalAllClasses(globalcache.getGlobalAllClasses());
 			long needed = System.currentTimeMillis()-start;
 			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "... scanning classes end, needed: "+needed/1000+" secs");
 		}
@@ -121,8 +125,11 @@ public class BpmnEditorWindow extends JFrame
 			globalcache.getGlobalTaskClasses().addAll(settings.getGlobalTaskClasses());
 			globalcache.getGlobalInterfaces().clear();
 			globalcache.getGlobalInterfaces().addAll(settings.getGlobalInterfaces());
+			globalcache.getGlobalAllClasses().clear();
+			globalcache.getGlobalAllClasses().addAll(settings.getGlobalAllClasses());
 			Collections.sort(globalcache.getGlobalTaskClasses(), comp);
 			Collections.sort(globalcache.getGlobalInterfaces(), comp);
+			Collections.sort(globalcache.getGlobalAllClasses(), comp);
 		}
 		
 		getContentPane().setLayout(new BorderLayout());

@@ -32,7 +32,7 @@
     <semantic:task name="Task" id="KpBOK9C1BjLJwJDO">
       <semantic:extensionElements>
         <jadex:taskclass>jadex.platform.service.servicepool.ServicePoolTask</jadex:taskclass>
-        <jadex:property name="mappings" type="java.util.List">new String[]{&quot;com.sun.crypto.provider.AESConstants&quot;,&quot;test.bpmn&quot;,&quot;org.glassfish.gmbal.AMXMetadata&quot;,&quot;test2.bpmn&quot;}</jadex:property>
+        <jadex:property name="mappings" type="java.util.List">new String[]{&quot;IThreadPoolService&quot;,&quot;test.bpmn&quot;,&quot;IMessageService&quot;,&quot;test2.bpmn&quot;}</jadex:property>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:sequenceFlow sourceRef="Cq/85Tim2tti2Odn" targetRef="z4VkNQkKmWLMN5JC" id="+tPLsbOaRzxn/Hqv">

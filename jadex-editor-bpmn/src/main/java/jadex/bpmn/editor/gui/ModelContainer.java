@@ -256,6 +256,9 @@ public class ModelContainer implements IModelContainer
 
 	/** The interface classes. */
 	protected List<ClassInfo> interclasses;
+	
+	/** The all classes. */
+	protected List<ClassInfo> allclasses;
 
 	
 	/**
@@ -274,6 +277,7 @@ public class ModelContainer implements IModelContainer
 		List<ClassInfo>[] tmp = scanForClassInfos();
 		this.taskclasses = tmp[0];
 		this.interclasses = tmp[1];
+		this.allclasses = tmp[2];
 	}
 	
 //	/**
@@ -347,6 +351,7 @@ public class ModelContainer implements IModelContainer
 	{
 		final List<ClassInfo> gtasks = new ArrayList<ClassInfo>(globalcache.getGlobalTaskClasses());
 		final List<ClassInfo> ginter = new ArrayList<ClassInfo>(globalcache.getGlobalInterfaces());
+		final List<ClassInfo> gall = new ArrayList<ClassInfo>(globalcache.getGlobalAllClasses());
 		
 		if(classloaderroot!=null)
 		{
@@ -382,20 +387,31 @@ public class ModelContainer implements IModelContainer
 						{
 							if(!obj.isInterface())
 							{
-								if(!Modifier.isAbstract(obj.getModifiers()))
+								if(!Modifier.isAbstract(obj.getModifiers()) && Modifier.isPublic(obj.getModifiers()))
 								{
-									ClassLoader cl = obj.getClassLoader();
-									Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
-									ret = SReflect.isSupertype(taskcl, obj);
-									if(ret)
+									ClassInfo ci = new ClassInfo(obj.getName());
+									if(!gall.contains(ci))
+										gall.add(ci);
+									if(!gtasks.contains(ci))
 									{
-										gtasks.add(new ClassInfo(obj.getName()));
+										ClassLoader cl = obj.getClassLoader();
+										Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+										ret = SReflect.isSupertype(taskcl, obj);
+										if(ret)
+										{
+											gtasks.add(new ClassInfo(obj.getName()));
+										}
 									}
 								}
 							}
 							else 
 							{
-								ginter.add(new ClassInfo(obj.getName()));
+								// collect interfaces
+								ClassInfo ci = new ClassInfo(obj.getName());
+								if(!gall.contains(ci))
+									gall.add(new ClassInfo(obj.getName()));
+								if(!ginter.contains(ci))
+									ginter.add(new ClassInfo(obj.getName()));
 							}
 						}
 						catch(Exception e)
@@ -415,7 +431,7 @@ public class ModelContainer implements IModelContainer
 				// nop
 			}
 		}
-		return new List[]{gtasks, ginter};
+		return new List[]{gtasks, ginter, gall};
 	}
 	
 	/**
@@ -434,6 +450,15 @@ public class ModelContainer implements IModelContainer
 	public List<ClassInfo> getInterfaces()
 	{
 		return interclasses;
+	}
+	
+	/**
+	 *  Get the allclasses.
+	 *  @return The allclasses.
+	 */
+	public List<ClassInfo> getAllClasses()
+	{
+		return allclasses;
 	}
 
 	/**

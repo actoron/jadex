@@ -167,36 +167,14 @@ public class ServicePoolTask implements ITask
 			final MappingsTableModel tm = new MappingsTableModel();
 			final JTable table = new JTable(tm);
 			panel.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHEAST, GridBagConstraints.BOTH, new Insets(0,5,5,0), 0, 0));
-			TableColumn col = table.getColumnModel().getColumn(0);
 			final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
 			final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, container.getInterfaces());
+			acc.setModel(accm);
 			
-//			acc.setEditor(new MetalComboBoxEditor()//BasicComboBoxEditor()
-//			{
-//				Object val;
-//				public void setItem(Object obj)
-//				{
-//					if(SUtil.equals(val, obj) || obj==null)
-//						return;
-//					
-//					ClassInfo ci = (ClassInfo)obj;
-//					
-//					String text = ci!=null && ci.getTypeName()!=null && ci.getTypeName().length()>0? accm.convertToString((ClassInfo)obj): "";
-//				    if(text!=null && !text.equals(editor.getText())) 
-//				    {
-//				    	val = obj;
-//				    	if(text.length()>0)
-//				    		editor.setText(text);
-//				    }
-//				}
-//				
-//				public Object getItem()
-//				{
-//					return accm.convertFromString(editor.getText());
-//				}
-//			
-//			});
-			 
+			TableColumn col = table.getColumnModel().getColumn(0);
+			col.setCellEditor(new AutoComboTableCellEditor(acc));
+			col.setCellRenderer(new AutoComboTableCellRenderer(acc));
+			
 //			acc.setRenderer(new BasicComboBoxRenderer()
 //			{
 //				public Component getListCellRendererComponent(JList list, Object value,
@@ -208,100 +186,8 @@ public class ServicePoolTask implements ITask
 //				}
 //			});
 			
-			acc.setEditable(true);
-			acc.setModel(accm);
 //			final JComboBox box = new JComboBox(container.getInterfaces().toArray());
 //			box.setEditable(true);
-	
-			col.setCellEditor(new AutoComboTableCellEditor(acc));
-//			col.setCellEditor(new DefaultCellEditor(acc)
-//			{
-//				final DefaultCellEditor self = this;
-//				{
-//					final JComboBox box = (JComboBox)editorComponent;
-//					box.removeActionListener(delegate);
-//					
-//					delegate = new EditorDelegate()
-//					{
-//						public void setValue(Object value)
-//						{
-//							box.setSelectedItem(value);
-//						}
-//
-//						public Object getCellEditorValue()
-//						{
-//							return box.getSelectedItem();
-//						}
-//
-//						public boolean shouldSelectCell(EventObject anEvent)
-//						{
-//							if(anEvent instanceof MouseEvent)
-//							{
-//								MouseEvent e = (MouseEvent)anEvent;
-//								return e.getID() != MouseEvent.MOUSE_DRAGGED;
-//							}
-//							return true;
-//						}
-//
-//						public boolean stopCellEditing()
-//						{
-//							if(box.isEditable())
-//							{
-//								// Commit edited value.
-//								box.actionPerformed(new ActionEvent(self, 0, ""));
-//							}
-//							return super.stopCellEditing();
-//						}
-//						
-//						public void actionPerformed(ActionEvent e) 
-//						{
-////							System.out.println(acc.isUpdating()+" "+e);
-////							if(!acc.isUpdating())
-////							{
-////								super.actionPerformed(e);
-////							}
-//						}
-//					};
-//					
-//					box.addActionListener(delegate);
-//					
-//					box.getEditor().getEditorComponent().addKeyListener(new KeyAdapter()
-//					{
-//						public void keyTyped(KeyEvent e)
-//						{
-//						}
-//						
-//						public void keyPressed(KeyEvent e)
-//						{
-//							if(e.getKeyCode() == KeyEvent.VK_ENTER)
-//							{
-//								stopCellEditing();
-//							}
-//						}
-//					});
-//				}
-//				
-//				public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected,
-//					boolean expanded, boolean leaf, int row) 
-//				{
-////					String         stringValue = tree.convertValueToText(value, isSelected, expanded, leaf, row, false);
-//					delegate.setValue(value);
-//					return editorComponent;
-//				}
-//			});
-			col.setCellRenderer(new AutoComboTableCellRenderer(acc));
-//			col.setCellRenderer(new DefaultTableCellRenderer()
-//			{
-//				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-//				{
-//					super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-//					
-////					ClassInfo ci = (ClassInfo)value;
-//					setText(value==null? "": );
-//					
-//					return this;
-//				}
-//			});
 			
 			MProperty mprop = task.getProperties().get(PROPERTY_MAPPINGS);
 			if(mprop.getInitialValue()!=null)
