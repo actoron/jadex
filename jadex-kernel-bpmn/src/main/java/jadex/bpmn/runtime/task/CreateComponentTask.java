@@ -51,6 +51,8 @@ public class CreateComponentTask implements ITask
 		reserved.add("resultmapping");
 		reserved.add("wait");
 		reserved.add("master");
+		reserved.add("monitoring");
+		reserved.add("synchronous");
 		reserved.add("arguments");
 	}
 	
@@ -78,6 +80,7 @@ public class CreateComponentTask implements ITask
 				Boolean daemon = context.getParameterValue("daemon")!=null? (Boolean)context.getParameterValue("daemon"): null;
 				Boolean autoshutdown = context.getParameterValue("autoshutdown")!=null? (Boolean)context.getParameterValue("autoshutdown"): null;
 				Boolean monitoring = context.getParameterValue("monitoring")!=null? (Boolean)context.getParameterValue("monitoring"): null;
+				Boolean synchronous = context.getParameterValue("synchronous")!=null? (Boolean)context.getParameterValue("synchronous"): null;
 				RequiredServiceBinding[] bindings = context.getParameterValue("bindings")!=null? (RequiredServiceBinding[])context.getParameterValue("bindings"): null;
 				
 				Map<String, Object> args = (Map<String, Object>)context.getParameterValue("arguments");
@@ -193,7 +196,8 @@ public class CreateComponentTask implements ITask
 				// todo: rid
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub? instance.getComponentIdentifier() : null, 
-						suspend, master, daemon, autoshutdown, monitoring, ((BpmnInterpreter) instance).getModelElement().getModelInfo().getAllImports(), bindings,
+						suspend, master, daemon, autoshutdown, monitoring, synchronous, 
+						((BpmnInterpreter) instance).getModelElement().getModelInfo().getAllImports(), bindings,
 						instance.getModel().getResourceIdentifier()), lis)
 					.addResultListener(instance.createResultListener(new DelegationResultListener(creationfuture)));
 				

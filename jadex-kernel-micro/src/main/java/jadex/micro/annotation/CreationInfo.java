@@ -1,5 +1,7 @@
 package jadex.micro.annotation;
 
+import jadex.commons.Boolean3;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,22 +20,32 @@ public @interface CreationInfo
 	/**
 	 *  The suspend state.
 	 */
-	public boolean suspend() default false;
+	public Boolean3 suspend() default Boolean3.NULL;
 	
 	/**
 	 *  The master flag.
 	 */
-	public boolean master() default false;
+	public Boolean3 master() default Boolean3.NULL;
 	
 	/**
 	 *  The daemon flag.
 	 */
-	public boolean daemon() default false;
+	public Boolean3 daemon() default Boolean3.NULL;
 	
 	/**
 	 *  The autoshutdown flag.
 	 */
-	public boolean autoshutdown() default false;
+	public Boolean3 autoshutdown() default Boolean3.NULL;
+
+	/**
+	 *  The monitoring flag.
+	 */
+	public Boolean3 monitoring() default Boolean3.NULL;
+
+	/**
+	 *  The synchronous flag.
+	 */
+	public Boolean3 synchronous() default Boolean3.NULL;
 
 	/**
 	 *  The component name.

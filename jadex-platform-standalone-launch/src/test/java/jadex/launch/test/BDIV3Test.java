@@ -22,7 +22,6 @@ public class BDIV3Test	extends	ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
-				"AA",	// abstract agent
 				"ComponentPlanAgent"	// sub agent
 			});
 	}

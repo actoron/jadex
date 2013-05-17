@@ -113,7 +113,7 @@ public class AgentCreationAgent extends MicroAgent
 				public void resultAvailable(Object result)
 				{
 					((IComponentManagementService)result).createComponent(createPeerName(num+1, getComponentIdentifier()), AgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
-						new CreationInfo(null, args, nested ? getComponentIdentifier() : null, null, null, null, null, null, null, null, getComponentDescription().getResourceIdentifier()), null);
+						new CreationInfo(null, args, nested ? getComponentIdentifier() : null, null, null, null, null, null, null, null, null, getComponentDescription().getResourceIdentifier()), null);
 				}
 			}));
 		}

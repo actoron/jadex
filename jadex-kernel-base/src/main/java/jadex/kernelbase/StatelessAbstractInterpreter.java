@@ -1563,12 +1563,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();
 					Boolean	autoshutdown = components[i].getAutoShutdown()!=null ? components[i].getAutoShutdown() : type.getAutoShutdown();
 					Boolean	monitoring = components[i].getMonitoring()!=null ? components[i].getMonitoring() : type.getMonitoring();
+					Boolean	synchronous = components[i].getSynchronous()!=null ? components[i].getSynchronous() : type.getSynchronous();
 					RequiredServiceBinding[] bindings = components[i].getBindings();
 					// todo: rid
 //					System.out.println("curcall: "+getName(components[i], model, j+1)+" "+CallAccess.getCurrentInvocation().getCause());
 					cms.createComponent(getName(components[i], model, j+1), type.getName(),
 						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), getComponentAdapter().getComponentIdentifier(),
-						suspend, master, daemon, autoshutdown, monitoring, model.getAllImports(), bindings, null), null).addResultListener(crl);
+						suspend, master, daemon, autoshutdown, monitoring, synchronous, model.getAllImports(), bindings, null), null).addResultListener(crl);
 				}
 				else
 				{

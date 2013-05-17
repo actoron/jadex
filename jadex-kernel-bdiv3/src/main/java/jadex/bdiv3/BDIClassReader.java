@@ -56,6 +56,7 @@ import jadex.micro.annotation.RequiredService;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
@@ -118,7 +119,7 @@ public class BDIClassReader extends MicroClassReader
 //		modelinfo.setFilename(model);
 		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
 		modelinfo.setFilename(src+File.separator+SReflect.getClassName(cma)+".class");
-		modelinfo.setStartable(true);
+		modelinfo.setStartable(!Modifier.isAbstract(cma.getModifiers()));
 		modelinfo.setType(BDIAgentFactory.FILETYPE_BDIAGENT);
 		modelinfo.setResourceIdentifier(rid);
 		ret.setClassloader(classloader); // use parent

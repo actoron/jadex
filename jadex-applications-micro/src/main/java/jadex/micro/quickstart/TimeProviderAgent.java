@@ -54,7 +54,7 @@ public class TimeProviderAgent	implements ITimeService, IComponentStep<Void>
 		// Notify all subscribers
 		for(SubscriptionIntermediateFuture<Date> subscriber: subscriptions)
 		{
-			// Add the current time as imetrmediate result.
+			// Add the current time as intermediate result.
 			// The if-undone part is used to ignore errors,
 			// when subscription was cancelled in the mean time.
 			subscriber.addIntermediateResultIfUndone(d);

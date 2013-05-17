@@ -240,9 +240,31 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-		return isLoadable(model, imports, rid);
+		final Future<Boolean>	ret	= new Future<Boolean>();
+		isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
+		{
+			public void customResultAvailable(Boolean result)
+			{
+				if(result.booleanValue())
+				{
+					loadModel(model, imports, rid)
+						.addResultListener(new ExceptionDelegationResultListener<IModelInfo, Boolean>(ret)
+					{
+						public void customResultAvailable(IModelInfo result)
+						{
+							ret.setResult(result.isStartable() ? Boolean.TRUE : Boolean.FALSE);
+						}
+					});
+				}
+				else
+				{
+					super.customResultAvailable(result);
+				}
+			}
+		});
+		return ret;
 	}
 
 	/**

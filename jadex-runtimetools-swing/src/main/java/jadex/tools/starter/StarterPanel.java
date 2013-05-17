@@ -138,6 +138,7 @@ public class StarterPanel extends JLayeredPane
 	protected JCheckBox daemoncb;
 	protected JCheckBox autosdcb;
 	protected JCheckBox monicb;
+	protected JCheckBox synccb;
 
 //	/** The application name. */
 //	protected JComboBox appname;
@@ -340,6 +341,7 @@ public class StarterPanel extends JLayeredPane
 										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										monicb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+										synccb.isSelected()? Boolean.TRUE: Boolean.FALSE,
 										killlistener, StarterPanel.this.parent, StarterPanel.this)
 									.addResultListener(new DelegationResultListener(fut));
 								}
@@ -354,6 +356,7 @@ public class StarterPanel extends JLayeredPane
 									daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									monicb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+									synccb.isSelected()? Boolean.TRUE: Boolean.FALSE,
 									killlistener, StarterPanel.this.parent, StarterPanel.this)
 								.addResultListener(new DelegationResultListener(fut));
 							}
@@ -449,12 +452,15 @@ public class StarterPanel extends JLayeredPane
 //		autosdcb.setMinimumSize(md);
 		monicb = new JCheckBox("Monitor");
 		monicb.setToolTipText("Monitor the component. If turned on it will push events to the IMonitoringService of the platform.");
+		synccb = new JCheckBox("Synchronous");
+		synccb.setToolTipText("Run the component synchronously on the thread of its parent.");
 		
 		flags.add(suspend);
 		flags.add(mastercb);
 		flags.add(daemoncb);
 		flags.add(autosdcb);
 		flags.add(monicb);
+		flags.add(synccb);
 		componentpanel.add(new JLabel("Flags"), new GridBagConstraints(0, 2, 1, 0, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(2, 2, 0, 2), 0, 0));
 		componentpanel.add(flags, new GridBagConstraints(1, 2, 4, 0, 0, 0, GridBagConstraints.WEST,
@@ -738,6 +744,7 @@ public class StarterPanel extends JLayeredPane
 			mastercb.setSelected(false);
 			autosdcb.setSelected(false);
 			monicb.setSelected(false);
+			synccb.setSelected(false);
 			genname.setSelected(false);
 			numcomponents.setValue(new Integer(1));
 			
@@ -959,11 +966,13 @@ public class StarterPanel extends JLayeredPane
 			boolean d = model.getDaemon(c)==null? daemoncb.isSelected(): model.getDaemon(c).booleanValue();
 			boolean a = model.getAutoShutdown(c)==null? autosdcb.isSelected(): model.getAutoShutdown(c).booleanValue();
 			boolean mo = model.getMonitoring(c)==null? monicb.isSelected(): model.getMonitoring(c).booleanValue();
+			boolean sy = model.getSynchronous(c)==null? synccb.isSelected(): model.getSynchronous(c).booleanValue();
 			suspend.setSelected(s);
 			mastercb.setSelected(m);
 			daemoncb.setSelected(d);
 			autosdcb.setSelected(a); 
-			monicb.setSelected(a); 
+			monicb.setSelected(mo); 
+			synccb.setSelected(sy); 
 //			System.out.println("smda: "+s+" "+m+" "+d+" "+a);
 		}
 	}
@@ -1628,7 +1637,7 @@ public class StarterPanel extends JLayeredPane
 	 */
 	public static IFuture createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
 		final String configname, final Map arguments, final Boolean suspend, 
-		final Boolean master, final Boolean daemon, final Boolean autosd, final Boolean moni,
+		final Boolean master, final Boolean daemon, final Boolean autosd, final Boolean moni, final Boolean sync,
 		final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future ret = new Future(); 
@@ -1637,7 +1646,7 @@ public class StarterPanel extends JLayeredPane
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, moni, null, null, rid), killlistener)
+				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd, moni, sync, null, null, rid), killlistener)
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)

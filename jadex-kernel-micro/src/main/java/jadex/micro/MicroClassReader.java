@@ -1284,10 +1284,12 @@ public class MicroClassReader
 	{
 		ComponentInstanceInfo ret = new ComponentInstanceInfo();
 		
-		ret.setSuspend(comp.suspend());
-		ret.setMaster(comp.master());
-		ret.setDaemon(comp.daemon());
-		ret.setAutoShutdown(comp.autoshutdown());
+		ret.setSuspend(comp.suspend().toBoolean());
+		ret.setMaster(comp.master().toBoolean());
+		ret.setDaemon(comp.daemon().toBoolean());
+		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
+		ret.setMonitoring(comp.monitoring().toBoolean());
+		ret.setSynchronous(comp.synchronous().toBoolean());
 		
 		if(comp.name().length()>0)
 			ret.setName(comp.name());
