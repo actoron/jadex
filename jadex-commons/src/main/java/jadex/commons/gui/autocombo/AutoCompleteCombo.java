@@ -1,5 +1,6 @@
 package jadex.commons.gui.autocombo;
 
+import jadex.bridge.ClassInfo;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPool;
@@ -21,6 +22,7 @@ import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.Timer;
+import javax.swing.plaf.metal.MetalComboBoxEditor;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -64,6 +66,29 @@ public class AutoCompleteCombo<T> extends JComboBox
 				{
 					putClientProperty("JComboBox.isTableCellEditor", Boolean.FALSE);
 				}
+			}
+		});
+		
+		setEditor(new MetalComboBoxEditor()//BasicComboBoxEditor() // Hack due to bug in BasicComboBoxEditor
+		{
+			Object val;
+			public void setItem(Object obj)
+			{
+				if(SUtil.equals(val, obj) || obj==null)
+					return;
+				
+				String text = getAutoModel().convertToString((T)obj);
+			    if(text!=null && !text.equals(editor.getText())) 
+			    {
+			    	val = obj;
+			    	if(text.length()>0)
+			    		editor.setText(text);
+			    }
+			}
+			
+			public Object getItem()
+			{
+				return getAutoModel().convertFromString(editor.getText());
 			}
 		});
 	}

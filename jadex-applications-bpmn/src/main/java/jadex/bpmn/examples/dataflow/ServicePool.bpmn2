@@ -12,8 +12,7 @@
   <semantic:process name="Pool" id="Kx77tY7+xbhWcwvf">
     <semantic:task name="Init Service Pool" id="8BQH55E2vFgxZo+3">
       <semantic:extensionElements>
-        <jadex:taskclass>jadex.platform.service.servicepool.ServicePoolTask</jadex:taskclass>
-        <jadex:property name="mappings" type="java.util.List">null</jadex:property>
+        <jadex:taskclass>ServicePoolTask</jadex:taskclass>
       </semantic:extensionElements>
     </semantic:task>
     <semantic:extensionElements>
