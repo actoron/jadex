@@ -10,6 +10,9 @@ public abstract class JadexClientAppService extends Service
 {
 
 
+	private Context applicationContext;
+	private Context baseContext;
+
 	@Override
 	protected void finalize() throws Throwable
 	{
@@ -46,10 +49,24 @@ public abstract class JadexClientAppService extends Service
 	}
 	
 	@Override
+	public Context getBaseContext()
+	{
+		return baseContext;
+	}
+	
+	@Override
 	public Context getApplicationContext()
 	{
 		System.out.println("JadexClientAppService: getApplicationContext()");
-		return super.getApplicationContext();
+		return applicationContext;
 	}
+
+	public void setContexts(Context applicationContext, Context baseContext)
+	{
+		this.applicationContext = applicationContext;
+		this.baseContext = baseContext;
+	}
+	
+	
 
 }

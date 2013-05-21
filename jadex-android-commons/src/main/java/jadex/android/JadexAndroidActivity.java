@@ -1,5 +1,6 @@
 package jadex.android;
 
+import jadex.android.exception.JadexAndroidError;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -61,7 +62,14 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	{
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		serviceIntent = new Intent(this, SReflect.classForName0("jadex.android.service.JadexPlatformService", this.getClass().getClassLoader()));
+		try
+		{
+			serviceIntent = new Intent(this, SReflect.classForName("jadex.android.service.JadexPlatformService", this.getClass().getClassLoader()));
+		}
+		catch (ClassNotFoundException e)
+		{
+			throw new JadexAndroidError("Class JadexPlatformService not found. Did you include the library jadex-platform-android in your build?");
+		}
 		bindService(serviceIntent, this, Service.BIND_AUTO_CREATE);
 	}
 	

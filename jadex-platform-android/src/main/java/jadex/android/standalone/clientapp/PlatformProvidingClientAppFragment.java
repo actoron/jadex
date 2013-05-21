@@ -191,34 +191,6 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 	 *            Path to the Component XML definition file
 	 * @return IFuture<IComponentIdentifier>
 	 */
-	protected IFuture<IComponentIdentifier> startBDIAgent(final String name, final String modelPath)
-	{
-		return startComponent(name, modelPath);
-	}
-
-	/**
-	 * Starts a Component.
-	 * 
-	 * @param name
-	 *            Name of the Component created
-	 * @param modelPath
-	 *            Path to the Component XML definition file
-	 * @return IFuture<IComponentIdentifier>
-	 */
-	protected IFuture<IComponentIdentifier> startBPMNAgent(final String name, final String modelPath)
-	{
-		return startComponent(name, modelPath);
-	}
-
-	/**
-	 * Starts a Component.
-	 * 
-	 * @param name
-	 *            Name of the Component created
-	 * @param modelPath
-	 *            Path to the Component XML definition file
-	 * @return IFuture<IComponentIdentifier>
-	 */
 	protected IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath)
 	{
 		checkIfJadexIsRunning("startComponent()");

@@ -20,24 +20,21 @@ public abstract class JadexApplication extends Activity
 			throw new Error("className or appPath missing");
 		}
 		
-		Intent intent = new Intent();
-		intent.setAction(INTENT_ACTION_LOADAPP);
-		intent.putExtra(EXTRA_KEY_APPLICATIONPATH, getAppPath());
-		intent.putExtra(EXTRA_KEY_ACTIVITYCLASS, getClassName());
-		intent.putExtra(EXTRA_KEY_APPLICATIONPACKAGE, getAppPackage());
+		Intent intent = new Intent() {{
+			setAction(INTENT_ACTION_LOADAPP);
+			putExtra(EXTRA_KEY_APPLICATIONPATH, getAppPath());
+			putExtra(EXTRA_KEY_ACTIVITYCLASS, getClassName());
+			putExtra(EXTRA_KEY_APPLICATIONPACKAGE, getAppPackage());
+		}};
+		
+		intent.putExtras(getIntent());
+		
 //		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
 		startActivity(intent);
 		finish();
 	}
-	
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-	}
-	
 	
 	/**
 	 * Please provide the name of the class which represents your main

@@ -1,7 +1,10 @@
 package jadex.android.clientapp.bditest;
 
 import jadex.android.clientapp.MyActivity;
+import jadex.android.clientapp.MyPlatformService;
+import jadex.android.clientapp.MyService;
 import jadex.bdi.runtime.Plan;
+import android.content.Context;
 import android.widget.Toast;
 
 /**
@@ -17,18 +20,38 @@ public class SayHelloPlan extends Plan
 	{
 		final String	message = (String)getBeliefbase().getBelief("HelloMessage").getFact();
 		
-		final MyActivity	act = (MyActivity)getBeliefbase().getBelief("androidContext").getFact();
+		Object fact = getBeliefbase().getBelief("androidContext").getFact();
 		
-		act.runOnUiThread(new Runnable()
-		{
-			
-			@Override
-			public void run()
-			{
-				Toast.makeText(act.getActivity(), message, Toast.LENGTH_LONG).show();
-			}
-		});
+		if (fact instanceof MyActivity) {
+			 final MyActivity act = (MyActivity)fact;
+			 
+			 act.runOnUiThread(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						Toast.makeText(act.getActivity(), message, Toast.LENGTH_LONG).show();
+					}
+				});
+				
+			 
+		} else if (fact instanceof MyPlatformService){
+			final MyPlatformService act = (MyPlatformService) fact;
+
+			act.post(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						Toast.makeText(act.getApplicationContext(), message, Toast.LENGTH_LONG).show();
+					}
+				});
+				
+		}
 		
+
 	}
 	
 }

@@ -112,21 +112,9 @@ public interface IJadexPlatformBinder
 	 */
 	public IFuture<IComponentIdentifier> startMicroAgent(final IComponentIdentifier platformId, final String name, final Class<?> clazz);
 
-	/**
-	 * Start a new BPMN agent on a given platform.
-	 * 
-	 * @param platformId
-	 *            Identifier of the jadex platform
-	 * @param name
-	 *            name of the newly created agent
-	 * @param modelPath
-	 *            Path to the bpmn model file of the new agent
-	 * @return ComponendIdentifier of the created agent.
-	 */
-	public IFuture<IComponentIdentifier> startBPMNAgent(final IComponentIdentifier platformId, final String name, final String modelPath);
 
 	/**
-	 * Start a new BDI agent on a given platform.
+	 * Start a new Component on a given platform.
 	 * 
 	 * @param platformId
 	 *            Identifier of the jadex platform
@@ -136,7 +124,7 @@ public interface IJadexPlatformBinder
 	 *            Path to the bpmn model file of the new agent
 	 * @return ComponendIdentifier of the created agent.
 	 */
-	public IFuture<IComponentIdentifier> startBDIAgent(final IComponentIdentifier platformId, final String name, final String modelPath);
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath);
 
 	
 	// ---------- Event-stuff ----------

@@ -1,11 +1,15 @@
 package jadex.android.standalone.clientapp;
 
+import jadex.android.AndroidContextManager;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Window;
 
 public class ClientAppFragment extends ActivityAdapterFragment
@@ -15,6 +19,20 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	public ClientAppFragment()
 	{
 		super();
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+//		AndroidContextManager.getInstance().setAndroidContext(getContext());
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+//		AndroidContextManager.getInstance().setAndroidContext(null);
 	}
 
 	/**
@@ -37,7 +55,7 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	}
 
 	@Override
-	public boolean bindService(Intent service, ServiceConnection conn, int flags)
+	public boolean bindService(final Intent service, final ServiceConnection conn, final int flags)
 	{
 		ComponentName originalComponent = service.getComponent();
 		String clientServiceName = originalComponent.getClassName();
@@ -48,7 +66,25 @@ public class ClientAppFragment extends ActivityAdapterFragment
 		else
 		{
 			// individual user service requested
-			return universalService.bindClientService(service, conn, flags);
+			if (universalService.isClientServiceConnection(conn))
+			{
+				// TODO: check for valid clientServiceName
+				return false;
+			}
+			else
+			{
+				final Handler handler = new Handler();
+				handler.post(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+//						Looper.prepare();
+						universalService.bindClientService(service, conn, flags);	
+					}
+				});
+			}
+			return true;
 		}
 	}
 

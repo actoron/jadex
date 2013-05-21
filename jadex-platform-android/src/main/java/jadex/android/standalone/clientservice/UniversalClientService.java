@@ -2,6 +2,8 @@ package jadex.android.standalone.clientservice;
 
 import jadex.android.exception.JadexAndroidError;
 import jadex.android.service.JadexPlatformManager;
+import jadex.android.service.JadexPlatformService;
+import jadex.android.standalone.clientapp.JadexClientAppService;
 import jadex.commons.SReflect;
 
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.Set;
 
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Binder;
@@ -55,7 +58,7 @@ public class UniversalClientService extends Service
 		// TODO: destroy all client services
 	}
 
-	private static Service createClientService(String className)
+	private Service createClientService(String className)
 	{
 		Service result;
 		ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(null);
@@ -64,6 +67,13 @@ public class UniversalClientService extends Service
 		try
 		{
 			result = clientServiceClass.newInstance();
+			Context applicationContext = getApplicationContext();
+			Context baseContext = getBaseContext();
+			if (result instanceof JadexClientAppService) {
+				((JadexClientAppService) result).setContexts(applicationContext, baseContext);
+			} else if (result instanceof JadexPlatformService) {
+				((JadexPlatformService) result).setContexts(applicationContext, baseContext);
+			}
 		}
 		catch (Exception e)
 		{
@@ -79,9 +89,8 @@ public class UniversalClientService extends Service
 		{
 		}
 
-		public boolean bindClientService(Intent intent, ServiceConnection conn, int flags)
+		public void bindClientService(Intent intent, ServiceConnection conn, int flags)
 		{
-			boolean result = false;
 			// TODO: handle flags
 			ComponentName clientServiceComponent = intent.getComponent();
 			String clientServiceClassName = clientServiceComponent.getClassName();
@@ -106,13 +115,11 @@ public class UniversalClientService extends Service
 				componentNames.put(conn, clientServiceComponent);
 
 				conn.onServiceConnected(clientServiceComponent, clientBinder);
-				result = true;
 			}
 			else
 			{
 				throw new JadexAndroidError("Service already bound!");
 			}
-			return result;
 		}
 
 		public boolean unbindClientService(ServiceConnection conn)

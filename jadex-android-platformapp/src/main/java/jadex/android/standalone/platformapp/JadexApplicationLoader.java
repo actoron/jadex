@@ -69,7 +69,6 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		
 		Intent serviceIntent = new Intent(this,UniversalClientService.class);
 		bindService(serviceIntent, this, BIND_AUTO_CREATE);
-		
 	}
 	
 	@Override

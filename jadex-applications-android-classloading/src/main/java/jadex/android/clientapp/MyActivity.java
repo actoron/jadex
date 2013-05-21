@@ -3,22 +3,12 @@ package jadex.android.clientapp;
 import jadex.android.clientapp.CalcService.CalcBinder;
 import jadex.android.clientapp.CalcService.CalcResult;
 import jadex.android.clientapp.MyService.MyBinder;
-import jadex.android.standalone.clientapp.JadexClientAppService;
 import jadex.android.standalone.clientapp.PlatformProvidingClientAppFragment;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.StreamCopy;
 import jadex.commons.future.DefaultResultListener;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -170,7 +160,7 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 //		URL resource = classLoader.getResource("jadex/android/classloading/bditest/HelloWorld.agent.xml");
 //		System.out.println(resource);
 		
-		startBDIAgent("myAgent", "jadex/android/clientapp/bditest/HelloWorld.agent.xml").addResultListener(new DefaultResultListener<IComponentIdentifier>()
+		startComponent("myAgent", "jadex/android/clientapp/bditest/HelloWorld.agent.xml").addResultListener(new DefaultResultListener<IComponentIdentifier>()
 		{
 
 			@Override

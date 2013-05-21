@@ -39,6 +39,10 @@ public class JadexPlatformService extends Service
 	private String platformName;
 
 	private IComponentIdentifier platformId;
+
+	private Context baseContext;
+
+	private Context applicationContext;
 	
 	public JadexPlatformService()
 	{
@@ -57,14 +61,9 @@ public class JadexPlatformService extends Service
 				return JadexPlatformService.this.startMicroAgent(platformId, name, clazz);
 			}
 
-			public IFuture<IComponentIdentifier> startBPMNAgent(final IComponentIdentifier platformId, String name, String modelPath)
+			public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, String name, String modelPath)
 			{
-				return JadexPlatformService.this.startBPMNAgent(platformId, name, modelPath);
-			}
-			
-			public IFuture<IComponentIdentifier> startBDIAgent(final IComponentIdentifier platformId, String name, String modelPath)
-			{
-				return JadexPlatformService.this.startBDIAgent(platformId, name, modelPath);
+				return JadexPlatformService.this.startComponent(platformId, name, modelPath);
 			}
 
 			public IFuture<IExternalAccess> startJadexPlatform()
@@ -97,7 +96,7 @@ public class JadexPlatformService extends Service
 		Context base = this.getBaseContext();
 		if (base != null) {
 			// if base is null, this service was not started through android
-			AndroidContextManager.getInstance().setAndroidContext(this);
+			AndroidContextManager.getInstance().setAndroidContext(base);
 		}
 		if (platformAutostart) {
 			startPlatform();
@@ -201,23 +200,9 @@ public class JadexPlatformService extends Service
 		return ret;
 	}
 	
-	/**
-	 * Start a new BDI agent on a given platform.
-	 * 
-	 * @param platformId
-	 *            Identifier of the jadex platform
-	 * @param name
-	 *            name of the newly created agent
-	 * @param modelPath
-	 *            Path to the bpmn model file of the new agent
-	 * @return ComponendIdentifier of the created agent.
-	 */
-	public IFuture<IComponentIdentifier> startBDIAgent(final IComponentIdentifier platformId, final String name, final String modelPath) {
-		return startBPMNAgent(platformId, name, modelPath);
-	}
 
 	/**
-	 * Start a new BPMN agent on a given platform.
+	 * Start a new Component on a given platform.
 	 * 
 	 * @param platformId
 	 *            Identifier of the jadex platform
@@ -227,9 +212,9 @@ public class JadexPlatformService extends Service
 	 *            Path to the bpmn model file of the new agent
 	 * @return ComponendIdentifier of the created agent.
 	 */
-	public IFuture<IComponentIdentifier> startBPMNAgent(final IComponentIdentifier platformId, final String name, final String modelPath)
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath)
 	{
-		checkIfPlatformIsRunning(platformId, "startBPMNAgent()");
+		checkIfPlatformIsRunning(platformId, "startComponent()");
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		jadexPlatformManager.getCMS(platformId)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
@@ -344,6 +329,32 @@ public class JadexPlatformService extends Service
 		if (!jadexPlatformManager.isPlatformRunning(platformId))
 		{
 			throw new JadexAndroidPlatformNotStartedError(caller);
+		}
+	}
+
+	public void setContexts(Context applicationContext, Context baseContext)
+	{
+		this.baseContext = baseContext;
+		this.applicationContext = applicationContext;
+	}
+	
+	@Override
+	public Context getBaseContext()
+	{
+		if (this.baseContext != null) {
+			return baseContext;
+		} else {
+			return super.getBaseContext();
+		}
+	}
+	
+	@Override
+	public Context getApplicationContext()
+	{
+		if (this.applicationContext != null) {
+			return applicationContext;
+		} else {
+			return super.getApplicationContext();
 		}
 	}
 
