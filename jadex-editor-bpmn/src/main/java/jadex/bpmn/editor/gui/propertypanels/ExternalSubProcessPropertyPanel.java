@@ -58,7 +58,7 @@ public class ExternalSubProcessPropertyPanel extends BasePropertyPanel
 		{
 			UnparsedExpression exp = msp.getPropertyValue("filename");
 			filename = exp != null? exp.getValue() : null;
-			filename = filename != null? filename.substring(1, filename.length() - 2) : "";
+			filename = filename != null? filename.length() == 2? "" : filename.substring(1, filename.length() - 2) : "";
 			filearea.setText(filename);
 			expbox.setSelected(false);
 		}

@@ -27,9 +27,9 @@ import com.mxgraph.model.mxICell;
 
 public class EdgeDragContextMenu extends JPopupMenu
 {
-	protected static Tuple3<String, String, Icon>[] DEFAULT_ITEMS;
-	protected static Tuple3<String, String, Icon>[] INTERMEDIATE_EVENT_ITEMS;
-	protected static Tuple3<String, String, Icon>[] END_EVENT_ITEMS;
+	protected Tuple3<String, String, Icon>[] defaultitems;
+	protected Tuple3<String, String, Icon>[] intermediateeventitems;
+	protected Tuple3<String, String, Icon>[] endeventitems;
 	
 	/** Source cell */
 	protected Object source;
@@ -46,7 +46,7 @@ public class EdgeDragContextMenu extends JPopupMenu
 	{
 		super("Create Target");
 		
-		if (DEFAULT_ITEMS == null)
+		if (defaultitems == null)
 		{
 			ImageProvider imgprov = ImageProvider.getInstance();
 			List<Tuple3<String, String, Icon>> defitems = new ArrayList<Tuple3<String, String, Icon>>();
@@ -54,6 +54,13 @@ public class EdgeDragContextMenu extends JPopupMenu
 			List<Tuple3<String, String, Icon>> eeitems = new ArrayList<Tuple3<String, String, Icon>>();
 			
 			List<IconGenerationTask> tasks =  BpmnToolbar.getTaskList(null, 0);
+			
+//			MActivity mac = null;
+//			if (src instanceof VActivity)
+//			{
+//				mac = (MActivity) ((VActivity) src).getBpmnElement();
+//			}
+			
 			for (IconGenerationTask task : tasks)
 			{
 				if (task.mode.startsWith("EventStart") ||
@@ -61,10 +68,16 @@ public class EdgeDragContextMenu extends JPopupMenu
 					ModelContainer.EDIT_MODE_LANE.equals(task.mode) ||
 					ModelContainer.EDIT_MODE_ADD_CONTROL_POINT.equals(task.mode) ||
 					ModelContainer.EDIT_MODE_SELECTION.equals(task.mode) ||
+					ModelContainer.EDIT_MODE_MESSAGING_EDGE.equals(task.mode) ||
 					task.mode.endsWith(ModelContainer.BOUNDARY_EVENT) ||
 					task.mode.equals(ModelContainer.EDIT_MODE_EVENT_BOUNDARY_MESSAGE))
 				{
 				}
+//				else if (ModelContainer.EDIT_MODE_MESSAGING_EDGE.equals(task.mode) &&
+//						 (mac == null || mac.getActivityType() == null ||
+//						 !(mac.getActivityType().contains("Message") && mac.isThrowing())))
+//				{
+//				}
 				else if (task.mode.startsWith("EventIntermediate"))
 				{
 					ImageIcon icon = imgprov.generateFlatButtonIcon(16, task.baseshape, task.frametype, task.sym, Color.BLACK, task.color);
@@ -84,9 +97,9 @@ public class EdgeDragContextMenu extends JPopupMenu
 					defitems.add(item);
 				}
 			}
-			DEFAULT_ITEMS = (Tuple3<String, String, Icon>[]) defitems.toArray(new Tuple3[defitems.size()]);
-			INTERMEDIATE_EVENT_ITEMS = (Tuple3<String, String, Icon>[]) ieitems.toArray(new Tuple3[ieitems.size()]);
-			END_EVENT_ITEMS = (Tuple3<String, String, Icon>[]) eeitems.toArray(new Tuple3[eeitems.size()]);
+			defaultitems = (Tuple3<String, String, Icon>[]) defitems.toArray(new Tuple3[defitems.size()]);
+			intermediateeventitems = (Tuple3<String, String, Icon>[]) ieitems.toArray(new Tuple3[ieitems.size()]);
+			endeventitems = (Tuple3<String, String, Icon>[]) eeitems.toArray(new Tuple3[eeitems.size()]);
 		}
 		
 		this.source = src;
@@ -96,15 +109,15 @@ public class EdgeDragContextMenu extends JPopupMenu
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				String mode = ((JMenuItem) e.getSource()).getName();
 				mxICell parent = ((mxICell) source).getParent();
-				
 				if (source instanceof VActivity && ((MActivity) ((VActivity) source).getBpmnElement()).isEventHandler())
 				{
 					parent = parent.getParent();
 				}
 				
 				target = SCreationController.createActivity(modelcontainer,
-												   ((JMenuItem) e.getSource()).getName(),
+												   mode,
 												   parent,
 												   loc,
 												   false);
@@ -112,7 +125,7 @@ public class EdgeDragContextMenu extends JPopupMenu
 			}
 		};
 		
-		for (Tuple3<String, String, Icon> item : DEFAULT_ITEMS)
+		for (Tuple3<String, String, Icon> item : defaultitems)
 		{
 			JMenuItem mitem = new JMenuItem(action);
 			mitem.setText(item.getSecondEntity());
@@ -122,7 +135,7 @@ public class EdgeDragContextMenu extends JPopupMenu
 		}
 		
 		JMenu iemenu = new JMenu("Intermediate Events");
-		for (Tuple3<String, String, Icon> item : INTERMEDIATE_EVENT_ITEMS)
+		for (Tuple3<String, String, Icon> item : intermediateeventitems)
 		{
 			JMenuItem mitem = new JMenuItem(action);
 			mitem.setText(item.getSecondEntity());
@@ -133,7 +146,7 @@ public class EdgeDragContextMenu extends JPopupMenu
 		add(iemenu);
 		
 		JMenu eemenu = new JMenu("End Events");
-		for (Tuple3<String, String, Icon> item : END_EVENT_ITEMS)
+		for (Tuple3<String, String, Icon> item : endeventitems)
 		{
 			JMenuItem mitem = new JMenuItem(action);
 			mitem.setText(item.getSecondEntity());
