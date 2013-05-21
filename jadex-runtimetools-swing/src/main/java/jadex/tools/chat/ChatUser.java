@@ -65,6 +65,10 @@ public class ChatUser
 	 */
 	public ChatUser(IComponentIdentifier cid)
 	{
+		if(cid==null)
+		{
+			throw new NullPointerException();
+		}
 		this.cid	= cid;
 		this.nick = "unknown";
 		this.messages	= new HashSet<Integer>();

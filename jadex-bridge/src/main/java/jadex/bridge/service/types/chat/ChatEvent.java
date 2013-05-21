@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.chat;
 
+
 import jadex.bridge.IComponentIdentifier;
 
 /**
@@ -164,4 +165,15 @@ public class ChatEvent
 	{
 		this.image = image;
 	}
+
+	/**
+	 *  Get a string representation.
+	 */
+	public String toString()
+	{
+		return "ChatEvent(type=" + type + ", nick=" + nick + ", cid=" + cid
+			+ ", value=" + value + ", privatemessage=" + privatemessage + ")";
+	}
+	
+	
 }

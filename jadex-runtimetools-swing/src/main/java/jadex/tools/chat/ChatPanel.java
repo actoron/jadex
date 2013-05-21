@@ -1138,7 +1138,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
-//							System.out.println("state change: "+ce.getComponentIdentifier()+", "+ce.getNick()+", "+ce.getImage()+", "+ce.getValue());
+							if(ce.getComponentIdentifier()==null)
+							{
+								System.out.println("state change: "+ce);
+							}
 							setUserState(ce.getComponentIdentifier(),
 								!IChatService.STATE_DEAD.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
 								IChatService.STATE_TYPING.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
@@ -1534,6 +1537,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public void	setUserState(final IComponentIdentifier cid, final Boolean online, final Boolean typing,  final Boolean away, final String nickname, final byte[] image)
 	{
+		if(cid==null)
+		{
+			throw new NullPointerException();
+		}
 //		System.out.println("setUserState "+cid+", "+online);
 		
 		// Called on component thread.

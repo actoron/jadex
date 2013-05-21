@@ -1100,6 +1100,11 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	protected boolean	publishEvent(String type, String nick, IComponentIdentifier cid, Object value, boolean privatemessage, byte[] image)
 	{
+		if(cid==null)
+		{
+			throw new NullPointerException();
+		}
+		
 		boolean	ret	= false;
 		if(subscribers!=null)
 		{
