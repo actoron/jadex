@@ -250,6 +250,11 @@ public class HttpRelayTransport implements ITransport
 	 */
 	protected void	connected(final String address, final boolean dead)
 	{
+		if(dead)
+		{
+			Thread.dumpStack();
+		}
+		
 		final String	httpadr	= address.substring(6);
 		
 //		Long	oldtime	= addresses.get(httpadr);
@@ -417,7 +422,7 @@ public class HttpRelayTransport implements ITransport
 					else
 					{
 						// Connection dead.
-						System.err.println("Relay. Dead connection to: "+address);
+						System.err.println("Relay. Dead connection to: "+address+", "+time);
 						ret	= new Future<Void>(new RuntimeException("No connection to "+address));
 					}
 					
@@ -498,6 +503,7 @@ public class HttpRelayTransport implements ITransport
 					}
 					catch(Exception e)
 					{
+						e.printStackTrace();
 						component.getLogger().info("HTTP relay: No connection to "+address+", "+e);
 						addresses.put(address, new Long(-System.currentTimeMillis()));
 					}

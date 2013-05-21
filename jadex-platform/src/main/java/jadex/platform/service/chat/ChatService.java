@@ -1102,7 +1102,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		if(cid==null)
 		{
-			throw new NullPointerException();
+			Thread.dumpStack();
 		}
 		
 		boolean	ret	= false;
