@@ -97,6 +97,8 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 							System.out.println("Service 1 says: " + result);
 						}
 					});
+					
+					unbindService(sc1);
 				}
 				if (service2 != null){
 					final CalcResult add = service2.add(3, 4);
@@ -110,7 +112,7 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 						}
 					});
 					
-					unbindService(sc1);
+					unbindService(sc2);
 				}
 			}
 		});
@@ -193,6 +195,7 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 			public void onServiceDisconnected(final ComponentName name)
 			{
 				System.out.println("MyActivity.onServiceDisconnected() 1");
+				service1 = null;
 			}
 
 			@Override
@@ -216,6 +219,7 @@ public class MyActivity extends PlatformProvidingClientAppFragment
 			public void onServiceDisconnected(ComponentName name)
 			{
 				System.out.println("MyActivity.onServiceDisconnected() 2");
+				service2 = null;
 			}
 
 			@Override

@@ -6,6 +6,8 @@ import jadex.commons.SReflect;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -26,6 +28,8 @@ public class UniversalClientService extends Service
 	private Map<ServiceConnection, Intent> clientIntents;
 
 	private Map<ServiceConnection, ComponentName> componentNames;
+	
+	private Map<Service, Boolean> startedServices;
 
 	@Override
 	public void onCreate()
@@ -35,6 +39,7 @@ public class UniversalClientService extends Service
 		serviceConnections = new HashMap<ServiceConnection, Service>();
 		clientIntents = new HashMap<ServiceConnection, Intent>();
 		componentNames = new HashMap<ServiceConnection, ComponentName>();
+		startedServices = new HashMap<Service, Boolean>();
 	}
 
 	@Override
@@ -68,29 +73,18 @@ public class UniversalClientService extends Service
 		return result;
 	}
 
-	private static Intent createClientIntent(Intent intent)
-	{
-		Intent result = new Intent();
-		ComponentName clientServiceComponent = intent.getParcelableExtra(ClientBinderProxy.CLIENT_SERVICE_COMPONENT);
-		result.setComponent(clientServiceComponent);
-		result.putExtras(intent.getExtras());
-		result.removeExtra(ClientBinderProxy.CLIENT_SERVICE_COMPONENT);
-		return result;
-	}
-
 	public class UniversalClientServiceBinder extends Binder
 	{
 		public UniversalClientServiceBinder()
 		{
-
 		}
 
-		public ClientBinderProxy bindClientService(Intent intent, ServiceConnection conn)
+		public boolean bindClientService(Intent intent, ServiceConnection conn, int flags)
 		{
+			boolean result = false;
+			// TODO: handle flags
 			ComponentName clientServiceComponent = intent.getComponent();
-
 			String clientServiceClassName = clientServiceComponent.getClassName();
-			String clientServicePackageName = clientServiceComponent.getPackageName();
 
 			Service clientService = serviceInstances.get(clientServiceClassName);
 			// do we already have an instance?
@@ -101,49 +95,118 @@ public class UniversalClientService extends Service
 				serviceInstances.put(clientServiceClassName, clientService);
 			}
 
-			Service service = serviceConnections.get(conn);
 			// has the service already been bound with the given connection?
-			if (service == null)
+			if (!serviceConnections.containsKey(conn))
 			{
-				Intent clientIntent = createClientIntent(intent);
+				Intent clientIntent = intent;
 				IBinder clientBinder = clientService.onBind(clientIntent);
 
 				clientIntents.put(conn, clientIntent);
 				serviceConnections.put(conn, clientService);
 				componentNames.put(conn, clientServiceComponent);
 
-				ClientBinderProxy binderProxy = new ClientBinderProxy(clientBinder);
-				return binderProxy;
+				conn.onServiceConnected(clientServiceComponent, clientBinder);
+				result = true;
 			}
 			else
 			{
 				throw new JadexAndroidError("Service already bound!");
 			}
+			return result;
 		}
 
 		public boolean unbindClientService(ServiceConnection conn)
 		{
+			boolean result = false;
 			Service service = serviceConnections.get(conn);
 			if (service != null)
 			{
 				Intent clientIntent = clientIntents.get(conn);
 				boolean isUnbound = service.onUnbind(clientIntent);
-				conn.onServiceDisconnected(componentNames.get(conn));
-				serviceConnections.remove(conn);
-				componentNames.remove(conn);
-				clientIntents.remove(conn);
-				return isUnbound;
+				if (isUnbound) {
+					conn.onServiceDisconnected(componentNames.get(conn));
+					serviceConnections.remove(conn);
+					componentNames.remove(conn);
+					clientIntents.remove(conn);
+					
+					checkDestroyService(service);
+				}
+				result = isUnbound;
 			}
 			else
 			{
-				return false;
 			}
-			// TODO: check for last binding, then destroy service
+			return result;
 		}
 
 		public boolean isClientServiceConnection(ServiceConnection conn)
 		{
 			return serviceConnections.containsKey(conn);
+		}
+		
+		public void startClientService(Intent service) {
+			String clientServiceClassName = service.getComponent().getClassName();
+
+			Service clientService = serviceInstances.get(clientServiceClassName);
+			// do we already have an instance?
+			if (clientService == null)
+			{
+				clientService = createClientService(clientServiceClassName);
+				clientService.onCreate();
+				serviceInstances.put(clientServiceClassName, clientService);
+			}
+			
+			clientService.onStart(service, 0);
+			startedServices.put(clientService, Boolean.TRUE);
+		}
+		
+		public boolean stopClientService(Intent intent) {
+			boolean result = false;
+			Boolean b = startedServices.remove(serviceInstances.get(intent.getComponent().getClassName()));
+			if (b != null && b) {
+				String clientServiceClassName = intent.getComponent().getClassName();
+				Service clientService = serviceInstances.get(clientServiceClassName);
+				
+				checkDestroyService(clientService);
+				
+				result = true;
+			}
+			return result;
+		}
+
+		private void checkDestroyService(Service clientService)
+		{
+			Boolean started = startedServices.get(clientService);
+			if (started == null || !started) { 
+				// check if clientService is bound anywhere, else destroy.
+				boolean isBound = false;
+				Set<Entry<ServiceConnection,Service>> entrySet = serviceConnections.entrySet();
+				for (Entry<ServiceConnection, Service> entry : entrySet)
+				{
+					if (entry.getValue() == clientService) {
+						isBound = true;
+						break;
+					}
+				}
+				if (!isBound) {
+					clientService.onDestroy();
+					serviceInstances.remove(clientService);
+				}
+			}
+		}
+
+		public boolean isClientServiceStarted(Intent intent)
+		{
+			boolean result = false;
+			Service instance = serviceInstances.get(intent.getComponent().getClassName());
+			if (instance != null) {
+				Boolean started = startedServices.get(instance);
+				if (started != null && started) {
+					result = true;
+				}
+			}
+
+			return result;
 		}
 	}
 
