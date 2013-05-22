@@ -39,7 +39,7 @@ public class VDataEdge extends VEdge
 			if (source != null)
 			{
 				VActivity vsrc = (VActivity) getSource().getParent();
-				((MActivity) vsrc.getBpmnElement()).addIncomingDataEdge(dedge);
+				((MActivity) vsrc.getBpmnElement()).addOutgoingDataEdge(dedge);
 				dedge.setSource((MActivity) vsrc.getBpmnElement());
 				String paramname = ((VOutParameter) getSource()).getParameter().getName();
 				dedge.setSourceParameter(paramname);

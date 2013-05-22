@@ -387,7 +387,7 @@ public class SCreationController
 					if (outparam.getName() != null && outparam.getName().equals(inparam.getName()) &&
 						outparam.getClazz() != null && outparam.getClazz().getTypeName().equals(inparam.getClazz().getTypeName()))
 					{
-						VDataEdge vdataedge = createDataEdge(graph, voutparam, vinparam);
+						VDataEdge vdataedge = createDataEdge(graph, modelcontainer.getIdGenerator(), voutparam, vinparam);
 						graph.addCell(vdataedge);
 						break;
 					}
@@ -399,24 +399,23 @@ public class SCreationController
 		}
 		else if (source instanceof VOutParameter && target instanceof VInParameter)
 		{
-			ret = createDataEdge(graph, (VOutParameter) source, (VInParameter) target);
+			ret = createDataEdge(graph, modelcontainer.getIdGenerator(), (VOutParameter) source, (VInParameter) target);
 		}
 		
 		return ret;
 	}
 	
-	protected static final VDataEdge createDataEdge(BpmnGraph graph, VOutParameter source, VInParameter target)
+	protected static final VDataEdge createDataEdge(BpmnGraph graph, IdGenerator idgenerator, VOutParameter source, VInParameter target)
 	{
 		MActivity sactivity = (MActivity) ((VActivity) source.getParent()).getBpmnElement();
 		MActivity tactivity = (MActivity) ((VActivity) target.getParent()).getBpmnElement();
 		
 		MDataEdge dedge = new MDataEdge();
+		dedge.setId(idgenerator.generateId());
 		dedge.setSource(sactivity);
 		dedge.setSourceParameter(source.getParameter().getName());
 		dedge.setTarget(tactivity);
 		dedge.setTargetParameter(target.getParameter().getName());
-		sactivity.addOutgoingDataEdge(dedge);
-		tactivity.addIncomingDataEdge(dedge);
 		
 		VDataEdge vedge = new VDataEdge(graph);
 		vedge.setBpmnElement(dedge);
