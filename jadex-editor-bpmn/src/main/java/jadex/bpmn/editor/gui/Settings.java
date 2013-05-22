@@ -47,6 +47,9 @@ public class Settings
 	/** Flag if save settings on exit is enable. */
 	protected boolean savesettingsonexit = true;
 	
+	/** Smooth zoom flag. */
+	protected boolean smoothzoom = true;
+	
 	/** The selected style sheet */
 	protected String selectedsheet = BpmnEditor.STYLE_SHEETS[0].getFirstEntity();
 	
@@ -120,6 +123,23 @@ public class Settings
 	public void setToolbarIconSize(int toolbariconsize)
 	{
 		this.toolbariconsize = toolbariconsize;
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public boolean isSmoothZoom()
+	{
+		return smoothzoom;
+	}
+	
+	/**
+	 * 
+	 */
+	public void setSmoothZoom(boolean smoothzoom)
+	{
+		this.smoothzoom = smoothzoom;
 	}
 
 	/**
@@ -340,6 +360,8 @@ public class Settings
 			props.put("homepath", libraryhome.getPath());
 		}
 		
+		props.put("smoothzoom", String.valueOf(smoothzoom));
+		
 		props.put("savesettingsonexit", String.valueOf(savesettingsonexit));
 		
 		props.put("toolbariconsize", String.valueOf(toolbariconsize));
@@ -441,6 +463,18 @@ public class Settings
 						ret.setSelectedSheet(prop);
 						break;
 					}
+				}
+			}
+			
+			prop = props.getProperty("smoothzoom");
+			if (prop != null)
+			{
+				try
+				{
+					ret.setSmoothZoom(Boolean.parseBoolean(prop));
+				}
+				catch (Exception e)
+				{
 				}
 			}
 			

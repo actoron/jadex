@@ -728,6 +728,14 @@ public class SBpmnModelReader
 				{
 					((ModelInfo) model.getModelInfo()).setAutoShutdown(Boolean.parseBoolean(attrs.get("autoshutdown")));
 				}
+				if (attrs.containsKey("monitoring"))
+				{
+					((ModelInfo) model.getModelInfo()).setMonitoring(Boolean.parseBoolean(attrs.get("monitoring")));
+				}
+				if (attrs.containsKey("synchronous"))
+				{
+					((ModelInfo) model.getModelInfo()).setSynchronous(Boolean.parseBoolean(attrs.get("synchronous")));
+				}
 				if (attrs.containsKey("keepalive"))
 				{
 					model.setKeepAlive(Boolean.parseBoolean(attrs.get("keepalive")));

@@ -252,55 +252,75 @@ public class MouseController extends MouseAdapter
 	
 	protected void setTargetScale(double scale)
 	{
-		modelcontainer.getGraphComponent().stopEditing(true);
-		targetscale = scale;
-		zoomdist = targetscale - modelcontainer.getGraph().getView().getScale();
-		zoomstep = 1;
-		
-		if (zoomtimer == null)
+		if (modelcontainer.getSettings().isSmoothZoom())
 		{
-			zoomtimer = new Timer(GuiConstants.ANIMATION_FRAME_TIME, new AbstractAction()
+			modelcontainer.getGraphComponent().stopEditing(true);
+			targetscale = scale;
+			zoomdist = targetscale - modelcontainer.getGraph().getView().getScale();
+			zoomstep = 1;
+			
+			if (zoomtimer == null)
 			{
-				public void actionPerformed(ActionEvent e)
+				zoomtimer = new Timer(GuiConstants.ANIMATION_FRAME_TIME, new AbstractAction()
 				{
-					BpmnGraphComponent gc = (BpmnGraphComponent) modelcontainer.getGraphComponent();
-					mxGraphView view = gc.getGraph().getView();
-					double scale = view.getScale();
-					double oldscale = scale;
-					
-					mxPoint center = null;
-					Point mp = modelcontainer.getGraphComponent().getMousePosition();
-					if (mp != null)
+					public void actionPerformed(ActionEvent e)
 					{
-						center = new mxPoint(mp);
-						center.setX(center.getX() / gc.getSize().width);
-						center.setY(center.getY() / gc.getSize().height);
-						center.setX(0.5 - ((0.5 - center.getX()) * GuiConstants.ZOOM_MOUSE_DIRECTION_FACTOR));
-						center.setY(0.5 - ((0.5 - center.getY()) * GuiConstants.ZOOM_MOUSE_DIRECTION_FACTOR));
+						BpmnGraphComponent gc = (BpmnGraphComponent) modelcontainer.getGraphComponent();
+						mxGraphView view = gc.getGraph().getView();
+						double scale = view.getScale();
+						double oldscale = scale;
+						
+						mxPoint center = null;
+						Point mp = modelcontainer.getGraphComponent().getMousePosition();
+						if (mp != null)
+						{
+							center = new mxPoint(mp);
+							center.setX(center.getX() / gc.getSize().width);
+							center.setY(center.getY() / gc.getSize().height);
+							center.setX(0.5 - ((0.5 - center.getX()) * GuiConstants.ZOOM_MOUSE_DIRECTION_FACTOR));
+							center.setY(0.5 - ((0.5 - center.getY()) * GuiConstants.ZOOM_MOUSE_DIRECTION_FACTOR));
+						}
+						
+						double steps = GuiConstants.ANIMATION_FPS / 2.0;
+						if (zoomstep > steps)
+						{
+							// lock in on final scale
+							scale = targetscale;
+							zoomtimer.stop();
+							zoomtimer = null;
+							//System.out.println(System.currentTimeMillis() - ts);
+						}
+						else
+						{
+							scale = (targetscale - zoomdist) + (zoomdist * (Math.log(zoomstep++) / Math.log(steps)));
+						}
+						
+						setScale(modelcontainer, oldscale, scale, center);
+						
+						//gc.extendComponent(grapharea);
+						
+						
 					}
-					
-					double steps = GuiConstants.ANIMATION_FPS / 2.0;
-					if (zoomstep > steps)
-					{
-						// lock in on final scale
-						scale = targetscale;
-						zoomtimer.stop();
-						zoomtimer = null;
-						//System.out.println(System.currentTimeMillis() - ts);
-					}
-					else
-					{
-						scale = (targetscale - zoomdist) + (zoomdist * (Math.log(zoomstep++) / Math.log(steps)));
-					}
-					
-					setScale(modelcontainer, oldscale, scale, center);
-					
-					//gc.extendComponent(grapharea);
-					
-					
-				}
-			});
-			zoomtimer.start();
+				});
+				zoomtimer.start();
+			}
+		}
+		else
+		{
+			double oldscale = modelcontainer.getGraph().getView().getScale();
+			
+			mxPoint center = null;
+			Point mp = modelcontainer.getGraphComponent().getMousePosition();
+			if (mp != null)
+			{
+				center = new mxPoint(mp);
+				center.setX(center.getX() / modelcontainer.getGraphComponent().getSize().width);
+				center.setY(center.getY() / modelcontainer.getGraphComponent().getSize().height);
+				center.setX(0.5 - ((0.5 - center.getX()) * GuiConstants.ZOOM_MOUSE_DIRECTION_FACTOR));
+				center.setY(0.5 - ((0.5 - center.getY()) * GuiConstants.ZOOM_MOUSE_DIRECTION_FACTOR));
+			}
+			
+			setScale(modelcontainer, oldscale, scale, center);
 		}
 	}
 	

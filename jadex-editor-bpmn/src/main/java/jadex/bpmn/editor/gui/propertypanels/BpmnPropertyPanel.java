@@ -231,6 +231,30 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		cbox.setText("Keep Alive");
 		column.add(cbox);
 		
+		cbox = new JCheckBox();
+		cbox.setSelected(convBool(getModelInfo().getMonitoring()));
+		cbox.setAction(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				getModelInfo().setMonitoring(((JCheckBox) e.getSource()).isSelected());
+			}
+		});
+		cbox.setText("Monitoring");
+		column.add(cbox);
+		
+		cbox = new JCheckBox();
+		cbox.setSelected(convBool(getModelInfo().getSynchronous()));
+		cbox.setAction(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				getModelInfo().setSynchronous(((JCheckBox) e.getSource()).isSelected());
+			}
+		});
+		cbox.setText("Synchronous");
+		column.add(cbox);
+		
 		setupImportsTable(tabpane);
 		
 		setupConfigurationsTable(tabpane);

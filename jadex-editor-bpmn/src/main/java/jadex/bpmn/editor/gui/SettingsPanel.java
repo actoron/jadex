@@ -15,6 +15,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -107,6 +108,18 @@ public class SettingsPanel extends JPanel
 		g.weighty = 1.0;
 		g.fill = GridBagConstraints.BOTH;
 		generalpanel.add(new JPanel(), g);
+		
+		JCheckBox szbox = new JCheckBox(new AbstractAction("Smooth Zoom")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				SettingsPanel.this.settings.setSmoothZoom(((JCheckBox) e.getSource()).isSelected());
+			}
+		});
+		szbox.setSelected(settings.isSmoothZoom());
+		g = new GridBagConstraints();
+		g.gridy = 2;
+		generalpanel.add(szbox, g);
 	}
 	
 	/**

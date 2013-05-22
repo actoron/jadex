@@ -28,7 +28,7 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 41;
+	public static final int BUILD = 42;
 	
 	/** Console logging flag. */
 	public static final boolean CONSOLE_LOGGING = false;
@@ -37,10 +37,13 @@ public class BpmnEditor
 	public static final String APP_NAME = "Jadex BPMN Editor";
 	
 	/** The settings directory name. */
-	public static final String HOME_DIR = System.getProperty("user.home") + File.separator + ".jadex-bpmn-editor";
+	public static String HOME_DIR = System.getProperty("user.home") + File.separator + ".jadex-bpmn-editor";
+	
+	/** The settings directory name for windows. */
+	public static final String WINDOWS_HOME_DIR = System.getProperty("user.dir") + File.separator + "config";
 	
 	/** The image cache file. */
-	public static final String IMAGE_CACHE = HOME_DIR + File.separator + "imagecache.dat";
+//	public static final String IMAGE_CACHE = HOME_DIR + File.separator + "imagecache.dat";
 	
 	/** Log level for status area. */
 	public static final Level STATUS_AREA_LOG_LEVEL = Level.INFO;
@@ -49,6 +52,7 @@ public class BpmnEditor
 	public static final Logger LOGGER = Logger.getLogger(APP_NAME);
 	
 	/** The style sheets. */
+	@SuppressWarnings("unchecked")
 	public static final Tuple2<String, mxStylesheet>[] STYLE_SHEETS = new Tuple2[] 
 		{
 			new Tuple2<String, mxStylesheet>("Color Gradient", new BpmnStylesheetColorGradient()),
@@ -90,6 +94,12 @@ public class BpmnEditor
 	{
 		LOGGER.setUseParentHandlers(CONSOLE_LOGGING);
 		LOGGER.setLevel(Level.ALL);
+		
+		String osname = System.getProperty("os.name");
+		if (osname != null && osname.toLowerCase().contains("win"))
+		{
+			HOME_DIR = WINDOWS_HOME_DIR;
+		}
 
 //		try
 //		{

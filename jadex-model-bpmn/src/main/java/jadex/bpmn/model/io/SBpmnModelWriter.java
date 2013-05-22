@@ -39,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 7;
+	public static final int BUILD = 8;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -207,9 +207,11 @@ public class SBpmnModelWriter
 		boolean master = Boolean.TRUE.equals(mmodel.getModelInfo().getMaster(null));
 		boolean daemon = Boolean.TRUE.equals(mmodel.getModelInfo().getDaemon(null));
 		boolean autoshutdown = Boolean.TRUE.equals(mmodel.getModelInfo().getAutoShutdown(null));
+		boolean monitoring = Boolean.TRUE.equals(mmodel.getModelInfo().getMonitoring(null));
+		boolean synchronous = Boolean.TRUE.equals(mmodel.getModelInfo().getSynchronous(null));
 		boolean keepalive = Boolean.TRUE.equals(mmodel.isKeepAlive());
 		
-		if (suspend || master || daemon || autoshutdown || keepalive)
+		if (suspend || master || daemon || autoshutdown || monitoring || synchronous || keepalive)
 		{
 			out.print(getIndent(ind));
 			out.print("<jadex:componentflags suspend=\"");
@@ -220,6 +222,10 @@ public class SBpmnModelWriter
 			out.print(escapeString(String.valueOf(daemon)));
 			out.print("\" autoshutdown=\"");
 			out.print(escapeString(String.valueOf(autoshutdown)));
+			out.print("\" monitoring=\"");
+			out.print(escapeString(String.valueOf(monitoring)));
+			out.print("\" synchronous=\"");
+			out.print(escapeString(String.valueOf(synchronous)));
 			out.print("\" keepalive=\"");
 			out.print(escapeString(String.valueOf(keepalive)));
 			out.println("\"/>");
