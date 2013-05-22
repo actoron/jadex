@@ -348,26 +348,31 @@ public class ServiceCallTask implements ITask
 				if(reqname!=null && methodname!=null)
 				{
 					RequiredServiceInfo reqser = mi.getRequiredService(reqname);
-					Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
-					
-					if(type!=null)
+					if(reqser!=null)
 					{
-						Method[] ms = type.getMethods();
-						// todo check parameter types?
-						for(Method m: ms)
+						Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
+						
+						if(type!=null)
 						{
-							if(m.getName().equals(methodname))
+							Method[] ms = type.getMethods();
+							// todo check parameter types?
+							for(Method m: ms)
 							{
-								Class<?>[] ptypes = m.getParameterTypes();
-								Class<?> pret = m.getReturnType();
-								
-								for(int j=0; j<ptypes.length; j++)
+								if(m.toString().equals(methodname))
 								{
-									ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], "param"+j, null, null));
-								}
-								if(!pret.equals(Void.class) && !pret.equals(void.class))
-								{
-									ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, pret, "return", null, null));
+									Class<?>[] ptypes = m.getParameterTypes();
+									// todo
+//									m.getGenericParameterTypes()
+									Class<?> pret = m.getReturnType();
+									
+									for(int j=0; j<ptypes.length; j++)
+									{
+										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], "param"+j, null, null));
+									}
+									if(!pret.equals(Void.class) && !pret.equals(void.class))
+									{
+										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, pret, "return", null, null));
+									}
 								}
 							}
 						}
@@ -394,6 +399,12 @@ public class ServiceCallTask implements ITask
 		/** The model. */
 		protected IModelInfo model;
 		
+		/** The task. */
+		protected MActivity task;
+		
+		/** The classloader. */
+		protected ClassLoader cl;
+		
 		/** The combo box for the service name. */
 		protected JComboBox cbsername;
 		
@@ -406,6 +417,8 @@ public class ServiceCallTask implements ITask
 		public void init(final IModelContainer container, final MActivity task, final ClassLoader cl)
 		{
 			this.model = container.getBpmnModel().getModelInfo();
+			this.task = task;
+			this.cl = cl;
 			PropertiesPanel pp = new PropertiesPanel();
 			
 			cbsername = pp.createComboBox("Required service name:", null);
@@ -416,7 +429,9 @@ public class ServiceCallTask implements ITask
 					int index, boolean isSelected, boolean cellHasFocus)
 				{
 					Method method = (Method)value;
-					String txt = method!=null? method.getName(): null;
+					String txt = null;
+					if(method!=null)
+						txt = SReflect.getMethodSignature(method);
 					return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
 				}
 			});
@@ -459,7 +474,7 @@ public class ServiceCallTask implements ITask
 					Method method = (Method)cbmethodname.getSelectedItem();
 					MProperty mprop = task.getProperties().get(PROPERTY_METHOD);
 					UnparsedExpression uexp = new UnparsedExpression(null, 
-						String.class, method!=null? "\""+method.getName()+"\"": "null", null);
+						String.class, method!=null? "\""+method.toString()+"\"": "null", null);
 					mprop.setInitialValue(uexp);
 				}
 			});
@@ -483,6 +498,37 @@ public class ServiceCallTask implements ITask
 				for(int i=0; i<reqs.length; i++)
 				{
 					mo.addElement(reqs[i].getName());
+				}
+			}
+			
+			MProperty mprop = task.getProperties().get(PROPERTY_SERVICE);
+			if(mprop.getInitialValue()!=null)
+			{
+				String sername = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
+				cbsername.setSelectedItem(sername);
+				System.out.println("sel item: "+sername);
+			
+				mprop = task.getProperties().get(PROPERTY_METHOD);
+				if(mprop.getInitialValue()!=null)
+				{
+					String methodname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
+					System.out.println(task.getName()+" "+mprop.getInitialValueString());
+					
+					RequiredServiceInfo reqser = model.getRequiredService(sername);
+					Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
+					
+					if(type!=null)
+					{
+						Method[] ms = type.getMethods();
+						for(Method m: ms)
+						{
+							if(m.toString().equals(methodname))
+							{
+								cbmethodname.setSelectedItem(methodname);
+								System.out.println("sel item2: "+methodname);
+							}
+						}
+					}
 				}
 			}
 		}

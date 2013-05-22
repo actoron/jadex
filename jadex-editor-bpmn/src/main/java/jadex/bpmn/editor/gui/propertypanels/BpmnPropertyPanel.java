@@ -394,7 +394,6 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		JScrollPane tablescrollpane = new JScrollPane(paramtable);
 		tablepanel.add(tablescrollpane, gc);
 		
-		
 		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
 		final FixedClassInfoComboModel accm = new FixedClassInfoComboModel(acc, 20, modelcontainer.getAllClasses());
 		acc.setModel(accm);
@@ -1995,6 +1994,9 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		/** Parameter initial values. */
 		public Map<String, String> inivals;
 		
+		/**
+		 * 
+		 */
 		public CachedParameter(String name, boolean arg, boolean res, String desc, String type)
 		{
 			this.name = name;

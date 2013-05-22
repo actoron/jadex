@@ -117,7 +117,7 @@ public class SReflect
 	 *  @return The wrapped type, return clazz when
 	 *  it is no basic type.
 	 */
-	public	static	Class	getWrappedType(Class clazz)
+	public	static	Class<?>	getWrappedType(Class<?> clazz)
 	{
 		if(clazz==null)
 			throw new IllegalArgumentException("Clazz must not null");
@@ -125,7 +125,7 @@ public class SReflect
 		// (jls) there are the following primitive types:
 		// byte, short, int, long, char, float, double, boolean
 
-		Class	result	= (Class)wrappedtypes.get(clazz);
+		Class<?>	result	= (Class<?>)wrappedtypes.get(clazz);
 		return result==null ? clazz : result;
 	}
 	
@@ -470,7 +470,43 @@ public class SReflect
 		}
 		return packagename;
 	}
-
+	
+	/**
+	 *  Get the generic signature of a method.
+	 *  @param method The method.
+	 *  @return The signature name.
+	 */
+	public static String getMethodSignature(Method method)
+	{
+		StringBuffer buf = new StringBuffer();
+		try
+		{
+			Type rtype = method.getGenericReturnType();
+			buf.append(getUnqualifiedTypeName(rtype.toString())).append(" ");
+		}
+		catch(Exception e)
+		{
+			buf.append("n/a ");
+		}
+		buf.append(method.getName()).append("(");
+		try
+		{
+			Type[] ptypes = method.getGenericParameterTypes();
+			for(int i=0; i<ptypes.length; i++)
+			{
+				buf.append(getUnqualifiedTypeName(ptypes[i].toString()));
+				if(i+1<ptypes.length)
+					buf.append(", ");
+			}
+		}
+		catch(Exception e)
+		{
+			buf.append("n/a");
+		}
+		buf.append(")");
+		return buf.toString();
+	}
+	
 	/**
 	 *  Get a field of the class,
 	 *  or any of it's superclasses.
@@ -1413,7 +1449,7 @@ public class SReflect
 				}
 				catch(Throwable t)
 				{
-//					e.printStackTrace();
+//					t.printStackTrace();
 //					System.out.println(file);
 				}
 			}
@@ -1470,6 +1506,10 @@ public class SReflect
 		for(int i=0; i<urls.length && !ret.isDone(); i++)
 		{
 //			System.out.println("Scanning: "+urls[i]+" "+ret.isDone());
+			
+//			if(urls[i].toString().indexOf("sftp")!=-1)
+//				System.out.println("ggggg");
+			
 			try
 			{
 //				System.out.println("url: "+urls[i].toURI());

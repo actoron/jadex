@@ -513,7 +513,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			if(pmis != null && pmis.size() > 0)
 			{
 				Set<String> validparams = new HashSet<String>();
-				MActivity mact = (MActivity) task.getBpmnElement();
+				MActivity mact = (MActivity)task.getBpmnElement();
 				for(int i = 0; i < pmis.size(); ++i)
 				{
 					validparams.add(pmis.get(i).getName());
@@ -521,7 +521,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 					{
 						int ind = -1;
 //						for(int j = 0; j < mact.getParameters().size(); ++j)
-						Iterator<String> it=mact.getParameters().keySet().iterator();
+						Iterator<String> it = mact.getParameters().keySet().iterator();
 						for(int j = 0; it.hasNext(); ++j)
 						{
 							String key = it.next();
@@ -531,7 +531,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 								break;
 							}
 						}
-						MParameter param = (MParameter) mact.getParameters().get(ind);
+						MParameter param = (MParameter)mact.getParameters().get(ind);
 						atable.removeParameters(new int[]{ind});
 						param.setClazz(new ClassInfo(pmis.get(i).getClazz().getTypeName()));
 						param.setDirection(pmis.get(i).getDirection());

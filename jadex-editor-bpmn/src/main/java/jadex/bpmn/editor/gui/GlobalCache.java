@@ -249,7 +249,7 @@ public class GlobalCache
 				fn	= je.getName();
 			}
 			
-			return contains? fn.indexOf(filename)!=-1: fn.indexOf(filename)==-1;
+			return fn.endsWith(".class") && (contains? fn.indexOf(filename)!=-1: fn.indexOf(filename)==-1);
 		}
 	}
 }

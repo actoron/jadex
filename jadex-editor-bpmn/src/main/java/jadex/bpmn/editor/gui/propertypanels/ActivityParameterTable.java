@@ -11,6 +11,7 @@ import jadex.commons.gui.autocombo.AutoComboTableCellRenderer;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
 import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ public class ActivityParameterTable extends JTable
 	/**
 	 *  Create a new ActivityParameterTable.
 	 */
-	public ActivityParameterTable(ModelContainer modelcontainer, VActivity activity)
+	public ActivityParameterTable(final ModelContainer modelcontainer, VActivity activity)
 	{
 		this.activity = activity;
 		setModel(new ParameterTableModel());
@@ -57,7 +58,27 @@ public class ActivityParameterTable extends JTable
 		
 		TableColumn col = getColumnModel().getColumn(2);
 		col.setCellEditor(new AutoComboTableCellEditor(acc));
-		col.setCellRenderer(new AutoComboTableCellRenderer(acc));
+		col.setCellRenderer(new AutoComboTableCellRenderer(acc)
+		{
+//			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+//			{
+//				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//				
+//				ClassInfo ci = (ClassInfo)value;
+//				try
+//				{
+//					ClassLoader cl = modelcontainer.getProjectClassLoader();
+//					Class<?> clazz = ci.getType(cl);
+//					
+//				}
+//				catch(Exception e)
+//				{
+//				}
+//				setText(value==null? "": box.getAutoModel().convertToString(value));
+//				
+//				return this;
+//			}
+		});
 	}
 	
 	/**
@@ -186,7 +207,7 @@ public class ActivityParameterTable extends JTable
 		 */
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-			MParameter param = (MParameter) getBpmnActivity().getParameters().get(rowIndex);
+			MParameter param = (MParameter)getBpmnActivity().getParameters().get(rowIndex);
 			switch (columnIndex)
 			{
 				case 0:
