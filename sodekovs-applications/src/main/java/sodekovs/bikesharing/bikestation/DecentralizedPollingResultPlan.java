@@ -3,6 +3,7 @@
  */
 package sodekovs.bikesharing.bikestation;
 
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector1;
@@ -18,7 +19,7 @@ import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
- * Plan is called when a decentralized polling reply was received. If all replies are received the station calculates alternative departure and arrival stations.	
+ * Plan is called when a decentralized polling reply was received. If all replies are received the station calculates alternative departure and arrival stations.
  * 
  * @author Thomas Preisler
  */
@@ -36,24 +37,26 @@ public class DecentralizedPollingResultPlan extends Plan {
 		String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
 		Cluster cluster = superCluster.getCluster(stationID);
 		int noStations = cluster.getStations().size();
-		StateCoordinationStationData data = (StateCoordinationStationData) getParameter("data").getValue();
-		
-		System.out.println(getComponentDescription() + " DecentralizedPollingResultPlan received " + data);
-		// only one plan instance should do the actual calculation when all answer have been received
-		startAtomic();
-		getBeliefbase().getBeliefSet("receivedDecentralizedCoordData").addFact(data);
 
-		if (getBeliefbase().getBeliefSet("receivedDecentralizedCoordData").getFacts().length == noStations) {
-			System.out.println(getComponentDescription() + " DecentralizedPollingResultPlan MASTER!");
-
-			StateCoordinationStationData[] answers = (StateCoordinationStationData[]) getBeliefbase().getBeliefSet("receivedDecentralizedCoordData").getFacts();
-			getBeliefbase().getBeliefSet("receivedDecentralizedCoordData").removeFacts();
-			calculateProposedStations(answers);
+		while (true) {
+			waitForTick();
+			if (getWaitqueue().size() == noStations) {
+				System.out.println("DecentralizedPollingResultPlan in " + getComponentName() + " received all " + noStations + " answers");
+				List<StateCoordinationStationData> answers = new ArrayList<StateCoordinationStationData>();
+				Object[] elements = getWaitqueue().getElements();
+				for (Object element : elements) {
+					IInternalEvent event = (IInternalEvent) element;
+					StateCoordinationStationData data = (StateCoordinationStationData) event.getParameter("data").getValue();
+					answers.add(data);
+					getWaitqueue().removeElement(element);
+				}
+				
+				calculateProposedStations(answers);
+			}
 		}
-		endAtomic();
 	}
 
-	private void calculateProposedStations(StateCoordinationStationData[] answers) {
+	private void calculateProposedStations(List<StateCoordinationStationData> answers) {
 		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
 		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("decentralized_polling_reply");
 		Double fullThreshold = mechanism.getMechanismConfiguration().getDoubleProperty("FULL_THRESHOLD");
@@ -61,32 +64,32 @@ public class DecentralizedPollingResultPlan extends Plan {
 		Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
 		Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
 		Double occupancy = Double.valueOf(stock) / Double.valueOf(capacity);
-		
+
 		// full
 		if (occupancy >= fullThreshold) {
 			getBeliefbase().getBelief("proposed_departure_station").setFact(null);
-			
+
 			List<StateCoordinationStationData> suitableStations = new ArrayList<StateCoordinationStationData>();
 			for (StateCoordinationStationData data : answers) {
 				if (data.getOccupancy() < fullThreshold) {
 					suitableStations.add(data);
 				}
 			}
-			
+
 			String nearestStationId = getNearest(suitableStations);
 			getBeliefbase().getBelief("proposed_arrival_station").setFact(nearestStationId);
 		}
 		// empty
 		else if (occupancy <= emptyThreshold) {
 			getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
-			
+
 			List<StateCoordinationStationData> suitableStations = new ArrayList<StateCoordinationStationData>();
 			for (StateCoordinationStationData data : answers) {
 				if (data.getOccupancy() > emptyThreshold) {
 					suitableStations.add(data);
 				}
 			}
-			
+
 			String nearestStationId = getNearest(suitableStations);
 			getBeliefbase().getBelief("proposed_departure_station").setFact(nearestStationId);
 		}
@@ -97,7 +100,7 @@ public class DecentralizedPollingResultPlan extends Plan {
 		Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
 		IVector1 shortestDistance = null;
 		String nearestStation = null;
-		
+
 		for (StateCoordinationStationData data : stations) {
 			if (shortestDistance == null) {
 				shortestDistance = environment.getDistance(position, data.getPosition());
@@ -107,7 +110,7 @@ public class DecentralizedPollingResultPlan extends Plan {
 				nearestStation = data.getStationID();
 			}
 		}
-		
+
 		return nearestStation;
 	}
 }

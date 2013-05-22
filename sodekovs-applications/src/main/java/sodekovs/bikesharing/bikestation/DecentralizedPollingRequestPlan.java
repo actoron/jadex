@@ -19,16 +19,27 @@ public class DecentralizedPollingRequestPlan extends Plan {
 
 	@Override
 	public void body() {
-		StateCoordinationStationData data = (StateCoordinationStationData) getParameter("data").getValue();
-		
-		Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
-		Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
-		String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
-		Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
-		
-		StateCoordinationStationData reply = new StateCoordinationStationData(stationID, capacity, stock, position, StateCoordinationStationData.REPLY, data.getOriginatorID());
-		IInternalEvent event = createInternalEvent("decentralized_polling_reply");
-		event.getParameter("data").setValue(reply);
-		dispatchInternalEvent(event);
+		while (true) {
+			waitForTick();
+			Object[] elements = getWaitqueue().getElements();
+			// IInternalEvent event = (IInternalEvent) getWaitqueue().removeNextElement();
+
+			if (elements != null) {
+				for (Object element : elements) {
+					IInternalEvent event = (IInternalEvent) element;
+					StateCoordinationStationData data = (StateCoordinationStationData) event.getParameter("data").getValue();
+
+					Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
+					Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
+					String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
+					Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
+
+					StateCoordinationStationData reply = new StateCoordinationStationData(stationID, capacity, stock, position, StateCoordinationStationData.REPLY, data.getOriginatorID());
+					IInternalEvent replyEvent = createInternalEvent("decentralized_polling_reply");
+					replyEvent.getParameter("data").setValue(reply);
+					dispatchInternalEvent(replyEvent);
+				}
+			}
+		}
 	}
 }
