@@ -8,6 +8,7 @@ import jadex.simulation.evaluation.bikesharing.BikeSharingEvaluation;
 import jadex.simulation.evaluation.bikesharing.EvalStockLevelData;
 import jadex.simulation.evaluation.bikesharing.xml.EvaluatedBikeStationShortList;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.IntermediateResult;
@@ -20,10 +21,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import sodekovs.util.misc.XMLHandler;
 
@@ -115,6 +119,10 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			if (simConf.getApplicationReference().indexOf("BikesharingSimulation") != -1) {
 				// Do specific evaluation for Bikesharing
 				compareSimulationWithRealData(rowResults, experimentDescription);
+			} else if (simConf.getApplicationReference().contains("MarsWorld")) {
+				// TODO: Auswertung der MarsWorld
+				evaluteMarsWorldMedian(rowResults, experimentDescription);
+				evaluteMarsWorldCSV(rowResults, experimentDescription);
 			}
 		}
 
@@ -153,6 +161,257 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	// System.out.println(rowRes.toStringShortNew());
 	// }
 	// }
+
+	@SuppressWarnings("rawtypes")
+	private void evaluteMarsWorldCSV(HashMap rowResults, String experimentDescription) {
+		StringBuffer mb = new StringBuffer();
+		mb.append("time,sensedOre,producedOre,collectedOre,targetSeen,targetAnalyzed,targetProduced,votingAttempts,adaptations,failures\n");
+		
+		for (Object o : rowResults.values()) {
+			RowResult result = (RowResult) o;
+			List<ExperimentResult> experimentResults = result.getExperimentsResults();
+			List<Integer> experimentSizes = new ArrayList<Integer>();
+			// single experiment eval
+			for (ExperimentResult experimentResult : experimentResults) {
+				StringBuffer sb = new StringBuffer();
+				experimentSizes.add(experimentResult.getEvents().size());
+				
+				List<ObservedEvent> events = experimentResult.getEvents();
+				sb.append("time,sensedOre,producedOre,collectedOre,targetSeen,targetAnalyzed,targetProduced,votingAttempts,adaptations,failures\n");
+				for (ObservedEvent event : events) {
+					Map properties = event.getObservedObjectProperties();
+					Double time = Double.valueOf((String) properties.get("time"));
+					Integer collectedOre = Integer.valueOf((String) properties.get("collectedOre"));
+					Integer sensedOre = Integer.valueOf((String) properties.get("sensedOre"));
+					Integer producedOre = Integer.valueOf((String) properties.get("producedOre"));
+					Integer targetSeen = Integer.valueOf((String) properties.get("targetSeen"));
+					Integer targetAnalyzed = Integer.valueOf((String) properties.get("targetAnalyzed"));
+					Integer targetProduced = Integer.valueOf((String) properties.get("targetProduced"));
+					Integer votingAttempts = Integer.valueOf((String) properties.get("votingAttempts"));
+					Integer adaptations = Integer.valueOf((String) properties.get("adaptations"));
+					Integer failures = Integer.valueOf((String) properties.get("failures"));
+					
+					sb.append(time + "," + sensedOre + "," + producedOre + "," + collectedOre + "," + targetSeen + "," + targetAnalyzed + "," + targetProduced + "," + votingAttempts + "," + adaptations + "," + failures + "\n");
+				}
+				
+				String id = getDateAsString();
+				// Persists result in file on disk as txt file
+				try {
+					BufferedWriter out = new BufferedWriter(new FileWriter("MarsWorld4SASOSingle" + "-" + id + "-" + experimentResult.getId() + ".csv"));
+					out.write(sb.toString());
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			// median eval of all experiments
+			for (int i = 0; i < Collections.min(experimentSizes); i++) {
+				double time = 0.0, collectedOre = 0.0, sensedOre = 0.0, producedOre = 0.0, targetSeen = 0.0, targetAnalyzed = 0.0, targetProduced = 0.0, votingAttempts = 0.0, adaptations = 0.0, failures = 0.0;
+				
+				for (ExperimentResult experimentResult : experimentResults) {
+					ObservedEvent event = experimentResult.getEvents().get(i);
+					Map properties = event.getObservedObjectProperties();
+					time += Double.valueOf((String) properties.get("time"));
+					collectedOre += Double.valueOf((String) properties.get("collectedOre"));
+					sensedOre += Double.valueOf((String) properties.get("sensedOre"));
+					producedOre += Double.valueOf((String) properties.get("producedOre"));
+					targetSeen += Double.valueOf((String) properties.get("targetSeen"));
+					targetAnalyzed += Double.valueOf((String) properties.get("targetAnalyzed"));
+					targetProduced += Double.valueOf((String) properties.get("targetProduced"));
+					votingAttempts += Double.valueOf((String) properties.get("votingAttempts"));
+					adaptations += Double.valueOf((String) properties.get("adaptations"));
+					failures += Double.valueOf((String) properties.get("failures"));
+				}
+				
+				time /= experimentResults.size();
+				collectedOre /= experimentResults.size();
+				sensedOre /= experimentResults.size();
+				producedOre /= experimentResults.size();
+				targetSeen /= experimentResults.size();
+				targetAnalyzed /= experimentResults.size();
+				targetProduced /= experimentResults.size();
+				votingAttempts /= experimentResults.size();
+				adaptations /= experimentResults.size();
+				failures /= experimentResults.size();
+				
+				mb.append(time + "," + sensedOre + "," + producedOre + "," + collectedOre + "," + targetSeen + "," + targetAnalyzed + "," + targetProduced + "," + votingAttempts + "," + adaptations + "," + failures + "\n");
+			}
+			
+			String id = getDateAsString();
+			// Persists result in file on disk as txt file
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter("MarsWorld4SASOMedian" + "-" + id + "-" + ".csv"));
+				out.write(mb.toString());
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void evaluteMarsWorldMedian(HashMap rowResults, String experimentDescription) {
+		List<Double> times = new ArrayList<Double>();
+		List<Double> costs = new ArrayList<Double>();
+		List<Double> ores = new ArrayList<Double>();
+		List<Double> adaptationCosts = new ArrayList<Double>();
+		List<Integer> collectedOres = new ArrayList<Integer>();
+		List<Integer> sensedOres = new ArrayList<Integer>();
+		List<Integer> producedOres = new ArrayList<Integer>();
+		List<Integer> targetsSeen = new ArrayList<Integer>();
+		List<Integer> targetsAnalyzed = new ArrayList<Integer>();
+		List<Integer> targetsProduced = new ArrayList<Integer>();
+		List<Integer> votingAttemptsList = new ArrayList<Integer>();
+		List<Integer> adaptationsList = new ArrayList<Integer>();
+		List<Integer> failuresList = new ArrayList<Integer>();
+		Integer noExps = 0;
+
+		for (Object o : rowResults.values()) {
+			RowResult result = (RowResult) o;
+			List<ExperimentResult> experimentResults = result.getExperimentsResults();
+			for (ExperimentResult experimentResult : experimentResults) {
+				List<ObservedEvent> events = experimentResult.getEvents();
+				ObservedEvent lastEvent = events.get(events.size() - 1);
+				Map properties = lastEvent.getObservedObjectProperties();
+				Double time = Double.valueOf((String) properties.get("time"));
+				Double energyCost = Double.valueOf((String) properties.get("energy_costs"));
+				Double oreAmount = Double.valueOf((String) properties.get("ore_amount"));
+				Double adaptationCost = Double.valueOf((String) properties.get("adaptation_costs"));
+				Integer collectedOre = Integer.valueOf((String) properties.get("collectedOre"));
+				Integer sensedOre = Integer.valueOf((String) properties.get("sensedOre"));
+				Integer producedOre = Integer.valueOf((String) properties.get("producedOre"));
+				Integer targetSeen = Integer.valueOf((String) properties.get("targetSeen"));
+				Integer targetAnalyzed = Integer.valueOf((String) properties.get("targetAnalyzed"));
+				Integer targetProduced = Integer.valueOf((String) properties.get("targetProduced"));
+				Integer votingAttempts = Integer.valueOf((String) properties.get("votingAttempts"));
+				Integer adaptations = Integer.valueOf((String) properties.get("adaptations"));
+				Integer failures = Integer.valueOf((String) properties.get("failures"));
+
+				times.add(time);
+				costs.add(energyCost);
+				ores.add(oreAmount);
+				adaptationCosts.add(adaptationCost);
+				collectedOres.add(collectedOre);
+				sensedOres.add(sensedOre);
+				producedOres.add(producedOre);
+				targetsSeen.add(targetSeen);
+				targetsAnalyzed.add(targetAnalyzed);
+				targetsProduced.add(targetProduced);
+				votingAttemptsList.add(votingAttempts);
+				adaptationsList.add(adaptations);
+				failuresList.add(failures);
+
+				noExps++;
+			}
+		}
+
+		double medianTime = 0;
+		for (Double time : times) {
+			medianTime += time;
+		}
+		medianTime = medianTime / noExps;
+
+		double medianCost = 0;
+		for (Double cost : costs) {
+			medianCost += cost;
+		}
+		medianCost = medianCost / noExps;
+
+		double medianOre = 0;
+		for (Double ore : ores) {
+			medianOre += ore;
+		}
+		medianOre = medianOre / noExps;
+		
+		double medianAdaptations = 0;
+		for (Double adaptation : adaptationCosts) {
+			medianAdaptations += adaptation;
+		}
+		medianAdaptations = medianAdaptations / noExps;
+		
+		double medianCollectedOre = 0;
+		for (Integer collectedOre : collectedOres) {
+			medianCollectedOre += collectedOre;
+		}
+		medianCollectedOre = medianCollectedOre / noExps;
+		
+		double medianSensedOre = 0;
+		for (Integer ore : sensedOres) {
+			medianSensedOre += ore;
+		}
+		medianSensedOre = medianSensedOre / noExps;
+		
+		double medianProducedOre = 0;
+		for (Integer ore : producedOres) {
+			medianProducedOre += ore;
+		}
+		medianProducedOre = medianProducedOre / noExps;
+		
+		double medianTargetsSeen = 0;
+		for (Integer target : targetsSeen) {
+			medianTargetsSeen += target;
+		}
+		medianTargetsSeen = medianTargetsSeen / noExps;
+		
+		double medianTargetsAnalyzed = 0;
+		for (Integer target : targetsAnalyzed) {
+			medianTargetsAnalyzed += target;
+		}
+		medianTargetsAnalyzed = medianTargetsAnalyzed / noExps;
+		
+		double medianTargetsProduced = 0;
+		for (Integer target : targetsProduced) {
+			medianTargetsProduced += target;
+		}
+		medianTargetsProduced = medianTargetsProduced / noExps;
+		
+		double medianVoting = 0;
+		for (Integer vote : votingAttemptsList) {
+			medianVoting += vote;
+		}
+		medianVoting = medianVoting / noExps;
+		
+		double medianAdaptationsReal = 0;
+		for (Integer adaptation : adaptationsList) {
+			medianAdaptationsReal += adaptation;
+		}
+		medianAdaptationsReal = medianAdaptationsReal / noExps;
+		
+		double medianFailures = 0;
+		for (Integer failure : failuresList) {
+			medianFailures += failure;
+		}
+		medianFailures = medianFailures / noExps;
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("Experiment: " + experimentDescription + "\n");
+		sb.append("No. Experiments: " + noExps + "\n");
+		sb.append("Median Time: " + medianTime + "\n");
+		sb.append("Median Energy Costs: " + medianCost + "\n");
+		sb.append("Median Adaptation Costs: " + medianAdaptations + "\n");
+		sb.append("Median Ore at homebase: " + medianOre + "\n");
+		sb.append("Median Collected Ore: " + medianCollectedOre + "\n");
+		sb.append("Median Sensed Ore: " + medianSensedOre + "\n");
+		sb.append("Median Produced Ore: " + medianProducedOre + "\n");
+		sb.append("Median Targets Seen: " + medianTargetsSeen + "\n");
+		sb.append("Median Targets Analyzed: " + medianTargetsAnalyzed + "\n");
+		sb.append("Median Targets Produced: " + medianTargetsProduced + "\n");
+		sb.append("Median Voting Attempts: " + medianVoting + "\n");
+		sb.append("Median Adaptations: " + medianAdaptationsReal + "\n");
+		sb.append("Median Failures: " + medianFailures + "\n");
+
+		System.out.println(sb);
+
+		String id = getDateAsString();
+		// Persists result in file on disk as txt file
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter("MarsWorldCoordSpaceAndEnergy" + "-" + id + ".txt"));
+			out.write(sb.toString());
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	private void evaluate(HashMap rowResults) {
 
@@ -198,7 +457,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 
 			System.out.println("\n\n#ComputeExperimentRowResultsPlan# Simulation finished. Write Results of Simulation to XML!");
 			XMLHandler.writeXMLToFile(result, "SimRes" + getDateAsString() + ".xml", SimulationResult.class);
-
+			
 			// Store also the evaluation in a file
 			try {
 				BufferedWriter out = new BufferedWriter(new FileWriter("SimulationEVALUATIONResults" + "-" + getDateAsString() + ".txt"));
