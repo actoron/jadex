@@ -20,7 +20,6 @@ import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
-import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -28,11 +27,12 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
-import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.rules.state.IOAVState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import deco.distributed.lang.dynamics.AgentElementType;
 import deco.distributed.lang.dynamics.MASDynamics;
@@ -47,6 +47,9 @@ import deco4mas.distributed.mechanism.CoordinationInfo;
  *         "Coordination Event Publication".
  */
 public class BDIBehaviorObservationComponent extends BehaviorObservationComponent {
+	
+	//TODO: Also store which elements already have listeners for other element types
+	private List<String> observedInternalEvents = new ArrayList<String>();
 
 	/**
 	 * @param exta
@@ -189,26 +192,34 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 	}
 
 	public void initInternalEventListener(final AgentElement agentElement, String mechanismRealizationId) {
-
 		addValueToMap(agentEventDCMRealizationMappings, AgentElementType.INTERNAL_EVENT.toString() + "::" + agentElement.getElement_id(), mechanismRealizationId);
-
-		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) extAccess;
-		IOAVState state = extaFly.getState();
-		Object[] scope = AgentRules.resolveCapability(agentElement.getElement_id(), OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
-		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
-		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0])) {
-			IEventbase base = EventbaseFlyweight.getEventbaseFlyweight(state, scope[1]);
-			base.addInternalEventListener(agentElement.getElement_id(), new IInternalEventListener() {
-
-				public void internalEventOccurred(AgentEvent ae) {
-					// InternalEventFlyweight ev = (InternalEventFlyweight) ae.getSource();
-					// Object ob = (ISpaceObject) ev.getParameter("latest_analyzed_target").getValue();
-
-					checkAndPublishIfApplicable(ae, AgentElementType.INTERNAL_EVENT);
-				}
-			});
-		} else {
-			throw new RuntimeException("No such internal event: " + scope[0] + " in " + scope[1]);
+		
+		if (!observedInternalEvents.contains(agentElement.getElement_id())) {
+			observedInternalEvents.add(agentElement.getElement_id());
+//			if (agentElement.getElement_id().equals("callProducerEvent")) {
+//				System.out.println("INIT callProducerEvent for " + mechanismRealizationId);
+//			}
+	
+			ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) extAccess;
+			IOAVState state = extaFly.getState();
+			Object[] scope = AgentRules.resolveCapability(agentElement.getElement_id(), OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+			Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+			if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0])) {
+				IEventbase base = EventbaseFlyweight.getEventbaseFlyweight(state, scope[1]);
+				base.addInternalEventListener(agentElement.getElement_id(), new IInternalEventListener() {
+	
+					public void internalEventOccurred(AgentEvent ae) {
+						// InternalEventFlyweight ev = (InternalEventFlyweight) ae.getSource();
+						// Object ob = (ISpaceObject) ev.getParameter("latest_analyzed_target").getValue();
+//						if (agentElement.getElement_id().equals("callProducerEvent")) {
+//							System.out.println("callProducerEvent-Listener");
+//						}
+						checkAndPublishIfApplicable(ae, AgentElementType.INTERNAL_EVENT);
+					}
+				});
+			} else {
+				throw new RuntimeException("No such internal event: " + scope[0] + " in " + scope[1]);
+			}
 		}
 	}
 

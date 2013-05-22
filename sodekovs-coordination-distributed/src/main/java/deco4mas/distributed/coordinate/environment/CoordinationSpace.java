@@ -125,6 +125,9 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 		if (obj instanceof CoordinationInformation) {
 			CoordinationInformation ci = (CoordinationInformation) obj;
 			for (CoordinationMechanism mechanism : activeCoordinationMechanisms.values()) {
+				if (mechanism == null) {
+					System.out.println("BREAK!");
+				}
 				if (mechanism.getRealisationName().equals(ci.getValueByName(Constants.DML_REALIZATION_NAME))) {
 					mechanism.perceiveCoordinationEvent(obj);
 				}
@@ -312,13 +315,15 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	 */
 	public void activateCoordinationMechanism(String realization) {
 		CoordinationMechanism mechanism = this.inactiveCoordinationMechanisms.get(realization);
-		this.inactiveCoordinationMechanisms.remove(realization);
+		if (mechanism != null) {
+			this.inactiveCoordinationMechanisms.remove(realization);
 
-		this.activeCoordinationMechanisms.put(realization, mechanism);
+			this.activeCoordinationMechanisms.put(realization, mechanism);
 
-		mechanism.start();
+			mechanism.start();
 
-		notifyMechanismActivated(realization);
+			notifyMechanismActivated(realization);
+		}
 	}
 
 	/**
@@ -330,13 +335,14 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	 */
 	public void deactivateCoordinationMechanism(String realization) {
 		CoordinationMechanism mechanism = this.activeCoordinationMechanisms.get(realization);
-		this.activeCoordinationMechanisms.remove(realization);
+		if (mechanism != null) {
+			mechanism.stop();
 
-		this.inactiveCoordinationMechanisms.put(realization, mechanism);
+			this.activeCoordinationMechanisms.remove(realization);
+			this.inactiveCoordinationMechanisms.put(realization, mechanism);
 
-		mechanism.stop();
-
-		notifyMechanismDeactivated(realization);
+			notifyMechanismDeactivated(realization);
+		}
 	}
 
 	/**

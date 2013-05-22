@@ -3,7 +3,9 @@ package deco4mas.distributed.convergence;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import deco.distributed.lang.dynamics.convergence.Adaption;
@@ -30,14 +32,18 @@ public abstract class ConvergenceService implements IConvergenceService {
 	/** The coordination context */
 	protected String coordinationContextId = null;
 	
-	/** Map of currently runnig {@link Adaption}s*/
+	/** Map of currently running {@link Adaption}s*/
 	protected Map<Adaption, Boolean> runningAdaptions = null;
+	
+	/** List of successful adaptations */
+	protected List<Adaption> successfulAdaptions = null;
 	
 	/**
 	 * Default constructor.
 	 */
 	public ConvergenceService() {
 		this.runningAdaptions = new HashMap<Adaption, Boolean>();
+		this.successfulAdaptions = new ArrayList<Adaption>();
 	}
 	
 	@Override

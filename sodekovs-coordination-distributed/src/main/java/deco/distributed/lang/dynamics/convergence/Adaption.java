@@ -31,6 +31,40 @@ public class Adaption {
 
 	private Boolean reset = null;
 
+	private Boolean single = null;
+	
+	private Long startDelay = null;
+	
+	/**
+	 * @return the startDelay
+	 */
+	@XmlAttribute(name = "startDelay")
+	public Long getStartDelay() {
+		return startDelay;
+	}
+
+	/**
+	 * @param startDelay the startDelay to set
+	 */
+	public void setStartDelay(Long startDelay) {
+		this.startDelay = startDelay;
+	}
+
+	/**
+	 * @return the single
+	 */
+	@XmlAttribute(name = "single")
+	public Boolean getSingle() {
+		return single;
+	}
+
+	/**
+	 * @param single the single to set
+	 */
+	public void setSingle(Boolean single) {
+		this.single = single;
+	}
+
 	private List<Realization> realizations = new ArrayList<Realization>();
 
 	private List<Constraint> constraints = new ArrayList<Constraint>();
@@ -165,18 +199,15 @@ public class Adaption {
 		this.constraints = constraints;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-//		final int maxLen = 10;
-//		return "Adaption [id=" + id + ", answer=" + answer + ", quorum=" + quorum + ", timeout=" + timeout + ", delay=" + delay + ", reset=" + reset + ", realizations="
-//				+ (realizations != null ? realizations.subList(0, Math.min(realizations.size(), maxLen)) : null) + ", constraints="
-//				+ (constraints != null ? constraints.subList(0, Math.min(constraints.size(), maxLen)) : null) + "]";
-		return "Adaption " + id;
+		final int maxLen = 10;
+		return "Adaption [id=" + id + ", answer=" + answer + ", quorum=" + quorum + ", timeout=" + timeout + ", delay=" + delay + ", reset=" + reset + ", single=" + single + ", startDelay="
+				+ startDelay + ", realizations=" + (realizations != null ? realizations.subList(0, Math.min(realizations.size(), maxLen)) : null) + ", constraints="
+				+ (constraints != null ? constraints.subList(0, Math.min(constraints.size(), maxLen)) : null) + "]";
 	}
 
 	/**
@@ -212,6 +243,8 @@ public class Adaption {
 		result = prime * result + ((quorum == null) ? 0 : quorum.hashCode());
 		result = prime * result + ((realizations == null) ? 0 : realizations.hashCode());
 		result = prime * result + ((reset == null) ? 0 : reset.hashCode());
+		result = prime * result + ((single == null) ? 0 : single.hashCode());
+		result = prime * result + ((startDelay == null) ? 0 : startDelay.hashCode());
 		result = prime * result + ((timeout == null) ? 0 : timeout.hashCode());
 		return result;
 	}
@@ -262,6 +295,16 @@ public class Adaption {
 			if (other.reset != null)
 				return false;
 		} else if (!reset.equals(other.reset))
+			return false;
+		if (single == null) {
+			if (other.single != null)
+				return false;
+		} else if (!single.equals(other.single))
+			return false;
+		if (startDelay == null) {
+			if (other.startDelay != null)
+				return false;
+		} else if (!startDelay.equals(other.startDelay))
 			return false;
 		if (timeout == null) {
 			if (other.timeout != null)
