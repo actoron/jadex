@@ -34,6 +34,32 @@ public class MSequenceEdge extends MAssociationTarget
 //	protected Map<String, Tuple2<UnparsedExpression, UnparsedExpression>> parametermappings;
 	
 	//-------- methods --------
+	
+	/**
+	 *  Helper method connecting two activities using this edge.
+	 *  The previous connection is removed.
+	 * 
+	 *  @param source New source of the edge.
+	 *  @param target New target of the edge.
+	 */
+	public void connect(MActivity source, MActivity target)
+	{
+		if (this.source != null)
+		{
+			this.source.removeOutgoingSequenceEdge(this);
+		}
+		
+		if (this.target != null)
+		{
+			this.target.removeIncomingSequenceEdge(this);
+		}
+		
+		this.source = source;
+		this.target = target;
+		
+		source.addOutgoingSequenceEdge(this);
+		target.addIncomingSequenceEdge(this);
+	}
 
 	/**
 	 *  Get the source.

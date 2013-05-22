@@ -32,6 +32,32 @@ public class MMessagingEdge extends MAssociationTarget
 	//-------- methods --------
 
 	/**
+	 *  Helper method connecting two activities using this edge.
+	 *  The previous connection is removed.
+	 * 
+	 *  @param source New source of the edge.
+	 *  @param target New target of the edge.
+	 */
+	public void connect(MActivity source, MActivity target)
+	{
+		if (this.source != null)
+		{
+			this.source.removeOutgoingMessagingEdge(this);
+		}
+		
+		if (this.target != null)
+		{
+			this.target.removeIncomingMessagingEdge(this);
+		}
+		
+		this.source = source;
+		this.target = target;
+		
+		source.addOutgoingMessagingEdge(this);
+		target.addIncomingMessagingEdge(this);
+	}
+	
+	/**
 	 *  Get the xml source description.
 	 *  @return The source description.
 	 */

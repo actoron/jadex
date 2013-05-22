@@ -28,6 +28,37 @@ public class MDataEdge extends MNamedIdElement
 	//-------- methods --------
 
 	/**
+	 *  Helper method connecting two activity parameters using this edge.
+	 *  The previous connection is removed.
+	 *  
+	 *  @param source The new source activity.
+	 *  @param sourceparam The new source activity parameter.
+	 *  @param target The new target activity.
+	 *  @param targetparam The new target activity parameter.
+	 */
+	public void connect(MActivity source, String sourceparam,
+						 MActivity target, String targetparam)
+	{
+		if (this.source != null)
+		{
+			this.source.removeOutgoingDataEdge(this);
+		}
+		
+		if (this.target != null)
+		{
+			this.target.removeIncomingDataEdge(this);
+		}
+		
+		this.source = source;
+		this.target = target;
+		
+		setSourceParameter(sourceparam);
+		setTargetParameter(targetparam);
+		source.addOutgoingDataEdge(this);
+		target.addIncomingDataEdge(this);
+	}
+	
+	/**
 	 *  Get the source.
 	 *  @return The source.
 	 */
