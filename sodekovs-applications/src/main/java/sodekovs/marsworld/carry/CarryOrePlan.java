@@ -58,6 +58,8 @@ public class CarryOrePlan extends Plan {
 			dispatchSubgoalAndWait(go_home);
 
 			// Unload ore at the homebase.
+			Integer collectedOre = (Integer) myself.getProperty("ore");
+			
 			res = new SyncResultListener();
 			props = new HashMap();
 			props.put(LoadOreTask.PROPERTY_TARGET, homebase);
@@ -66,6 +68,9 @@ public class CarryOrePlan extends Plan {
 			taskid = env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
 			env.addTaskListener(taskid, myself.getId(), res);
 			res.waitForResult();
+			
+			ISpaceObject ore = env.getSpaceObjectsByType("ore")[0];
+			ore.setProperty("collectedOre", (Integer) ore.getProperty("collectedOre") + collectedOre);
 		}
 	}
 }

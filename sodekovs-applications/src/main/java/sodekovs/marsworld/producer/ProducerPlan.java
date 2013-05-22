@@ -31,25 +31,54 @@ public class ProducerPlan extends Plan {
 	 */
 	public void body() {
 		while (true) {
-			IInternalEvent event = waitForInternalEvent("latestAnalyzedTargetEvent");
-			// reset the no_msg_received counter for the convergence
-			getBeliefbase().getBelief("no_msg_received").setFact(new Integer(0));
+			waitForTick();
+			Object[] events = getWaitqueue().getElements();
+			
+			for (Object o : events) {
+				IInternalEvent event = (IInternalEvent) o;
+				// reset the no_msg_received counter for the convergence
+				getBeliefbase().getBelief("no_msg_received").setFact(new Integer(0));
 
-			CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_analyzed_target").getValue();
-			System.out.println("#ProducerPlan# Received latest analyzed target:  " + data);
+				CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_analyzed_target").getValue();
+				System.out.println("#ProducerPlan# Received latest analyzed target:  " + data);
 
-			// Producing ore here.
-			ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
-			IVector2 position = new Vector2Double(data.getX(), data.getY());
-			ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+				// Producing ore here.
+				ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
+				IVector2 position = new Vector2Double(data.getX(), data.getY());
+				ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
 
-			IGoal produce_ore = createGoal("produce_ore");
-			produce_ore.getParameter("target").setValue(latestTarget);
-			dispatchSubgoalAndWait(produce_ore);
+				IGoal produce_ore = createGoal("produce_ore");
+				produce_ore.getParameter("target").setValue(latestTarget);
+				dispatchSubgoalAndWait(produce_ore);
 
-			IInternalEvent ievent = createInternalEvent("callCarryEvent");
-			ievent.getParameter("latest_produced_target").setValue(data);
-			dispatchInternalEvent(ievent);
+				IInternalEvent ievent = createInternalEvent("callCarryEvent");
+				ievent.getParameter("latest_produced_target").setValue(data);
+				dispatchInternalEvent(ievent);
+				
+				getWaitqueue().removeElement(o);
+			}
 		}
+		
+//		while (true) {
+//			IInternalEvent event = waitForInternalEvent("latestAnalyzedTargetEvent");
+//			// reset the no_msg_received counter for the convergence
+//			getBeliefbase().getBelief("no_msg_received").setFact(new Integer(0));
+//
+//			CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_analyzed_target").getValue();
+//			System.out.println("#ProducerPlan# Received latest analyzed target:  " + data);
+//
+//			// Producing ore here.
+//			ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
+//			IVector2 position = new Vector2Double(data.getX(), data.getY());
+//			ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+//
+//			IGoal produce_ore = createGoal("produce_ore");
+//			produce_ore.getParameter("target").setValue(latestTarget);
+//			dispatchSubgoalAndWait(produce_ore);
+//
+//			IInternalEvent ievent = createInternalEvent("callCarryEvent");
+//			ievent.getParameter("latest_produced_target").setValue(data);
+//			dispatchInternalEvent(ievent);
+//		}
 	}
 }

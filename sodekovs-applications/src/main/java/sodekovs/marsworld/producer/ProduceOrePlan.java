@@ -41,5 +41,11 @@ public class ProduceOrePlan extends Plan
 		Object taskid	= space.createObjectTask(ProduceOreTask.PROPERTY_TYPENAME, props, myself.getId());
 		space.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
+		
+		if (((Number) target.getProperty(ProduceOreTask.PROPERTY_CAPACITY)).intValue() > 0) {
+			Integer producedOre = (Integer) target.getProperty(ProduceOreTask.PROPERTY_CAPACITY);
+			ISpaceObject ore = space.getSpaceObjectsByType("ore")[0];
+			ore.setProperty("producedOre", (Integer) ore.getProperty("producedOre") + producedOre);
+		}
 	}
 }

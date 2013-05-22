@@ -127,11 +127,7 @@ public class ProximityMechanism extends CoordinationMechanism {
 				}
 				
 				// calculate the energy costs
-				double factor = (Double) energyCosts.getProperty("factor");
-				double oldCosts = (Double) energyCosts.getProperty("costs");
-				double costs = oldCosts + (distance.getAsDouble() * factor);
-				// and store them
-				energyCosts.setProperty("costs", costs);
+				energyCosts.setProperty("costs", (Double) energyCosts.getProperty("costs") + distance.getAsDouble());
 
 				space.publishCoordinationEvent(ci, receiver, getRealisationName(), ++eventNumber);
 			}

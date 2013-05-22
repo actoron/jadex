@@ -57,7 +57,7 @@
 		<belief name="env" class="CoordinationSpace"> 			
  			<fact class="IFuture">$scope.getParentAccess().getExtension("mycoordspace")</fact>
  		</belief>
-
+ 		
 		<!-- Missionend belief is used in drop condition of analyze target goal. -->
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
@@ -147,6 +147,9 @@
 		<!-- Informs sentries about new targets. -->
 		<plan name="addTargetPlan">	
 			<body class="AddTargetPlan"/>
+			<waitqueue>
+			    <internalevent ref="latestTargetEvent"/>
+			</waitqueue>
 		</plan>
 		
 		<!-- TMP: Counter. -->

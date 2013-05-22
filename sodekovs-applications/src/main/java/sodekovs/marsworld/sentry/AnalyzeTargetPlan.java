@@ -44,9 +44,13 @@ public class AnalyzeTargetPlan extends Plan {
 			space.addTaskListener(taskid, myself.getId(), res);
 
 			res.waitForResult();
-			if (((Number) target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue() > 0)
+			
+			if (((Number) target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue() > 0) {
+				Integer sensedOre = (Integer) target.getProperty(AnalyzeTargetTask.PROPERTY_ORE);
+				ISpaceObject ore = space.getSpaceObjectsByType("ore")[0];
+				ore.setProperty("sensedOre", (Integer) ore.getProperty("sensedOre") + sensedOre);
 				callProducerAgent(target);
-
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			// Fails for one agent, when two agents try to analyze the same target at once.

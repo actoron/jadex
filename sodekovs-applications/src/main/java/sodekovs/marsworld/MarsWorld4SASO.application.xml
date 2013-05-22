@@ -9,7 +9,7 @@
 	                    http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="MarsWorld4SimulationExperimentsANDCoordSpaceANDEnergy" package="sodekovs.marsworld">
+	name="MarsWorld4SASO" package="sodekovs.marsworld">
 
 	<imports>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
@@ -52,7 +52,7 @@
 	 
 	<extensiontypes>
 		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">					
-				<env:property name="dynamics_configuration">"sodekovs-applications/src/main/java/sodekovs/marsworld/coordination/MarsWorldDynamicCoordination.dynamics.xml"</env:property>				
+				<env:property name="dynamics_configuration">"sodekovs-applications/src/main/java/sodekovs/marsworld/coordination/MarsWorldSASOCoordination.dynamics.xml"</env:property>				
 			<env:spaceexecutor class="DeltaTimeExecutor">
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
@@ -68,18 +68,18 @@
 					<env:property name="state">"unknown"</env:property>
 				</env:objecttype>
 				<env:objecttype name="sentry">
-					<env:property name="vision">0.07</env:property>
-					<env:property name="speed">0.05</env:property>
+					<env:property name="vision" class="double">0.15</env:property>
+					<env:property name="speed" class="double">0.1</env:property>
 					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
-					<env:property name="vision">0.25</env:property>
-					<env:property name="speed">0.1</env:property>
+					<env:property name="vision" class="double">0.1</env:property>
+					<env:property name="speed" class="double">0.1</env:property>
 					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="carry">
-					<env:property name="vision">0.07</env:property>
-					<env:property name="speed">0.15</env:property>
+					<env:property name="vision" class="double">0.05</env:property>
+					<env:property name="speed" class="double">0.2</env:property>
 					<env:property name="ore">0</env:property>
 					<env:property name="capacity">20</env:property>
 					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
@@ -122,6 +122,24 @@
 					<env:property name="costs">new Double(0.0)</env:property>
 					<env:property name="factor">new Double(1.0)</env:property>
 					<env:property name="adaptationCosts">new Double(0.0)</env:property>
+				</env:objecttype>
+				
+				<env:objecttype name="ore">
+					<env:property name="collectedOre">0</env:property>
+					<env:property name="sensedOre">0</env:property>
+					<env:property name="producedOre">0</env:property>
+				</env:objecttype>
+				
+				<env:objecttype name="soMessages">
+				    <env:property name="targetSeen">0</env:property>
+				    <env:property name="targetAnalyzed">0</env:property>
+				    <env:property name="targetProduced">0</env:property>
+				</env:objecttype>
+				
+				<env:objecttype name="adaptation">
+				   	<env:property name="votingAttempts">0</env:property>
+				   	<env:property name="adaptations">0</env:property>
+				   	<env:property name="failures">0</env:property>
 				</env:objecttype>
 			</env:objecttypes>
 
@@ -167,7 +185,7 @@
 							<env:drawcondition>$object.getProperty("state").equals("analyzed")&amp;&amp;($object.getProperty("ore")!=0 ||$object.getProperty("capacity")!=0)
 							</env:drawcondition>
 						</env:texturedrectangle>
-						<env:text layer="2" x="0.02" y="-0.01" size="8" font="Arial"
+						<env:text layer="2" x="0.02" y="-0.01" size="6" font="Arial"
 							abssize="true" text="ore: $ore$\ncapacity: $capacity$" align="left"
 							color="black">
 							<env:drawcondition>$object.getProperty("state").equals("analyzed")</env:drawcondition>
@@ -186,7 +204,7 @@
 						<env:property name="oreposition" dynamic="true">new	Vector2Double(0,0.3-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
 						<env:rectangle layer="1" width="1" height="1"
 							color="#1e1e1e46" />
-						<env:text layer="2" x="-0.07" y="0.09" size="8" font="Arial"
+						<env:text layer="2" x="-0.07" y="0.09" size="6" font="Arial"
 							abssize="true" text="$text$" align="left" color="black" />
 						<env:texturedrectangle layer="1" size="oresize"
 							position="oreposition" imagepath="sodekovs/marsworld/images/ore.png">
@@ -274,37 +292,96 @@
 	<configurations>
 		<configuration name="StandardConfiguation">
 			<extensions>
-				<env:envspace name="my2dspace" type="2dspace" width="1"
-					height="1">
+				<env:envspace name="my2dspace" type="2dspace" width="2" height="2">
 					<env:objects>
 						<env:object type="homebase">
-							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+							<env:property name="position">new Vector2Double(1.0, 1.0)</env:property>
 							<env:property name="space">$space</env:property>
 							<env:property name="missiontime">7000000 +$properties.clock.getTime()</env:property>
 						</env:object>
+						<!-- First Quarter -->
 						<env:object type="target">
-							<env:property name="position">new Vector2Double(0.1, 0.2)</env:property>
-							<env:property name="ore">20</env:property>
+							<env:property name="position">new Vector2Double(0.1, 0.1)</env:property>
+							<env:property name="ore">40</env:property>
 						</env:object>
 						<env:object type="target">
-							<env:property name="position">new Vector2Double(0.05, 0.7)</env:property>
-							<env:property name="ore">0</env:property>
+							<env:property name="position">new Vector2Double(0.5, 0.1)</env:property>
+							<env:property name="ore">50</env:property>
 						</env:object>
 						<env:object type="target">
-							<env:property name="position">new Vector2Double(0.5, 0.6)</env:property>
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+							<env:property name="ore">70</env:property>
 						</env:object>
 						<env:object type="target">
-							<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
-							<env:property name="ore">0</env:property>
+							<env:property name="position">new Vector2Double(0.1, 0.5)</env:property>
+							<env:property name="ore">30</env:property>
 						</env:object>
 						<env:object type="target">
-							<env:property name="position">new Vector2Double(0.7, 0.4)</env:property>
-							<env:property name="ore">10</env:property>
-							<!-- <env:property name="ore">$args.al</env:property> -->
+							<env:property name="position">new Vector2Double(0.5, 0.5)</env:property>
+							<env:property name="ore">60</env:property>
+						</env:object>
+						<!-- Second Quarter -->
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.5, 0.1)</env:property>
+							<env:property name="ore">40</env:property>
 						</env:object>
 						<env:object type="target">
-							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
-							<env:property name="ore">25</env:property>
+							<env:property name="position">new Vector2Double(1.9, 0.1)</env:property>
+							<env:property name="ore">50</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.7, 0.3)</env:property>
+							<env:property name="ore">70</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.5, 0.5)</env:property>
+							<env:property name="ore">30</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.9, 0.5)</env:property>
+							<env:property name="ore">60</env:property>
+						</env:object>
+						<!-- Third Quarter -->
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.1, 1.5)</env:property>
+							<env:property name="ore">40</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.5, 1.5)</env:property>
+							<env:property name="ore">50</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.3, 1.7)</env:property>
+							<env:property name="ore">70</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.1, 1.9)</env:property>
+							<env:property name="ore">30</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.5, 1.9)</env:property>
+							<env:property name="ore">60</env:property>
+						</env:object>
+						<!-- Fourth Quarter -->
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.5, 1.5)</env:property>
+							<env:property name="ore">40</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.9, 1.5)</env:property>
+							<env:property name="ore">50</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.7, 1.7)</env:property>
+							<env:property name="ore">70</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.5, 1.9)</env:property>
+							<env:property name="ore">30</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.9, 1.9)</env:property>
+							<env:property name="ore">60</env:property>
 						</env:object>
 
 						<!-- TMP-HACK! -->
@@ -320,6 +397,24 @@
 							<env:property name="factor">new Double(1.0)</env:property>
 							<env:property name="adaptationCosts">new Double(0.0)</env:property>
 						</env:object>
+						
+						<env:object type="ore">
+							<env:property name="collectedOre">0</env:property>
+							<env:property name="sensedOre">0</env:property>
+							<env:property name="producedOre">0</env:property>
+						</env:object>
+				
+						<env:object type="soMessages">
+					 		<env:property name="targetSeen">0</env:property>
+						    <env:property name="targetAnalyzed">0</env:property>
+				    		<env:property name="targetProduced">0</env:property>
+						</env:object>
+				
+						<env:object type="adaptation">
+				   			<env:property name="votingAttempts">0</env:property>
+				 		  	<env:property name="adaptations">0</env:property>
+						   	<env:property name="failures">0</env:property>
+						</env:object>
 					</env:objects>
 
 					<env:observers>
@@ -333,9 +428,9 @@
 				<env:envspace name="mycoordspace" type="coordspace" width="2" height ="2" />
 			</extensions>
 			<components>
-				<component type="Sentry" number="$args.NumberOfSentries" />
-				<component type="Producer" number="$args.NumberOfProducers" />
-				<component type="Carry" number="$args.NumberOfCarries" />			
+				<component type="Sentry" number="4" />
+				<component type="Producer" number="4" />
+				<component type="Carry" number="8" />			
 			</components>
 		</configuration>
 	</configurations>

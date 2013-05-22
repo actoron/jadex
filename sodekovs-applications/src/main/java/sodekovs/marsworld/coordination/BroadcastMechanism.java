@@ -46,11 +46,8 @@ public class BroadcastMechanism extends CoordinationMechanism {
 	@Override
 	public void perceiveCoordinationEvent(Object obj) {
 		// calculate the energy costs
-		double factor = (Double) energyCosts.getProperty("factor");
-		double oldCosts = (Double) energyCosts.getProperty("costs");
-		double costs = oldCosts + (Math.sqrt(2.0) * factor);
-		// and store them
-		energyCosts.setProperty("costs", costs);
+		//TODO: Kosten der Groesse der Umgebung anpassen
+		energyCosts.setProperty("costs", (Double) energyCosts.getProperty("costs") + Math.sqrt(2.0));
 		
 		// just publish the coordination information to the coordination space, no computation is needed, he knows what to do with it
 		space.publishCoordinationEvent(obj);

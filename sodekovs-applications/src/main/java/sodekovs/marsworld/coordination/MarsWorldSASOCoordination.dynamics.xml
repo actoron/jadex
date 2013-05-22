@@ -44,7 +44,7 @@
 	<causalities>
 		<deco_links>
 			<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
-			<deco_link realization="latest_target_seen_proximity" type="POSITIVE" name="target_seen_send-receive-proximity" spaces="mycoordspace">
+			<deco_link realization="latest_target_seen_nearest" type="POSITIVE" name="target_seen_send-receive-nearest" spaces="mycoordspace">
 				<froms>
 					<from>target_seen_sender</from>
 				</froms>
@@ -53,7 +53,7 @@
 				</tos>
 			</deco_link>			
 			<!-- The link, where the sentry informs the producer about the latest analyzed target. -->
-			<deco_link realization="latest_target_analyzed_proximity" type="POSITIVE" name="target_analyzed_send-receive-proximity" spaces="mycoordspace">
+			<deco_link realization="latest_target_analyzed_nearest" type="POSITIVE" name="target_analyzed_send-receive-nearest" spaces="mycoordspace">
 				<froms>
 					<from>target_analyzed_sender</from>
 				</froms>
@@ -62,7 +62,7 @@
 				</tos>
 			</deco_link>
 			<!-- The link, where the producer informs the carry about the latest produced target. -->
-			<deco_link realization="latest_target_produced_proximity" type="POSITIVE" name="target_produced_send-receive-proximity" spaces="mycoordspace">
+			<deco_link realization="latest_target_produced_nearest" type="POSITIVE" name="target_produced_send-receive-nearest" spaces="mycoordspace">
 				<froms>
 					<from>target_produced_sender</from>
 				</froms>
@@ -71,7 +71,7 @@
 				</tos>
 			</deco_link>
 			<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
-			<deco_link realization="latest_target_seen_broadcast" type="POSITIVE" name="target_seen_send-receive-broadcast" spaces="mycoordspace">
+			<deco_link realization="latest_target_seen_random" type="POSITIVE" name="target_seen_send-receive-random" spaces="mycoordspace">
 				<froms>
 					<from>target_seen_sender</from>
 				</froms>
@@ -80,7 +80,7 @@
 				</tos>
 			</deco_link>			
 			<!-- The link, where the sentry informs the producer about the latest analyzed target. -->
-			<deco_link realization="latest_target_analyzed_broadcast" type="POSITIVE" name="target_analyzed_send-receive-broadcast" spaces="mycoordspace">
+			<deco_link realization="latest_target_analyzed_random" type="POSITIVE" name="target_analyzed_send-receive-random" spaces="mycoordspace">
 				<froms>
 					<from>target_analyzed_sender</from>
 				</froms>
@@ -89,7 +89,7 @@
 				</tos>
 			</deco_link>
 			<!-- The link, where the producer informs the carry about the latest produced target. -->
-			<deco_link realization="latest_target_produced_broadcast" type="POSITIVE" name="target_produced_send-receive-broadcast" spaces="mycoordspace">
+			<deco_link realization="latest_target_produced_random" type="POSITIVE" name="target_produced_send-receive-random" spaces="mycoordspace">
 				<froms>
 					<from>target_produced_sender</from>
 				</froms>
@@ -102,7 +102,7 @@
 		<!-- The detailed configuration of interdependency enactment. -->
 		<deco-link-realizations>
 		<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
-			<realization id="latest_target_seen_proximity">
+			<realization id="latest_target_seen_nearest">
 				<from>		<!-- Published behaviors / events: -->					
 					<!-- <agent_element element="latest_target" agent_id="Producer" type="BDI_BELIEFSET">-->
 					<agent_element element="callSentryEvent" agent_id="Producer" type="INTERNAL_EVENT">					
@@ -119,14 +119,8 @@
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
-					mechanism_id="sodekovs.marsworld.coordination.ProximityMechanism"
+					mechanism_id="sodekovs.marsworld.coordination.NearestMechanism"
 					agent_type="JADEX">
-					<properties>
-						<entry>
-							<key>proximity</key>
-							<value>0.25</value>
-						</entry>
-					</properties>
 				</mechanism_configuration>			
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
 					 <!-- <agent_element element="addTargetPlan" agent_id="Sentry" type="BDI_PLAN">-->
@@ -136,11 +130,11 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-				<active>false</active>
+				<active>true</active>
 			</realization>
 			
 			<!-- The link, where the sentry informs the producer about the latest analyzed target. -->
-			<realization id="latest_target_analyzed_proximity">
+			<realization id="latest_target_analyzed_nearest">
 				<from>		<!-- Published behaviors / events: -->					
 					<agent_element element="callProducerEvent" agent_id="Sentry" type="INTERNAL_EVENT">
 					 <!-- <agent_element element="callProducerAgentPlan" agent_id="Sentry" type="BDI_PLAN">-->
@@ -151,14 +145,8 @@
 				</from>
 				<!-- Coordination Medium configuration: -->				
 				<mechanism_configuration
-					mechanism_id="sodekovs.marsworld.coordination.ProximityMechanism"
+					mechanism_id="sodekovs.marsworld.coordination.NearestMechanism"
 					agent_type="JADEX">
-					<properties>
-						<entry>
-							<key>proximity</key>
-							<value>0.25</value>
-						</entry>
-					</properties>
 				</mechanism_configuration>	
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
 					 <!-- <agent_element element="latest_analyzed_target" agent_id="Producer" type="BDI_BELIEFSET">-->
@@ -168,11 +156,11 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-				<active>false</active>
+				<active>true</active>
 			</realization>
 			
 			<!-- The link, where the producer informs the carry about the latest produced target. -->
-			<realization id="latest_target_produced_proximity">
+			<realization id="latest_target_produced_nearest">
 				<from>		<!-- Published behaviors / events: -->					
 					<!-- <agent_element element="latest_produced_target" agent_id="Producer" type="BDI_BELIEFSET">-->
 					<agent_element element="callCarryEvent" agent_id="Producer" type="INTERNAL_EVENT">
@@ -183,14 +171,8 @@
 				</from>
 				<!-- Coordination Medium configuration: -->				
 				<mechanism_configuration
-					mechanism_id="sodekovs.marsworld.coordination.ProximityMechanism"
+					mechanism_id="sodekovs.marsworld.coordination.NearestMechanism"
 					agent_type="JADEX">
-					<properties>
-						<entry>
-							<key>proximity</key>
-							<value>0.25</value>
-						</entry>
-					</properties>
 				</mechanism_configuration>	
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->									 
 					 <!-- <agent_element element="latest_produced_target" agent_id="Carry" type="BDI_BELIEFSET"> -->
@@ -200,11 +182,11 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-				<active>false</active>
+				<active>true</active>
 			</realization>
 		
 		<!-- The link, where the producer/carry inform the sentry about the latest detected target. -->
-			<realization id="latest_target_seen_broadcast">
+			<realization id="latest_target_seen_random">
 				<from>		<!-- Published behaviors / events: -->					
 					<!-- <agent_element element="latest_target" agent_id="Producer" type="BDI_BELIEFSET">-->
 					<agent_element element="callSentryEvent" agent_id="Producer" type="INTERNAL_EVENT">					
@@ -221,7 +203,7 @@
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
-					mechanism_id="sodekovs.marsworld.coordination.BroadcastMechanism"
+					mechanism_id="sodekovs.marsworld.coordination.RandomMechanism"
 					agent_type="JADEX">
 				</mechanism_configuration>			
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
@@ -232,11 +214,11 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-				<active>true</active>
+				<active>false</active>
 			</realization>
 			
 			<!-- The link, where the sentry informs the producer about the latest analyzed target. -->
-			<realization id="latest_target_analyzed_broadcast">
+			<realization id="latest_target_analyzed_random">
 				<from>		<!-- Published behaviors / events: -->					
 					<agent_element element="callProducerEvent" agent_id="Sentry" type="INTERNAL_EVENT">
 					 <!-- <agent_element element="callProducerAgentPlan" agent_id="Sentry" type="BDI_PLAN">-->
@@ -247,7 +229,7 @@
 				</from>
 				<!-- Coordination Medium configuration: -->				
 				<mechanism_configuration
-					mechanism_id="sodekovs.marsworld.coordination.BroadcastMechanism"
+					mechanism_id="sodekovs.marsworld.coordination.RandomMechanism"
 					agent_type="JADEX">
 				</mechanism_configuration>	
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->				
@@ -258,11 +240,11 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-				<active>true</active>
+				<active>false</active>
 			</realization>
 			
 			<!-- The link, where the producer informs the carry about the latest produced target. -->
-			<realization id="latest_target_produced_broadcast">
+			<realization id="latest_target_produced_random">
 				<from>		<!-- Published behaviors / events: -->					
 					<!-- <agent_element element="latest_produced_target" agent_id="Producer" type="BDI_BELIEFSET">-->
 					<agent_element element="callCarryEvent" agent_id="Producer" type="INTERNAL_EVENT">
@@ -273,7 +255,7 @@
 				</from>
 				<!-- Coordination Medium configuration: -->				
 				<mechanism_configuration
-					mechanism_id="sodekovs.marsworld.coordination.BroadcastMechanism"
+					mechanism_id="sodekovs.marsworld.coordination.RandomMechanism"
 					agent_type="JADEX">
 				</mechanism_configuration>	
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->									 
@@ -284,65 +266,32 @@
 						</parameter_mappings>
 					</agent_element>
 				</to>
-				<active>true</active>
+				<active>false</active>
 			</realization>											
 		</deco-link-realizations>
 	</causalities>
-	<convergence>
+		<convergence>
 	    <agents>
 	        <agent id="Producer"/>
 			<agent id="Carry"/>
 			<agent id="Sentry"/>
 	    </agents>
 	    <adaptions>
-		    <adaption id="proximity-it-up" answers="3" quorum="0.66" timeout="10000" delay="1000" reset="true">
+		    <adaption id="change-to-random" answers="16" quorum="0.75" timeout="10000" delay="0" startDelay="30000" reset="false" single="true">
 		        <realizations>
-			        <realization id="latest_target_seen_proximity">
-			            <properties>
-			                <entry>
-			                    <key>proximity</key>
-			                    <value>1</value>
-			                </entry>
-			            </properties>
-			        </realization>
-			        <realization id="latest_target_analyzed_proximity">
-			            <properties>
-			                <entry>
-			                    <key>proximity</key>
-			                    <value>1</value>
-			                </entry>
-			            </properties>
-			        </realization>
-			        <realization id="latest_target_produced_proximity">
-			            <properties>
-			                <entry>
-			                    <key>proximity</key>
-			                    <value>1</value>
-			                </entry>
-			            </properties>
-			        </realization>
+			        <realization id="latest_target_seen_nearest" activate="false"/>
+			        <realization id="latest_target_analyzed_nearest" activate="false"/>
+			        <realization id="latest_target_produced_nearest" activate="false"/>
+			        <realization id="latest_target_seen_random" activate="true"/>
+			        <realization id="latest_target_analyzed_random" activate="true"/>
+			        <realization id="latest_target_produced_random" activate="true"/>
 		        </realizations>
 		        <constraints>
-	        		<constraint agent_id="Producer" element="no_msg_received" type="BDI_BELIEF" condition="10" threshold="7"/>
-	        		<constraint agent_id="Carry" element="no_msg_received" type="BDI_BELIEF" condition="10" threshold="7"/>
-	        		<constraint agent_id="Sentry" element="no_msg_received" type="BDI_BELIEF" condition="10" threshold="7"/>
+	        		<constraint agent_id="Producer" element="no_msg_received" type="BDI_BELIEF" condition="20" threshold="15"/>
+	        		<constraint agent_id="Carry" element="no_msg_received" type="BDI_BELIEF" condition="20" threshold="15"/>
+	        		<constraint agent_id="Sentry" element="no_msg_received" type="BDI_BELIEF" condition="20" threshold="15"/>
 	    		</constraints>
 		    </adaption>
-<!-- 		    <adaption id="change-to-broadcast" answers="3" quorum="0.66" timeout="10000" delay="1000" reset="true"> -->
-<!-- 		        <realiazions> -->
-<!-- 			        <realization id="latest_target_seen_proximity" activate="false"/> -->
-<!-- 			        <realization id="latest_target_analyzed_proximity" activate="false"/> -->
-<!-- 			        <realization id="latest_target_produced_proximity" activate="false"/> -->
-<!-- 			        <realization id="latest_target_seen_broadcast" activate="true"/> -->
-<!-- 			        <realization id="latest_target_analyzed_broadcast" activate="true"/> -->
-<!-- 			        <realization id="latest_target_produced_broadcast" activate="true"/> -->
-<!-- 		        </realiazions> -->
-<!-- 		        <constraints> -->
-<!-- 	        		<constraint agent_id="Producer" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/> -->
-<!-- 	        		<constraint agent_id="Carry" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/> -->
-<!-- 	        		<constraint agent_id="Sentry" element="no_msg_received" type="BDI_BELIEF" condition="15" threshold="12"/> -->
-<!-- 	    		</constraints> -->
-<!-- 		    </adaption> -->
 	    </adaptions>
 	</convergence>
 </MASDynamic>

@@ -16,6 +16,9 @@ public class CountNoMsgPlan extends Plan {
 
 	@Override
 	public void body() {
+		// wait for 
+		waitFor(30000);
+		
 		while (true) {
 			// wait for one second
 			waitFor(1000);

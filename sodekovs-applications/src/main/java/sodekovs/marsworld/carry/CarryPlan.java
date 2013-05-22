@@ -30,21 +30,46 @@ public class CarryPlan extends Plan {
 	 */
 	public void body() {
 		while (true) {
-			IInternalEvent event = waitForInternalEvent("latestProducedTargetEvent");
-			// reset the no_msg_received counter for the convergence
-			getBeliefbase().getBelief("no_msg_received").setFact(new Integer(0));
-			
-			CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_produced_target").getValue();
-			System.out.println("#CarryPlan# Received latest produced target:  " + data);
+			waitForTick();
+			Object[] events = getWaitqueue().getElements();
 
-			ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
-			IVector2 position = new Vector2Double(data.getX(), data.getY());
-			ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+			for (Object o : events) {
+				IInternalEvent event = (IInternalEvent) o;
+				// reset the no_msg_received counter for the convergence
+				getBeliefbase().getBelief("no_msg_received").setFact(new Integer(0));
 
-			// Producing ore here.
-			IGoal carry_ore = createGoal("carry_ore");
-			carry_ore.getParameter("target").setValue(latestTarget);
-			dispatchSubgoalAndWait(carry_ore);
+				CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_produced_target").getValue();
+				System.out.println("#CarryPlan# Received latest produced target:  " + data);
+
+				ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
+				IVector2 position = new Vector2Double(data.getX(), data.getY());
+				ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+
+				// Producing ore here.
+				IGoal carry_ore = createGoal("carry_ore");
+				carry_ore.getParameter("target").setValue(latestTarget);
+				dispatchSubgoalAndWait(carry_ore);
+				
+				getWaitqueue().removeElement(o);
+			}
 		}
+
+		// while (true) {
+		// IInternalEvent event = waitForInternalEvent("latestProducedTargetEvent");
+		// // reset the no_msg_received counter for the convergence
+		// getBeliefbase().getBelief("no_msg_received").setFact(new Integer(0));
+		//
+		// CoordinationSpaceData data = (CoordinationSpaceData) event.getParameter("latest_produced_target").getValue();
+		// System.out.println("#CarryPlan# Received latest produced target:  " + data);
+		//
+		// ContinuousSpace2D env = (ContinuousSpace2D) getBeliefbase().getBelief("move.environment").getFact();
+		// IVector2 position = new Vector2Double(data.getX(), data.getY());
+		// ISpaceObject latestTarget = env.getNearestObject(position, null, "target");
+		//
+		// // Producing ore here.
+		// IGoal carry_ore = createGoal("carry_ore");
+		// carry_ore.getParameter("target").setValue(latestTarget);
+		// dispatchSubgoalAndWait(carry_ore);
+		// }
 	}
 }

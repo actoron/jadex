@@ -77,6 +77,9 @@
 		<!-- The main plan handling action requests. -->
 		<plan name="producer_plan">
 			<body class="ProducerPlan"/>
+			<waitqueue>
+		         <internalevent ref="latestAnalyzedTargetEvent"/>
+		     </waitqueue>
 		</plan>
 
 		<!-- Produce ore at a target. -->

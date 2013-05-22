@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SimulationConfiguration name="MarsWorldExperiments"
-	applicationReference="../sodekovs-applications/target/classes/sodekovs/marsworld/MarsWorld4SimulationExperimentsANDCoordSpaceANDEnergy.application.xml"
+	applicationReference="../sodekovs-applications/target/classes/sodekovs/marsworld/MarsWorld4SASO.application.xml"
 	applicationConfiguration="StandardConfiguation"	 
 	nameOfSpace="my2dspace"
-	description="My Simulation">
-
+	description="Nearest and random, adaptation 30s start delay, 50 experiment(s), failure after 60s">
 
 	<Imports>		
 		<Import>jadex.extension.envsupport.evaluation.XYChartDataConsumer</Import>		
@@ -13,24 +12,25 @@
 	</Imports>
 
 	<Dataproviders>
-		<!--
-		<Dataprovider name="homebaselogger">
-			<Source name="$homebase" sourcetype="ISpaceObject" objecttype="homebase"/> 						
-			<Data name="ore_amount">$homebase.ore</Data>
-			<Data name="time">$tick</Data>				
-		</Dataprovider>
-		<Dataprovider name="energycostslogger">
-			<Source name="$energyCosts" sourcetype="ISpaceObject" objecttype="energyCosts"/> 						
-			<Data name="energy_costs">$energyCosts.costs</Data>
-			<Data name="time">$tick</Data>				
-		</Dataprovider>
-		-->
 		<Dataprovider name="simulationlogger">
 		    <Source name="$homebase" sourcetype="ISpaceObject" objecttype="homebase"/>
 		    <Source name="$energyCosts" sourcetype="ISpaceObject" objecttype="energyCosts"/>
+		    <Source name="$ore" sourcetype="ISpaceObject" objecttype="ore"/>
+		    <Source name="$soMessages" sourcetype="ISpaceObject" objecttype="soMessages"/>
+		    <Source name="$adaptation" sourcetype="ISpaceObject" objecttype="adaptation"/>
 		    <Data name="ore_amount">$homebase.ore</Data>
 		    <Data name="time">$tick</Data>
 		    <Data name="energy_costs">$energyCosts.costs</Data>
+		    <Data name="adaptation_costs">$energyCosts.adaptationCosts</Data>
+		    <Data name="collectedOre">$homebase.ore</Data>
+		    <Data name="sensedOre">$ore.sensedOre</Data>
+		    <Data name="producedOre">$ore.producedOre</Data>
+		    <Data name="targetSeen">$soMessages.targetSeen</Data>
+		    <Data name="targetAnalyzed">$soMessages.targetAnalyzed</Data>
+		    <Data name="targetProduced">$soMessages.targetProduced</Data>
+		    <Data name="votingAttempts">$adaptation.votingAttempts</Data>
+		    <Data name="adaptations">$adaptation.adaptations</Data>
+		    <Data name="failures">$adaptation.failures</Data>
 		</Dataprovider>
 	</Dataproviders>
 
@@ -53,18 +53,31 @@
 				<Property name="valuex_0">"time"</Property>
 				<Property name="valuey_0">"energy_costs"</Property>
 		</Dataconsumer>
+		<Dataconsumer name="adaptationcostsConsumer" clazz="XYChartDataConsumer">
+				<Property name="dataprovider">"simulationlogger"</Property>
+				<Property name="title">"Evaluation of adaptation costs"</Property>				
+				<Property name="labelx">"Time"</Property>			
+				<Property name="labely">"Adaptation Costs"</Property>				
+				<Property name="seriesname_0">"Adaptation Costs Costs"</Property>				
+				<Property name="valuex_0">"time"</Property>
+				<Property name="valuey_0">"adaptation_costs"</Property>
+		</Dataconsumer>
 		<Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">		
 				<Property name="dataprovider">"simulationlogger"</Property>
 				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. -->
 				<Property name="ore_amount" filter="last"/>
 				<Property name="energy_costs" filter="last"/> 
-		</Dataconsumer>
-		 
-		<!--<Dataconsumer name="homebaseConsumer" clazz="SimulationLogger">
-				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="title">"Logging Simulation"</Property>
-				<Property name="filelocation">"C:\simulation\marsworld.log"</Property>
-		</Dataconsumer>-->		
+				<Property name="adaptation_costs" filter="last"/>
+				<Property name="collectedOre" filter="last"/> 
+				<Property name="sensedOre" filter="last"/> 
+				<Property name="producedOre" filter="last"/> 
+				<Property name="targetSeen" filter="last"/> 
+				<Property name="targetAnalyzed" filter="last"/> 
+				<Property name="targetProduced" filter="last"/> 
+				<Property name="votingAttempts" filter="last"/> 
+				<Property name="adaptations" filter="last"/> 
+				<Property name="failures" filter="last"/> 
+		</Dataconsumer>	
 	</Dataconsumers>
 
 	<DataVisualization>
@@ -84,12 +97,12 @@
 
 	<RunConfiguration>
 		<General rows="1" parallelRuns="1" delta="true"/>
-		<Rows experiments="1">
+		<Rows experiments="50">
 			<TerminateCondition>
-				    <Time value="30000" type="relative" />
-					<TargetFunction function="$object.getProperty(&quot;ore&quot;) >= 55">
-					    <ObjectSource type="ISpaceObject" name="homebase"/>
-					</TargetFunction>
+			    <Time value="300000" type="relative" />
+				<TargetFunction function="$object.getProperty(&quot;ore&quot;) >= 1000">
+				    <ObjectSource type="ISpaceObject" name="homebase"/>
+				</TargetFunction>
 			</TerminateCondition>
 		</Rows>
 	</RunConfiguration>

@@ -79,6 +79,9 @@
 		<!-- The main plan handling action requests. -->
 		<plan name="carry_plan">
 		    <body class="CarryPlan"/>
+		    <waitqueue>
+		        <internalevent ref="latestProducedTargetEvent"/>
+		    </waitqueue>
 		</plan>
 
 		<!-- Carry ore to the homebase. -->
