@@ -511,14 +511,15 @@ public class SBpmnModelReader
 			}
 			
 			LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
-			if (sps.isEmpty())
-			{
-				((MPool) buffer.get("pool")).addSequenceEdge(edge);
-			}
-			else
-			{
-				sps.peek().addSequenceEdge(edge);
-			}
+			//TODO: No longer necessary, cleanup?
+//			if (sps.isEmpty())
+//			{
+//				((MPool) buffer.get("pool")).addSequenceEdge(edge);
+//			}
+//			else
+//			{
+//				sps.peek().addSequenceEdge(edge);
+//			}
 			
 			emap.put(edge.getId(), edge);
 		}

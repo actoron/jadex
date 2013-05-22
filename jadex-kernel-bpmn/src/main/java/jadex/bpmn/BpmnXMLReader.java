@@ -91,6 +91,9 @@ public class BpmnXMLReader
 	/** Key for error entries in read context. */
 	public static final String CONTEXT_ENTRIES = "entries";
 	
+	/** Key for sequence edges in read context. */
+	public static final String SEQUENCE_EDGES = "sequenceedges";
+	
 	// Copied from jadex.tools.bpmn.editor.properties.AbstractJadexPropertySection
 	
 	/** 
@@ -205,6 +208,7 @@ public class BpmnXMLReader
 		Map	user	= new HashMap();
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
 		user.put(CONTEXT_ENTRIES, report);
+		user.put(SEQUENCE_EDGES, new HashMap<String, MSequenceEdge>());
 		MBpmnModel ret = (MBpmnModel)reader.read(manager, handler, rinfo.getInputStream(), classloader, user);
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
@@ -343,7 +347,7 @@ public class BpmnXMLReader
 			}, 
 			new SubobjectInfo[]{
 			new SubobjectInfo(new AccessInfo("vertices", "activity")),
-			new SubobjectInfo(new AccessInfo("sequenceEdges", "sequenceEdge")),
+//			new SubobjectInfo(new AccessInfo("sequenceEdges", "sequenceEdge")),
 			new SubobjectInfo(new AccessInfo("lanes", "lane")),
 			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
@@ -437,7 +441,7 @@ public class BpmnXMLReader
 			new SubobjectInfo(new AccessInfo("outgoingMessages", "outgoingMessageDescription")),
 			new SubobjectInfo(new AccessInfo("eventHandlers", "eventHandler")),
 			new SubobjectInfo(new AccessInfo("vertices", "Activity")),
-			new SubobjectInfo(new AccessInfo("sequenceEdges", "sequenceEdge")),
+//			new SubobjectInfo(new AccessInfo("sequenceEdges", "sequenceEdge")),
 			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
@@ -514,7 +518,8 @@ public class BpmnXMLReader
 //			System.out.println("Act: "+act.getName()+" "+act.getDescription());
 
 			// Make edge connections.
-			Map edges = dia.getAllSequenceEdges();
+//			Map edges = dia.getAllSequenceEdges();
+			Map<String, MSequenceEdge> edges = (Map<String, MSequenceEdge>) ((Map)context.getUserContext()).get(SEQUENCE_EDGES);
 			String indesc = act.getIncomingSequenceEdgesDescription();
 			if(indesc!=null)
 			{
@@ -538,6 +543,10 @@ public class BpmnXMLReader
 					MSequenceEdge edge = (MSequenceEdge)edges.get(edgeid);
 					act.addOutgoingSequenceEdge(edge);
 					edge.setSource(act);
+					if (edge.getCondition() != null)
+					{
+						SJavaParser.parseExpression(edge.getCondition(), dia.getModelInfo().getAllImports(), context.getClassLoader());
+					}
 				}
 			}
 			
@@ -1063,6 +1072,7 @@ public class BpmnXMLReader
 		{
 			MBpmnModel dia = (MBpmnModel)context.getRootObject();
 			MSequenceEdge edge = (MSequenceEdge)object;
+			((Map<String, MSequenceEdge>) ((Map) context.getUserContext()).get(SEQUENCE_EDGES)).put(edge.getId(), edge);
 			//JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
 			// Read annotations from Jadex bpmn tool.
@@ -1173,7 +1183,6 @@ public class BpmnXMLReader
 								{
 //									IParsedExpression cond = parser.parseExpression(value, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
 									UnparsedExpression cond = new UnparsedExpression(null, (Class<?>) null, value, null);
-									SJavaParser.parseExpression(cond, dia.getModelInfo().getAllImports(), context.getClassLoader());
 									edge.setCondition(cond);
 
 									// System.out.println("Condition: "+key+" "+value);
@@ -1259,7 +1268,7 @@ public class BpmnXMLReader
 				}
 			}
 			
-			return null;
+			return IPostProcessor.DISCARD_OBJECT;
 		}
 		
 		/**
@@ -1268,7 +1277,7 @@ public class BpmnXMLReader
 		 */
 		public int getPass()
 		{
-			return 2;
+			return 0;
 		}
 	}
 	

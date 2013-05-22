@@ -113,7 +113,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	//-------- attributes --------
 	
 	/** The pools. */
-	protected List pools;
+	protected List<MPool> pools;
 	
 	/** The artifacts. */
 	protected List artifacts;
@@ -236,7 +236,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get the pools.
 	 *  @return The pools.
 	 */
-	public List getPools()
+	public List<MPool> getPools()
 	{
 		return pools;
 	}
@@ -367,30 +367,26 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get all sequence edges.
 	 *  @return The sequence edges (id -> edge).
 	 */
-	public Map getAllSequenceEdges()
+	public Map<String, MSequenceEdge> getAllSequenceEdges()
 	{
 		if(this.alledges==null)
 		{
-			this.alledges = new HashMap();
+			this.alledges = new HashMap<String, MSequenceEdge>();
 			// todo: hierarchical search also in lanes of pools?!
 			
-			List pools = getPools();
+			List<MPool> pools = getPools();
 			if(pools!=null)
 			{
 				for(int i=0; i<pools.size(); i++)
 				{
 					MPool tmp = (MPool)pools.get(i);
-					addEdges(tmp.getSequenceEdges(), alledges);
 					
-					List acts = tmp.getActivities();
+					List<MActivity> acts = tmp.getActivities();
 					if(acts!=null)
 					{
 						for(int j=0; j<acts.size(); j++)
 						{
-							if(acts.get(j) instanceof MSubProcess)
-							{
-								getAllEdges((MSubProcess)acts.get(j), alledges);
-							}
+							getAllEdges(acts.get(j), alledges);
 						}
 					}
 					
@@ -475,18 +471,19 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  @param sub The subprocess.
 	 *  @param edges The edges (results will be added to this).
 	 */
-	protected void getAllEdges(MSubProcess sub, Map edges)
+	protected void getAllEdges(MActivity act, Map<String, MSequenceEdge> edges)
 	{
-		addEdges(sub.getSequenceEdges(), edges);
+//		addEdges(sub.getSequenceEdges(), edges);
+		addEdges(act.getOutgoingSequenceEdges(), edges);
 		
-		List acts = sub.getActivities();
-		if(acts!=null)
+		if(act instanceof MSubProcess)
 		{
-			for(int j=0; j<acts.size(); j++)
+			List<MActivity> acts = ((MSubProcess) act).getActivities();
+			if(acts!=null)
 			{
-				if(acts.get(j) instanceof MSubProcess)
+				for(int j=0; j<acts.size(); j++)
 				{
-					getAllEdges((MSubProcess)acts.get(j), edges);
+					getAllEdges(acts.get(j), edges);
 				}
 			}
 		}
@@ -497,7 +494,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  @param tmp The list of edges.
 	 *  @param edges The result map (id -> edge).
 	 */
-	protected void addEdges(List tmp, Map edges)
+	protected void addEdges(List<MSequenceEdge> tmp, Map<String, MSequenceEdge> edges)
 	{
 		if(tmp!=null)
 		{

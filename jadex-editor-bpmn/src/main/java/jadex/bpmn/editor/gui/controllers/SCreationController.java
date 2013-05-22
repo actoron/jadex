@@ -340,15 +340,16 @@ public class SCreationController
 			MSequenceEdge medge = new MSequenceEdge();
 			medge.setId(modelcontainer.getIdGenerator().generateId());
 			
-			if (((VActivity) source).getParent() instanceof VSubProcess)
-			{
-				((MSubProcess) ((VSubProcess) ((VActivity) source).getParent()).getBpmnElement()).addSequenceEdge(medge);
-			}
-			else
-			{
-				MActivity msrc = (MActivity) ((VActivity) source).getBpmnElement();
-				msrc.getPool().addSequenceEdge(medge);
-			}
+			//TODO: No longer necessary, cleanup?
+//			if (((VActivity) source).getParent() instanceof VSubProcess)
+//			{
+//				((MSubProcess) ((VSubProcess) ((VActivity) source).getParent()).getBpmnElement()).addSequenceEdge(medge);
+//			}
+//			else
+//			{
+//				MActivity msrc = (MActivity) ((VActivity) source).getBpmnElement();
+//				msrc.getPool().addSequenceEdge(medge);
+//			}
 			
 			VSequenceEdge vedge = new VSequenceEdge(modelcontainer.getGraph(), VSequenceEdge.class.getSimpleName());
 			vedge.setBpmnElement(medge);

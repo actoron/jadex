@@ -10,6 +10,7 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class BpmnVisualModelGenerator
 			
 			Map<String, mxICell> elements = new HashMap<String, mxICell>();
 			
+			List<MSequenceEdge> seqedges = new ArrayList<MSequenceEdge>();
 			List<MActivity> activities = mpool.getActivities();
 			if (activities != null && activities.size() > 0)
 			{
@@ -57,7 +59,11 @@ public class BpmnVisualModelGenerator
 //					vactivity.setBpmnElement(mactivity);
 //					setActivityGeometry(vactivity);
 //					elements.put(mactivity.getId(), vactivity);
-					elements.put(mactivity.getId(), generateActivity(graph, mactivity, vpool));
+					if (mactivity.getOutgoingSequenceEdges() != null)
+					{
+						seqedges.addAll(mactivity.getOutgoingSequenceEdges());
+					}
+					elements.put(mactivity.getId(), generateActivity(graph, mactivity, vpool, seqedges));
 				}
 			}
 			
@@ -83,13 +89,17 @@ public class BpmnVisualModelGenerator
 //							graph.getModel().endUpdate();
 //							vactivity.setBpmnElement(mactivity);
 //							elements.put(mactivity.getId(), vactivity);
-							elements.put(mactivity.getId(), generateActivity(graph, mactivity, vlane));
+							if (mactivity.getOutgoingSequenceEdges() != null)
+							{
+								seqedges.addAll(mactivity.getOutgoingSequenceEdges());
+							}
+							elements.put(mactivity.getId(), generateActivity(graph, mactivity, vlane, seqedges));
 						}
 					}
 				}
 			}
 			
-			List<MSequenceEdge> seqedges = mpool.getSequenceEdges();
+//			List<MSequenceEdge> seqedges = mpool.getSequenceEdges();
 			if (seqedges != null && seqedges.size() > 0)
 			{
 				for (MSequenceEdge medge : seqedges)
@@ -107,7 +117,7 @@ public class BpmnVisualModelGenerator
 		}
 	}
 	
-	protected VActivity generateActivity(BpmnGraph graph, MActivity mactivity, mxICell parent)
+	protected VActivity generateActivity(BpmnGraph graph, MActivity mactivity, mxICell parent, List<MSequenceEdge> sseqedges)
 	{
 		VActivity vactivity = null;
 		if (mactivity instanceof MSubProcess)
@@ -134,12 +144,18 @@ public class BpmnVisualModelGenerator
 				
 				Map<String, mxICell> elements = new HashMap<String, mxICell>();
 				
+				List<MSequenceEdge> seqedges = new ArrayList<MSequenceEdge>();
+				
 				List<MActivity> evthandlers = mactivity.getEventHandlers();
 				if (evthandlers != null && evthandlers.size() > 0)
 				{
 					for (MActivity evthandler : evthandlers)
 					{
-						elements.put(evthandler.getId(), generateActivity(graph, evthandler, vactivity));
+						if (evthandler.getOutgoingSequenceEdges() != null)
+						{
+							seqedges.addAll(evthandler.getOutgoingSequenceEdges());
+						}
+						elements.put(evthandler.getId(), generateActivity(graph, evthandler, vactivity, seqedges));
 					}
 				}
 				
@@ -148,11 +164,14 @@ public class BpmnVisualModelGenerator
 				{
 					for (MActivity activity : activities)
 					{
-						elements.put(activity.getId(), generateActivity(graph, activity, vactivity));
+						if (activity.getOutgoingSequenceEdges() != null)
+						{
+							seqedges.addAll(activity.getOutgoingSequenceEdges());
+						}
+						elements.put(activity.getId(), generateActivity(graph, activity, vactivity, seqedges));
 					}
 				}
 				
-				List<MSequenceEdge> seqedges = ((MSubProcess) mactivity).getSequenceEdges();
 				if (seqedges != null && seqedges.size() > 0)
 				{
 					for (MSequenceEdge medge : seqedges)
@@ -183,7 +202,11 @@ public class BpmnVisualModelGenerator
 			{
 				for (MActivity evthandler : evthandlers)
 				{
-					generateActivity(graph, evthandler, vactivity);
+					if (evthandler.getOutgoingSequenceEdges() != null && sseqedges != null)
+					{
+						sseqedges.addAll(evthandler.getOutgoingSequenceEdges());
+					}
+					generateActivity(graph, evthandler, vactivity, null);
 				}
 			}
 		}

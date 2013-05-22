@@ -63,20 +63,21 @@ public class DeletionController implements mxIEventListener
 			{
 				VSequenceEdge vedge = (VSequenceEdge) cells[i];
 				MSequenceEdge medge = (MSequenceEdge) vedge.getBpmnElement();
-				List pools = modelcontainer.getBpmnModel().getPools();
-				
-				for (Object obj : pools)
-				{
-					MPool mpool = (MPool) obj;
-					if (mpool.getSequenceEdges() != null)
-					{
-						if (mpool.getSequenceEdges().contains(medge))
-						{
-							mpool.removeSequenceEdge(medge);
-							break;
-						}
-					}
-				}
+				//TODO: No longer necessary, cleanup?
+//				List pools = modelcontainer.getBpmnModel().getPools();
+//				
+//				for (Object obj : pools)
+//				{
+//					MPool mpool = (MPool) obj;
+//					if (mpool.getSequenceEdges() != null)
+//					{
+//						if (mpool.getSequenceEdges().contains(medge))
+//						{
+//							mpool.removeSequenceEdge(medge);
+//							break;
+//						}
+//					}
+//				}
 				medge.getSource().removeOutgoingSequenceEdge(medge);
 				medge.getTarget().removeIncomingSequenceEdge(medge);
 			}

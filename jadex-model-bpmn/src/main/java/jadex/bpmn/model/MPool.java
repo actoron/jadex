@@ -11,10 +11,10 @@ public class MPool extends MAssociationTarget
 	//-------- attributes --------
 	
 	/** The vertices. */
-	protected List activities;
+	protected List<MActivity> activities;
 	
 	/** The sequence edges. */
-	protected List sequenceedges;
+	//protected List sequenceedges;
 	
 	/** The pools. */
 	protected List lanes;
@@ -31,7 +31,7 @@ public class MPool extends MAssociationTarget
 	 *  Get the activities.
 	 *  @return The activities.
 	 */
-	public List getActivities()
+	public List<MActivity> getActivities()
 	{
 		return activities;
 	}
@@ -43,7 +43,7 @@ public class MPool extends MAssociationTarget
 	public void addActivity(MActivity activity)
 	{
 		if(activities==null)
-			activities = new ArrayList();
+			activities = new ArrayList<MActivity>();
 		for (Object act : activities)
 		{
 			if (((MActivity) act).getId().equals(activity.getId()))
@@ -69,31 +69,31 @@ public class MPool extends MAssociationTarget
 	 *  Get the sequence edges.
 	 *  @return The edges. 
 	 */
-	public List getSequenceEdges()
-	{
-		return sequenceedges;
-	}
+//	public List getSequenceEdges()
+//	{
+//		return sequenceedges;
+//	}
 	
 	/**
 	 *  Add a sequence edge.
 	 *  @param edge The edge.
 	 */
-	public void addSequenceEdge(MSequenceEdge edge)
-	{
-		if(sequenceedges==null)
-			sequenceedges = new ArrayList();
-		sequenceedges.add(edge);
-	}
+//	public void addSequenceEdge(MSequenceEdge edge)
+//	{
+//		if(sequenceedges==null)
+//			sequenceedges = new ArrayList();
+//		sequenceedges.add(edge);
+//	}
 	
 	/**
 	 *  Remove a sequence edge.
 	 *  @param edge The edge.
 	 */
-	public void removeSequenceEdge(MSequenceEdge edge)
-	{
-		if(sequenceedges!=null)
-			sequenceedges.remove(edge);
-	}
+//	public void removeSequenceEdge(MSequenceEdge edge)
+//	{
+//		if(sequenceedges!=null)
+//			sequenceedges.remove(edge);
+//	}
 	
 	/**
 	 *  Get the lanes.
