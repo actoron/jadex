@@ -102,6 +102,7 @@ public class MProperty extends MAnnotationElement
 	 */
 	public void setInitialValue(UnparsedExpression initialval)
 	{
+//		System.out.println("setting: "+initialval.getValue());
 		this.initialval = initialval;
 	}
 	

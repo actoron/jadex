@@ -104,7 +104,7 @@ public abstract class AbstractAutoComboModel<T> extends AbstractListModel implem
 	 */
 	public void setSelectedItem(Object obj)
 	{
-		System.out.println("sel obj is: "+obj);
+//		System.out.println("sel obj is: "+obj);
 		
 //		if(obj instanceof String)
 //			System.out.println("herer");

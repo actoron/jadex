@@ -493,6 +493,10 @@ public class ServiceCallTask implements ITask
 			mo.removeAllElements();
 			
 			RequiredServiceInfo[] reqs = model.getRequiredServices();
+			ActionListener[] als = cbsername.getActionListeners();
+			for(ActionListener al: als)
+				cbsername.removeActionListener(al);
+			
 			if(reqs!=null)
 			{
 				for(int i=0; i<reqs.length; i++)
@@ -500,19 +504,21 @@ public class ServiceCallTask implements ITask
 					mo.addElement(reqs[i].getName());
 				}
 			}
+			for(ActionListener al: als)
+				cbsername.addActionListener(al);
 			
 			MProperty mprop = task.getProperties().get(PROPERTY_SERVICE);
 			if(mprop.getInitialValue()!=null)
 			{
 				String sername = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
 				cbsername.setSelectedItem(sername);
-				System.out.println("sel item: "+sername);
+//				System.out.println("sel item: "+sername);
 			
 				mprop = task.getProperties().get(PROPERTY_METHOD);
 				if(mprop.getInitialValue()!=null)
 				{
 					String methodname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
-					System.out.println(task.getName()+" "+mprop.getInitialValueString());
+//					System.out.println(task.getName()+" "+mprop.getInitialValueString());
 					
 					RequiredServiceInfo reqser = model.getRequiredService(sername);
 					Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
@@ -525,7 +531,7 @@ public class ServiceCallTask implements ITask
 							if(m.toString().equals(methodname))
 							{
 								cbmethodname.setSelectedItem(methodname);
-								System.out.println("sel item2: "+methodname);
+//								System.out.println("sel item2: "+methodname);
 							}
 						}
 					}
