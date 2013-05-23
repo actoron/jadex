@@ -151,11 +151,11 @@ public class ServiceCall
 		else if(props!=null)
 		{
 			
-			if(ret.getCaller()==null && props.get("method2")!=null && props.get("method2").equals("status"))
-			{
-				System.out.println("abgsdoyi: "+ret);
-//				Thread.dumpStack();
-			}
+//			if(ret.getCaller()==null && props.get("method2")!=null && props.get("method2").equals("status"))
+//			{
+//				System.out.println("abgsdoyi: "+ret);
+////				Thread.dumpStack();
+//			}
 			ret.properties.putAll(props);
 		}
 		return ret;

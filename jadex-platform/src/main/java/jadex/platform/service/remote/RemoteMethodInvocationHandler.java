@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -96,13 +97,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		// Get the current service invocation 
 //		ServiceCall invoc = ServiceCall.getCurrentInvocation();
-		if(IComponentIdentifier.LOCAL.get()==null && method.getName().equals("status"))
-		{
-			System.out.println("null invocation1: "+method);
-			Thread.dumpStack();
-		}
 		Map<String, Object>	props	= new HashMap<String, Object>();
-		props.put("method2", method.getName());
+//		props.put("method2", method.getName());
 		ServiceCall invoc = ServiceCall.getInvocation(props);
 		
 		// Get method timeout
@@ -122,6 +118,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		}
 		nf.put(Timeout.TIMEOUT, new Long(to));
 		final Map<String, Object> nonfunc = nf; 
+		
+		CallAccess.resetNextInvocation();
 		
 		Future future;
 		Class type = determineReturnType(proxy, method, args);

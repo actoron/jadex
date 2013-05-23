@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
@@ -231,11 +232,18 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		IComponentAdapter.LOCAL.set(null);	// No adapter for remote component.
 		Map<String, Object> props = getNonFunctionalProperties();
 		
-		props.put("method3", method.getName());
+//		props.put("method3", method.getName());
 
+//		if(ServiceCall.getInvocation0()!=null)
+//		{
+//			System.out.println("lsdjgho");
+//		}
+		
 		ServiceCall.getInvocation(props);
 		
 		invokeMethod(ret, rsms);
+		
+		CallAccess.resetNextInvocation();
 		
 		IComponentIdentifier.LOCAL.set(component.getComponentIdentifier());
 		IComponentAdapter.LOCAL.set(ada);
