@@ -6,8 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Authenticated;
-import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;

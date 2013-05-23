@@ -119,7 +119,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		nf.put(Timeout.TIMEOUT, new Long(to));
 		final Map<String, Object> nonfunc = nf; 
 		
-		CallAccess.resetNextInvocation();
+		CallAccess.resetNextInvocation(); 
 		
 		Future future;
 		Class type = determineReturnType(proxy, method, args);

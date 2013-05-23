@@ -4,6 +4,7 @@ import jadex.bridge.Cause;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
@@ -16,6 +17,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.component.interceptors.AuthenticationInterceptor;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
@@ -248,8 +250,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		if(sid==null)
 		{
+			// Hack!!! Preserve call context after getServiceIdentifier()
+			ServiceCall	sc	= CallAccess.getNextInvocation();
+			CallAccess.resetNextInvocation();
+			
 			sid = service instanceof ServiceInfo? ((ServiceInfo)service).getManagementService().getServiceIdentifier():
 				((IService)service).getServiceIdentifier();
+			
+			CallAccess.setNextInvocation(sc);
 		}
 		return sid;
 	}
