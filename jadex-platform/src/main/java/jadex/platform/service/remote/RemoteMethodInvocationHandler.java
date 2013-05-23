@@ -96,7 +96,14 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		// Get the current service invocation 
 //		ServiceCall invoc = ServiceCall.getCurrentInvocation();
-		ServiceCall invoc = ServiceCall.getInvocation();
+		if(IComponentIdentifier.LOCAL.get()==null && method.getName().equals("status"))
+		{
+			System.out.println("null invocation1: "+method);
+			Thread.dumpStack();
+		}
+		Map<String, Object>	props	= new HashMap<String, Object>();
+		props.put("method2", method.getName());
+		ServiceCall invoc = ServiceCall.getInvocation(props);
 		
 		// Get method timeout
 		final long to = invoc!=null && invoc.getTimeout()!=-1? invoc.getTimeout(): pi.getMethodTimeout(method);

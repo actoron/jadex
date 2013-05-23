@@ -4,6 +4,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -168,6 +169,11 @@ public class RemoteServiceManagementAgent extends MicroAgent
 			return;
 		}
 		
+//		if(ServiceCall.getInvocation0()!=null)
+//		{
+//			System.out.println("sdklugi: "+ServiceCall.getInvocation0());
+//		}
+		
 		final IResourceIdentifier[] rid = new IResourceIdentifier[1];
 		
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
@@ -245,8 +251,19 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								{
 									public void resultAvailable(final IResourceIdentifier srid) 
 									{
+//										if(ServiceCall.getInvocation0()!=null)
+//										{
+//											System.out.println("xdfhklx: "+ServiceCall.getInvocation0());
+//										}
+
 										rid[0] = srid;
 //										System.out.println("Command valid: "+com);
+										
+//										if(com instanceof RemoteMethodInvocationCommand && ((RemoteMethodInvocationCommand)com).getCaller()==null)
+//										{
+//											System.out.println("No caller: "+msg.get(SFipa.SENDER)+", "+((RemoteMethodInvocationCommand)com).getMethodName());
+//										}
+										
 										com.execute((IMicroExternalAccess)getExternalAccess(), rms)
 											.addResultListener(createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
 									}

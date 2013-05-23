@@ -1100,13 +1100,13 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	protected boolean	publishEvent(String type, String nick, IComponentIdentifier cid, Object value, boolean privatemessage, byte[] image)
 	{
-		if(cid==null)
-		{
-			Thread.dumpStack();
-		}
-		
+//		if(cid==null)
+//		{
+//			Thread.dumpStack();
+//		}
+//		
 		boolean	ret	= false;
-		if(subscribers!=null)
+		if(subscribers!=null && cid!=null)	// Hack!!! why is cid null?
 		{
 			ChatEvent	ce	= new ChatEvent(type, nick, cid, value, privatemessage, image);
 			for(Iterator<SubscriptionIntermediateFuture<ChatEvent>> it=subscribers.iterator(); it.hasNext(); )

@@ -1138,10 +1138,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
-							if(ce.getComponentIdentifier()==null)
-							{
-								System.out.println("state change: "+ce);
-							}
 							setUserState(ce.getComponentIdentifier(),
 								!IChatService.STATE_DEAD.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,
 								IChatService.STATE_TYPING.equals(ce.getValue()) ? Boolean.TRUE : Boolean.FALSE,

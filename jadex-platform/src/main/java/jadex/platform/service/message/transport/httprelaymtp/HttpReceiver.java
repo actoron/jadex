@@ -85,7 +85,7 @@ public class HttpReceiver
 					{
 						selectServer(curadrs).addResultListener(new IResultListener<String>()
 						{
-							public void resultAvailable(String adr)
+							public void resultAvailable(final String adr)
 							{
 								if(!shutdown)
 								{
@@ -99,7 +99,10 @@ public class HttpReceiver
 										
 										public void exceptionOccurred(Exception exception)
 										{
-											exception.printStackTrace();
+											if(!shutdown)
+											{
+												exception.printStackTrace();
+											}
 											restart(exception);
 										}
 									});
@@ -525,7 +528,7 @@ public class HttpReceiver
 			}
 			else
 			{
-//				System.out.println("relay timeout");
+				System.out.println("relay timeout");
 				RelayConnectionManager.closeConnection(con);
 			}
 		}

@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
@@ -13,7 +14,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -72,7 +75,14 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 			BasicServiceInvocationHandler	handler	= (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
 			Object	service	= handler.getService();
 			IFuture<Boolean>	valid;
-			ServiceCall sc = CallAccess.getInvocation();
+			
+			if(IComponentIdentifier.LOCAL.get()==null && sic.getMethod().getName().equals("status"))
+			{
+				System.out.println("null invocation: "+sic.getMethod());
+			}
+			Map<String, Object>	props	= new HashMap<String, Object>();
+			props.put("method1", sic.getMethod());
+			ServiceCall sc = CallAccess.getInvocation(props);
 			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
 			sc.setProperty(ServiceCall.INHERIT, true);
 //			CallAccess.setServiceCall(sc);

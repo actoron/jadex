@@ -201,8 +201,11 @@ public class ServiceInvocationContext
 			call.setProperty(ServiceCall.REALTIME, realtime ? Boolean.TRUE : Boolean.FALSE);
 		}
 		
-//		if(method.getName().indexOf("method")!=-1)
-//			System.out.println("ggggg");
+		if(method.getName().indexOf("get")==-1 && method.getDeclaringClass().getName().indexOf("IChatService")!=-1 && call.getCaller()==null)
+		{
+			System.out.println("ggggg: "+call);
+//			Thread.dumpStack();
+		}
 		
 		// Init the cause of the next call based on the last one
 		if(this.call.getCause()==null)

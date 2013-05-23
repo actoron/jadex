@@ -111,6 +111,14 @@ public class ServiceCall
 	}
 	
 	/**
+	 *  Get the next invocation if any.
+	 */
+	public static ServiceCall getInvocation0()
+	{
+		return INVOCATIONS.get();
+	}
+	
+	/**
 	 *  Get or create the next servicecall for the next invocation. 
 	 *  @param timeout The timeout.
 	 *  @param realtime The realtime flag.
@@ -121,6 +129,13 @@ public class ServiceCall
 		if(ret==null)
 		{
 			ret = new ServiceCall(IComponentIdentifier.LOCAL.get(), props);
+			
+//			if(ret.getCaller()==null)
+//			{
+//				System.out.println("sflöjyhö");
+//				Thread.dumpStack();
+//			}
+
 			INVOCATIONS.set(ret);
 			
 //			if(getCurrentInvocation()!=null)
@@ -135,6 +150,12 @@ public class ServiceCall
 		}
 		else if(props!=null)
 		{
+			
+			if(ret.getCaller()==null && props.get("method2")!=null && props.get("method2").equals("status"))
+			{
+				System.out.println("abgsdoyi: "+ret);
+//				Thread.dumpStack();
+			}
 			ret.properties.putAll(props);
 		}
 		return ret;

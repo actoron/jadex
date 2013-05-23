@@ -1,5 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
@@ -88,7 +91,10 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 		final ServiceCall cur = CallAccess.getCurrentInvocation();
 		final ServiceCall next = CallAccess.getNextInvocation();
 		
-		ServiceCall sc = CallAccess.getInvocation();
+		Map<String, Object>	props	= new HashMap<String, Object>();
+		props.put("method4", context.getMethod().getName());
+		
+		ServiceCall sc = CallAccess.getInvocation(props);
 		sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
 		sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
 		
@@ -173,6 +179,9 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 			// service call (getChildren) will reset the call context afterwards :-(
 			final ServiceCall cur = CallAccess.getCurrentInvocation();
 			final ServiceCall next = CallAccess.getNextInvocation();
+			
+			Map<String, Object>	props	= new HashMap<String, Object>();
+			props.put("method5", sic.getMethod().getName());
 			
 			ServiceCall sc = CallAccess.getInvocation();
 			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);

@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -218,12 +219,20 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
+		if(caller==null && getMethodName().equals("status"))
+		{
+			System.out.println("dglkysfi");
+			Thread.dumpStack();
+		}
+		
 		// RMS acts as representative of remote caller.
 		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();
 		IComponentIdentifier.LOCAL.set(caller);
 		IComponentAdapter.LOCAL.set(null);	// No adapter for remote component.
 		Map<String, Object> props = getNonFunctionalProperties();
 		
+		props.put("method3", method.getName());
+
 		ServiceCall.getInvocation(props);
 		
 		invokeMethod(ret, rsms);

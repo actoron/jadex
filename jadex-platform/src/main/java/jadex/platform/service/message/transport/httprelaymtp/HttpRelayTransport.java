@@ -250,42 +250,42 @@ public class HttpRelayTransport implements ITransport
 	 */
 	protected void	connected(final String address, final boolean dead)
 	{
-		if(dead)
-		{
-			Thread.dumpStack();
-		}
+//		if(dead)
+//		{
+//			Thread.dumpStack();
+//		}
 		
-		final String	httpadr	= address.substring(6);
+//		final String	httpadr	= address.substring(6);
 		
 //		Long	oldtime	= addresses.get(httpadr);
 		// Remove all old entries with start address (e.g. also awareness urls).
-		if(!dead)
-		{
-			String[]	aadrs	= addresses.keySet().toArray(new String[0]);
-			for(int i=0; i<aadrs.length; i++)
-			{
-				if(aadrs[i].startsWith(httpadr))
-				{
-					addresses.remove(aadrs[i]);
-				}
-			}
-		}
-		addresses.put(httpadr, new Long(dead ? -System.currentTimeMillis() : System.currentTimeMillis()));
-		
-		ISendTask[]	readytasks	= null;
-		synchronized(readyqueue)
-		{
-			Collection<ISendTask>	queue	= readyqueue.get(httpadr);
-			if(queue!=null)
-			{
-				readytasks	= queue.toArray(new ISendTask[queue.size()]);
-				readyqueue.remove(httpadr);
-			}
-		}
-		for(int i=0; readytasks!=null && i<readytasks.length; i++)
-		{
-			internalSendMessage(httpadr, readytasks[i]);
-		}
+//		if(!dead)
+//		{
+//			String[]	aadrs	= addresses.keySet().toArray(new String[0]);
+//			for(int i=0; i<aadrs.length; i++)
+//			{
+//				if(aadrs[i].startsWith(httpadr))
+//				{
+//					addresses.remove(aadrs[i]);
+//				}
+//			}
+//		}
+//		addresses.put(httpadr, new Long(dead ? -System.currentTimeMillis() : System.currentTimeMillis()));
+//		
+//		ISendTask[]	readytasks	= null;
+//		synchronized(readyqueue)
+//		{
+//			Collection<ISendTask>	queue	= readyqueue.get(httpadr);
+//			if(queue!=null)
+//			{
+//				readytasks	= queue.toArray(new ISendTask[queue.size()]);
+//				readyqueue.remove(httpadr);
+//			}
+//		}
+//		for(int i=0; readytasks!=null && i<readytasks.length; i++)
+//		{
+//			internalSendMessage(httpadr, readytasks[i]);
+//		}
 		
 		// inform awa when olddead
 //		boolean	olddead	= oldtime==null || oldtime.longValue()<=0;
@@ -524,6 +524,28 @@ public class HttpRelayTransport implements ITransport
 					}
 				}
 			});
+		}
+		else
+		{
+			// Check if ping succeeded in mean time.
+			Long	time	= addresses.get(address);
+			if(time!=null && time.longValue()!=0)
+			{
+				ISendTask[]	readytasks	= null;
+				synchronized(readyqueue)
+				{
+					Collection<ISendTask>	queue	= readyqueue.get(address);
+					if(queue!=null)
+					{
+						readytasks	= queue.toArray(new ISendTask[queue.size()]);
+						readyqueue.remove(address);
+					}
+				}
+				for(int i=0; readytasks!=null && i<readytasks.length; i++)
+				{
+					internalSendMessage(address, readytasks[i]);
+				}				
+			}
 		}
 	}
 
