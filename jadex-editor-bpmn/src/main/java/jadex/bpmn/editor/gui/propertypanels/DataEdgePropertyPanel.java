@@ -51,26 +51,26 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 		});
 		configureAndAddInputLine(column, label, textarea, y++);
 		
-		label = new JLabel("Index Mapping");
-		textarea = new JTextArea();
-		if (getBpmnDataEdge().getParameterMapping() != null)
-		{
-			textarea.setText(getBpmnDataEdge().getParameterMapping().getSecondEntity() != null? getBpmnDataEdge().getParameterMapping().getSecondEntity().getValue() : "");
-		}
+//		label = new JLabel("Index Mapping");
+//		textarea = new JTextArea();
+//		if (getBpmnDataEdge().getParameterMapping() != null)
+//		{
+//			textarea.setText(getBpmnDataEdge().getParameterMapping().getSecondEntity() != null? getBpmnDataEdge().getParameterMapping().getSecondEntity().getValue() : "");
+//		}
+//		
+//		textarea.getDocument().addDocumentListener(new DocumentAdapter()
+//		{
+//			public void update(DocumentEvent e)
+//			{
+//				String exp = getText(e.getDocument());
+//				UnparsedExpression unusedexp = getBpmnDataEdge().getParameterMapping() != null? getBpmnDataEdge().getParameterMapping().getFirstEntity() : null;
+//				getBpmnDataEdge().setParameterMapping(unusedexp, exp != null? new UnparsedExpression(null, (String) null, exp, null) : null);
+//				modelcontainer.setDirty(true);
+//			}
+//		});
+//		configureAndAddInputLine(column, label, textarea, y++);
 		
-		textarea.getDocument().addDocumentListener(new DocumentAdapter()
-		{
-			public void update(DocumentEvent e)
-			{
-				String exp = getText(e.getDocument());
-				UnparsedExpression unusedexp = getBpmnDataEdge().getParameterMapping() != null? getBpmnDataEdge().getParameterMapping().getFirstEntity() : null;
-				getBpmnDataEdge().setParameterMapping(unusedexp, exp != null? new UnparsedExpression(null, (String) null, exp, null) : null);
-				modelcontainer.setDirty(true);
-			}
-		});
-		configureAndAddInputLine(column, label, textarea, y++);
-		
-		addVerticalFiller(y);
+		addVerticalFiller(column, y);
 	}
 	
 	protected MDataEdge getBpmnDataEdge()
