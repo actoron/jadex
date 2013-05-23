@@ -41,6 +41,9 @@ public class Settings
 	/** The last file opened or saved. */
 	protected int toolbariconsize = GuiConstants.DEFAULT_ICON_SIZE;
 	
+	/** Data edge enabled flag. */
+	protected boolean dataedges = true;
+	
 	/** Flag if simple name/type data edge auto-connect is enabled. */
 	protected boolean nametypedataautoconnect = true;
 	
@@ -140,6 +143,26 @@ public class Settings
 	public void setSmoothZoom(boolean smoothzoom)
 	{
 		this.smoothzoom = smoothzoom;
+	}
+	
+	/**
+	 *  Gets the dataedges.
+	 *
+	 *  @return The dataedges.
+	 */
+	public boolean isDataEdges()
+	{
+		return dataedges;
+	}
+
+	/**
+	 *  Sets the dataedges.
+	 *
+	 *  @param dataedges The dataedges.
+	 */
+	public void setDataEdges(boolean dataedges)
+	{
+		this.dataedges = dataedges;
 	}
 
 	/**
@@ -382,6 +405,8 @@ public class Settings
 		
 		props.put("smoothzoom", String.valueOf(smoothzoom));
 		
+		props.put("dataedges", String.valueOf(dataedges));
+		
 		props.put("nametypedataautoconnect", String.valueOf(nametypedataautoconnect));
 		
 		props.put("savesettingsonexit", String.valueOf(savesettingsonexit));
@@ -494,6 +519,18 @@ public class Settings
 				try
 				{
 					ret.setSmoothZoom(Boolean.parseBoolean(prop));
+				}
+				catch (Exception e)
+				{
+				}
+			}
+			
+			prop = props.getProperty("dataedges");
+			if (prop != null)
+			{
+				try
+				{
+					ret.setDataEdges(Boolean.parseBoolean(prop));
 				}
 				catch (Exception e)
 				{

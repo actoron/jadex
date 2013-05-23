@@ -32,6 +32,9 @@ public class SettingsPanel extends JPanel
 	/** Smooth zoom box. */
 	protected JCheckBox szbox;
 	
+	/** Data edge enabled box. */
+	protected JCheckBox debox;
+	
 	/** Name/Type data edge box. */
 	protected JCheckBox ntbox;
 	
@@ -107,29 +110,46 @@ public class SettingsPanel extends JPanel
 		g.insets = new Insets(0, 10, 0, 5);
 		generalpanel.add(button, g);
 		
+		szbox = new JCheckBox("Smooth Zoom");
+		szbox.setSelected(settings.isSmoothZoom());
 		g = new GridBagConstraints();
 		g.gridy = 1;
+		generalpanel.add(szbox, g);
+		
+		g = new GridBagConstraints();
+		g.gridy = 2;
 		g.gridwidth = GridBagConstraints.REMAINDER;
 		g.weightx = 1.0;
 		g.weighty = 1.0;
 		g.fill = GridBagConstraints.BOTH;
 		generalpanel.add(new JPanel(), g);
 		
-		szbox = new JCheckBox("Smooth Zoom");
-		szbox.setSelected(settings.isSmoothZoom());
-		g = new GridBagConstraints();
-		g.gridy = 2;
-		generalpanel.add(szbox, g);
-		
 		JPanel dataedgepanel = new JPanel(new GridBagLayout());
 		dataedgepanel.setBorder(new TitledBorder("Data Edge Settings"));
 		tabpane.addTab("Data Edge Settings", dataedgepanel);
+		
+		debox = new JCheckBox("Enable data edges");
+		debox.setToolTipText("Enable data edges.");
+		debox.setSelected(settings.isDataEdges());
+		g = new GridBagConstraints();
+		g.anchor = GridBagConstraints.WEST;
+		dataedgepanel.add(debox, g);
 		
 		ntbox = new JCheckBox("Generate data edge for matching name and type");
 		ntbox.setToolTipText("Generate data edge if following task has parameter of matching name and type.");
 		ntbox.setSelected(settings.isNameTypeDataAutoConnect());
 		g = new GridBagConstraints();
+		g.gridy = 1;
+		g.anchor = GridBagConstraints.WEST;
 		dataedgepanel.add(ntbox, g);
+		
+		g = new GridBagConstraints();
+		g.gridy = 2;
+		g.gridwidth = GridBagConstraints.REMAINDER;
+		g.weightx = 1.0;
+		g.weighty = 1.0;
+		g.fill = GridBagConstraints.BOTH;
+		dataedgepanel.add(new JPanel(), g);
 	}
 	
 	/**
@@ -160,5 +180,6 @@ public class SettingsPanel extends JPanel
 		}
 		settings.setSmoothZoom(szbox.isSelected());
 		settings.setNameTypeDataAutoConnect(ntbox.isSelected());
+		settings.setDataEdges(debox.isSelected());
 	}
 }

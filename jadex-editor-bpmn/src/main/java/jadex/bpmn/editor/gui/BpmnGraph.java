@@ -111,6 +111,23 @@ public class BpmnGraph extends mxGraph
 	{
 		return modelcontainer;
 	}
+	
+	/**
+	 * 
+	 */
+	public boolean isCellVisible(Object cell)
+	{
+		boolean ret = super.isCellVisible(cell);
+		
+		if (cell instanceof VInParameter ||
+			cell instanceof VOutParameter ||
+			cell instanceof VDataEdge)
+		{
+			ret &= modelcontainer.getSettings().isDataEdges();
+		}
+		
+		return ret;
+	}
 
 	/**
 	 * Returns true if the given cell is a valid drop target for the specified

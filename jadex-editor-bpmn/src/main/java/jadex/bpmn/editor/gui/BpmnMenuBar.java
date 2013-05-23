@@ -93,6 +93,7 @@ public class BpmnMenuBar extends JMenuBar
 							}
 							
 							cont.generateClassLoader();
+							cont.getGraph().refresh();
 						}
 					}
 				});
