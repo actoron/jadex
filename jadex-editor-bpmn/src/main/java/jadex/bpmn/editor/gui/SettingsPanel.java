@@ -168,9 +168,20 @@ public class SettingsPanel extends JPanel
 	 */
 	public void applySettings()
 	{
-		if (libpathfield.getText() != null && !libpathfield.getText().equals(settings.getLibraryHome() != null? settings.getLibraryHome().getPath() : null))
+		String pf = libpathfield.getText();
+		pf = pf != null && pf.length() == 0 ? null : pf;
+		if ((pf != null && settings.getLibraryHome() == null) ||
+			(pf == null && settings.getLibraryHome() != null) ||
+			(pf != null && !libpathfield.getText().equals(settings.getLibraryHome().getPath())))
 		{
-			settings.setLibraryHome(new File(libpathfield.getText()));
+			if (pf == null)
+			{
+				settings.setLibraryHome(null);
+			}
+			else
+			{
+				settings.setLibraryHome(new File(pf));
+			}
 			Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
 			{
 				public int compare(ClassInfo o1, ClassInfo o2)
