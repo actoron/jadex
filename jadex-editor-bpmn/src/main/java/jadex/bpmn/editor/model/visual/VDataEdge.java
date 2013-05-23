@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.model.visual;
 
+import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MDataEdge;
 
@@ -62,12 +63,14 @@ public class VDataEdge extends VEdge
 			if (getTarget() != null)
 			{
 				VActivity vtgt = (VActivity) getTarget().getParent();
+				((BpmnGraph) getGraph()).delayedRefreshCellView(vtgt);
 				((MActivity) vtgt.getBpmnElement()).removeIncomingDataEdge(dedge);
 			}
 			super.setTarget(target);
 			if (target != null)
 			{
 				VActivity vtgt = (VActivity) getTarget().getParent();
+				((BpmnGraph) getGraph()).delayedRefreshCellView(vtgt);
 				((MActivity) vtgt.getBpmnElement()).addIncomingDataEdge(dedge);
 				dedge.setTarget((MActivity) vtgt.getBpmnElement());
 				String paramname = ((VInParameter) getTarget()).getParameter().getName();

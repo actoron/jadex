@@ -35,6 +35,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.util.mxPoint;
@@ -406,10 +408,11 @@ public class SCreationController
 		return ret;
 	}
 	
-	protected static final VDataEdge createDataEdge(BpmnGraph graph, IdGenerator idgenerator, VOutParameter source, VInParameter target)
+	protected static final VDataEdge createDataEdge(final BpmnGraph graph, IdGenerator idgenerator, VOutParameter source, VInParameter target)
 	{
+		final VActivity vtactivity = (VActivity) target.getParent();
 		MActivity sactivity = (MActivity) ((VActivity) source.getParent()).getBpmnElement();
-		MActivity tactivity = (MActivity) ((VActivity) target.getParent()).getBpmnElement();
+		MActivity tactivity = (MActivity) vtactivity.getBpmnElement();
 		
 		MDataEdge dedge = new MDataEdge();
 		dedge.setId(idgenerator.generateId());
@@ -422,6 +425,8 @@ public class SCreationController
 		vedge.setBpmnElement(dedge);
 		vedge.setSource(source);
 		vedge.setTarget(target);
+		
+		graph.delayedRefreshCellView(vtactivity);
 		
 		return vedge;
 	}

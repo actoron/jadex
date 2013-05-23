@@ -11,16 +11,12 @@ import jadex.commons.gui.autocombo.AutoComboTableCellRenderer;
 import jadex.commons.gui.autocombo.AutoCompleteCombo;
 import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;

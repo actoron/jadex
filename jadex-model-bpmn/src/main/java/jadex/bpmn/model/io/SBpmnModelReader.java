@@ -510,7 +510,7 @@ public class SBpmnModelReader
 				tgt.addIncomingSequenceEdge(edge);
 			}
 			
-			LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
+//			LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
 			//TODO: No longer necessary, cleanup?
 //			if (sps.isEmpty())
 //			{
@@ -962,7 +962,7 @@ public class SBpmnModelReader
 			edge.setSourceParameter(attrs.get("sourceParam"));
 			edge.setTargetParameter(attrs.get("targetParam"));
 			
-			String expstr = attrs.get("mapping");
+			String expstr = (String) buffer.remove("dataFlowValueMapping");
 			if(expstr!=null && expstr.length()>0)
 			{
 				UnparsedExpression exp = new UnparsedExpression(
@@ -981,6 +981,10 @@ public class SBpmnModelReader
 			}
 			
 			emap.put(edge.getId(), edge);
+		}
+		else if ("dataFlowValueMapping".equals(tag.getLocalPart()))
+		{
+			buffer.put("dataFlowValueMapping", content);
 		}
 	}
 	

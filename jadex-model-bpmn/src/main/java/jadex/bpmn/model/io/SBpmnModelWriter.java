@@ -39,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 8;
+	public static final int BUILD = 9;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -856,7 +856,26 @@ public class SBpmnModelWriter
 			out.print(escapeString(dedge.getTarget().getId()));
 			out.print("\" targetParam=\"");
 			out.print(escapeString(dedge.getTargetParameter()));
-			out.println("\"/>");
+			
+			if (dedge.getParameterMapping() != null &&
+				dedge.getParameterMapping().getFirstEntity() != null &&
+				dedge.getParameterMapping().getFirstEntity().getValue() != null &&
+				dedge.getParameterMapping().getFirstEntity().getValue().length() > 0)
+			{
+				out.println("\">");
+				++ind;
+				out.print(getIndent(ind));
+				out.print("<jadex:dataFlowValueMapping>");
+				out.print(escapeString(dedge.getParameterMapping().getFirstEntity().getValue()));
+				out.println("</jadex:dataFlowValueMapping>");
+				--ind;
+				out.print(getIndent(ind));
+				out.println("</jadex:dataFlow>");
+			}
+			else
+			{
+				out.println("\"/>");
+			}
 		}
 		--ind;
 		out.println(getIndent(ind) + "</semantic:extensionElements>");

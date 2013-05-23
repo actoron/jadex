@@ -1,35 +1,13 @@
 package jadex.bpmn.model;
 
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
-import jadex.commons.IFilter;
-import jadex.commons.SReflect;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.io.File;
-import java.lang.reflect.Modifier;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 

@@ -1,5 +1,7 @@
 package jadex.bpmn.editor.gui;
 
+import javax.swing.SwingUtilities;
+
 import jadex.bpmn.editor.gui.controllers.SValidation;
 import jadex.bpmn.editor.gui.layouts.EventHandlerLayout;
 import jadex.bpmn.editor.gui.layouts.LaneLayout;
@@ -162,6 +164,22 @@ public class BpmnGraph extends mxGraph
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Refreshes the view for a cell later.
+	 *  
+	 *  @param cell The cell.
+	 */
+	public void delayedRefreshCellView(final mxICell cell)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				refreshCellView(cell);
+			}
+		});
 	}
 
 	/**
