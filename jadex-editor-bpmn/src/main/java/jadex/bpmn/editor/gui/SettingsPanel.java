@@ -110,7 +110,16 @@ public class SettingsPanel extends JPanel
 		g.insets = new Insets(0, 10, 0, 5);
 		generalpanel.add(button, g);
 		
-		szbox = new JCheckBox("Smooth Zoom");
+		AbstractAction changeaction = new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				SettingsPanel.this.firePropertyChange(OptionDialog.OPTIONS_CHANGED_PROPERTY, null, null);
+			}
+		};
+		
+		szbox = new JCheckBox(changeaction);
+		szbox.setText("Smooth Zoom");
 		szbox.setSelected(settings.isSmoothZoom());
 		g = new GridBagConstraints();
 		g.gridy = 1;
@@ -128,14 +137,16 @@ public class SettingsPanel extends JPanel
 		dataedgepanel.setBorder(new TitledBorder("Data Edge Settings"));
 		tabpane.addTab("Data Edge Settings", dataedgepanel);
 		
-		debox = new JCheckBox("Enable data edges");
+		debox = new JCheckBox(changeaction);
+		debox.setText("Enable data edges");
 		debox.setToolTipText("Enable data edges.");
 		debox.setSelected(settings.isDataEdges());
 		g = new GridBagConstraints();
 		g.anchor = GridBagConstraints.WEST;
 		dataedgepanel.add(debox, g);
 		
-		ntbox = new JCheckBox("Generate data edge for matching name and type");
+		ntbox = new JCheckBox(changeaction);
+		ntbox.setText("Generate data edge for matching name and type");
 		ntbox.setToolTipText("Generate data edge if following task has parameter of matching name and type.");
 		ntbox.setSelected(settings.isNameTypeDataAutoConnect());
 		g = new GridBagConstraints();
@@ -157,7 +168,7 @@ public class SettingsPanel extends JPanel
 	 */
 	public void applySettings()
 	{
-		if (libpathfield.getText() != null && !libpathfield.getText().equals(settings.getLibraryHome().getPath()))
+		if (libpathfield.getText() != null && !libpathfield.getText().equals(settings.getLibraryHome() != null? settings.getLibraryHome().getPath() : null))
 		{
 			settings.setLibraryHome(new File(libpathfield.getText()));
 			Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
