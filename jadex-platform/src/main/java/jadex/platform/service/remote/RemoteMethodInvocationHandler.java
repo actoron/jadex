@@ -13,15 +13,20 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IPullIntermediateFuture;
+import jadex.commons.future.IPullSubscriptionIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.PullIntermediateDelegationFuture;
+import jadex.commons.future.PullSubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.platform.service.remote.commands.RemoteFuturePullCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteMethodInvocationCommand;
 
@@ -125,7 +130,109 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		Class type = determineReturnType(proxy, method, args);
 //		Class type = method.getReturnType();
 
-		if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, type))
+		if(SReflect.isSupertype(IPullSubscriptionIntermediateFuture.class, type))
+		{
+			future = new PullSubscriptionIntermediateDelegationFuture()
+			{
+				public void pullIntermediateResult() 
+				{
+					Future<Object> res = new Future<Object>();
+					final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+					RemoteFuturePullCommand content = new RemoteFuturePullCommand(mycallid, callid);
+					// Can be invoked directly, because internally redirects to agent thread.
+//					System.out.println("sending terminate");
+					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+						content, mycallid, to, res, nonfunc);
+				}
+				
+				public void terminate(Exception reason) 
+				{
+					// Set exception for local state (as rms removes waiting call, cannot receive remote result any more)
+					boolean	set	= setExceptionIfUndone(reason);
+					
+					// Send message to announce termination to remote
+					if(set)
+					{
+						Future<Object> res = new Future<Object>();
+	//					res.addResultListener(new IResultListener()
+	//					{
+	//						public void resultAvailable(Object result)
+	//						{
+	//							System.out.println("received result: "+result);
+	//						}
+	//						public void exceptionOccurred(Exception exception)
+	//						{
+	//							System.out.println("received exception: "+exception);
+	//						}
+	//					});
+						final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
+						// Can be invoked directly, because internally redirects to agent thread.
+	//					System.out.println("sending terminate");
+						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+							content, mycallid, to, res, nonfunc);
+					}
+				}
+				
+				// Called from delegation listeners in RMS -> ignore if already terminated
+				public void setException(Exception exception)
+				{
+					super.setExceptionIfUndone(exception);
+				}
+			};
+		}
+		else if(SReflect.isSupertype(IPullIntermediateFuture.class, type))
+		{
+			future = new PullIntermediateDelegationFuture()
+			{
+				public void pullIntermediateResult() 
+				{
+					Future<Object> res = new Future<Object>();
+					final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+					RemoteFuturePullCommand content = new RemoteFuturePullCommand(mycallid, callid);
+					// Can be invoked directly, because internally redirects to agent thread.
+//					System.out.println("sending terminate");
+					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+						content, mycallid, to, res, nonfunc);
+				}
+				
+				public void terminate(Exception reason) 
+				{
+					// Set exception for local state (as rms removes waiting call, cannot receive remote result any more)
+					boolean	set	= setExceptionIfUndone(reason);
+					
+					// Send message to announce termination to remote
+					if(set)
+					{
+						Future<Object> res = new Future<Object>();
+	//					res.addResultListener(new IResultListener()
+	//					{
+	//						public void resultAvailable(Object result)
+	//						{
+	//							System.out.println("received result: "+result);
+	//						}
+	//						public void exceptionOccurred(Exception exception)
+	//						{
+	//							System.out.println("received exception: "+exception);
+	//						}
+	//					});
+						final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
+						// Can be invoked directly, because internally redirects to agent thread.
+	//					System.out.println("sending terminate");
+						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+							content, mycallid, to, res, nonfunc);
+					}
+				}
+				
+				// Called from delegation listeners in RMS -> ignore if already terminated
+				public void setException(Exception exception)
+				{
+					super.setExceptionIfUndone(exception);
+				}
+			};
+		}
+		else if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, type))
 		{
 			future = new SubscriptionIntermediateDelegationFuture()
 			{

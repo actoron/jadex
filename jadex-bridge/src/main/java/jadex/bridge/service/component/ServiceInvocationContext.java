@@ -383,8 +383,8 @@ public class ServiceInvocationContext
 		if(interceptor!=null)
 		{
 //			if(method.getName().equals("shutdownService") && sid.toString().indexOf("Context")!=-1 && sid.getProviderId().getParent()==null)
-			if(sid.getProviderId().getParent()==null && method.getName().indexOf("killComponent")!=-1)
-				System.out.println("invoke before: "+method.getName()+" "+interceptor);
+//			if(sid.getProviderId().getParent()==null && method.getName().indexOf("getResults")!=-1)
+//				System.out.println("invoke before: "+method.getName()+" "+interceptor);
 			interceptor.execute(this).addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
@@ -392,6 +392,9 @@ public class ServiceInvocationContext
 //					if(sid.getProviderId().getParent()==null)// && method.getName().indexOf("getChildren")!=-1)
 //						System.out.println("invoke after: "+method.getName()+" "+interceptor);
 
+//					if(method.getName().indexOf("getResults")!=-1)
+//						System.out.println("invoke after: "+method.getName()+" "+interceptor+" "+getResult());
+					
 					pop();
 					ret.setResult(null);
 				}

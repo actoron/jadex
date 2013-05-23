@@ -278,12 +278,17 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			final Object res = method.invoke(target, parametervalues);
 			
 			// Remember invocation for termination invocation
-			if(terminable)
+			if(terminable) // or pullable
 			{
 				rsms.putProcessingCall(callid, res);
-				Runnable cmd = rsms.removeTerminationCommand(callid);
-				if(cmd!=null)
-					cmd.run();
+				List<Runnable> cmds = rsms.removeFutureCommands(callid);
+				if(cmds!=null)
+				{
+					for(Runnable cmd: cmds)
+					{
+						cmd.run();
+					}
+				}
 			}
 			
 			if(res instanceof IIntermediateFuture)

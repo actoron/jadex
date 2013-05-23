@@ -73,13 +73,15 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 		Object tfut = rsms.getProcessingCall(terminatecallid);
 		if(tfut!=null)
 		{
+			// directly invoke terminate when call has already been received
 //			System.out.println("terminating remote future: "+tfut.hashCode());
 			((ITerminableFuture<?>)tfut).terminate(exception);
 		}
 		else
 		{
 //			System.out.println("remote future not found");
-			rsms.addTerminationCommand(terminatecallid, new Runnable()
+			// store as command if not already received
+			rsms.addFutureCommand(terminatecallid, new Runnable()
 			{
 				public void run()
 				{

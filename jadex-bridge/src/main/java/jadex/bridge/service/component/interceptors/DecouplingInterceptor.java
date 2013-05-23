@@ -488,6 +488,33 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 							terminate.resultAvailable(null);
 						}						
 					}
+					
+					// Switch terminate() calls back to component thread.
+					public void pullIntermediateResult(final IResultListener<Void> lis)
+					{
+						if(adapter.isExternalThread())
+						{
+							try
+							{
+								ea.scheduleStep(new IComponentStep<Void>()
+								{
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										lis.resultAvailable(null);
+										return IFuture.DONE;
+									}
+								});
+							}
+							catch(ComponentTerminatedException e)
+							{
+								lis.exceptionOccurred(e);
+							}				
+						}
+						else
+						{
+							lis.resultAvailable(null);
+						}						
+					}
 				};
 				
 				final Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);

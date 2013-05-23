@@ -45,18 +45,27 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 	//-------- methods --------
 	
 	/**
-	 *  Set the termination source.
+	 *  Set the source.
 	 */
-	public void setTerminationSource(ITerminableIntermediateFuture<?> src)
+	public void setSource(ITerminableIntermediateFuture<?> src)
 	{
 		assert this.src==null;
+	
+		this.src = src;
 		
+		doNotify();
+	}
+	
+	/**
+	 *  Possibly notify the termination source.
+	 */
+	protected void doNotify()
+	{
 		boolean mynotify;
 		synchronized(this)
 		{
 			// Notify when someone has called terminate (notify is set)
 			// src is set and not already notified
-			this.src = src;
 			mynotify = notify && !notified;
 			notified = notified || mynotify;
 		}
@@ -64,6 +73,7 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 		if(mynotify)
 			src.terminate(reason);
 	}
+	
 	
 	/**
 	 *  Terminate the future.

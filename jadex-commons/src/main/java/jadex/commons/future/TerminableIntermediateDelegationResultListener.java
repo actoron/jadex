@@ -16,6 +16,6 @@ public class TerminableIntermediateDelegationResultListener<E> extends Intermedi
 		ITerminableIntermediateFuture<E> src)
 	{
 		super(future);
-		future.setTerminationSource(src);
+		future.setSource(src);
 	}
 }

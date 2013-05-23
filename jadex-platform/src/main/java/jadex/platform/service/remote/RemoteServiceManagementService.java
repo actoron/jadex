@@ -137,7 +137,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	
 	/** The map of termination commands without futures (callid -> command). 
 	    This can happen whenever a remote invocation command is executed after the terminate arrives. */
-	protected LRU<String, Runnable> terminationcommands;
+	protected LRU<String, List<Runnable>> terminationcommands;
 
 	/** The remote reference module. */
 	protected RemoteReferenceModule rrm;
@@ -179,7 +179,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.rrm = new RemoteReferenceModule(this, libservice, marshal);
 		this.waitingcalls = new HashMap<String, WaitingCallInfo>();
 		this.processingcalls = new HashMap<String, Object>();
-		this.terminationcommands = new LRU<String, Runnable>(100);
+		this.terminationcommands = new LRU<String, List<Runnable>>(1000);
 		this.timer	= new Timer(true);
 		this.marshal = marshal;
 		this.msgservice = msgservice;
@@ -474,19 +474,25 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	}
 	
 	/**
-	 *  Add a termination command.
+	 *  Add a future command.
 	 */
-	public void addTerminationCommand(String callid, Runnable command)
+	public void addFutureCommand(String callid, Runnable command)
 	{
 		getRemoteReferenceModule().checkThread();
 		
-		terminationcommands.put(callid, command);
+		List<Runnable> coms = terminationcommands.get(callid);
+		if(coms==null)
+		{
+			coms = new ArrayList<Runnable>();
+			terminationcommands.put(callid, coms);
+		}
+		coms.add(command);
 	}
 	
 	/**
-	 *  Remove a termination command.
+	 *  Remove a future command.
 	 */
-	public Runnable removeTerminationCommand(String callid)
+	public List<Runnable> removeFutureCommands(String callid)
 	{
 		getRemoteReferenceModule().checkThread();
 		
