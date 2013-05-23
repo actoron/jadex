@@ -23,7 +23,7 @@ public class MDataEdge extends MNamedIdElement
 	protected String targetparam;
 	
 	/** The parameter mappings. */
-	protected Tuple2<UnparsedExpression, UnparsedExpression> parametermapping;
+	protected UnparsedExpression parametermapping;
 	
 	//-------- methods --------
 
@@ -133,7 +133,7 @@ public class MDataEdge extends MNamedIdElement
 	 *  Get the parametermapping.
 	 *  @return The parametermapping.
 	 */
-	public Tuple2<UnparsedExpression, UnparsedExpression> getParameterMapping()
+	public UnparsedExpression getParameterMapping()
 	{
 		return parametermapping;
 	}
@@ -141,9 +141,9 @@ public class MDataEdge extends MNamedIdElement
 	/**
 	 *  Set the parameter mapping.
 	 */
-	public void setParameterMapping(UnparsedExpression valmap, UnparsedExpression indexmap)
+	public void setParameterMapping(UnparsedExpression valmap)
 	{
-		this.parametermapping = new Tuple2<UnparsedExpression, UnparsedExpression>(valmap, indexmap);
+		this.parametermapping = valmap;
 	}
 	
 }

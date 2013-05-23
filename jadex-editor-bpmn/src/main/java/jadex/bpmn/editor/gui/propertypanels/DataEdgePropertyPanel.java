@@ -36,7 +36,7 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 		
 		if (getBpmnDataEdge().getParameterMapping() != null)
 		{
-			textarea.setText(getBpmnDataEdge().getParameterMapping().getFirstEntity() != null? getBpmnDataEdge().getParameterMapping().getFirstEntity().getValue() : "");
+			textarea.setText(getBpmnDataEdge().getParameterMapping() != null? getBpmnDataEdge().getParameterMapping().getValue() : "");
 		}
 		
 		textarea.getDocument().addDocumentListener(new DocumentAdapter()
@@ -44,8 +44,8 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 			public void update(DocumentEvent e)
 			{
 				String exp = getText(e.getDocument());
-				UnparsedExpression unusedexp = getBpmnDataEdge().getParameterMapping() != null? getBpmnDataEdge().getParameterMapping().getSecondEntity() : null;
-				getBpmnDataEdge().setParameterMapping(exp != null? new UnparsedExpression(null, (String) null, exp, null) : null, unusedexp);
+//				UnparsedExpression unusedexp = getBpmnDataEdge().getParameterMapping() != null? getBpmnDataEdge().getParameterMapping().getSecondEntity() : null;
+				getBpmnDataEdge().setParameterMapping(exp != null? new UnparsedExpression(null, (String) null, exp, null) : null);
 				modelcontainer.setDirty(true);
 			}
 		});

@@ -832,7 +832,7 @@ public class ProcessThread	implements ITaskContext
 							sf.setValue("$value", value);
 							sf.setValue(pname, value);
 							IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, sf);
-							IParsedExpression exp = (IParsedExpression)de.getParameterMapping().getFirstEntity().getParsed();
+							IParsedExpression exp = (IParsedExpression)de.getParameterMapping().getParsed();
 //							UnparsedExpression uiexp =  de.getParameterMapping().getSecondEntity();
 //							IParsedExpression iexp = uiexp!=null? (IParsedExpression)uiexp.getParsed(): null;
 							try

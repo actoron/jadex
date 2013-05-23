@@ -968,7 +968,7 @@ public class SBpmnModelReader
 				UnparsedExpression exp = new UnparsedExpression(
 				edge.getSourceParameter()+"-"+edge.getTargetParameter(), "java.lang.Object", expstr, null);
 				parseExp(exp, model.getModelInfo().getAllImports(), cl);
-				edge.setParameterMapping(exp, null);
+				edge.setParameterMapping(exp);
 			}
 			
 			if(src != null)

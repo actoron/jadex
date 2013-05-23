@@ -332,10 +332,11 @@ public class VActivity extends VNamedNode
 					graph.removeCells(edges.toArray());
 					
 					remove(i);
-					--i;	
+					--i;
 				}
 			}
 		}
+		refreshParameterObjectGeometry();
 		((BpmnGraph) graph).refreshCellView(this);
 	}
 	

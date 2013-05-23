@@ -156,8 +156,10 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 		gc.weighty = 1.0;
 		gc.anchor = GridBagConstraints.SOUTH;
 		gc.fill = GridBagConstraints.BOTH;
-		column.add(mappanel, gc);
-		//addVerticalFiller(y);
+		
+		// Parameter mapping disabled.
+//		column.add(mappanel, gc);
+		addVerticalFiller(column, y);
 	}
 	
 	protected MSequenceEdge getBpmnSequenceEdge()
