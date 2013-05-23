@@ -41,8 +41,8 @@ public class Settings
 	/** The last file opened or saved. */
 	protected int toolbariconsize = GuiConstants.DEFAULT_ICON_SIZE;
 	
-	/** Flag if simple data edge auto-connect is enabled. */
-	protected boolean simpledataautoconncect = true;
+	/** Flag if simple name/type data edge auto-connect is enabled. */
+	protected boolean nametypedataautoconnect = true;
 	
 	/** Flag if save settings on exit is enable. */
 	protected boolean savesettingsonexit = true;
@@ -140,6 +140,26 @@ public class Settings
 	public void setSmoothZoom(boolean smoothzoom)
 	{
 		this.smoothzoom = smoothzoom;
+	}
+
+	/**
+	 *  Gets the nametypedataautoconnect.
+	 *
+	 *  @return The nametypedataautoconnect.
+	 */
+	public boolean isNameTypeDataAutoConnect()
+	{
+		return nametypedataautoconnect;
+	}
+
+	/**
+	 *  Sets the nametypedataautoconnect.
+	 *
+	 *  @param nametypedataautoconnect The nametypedataautoconnect.
+	 */
+	public void setNameTypeDataAutoConnect(boolean nametypedataautoconnect)
+	{
+		this.nametypedataautoconnect = nametypedataautoconnect;
 	}
 
 	/**
@@ -362,6 +382,8 @@ public class Settings
 		
 		props.put("smoothzoom", String.valueOf(smoothzoom));
 		
+		props.put("nametypedataautoconnect", String.valueOf(nametypedataautoconnect));
+		
 		props.put("savesettingsonexit", String.valueOf(savesettingsonexit));
 		
 		props.put("toolbariconsize", String.valueOf(toolbariconsize));
@@ -472,6 +494,18 @@ public class Settings
 				try
 				{
 					ret.setSmoothZoom(Boolean.parseBoolean(prop));
+				}
+				catch (Exception e)
+				{
+				}
+			}
+			
+			prop = props.getProperty("nametypedataautoconnect");
+			if (prop != null)
+			{
+				try
+				{
+					ret.setNameTypeDataAutoConnect(Boolean.parseBoolean(prop));
 				}
 				catch (Exception e)
 				{

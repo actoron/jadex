@@ -384,7 +384,8 @@ public class SCreationController
 					MParameter outparam = voutparam.getParameter();
 					MParameter inparam = vinparam.getParameter();
 					
-					if (outparam.getName() != null && outparam.getName().equals(inparam.getName()) &&
+					if (modelcontainer.getSettings().isNameTypeDataAutoConnect() &&
+						outparam.getName() != null && outparam.getName().equals(inparam.getName()) &&
 						outparam.getClazz() != null && outparam.getClazz().getTypeName().equals(inparam.getClazz().getTypeName()))
 					{
 						VDataEdge vdataedge = createDataEdge(graph, modelcontainer.getIdGenerator(), voutparam, vinparam);

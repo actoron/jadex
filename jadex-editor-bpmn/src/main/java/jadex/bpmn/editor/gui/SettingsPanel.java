@@ -29,6 +29,12 @@ public class SettingsPanel extends JPanel
 	/** The library path field. */
 	protected JTextField libpathfield;
 	
+	/** Smooth zoom box. */
+	protected JCheckBox szbox;
+	
+	/** Name/Type data edge box. */
+	protected JCheckBox ntbox;
+	
 	/** The global cache. */
 	protected GlobalCache globalcache;
 	
@@ -109,17 +115,21 @@ public class SettingsPanel extends JPanel
 		g.fill = GridBagConstraints.BOTH;
 		generalpanel.add(new JPanel(), g);
 		
-		JCheckBox szbox = new JCheckBox(new AbstractAction("Smooth Zoom")
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				SettingsPanel.this.settings.setSmoothZoom(((JCheckBox) e.getSource()).isSelected());
-			}
-		});
+		szbox = new JCheckBox("Smooth Zoom");
 		szbox.setSelected(settings.isSmoothZoom());
 		g = new GridBagConstraints();
 		g.gridy = 2;
 		generalpanel.add(szbox, g);
+		
+		JPanel dataedgepanel = new JPanel(new GridBagLayout());
+		dataedgepanel.setBorder(new TitledBorder("Data Edge Settings"));
+		tabpane.addTab("Data Edge Settings", dataedgepanel);
+		
+		ntbox = new JCheckBox("Generate data edge for matching name and type");
+		ntbox.setToolTipText("Generate data edge if following task has parameter of matching name and type.");
+		ntbox.setSelected(settings.isNameTypeDataAutoConnect());
+		g = new GridBagConstraints();
+		dataedgepanel.add(ntbox, g);
 	}
 	
 	/**
@@ -127,23 +137,28 @@ public class SettingsPanel extends JPanel
 	 */
 	public void applySettings()
 	{
-		settings.setLibraryHome(new File(libpathfield.getText()));
-		Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
+		if (libpathfield.getText() != null && !libpathfield.getText().equals(settings.getLibraryHome().getPath()))
 		{
-			public int compare(ClassInfo o1, ClassInfo o2)
+			settings.setLibraryHome(new File(libpathfield.getText()));
+			Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
 			{
-				String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
-				String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
-				return str1.compareTo(str2);
-			}
-		};
-		Set<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
-		globalcache.getGlobalTaskClasses().addAll(tmp[0]);
-		globalcache.getGlobalInterfaces().addAll(tmp[1]);
-		Collections.sort(globalcache.getGlobalTaskClasses(), comp);
-		Collections.sort(globalcache.getGlobalInterfaces(), comp);
-		settings.setGlobalTaskClasses(globalcache.getGlobalTaskClasses());
-		settings.setGlobalInterfaces(globalcache.getGlobalInterfaces());
-		settings.setGlobalAllClasses(globalcache.getGlobalAllClasses());
+				public int compare(ClassInfo o1, ClassInfo o2)
+				{
+					String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
+					String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
+					return str1.compareTo(str2);
+				}
+			};
+			Set<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
+			globalcache.getGlobalTaskClasses().addAll(tmp[0]);
+			globalcache.getGlobalInterfaces().addAll(tmp[1]);
+			Collections.sort(globalcache.getGlobalTaskClasses(), comp);
+			Collections.sort(globalcache.getGlobalInterfaces(), comp);
+			settings.setGlobalTaskClasses(globalcache.getGlobalTaskClasses());
+			settings.setGlobalInterfaces(globalcache.getGlobalInterfaces());
+			settings.setGlobalAllClasses(globalcache.getGlobalAllClasses());
+		}
+		settings.setSmoothZoom(szbox.isSelected());
+		settings.setNameTypeDataAutoConnect(ntbox.isSelected());
 	}
 }
