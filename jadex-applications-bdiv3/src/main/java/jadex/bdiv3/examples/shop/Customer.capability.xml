@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Customer capability for buying items.</H3>
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.4.xsd"
+	name="Customer"
+	package="jadex.bdi.examples.shop">
+
+	<beliefs>
+		<beliefref name="money">
+			<abstract/>
+		</beliefref>
+
+		<beliefset name="inventory" class="ItemInfo"/>
+		
+		<belief name="gui" class="jadex.commons.gui.GuiCreator">
+			<fact>new jadex.commons.gui.GuiCreator(CustomerFrame.class, 
+				new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+				new Object[]{$scope.getExternalAccess()})</fact>
+			<!-- <fact>new jadex.commons.gui.GuiCreator(CustomerPanel.class.getMethod("createCustomerGui", 
+				new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}), new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+				new Object[]{$scope.getExternalAccess()})</fact> -->
+		</belief>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="buy">
+			<parameter name="shop" class="IShopService"/>
+			<parameter name="name" class="String"/>
+			<parameter name="price" class="double"/>
+			<parameter name="result" class="Object" direction="out"/>
+		</achievegoal>
+	</goals>
+	
+	<plans>
+		<plan name="buyplan">
+			<parameter name="shop" class="IShopService">
+				<goalmapping ref="sell.shop"/>
+			</parameter>
+			<parameter name="name" class="String">
+				<goalmapping ref="sell.name"/>
+			</parameter>
+			<parameter name="price" class="double">
+				<goalmapping ref="sell.price"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="sell.result"/>
+			</parameter>
+			<body class="BuyItemPlan"></body>
+			<trigger>
+				<goal ref="buy"></goal>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<services>
+		<requiredservice name="localshopservices" class="IShopService" multiple="true">
+			<binding dynamic="true" scope="platform"/>
+		</requiredservice>
+		<requiredservice name="remoteshopservices" class="IShopService" multiple="true">
+			<binding dynamic="true" scope="global"/>
+		</requiredservice>
+	</services>
+	
+	<properties>
+		<property name="componentviewer.viewerclass">"jadex.bdi.examples.shop.CustomerViewerPanel"</property>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+	</properties>
+	
+</capability>

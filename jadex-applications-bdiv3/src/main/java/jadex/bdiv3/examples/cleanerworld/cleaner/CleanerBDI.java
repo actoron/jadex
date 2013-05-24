@@ -26,7 +26,6 @@ import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
