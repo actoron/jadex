@@ -3,7 +3,7 @@ package jadex.bdiv3.examples.shop;
 /**
  *  Item info stores details about items.
  *  
- *  Note: two item infos are condidered equal if there name is equal.
+ *  Note: two item infos are considered equal if there name is equal.
  *  This allows fetching old item infos and updating them by item name.
  */
 public class ItemInfo

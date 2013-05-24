@@ -1,16 +1,19 @@
 package jadex.bdiv3.examples.shop;
 
-import jadex.bdiv3.runtime.IBeliefListener;
-import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.micro.IPojoMicroAgent;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -56,455 +59,429 @@ public class CustomerPanel extends JPanel
 {
 	//-------- attributes --------
 	
-//	protected IBDIExternalAccess agent;
-//	protected List shoplist = new ArrayList();
-//	protected JCheckBox remote;
-//	protected JTable shoptable;
-//	protected AbstractTableModel shopmodel = new ItemTableModel(shoplist);
-//	
-//	protected List invlist = new ArrayList();
-//	protected AbstractTableModel invmodel = new ItemTableModel(invlist);
-//	protected JTable invtable;
-//	protected Map	shops;
+	protected BDIAgent agent;
+	protected List shoplist = new ArrayList();
+	protected JCheckBox remote;
+	protected JTable shoptable;
+	protected AbstractTableModel shopmodel = new ItemTableModel(shoplist);
+	
+	protected List invlist = new ArrayList();
+	protected AbstractTableModel invmodel = new ItemTableModel(invlist);
+	protected JTable invtable;
+	protected Map	shops;
 	
 	//-------- constructors --------
 	
-//	/**
-//	 *  Create a new gui.
-//	 */
-//	public CustomerPanel(final IBDIExternalAccess agent)
-//	{
-//		this.agent = agent;
-//		this.shops	= new HashMap();
-//		
-//		final JComboBox shopscombo = new JComboBox();
-//		shopscombo.addItem("none");
-//		shopscombo.addItemListener(new ItemListener()
-//		{
-//			public void itemStateChanged(ItemEvent e)
-//			{
-//				if(shops.get(shopscombo.getSelectedItem()) instanceof IShopService)
-//				{
-//					refresh((IShopService)shops.get(shopscombo.getSelectedItem()));
-//				}
-//			}
-//		});
-//		
-//		remote = new JCheckBox("Remote");
-//		remote.setToolTipText("Also search remote platforms for shops.");
-//		final JButton searchbut = new JButton("Search");
-//		searchbut.addActionListener(new ActionListener()
-//		{
-//		    public void actionPerformed(ActionEvent e)
-//		    {
-//		    	searchbut.setEnabled(false);
-//		    	
-////		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, remote.isSelected(), true)
-//				IFuture<Collection<IShopService>> ret = agent.scheduleStep(new IComponentStep<Collection<IShopService>>()
-//				{
-//					public IFuture<Collection<IShopService>> execute(IInternalAccess ia)
-//					{
-//						Future<Collection<IShopService>> ret = new Future<Collection<IShopService>>();
-//						if(remote.isSelected())
-//						{
-//							IFuture<Collection<IShopService>> fut = ia.getServiceContainer().getRequiredServices("remoteshopservices");
-//							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
-//						}
-//						else
-//						{
-//							IFuture<Collection<IShopService>> fut = ia.getServiceContainer().getRequiredServices("localshopservices");
-//							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
-//						}
-//						return ret;
-//					}
-//				});
-//				
-//				ret.addResultListener(new SwingDefaultResultListener<Collection<IShopService>>(CustomerPanel.this)
-//				{
-//					public void customResultAvailable(Collection<IShopService> coll)
-//					{
-//				    	searchbut.setEnabled(true);
-////						System.out.println("Customer search result: "+result);
-//						((DefaultComboBoxModel)shopscombo.getModel()).removeAllElements();
-//						shops.clear();
-//						if(coll!=null && coll.size()>0)
-//						{
-//							for(Iterator<IShopService> it=coll.iterator(); it.hasNext(); )
-//							{
-//								IShopService	shop	= it.next();
-//								shops.put(shop.getName(), shop);
-//								((DefaultComboBoxModel)shopscombo.getModel()).addElement(shop.getName());
-//							}
-//						}
-//						else
-//						{
-//							((DefaultComboBoxModel)shopscombo.getModel()).addElement("none");
-//						}					
-//					}
-//					
-//					public void customExceptionOccurred(Exception exception)
-//					{
-//				    	searchbut.setEnabled(true);
-//						super.customExceptionOccurred(exception);
-//					}
-//				});
-//		    }
-//		});
-//
-//		final NumberFormat df = NumberFormat.getInstance();
-//		df.setMaximumFractionDigits(2);
-//		df.setMinimumFractionDigits(2);
-//
-//		final JTextField money = new JTextField(5);
-//		
-//		agent.scheduleStep(new IComponentStep<Void>()
-//		{
-//			@Classname("initialMoney")
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-//				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//				final Object mon = bia.getBeliefbase().getBelief("money").getFact();
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						money.setText(df.format(mon));
-//					}
-//				});
-//				return IFuture.DONE;
-//			}
-//		});
-//		money.setEditable(false);
-//		
-//		agent.scheduleStep(new IComponentStep<Void>()
-//		{
-//			@Classname("money")
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-//				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//				bia.getBeliefbase().getBelief("money").addBeliefListener(new IBeliefListener()
-//				{
-//					public void beliefChanged(final AgentEvent ae)
-//					{
-//						SwingUtilities.invokeLater(new Runnable()
-//						{
-//							public void run()
-//							{
-//								money.setText(df.format(ae.getValue()));
-//							}
-//						});
-//					}
-//				});
-//				return IFuture.DONE;
-//			}
-//		});
-//		
-//		JPanel selpanel = new JPanel(new GridBagLayout());
-//		selpanel.setBorder(new TitledBorder(new EtchedBorder(), "Properties"));
-//		int x=0;
-//		int y=0;
-//		selpanel.add(new JLabel("Money: "), new GridBagConstraints(
-//			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
-//		x++;
-//		selpanel.add(money, new GridBagConstraints(
-//			x,y,1,1,1,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
-//		x++;
-//		selpanel.add(new JLabel("Available shops: "), new GridBagConstraints(
-//			x,y,1,1,0,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
-//		x++;
-//		selpanel.add(shopscombo, new GridBagConstraints(
-//			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(2,2,2,2),0,0));
-//		x++;
-//		selpanel.add(searchbut, new GridBagConstraints(
-//			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
-//		x++;
-//		selpanel.add(remote, new GridBagConstraints(
-//			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
-//		
-//		JPanel shoppanel = new JPanel(new BorderLayout());
-//		shoppanel.setBorder(new TitledBorder(new EtchedBorder(), "Shop Catalog"));
-//		shoptable = new JTable(shopmodel);
-//		shoptable.setPreferredScrollableViewportSize(new Dimension(600, 120));
-//		shoptable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		shoppanel.add(BorderLayout.CENTER, new JScrollPane(shoptable));
-//
-//		JPanel invpanel = new JPanel(new BorderLayout());
-//		invpanel.setBorder(new TitledBorder(new EtchedBorder(), "Customer Inventory"));
-//		invtable = new JTable(invmodel);
-//		invtable.setPreferredScrollableViewportSize(new Dimension(600, 120));
-//		invpanel.add(BorderLayout.CENTER, new JScrollPane(invtable));
-//
-//		agent.scheduleStep(new IComponentStep<Void>()
-//		{
-//			@Classname("inventory")
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-//				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//				try
-//				{
-//					bia.getBeliefbase().getBeliefSet("inventory").addBeliefSetListener(new IBeliefSetListener()
-//					{
-//						public void factRemoved(final AgentEvent ae)
-//						{
-//							SwingUtilities.invokeLater(new Runnable()
-//							{
-//								public void run()
-//								{
-//									invlist.remove(ae.getValue());
-//									invmodel.fireTableDataChanged();
-//								}
-//							});
-//						}
-//						
-//						public void factChanged(final AgentEvent ae)
-//						{
-//							SwingUtilities.invokeLater(new Runnable()
-//							{
-//								public void run()
-//								{
-//									invlist.remove(ae.getValue());
-//									invlist.add(ae.getValue());
-//									invmodel.fireTableDataChanged();
-//								}
-//							});
-//						}
-//						
-//						public void factAdded(final AgentEvent ae)
-//						{
-//							SwingUtilities.invokeLater(new Runnable()
-//							{
-//								public void run()
-//								{
-//									invlist.add(ae.getValue());
-//									invmodel.fireTableDataChanged();
-//								}
-//							});
-//						}
-//					});
-//				}
-//				catch(Exception e)
-//				{
-//					e.printStackTrace();
-//				}
-//				return IFuture.DONE;
-//			}
-//		});
-//		
-//		JPanel butpanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-////		butpanel.setBorder(new TitledBorder(new EtchedBorder(), "Actions"));
-//		JButton buy = new JButton("Buy");
-//		final JTextField item = new JTextField(8);
-//		item.setEditable(false);
-//		butpanel.add(new JLabel("Selected item:"));
-//		butpanel.add(item);
-//		butpanel.add(buy);
-//		buy.addActionListener(new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				int sel = shoptable.getSelectedRow();
-//				if(sel!=-1)
-//				{
-//					final String name = (String)shopmodel.getValueAt(sel, 0);
-//					final Double price = (Double)shopmodel.getValueAt(sel, 1);
-//					final IShopService shop = (IShopService)shops.get(shopscombo.getSelectedItem());
-//					agent.scheduleStep(new IComponentStep<Void>()
-//					{
-//						@Classname("buy")
-//						public IFuture<Void> execute(IInternalAccess ia)
-//						{
-//							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//							final IGoal buy = bia.getGoalbase().createGoal("buy");
-//							buy.getParameter("name").setValue(name);
-//							buy.getParameter("shop").setValue(shop);
-//							buy.getParameter("price").setValue(price);
-//							buy.addGoalListener(new IGoalListener()
-//							{
-//								public void goalFinished(AgentEvent ae)
-//								{
-//									// Update number of available items
-//									refresh(shop);
-//									if(!buy.isSucceeded())
-//									{
-//										final String text = SUtil.wrapText("Item could not be bought. "+buy.getException().getMessage());
-//										SwingUtilities.invokeLater(new Runnable()
-//										{
-//											public void run()
-//											{
-//												JOptionPane.showMessageDialog(SGUI.getWindowParent(CustomerPanel.this), text, "Buy problem", JOptionPane.INFORMATION_MESSAGE);
-//											}
-//										});
-//									}
-//								}
-//								
-//								public void goalAdded(AgentEvent ae)
-//								{
-//								}
-//							});
-//							bia.getGoalbase().dispatchTopLevelGoal(buy);
-//							return IFuture.DONE;
-//						}
-//					});
-//				}
-//			}
-//		});
-//		
-//		shoptable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-//		{
-//			public void valueChanged(ListSelectionEvent e)
-//			{
-//				int sel = shoptable.getSelectedRow();
-//				if(sel!=-1)
-//				{
-//					item.setText(""+shopmodel.getValueAt(sel, 0));
-//				}
-//			}
-//		});
-//		
-//		setLayout(new GridBagLayout());
-//		x=0;
-//		y=0;
-//		add(selpanel, new GridBagConstraints(
-//			x,y++,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-//		add(shoppanel, new GridBagConstraints(
-//			x,y++,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-//		add(invpanel, new GridBagConstraints(
-//			x,y++,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-//		add(butpanel, new GridBagConstraints(
-//			x,y++,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-//		
-////		refresh();
-//	}
-//	
-//	/**
-//	 *  Create a customer gui frame.
-//	 * /
-//	public static void createCustomerGui(final IBDIExternalAccess agent)
-//	{
-//		final JFrame f = new JFrame();
-//		f.add(new CustomerPanel(agent));
-//		f.pack();
-//		f.setLocation(SGUI.calculateMiddlePosition(f));
-//		f.setVisible(true);
-//		f.addWindowListener(new WindowAdapter()
-//		{
-//			public void windowClosing(WindowEvent e)
-//			{
-//				agent.killAgent();
-//			}
-//		});
-//		agent.addAgentListener(new IAgentListener() 
-//		{
-//			public void agentTerminating(AgentEvent ae) 
-//			{
-//				f.setVisible(false);
-//				f.dispose();
-//			}
-//			
-//			public void agentTerminated(AgentEvent ae) 
-//			{
-//			}
-//		});
-//	}*/
-//	
-//	/**
-//	 * Method to be called when goals may have changed.
-//	 */
-//	public void refresh(IShopService shop)
-//	{
-//		if(shop!=null)
-//		{
-//			shop.getCatalog().addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//					int sel = shoptable.getSelectedRow();
-//					ItemInfo[] aitems = (ItemInfo[])result;
-//					shoplist.clear();
-//					for(int i = 0; i < aitems.length; i++)
-//					{
-//						if(!shoplist.contains(aitems[i]))
-//						{
-////							System.out.println("added: "+aitems[i]);
-//							shoplist.add(aitems[i]);
-//						}
-//					}
-//					shopmodel.fireTableDataChanged();
-//					if(sel!=-1 && sel<aitems.length)
-//						((DefaultListSelectionModel)shoptable.getSelectionModel()).setSelectionInterval(sel, sel);
-//				}
-//			});
-//		}
-//		else
-//		{
-//			SwingUtilities.invokeLater(new Runnable()
-//			{
-//				public void run()
-//				{
-//					shoplist.clear();
-//					shopmodel.fireTableDataChanged();
-//				}
-//			});
-//		}
-//	}
-//		
-//}
-//
-//class ItemTableModel extends AbstractTableModel
-//{
-//	protected List list;
-//	
-//	public ItemTableModel(List list)
-//	{
-//		this.list = list;
-//	}
-//	
-//	public int getRowCount()
-//	{
-//		return list.size();
-//	}
-//
-//	public int getColumnCount()
-//	{
-//		return 3;
-//	}
-//
-//	public String getColumnName(int column)
-//	{
-//		switch(column)
-//		{
-//			case 0:
-//				return "Name";
-//			case 1:
-//				return "Price";
-//			case 2:
-//				return "Quantity";
-//			default:
-//				return "";
-//		}
-//	}
-//
-//	public boolean isCellEditable(int row, int column)
-//	{
-//		return false;
-//	}
-//
-//	public Object getValueAt(int row, int column)
-//	{
-//		Object value = null;
-//		ItemInfo ii = (ItemInfo)list.get(row);
-//		if(column == 0)
-//		{
-//			value = ii.getName();
-//		}
-//		else if(column == 1)
-//		{
-//			value = new Double(ii.getPrice());
-//		}
-//		else if(column == 2)
-//		{
-//			value = new Integer(ii.getQuantity());
-//		}
-//		return value;
-//	}
+	/**
+	 *  Create a new gui.
+	 */
+	public CustomerPanel(final BDIAgent agent)
+	{
+		this.agent	= agent;
+		this.shops	= new HashMap();
+		
+		final JComboBox shopscombo = new JComboBox();
+		shopscombo.addItem("none");
+		shopscombo.addItemListener(new ItemListener()
+		{
+			public void itemStateChanged(ItemEvent e)
+			{
+				if(shops.get(shopscombo.getSelectedItem()) instanceof IShopService)
+				{
+					refresh((IShopService)shops.get(shopscombo.getSelectedItem()));
+				}
+			}
+		});
+		
+		remote = new JCheckBox("Remote");
+		remote.setToolTipText("Also search remote platforms for shops.");
+		final JButton searchbut = new JButton("Search");
+		searchbut.addActionListener(new ActionListener()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		    	searchbut.setEnabled(false);
+		    	
+//		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, remote.isSelected(), true)
+				IFuture<Collection<IShopService>> ret = agent.getExternalAccess().scheduleStep(new IComponentStep<Collection<IShopService>>()
+				{
+					public IFuture<Collection<IShopService>> execute(IInternalAccess ia)
+					{
+						Future<Collection<IShopService>> ret = new Future<Collection<IShopService>>();
+						if(remote.isSelected())
+						{
+							IFuture<Collection<IShopService>> fut = ia.getServiceContainer().getRequiredServices("remoteshopservices");
+							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
+						}
+						else
+						{
+							IFuture<Collection<IShopService>> fut = ia.getServiceContainer().getRequiredServices("localshopservices");
+							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
+						}
+						return ret;
+					}
+				});
+				
+				ret.addResultListener(new SwingDefaultResultListener<Collection<IShopService>>(CustomerPanel.this)
+				{
+					public void customResultAvailable(Collection<IShopService> coll)
+					{
+				    	searchbut.setEnabled(true);
+//						System.out.println("Customer search result: "+result);
+						((DefaultComboBoxModel)shopscombo.getModel()).removeAllElements();
+						shops.clear();
+						if(coll!=null && coll.size()>0)
+						{
+							for(Iterator<IShopService> it=coll.iterator(); it.hasNext(); )
+							{
+								IShopService	shop	= it.next();
+								shops.put(shop.getName(), shop);
+								((DefaultComboBoxModel)shopscombo.getModel()).addElement(shop.getName());
+							}
+						}
+						else
+						{
+							((DefaultComboBoxModel)shopscombo.getModel()).addElement("none");
+						}					
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+				    	searchbut.setEnabled(true);
+						super.customExceptionOccurred(exception);
+					}
+				});
+		    }
+		});
+
+		final NumberFormat df = NumberFormat.getInstance();
+		df.setMaximumFractionDigits(2);
+		df.setMinimumFractionDigits(2);
+
+		final JTextField money = new JTextField(5);
+		
+		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("initialMoney")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				CustomerBDI cust = (CustomerBDI)((IPojoMicroAgent)ia).getPojoAgent();
+				final int mon = cust.getMoney();
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						money.setText(df.format(mon));
+					}
+				});
+				return IFuture.DONE;
+			}
+		});
+		money.setEditable(false);
+		
+		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("money")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				agent.addBeliefListener("money", new BeliefAdapter()
+				{
+					public void beliefChanged(final Object value)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								money.setText(df.format(value));
+							}
+						});
+					}
+				});
+				return IFuture.DONE;
+			}
+		});
+		
+		JPanel selpanel = new JPanel(new GridBagLayout());
+		selpanel.setBorder(new TitledBorder(new EtchedBorder(), "Properties"));
+		int x=0;
+		int y=0;
+		selpanel.add(new JLabel("Money: "), new GridBagConstraints(
+			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+		x++;
+		selpanel.add(money, new GridBagConstraints(
+			x,y,1,1,1,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+		x++;
+		selpanel.add(new JLabel("Available shops: "), new GridBagConstraints(
+			x,y,1,1,0,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+		x++;
+		selpanel.add(shopscombo, new GridBagConstraints(
+			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(2,2,2,2),0,0));
+		x++;
+		selpanel.add(searchbut, new GridBagConstraints(
+			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+		x++;
+		selpanel.add(remote, new GridBagConstraints(
+			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+		
+		JPanel shoppanel = new JPanel(new BorderLayout());
+		shoppanel.setBorder(new TitledBorder(new EtchedBorder(), "Shop Catalog"));
+		shoptable = new JTable(shopmodel);
+		shoptable.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		shoptable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		shoppanel.add(BorderLayout.CENTER, new JScrollPane(shoptable));
+
+		JPanel invpanel = new JPanel(new BorderLayout());
+		invpanel.setBorder(new TitledBorder(new EtchedBorder(), "Customer Inventory"));
+		invtable = new JTable(invmodel);
+		invtable.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		invpanel.add(BorderLayout.CENTER, new JScrollPane(invtable));
+
+		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("inventory")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				try
+				{
+					agent.addBeliefListener("inventory", new BeliefAdapter()
+					{
+						public void factRemoved(final Object value)
+						{
+							SwingUtilities.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+									invlist.remove(value);
+									invmodel.fireTableDataChanged();
+								}
+							});
+						}
+						
+						public void factAdded(final Object value)
+						{
+							SwingUtilities.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+									invlist.add(value);
+									invmodel.fireTableDataChanged();
+								}
+							});
+						}
+					});
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				return IFuture.DONE;
+			}
+		});
+		
+		JPanel butpanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+//		butpanel.setBorder(new TitledBorder(new EtchedBorder(), "Actions"));
+		JButton buy = new JButton("Buy");
+		final JTextField item = new JTextField(8);
+		item.setEditable(false);
+		butpanel.add(new JLabel("Selected item:"));
+		butpanel.add(item);
+		butpanel.add(buy);
+		buy.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				int sel = shoptable.getSelectedRow();
+				if(sel!=-1)
+				{
+					final String name = (String)shopmodel.getValueAt(sel, 0);
+					final Double price = (Double)shopmodel.getValueAt(sel, 1);
+					final IShopService shop = (IShopService)shops.get(shopscombo.getSelectedItem());
+					agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+					{
+						@Classname("buy")
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							CustomerBDI cust = (CustomerBDI)((IPojoMicroAgent)ia).getPojoAgent();
+							cust.buyItem(name, shop, price).addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									// Update number of available items
+									refresh(shop);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									// Update number of available items
+									refresh(shop);
+
+									String text = SUtil.wrapText("Item could not be bought. "+exception.getMessage());
+									JOptionPane.showMessageDialog(SGUI.getWindowParent(CustomerPanel.this), text, "Buy problem", JOptionPane.INFORMATION_MESSAGE);
+								}
+							}));
+							return IFuture.DONE;
+						}
+					});
+				}
+			}
+		});
+		
+		shoptable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				int sel = shoptable.getSelectedRow();
+				if(sel!=-1)
+				{
+					item.setText(""+shopmodel.getValueAt(sel, 0));
+				}
+			}
+		});
+		
+		setLayout(new GridBagLayout());
+		x=0;
+		y=0;
+		add(selpanel, new GridBagConstraints(
+			x,y++,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
+		add(shoppanel, new GridBagConstraints(
+			x,y++,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
+		add(invpanel, new GridBagConstraints(
+			x,y++,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
+		add(butpanel, new GridBagConstraints(
+			x,y++,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
+		
+//		refresh();
+	}
+	
+	/**
+	 *  Create a customer gui frame.
+	 * /
+	public static void createCustomerGui(final IBDIExternalAccess agent)
+	{
+		final JFrame f = new JFrame();
+		f.add(new CustomerPanel(agent));
+		f.pack();
+		f.setLocation(SGUI.calculateMiddlePosition(f));
+		f.setVisible(true);
+		f.addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				agent.killAgent();
+			}
+		});
+		agent.addAgentListener(new IAgentListener() 
+		{
+			public void agentTerminating(AgentEvent ae) 
+			{
+				f.setVisible(false);
+				f.dispose();
+			}
+			
+			public void agentTerminated(AgentEvent ae) 
+			{
+			}
+		});
+	}*/
+	
+	/**
+	 * Method to be called when goals may have changed.
+	 */
+	public void refresh(IShopService shop)
+	{
+		if(shop!=null)
+		{
+			shop.getCatalog().addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
+			{
+				public void customResultAvailable(Object result)
+				{
+					int sel = shoptable.getSelectedRow();
+					ItemInfo[] aitems = (ItemInfo[])result;
+					shoplist.clear();
+					for(int i = 0; i < aitems.length; i++)
+					{
+						if(!shoplist.contains(aitems[i]))
+						{
+//							System.out.println("added: "+aitems[i]);
+							shoplist.add(aitems[i]);
+						}
+					}
+					shopmodel.fireTableDataChanged();
+					if(sel!=-1 && sel<aitems.length)
+						((DefaultListSelectionModel)shoptable.getSelectionModel()).setSelectionInterval(sel, sel);
+				}
+			});
+		}
+		else
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					shoplist.clear();
+					shopmodel.fireTableDataChanged();
+				}
+			});
+		}
+	}
+		
+}
+
+class ItemTableModel extends AbstractTableModel
+{
+	protected List list;
+	
+	public ItemTableModel(List list)
+	{
+		this.list = list;
+	}
+	
+	public int getRowCount()
+	{
+		return list.size();
+	}
+
+	public int getColumnCount()
+	{
+		return 3;
+	}
+
+	public String getColumnName(int column)
+	{
+		switch(column)
+		{
+			case 0:
+				return "Name";
+			case 1:
+				return "Price";
+			case 2:
+				return "Quantity";
+			default:
+				return "";
+		}
+	}
+
+	public boolean isCellEditable(int row, int column)
+	{
+		return false;
+	}
+
+	public Object getValueAt(int row, int column)
+	{
+		Object value = null;
+		ItemInfo ii = (ItemInfo)list.get(row);
+		if(column == 0)
+		{
+			value = ii.getName();
+		}
+		else if(column == 1)
+		{
+			value = new Double(ii.getPrice());
+		}
+		else if(column == 2)
+		{
+			value = new Integer(ii.getQuantity());
+		}
+		return value;
+	}
 };
