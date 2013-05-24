@@ -31,13 +31,13 @@
 					<arguments>
 						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
 						<argument name="catalog">
-							new ItemInfo[]
+							java.util.Arrays.asList(new ItemInfo[]
 							{
 								new ItemInfo("Cookies", 0.89, 10),
 								new ItemInfo("Milk", 0.56, 2),
 								new ItemInfo("Bread", 1.09, 8),
 								new ItemInfo("Meat", 2.89, 6)
-							}
+							})
 						</argument>
 					</arguments>
 				</component>
@@ -45,12 +45,12 @@
 					<arguments>
 						<argument name="shopname">"Herzie, "+$component.getComponentIdentifier().getPlatformName()</argument>
 						<argument name="catalog">
-							new ItemInfo[]
+							java.util.Arrays.asList(new ItemInfo[]
 							{
 								new ItemInfo("Shoes", 55.99, 2),
 								new ItemInfo("Shirt", 15.00, 10),
 								new ItemInfo("Pants", 75.99, 15)
-							}
+							})
 						</argument>
 					</arguments>
 				</component>
@@ -64,13 +64,13 @@
 					<arguments>
 						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
 						<argument name="catalog">
-							new ItemInfo[]
+							java.util.Arrays.asList(new ItemInfo[]
 							{
 								new ItemInfo("Cookies", 0.89, 10),
 								new ItemInfo("Milk", 0.56, 2),
 								new ItemInfo("Bread", 1.09, 8),
 								new ItemInfo("Meat", 2.89, 6)
-							}
+							})
 						</argument>
 					</arguments>
 				</component>
@@ -84,13 +84,13 @@
 					<arguments>
 						<argument name="shopname">"Ladl, "+$component.getComponentIdentifier().getPlatformName()</argument>
 						<argument name="catalog">
-							new ItemInfo[]
+							java.util.Arrays.asList(new ItemInfo[]
 							{
 								new ItemInfo("Cookies", 0.89, 10),
 								new ItemInfo("Milk", 0.56, 2),
 								new ItemInfo("Bread", 1.09, 8),
 								new ItemInfo("Meat", 2.89, 6)
-							}
+							})
 						</argument>
 					</arguments>
 				</component>
@@ -98,12 +98,12 @@
 					<arguments>
 						<argument name="shopname">"Herzie, "+$component.getComponentIdentifier().getPlatformName()</argument>
 						<argument name="catalog">
-							new ItemInfo[]
+							java.util.Arrays.asList(new ItemInfo[]
 							{
 								new ItemInfo("Shoes", 55.99, 2),
 								new ItemInfo("Shirt", 15.00, 10),
 								new ItemInfo("Pants", 75.99, 15)
-							}
+							})
 						</argument>
 					</arguments>
 				</component>
