@@ -15,19 +15,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-application-2.4.xsd"
-	name="Shopping" package="jadex.bdi.examples.shop"
+	name="Shopping" package="jadex.bdiv3.examples.shop"
 	autoshutdown="true">
 	
-	<imports>
-		<import>jadex.bridge.service.clock.IClockService</import>
-		<import>jadex.bridge.service.SServiceProvider</import>
-		<import>jadex.commons.future.*</import>
-	</imports>
-	
 	<componenttypes>
-		<componenttype name="Shop" filename="jadex/bdi/examples/shop/Shop.agent.xml"/>
-		<componenttype name="Customer" filename="jadex/bdi/examples/shop/Customer.agent.xml"/>
-		<componenttype name="ShopAndCustomer" filename="jadex/bdi/examples/shop/ShopAndCustomer.agent.xml"/>
+		<componenttype name="Shop" filename="jadex/bdi/examples/shop/ShopBDI.class"/>
+		<componenttype name="Customer" filename="jadex/bdi/examples/shop/CustomerBDI.class"/>
+		<componenttype name="ShopAndCustomer" filename="jadex/bdi/examples/shop/ShopAndCustomerBDI.class"/>
 	</componenttypes>
 	
 	<configurations>
