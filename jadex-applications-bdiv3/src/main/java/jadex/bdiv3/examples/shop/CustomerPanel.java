@@ -303,10 +303,10 @@ public class CustomerPanel extends JPanel
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							BuyItem	big	= new BuyItem(name, shop, price.doubleValue());
-							IFuture<Void>	ret	= agent.dispatchTopLevelGoal(big);
-							ret.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
+							IFuture<BuyItem>	ret	= agent.dispatchTopLevelGoal(big);
+							ret.addResultListener(new SwingResultListener<BuyItem>(new IResultListener<BuyItem>()
 							{
-								public void resultAvailable(Void result)
+								public void resultAvailable(BuyItem result)
 								{
 									// Update number of available items
 									refresh(shop);
