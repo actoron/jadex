@@ -20,7 +20,7 @@ import jadex.micro.annotation.Results;
  */
 @Agent
 @Plans(@Plan(trigger=@Trigger(goals=ComponentPlanBDI.AchieveSuccess.class),
-	body=@Body(component="jadex/bdiv3/testcases/componentplans/ComponentPlanAgent.class")))
+	body=@Body(ComponentPlanAgent.class)))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class ComponentPlanBDI
 {

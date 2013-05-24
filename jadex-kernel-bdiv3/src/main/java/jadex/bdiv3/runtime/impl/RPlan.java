@@ -25,6 +25,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Agent;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
@@ -120,7 +121,19 @@ public class RPlan extends RElement implements IPlan
 		}
 		else if(mbody.getClazz()!=null)
 		{
-			body = new ClassPlanBody(ia, rplan, (Class<?>)mbody.getClazz().getType(ia.getClassLoader()));
+			Class<?>	clazz	= (Class<?>)mbody.getClazz().getType(ia.getClassLoader());
+			if(clazz.isAnnotationPresent(Plan.class))
+			{
+				body = new ClassPlanBody(ia, rplan, clazz);
+			}
+			else if(clazz.isAnnotationPresent(Agent.class))
+			{
+				body	= new ComponentPlanBody(clazz.getName()+".class", ia);
+			}
+			else
+			{
+				throw new RuntimeException("Neither @Plan nor @Agent annotation on plan body class: "+clazz);
+			}
 		}
 		else if(mbody.getMethod()!=null)
 		{

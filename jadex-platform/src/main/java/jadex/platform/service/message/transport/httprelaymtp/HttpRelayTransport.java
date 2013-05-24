@@ -255,7 +255,7 @@ public class HttpRelayTransport implements ITransport
 //			Thread.dumpStack();
 //		}
 		
-//		final String	httpadr	= address.substring(6);
+//		final String	httpadr	= RelayConnectionManager.httpAddress(address);
 		
 //		Long	oldtime	= addresses.get(httpadr);
 		// Remove all old entries with start address (e.g. also awareness urls).
@@ -383,7 +383,7 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public void	sendMessage(String address, ISendTask task)
 	{
-		internalSendMessage(address.substring(6), task);	// strip 'relay-' prefix.
+		internalSendMessage(RelayConnectionManager.httpAddress(address), task);
 		
 //		((AbstractSendTask)task).getFuture().addResultListener(new IResultListener<Void>()
 //		{
@@ -422,7 +422,7 @@ public class HttpRelayTransport implements ITransport
 					else
 					{
 						// Connection dead.
-						System.err.println("Relay. Dead connection to: "+address+", "+time);
+//						System.err.println("Relay. Dead connection to: "+address+", "+time);
 						ret	= new Future<Void>(new RuntimeException("No connection to "+address));
 					}
 					
