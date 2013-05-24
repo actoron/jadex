@@ -32,7 +32,7 @@ public @interface Implementation
 	/**
 	 *  The creation class.
 	 */
-	public Class value() default Object.class;
+	public Class<?> value() default Object.class;
 
 	/**
 	 *  The creation expression.

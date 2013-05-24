@@ -43,7 +43,7 @@ public class UnparsedExpression
 	public UnparsedExpression(String name, Class<?> clazz, String value, String language)
 	{
 		this.name = name;
-		this.clazz = clazz!=null? new ClassInfo(clazz): null; 
+		this.clazz = clazz!=null? new ClassInfo(clazz.getName()): null; 
 		this.value = value;
 		this.language = language;
 	}
