@@ -7,7 +7,6 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.GuiCreator;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
@@ -122,11 +121,11 @@ public class CustomerBDI
 			throw new RuntimeException("Not enough money to buy: "+big.name);
 		
 		// Buy the item at the shop (the shop is a service at another agent)
-//		System.out.println(getComponentName()+" buying item: "+name);
+		System.out.println(agent.getAgentName()+" buying item: "+big.name);
 		IFuture<ItemInfo>	future	= big.shop.buyItem(big.name, big.price);
-//		System.out.println(getComponentName()+" getting item: "+future);
+		System.out.println(agent.getAgentName()+" getting item: "+future);
 		ItemInfo item = (ItemInfo)future.get();
-//		System.out.println(getComponentName()+" bought item: "+item);
+		System.out.println(agent.getAgentName()+" bought item: "+item);
 		
 		// Update the customer inventory 
 		ItemInfo ii = null;
