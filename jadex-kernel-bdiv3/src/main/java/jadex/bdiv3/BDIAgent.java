@@ -1,6 +1,5 @@
 package jadex.bdiv3;
 
-import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
@@ -8,7 +7,6 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
-import jadex.bdiv3.runtime.impl.RCapability;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
