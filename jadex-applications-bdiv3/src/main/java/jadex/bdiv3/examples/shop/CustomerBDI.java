@@ -7,6 +7,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.GuiCreator;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
@@ -76,23 +77,13 @@ public class CustomerBDI
 		return money;
 	}
 	
-	/**
-	 *  Buy an item.
-	 */
-	public IFuture<Void>	buyItem(String name, IShopService shop, double price)
-	{
-		BuyItem	big	= new BuyItem(name, shop, price);
-		IFuture<Void>	ret	= agent.dispatchTopLevelGoal(big);
-		return ret;
-	}
-	
 	//-------- goals --------
 	
 	/**
 	 *  Goal to buy an item.
 	 */
 	@Goal
-	public class BuyItem
+	public static class BuyItem
 	{
 		//-------- attributes --------
 		

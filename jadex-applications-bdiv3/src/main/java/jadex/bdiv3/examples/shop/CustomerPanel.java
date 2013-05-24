@@ -1,6 +1,7 @@
 package jadex.bdiv3.examples.shop;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.examples.shop.CustomerBDI.BuyItem;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -301,8 +302,9 @@ public class CustomerPanel extends JPanel
 						@Classname("buy")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							CustomerBDI cust = (CustomerBDI)((IPojoMicroAgent)ia).getPojoAgent();
-							cust.buyItem(name, shop, price).addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
+							BuyItem	big	= new BuyItem(name, shop, price.doubleValue());
+							IFuture<Void>	ret	= agent.dispatchTopLevelGoal(big);
+							ret.addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 							{
 								public void resultAvailable(Void result)
 								{
