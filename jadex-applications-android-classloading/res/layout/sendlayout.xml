@@ -9,18 +9,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.21"
-        android:text="@string/app_title"
+        android:text="@string/app_sendtitle"
         android:textAppearance="?android:attr/textAppearanceLarge" />
     
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content" 
-            android:text="@string/status_label"/>
         <TextView  android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/statusTextView"
+            android:id="@+id/sendActivityTextView"
 			android:textAppearance="?android:attr/textAppearanceLarge"
 			/>            
         

@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MySimpleActivity extends ClientAppFragment implements ServiceConnection, PlatformListener
+public class MyServiceActivity extends ClientAppFragment implements ServiceConnection, PlatformListener
 {
 	private TextView statusTextView;
 
@@ -41,6 +41,7 @@ public class MySimpleActivity extends ClientAppFragment implements ServiceConnec
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		System.out.println("MyActivity onCreateView");
+		setTitle(R.string.app_title);
 		int userlayout = R.layout.mylayout2;
 		View view = inflater.inflate(userlayout, container, false);
 		statusTextView = (TextView) view.findViewById(R.id.statusTextView);

@@ -14,15 +14,25 @@
         android:icon="@drawable/icon"
         android:label="ClientAppDemo"
         android:screenOrientation="portrait" >
-<!--         <uses-library android:name="jadex.android.classloading" android:required="false"/> -->
         <activity android:name="jadex.android.clientapp.MyApplication" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+             <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+			    <data android:mimeType="application/*" />
+			    <data android:mimeType="audio/*" />
+			    <data android:mimeType="image/*" />
+			    <data android:mimeType="message/*" />
+			    <data android:mimeType="multipart/*" />
+			    <data android:mimeType="text/*" />
+			    <data android:mimeType="video/*" />
+            </intent-filter>
         </activity>
-<!--         <activity android:name="jadex.android.controlcenter.JadexAndroidControlCenter" /> -->
-
+        
         <service
             android:name="jadex.android.clientapp.MyService"
             android:label="MyService" >

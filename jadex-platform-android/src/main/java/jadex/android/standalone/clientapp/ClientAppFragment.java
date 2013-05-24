@@ -1,6 +1,5 @@
 package jadex.android.standalone.clientapp;
 
-import jadex.android.AndroidContextManager;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
 import android.app.Activity;
 import android.content.ComponentName;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.view.Window;
 
 public class ClientAppFragment extends ActivityAdapterFragment
@@ -25,20 +23,18 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-//		AndroidContextManager.getInstance().setAndroidContext(getContext());
 	}
 	
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
-//		AndroidContextManager.getInstance().setAndroidContext(null);
 	}
 
 	/**
 	 * This method is called upon instantiation of the Fragment. Tasks that
 	 * should be run before the layout of the Activity is set should be
-	 * performed here.
+	 * performed here, such as requesting Window Features.
 	 * 
 	 * Note that getActivity() will return null during this method.
 	 * 
@@ -79,7 +75,6 @@ public class ClientAppFragment extends ActivityAdapterFragment
 					@Override
 					public void run()
 					{
-//						Looper.prepare();
 						universalService.bindClientService(service, conn, flags);	
 					}
 				});

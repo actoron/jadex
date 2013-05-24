@@ -17,6 +17,8 @@ import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
@@ -32,70 +34,90 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	private String userAppPackage;
 	private Context userAppContext;
 	private ClientAppFragment defaultActivity;
+	private UniversalClientServiceBinder universalService;
+	private Resources resources;
+	private String className;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		
 		// set default layout inflater during onCreate()
 		userAppInflater = super.getLayoutInflater();
 		super.onCreate(savedInstanceState);
-		
+
 		Intent intent = getIntent();
-		if (intent != null && JadexApplication.INTENT_ACTION_LOADAPP.equals(intent.getAction())) {
-			String appPath = intent.getStringExtra(JadexApplication.EXTRA_KEY_APPLICATIONPATH);
+		if (intent != null && JadexApplication.INTENT_ACTION_LOADAPP.equals(intent.getAction()))
+		{
+			ApplicationInfo info = intent.getParcelableExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
+			String appPath = info.sourceDir;
+			userAppPackage = info.packageName;
 			String className = intent.getStringExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
-			userAppPackage = intent.getStringExtra(JadexApplication.EXTRA_KEY_APPLICATIONPACKAGE);
+			String originalAction = intent.getStringExtra(JadexApplication.EXTRA_KEY_ORIGINALACTION);
+
+			intent.setAction(originalAction);
+			intent.removeExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
+			intent.removeExtra(JadexApplication.EXTRA_KEY_ORIGINALACTION);
+			intent.removeExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
+
 			if (className == null)
 			{
 				className = defaultEntryActivityName;
 			}
-			
-			if (appPath != null) {
+
+			this.className = className;
+
+			if (appPath != null)
+			{
 				ClientAppFragment act = loadAndCreateUserActivity(appPath, className);
+				act.setIntent(intent);
 				act.onPrepare(this);
 				this.defaultActivity = act;
-			} else {
+			}
+			else
+			{
 				Logger.e("Please specify an Activity class to start with EXTRA_KEY_ACTIVITYCLASS!");
 				finish();
 				return;
 			}
-			
-		} else {
+
+		}
+		else
+		{
 			Logger.e("Please start this application with action net.sourceforge.jadex.LOAD_APPLICATION");
 			finish();
 			return;
 		}
-		
-		Intent serviceIntent = new Intent(this,UniversalClientService.class);
+
+		Intent serviceIntent = new Intent(this, UniversalClientService.class);
 		bindService(serviceIntent, this, BIND_AUTO_CREATE);
 	}
-	
+
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
-		defaultActivity.setUniversalClientService((UniversalClientServiceBinder) service);
-		
+		this.universalService = (UniversalClientServiceBinder) service;
+		defaultActivity.setUniversalClientService(universalService);
+
 		FragmentManager manager = getSupportFragmentManager();
 		FragmentTransaction ta = manager.beginTransaction();
-		
-		userAppInflater = createUserAppInflater(userAppPackage);
+
+		initUserAppContext(userAppPackage);
+
 		ta.add(R.id.fragmentContainer, defaultActivity);
-		
+
 		setContentView(R.layout.loaderlayout);
-		// set custom layout inflater during user app lifetime
 		ta.commit();
 	}
-	
+
 	@Override
 	public void onServiceDisconnected(ComponentName name)
 	{
+		universalService = null;
 		System.err.println("UniversalClientService disconnected. User Service bindings may be invalid.");
-		// TODO: crash!?
+		// TODO: crash here!?
 	}
-	
-	
-	private LayoutInflater createUserAppInflater(String userApplicationPackage)
+
+	private void initUserAppContext(String userApplicationPackage)
 	{
 		try
 		{
@@ -105,17 +127,20 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		{
 			e.printStackTrace();
 		}
-		
-		LayoutInflater inflater = LayoutInflater.from(userAppContext);
-		return inflater;
+		userAppInflater = LayoutInflater.from(userAppContext);
+		resources = new ResourceSet(getResources(), userAppContext.getResources());
+		// TODO: same with assets?
 	}
-	
+
 	@Override
 	public Context getApplicationContext()
 	{
-		if (userAppContext == null) {
+		if (userAppContext == null)
+		{
 			return super.getApplicationContext();
-		} else {
+		}
+		else
+		{
 			System.out.println("Custom context returned");
 			return userAppContext;
 		}
@@ -126,17 +151,45 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	{
 		super.onResume();
 	}
-	
+
 	@Override
 	protected void onDestroy()
 	{
+		if (universalService != null)
+		{
+			unbindService(this);
+		}
+		if (defaultActivity != null)
+		{
+			defaultActivity.onDestroy();
+		}
 		super.onDestroy();
 	}
-	
+
 	@Override
 	public LayoutInflater getLayoutInflater()
 	{
 		return userAppInflater;
+	}
+
+	@Override
+	public Resources getResources()
+	{
+		if (resources != null)
+		{
+			return resources;
+		}
+		else
+		{
+			return super.getResources();
+		}
+	}
+
+	@Override
+	public AssetManager getAssets()
+	{
+		System.out.println("getAssets");
+		return getApplicationContext().getAssets();
 	}
 
 	private ClientAppFragment loadAndCreateUserActivity(String appPath, String className)
@@ -146,32 +199,11 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		try
 		{
 			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
-//			Constructor<ClientAppFragment> actCon = actClass.getConstructor();
 			ClientAppFragment act = actClass.newInstance();
 			return act;
 		}
-		catch (ClassNotFoundException e)
+		catch (Exception e)
 		{
-			e.printStackTrace();
-		}
-		catch (SecurityException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (InstantiationException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IllegalArgumentException e)
-		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -179,34 +211,24 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 
 	private DexClassLoader getClassLoaderForExternalDex(ClassLoader parent, String appPath)
 	{
-//		File dexInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE), "jadex.jar");
+		// File dexInternalStoragePath = new File(getDir("dex",
+		// Context.MODE_PRIVATE), "jadex.jar");
 		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
 
-		DexClassLoader cl = new DexClassLoader(appPath, optimizedDexOutputPath.getAbsolutePath(), null,
-				parent);
+		DexClassLoader cl = new DexClassLoader(appPath, optimizedDexOutputPath.getAbsolutePath(), null, parent);
 
 		return cl;
 	}
-	
-	
+
 	private ClassLoader getClassLoaderForInternalClasses(ClassLoader parent)
 	{
 		PackageManager pm = getPackageManager();
 
 		ApplicationInfo applicationInfo = this.getApplicationInfo();
-		
+
 		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
-		
+
 		return new DexClassLoader(applicationInfo.sourceDir, optimizedDexOutputPath.getAbsolutePath(), null, parent);
-		
-//		return new ParentLastPathClassLoader(applicationInfo.sourceDir, parent);
-		
-//		for (ApplicationInfo app : pm.getInstalledApplications(0)) {
-//			if (applicationInfo.packageName.equals(app.packageName)) {
-//				
-//			}
-//		  Log.d("PackageList", "package: " + app.packageName + ", sourceDir: " + app.sourceDir);
-//		}
 	}
 
 }

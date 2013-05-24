@@ -3,6 +3,8 @@ package jadex.android.standalone.clientapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.net.Uri;
 
 /**
  * This class provides some Activity functionality to a Fragment by calling the
@@ -17,6 +19,7 @@ class ActivityAdapterFragment extends android.support.v4.app.Fragment
 	public static final int BIND_AUTO_CREATE = Activity.BIND_AUTO_CREATE;
 	public static final int BIND_DEBUG_UNBIND = Activity.BIND_DEBUG_UNBIND;
 	public static final int BIND_NOT_FOREGROUND = Activity.BIND_NOT_FOREGROUND;
+	private Intent intent;
 
 	/**
 	 * Calls getActivity().bindService()
@@ -67,6 +70,41 @@ class ActivityAdapterFragment extends android.support.v4.app.Fragment
 	public void runOnUiThread(Runnable runnable)
 	{
 		getActivity().runOnUiThread(runnable);
+	}
+	
+	/**
+	 * Calls getActivity().setTitle()
+	 */
+	public void setTitle(CharSequence title) {
+		getActivity().setTitle(title);
+	}
+	
+	/**
+	 * Calls getActivity().setTitle()
+	 */
+	public void setTitle(int titleId) {
+		getActivity().setTitle(titleId);
+	}
+	
+	/**
+	 * Calls getActivity().managedQuery()
+	 */
+	public final Cursor managedQuery(Uri uri,
+            String[] projection,
+            String selection,
+            String[] selectionArgs,
+            String sortOrder)
+	{
+		return getActivity().managedQuery(uri, projection, selection, selectionArgs, sortOrder);
+	}
+	
+	public Intent getIntent()
+	{
+		return intent;
+	}
+	
+	public void setIntent(Intent intent) {
+		this.intent = intent;
 	}
 	
 	
