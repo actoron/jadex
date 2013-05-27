@@ -1540,6 +1540,7 @@ In the configurations section, predefined
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	<!-- 
 	<xs:complexType name="MTypedElementReference" abstract="true" mixed="true">
 		<xs:annotation>
 			<xs:documentation>Reference to a typed element.</xs:documentation>
@@ -1584,12 +1585,14 @@ In the configurations section, predefined
 			<xs:extension base="MTypedElementSetReference"/>
 		</xs:complexContent>
 	</xs:complexType>
+	 -->
 	<xs:complexType name="MBeliefReference" mixed="true">
 		<xs:annotation>
 			<xs:documentation>Reference to a belief.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MTypedElementReference">
+			<!-- <xs:extension base="MTypedElementReference"> -->
+			<xs:extension base="MElementReference">
 				<xs:attribute name="argument" type="xs:boolean"/>
 				<xs:attribute name="result" type="xs:boolean"/>
 			</xs:extension>
@@ -1602,12 +1605,14 @@ In the configurations section, predefined
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MTypedElementSetReference">
+			<!-- <xs:extension base="MTypedElementSetReference"> -->
+			<xs:extension base="MElementReference">
 				<xs:attribute name="argument" type="xs:boolean"/>
 				<xs:attribute name="result" type="xs:boolean"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	<!-- 
 	<xs:complexType name="MParameterElementReference" abstract="true" mixed="true">
 		<xs:annotation>
 			<xs:documentation>Reference to a parameter element.</xs:documentation>
@@ -1629,12 +1634,14 @@ In the configurations section, predefined
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	 -->
 	<xs:complexType name="MGoalReference" mixed="true">
 		<xs:annotation>
 			<xs:documentation>Reference to a goal.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MParameterElementReference">
+			<!-- <xs:extension base="MParameterElementReference">  -->
+			<xs:extension base="MElementReference">
 				<xs:sequence>
 					<xs:element name="deliberation" type="MDeliberation" minOccurs="0"/>
 				</xs:sequence>
@@ -1686,7 +1693,8 @@ In the configurations section, predefined
 			<xs:documentation>Reference to an event.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MParameterElementReference"/>
+			<xs:extension base="MElementReference"/>
+			<!-- <xs:extension base="MParameterElementReference"/> -->
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MInternalEventReference" mixed="true">

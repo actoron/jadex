@@ -49,7 +49,7 @@ public class GoalProcessingRules
 			state.setAttributeValue(rgoal, OAVBDIRuntimeModel.processableelement_has_state, null);
 			
 			// Remove finished plans that would otherwise interfere with next goal processing (if any).
-			Collection	fplans	= state.getAttributeValues(rgoal, OAVBDIRuntimeModel.goal_has_finishedplans);
+			Collection<?>	fplans	= state.getAttributeValues(rgoal, OAVBDIRuntimeModel.goal_has_finishedplans);
 			if(fplans!=null && !fplans.isEmpty())
 			{
 				Object[]	afplans	= fplans.toArray();
@@ -66,7 +66,7 @@ public class GoalProcessingRules
 			state.setAttributeValue(rgoal, OAVBDIRuntimeModel.processableelement_has_apl, null);
 			
 			// Clean tried plans if necessary.
-			Collection coll = state.getAttributeValues(rgoal, OAVBDIRuntimeModel.goal_has_triedmplans);
+			Collection<?> coll = state.getAttributeValues(rgoal, OAVBDIRuntimeModel.goal_has_triedmplans);
 			if(coll!=null)
 			{
 				Object[]	acoll	= coll.toArray();
@@ -1319,17 +1319,13 @@ public class GoalProcessingRules
 //				System.out.println("Recur initiated: "+rgoal);
 				changeProcessingState(state, rgoal, OAVBDIRuntimeModel.GOALPROCESSINGSTATE_PAUSED);
 				
-				// Initiate recur when delay or no condition
-				
-				// todo: recur condition
-				
+				// Initiate recur when delay or no condition (otherwise recur user rule is used)
 				Object mgoal = state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model);
 				long recurdelay = ((Long)state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_recurdelay)).longValue();
 				Object recurcond = state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_recurcondition);
 				
 				if(recurdelay>0)
 				{
-//					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_recurtimer,
 						BDIInterpreter.getInterpreter(state).getClockService().createTimer(recurdelay, 
 							new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
