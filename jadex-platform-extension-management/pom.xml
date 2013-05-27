@@ -51,6 +51,11 @@
 		    <artifactId>commons-daemon</artifactId>
 		    <version>1.0.10</version><!-- todo: update to 1.0.11 when available for compatibility with binary executables -->
 		</dependency>
+		<dependency>
+			<groupId>javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.12.1.GA</version>
+		</dependency>
 	</dependencies>
 
 

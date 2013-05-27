@@ -1,40 +1,94 @@
 package jadex.commons.transformation.binaryserializer;
 
 import jadex.commons.SReflect;
-import jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector;
 import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
+import java.lang.reflect.Constructor;
+
 /**
- *  todo: comment me!
+ *  Factory for generating bean introspectors.
  */
 public class BeanIntrospectorFactory 
 {
+	/** If true, attempt to use delegate optimization */;
+	protected static boolean OPTIMIZE = false;
+	
+	/** Class of the optimizing delegate introspector. */
+	protected static final String DELEGATE_INTRO_CLASS = "jadex.platform.optimizations.BeanDelegateReflectionIntrospector";
+	
+	/** The factor instance */
+	protected static BeanIntrospectorFactory instance;
+	
+	/**
+	 *  Private constructor.
+	 */
 	private BeanIntrospectorFactory() 
 	{
 	}
 	
+	/**
+	 *  Gets a factory instance.
+	 *  
+	 *  @return Instance.
+	 */
 	public static BeanIntrospectorFactory getInstance() 
 	{
-		return new BeanIntrospectorFactory();
+		BeanIntrospectorFactory ret = instance;
+		if (ret == null)
+		{
+			synchronized (BeanIntrospectorFactory.class)
+			{
+				if (instance == null)
+				{
+					instance = new BeanIntrospectorFactory();
+				}
+				ret = instance;
+			}
+		}
+		return ret;
 	}
 	
+	/**
+	 *  Gets an introspector with default lru size.
+	 *  
+	 *  @return The introspector.
+	 */
 	public IBeanIntrospector getBeanIntrospector() 
 	{
 		return getBeanIntrospector(200);
 	}
 	
+	/**
+	 *  Gets an introspector.
+	 *  
+	 *  @return The introspector.
+	 */
 	public IBeanIntrospector getBeanIntrospector(int lrusize) 
 	{
-//		return new BeanReflectionIntrospector(lrusize);
+		IBeanIntrospector ret = null;
+		if(OPTIMIZE && !SReflect.isAndroid())
+		{
+			ClassLoader cl = BeanIntrospectorFactory.class.getClassLoader();
+			try
+			{
+				Class<?> introclass = cl.loadClass(DELEGATE_INTRO_CLASS);
+				if (introclass != null)
+				{
+					Constructor<?> con = introclass.getConstructor(int.class);
+					ret = (IBeanIntrospector) con.newInstance(lrusize);
+				}
+			}
+			catch (Exception e)
+			{
+			}
+		}
 		
-//		if(!SReflect.isAndroid())
-//		{
-//			return new BeanDelegateReflectionIntrospector(lrusize);
-//		}
-//		else
+		if (ret == null)
 		{
 			return new BeanReflectionIntrospector(lrusize);
 		}
+		
+		return ret;
 	}
 }

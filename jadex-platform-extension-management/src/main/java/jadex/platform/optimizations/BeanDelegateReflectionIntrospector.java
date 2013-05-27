@@ -1,6 +1,10 @@
-package jadex.commons.transformation.traverser;
+package jadex.platform.optimizations;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
+import jadex.commons.transformation.traverser.IBeanAccessorDelegate;
+import jadex.commons.transformation.traverser.IBeanDelegateProvider;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
