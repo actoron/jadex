@@ -4,6 +4,7 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
@@ -618,7 +619,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				}
 			}
 
-			Method m = clazz.getMethod("getExtraParameters", new Class[]{Map.class, IModelInfo.class, ClassLoader.class});
+			Method m = clazz.getMethod("getExtraParameters", new Class[]{Map.class, IModelContainer.class, ClassLoader.class});
 			// todo: use classloader of tool!
 			List<ParameterMetaInfo> pis = new ArrayList<ParameterMetaInfo>();
 			if(ret.getParameterInfos()!=null && !ret.getParameterInfos().isEmpty())
@@ -626,7 +627,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				pis.addAll(ret.getParameterInfos());
 			}
 			Map<String, MProperty> ps = getBpmnTask().getProperties().getAsMap();
-			List<ParameterMetaInfo> params = (List<ParameterMetaInfo>)m.invoke(null, new Object[]{ps, modelcontainer.getBpmnModel().getModelInfo(), modelcontainer.getProjectClassLoader()});
+			List<ParameterMetaInfo> params = (List<ParameterMetaInfo>)m.invoke(null, new Object[]{ps, modelcontainer, modelcontainer.getProjectClassLoader()});
 			pis.addAll(params);
 			ret = new TaskMetaInfo(ret!=null? ret.getDescription(): null, pis, ret!=null? ret.getPropertyInfos(): null, ret!=null? ret.getGuiClassInfo(): null);
 		}

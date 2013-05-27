@@ -643,7 +643,7 @@ public class MActivity extends MAssociationTarget
 	 *  @param exp
 	 */
 	public void setPropertyValue(String name, UnparsedExpression exp)
-	{
+	{		
 		MProperty mprop = new MProperty();
 		mprop.setName(name);
 		mprop.setInitialValue(exp); 
@@ -658,7 +658,7 @@ public class MActivity extends MAssociationTarget
 	 */
 	public void setPropertyValue(String name, IParsedExpression exp)
 	{
-		if (exp != null)
+		if(exp != null)
 		{
 			MProperty mprop = new MProperty();
 			mprop.setName(name);

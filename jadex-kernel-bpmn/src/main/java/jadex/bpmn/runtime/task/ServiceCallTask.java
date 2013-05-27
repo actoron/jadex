@@ -331,10 +331,11 @@ public class ServiceCallTask implements ITask
 	/**
 	 *  Get the extra parameters that depend on the property settings of the task.
 	 */
-	public static List<ParameterMetaInfo> getExtraParameters(Map<String, MProperty> params, IModelInfo mi, ClassLoader cl)
+	public static List<ParameterMetaInfo> getExtraParameters(Map<String, MProperty> params, IModelContainer modelcontainer, ClassLoader cl)
 	{
 		List<ParameterMetaInfo> ret = new ArrayList<ParameterMetaInfo>();
 		
+		IModelInfo mi = modelcontainer.getBpmnModel().getModelInfo();
 		try
 		{
 			MProperty msparam = params.get(PROPERTY_SERVICE);
@@ -360,6 +361,7 @@ public class ServiceCallTask implements ITask
 							{
 								if(m.toString().equals(methodname))
 								{
+									List<String> names = modelcontainer.getParameterNames(m);
 									Class<?>[] ptypes = m.getParameterTypes();
 									// todo
 //									m.getGenericParameterTypes()
@@ -367,7 +369,7 @@ public class ServiceCallTask implements ITask
 									
 									for(int j=0; j<ptypes.length; j++)
 									{
-										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], "param"+j, null, null));
+										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], names!=null && names.size()>0? names.get(j): "param"+j, null, null));
 									}
 									if(!pret.equals(Void.class) && !pret.equals(void.class))
 									{
@@ -454,14 +456,20 @@ public class ServiceCallTask implements ITask
 						
 						if(type!=null)
 						{
+							ActionListener[] als = cbmethodname.getActionListeners();
+							for(ActionListener al: als)
+								cbmethodname.removeActionListener(al);
+							
 							DefaultComboBoxModel mo = ((DefaultComboBoxModel)cbmethodname.getModel());
 							mo.removeAllElements();
-							
 							Method[] ms = type.getMethods();
 							for(Method m: ms)
 							{
 								mo.addElement(m);
 							}
+							
+							for(ActionListener al: als)
+								cbmethodname.addActionListener(al);
 						}
 					}
 				}
@@ -472,6 +480,9 @@ public class ServiceCallTask implements ITask
 				public void actionPerformed(ActionEvent e)
 				{
 					Method method = (Method)cbmethodname.getSelectedItem();
+					
+//					System.out.println("setting: "+method);
+					
 					MProperty mprop = task.getProperties().get(PROPERTY_METHOD);
 					UnparsedExpression uexp = new UnparsedExpression(null, 
 						String.class, method!=null? "\""+method.toString()+"\"": "null", null);
@@ -493,10 +504,10 @@ public class ServiceCallTask implements ITask
 			mo.removeAllElements();
 			
 			RequiredServiceInfo[] reqs = model.getRequiredServices();
+			
 			ActionListener[] als = cbsername.getActionListeners();
 			for(ActionListener al: als)
 				cbsername.removeActionListener(al);
-			
 			if(reqs!=null)
 			{
 				for(int i=0; i<reqs.length; i++)
@@ -521,17 +532,20 @@ public class ServiceCallTask implements ITask
 //					System.out.println(task.getName()+" "+mprop.getInitialValueString());
 					
 					RequiredServiceInfo reqser = model.getRequiredService(sername);
-					Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
-					
-					if(type!=null)
+					if(reqser!=null)
 					{
-						Method[] ms = type.getMethods();
-						for(Method m: ms)
+						Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
+						
+						if(type!=null)
 						{
-							if(m.toString().equals(methodname))
+							Method[] ms = type.getMethods();
+							for(Method m: ms)
 							{
-								cbmethodname.setSelectedItem(methodname);
-//								System.out.println("sel item2: "+methodname);
+								if(m.toString().equals(methodname))
+								{
+									cbmethodname.setSelectedItem(m);
+	//								System.out.println("sel item2: "+methodname);
+								}
 							}
 						}
 					}

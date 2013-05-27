@@ -13,6 +13,7 @@ import jadex.commons.SReflect;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -921,4 +922,13 @@ public class ModelContainer implements IModelContainer
 			listener.stateChanged(e);
 		}
 	}
+	
+	/**
+	 *  Get parameter names of a method.
+	 */
+	public List<String> getParameterNames(Method m)
+	{
+		return SHelper.getParameterNames(m);
+	}
+
 }
