@@ -614,6 +614,7 @@
 				<module>jadex-applications-android-chat</module>
 				<module>jadex-android-integration-test</module>
 				<module>docs/android/jadex-android-example-project-maven</module>
+				<module>docs/android/jadex-android-clientapp-example-maven</module>
 			</modules>
 		</profile>
 		
