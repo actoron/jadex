@@ -417,16 +417,11 @@ public class Operator
 			if(numval1 instanceof Double || numval2 instanceof Double
 				|| numval1 instanceof Float || numval2 instanceof Float)
 			{
-				double	cmp	= numval1.doubleValue() - numval2.doubleValue();
-				return cmp>0 ? 1 : (cmp<0 ? -1 : 0);
-			}
-			else if(numval1 instanceof Long || numval2 instanceof Long)
-			{
-				return (int)(numval1.longValue() - numval2.longValue());
+				return numval1.doubleValue()>numval2.doubleValue() ? 1 : (numval1.doubleValue()<numval2.doubleValue() ? -1 : 0);
 			}
 			else
 			{
-				return numval1.intValue() - numval2.intValue();
+				return numval1.longValue()>numval2.longValue() ? 1 : (numval1.longValue()<numval2.longValue() ? -1 : 0);
 			}
 		}
 

@@ -106,7 +106,10 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 	public void modifyObject(Object object, OAVAttributeType type, Object oldvalue, Object newvalue, 
 		IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-		//System.out.println("Modify object called: "+this+" "+object);
+//		if(getNodeId()==369)
+//		{
+//			System.out.println("Modify object called: "+this+" "+object);
+//		}
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 

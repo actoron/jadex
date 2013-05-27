@@ -37,10 +37,13 @@
 		<belief name="androidContext" class="android.app.Activity" exported="true" argument="true">
 		</belief>
 	</beliefs>
-
+	
 	<plans>
 		<plan name="say_hello">
 			<body class="SayHelloPlan" />
+			<trigger>
+			    <goal ref="hello"/>
+			</trigger>
 		</plan>
 	</plans>
 	
