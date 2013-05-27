@@ -2,6 +2,10 @@ package jadex.bridge;
 
 import jadex.commons.SReflect;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Map;
+
 
 /**
  *  The class info struct serves for saving class information.
@@ -23,6 +27,9 @@ public class ClassInfo
 	
 	/** The service interface type. */
 	protected Class<?> type;
+	
+	/** The generic type info (e.g. when obtained via method parameter). */
+	protected String geninfo;
 
 	//-------- constructors --------
 	
@@ -52,11 +59,40 @@ public class ClassInfo
 	 *  Create a new class info.
 	 *  @param type The class info.
 	 */
+	public ClassInfo(Type type)
+	{
+		if(type==null)
+			throw new IllegalArgumentException("Must not null.");
+		
+		if(type instanceof ParameterizedType)
+		{ 
+			geninfo = type.toString();
+		}
+
+		this.type = SReflect.getClass(type);
+		
+//		this.type = type; // remember only classname to avoid classloader dependencies
+//		this.typename = SReflect.getClassName(type);
+	}
+	
+	/**
+	 *  Create a new class info.
+	 *  @param type The class info.
+	 */
 	public ClassInfo(String typename)
 	{
 		if(typename==null)
 			throw new IllegalArgumentException("Must not null.");
-		this.typename = typename;
+		int pos = typename.indexOf("<");
+		if(pos!=-1)
+		{
+			this.typename = typename.substring(0, pos);
+			this.geninfo = typename;
+		}
+		else
+		{
+			this.typename = typename;
+		}
 	}
 
 	/**
@@ -121,6 +157,15 @@ public class ClassInfo
 	{
 		this.type = type;
 	}
+	
+	/**
+	 *  Get the generic type name.
+	 *  @return The type name.
+	 */
+	public String getGenericTypeName()
+	{
+		return geninfo!=null? geninfo: getTypeName();
+	}
 
 	/** 
 	 *  Get the hashcode.
@@ -130,7 +175,7 @@ public class ClassInfo
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((getTypeName() == null) ? 0 : getTypeName().hashCode());
+				+ ((getGenericTypeName() == null) ? 0 : getGenericTypeName().hashCode());
 		return result;
 	}
 
@@ -144,7 +189,7 @@ public class ClassInfo
 		if(obj instanceof ClassInfo)
 		{
 			ClassInfo ci = (ClassInfo)obj;
-			ret = getTypeName().equals(ci.getTypeName());
+			ret = getGenericTypeName().equals(ci.getGenericTypeName());
 		}
 		
 		return ret;
@@ -155,6 +200,20 @@ public class ClassInfo
 	 */
 	public String toString()
 	{
-		return typename!=null? typename: type!=null? type.getName(): "n/a";
+		return getGenericTypeName()!=null? getGenericTypeName(): "n/a";
+	}
+	
+	public static Map<Map<String, Long>, Integer> getVals()
+	{
+		return null;
+	}
+	
+	/**
+	 *  Main for testing
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		Type t = ClassInfo.class.getMethod("getVals", new Class[0]).getGenericReturnType();
+		ClassInfo ci = new ClassInfo(t.toString());
 	}
 }

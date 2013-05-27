@@ -1,5 +1,7 @@
 package jadex.bpmn.task.info;
 
+import jadex.bridge.ClassInfo;
+
 
 
 /**
@@ -38,6 +40,15 @@ public class ParameterMetaInfo extends PropertyMetaInfo
 	public ParameterMetaInfo(String direction, Class<?> clazz, String name, String initialval, String description)
 	{
 		super(clazz, name, initialval, description);
+		this.direction = direction;
+	}
+	
+	/**
+	 *  Create a new parameter meta info.
+	 */
+	public ParameterMetaInfo(String direction, ClassInfo clinfo, String name, String initialval, String description)
+	{
+		super(clinfo, name, initialval, description);
 		this.direction = direction;
 	}
 		

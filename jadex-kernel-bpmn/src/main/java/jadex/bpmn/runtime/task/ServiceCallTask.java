@@ -12,6 +12,7 @@ import jadex.bpmn.model.task.annotation.TaskProperty;
 import jadex.bpmn.model.task.annotation.TaskPropertyGui;
 import jadex.bpmn.runtime.task.ServiceCallTask.ServiceCallTaskGui;
 import jadex.bpmn.task.info.ParameterMetaInfo;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
@@ -29,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -362,18 +364,16 @@ public class ServiceCallTask implements ITask
 								if(m.toString().equals(methodname))
 								{
 									List<String> names = modelcontainer.getParameterNames(m);
-									Class<?>[] ptypes = m.getParameterTypes();
-									// todo
-//									m.getGenericParameterTypes()
-									Class<?> pret = m.getReturnType();
+									Type[] ptypes = m.getGenericParameterTypes();
+									Type pret = m.getGenericReturnType();
 									
 									for(int j=0; j<ptypes.length; j++)
 									{
-										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, ptypes[j], names!=null && names.size()>0? names.get(j): "param"+j, null, null));
+										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, new ClassInfo(ptypes[j]), names!=null && names.size()>0? names.get(j): "param"+j, null, null));
 									}
 									if(!pret.equals(Void.class) && !pret.equals(void.class))
 									{
-										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, pret, "return", null, null));
+										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, new ClassInfo(pret), "return", null, null));
 									}
 								}
 							}

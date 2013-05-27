@@ -534,14 +534,14 @@ public class TaskPropertyPanel extends BasePropertyPanel
 						}
 						MParameter param = (MParameter)mact.getParameters().get(ind);
 						atable.removeParameters(new int[]{ind});
-						param.setClazz(new ClassInfo(pmis.get(i).getClazz().getTypeName()));
+						param.setClazz(pmis.get(i).getClazz());
 						param.setDirection(pmis.get(i).getDirection());
 						atable.addParameter(param);
 					}
 					else
 					{
 						String name = pmis.get(i).getName();
-						ClassInfo clazz = new ClassInfo(pmis.get(i).getClazz().getTypeName());
+						ClassInfo clazz = pmis.get(i).getClazz();
 						UnparsedExpression inival = new UnparsedExpression(name, clazz.getTypeName(), pmis.get(i).getInitialValue(), null);
 						MParameter param = new MParameter(pmis.get(i).getDirection(), clazz, name, inival);
 						atable.addParameter(param);

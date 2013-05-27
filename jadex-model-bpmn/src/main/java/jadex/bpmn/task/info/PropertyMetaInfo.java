@@ -35,12 +35,20 @@ public class PropertyMetaInfo
 	 */
 	public PropertyMetaInfo(Class<?> clazz, String name, String initialval, String description)
 	{
-		this.clazz = new ClassInfo(clazz);
+		this(new ClassInfo(clazz), name, initialval, description);
+	}
+
+	/**
+	 *  Create a new parameter meta info.
+	 */
+	public PropertyMetaInfo(ClassInfo clinfo, String name, String initialval, String description)
+	{
+		this.clazz = clinfo;
 		this.name = name;
 		this.initialval = initialval;
 		this.description = description;
 	}
-		
+	
 	//-------- methods --------
 	
 	/**
