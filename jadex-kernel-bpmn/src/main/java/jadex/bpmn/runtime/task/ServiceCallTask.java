@@ -364,6 +364,7 @@ public class ServiceCallTask implements ITask
 								if(m.toString().equals(methodname))
 								{
 									List<String> names = modelcontainer.getParameterNames(m);
+									String retname = modelcontainer.getReturnValueName(m);
 									Type[] ptypes = m.getGenericParameterTypes();
 									Type pret = m.getGenericReturnType();
 									
@@ -373,7 +374,7 @@ public class ServiceCallTask implements ITask
 									}
 									if(!pret.equals(Void.class) && !pret.equals(void.class))
 									{
-										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, new ClassInfo(pret), "return", null, null));
+										ret.add(new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, new ClassInfo(pret), retname==null? "return": retname, null, null));
 									}
 								}
 							}

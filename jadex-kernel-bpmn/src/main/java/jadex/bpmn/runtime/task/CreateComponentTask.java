@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;

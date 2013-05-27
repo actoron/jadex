@@ -6,10 +6,10 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.ParameterInfo;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.Collection;
@@ -27,7 +27,8 @@ public interface IComponentManagementService //extends IService
 	 *  @param name The component name.
 	 *  @return The model info of the 
 	 */
-	public IFuture<IModelInfo> loadComponentModel(String filename, IResourceIdentifier rid);
+	@ParameterInfo("modelinfo")
+	public IFuture<IModelInfo> loadComponentModel(@ParameterInfo("filename") String filename, @ParameterInfo("rid") IResourceIdentifier rid);
 
 	/**
 	 *  Create a new component on the platform.

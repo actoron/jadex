@@ -930,5 +930,13 @@ public class ModelContainer implements IModelContainer
 	{
 		return SHelper.getParameterNames(m);
 	}
+	
+	/**
+	 *  Get return value name.
+	 */
+	public String getReturnValueName(Method m)
+	{
+		return SHelper.getReturnValueName(m);
+	}
 
 }

@@ -106,5 +106,10 @@ public interface IModelContainer
 	 *  Get parameter names of a method.
 	 */
 	public List<String> getParameterNames(Method m);
-	
+
+	/**
+	 *  Get the return value name.
+	 */
+	public String getReturnValueName(Method m);
+
 }
