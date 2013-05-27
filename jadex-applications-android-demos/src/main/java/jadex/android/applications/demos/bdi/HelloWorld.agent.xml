@@ -41,9 +41,6 @@
 	<plans>
 		<plan name="say_hello">
 			<body class="SayHelloPlan" />
-			<trigger>
-			    <goal ref="hello"/>
-			</trigger>
 		</plan>
 	</plans>
 	
