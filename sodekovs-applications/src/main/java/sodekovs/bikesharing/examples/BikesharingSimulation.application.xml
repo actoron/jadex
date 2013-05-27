@@ -106,7 +106,27 @@
 				<env:objecttype name="SimInfo">
 					<env:property name="duration" dynamic="true">$properties.clock.getTick()</env:property>
 				</env:objecttype>
+				
+				<env:objecttype name="adaptation">
+				   	<env:property name="votingAttempts">0</env:property>
+				   	<env:property name="adaptations">0</env:property>
+				   	<env:property name="failures">0</env:property>
+				</env:objecttype>
+				
+				<env:objecttype name="superStationCoordination">
+				   	<env:property name="polling">0</env:property>
+				   	<env:property name="alternative">0</env:property>
+				   	<env:property name="reply">0</env:property>
+				</env:objecttype>
+				
+				<env:objecttype name="tupleCoordination">
+				   	<env:property name="stateChanged">0</env:property>
+				</env:objecttype>
 
+				<env:objecttype name="decentralizedPollingCoordination">
+				   	<env:property name="request">0</env:property>
+				   	<env:property name="reply">0</env:property>
+				</env:objecttype>
 			</env:objecttypes>
 
 			<env:avatarmappings>
@@ -237,6 +257,27 @@
 					<env:objects>
 						<env:object type="SimInfo"> <env:property name="position">new	Vector2Double(2.0, 4.0)</env:property> </env:object>
 					</env:objects>
+					
+					<env:object type="adaptation">
+			 		  	<env:property name="votingAttempts">0</env:property>
+			   			<env:property name="adaptations">0</env:property>
+			 		  	<env:property name="failures">0</env:property>
+					</env:object>
+			
+					<env:object type="superStationCoordination">
+					   	<env:property name="polling">0</env:property>
+					   	<env:property name="alternative">0</env:property>
+					   	<env:property name="reply">0</env:property>
+					</env:object>
+			
+					<env:object type="tupleCoordination">
+					   	<env:property name="stateChanged">0</env:property>
+					</env:object>
+
+					<env:object type="decentralizedPollingCoordination">
+					   	<env:property name="request">0</env:property>
+					   	<env:property name="reply">0</env:property>
+					</env:object>
 
 					<!-- <env:observers>
 						<env:observer name="world" dataview="view_all"
@@ -262,6 +303,27 @@
 
 					<env:objects>
 						<env:object type="SimInfo"> <env:property name="position">new	Vector2Double(2.0, 4.0)</env:property> </env:object>
+						
+						<env:object type="adaptation">
+				 		  	<env:property name="votingAttempts">0</env:property>
+				   			<env:property name="adaptations">0</env:property>
+				 		  	<env:property name="failures">0</env:property>
+						</env:object>
+				
+						<env:object type="superStationCoordination">
+						   	<env:property name="polling">0</env:property>
+						   	<env:property name="alternative">0</env:property>
+						   	<env:property name="reply">0</env:property>
+						</env:object>
+				
+						<env:object type="tupleCoordination">
+						   	<env:property name="stateChanged">0</env:property>
+						</env:object>
+
+						<env:object type="decentralizedPollingCoordination">
+						   	<env:property name="request">0</env:property>
+						   	<env:property name="reply">0</env:property>
+						</env:object>
 					</env:objects>
 
 					<env:observers>

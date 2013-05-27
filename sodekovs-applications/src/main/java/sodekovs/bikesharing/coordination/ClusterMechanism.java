@@ -34,6 +34,8 @@ public class ClusterMechanism extends CoordinationMechanism {
 
 	/** The number of published events */
 	protected Integer eventNumber = null;
+	
+	protected ISpaceObject superStationCoordination = null;
 
 	public ClusterMechanism(CoordinationSpace space) {
 		super(space);
@@ -41,6 +43,8 @@ public class ClusterMechanism extends CoordinationMechanism {
 		this.applicationInterpreter = (StatelessAbstractInterpreter) space.getApplicationInternalAccess();
 		this.appSpace = (ContinuousSpace2D) applicationInterpreter.getExtension("my2dspace");
 		this.eventNumber = 0;
+		
+		this.superStationCoordination = appSpace.getSpaceObjectsByType("superStationCoordination")[0];
 		
 		this.superCluster = (SuperCluster) appSpace.getProperty("StationCluster");
 	}
@@ -59,9 +63,14 @@ public class ClusterMechanism extends CoordinationMechanism {
 	public void perceiveCoordinationEvent(Object obj) {
 		CoordinationInfo coordInfo = (CoordinationInfo) obj;
 		ClusterStationCoordData coordData = (ClusterStationCoordData) coordInfo.getValueByName(Constants.VALUE);
-		if (coordData.getState().equals(ClusterStationCoordData.STATE_POLLING) || coordData.getState().equals(ClusterStationCoordData.STATE_ALTERNATIVES)) {
+		if (coordData.getState().equals(ClusterStationCoordData.STATE_POLLING)) {
+			superStationCoordination.setProperty("polling", (Integer) superStationCoordination.getProperty("polling") + 1);
+			informClusterStations(coordInfo);
+		} else if (coordData.getState().equals(ClusterStationCoordData.STATE_ALTERNATIVES)) {
+			superStationCoordination.setProperty("alternative", (Integer) superStationCoordination.getProperty("alternative") + 1);
 			informClusterStations(coordInfo);
 		} else if (coordData.getState().equals(ClusterStationCoordData.STATE_REPLY)) {
+			superStationCoordination.setProperty("reply", (Integer) superStationCoordination.getProperty("reply") + 1);
 			informSuperStation(coordInfo);
 		}
 	}

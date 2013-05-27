@@ -35,6 +35,8 @@ public class DecentralizedPollingMechanism extends CoordinationMechanism {
 
 	/** The number of published events */
 	protected Integer eventNumber = null;
+	
+	protected ISpaceObject decentralizedPollingCoordination = null;
 
 	public DecentralizedPollingMechanism(CoordinationSpace space) {
 		super(space);
@@ -42,6 +44,8 @@ public class DecentralizedPollingMechanism extends CoordinationMechanism {
 		this.appSpace = (ContinuousSpace2D) applicationInterpreter.getExtension("my2dspace");
 		this.eventNumber = 0;
 
+		this.decentralizedPollingCoordination = appSpace.getSpaceObjectsByType("decentralizedPollingCoordination")[0];
+		
 		this.superCluster = (SuperCluster) appSpace.getProperty("StationCluster");
 	}
 
@@ -61,8 +65,10 @@ public class DecentralizedPollingMechanism extends CoordinationMechanism {
 		StateCoordinationStationData data = (StateCoordinationStationData) coordInfo.getValueByName(Constants.VALUE);
 		
 		if (data.getState().equals(StateCoordinationStationData.REQUEST)) {
+			decentralizedPollingCoordination.setProperty("request", (Integer) decentralizedPollingCoordination.getProperty("request") + 1);
 			handleRequest(coordInfo);
 		} else if (data.getState().equals(StateCoordinationStationData.REPLY)) {
+			decentralizedPollingCoordination.setProperty("reply", (Integer) decentralizedPollingCoordination.getProperty("reply") + 1);
 			handleReply(coordInfo);
 		}
 	}

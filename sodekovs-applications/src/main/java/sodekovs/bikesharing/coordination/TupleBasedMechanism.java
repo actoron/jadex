@@ -41,6 +41,8 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 	private SuperCluster superCluster = null;
 
 	private Map<String, CoordinationStationData> occupancyTuples = null;
+	
+	protected ISpaceObject tupleCoordination = null;
 
 	/** The number of published events */
 	protected Integer eventNumber = null;
@@ -50,6 +52,8 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 		this.applicationInterpreter = (StatelessAbstractInterpreter) space.getApplicationInternalAccess();
 		this.appSpace = (ContinuousSpace2D) applicationInterpreter.getExtension("my2dspace");
 		this.eventNumber = 0;
+		
+		this.tupleCoordination = appSpace.getSpaceObjectsByType("tupleCoordination")[0];
 
 		this.superCluster = (SuperCluster) appSpace.getProperty("StationCluster");
 
@@ -81,6 +85,8 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 		if (oldTuple == null || getState(oldTuple) != getState(tuple)) {
 			// if the state has changed or it was not stored previously...
 			// ...inform the other cluster stations
+			tupleCoordination.setProperty("stateChanged", (Integer) tupleCoordination.getProperty("stateChanged") + 1);
+			
 			Cluster cluster = superCluster.getCluster(tuple.getStationID());
 			List<String> stationIDs = superCluster.getStationIDs(cluster);
 			informStations(stationIDs, coordInfo);
