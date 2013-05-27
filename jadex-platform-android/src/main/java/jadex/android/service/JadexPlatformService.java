@@ -2,6 +2,7 @@ package jadex.android.service;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.IEventReceiver;
+import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -28,7 +29,7 @@ import android.os.IBinder;
  * Android Service to start/stop Jadex Platforms. Platforms are terminated on
  * destroy.
  */
-public class JadexPlatformService extends Service
+public class JadexPlatformService extends Service implements JadexPlatformOptions
 {
 
 	private JadexPlatformManager jadexPlatformManager;

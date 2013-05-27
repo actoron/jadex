@@ -32,11 +32,13 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	}
 
 	/**
-	 * This method is called upon instantiation of the Fragment. Tasks that
-	 * should be run before the layout of the Activity is set should be
+	 * This method is called upon instantiation of the Fragment and before the
+	 * default Fragment Lifecycle comes into play. 
+	 * Tasks that should be run before the layout of the Activity is set must be
 	 * performed here, such as requesting Window Features.
 	 * 
-	 * Note that getActivity() will return null during this method.
+	 * Note that getActivity() will return null during this method, use the given parameter
+	 * instead.
 	 * 
 	 * @param mainActivity
 	 */

@@ -1,12 +1,14 @@
 package jadex.android.standalone;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 
+/**
+ * This class marks the entry point for a Jadex Client Application.
+ * Subclasses can define the main Fragment (which will be loaded on application startup)
+ * by implementing getClassName(). 
+ */
 public abstract class JadexApplication extends Activity
 {
 	public static final String EXTRA_KEY_ACTIVITYCLASS = "net.sourceforge.jadex.EXTRA_KEY_ACTIVITYCLASS";
@@ -20,8 +22,8 @@ public abstract class JadexApplication extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		final String className = getClassName();
-		if (className == null || getAppPath() == null) {
-			throw new Error("className or appPath missing");
+		if (className == null) {
+			throw new Error("ClassName missing. Please implement getClassName() correctly.");
 		}
 		
 		Intent intent = new Intent() {{
@@ -47,13 +49,4 @@ public abstract class JadexApplication extends Activity
 	 * @return the class name
 	 */
 	protected abstract String getClassName();
-	
-	protected String getAppPackage() {
-		return getApplicationInfo().packageName;
-	};
-	
-	protected String getAppPath() {
-		return getApplicationInfo().sourceDir;
-	}
-	
 }
