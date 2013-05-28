@@ -6,9 +6,11 @@ import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.IResultListener;
@@ -411,7 +413,6 @@ public class RGoal extends RProcessableElement implements IGoal
 	 */
 	public void setException(Exception exception)
 	{
-		assert this.exception==null;
 		this.exception = exception;
 	}
 
@@ -595,6 +596,14 @@ public class RGoal extends RProcessableElement implements IGoal
 		super.planFinished(ia, rplan);
 		childplan = null;
 		
+		if(rplan!=null)
+		{
+			PlanLifecycleState state = rplan.getLifecycleState();
+			if(state.equals(RPlan.PlanLifecycleState.FAILED))
+			{
+				this.setException(rplan.getException());
+			}
+		}
 //		if(rplan!=null)
 //			System.out.println("plan finished: "+rplan.getId());
 		
@@ -629,7 +638,10 @@ public class RGoal extends RProcessableElement implements IGoal
 					}
 					else if(RProcessableElement.State.NOCANDIDATES.equals(getState()))
 					{
-						setException(new GoalFailureException("No canditates."));
+						if(getException()==null)
+						{
+							setException(new GoalFailureException("No candidates."));
+						}
 						setProcessingState(ia, GoalProcessingState.FAILED);
 					}
 //					else
@@ -645,7 +657,10 @@ public class RGoal extends RProcessableElement implements IGoal
 					}
 					else
 					{
-						setException(new GoalFailureException("No canditates."));
+						if(getException()==null)
+						{
+							setException(new GoalFailureException("No candidates."));
+						}
 						setProcessingState(ia, GoalProcessingState.FAILED);
 					}
 				}

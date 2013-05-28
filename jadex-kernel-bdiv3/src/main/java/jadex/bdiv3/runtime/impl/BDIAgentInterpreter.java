@@ -1082,6 +1082,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		catch(Exception e)
 		{
+			System.err.println("method: "+m);
 			e.printStackTrace();
 			return false;
 		}

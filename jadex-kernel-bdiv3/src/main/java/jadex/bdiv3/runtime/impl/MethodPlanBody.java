@@ -2,6 +2,7 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bridge.IInternalAccess;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -39,7 +40,13 @@ public class MethodPlanBody extends AbstractPlanBody
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			Throwable	t	= e;
+			if(e instanceof InvocationTargetException)
+			{
+				t	= ((InvocationTargetException)e).getTargetException();
+			}
+			throw t instanceof RuntimeException
+				? (RuntimeException)t : new RuntimeException(t);
 		}
 	}
 	

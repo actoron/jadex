@@ -120,7 +120,11 @@ public class ShopBDI
 		}
 		
 		// Check if enough money is given and it is in stock.
-		if(ii.getQuantity()>0 && ii.getPrice()<=goal.getPrice())
+		if(ii==null || ii.getQuantity()==0)
+		{
+			throw new RuntimeException("Item not in store: "+goal.getName());
+		}
+		else if(ii.getQuantity()>0 && ii.getPrice()<=goal.getPrice())
 		{
 			// Sell item by updating catalog and account
 ////		System.out.println(getComponentName()+" sell item: "+name+" for: "+price);
@@ -130,10 +134,6 @@ public class ShopBDI
 			catalog.set(pos, ii);
 			
 			money = money+goal.getPrice();
-		}
-		else if(ii.getQuantity()==0)
-		{
-			throw new RuntimeException("Item not in store: "+goal.getName());
 		}
 		else
 		{
