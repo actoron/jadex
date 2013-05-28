@@ -2,6 +2,7 @@ package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
+import jadex.bpmn.editor.gui.CellContextMenu;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
@@ -9,7 +10,6 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VPool;
-import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 
 import java.awt.Dimension;
@@ -19,20 +19,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import javax.swing.AbstractAction;
 import javax.swing.JScrollBar;
 import javax.swing.Timer;
 
-import com.mxgraph.model.mxGeometry;
-import com.mxgraph.model.mxICell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxUtils;
-import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraphView;
 
 /**
@@ -161,6 +156,17 @@ public class MouseController extends MouseAdapter
 				}
 			}
 		}
+//		else if (MouseEvent.BUTTON3 == e.getButton() &&
+//				  e.getClickCount() == 1 &&
+//				  modelcontainer.getGraph().getSelectionCells() != null &&
+//				  modelcontainer.getGraph().getSelectionCells().length > 0 &&
+//				  modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY()) != null &&
+//				  Arrays.asList(modelcontainer.getGraph().getSelectionCells()).contains(modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY())))
+//		{
+//			Object[] cells = modelcontainer.getGraph().getSelectionCells();
+//			CellContextMenu ccm = new CellContextMenu(modelcontainer.getGraph(), cells);
+//			ccm.show(modelcontainer.getGraphComponent(), e.getX(), e.getY());
+//		}
 	}
 	
 	/**

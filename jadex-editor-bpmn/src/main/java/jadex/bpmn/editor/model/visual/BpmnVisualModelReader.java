@@ -260,7 +260,6 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				geo.setPoints(mxpoints);
 				vedge.setGeometry(geo);
 			}
-			
 			graph.getModel().beginUpdate();
 			graph.addCell(vedge, vedge.getEdgeParent());
 //			graph.addCell(vedge);
