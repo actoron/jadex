@@ -141,7 +141,7 @@ public class SBpmnModelReader
 		    		attrs = new HashMap<String, String>(reader.getAttributeCount());
 			    	for (int i = 0; i < reader.getAttributeCount(); ++i)
 			    	{
-			    		attrs.put(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
+			    		attrs.put(reader.getAttributeLocalName(i), unescapeString(reader.getAttributeValue(i)));
 			    	}
 		    	}
 		    	attrstack.push(attrs);
@@ -170,6 +170,8 @@ public class SBpmnModelReader
 		    }
 		    else if (reader.getEventType() == XMLStreamConstants.END_ELEMENT)
 		    {
+		    	text = text!=null && text.trim().length()>0? text.trim(): null;
+		    	text = text != null? unescapeString(text) : null;
 		    	contentstack.push(text);
 		    	text = null;
 		    	
@@ -587,8 +589,6 @@ public class SBpmnModelReader
 												   Map<String, MIdElement> emap)
 	{
 		ClassLoader cl = model.getClassLoader();
-
-		content = content!=null && content.trim().length()>0? content.trim(): null;
 		
 		if ("description".equals(tag.getLocalPart()))
 		{
@@ -1183,5 +1183,15 @@ public class SBpmnModelReader
 			SJavaParser.parseExpression(exp, imports, cl);
 		}
 		return exp;
+	}
+	
+	/**
+	 *  Unescapes strings for xml.
+	 */
+	private static final String unescapeString(String string)
+	{
+		string = string.replace("\\n", "\n");
+		string = string.replace("\\\\", "\\");
+		return string;
 	}
 }

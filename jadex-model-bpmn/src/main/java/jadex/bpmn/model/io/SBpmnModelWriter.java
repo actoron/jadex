@@ -1332,16 +1332,44 @@ public class SBpmnModelWriter
 		return sb.toString();
 	}
 	
+	/** Carriage return. */
+	private static final String CR = makeCharStringTrustMeJava(13);
+	
+	/** Line feed. */
+	private static final String LF = makeCharStringTrustMeJava(10);
+	
 	/**
 	 *  Escapes strings for xml.
 	 */
 	private static final String escapeString(String string)
 	{
-		string = string.replaceAll("&", "&amp;");
-		string = string.replaceAll("\"", "&quot;");
-		string = string.replaceAll("'", "&apos;");
-		string = string.replaceAll("<", "&lt;");
-		string = string.replaceAll(">", "&gt;");
+		string = string.replace("&", "&amp;");
+		string = string.replace("\"", "&quot;");
+		string = string.replace("'", "&apos;");
+		string = string.replace("<", "&lt;");
+		string = string.replace(">", "&gt;");
+		string = string.replace("\\", "\\\\");
+		string = string.replace(CR + LF, LF);
+		string = string.replace(CR + CR, LF);
+		string = string.replace(CR, LF);
+		string = string.replace(LF, "\\n");
+		string = string.replace("\n", "\\n");
 		return string;
+	}
+	
+	/**
+	 *  Helper method to override stupid Java checks.
+	 */
+	private static final String makeCharStringTrustMeJava(int num)
+	{
+		String ret = null;
+		try
+		{
+			ret = new String(new byte[] { (byte) num }, "UTF-8");
+		}
+		catch(Exception e)
+		{
+		}
+		return ret;
 	}
 }
