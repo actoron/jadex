@@ -3,10 +3,12 @@ package jadex.bpmn.editor.gui.controllers;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VMessagingEdge;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 
@@ -45,6 +47,7 @@ public class DeletionController implements mxIEventListener
 			{
 				MLane mlane = (MLane) ((VLane) cells[i]).getBpmnElement();
 				List<MPool> pools = modelcontainer.getBpmnModel().getPools();
+				modelcontainer.setDirty(true);
 				
 				// Workaround, since the lane has already lost its parent at this point. 
 				for (MPool mpool : pools)
@@ -79,6 +82,7 @@ public class DeletionController implements mxIEventListener
 //				}
 				medge.getSource().removeOutgoingSequenceEdge(medge);
 				medge.getTarget().removeIncomingSequenceEdge(medge);
+				modelcontainer.setDirty(true);
 			}
 			else if (cells[i] instanceof VDataEdge)
 			{
@@ -87,6 +91,16 @@ public class DeletionController implements mxIEventListener
 				
 				medge.getSource().removeOutgoingDataEdge(medge);
 				medge.getTarget().removeIncomingDataEdge(medge);
+				modelcontainer.setDirty(true);
+			}
+			else if (cells[i] instanceof VMessagingEdge)
+			{
+				VMessagingEdge vedge = (VMessagingEdge) cells[i];
+				MMessagingEdge medge = (MMessagingEdge) vedge.getBpmnElement();
+				
+				medge.getSource().removeOutgoingMessagingEdge(medge);
+				medge.getTarget().removeIncomingMessagingEdge(medge);
+				modelcontainer.setDirty(true);
 			}
 //			else if (cells[i] instanceof VActivity)
 //			{
