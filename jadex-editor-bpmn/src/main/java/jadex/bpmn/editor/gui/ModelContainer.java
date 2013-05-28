@@ -646,7 +646,7 @@ public class ModelContainer implements IModelContainer
 	 */
 	public ClassLoader getProjectClassLoader()
 	{
-		return model != null? model.getClassLoader() : settings!= null? settings.getHomeClassLoader() != null? settings.getHomeClassLoader() : Settings.class.getClassLoader() : Settings.class.getClassLoader();
+		return model != null? model.getClassLoader() : settings!= null? settings.getLibraryClassLoader() != null? settings.getLibraryClassLoader() : Settings.class.getClassLoader() : Settings.class.getClassLoader();
 	}
 	
 	/**
@@ -880,7 +880,7 @@ public class ModelContainer implements IModelContainer
 	 */
 	public void generateClassLoader()
 	{
-		ClassLoader parent = settings.getHomeClassLoader();
+		ClassLoader parent = settings.getLibraryClassLoader();
 		if(parent == null)
 		{
 			parent = Settings.class.getClassLoader();

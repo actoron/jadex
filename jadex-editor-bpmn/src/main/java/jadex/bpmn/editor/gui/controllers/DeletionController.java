@@ -44,12 +44,11 @@ public class DeletionController implements mxIEventListener
 			else if (cells[i] instanceof VLane)
 			{
 				MLane mlane = (MLane) ((VLane) cells[i]).getBpmnElement();
-				List pools = modelcontainer.getBpmnModel().getPools();
+				List<MPool> pools = modelcontainer.getBpmnModel().getPools();
 				
 				// Workaround, since the lane has already lost its parent at this point. 
-				for (Object obj : pools)
+				for (MPool mpool : pools)
 				{
-					MPool mpool = (MPool) obj;
 					if (mpool.getLanes().contains(mlane))
 					{
 						mpool.removeLane(mlane);

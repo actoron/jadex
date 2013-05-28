@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -57,10 +58,13 @@ public class Settings
 	protected String selectedsheet = BpmnEditor.STYLE_SHEETS[0].getFirstEntity();
 	
 	/** The library home. */
-	protected File libraryhome;
+	//protected File libraryhome;
 	
-	/** The home class loader. */
-	protected ClassLoader homeclassloader;
+	/** The library class loader entries. */
+	protected File[] libentries;
+	
+	/** The library class loader. */
+	protected ClassLoader libclassloader;
 	
 	/** Global task classes */
 	protected List<ClassInfo> globaltaskclasses;
@@ -212,76 +216,111 @@ public class Settings
 	 *
 	 *  @return The library home.
 	 */
-	public File getLibraryHome()
-	{
-		return libraryhome;
-	}
+//	public File getLibraryHome()
+//	{
+//		return libraryhome;
+//	}
 
 	/**
 	 *  Sets the library home.
 	 *
 	 *  @param libraryhome The library home.
 	 */
-	public void setLibraryHome(File libraryhome)
+//	public void addLibraryHome(File libhome)
+//	{
+//		if (libhome != null && libhome.getPath().length() > 0)
+//		{
+////			this.libraryhome = libraryhome;
+//			
+//			File libdir = new File(libhome.getAbsolutePath() + File.separator + "lib");
+//			if (!libdir.exists() || !libdir.isDirectory())
+//			{
+//				libdir = libhome;
+//			}
+//			
+//			Set<File> entries = new HashSet<File>();
+//			File[] files = libdir.listFiles();
+////			List<URL> urls = new ArrayList<URL>();
+//			if (files != null)
+//			{
+//				for (File file : files)
+//				{
+//					if (file.getAbsolutePath().endsWith(".jar"))
+//					{
+//						entries.add(file);
+//						urls.add(file.toURI().toURL());
+//					}
+//				}
+//			}
+//			
+//			if (entries.isEmpty())
+//			{
+//				// Attempt developer-mode search.
+//				File[] dirs = libdir.listFiles();
+//				for (File dir : dirs)
+//				{
+//					if (dir.isDirectory())
+//					{
+//						File targetdir = new File(dir.getAbsolutePath() + File.separator + "target" + File.separator + "classes");
+//						if (targetdir.exists() && targetdir.isDirectory())
+//						{
+//							entries.add(targetdir);
+//							urls.add(targetdir.toURI().toURL());
+//						}
+//					}
+//				}
+//			}
+//			
+//			if (libentries != null)
+//			{
+//				entries.addAll(Arrays.asList(libentries));
+//			}
+//			
+//			setLibraryEntries(entries);
+//		}
+//		else
+//		{
+//			this.libraryhome = null;
+//			homeclassloader = Settings.class.getClassLoader();
+//		}
+//	}
+	
+	/**
+	 *  Sets the library entries.
+	 *  @param entries The entries.
+	 */
+	public File[] getLibraryEntries()
 	{
-		if (libraryhome != null && libraryhome.getPath().length() > 0)
+		return libentries;
+	}
+	
+	/**
+	 *  Sets the library entries.
+	 *  @param entries The entries.
+	 */
+	public void setLibraryEntries(Collection<File> entries)
+	{
+		libentries = entries.toArray(new File[entries.size()]);
+		
+		URL[] urls = new URL[libentries.length];
+		for (int i = 0; i < urls.length; ++i)
 		{
-			this.libraryhome = libraryhome;
-			
-			File libdir = new File(libraryhome.getAbsolutePath() + File.separator + "lib");
-			if (!libdir.exists() || !libdir.isDirectory())
+			try
 			{
-				libdir = libraryhome;
+				urls[i] = libentries[i].toURI().toURL();
 			}
-			
-			File[] files = libdir.listFiles();
-			List<URL> urls = new ArrayList<URL>();
-			if (files != null)
+			catch (MalformedURLException e)
 			{
-				for (File file : files)
-				{
-					if (file.getAbsolutePath().endsWith(".jar"))
-					{
-						try
-						{
-							urls.add(file.toURI().toURL());
-						}
-						catch (MalformedURLException e)
-						{
-						}
-					}
-				}
 			}
-			
-			if (urls.isEmpty())
-			{
-				// Attempt developer-mode search.
-				File[] dirs = libdir.listFiles();
-				for (File dir : dirs)
-				{
-					if (dir.isDirectory())
-					{
-						File targetdir = new File(dir.getAbsolutePath() + File.separator + "target" + File.separator + "classes");
-						if (targetdir.exists() && targetdir.isDirectory())
-						{
-							try
-							{
-								urls.add(targetdir.toURI().toURL());
-							}
-							catch (MalformedURLException e)
-							{
-							}
-						}
-					}
-				}
-			}
-			
-			homeclassloader = new URLClassLoader(urls.toArray(new URL[urls.size()]), Settings.class.getClassLoader());
+		}
+		
+		if (urls.length > 0)
+		{
+			libclassloader = new URLClassLoader(urls, Settings.class.getClassLoader());
 		}
 		else
 		{
-			this.libraryhome = null;
-			homeclassloader = Settings.class.getClassLoader();
+			libclassloader = Settings.class.getClassLoader();
 		}
 	}
 	
@@ -360,13 +399,13 @@ public class Settings
 	}
 	
 	/**
-	 *  Gets the home class loader.
+	 *  Gets the library class loader.
 	 *
-	 *  @return The home class loader.
+	 *  @return The library class loader.
 	 */
-	public ClassLoader getHomeClassLoader()
+	public ClassLoader getLibraryClassLoader()
 	{
-		return homeclassloader;
+		return libclassloader;
 	}
 
 	/**
@@ -398,10 +437,10 @@ public class Settings
 			props.put("stylesheet", selectedsheet);
 		}
 		
-		if (libraryhome != null)
-		{
-			props.put("homepath", libraryhome.getPath());
-		}
+//		if (libraryhome != null)
+//		{
+//			props.put("homepath", libraryhome.getPath());
+//		}
 		
 		props.put("smoothzoom", String.valueOf(smoothzoom));
 		
@@ -419,6 +458,15 @@ public class Settings
 			for (File file : openedfiles)
 			{
 				props.put("openfile" + ++counter, file.getAbsolutePath());
+			}
+		}
+		
+		if (libentries != null)
+		{
+			int counter = 0;
+			for (File file : libentries)
+			{
+				props.put("libentry" + ++counter, file.getAbsolutePath());
 			}
 		}
 		
@@ -494,11 +542,11 @@ public class Settings
 				ret.setSaveSettingsOnExit(Boolean.parseBoolean(prop));
 			}
 			
-			prop = props.getProperty("homepath");
-			if (prop != null)
-			{
-				ret.setLibraryHome(new File(prop));
-			}
+//			prop = props.getProperty("homepath");
+//			if (prop != null)
+//			{
+//				ret.setLibraryHome(new File(prop));
+//			}
 			
 			prop = props.getProperty("stylesheet");
 			if (prop != null)
@@ -582,6 +630,20 @@ public class Settings
 				}
 			}
 			ret.setOpenedFiles(openfiles.toArray(new File[openfiles.size()]));
+			
+			List<File> lentries = new ArrayList<File>();
+			for(Object okey: props.keySet())
+			{
+				if(okey instanceof String)
+				{
+					String key = (String) okey;
+					if (key.startsWith("libentry"))
+					{
+						lentries.add(new File(props.getProperty(key)));
+					}
+				}
+			}
+			ret.setLibraryEntries(lentries);
 			
 			File classcachefile = new File(BpmnEditor.HOME_DIR + File.separator + CLASS_CACHE_FILE_NAME);
 			

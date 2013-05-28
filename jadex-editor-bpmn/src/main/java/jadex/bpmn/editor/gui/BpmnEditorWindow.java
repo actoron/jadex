@@ -106,7 +106,7 @@ public class BpmnEditorWindow extends JFrame
 		{
 			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "Scanning classes start...");
 			long start = System.currentTimeMillis();
-			Set<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getHomeClassLoader());
+			Set<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getLibraryClassLoader());
 			globalcache.getGlobalTaskClasses().addAll(tmp[0]);
 			globalcache.getGlobalInterfaces().addAll(tmp[1]);
 			globalcache.getGlobalAllClasses().addAll(tmp[2]);

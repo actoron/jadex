@@ -1,9 +1,6 @@
 package jadex.bpmn.editor.model.visual;
 
-import jadex.bpmn.model.MIdElement;
-import jadex.bpmn.model.MProperty;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bridge.modelinfo.UnparsedExpression;
 
 import com.mxgraph.view.mxGraph;
 
