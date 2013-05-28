@@ -6,8 +6,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import com.mxgraph.model.mxICell;
-
 public class CellContextMenu extends JPopupMenu
 {
 	public CellContextMenu(final BpmnGraph graph, final Object[] cells)

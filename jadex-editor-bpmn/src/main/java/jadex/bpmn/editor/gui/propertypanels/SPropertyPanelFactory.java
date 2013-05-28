@@ -8,6 +8,7 @@ import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
+import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 
@@ -36,7 +37,8 @@ public class SPropertyPanelFactory
 			{
 				ret = new BpmnPropertyPanel(container);
 			}
-			else if (velement instanceof VActivity && MBpmnModel.TASK.equals(((MActivity) velement.getBpmnElement()).getActivityType()))
+			else if ((velement instanceof VActivity && MBpmnModel.TASK.equals(((MActivity) velement.getBpmnElement()).getActivityType())) ||
+					  (velement instanceof VSubProcess))
 			{
 				ret = new TaskPropertyPanel(container, (VActivity) velement);
 			}

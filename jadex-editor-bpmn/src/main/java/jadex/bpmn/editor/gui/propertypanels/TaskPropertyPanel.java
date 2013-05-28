@@ -4,6 +4,7 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
@@ -87,7 +88,11 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		int y = 0;
 		JPanel column = new JPanel(new GridBagLayout());
-		tabpane.addTab("Task", column);
+		
+		if (!(task instanceof VSubProcess))
+		{
+			tabpane.addTab("Task", column);
+		}
 		
 		JLabel label = new JLabel("Class");
 //		Set<String> tasknameset = new HashSet<String>(BpmnEditor.TASK_INFOS.keySet());
@@ -391,8 +396,16 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 0, 5, 5);
 		parameterpanel.add(buttonpanel, gc);
 		
-		tabpane.addTab("Properties", proppanel);
-		tabpane.addTab("Parameters", parameterpanel);
+		if (task instanceof VSubProcess)
+		{
+			tabpane.addTab("Parameters", parameterpanel);
+			tabpane.addTab("Properties", proppanel);
+		}
+		else
+		{
+			tabpane.addTab("Properties", proppanel);
+			tabpane.addTab("Parameters", parameterpanel);
+		}
 		
 		add(tabpane, BorderLayout.CENTER);
 		

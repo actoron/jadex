@@ -2,7 +2,6 @@ package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.BpmnGraphComponent.BpmnGraphControl;
-import jadex.bpmn.editor.gui.CellContextMenu;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
@@ -19,7 +18,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 
 import javax.swing.AbstractAction;
 import javax.swing.JScrollBar;
