@@ -270,10 +270,16 @@ public class CustomerPanel extends JPanel
 							});
 						}
 						
-						public void factChanged(Object value, Object oldvalue, Object info)
+						public void factChanged(final Object value, Object oldvalue, Object info)
 						{
-							System.out.println("factchanged: "+value);
-							super.beliefChanged(value);
+							SwingUtilities.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+//									System.out.println("factchanged: "+value);
+									invmodel.fireTableDataChanged();
+								}
+							});
 						}
 					});
 				}
