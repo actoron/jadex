@@ -52,7 +52,7 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 	public T set(int index, T element)
 	{
 		T ret = getList().set(index, element);
-		rulesystem.addEvent(new Event(changeevent, element));
+		rulesystem.addEvent(new Event(changeevent, new Object[]{ret, element, new Integer(index)}));
 		return ret;
 	}
 

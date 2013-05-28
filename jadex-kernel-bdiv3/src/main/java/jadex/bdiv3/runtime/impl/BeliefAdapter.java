@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 
 /**
@@ -33,10 +34,11 @@ public class BeliefAdapter implements IBeliefListener
 	{
 	}
 
-	// todo?!
-//	/**
-//	 *  Invoked when a fact in a belief set has changed (i.e. bean event).
-//	 *  @param event The change event.
-//	 */ 
-//	public void factChanged(ChangeEvent ae);
+	/**
+	 *  Invoked when a fact in a belief set has changed (i.e. bean event).
+	 *  @param event The change event.
+	 */ 
+	public void factChanged(Object value, Object oldvalue, Object info)
+	{
+	}
 }

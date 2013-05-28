@@ -26,11 +26,10 @@ public interface IBeliefListener
 	 */
 	public void factRemoved(Object value);
 
-	// todo?!
-//	/**
-//	 *  Invoked when a fact in a belief set has changed (i.e. bean event).
-//	 *  @param event The change event.
-//	 */ 
-//	public void factChanged(ChangeEvent ae);
+	/**
+	 *  Invoked when a fact in a belief set has changed (i.e. bean event).
+	 *  @param event The change event.
+	 */ 
+	public void factChanged(Object value, Object oldvalue, Object info);
 
 }

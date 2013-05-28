@@ -366,7 +366,7 @@ public class SReflect
 	 *	Beautifies names of arrays (eg 'String[]' instead of '[LString;').
 	 *  @return The beautified name of a class.
 	 */
-	public static String getClassName(Class clazz)
+	public static String getClassName(Class<?> clazz)
 	{
 		int dim	= 0;
 		if(clazz==null)
@@ -408,9 +408,8 @@ public class SReflect
 		if(lpos>0)
 		{
 			String left = name.substring(0, lpos);
-			int pos = left.lastIndexOf(".");
-			if(pos!=-1)
-				left = left.substring(pos+1);
+			
+			left = processName(left);
 			
 			String right = name.substring(lpos+1);
 			right = getUnqualifiedTypeName(right);
@@ -418,18 +417,49 @@ public class SReflect
 		}
 		else
 		{
-			int pos = name.lastIndexOf(".");
-			if(pos!=-1)
-				name = name.substring(pos+1);
+			name = processName(name);
 		}
+		
+		int pos = name.lastIndexOf(".");
+		if(pos!=-1)
+			name = name.substring(pos+1);
 		
 		return name;
 	}
 
-//	public static void main(String[] args)
-//	{
-//		System.out.println(getUnqualifiedTypeName("a.b.c.D<aa.F<ab.V><a.B>>>"));
-//	}
+	/**
+	 * 
+	 */
+	protected static String processName(String name)
+	{
+		int found = 0;
+		for(int i=0; name.charAt(i)=='['; i++)
+			found++;
+		
+		if(found>0)
+		{
+			int paren = 0;
+			for(int i=1; name.charAt(name.length()-i)=='>'; i++)
+				paren++;
+			
+			name = name.substring(found+1, name.length()-(paren+1)); // paren+;
+			for(int i=0; i<found; i++)
+				name = name+"[]"; 
+			for(int i=0; i<paren; i++)
+				name = name+">";
+		}
+		int pos = name.lastIndexOf(".");
+		if(pos!=-1)
+			name = name.substring(pos+1);
+		return name;
+	}
+	
+	public static void main(String[] args)
+	{
+		System.out.println(getUnqualifiedTypeName("a.b.c.D<aa.F<ab.V><a.B>>>"));
+		System.out.println(getUnqualifiedTypeName("a.b.c.D<[[Laa.F;<ab.V><a.B>>>"));
+		System.out.println(String[][].class.getName()+" "+getUnqualifiedTypeName(String[][].class.getName()));
+	}
 	
 	/**
 	 *	Get inner class name.
@@ -1698,64 +1728,64 @@ public class SReflect
 		return ret;
 	}
 	
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args)
-	{
-//		System.out.println(getMethodName());
-	
-		IFilter<Object> filefilter = new IFilter<Object>()
-		{
-			public boolean filter(Object obj)
-			{
-				String	fn	= "";
-				if(obj instanceof File)
-				{
-					File	f	= (File)obj;
-					fn	= f.getName();
-				}
-				else if(obj instanceof JarEntry)
-				{
-					JarEntry	je	= (JarEntry)obj;
-					fn	= je.getName();
-				}
-				return fn.indexOf("$")==-1;// && fn.endsWith(".class");
-			}
-		};
-		final int[] cnt = new int[1]; 
-		IFilter<Class<?>> classfilter = new IFilter<Class<?>>()
-		{
-			public boolean filter(Class<?> clazz)
-			{
-//				System.out.println("testing class: "+(cnt[0]++)+clazz);
-						
-//							Class<?> cl = (Class<?>)obj;
-				boolean ret = SReflect.getInnerClassName(clazz).startsWith("Mouse");
-//							boolean ret = SReflect.isSupertype(IControlCenterPlugin.class, cl) && !(cl.isInterface() || Modifier.isAbstract(cl.getModifiers()));
-				
-				return ret;
-			}
-		};
-		
-		asyncScanForClasses(null, filefilter, classfilter, 5, true).addResultListener(new IIntermediateResultListener<Class<?>>()
-		{
-			public void intermediateResultAvailable(Class<?> result)
-			{
-				System.out.println("found: "+result);
-			}
-			public void finished()
-			{
-				System.out.println("fini");
-			}
-			public void resultAvailable(Collection<Class<?>> result)
-			{
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-		});
-	}
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+////		System.out.println(getMethodName());
+//		
+//		IFilter<Object> filefilter = new IFilter<Object>()
+//		{
+//			public boolean filter(Object obj)
+//			{
+//				String	fn	= "";
+//				if(obj instanceof File)
+//				{
+//					File	f	= (File)obj;
+//					fn	= f.getName();
+//				}
+//				else if(obj instanceof JarEntry)
+//				{
+//					JarEntry	je	= (JarEntry)obj;
+//					fn	= je.getName();
+//				}
+//				return fn.indexOf("$")==-1;// && fn.endsWith(".class");
+//			}
+//		};
+//		final int[] cnt = new int[1]; 
+//		IFilter<Class<?>> classfilter = new IFilter<Class<?>>()
+//		{
+//			public boolean filter(Class<?> clazz)
+//			{
+////				System.out.println("testing class: "+(cnt[0]++)+clazz);
+//						
+////							Class<?> cl = (Class<?>)obj;
+//				boolean ret = SReflect.getInnerClassName(clazz).startsWith("Mouse");
+////							boolean ret = SReflect.isSupertype(IControlCenterPlugin.class, cl) && !(cl.isInterface() || Modifier.isAbstract(cl.getModifiers()));
+//				
+//				return ret;
+//			}
+//		};
+//		
+//		asyncScanForClasses(null, filefilter, classfilter, 5, true).addResultListener(new IIntermediateResultListener<Class<?>>()
+//		{
+//			public void intermediateResultAvailable(Class<?> result)
+//			{
+//				System.out.println("found: "+result);
+//			}
+//			public void finished()
+//			{
+//				System.out.println("fini");
+//			}
+//			public void resultAvailable(Collection<Class<?>> result)
+//			{
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//			}
+//		});
+//	}
 	
 	/** Cached flag for android check. */
 	protected static Boolean isandroid;

@@ -269,6 +269,12 @@ public class CustomerPanel extends JPanel
 								}
 							});
 						}
+						
+						public void factChanged(Object value, Object oldvalue, Object info)
+						{
+							System.out.println("factchanged: "+value);
+							super.beliefChanged(value);
+						}
 					});
 				}
 				catch(Exception e)

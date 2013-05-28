@@ -135,6 +135,11 @@ public class BDIAgent extends MicroAgent
 					{
 						listener.factAdded(event.getContent());
 					}
+					else if(ChangeEvent.FACTCHANGED.equals(event.getType().getType(0)))
+					{
+						Object[] vals = (Object[])event.getContent();
+						listener.factChanged(vals[0], vals[1], vals[2]);
+					}
 				}
 				return IFuture.DONE;
 			}

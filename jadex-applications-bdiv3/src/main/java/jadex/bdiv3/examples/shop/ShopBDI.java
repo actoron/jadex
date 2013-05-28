@@ -18,12 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  Shop BDI agent offers items from a catalog.
  */
 @Agent
-@Arguments(@Argument(name="catalog", clazz=List.class))
-@ProvidedServices(@ProvidedService(type=IShopService.class, 
-	implementation=@Implementation(value=ShopService.class)))//expression="new ShopService($beliefbase.shopname)")))
+@Arguments(
+{
+	@Argument(name="catalog", clazz=List.class), 
+	@Argument(name="shopname", clazz=String.class)
+})
+@ProvidedServices(@ProvidedService(type=IShopService.class, //	implementation=@Implementation(value=ShopService.class)))
+	implementation=@Implementation(expression="new ShopService($args.shopname)")))
 public class ShopBDI
 {
 	/** The bdi agent. */
@@ -35,8 +39,9 @@ public class ShopBDI
 	protected double money = 100;
 
 	/** The shop name. */
+	@AgentArgument
 	@Belief
-	protected String shopname = "Shop24";
+	protected String shopname;
 	
 	/** The shop catalog. */
 	@AgentArgument
@@ -102,7 +107,10 @@ public class ShopBDI
 		}
 	}
 	
-
+	/**
+	 *  Plan for handling a sell goal.
+	 *  @param goal The goal.
+	 */
 	@Plan(trigger=@Trigger(goals=SellGoal.class))
 	public void sell(SellGoal goal)
 	{
@@ -170,7 +178,6 @@ public class ShopBDI
 	{
 		return shopname;
 	}
-
 
 	/**
 	 *  Get the catalog.
