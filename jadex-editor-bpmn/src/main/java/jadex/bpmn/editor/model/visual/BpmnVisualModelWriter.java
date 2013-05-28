@@ -54,7 +54,7 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 			out.print(SBpmnModelWriter.getIndent(3));
 			out.print("<bpmndi:BPMNShape bpmnElement=\"");
 			out.print(node.getBpmnElement().getId());
-			if (node instanceof VSubProcess || node instanceof VExternalSubProcess)
+			if (node instanceof VSubProcess)// || node instanceof VExternalSubProcess)
 			{
 				out.print("\" isExpanded=\"");
 				out.print(!node.isCollapsed());

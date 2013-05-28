@@ -95,7 +95,8 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 		
 		if (e instanceof MSubProcess)
 		{
-			if (((MSubProcess) e).hasPropertyValue("file"))
+			if (((MSubProcess) e).hasProperty("file") ||
+				((MSubProcess) e).hasProperty("filename"))
 			{
 				vnode = new VExternalSubProcess(graph);
 			}

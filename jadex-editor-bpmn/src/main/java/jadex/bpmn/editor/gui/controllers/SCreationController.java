@@ -212,12 +212,12 @@ public class SCreationController
 		}
 		else if (ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS.equals(mode))
 		{
-			mactivity.setName("External Sub-Process");
+			mactivity.setName("Ext. Sub-Process");
 			UnparsedExpression exp = new UnparsedExpression("filename", String.class, "\"\"", null);
 			MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
 			mactivity.addProperty(mprop);
 			vactivity = new VExternalSubProcess(modelcontainer.getGraph());
-			vactivity.setCollapsed(true);
+//			vactivity.setCollapsed(true);
 		}
 		else
 		{

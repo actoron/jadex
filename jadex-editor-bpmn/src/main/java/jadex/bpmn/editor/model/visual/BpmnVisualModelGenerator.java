@@ -122,7 +122,8 @@ public class BpmnVisualModelGenerator
 		VActivity vactivity = null;
 		if (mactivity instanceof MSubProcess)
 		{
-			if (mactivity.hasPropertyValue("file"))
+			if (mactivity.hasProperty("file") ||
+				mactivity.hasProperty("filename"))
 			{
 				vactivity = new VExternalSubProcess(graph);
 				

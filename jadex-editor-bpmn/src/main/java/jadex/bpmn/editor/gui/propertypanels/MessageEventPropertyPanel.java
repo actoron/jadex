@@ -145,27 +145,30 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 		});
 		configureAndAddInputLine(column, label, cbox, y++);
 		
-		label = new JLabel("Message");
-		JTextArea textarea = new JTextArea();
-		textarea.setWrapStyleWord(true);
-		textarea.setLineWrap(true);
-		String strval = getMEvent().getPropertyValueString(PROPERTY_MESSAGE);
-		textarea.setText(strval != null? strval : "");
-		textarea.getDocument().addDocumentListener(new DocumentAdapter()
+		if (getMEvent().isThrowing())
 		{
-			public void update(DocumentEvent e)
+			label = new JLabel("Message");
+			JTextArea textarea = new JTextArea();
+			textarea.setWrapStyleWord(true);
+			textarea.setLineWrap(true);
+			String strval = getMEvent().getPropertyValueString(PROPERTY_MESSAGE);
+			textarea.setText(strval != null? strval : "");
+			textarea.getDocument().addDocumentListener(new DocumentAdapter()
 			{
-				String msgval = getText(e.getDocument());
-				msgval = msgval.isEmpty() ? null : msgval;
-				getMEvent().addProperty("message", msgval);
-			}
-		});
-		JScrollPane sp =  new JScrollPane(textarea);
-		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		configureAndAddInputLine(column, label, sp, y++);
-		textarea.setRows(3);
-		sp.setMinimumSize(textarea.getPreferredSize());
+				public void update(DocumentEvent e)
+				{
+					String msgval = getText(e.getDocument());
+					msgval = msgval.isEmpty() ? null : msgval;
+					getMEvent().addProperty("message", msgval);
+				}
+			});
+			JScrollPane sp =  new JScrollPane(textarea);
+			sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+			configureAndAddInputLine(column, label, sp, y++);
+			textarea.setRows(3);
+			sp.setMinimumSize(textarea.getPreferredSize());
+		}
 		
 		JPanel tablepanel = new JPanel(new GridBagLayout());
 		

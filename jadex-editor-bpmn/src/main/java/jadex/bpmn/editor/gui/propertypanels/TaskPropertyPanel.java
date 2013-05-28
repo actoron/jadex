@@ -4,18 +4,19 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MProperty;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.model.task.ITaskPropertyGui;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.PropertyMetaInfo;
 import jadex.bpmn.task.info.STaskMetaInfoExtractor;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -45,6 +46,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -53,9 +55,11 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.plaf.metal.MetalComboBoxEditor;
 
@@ -64,6 +68,12 @@ import javax.swing.plaf.metal.MetalComboBoxEditor;
  */
 public class TaskPropertyPanel extends BasePropertyPanel
 {
+	/** Label text for file name. */
+	protected final String FILE_NAME_TEXT = "File";
+	
+	/** Label text for file expression. */
+	protected final String FILE_EXPRESSION_TEXT = "File Expression";
+	
 	/** The task. */
 	protected VActivity task;
 	
@@ -89,9 +99,13 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		int y = 0;
 		JPanel column = new JPanel(new GridBagLayout());
 		
-		if (!(task instanceof VSubProcess))
+		if (!isSubprocess())
 		{
 			tabpane.addTab("Task", column);
+		}
+		else if (task instanceof VExternalSubProcess)
+		{
+			tabpane.addTab("External Sub-Process", createExternalSubprocessTab());
 		}
 		
 		JLabel label = new JLabel("Class");
@@ -378,17 +392,20 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		};
-		Icon[] icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), ImageProvider.EMPTY_FRAME_TYPE, "page", buttonpanel.getIconColor());
-		defaultParameterButton.setAction(setDefaultParametersAction);
-		defaultParameterButton.setIcon(icons[0]);
-		defaultParameterButton.setPressedIcon(icons[1]);
-		defaultParameterButton.setRolloverIcon(icons[2]);
-		defaultParameterButton.setContentAreaFilled(false);
-		defaultParameterButton.setBorder(new EmptyBorder(0, 0, 0, 0));
-		defaultParameterButton.setMargin(new Insets(0, 0, 0, 0));
-		defaultParameterButton.setToolTipText("Enter default parameters appropriate for the selected task.");
-		((GridLayout) buttonpanel.getLayout()).setRows(3);
-		buttonpanel.add(defaultParameterButton);
+		if (!isSubprocess())
+		{
+			Icon[] icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), ImageProvider.EMPTY_FRAME_TYPE, "page", buttonpanel.getIconColor());
+			defaultParameterButton.setAction(setDefaultParametersAction);
+			defaultParameterButton.setIcon(icons[0]);
+			defaultParameterButton.setPressedIcon(icons[1]);
+			defaultParameterButton.setRolloverIcon(icons[2]);
+			defaultParameterButton.setContentAreaFilled(false);
+			defaultParameterButton.setBorder(new EmptyBorder(0, 0, 0, 0));
+			defaultParameterButton.setMargin(new Insets(0, 0, 0, 0));
+			defaultParameterButton.setToolTipText("Enter default parameters appropriate for the selected task.");
+			((GridLayout) buttonpanel.getLayout()).setRows(3);
+			buttonpanel.add(defaultParameterButton);
+		}
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -396,7 +413,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 0, 5, 5);
 		parameterpanel.add(buttonpanel, gc);
 		
-		if (task instanceof VSubProcess)
+		if (isSubprocess())
 		{
 			tabpane.addTab("Parameters", parameterpanel);
 			tabpane.addTab("Properties", proppanel);
@@ -652,5 +669,121 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		
 		return ret;
+	}
+	
+	protected JPanel createExternalSubprocessTab()
+	{
+		final VExternalSubProcess subprocess = (VExternalSubProcess) task;
+		
+		int y = 0;
+		JPanel column = new JPanel();
+		column.setLayout(new GridBagLayout());
+		
+		final JCheckBox expbox = new JCheckBox();
+		
+		final JLabel label = new JLabel(FILE_NAME_TEXT);
+		final JTextArea filearea = new JTextArea();
+		filearea.setWrapStyleWord(true);
+		filearea.setLineWrap(true);
+		MSubProcess msp = (MSubProcess) subprocess.getBpmnElement();
+		String filename = null;
+		if (msp.hasProperty("filename"))
+		{
+			UnparsedExpression exp = msp.getPropertyValue("filename");
+			filename = exp != null? exp.getValue() : null;
+			filename = filename != null? filename.length() == 2? "" : filename.substring(1, filename.length() - 2) : "";
+			filearea.setText(filename);
+			expbox.setSelected(false);
+		}
+		else
+		{
+			UnparsedExpression fileexp = (UnparsedExpression) msp.getPropertyValue("file");
+			filearea.setText(fileexp.getValue());
+			expbox.setSelected(true);
+			label.setText(FILE_EXPRESSION_TEXT);
+		}
+		
+		
+		filearea.getDocument().addDocumentListener(new DocumentAdapter()
+		{
+			public void update(DocumentEvent e)
+			{
+				String val = getText(e.getDocument());
+//				if (subprocess.isCollapsed())
+//				{
+				if (expbox.isSelected())
+				{
+					UnparsedExpression exp = new UnparsedExpression("file", String.class, val, null);
+					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+					((MSubProcess) subprocess.getBpmnElement()).addProperty(mprop);
+				}
+				else
+				{
+					UnparsedExpression exp = new UnparsedExpression("filename", String.class, "\"" + val + "\"", null);
+					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+					((MSubProcess) subprocess.getBpmnElement()).addProperty(mprop);
+				}
+//				}
+//				else
+//				{
+//					modelcontainer.getGraph().getModel().setValue(subprocess, val);
+//				}
+				modelcontainer.setDirty(true);
+			}
+		});
+		JScrollPane sp =  new JScrollPane(filearea);
+		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		expbox.setAction(new AbstractAction("Expression")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String val = DocumentAdapter.getText(filearea.getDocument());
+				MSubProcess msp = (MSubProcess) subprocess.getBpmnElement();
+				if (expbox.isSelected())
+				{
+					msp.removeProperty("filename");
+					label.setText(FILE_EXPRESSION_TEXT);
+					UnparsedExpression exp = new UnparsedExpression("file", String.class, val, null);
+					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+					msp.addProperty(mprop);
+				}
+				else
+				{
+					msp.removeProperty("file");
+					label.setText(FILE_NAME_TEXT);
+					UnparsedExpression exp = new UnparsedExpression("filename", String.class, "\"" + val + "\"", null);
+					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+					msp.addProperty(mprop);
+				}
+			}
+		});
+		
+		JPanel expentrypanel = new JPanel(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.weightx = 1.0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;	
+		expentrypanel.add(sp, gbc);
+		filearea.setRows(3);
+		sp.setMinimumSize(filearea.getPreferredSize());
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		expentrypanel.add(expbox, gbc);
+		configureAndAddInputLine(column, label, expentrypanel, y++);
+		
+		addVerticalFiller(column, y);
+		
+		return column;
+	}
+	
+	/**
+	 * 
+	 * @return True if the task is a subprocess.
+	 */
+	protected boolean isSubprocess()
+	{
+		return task instanceof VSubProcess || task instanceof VExternalSubProcess;
 	}
 }

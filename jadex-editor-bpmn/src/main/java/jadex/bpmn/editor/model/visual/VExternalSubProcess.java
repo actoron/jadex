@@ -7,12 +7,19 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 
 import com.mxgraph.view.mxGraph;
 
+/**
+ *  Visual representation of an external subprocess.
+ */
 public class VExternalSubProcess extends VActivity
 {
+	/**
+	 *  Creates the subprocess.
+	 *  @param graph The graph.
+	 */
 	public VExternalSubProcess(mxGraph graph)
 	{
 		super(graph);
-		setCollapsed(true);
+//		setCollapsed(true);
 	}
 	
 	/**
@@ -32,26 +39,27 @@ public class VExternalSubProcess extends VActivity
 	{
 		if (getBpmnElement() != null)
 		{
-			if (isCollapsed())
-			{
-				return ((MSubProcess) getBpmnElement()).getName();
-			}
-			else
-			{
-				MSubProcess msp = (MSubProcess) getBpmnElement();
-				String ret;
-				if(msp.hasPropertyValue("file"))
-				{
-					UnparsedExpression mp = (UnparsedExpression)msp.getPropertyValue("file");
-					ret = mp.getValue();
-				}
-				else
-				{
-					ret = msp.getPropertyValue("filename").getValue();
-					ret = ret.substring(1, ret.length() - 2);
-				}
-				return ret != null? ret : "";
-			}
+			return ((MSubProcess) getBpmnElement()).getName();
+//			if (isCollapsed())
+//			{
+//				return ((MSubProcess) getBpmnElement()).getName();
+//			}
+//			else
+//			{
+//				MSubProcess msp = (MSubProcess) getBpmnElement();
+//				String ret;
+//				if(msp.hasPropertyValue("file"))
+//				{
+//					UnparsedExpression mp = (UnparsedExpression)msp.getPropertyValue("file");
+//					ret = mp.getValue();
+//				}
+//				else
+//				{
+//					ret = msp.getPropertyValue("filename").getValue();
+//					ret = ret.substring(1, ret.length() - 2);
+//				}
+//				return ret != null? ret : "";
+//			}
 		}
 		
 		return super.getValue();
@@ -66,36 +74,27 @@ public class VExternalSubProcess extends VActivity
 	{
 		if (getBpmnElement() != null)
 		{
-			if (isCollapsed())
-			{
-				((MSubProcess) getBpmnElement()).setName((String) value);
-			}
-			else
-			{
-				MSubProcess msp = (MSubProcess) getBpmnElement();
-				if (msp.hasPropertyValue("file"))
-				{
-					UnparsedExpression exp = new UnparsedExpression("file", String.class, (String) value, null);
-					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
-					msp.addProperty(mprop);
-				}
-				else
-				{
-					UnparsedExpression exp = new UnparsedExpression("filename", String.class, "\"" + value + "\"", null);
-					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
-					msp.addProperty(mprop);
-				}
-			}
+			((MSubProcess) getBpmnElement()).setName((String) value);
+//			if (isCollapsed())
+//			{
+//				((MSubProcess) getBpmnElement()).setName((String) value);
+//			}
+//			else
+//			{
+//				MSubProcess msp = (MSubProcess) getBpmnElement();
+//				if (msp.hasPropertyValue("file"))
+//				{
+//					UnparsedExpression exp = new UnparsedExpression("file", String.class, (String) value, null);
+//					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+//					msp.addProperty(mprop);
+//				}
+//				else
+//				{
+//					UnparsedExpression exp = new UnparsedExpression("filename", String.class, "\"" + value + "\"", null);
+//					MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
+//					msp.addProperty(mprop);
+//				}
+//			}
 		}
-	}
-	
-	/**
-	 *  Sets the BPMN element.
-	 *  
-	 *  @param bpmnelement The BPMN element.
-	 */
-	public void setBpmnElement(MIdElement bpmnelement)
-	{
-		this.bpmnelement = bpmnelement;
 	}
 }

@@ -38,7 +38,8 @@ public class SPropertyPanelFactory
 				ret = new BpmnPropertyPanel(container);
 			}
 			else if ((velement instanceof VActivity && MBpmnModel.TASK.equals(((MActivity) velement.getBpmnElement()).getActivityType())) ||
-					  (velement instanceof VSubProcess))
+					  (velement instanceof VSubProcess) ||
+					  (velement instanceof VExternalSubProcess))
 			{
 				ret = new TaskPropertyPanel(container, (VActivity) velement);
 			}
@@ -49,15 +50,15 @@ public class SPropertyPanelFactory
 			if (velement instanceof VActivity &&
 				(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(((MActivity) velement.getBpmnElement()).getActivityType()) ||
 				 MBpmnModel.EVENT_START_MESSAGE.equals(((MActivity) velement.getBpmnElement()).getActivityType()) ||
-				 MBpmnModel.EVENT_END_MESSAGE.equals(((MActivity) velement.getBpmnElement()).getActivityType())) &&
-				 ((MActivity) velement.getBpmnElement()).isThrowing())
+				 MBpmnModel.EVENT_END_MESSAGE.equals(((MActivity) velement.getBpmnElement()).getActivityType())))// &&
+//				 ((MActivity) velement.getBpmnElement()).isThrowing())
 			{
 				ret = new MessageEventPropertyPanel(container, (VActivity) velement);
 			}
-			else if (velement instanceof VExternalSubProcess)
-			{
-				ret = new ExternalSubProcessPropertyPanel(container, (VExternalSubProcess) velement);
-			}
+//			else if (velement instanceof VExternalSubProcess)
+//			{
+//				ret = new ExternalSubProcessPropertyPanel(container, (VExternalSubProcess) velement);
+//			}
 			else if (velement instanceof VSequenceEdge)
 			{
 				ret = new SequenceEdgePropertyPanel(container, (VSequenceEdge) velement);
