@@ -82,4 +82,22 @@ public class VDataEdge extends VEdge
 			super.setTarget(target);
 		}
 	}
+	
+	/**
+	 *  Gets the authoritative edge parent. 
+	 * 
+	 * 	@return The parent.
+	 */
+	public mxICell getEdgeParent()
+	{
+		mxICell ret = null;
+		if (getSource() != null)
+		{
+			if (getSource().getParent() != null)
+			{
+				ret = getSource().getParent().getParent();
+			}
+		}
+		return ret;
+	}
 }

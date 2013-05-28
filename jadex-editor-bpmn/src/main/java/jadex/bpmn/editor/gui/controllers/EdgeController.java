@@ -6,6 +6,7 @@ import jadex.bpmn.editor.gui.EdgeDragContextMenu;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
+import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 
@@ -211,7 +212,14 @@ public class EdgeController extends mxConnectionHandler
 					
 					if (commit || reallycommit)
 					{
-						result = graph.addCell(cell, ((mxICell) src).getParent(), null, src, trg);
+						if (cell instanceof VEdge)
+						{
+							result = graph.addCell(cell, ((VEdge) cell).getEdgeParent(), null, src, trg);
+						}
+						else
+						{
+							result = graph.addCell(cell, ((mxICell) src).getParent(), null, src, trg);
+						}
 						if (cell instanceof VDataEdge)
 						{
 							((BpmnGraph) graph).refreshCellView(((VDataEdge) cell).getTarget().getParent());

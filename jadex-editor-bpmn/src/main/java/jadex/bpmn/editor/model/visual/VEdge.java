@@ -1,5 +1,8 @@
 package jadex.bpmn.editor.model.visual;
 
+import jadex.bpmn.editor.gui.BpmnGraph;
+
+import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
 
 /**
@@ -21,5 +24,27 @@ public class VEdge extends VElement
 		setEdge(true);
 		setVisible(true);
 		setConnectable(false);
+	}
+	
+	public void setSource(mxICell source)
+	{
+		super.setSource(source);
+		setParent(getEdgeParent());
+		((BpmnGraph) graph).refreshCellView(this);
+	}
+	
+	/**
+	 *  Gets the authoritative edge parent. 
+	 * 
+	 * 	@return The parent.
+	 */
+	public mxICell getEdgeParent()
+	{
+		mxICell ret = null;
+		if (getSource() != null)
+		{
+			ret = getSource().getParent();
+		}
+		return ret;
 	}
 }

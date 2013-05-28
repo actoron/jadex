@@ -84,64 +84,7 @@ public class MouseController extends MouseAdapter
 					modelcontainer.getGraph().getSelectionCount() == 1 &&
 					modelcontainer.getGraph().getSelectionCell() instanceof VEdge)
 				{
-					boolean gridstate = modelcontainer.getGraph().isGridEnabled();
-					modelcontainer.getGraph().setGridEnabled(false);
-					mxp = modelcontainer.getGraphComponent().getPointForEvent(e, false);
-					p = new Point2D.Double(mxp.getX(), mxp.getY());
-					
-					VEdge vedge = (VEdge) cell;
-					mxGeometry geo = vedge.getGeometry();
-					List<mxPoint> points = (List<mxPoint>) geo.getPoints();
-					
-					mxICell parent = null;
-					if (vedge.getSource() != null && vedge.getSource().getParent() != null)
-					{
-						parent = vedge.getSource().getParent();
-						while (parent != null &&
-							   !(parent instanceof VSubProcess) &&
-							   !(parent instanceof VLane) &&
-							   !(parent instanceof VPool))
-						{
-							parent = parent.getParent();
-						}
-						
-						if (parent != null)
-						{
-							mxCellState pstate = modelcontainer.getGraph().getView().getState(parent, true);
-							if (pstate != null)
-							{
-								mxp.setX(p.getX() - pstate.getOrigin().getX());
-								mxp.setY(p.getY() - pstate.getOrigin().getY());
-							}
-						}
-					}
-					
-					if (points == null)
-					{
-						points = new ArrayList<mxPoint>();
-						geo.setPoints(points);
-					}
-					
-					double scale = modelcontainer.getGraph().getView().getScale();
-					mxPoint amxp = (new mxPoint(p.getX() * scale, p.getY() * scale));
-					
-					if (points.size() == 0)
-					{
-						points.add(mxp);
-					}
-					else
-					{
-						int ind = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), amxp.getX(), amxp.getY());;
-						points.add(ind, mxp);
-					}
-					
-					modelcontainer.getGraph().refreshCellView((VEdge) cell);
-					modelcontainer.getGraph().setSelectionCell(cell);
-					modelcontainer.setDirty(true);
-					
-					modelcontainer.getGraph().setGridEnabled(gridstate);
-					
-					modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+					SCreationController.createControlPoint((VEdge) cell, mxp, modelcontainer);
 				}
 			}
 			else if (cell == null && ModelContainer.EDIT_MODE_POOL.equals(mode))

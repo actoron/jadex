@@ -5,6 +5,7 @@ import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
+import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VExternalSubProcess;
 import jadex.bpmn.editor.model.visual.VInParameter;
@@ -35,11 +36,10 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
 import com.mxgraph.util.mxPoint;
+import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
@@ -408,6 +408,82 @@ public class SCreationController
 		return ret;
 	}
 	
+	/**
+	 *  Creates a control point.
+	 */
+	public static final void createControlPoint(VEdge vedge, mxPoint mxp, ModelContainer modelcontainer)
+	{
+		boolean gridstate = modelcontainer.getGraph().isGridEnabled();
+		modelcontainer.getGraph().setGridEnabled(false);
+//		mxp = modelcontainer.getGraphComponent().getPointForEvent(e, false);
+//		p = new Point2D.Double(mxp.getX(), mxp.getY());
+		
+//		VEdge vedge = (VEdge) cell;
+		mxGeometry geo = vedge.getGeometry();
+		List<mxPoint> points = (List<mxPoint>) geo.getPoints();
+		
+		mxICell parent = null;
+//		if (vedge.getSource() != null && vedge.getSource().getParent() != null)
+//		{
+		parent = vedge.getEdgeParent();
+//			parent = vedge.getSource().getParent();
+//			while (parent != null &&
+//				   !(parent instanceof VSubProcess) &&
+//				   !(parent instanceof VLane) &&
+//				   !(parent instanceof VPool))
+//			{
+//				parent = parent.getParent();
+//			}
+			
+		if (parent != null)
+		{
+			mxCellState pstate = modelcontainer.getGraph().getView().getState(parent, true);
+			if (pstate != null)
+			{
+				mxp.setX(mxp.getX() - pstate.getOrigin().getX());
+				mxp.setY(mxp.getY() - pstate.getOrigin().getY());
+			}
+		}
+//		}
+		
+		if (points == null)
+		{
+			points = new ArrayList<mxPoint>();
+			geo.setPoints(points);
+		}
+		
+//		double scale = modelcontainer.getGraph().getView().getScale();
+//		mxPoint amxp = (new mxPoint(p.getX() * scale, p.getY() * scale));
+		
+		if (points.size() == 0)
+		{
+			points.add(mxp);
+		}
+		else
+		{
+//			int ind = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), amxp.getX(), amxp.getY());
+			int ind = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(vedge), mxp.getX(), mxp.getY());
+			points.add(ind, mxp);
+		}
+		
+		modelcontainer.getGraph().refreshCellView(vedge);
+		modelcontainer.getGraph().setSelectionCell(vedge);
+		modelcontainer.setDirty(true);
+		
+		modelcontainer.getGraph().setGridEnabled(gridstate);
+		
+		modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+	}
+	
+	/**
+	 *  Creates a data edge.
+	 * 
+	 * 	@param graph The graph.
+	 * 	@param idgenerator The ID generator.
+	 * 	@param source Edge source.
+	 * 	@param target Edge target.
+	 * 	@return The edge.
+	 */
 	protected static final VDataEdge createDataEdge(final BpmnGraph graph, IdGenerator idgenerator, VOutParameter source, VInParameter target)
 	{
 		final VActivity vtactivity = (VActivity) target.getParent();

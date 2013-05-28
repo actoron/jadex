@@ -248,6 +248,7 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			}
 			vedge.setBpmnElement(medge);
 			
+			mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
 			if (waypoints != null)
 			{
 				List<mxPoint> mxpoints = new ArrayList<mxPoint>();
@@ -256,14 +257,13 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 					mxpoints.add(new mxPoint(point));
 				}
 				
-				mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();
 				geo.setPoints(mxpoints);
-				geo.setRelative(false);
 				vedge.setGeometry(geo);
 			}
 			
 			graph.getModel().beginUpdate();
-			graph.addCell(vedge, vedge.getSource().getParent());
+			graph.addCell(vedge, vedge.getEdgeParent());
+//			graph.addCell(vedge);
 			graph.getModel().endUpdate();
 		}
 		else
@@ -310,7 +310,8 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				}
 				
 				graph.getModel().beginUpdate();
-				graph.addCell(vedge, vedge.getSource().getParent().getParent());
+//				graph.addCell(vedge, vedge.getSource().getParent().getParent());
+				graph.addCell(vedge);
 				graph.getModel().endUpdate();
 			}
 			else
