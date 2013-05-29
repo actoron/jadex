@@ -1,6 +1,8 @@
 package jadex.bdiv3.examples.shop;
 
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Capability;
+import jadex.bdiv3.annotation.Mapping;
 import jadex.micro.annotation.Agent;
 
 /**
@@ -11,8 +13,8 @@ public class Customer2BDI
 {
 	//-------- attributes --------
 
-	/** The capability. */
-//	@Capability(assignto={@Mapping("money", target="money")})
+	/** The customer capability. */
+	@Capability(assignto=@Mapping("money"))
 	protected CustomerCapability	cap	= new CustomerCapability();
 	
 	/** The money. */

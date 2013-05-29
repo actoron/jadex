@@ -1,11 +1,11 @@
 package jadex.bdiv3.examples.shop;
 
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.runtime.ICapability;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -15,39 +15,31 @@ import java.util.List;
 /**
  * 
  */
+@Capability
 @ProvidedServices(@ProvidedService(type=IShopService.class, //	implementation=@Implementation(value=ShopService.class)))
 	implementation=@Implementation(expression="new ShopService($pojoagent.shopname)")))
 public class ShopCapa
 {
-	/** The bdi capability. */
-//	@Capability
-	protected ICapability capa;
-	
-	/** The money. */
-//	@Belief(abztract=true)
-//	protected double money;
-
-//	@Belief
+	@Belief
 	public native double getMoney();
 	
-//	@Belief
+	@Belief
 	public native void setMoney(double money);
-	
 	
 	/** The shop name. */
 	protected String shopname;
 	
 	/** The shop catalog. */
-//	@AgentArgument
 	@Belief
 	protected List<ItemInfo> catalog;
 	
 	/**
 	 *  Create a shop capability.
 	 */
-	public ShopCapa(String shopname)
+	public ShopCapa(String shopname, List<ItemInfo> catalog)
 	{
 		this.shopname	= shopname;
+		this.catalog	= catalog;
 	}
 	
 	@Goal
@@ -150,32 +142,5 @@ public class ShopCapa
 		{
 			throw new RuntimeException("Payment not sufficient: "+goal.getPrice());
 		}
-	}
-
-//	/**
-//	 *  Get the agent.
-//	 *  @return The agent.
-//	 */
-//	public BDIAgent getAgent()
-//	{
-//		return agent;
-//	}
-
-	/**
-	 *  Get the shopname.
-	 *  @return The shopname.
-	 */
-	public String getShopname()
-	{
-		return shopname;
-	}
-
-	/**
-	 *  Get the catalog.
-	 *  @return The catalog.
-	 */
-	public List<ItemInfo> getCatalog()
-	{
-		return catalog;
 	}
 }

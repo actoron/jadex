@@ -4,6 +4,7 @@ import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
+import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalInhibit;
@@ -198,8 +199,18 @@ public class BDIClassReader extends MicroClassReader
 				}
 			}
 			
-			// Find beliefs
+			// Find capabilities
 			Field[] fields = clazz.getDeclaredFields();
+			for(int i=0; i<fields.length; i++)
+			{
+				if(isAnnotationPresent(fields[i], Capability.class, cl))
+				{
+					System.out.println("found capability: "+fields[i].getName());
+					agtcls.add(0, fields[i].getType());
+				}
+			}
+
+			// Find beliefs
 			for(int i=0; i<fields.length; i++)
 			{
 				if(isAnnotationPresent(fields[i], Belief.class, cl))

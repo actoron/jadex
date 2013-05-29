@@ -300,7 +300,8 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 		{
 			for(AnnotationNode an: cn.visibleAnnotations)
 			{
-				if("Ljadex/micro/annotation/Agent;".equals(an.desc))
+				if("Ljadex/micro/annotation/Agent;".equals(an.desc)
+					|| "Ljadex/bdiv3/annotation/Capability;".equals(an.desc))
 				{
 					agentclass	= true;
 					break;

@@ -30,7 +30,7 @@ public class Shop2BDI
 //	@Capability
 //	@AgentArgument("shopname")//, target="shopname")
 //	@AgentArgument("catalog")//, target="catalog")
-	protected ShopCapa shopcap	= new ShopCapa((String)agent.getArgument("shopname"));
+	protected ShopCapa shopcap	= new ShopCapa((String)agent.getArgument("shopname"), (List<ItemInfo>)agent.getArgument("catalog"));
 	
 	
 	

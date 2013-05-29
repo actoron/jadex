@@ -1,15 +1,13 @@
 package jadex.bdiv3.examples.shop;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ICapability;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
@@ -24,7 +22,7 @@ import javax.swing.SwingUtilities;
 /**
  *  Customer capability.
  */
-@Agent
+@Capability
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.bdi.examples.shop.CustomerViewerPanel\""))
 @RequiredServices({
 	@RequiredService(name="localshopservices", type=IShopService.class, multiple=true,
@@ -44,25 +42,20 @@ public class CustomerCapability
 	@Belief
 	protected List<ItemInfo>	inventory	= new ArrayList<ItemInfo>();
 	
-	//-------- methods --------
+	//-------- constructors --------
 	
 	/**
 	 *  Called when the agent is started.
 	 */
-	@AgentCreated
-	public IFuture<Void>	init()
+	public CustomerCapability()
 	{
-		final Future<Void>	ret	= new Future<Void>();
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				new CustomerFrame(capa);
-				ret.setResult(null);
 			}
 		});
-		
-		return ret;
 	}
 	
 	/**
