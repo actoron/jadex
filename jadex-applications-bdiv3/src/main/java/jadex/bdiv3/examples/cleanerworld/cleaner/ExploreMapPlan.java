@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanAPI;
@@ -23,6 +24,7 @@ import java.util.Set;
  *  Uses the absolute quantity to go to positions that are not yet
  *  explored.
  */
+@Plan
 public class ExploreMapPlan 
 {
 	@PlanCapability

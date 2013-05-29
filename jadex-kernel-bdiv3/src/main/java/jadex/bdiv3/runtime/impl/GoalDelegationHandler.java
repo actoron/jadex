@@ -64,7 +64,8 @@ public class GoalDelegationHandler  implements InvocationHandler
 		if(goalname==null)
 			throw new RuntimeException("No method-goal mapping found: "+method.getName()+" "+goalnames);
 		
-		MCapability mcapa = (MCapability)agent.getCapability().getModelElement();
+		BDIAgentInterpreter	ip	= (BDIAgentInterpreter)agent.getInterpreter();
+		MCapability mcapa = (MCapability)ip.getCapability().getModelElement();
 		final MGoal mgoal = mcapa.getGoal(goalname);
 		
 		Class<?> goalcl = mgoal.getTargetClass(agent.getClassLoader());
@@ -92,7 +93,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 		}
 		
 		final Object fgoal = goal;
-		agent.dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
+		ip.dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{

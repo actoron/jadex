@@ -1,7 +1,5 @@
 package jadex.bdiv3.testcases.componentplans;
 
-import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.Boolean3;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;

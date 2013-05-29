@@ -3,7 +3,6 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
@@ -18,7 +17,7 @@ import java.util.Map;
 /**
  *  Runtime element for storing goal ans plan instances.
  */
-public class RCapability extends RElement implements ICapability
+public class RCapability extends RElement
 {
 	/** Flag to save first exceptions. */
 	protected final static boolean DEBUG = false;

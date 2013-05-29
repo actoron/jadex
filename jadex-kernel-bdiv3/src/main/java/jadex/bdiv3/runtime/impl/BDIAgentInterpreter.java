@@ -20,6 +20,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.RGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
@@ -35,6 +36,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -59,7 +61,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -126,8 +127,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				try
 				{
 					Field f = fields[i].getField(getClassLoader());
-					f.setAccessible(true);
-					f.set(agent, ret);
+					if(SReflect.isSupertype(f.getType(), ICapability.class))
+					{
+						f.setAccessible(true);
+						f.set(agent, new CapabilityWrapper(pa, null));						
+					}
+					else
+					{
+						f.setAccessible(true);
+						f.set(agent, ret);
+					}
 				}
 				catch(Exception e)
 				{
@@ -159,6 +168,32 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Dispatch a goal wait for its result.
+	 */
+	public <T, E> IFuture<E> dispatchTopLevelGoal(final T goal)
+	{
+		final Future<E> ret = new Future<E>();
+		
+		final MGoal mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
+		if(mgoal==null)
+			throw new RuntimeException("Unknown goal type: "+goal);
+		final RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null);
+		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, E>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				Object res = RGoal.getGoalResult(goal, mgoal, bdimodel.getClassloader());
+				ret.setResult((E)res);
+			}
+		});
+
+//		System.out.println("adopt goal");
+		RGoal.adoptGoal(rgoal, getInternalAccess());
 		
 		return ret;
 	}
@@ -456,7 +491,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							if(!getCapability().containsGoal(pojogoal))
 							{
 								final Object fpojogoal = pojogoal;
-								((BDIAgent)microagent).dispatchTopLevelGoal(pojogoal)
+								dispatchTopLevelGoal(pojogoal)
 									.addResultListener(new IResultListener<Object>()
 								{
 									public void resultAvailable(Object result)
@@ -521,7 +556,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								throw new RuntimeException("Unknown how to create goal: "+gcl);
 							}
 							
-							((BDIAgent)microagent).dispatchTopLevelGoal(pojogoal);
+							dispatchTopLevelGoal(pojogoal);
 							
 							return IFuture.DONE;
 						}

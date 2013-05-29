@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanAPI;
@@ -20,6 +21,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Go to the charging station and load the battery.
  */
+@Plan
 public class LoadBatteryPlan
 {
 	@PlanCapability

@@ -1,11 +1,8 @@
 package jadex.bdiv3;
 
-import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
-import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
-import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.IComponentStep;
@@ -14,7 +11,6 @@ import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.IPojoMicroAgent;
@@ -31,6 +27,7 @@ import jadex.rules.eca.RuleSystem;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,66 +38,28 @@ import java.util.Map;
 public class BDIAgent extends MicroAgent
 {
 	/**
-	 *  Get the capability.
-	 *  @return the capability.
+	 *  Get the goals of a given type.
 	 */
-	public ICapability getCapability()
+	public <T> Collection<T> getGoals(Class<T> clazz)
 	{
-		return ((BDIAgentInterpreter)getInterpreter()).getCapability();
+		Collection<RGoal>	rgoals	= ((BDIAgentInterpreter)getInterpreter()).getCapability().getGoals(clazz);
+		List<T>	ret	= new ArrayList<T>();
+		for(RGoal rgoal: rgoals)
+		{
+			ret.add((T)rgoal.getPojoElement());
+		}
+		
+		return ret;
 	}
-	
-//	/**
-//	 *  Dispatch a goal wait for its result.
-//	 */
-//	public <T> IFuture<T> dispatchTopLevelGoal(final T goal)
-//	{
-//		final Future<T> ret = new Future<T>();
-//		
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-//		BDIModel bdim = ip.getBDIModel();
-//		MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
-//		if(mgoal==null)
-//			throw new RuntimeException("Unknown goal type: "+goal);
-//		final RGoal rgoal = new RGoal(mgoal, goal, null);
-//		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, T>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				ret.setResult(goal);
-//			}
-//		});
-//
-////		System.out.println("adopt goal");
-//		RGoal.adoptGoal(rgoal, getInterpreter().getInternalAccess());
-//		return ret;
-//	}
+
 	
 	/**
 	 *  Dispatch a goal wait for its result.
 	 */
-	public <T, E> IFuture<E> dispatchTopLevelGoal(final T goal)
+	public <T, E> IFuture<E> dispatchTopLevelGoal(T goal)
 	{
-		final Future<E> ret = new Future<E>();
-		
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-		BDIModel bdim = ip.getBDIModel();
-		final MGoal mgoal = bdim.getCapability().getGoal(goal.getClass().getName());
-		if(mgoal==null)
-			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(ip.getInternalAccess(), mgoal, goal, null);
-		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, E>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				Object res = RGoal.getGoalResult(goal, mgoal, getClassLoader());
-				ret.setResult((E)res);
-			}
-		});
-
-//		System.out.println("adopt goal");
-		RGoal.adoptGoal(rgoal, getInterpreter().getInternalAccess());
-		
-		return ret;
+		return ip.dispatchTopLevelGoal(goal);
 	}
 	
 	/**
@@ -110,10 +69,13 @@ public class BDIAgent extends MicroAgent
 	 */
 	public void addBeliefListener(final String name, final IBeliefListener listener)
 	{
+		// Todo: flattened beliefs with name prefixes.
+		
 		List<EventType> events = new ArrayList<EventType>();
 		BDIAgentInterpreter.addBeliefEvents(this, events, name);
 
-		final boolean multi = ((MCapability)getCapability().getModelElement()).getBelief(name).isMulti(getClassLoader());
+		final boolean multi = ((MCapability)((BDIAgentInterpreter)getInterpreter()).getCapability().getModelElement())
+			.getBelief(name).isMulti(getClassLoader());
 		
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		Rule<Void> rule = new Rule<Void>(rulename, 
@@ -156,10 +118,12 @@ public class BDIAgent extends MicroAgent
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
+		// Todo: flattened beliefs with name prefixes.
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		ip.getRuleSystem().getRulebase().removeRule(rulename);
 	}
+
 	
 	//-------- internal method used for rewriting field access -------- 
 	

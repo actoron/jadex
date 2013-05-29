@@ -1,19 +1,15 @@
 package jadex.bdiv3.actions;
 
-import java.lang.reflect.Field;
-
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.GoalAPI;
-import jadex.bdiv3.annotation.PlanAPI;
-import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+
+import java.lang.reflect.Field;
 
 /**
  * 

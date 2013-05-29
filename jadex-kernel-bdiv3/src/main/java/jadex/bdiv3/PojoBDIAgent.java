@@ -1,5 +1,7 @@
 package jadex.bdiv3;
 
+import jadex.bdiv3.runtime.ICapability;
+import jadex.bdiv3.runtime.impl.CapabilityWrapper;
 import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.message.MessageType;
@@ -12,7 +14,6 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
-import jadex.micro.PojoMicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -263,6 +264,10 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 						else if(SReflect.isSupertype(clazz, IExternalAccess.class))
 						{
 							tmp[j]= PojoBDIAgent.this.getExternalAccess();
+						}
+						else if(SReflect.isSupertype(clazz, ICapability.class))
+						{
+							tmp[j]= new CapabilityWrapper(this, null);
 						}
 					}
 					args	= tmp;

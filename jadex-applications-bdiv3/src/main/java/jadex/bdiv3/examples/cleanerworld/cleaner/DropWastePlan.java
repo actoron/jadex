@@ -1,20 +1,18 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveDropWaste;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchievePickupWaste;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.DropWasteAction;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
-import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -23,6 +21,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Clean-up some waste.
  */
+@Plan
 public class DropWastePlan
 {
 	@PlanCapability

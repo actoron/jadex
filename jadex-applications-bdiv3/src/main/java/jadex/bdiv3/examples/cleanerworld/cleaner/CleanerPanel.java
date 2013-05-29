@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.examples.cleanerworld.world.Cleaner;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
@@ -230,12 +231,12 @@ class CleanerPanel extends JPanel
 			drawdata.my_chargestate = cleaner.getMyChargestate();
 			drawdata.my_location = cleaner.getMyLocation();
 			drawdata.my_waste = cleaner.getCarriedWaste()!=null;
-			Collection<RGoal> goals = cleaner.getAgent().getCapability().getGoals(CleanerBDI.AchieveMoveTo.class);
+			Collection<CleanerBDI.AchieveMoveTo> goals = cleaner.getAgent().getGoals(CleanerBDI.AchieveMoveTo.class);
 			drawdata.dests = new Location[goals.size()];
-			Iterator<RGoal>	goalit	= goals.iterator();
+			Iterator<CleanerBDI.AchieveMoveTo>	goalit	= goals.iterator();
 			for(int i=0; i<goals.size(); i++)
 			{
-				drawdata.dests[i] = ((CleanerBDI.AchieveMoveTo)goalit.next().getPojoElement()).getLocation();
+				drawdata.dests[i] = goalit.next().getLocation();
 			}
 			return new Future<DrawData>(drawdata);
 		}

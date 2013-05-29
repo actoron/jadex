@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanAPI;
@@ -22,6 +23,7 @@ import java.util.Set;
  *  Walk to the least visited positions.
  *  Uses a relative measure to go to seldom seen positions.
  */
+@Plan
 public class LeastSeenWalkPlan 
 {
 	@PlanCapability

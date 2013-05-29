@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanAPI;
@@ -14,6 +15,7 @@ import java.util.Set;
 /**
  *  Memorize the visited positions.
  */
+@Plan
 public class MemorizePositionsPlan 
 {
 	//-------- attributes --------

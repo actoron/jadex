@@ -1,68 +1,84 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.model.MElement;
-import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.runtime.impl.RGoal;
-import jadex.bdiv3.runtime.impl.RPlan;
-
-import java.util.Collection;
+import jadex.bdiv3.BDIAgent;
 
 /**
  * 
  */
 public interface ICapability
 {
-	/**
-	 *  Get the model element.
-	 *  @return The model element.
-	 */
-	public MElement getModelElement();
+	//-------- ICapability interface --------
 	
 	/**
-	 *  Get the id.
-	 *  @return The id.
+	 *  Add a belief listener.
+	 *  @param name The belief name.
+	 *  @param listener The belief listener.
 	 */
-	public String getId();
-	
-	
-	/**
-	 *  Get the goals.
-	 *  @return The goals.
-	 */
-	public Collection<RGoal> getGoals();
+	public void addBeliefListener(final String name, final IBeliefListener listener);
 	
 	/**
-	 *  Get goals of a specific pojo type.
-	 *  @param type The type.
-	 *  @return The goals.
+	 *  Remove a belief listener.
+	 *  @param name The belief name.
+	 *  @param listener The belief listener.
 	 */
-	public Collection<RGoal> getGoals(MGoal mgoal);
+	public void removeBeliefListener(String name, IBeliefListener listener);
 	
 	/**
-	 *  Get goals of a specific pojo type.
-	 *  @param type The type.
-	 *  @return The goals.
+	 *  Get the agent.
 	 */
-	public Collection<RGoal> getGoals(Class<?> type);
-	
-	/**
-	 *  Test if a goal is contained.
-	 *  @param type The type.
-	 *  @return The goals.
-	 */
-	public boolean containsGoal(Object pojogoal);
+	public BDIAgent	getAgent();
 
-	/**
-	 *  Get the plans.
-	 *  @return The plans.
-	 */
-	public Collection<RPlan> getPlans();
-
-	/**
-	 *  Get goals of a specific pojo type.
-	 *  @param type The type.
-	 *  @return The goals.
-	 */
-	public Collection<RPlan> getPlans(MPlan mplan);
+	
+//	/**
+//	 *  Get the model element.
+//	 *  @return The model element.
+//	 */
+//	public MElement getModelElement();
+//	
+//	/**
+//	 *  Get the id.
+//	 *  @return The id.
+//	 */
+//	public String getId();
+//	
+//	
+//	/**
+//	 *  Get the goals.
+//	 *  @return The goals.
+//	 */
+//	public Collection<RGoal> getGoals();
+//	
+//	/**
+//	 *  Get goals of a specific pojo type.
+//	 *  @param type The type.
+//	 *  @return The goals.
+//	 */
+//	public Collection<RGoal> getGoals(MGoal mgoal);
+//	
+//	/**
+//	 *  Get goals of a specific pojo type.
+//	 *  @param type The type.
+//	 *  @return The goals.
+//	 */
+//	public Collection<RGoal> getGoals(Class<?> type);
+//	
+//	/**
+//	 *  Test if a goal is contained.
+//	 *  @param type The type.
+//	 *  @return The goals.
+//	 */
+//	public boolean containsGoal(Object pojogoal);
+//
+//	/**
+//	 *  Get the plans.
+//	 *  @return The plans.
+//	 */
+//	public Collection<RPlan> getPlans();
+//
+//	/**
+//	 *  Get goals of a specific pojo type.
+//	 *  @param type The type.
+//	 *  @return The goals.
+//	 */
+//	public Collection<RPlan> getPlans(MPlan mplan);
 }
