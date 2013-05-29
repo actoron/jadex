@@ -13,12 +13,12 @@ import java.lang.annotation.Target;
 public @interface Belief
 {
 	/**
-	 *  The implementation type (obsolete?)
+	 *  The implementation type for collection types.
 	 */
 	public Class<?> implementation() default Object.class;
 
 	/**
-	 *  A dynamic belief is automatically updated when other beliefs change.
+	 *  A dynamic belief reevaluated on every access.
 	 */
 	public boolean dynamic() default false;
 	

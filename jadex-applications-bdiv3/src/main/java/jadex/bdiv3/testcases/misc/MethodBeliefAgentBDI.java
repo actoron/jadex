@@ -28,7 +28,7 @@ public class MethodBeliefAgentBDI
 	/**
 	 *  Get the value.
 	 */
-	@Belief
+	@Belief()
 	public String	getValue()
 	{
 		return value;
