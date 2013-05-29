@@ -74,6 +74,16 @@ public class PostEvaluation {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		// 1d.) Transform results to  data file for GnuPlot
+				try {
+					BufferedWriter out = new BufferedWriter(new FileWriter(folderPath + "cumulated-stock-levels.txt"));
+					ArrayList<EvalStockLevelData> res = evaluatedStockLevel.resultsAsList();					
+					out.write(resToGnuPlotDataFile(res));
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 
 		// *************************************************************************************************
 
@@ -294,6 +304,28 @@ public class PostEvaluation {
 		}
 
 		return results;
+	}
+	
+	/**
+	 * Transform computed results into a special data file that is required for GnuPlot!
+	 * @param res
+	 * @return
+	 */
+	private static String resToGnuPlotDataFile(ArrayList<EvalStockLevelData> res){
+		StringBuffer buf = new StringBuffer();
+		
+		for(EvalStockLevelData data : res){
+			buf.append(data.getTimeSliceKey());
+			buf.append("\t");
+			buf.append(data.getBlueLevelRelative());
+			buf.append("\t");
+			buf.append(data.getGreenLevelRelative());
+			buf.append("\t");
+			buf.append(data.getRedLevelRelative());
+			buf.append("\n");
+		}
+		
+		return buf.toString();
 	}
 
 	private static String getDateAsString() {
