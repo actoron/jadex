@@ -268,9 +268,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
 						Object val = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader()).getValue(null);
-						Field f = mbel.getTarget().getField(getClassLoader());
-						f.setAccessible(true);
-						f.set(agent, val);
+//						Field f = mbel.getTarget().getField(getClassLoader());
+//						f.setAccessible(true);
+//						f.set(agent, val);
+						mbel.setValue(agent, val, getClassLoader());
 					}
 					catch(RuntimeException e)
 					{
@@ -385,9 +386,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		{
 			try
 			{
-				Field f = mbel.getTarget().getField(getClassLoader());
-				f.setAccessible(true);
-				Object val = f.get(agent);
+//				Field f = mbel.getTarget().getField(getClassLoader());
+//				f.setAccessible(true);
+//				Object val = f.get(agent);
+				Object val = mbel.getValue(agent, getClassLoader());
 				if(val==null)
 				{
 					String impl = mbel.getImplClassName();
@@ -398,7 +400,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					}
 					else
 					{
-						Class<?> cl = f.getType();
+						Class<?> cl = mbel.getType(getClassLoader());//f.getType();
 						if(SReflect.isSupertype(List.class, cl))
 						{
 							val = new ArrayList();
@@ -416,17 +418,20 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(val instanceof List)
 				{
 					String bname = mbel.getName();
-					f.set(agent, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+//					f.set(agent, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+					mbel.setValue(agent, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
-					f.set(agent, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+//					f.set(agent, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+					mbel.setValue(agent, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
-					f.set(agent, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+//					f.set(agent, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+					mbel.setValue(agent, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
 				}
 			}
 			catch(RuntimeException e)

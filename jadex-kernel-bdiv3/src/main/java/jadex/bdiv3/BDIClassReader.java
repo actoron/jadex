@@ -235,6 +235,32 @@ public class BDIClassReader extends MicroClassReader
 					Plan p = getAnnotation(methods[i], Plan.class, cl);
 					getMPlan(bdimodel, p, new MethodInfo(methods[i]), null, cl, pubs);
 				}
+				else if(isAnnotationPresent(methods[i], Belief.class, cl))
+				{
+					Belief bel = getAnnotation(methods[i], Belief.class, cl);
+					
+					String name = methods[i].getName().substring(3);
+					name = name.substring(0, 1).toLowerCase()+name.substring(1);
+					
+					MBelief mbel = bdimodel.getCapability().getBelief(name);
+					if(mbel!=null)
+					{
+						if(methods[i].getName().startsWith("get"))
+						{
+							mbel.setGetter(new MethodInfo(methods[i]));
+						}
+						else
+						{
+							mbel.setSetter(new MethodInfo(methods[i]));
+						}
+					}
+					else
+					{
+						bdimodel.getCapability().addBelief(new MBelief(new MethodInfo(methods[i]), 
+							bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
+							bel.dynamic(), bel.events().length==0? null: bel.events()));
+					}
+				}
 			}
 			
 			// Find external plans

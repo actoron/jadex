@@ -4,7 +4,7 @@ import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -17,9 +17,13 @@ import java.util.Set;
  */
 public class MBelief extends MElement
 {
-	/** The target. */
-	protected FieldInfo target;
+	/** The field target. */
+	protected FieldInfo ftarget;
 
+	/** The method targets. */
+	protected MethodInfo mgetter;
+	protected MethodInfo msetter;
+	
 	/** The collection implementation class. */
 	protected String impl;
 	
@@ -37,8 +41,8 @@ public class MBelief extends MElement
 	 */
 	public MBelief(FieldInfo target, String impl, boolean dynamic, String[] events)
 	{
-		super(target.getName());
-		this.target = target;
+		super(target!=null? target.getName(): null);
+		this.ftarget = target;
 		this.impl = impl;
 		this.dynamic = dynamic;
 		this.events = new HashSet<String>();
@@ -55,22 +59,60 @@ public class MBelief extends MElement
 	}
 
 	/**
-	 *  Get the target.
-	 *  @return The target.
+	 *  Create a new belief.
 	 */
-	public FieldInfo getTarget()
+	public MBelief(MethodInfo target, String impl, boolean dynamic, String[] events)
 	{
-		return target;
+		this((FieldInfo)null, impl, dynamic, events);
+		
+		if(target.getName().startsWith("get"))
+		{
+			this.mgetter = target;
+		}
+		else
+		{
+			this.msetter = target;
+		}
+		
+		name = target.getName().substring(3);
+		name = name.substring(0, 1).toLowerCase()+name.substring(1);
 	}
-
-	/**
-	 *  Set the target.
-	 *  @param target The target to set.
-	 */
-	public void setTarget(FieldInfo target)
-	{
-		this.target = target;
-	}
+	
+//	/**
+//	 *  Get the target.
+//	 *  @return The target.
+//	 */
+//	public FieldInfo getFieldTarget()
+//	{
+//		return ftarget;
+//	}
+//
+//	/**
+//	 *  Set the target.
+//	 *  @param target The target to set.
+//	 */
+//	public void setFieldTarget(FieldInfo target)
+//	{
+//		this.ftarget = target;
+//	}
+//	
+//	/**
+//	 *  Get the target.
+//	 *  @return The target.
+//	 */
+//	public MethodInfo[] getMethodTarget()
+//	{
+//		return mtarget;
+//	}
+//
+//	/**
+//	 *  Set the target.
+//	 *  @param target The target to set.
+//	 */
+//	public void setMethodTarget(MethodInfo[] target)
+//	{
+//		this.mtarget = target;
+//	}
 	
 	/**
 	 *  Get the impl.
@@ -126,6 +168,24 @@ public class MBelief extends MElement
 	{
 		this.dynamic = dynamic;
 	}
+	
+	/**
+	 *  Set the mgetter.
+	 *  @param mgetter The mgetter to set.
+	 */
+	public void setGetter(MethodInfo mgetter)
+	{
+		this.mgetter = mgetter;
+	}
+
+	/**
+	 *  Set the msetter.
+	 *  @param msetter The msetter to set.
+	 */
+	public void setSetter(MethodInfo msetter)
+	{
+		this.msetter = msetter;
+	}
 
 	/**
 	 *  Get the multi.
@@ -135,9 +195,18 @@ public class MBelief extends MElement
 	{
 		if(multi==null)
 		{
-			Field f = target.getField(cl);
-			Class<?> ftype = f.getType();
-			if(SReflect.isSupertype(List.class, ftype) 
+			Class<?> ftype = null;
+			if(ftarget!=null)
+			{
+				Field f = ftarget.getField(cl);
+				ftype = f.getType();
+				
+			}
+			else 
+			{
+				ftype = mgetter.getMethod(cl).getReturnType();
+			}
+			if(ftype.isArray() || SReflect.isSupertype(List.class, ftype) 
 				|| SReflect.isSupertype(Set.class, ftype)
 				|| SReflect.isSupertype(Map.class, ftype))
 			{
@@ -149,5 +218,105 @@ public class MBelief extends MElement
 			}
 		}
 		return multi;
+	}
+	
+	/**
+	 *  Set the value of the belief.
+	 */
+	public Object getValue(Object object, ClassLoader cl)
+	{
+		Object ret = null;
+		if(ftarget!=null)
+		{
+			try
+			{
+				Field f = ftarget.getField(cl);
+				f.setAccessible(true);
+				ret = f.get(object);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			try
+			{
+				Method m = mgetter.getMethod(cl);
+				ret = m.invoke(object, new Object[0]);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Set the value of the belief.
+	 */
+	public void setValue(Object object, Object value, ClassLoader cl)
+	{
+		if(ftarget!=null)
+		{
+			try
+			{
+				Field f = ftarget.getField(cl);
+				f.setAccessible(true);
+				f.set(object, value);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			try
+			{
+				Method m = msetter.getMethod(cl);
+				m.invoke(object, new Object[]{value});
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 *  Get the class of the belief.
+	 */
+	public Class<?> getType(ClassLoader cl)
+	{
+		Class<?> ret = null;
+		if(ftarget!=null)
+		{
+			try
+			{
+				Field f = ftarget.getField(cl);
+//				f.setAccessible(true);
+				ret = f.getType();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			try
+			{
+				Method m = mgetter.getMethod(cl);
+				ret = m.getReturnType();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return ret;
 	}
 }

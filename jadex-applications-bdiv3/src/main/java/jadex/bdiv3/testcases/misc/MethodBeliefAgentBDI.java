@@ -28,7 +28,7 @@ public class MethodBeliefAgentBDI
 	/**
 	 *  Get the value.
 	 */
-	@Belief()
+	@Belief
 	public String	getValue()
 	{
 		return value;
@@ -59,6 +59,7 @@ public class MethodBeliefAgentBDI
 				{
 					tr.setSucceeded(true);
 					agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.killAgent();
 				}
 			}
 		});
@@ -73,6 +74,7 @@ public class MethodBeliefAgentBDI
 				{
 					tr.setFailed("No event occurred.");
 					agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+					agent.killAgent();
 				}
 			}
 		});
