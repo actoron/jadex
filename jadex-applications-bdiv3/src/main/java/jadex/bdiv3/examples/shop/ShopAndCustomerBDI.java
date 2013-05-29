@@ -28,11 +28,11 @@ public class ShopAndCustomerBDI
 	protected BDIAgent	agent;
 	
 	/** The customer capability. */
-	@Capability(assignto=@Mapping("money"))
+	@Capability(beliefmapping=@Mapping("money"))
 	protected CustomerCapability	customercap	= new CustomerCapability();
 
 	/** The shop capability. */
-	@Capability(assignto=@Mapping("money"))
+	@Capability(beliefmapping=@Mapping(value="money", target="money"))
 	protected ShopCapa shopcap	= new ShopCapa((String)agent.getArgument("shopname"), (List<ItemInfo>)agent.getArgument("catalog"));
 	
 	/** The money. */

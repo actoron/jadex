@@ -15,5 +15,5 @@ public @interface Capability
 	/**
 	 *  Belief mappings from outer beliefs to inner abstract beliefs.
 	 */
-	public Mapping[]	assignto() default {};	
+	public Mapping[]	beliefmapping() default {};	
 }

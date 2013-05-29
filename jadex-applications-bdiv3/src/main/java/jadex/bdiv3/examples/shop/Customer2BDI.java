@@ -14,7 +14,7 @@ public class Customer2BDI
 	//-------- attributes --------
 
 	/** The customer capability. */
-	@Capability(assignto=@Mapping("money"))
+	@Capability(beliefmapping=@Mapping("money"))
 	protected CustomerCapability	cap	= new CustomerCapability();
 	
 	/** The money. */
