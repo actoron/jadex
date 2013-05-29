@@ -44,7 +44,7 @@ public class InitExpressionsBDI
 	 *  Agent body.
 	 */
 	@AgentBody(keepalive=false)
-	public void	body(BDIAgent agent)
+	public void	body()
 	{
 		TestReport	tr1	= new TestReport("#1", "Test if field expression works.");
 		if(agent.getAgentName().equals(name1))
