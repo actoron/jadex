@@ -10,7 +10,7 @@ import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
- * This plan is called whenever the station receives information about a state occupancy state in another station in the same cluster.
+ * This plan is called whenever the station receives information about a changed occupancy state in another station in the same cluster.
  * 
  * @author Thomas Preisler
  */

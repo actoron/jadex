@@ -44,7 +44,7 @@ public class DecentralizedChangedStatePlan extends Plan {
 			if (occupany >= fullThreshold || occupany <= emptyThreshold) {
 				StateCoordinationStationData data = new StateCoordinationStationData(stationID, capacity, stock, position, StateCoordinationStationData.REQUEST, stationID);
 
-				System.out.println("Occupancy state changed in " + stationID + " " + data);
+//				System.out.println("Occupancy state changed in " + stationID + " " + data);
 
 				IInternalEvent event = createInternalEvent("changed_state");
 				event.getParameter("data").setValue(data);

@@ -61,6 +61,10 @@ public class DecentralizedPollingMechanism extends CoordinationMechanism {
 
 	@Override
 	public void perceiveCoordinationEvent(Object obj) {
+		if (superCluster == null) {
+			superCluster = (SuperCluster) appSpace.getProperty("StationCluster");
+		}
+		
 		CoordinationInfo coordInfo = (CoordinationInfo) obj;
 		StateCoordinationStationData data = (StateCoordinationStationData) coordInfo.getValueByName(Constants.VALUE);
 		

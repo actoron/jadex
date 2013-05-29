@@ -72,6 +72,10 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 
 	@Override
 	public void perceiveCoordinationEvent(Object obj) {
+		if (superCluster == null) {
+			superCluster = (SuperCluster) appSpace.getProperty("StationCluster");
+		}
+		
 		CoordinationInfo coordInfo = (CoordinationInfo) obj;
 		// get the tuple from the coordination info
 		CoordinationStationData tuple = (CoordinationStationData) coordInfo.getValueByName(Constants.VALUE);
