@@ -170,14 +170,14 @@ public class ShopBDI
 	}
 
 
-	/**
-	 *  Get the shopname.
-	 *  @return The shopname.
-	 */
-	public String getShopname()
-	{
-		return shopname;
-	}
+//	/**
+//	 *  Get the shopname.
+//	 *  @return The shopname.
+//	 */
+//	public String getShopname()
+//	{
+//		return shopname;
+//	}
 
 	/**
 	 *  Get the catalog.

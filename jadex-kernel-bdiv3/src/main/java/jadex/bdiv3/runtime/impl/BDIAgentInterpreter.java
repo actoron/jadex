@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -169,6 +170,50 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
 		
+		return ret;
+	}
+	
+	/**
+	 *  Add init code after parent injection.
+	 */
+	protected IFuture<Void> injectParent(final Object agent, MicroModel model)
+	{
+		Future<Void>	ret	= new Future<Void>();
+		super.injectParent(agent, model).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				// Find classes with generated init methods.
+				List<Class<?>>	inits	= new ArrayList<Class<?>>();
+				inits.add(agent.getClass());
+				for(int i=0; i<inits.size(); i++)
+				{
+					Class<?>	clazz	= inits.get(i);
+					if(clazz.getSuperclass().isAnnotationPresent(Agent.class))
+					{
+						inits.add(clazz.getSuperclass());
+					}
+				}
+				
+				// Call init methods of superclasses first.
+				for(int i=inits.size()-1; i>=0; i--)
+				{
+					Class<?>	clazz	= inits.get(i);
+					try
+					{
+						String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+clazz.getName().replace("/", "_").replace(".", "_");
+//						System.out.println("Init: "+name);
+						Method um = agent.getClass().getMethod(name, new Class[0]);
+						um.invoke(agent, new Object[0]);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				super.customResultAvailable(result);
+			}
+		});
 		return ret;
 	}
 	

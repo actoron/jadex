@@ -30,6 +30,7 @@ import org.kohsuke.asm4.MethodVisitor;
 import org.kohsuke.asm4.Opcodes;
 import org.kohsuke.asm4.Type;
 import org.kohsuke.asm4.tree.AbstractInsnNode;
+import org.kohsuke.asm4.tree.AnnotationNode;
 import org.kohsuke.asm4.tree.ClassNode;
 import org.kohsuke.asm4.tree.FieldInsnNode;
 import org.kohsuke.asm4.tree.InsnList;
@@ -38,12 +39,6 @@ import org.kohsuke.asm4.tree.LdcInsnNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
 import org.kohsuke.asm4.tree.MethodNode;
 import org.kohsuke.asm4.tree.VarInsnNode;
-import org.kohsuke.asm4.tree.analysis.Analyzer;
-import org.kohsuke.asm4.tree.analysis.BasicInterpreter;
-import org.kohsuke.asm4.tree.analysis.BasicValue;
-import org.kohsuke.asm4.tree.analysis.Frame;
-import org.kohsuke.asm4.tree.analysis.Value;
-import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
@@ -102,7 +97,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 			
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 			ClassNode cn = new ClassNode();
-			TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
+//			TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out))
 //			TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
 //			CheckClassAdapter cc = new CheckClassAdapter(cw);
 			
@@ -299,6 +294,19 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	 */
 	protected void transformClassNode(ClassNode cn, final String clname, final BDIModel model)
 	{
+		boolean	agentclass	= false;
+		if(cn.visibleAnnotations!=null)
+		{
+			for(AnnotationNode an: cn.visibleAnnotations)
+			{
+				if("Ljadex/micro/annotation/Agent;".equals(an.desc))
+				{
+					agentclass	= true;
+					break;
+				}
+			}
+		}
+		
 		final String iclname = clname.replace(".", "/");
 		
 		// Check method for array store access of beliefs and replace with static method call
@@ -402,7 +410,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 			}
 		}
 		
-		if(!todo.isEmpty())
+		if(agentclass)
 		{
 //			MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
 			for(MethodNode mn: mths)
@@ -414,11 +422,11 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				// will be incarnated as new update methods 
 				if(mn.name.equals("<init>"))
 				{
-					InsnList l = cn.methods.get(0).instructions;
+					InsnList l = mn.instructions;
 					LabelNode begin = null;
-					boolean foundcon = false;
+					int foundcon = -1;
 					
-					for(int i=0; i<l.size() && !todo.isEmpty(); i++)
+					for(int i=0; i<l.size(); i++)
 					{
 						AbstractInsnNode n = l.get(i);
 						
@@ -428,9 +436,9 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						}
 						
 						// find first constructor call
-						if(Opcodes.INVOKESPECIAL==n.getOpcode() && !foundcon)
+						if(Opcodes.INVOKESPECIAL==n.getOpcode() && foundcon==-1)
 						{
-							foundcon = true;
+							foundcon = i;
 							begin = null;
 						}
 						else if(n instanceof MethodInsnNode && ((MethodInsnNode)n).name.equals("writeField"))
@@ -491,6 +499,28 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 							begin = null;
 						}
 					}
+					
+					// Move init code to separate method for being called after injections. 
+					if(foundcon!=-1 && foundcon+1<l.size())
+					{
+						String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+clname.replace("/", "_").replace(".", "_");
+//						System.out.println("Init method: "+name);
+						MethodNode mnode = new MethodNode(mn.access, name, mn.desc, mn.signature, null);
+						cn.methods.add(mnode);
+
+						while(l.size()>foundcon+1)
+						{
+							AbstractInsnNode	node	= l.get(foundcon+1);
+							if(node.getOpcode()==Opcodes.RETURN)
+							{
+								break;
+							}
+							l.remove(node);
+							mnode.instructions.add(node);
+						}						
+						mnode.visitInsn(Opcodes.RETURN);
+					}
+					
 					break;
 				}
 			}

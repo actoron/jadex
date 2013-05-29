@@ -9,6 +9,8 @@ public interface IBDIClassGenerator
 {
 	public final static String DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX = "__update";
 	
+	public final static String INIT_EXPRESSIONS_METHOD_PREFIX = "__init_expressions";
+	
 	/**
 	 *  Generate class.
 	 */

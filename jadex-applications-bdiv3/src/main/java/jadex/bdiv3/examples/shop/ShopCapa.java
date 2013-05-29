@@ -1,28 +1,23 @@
 package jadex.bdiv3.examples.shop;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.examples.shop.ShopBDI.SellGoal;
 import jadex.bdiv3.runtime.ICapability;
-import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 
  */
 @ProvidedServices(@ProvidedService(type=IShopService.class, //	implementation=@Implementation(value=ShopService.class)))
-	implementation=@Implementation(expression="new ShopService($args.shopname)")))
-public class ShopCapaBDI
+	implementation=@Implementation(expression="new ShopService($pojoagent.shopname)")))
+public class ShopCapa
 {
 	/** The bdi capability. */
 //	@Capability
@@ -40,14 +35,20 @@ public class ShopCapaBDI
 	
 	
 	/** The shop name. */
-//	@AgentArgument
-	@Belief
 	protected String shopname;
 	
 	/** The shop catalog. */
 //	@AgentArgument
 	@Belief
 	protected List<ItemInfo> catalog;
+	
+	/**
+	 *  Create a shop capability.
+	 */
+	public ShopCapa(String shopname)
+	{
+		this.shopname	= shopname;
+	}
 	
 	@Goal
 	public class SellGoal
