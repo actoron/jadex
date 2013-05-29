@@ -294,6 +294,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	 */
 	protected void transformClassNode(ClassNode cn, final String clname, final BDIModel model)
 	{
+		// Some transformations are only applied to the agent class and not its inner classes.
 		boolean	agentclass	= false;
 		if(cn.visibleAnnotations!=null)
 		{

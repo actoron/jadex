@@ -131,7 +131,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					if(SReflect.isSupertype(f.getType(), ICapability.class))
 					{
 						f.setAccessible(true);
-						f.set(agent, new CapabilityWrapper(pa, null));						
+						f.set(agent, new CapabilityWrapper(pa, agent, null));						
 					}
 					else
 					{

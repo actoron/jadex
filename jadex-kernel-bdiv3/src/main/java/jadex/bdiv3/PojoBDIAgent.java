@@ -267,7 +267,7 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 						}
 						else if(SReflect.isSupertype(clazz, ICapability.class))
 						{
-							tmp[j]= new CapabilityWrapper(this, null);
+							tmp[j]= new CapabilityWrapper(this, agent, null);
 						}
 					}
 					args	= tmp;

@@ -1,6 +1,7 @@
 package jadex.bdiv3.examples.shop;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -25,11 +26,11 @@ public class CustomerFrame extends JFrame
 	/**
 	 *  Create a new frame.
 	 */
-	public CustomerFrame(final BDIAgent agent)
+	public CustomerFrame(final ICapability capa)
 	{
-		super(agent.getExternalAccess().getComponentIdentifier().getName());
+		super(capa.getAgent().getExternalAccess().getComponentIdentifier().getName());
 		
-		add(new CustomerPanel(agent));
+		add(new CustomerPanel(capa));
 		pack();
 		setLocation(SGUI.calculateMiddlePosition(this));
 		setVisible(true);
@@ -38,7 +39,7 @@ public class CustomerFrame extends JFrame
 			public void windowClosing(WindowEvent e)
 			{
 //				agent.killAgent();
-				agent.getExternalAccess().killComponent();
+				capa.getAgent().getExternalAccess().killComponent();
 			}
 		});
 		// Dispose frame on exception.
@@ -52,7 +53,7 @@ public class CustomerFrame extends JFrame
 			{
 			}
 		};
-		agent.scheduleStep(new IComponentStep<Void>()
+		capa.getAgent().scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)

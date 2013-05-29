@@ -1,6 +1,7 @@
 package jadex.bdiv3.runtime;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bridge.service.IServiceContainer;
 
 /**
  * 
@@ -27,6 +28,16 @@ public interface ICapability
 	 *  Get the agent.
 	 */
 	public BDIAgent	getAgent();
+	
+	/**
+	 *  Get the pojo capability object.
+	 */
+	public Object	getPojoCapability();
+	
+	/**
+	 *  Get the service container of the capability.
+	 */
+	public IServiceContainer	getServiceContainer();
 
 	
 //	/**

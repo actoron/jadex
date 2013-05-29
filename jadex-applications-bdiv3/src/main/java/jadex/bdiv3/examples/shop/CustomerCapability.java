@@ -5,6 +5,7 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.runtime.ICapability;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -35,9 +36,9 @@ public class CustomerCapability
 {
 	//-------- attributes --------
 
-	/** The agent. */
+	/** The capability. */
 	@Agent
-	protected BDIAgent	agent;
+	protected ICapability	capa;
 	
 	/** The inventory. */
 	@Belief
@@ -56,7 +57,7 @@ public class CustomerCapability
 		{
 			public void run()
 			{
-				new CustomerFrame(agent);
+				new CustomerFrame(capa);
 				ret.setResult(null);
 			}
 		});
@@ -121,11 +122,11 @@ public class CustomerCapability
 			throw new RuntimeException("Not enough money to buy: "+big.name);
 		
 		// Buy the item at the shop (the shop is a service at another agent)
-		System.out.println(agent.getAgentName()+" buying item: "+big.name);
+		System.out.println(capa.getAgent().getAgentName()+" buying item: "+big.name);
 		IFuture<ItemInfo>	future	= big.shop.buyItem(big.name, big.price);
-		System.out.println(agent.getAgentName()+" getting item: "+future);
+		System.out.println(capa.getAgent().getAgentName()+" getting item: "+future);
 		ItemInfo item = (ItemInfo)future.get();
-		System.out.println(agent.getAgentName()+" bought item: "+item);
+		System.out.println(capa.getAgent().getAgentName()+" bought item: "+item);
 		
 		// Update the customer inventory 
 		ItemInfo ii = null;

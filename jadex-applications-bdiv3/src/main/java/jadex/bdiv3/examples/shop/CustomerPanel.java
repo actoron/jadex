@@ -1,7 +1,7 @@
 package jadex.bdiv3.examples.shop;
 
-import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.examples.shop.CustomerBDI.BuyItem;
+import jadex.bdiv3.examples.shop.CustomerCapability.BuyItem;
+import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -14,7 +14,6 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.IPojoMicroAgent;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -60,7 +59,7 @@ public class CustomerPanel extends JPanel
 {
 	//-------- attributes --------
 	
-	protected BDIAgent agent;
+	protected ICapability capa;
 	protected List shoplist = new ArrayList();
 	protected JCheckBox remote;
 	protected JTable shoptable;
@@ -76,9 +75,9 @@ public class CustomerPanel extends JPanel
 	/**
 	 *  Create a new gui.
 	 */
-	public CustomerPanel(final BDIAgent agent)
+	public CustomerPanel(final ICapability capa)
 	{
-		this.agent	= agent;
+		this.capa	= capa;
 		this.shops	= new HashMap();
 		
 		final JComboBox shopscombo = new JComboBox();
@@ -104,19 +103,19 @@ public class CustomerPanel extends JPanel
 		    	searchbut.setEnabled(false);
 		    	
 //		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, remote.isSelected(), true)
-				IFuture<Collection<IShopService>> ret = agent.getExternalAccess().scheduleStep(new IComponentStep<Collection<IShopService>>()
+				IFuture<Collection<IShopService>> ret = capa.getAgent().getExternalAccess().scheduleStep(new IComponentStep<Collection<IShopService>>()
 				{
 					public IFuture<Collection<IShopService>> execute(IInternalAccess ia)
 					{
 						Future<Collection<IShopService>> ret = new Future<Collection<IShopService>>();
 						if(remote.isSelected())
 						{
-							IFuture<Collection<IShopService>> fut = ia.getServiceContainer().getRequiredServices("remoteshopservices");
+							IFuture<Collection<IShopService>> fut = capa.getServiceContainer().getRequiredServices("remoteshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						else
 						{
-							IFuture<Collection<IShopService>> fut = ia.getServiceContainer().getRequiredServices("localshopservices");
+							IFuture<Collection<IShopService>> fut = capa.getServiceContainer().getRequiredServices("localshopservices");
 							fut.addResultListener(new DelegationResultListener<Collection<IShopService>>(ret));
 						}
 						return ret;
@@ -161,13 +160,13 @@ public class CustomerPanel extends JPanel
 
 		final JTextField money = new JTextField(5);
 		
-		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		capa.getAgent().getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("initialMoney")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				CustomerBDI cust = (CustomerBDI)((IPojoMicroAgent)ia).getPojoAgent();
-				final int mon = cust.getMoney();
+				CustomerCapability cust = (CustomerCapability)capa.getPojoCapability();
+				final double mon = cust.getMoney();
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -180,12 +179,12 @@ public class CustomerPanel extends JPanel
 		});
 		money.setEditable(false);
 		
-		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		capa.getAgent().getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("money")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				agent.addBeliefListener("money", new BeliefAdapter()
+				capa.addBeliefListener("money", new BeliefAdapter()
 				{
 					public void beliefChanged(final Object value)
 					{
@@ -237,14 +236,14 @@ public class CustomerPanel extends JPanel
 		invtable.setPreferredScrollableViewportSize(new Dimension(600, 120));
 		invpanel.add(BorderLayout.CENTER, new JScrollPane(invtable));
 
-		agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		capa.getAgent().getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("inventory")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				try
 				{
-					agent.addBeliefListener("inventory", new BeliefAdapter()
+					capa.addBeliefListener("inventory", new BeliefAdapter()
 					{
 						public void factRemoved(final Object value)
 						{
@@ -309,13 +308,13 @@ public class CustomerPanel extends JPanel
 					final String name = (String)shopmodel.getValueAt(sel, 0);
 					final Double price = (Double)shopmodel.getValueAt(sel, 1);
 					final IShopService shop = (IShopService)shops.get(shopscombo.getSelectedItem());
-					agent.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+					capa.getAgent().getExternalAccess().scheduleStep(new IComponentStep<Void>()
 					{
 						@Classname("buy")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							BuyItem	big	= new BuyItem(name, shop, price.doubleValue());
-							IFuture<BuyItem>	ret	= agent.dispatchTopLevelGoal(big);
+							IFuture<BuyItem>	ret	= capa.getAgent().dispatchTopLevelGoal(big);
 							ret.addResultListener(new SwingResultListener<BuyItem>(new IResultListener<BuyItem>()
 							{
 								public void resultAvailable(BuyItem result)

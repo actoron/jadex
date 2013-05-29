@@ -3,6 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
+import jadex.bridge.service.IServiceContainer;
 
 /**
  *  Wrapper providing BDI methods to the user.
@@ -14,6 +15,9 @@ public class CapabilityWrapper implements ICapability
 	/** The agent. */
 	protected BDIAgent	agent;
 	
+	/** The pojo capability object. */
+	protected Object	pojo;
+	
 	/** The fully qualified capability name (or null for agent). */
 	protected String	capa;
 	
@@ -22,9 +26,10 @@ public class CapabilityWrapper implements ICapability
 	/**
 	 *  Create a capability wrapper.
 	 */
-	public CapabilityWrapper(BDIAgent agent, String capa)
+	public CapabilityWrapper(BDIAgent agent, Object pojo, String capa)
 	{
 		this.agent	= agent;
+		this.pojo	= pojo;
 		this.capa	= capa;
 	}
 	
@@ -57,4 +62,22 @@ public class CapabilityWrapper implements ICapability
 	{
 		return agent;
 	}
+	
+	/**
+	 *  Get the service container of the capability.
+	 */
+	public IServiceContainer	getServiceContainer()
+	{
+		return new ServiceContainerProxy((BDIAgentInterpreter)agent.getInterpreter(), capa);
+		
+	}
+
+	/**
+	 *  Get the pojo capability object.
+	 */
+	public Object	getPojoCapability()
+	{
+		return pojo;
+	}
+
 }
