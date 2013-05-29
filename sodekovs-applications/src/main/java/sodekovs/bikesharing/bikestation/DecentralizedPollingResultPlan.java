@@ -40,8 +40,8 @@ public class DecentralizedPollingResultPlan extends Plan {
 
 		while (true) {
 			waitForTick();
-			if (getWaitqueue().size() == noStations) {
-				System.out.println("DecentralizedPollingResultPlan in " + getComponentName() + " received all " + noStations + " answers");
+			if (getWaitqueue().size() >= noStations) {
+//				System.out.println("DecentralizedPollingResultPlan in " + getComponentName() + " received all " + noStations + " answers");
 				List<StateCoordinationStationData> answers = new ArrayList<StateCoordinationStationData>();
 				Object[] elements = getWaitqueue().getElements();
 				for (Object element : elements) {

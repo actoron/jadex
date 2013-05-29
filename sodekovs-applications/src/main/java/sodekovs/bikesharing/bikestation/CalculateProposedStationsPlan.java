@@ -37,7 +37,7 @@ public class CalculateProposedStationsPlan extends Plan {
 
 			while (true) {
 				waitForTick();
-				if (getWaitqueue().size() == noClusterStations) {
+				if (getWaitqueue().size() >= noClusterStations) {
 					System.out.println("CalculateProposedStationsPlan in " + getComponentName() + " received all " + noClusterStations + " answers");
 					Object[] elements = getWaitqueue().getElements();
 
