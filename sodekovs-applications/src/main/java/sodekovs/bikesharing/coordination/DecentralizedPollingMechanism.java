@@ -5,7 +5,6 @@ package sodekovs.bikesharing.coordination;
 
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
@@ -37,7 +36,7 @@ public class DecentralizedPollingMechanism extends CoordinationMechanism {
 	/** The number of published events */
 	protected Integer eventNumber = null;
 	
-	protected SpaceObject decentralizedPollingCoordination = null;
+	protected ISpaceObject decentralizedPollingCoordination = null;
 
 	public DecentralizedPollingMechanism(CoordinationSpace space) {
 		super(space);
@@ -45,7 +44,7 @@ public class DecentralizedPollingMechanism extends CoordinationMechanism {
 		this.appSpace = (ContinuousSpace2D) applicationInterpreter.getExtension("my2dspace");
 		this.eventNumber = 0;
 
-		this.decentralizedPollingCoordination = (SpaceObject) appSpace.getSpaceObjectsByType("decentralizedPollingCoordination")[0];
+		this.decentralizedPollingCoordination = appSpace.getSpaceObjectsByType("decentralizedPollingCoordination")[0];
 		
 		this.superCluster = (SuperCluster) appSpace.getProperty("StationCluster");
 	}

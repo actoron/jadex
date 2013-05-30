@@ -5,7 +5,6 @@ package sodekovs.bikesharing.coordination;
 
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
@@ -43,7 +42,7 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 
 	private Map<String, CoordinationStationData> occupancyTuples = null;
 	
-	protected SpaceObject tupleCoordination = null;
+	protected ISpaceObject tupleCoordination = null;
 
 	/** The number of published events */
 	protected Integer eventNumber = null;
@@ -54,7 +53,7 @@ public class TupleBasedMechanism extends CoordinationMechanism {
 		this.appSpace = (ContinuousSpace2D) applicationInterpreter.getExtension("my2dspace");
 		this.eventNumber = 0;
 		
-		this.tupleCoordination = (SpaceObject) appSpace.getSpaceObjectsByType("tupleCoordination")[0];
+		this.tupleCoordination = appSpace.getSpaceObjectsByType("tupleCoordination")[0];
 
 		this.superCluster = (SuperCluster) appSpace.getProperty("StationCluster");
 

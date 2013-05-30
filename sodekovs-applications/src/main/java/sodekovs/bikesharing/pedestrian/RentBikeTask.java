@@ -4,7 +4,6 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 
 /**
@@ -40,7 +39,7 @@ public class RentBikeTask extends AbstractTask {
 //		assert (Boolean) so.getProperty("has_food") == true : so;
 
 		// TODO: atomic action?
-		SpaceObject[] allBiketations = (SpaceObject[]) contSpace.getSpaceObjectsByType("bikestation");
+		ISpaceObject[] allBiketations = contSpace.getSpaceObjectsByType("bikestation");
 		
 //		synchronized (allBiketations) {
 		
@@ -48,7 +47,7 @@ public class RentBikeTask extends AbstractTask {
 		buf.append("Tries to rent bike: " + myself.getId() + "\n");
 
 		// Get the "right" nest.
-		for (SpaceObject bikestation : allBiketations) {
+		for (ISpaceObject bikestation : allBiketations) {
 			if (bikestation.getProperty(ContinuousSpace2D.PROPERTY_POSITION).equals(myself.getProperty(ContinuousSpace2D.PROPERTY_POSITION))) {
 //				System.out.println("Nest Pos: " + nest.getProperty(ContinuousSpace2D.PROPERTY_POSITION) + " ant Pos: " + so.getProperty(ContinuousSpace2D.PROPERTY_POSITION));
 //				int stock = (Integer) bikestation.getProperty("stock");
