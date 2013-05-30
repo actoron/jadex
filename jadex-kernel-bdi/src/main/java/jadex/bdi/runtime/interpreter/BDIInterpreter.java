@@ -468,7 +468,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Overridden to init BDI internals before services.
 	 */
-	public IFuture initServices(final IModelInfo model, final String config)
+	public IFuture initProvidedServices(final IModelInfo model, final String config)
 	{
 //		assert isAgentThread();
 		assert !getAgentAdapter().isExternalThread();
@@ -487,7 +487,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					{
 						public void customResultAvailable(Object result)
 						{
-							BDIInterpreter.super.initServices(model, config).addResultListener(new DelegationResultListener(fut));
+							BDIInterpreter.super.initProvidedServices(model, config).addResultListener(new DelegationResultListener(fut));
 						}
 					}));				
 				}
@@ -496,7 +496,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		else
 		{
 			// Capability model: agent stuff already inited.
-			ret	= BDIInterpreter.super.initServices(model, config);
+			ret	= BDIInterpreter.super.initProvidedServices(model, config);
 //			ret	= IFuture.DONE;
 		}
 		return ret;

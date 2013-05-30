@@ -675,29 +675,36 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 							{
 								public void customResultAvailable(Void result)
 								{
-									initServices(model, config).addResultListener(
+									initRequiredServices(model, config).addResultListener(
 										createResultListener(new DelegationResultListener<Void>(fut)
 									{
 										public void customResultAvailable(Void result)
 										{
-											initComponents(model, config).addResultListener(
+											initProvidedServices(model, config).addResultListener(
 												createResultListener(new DelegationResultListener<Void>(fut)
 											{
 												public void customResultAvailable(Void result)
 												{
-//													ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), 
-//														getComponentDescription().getName().getName(), getComponentIdentifier(), getComponentDescription().getCreationTime(), getComponentDescription());
-//													notifyListeners(event);
-													
-													MonitoringEvent me = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
-														MonitoringEvent.TYPE_COMPONENT_CREATED, getComponentDescription().getCause(), getComponentDescription().getCreationTime());
-													me.setProperty("details", getComponentDescription());
-													publishEvent(me);
-//														.addResultListener(new DelegationResultListener<Void>(ret));
+													initComponents(model, config).addResultListener(
+														createResultListener(new DelegationResultListener<Void>(fut)
+													{
+														public void customResultAvailable(Void result)
+														{
+//															ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), 
+//																getComponentDescription().getName().getName(), getComponentIdentifier(), getComponentDescription().getCreationTime(), getComponentDescription());
+//															notifyListeners(event);
+															
+															MonitoringEvent me = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
+																MonitoringEvent.TYPE_COMPONENT_CREATED, getComponentDescription().getCause(), getComponentDescription().getCreationTime());
+															me.setProperty("details", getComponentDescription());
+															publishEvent(me);
+//																.addResultListener(new DelegationResultListener<Void>(ret));
 
-													super.customResultAvailable(result);
+															super.customResultAvailable(result);
+														}
+													}));
 												}
-											}));
+											}));											
 										}
 									}));
 								}
@@ -805,7 +812,53 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the services.
 	 */
-	public IFuture<Void> initServices(final IModelInfo model, final String config)
+	public IFuture<Void> initRequiredServices(final IModelInfo model, final String config)
+	{
+		assert !getComponentAdapter().isExternalThread();
+		
+		// Required services.
+		RequiredServiceInfo[] ms = model.getRequiredServices();
+		
+		Map<String, RequiredServiceInfo>	sermap = new LinkedHashMap<String, RequiredServiceInfo>();
+		for(int i=0; i<ms.length; i++)
+		{
+			ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType().getType(getClassLoader()), ms[i].isMultiple(), 
+				ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), ms[i].getDefaultBinding());
+			sermap.put(ms[i].getName(), ms[i]);
+		}
+
+		if(config!=null)
+		{
+			ConfigurationInfo cinfo = model.getConfiguration(config);
+			RequiredServiceInfo[] cs = cinfo.getRequiredServices();
+			for(int i=0; i<cs.length; i++)
+			{
+				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getServicePrefix()+cs[i].getName());
+				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
+					ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(cs[i].getDefaultBinding()));
+				sermap.put(rsi.getName(), newrsi);
+			}
+		}
+		if(getBindings()!=null)
+		{
+			for(int i=0; i<getBindings().length; i++)
+			{
+				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getBindings()[i].getName());
+				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
+					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(getBindings()[i]));
+				sermap.put(rsi.getName(), newrsi);
+			}
+		}
+		RequiredServiceInfo[]	rservices	= (RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]);
+		getServiceContainer().addRequiredServiceInfos(rservices);
+					
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Init the services.
+	 */
+	public IFuture<Void> initProvidedServices(final IModelInfo model, final String config)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
@@ -842,42 +895,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			{
 				public void customResultAvailable(Void result)
 				{
-					// Required services.
-					RequiredServiceInfo[] ms = model.getRequiredServices();
-					
-					Map<String, RequiredServiceInfo>	sermap = new LinkedHashMap<String, RequiredServiceInfo>();
-					for(int i=0; i<ms.length; i++)
-					{
-						ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType().getType(getClassLoader()), ms[i].isMultiple(), 
-							ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), ms[i].getDefaultBinding());
-						sermap.put(ms[i].getName(), ms[i]);
-					}
-
-					if(config!=null)
-					{
-						ConfigurationInfo cinfo = model.getConfiguration(config);
-						RequiredServiceInfo[] cs = cinfo.getRequiredServices();
-						for(int i=0; i<cs.length; i++)
-						{
-							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getServicePrefix()+cs[i].getName());
-							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-								ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(cs[i].getDefaultBinding()));
-							sermap.put(rsi.getName(), newrsi);
-						}
-					}
-					if(getBindings()!=null)
-					{
-						for(int i=0; i<getBindings().length; i++)
-						{
-							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getBindings()[i].getName());
-							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-								rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(getBindings()[i]));
-							sermap.put(rsi.getName(), newrsi);
-						}
-					}
-					RequiredServiceInfo[]	rservices	= (RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]);
-					getServiceContainer().addRequiredServiceInfos(rservices);
-					
 					// Start service container.
 					startServiceContainer().addResultListener(createResultListener(new DelegationResultListener(ret)));
 				}

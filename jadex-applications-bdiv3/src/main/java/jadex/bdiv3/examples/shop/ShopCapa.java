@@ -137,7 +137,6 @@ public class ShopCapa
 //			getBeliefbase().getBeliefSet("catalog").modified(ii);
 			catalog.set(pos, ii);
 			
-//			money = money+goal.getPrice();
 			setMoney(getMoney()+goal.getPrice());
 		}
 		else

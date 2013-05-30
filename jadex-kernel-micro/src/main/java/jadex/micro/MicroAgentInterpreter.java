@@ -11,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -96,7 +97,6 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		{
 			this.classloader = model.getClassloader();
 			this.microagent = createAgent(microclass, model);
-			final Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
 
 			this.container = createMyServiceContainer(args);
 					
@@ -109,26 +109,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					{
 						public void customResultAvailable(Void result)
 						{
-							injectArguments(agent, model).addResultListener(new DelegationResultListener<Void>(inited)
-							{
-								public void customResultAvailable(Void result)
-								{
-									injectServices(agent, model).addResultListener(new DelegationResultListener<Void>(inited)
-									{
-										public void customResultAvailable(Void result)
-										{
-											injectParent(agent, model).addResultListener(new DelegationResultListener<Void>(inited)
-											{
-												public void customResultAvailable(Void result)
-												{
-													// Call user code init.
-													microagent.agentCreated().addResultListener(new DelegationResultListener<Void>(inited));
-												}
-											});
-										}
-									});
-								}
-							});
+							// Call user code init.
+							microagent.agentCreated().addResultListener(new DelegationResultListener<Void>(inited));
 						}
 					}));
 					
@@ -192,6 +174,39 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //				}
 			}
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Add extra init code before provided services.
+	 */
+	public IFuture<Void> initProvidedServices(final IModelInfo model, final String config)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		final Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
+		
+		injectArguments(agent, micromodel).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				injectServices(agent, micromodel).addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						injectParent(agent, micromodel).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								MicroAgentInterpreter.super.initProvidedServices(model, config)
+									.addResultListener(new DelegationResultListener<Void>(ret));
+							}
+						}));
+					}
+				});
+			}
+		});
+		
 		return ret;
 	}
 	

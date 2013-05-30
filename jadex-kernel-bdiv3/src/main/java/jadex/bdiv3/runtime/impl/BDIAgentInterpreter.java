@@ -27,11 +27,14 @@ import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.FieldInfo;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -175,6 +178,24 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				break;
 			}
 		}
+	}
+	
+	/**
+	 *  Init a service.
+	 */
+	protected IFuture<Void> initService(ProvidedServiceInfo info, IModelInfo model)
+	{
+		Future<Void>	ret	= new Future<Void>();
+		
+		int i	= info.getName().indexOf(".");
+		String	capa	= null;
+		if(i!=-1)
+		{
+			capa	= info.getName().substring(0, i); 
+		}
+		super.initService(info, model).addResultListener(new DelegationResultListener<Void>(ret));
+		
+		return ret;
 	}
 	
 	/**
