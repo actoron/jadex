@@ -34,6 +34,7 @@ import org.kohsuke.asm4.tree.AnnotationNode;
 import org.kohsuke.asm4.tree.ClassNode;
 import org.kohsuke.asm4.tree.FieldInsnNode;
 import org.kohsuke.asm4.tree.InsnList;
+import org.kohsuke.asm4.tree.InsnNode;
 import org.kohsuke.asm4.tree.LabelNode;
 import org.kohsuke.asm4.tree.LdcInsnNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
@@ -537,6 +538,16 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 					if((mn.access&Opcodes.ACC_NATIVE)!=0)
 					{
 						// todo: native methods
+						
+						mn.access = mn.access-Opcodes.ACC_NATIVE;
+						InsnList nl = new InsnList();
+						
+					    nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream"));
+					    nl.add(new LdcInsnNode("Test"));    
+					    nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V"));
+						nl.add(new InsnNode(Opcodes.RETURN));
+						
+						mn.instructions = nl;
 					}
 					else
 					{
