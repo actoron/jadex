@@ -64,7 +64,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -122,49 +121,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			pa.init(this, agent);
 			ret = pa;
 
-			FieldInfo[] fields = model.getAgentInjections();
-			for(int i=0; i<fields.length; i++)
-			{
-				try
-				{
-					Field f = fields[i].getField(getClassLoader());
-					if(SReflect.isSupertype(f.getType(), ICapability.class))
-					{
-						f.setAccessible(true);
-						f.set(agent, new CapabilityWrapper(pa, agent, null));						
-					}
-					else
-					{
-						f.setAccessible(true);
-						f.set(agent, ret);
-					}
-				}
-				catch(Exception e)
-				{
-					getLogger().warning("Agent injection failed: "+e);
-				}
-			}
-		}
-		
-		// Additionally inject agent to hidden agent field
-		if(!(agent instanceof MicroAgent))
-		{
-			Class<?> agcl = agent.getClass();
-			while(agcl.isAnnotationPresent(Agent.class))
-			{
-				try
-				{
-					Field field = agcl.getDeclaredField("__agent");
-					field.setAccessible(true);
-					field.set(agent, ret);
-					agcl = agcl.getSuperclass();
-				}
-				catch(Exception e)
-				{
-					getLogger().warning("Hidden agent injection failed: "+e);
-					break;
-				}
-			}
+			injectAgent(pa, agent, model);
 		}
 		
 		// Init rule system
@@ -174,11 +131,58 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
+	 *  Inject the agent into annotated fields.
+	 */
+	protected void	injectAgent(BDIAgent pa, Object agent, MicroModel model)
+	{
+		FieldInfo[] fields = model.getAgentInjections();
+		for(int i=0; i<fields.length; i++)
+		{
+			try
+			{
+				Field f = fields[i].getField(getClassLoader());
+				if(SReflect.isSupertype(f.getType(), ICapability.class))
+				{
+					f.setAccessible(true);
+					f.set(agent, new CapabilityWrapper(pa, agent, null));						
+				}
+				else
+				{
+					f.setAccessible(true);
+					f.set(agent, pa);
+				}
+			}
+			catch(Exception e)
+			{
+				getLogger().warning("Agent injection failed: "+e);
+			}
+		}
+	
+		// Additionally inject agent to hidden agent field
+		Class<?> agcl = agent.getClass();
+		while(agcl.isAnnotationPresent(Agent.class))
+		{
+			try
+			{
+				Field field = agcl.getDeclaredField("__agent");
+				field.setAccessible(true);
+				field.set(agent, pa);
+				agcl = agcl.getSuperclass();
+			}
+			catch(Exception e)
+			{
+				getLogger().warning("Hidden agent injection failed: "+e);
+				break;
+			}
+		}
+	}
+	
+	/**
 	 *  Add init code after parent injection.
 	 */
-	protected IFuture<Void> injectParent(final Object agent, MicroModel model)
+	protected IFuture<Void> injectParent(final Object agent, final MicroModel model)
 	{
-		Future<Void>	ret	= new Future<Void>();
+		final Future<Void>	ret	= new Future<Void>();
 		super.injectParent(agent, model).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -211,9 +215,58 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						e.printStackTrace();
 					}
 				}
-				super.customResultAvailable(result);
+				
+				
+				initCapabilities(agent, ((BDIModel)model).getSubcapabilities(), 0).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
+		return ret;
+	}
+	
+	/**
+	 *  Init the capability pojo objects.
+	 */
+	protected IFuture<Void>	initCapabilities(final Object agent, final Tuple2<FieldInfo, BDIModel>[] caps, final int i)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		try
+		{
+			Field	f	= caps[i].getFirstEntity().getField(getClassLoader());
+			f.setAccessible(true);
+			final Object	capa	= f.get(agent);
+			
+			injectAgent((BDIAgent)microagent, capa, caps[i].getSecondEntity());
+			
+			injectServices(capa, caps[i].getSecondEntity())
+				.addResultListener(new DelegationResultListener<Void>(ret)
+			{
+				public void customResultAvailable(Void result)
+				{
+					injectParent(capa, caps[i].getSecondEntity())
+						.addResultListener(new DelegationResultListener<Void>(ret)
+					{
+						public void customResultAvailable(Void result)
+						{
+							if(i<caps.length)
+							{
+								initCapabilities(agent, caps, i+1)
+									.addResultListener(new DelegationResultListener<Void>(ret));
+							}
+							else
+							{
+								super.customResultAvailable(result);
+							}
+						}
+					});
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
 		return ret;
 	}
 	

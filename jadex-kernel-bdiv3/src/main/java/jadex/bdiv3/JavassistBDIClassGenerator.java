@@ -1,19 +1,5 @@
 package jadex.bdiv3;
 
-import jadex.bdiv3.model.BDIModel;
-
-import java.lang.reflect.Field;
-
-import javassist.CannotCompileException;
-import javassist.ClassClassPath;
-import javassist.ClassPath;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtField;
-import javassist.CtMethod;
-import javassist.bytecode.ClassFile;
-import javassist.expr.ExprEditor;
-import javassist.expr.FieldAccess;
 
 /**
  * 

@@ -194,15 +194,6 @@ public class MBelief extends MElement
 	}
 	
 	/**
-	 *  Get the msetter.
-	 *  @return The msetter.
-	 */
-	public MethodInfo getSetter()
-	{
-		return msetter;
-	}
-
-	/**
 	 *  Test if this belief refers to a field.
 	 *  @return True if is a field belief.
 	 */
@@ -367,6 +358,4 @@ public class MBelief extends MElement
 	{
 		return msetter;
 	}
-
-	
 }
