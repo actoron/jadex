@@ -11,7 +11,7 @@ import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
- * Plan is called whenever the stock or the capacity of a station changes. The plan changes the alternative stations if they are not needed anymore and informs other stations about the changed
+ * Plan is called whenever the stock of a station changes. The plan changes the alternative stations if they are not needed anymore and informs other stations about the changed
  * occupancy using DeCoMAS.
  * 
  * @author Thomas Preisler
