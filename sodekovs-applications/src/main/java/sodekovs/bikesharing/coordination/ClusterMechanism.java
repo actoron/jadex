@@ -5,6 +5,7 @@ package sodekovs.bikesharing.coordination;
 
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
@@ -35,7 +36,7 @@ public class ClusterMechanism extends CoordinationMechanism {
 	/** The number of published events */
 	protected Integer eventNumber = null;
 	
-	protected ISpaceObject superStationCoordination = null;
+	protected SpaceObject superStationCoordination = null;
 
 	public ClusterMechanism(CoordinationSpace space) {
 		super(space);
@@ -44,7 +45,7 @@ public class ClusterMechanism extends CoordinationMechanism {
 		this.appSpace = (ContinuousSpace2D) applicationInterpreter.getExtension("my2dspace");
 		this.eventNumber = 0;
 		
-		this.superStationCoordination = appSpace.getSpaceObjectsByType("superStationCoordination")[0];
+		this.superStationCoordination = (SpaceObject) appSpace.getSpaceObjectsByType("superStationCoordination")[0];
 		
 		this.superCluster = (SuperCluster) appSpace.getProperty("StationCluster");
 	}
@@ -68,13 +69,16 @@ public class ClusterMechanism extends CoordinationMechanism {
 		CoordinationInfo coordInfo = (CoordinationInfo) obj;
 		ClusterStationCoordData coordData = (ClusterStationCoordData) coordInfo.getValueByName(Constants.VALUE);
 		if (coordData.getState().equals(ClusterStationCoordData.STATE_POLLING)) {
-			superStationCoordination.setProperty("polling", (Integer) superStationCoordination.getProperty("polling") + 1);
+//			superStationCoordination.setProperty("polling", (Integer) superStationCoordination.getProperty("polling") + 1);
+			superStationCoordination.incrementProperty("polling", 1);
 			informClusterStations(coordInfo);
 		} else if (coordData.getState().equals(ClusterStationCoordData.STATE_ALTERNATIVES)) {
-			superStationCoordination.setProperty("alternative", (Integer) superStationCoordination.getProperty("alternative") + 1);
+//			superStationCoordination.setProperty("alternative", (Integer) superStationCoordination.getProperty("alternative") + 1);
+			superStationCoordination.incrementProperty("alternative", 1);
 			informClusterStations(coordInfo);
 		} else if (coordData.getState().equals(ClusterStationCoordData.STATE_REPLY)) {
-			superStationCoordination.setProperty("reply", (Integer) superStationCoordination.getProperty("reply") + 1);
+//			superStationCoordination.setProperty("reply", (Integer) superStationCoordination.getProperty("reply") + 1);
+			superStationCoordination.incrementProperty("reply", 1);
 			informSuperStation(coordInfo);
 		}
 	}
