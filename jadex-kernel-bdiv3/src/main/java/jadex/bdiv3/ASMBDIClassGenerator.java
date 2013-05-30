@@ -215,6 +215,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				public void visitEnd()
 				{
 					visitField(Opcodes.ACC_PUBLIC, "__agent", Type.getDescriptor(BDIAgent.class), null, null);
+					visitField(Opcodes.ACC_PUBLIC, "__globalname", Type.getDescriptor(String.class), null, null);
 					super.visitEnd();
 				}
 			};
