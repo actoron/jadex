@@ -28,6 +28,7 @@ public class ShopAndCustomerBDI
 	protected BDIAgent	agent;
 	
 	/** The customer capability. */
+//	@Capability(beliefmapping=@Mapping(value="shopcap.money", target="money"))
 	@Capability(beliefmapping=@Mapping("money"))
 	protected CustomerCapability	customercap	= new CustomerCapability();
 
