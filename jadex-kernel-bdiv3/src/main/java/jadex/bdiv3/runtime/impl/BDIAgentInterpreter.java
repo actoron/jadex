@@ -34,7 +34,6 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.FieldInfo;
-import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -237,7 +236,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					}
 				}
 				
-				
 				initCapabilities(agent, ((BDIModel)model).getSubcapabilities(), 0).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
@@ -251,41 +249,41 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		try
+		if(i<caps.length)
 		{
-			Field	f	= caps[i].getFirstEntity().getField(getClassLoader());
-			f.setAccessible(true);
-			final Object	capa	= f.get(agent);
-			
-			injectAgent((BDIAgent)microagent, capa, caps[i].getSecondEntity());
-			
-			injectServices(capa, caps[i].getSecondEntity())
-				.addResultListener(new DelegationResultListener<Void>(ret)
+			try
 			{
-				public void customResultAvailable(Void result)
+				Field	f	= caps[i].getFirstEntity().getField(getClassLoader());
+				f.setAccessible(true);
+				final Object	capa	= f.get(agent);
+				
+				injectAgent((BDIAgent)microagent, capa, caps[i].getSecondEntity());
+				
+				injectServices(capa, caps[i].getSecondEntity())
+					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
-					injectParent(capa, caps[i].getSecondEntity())
-						.addResultListener(new DelegationResultListener<Void>(ret)
+					public void customResultAvailable(Void result)
 					{
-						public void customResultAvailable(Void result)
+						injectParent(capa, caps[i].getSecondEntity())
+							.addResultListener(new DelegationResultListener<Void>(ret)
 						{
-							if(i<caps.length)
+							public void customResultAvailable(Void result)
 							{
 								initCapabilities(agent, caps, i+1)
 									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
-							else
-							{
-								super.customResultAvailable(result);
-							}
-						}
-					});
-				}
-			});
+						});
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			ret.setResult(null);
 		}
 		
 		return ret;
