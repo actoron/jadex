@@ -68,13 +68,19 @@ public class MBelief extends MElement
 		if(target.getName().startsWith("get"))
 		{
 			this.mgetter = target;
+			name = target.getName().substring(3);			
 		}
-		else
+		else if(target.getName().startsWith("is"))
+		{
+			this.mgetter = target;
+			name = target.getName().substring(2);			
+		}
+		else// if(target.getName().startsWith("set"))
 		{
 			this.msetter = target;
+			name = target.getName().substring(3);			
 		}
 		
-		name = target.getName().substring(3);
 		name = name.substring(0, 1).toLowerCase()+name.substring(1);
 	}
 	
@@ -337,4 +343,30 @@ public class MBelief extends MElement
 		}
 		return ret;
 	}
+
+	/**
+	 *  Get the field (for field-backed beliefs).
+	 */
+	public FieldInfo getField()
+	{
+		return ftarget;
+	}
+
+	/**
+	 *  Get the getter method (for method-backed beliefs).
+	 */
+	public MethodInfo getGetter()
+	{
+		return mgetter;
+	}
+
+	/**
+	 *  Get the setter method (for method-backed beliefs).
+	 */
+	public MethodInfo getSetter()
+	{
+		return msetter;
+	}
+
+	
 }

@@ -44,6 +44,7 @@ import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.micro.MicroAgent;
 import jadex.micro.MicroClassReader;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
@@ -77,13 +78,17 @@ public class BDIClassReader extends MicroClassReader
 	/** The class generator. */
 	protected IBDIClassGenerator gen;
 	
+	/** The model loader for subcapabilities. */
+	protected BDIModelLoader	loader;
+	
 	/**
 	 *  Create a new bdi class reader.
 	 */
-	public BDIClassReader()
+	public BDIClassReader(BDIModelLoader loader)
 	{
 //		this.gen = new JavassistBDIClassGenerator();
 		this.gen = new ASMBDIClassGenerator();
+		this.loader	= loader;
 	}
 	
 	/**
@@ -136,7 +141,7 @@ public class BDIClassReader extends MicroClassReader
 		
 		fillMicroModelFromAnnotations(ret, model, cma, cl);
 		
-		fillBDIModelFromAnnotations(ret, model, cma, cl);
+		fillBDIModelFromAnnotations(ret, model, cma, cl, rid, root);
 		
 		return ret;
 	}
@@ -145,7 +150,7 @@ public class BDIClassReader extends MicroClassReader
 	 *  Fill the model details using annotation.
 	 *  // called with dummy classloader (that was used to load cma first time)
 	 */
-	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, final Class<?> cma, ClassLoader cl)
+	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, final Class<?> cma, ClassLoader cl,  IResourceIdentifier rid, IComponentIdentifier root)
 	{
 //		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
@@ -155,6 +160,8 @@ public class BDIClassReader extends MicroClassReader
 //		final Set<String> beliefnames = new HashSet<String>();
 //		List<Class> goals = new ArrayList<Class>();
 //		List<Method> plans = new ArrayList<Method>();
+		
+		Map<String, BDIModel>	capas	= new LinkedHashMap<String, BDIModel>();
 		
 		Map<String, ConfigurationInfo> confs = new LinkedHashMap<String, ConfigurationInfo>();
 		List<MConfiguration> bdiconfs = new ArrayList<MConfiguration>();
@@ -166,7 +173,8 @@ public class BDIClassReader extends MicroClassReader
 		Class<?> clazz = cma;
 		while(clazz!=null && !clazz.equals(Object.class) && !clazz.equals(getClass(BDIAgent.class, cl)))
 		{
-			if(isAnnotationPresent(clazz, Agent.class, cl))
+			if(isAnnotationPresent(clazz, Agent.class, cl)
+				|| isAnnotationPresent(clazz, Capability.class, cl))
 			{
 				agtcls.add(0, clazz);
 			}
@@ -205,8 +213,16 @@ public class BDIClassReader extends MicroClassReader
 			{
 				if(isAnnotationPresent(fields[i], Capability.class, cl))
 				{
-					System.out.println("found capability: "+fields[i].getName());
-					agtcls.add(0, fields[i].getType());
+					try
+					{
+						BDIModel	cap	= loader.loadComponentModel(fields[i].getType().getName()+".class", null, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root});
+//						System.out.println("found capability: "+fields[i].getName()+", "+cap);
+						capas.put(fields[i].getName(), cap);
+					}
+					catch(Exception e)
+					{
+						throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+					}
 				}
 			}
 
@@ -432,6 +448,52 @@ public class BDIClassReader extends MicroClassReader
 		}
 		
 //		System.out.println("genclazz: "+genclazz);
+		
+		// Add elements from capabilities.
+		for(String name: capas.keySet())
+		{
+			BDIModel	capa	= capas.get(name);
+			
+			capa.getModelInfo().getExtensionTypes(); //???
+			capa.getModelInfo().getConfigurations();	// todo!!!
+
+			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
+			{
+				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+"."+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish());
+				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
+			}
+			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
+			{
+				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+"."+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding());
+				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
+			}
+			
+			for(MBelief bel: capa.getCapability().getBeliefs())
+			{
+				List<String>	events	= new ArrayList<String>();
+				for(String event: bel.getEvents())
+				{
+					events.add(name+"."+event);
+				}
+				
+				MBelief	bel2;
+				if(bel.getField()!=null)
+				{
+					bel2	= new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), events.toArray(new String[events.size()]));
+				}
+				else
+				{
+					bel2	= new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), events.toArray(new String[events.size()]));
+					bel2.setSetter(bel.getSetter());
+				}
+				bel2.setName(name+"."+bel2.getName());
+				
+				bdimodel.getCapability().addBelief(bel2);
+			}
+			
+			capa.getCapability().getGoals();
+			capa.getCapability().getPlans();
+		}
 	}
 	
 	/**
@@ -647,4 +709,52 @@ public class BDIClassReader extends MicroClassReader
 		}
 		return mgoal;
 	}
+	
+	/**
+	 * Get the mirco agent class.
+	 */
+	// todo: make use of cache
+	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
+	{
+		Class ret = SReflect.findClass0(clname, imports, classloader);
+//		System.out.println(clname+" "+ret+" "+classloader);
+		int idx;
+		while(ret == null && (idx = clname.indexOf('.')) != -1)
+		{
+			clname = clname.substring(idx + 1);
+			try
+			{
+				ret = SReflect.findClass0(clname, imports, classloader);
+			}
+			catch(IllegalArgumentException iae)
+			{
+				// Hack!!! Sun URL class loader doesn't like if classnames start
+				// with (e.g.) 'C:'.
+			}
+			// System.out.println(clname+" "+cma+" "+ret);
+		}
+		if(ret == null)
+		{
+			throw new RuntimeException("BDI agent class not found: " + clname);
+		}
+		else if(!MicroAgent.class.isAssignableFrom(ret))
+		{
+			boolean	found	= false;
+			Class	cma	= ret;
+			while(!found && cma!=null)
+			{
+				found = isAnnotationPresent(cma, Agent.class, classloader)
+					|| isAnnotationPresent(cma, Capability.class, classloader); 
+//				found	=  cma.isAnnotationPresent(Agent.class);
+				cma	= cma.getSuperclass();
+			}
+
+			if(!found)
+			{
+				throw new RuntimeException("Not a BDI agent class: " + clname);
+			}
+		}
+		return ret;
+	}
+
 }

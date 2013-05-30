@@ -75,7 +75,7 @@ public class RequiredServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class type)
+	public RequiredServiceInfo(String name, Class<?> type)
 	{
 		this(name, type, RequiredServiceInfo.SCOPE_APPLICATION, null);
 	}
@@ -102,12 +102,22 @@ public class RequiredServiceInfo
 	public RequiredServiceInfo(String name, Class<?> type, boolean multiple, 
 		Class<?> multiplextype, RequiredServiceBinding binding)
 	{
+		this(name, type!=null ? new ClassInfo(SReflect.getClassName(type)) : null,
+			multiple,
+			multiplextype!=null ? new ClassInfo(SReflect.getClassName(multiplextype)) : null,
+			binding);
+	}
+
+	/**
+	 *  Create a new service info.
+	 */
+	public RequiredServiceInfo(String name, ClassInfo type, boolean multiple, 
+		ClassInfo multiplextype, RequiredServiceBinding binding)
+	{
 		this.name = name;
-		if(type!=null)
-			setType(new ClassInfo(SReflect.getClassName(type)));
-		if(multiplextype!=null)
-			setMultiplexType(new ClassInfo(SReflect.getClassName(multiplextype)));
+		this.type	= type;
 		this.multiple = multiple;
+		this.multiplextype	= multiplextype;
 		this.binding = binding;
 	}
 

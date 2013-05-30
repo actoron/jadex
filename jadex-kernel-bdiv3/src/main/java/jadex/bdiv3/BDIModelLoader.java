@@ -32,7 +32,7 @@ public class BDIModelLoader extends AbstractModelLoader
 	public BDIModelLoader()
 	{
 		super(new String[]{FILE_EXTENSION_BDIV3});
-		this.reader = new BDIClassReader();
+		this.reader = new BDIClassReader(this);
 	}
 
 	//-------- methods --------
