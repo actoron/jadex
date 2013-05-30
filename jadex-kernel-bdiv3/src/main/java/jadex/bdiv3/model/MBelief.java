@@ -186,7 +186,25 @@ public class MBelief extends MElement
 	{
 		this.msetter = msetter;
 	}
+	
+	/**
+	 *  Get the msetter.
+	 *  @return The msetter.
+	 */
+	public MethodInfo getSetter()
+	{
+		return msetter;
+	}
 
+	/**
+	 *  Test if this belief refers to a field.
+	 *  @return True if is a field belief.
+	 */
+	public boolean isFieldBelief()
+	{
+		return ftarget!=null;
+	}
+	
 	/**
 	 *  Get the multi.
 	 *  @return The multi.

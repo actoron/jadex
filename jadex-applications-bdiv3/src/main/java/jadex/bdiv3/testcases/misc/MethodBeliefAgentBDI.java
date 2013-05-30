@@ -20,8 +20,10 @@ public class MethodBeliefAgentBDI
 {
 	//-------- attributes --------
 	
+	// Not using value to make testcase more difficult
+	// In case of getter/setter beliefs the setter method is enhanced.
 	/** The value. */
-	protected String	value;
+	protected String	val; 
 	
 	//-------- methods --------
 	
@@ -31,7 +33,7 @@ public class MethodBeliefAgentBDI
 	@Belief
 	public String	getValue()
 	{
-		return value;
+		return val;
 	}
 	
 	/**
@@ -40,7 +42,7 @@ public class MethodBeliefAgentBDI
 	@Belief
 	public void	setValue(String value)
 	{
-		this.value	= value;
+		this.val	= value;
 	}
 
 	

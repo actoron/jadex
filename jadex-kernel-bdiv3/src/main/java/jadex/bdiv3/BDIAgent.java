@@ -26,6 +26,7 @@ import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -386,6 +387,63 @@ public class BDIAgent extends MicroAgent
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Unobserving an old belief value.
+	 *  @param agent The agent.
+	 *  @param belname The belief name.
+	 */
+	public static void unobserveValue(BDIAgent agent, final String belname)
+	{
+//		System.out.println("unobserve: "+agent+" "+belname);
+		
+		try
+		{
+			Object pojo = ((IPojoMicroAgent)agent).getPojoAgent();
+		
+			Method getter = pojo.getClass().getMethod("get"+belname.substring(0,1).toUpperCase()+belname.substring(1), new Class[0]);
+			Object oldval = getter.invoke(pojo, new Object[0]);
+		
+			RuleSystem rs = ((BDIAgentInterpreter)agent.getInterpreter()).getRuleSystem();
+			rs.unobserveObject(oldval);	
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 *  Create a belief changed event.
+	 *  @param val The new value.
+	 *  @param agent The agent.
+	 *  @param belname The belief name.
+	 */
+	public static void createEvent(Object val, final BDIAgent agent, final String belname)
+	{
+//		System.out.println("createEv: "+val+" "+agent+" "+belname);
+		
+		RuleSystem rs = ((BDIAgentInterpreter)agent.getInterpreter()).getRuleSystem();
+		rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
+		if(val!=null)
+		{
+			rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
+			{
+				public IFuture<IEvent> execute(final PropertyChangeEvent event)
+				{
+					return agent.scheduleStep(new IComponentStep<IEvent>()
+					{
+						public IFuture<IEvent> execute(IInternalAccess ia)
+						{
+//							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
+							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+belname, event.getNewValue());
+							return new Future<IEvent>(ev);
+						}
+					});
+				}
+			});
 		}
 	}
 }

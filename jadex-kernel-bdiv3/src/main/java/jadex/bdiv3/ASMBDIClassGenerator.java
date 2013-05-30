@@ -39,6 +39,7 @@ import org.kohsuke.asm4.tree.LdcInsnNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
 import org.kohsuke.asm4.tree.MethodNode;
 import org.kohsuke.asm4.tree.VarInsnNode;
+import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
@@ -120,7 +121,8 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						public void visitFieldInsn(int opcode, String owner, String name, String desc)
 						{
 							// if is a putfield and is belief and not is in init (__agent field is not available)
-							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name))
+							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name) 
+								&& model.getCapability().getBelief(name).isFieldBelief())
 							{
 //								visitInsn(Opcodes.POP);
 //								visitInsn(Opcodes.POP);
@@ -310,7 +312,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 		}
 		
 		final String iclname = clname.replace(".", "/");
-		
+				
 		// Check method for array store access of beliefs and replace with static method call
 		MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
 		for(MethodNode mn: mths)
@@ -401,14 +403,21 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 		}
 		
 		// Check if there are dynamic beliefs
+		// and enhance getter/setter beliefs by adding event call to setter
+		List<String> tododyn = new ArrayList<String>();
+		List<String> todoset = new ArrayList<String>();
 		List<MBelief> mbels = model.getCapability().getBeliefs();
-		List<String> todo = new ArrayList<String>();
 		for(MBelief mbel: mbels)
 		{
 			Collection<String> evs = mbel.getEvents();
 			if(evs!=null && !evs.isEmpty() || mbel.isDynamic())
 			{
-				todo.add(mbel.getName());
+				tododyn.add(mbel.getName());
+			}
+			
+			if(!mbel.isFieldBelief())
+			{
+				todoset.add(mbel.getSetter().getName());
 			}
 		}
 		
@@ -467,7 +476,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 								start = start.getPrevious();
 							}
 							
-							if(todo.remove(name))
+							if(tododyn.remove(name))
 							{
 								MBelief mbel = model.getCapability().getBelief(name);
 								mbel.getEvents().addAll(evs);
@@ -522,8 +531,42 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						}						
 						mnode.visitInsn(Opcodes.RETURN);
 					}
+				}
+				// Enhance setter method with unobserve oldvalue at the beginning and event call at the end
+				else if(todoset.contains(mn.name))
+				{
+					String belname = mn.name.substring(3);
+					belname = belname.substring(0,1).toLowerCase()+belname.substring(1);
 					
-					break;
+					InsnList l = mn.instructions;
+					
+//					System.out.println("icl: "+iclname);
+					
+					InsnList nl = new InsnList();
+					nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
+					nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+					nl.add(new LdcInsnNode(belname));
+					nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "unobserveValue", 
+//						"(Ljava/lang/String;)V"));
+						"(Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+					l.insertBefore(l.getFirst(), nl);
+					
+					nl = new InsnList();
+					nl.add(new VarInsnNode(Opcodes.ALOAD, 1)); // loads the argument (=parameter0)
+					nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
+					nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+					nl.add(new LdcInsnNode(belname));
+					nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
+						"(Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+//					nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
+//						"()V"));
+
+					// Find return and insert call before that
+					AbstractInsnNode n;
+					for(n = l.getLast(); n.getOpcode()!=Opcodes.RETURN; n = n.getPrevious())
+					{
+					}
+					l.insertBefore(n, nl);
 				}
 			}
 		}
