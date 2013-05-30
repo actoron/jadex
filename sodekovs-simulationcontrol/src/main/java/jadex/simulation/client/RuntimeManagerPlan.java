@@ -134,7 +134,7 @@ public class RuntimeManagerPlan extends Plan {
 						// Experiment has reached Target Function. Terminate
 						break;
 					} else {
-						System.out.println("#RuntimeManagerPlan# Do not terminate yet!!!");
+						// System.out.println("#RuntimeManagerPlan# Do not terminate yet!!!");
 					}
 				} else {
 					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());
@@ -254,6 +254,25 @@ public class RuntimeManagerPlan extends Plan {
 		getBeliefbase().getBelief("factsAboutAllExperiments").setFact(factsAboutAllExperiments);
 	}
 
+	// /**
+	// * Returns the observedEvents from the SimulationDataConsumer Hack: Can only process one SimualtioDataConsumer, i.e. it returns the events from the FIRST SimulatioDataConsumer
+	// *
+	// * @param space
+	// * @return
+	// */
+	// private ConcurrentHashMap<Long, ArrayList<ObservedEvent>> getResult(AbstractEnvironmentSpace space) {
+	// Collection collection = space.getDataConsumers();
+	//
+	// Iterator itr = collection.iterator();
+	//
+	// while (itr.hasNext()) {
+	// Object con = itr.next();
+	// if (con instanceof SimulationDataConsumer)
+	// return ((SimulationDataConsumer) con).getResults();
+	// }
+	// return null;
+	// }
+
 	/**
 	 * Returns the observedEvents from the SimulationDataConsumer Hack: Can only process one SimualtioDataConsumer, i.e. it returns the events from the FIRST SimulatioDataConsumer
 	 * 
@@ -262,15 +281,29 @@ public class RuntimeManagerPlan extends Plan {
 	 */
 	private ConcurrentHashMap<Long, ArrayList<ObservedEvent>> getResult(AbstractEnvironmentSpace space) {
 		Collection collection = space.getDataConsumers();
-
 		Iterator itr = collection.iterator();
+		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> allObservedEvents = new ConcurrentHashMap<Long, ArrayList<ObservedEvent>>();
 
 		while (itr.hasNext()) {
 			Object con = itr.next();
-			if (con instanceof SimulationDataConsumer)
-				return ((SimulationDataConsumer) con).getResults();
+			if (con instanceof SimulationDataConsumer) {
+				ConcurrentHashMap<Long, ArrayList<ObservedEvent>> tmpRes = ((SimulationDataConsumer) con).getResults();
+
+				Iterator timeIt = tmpRes.keySet().iterator();
+				while (timeIt.hasNext()) {
+					Long currentTime = (Long) timeIt.next();
+					if (allObservedEvents.get(currentTime) != null) {
+						ArrayList<ObservedEvent> existingEventsList = allObservedEvents.get(currentTime);
+						existingEventsList.addAll(tmpRes.get(currentTime));
+						allObservedEvents.put(currentTime, existingEventsList);
+					} else {
+						// no values for this time in the map since now
+						allObservedEvents.put(currentTime, tmpRes.get(currentTime));
+					}
+				}
+			}
 		}
-		return null;
+		return allObservedEvents;
 	}
 
 	/**
