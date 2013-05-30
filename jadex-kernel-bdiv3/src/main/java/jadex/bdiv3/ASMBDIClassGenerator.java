@@ -39,7 +39,6 @@ import org.kohsuke.asm4.tree.LdcInsnNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
 import org.kohsuke.asm4.tree.MethodNode;
 import org.kohsuke.asm4.tree.VarInsnNode;
-import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
@@ -219,7 +218,6 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 					super.visitEnd();
 				}
 			};
-			
 			
 			InputStream is = null;
 			try
@@ -535,38 +533,45 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 				// Enhance setter method with unobserve oldvalue at the beginning and event call at the end
 				else if(todoset.contains(mn.name))
 				{
-					String belname = mn.name.substring(3);
-					belname = belname.substring(0,1).toLowerCase()+belname.substring(1);
-					
-					InsnList l = mn.instructions;
-					
-//					System.out.println("icl: "+iclname);
-					
-					InsnList nl = new InsnList();
-					nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
-					nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
-					nl.add(new LdcInsnNode(belname));
-					nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "unobserveValue", 
-//						"(Ljava/lang/String;)V"));
-						"(Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
-					l.insertBefore(l.getFirst(), nl);
-					
-					nl = new InsnList();
-					nl.add(new VarInsnNode(Opcodes.ALOAD, 1)); // loads the argument (=parameter0)
-					nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
-					nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
-					nl.add(new LdcInsnNode(belname));
-					nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
-						"(Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
-//					nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
-//						"()V"));
-
-					// Find return and insert call before that
-					AbstractInsnNode n;
-					for(n = l.getLast(); n.getOpcode()!=Opcodes.RETURN; n = n.getPrevious())
+					if((mn.access&Opcodes.ACC_NATIVE)!=0)
 					{
+						// todo: native methods
 					}
-					l.insertBefore(n, nl);
+					else
+					{
+						String belname = mn.name.substring(3);
+						belname = belname.substring(0,1).toLowerCase()+belname.substring(1);
+						
+						InsnList l = mn.instructions;
+						
+	//					System.out.println("icl: "+iclname);
+						
+						InsnList nl = new InsnList();
+						nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
+						nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+						nl.add(new LdcInsnNode(belname));
+						nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "unobserveValue", 
+	//						"(Ljava/lang/String;)V"));
+							"(Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+						l.insertBefore(l.getFirst(), nl);
+						
+						nl = new InsnList();
+						nl.add(new VarInsnNode(Opcodes.ALOAD, 1)); // loads the argument (=parameter0)
+						nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
+						nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+						nl.add(new LdcInsnNode(belname));
+						nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
+							"(Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+	//					nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
+	//						"()V"));
+	
+						// Find return and insert call before that
+						AbstractInsnNode n;
+						for(n = l.getLast(); n.getOpcode()!=Opcodes.RETURN; n = n.getPrevious())
+						{
+						}
+						l.insertBefore(n, nl);
+					}
 				}
 			}
 		}
