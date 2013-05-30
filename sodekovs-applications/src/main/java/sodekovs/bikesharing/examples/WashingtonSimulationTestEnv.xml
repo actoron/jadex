@@ -25,7 +25,30 @@
 			<Data name="stationID">$bikestation.stationID</Data>
 			<Data name="time">$tick</Data>							
 		</Dataprovider>
-		
+
+		<!-- PROVIDERS for DeCoMas Eval Stats -->		
+		<Dataprovider name="AdaptationLogger">
+			<Source name="$adaptation" sourcetype="ISpaceObject" objecttype="adaptation"/> 						
+			<Data name="votingAttempts">$adaptation.votingAttempts</Data>				
+			<Data name="adaptations">$adaptation.adaptations</Data>
+			<Data name="failures">$adaptation.failures</Data>							
+		</Dataprovider>
+		<Dataprovider name="SuperStationCoordination">
+			<Source name="$superStationCoordination" sourcetype="ISpaceObject" objecttype="superStationCoordination"/> 						
+			<Data name="polling">$superStationCoordination.polling</Data>				
+			<Data name="alternative">$superStationCoordination.alternative</Data>
+			<Data name="reply">$superStationCoordination.reply</Data>							
+		</Dataprovider>
+		<Dataprovider name="TupleCoordination">
+			<Source name="$tupleCoordination" sourcetype="ISpaceObject" objecttype="tupleCoordination"/> 						
+			<Data name="stateChanged">$tupleCoordination.stateChanged</Data>													
+		</Dataprovider>
+		<Dataprovider name="DecentralizedPollingCoordination">
+			<Source name="$decentralizedPollingCoordination" sourcetype="ISpaceObject" objecttype="decentralizedPollingCoordination"/> 						
+			<Data name="request">$decentralizedPollingCoordination.request</Data>				
+			<Data name="reply">$decentralizedPollingCoordination.reply</Data>									
+		</Dataprovider>
+				
 		<!-- New Provider! Test -->
 		<!-- <Dataprovider name="bikesharingStatistics">
 			<Source name="$bikestation" objecttype="bikestation" sourcetype="ISpaceObject" aggregate="true"/>
@@ -72,6 +95,28 @@
 				<Property name="isComplexEvent">"stationID"</Property>				
 				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. --> 
 		</Dataconsumer>
+		<!-- CONSUMERS for DeCoMas Eval Stats -->
+		<Dataconsumer name="simConsumerAdapt" clazz="SimulationDataConsumer">		
+				<Property name="dataprovider">"AdaptationLogger"</Property>								
+				<Property name="votingAttempts" /> 
+				<Property name="adaptations" />
+				<Property name="failures" />				
+		</Dataconsumer>
+		<Dataconsumer name="superStationCoordinationConsumer" clazz="SimulationDataConsumer">		
+				<Property name="dataprovider">"SuperStationCoordination"</Property>								
+				<Property name="polling" /> 
+				<Property name="alternative" />
+				<Property name="reply" />				
+		</Dataconsumer>		
+		<Dataconsumer name="tupleCoordinationConsumer" clazz="SimulationDataConsumer">		
+				<Property name="dataprovider">"TupleCoordination"</Property>								
+				<Property name="stateChanged" /> 								
+		</Dataconsumer>		
+		<Dataconsumer name="decentralizedPollingCoordinationConsumer" clazz="SimulationDataConsumer">		
+				<Property name="dataprovider">"DecentralizedPollingCoordination"</Property>								
+				<Property name="request" /> 
+				<Property name="reply" />							
+		</Dataconsumer>				
 	</Dataconsumers>
 
 	<DataVisualization>
@@ -106,7 +151,7 @@
 		</General>
 		<Rows experiments="1">
 			<TerminateCondition>
-				 <Time value="1441" type="tick_based" /><!-- relatively, absolute or tick_based -->
+				 <Time value="155" type="tick_based" /><!-- relatively, absolute or tick_based -->
 				
 					<!-- <TargetFunction function="$object.getProperty(&quot;stock&quot;) >=
 					30">	<ObjectSource type="ISpaceObject" name="bikestation" /> </TargetFunction> -->
