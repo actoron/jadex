@@ -40,6 +40,7 @@ import org.kohsuke.asm4.tree.LdcInsnNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
 import org.kohsuke.asm4.tree.MethodNode;
 import org.kohsuke.asm4.tree.VarInsnNode;
+import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
@@ -542,15 +543,20 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						mn.access = mn.access-Opcodes.ACC_NATIVE;
 						InsnList nl = new InsnList();
 						
-					    nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream"));
-					    nl.add(new LdcInsnNode("Test"));    
-					    nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V"));
-						nl.add(new InsnNode(Opcodes.RETURN));
+//					    nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream"));
+//					    nl.add(new LdcInsnNode("Test"));    
+//					    nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V"));
+						
+						nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", "()V"));
+					    
+					    nl.add(new InsnNode(Opcodes.RETURN));
 						
 						mn.instructions = nl;
 					}
 					else
 					{
+						System.out.println("method acc: "+mn.name+" "+mn.access);
+						
 						String belname = mn.name.substring(3);
 						belname = belname.substring(0,1).toLowerCase()+belname.substring(1);
 						
@@ -620,6 +626,8 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 			{
 				if(e.getTargetException() instanceof LinkageError)
 				{
+					e.printStackTrace();
+					
 					// when same class was already loaded via other filename wrong cache miss:-(
 //					ret = SReflect.findClass(name, null, loader);
 					ret = Class.forName(name, true, loader);

@@ -446,4 +446,9 @@ public class BDIAgent extends MicroAgent
 			});
 		}
 	}
+	
+	public static void createEvent()
+	{
+		System.out.println("asfbsfjkah");
+	}
 }
