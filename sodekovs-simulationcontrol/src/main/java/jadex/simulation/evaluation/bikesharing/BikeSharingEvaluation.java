@@ -25,8 +25,9 @@ import sodekovs.util.misc.XMLHandler;
  */
 public class BikeSharingEvaluation {
 
-//	private String realDataXMLFile = "E:\\Workspaces\\Jadex\\Bikesharing\\V2\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
-	private String realDataXMLFile = "C:\\Users\\Thomas\\workspaces\\jadex-sodekovs\\trunk\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
+	private String realDataXMLFile = "E:\\Workspaces\\Jadex\\Bikesharing\\V2\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
+	// private String realDataXMLFile =
+	// "C:\\Users\\Thomas\\workspaces\\jadex-sodekovs\\trunk\\sodekovs-applications\\src\\main\\java\\sodekovs\\bikesharing\\setting\\WashingtonEvaluation_Monday_new.xml";
 	private SimulationDescription realData;
 	// conf. following method for understanding the data structure:
 	// EvaluateRow.evaluateRowData(preparedRowData)
@@ -43,8 +44,8 @@ public class BikeSharingEvaluation {
 	public void compare() {
 
 		realData = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(realDataXMLFile, SimulationDescription.class);
-		
-		//sort the time slices in the real data: real evaluation data have to be sorted ascendingly!!!
+
+		// sort the time slices in the real data: real evaluation data have to be sorted ascendingly!!!
 		sortData();
 
 		// 1.Compute tick size, e.g. the "length" of the observed simulation
@@ -203,42 +204,49 @@ public class BikeSharingEvaluation {
 						String currentStation = stationInstanceIt.next();
 						HashMap<String, HashMap<String, String>> stationInstancePropertiesMap = stationsMap.get(currentStation);
 
-						// check, if hashMaps have been already initialized
-						if (resultMap.get((int) tSlice.getStartTime()) == null) {
-							resultMap.put((int) tSlice.getStartTime(), new HashMap<String, HashMap<String, HashMap<String, ArrayList<Long>>>>());
+						//HACK!! Cause of multiple SimDataConsumer, that are now enabled!
+						if (stationInstancePropertiesMap.get("stock") != null) {
+
+							// check, if hashMaps have been already initialized
+							if (resultMap.get((int) tSlice.getStartTime()) == null) {
+								resultMap.put((int) tSlice.getStartTime(), new HashMap<String, HashMap<String, HashMap<String, ArrayList<Long>>>>());
+							}
+
+							if (resultMap.get((int) tSlice.getStartTime()).get(currentStation) == null) {
+								resultMap.get((int) tSlice.getStartTime()).put(currentStation, new HashMap<String, HashMap<String, ArrayList<Long>>>());
+							}
+
+							if (resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock") == null) {
+								resultMap.get((int) tSlice.getStartTime()).get(currentStation).put("stock", new HashMap<String, ArrayList<Long>>());
+							}
+
+							if (resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST) == null) {
+								resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.SINGLE_OBSERVED_VALUES_LIST, new ArrayList<Long>());
+							}
+
+							// Get single values from simulated data. they are stored as a string, separated by ";" and brackets and the beginning/end
+							String singleValues = stationInstancePropertiesMap.get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST);
+							// Get List of already transformed data for this station: This this will contain all single observed data for the stock level for this station at all experiments and the
+							// whole
+							// time slice
+							ArrayList<Long> singleValueList = resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST);
+
+							// System.out.println(singleValues);
+							// Delete brackets from string at beginning and end
+							singleValues = singleValues.substring(1, singleValues.length() - 2);
+							// System.out.println(singleValues);
+
+							while (singleValues.contains(";")) {
+								long val = Long.valueOf(singleValues.substring(0, singleValues.indexOf(";")));
+								singleValueList.add(val);
+								singleValues = singleValues.substring(singleValues.indexOf(";") + 1);
+								// System.out.println("New string: " + singleValues + "\n" + "val:" + val);
+							}
+
+							resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.SINGLE_OBSERVED_VALUES_LIST, singleValueList);
+						} else {
+							System.out.println("No stock value in this map!");
 						}
-
-						if (resultMap.get((int) tSlice.getStartTime()).get(currentStation) == null) {
-							resultMap.get((int) tSlice.getStartTime()).put(currentStation, new HashMap<String, HashMap<String, ArrayList<Long>>>());
-						}
-
-						if (resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock") == null) {
-							resultMap.get((int) tSlice.getStartTime()).get(currentStation).put("stock", new HashMap<String, ArrayList<Long>>());
-						}
-
-						if (resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST) == null) {
-							resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.SINGLE_OBSERVED_VALUES_LIST, new ArrayList<Long>());
-						}
-
-						// Get single values from simulated data. they are stored as a string, separated by ";" and brackets and the beginning/end
-						String singleValues = stationInstancePropertiesMap.get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST);
-						// Get List of already transformed data for this station: This this will contain all single observed data for the stock level for this station at all experiments and the whole
-						// time slice
-						ArrayList<Long> singleValueList = resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").get(Constants.SINGLE_OBSERVED_VALUES_LIST);
-
-						// System.out.println(singleValues);
-						// Delete brackets from string at beginning and end
-						singleValues = singleValues.substring(1, singleValues.length() - 2);
-						// System.out.println(singleValues);
-
-						while (singleValues.contains(";")) {
-							long val = Long.valueOf(singleValues.substring(0, singleValues.indexOf(";")));
-							singleValueList.add(val);
-							singleValues = singleValues.substring(singleValues.indexOf(";") + 1);
-							// System.out.println("New string: " + singleValues + "\n" + "val:" + val);
-						}
-
-						resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.SINGLE_OBSERVED_VALUES_LIST, singleValueList);
 					}
 				}
 			}
@@ -403,7 +411,7 @@ public class BikeSharingEvaluation {
 				} catch (Exception e) {
 					// Happens, if station is not found in Simulation Data AND Real Data. Then evaluation fails in "EvaluatedBikeStation.compareSimulationVsReality()" and corresponding String is
 					// empty!
-//					System.out.println("Exception@BikeSharingEvaluation.bikestationResultsToString()# Station not found in real data: " + objectInstancesKey);
+					// System.out.println("Exception@BikeSharingEvaluation.bikestationResultsToString()# Station not found in real data: " + objectInstancesKey);
 					boolean containsStationAlready = false;
 					for (String stationID : faultStations) {
 						if (stationID.equals(evalutedBikeStation.getStationId())) {
@@ -459,7 +467,7 @@ public class BikeSharingEvaluation {
 				try {
 					timeSliceRes.getStationDataShort().add(
 							new EvaluatedBikeStationShort(evalutedBikeStation.getStationId(), evalutedBikeStation.getComparedData().getDevation(), evalutedBikeStation.getComparedData()
-									.getStandardDevation(), evalutedBikeStation.getSimulatedData().getMeanValue(),evalutedBikeStation.getRealData().getMeanValue()));
+									.getStandardDevation(), evalutedBikeStation.getSimulatedData().getMeanValue(), evalutedBikeStation.getRealData().getMeanValue()));
 				} catch (Exception e) {
 					// Happens, if station is not found in Simulation Data AND Real Data. Then evaluation fails in "EvaluatedBikeStation.compareSimulationVsReality()" and corresponding String is
 					// empty!
@@ -487,22 +495,22 @@ public class BikeSharingEvaluation {
 		}
 		return res;
 	}
-	
+
 	/**
 	 * sort the time slices in the real data: real evaluation data have to be sorted ascendingly!!!
 	 */
-	private void sortData(){	
+	private void sortData() {
 		Collections.sort(realData.getTimeSlices().getTimeSlice(), new Comparator() {
 			public int compare(Object arg0, Object arg1) {
 				return Long.valueOf(((TimeSlice) arg0).getStartTime()).compareTo(Long.valueOf(((TimeSlice) arg1).getStartTime()));
 			}
 		});
-		
-//		StringBuffer buf = new StringBuffer();
-//		for(TimeSlice ts : realData.getTimeSlices().getTimeSlice()){
-//			buf.append(ts.getStartTime() + " - ");
-//		}
-//		
-//		System.out.println("ORDERED TS? : " + buf.toString());
-	}	
+
+		// StringBuffer buf = new StringBuffer();
+		// for(TimeSlice ts : realData.getTimeSlices().getTimeSlice()){
+		// buf.append(ts.getStartTime() + " - ");
+		// }
+		//
+		// System.out.println("ORDERED TS? : " + buf.toString());
+	}
 }
