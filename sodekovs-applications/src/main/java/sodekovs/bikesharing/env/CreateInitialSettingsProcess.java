@@ -73,7 +73,8 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 
 		// get all super station names (ids)
 		for (Cluster cluster : superCluster.getCluster()) {
-			superStations.add(cluster.getSuperStation().getName());
+			if (!cluster.getStations().isEmpty())
+				superStations.add(cluster.getSuperStation().getName());
 		}
 
 		// try {
