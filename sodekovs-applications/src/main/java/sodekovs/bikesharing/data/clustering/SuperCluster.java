@@ -12,17 +12,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author thomas
- *
+ * 
  */
 @XmlRootElement(name = "superCluster")
 public class SuperCluster {
 
 	private List<Cluster> cluster = null;
-	
+
 	public SuperCluster() {
 		this.cluster = new ArrayList<Cluster>();
 	}
-	
+
 	public SuperCluster(List<Cluster> cluster) {
 		this.cluster = cluster;
 	}
@@ -37,34 +37,41 @@ public class SuperCluster {
 	}
 
 	/**
-	 * @param cluster the cluster to set
+	 * @param cluster
+	 *            the cluster to set
 	 */
 	public void setCluster(List<Cluster> cluster) {
 		this.cluster = cluster;
 	}
-	
+
 	/**
-	 * Returns the {@link List} of all station ids for the given super station id.
+	 * Returns the {@link List} of all station ids for the given super station
+	 * id.
+	 * 
 	 * @param superStationId
 	 * @return
 	 */
 	public List<String> getClusterStationIDs(String superStationId) {
 		List<String> clusterStations = new ArrayList<String>();
-		
+
 		for (Cluster cluster : this.cluster) {
 			Station superStation = cluster.getSuperStation();
-			if (superStation.getName().equals(superStationId)) {
-				for (Station station : cluster.getStations()) {
-					clusterStations.add(station.getName());
+			if (superStation != null) {
+				if (superStation.getName().equals(superStationId)) {
+					for (Station station : cluster.getStations()) {
+						clusterStations.add(station.getName());
+					}
 				}
 			}
 		}
-		
+
 		return clusterStations;
 	}
-	
+
 	/**
-	 * Returns the {@link Cluster} which contains a station with the given station id.
+	 * Returns the {@link Cluster} which contains a station with the given
+	 * station id.
+	 * 
 	 * @param stationId
 	 * @return
 	 */
@@ -76,22 +83,24 @@ public class SuperCluster {
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
-	 * Returns a {@link List} with the station ids from all the stations in the given {@link Cluster}.
+	 * Returns a {@link List} with the station ids from all the stations in the
+	 * given {@link Cluster}.
+	 * 
 	 * @param cluster
 	 * @return
 	 */
 	public List<String> getStationIDs(Cluster cluster) {
 		List<String> stationIds = new ArrayList<String>();
-		
-		for (Station station: cluster.getStations()) {
+
+		for (Station station : cluster.getStations()) {
 			stationIds.add(station.getName());
 		}
-		
+
 		return stationIds;
 	}
 }
