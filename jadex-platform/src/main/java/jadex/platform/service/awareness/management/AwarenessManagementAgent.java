@@ -326,6 +326,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		boolean	changedaddrs	= false;	// Should an existing proxy be updated with new addresses?
 		
 		dif = (DiscoveryInfo)discovered.get(sender);
+		if(info.getProperties()==null)
+		{
+			info.setProperties(new LinkedHashMap<String, String>());
+		}
 		final String awamech = info.getProperties().get(AwarenessInfo.PROPERTY_AWAMECHANISM);
 		
 		// Hack!!! Used from relay if connection disappeared

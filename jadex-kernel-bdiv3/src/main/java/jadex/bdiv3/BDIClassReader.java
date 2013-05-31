@@ -507,7 +507,19 @@ public class BDIClassReader extends MicroClassReader
 				bdimodel.addBeliefMapping(name+"."+target, name+"."+capa.getBeliefMappings().get(target));
 			}
 			
-			capa.getCapability().getGoals();	// todo
+			for(MGoal goal : capa.getCapability().getGoals())
+			{
+				// Todo: copy goal object???
+				bdimodel.getCapability().addGoal(goal);
+				// Todo: map events of goal conditions
+			}
+			
+			for(MPlan plan : capa.getCapability().getPlans())
+			{
+				MPlan	plan2	= new MPlan(name+"."+plan.getName(), plan.getBody(), plan.getTrigger(), plan.getWaitqueue(), plan.getPriority());
+				bdimodel.getCapability().addPlan(plan2);
+				// Todo: map events of plan trigger / waitqueue
+			}
 			capa.getCapability().getPlans();	// todo
 		}
 	}

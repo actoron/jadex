@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
@@ -51,7 +52,10 @@ public abstract class AbstractPlanBody implements IPlanBody
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final Object agent = ia instanceof IPojoMicroAgent? ((IPojoMicroAgent)ia).getPojoAgent(): ia;
+		String	pname	= rplan.getModelElement().getName();
+		String	capaname	= pname.indexOf(".")==-1 ? null : pname.substring(0, pname.lastIndexOf("."));
+		final Object agent	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).getCapabilityObject(capaname);
+
 		internalInvokePart(agent, guessParameters(getBodyParameterTypes()), 0).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)

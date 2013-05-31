@@ -40,8 +40,6 @@ public class ShopCapa
 	{
 		this.shopname	= shopname;
 		this.catalog	= catalog;
-		
-		setMoney(1);
 	}
 	
 	/**

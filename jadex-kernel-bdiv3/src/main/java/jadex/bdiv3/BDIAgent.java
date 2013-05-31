@@ -531,7 +531,7 @@ public class BDIAgent extends MicroAgent
 	 */
 	public void	setAbstractBeliefValue(String capa, String name, Object value)
 	{
-		System.out.println("setAbstractBeliefValue(): "+capa+"."+name);
+//		System.out.println("setAbstractBeliefValue(): "+capa+"."+name);
 		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
 		String	belname	= bdimodel.getBeliefMappings().get(capa+"."+name);
 		String	capaname	= belname.indexOf(".")==-1 ? null : belname.substring(0, belname.lastIndexOf("."));
