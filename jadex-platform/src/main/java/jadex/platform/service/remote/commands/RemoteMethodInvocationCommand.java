@@ -12,10 +12,11 @@ import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.annotations.Alias;
@@ -30,7 +31,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -220,11 +220,11 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
-		if(caller==null && getMethodName().equals("status"))
-		{
-			System.out.println("dglkysfi");
-			Thread.dumpStack();
-		}
+//		if(caller==null && getMethodName().equals("status"))
+//		{
+//			System.out.println("dglkysfi");
+//			Thread.dumpStack();
+//		}
 		
 		// RMS acts as representative of remote caller.
 		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();
@@ -293,7 +293,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			
 			if(res instanceof IIntermediateFuture)
 			{
-				((IIntermediateFuture)res).addResultListener(new IIntermediateResultListener()
+				((IIntermediateFuture)res).addResultListener(new IIntermediateFutureCommandResultListener()
 				{
 					int cnt = 0;
 					public void intermediateResultAvailable(Object result)
@@ -338,11 +338,16 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
 					}
+					public void commandAvailable(Type command)
+					{
+						ret.addIntermediateResult(new RemoteFutureSourceCommand(ridcom, command, callid, 
+							returnisref, methodname, getNonFunctionalProperties()));
+					}
 				});
 			}
 			else if(res instanceof IFuture)
 			{
-				((IFuture)res).addResultListener(new IResultListener()
+				((IFuture)res).addResultListener(new IFutureCommandResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -358,6 +363,12 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 							false, methodname, getNonFunctionalProperties()));
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
+					}
+					
+					public void commandAvailable(Type command)
+					{
+						ret.addIntermediateResult(new RemoteFutureSourceCommand(ridcom, command, callid, 
+							returnisref, methodname, getNonFunctionalProperties()));
 					}
 				});
 			}

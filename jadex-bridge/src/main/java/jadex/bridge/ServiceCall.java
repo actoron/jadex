@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Timeout;
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ public class ServiceCall
 
 	/** The timeout constant. */
 	public static final String TIMEOUT = Timeout.TIMEOUT;
+	public static final String DEFTIMEOUT = "deftimeout";
 	
 	/** The realtime constant. */
 	public static final String REALTIME = "realtime";
@@ -55,14 +57,14 @@ public class ServiceCall
 		this.caller	= caller;
 		this.properties = props!=null? props: new HashMap<String, Object>();
 		if(!properties.containsKey(TIMEOUT))
-			properties.put(TIMEOUT, new Long(-1)); // todo: refactor that
+			properties.put(DEFTIMEOUT, BasicService.DEFAULT_LOCAL); // todo: refactor that
 				
 //		if(props!=null)
 //			properties.putAll(props);
-		if(props!=null && props.get(CAUSE) instanceof String)
-		{
-			System.out.println("sdgouh287418");
-		}
+//		if(props!=null && props.get(CAUSE) instanceof String)
+//		{
+//			System.out.println("sdgouh287418");
+//		}
 		
 //		System.err.println("call: "+this);
 //		Thread.dumpStack();
@@ -176,7 +178,16 @@ public class ServiceCall
 	 */
 	public long	getTimeout()
 	{
-		return ((Long)properties.get(TIMEOUT)).longValue();
+		return properties.containsKey(TIMEOUT)? ((Long)properties.get(TIMEOUT)).longValue(): ((Long)properties.get(DEFTIMEOUT)).longValue();
+	}
+	
+	/**
+	 *  Test if the user has set a timeout.
+	 *  @return True, if the user has set a timeout.
+	 */
+	public boolean hasUserTimeout()
+	{
+		return properties.containsKey(TIMEOUT);
 	}
 	
 	/**
@@ -222,10 +233,10 @@ public class ServiceCall
 	 */
 	public Cause getCause()
 	{
-		if(properties.get(CAUSE)!=null && !(properties.get(CAUSE) instanceof Cause))
-		{
-			System.out.println("sdmyb");
-		}
+//		if(properties.get(CAUSE)!=null && !(properties.get(CAUSE) instanceof Cause))
+//		{
+//			System.out.println("sdmyb");
+//		}
 		return (Cause)properties.get(CAUSE);
 	}
 	

@@ -44,7 +44,6 @@ public class MethodBeliefAgentBDI
 	{
 		this.val	= value;
 	}
-
 	
 	/**
 	 *  Agent body.

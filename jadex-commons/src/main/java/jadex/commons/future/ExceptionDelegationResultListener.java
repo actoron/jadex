@@ -1,10 +1,12 @@
 package jadex.commons.future;
 
+import jadex.commons.future.ICommandFuture.Type;
+
 
 /**
  *  Result listener that delegates calls to a future.
  */
-public abstract class ExceptionDelegationResultListener<E, T> implements IResultListener<E>
+public abstract class ExceptionDelegationResultListener<E, T> implements IResultListener<E>, IFutureCommandListener
 {
 	//-------- attributes --------
 	
@@ -74,5 +76,20 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	{
 //		System.err.println("Problem: "+exception);
 		future.setException(exception);
+	}
+	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void commandAvailable(Type command)
+	{
+		if(future instanceof ICommandFuture)
+		{
+			((ICommandFuture)future).equals(command);
+		}
+		else
+		{
+			System.out.println("Cannot forward command: "+future+" "+command);
+		}
 	}
 }

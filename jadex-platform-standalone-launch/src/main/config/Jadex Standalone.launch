@@ -25,7 +25,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.base.Starter"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-simulation false&#13;&#10;-logging false&#13;&#10;-deftimeout -1&#13;&#10;-uniqueids false&#13;&#10;-monitoring false"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-simulation false&#13;&#10;-logging false&#13;&#10;-deftimeoutiii -1&#13;&#10;-uniqueids false&#13;&#10;-monitoring false"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-platform-standalone-launch"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea&#13;&#10;-Dxswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel&#13;&#10;-Dxswing.defaultlaf=com.sun.java.swing.plaf.motif.MotifLookAndFeel&#13;&#13;&#10;-Dxswing.defaultlaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel&#13;&#13;&#10;-DXbootclasspath/a:C:\Programme\jprofiler5\bin\agent.jar&#13;&#13;&#10;-Dagentlib:jprofilerti"/>

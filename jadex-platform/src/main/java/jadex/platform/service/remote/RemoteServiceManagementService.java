@@ -15,7 +15,6 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.AnyResultSelector;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
@@ -41,10 +40,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.DecodingContext;
 import jadex.commons.transformation.binaryserializer.EncodingContext;
@@ -77,8 +76,9 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
-import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.AReader;
+import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.stax.QName;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.IObjectWriterHandler;
 
@@ -90,8 +90,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import jadex.xml.stax.QName;
 
 
 /**
@@ -557,7 +555,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							putWaitingCall(callid, future, tt);
 							
 							// Remove waiting call when future is done
-							future.addResultListener(ia.createResultListener(new IResultListener<Object>()
+							future.addResultListener(ia.createResultListener(new IFutureCommandResultListener<Object>()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -567,6 +565,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 								{
 									removeWaitingCall(callid);								
 									ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
+								}
+								public void commandAvailable(Type command)
+								{
+									// do nothing here, cannot forward
 								}
 							}));
 							
@@ -812,6 +814,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		}
 
 		/**
+		 * 
 		 */
 		public void addIntermediateResult(Integer num, Object res, boolean fini)
 		{

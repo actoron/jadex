@@ -107,7 +107,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		ServiceCall invoc = ServiceCall.getInvocation(props);
 		
 		// Get method timeout
-		final long to = invoc!=null && invoc.getTimeout()!=-1? invoc.getTimeout(): pi.getMethodTimeout(method);
+		final long to = invoc!=null && invoc.hasUserTimeout()? invoc.getTimeout(): pi.getMethodTimeout(method);
 		// The reatime property is not necessary, as currently message are sent with realtime timeouts always  
 		
 //		if(method.getName().indexOf("schedule")!=-1)

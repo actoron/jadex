@@ -14,7 +14,7 @@ public interface IResultListener<E>
 	
 	/**
 	 *  Called when an exception occurred.
-	 * @param exception The exception.
+	 *  @param exception The exception.
 	 */
 	public void exceptionOccurred(Exception exception);
 }

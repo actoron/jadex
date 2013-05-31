@@ -20,7 +20,7 @@ import java.util.Map;
  *  a) a blocking call to get() should be used
  *  b) a callback shall be invoked
  */
-public class Future<E> implements IFuture<E>
+public class Future<E> implements IFuture<E>, ICommandFuture
 {
 	static int stackcount, maxstack;
 	static double	avgstack;
@@ -247,15 +247,19 @@ public class Future<E> implements IFuture<E>
             		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, this.result, exception);        			
         		}
         	}
-        	else if(DEBUG)
+//        	else if(DEBUG)
+//        	{
+//        		first	= new DebugException("first setException()");
+//        	}
+        	
+      		this.exception = exception;
+      		
+    		resultavailable = true;		
+    		if(DEBUG)
         	{
         		first	= new DebugException("first setException()");
         	}
-        	
-//        	System.out.println(this+" setResult: "+result);
-        	this.exception = exception;
-        	resultavailable = true;			
-		}
+        }
     	
     	resume();
     }
@@ -283,8 +287,9 @@ public class Future<E> implements IFuture<E>
         	}
         	else
         	{
-//	        	System.out.println(this+" setResult: "+result);
         		this.exception = exception;
+//	        	System.out.println(this+" setResult: "+result);
+            	
         		resultavailable = true;
             	if(DEBUG)
             	{
@@ -506,4 +511,40 @@ public class Future<E> implements IFuture<E>
     		STACK.get().add(new Tuple2<Future<?>, IResultListener<?>>(this, listener));
     	}
     }
+    
+    /**
+	 *  Send a command to the listeners.
+	 *  @param command The command.
+	 */
+	public void sendCommand(Type command)
+	{
+		if(listener!=null)
+		{
+    		notifyListenerCommand(listener, command);			
+		}
+		if(listeners!=null)
+		{
+	    	for(int i=0; i<listeners.size(); i++)
+	    	{
+	    		notifyListenerCommand(listeners.get(i), command);
+	    	}
+		}
+	}
+	
+	/**
+	 *  Notify the command listeners.
+	 *  @param listener The listener.
+	 *  @param command The command.
+	 */
+	protected void notifyListenerCommand(IResultListener<E> listener, Type command)
+	{
+		if(listener instanceof IFutureCommandListener)
+		{
+			((IFutureCommandListener)listener).commandAvailable(command);
+		}
+		else
+		{
+			System.out.println("Cannot forward command: "+listener+" "+command);
+		}
+	}
 }

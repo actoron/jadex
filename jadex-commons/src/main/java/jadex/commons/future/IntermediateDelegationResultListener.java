@@ -1,5 +1,7 @@
 package jadex.commons.future;
 
+import jadex.commons.future.ICommandFuture.Type;
+
 import java.util.Collection;
 
 
@@ -7,7 +9,7 @@ import java.util.Collection;
 /**
  *  Intermediate version of the delegation result listener.
  */
-public class IntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>
+public class IntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>, IFutureCommandListener
 {
 	//-------- attributes --------
 	
@@ -121,5 +123,20 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	public void customIntermediateResultAvailable(E result)
 	{
 		future.addIntermediateResult(result);
+	}
+	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void commandAvailable(Type command)
+	{
+		if(future instanceof ICommandFuture)
+		{
+			((ICommandFuture)future).sendCommand(command);
+		}
+		else
+		{
+			System.out.println("Cannot forward command: "+future+" "+command);
+		}
 	}
 }

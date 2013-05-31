@@ -136,7 +136,7 @@ public class InitiatorAgent extends TestAgent
 		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
 		
 //		System.out.println("root: "+root+" "+SUtil.arrayToString(root.getAddresses()));
-		createComponent("jadex/micro/testcases/timeout/ProviderAgent.class", root, reslis)
+		createComponent(ProviderAgent.class.getName()+".class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 

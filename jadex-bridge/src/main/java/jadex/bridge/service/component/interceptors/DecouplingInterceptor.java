@@ -1,14 +1,11 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.TimeoutIntermediateResultListener;
 import jadex.bridge.TimeoutResultListener;
-import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -23,9 +20,11 @@ import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
@@ -529,7 +528,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					{
 						if(fut instanceof IIntermediateFuture)
 						{
-							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod().toString(), new IIntermediateResultListener()
+							TimeoutIntermediateResultListener	tirl	= new TimeoutIntermediateResultListener(timeout, ea, realtime, sic.getMethod().toString(), new IIntermediateFutureCommandResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
@@ -557,6 +556,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 								public void finished()
 								{
 								}
+								public void commandAvailable(Type command)
+								{
+								}
 							});
 							if(fut instanceof ISubscriptionIntermediateFuture)
 							{
@@ -570,12 +572,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						else
 						{
 //							SIC.set(sic);
-							fut.addResultListener(new TimeoutResultListener(timeout, ea, realtime, sic.getMethod().toString(), new IResultListener()
+							fut.addResultListener(new TimeoutResultListener(timeout, ea, realtime, sic.getMethod().toString(), new IFutureCommandResultListener()
 							{
 								public void resultAvailable(Object result)
 								{
 									// Ignore if result is normally set.
 								}
+								
 								public void exceptionOccurred(Exception exception)
 								{
 									// Forward timeout exception to future.
@@ -587,6 +590,18 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 											((ITerminableFuture)fut).terminate(exception);
 										}
 									}
+								}
+								
+								public void commandAvailable(Type command)
+								{
+//									if(fut instanceof ICommandFuture)
+//									{
+//										((ICommandFuture)fut).sendCommand(command);
+//									}
+//									else
+//									{
+//										System.out.println("Cannot forward command: "+fut+" "+command);
+//									}
 								}
 							}));
 						}

@@ -2,13 +2,16 @@ package jadex.bridge;
 
 import jadex.base.Starter;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.commons.future.ICommandFuture;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ICommandFuture.Type;
 
 /**
  *  The result listener for executing listener invocations as a component step.
  */
-public class ComponentResultListener<E> implements IResultListener<E>
+public class ComponentResultListener<E> implements IResultListener<E>, IFutureCommandListener
 {
 	//-------- attributes --------
 	
@@ -199,6 +202,21 @@ public class ComponentResultListener<E> implements IResultListener<E>
 			{
 				listener.exceptionOccurred(exception);
 			}
+		}
+	}
+	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void commandAvailable(Type command)
+	{
+		if(listener instanceof IFutureCommandListener)
+		{
+			((IFutureCommandListener)listener).commandAvailable(command);
+		}
+		else
+		{
+			System.out.println("Cannot forward command: "+listener+" "+command);
 		}
 	}
 }

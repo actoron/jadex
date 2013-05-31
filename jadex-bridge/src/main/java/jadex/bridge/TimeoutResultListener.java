@@ -7,7 +7,10 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ICommandFuture;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 
 import java.util.TimerTask;
@@ -17,7 +20,7 @@ import java.util.TimerTask;
  *  Listener that allows to automatically trigger a timeout when
  *  no result (or exception) was received after some timeout interval.
  */
-public class TimeoutResultListener<E> implements IResultListener<E>
+public class TimeoutResultListener<E> implements IResultListener<E>, IFutureCommandListener
 {
 	//-------- attributes --------
 	
@@ -104,6 +107,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 		{
 			if(!notified)
 			{
+				// need to further delegate to chained listeners/futures?
 				notify = true;
 				notified = true;
 				cancel();
@@ -263,5 +267,24 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 				return IFuture.DONE;
 			}
 		});
+	}
+	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void commandAvailable(Type command)
+	{
+		// reinit the timer
+		System.out.println("reinit of timer");
+		initTimer();
+		
+		if(listener instanceof IFutureCommandListener)
+		{
+			((IFutureCommandListener)listener).commandAvailable(command);
+		}
+		else
+		{
+			System.out.println("Cannot forward command: "+listener+" "+command);
+		}
 	}
 }
