@@ -15,6 +15,7 @@ import jadex.micro.MicroAgent;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import sodekovs.bikesharing.pedestrian.movement.MoveTask;
 
 /**
@@ -26,6 +27,10 @@ public class MicroPedestrianAgent extends MicroAgent {
 
 	private ContinuousSpace2D environment = null;
 	private ISpaceObject myself = null;
+	
+	//denotes whether the arrvial/departure station has been adapted due so mechanisms
+	private boolean adaptedDepartureStation = false;
+	private boolean adaptedArrvialStation = false;
 	
 	/*
 	 * (non-Javadoc)
@@ -39,7 +44,7 @@ public class MicroPedestrianAgent extends MicroAgent {
 			@Override
 			public void resultAvailable(IExtensionInstance result) {
 				// get the important variables
-				environment = (ContinuousSpace2D) result;
+				environment = (ContinuousSpace2D) result;				
 				myself = environment.getAvatar(getComponentDescription());
 				int behaviourStrategy = ((Integer) myself.getProperty("behaviour_strategy")).intValue();
 
@@ -147,6 +152,7 @@ public class MicroPedestrianAgent extends MicroAgent {
 						String checkProposedArrivalStation = checkStation("proposed_arrival_station");
 						if (checkProposedArrivalStation != null) {
 							// go to alternative arrival station
+							adaptedArrvialStation = true;
 							ISpaceObject[] allBikestations = environment.getSpaceObjectsByType("bikestation");
 							for (ISpaceObject bikestation : allBikestations) {
 								if (bikestation.getProperty("stationID").equals(checkProposedArrivalStation)) {
@@ -182,7 +188,19 @@ public class MicroPedestrianAgent extends MicroAgent {
 
 			@Override
 			public void resultAvailable(Object result) {
-				//Kill Agent via ISpaceObject
+				
+				//Eval behaviour before killing agent
+				if(!adaptedArrvialStation&&!adaptedDepartureStation){
+					environment.getSpaceObjectsByType("bikeRentsEval")[0].incrementProperty("noAdaption", 1);
+				}else if(!adaptedArrvialStation&&adaptedDepartureStation){
+					environment.getSpaceObjectsByType("bikeRentsEval")[0].incrementProperty("departureAdaption", 1);
+				}else if(adaptedArrvialStation&&!adaptedDepartureStation){
+					environment.getSpaceObjectsByType("bikeRentsEval")[0].incrementProperty("arrivalAdaption", 1);
+				}else if(adaptedArrvialStation&&adaptedDepartureStation){
+					environment.getSpaceObjectsByType("bikeRentsEval")[0].incrementProperty("departureAndArrivalAdaption", 1);
+				}
+				environment.getSpaceObjectsByType("bikeRentsEval")[0].incrementProperty("totalNrOfRents", 1);												
+				//Kill Agent via ISpaceObject				
 				environment.destroySpaceObject(myself.getId());
 				// get yourself killed after returning
 				killAgent();
@@ -203,6 +221,7 @@ public class MicroPedestrianAgent extends MicroAgent {
 			String checkProposedDepartureStation = checkStation("proposed_departure_station");
 			if (checkProposedDepartureStation != null) {
 				// go to alternative departure station
+				adaptedDepartureStation = true;
 				ISpaceObject[] allBikestations = environment.getSpaceObjectsByType("bikestation");
 				for (ISpaceObject bikestation : allBikestations) {
 					if (bikestation.getProperty("stationID").equals(checkProposedDepartureStation)) {

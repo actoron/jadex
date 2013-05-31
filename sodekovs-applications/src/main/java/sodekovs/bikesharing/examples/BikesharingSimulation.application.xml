@@ -127,6 +127,15 @@
 				   	<env:property name="request">0</env:property>
 				   	<env:property name="reply">0</env:property>
 				</env:objecttype>
+
+				<!-- Logging object for conducted bike rents -->				
+				<env:objecttype name="bikeRentsEval">
+					<env:property name="noAdaption">0</env:property>
+					<env:property name="departureAdaption">0</env:property>
+					<env:property name="arrivalAdaption">0</env:property>
+					<env:property name="departureAndArrivalAdaption">0</env:property>
+					<env:property name="totalNrOfRents">0</env:property>
+				</env:objecttype>
 			</env:objecttypes>
 
 			<env:avatarmappings>
@@ -278,11 +287,20 @@
 					   	<env:property name="request">0</env:property>
 					   	<env:property name="reply">0</env:property>
 					</env:object>
+					
+					<!-- Logging object for conducted bike rents -->
+					<env:object type="bikeRentsEval">
+						   	<env:property name="noAdaption">0</env:property>
+						   	<env:property name="departureAdaption">0</env:property>
+						   	<env:property name="arrivalAdaption">0</env:property>
+						   	<env:property name="departureAndArrivalAdaption">0</env:property>
+						   	<env:property name="totalNrOfRents">0</env:property>
+						</env:object>
 
-					<!-- <env:observers>
+					<env:observers>
 						<env:observer name="world" dataview="view_all"
 							perspective="main" />
-					</env:observers>--> 
+					</env:observers> 
 				</env:envspace>
 				
 				<!-- The CoordinationSpace -->				
@@ -323,6 +341,15 @@
 						<env:object type="decentralizedPollingCoordination">
 						   	<env:property name="request">0</env:property>
 						   	<env:property name="reply">0</env:property>
+						</env:object>
+						
+						<!-- Logging object for conducted bike rents -->
+						<env:object type="bikeRentsEval">
+						   	<env:property name="noAdaption">0</env:property>
+						   	<env:property name="departureAdaption">0</env:property>
+						   	<env:property name="arrivalAdaption">0</env:property>
+						   	<env:property name="departureAndArrivalAdaption">0</env:property>
+						   	<env:property name="totalNrOfRents">0</env:property>
 						</env:object>
 					</env:objects>
 

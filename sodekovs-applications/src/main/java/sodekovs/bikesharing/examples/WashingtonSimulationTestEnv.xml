@@ -48,6 +48,14 @@
 			<Data name="request">$decentralizedPollingCoordination.request</Data>				
 			<Data name="reply">$decentralizedPollingCoordination.reply</Data>									
 		</Dataprovider>
+		<Dataprovider name="BikeRentsEval">
+			<Source name="$bikeRentsEval" sourcetype="ISpaceObject" objecttype="bikeRentsEval"/> 						
+			<Data name="noAdaption">$bikeRentsEval.noAdaption</Data>				
+			<Data name="departureAdaption">$bikeRentsEval.departureAdaption</Data>									
+			<Data name="arrivalAdaption">$bikeRentsEval.arrivalAdaption</Data>
+			<Data name="departureAndArrivalAdaption">$bikeRentsEval.departureAndArrivalAdaption</Data>
+			<Data name="totalNrOfRents">$bikeRentsEval.totalNrOfRents</Data>
+		</Dataprovider>
 				
 		<!-- New Provider! Test -->
 		<!-- <Dataprovider name="bikesharingStatistics">
@@ -116,6 +124,14 @@
 				<Property name="dataprovider">"DecentralizedPollingCoordination"</Property>								
 				<Property name="request" /> 
 				<Property name="reply" />							
+		</Dataconsumer>
+		<Dataconsumer name="bikeRentsEvalConsumer" clazz="SimulationDataConsumer">		
+				<Property name="dataprovider">"BikeRentsEval"</Property>								
+				<Property name="noAdaption" /> 
+				<Property name="departureAdaption" />							
+				<Property name="arrivalAdaption" />
+				<Property name="departureAndArrivalAdaption" />
+				<Property name="totalNrOfRents" />
 		</Dataconsumer>				
 	</Dataconsumers>
 

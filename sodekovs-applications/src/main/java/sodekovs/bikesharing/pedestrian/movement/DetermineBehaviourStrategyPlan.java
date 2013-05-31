@@ -1,21 +1,8 @@
 package sodekovs.bikesharing.pedestrian.movement;
 
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.extension.envsupport.environment.AbstractTask;
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector2Double;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
-import sodekovs.bikesharing.pedestrian.RentBikeTask;
-import sodekovs.bikesharing.pedestrian.ReturnBikeTask;
 
 /**
  * Determine which kind of behaviour strategy the pedestrian should follow. Following options are possible:
