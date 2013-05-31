@@ -1,6 +1,9 @@
 package jadex.bdiv3.examples.shop;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Capability;
+import jadex.bdiv3.annotation.Mapping;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -18,6 +21,8 @@ import java.util.List;
 })
 public class Shop2BDI
 {
+	//-------- attributes --------
+
 	@Agent
 	protected BDIAgent	agent;
 	
@@ -27,28 +32,11 @@ public class Shop2BDI
 	// - delegation to the outside via own getter/setters (allows renaming)
 	// - abstract beliefs need to be declared via native getter/setter pairs
 	
-//	@Capability
-//	@AgentArgument("shopname")//, target="shopname")
-//	@AgentArgument("catalog")//, target="catalog")
+	/** The customer capability. */
+	@Capability(beliefmapping=@Mapping("money"))
 	protected ShopCapa shopcap	= new ShopCapa((String)agent.getArgument("shopname"), (List<ItemInfo>)agent.getArgument("catalog"));
 	
-	
-	
-	
-	
-	
-	// Money is abstract in capa
-//	/** The money. */
-//	@Belief//(assign="shopcap.money")
-//	protected double money = shopcap.money;
-
-//	/** The shop name. */
-//	@AgentArgument
-//	@Belief//(ref="shopcap.shopname")
-//	protected String shopname = shopcap.shopname;
-	
-//	/** The shop catalog. */
-//	@AgentArgument
-//	@Belief
-//	protected List<ItemInfo> catalog = shopcap.catalog;
+	/** The money. */
+	@Belief
+	protected double	money	= 100;
 }

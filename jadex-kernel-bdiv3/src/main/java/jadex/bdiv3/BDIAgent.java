@@ -1,5 +1,7 @@
 package jadex.bdiv3;
 
+import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
@@ -11,7 +13,6 @@ import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -493,18 +494,18 @@ public class BDIAgent extends MicroAgent
 		}
 	}
 	
-	public static void createEvent()
-	{
-		System.out.println("asfbsfjkah");
-	}
-	
 	/**
 	 *  Get the value of an abstract belief.
 	 */
-	public static Object	getAbstractBeliefValue(String capa, String name, Class<?> type)
+	public Object	getAbstractBeliefValue(String capa, String name, Class<?> type)
 	{
-		System.out.println("getAbstractBeliefValue(): "+capa+"."+name+", "+type);
-		Object	ret	= null;
+//		System.out.println("getAbstractBeliefValue(): "+capa+"."+name+", "+type);
+		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
+		String	belname	= bdimodel.getBeliefMappings().get(capa+"."+name);
+		String	capaname	= belname.indexOf(".")==-1 ? null : belname.substring(0, belname.lastIndexOf("."));
+		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
+		Object	ocapa	= ((BDIAgentInterpreter)getInterpreter()).getCapabilityObject(capaname);
+		Object	ret	= bel.getValue(ocapa, getClassLoader());
 		
 		if(ret==null)
 		{
@@ -523,5 +524,24 @@ public class BDIAgent extends MicroAgent
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Set the value of an abstract belief.
+	 */
+	public void	setAbstractBeliefValue(String capa, String name, Object value)
+	{
+		System.out.println("setAbstractBeliefValue(): "+capa+"."+name);
+		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
+		String	belname	= bdimodel.getBeliefMappings().get(capa+"."+name);
+		String	capaname	= belname.indexOf(".")==-1 ? null : belname.substring(0, belname.lastIndexOf("."));
+		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
+		Object	ocapa	= ((BDIAgentInterpreter)getInterpreter()).getCapabilityObject(capaname);
+		boolean	field	= bel.setValue(ocapa, value, getClassLoader());
+		
+		if(field)
+		{
+			// todo: generate event.
+		}
 	}
 }

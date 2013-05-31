@@ -194,22 +194,25 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 *  Get a capability pojo object.
 	 */
-	protected Object	getCapabilityObject(String name)
+	public Object	getCapabilityObject(String name)
 	{
-		StringTokenizer	stok	= new StringTokenizer(name, ".");
 		Object	ret	= ((PojoBDIAgent)microagent).getPojoAgent();
-		while(stok.hasMoreTokens())
+		if(name!=null)
 		{
-			try
+			StringTokenizer	stok	= new StringTokenizer(name, ".");
+			while(stok.hasMoreTokens())
 			{
-				name	= stok.nextToken();
-				Field	f	= ret.getClass().getDeclaredField(name);
-				f.setAccessible(true);
-				ret	= f.get(ret);
-			}
-			catch(Exception e)
-			{
-				throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+				try
+				{
+					name	= stok.nextToken();
+					Field	f	= ret.getClass().getDeclaredField(name);
+					f.setAccessible(true);
+					ret	= f.get(ret);
+				}
+				catch(Exception e)
+				{
+					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+				}
 			}
 		}
 		return ret;

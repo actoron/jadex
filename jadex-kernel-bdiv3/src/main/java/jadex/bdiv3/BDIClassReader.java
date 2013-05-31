@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.Goals;
+import jadex.bdiv3.annotation.Mapping;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
@@ -218,6 +219,15 @@ public class BDIClassReader extends MicroClassReader
 						BDIModel	cap	= loader.loadComponentModel(fields[i].getType().getName()+".class", null, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root});
 //						System.out.println("found capability: "+fields[i].getName()+", "+cap);
 						capas.put(fields[i].getName(), cap);
+						
+						Capability acap	= getAnnotation(fields[i], Capability.class, cl);
+						for(Mapping mapping : acap.beliefmapping())
+						{
+							String	source	= mapping.value();
+							String	target	= fields[i].getName()+"."+(mapping.target().equals("") ? source : mapping.target());
+							bdimodel.addBeliefMapping(target, source);	// Store inverse mapping
+						}
+						
 						bdimodel.addSubcapability(new FieldInfo(fields[i]), cap);
 					}
 					catch(Exception e)
@@ -492,8 +502,13 @@ public class BDIClassReader extends MicroClassReader
 				bdimodel.getCapability().addBelief(bel2);
 			}
 			
-			capa.getCapability().getGoals();
-			capa.getCapability().getPlans();
+			for(String target: capa.getBeliefMappings().keySet())
+			{
+				bdimodel.addBeliefMapping(name+"."+target, name+"."+capa.getBeliefMappings().get(target));
+			}
+			
+			capa.getCapability().getGoals();	// todo
+			capa.getCapability().getPlans();	// todo
 		}
 	}
 	

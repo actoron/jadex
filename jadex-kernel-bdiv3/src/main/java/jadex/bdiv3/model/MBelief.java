@@ -272,10 +272,12 @@ public class MBelief extends MElement
 	/**
 	 *  Set the value of the belief.
 	 */
-	public void setValue(Object object, Object value, ClassLoader cl)
+	public boolean setValue(Object object, Object value, ClassLoader cl)
 	{
+		boolean field	= false;
 		if(ftarget!=null)
 		{
+			field	= true;
 			try
 			{
 				Field f = ftarget.getField(cl);
@@ -299,6 +301,7 @@ public class MBelief extends MElement
 				e.printStackTrace();
 			}
 		}
+		return field;
 	}
 	
 	/**

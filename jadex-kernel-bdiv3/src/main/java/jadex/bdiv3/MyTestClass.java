@@ -1,9 +1,5 @@
 package jadex.bdiv3;
 
-import jadex.commons.Tuple3;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class MyTestClass
@@ -25,6 +21,8 @@ public class MyTestClass
 	
 	protected String	__globalname	= "huhu";
 	
+	protected BDIAgent	__agent;
+	
 	
 //	public MyTestClass(String name, List values)
 //	{
@@ -45,57 +43,57 @@ public class MyTestClass
 ////		testfield = 22;
 //	}
 	
-	public int getVal()
+	public void setVal(double val)
 	{
 		String	belief	= "haha";
-		return (Integer)BDIAgent.getAbstractBeliefValue(__globalname, belief, byte.class);
+		__agent.setAbstractBeliefValue(__globalname, belief, val);
 	}
-	
-	Integer	n	= new Integer(39784374);
-	Character	c 	= new Character('d');
-	Long	l	= new Long(247895);
-	Float	f	= new Float(378156);
-	Double	d	= new Double(91347);
-	
-	public byte getbVal()
-	{
-		return (byte)n.intValue();
-	}
-
-	public short getsVal()
-	{
-		return (short)n.intValue();
-	}
-
-	public int getiVal()
-	{
-		return n;
-	}
-
-	public long getlVal()
-	{
-		return l;
-	}
-
-	public float getfVal()
-	{
-		return f;
-	}
-
-	public double getdVal()
-	{
-		return d;
-	}
-
-	public boolean getboVal()
-	{
-		return false;
-	}
-
-	public char getcVal()
-	{
-		return c;
-	}
+//	
+//	Integer	n	= new Integer(39784374);
+//	Character	c 	= new Character('d');
+//	Long	l	= new Long(247895);
+//	Float	f	= new Float(378156);
+//	Double	d	= new Double(91347);
+//	
+//	public byte getbVal()
+//	{
+//		return (byte)n.intValue();
+//	}
+//
+//	public short getsVal()
+//	{
+//		return (short)n.intValue();
+//	}
+//
+//	public int getiVal()
+//	{
+//		return n;
+//	}
+//
+//	public long getlVal()
+//	{
+//		return l;
+//	}
+//
+//	public float getfVal()
+//	{
+//		return f;
+//	}
+//
+//	public double getdVal()
+//	{
+//		return d;
+//	}
+//
+//	public boolean getboVal()
+//	{
+//		return false;
+//	}
+//
+//	public char getcVal()
+//	{
+//		return c;
+//	}
 
 //	
 //	public int inc()
