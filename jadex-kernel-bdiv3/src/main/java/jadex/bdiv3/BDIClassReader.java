@@ -484,7 +484,8 @@ public class BDIClassReader extends MicroClassReader
 				List<String>	events	= new ArrayList<String>();
 				for(String event: bel.getEvents())
 				{
-					events.add(name+"."+event);
+					String	mapped	= name+"."+event;
+					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
 				}
 				
 				MBelief	bel2;

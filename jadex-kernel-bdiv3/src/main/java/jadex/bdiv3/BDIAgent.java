@@ -71,17 +71,18 @@ public class BDIAgent extends MicroAgent
 	 *  @param name The belief name.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefListener(final String name, final IBeliefListener listener)
+	public void addBeliefListener(String name, final IBeliefListener listener)
 	{
-		// Todo: flattened beliefs with name prefixes.
+		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
+		final String	fname	= bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
 		
 		List<EventType> events = new ArrayList<EventType>();
-		BDIAgentInterpreter.addBeliefEvents(this, events, name);
+		BDIAgentInterpreter.addBeliefEvents(this, events, fname);
 
 		final boolean multi = ((MCapability)((BDIAgentInterpreter)getInterpreter()).getCapability().getModelElement())
-			.getBelief(name).isMulti(getClassLoader());
+			.getBelief(fname).isMulti(getClassLoader());
 		
-		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
+		String rulename = fname+"_belief_listener_"+System.identityHashCode(listener);
 		Rule<Void> rule = new Rule<Void>(rulename, 
 			ICondition.TRUE_CONDITION, new IAction<Void>()
 		{
@@ -122,7 +123,8 @@ public class BDIAgent extends MicroAgent
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
-		// Todo: flattened beliefs with name prefixes.
+		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
+		name	= bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 		String rulename = name+"_belief_listener_"+System.identityHashCode(listener);
 		ip.getRuleSystem().getRulebase().removeRule(rulename);
@@ -537,11 +539,17 @@ public class BDIAgent extends MicroAgent
 		String	capaname	= belname.indexOf(".")==-1 ? null : belname.substring(0, belname.lastIndexOf("."));
 		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
 		Object	ocapa	= ((BDIAgentInterpreter)getInterpreter()).getCapabilityObject(capaname);
+
+		// Maybe unobserve old value
+		Object	old	= bel.getValue(ocapa, getClassLoader());
+
 		boolean	field	= bel.setValue(ocapa, value, getClassLoader());
 		
 		if(field)
 		{
-			// todo: generate event.
+			RuleSystem rs = ((BDIAgentInterpreter)getInterpreter()).getRuleSystem();
+			rs.unobserveObject(old);	
+			createEvent(value, this, belname);
 		}
 	}
 }
