@@ -7,7 +7,9 @@ import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.stylesheets.BpmnStylesheetColor;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VEdge;
+import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.model.MActivity;
 
@@ -71,7 +73,13 @@ public class MouseController extends MouseAdapter
 			String mode = modelcontainer.getEditMode();
 			
 			Object cell = modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY());
-			if (ModelContainer.EDIT_MODE_ADD_CONTROL_POINT.equals(mode))
+			if (e.getClickCount() == 1 &&
+				(cell instanceof VInParameter ||
+				 cell instanceof VOutParameter))
+			{
+				modelcontainer.getGraph().setSelectionCell(cell);
+			}
+			else if (ModelContainer.EDIT_MODE_ADD_CONTROL_POINT.equals(mode))
 			{
 				if (cell == modelcontainer.getGraph().getSelectionCell() &&
 					modelcontainer.getGraph().getSelectionCount() == 1 &&

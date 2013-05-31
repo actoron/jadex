@@ -21,6 +21,9 @@ import com.mxgraph.view.mxGraph;
  */
 public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 {
+	/** Offset adjustment for non-aligned axis */
+	protected static final double NON_ALIGNED_AXIS_OFFSET_ADJUSTMENT = 0.2;
+	
 	/**
 	 *  Applies the style.
 	 */
@@ -35,6 +38,7 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 		}
 		
 		double scale = state.getView().getScale();
+		
 		double adjedgedist = GuiConstants.MIN_EDGE_DIST * scale;
 		mxGeometry sgeo = sourcenode.getGeometry();
 		mxPoint spos = new mxPoint(sgeo.getX() * scale, sgeo.getY() * scale);
@@ -52,6 +56,17 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 //		tpos.setX(tpos.getX() * scale);
 //		tpos.setY(tpos.getY() * scale);
 		tgeo = new mxGeometry(tpos.getX(), tpos.getY(), tgeo.getWidth() * scale, tgeo.getHeight() * scale);
+		
+		double offsets = 0.0;
+		if (source.getCell() instanceof VOutParameter)
+		{
+			offsets = -((VOutParameter) source.getCell()).getGeometry().getY();
+		}
+		double offsett = 0.0;
+		if (target.getCell() instanceof VInParameter)
+		{
+			offsett = -((VInParameter) target.getCell()).getGeometry().getY();
+		}
 		
 		if (points == null || points.size() == 0)
 		{
@@ -164,8 +179,8 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 			{
 				double cx = sgeo.getX() +  sgeo.getWidth();
 				cx += (tgeo.getX() - cx) * 0.5;
-				result.add(new mxPoint(cx, sgeo.getCenterY()));
-				result.add(new mxPoint(cx, tgeo.getCenterY()));
+				result.add(new mxPoint(cx - offsets * NON_ALIGNED_AXIS_OFFSET_ADJUSTMENT, sgeo.getCenterY() + offsets));
+				result.add(new mxPoint(cx - offsett * NON_ALIGNED_AXIS_OFFSET_ADJUSTMENT, tgeo.getCenterY() + offsett));
 			}
 			else
 			{

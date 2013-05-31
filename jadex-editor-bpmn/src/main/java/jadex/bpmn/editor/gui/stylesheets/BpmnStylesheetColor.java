@@ -23,7 +23,6 @@ import java.awt.Rectangle;
 import java.awt.font.LineMetrics;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
@@ -443,6 +442,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_DELETABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_RESIZABLE, Boolean.FALSE);
 		putCellStyle(VOutParameter.class.getSimpleName(), style);
@@ -454,6 +455,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
 		style.put(mxConstants.STYLE_FOLDABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
+		style.put(mxConstants.STYLE_DELETABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_RESIZABLE, Boolean.FALSE);
 		putCellStyle(VInParameter.class.getSimpleName(), style);

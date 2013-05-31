@@ -81,7 +81,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 *  Creates a new property panel.
 	 *  @param container The model container.
 	 */
-	public TaskPropertyPanel(final ModelContainer container, VActivity task)
+	public TaskPropertyPanel(final ModelContainer container, VActivity task, MParameter selectedparameter)
 	{
 		super(null, container);
 		
@@ -422,6 +422,13 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		{
 			tabpane.addTab("Properties", proppanel);
 			tabpane.addTab("Parameters", parameterpanel);
+		}
+		
+		if (selectedparameter != null)
+		{
+			tabpane.setSelectedComponent(parameterpanel);
+			int row = getBpmnTask().getParameters().indexOf(selectedparameter);
+			atable.setRowSelectionInterval(row, row);
 		}
 		
 		add(tabpane, BorderLayout.CENTER);
