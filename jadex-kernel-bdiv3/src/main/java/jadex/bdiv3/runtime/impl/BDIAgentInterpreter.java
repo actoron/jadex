@@ -35,11 +35,11 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.FieldInfo;
+import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -129,7 +129,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			pa.init(this, agent);
 			ret = pa;
 
-			injectAgent(pa, agent, model);
+			injectAgent(pa, agent, model, null);
 		}
 		
 		// Init rule system
@@ -141,7 +141,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 *  Inject the agent into annotated fields.
 	 */
-	protected void	injectAgent(BDIAgent pa, Object agent, MicroModel model)
+	protected void	injectAgent(BDIAgent pa, Object agent, MicroModel model, String globalname)
 	{
 		FieldInfo[] fields = model.getAgentInjections();
 		for(int i=0; i<fields.length; i++)
@@ -152,7 +152,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(SReflect.isSupertype(f.getType(), ICapability.class))
 				{
 					f.setAccessible(true);
-					f.set(agent, new CapabilityWrapper(pa, agent, null));						
+					f.set(agent, new CapabilityWrapper(pa, agent, globalname));						
 				}
 				else
 				{
@@ -166,16 +166,22 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			}
 		}
 	
-		// Additionally inject agent to hidden agent field
+		// Additionally inject hidden agent fields
 		Class<?> agcl = agent.getClass();
-		while(agcl.isAnnotationPresent(Agent.class))
+		while(agcl.isAnnotationPresent(Agent.class)
+			|| agcl.isAnnotationPresent(Capability.class))
 		{
 			try
 			{
 				Field field = agcl.getDeclaredField("__agent");
 				field.setAccessible(true);
 				field.set(agent, pa);
+				
+				field = agcl.getDeclaredField("__globalname");
+				field.setAccessible(true);
+				field.set(agent, globalname);
 				agcl = agcl.getSuperclass();
+
 			}
 			catch(Exception e)
 			{
@@ -209,14 +215,41 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		return ret;
 	}
 	
+	
+	/**
+	 *  Get the component fetcher.
+	 */
+	protected IResultCommand<Object, Class<?>>	getComponentFetcher()
+	{
+		return new IResultCommand<Object, Class<?>>()
+		{
+			public Object execute(Class<?> type)
+			{
+				Object ret	= null;
+				if(SReflect.isSupertype(type, microagent.getClass()))
+				{
+					ret	= microagent;
+				}
+				else if(microagent instanceof IPojoMicroAgent
+					&& SReflect.isSupertype(type, ((IPojoMicroAgent)microagent).getPojoAgent().getClass()))
+				{
+					ret	= ((IPojoMicroAgent)microagent).getPojoAgent();
+				}
+				return ret;
+			}
+		};
+	}
+	
+
 	/**
 	 *  Init a service.
 	 */
-	protected IFuture<Void> initService(ProvidedServiceInfo info, IModelInfo model)
+	protected IFuture<Void> initService(ProvidedServiceInfo info, IModelInfo model, IResultCommand<Object, Class<?>> componentfetcher)
 	{
 		Future<Void>	ret	= new Future<Void>();
 		
 		int i	= info.getName().indexOf(".");
+		Object	ocapa	= ((PojoBDIAgent)microagent).getPojoAgent();
 		String	capa	= null;
 		final IValueFetcher	oldfetcher	= getFetcher();
 		if(i!=-1)
@@ -225,11 +258,35 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			SimpleValueFetcher fetcher = new SimpleValueFetcher(oldfetcher);
 			if(microagent instanceof IPojoMicroAgent)
 			{
-				fetcher.setValue("$pojocapa", getCapabilityObject(capa));
+				ocapa	= getCapabilityObject(capa);
+				fetcher.setValue("$pojocapa", ocapa);
 			}
 			this.fetcher = fetcher;
+			final Object	oocapa	= ocapa;
+			final String	scapa	= capa;
+			componentfetcher	= componentfetcher!=null ? componentfetcher :
+				new IResultCommand<Object, Class<?>>()
+			{
+				public Object execute(Class<?> type)
+				{
+					Object ret	= null;
+					if(SReflect.isSupertype(type, microagent.getClass()))
+					{
+						ret	= microagent;
+					}
+					else if(SReflect.isSupertype(type, oocapa.getClass()))
+					{
+						ret	= oocapa;
+					}
+					else if(SReflect.isSupertype(type, ICapability.class))
+					{
+						ret	= new CapabilityWrapper((BDIAgent)microagent, oocapa, scapa);
+					}
+					return ret;
+				}
+			};
 		}
-		super.initService(info, model).addResultListener(new DelegationResultListener<Void>(ret)
+		super.initService(info, model, componentfetcher).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
@@ -306,7 +363,20 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				f.setAccessible(true);
 				final Object	capa	= f.get(agent);
 				
-				injectAgent((BDIAgent)microagent, capa, caps[i].getSecondEntity());
+				String globalname;
+				try
+				{
+					Field	g	= agent.getClass().getDeclaredField("__globalname");
+					g.setAccessible(true);
+					globalname	= (String)g.get(agent);
+					globalname	= globalname==null ? f.getName() : globalname+"."+f.getName();
+				}
+				catch(Exception e)
+				{
+					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+				}
+				
+				injectAgent((BDIAgent)microagent, capa, caps[i].getSecondEntity(), globalname);
 				
 				injectServices(capa, caps[i].getSecondEntity())
 					.addResultListener(new DelegationResultListener<Void>(ret)

@@ -938,7 +938,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 //			{
 				try
 				{
-					fut	= initService(services[i], model);
+					fut	= initService(services[i], model, null);
 				}
 				catch(Exception e)
 				{
@@ -1266,7 +1266,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
 	public IFuture<IInternalService> addService(final String name, final Class<?> type, final String proxytype, 
-		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info)
+		final IServiceInvocationInterceptor[] ics, final Object service, final ProvidedServiceInfo info, IResultCommand<Object, Class<?>> componentfetcher)
 	{
 //		System.out.println("addS:"+service);
 
@@ -1275,8 +1275,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		boolean moni = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring().booleanValue(): false;
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier(), moni);
-		getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
+			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier(), moni, componentfetcher);
+		getServiceContainer().addService(proxy, info, componentfetcher).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
@@ -1291,7 +1291,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Add a service to the component. 
 	 *  @param info The provided service info.
 	 */
-	protected IFuture<Void>	initService(final ProvidedServiceInfo info, final IModelInfo model)
+	protected IFuture<Void>	initService(final ProvidedServiceInfo info, final IModelInfo model, IResultCommand<Object, Class<?>> componentfetcher)
 	{
 		final Future<Void> ret = new Future<Void>();
 		assert !getComponentAdapter().isExternalThread();
@@ -1308,7 +1308,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					rsi.getName(), rsi.getType().getType(getClassLoader()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier());
 				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 					getInternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), getClassLoader(), isRealtime());
-				getServiceContainer().addService(service, info).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
+				getServiceContainer().addService(service, info, componentfetcher).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 			}
 			else
 			{
@@ -1354,7 +1354,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					}
 					
 					final Class<?> type = info.getType().getType(getClassLoader());
-					addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser, info)
+					addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser, info, componentfetcher)
 						.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
 					{
 						public void customResultAvailable(final IInternalService service)

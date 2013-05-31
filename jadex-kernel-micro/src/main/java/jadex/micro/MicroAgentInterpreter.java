@@ -13,6 +13,7 @@ import jadex.bridge.ITransferableStep;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
@@ -25,6 +26,7 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.FieldInfo;
+import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -208,6 +210,39 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the component fetcher.
+	 */
+	protected IResultCommand<Object, Class<?>>	getComponentFetcher()
+	{
+		return new IResultCommand<Object, Class<?>>()
+		{
+			public Object execute(Class<?> type)
+			{
+				Object ret	= null;
+				if(SReflect.isSupertype(type, microagent.getClass()))
+				{
+					ret	= microagent;
+				}
+				else if(microagent instanceof IPojoMicroAgent
+					&& SReflect.isSupertype(type, ((IPojoMicroAgent)microagent).getPojoAgent().getClass()))
+				{
+					ret	= ((IPojoMicroAgent)microagent).getPojoAgent();
+				}
+				return ret;
+			}
+		};
+	}
+	
+	/**
+	 *  Add component fetcher to service init.
+	 */
+	protected IFuture<Void> initService(ProvidedServiceInfo info,
+		IModelInfo model, IResultCommand<Object, Class<?>> componentfetcher)
+	{
+		return super.initService(info, model, componentfetcher!=null ? componentfetcher : getComponentFetcher());
 	}
 	
 	/**

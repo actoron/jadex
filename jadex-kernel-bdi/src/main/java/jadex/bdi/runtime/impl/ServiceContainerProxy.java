@@ -14,6 +14,7 @@ import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 
@@ -69,10 +70,13 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  Add a service to the container.
 	 *  The service is started, if the container is already running.
 	 *  @param service The service.
+	 *  @param info The provided service info.
+	 *  @param componentfetcher	 Helper to fetch corrent object for component injection based on field type.
+	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture	addService(IInternalService service, ProvidedServiceInfo info)
+	public IFuture<Void>	addService(IInternalService service, ProvidedServiceInfo info, IResultCommand<Object, Class<?>> componentfetcher)
 	{
-		return interpreter.getServiceContainer().addService(service, info);
+		return interpreter.getServiceContainer().addService(service, info, componentfetcher);
 	}
 	
 	/**

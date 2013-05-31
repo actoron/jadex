@@ -48,6 +48,7 @@ import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -1559,7 +1560,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 *  Init a service.
 	 *  Overriden to allow for service implementations as BPMN processes using signal events.
 	 */
-	protected IFuture<Void> initService(ProvidedServiceInfo info, IModelInfo model)
+	protected IFuture<Void> initService(ProvidedServiceInfo info, IModelInfo model, IResultCommand<Object, Class<?>> componentfetcher)
 	{
 		IFuture<Void>	ret;
 		ProvidedServiceImplementation	impl	= info.getImplementation();
@@ -1627,7 +1628,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //			System.out.println("Found mapping: "+methods);
 			// Todo: interceptors
 			addService(info.getName(), info.getType().getType(getClassLoader()), info.getImplementation().getProxytype(), null,
-				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType().getType(getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null)
+				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType().getType(getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null, componentfetcher)
 				.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(fut)
 			{
 				public void customResultAvailable(IInternalService result)
@@ -1640,7 +1641,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// External service implementation
 		else
 		{
-			ret	= super.initService(info, model);
+			ret	= super.initService(info, model, componentfetcher);
 		}
 		
 		return ret;

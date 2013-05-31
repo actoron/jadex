@@ -29,6 +29,7 @@ import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -366,7 +367,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
 		String name, Class<?> type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, 
-		boolean realtime, IResourceIdentifier rid, boolean monitoring)
+		boolean realtime, IResourceIdentifier rid, boolean monitoring, IResultCommand<Object, Class<?>> componentfetcher)
 	{
 		IInternalService	ret;
 		
@@ -382,7 +383,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
-			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service, realtime);
+			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service, realtime, componentfetcher);
 			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy, monitoring);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
@@ -416,7 +417,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Create a basic invocation handler.
 	 */
-	protected static BasicServiceInvocationHandler createHandler(String name, IInternalAccess ia, Class<?> type, Object service, boolean realtime)
+	protected static BasicServiceInvocationHandler createHandler(String name, IInternalAccess ia, Class<?> type, Object service, boolean realtime, IResultCommand<Object, Class<?>> componentfetcher)
 	{
 		BasicServiceInvocationHandler handler;
 		if(service instanceof IService)
@@ -487,25 +488,25 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 								}
 								else
 								{
-									System.out.println("Field cannot store IServiceIdentifer: "+fields[i]);
+									throw new RuntimeException("Field cannot store IServiceIdentifer: "+fields[i]);
 								}
 							}
 						}
 						
 						if(fields[i].isAnnotationPresent(ServiceComponent.class))
 						{
-							Object val = null;
-							if(SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
+							Object val = componentfetcher!=null ? componentfetcher.execute(fields[i].getType()) : null;
+							if(val==null && SReflect.isSupertype(IInternalAccess.class, fields[i].getType()))
 							{
 								val = ia;
 							}
-							else if(SReflect.isSupertype(IExternalAccess.class, fields[i].getType()))
+							else if(val==null && SReflect.isSupertype(IExternalAccess.class, fields[i].getType()))
 							{
 								val = ia.getExternalAccess();
 							}
-							else
+							else if(val==null)
 							{
-								System.out.println("Field cannot store component: "+fields[i].getName()+" "+fields[i].getType());
+								throw new RuntimeException("Field cannot store component: "+fields[i].getName()+" "+fields[i].getType());
 							}
 							if(val!=null)
 							{

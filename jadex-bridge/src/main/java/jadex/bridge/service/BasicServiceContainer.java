@@ -10,6 +10,7 @@ import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -121,10 +122,13 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	
 	/**
 	 *  Add a service to the container.
-	 *  @param chainid The name.
+	 *  The service is started, if the container is already running.
 	 *  @param service The service.
+	 *  @param info The provided service info.
+	 *  @param componentfetcher	 Helper to fetch corrent object for component injection based on field type.
+	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture<Void>	addService(final IInternalService service, final ProvidedServiceInfo info)
+	public IFuture<Void>	addService(final IInternalService service, final ProvidedServiceInfo info, IResultCommand<Object, Class<?>> componentfetcher)
 	{
 		if(shutdowned)
 			return new Future<Void>(new ComponentTerminatedException(id));

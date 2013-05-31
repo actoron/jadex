@@ -8,6 +8,7 @@ import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -495,5 +496,32 @@ public class BDIAgent extends MicroAgent
 	public static void createEvent()
 	{
 		System.out.println("asfbsfjkah");
+	}
+	
+	/**
+	 *  Get the value of an abstract belief.
+	 */
+	public static Object	getAbstractBeliefValue(String capa, String name, Class<?> type)
+	{
+		System.out.println("getAbstractBeliefValue(): "+capa+"."+name+", "+type);
+		Object	ret	= null;
+		
+		if(ret==null)
+		{
+			if(type.equals(boolean.class))
+			{
+				ret	= Boolean.FALSE;
+			}
+			else if(type.equals(char.class))
+			{
+				ret	= new Character((char)0);
+			}
+			else if(SReflect.getWrappedType(type)!=type)	// Number type
+			{
+				ret	= new Integer(0);
+			}
+		}
+		
+		return ret;
 	}
 }

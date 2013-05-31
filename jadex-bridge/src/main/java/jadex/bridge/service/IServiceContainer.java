@@ -4,6 +4,7 @@ package jadex.bridge.service;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 
@@ -39,9 +40,10 @@ public interface IServiceContainer extends IServiceProvider
 	 *  The service is started, if the container is already running.
 	 *  @param service The service.
 	 *  @param info The provided service info.
+	 *  @param componentfetcher	 Helper to fetch corrent object for component injection based on field type.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture<Void>	addService(IInternalService service, ProvidedServiceInfo info);
+	public IFuture<Void>	addService(IInternalService service, ProvidedServiceInfo info, IResultCommand<Object, Class<?>> componentfetcher);
 
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).

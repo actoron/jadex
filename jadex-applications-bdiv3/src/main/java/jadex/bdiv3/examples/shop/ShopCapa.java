@@ -41,7 +41,7 @@ public class ShopCapa
 		this.shopname	= shopname;
 		this.catalog	= catalog;
 		
-//		setMoney(1);
+		setMoney(1);
 	}
 	
 	/**
@@ -50,6 +50,14 @@ public class ShopCapa
 	public String	getShopname()
 	{
 		return shopname;
+	}
+	
+	/**
+	 *  Get the catalog.
+	 */
+	public List<ItemInfo>	getCatalog()
+	{
+		return catalog;
 	}
 	
 	@Goal

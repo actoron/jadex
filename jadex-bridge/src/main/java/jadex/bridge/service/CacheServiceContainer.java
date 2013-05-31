@@ -8,6 +8,7 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.Tuple;
 import jadex.commons.collection.Cache;
 import jadex.commons.future.CounterResultListener;
@@ -332,15 +333,16 @@ public class CacheServiceContainer	implements IServiceContainer
 	}
 	
 	/**
-	 *  Add a service to the platform.
-	 *  If under the same name and type a service was contained,
-	 *  the old one is removed and shutdowned.
-	 *  @param name The name.
+	 *  Add a service to the container.
+	 *  The service is started, if the container is already running.
 	 *  @param service The service.
+	 *  @param info The provided service info.
+	 *  @param componentfetcher	 Helper to fetch corrent object for component injection based on field type.
+	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture addService(IInternalService service, ProvidedServiceInfo info)
+	public IFuture<Void>	addService(IInternalService service, ProvidedServiceInfo info, IResultCommand<Object, Class<?>> componentfetcher)
 	{
-		return container.addService(service, info);
+		return container.addService(service, info, componentfetcher);
 	}
 
 	/**

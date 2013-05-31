@@ -61,13 +61,13 @@ public class CustomerCapability
 	/**
 	 *  Get the money.
 	 */
-//	@Belief
+	@Belief
 	public native double	getMoney();
 	
 	/**
 	 *  Set the money.
 	 */
-//	@Belief
+	@Belief
 	public native void	setMoney(double money);
 	
 	//-------- goals --------

@@ -1,12 +1,11 @@
 package jadex.bdiv3.examples.shop;
 
-import jadex.bdiv3.examples.shop.ShopBDI.SellGoal;
-import jadex.bridge.IInternalAccess;
+import jadex.bdiv3.examples.shop.ShopCapa.SellGoal;
+import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.micro.IPojoMicroAgent;
 
 /**
  *  The shop for buying goods at the shop.
@@ -18,21 +17,13 @@ public class ShopService implements IShopService
 	
 	/** The component. */
 	@ServiceComponent
-	protected IInternalAccess comp;
+	protected ICapability	capa;
 	
 	/** The shop name. */
 	protected String name;
 	
 	//-------- constructors --------
-	
-	/**
-	 *  Create a new shop service.
-	 */
-	public ShopService()
-	{
-		this.name = "noname-";
-	}
-	
+
 	/**
 	 *  Create a new shop service.
 	 */
@@ -60,9 +51,9 @@ public class ShopService implements IShopService
 	 */
 	public IFuture<ItemInfo> buyItem(final String item, final double price)
 	{
-		ShopBDI shop = (ShopBDI)((IPojoMicroAgent)comp).getPojoAgent();
+		ShopCapa shop = (ShopCapa)capa.getPojoCapability();
 		SellGoal sell = shop.new SellGoal(item, price);
-		return shop.getAgent().dispatchTopLevelGoal(sell);
+		return capa.getAgent().dispatchTopLevelGoal(sell);
 	}
 	
 	/**
@@ -72,7 +63,7 @@ public class ShopService implements IShopService
 	public IFuture<ItemInfo[]> getCatalog()
 	{
 		final Future<ItemInfo[]> ret = new Future<ItemInfo[]>();
-		ShopBDI shop = (ShopBDI)((IPojoMicroAgent)comp).getPojoAgent();
+		ShopCapa shop = (ShopCapa)capa.getPojoCapability();
 		ret.setResult(shop.getCatalog().toArray(new ItemInfo[shop.getCatalog().size()]));
 		return ret;
 	}
