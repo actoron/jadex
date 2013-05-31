@@ -1,5 +1,10 @@
 package jadex.bdiv3;
 
+import jadex.commons.Tuple3;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MyTestClass
 {
@@ -10,15 +15,29 @@ public class MyTestClass
 
 //	protected int testfield3 = getVal();
 
-	protected int[] myints = new int[3];
-
-	protected Object[] myobs = new Object[2];
+//	protected int[] myints = new int[3];
+//
+//	protected Object[] myobs = new Object[2];
 	
-	public MyTestClass()
+//	protected BDIAgent	__agent;
+
+//	protected List<Tuple3<Class<?>,Class<?>[], Object[]>>	initcalls;
+	
+	
+	public MyTestClass(String name, List values)
 	{
-		myints[0] = 3;
+		BDIAgent.addInitArgs(this, MyTestClass.class, new Class<?>[]{String.class,  List.class}, new Object[]{name, values});
 		
-		myobs[1] = new Object();
+//		if(initcalls==null)
+//		{
+//			initcalls	= new ArrayList<Tuple3<Class<?>,Class<?>[], Object[]>>();
+//		}
+//		
+//		initcalls.add(new Tuple3<Class<?>, Class<?>[], Object[]>(MyTestClass.class, new Class<?>[]{String.class,  List.class}, new Object[]{name, values}));
+		
+//		myints[0] = 3;
+//		
+//		myobs[1] = new Object();
 //		System.out.println("hello");
 //		System.out.println(testfield+" "+testfield2+" "+testfield3);
 //		testfield = 22;
@@ -39,8 +58,8 @@ public class MyTestClass
 //		return testfield;
 //	}
 
-	public static void main(String[] args)
-	{
-		MyTestClass tm = new MyTestClass();
-	}
+//	public static void main(String[] args)
+//	{
+//		MyTestClass tm = new MyTestClass();
+//	}
 }

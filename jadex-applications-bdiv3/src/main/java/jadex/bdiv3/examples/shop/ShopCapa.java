@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Capability
 @ProvidedServices(@ProvidedService(type=IShopService.class, //	implementation=@Implementation(value=ShopService.class)))
-	implementation=@Implementation(expression="new ShopService($pojoagent.shopname)")))
+	implementation=@Implementation(expression="new ShopService($pojocapa.getShopname())")))
 public class ShopCapa
 {
 	@Belief
@@ -41,7 +41,15 @@ public class ShopCapa
 		this.shopname	= shopname;
 		this.catalog	= catalog;
 		
-		setMoney(1);
+//		setMoney(1);
+	}
+	
+	/**
+	 *  Get the shop name.
+	 */
+	public String	getShopname()
+	{
+		return shopname;
 	}
 	
 	@Goal

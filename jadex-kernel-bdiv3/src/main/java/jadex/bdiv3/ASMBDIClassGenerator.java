@@ -33,14 +33,16 @@ import org.kohsuke.asm4.tree.AbstractInsnNode;
 import org.kohsuke.asm4.tree.AnnotationNode;
 import org.kohsuke.asm4.tree.ClassNode;
 import org.kohsuke.asm4.tree.FieldInsnNode;
+import org.kohsuke.asm4.tree.FieldNode;
 import org.kohsuke.asm4.tree.InsnList;
 import org.kohsuke.asm4.tree.InsnNode;
 import org.kohsuke.asm4.tree.LabelNode;
 import org.kohsuke.asm4.tree.LdcInsnNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
 import org.kohsuke.asm4.tree.MethodNode;
+import org.kohsuke.asm4.tree.TypeInsnNode;
 import org.kohsuke.asm4.tree.VarInsnNode;
-import org.kohsuke.asm4.util.CheckClassAdapter;
+import org.kohsuke.asm4.util.ASMifier;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 /**
@@ -424,6 +426,8 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 		
 		if(agentclass)
 		{
+			cn.fields.add(new FieldNode(Opcodes.ACC_PROTECTED, "__initargs", "Ljava/util/List;", "Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;", null));
+			
 //			MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
 			for(MethodNode mn: mths)
 			{
@@ -482,8 +486,8 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 								MBelief mbel = model.getCapability().getBelief(name);
 								mbel.getEvents().addAll(evs);
 								
-								MethodNode mnode = new MethodNode(mn.access, IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX
-									+SUtil.firstToUpperCase(name), mn.desc, mn.signature, null);
+								MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX
+									+SUtil.firstToUpperCase(name), Type.getMethodDescriptor(Type.VOID_TYPE), null, null);
 								
 								// First labels are cloned
 								AbstractInsnNode cur = start;
@@ -517,7 +521,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 					{
 						String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+clname.replace("/", "_").replace(".", "_");
 //						System.out.println("Init method: "+name);
-						MethodNode mnode = new MethodNode(mn.access, name, mn.desc, mn.signature, null);
+						MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, name, mn.desc, mn.signature, null);
 						cn.methods.add(mnode);
 
 						while(l.size()>foundcon+1)
@@ -531,6 +535,43 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 							mnode.instructions.add(node);
 						}						
 						mnode.visitInsn(Opcodes.RETURN);
+						
+						// Add code to store arguments in field.
+						Type[]	args	= Type.getArgumentTypes(mn.desc);
+						InsnList	init	= new InsnList();
+
+						// obj param
+						init.add(new VarInsnNode(Opcodes.ALOAD, 0));
+						
+						// clazz param
+						init.add(new LdcInsnNode(Type.getType("L"+iclname+";")));
+						
+						// argtypes param
+						init.add(new LdcInsnNode(args.length));
+						init.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Class"));
+						for(int i=0; i<args.length; i++)
+						{
+							init.add(new InsnNode(Opcodes.DUP));
+							init.add(new LdcInsnNode(i));
+							init.add(new LdcInsnNode(args[i]));
+							init.add(new InsnNode(Opcodes.AASTORE));
+						}
+						
+						// args param
+						init.add( new LdcInsnNode(args.length));
+						init.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Object"));
+						for(int i=0; i<args.length; i++)
+						{
+							init.add(new InsnNode(Opcodes.DUP));
+							init.add(new LdcInsnNode(i));
+							init.add(new VarInsnNode(Opcodes.ALOAD, i+1));	// 0==this, 1==arg0, ...
+							init.add(new InsnNode(Opcodes.AASTORE));
+						}
+						
+						// Invoke method.
+						init.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "addInitArgs", "(Ljava/lang/Object;Ljava/lang/Class;[Ljava/lang/Class;[Ljava/lang/Object;)V"));
+						
+						l.insertBefore(l.get(foundcon+1), init);
 					}
 				}
 				// Enhance setter method with unobserve oldvalue at the beginning and event call at the end
@@ -665,8 +706,8 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 		}
 				
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
-//		TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
+//		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
+		TraceClassVisitor tcv = new TraceClassVisitor(cw, new ASMifier(), new PrintWriter(System.out));
 //		CheckClassAdapter cc = new CheckClassAdapter(tcv);
 		
 //		final String classname = "lars/Lars";

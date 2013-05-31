@@ -3,6 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.PojoBDIAgent;
+import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
@@ -34,9 +35,11 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.FieldInfo;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -44,6 +47,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
+import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
@@ -69,6 +74,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  *  The bdi agent interpreter.
@@ -180,6 +186,30 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
+	 *  Get a capability pojo object.
+	 */
+	protected Object	getCapabilityObject(String name)
+	{
+		StringTokenizer	stok	= new StringTokenizer(name, ".");
+		Object	ret	= ((PojoBDIAgent)microagent).getPojoAgent();
+		while(stok.hasMoreTokens())
+		{
+			try
+			{
+				name	= stok.nextToken();
+				Field	f	= ret.getClass().getDeclaredField(name);
+				f.setAccessible(true);
+				ret	= f.get(ret);
+			}
+			catch(Exception e)
+			{
+				throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Init a service.
 	 */
 	protected IFuture<Void> initService(ProvidedServiceInfo info, IModelInfo model)
@@ -188,11 +218,25 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		int i	= info.getName().indexOf(".");
 		String	capa	= null;
+		final IValueFetcher	oldfetcher	= getFetcher();
 		if(i!=-1)
 		{
 			capa	= info.getName().substring(0, i); 
+			SimpleValueFetcher fetcher = new SimpleValueFetcher(oldfetcher);
+			if(microagent instanceof IPojoMicroAgent)
+			{
+				fetcher.setValue("$pojocapa", getCapabilityObject(capa));
+			}
+			this.fetcher = fetcher;
 		}
-		super.initService(info, model).addResultListener(new DelegationResultListener<Void>(ret));
+		super.initService(info, model).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				BDIAgentInterpreter.this.fetcher	= oldfetcher;
+				super.customResultAvailable(result);
+			}
+		});
 		
 		return ret;
 	}
@@ -213,7 +257,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				for(int i=0; i<inits.size(); i++)
 				{
 					Class<?>	clazz	= inits.get(i);
-					if(clazz.getSuperclass().isAnnotationPresent(Agent.class))
+					if(clazz.getSuperclass().isAnnotationPresent(Agent.class)
+						|| clazz.getSuperclass().isAnnotationPresent(Capability.class))
 					{
 						inits.add(clazz.getSuperclass());
 					}
@@ -223,16 +268,20 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				for(int i=inits.size()-1; i>=0; i--)
 				{
 					Class<?>	clazz	= inits.get(i);
-					try
-					{
-						String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+clazz.getName().replace("/", "_").replace(".", "_");
-//						System.out.println("Init: "+name);
-						Method um = agent.getClass().getMethod(name, new Class[0]);
-						um.invoke(agent, new Object[0]);
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
+					List<Tuple2<Class<?>[], Object[]>>	initcalls	= BDIAgent.getInitCalls(agent, clazz);
+					for(Tuple2<Class<?>[], Object[]> initcall: initcalls)
+					{					
+						try
+						{
+							String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+clazz.getName().replace("/", "_").replace(".", "_");
+							Method um = agent.getClass().getMethod(name, initcall.getFirstEntity());
+//							System.out.println("Init: "+um);
+							um.invoke(agent, initcall.getSecondEntity());
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 				}
 				
@@ -458,10 +507,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		{
 			try
 			{
-//				Field f = mbel.getTarget().getField(getClassLoader());
-//				f.setAccessible(true);
-//				Object val = f.get(agent);
-				Object val = mbel.getValue(agent, getClassLoader());
+				Object	capa	= agent;
+				int	i	= mbel.getName().indexOf(".");
+				if(i!=-1)
+				{
+					capa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(".")));
+				}
+				Object val = mbel.getValue(capa, getClassLoader());
 				if(val==null)
 				{
 					String impl = mbel.getImplClassName();
@@ -491,19 +543,19 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				{
 					String bname = mbel.getName();
 //					f.set(agent, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
-					mbel.setValue(agent, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
+					mbel.setValue(capa, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
 //					f.set(agent, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
-					mbel.setValue(agent, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
+					mbel.setValue(capa, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
 //					f.set(agent, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
-					mbel.setValue(agent, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
+					mbel.setValue(capa, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
 				}
 			}
 			catch(RuntimeException e)
@@ -524,6 +576,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			Collection<String> evs = mbel.getEvents();
 			if(evs!=null && !evs.isEmpty())
 			{
+				Object	ocapa	= agent;
+				int	i	= mbel.getName().indexOf(".");
+				if(i!=-1)
+				{
+					ocapa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(".")));
+				}
+				final Object	capa	= ocapa;
+
 				List<EventType> events = new ArrayList<EventType>();
 				for(String ev: evs)
 				{
@@ -538,8 +598,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //						System.out.println("belief update: "+event);
 						try
 						{
-							Method um = agent.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
-							um.invoke(agent, new Object[0]);
+							Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
+							um.invoke(capa, new Object[0]);
 						}
 						catch(Exception e)
 						{

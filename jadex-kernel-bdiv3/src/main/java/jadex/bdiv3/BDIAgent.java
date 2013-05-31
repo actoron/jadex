@@ -10,6 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -127,6 +128,50 @@ public class BDIAgent extends MicroAgent
 
 	
 	//-------- internal method used for rewriting field access -------- 
+	
+	/**
+	 *  Add an entry to the init calls.
+	 */
+	public static void	addInitArgs(Object obj, Class<?> clazz, Class<?>[] argtypes, Object[] args)
+	{
+		try
+		{
+			Field f	= clazz.getDeclaredField("__initargs");
+//			System.out.println(f+", "+SUtil.arrayToString(args));
+			f.setAccessible(true);
+			List<Tuple2<Class<?>[], Object[]>> initcalls	= (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
+			if(initcalls==null)
+			{
+				initcalls	= new ArrayList<Tuple2<Class<?>[], Object[]>>();
+				f.set(obj, initcalls);
+			}
+			initcalls.add(new Tuple2<Class<?>[], Object[]>(argtypes, args));
+		}
+		catch(Exception e)
+		{
+			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Get the init calls.
+	 *  Cleans the initargs field on return.
+	 */
+	public static List<Tuple2<Class<?>[], Object[]>>	getInitCalls(Object obj, Class<?> clazz)
+	{
+		try
+		{
+			Field f	= clazz.getDeclaredField("__initargs");
+			f.setAccessible(true);
+			List<Tuple2<Class<?>[], Object[]>> initcalls	= (List<Tuple2<Class<?>[], Object[]>>)f.get(obj);
+			f.set(obj, null);
+			return initcalls;
+		}
+		catch(Exception e)
+		{
+			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+		}
+	}
 	
 	/**
 	 *  Method that is called automatically when a belief 
