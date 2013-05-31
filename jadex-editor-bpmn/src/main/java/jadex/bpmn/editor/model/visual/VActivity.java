@@ -12,7 +12,9 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSubProcess;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +34,9 @@ public class VActivity extends VNamedNode
 	
 	/** Map to parameter input ports. */
 	public Map<String, VOutParameter> outports = new HashMap<String, VOutParameter>();
+	
+	/** Set of internal parameters */
+	public Set<String> internalparameters = new HashSet<String>();
 	
 	/**
 	 *  Creates a new activity.
@@ -179,18 +184,85 @@ public class VActivity extends VNamedNode
 		return outports.get(paramname);
 	}
 	
+	/**
+	 *  Set geometry.
+	 */
 	public void setGeometry(mxGeometry geometry)
 	{
 		super.setGeometry(geometry);
 		refreshParameterObjectGeometry();
 	}
 	
+	/**
+	 *  Set BPMN element.
+	 */
 	public void setBpmnElement(MIdElement bpmnelement)
 	{
 		super.setBpmnElement(bpmnelement);
 		createParameterObjects();
 	}
 	
+	/**
+	 *  Adds a parameter to the internal parameter set.
+	 *  
+	 *  @param paramname The parameter name.
+	 */
+	public void addInternalParameter(String paramname)
+	{
+		MActivity mact = (MActivity) getBpmnElement();
+		MParameter param = mact.getParameters().get(paramname);
+		if (param != null)
+		{
+			internalparameters.add(paramname);
+			refreshParameter(param);
+		}
+	}
+	
+	/**
+	 *  Removes a parameter from the internal parameter set.
+	 *  
+	 *  @param paramname The parameter name.
+	 */
+	public void removeInternalParameter(String paramname)
+	{
+		MActivity mact = (MActivity) getBpmnElement();
+		MParameter param = mact.getParameters().get(paramname);
+		if (param != null)
+		{
+			internalparameters.remove(paramname);
+			refreshParameter(param);
+		}
+	}
+	
+	/**
+	 *  Returns if a parameter is in the internal parameter set.
+	 *  
+	 *  @return True, if contained.
+	 */
+	public boolean isInternalParameters(String paramname)
+	{
+		return internalparameters.contains(paramname);
+	}
+	
+	/**
+	 *  Sets the internal parameter set.
+	 */
+	public void setInternalParameters(Collection<String> internalparameters)
+	{
+		this.internalparameters.addAll(internalparameters);
+	}
+	
+	/**
+	 *  Gets the internal parameter set.
+	 */
+	public Set<String> getInternalParameters()
+	{
+		return internalparameters;
+	}
+	
+	/**
+	 *  Refresh the parameter geometry.
+	 */
 	public void refreshParameterObjectGeometry()
 	{
 		List<VOutParameter> outparameters = new ArrayList<VOutParameter>();
@@ -340,6 +412,82 @@ public class VActivity extends VNamedNode
 		((BpmnGraph) graph).refreshCellView(this);
 	}
 	
+	/**
+	 *  Called when a parameters need to be refreshed.
+	 *  
+	 *  @param rparam The parameter.
+	 */
+	public void refreshParameter(MParameter rparam)
+	{
+		boolean expectedin = !(MParameter.DIRECTION_OUT.equals(rparam.getDirection()) || isInternalParameters(rparam.getName()));
+		boolean expectedout = !(MParameter.DIRECTION_IN.equals(rparam.getDirection()));
+		boolean noin = true;
+		boolean noout = true;
+		for (int i = 0; i < getChildCount(); ++i)
+		{
+			mxICell child = getChildAt(i);
+			if (child instanceof VInParameter || 
+				child instanceof VOutParameter)
+			{
+				MParameter cparam = null;
+				boolean isinparam = false;
+				if (child instanceof VOutParameter)
+				{
+					cparam = ((VOutParameter) child).getParameter();
+				}
+				else
+				{
+					cparam = ((VInParameter) child).getParameter();
+					isinparam = true;
+				}
+				
+				if (rparam.getName().equals(cparam.getName()))
+				{
+					if ((isinparam && !expectedin) ||
+						(!isinparam && !expectedout))
+					{
+						List<mxICell> edges = new ArrayList<mxICell>();
+						for (int ei = 0; ei < child.getEdgeCount(); ++ei)
+						{
+							edges.add(child.getEdgeAt(ei));
+						}
+						graph.removeCells(edges.toArray());
+						
+						remove(i);
+						--i;
+					}
+					else
+					{
+						if (isinparam)
+						{
+							noin = false;
+						}
+						
+						if (!isinparam)
+						{
+							noout = false;
+						}
+					}
+				}
+			}
+		}
+		
+		if (noin && expectedin)
+		{
+			VInParameter vparam = new VInParameter(graph, rparam);
+			insert(vparam);
+		}
+		
+		if (noout && expectedout)
+		{
+			VOutParameter vparam = new VOutParameter(graph, rparam);
+			insert(vparam);
+		}
+		
+		refreshParameterObjectGeometry();
+		((BpmnGraph) graph).refreshCellView(this);
+	}
+	
 	protected void createParameterObjects()
 	{
 		for (int i = 0; i < getChildCount(); ++i)
@@ -377,8 +525,9 @@ public class VActivity extends VNamedNode
 					insert(vparam);
 					outports.put(param.getName(), vparam);
 				}
-				if (MParameter.DIRECTION_IN.equals(param.getDirection()) ||
-					MParameter.DIRECTION_INOUT.equals(param.getDirection()))
+				if (!internalparameters.contains(param.getName()) &&
+					(MParameter.DIRECTION_IN.equals(param.getDirection()) ||
+					MParameter.DIRECTION_INOUT.equals(param.getDirection())))
 				{
 					VInParameter vparam = new VInParameter(graph, param);
 					insert(vparam);

@@ -6,6 +6,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -25,8 +26,7 @@ public interface IBpmnVisualModelReader
 	 *  @param buffer Buffer map.
 	 */
 	public abstract void readElement(QName tag,
-									 Map<String,
-									 String> attrs,
+									 Map<String, String> attrs,
 									 Map<String, String> laneparents,
 									 Map<String, MIdElement> emap,
 									 Map<String, Object> buffer);
@@ -39,11 +39,12 @@ public interface IBpmnVisualModelReader
 	 *  @param expanded Flag whether the shape should be collapsed (false), expanded (true) or default (null).
 	 * 	@param bounds Bounds of the shape.
 	 * 	@param altbounds Alternative bounds.
+	 *  @param internalparameters Parameters that are considered to be internal and should not have input connectors.
 	 * 	@param eventparentid The parent ID if the shape is an event with a parent.
 	 * 	@param subprocessparentid The parent subprocess ID if the shape is part of a subprocess.
 	 * 	@param laneparentid ID if the parent if the shape is a lane.
 	 */
-	public void processBpmnShape(String bpmnid, MIdElement e, Boolean expanded, Rectangle2D bounds, Rectangle2D altbounds, String eventparentid, String subprocessparentid, String laneparentid);
+	public void processBpmnShape(String bpmnid, MIdElement e, Boolean expanded, Rectangle2D bounds, Rectangle2D altbounds,  Set<String> internalparameters, String eventparentid, String subprocessparentid, String laneparentid);
 
 	/**
 	 *  Process the visual part of a standard BPMN edge.

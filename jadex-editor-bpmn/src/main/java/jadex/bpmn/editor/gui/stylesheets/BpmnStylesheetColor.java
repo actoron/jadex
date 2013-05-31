@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import java.awt.font.LineMetrics;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
@@ -297,6 +298,9 @@ public class BpmnStylesheetColor extends mxStylesheet
 
 				if (g.getClipBounds() == null || g.getClipBounds().intersects(rect))
 				{
+					boolean hz = mxUtils.isTrue(style,
+							mxConstants.STYLE_HORIZONTAL, true);
+					
 					double scale = canvas.getScale();
 
 					Color fontColor = mxUtils.getColor(style,
@@ -320,6 +324,12 @@ public class BpmnStylesheetColor extends mxStylesheet
 						{
 							fbounds.setY(fbounds.getY() + lms[i].getLeading());
 						}
+					}
+					
+					double fheight = 0.0;
+					for (int i = 0; i < lms.length; ++i)
+					{
+						fheight += lms[i].getHeight();
 					}
 					
 					double ty = rect.y;
@@ -349,9 +359,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 						halignfac = 1.0;
 					}
 					
-					boolean hz = mxUtils.isTrue(style,
-							mxConstants.STYLE_HORIZONTAL, true);
-					
+					double basety = ty;
 					for (int i = 0; i < lines.length; ++i)
 					{
 						Rectangle2D linebounds = fm.getStringBounds(lines[i], g);
@@ -361,7 +369,12 @@ public class BpmnStylesheetColor extends mxStylesheet
 						if (!hz)
 						{
 							AffineTransform oldtf = g.getTransform();
-							g.rotate(4.71238898038468985769, tx + tl.getVisibleAdvance() * 0.5, rect.y + lms[0].getHeight());
+//							g.draw(new Ellipse2D.Double(tx + tl.getVisibleAdvance() * 0.5, ty + lms[0].getHeight() * 0.5, 10.0, 10.0));
+//							g.draw(new Ellipse2D.Double(tx + tl.getVisibleAdvance() * 0.5 - 5.0, basety + fheight * 0.5 - 5.0, 10.0, 10.0));
+							
+//							g.rotate(4.71238898038468985769, tx + tl.getVisibleAdvance() * 0.5, rect.y + lms[0].getHeight());
+//							g.rotate(4.71238898038468985769, tx + tl.getVisibleAdvance() * 0.5, ty + lms[0].getHeight() * 0.5);
+							g.rotate(4.71238898038468985769, tx + tl.getVisibleAdvance() * 0.5, basety + fheight * 0.5);
 							g.drawString(lines[i], (float) tx, (float) ty + lms[i].getAscent());
 							g.setTransform(oldtf);
 						}
@@ -491,7 +504,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_SHADOW, Boolean.TRUE);
 		style.put(mxConstants.STYLE_SPACING_TOP, 4);
 		style.put(mxConstants.STYLE_FILLCOLOR, GATEWAY_COLOR);
-		style.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
+//		style.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, style);
 		
 		style = new HashMap<String, Object>(style);
@@ -534,8 +547,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
-		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
-		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
+//		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+//		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
 //		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_ORTHOGONAL);
 //		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_SIDETOSIDE);
@@ -558,8 +571,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
-		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
-		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
+//		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+//		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
 //		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_ORTHOGONAL);
 //		style.put(mxConstants.STYLE_EDGE, mxConstants.EDGESTYLE_SIDETOSIDE);
@@ -577,8 +590,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
-		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
-		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
+//		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
+//		style.put(mxConstants.STYLE_EDITABLE, Boolean.FALSE);
 		style.put(mxConstants.STYLE_MOVABLE, Boolean.FALSE);
 		putCellStyle(VMessagingEdge.class.getSimpleName(), style);
 	}

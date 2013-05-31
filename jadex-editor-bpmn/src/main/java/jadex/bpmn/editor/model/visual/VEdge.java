@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.model.visual;
 
 import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.model.MNamedIdElement;
 
 import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
@@ -46,5 +47,24 @@ public class VEdge extends VElement
 			ret = getSource().getParent();
 		}
 		return ret;
+	}
+	
+	/** 
+	 *  Sets the value.
+	 */
+	public void setValue(Object value)
+	{
+		if (getBpmnElement() != null)
+		{
+			((MNamedIdElement) getBpmnElement()).setName((String) value);
+		}
+	}
+	
+	/** 
+	 *  Gets the value.
+	 */
+	public Object getValue()
+	{
+		return getBpmnElement() != null? ((MNamedIdElement) getBpmnElement()).getName() :  super.getValue();
 	}
 }

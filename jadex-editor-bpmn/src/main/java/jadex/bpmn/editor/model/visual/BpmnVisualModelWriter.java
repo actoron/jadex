@@ -8,6 +8,7 @@ import jadex.bpmn.model.io.SBpmnModelWriter;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
@@ -89,6 +90,25 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 					out.print("\" y=\"");
 					out.print(alt.getY());
 					out.println("\"/>");
+				}
+			}
+			
+			if (node instanceof VActivity)
+			{
+				Set<String> intparams = ((VActivity) node).getInternalParameters();
+				if (intparams != null && intparams.size() > 0)
+				{
+					out.print(SBpmnModelWriter.getIndent(4));
+					out.println("<di:extension>");
+					for (String intparam : intparams)
+					{
+						out.print(SBpmnModelWriter.getIndent(5));
+						out.print("<jadexvisual:internalParameter>");
+						out.print(intparam);
+						out.println("</jadexvisual:internalParameter>");
+					}
+					out.print(SBpmnModelWriter.getIndent(4));
+					out.println("</di:extension>");
 				}
 			}
 			

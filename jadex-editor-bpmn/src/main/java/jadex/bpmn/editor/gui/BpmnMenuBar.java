@@ -8,17 +8,20 @@ import jadex.commons.SUtil;
 
 import java.awt.Dimension;
 import java.awt.Event;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPOutputStream;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -38,8 +41,12 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGeneratorContext;
+import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.xmlgraphics.java2d.GraphicContext;
 import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
+import org.w3c.dom.Document;
 
 import com.mxgraph.model.mxICell;
 import com.mxgraph.util.mxRectangle;
@@ -413,18 +420,30 @@ public class BpmnMenuBar extends JMenuBar
 				ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
 				if (modelcontainer != null)
 				{
+					String basefilename = modelcontainer.getFile() != null? modelcontainer.getFile().getPath() : "";
+					
+					if (basefilename.endsWith(".bpmn2"))
+					{
+						basefilename = basefilename.substring(0, basefilename.length() - 5) + "svg";
+					}
+					
 					BetterFileChooser fc = new BetterFileChooser(modelcontainer.getFile());
-					FileNameExtensionFilter filter = new FileNameExtensionFilter("EPS file", "eps");
+					FileNameExtensionFilter filter = new FileNameExtensionFilter("SVG file", "svg");
 					fc.addChoosableFileFilter(filter);
 					fc.setFileFilter(filter);
+//					filter = new FileNameExtensionFilter("WMF file", "wmf");
+//					fc.setFileFilter(filter);
+					filter = new FileNameExtensionFilter("EPS file", "eps");
+					fc.addChoosableFileFilter(filter);
+					fc.setAcceptAllFileFilterUsed(false);
+					
+					fc.setSelectedFile(new File(basefilename));
+					
 					int result = fc.showSaveDialog(modelcontainer.getGraphComponent());
 					if (JFileChooser.APPROVE_OPTION == result)
 					{
 						try
 						{
-							EPSDocumentGraphics2D g2d = new EPSDocumentGraphics2D(false);
-							g2d.setGraphicContext(new GraphicContext());
-							
 							BpmnGraph graph = modelcontainer.getGraph();
 							
 							int x = Integer.MAX_VALUE;
@@ -459,10 +478,31 @@ public class BpmnMenuBar extends JMenuBar
 							w += 4;
 							h += 4;
 							
-							File tmpfile = File.createTempFile("export", ".eps");
-							//modelcontainer.getGraphComponent().paint(g)
+							String ext = "eps";
+							if (fc.getFileFilter() instanceof FileNameExtensionFilter)
+							{
+								ext = ((FileNameExtensionFilter) fc.getFileFilter()).getExtensions()[0];
+							}
+							
+							File tmpfile = File.createTempFile("bpmnexport", "." + ext);
 							FileOutputStream fos = new FileOutputStream(tmpfile);
-							g2d.setupDocument(fos, w, h);
+							Graphics2D  g2d = null;
+							
+							if ("svg".equals(ext))
+							{
+								Document doc = GenericDOMImplementation.getDOMImplementation().createDocument("http://www.w3.org/2000/svg", "svg", null);
+								SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(doc);
+								ctx.setEmbeddedFontsOn(true);
+								g2d = new SVGGraphics2D(ctx, true);
+							}
+							else
+							{
+								g2d = new EPSDocumentGraphics2D(true);
+								((EPSDocumentGraphics2D) g2d).setGraphicContext(new GraphicContext());
+								((EPSDocumentGraphics2D) g2d).setupDocument(fos, w, h);
+							}
+							
+							//modelcontainer.getGraphComponent().paint(g)
 							g2d.setClip(0, 0, w, h);
 							g2d.translate(-x, -y);
 							Object[] selcells = modelcontainer.getGraph().getSelectionModel().getCells();
@@ -470,14 +510,23 @@ public class BpmnMenuBar extends JMenuBar
 				        	
 							modelcontainer.getGraphComponent().getGraphControl().paint(g2d);
 				        	modelcontainer.getGraph().setSelectionCells(selcells);
-				        	g2d.finish();
-				        	fos.close();
+				        	
+				        	if (g2d instanceof EPSDocumentGraphics2D)
+				        	{
+				        		((EPSDocumentGraphics2D) g2d).finish();
+				        		fos.close();
+				        	}
+				        	else if (g2d instanceof SVGGraphics2D)
+				        	{
+				        		OutputStreamWriter writer = new OutputStreamWriter(new GZIPOutputStream(fos));
+				        		((SVGGraphics2D) g2d).stream(writer, false, true);
+				        		writer.close();
+				        	}
 				        	
 				        	File file = fc.getSelectedFile();
-				        	String ext = "." + filter.getExtensions()[0];
 				        	if (!file.getName().endsWith(ext))
 							{
-								file = new File(file.getAbsolutePath() + ext);
+								file = new File(file.getPath() + ext);
 							}
 				        	
 				        	SUtil.moveFile(tmpfile, file);

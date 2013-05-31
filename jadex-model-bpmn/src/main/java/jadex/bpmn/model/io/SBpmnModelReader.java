@@ -53,6 +53,9 @@ public class SBpmnModelReader
 	/** Key for alternative visual object bounds. */
 	public static final String WAYPOINTS_KEY = "waypoints";
 	
+	/** Key for visual internalized parameters. */
+	public static final String INTERNAL_PARAMETERS_KEY = "internalparameters";
+	
 	/** Activity type mapping. */
 	public static final Map<String, String> ACT_TYPE_MAPPING = new HashMap<String, String>();
 	static
@@ -128,6 +131,8 @@ public class SBpmnModelReader
 				buffer.put("dc", reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/DD/20100524/DC"));
 				buffer.put("bpmndi", reader.getNamespaceContext().getPrefix("http://www.omg.org/spec/BPMN/20100524/DI"));
 				buffer.put("semantic", sempre);
+				buffer.put("jadex", reader.getNamespaceContext().getPrefix("http://www.activecomponents.org/bpmnextensions"));
+				buffer.put("jadexvisual", reader.getNamespaceContext().getPrefix("http://www.activecomponents.org/bpmnvisualextensions"));
 		    }
 		    if (reader.getEventType() == XMLStreamConstants.START_ELEMENT)
 		    {
@@ -228,13 +233,13 @@ public class SBpmnModelReader
 		{
 			handleSemanticElement(model, emap, lanemap, laneparents, tag, tagstack, attrs, content, buffer);
 		}
-		else if("jadex".equals(tag.getPrefix()))
+		else if(buffer.get("jadex").equals(tag.getPrefix()))
 		{
 			handleJadexElement(model, tag, tagstack, attrs, content, buffer, emap);
 		}
-		else if (vreader != null && (buffer.get("bpmndi").equals(tag.getPrefix()) || buffer.get("dc").equals(tag.getPrefix()) || buffer.get("di").equals(tag.getPrefix())))
+		else if (vreader != null && (buffer.get("bpmndi").equals(tag.getPrefix()) || buffer.get("dc").equals(tag.getPrefix()) || buffer.get("di").equals(tag.getPrefix()) || buffer.get("jadexvisual").equals(tag.getPrefix())))
 		{
-			handleVisualElement(vreader, tag, attrs, laneparents, emap, buffer);
+			handleVisualElement(vreader, tag, attrs, content, laneparents, emap, buffer);
 		}
 	}
 	
@@ -464,6 +469,9 @@ public class SBpmnModelReader
 		{
 			MSequenceEdge edge = new MSequenceEdge();
 			edge.setId(attrs.get("id"));
+			String edgename = attrs.get("name");
+			edgename = edgename != null? unescapeString(edgename) : null;
+			edge.setName(edgename);
 			MActivity src = (MActivity) emap.get(attrs.get("sourceRef"));
 			MActivity tgt = (MActivity) emap.get(attrs.get("targetRef"));
 			edge.setSource(src);
@@ -529,6 +537,9 @@ public class SBpmnModelReader
 		{
 			MMessagingEdge edge = new MMessagingEdge();
 			edge.setId(attrs.get("id"));
+			String edgename = attrs.get("name");
+			edgename = edgename != null? unescapeString(edgename) : null;
+			edge.setName(edgename);
 			MActivity src = (MActivity) emap.get(attrs.get("sourceRef"));
 			MActivity tgt = (MActivity) emap.get(attrs.get("targetRef"));
 			edge.setSource(src);
@@ -955,6 +966,9 @@ public class SBpmnModelReader
 		{
 			MDataEdge edge = new MDataEdge();
 			edge.setId(attrs.get("id"));
+			String edgename = attrs.get("name");
+			edgename = edgename != null? unescapeString(edgename) : null;
+			edge.setName(edgename);
 			MActivity src = (MActivity)emap.get(attrs.get("sourceRef"));
 			MActivity tgt = (MActivity)emap.get(attrs.get("targetRef"));
 			edge.setSource(src);
@@ -997,7 +1011,7 @@ public class SBpmnModelReader
 	 *  @param emap The element map.
 	 *  @param buffer The buffer.
 	 */
-	protected static final void handleVisualElement(IBpmnVisualModelReader vreader, QName tag, Map<String, String> attrs, Map<String, String> laneparents, Map<String, MIdElement> emap, Map<String, Object> buffer)
+	protected static final void handleVisualElement(IBpmnVisualModelReader vreader, QName tag, Map<String, String> attrs, String content, Map<String, String> laneparents, Map<String, MIdElement> emap, Map<String, Object> buffer)
 	{
 		if (vreader != null)
 		{
@@ -1051,34 +1065,46 @@ public class SBpmnModelReader
 				String laneparentid = e != null? laneparents.get(e.getId()) : null;
 				Rectangle2D bounds = (Rectangle2D) vbuffer.remove(BOUNDS_KEY);
 				Rectangle2D altbounds = (Rectangle2D) vbuffer.remove(ALT_BOUNDS_KEY);
-				vreader.processBpmnShape(bpmnid, e, expanded, bounds, altbounds, eventparentid, subprocessparentid, laneparentid);
+				Set<String> intparams = (Set<String>) vbuffer.remove(INTERNAL_PARAMETERS_KEY);
+				vreader.processBpmnShape(bpmnid, e, expanded, bounds, altbounds, intparams, eventparentid, subprocessparentid, laneparentid);
 			}
 			else if ("BPMNEdge".equals(tag.getLocalPart()))
 			{
 				String bpmnid = attrs.get("bpmnElement");
 				MIdElement medge = emap.get(bpmnid);
-				List<Point2D> waypoints = (List<Point2D>) buffer.remove("waypoints");
+				List<Point2D> waypoints = (List<Point2D>) vbuffer.remove(WAYPOINTS_KEY);
 				vreader.processBpmnEdge(bpmnid, medge, waypoints);
 			}
 			else if ("Edge".equals(tag.getLocalPart()))
 			{
 				String type = attrs.get("type");
-				List<Point2D> waypoints = (List<Point2D>) buffer.remove("waypoints");
+				List<Point2D> waypoints = (List<Point2D>) vbuffer.remove(WAYPOINTS_KEY);
 				vreader.processGenericEdge(type, waypoints, attrs, emap);
 			}
 			else if ("waypoint".equals(tag.getLocalPart()))
 			{
-				List<Point2D> waypoints = (List<Point2D>) buffer.get(WAYPOINTS_KEY);
+				List<Point2D> waypoints = (List<Point2D>) vbuffer.get(WAYPOINTS_KEY);
 				if (waypoints == null)
 				{
 					waypoints = new ArrayList<Point2D>();
-					buffer.put(WAYPOINTS_KEY, waypoints);
+					vbuffer.put(WAYPOINTS_KEY, waypoints);
 				}
 				
 				Point2D.Double point = new Point2D.Double();
 				point.x = Double.parseDouble(attrs.get("x"));
 				point.y = Double.parseDouble(attrs.get("y"));
 				waypoints.add(point);
+			}
+			else if ("internalParameter".equals(tag.getLocalPart()))
+			{
+				Set<String> intparams = (Set<String>) vbuffer.get(INTERNAL_PARAMETERS_KEY);
+				if (intparams == null)
+				{
+					intparams = new HashSet<String>();
+					vbuffer.put(INTERNAL_PARAMETERS_KEY, intparams);
+				}
+				
+				intparams.add(content);
 			}
 		}
 	}

@@ -39,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 10;
+	public static final int BUILD = 11;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -160,7 +160,9 @@ public class SBpmnModelWriter
 		out.print(indent);
 		out.println("xmlns:semantic=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"");
 		out.print(indent);
-		out.println("xmlns:jadex=\"http://www.activecomponents.org/bpmnextensions\">");
+		out.println("xmlns:jadex=\"http://www.activecomponents.org/bpmnextensions\"");
+		out.print(indent);
+		out.println("xmlns:jadexvisual=\"http://www.activecomponents.org/bpmnvisualextensions\">");
 	}
 	
 	/**
@@ -846,7 +848,14 @@ public class SBpmnModelWriter
 		for (MDataEdge dedge : dataedges)
 		{
 			out.print(getIndent(ind));
-			out.print("<jadex:dataFlow id=\"");
+			out.print("<jadex:dataFlow ");
+			if (dedge.getName() != null && dedge.getName().length() > 0)
+			{
+				out.print("name=\"");
+				out.print(escapeString(dedge.getName()));
+				out.print("\" ");
+			}
+			out.print("id=\"");
 			out.print(escapeString(dedge.getId()));
 			out.print("\" sourceRef=\"");
 			out.print(escapeString(dedge.getSource().getId()));
@@ -1221,7 +1230,14 @@ public class SBpmnModelWriter
 	{
 		for (MSequenceEdge edge : seqedges)
 		{
-			out.print(getIndent(baseind) + "<semantic:sequenceFlow sourceRef=\"");
+			out.print(getIndent(baseind) + "<semantic:sequenceFlow ");
+			if (edge.getName() != null && edge.getName().length() > 0)
+			{
+				out.print("name=\"");
+				out.print(escapeString(edge.getName()));
+				out.print("\" ");
+			}
+			out.print("sourceRef=\"");
 			out.print(escapeString(edge.getSource().getId()));
 			out.print("\" targetRef=\"");
 			out.print(escapeString(edge.getTarget().getId()));
@@ -1272,7 +1288,14 @@ public class SBpmnModelWriter
 	{
 		for (MMessagingEdge edge : medges)
 		{
-			out.print(getIndent(baseind) + "<semantic:messageFlow sourceRef=\"");
+			out.print(getIndent(baseind) + "<semantic:messageFlow ");
+			if (edge.getName() != null && edge.getName().length() > 0)
+			{
+				out.print("name=\"");
+				out.print(escapeString(edge.getName()));
+				out.print("\" ");
+			}
+			out.print("sourceRef=\"");
 			out.print(escapeString(edge.getSource().getId()));
 			out.print("\" targetRef=\"");
 			out.print(escapeString(edge.getTarget().getId()));

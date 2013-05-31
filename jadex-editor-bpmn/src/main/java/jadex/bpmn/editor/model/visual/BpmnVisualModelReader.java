@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,11 +86,12 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 	 *  @param expanded Flag whether the shape should be collapsed (false), expanded (true) or default (null).
 	 * 	@param bounds Bounds of the shape.
 	 * 	@param altbounds Alternative bounds.
+	 *  @param internalparameters Parameters that are considered to be internal and should not have input connectors.
 	 * 	@param eventparentid The parent ID if the shape is an event with a parent.
 	 * 	@param subprocessparentid The parent subprocess ID if the shape is part of a subprocess.
 	 * 	@param laneparentid ID if the parent if the shape is a lane.
 	 */
-	public void processBpmnShape(String bpmnid, MIdElement e, Boolean expanded, Rectangle2D bounds, Rectangle2D altbounds, String eventparentid, String subprocessparentid, String laneparentid)
+	public void processBpmnShape(String bpmnid, MIdElement e, Boolean expanded, Rectangle2D bounds, Rectangle2D altbounds, Set<String> internalparameters, String eventparentid, String subprocessparentid, String laneparentid)
 	{
 		VNamedNode vnode = null;
 		
@@ -116,6 +118,11 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 		else if (e instanceof MLane)
 		{
 			vnode = new VLane(graph);
+		}
+		
+		if (internalparameters != null && vnode instanceof VActivity)
+		{
+			((VActivity) vnode).setInternalParameters(internalparameters);
 		}
 		
 		if (vnode == null)

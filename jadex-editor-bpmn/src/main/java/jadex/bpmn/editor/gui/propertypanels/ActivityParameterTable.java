@@ -27,7 +27,7 @@ import javax.swing.table.TableColumn;
 public class ActivityParameterTable extends JTable
 {
 	/** The column names. */
-	protected static final String[] COLUMN_NAMES = { "Direction", "Name", "Class", "Initial Value" };
+	protected static final String[] COLUMN_NAMES = { "Direction", "Name", "Class", "Initial Value", "Internal" };
 	
 	/** The activity. */
 	protected VActivity activity;
@@ -40,11 +40,11 @@ public class ActivityParameterTable extends JTable
 		this.activity = activity;
 		setModel(new ParameterTableModel());
 		
-		getColumnModel().getColumn(0).setPreferredWidth(1000);
-		for (int i = 1; i < getColumnCount(); ++i)
-		{
-			getColumnModel().getColumn(i).setPreferredWidth(3000);
-		}
+		getColumnModel().getColumn(0).setPreferredWidth(500);
+		getColumnModel().getColumn(1).setPreferredWidth(1000);
+		getColumnModel().getColumn(2).setPreferredWidth(3000);
+		getColumnModel().getColumn(3).setPreferredWidth(5000);
+		getColumnModel().getColumn(4).setPreferredWidth(500);
 		
 //		System.out.println("size: "+modelcontainer.getAllClasses().size());
 		
@@ -170,7 +170,30 @@ public class ActivityParameterTable extends JTable
 	     */
 		public boolean isCellEditable(int rowIndex, int columnIndex)
 		{
-			return true;
+			boolean ret = true;
+			if (columnIndex == 4)
+			{
+				MParameter param = (MParameter)getBpmnActivity().getParameters().get(rowIndex);
+				String inival = (String) getValueAt(rowIndex, 3);
+				if (MParameter.DIRECTION_OUT.equals(param.getDirection()) || inival == null || inival.length() == 0)
+				{
+					ret = false;
+				}
+			}
+			return ret;
+		}
+		
+		/**
+		 *  Returns the column class.
+		 */
+		public Class<?> getColumnClass(int columnIndex)
+		{
+			if (columnIndex == 4)
+			{
+				return Boolean.class;
+			}
+			
+			return super.getColumnClass(columnIndex);
 		}
 		
 		/**
@@ -215,6 +238,8 @@ public class ActivityParameterTable extends JTable
 					return param.getClazz();
 				case 3:
 					return param.getInitialValue() != null? param.getInitialValue().getValue() : "";
+				case 4:
+					return activity.isInternalParameters(param.getName());
 			}
 		}
 		
@@ -232,14 +257,26 @@ public class ActivityParameterTable extends JTable
 			{
 				case 0:
 					param.setDirection((String) value);
+					if (MParameter.DIRECTION_OUT.equals(value))
+					{
+						activity.removeInternalParameter(param.getName());
+						fireTableCellUpdated(rowIndex, 4);
+					}
+					activity.refreshParameter(param);
 					break;
 				case 1:
 				default:
 					if (!value.equals(getValueAt(rowIndex, columnIndex)))
 					{
+						boolean internal = activity.isInternalParameters(param.getName());
+						activity.removeInternalParameter(param.getName());
 						getBpmnActivity().getParameters().remove(rowIndex);
 						param.setName(BasePropertyPanel.createFreeName((String) value, new BasePropertyPanel.IndexMapContains(getBpmnActivity().getParameters())));
 						getBpmnActivity().getParameters().add(rowIndex, param.getName(), param);
+						if (internal)
+						{
+							activity.addInternalParameter(param.getName());
+						}
 					}
 					break;
 				case 2:
@@ -247,6 +284,17 @@ public class ActivityParameterTable extends JTable
 					break;
 				case 3:
 					param.getInitialValue().setValue((String) value);
+					break;
+				case 4:
+					if (Boolean.TRUE.equals(value))
+					{
+						activity.addInternalParameter(param.getName());
+					}
+					else
+					{
+						activity.removeInternalParameter(param.getName());
+					}
+					break;
 			}
 			fireTableCellUpdated(rowIndex, columnIndex);
 		}
