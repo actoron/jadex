@@ -3,6 +3,10 @@ package jadex.micro.testcases.longcall;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IPullIntermediateFuture;
+import jadex.commons.future.IPullSubscriptionIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableFuture;
 
 /**
  *  Test interface that has a timeout annotation specifying
@@ -13,14 +17,39 @@ import jadex.commons.future.IIntermediateFuture;
 public interface ITestService
 {
 	/**
-	 *  A first test method.
+	 *  A test method.
 	 */
 	@Timeout(2000)
-	public IFuture<Void> method(String msg);
+	public IFuture<Void> method1();
 	
 	/**
-	 *  A second test method.
+	 *  A test method.
 	 */
 	@Timeout(2000)
-	public IIntermediateFuture<Void> imethod();
+	public ITerminableFuture<Void> method2();
+	
+	/**
+	 *  A test method.
+	 */
+	@Timeout(2000)
+	public IIntermediateFuture<Void> method3();
+	
+	/**
+	 *  A test method.
+	 */
+	@Timeout(2000)
+	public ISubscriptionIntermediateFuture<Void> method4();
+	
+	/**
+	 *  A test method.
+	 */
+	@Timeout(2000)
+	public IPullIntermediateFuture<Void> method5();
+	
+	/**
+	 *  A test method.
+	 */
+	@Timeout(2000)
+	public IPullSubscriptionIntermediateFuture<Void> method6();
+
 }

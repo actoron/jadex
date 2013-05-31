@@ -5,11 +5,20 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.commons.ICommand;
 import jadex.commons.future.Future;
 import jadex.commons.future.ICommandFuture;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IPullIntermediateFuture;
+import jadex.commons.future.IPullSubscriptionIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.PullIntermediateFuture;
+import jadex.commons.future.PullSubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminableFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
@@ -32,34 +41,74 @@ public class ProviderAgent implements ITestService
 	 *  Call a method that must use a secure
 	 *  transport under the hood.
 	 */
-	public IFuture<Void> method(String msg)
+	public IFuture<Void> method1()
 	{
 		final Future<Void> ret = new Future<Void>();
-		
 		System.out.println("Called method");
-		
 		doCall(ret);
-		
 		return ret;
-//		return IFuture.DONE;
 	}
 	
-
 	/**
-	 *  A second test method.
+	 *  A test method.
 	 */
-	public IIntermediateFuture<Void> imethod()
+	@Timeout(2000)
+	public ITerminableFuture<Void> method2()
+	{
+		final TerminableFuture<Void> ret = new TerminableFuture<Void>();
+		System.out.println("Called tmethod");
+		doCall(ret);
+		return ret;
+	}
+	
+	/**
+	 *  A test method.
+	 */
+	@Timeout(2000)
+	public IIntermediateFuture<Void> method3()
 	{
 		final IntermediateFuture<Void> ret = new IntermediateFuture<Void>();
-		
 		System.out.println("Called imethod");
-		
 		doCall(ret);
-		
 		return ret;
-//		return IFuture.DONE;
 	}
 	
+	/**
+	 *  A test method.
+	 */
+	@Timeout(2000)
+	public ISubscriptionIntermediateFuture<Void> method4()
+	{
+		final SubscriptionIntermediateFuture<Void> ret = new SubscriptionIntermediateFuture<Void>();
+		System.out.println("Called smethod");
+		doCall(ret);
+		return ret;
+	}
+	
+	/**
+	 *  A test method.
+	 */
+	@Timeout(2000)
+	public IPullIntermediateFuture<Void> method5()
+	{
+		final PullIntermediateFuture<Void> ret = new PullIntermediateFuture<Void>((ICommand<PullIntermediateFuture<Void>>)null);
+		System.out.println("Called pmethod");
+		doCall(ret);
+		return ret;
+	}
+	
+	/**
+	 *  A test method.
+	 */
+	@Timeout(2000)
+	public IPullSubscriptionIntermediateFuture<Void> method6()
+	{
+		final PullSubscriptionIntermediateFuture<Void> ret = new PullSubscriptionIntermediateFuture<Void>((ICommand<PullSubscriptionIntermediateFuture<Void>>)null);
+		System.out.println("Called psmethod");
+		doCall(ret);
+		return ret;
+	}
+
 	/**
 	 * 
 	 */

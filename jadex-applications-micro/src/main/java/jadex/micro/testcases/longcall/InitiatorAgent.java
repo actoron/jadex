@@ -24,8 +24,10 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,7 +40,7 @@ import java.util.List;
 })
 @Arguments(
 {
-	@Argument(name="testcnt", clazz=int.class, defaultvalue="4")
+	@Argument(name="testcnt", clazz=int.class, defaultvalue="12")
 })
 public class InitiatorAgent extends TestAgent
 {
@@ -232,48 +234,70 @@ public class InitiatorAgent extends TestAgent
 				
 				System.out.println("calling method: "+ServiceCall.getInvocation());
 				
-				ts.method("test1").addResultListener(new IResultListener<Void>()
+				callMethod(ts, 1, ret).addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
-						System.out.println("rec result");
-						tr.setSucceeded(true);
-						ret.addIntermediateResult(tr);
-						proceed();
+						ret.setFinished();
 					}
-					
 					public void exceptionOccurred(Exception exception)
 					{
-						tr.setFailed("Exception: "+exception);
-						ret.addIntermediateResult(tr);
-						proceed();
-					}
-					
-					public void proceed()
-					{
-						ts.imethod().addResultListener(new IResultListener<Collection<Void>>()
-						{
-							public void resultAvailable(Collection<Void> result)
-							{
-								System.out.println("rec result");
-								tr.setSucceeded(true);
-								ret.addIntermediateResult(tr);
-								ret.setFinished();
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								tr.setFailed("Exception: "+exception);
-								ret.addIntermediateResult(tr);
-								ret.setFinished();
-							}
-						});
+						ret.setException(exception);
 					}
 				});
-				
-				
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> callMethod(final ITestService ts, final int cnt, final IntermediateFuture<TestReport> ret) 
+	{
+		final Future<Void> res = new Future<Void>();
+		
+		try
+		{
+			final TestReport tr = new TestReport("#"+cnt, "Test if long call works with normal timeout.");
+
+			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
+			
+			((IFuture<Void>)m.invoke(ts, new Object[0])).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					System.out.println("rec result");
+					tr.setSucceeded(true);
+					ret.addIntermediateResult(tr);
+					proceed();
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					tr.setFailed("Exception: "+exception);
+					ret.addIntermediateResult(tr);
+					proceed();
+				}
+				
+				public void proceed()
+				{
+					if(cnt<6)
+					{
+						callMethod(ts, cnt+1, ret).addResultListener(new DelegationResultListener<Void>(res));
+					}
+					else
+					{
+						res.setResult(null);
+					}
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
+		return res;
 	}
 }

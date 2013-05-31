@@ -34,7 +34,8 @@ public class Shop2BDI
 	
 	/** The customer capability. */
 	@Capability(beliefmapping=@Mapping("money"))
-	protected ShopCapa shopcap	= new ShopCapa((String)agent.getArgument("shopname"), (List<ItemInfo>)agent.getArgument("catalog"));
+	protected ShopCapa shopcap	= new ShopCapa((String)agent.getArgument("shopname"), 
+		(List<ItemInfo>)agent.getArgument("catalog"));
 	
 	/** The money. */
 	@Belief
