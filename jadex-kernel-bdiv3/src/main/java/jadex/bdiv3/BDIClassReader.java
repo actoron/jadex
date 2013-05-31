@@ -24,6 +24,7 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
+import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.GoalDelegationHandler;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
 import jadex.bridge.ClassInfo;
@@ -224,7 +225,7 @@ public class BDIClassReader extends MicroClassReader
 						for(Mapping mapping : acap.beliefmapping())
 						{
 							String	source	= mapping.value();
-							String	target	= fields[i].getName()+"."+(mapping.target().equals("") ? source : mapping.target());
+							String	target	= fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+(mapping.target().equals("") ? source : mapping.target());
 							bdimodel.addBeliefMapping(target, source);	// Store inverse mapping
 						}
 						
@@ -470,12 +471,12 @@ public class BDIClassReader extends MicroClassReader
 
 			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
 			{
-				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+"."+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish());
+				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish());
 				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
 			}
 			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
 			{
-				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+"."+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding());
+				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding());
 				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
 			}
 			
@@ -484,7 +485,7 @@ public class BDIClassReader extends MicroClassReader
 				List<String>	events	= new ArrayList<String>();
 				for(String event: bel.getEvents())
 				{
-					String	mapped	= name+"."+event;
+					String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
 					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
 				}
 				
@@ -498,14 +499,14 @@ public class BDIClassReader extends MicroClassReader
 					bel2	= new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), events.toArray(new String[events.size()]));
 					bel2.setSetter(bel.getSetter());
 				}
-				bel2.setName(name+"."+bel2.getName());
+				bel2.setName(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+bel2.getName());
 				
 				bdimodel.getCapability().addBelief(bel2);
 			}
 			
 			for(String target: capa.getBeliefMappings().keySet())
 			{
-				bdimodel.addBeliefMapping(name+"."+target, name+"."+capa.getBeliefMappings().get(target));
+				bdimodel.addBeliefMapping(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target, name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
 			}
 			
 			for(MGoal goal : capa.getCapability().getGoals())
@@ -517,7 +518,7 @@ public class BDIClassReader extends MicroClassReader
 			
 			for(MPlan plan : capa.getCapability().getPlans())
 			{
-				MPlan	plan2	= new MPlan(name+"."+plan.getName(), plan.getBody(), plan.getTrigger(), plan.getWaitqueue(), plan.getPriority());
+				MPlan	plan2	= new MPlan(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(), plan.getTrigger(), plan.getWaitqueue(), plan.getPriority());
 				bdimodel.getCapability().addPlan(plan2);
 				// Todo: map events of plan trigger / waitqueue
 			}

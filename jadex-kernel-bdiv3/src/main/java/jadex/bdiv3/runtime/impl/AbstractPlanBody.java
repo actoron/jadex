@@ -8,7 +8,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.IPojoMicroAgent;
 
 /**
  *  Abstract base class for plan body implementations.
@@ -53,7 +52,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 		final Future<Void> ret = new Future<Void>();
 		
 		String	pname	= rplan.getModelElement().getName();
-		String	capaname	= pname.indexOf(".")==-1 ? null : pname.substring(0, pname.lastIndexOf("."));
+		String	capaname	= pname.indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
+			? null : pname.substring(0, pname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
 		final Object agent	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).getCapabilityObject(capaname);
 
 		internalInvokePart(agent, guessParameters(getBodyParameterTypes()), 0).addResultListener(new IResultListener<Void>()

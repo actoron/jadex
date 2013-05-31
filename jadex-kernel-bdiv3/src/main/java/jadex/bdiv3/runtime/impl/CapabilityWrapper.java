@@ -42,7 +42,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public void addBeliefListener(final String name, final IBeliefListener listener)
 	{
-		agent.addBeliefListener(capa!=null ? capa+"."+name : name, listener);
+		agent.addBeliefListener(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, listener);
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public void removeBeliefListener(String name, IBeliefListener listener)
 	{
-		agent.removeBeliefListener(capa!=null ? capa+"."+name : name, listener);
+		agent.removeBeliefListener(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, listener);
 	}
 
 	/**

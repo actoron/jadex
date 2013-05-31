@@ -501,10 +501,11 @@ public class BDIAgent extends MicroAgent
 	 */
 	public Object	getAbstractBeliefValue(String capa, String name, Class<?> type)
 	{
-//		System.out.println("getAbstractBeliefValue(): "+capa+"."+name+", "+type);
+//		System.out.println("getAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name+", "+type);
 		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
-		String	belname	= bdimodel.getBeliefMappings().get(capa+"."+name);
-		String	capaname	= belname.indexOf(".")==-1 ? null : belname.substring(0, belname.lastIndexOf("."));
+		String	belname	= bdimodel.getBeliefMappings().get(capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+		String	capaname	= belname.indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
+			? null : belname.substring(0, belname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
 		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
 		Object	ocapa	= ((BDIAgentInterpreter)getInterpreter()).getCapabilityObject(capaname);
 		Object	ret	= bel.getValue(ocapa, getClassLoader());
@@ -533,10 +534,11 @@ public class BDIAgent extends MicroAgent
 	 */
 	public void	setAbstractBeliefValue(String capa, String name, Object value)
 	{
-//		System.out.println("setAbstractBeliefValue(): "+capa+"."+name);
+//		System.out.println("setAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
 		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
-		String	belname	= bdimodel.getBeliefMappings().get(capa+"."+name);
-		String	capaname	= belname.indexOf(".")==-1 ? null : belname.substring(0, belname.lastIndexOf("."));
+		String	belname	= bdimodel.getBeliefMappings().get(capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+		String	capaname	= belname.indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
+			? null : belname.substring(0, belname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
 		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
 		Object	ocapa	= ((BDIAgentInterpreter)getInterpreter()).getCapabilityObject(capaname);
 

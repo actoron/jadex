@@ -107,7 +107,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IService getProvidedService(String name)
 	{
-		return interpreter.getServiceContainer().getProvidedService(capa!=null ? capa+"."+name : name);
+		return interpreter.getServiceContainer().getProvidedService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name)
 	{
-		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+"."+name : name);
+		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IIntermediateFuture getRequiredServices(String name)
 	{
-		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+"."+name : name);
+		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
 	}
 	
 	/**
@@ -162,7 +162,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name, boolean rebind)
 	{
-		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+"."+name : name);
+		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
 	}
 	
 	/**
@@ -171,7 +171,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
-		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+"."+name : name, rebind);
+		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind);
 	}
 	
 	/**
@@ -180,7 +180,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IFuture getRequiredService(String name, boolean rebind, IFilter filter)
 	{
-		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+"."+name : name, rebind, filter);
+		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind, filter);
 	}
 	
 	/**
@@ -189,7 +189,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 */
 	public IIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
 	{
-		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+"."+name : name, rebind, filter);
+		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind, filter);
 	}
 	
 	/**

@@ -84,6 +84,11 @@ import java.util.StringTokenizer;
  */
 public class BDIAgentInterpreter extends MicroAgentInterpreter
 {
+	//-------- constants --------
+	
+	/** The capability separator. */
+	public static String	CAPABILITY_SEPARATOR	= "/";
+	
 	//-------- attributes --------
 	
 	/** The bdi model. */
@@ -199,7 +204,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		Object	ret	= ((PojoBDIAgent)microagent).getPojoAgent();
 		if(name!=null)
 		{
-			StringTokenizer	stok	= new StringTokenizer(name, ".");
+			StringTokenizer	stok	= new StringTokenizer(name, CAPABILITY_SEPARATOR);
 			while(stok.hasMoreTokens())
 			{
 				try
@@ -251,7 +256,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		Future<Void>	ret	= new Future<Void>();
 		
-		int i	= info.getName().indexOf(".");
+		int i	= info.getName().indexOf(CAPABILITY_SEPARATOR);
 		Object	ocapa	= ((PojoBDIAgent)microagent).getPojoAgent();
 		String	capa	= null;
 		final IValueFetcher	oldfetcher	= getFetcher();
@@ -372,7 +377,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					Field	g	= agent.getClass().getDeclaredField("__globalname");
 					g.setAccessible(true);
 					globalname	= (String)g.get(agent);
-					globalname	= globalname==null ? f.getName() : globalname+"."+f.getName();
+					globalname	= globalname==null ? f.getName() : globalname+CAPABILITY_SEPARATOR+f.getName();
 				}
 				catch(Exception e)
 				{
@@ -581,10 +586,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			try
 			{
 				Object	capa	= agent;
-				int	i	= mbel.getName().indexOf(".");
+				int	i	= mbel.getName().indexOf(CAPABILITY_SEPARATOR);
 				if(i!=-1)
 				{
-					capa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(".")));
+					capa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)));
 				}
 				Object val = mbel.getValue(capa, getClassLoader());
 				if(val==null)
@@ -650,10 +655,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			if(evs!=null && !evs.isEmpty())
 			{
 				Object	ocapa	= agent;
-				int	i	= mbel.getName().indexOf(".");
+				int	i	= mbel.getName().indexOf(CAPABILITY_SEPARATOR);
 				if(i!=-1)
 				{
-					ocapa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(".")));
+					ocapa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)));
 				}
 				final Object	capa	= ocapa;
 
