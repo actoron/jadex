@@ -1,5 +1,7 @@
 package jadex.bpmn.editor.gui;
 
+import java.awt.Insets;
+
 
 
 /**
@@ -10,6 +12,9 @@ public class GuiConstants
 {
 	/** Constant 45 degree sine value. */
 	public static final double SINE_45 = Math.sin(0.25 * Math.PI);
+	
+	/** Default button insets. */
+	public static final Insets DEFAULT_BUTTON_INSETS = new Insets(2, 2, 2, 2);
 	
 	/** Ratio between graph and property view. */
 	public static final double GRAPH_PROPERTY_RATIO = 0.7;

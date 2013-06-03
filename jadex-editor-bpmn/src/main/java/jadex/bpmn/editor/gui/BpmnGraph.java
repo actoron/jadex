@@ -53,7 +53,7 @@ public class BpmnGraph extends mxGraph
 		setAllowLoops(true);
 		setVertexLabelsMovable(false);
 		setCellsCloneable(false);
-		setAllowNegativeCoordinates(false);
+		setAllowNegativeCoordinates(true);
 		setGridEnabled(true);
 		setGridSize(10);
 		/*getModel().addListener(mxEvent.EXECUTE, access.getValueChangeController());
@@ -157,6 +157,10 @@ public class BpmnGraph extends mxGraph
 			cell instanceof VDataEdge)
 		{
 			ret &= modelcontainer.getSettings().isDataEdges();
+		}
+		else if (cell instanceof VSequenceEdge)
+		{
+			ret &= modelcontainer.getSettings().isSequenceEdges();
 		}
 		
 		return ret;

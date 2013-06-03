@@ -30,9 +30,6 @@ import javax.swing.table.AbstractTableModel;
 
 public class SettingsPanel extends JPanel
 {
-	/** The library path field. */
-//	protected JTextField libpathfield;
-	
 	/** The library entry table. */
 	protected JTable libentrytable;
 	
@@ -41,6 +38,12 @@ public class SettingsPanel extends JPanel
 	
 	/** Smooth zoom box. */
 	protected JCheckBox szbox;
+	
+	/** Sequence edge enabled box. */
+	protected JCheckBox sebox;
+	
+	/** Direct sequence edge auto box. */
+	protected JCheckBox dsbox;
 	
 	/** Data edge enabled box. */
 	protected JCheckBox debox;
@@ -85,20 +88,6 @@ public class SettingsPanel extends JPanel
 				SettingsPanel.this.firePropertyChange(OptionDialog.OPTIONS_CHANGED_PROPERTY, null, null);
 			}
 		};
-		
-//		JLabel label = new JLabel("Jadex Home");
-//		libpathfield = new JTextField();
-//		if (settings.getLibraryHome() != null)
-//		{
-//			libpathfield.setText(settings.getLibraryHome().getPath());
-//		}
-//		libpathfield.getDocument().addDocumentListener(new DocumentAdapter()
-//		{
-//			public void update(DocumentEvent e)
-//			{
-//				SettingsPanel.this.firePropertyChange(OptionDialog.OPTIONS_CHANGED_PROPERTY, null, null);
-//			}
-//		});
 		
 		libentrytable = new JTable(new ClassPathTableModel());
 		
@@ -256,50 +245,65 @@ public class SettingsPanel extends JPanel
 //		g.insets = new Insets(0, 10, 0, 5);
 //		generalpanel.add(button, g);
 		
+		JPanel cppanel = new JPanel(new GridBagLayout());
+		cppanel.setBorder(new TitledBorder("Class Path Settings"));
+		tabpane.addTab("Class Path", cppanel);
+		
 		g = new GridBagConstraints();
 		g.gridheight = 5;
 		g.weightx = 1.0;
 		g.weighty = 1.0;
 		g.fill = GridBagConstraints.BOTH;
-		generalpanel.add(new JScrollPane(libentrytable), g);
+		cppanel.add(new JScrollPane(libentrytable), g);
 		
 		g = new GridBagConstraints();
 		g.gridx = 1;
 		g.fill = GridBagConstraints.HORIZONTAL;
-		generalpanel.add(pathbutton, g);
+		g.insets = GuiConstants.DEFAULT_BUTTON_INSETS;
+		cppanel.add(pathbutton, g);
 		
 		g = new GridBagConstraints();
 		g.gridx = 1;
 		g.gridy = 1;
 		g.fill = GridBagConstraints.HORIZONTAL;
-		generalpanel.add(projectbutton, g);
+		g.insets = GuiConstants.DEFAULT_BUTTON_INSETS;
+		cppanel.add(projectbutton, g);
 		
 		g = new GridBagConstraints();
 		g.gridx = 1;
 		g.gridy = 2;
 		g.fill = GridBagConstraints.HORIZONTAL;
-		generalpanel.add(removebutton, g);
+		g.insets = GuiConstants.DEFAULT_BUTTON_INSETS;
+		cppanel.add(removebutton, g);
 		
 		g = new GridBagConstraints();
 		g.gridx = 1;
 		g.gridy = 3;
 		g.fill = GridBagConstraints.HORIZONTAL;
-		generalpanel.add(clearbutton, g);
+		g.insets = GuiConstants.DEFAULT_BUTTON_INSETS;
+		cppanel.add(clearbutton, g);
 		
 		g = new GridBagConstraints();
 		g.gridx = 1;
 		g.gridy = 4;
 		g.weighty = 1.0;
 		g.fill = GridBagConstraints.VERTICAL;
-		generalpanel.add(new JPanel(), g);
+		cppanel.add(new JPanel(), g);
 		
 		szbox = new JCheckBox(changeaction);
 		szbox.setText("Smooth Zoom");
 		szbox.setSelected(settings.isSmoothZoom());
 		g = new GridBagConstraints();
-		g.gridy = 5;
 		g.anchor = GridBagConstraints.WEST;
 		generalpanel.add(szbox, g);
+		
+		g = new GridBagConstraints();
+		g.gridwidth = 2;
+		g.gridy = 1;
+		g.weightx = 1.0;
+		g.weighty = 1.0;
+		g.fill = GridBagConstraints.BOTH;
+		generalpanel.add(new JPanel(), g);
 		
 //		g = new GridBagConstraints();
 //		g.gridy = 5;
@@ -309,34 +313,52 @@ public class SettingsPanel extends JPanel
 //		g.fill = GridBagConstraints.BOTH;
 //		generalpanel.add(new JPanel(), g);
 		
-		JPanel dataedgepanel = new JPanel(new GridBagLayout());
-		dataedgepanel.setBorder(new TitledBorder("Data Edge Settings"));
-		tabpane.addTab("Data Edge Settings", dataedgepanel);
+		JPanel edgepanel = new JPanel(new GridBagLayout());
+		edgepanel.setBorder(new TitledBorder("Edge Settings"));
+		tabpane.addTab("Data Edge Settings", edgepanel);
+		
+		sebox = new JCheckBox(changeaction);
+		sebox.setText("Enable sequence edges");
+		sebox.setToolTipText("Enable sequence edges.");
+		sebox.setSelected(settings.isSequenceEdges());
+		g = new GridBagConstraints();
+		g.anchor = GridBagConstraints.WEST;
+		edgepanel.add(sebox, g);
+		
+		dsbox = new JCheckBox(changeaction);
+		dsbox.setText("Generate missing sequence edge on data connections");
+		dsbox.setToolTipText("Generate missing sequence edge on data connections.");
+		dsbox.setSelected(settings.isDirectSequenceAutoConnect());
+		g = new GridBagConstraints();
+		g.gridy = 1;
+		g.anchor = GridBagConstraints.WEST;
+		edgepanel.add(dsbox, g);
 		
 		debox = new JCheckBox(changeaction);
 		debox.setText("Enable data edges");
 		debox.setToolTipText("Enable data edges.");
 		debox.setSelected(settings.isDataEdges());
 		g = new GridBagConstraints();
+		g.gridy = 2;
 		g.anchor = GridBagConstraints.WEST;
-		dataedgepanel.add(debox, g);
+		edgepanel.add(debox, g);
 		
 		ntbox = new JCheckBox(changeaction);
 		ntbox.setText("Generate data edge for matching name and type");
 		ntbox.setToolTipText("Generate data edge if following task has parameter of matching name and type.");
 		ntbox.setSelected(settings.isNameTypeDataAutoConnect());
 		g = new GridBagConstraints();
-		g.gridy = 1;
+		g.gridy = 3;
 		g.anchor = GridBagConstraints.WEST;
-		dataedgepanel.add(ntbox, g);
+		edgepanel.add(ntbox, g);
 		
 		g = new GridBagConstraints();
-		g.gridy = 2;
+		g.gridy = 4;
 		g.gridwidth = GridBagConstraints.REMAINDER;
 		g.weightx = 1.0;
 		g.weighty = 1.0;
 		g.fill = GridBagConstraints.BOTH;
-		dataedgepanel.add(new JPanel(), g);
+		edgepanel.add(new JPanel(), g);
 	}
 	
 	/**
@@ -379,6 +401,8 @@ public class SettingsPanel extends JPanel
 			settings.setGlobalAllClasses(globalcache.getGlobalAllClasses());
 		}
 		settings.setSmoothZoom(szbox.isSelected());
+		settings.setDirectSequenceAutoConnect(dsbox.isSelected());
+		settings.setSequenceEdges(sebox.isSelected());
 		settings.setNameTypeDataAutoConnect(ntbox.isSelected());
 		settings.setDataEdges(debox.isSelected());
 	}

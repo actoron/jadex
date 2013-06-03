@@ -42,11 +42,17 @@ public class Settings
 	/** The last file opened or saved. */
 	protected int toolbariconsize = GuiConstants.DEFAULT_ICON_SIZE;
 	
+	/** Sequence edge enabled flag. */
+	protected boolean sequenceedges = true;
+	
 	/** Data edge enabled flag. */
 	protected boolean dataedges = true;
 	
 	/** Flag if simple name/type data edge auto-connect is enabled. */
 	protected boolean nametypedataautoconnect = true;
+	
+	/** Flag if simple direct sequence edge auto-connect is enabled. */
+	protected boolean directsequenceautoconnect = true;
 	
 	/** Flag if save settings on exit is enable. */
 	protected boolean savesettingsonexit = true;
@@ -150,6 +156,26 @@ public class Settings
 	}
 	
 	/**
+	 *  Gets the sequenceedges.
+	 *
+	 *  @return The sequenceedges.
+	 */
+	public boolean isSequenceEdges()
+	{
+		return sequenceedges;
+	}
+
+	/**
+	 *  Sets the sequenceedges.
+	 *
+	 *  @param sequenceedges The sequenceedges.
+	 */
+	public void setSequenceEdges(boolean sequenceedges)
+	{
+		this.sequenceedges = sequenceedges;
+	}
+
+	/**
 	 *  Gets the dataedges.
 	 *
 	 *  @return The dataedges.
@@ -187,6 +213,26 @@ public class Settings
 	public void setNameTypeDataAutoConnect(boolean nametypedataautoconnect)
 	{
 		this.nametypedataautoconnect = nametypedataautoconnect;
+	}
+	
+	/**
+	 *  Gets the directsequenceautoconnect.
+	 *
+	 *  @return The directsequenceautoconnect.
+	 */
+	public boolean isDirectSequenceAutoConnect()
+	{
+		return directsequenceautoconnect;
+	}
+
+	/**
+	 *  Sets the directsequenceautoconnect.
+	 *
+	 *  @param directsequenceautoconnect The directsequenceautoconnect.
+	 */
+	public void setDirectSequenceAutoConnect(boolean directsequenceautoconnect)
+	{
+		this.directsequenceautoconnect = directsequenceautoconnect;
 	}
 
 	/**
@@ -444,6 +490,10 @@ public class Settings
 		
 		props.put("smoothzoom", String.valueOf(smoothzoom));
 		
+		props.put("sequenceedges", String.valueOf(sequenceedges));
+		
+		props.put("directsequenceautoconnect", String.valueOf(directsequenceautoconnect));
+		
 		props.put("dataedges", String.valueOf(dataedges));
 		
 		props.put("nametypedataautoconnect", String.valueOf(nametypedataautoconnect));
@@ -567,6 +617,30 @@ public class Settings
 				try
 				{
 					ret.setSmoothZoom(Boolean.parseBoolean(prop));
+				}
+				catch (Exception e)
+				{
+				}
+			}
+			
+			prop = props.getProperty("sequenceedges");
+			if (prop != null)
+			{
+				try
+				{
+					ret.setSequenceEdges(Boolean.parseBoolean(prop));
+				}
+				catch (Exception e)
+				{
+				}
+			}
+			
+			prop = props.getProperty("directsequenceautoconnect");
+			if (prop != null)
+			{
+				try
+				{
+					ret.setDirectSequenceAutoConnect(Boolean.parseBoolean(prop));
 				}
 				catch (Exception e)
 				{

@@ -35,7 +35,9 @@ import java.awt.Point;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxICell;
@@ -390,7 +392,7 @@ public class SCreationController
 						outparam.getName() != null && outparam.getName().equals(inparam.getName()) &&
 						outparam.getClazz() != null && outparam.getClazz().getTypeName().equals(inparam.getClazz().getTypeName()))
 					{
-						VDataEdge vdataedge = createDataEdge(graph, modelcontainer.getIdGenerator(), voutparam, vinparam);
+						VDataEdge vdataedge = createDataEdge(graph, modelcontainer.getIdGenerator(), voutparam, vinparam, false);
 						graph.addCell(vdataedge, vdataedge.getEdgeParent());
 						break;
 					}
@@ -402,7 +404,7 @@ public class SCreationController
 		}
 		else if (source instanceof VOutParameter && target instanceof VInParameter)
 		{
-			ret = createDataEdge(graph, modelcontainer.getIdGenerator(), (VOutParameter) source, (VInParameter) target);
+			ret = createDataEdge(graph, modelcontainer.getIdGenerator(), (VOutParameter) source, (VInParameter) target, modelcontainer.getSettings().isDirectSequenceAutoConnect());
 		}
 		
 		return ret;
@@ -587,10 +589,11 @@ public class SCreationController
 	 * 	@param target Edge target.
 	 * 	@return The edge.
 	 */
-	protected static final VDataEdge createDataEdge(final BpmnGraph graph, IdGenerator idgenerator, VOutParameter source, VInParameter target)
+	protected static final VDataEdge createDataEdge(final BpmnGraph graph, IdGenerator idgenerator, VOutParameter source, VInParameter target, boolean autoseqedge)
 	{
 		final VActivity vtactivity = (VActivity) target.getParent();
-		MActivity sactivity = (MActivity) ((VActivity) source.getParent()).getBpmnElement();
+		VActivity vsactivity = (VActivity) source.getParent();
+		MActivity sactivity = (MActivity) vsactivity.getBpmnElement();
 		MActivity tactivity = (MActivity) vtactivity.getBpmnElement();
 		
 		MDataEdge dedge = new MDataEdge();
@@ -607,7 +610,46 @@ public class SCreationController
 		
 		graph.delayedRefreshCellView(vtactivity);
 		
+		if (autoseqedge)
+		{
+			Set<VNode> rnodes = getReverseSequenceFlowNodes(vtactivity, null);
+			if (!rnodes.contains(vsactivity))
+			{
+				MSequenceEdge medge = new MSequenceEdge();
+				medge.setId(idgenerator.generateId());
+				VSequenceEdge seqedge = new VSequenceEdge(graph, VSequenceEdge.class.getSimpleName());
+				seqedge.setBpmnElement(medge);
+				seqedge.setSource(vsactivity);
+				seqedge.setTarget(vtactivity);
+				graph.addCell(seqedge, seqedge.getEdgeParent());
+			}
+		}
+		
 		return vedge;
+	}
+	
+	protected static final Set<VNode> getReverseSequenceFlowNodes(VNode start, Set<VNode> visited)
+	{
+		if (visited == null)
+		{
+			visited = new HashSet<VNode>();
+		}
+		
+		if (!visited.contains(start))
+		{
+			visited.add(start);
+			
+			for (int i = 0; i < start.getEdgeCount(); ++i)
+			{
+				if (start.getEdgeAt(i) instanceof VSequenceEdge &&
+					start.equals(((VSequenceEdge) start.getEdgeAt(i)).getTarget()))
+				{
+					getReverseSequenceFlowNodes((VNode) ((VSequenceEdge) start.getEdgeAt(i)).getSource(), visited);
+				}
+			}
+		}
+		
+		return visited;
 	}
 	
 	/**
