@@ -32,6 +32,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -421,11 +422,12 @@ public class SCreationController
 //		VEdge vedge = (VEdge) cell;
 		mxGeometry geo = vedge.getGeometry();
 		List<mxPoint> points = (List<mxPoint>) geo.getPoints();
-		
+//		mxPoint amxp = (new mxPoint(mxp));
 		mxICell parent = null;
 //		if (vedge.getSource() != null && vedge.getSource().getParent() != null)
 //		{
 		parent = vedge.getEdgeParent();
+		mxCellState pstate = modelcontainer.getGraph().getView().getState(parent, true);
 //			parent = vedge.getSource().getParent();
 //			while (parent != null &&
 //				   !(parent instanceof VSubProcess) &&
@@ -437,7 +439,7 @@ public class SCreationController
 			
 		if (parent != null)
 		{
-			mxCellState pstate = modelcontainer.getGraph().getView().getState(parent, true);
+			
 			if (pstate != null)
 			{
 				mxp.setX(mxp.getX() - pstate.getOrigin().getX());
@@ -461,9 +463,56 @@ public class SCreationController
 		}
 		else
 		{
+			List<mxPoint> newpoints = new ArrayList<mxPoint>(points);
+			mxPoint p = new mxPoint(vedge.getSource().getGeometry().getCenterX(), vedge.getSource().getGeometry().getCenterY());
+			mxICell pp = vedge.getSource();
+			if (pp instanceof VOutParameter)
+			{
+				pp = pp.getParent();
+				p.setX(p.getX() + pp.getGeometry().getX());
+				p.setY(p.getY() + pp.getGeometry().getY());
+			}
+			
+			newpoints.add(0, p);
+			p = new mxPoint(vedge.getTarget().getGeometry().getCenterX(), vedge.getTarget().getGeometry().getCenterY());
+			pp = vedge.getTarget();
+			if (pp instanceof VInParameter)
+			{
+				pp = pp.getParent();
+				p.setX(p.getX() + pp.getGeometry().getX());
+				p.setY(p.getY() + pp.getGeometry().getY());
+			}
+			
+			newpoints.add(p);
+			
+//			newpoints.add(new mxPoint(vedge.getTarget().getGeometry().getCenterX(), vedge.getTarget().getGeometry().getCenterY()));
+//			modelcontainer.getGraph().getView().getState(vedge, true).
+//			if (pstate != null)
+//			{
+//				newpoints.get(0).setX(newpoints.get(0).getX() + pstate.getOrigin().getX());
+//				newpoints.get(0).setY(newpoints.get(0).getY() + pstate.getOrigin().getY());
+//				newpoints.get(newpoints.size() - 1).setX(newpoints.get(newpoints.size() - 1).getX() + pstate.getOrigin().getX());
+//				newpoints.get(newpoints.size() - 1).setY(newpoints.get(newpoints.size() - 1).getY() + pstate.getOrigin().getY());
+//			}
 //			int ind = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(cell), amxp.getX(), amxp.getY());
-			int ind = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(vedge), mxp.getX(), mxp.getY());
-			points.add(ind, mxp);
+//			int ind = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(vedge), mxp.getX(), mxp.getY());
+			double dist2 = Double.MAX_VALUE;
+			int ind = -1;
+			for (int i = 0; i < newpoints.size() - 1; ++i)
+			{
+				double d2 = Line2D.ptSegDistSq(newpoints.get(i).getX(), newpoints.get(i).getY(),
+						  newpoints.get(i + 1).getX(), newpoints.get(i + 1).getY(), mxp.getX(), mxp.getY());
+				if (dist2 > d2)
+				{
+					dist2 = d2;
+					ind = i + 1;
+				}
+			}
+			newpoints.add(ind, mxp);
+			newpoints.remove(0);
+			newpoints.remove(newpoints.size() - 1);
+			points.clear();
+			points.addAll(newpoints);
 		}
 		
 		modelcontainer.getGraph().refreshCellView(vedge);
@@ -473,6 +522,61 @@ public class SCreationController
 		modelcontainer.getGraph().setGridEnabled(gridstate);
 		
 		modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+	}
+	
+	/**
+	 *  Deletes a control point.
+	 */
+	public static final void deleteControlPoint(VEdge vedge, mxPoint mxp, ModelContainer modelcontainer)
+	{
+		boolean gridstate = modelcontainer.getGraph().isGridEnabled();
+		modelcontainer.getGraph().setGridEnabled(false);
+		
+		mxGeometry geo = vedge.getGeometry();
+		List<mxPoint> points = (List<mxPoint>) geo.getPoints();
+		
+		mxICell parent = vedge.getEdgeParent();
+			
+		if (parent != null)
+		{
+			mxCellState pstate = modelcontainer.getGraph().getView().getState(parent, true);
+			if (pstate != null)
+			{
+				mxp.setX(mxp.getX() - pstate.getOrigin().getX());
+				mxp.setY(mxp.getY() - pstate.getOrigin().getY());
+			}
+		}
+		
+		if (points == null)
+		{
+			points = new ArrayList<mxPoint>();
+			geo.setPoints(points);
+		}
+		
+		if (points.size() > 0)
+		{
+			double dist2 = Double.MAX_VALUE;
+			int ind = -1;
+			for (int i = 0; i < points.size(); ++i)
+			{
+				double diffx = points.get(i).getX() - mxp.getX();
+				double diffy = points.get(i).getY() - mxp.getY();
+				double d2p = Math.abs(diffx * diffx + diffy * diffy);
+				if (dist2 > d2p)
+				{
+					dist2 = d2p;
+					ind = i;
+				}
+			}
+//			int ind = mxUtils.findNearestSegment(modelcontainer.getGraph().getView().getState(vedge), mxp.getX(), mxp.getY());
+			points.remove(ind);
+		}
+		
+		modelcontainer.getGraph().refreshCellView(vedge);
+		modelcontainer.getGraph().setSelectionCell(vedge);
+		modelcontainer.setDirty(true);
+		
+		modelcontainer.getGraph().setGridEnabled(gridstate);
 	}
 	
 	/**

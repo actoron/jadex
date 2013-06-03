@@ -66,7 +66,7 @@ public class MouseController extends MouseAdapter
 	 */
 	public void mouseClicked(MouseEvent e)
 	{
-		if (MouseEvent.BUTTON1 == e.getButton())
+		if (MouseEvent.BUTTON1 == e.getButton() && e.getClickCount() == 1)
 		{
 			mxPoint mxp = modelcontainer.getGraphComponent().getPointForEvent(e);
 			Point2D p = new Point2D.Double(mxp.getX(), mxp.getY());
@@ -160,6 +160,13 @@ public class MouseController extends MouseAdapter
 						modelcontainer.setDirty(true);
 					}
 				}
+			}
+			
+			mxPoint mxp = modelcontainer.getGraphComponent().getPointForEvent(e);
+			Object cell = modelcontainer.getGraphComponent().getCellAt(e.getX(), e.getY());
+			if (cell instanceof VEdge)
+			{
+				SCreationController.deleteControlPoint((VEdge) cell, mxp, modelcontainer);
 			}
 		}
 //		else if (MouseEvent.BUTTON3 == e.getButton() &&
