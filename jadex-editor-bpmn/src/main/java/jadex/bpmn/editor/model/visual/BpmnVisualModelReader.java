@@ -318,7 +318,8 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				
 				graph.getModel().beginUpdate();
 //				graph.addCell(vedge, vedge.getSource().getParent().getParent());
-				graph.addCell(vedge);
+//				graph.addCell(vedge);
+				graph.addCell(vedge, vedge.getEdgeParent());
 				graph.getModel().endUpdate();
 			}
 			else
