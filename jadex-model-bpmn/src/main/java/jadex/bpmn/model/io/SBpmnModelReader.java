@@ -1216,8 +1216,35 @@ public class SBpmnModelReader
 	 */
 	private static final String unescapeString(String string)
 	{
-		string = string.replace("\\n", "\n");
-		string = string.replace("\\\\", "\\");
-		return string;
+		StringBuilder ret = new StringBuilder();
+		boolean escapemode = false;
+		for (int i = 0; i < string.length(); ++i)
+		{
+			String c = string.substring(i, i + 1);
+			if (escapemode)
+			{
+				if (c.equals("n"))
+				{
+					ret.append("\n");
+				}
+				else
+				{
+					ret.append(c);
+				}
+				escapemode = false;
+			}
+			else
+			{
+				if (c.equals("\\"))
+				{
+					escapemode = true;
+				}
+				else
+				{
+					ret.append(c);
+				}
+			}
+		}
+		return ret.toString();
 	}
 }
