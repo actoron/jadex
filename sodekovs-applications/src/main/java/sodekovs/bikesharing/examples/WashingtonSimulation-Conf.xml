@@ -21,7 +21,8 @@
 	<Dataproviders>
 		<Dataprovider name="BikestationsLogger">
 			<Source name="$bikestation" sourcetype="ISpaceObject" objecttype="bikestation"/> 						
-			<Data name="stock">$bikestation.stock</Data>				
+			<Data name="stock">$bikestation.stock</Data>
+			<Data name="capacity">$bikestation.capacity</Data>				
 			<Data name="stationID">$bikestation.stationID</Data>
 			<Data name="time">$tick</Data>							
 		</Dataprovider>
