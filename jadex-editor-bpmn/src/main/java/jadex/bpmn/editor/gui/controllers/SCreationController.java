@@ -391,7 +391,7 @@ public class SCreationController
 						outparam.getClazz() != null && outparam.getClazz().getTypeName().equals(inparam.getClazz().getTypeName()))
 					{
 						VDataEdge vdataedge = createDataEdge(graph, modelcontainer.getIdGenerator(), voutparam, vinparam);
-						graph.addCell(vdataedge);
+						graph.addCell(vdataedge, vdataedge.getEdgeParent());
 						break;
 					}
 				}
