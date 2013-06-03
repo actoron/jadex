@@ -93,6 +93,9 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 	/** The visual event */
 	protected VActivity vevent;
 	
+	/** The parameter table. */
+	protected JTable paramtable;
+	
 	public MessageEventPropertyPanel(ModelContainer container, VActivity vmsgevent)
 	{
 		super("Message Event", container);
@@ -172,7 +175,7 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 		
 		JPanel tablepanel = new JPanel(new GridBagLayout());
 		
-		final JTable paramtable = new JTable(new ParameterTableModel());
+		paramtable = new JTable(new ParameterTableModel());
 		JScrollPane tablescrollpane = new JScrollPane(paramtable);
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.weightx = 1.0;
@@ -317,6 +320,17 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 		msgtypestring = MESSAGE_NAME_MAPPING.containsKey(msgtypestring) ? MESSAGE_NAME_MAPPING.get(msgtypestring) : msgtypestring;
 		msgtypestring = "fipa".equals(msgtypestring)? null : msgtypestring;
 		//getMEvent().setPropertyValue("messagetype", msgtypestring);
+	}
+	
+	/**
+	 *  Terminates.
+	 */
+	public void terminate()
+	{
+		if (paramtable.isEditing())
+		{
+			paramtable.getCellEditor().stopCellEditing();
+		}
 	}
 	
 	protected class ParameterTableModel extends AbstractTableModel

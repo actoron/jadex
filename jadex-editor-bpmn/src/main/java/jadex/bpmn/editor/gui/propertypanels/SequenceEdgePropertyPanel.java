@@ -37,6 +37,9 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 	/** The sequence edge */
 	protected VSequenceEdge seqedge;
 	
+	/** The mappings table. */
+	protected JTable maptable;
+	
 	/**
 	 *  Creates a new property panel.
 	 *  @param container The model container.
@@ -111,7 +114,7 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 		gc.weighty = 1.0;
 		gc.fill = GridBagConstraints.BOTH;
 		gc.insets = new Insets(0, 5, 5, 0);
-		final JTable maptable = new JTable(new MappingsTableModel());
+		maptable = new JTable(new MappingsTableModel());
 		JScrollPane mapscrollpane = new JScrollPane(maptable);
 		mappanel.add(mapscrollpane, gc);
 		
@@ -162,9 +165,23 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 		addVerticalFiller(column, y);
 	}
 	
+	/**
+	 * Get the edge.
+	 */
 	protected MSequenceEdge getBpmnSequenceEdge()
 	{
 		return (MSequenceEdge) seqedge.getBpmnElement();
+	}
+	
+	/**
+	 *  Terminate.
+	 */
+	public void terminate()
+	{
+		if (maptable.isEditing())
+		{
+			maptable.getCellEditor().stopCellEditing();
+		}
 	}
 	
 	/**

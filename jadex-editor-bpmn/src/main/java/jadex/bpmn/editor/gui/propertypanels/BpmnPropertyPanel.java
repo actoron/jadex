@@ -96,11 +96,23 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	/** Cache for handling configurations. */
 	protected List<ConfigurationInfo> confcache;
 	
+	/** The import table. */
+	protected JTable importtable;
+	
 	/** The configurations table. */
 	protected JTable conftable;
 	
-	/** The configurations table. */
+	/** The parameter table. */
 	protected JTable paramtable;
+	
+	/** The properties table. */
+	protected JTable proptable;
+	
+	/** The provided services table. */
+	protected JTable pstable;
+	
+	/** The required services table. */
+	protected JTable rstable;
 	
 	/** Cache for handling parameters. */
 	protected IndexMap paramcche;
@@ -283,7 +295,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.weighty = 1.0;
 		gc.fill = GridBagConstraints.BOTH;
 		gc.insets = new Insets(0, 5, 5, 0);
-		final JTable importtable = new JTable(new ImportTableModel());
+		importtable = new JTable(new ImportTableModel());
 		JScrollPane tablescrollpane = new JScrollPane(importtable);
 		tablepanel.add(tablescrollpane, gc);
 		
@@ -557,7 +569,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.weighty = 1.0;
 		gc.fill = GridBagConstraints.BOTH;
 		gc.insets = new Insets(0, 5, 5, 0);
-		final JTable proptable = new JTable(new PropertyTableModel());
+		proptable = new JTable(new PropertyTableModel());
 		JScrollPane tablescrollpane = new JScrollPane(proptable);
 		tablepanel.add(tablescrollpane, gc);
 		
@@ -629,7 +641,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 5, 5, 0);
 		JComboBox proxybox = new JComboBox(PROXY_TYPES);
 		final DefaultCellEditor proxyeditor = new DefaultCellEditor(proxybox);
-		final JTable pstable = new JTable(new ProvidedServicesTableModel())
+		pstable = new JTable(new ProvidedServicesTableModel())
 		{
 			public TableCellEditor getCellEditor(int row, int column)
 			{
@@ -736,7 +748,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		}
 		JComboBox scopebox = new JComboBox(scopeboxscopes);
 		final DefaultCellEditor scopeeditor = new DefaultCellEditor(scopebox);
-		final JTable rstable = new JTable(new RequiredServicesTableModel())
+		rstable = new JTable(new RequiredServicesTableModel())
 		{
 			public TableCellEditor getCellEditor(int row, int column)
 			{
@@ -997,6 +1009,42 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			conf = confcache.get(sel);
 		}
 		return conf != null? conf.getName() : null;
+	}
+	
+	/**
+	 *  Terminates.
+	 */
+	public void terminate()
+	{
+		if (importtable.isEditing())
+		{
+			importtable.getCellEditor().stopCellEditing();
+		}
+		
+		if (conftable.isEditing())
+		{
+			conftable.getCellEditor().stopCellEditing();
+		}
+		
+		if (conftable.isEditing())
+		{
+			paramtable.getCellEditor().stopCellEditing();
+		}
+		
+		if (conftable.isEditing())
+		{
+			proptable.getCellEditor().stopCellEditing();
+		}
+		
+		if (conftable.isEditing())
+		{
+			pstable.getCellEditor().stopCellEditing();
+		}
+		
+		if (conftable.isEditing())
+		{
+			rstable.getCellEditor().stopCellEditing();
+		}
 	}
 	
 	/**

@@ -77,6 +77,9 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	/** The task. */
 	protected VActivity task;
 	
+	/** Parameter table. */
+	protected ActivityParameterTable atable;
+	
 	/**
 	 *  Creates a new property panel.
 	 *  @param container The model container.
@@ -217,7 +220,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		gc.fill = GridBagConstraints.BOTH;
 		column.add(descpane, gc);
 		
-		final ActivityParameterTable atable = new ActivityParameterTable(container, task);
+		atable = new ActivityParameterTable(container, task);
 		
 		processTaskInfos((ClassInfo)cbox.getSelectedItem(), descarea);
 		
@@ -444,6 +447,17 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	protected MActivity getBpmnTask()
 	{
 		return (MActivity)task.getBpmnElement();
+	}
+	
+	/**
+	 *  Terminate.
+	 */
+	public void terminate()
+	{
+		if (atable.isEditing())
+		{
+			atable.getCellEditor().stopCellEditing();
+		}
 	}
 	
 	/**

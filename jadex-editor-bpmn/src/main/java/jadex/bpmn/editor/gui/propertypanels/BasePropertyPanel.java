@@ -270,6 +270,13 @@ public class BasePropertyPanel extends JPanel
 	}
 	
 	/**
+	 *  Terminate operations.
+	 */
+	public void terminate()
+	{
+	}
+	
+	/**
 	 *  Helper method for finding a free name.
 	 */
 	protected static final String createFreeName(String name, IFilter<String> contains)

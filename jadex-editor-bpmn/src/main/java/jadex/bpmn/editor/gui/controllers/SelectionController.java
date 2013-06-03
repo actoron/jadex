@@ -34,7 +34,10 @@ public class SelectionController implements mxIEventListener
 		//String added = "removed";
 		
 		BasePropertyPanel proppanel = (BasePropertyPanel) modelcontainer.getPropertypanelcontainer().getComponent(0);
-		
+		if (proppanel != null)
+		{
+			proppanel.terminate();
+		}
 		
 		if (evt.getProperty(removed) != null ||
 			modelcontainer.getGraph().getSelectionCount() == 0 ||
