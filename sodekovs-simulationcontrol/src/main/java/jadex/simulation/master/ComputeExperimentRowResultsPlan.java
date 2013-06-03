@@ -166,7 +166,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	private void evaluteMarsWorldCSV(HashMap rowResults, String experimentDescription) {
 		StringBuffer mb = new StringBuffer();
 		mb.append("time,sensedOre,producedOre,collectedOre,targetSeen,targetAnalyzed,targetProduced,votingAttempts,adaptations,failures\n");
-		
+
 		for (Object o : rowResults.values()) {
 			RowResult result = (RowResult) o;
 			List<ExperimentResult> experimentResults = result.getExperimentsResults();
@@ -175,7 +175,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			for (ExperimentResult experimentResult : experimentResults) {
 				StringBuffer sb = new StringBuffer();
 				experimentSizes.add(experimentResult.getEvents().size());
-				
+
 				List<ObservedEvent> events = experimentResult.getEvents();
 				sb.append("time,sensedOre,producedOre,collectedOre,targetSeen,targetAnalyzed,targetProduced,votingAttempts,adaptations,failures\n");
 				for (ObservedEvent event : events) {
@@ -190,10 +190,11 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 					Integer votingAttempts = Integer.valueOf((String) properties.get("votingAttempts"));
 					Integer adaptations = Integer.valueOf((String) properties.get("adaptations"));
 					Integer failures = Integer.valueOf((String) properties.get("failures"));
-					
-					sb.append(time + "," + sensedOre + "," + producedOre + "," + collectedOre + "," + targetSeen + "," + targetAnalyzed + "," + targetProduced + "," + votingAttempts + "," + adaptations + "," + failures + "\n");
+
+					sb.append(time + "," + sensedOre + "," + producedOre + "," + collectedOre + "," + targetSeen + "," + targetAnalyzed + "," + targetProduced + "," + votingAttempts + ","
+							+ adaptations + "," + failures + "\n");
 				}
-				
+
 				String id = getDateAsString();
 				// Persists result in file on disk as txt file
 				try {
@@ -204,11 +205,11 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 					e.printStackTrace();
 				}
 			}
-			
+
 			// median eval of all experiments
 			for (int i = 0; i < Collections.min(experimentSizes); i++) {
 				double time = 0.0, collectedOre = 0.0, sensedOre = 0.0, producedOre = 0.0, targetSeen = 0.0, targetAnalyzed = 0.0, targetProduced = 0.0, votingAttempts = 0.0, adaptations = 0.0, failures = 0.0;
-				
+
 				for (ExperimentResult experimentResult : experimentResults) {
 					ObservedEvent event = experimentResult.getEvents().get(i);
 					Map properties = event.getObservedObjectProperties();
@@ -223,7 +224,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 					adaptations += Double.valueOf((String) properties.get("adaptations"));
 					failures += Double.valueOf((String) properties.get("failures"));
 				}
-				
+
 				time /= experimentResults.size();
 				collectedOre /= experimentResults.size();
 				sensedOre /= experimentResults.size();
@@ -234,10 +235,11 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 				votingAttempts /= experimentResults.size();
 				adaptations /= experimentResults.size();
 				failures /= experimentResults.size();
-				
-				mb.append(time + "," + sensedOre + "," + producedOre + "," + collectedOre + "," + targetSeen + "," + targetAnalyzed + "," + targetProduced + "," + votingAttempts + "," + adaptations + "," + failures + "\n");
+
+				mb.append(time + "," + sensedOre + "," + producedOre + "," + collectedOre + "," + targetSeen + "," + targetAnalyzed + "," + targetProduced + "," + votingAttempts + "," + adaptations
+						+ "," + failures + "\n");
 			}
-			
+
 			String id = getDateAsString();
 			// Persists result in file on disk as txt file
 			try {
@@ -322,67 +324,67 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			medianOre += ore;
 		}
 		medianOre = medianOre / noExps;
-		
+
 		double medianAdaptations = 0;
 		for (Double adaptation : adaptationCosts) {
 			medianAdaptations += adaptation;
 		}
 		medianAdaptations = medianAdaptations / noExps;
-		
+
 		double medianCollectedOre = 0;
 		for (Integer collectedOre : collectedOres) {
 			medianCollectedOre += collectedOre;
 		}
 		medianCollectedOre = medianCollectedOre / noExps;
-		
+
 		double medianSensedOre = 0;
 		for (Integer ore : sensedOres) {
 			medianSensedOre += ore;
 		}
 		medianSensedOre = medianSensedOre / noExps;
-		
+
 		double medianProducedOre = 0;
 		for (Integer ore : producedOres) {
 			medianProducedOre += ore;
 		}
 		medianProducedOre = medianProducedOre / noExps;
-		
+
 		double medianTargetsSeen = 0;
 		for (Integer target : targetsSeen) {
 			medianTargetsSeen += target;
 		}
 		medianTargetsSeen = medianTargetsSeen / noExps;
-		
+
 		double medianTargetsAnalyzed = 0;
 		for (Integer target : targetsAnalyzed) {
 			medianTargetsAnalyzed += target;
 		}
 		medianTargetsAnalyzed = medianTargetsAnalyzed / noExps;
-		
+
 		double medianTargetsProduced = 0;
 		for (Integer target : targetsProduced) {
 			medianTargetsProduced += target;
 		}
 		medianTargetsProduced = medianTargetsProduced / noExps;
-		
+
 		double medianVoting = 0;
 		for (Integer vote : votingAttemptsList) {
 			medianVoting += vote;
 		}
 		medianVoting = medianVoting / noExps;
-		
+
 		double medianAdaptationsReal = 0;
 		for (Integer adaptation : adaptationsList) {
 			medianAdaptationsReal += adaptation;
 		}
 		medianAdaptationsReal = medianAdaptationsReal / noExps;
-		
+
 		double medianFailures = 0;
 		for (Integer failure : failuresList) {
 			medianFailures += failure;
 		}
 		medianFailures = medianFailures / noExps;
-		
+
 		StringBuffer sb = new StringBuffer();
 		sb.append("Experiment: " + experimentDescription + "\n");
 		sb.append("No. Experiments: " + noExps + "\n");
@@ -457,7 +459,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 
 			System.out.println("\n\n#ComputeExperimentRowResultsPlan# Simulation finished. Write Results of Simulation to XML!");
 			XMLHandler.writeXMLToFile(result, "SimRes" + getDateAsString() + ".xml", SimulationResult.class);
-			
+
 			// Store also the evaluation in a file
 			try {
 				BufferedWriter out = new BufferedWriter(new FileWriter("SimulationEVALUATIONResults" + "-" + getDateAsString() + ".txt"));
@@ -548,8 +550,8 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 
 			System.out.println("\n\n\nResults contain: \n1) Stock level eval. \n2)Single Bike Stations eval.");
 			System.out.println("\nExperiment Description: " + experimentDescription + "\n");
-			System.out.println(bikeSharEval.stockLevelResultsToString());
-			System.out.println(bikeSharEval.bikestationResultsToString());
+			// System.out.println(bikeSharEval.stockLevelResultsToString());
+			// System.out.println(bikeSharEval.bikestationResultsToString());
 
 			String id = getDateAsString();
 			// Persists result in file on disk as txt file
@@ -593,6 +595,30 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
+			// 3) Prepare GnuPlot File for StockLevel Visualization
+			// Transform computed results into a special data file that is required for GnuPlot!
+			ArrayList<EvalStockLevelData> res = bikeSharEval.stockLevelResultsToList();
+			StringBuffer buf = new StringBuffer();
+
+			for (EvalStockLevelData data : res) {
+				buf.append(data.getTimeSliceKey());
+				buf.append("\t");
+				buf.append(data.getBlueLevelRelative());
+				buf.append("\t");
+				buf.append(data.getGreenLevelRelative());
+				buf.append("\t");
+				buf.append(data.getRedLevelRelative());
+				buf.append("\n");
+			}
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter("cumulated-stock-levels.txt"));
+				out.write(buf.toString());
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		}
 	}
 

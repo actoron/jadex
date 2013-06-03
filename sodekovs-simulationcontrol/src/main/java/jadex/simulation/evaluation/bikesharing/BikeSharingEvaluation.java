@@ -245,7 +245,7 @@ public class BikeSharingEvaluation {
 
 							resultMap.get((int) tSlice.getStartTime()).get(currentStation).get("stock").put(Constants.SINGLE_OBSERVED_VALUES_LIST, singleValueList);
 						} else {
-							System.out.println("No stock value in this map!");
+//							System.out.println("No stock value in this map!");
 						}
 					}
 				}
@@ -316,14 +316,15 @@ public class BikeSharingEvaluation {
 			for (Iterator<String> stationInstancesMapIt = evaluatedStationsMap.keySet().iterator(); stationInstancesMapIt.hasNext();) {
 				String stationId = stationInstancesMapIt.next();
 				EvaluatedBikeStation evaluatedBikeStation = evaluatedStationsMap.get(stationId);
-
+				
 				if (evaluatedBikeStation.getSimulatedData().getMeanValue() < 1.0) {
 					red++;
-				} else if (evaluatedBikeStation.getSimulatedData().getMeanValue() >= getStockNrOfDocks(realData, stationId)) {
+//				} else if (evaluatedBikeStation.getSimulatedData().getMeanValue() >= getStockNrOfDocks(realData, stationId)) {
+				} else if (evaluatedBikeStation.getSimulatedData().getMeanValue() >= getCapacityFromSimData(stationId)) {
 					blue++;
 				} else {
 					green++;
-				}
+				}				
 			}
 			evalStockLevelData.setBlueLevelAbsolute(blue);
 			evalStockLevelData.setRedLevelAbsolute(red);
@@ -342,15 +343,15 @@ public class BikeSharingEvaluation {
 	 * @param stationId
 	 * @return
 	 */
-	private int getStockNrOfDocks(SimulationDescription realData, String stationId) {
-		// Take arbitrary time slice to get number of docks for this station
-
-		for (Station station : realData.getTimeSlices().getTimeSlice().get(0).getStations().getStation()) {
-			if (station.getStationID().equals(stationId))
-				return station.getNumberOfDocks();
-		}
-		return -1;
-	}
+//	private int getStockNrOfDocks(SimulationDescription realData, String stationId) {
+//		// Take arbitrary time slice to get number of docks for this station
+//
+//		for (Station station : realData.getTimeSlices().getTimeSlice().get(0).getStations().getStation()) {
+//			if (station.getStationID().equals(stationId))
+//				return station.getNumberOfDocks();
+//		}
+//		return -1;
+//	}
 
 	public String stockLevelResultsToString() {
 		StringBuffer result = new StringBuffer();
@@ -494,6 +495,13 @@ public class BikeSharingEvaluation {
 			System.out.println(buf.toString());
 		}
 		return res;
+	}
+	
+	private int getCapacityFromSimData(String stationId) {
+		
+		String capacity = simulationData.get(stationId).get("capacity").get("singleObservedValuesList").get(0);
+		capacity = capacity.substring(1, capacity.indexOf(";"));
+		return Integer.valueOf(capacity);		
 	}
 
 	/**
