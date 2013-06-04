@@ -4,6 +4,14 @@ import jadex.extension.envsupport.math.IVector2;
 
 import java.util.Collection;
 
+/**
+ *Importand Interfance
+ * connects the Abstract Space with the 3d MonkeyWorld
+ * 
+ * 
+ * @author Philip Willuweit p.willuweit@gmx.de
+ *
+ */
 public interface ISpaceController 
 {
 	public Collection getSpaceObjectsByGridPosition(IVector2 position, Object type);
