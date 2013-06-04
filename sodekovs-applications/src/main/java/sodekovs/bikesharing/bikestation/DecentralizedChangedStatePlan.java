@@ -5,6 +5,7 @@ package sodekovs.bikesharing.bikestation;
 
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.Vector2Double;
 import sodekovs.bikesharing.coordination.StateCoordinationStationData;
 import deco4mas.distributed.coordinate.environment.CoordinationSpace;
@@ -24,6 +25,7 @@ public class DecentralizedChangedStatePlan extends Plan {
 	public void body() {
 		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();
 		CoordinationMechanism mechanism = coordSpace.getActiveCoordinationMechanisms().get("decentralized_polling_request");
+		ISpaceObject myself = (ISpaceObject) getBeliefbase().getBelief("myself").getFact();
 		Boolean initial = (Boolean) getBeliefbase().getBelief("initial").getFact();
 		if (initial) {
 			getBeliefbase().getBelief("initial").setFact(Boolean.FALSE);
@@ -39,10 +41,12 @@ public class DecentralizedChangedStatePlan extends Plan {
 
 				// reset alternative if they are not needed any more
 				if (occupany < fullThreshold) {
-					getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
+//					getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
+					myself.setProperty("proposed_arrival_station", null);
 				}
 				if (occupany > emptyThreshold) {
-					getBeliefbase().getBelief("proposed_departure_station").setFact(null);
+//					getBeliefbase().getBelief("proposed_departure_station").setFact(null);
+					myself.setProperty("proposed_departure_station", null);
 				}
 
 				if (occupany >= fullThreshold || occupany <= emptyThreshold) {

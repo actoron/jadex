@@ -5,6 +5,7 @@ package sodekovs.bikesharing.bikestation;
 
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.Vector2Double;
@@ -64,10 +65,12 @@ public class DecentralizedPollingResultPlan extends Plan {
 		Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
 		Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
 		Double occupancy = Double.valueOf(stock) / Double.valueOf(capacity);
+		ISpaceObject myself = (ISpaceObject) getBeliefbase().getBelief("myself").getFact();
 
 		// full
 		if (occupancy >= fullThreshold) {
-			getBeliefbase().getBelief("proposed_departure_station").setFact(null);
+//			getBeliefbase().getBelief("proposed_departure_station").setFact(null);
+			myself.setProperty("proposed_departure_station", null);
 
 			List<StateCoordinationStationData> suitableStations = new ArrayList<StateCoordinationStationData>();
 			for (StateCoordinationStationData data : answers) {
@@ -77,11 +80,13 @@ public class DecentralizedPollingResultPlan extends Plan {
 			}
 
 			String nearestStationId = getNearest(suitableStations);
-			getBeliefbase().getBelief("proposed_arrival_station").setFact(nearestStationId);
+//			getBeliefbase().getBelief("proposed_arrival_station").setFact(nearestStationId);
+			myself.setProperty("proposed_arrival_station", nearestStationId);
 		}
 		// empty
 		else if (occupancy <= emptyThreshold) {
-			getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
+//			getBeliefbase().getBelief("proposed_arrival_station").setFact(null);
+			myself.setProperty("proposed_arrival_station", null);
 
 			List<StateCoordinationStationData> suitableStations = new ArrayList<StateCoordinationStationData>();
 			for (StateCoordinationStationData data : answers) {
@@ -91,7 +96,8 @@ public class DecentralizedPollingResultPlan extends Plan {
 			}
 
 			String nearestStationId = getNearest(suitableStations);
-			getBeliefbase().getBelief("proposed_departure_station").setFact(nearestStationId);
+//			getBeliefbase().getBelief("proposed_departure_station").setFact(nearestStationId);
+			myself.setProperty("proposed_departure_station", nearestStationId);
 		}
 	}
 

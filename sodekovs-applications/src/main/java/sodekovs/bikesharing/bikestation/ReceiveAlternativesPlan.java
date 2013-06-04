@@ -5,6 +5,7 @@ package sodekovs.bikesharing.bikestation;
 
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import sodekovs.bikesharing.coordination.ClusterStationCoordData;
 
 /**
@@ -19,6 +20,7 @@ public class ReceiveAlternativesPlan extends Plan {
 	@Override
 	public void body() {
 		System.out.println("ReceiveAlternativesPlan started in " + getComponentName());
+		ISpaceObject myself = (ISpaceObject) getBeliefbase().getBelief("myself").getFact();
 
 		while (true) {
 			waitForTick();
@@ -42,8 +44,10 @@ public class ReceiveAlternativesPlan extends Plan {
 //					if (proposedDepartureStation != null)
 //						System.out.println("break");
 					
-					getBeliefbase().getBelief("proposed_arrival_station").setFact(proposedArrivalStation);
-					getBeliefbase().getBelief("proposed_departure_station").setFact(proposedDepartureStation);
+//					getBeliefbase().getBelief("proposed_arrival_station").setFact(proposedArrivalStation);
+					myself.setProperty("proposed_arrival_station", proposedArrivalStation);
+//					getBeliefbase().getBelief("proposed_departure_station").setFact(proposedDepartureStation);
+					myself.setProperty("proposed_departure_station", proposedDepartureStation);
 
 					getWaitqueue().removeElement(element);
 				}

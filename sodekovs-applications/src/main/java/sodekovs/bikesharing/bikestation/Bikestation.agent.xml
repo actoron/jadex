@@ -51,14 +51,18 @@
  		<belief name="noClusterStations" class="Integer"/>
  		
 		<!-- Used for SO. Which alternative departure station is proposed? -->
+		<!--
 		<belief name="proposed_departure_station" class="String" updaterate="100" evaluationmode="push" argument="true">
 			<fact class="IFuture">$beliefbase.myself.getProperty("proposed_departure_station")</fact>
-		</belief> 				
+		</belief>
+		-->		
 		
 		<!-- Used for SO. Which alternative arrival station is proposed? -->
+		<!-- 
 		<belief name="proposed_arrival_station" class="String" updaterate="100" evaluationmode="push" argument="true">
 			<fact class="IFuture">$beliefbase.myself.getProperty("proposed_arrival_station")</fact>
 		</belief>
+		-->
 		
 		<!-- Used for SO. Is it a SuperStation? They are used for DeCoMAS -->
 		<belief name="isSuperStation" class="Boolean" argument="true">
