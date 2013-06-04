@@ -2,6 +2,7 @@ package jadex.micro.testcases.longcall;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
@@ -114,29 +115,10 @@ public class ProviderAgent implements ITestService
 	 */
 	protected void doCall(final Future<?> ret)
 	{
+		SFuture.avoidCallTimeouts(ret, agent);
+		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		long to = sc.getTimeout();
-//		boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
-//		long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
-//		to = 5000;
-		
-		if(to>0)
-		{
-			final long w = (long)(to*0.8);
-			IComponentStep<Void> step = new IComponentStep<Void>()
-			{
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					if(!ret.isDone())
-					{
-						ret.sendCommand(ICommandFuture.Type.UPDATETIMER);
-						agent.waitForDelay(w, this);
-					}
-					return IFuture.DONE;
-				}
-			};
-			agent.waitForDelay(w, step);
-		}
 	
 		long wait = to>0? to*3: 0;
 		System.out.println("waiting: "+wait);

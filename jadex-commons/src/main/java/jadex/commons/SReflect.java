@@ -442,7 +442,9 @@ public class SReflect
 			for(int i=1; name.charAt(name.length()-i)=='>'; i++)
 				paren++;
 			
-			name = name.substring(found+1, name.length()-(paren+1)); // paren+;
+			name = name.substring(found, name.length()-paren);
+			if(name.endsWith(";"))
+				name = name.substring(0, name.length()-1); // cut optionally ; from array, but not if basic array types <[I>
 			for(int i=0; i<found; i++)
 				name = name+"[]"; 
 			for(int i=0; i<paren; i++)

@@ -123,6 +123,8 @@ public class TaskPropertyPanel extends BasePropertyPanel
 //		StringComboModel model = new StringComboModel(cbox, 20, SUtil.createArrayList(tasknames));
 //		cbox.setModel(model);
 		
+//		System.out.println("taskcl: "+modelcontainer.getTaskClasses());
+		
 		final AutoCompleteCombo cbox = new AutoCompleteCombo(null, cl);
 		final FixedClassInfoComboModel model = new FixedClassInfoComboModel(cbox, -1, new ArrayList<ClassInfo>(modelcontainer.getTaskClasses()));
 //		final ClassComboModel model = new ClassComboModel(cbox, 20, false, false, true, true, null,// null);
