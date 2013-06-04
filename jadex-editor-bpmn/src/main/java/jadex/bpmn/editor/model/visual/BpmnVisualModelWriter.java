@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.model.visual;
 
 import jadex.bpmn.editor.gui.BpmnGraph;
+import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.io.IBpmnVisualModelWriter;
 import jadex.bpmn.model.io.SBpmnModelWriter;
@@ -157,6 +158,7 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 				}
 			}
 			
+//			System.out.println(vmodel.getView().getState(edge).getLabelBounds());
 			//FIXME: Necessary?
 //			out.print(SBpmnModelWriter.getIndent(4));
 //			out.println("<bpmndi:BPMNLabel/>");

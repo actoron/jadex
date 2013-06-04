@@ -46,6 +46,7 @@ public class BpmnGraph extends mxGraph
 		setAllowDanglingEdges(false);
 		setAllowLoops(true);
 		setVertexLabelsMovable(false);
+		setEdgeLabelsMovable(true);
 		setCellsCloneable(false);
 		setAllowNegativeCoordinates(true);
 		setGridEnabled(true);

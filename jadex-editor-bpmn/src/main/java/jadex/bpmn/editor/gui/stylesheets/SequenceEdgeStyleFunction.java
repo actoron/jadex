@@ -60,12 +60,15 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 		double offsets = 0.0;
 		if (source.getCell() instanceof VOutParameter)
 		{
-			offsets = -((VOutParameter) source.getCell()).getGeometry().getY();
+//			offsets = -((VOutParameter) source.getCell()).getGeometry().getY() + sourcenode.getGeometry().getHeight() * 0.5;
+//			mxPoint opos = new mxPoint(((VOutParameter) source.getCell()).getGeometry().getX() * scale, ((VOutParameter) source.getCell()).getGeometry().getY() * scale);
+			offsets = -sgeo.getHeight() * 0.5 + ((VOutParameter) source.getCell()).getGeometry().getCenterY() * scale;
 		}
 		double offsett = 0.0;
 		if (target.getCell() instanceof VInParameter)
 		{
-			offsett = -((VInParameter) target.getCell()).getGeometry().getY();
+			offsett = -tgeo.getHeight() * 0.5 + ((VInParameter) target.getCell()).getGeometry().getCenterY() * scale;
+//			offsett = -tgeo.getHeight() * 0.5 + ((VInParameter) target.getCell()).getGeometry().getY();
 		}
 		
 		if (points == null || points.size() == 0)
@@ -179,8 +182,9 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 			{
 				double cx = sgeo.getX() +  sgeo.getWidth();
 				cx += (tgeo.getX() - cx) * 0.5;
-				result.add(new mxPoint(cx - offsets * NON_ALIGNED_AXIS_OFFSET_ADJUSTMENT, sgeo.getCenterY() + offsets));
-				result.add(new mxPoint(cx - offsett * NON_ALIGNED_AXIS_OFFSET_ADJUSTMENT, tgeo.getCenterY() + offsett));
+//				double xshift = NON_ALIGNED_AXIS_OFFSET_ADJUSTMENT * tgeo.getY() > sgeo.getY()? offsets : -offsets;
+				result.add(new mxPoint(cx, sgeo.getCenterY() + offsets));
+				result.add(new mxPoint(cx, tgeo.getCenterY() + offsett));
 			}
 			else
 			{
@@ -240,9 +244,9 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 				res.setX(res.getX() * scale);
 				res.setY(res.getY() * scale);
 				VEdge vedge = (VEdge) state.getCell();
-				if (vedge.getSource() != null && vedge.getSource().getParent() != null)
+				if (vedge.getSource() != null && vedge.getEdgeParent() != null)
 				{
-					res = adjustPoint(state.getView().getGraph(), vedge.getSource().getParent(), res);
+					res = adjustPoint(state.getView().getGraph(), vedge.getEdgeParent(), res);
 				}
 				result.add(res);
 			}
