@@ -250,7 +250,12 @@ public class BpmnEditorWindow extends JFrame
 							{
 								try
 								{
+									long ts = System.currentTimeMillis();
+									SBpmnModelReader.readModel(file, null);
+//									System.out.println(file.toString() + " " + (System.currentTimeMillis() - ts));
+									ts = System.currentTimeMillis();
 									loadModel(file);
+//									System.out.println(file.toString() + " " + (System.currentTimeMillis() - ts));
 								}
 								catch(Exception e)
 								{
@@ -592,7 +597,13 @@ public class BpmnEditorWindow extends JFrame
 		if (file.getName().endsWith("bpmn2"))
 		{
 			BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
+			graph.deactivate();
+			graph.setEventsEnabled(false);
+			graph.getModel().beginUpdate();
 			mmodel = SBpmnModelReader.readModel(file, vreader);
+			graph.getModel().endUpdate();
+			graph.setEventsEnabled(true);
+			graph.activate();
 		}
 		else
 		{

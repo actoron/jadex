@@ -38,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,12 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.ImageTranscoder;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 
 /**
  *  Class for providing images, either stored or generated, with a cache.
@@ -1002,6 +1009,33 @@ public class ImageProvider
 			g.setColor(color);
 			g.fill(shape);
 		}
+//		else if ("folder".equals(name))
+//		{
+//			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+//			Graphics2D g = ((BufferedImage) ret).createGraphics();
+//			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//			
+//			double w = size.width * 0.7;
+//			double h = size.height * 0.7;
+//			double x = (size.width - w) * 0.5;
+//			double y = (size.height - h) * 0.5;
+//			double notchx1 = w * 0.3;
+//			double notchx2 = w * 0.35;
+//			double notchy = w * 0.1;
+//			GeneralPath gp = new GeneralPath();
+//			gp.moveTo(x, y);
+//			gp.lineTo(x + notchx1, y);
+//			gp.lineTo(x + notchx2, y + notchy);
+//			gp.lineTo(x + w, y + notchy);
+//			gp.lineTo(x + w, y + h);
+//			gp.lineTo(x, y + h);
+//			gp.closePath();
+//			g.setColor(Color.RED);
+//			g.fill(gp);
+//			g.setColor(Color.BLACK);
+//			g.draw(gp);
+//		}
 		
 		return ret;
 	}
@@ -1303,6 +1337,41 @@ public class ImageProvider
 			if (ret == null)
 			{
 				ret = loadSymbol(name + ".gif", size);
+			}
+			if (ret == null)
+			{
+				String svgname = name + ".svg";
+				try
+				{
+					InputStream svgstream = this.getClass().getClassLoader().getResourceAsStream(IMAGE_DIR + svgname);
+					if (svgstream != null)
+					{
+						final BufferedImage[] bfimg = new BufferedImage[1];
+						ImageTranscoder tc = new ImageTranscoder()
+						{
+							public void writeImage(BufferedImage img, TranscoderOutput to)
+									throws TranscoderException
+							{
+								bfimg[0] = img;
+							}
+							
+							public BufferedImage createImage(int w, int h)
+							{
+								return new BufferedImage(w, h, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+							}
+						};
+						 
+					    tc.addTranscodingHint(PNGTranscoder.KEY_WIDTH, (float) size.width);
+					    tc.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, (float) size.height);
+					 
+					    TranscoderInput input = new TranscoderInput(svgstream);
+					    tc.transcode(input, null);
+					    ret = bfimg[0];
+					}
+				}
+				catch (Exception e)
+				{
+				}
 			}
 			
 			if (ret == null)

@@ -1015,6 +1015,7 @@ public class SBpmnModelReader
 	{
 		if (vreader != null)
 		{
+			long ts = System.currentTimeMillis();
 			Map<String, Object> vbuffer = (Map<String, Object>) buffer.get("vbuffer");
 			if (vbuffer == null)
 			{
@@ -1106,6 +1107,8 @@ public class SBpmnModelReader
 				
 				intparams.add(content);
 			}
+			
+//			System.out.println(tag.getLocalPart() + " " + (System.currentTimeMillis() - ts));
 		}
 	}
 	

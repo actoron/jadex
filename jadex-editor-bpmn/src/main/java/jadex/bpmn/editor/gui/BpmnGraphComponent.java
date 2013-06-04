@@ -3,6 +3,7 @@ package jadex.bpmn.editor.gui;
 import jadex.bpmn.editor.gui.controllers.EdgeController;
 import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 
@@ -23,6 +24,7 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
+import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxConnectionHandler;
 import com.mxgraph.swing.handler.mxGraphHandler;
@@ -61,7 +63,8 @@ public class BpmnGraphComponent extends mxGraphComponent
 		super(graph);
 		
 		((mxCellEditor) getCellEditor()).setMinimumEditorScale(0.0);
-		
+		double fac1 = 0.5;
+		double fac2 = 3.0;
 		int width = 16;
 		int height = 16;
 		double dx = width / 16.0;
@@ -69,18 +72,18 @@ public class BpmnGraphComponent extends mxGraphComponent
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 		Graphics2D g = img.createGraphics();
 		GeneralPath gp = new GeneralPath();
-		gp.moveTo(dx * 2.0, height * 0.5 - dy);
-		gp.lineTo(width * 0.5 - dx, height * 0.5 - dy);
-		gp.lineTo(width * 0.5 - dx, dy * 2.0);
-		gp.lineTo(width * 0.5 + dx, dy * 2.0);
-		gp.lineTo(width * 0.5 + dx, height * 0.5 - dy);
-		gp.lineTo(width - dx * 2.0, height * 0.5 - dy);
-		gp.lineTo(width - dx * 2.0, height * 0.5 + dy);
-		gp.lineTo(width * 0.5 + dx, height * 0.5 + dy);
-		gp.lineTo(width * 0.5 + dx, height - dy * 2.0);
-		gp.lineTo(width * 0.5 - dx, height - dy * 2.0);
-		gp.lineTo(width * 0.5 - dx, height * 0.5 + dy);
-		gp.lineTo(dx * 2.0, height * 0.5 + dy);
+		gp.moveTo(dx * fac2, height * fac1 - dy);
+		gp.lineTo(width * fac1 - dx, height * fac1 - dy);
+		gp.lineTo(width * fac1 - dx, dy * fac2);
+		gp.lineTo(width * fac1 + dx, dy * fac2);
+		gp.lineTo(width * fac1 + dx, height * fac1 - dy);
+		gp.lineTo(width - dx * fac2, height * fac1 - dy);
+		gp.lineTo(width - dx * fac2, height * fac1 + dy);
+		gp.lineTo(width * fac1 + dx, height * fac1 + dy);
+		gp.lineTo(width * fac1 + dx, height - dy * fac2);
+		gp.lineTo(width * fac1 - dx, height - dy * fac2);
+		gp.lineTo(width * fac1 - dx, height * fac1 + dy);
+		gp.lineTo(dx * fac2, height * fac1 + dy);
 		gp.closePath();
 		g.setColor(Color.BLACK);
 		g.fill(gp);
@@ -93,10 +96,10 @@ public class BpmnGraphComponent extends mxGraphComponent
 		img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 		g = img.createGraphics();
 		gp = new GeneralPath();
-		gp.moveTo(dx * 2.0, height * 0.5 - dy);
-		gp.lineTo(width - dx * 2.0, height * 0.5 - dy);
-		gp.lineTo(width - dx * 2.0, height * 0.5 + dy);
-		gp.lineTo(dx * 2.0, height * 0.5 + dy);
+		gp.moveTo(dx * fac2, height * fac1 - dy);
+		gp.lineTo(width - dx * fac2, height * fac1 - dy);
+		gp.lineTo(width - dx * fac2, height * fac1 + dy);
+		gp.lineTo(dx * fac2, height * fac1 + dy);
 		gp.closePath();
 		g.setColor(Color.BLACK);
 		g.fill(gp);
@@ -342,6 +345,9 @@ public class BpmnGraphComponent extends mxGraphComponent
 	
 	protected class BpmnPanningHandler extends mxPanningHandler
 	{
+		protected int mdx;
+		protected int mdy;
+		
 		public BpmnPanningHandler()
 		{
 			super(BpmnGraphComponent.this);
@@ -351,6 +357,8 @@ public class BpmnGraphComponent extends mxGraphComponent
 		{
 			if (isEnabled() && !e.isConsumed() && graphComponent.isPanningEvent(e))
 			{
+				mdx = 0;
+				mdy = 0;
 				start = e.getPoint();
 			}
 		}
@@ -361,6 +369,8 @@ public class BpmnGraphComponent extends mxGraphComponent
 			{
 				int dx = e.getX() - start.x;
 				int dy = e.getY() - start.y;
+				int incx = dx - mdx;
+				int incy = dy - mdy;
 
 				Rectangle r = graphComponent.getViewport().getViewRect();
 
@@ -368,7 +378,59 @@ public class BpmnGraphComponent extends mxGraphComponent
 				int bottom = r.y + ((dy > 0) ? 0 : r.height) - dy;
 				
 				boolean extend = ((right > 0) && (bottom > 0));
-
+				
+				boolean refresh = false;
+				if (r.x == 0)
+				{
+					if (incx > 0)
+					{
+						Object[] cells = graph.getChildCells(graph.getDefaultParent());
+						for (Object cell : cells)
+						{
+							if (cell instanceof VPool)
+							{
+								mxGeometry geo = ((VPool) cell).getGeometry();
+								geo.setX(geo.getX() + incx / graph.getView().getScale());
+								mdx = dx;
+							}
+						}
+						refresh = true;
+					}
+					else
+					{
+						mdx = 0;
+						start.x = e.getPoint().x;
+					}
+				}
+				
+				if (r.y == 0)
+				{
+				if (incy > 0)
+					{
+						Object[] cells = graph.getChildCells(graph.getDefaultParent());
+						for (Object cell : cells)
+						{
+							if (cell instanceof VPool)
+							{
+								mxGeometry geo = ((VPool) cell).getGeometry();
+								geo.setY(geo.getY() + incy / graph.getView().getScale());
+								mdy = dy;
+							}
+						}
+						refresh = true;
+					}
+					else
+					{
+						mdy = 0;
+						start.y = e.getPoint().y;
+					}
+				}
+				
+				if (refresh)
+				{
+					graph.refresh();
+				}
+				
 				graphComponent.getGraphControl().scrollRectToVisible(
 						new Rectangle(right, bottom, 0, 0), extend);
 

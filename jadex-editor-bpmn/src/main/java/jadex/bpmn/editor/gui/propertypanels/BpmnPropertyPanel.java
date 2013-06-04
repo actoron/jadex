@@ -48,6 +48,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -282,6 +284,14 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		tabpane.add("Subcomponents", new SubcomponentTab(container));
 		
 		add(tabpane, BorderLayout.CENTER);
+		
+		tabpane.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				terminateEditing();
+			}
+		});
 	}
 	
 	/**
@@ -1015,6 +1025,14 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	 *  Terminates.
 	 */
 	public void terminate()
+	{
+		terminateEditing();
+	}
+	
+	/**
+	 *  Terminates editing.
+	 */
+	public void terminateEditing()
 	{
 		if (importtable.isEditing())
 		{

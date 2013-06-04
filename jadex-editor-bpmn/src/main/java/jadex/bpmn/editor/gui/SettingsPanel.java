@@ -3,8 +3,10 @@ package jadex.bpmn.editor.gui;
 import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -91,7 +94,7 @@ public class SettingsPanel extends JPanel
 		
 		libentrytable = new JTable(new ClassPathTableModel());
 		
-		JButton pathbutton = new JButton(new AbstractAction("Add Path")
+		JButton pathbutton = new JButton(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -118,8 +121,16 @@ public class SettingsPanel extends JPanel
 				}
 			}
 		});
+		pathbutton.setToolTipText("Add Path");
+		Icon[] icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "folder", Color.BLACK);
+		pathbutton.setIcon(icons[0]);
+		pathbutton.setPressedIcon(icons[1]);
+		pathbutton.setRolloverIcon(icons[2]);
+		pathbutton.setContentAreaFilled(false);
+		pathbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
+		pathbutton.setMargin(new Insets(0, 0, 0, 0));
 		
-		JButton projectbutton = new JButton(new AbstractAction("Add Project")
+		JButton projectbutton = new JButton(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -181,8 +192,16 @@ public class SettingsPanel extends JPanel
 				}
 			}
 		});
+		icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "user-home", Color.BLACK);
+		projectbutton.setToolTipText("Add Project");
+		projectbutton.setIcon(icons[0]);
+		projectbutton.setPressedIcon(icons[1]);
+		projectbutton.setRolloverIcon(icons[2]);
+		projectbutton.setContentAreaFilled(false);
+		projectbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
+		projectbutton.setMargin(new Insets(0, 0, 0, 0));
 		
-		JButton removebutton = new JButton(new AbstractAction("Remove Paths")
+		JButton removebutton = new JButton(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -201,8 +220,16 @@ public class SettingsPanel extends JPanel
 				}
 			}
 		});
+		icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "folder-forbidden", Color.BLACK);
+		removebutton.setToolTipText("Remove Paths");
+		removebutton.setIcon(icons[0]);
+		removebutton.setPressedIcon(icons[1]);
+		removebutton.setRolloverIcon(icons[2]);
+		removebutton.setContentAreaFilled(false);
+		removebutton.setBorder(new EmptyBorder(0, 0, 0, 0));
+		removebutton.setMargin(new Insets(0, 0, 0, 0));
 		
-		JButton clearbutton = new JButton(new AbstractAction("Clear")
+		JButton clearbutton = new JButton(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -211,39 +238,14 @@ public class SettingsPanel extends JPanel
 				changeaction.actionPerformed(e);
 			}
 		});
-		
-//		JButton button = new JButton(new AbstractAction("...")
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				File oldhome = new File(libpathfield.getText());
-//				BetterFileChooser fc = new BetterFileChooser(oldhome);
-//				fc.setDialogType(BetterFileChooser.OPEN_DIALOG);
-//				fc.setFileSelectionMode(BetterFileChooser.DIRECTORIES_ONLY);
-//				
-//				int state = fc.showOpenDialog(SettingsPanel.this);
-//				
-//				if (state == BetterFileChooser.APPROVE_OPTION)
-//				{
-//					libpathfield.setText(fc.getSelectedFile().getPath());
-//				}
-//			}
-//		});
-		
-//		g = new GridBagConstraints();
-//		g.insets = new Insets(0, 5, 0, 10);
-//		generalpanel.add(label, g);
-//		
-//		g = new GridBagConstraints();
-//		g.gridx = 1;
-//		g.weightx = 1.0;
-//		g.fill = GridBagConstraints.HORIZONTAL;
-//		generalpanel.add(libpathfield, g);
-//		
-//		g = new GridBagConstraints();
-//		g.gridx = 2;
-//		g.insets = new Insets(0, 10, 0, 5);
-//		generalpanel.add(button, g);
+		icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "user-trash", Color.BLACK);
+		clearbutton.setToolTipText("Clear");
+		clearbutton.setIcon(icons[0]);
+		clearbutton.setPressedIcon(icons[1]);
+		clearbutton.setRolloverIcon(icons[2]);
+		clearbutton.setContentAreaFilled(false);
+		clearbutton.setBorder(new EmptyBorder(0, 0, 0, 0));
+		clearbutton.setMargin(new Insets(0, 0, 0, 0));
 		
 		JPanel cppanel = new JPanel(new GridBagLayout());
 		cppanel.setBorder(new TitledBorder("Class Path Settings"));

@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
+import com.mxgraph.view.mxGraph;
 
 /**
  *  Reader for the visual BPMN model.
@@ -167,9 +168,11 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				
 				if (parent != null)
 				{
-					graph.getModel().beginUpdate();
+//					graph.getModel().beginUpdate();
+//					vnode.setParent(parent);
+//					cells.add(vnode);
 					graph.addCell(vnode, parent);
-					graph.getModel().endUpdate();
+//					graph.getModel().endUpdate();
 				}
 				else
 				{
@@ -185,18 +188,21 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			}
 			else if (e instanceof MPool)
 			{
-				graph.getModel().beginUpdate();
+//				graph.getModel().beginUpdate();
 				graph.addCell(vnode);
-				graph.getModel().endUpdate();
+//				cells.add(vnode);
+//				graph.getModel().endUpdate();
 				
 				List<VNode> children = childmap.remove(e.getId());
 				if (children != null)
 				{
 					for (VNode child : children)
 					{
-						graph.getModel().beginUpdate();
+//						graph.getModel().beginUpdate();
+//						child.setParent(vnode);
 						graph.addCell(child, vnode);
-						graph.getModel().endUpdate();
+//						cells.add(child);
+//						graph.getModel().endUpdate();
 					}
 				}
 				vnode.setBpmnElement(e);
@@ -207,9 +213,11 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				
 				if (parent != null)
 				{
-					graph.getModel().beginUpdate();
+//					graph.getModel().beginUpdate();
+//					vnode.setParent(parent);
+//					cells.add(vnode);
 					graph.addCell(vnode, parent);
-					graph.getModel().endUpdate();
+//					graph.getModel().endUpdate();
 				}
 				else
 				{
@@ -268,10 +276,12 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				geo.setPoints(mxpoints);
 				vedge.setGeometry(geo);
 			}
-			graph.getModel().beginUpdate();
+//			graph.getModel().beginUpdate();
+//			vedge.setParent(vedge.getEdgeParent());
+//			cells.add(vedge);
 			graph.addCell(vedge, vedge.getEdgeParent());
 //			graph.addCell(vedge);
-			graph.getModel().endUpdate();
+//			graph.getModel().endUpdate();
 		}
 		else
 		{
@@ -316,11 +326,13 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 					vedge.setGeometry(geo);
 				}
 				
-				graph.getModel().beginUpdate();
+//				graph.getModel().beginUpdate();
 //				graph.addCell(vedge, vedge.getSource().getParent().getParent());
 //				graph.addCell(vedge);
+//				vedge.setParent(vedge.getEdgeParent());
+//				cells.add(vedge);
 				graph.addCell(vedge, vedge.getEdgeParent());
-				graph.getModel().endUpdate();
+//				graph.getModel().endUpdate();
 			}
 			else
 			{

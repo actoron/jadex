@@ -59,6 +59,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.plaf.metal.MetalComboBoxEditor;
@@ -438,6 +440,14 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		add(tabpane, BorderLayout.CENTER);
 		
+		tabpane.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				terminateEditing();
+			}
+		});
+		
 		al.actionPerformed(null);
 	}
 	
@@ -455,6 +465,14 @@ public class TaskPropertyPanel extends BasePropertyPanel
 	 *  Terminate.
 	 */
 	public void terminate()
+	{
+		terminateEditing();
+	}
+	
+	/**
+	 *  Terminates editing.
+	 */
+	public void terminateEditing()
 	{
 		if (atable.isEditing())
 		{

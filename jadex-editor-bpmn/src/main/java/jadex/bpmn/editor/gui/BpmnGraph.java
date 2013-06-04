@@ -5,7 +5,6 @@ import jadex.bpmn.editor.gui.layouts.EventHandlerLayout;
 import jadex.bpmn.editor.gui.layouts.LaneLayout;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
-import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
@@ -17,16 +16,11 @@ import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.SwingUtilities;
 
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.layout.mxStackLayout;
 import com.mxgraph.model.mxICell;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxLayoutManager;
 import com.mxgraph.view.mxStylesheet;
@@ -41,7 +35,7 @@ public class BpmnGraph extends mxGraph
 	protected ModelContainer modelcontainer;
 	
 	/** The layout manager. */
-	protected BpmnLayoutManager layoutmanager; 
+	protected BpmnLayoutManager layoutmanager;
 	
 	/**
 	 *  Creates the graph.
@@ -63,37 +57,53 @@ public class BpmnGraph extends mxGraph
 		
 		addListener(mxEvent.CELLS_FOLDED, access.getFoldController());*/
 		
-		addListener(mxEvent.CELLS_ADDED, new mxIEventListener()
-		{
-			public void invoke(Object sender, mxEventObject evt)
-			{
-				Object[] cells = (Object[]) evt.getProperty("cells");
-				for (Object cell : cells)
-				{
-					if (cell instanceof mxICell)
-					{
-						mxICell parent = ((mxICell) cell).getParent();
-						if (parent != null)
-						{
-							List<VEdge> edges = new ArrayList<VEdge>();
-							for (int i = 0; i < parent.getChildCount(); ++i)
-							{
-								if (parent.getChildAt(i) instanceof VEdge)
-								{
-									edges.add((VEdge) parent.getChildAt(i));
-								}
-							}
-							Object[] aedges = edges.toArray();
-							orderCells(false, aedges);
-						}
-					}
-				}
-			}
-		});
+		setKeepEdgesInForeground(true);
 		
+//		addListener(mxEvent.CELLS_ADDED, new mxIEventListener()
+//		{
+//			public void invoke(Object sender, mxEventObject evt)
+//			{
+//				Object[] cells = (Object[]) evt.getProperty("cells");
+//				for (Object cell : cells)
+//				{
+//					if (cell instanceof mxICell)
+//					{
+//						mxICell parent = ((mxICell) cell).getParent();
+//						if (parent != null)
+//						{
+//							List<VEdge> edges = new ArrayList<VEdge>();
+//							for (int i = 0; i < parent.getChildCount(); ++i)
+//							{
+//								if (parent.getChildAt(i) instanceof VEdge)
+//								{
+//									edges.add((VEdge) parent.getChildAt(i));
+//								}
+//							}
+//							Object[] aedges = edges.toArray();
+//							orderCells(false, aedges);
+//						}
+//					}
+//				}
+//			}
+//		});
 		setStylesheet(sheet);
-		
+		activate();
+	}
+	
+	/**
+	 * 
+	 */
+	public void activate()
+	{
 		layoutmanager = new BpmnLayoutManager(this);
+	}
+	
+	/**
+	 * 
+	 */
+	public void deactivate()
+	{
+		layoutmanager = null;
 	}
 	
 	/**
@@ -227,13 +237,16 @@ public class BpmnGraph extends mxGraph
 	 */
 	public void delayedRefreshCellView(final mxICell cell)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		if (layoutmanager != null)
 		{
-			public void run()
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				refreshCellView(cell);
-			}
-		});
+				public void run()
+				{
+					refreshCellView(cell);
+				}
+			});
+		}
 	}
 
 	/**
@@ -243,17 +256,20 @@ public class BpmnGraph extends mxGraph
 	 */
 	public void refreshCellView(mxICell cell)
 	{
-		mxIGraphLayout layout = layoutmanager.getLayout(cell);
-		if (layout != null)
+		if (layoutmanager != null)
 		{
-			layout.execute(cell);
+			mxIGraphLayout layout = layoutmanager.getLayout(cell);
+			if (layout != null)
+			{
+				layout.execute(cell);
+			}
+			
+			getView().clear(cell, true, false);
+			getView().invalidate(cell);
+			getView().validate();
+			
+			refresh();
 		}
-		
-		getView().clear(cell, true, false);
-		getView().invalidate(cell);
-		getView().validate();
-		
-		refresh();
 	}
 	
 	/**
