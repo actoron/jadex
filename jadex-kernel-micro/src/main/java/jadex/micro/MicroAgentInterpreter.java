@@ -192,23 +192,34 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		{
 			public void customResultAvailable(Void result)
 			{
-				injectServices(agent, micromodel).addResultListener(new DelegationResultListener<Void>(ret)
+				injectParent(agent, micromodel).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						injectParent(agent, micromodel).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
-						{
-							public void customResultAvailable(Void result)
-							{
-								MicroAgentInterpreter.super.initProvidedServices(model, config)
-									.addResultListener(new DelegationResultListener<Void>(ret));
-							}
-						}));
+						MicroAgentInterpreter.super.initProvidedServices(model, config)
+							.addResultListener(new DelegationResultListener<Void>(ret));
 					}
-				});
+				}));
 			}
 		});
 		
+		return ret;
+	}
+	
+	/**
+	 *  Add extra init code after components.
+	 */
+	public IFuture<Void> initComponents(IModelInfo model, String config)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		super.initComponents(model, config).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
+				injectServices(agent, micromodel).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
 		return ret;
 	}
 	

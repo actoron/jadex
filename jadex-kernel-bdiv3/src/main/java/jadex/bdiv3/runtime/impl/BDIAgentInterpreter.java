@@ -256,7 +256,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		Future<Void>	ret	= new Future<Void>();
 		
-		int i	= info.getName().indexOf(CAPABILITY_SEPARATOR);
+		int i	= info.getName()!=null ? info.getName().indexOf(CAPABILITY_SEPARATOR) : -1;
 		Object	ocapa	= ((PojoBDIAgent)microagent).getPojoAgent();
 		String	capa	= null;
 		final IValueFetcher	oldfetcher	= getFetcher();

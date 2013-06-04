@@ -29,13 +29,13 @@ public class GoalsWithCapabilityBDI
 	/**
 	 *  Agent body.
 	 */
-	@AgentBody
+	@AgentBody(keepalive=false)
 	public void	body(final BDIAgent agent)
 	{
 		final TestReport tr	= new TestReport("#1", "Test if capability goals work.");
 		
 		TestGoal goal = testcap.new TestGoal();
-		agent.dispatchTopLevelGoal(goal).get();
+		agent.dispatchTopLevelGoal(goal).get(3000);
 		
 		if(goal.getCnt()==2)
 		{
@@ -46,6 +46,7 @@ public class GoalsWithCapabilityBDI
 			tr.setReason("Wrong number of plans executed: "+goal.getCnt());
 		}
 		
+		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	/**

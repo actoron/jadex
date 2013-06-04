@@ -816,7 +816,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 			{
 				if(e.getTargetException() instanceof LinkageError)
 				{
-					e.printStackTrace();
+//					e.printStackTrace();
 					
 					// when same class was already loaded via other filename wrong cache miss:-(
 //					ret = SReflect.findClass(name, null, loader);
