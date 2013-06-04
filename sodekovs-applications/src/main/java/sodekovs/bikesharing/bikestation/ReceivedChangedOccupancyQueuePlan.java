@@ -21,7 +21,7 @@ public class ReceivedChangedOccupancyQueuePlan extends Plan {
 
 	@Override
 	public void body() {
-		System.out.println("ReceivedChangedOccupancyPlan started in " + getComponentName());
+//		System.out.println("ReceivedChangedOccupancyPlan started in " + getComponentName());
 
 		while (true) {
 			waitForTick();
@@ -36,7 +36,7 @@ public class ReceivedChangedOccupancyQueuePlan extends Plan {
 					String proposedArrivalStation = (String) getBeliefbase().getBelief("proposed_arrival_station").getFact();
 					String proposedDepartureStation = (String) getBeliefbase().getBelief("proposed_departure_station").getFact();
 					String stationID = (String) getBeliefbase().getBelief("stationID").getFact();
-					System.out.println("ReceivedChangedOccupancy called in " + stationID + " with " + tuple);
+//					System.out.println("ReceivedChangedOccupancy called in " + stationID + " with " + tuple);
 
 					// get the occupancy of the station
 					Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();

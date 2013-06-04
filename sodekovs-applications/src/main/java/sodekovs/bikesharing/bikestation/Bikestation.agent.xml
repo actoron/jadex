@@ -51,12 +51,12 @@
  		<belief name="noClusterStations" class="Integer"/>
  		
 		<!-- Used for SO. Which alternative departure station is proposed? -->
-		<belief name="proposed_departure_station" class="String" argument="true">
+		<belief name="proposed_departure_station" class="String" updaterate="100" evaluationmode="push" argument="true">
 			<fact class="IFuture">$beliefbase.myself.getProperty("proposed_departure_station")</fact>
 		</belief> 				
 		
 		<!-- Used for SO. Which alternative arrival station is proposed? -->
-		<belief name="proposed_arrival_station" class="String" argument="true">
+		<belief name="proposed_arrival_station" class="String" updaterate="100" evaluationmode="push" argument="true">
 			<fact class="IFuture">$beliefbase.myself.getProperty("proposed_arrival_station")</fact>
 		</belief>
 		
@@ -134,7 +134,7 @@
 		    </trigger>
 		</plan>
 		
-		<plan name="received_change_occupancy">
+		<!-- <plan name="received_change_occupancy">
 		    <body class="ReceivedChangedOccupancyPlan"/>
 		    <parameter name="tuple" class="CoordinationStationData">
 		        <internaleventmapping ref="inform_changed_occupancy.tuple"/>
@@ -143,6 +143,7 @@
 		        <internalevent ref="inform_changed_occupancy"/>
 		    </trigger>
 		</plan>
+		-->
 		
 		<plan name="received_change_occupancy_queue">
 		    <body class="ReceivedChangedOccupancyQueuePlan"/>
@@ -269,9 +270,7 @@
 				<initialplan ref="receive_alternatives"/>
 				<initialplan ref="decentralized_polling_request"/>
 				<initialplan ref="decentralized_polling_result"/>
-				<!--
 				<initialplan ref="received_change_occupancy_queue"/>
-				 -->
 			</plans>
 		</configuration>
 	</configurations>

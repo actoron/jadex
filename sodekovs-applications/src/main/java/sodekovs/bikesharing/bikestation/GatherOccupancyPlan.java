@@ -34,7 +34,7 @@ public class GatherOccupancyPlan extends Plan {
 					String stationId = (String) getBeliefbase().getBelief("stationID").getFact();
 					Vector2Double position = (Vector2Double) getBeliefbase().getBelief("position").getFact();
 
-					System.out.println(getComponentName() + " GatherOccupancyPlan received " + receivedCoordData);
+//					System.out.println(getComponentName() + " GatherOccupancyPlan received " + receivedCoordData);
 
 					Integer capacity = (Integer) getBeliefbase().getBelief("capacity").getFact();
 					Integer stock = (Integer) getBeliefbase().getBelief("stock").getFact();
