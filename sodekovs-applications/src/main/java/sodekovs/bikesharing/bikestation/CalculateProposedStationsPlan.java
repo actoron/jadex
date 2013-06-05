@@ -100,27 +100,50 @@ public class CalculateProposedStationsPlan extends Plan {
 			}
 		}
 
+		// new behavior
 		// proposed_arrival_station
 		Map<String, String> proposedArrivalStations = new HashMap<String, String>();
 		for (CoordinationStationData stationData : fullStations) {
-			List<CoordinationStationData> stations = new ArrayList<CoordinationStationData>();
-			stations.addAll(normalStations);
-			stations.addAll(emptyStations);
-
-			String proposedArrivalStation = getNearestSuitableStation(stationData, stations);
+			String proposedArrivalStation = getNearestSuitableStation(stationData, emptyStations);
+			if (proposedArrivalStation == null) {
+				proposedArrivalStation = getNearestSuitableStation(stationData, normalStations);
+			}
+			
 			proposedArrivalStations.put(stationData.getStationID(), proposedArrivalStation);
 		}
 
 		// proposed_departure_station
 		Map<String, String> proposedDepartureStations = new HashMap<String, String>();
 		for (CoordinationStationData stationData : emptyStations) {
-			List<CoordinationStationData> stations = new ArrayList<CoordinationStationData>();
-			stations.addAll(normalStations);
-			stations.addAll(fullStations);
-
-			String proposedDepartureStation = getNearestSuitableStation(stationData, stations);
+			String proposedDepartureStation = getNearestSuitableStation(stationData, fullStations);
+			if (proposedDepartureStation == null) {
+				proposedDepartureStation = getNearestSuitableStation(stationData, normalStations);
+			}
+			
 			proposedDepartureStations.put(stationData.getStationID(), proposedDepartureStation);
 		}
+		
+//		// proposed_arrival_station
+//		Map<String, String> proposedArrivalStations = new HashMap<String, String>();
+//		for (CoordinationStationData stationData : fullStations) {
+//			List<CoordinationStationData> stations = new ArrayList<CoordinationStationData>();
+//			stations.addAll(normalStations);
+//			stations.addAll(emptyStations);
+//
+//			String proposedArrivalStation = getNearestSuitableStation(stationData, stations);
+//			proposedArrivalStations.put(stationData.getStationID(), proposedArrivalStation);
+//		}
+//
+//		// proposed_departure_station
+//		Map<String, String> proposedDepartureStations = new HashMap<String, String>();
+//		for (CoordinationStationData stationData : emptyStations) {
+//			List<CoordinationStationData> stations = new ArrayList<CoordinationStationData>();
+//			stations.addAll(normalStations);
+//			stations.addAll(fullStations);
+//
+//			String proposedDepartureStation = getNearestSuitableStation(stationData, stations);
+//			proposedDepartureStations.put(stationData.getStationID(), proposedDepartureStation);
+//		}
 
 		// the answer
 		IInternalEvent event = createInternalEvent("inform_alternatives");
