@@ -76,6 +76,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -498,12 +499,13 @@ public class BDIClassReader extends MicroClassReader
 			
 			for(MBelief bel: capa.getCapability().getBeliefs())
 			{
-				List<String>	events	= new ArrayList<String>();
-				for(String event: bel.getEvents())
-				{
-					String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
-					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
-				}
+//				List<String>	events	= new ArrayList<String>();
+//				for(String event: bel.getEvents())
+//				{
+//					String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+//					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
+//				}
+				List<String> events = convertEvents(name, bel.getEvents(), bdimodel);
 				
 				MBelief	bel2;
 				if(bel.getField()!=null)
@@ -525,16 +527,32 @@ public class BDIClassReader extends MicroClassReader
 				bdimodel.addBeliefMapping(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target, name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
 			}
 			
-			for(MGoal goal : capa.getCapability().getGoals())
+			for(MGoal goal: capa.getCapability().getGoals())
 			{
-				// Todo: copy goal object???
-				bdimodel.getCapability().addGoal(goal);
-				// Todo: map events of goal conditions
+				MGoal goal2	= new MGoal(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
+					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
+					goal.getRetryDelay(), goal.getRecurDelay(), goal.isSucceedOnPassed(), goal.isUnique(), goal.getDeliberation());
+						
+				// Convert goal condition events
+				if(goal.getConditions()!=null)
+				{
+					for(String type: goal.getConditions().keySet())
+					{
+						List<MCondition> conds = goal.getConditions(type);
+						for(MCondition cond: conds)
+						{
+							MCondition ccond = new MCondition(cond.getName(), convertEvents(name, cond.getEvents(), bdimodel).toArray(new String[0]));
+							goal2.addCondition(type, ccond);
+						}
+					}
+				}
+
+				bdimodel.getCapability().addGoal(goal2);
 			}
 			
 			for(MPlan plan : capa.getCapability().getPlans())
 			{
-				MPlan	plan2	= new MPlan(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
+				MPlan plan2	= new MPlan(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
 					copyTrigger(bdimodel, name, plan.getTrigger()), copyTrigger(bdimodel, name, plan.getWaitqueue()),
 					plan.getPriority());
 				bdimodel.getCapability().addPlan(plan2);
@@ -586,6 +604,20 @@ public class BDIClassReader extends MicroClassReader
 		}
 		
 		return trigger2;
+	}
+	
+	/**
+	 * 
+	 */
+	protected List<String> convertEvents(String name, Collection<String> evs, BDIModel bdimodel)
+	{
+		List<String>	events	= new ArrayList<String>();
+		for(String event: events)
+		{
+			String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+			events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
+		}
+		return events;
 	}
 	
 	/**
@@ -782,7 +814,7 @@ public class BDIClassReader extends MicroClassReader
 			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms);
 		}
 
-		MGoal mgoal = new MGoal(gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
+		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
 			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.succeedonpassed(), goal.unique(), mdel);
 		
 		jadex.bdiv3.annotation.Publish pub = goal.publish();
@@ -800,9 +832,8 @@ public class BDIClassReader extends MicroClassReader
 			tmp.add(new Tuple2<MGoal, String>(mgoal, method));
 		}
 		
-		
-		boolean declarative = false;
-		boolean maintain = false;
+//		boolean declarative = false;
+//		boolean maintain = false;
 		
 		Constructor<?>[] cons = gcl.getConstructors();
 		for(final Constructor<?> c: cons)

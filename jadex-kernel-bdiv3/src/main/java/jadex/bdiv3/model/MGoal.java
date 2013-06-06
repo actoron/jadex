@@ -84,11 +84,11 @@ public class MGoal extends MClassBasedElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MGoal(String target, boolean posttoall, boolean randomselection, String excludemode,
+	public MGoal(String name, String target, boolean posttoall, boolean randomselection, String excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
 		boolean succeedonpassed, boolean unique, MDeliberation deliberation)
 	{
-		super(target, posttoall, randomselection, excludemode);
+		super(name, target, posttoall, randomselection, excludemode);
 		this.retry = retry;
 		this.recur = recur;
 		this.retrydelay = retrydelay;
@@ -287,10 +287,18 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
-	 *  Add a condition to the goal.
+	 *  Get the conditions of a type.
 	 */
 	public List<MCondition> getConditions(String type)
 	{
 		return conditions==null? null: conditions.get(type);
+	}
+	
+	/**
+	 *  Get all conditions.
+	 */
+	public Map<String, List<MCondition>> getConditions()
+	{
+		return conditions;
 	}
 }

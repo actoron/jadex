@@ -68,4 +68,15 @@ public class MCondition extends MElement
 	{
 		this.ctarget = ctarget;
 	}
+
+	/**
+	 *  Get the events.
+	 *  @return The events.
+	 */
+	public Set<String> getEvents()
+	{
+		return events;
+	}
+	
+	
 }

@@ -13,7 +13,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.rules.eca.annotations.Action;
 import jadex.rules.eca.annotations.Condition;
-import jadex.rules.eca.annotations.RuleObject;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -409,7 +408,7 @@ public class RuleSystem
 		{
 			IEvent event = events.remove(0);
 			
-//			if(event.getType().startsWith("goalopt"))
+//			if(event.getType().getType(0).startsWith("goal"))
 //				System.out.println("here");
 			
 			List<IRule<?>> rules = rulebase.getRules(event.getType());
