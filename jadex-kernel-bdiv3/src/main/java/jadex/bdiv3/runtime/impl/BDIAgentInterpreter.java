@@ -997,7 +997,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					});
 					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
-					declarative = true;
+//					declarative = true; ???
 				}
 			}
 			

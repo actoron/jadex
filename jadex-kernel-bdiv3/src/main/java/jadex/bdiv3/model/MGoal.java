@@ -1,10 +1,13 @@
 package jadex.bdiv3.model;
 
 import jadex.bdiv3.annotation.GoalResult;
-import jadex.bdiv3.annotation.PlanAborted;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -12,6 +15,26 @@ import java.lang.reflect.Method;
  */
 public class MGoal extends MClassBasedElement
 {
+	/** Goal creation condition name. */
+	public static final String CONDITION_CREATION = "creation";
+	
+	/** Goal drop condition name. */
+	public static final String CONDITION_DROP = "drop";
+	
+	/** Goal target condition name. */
+	public static final String CONDITION_TARGET = "target";
+
+	/** Goal maintain condition name. */
+	public static final String CONDITION_MAINTAIN = "maintain";
+	
+	/** Goal context condition name. */
+	public static final String CONDITION_CONTEXT = "context";
+
+	/** Goal recur condition name. */
+	public static final String CONDITION_RECUR = "recur";
+
+
+	
 	/** Never exclude plan candidates from apl. */
 	public static final String EXCLUDE_NEVER = "never";
 
@@ -49,13 +72,14 @@ public class MGoal extends MClassBasedElement
 	/** The pojo result access (field or method). */
 	protected Object pojoresultaccess;
 	
+	/** The goal conditions. */
+	protected Map<String, List<MCondition>> conditions;
 	
 	// hack?!
 	protected boolean declarative;
 	
 	// hack?!
 	protected boolean maintain;
-	
 	
 	/**
 	 *  Create a new belief.
@@ -244,5 +268,29 @@ public class MGoal extends MClassBasedElement
 		{
 			return null;
 		}
+	}
+	
+	/**
+	 *  Add a condition to the goal.
+	 */
+	public void addCondition(String type, MCondition cond)
+	{
+		if(conditions==null)
+			conditions = new HashMap<String, List<MCondition>>();
+		List<MCondition> conds = conditions.get(type);
+		if(conds==null)
+		{
+			conds = new ArrayList<MCondition>();
+			conditions.put(type, conds);
+		}
+		conds.add(cond);
+	}
+	
+	/**
+	 *  Add a condition to the goal.
+	 */
+	public List<MCondition> getConditions(String type)
+	{
+		return conditions==null? null: conditions.get(type);
 	}
 }

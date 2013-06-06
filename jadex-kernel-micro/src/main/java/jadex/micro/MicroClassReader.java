@@ -55,6 +55,7 @@ import jadex.micro.annotation.Results;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -1435,6 +1436,14 @@ public class MicroClassReader
 	/**
 	 * 
 	 */
+	public static boolean isAnnotationPresent(Constructor<?> con, Class<? extends Annotation> anclazz, ClassLoader cl)
+	{
+		return con.isAnnotationPresent((Class<? extends Annotation>)getClass(anclazz, cl));
+	}
+	
+	/**
+	 * 
+	 */
 	public <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> anclazz, ClassLoader cl)
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
@@ -1457,6 +1466,59 @@ public class MicroClassReader
 	{
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		return getProxyAnnotation(m.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
+	}
+	
+	/**
+	 * 
+	 */
+	public <T extends Annotation> T getAnnotation(Constructor<?> c, Class<T> anclazz, ClassLoader cl)
+	{
+		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
+		return getProxyAnnotation(c.getAnnotation((Class<T>)getClass(anclazz, cl)), cl2);
+	}
+	
+	/**
+	 * 
+	 */
+	public Annotation[][]  getParameterAnnotations(Method m, ClassLoader cl)
+	{
+		Annotation[][] ret = null;
+		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
+		Annotation[][] annos = m.getParameterAnnotations();
+		if(annos[0].length>0)
+		{
+			ret = new Annotation[annos.length][annos[0].length];
+			for(int i=0; i<annos.length; i++)
+			{
+				for(int j=0; j<annos[0].length; j++)
+				{
+					ret[i][j] = getProxyAnnotation(annos[i][j], cl);
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public Annotation[][]  getParameterAnnotations(Constructor c, ClassLoader cl)
+	{
+		Annotation[][] ret = null;
+		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
+		Annotation[][] annos = c.getParameterAnnotations();
+		if(annos[0].length>0)
+		{
+			ret = new Annotation[annos.length][annos[0].length];
+			for(int i=0; i<annos.length; i++)
+			{
+				for(int j=0; j<annos[0].length; j++)
+				{
+					ret[i][j] = getProxyAnnotation(annos[i][j], cl);
+				}
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -1556,7 +1618,7 @@ public class MicroClassReader
 							}
 							else if(ret.getClass().isEnum())
 							{
-								ret	= Enum.valueOf((Class<Enum>) SReflect.classForName(ret.getClass().getName(), cl), ret.toString());
+								ret	= Enum.valueOf((Class<Enum>)SReflect.classForName(ret.getClass().getName(), cl), ret.toString());
 							}
 						}
 						return ret;

@@ -7,7 +7,13 @@ import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalContextCondition;
+import jadex.bdiv3.annotation.GoalCreationCondition;
+import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalInhibit;
+import jadex.bdiv3.annotation.GoalMaintainCondition;
+import jadex.bdiv3.annotation.GoalRecurCondition;
+import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bdiv3.annotation.Plan;
@@ -15,15 +21,18 @@ import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.ConstructorInfo;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.GoalDelegationHandler;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
@@ -56,8 +65,11 @@ import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.Publish;
 import jadex.micro.annotation.RequiredService;
+import jadex.rules.eca.EventType;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -737,7 +749,129 @@ public class BDIClassReader extends MicroClassReader
 			}
 			tmp.add(new Tuple2<MGoal, String>(mgoal, method));
 		}
+		
+		
+		boolean declarative = false;
+		boolean maintain = false;
+		
+		Constructor<?>[] cons = gcl.getConstructors();
+		for(final Constructor<?> c: cons)
+		{
+			if(isAnnotationPresent(c, GoalCreationCondition.class, cl))
+			{
+				String[] evs = getAnnotation(c, GoalCreationCondition.class, cl).events();
+				List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(c, cl), cl);
+				for(String ev: evs)
+				{
+					addBeliefEvents(model.getCapability(), events, ev, cl);
+				}
+				MCondition cond = new MCondition("creation_"+c.toString(), events.toArray(new String[events.size()]));
+				cond.setConstructorTarget(new ConstructorInfo(c));
+				mgoal.addCondition(MGoal.CONDITION_CREATION, cond);
+			}
+		}
+		
+		Method[] ms = gcl.getDeclaredMethods();
+		for(final Method m: ms)
+		{
+			if(isAnnotationPresent(m, GoalCreationCondition.class, cl))
+			{
+				addMethodCondition(mgoal, MGoal.CONDITION_CREATION, getAnnotation(m, 
+					GoalCreationCondition.class, cl).events(), model, m, cl);
+			}
+			else if(isAnnotationPresent(m, GoalDropCondition.class, cl))
+			{
+				addMethodCondition(mgoal, MGoal.CONDITION_DROP, getAnnotation(m, 
+					GoalDropCondition.class, cl).events(), model, m, cl);
+			}
+			else if(isAnnotationPresent(m, GoalMaintainCondition.class, cl))
+			{
+				addMethodCondition(mgoal, MGoal.CONDITION_MAINTAIN, getAnnotation(m, 
+					GoalMaintainCondition.class, cl).events(), model, m, cl);
+			}
+			else if(isAnnotationPresent(m, GoalTargetCondition.class, cl))
+			{
+				addMethodCondition(mgoal, MGoal.CONDITION_TARGET, getAnnotation(m, 
+					GoalTargetCondition.class, cl).events(), model, m, cl);
+			}
+			else if(isAnnotationPresent(m, GoalContextCondition.class, cl))
+			{
+				addMethodCondition(mgoal, MGoal.CONDITION_CONTEXT, getAnnotation(m, 
+					GoalContextCondition.class, cl).events(), model, m, cl);
+			}
+			else if(isAnnotationPresent(m, GoalRecurCondition.class, cl))
+			{
+				addMethodCondition(mgoal, MGoal.CONDITION_TARGET, getAnnotation(m, 
+					GoalRecurCondition.class, cl).events(), model, m, cl);
+			}
+		}
+		
 		return mgoal;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addMethodCondition(MGoal mgoal, String condtype, String[] evs, BDIModel model, Method m, ClassLoader cl)
+	{
+		List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(m, cl), cl);
+		for(String ev: evs)
+		{
+			addBeliefEvents(model.getCapability(), events, ev, cl);
+		}
+		MCondition cond = new MCondition(condtype+"_"+m.toString(), events.toArray(new String[events.size()]));
+		cond.setMethodTarget(new MethodInfo(m));
+		mgoal.addCondition(MGoal.CONDITION_CREATION, cond);
+	}
+	
+	/**
+	 *  Read the annotation events from method annotations.
+	 */
+	public static List<EventType> readAnnotationEvents(MCapability capa, Annotation[][] annos, ClassLoader cl)
+	{
+		List<EventType> events = new ArrayList<EventType>();
+		for(Annotation[] ana: annos)
+		{
+			for(Annotation an: ana)
+			{
+				if(an instanceof jadex.rules.eca.annotations.Event)
+				{
+					jadex.rules.eca.annotations.Event ev = (jadex.rules.eca.annotations.Event)an;
+					String name = ev.value();
+					String type = ev.type();
+					if(type.isEmpty())
+					{
+						addBeliefEvents(capa, events, name, cl);
+					}
+					else
+					{
+						events.add(new EventType(new String[]{type, name}));
+					}
+				}
+			}
+		}
+		return events;
+	}
+	
+	/**
+	 *  Create belief events from a belief name.
+	 *  For normal beliefs 
+	 *  beliefchanged.belname and factchanged.belname 
+	 *  and for multi beliefs additionally
+	 *  factadded.belname and factremoved 
+	 *  are created.
+	 */
+	public static void addBeliefEvents(MCapability mcapa, List<EventType> events, String belname, ClassLoader cl)
+	{
+		events.add(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, belname})); // the whole value was changed
+		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
+		
+		MBelief mbel = mcapa.getBelief(belname);
+		if(mbel!=null && mbel.isMulti(cl))
+		{
+			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
+			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
+		}
 	}
 	
 	/**
