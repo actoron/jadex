@@ -18,7 +18,6 @@ import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.PojoMicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
@@ -36,7 +35,7 @@ import java.util.Map;
 @Description("This agents benchmarks BDI V3 agent creation and termination.")
 @Arguments(
 {
-	@Argument(name="max", description="Maximum number of agents to create.", clazz=int.class, defaultvalue="10000"),
+	@Argument(name="max", description="Maximum number of agents to create.", clazz=int.class, defaultvalue="100000"),
 	@Argument(name="num", description="Number of agents already created.", clazz=int.class),
 	@Argument(name="startime", description="Time when the first agent was started.", clazz=long.class),
 	@Argument(name="startmem", description="Memory usage when the first agent was started", clazz=long.class)

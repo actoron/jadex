@@ -99,10 +99,10 @@ public class HttpReceiver
 										
 										public void exceptionOccurred(Exception exception)
 										{
-											if(!shutdown)
-											{
-												exception.printStackTrace();
-											}
+//											if(!shutdown)
+//											{
+//												exception.printStackTrace();
+//											}
 											restart(exception);
 										}
 									});

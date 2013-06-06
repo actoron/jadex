@@ -138,6 +138,10 @@ public class BDIParserHelper extends	DefaultParserHelper
 			{
 				// (ResolvesTo ?rcapa "mycap.mybelief" ?rbel ?rtargetscope)
 				String	ref	= (String)state.getAttributeValue(mbel, OAVBDIMetaModel.elementreference_has_concrete);
+				if(ref==null)
+				{
+					throw new RuntimeException("Abstract beliefs not supported in conditions: "+name);
+				}
 				String	tmpbelname	= ref;
 				int	idx=tmpbelname.indexOf('.');
 				String	capname	= tmpbelname.substring(0, idx);
@@ -180,6 +184,10 @@ public class BDIParserHelper extends	DefaultParserHelper
 			{
 				// (ResolvesTo ?rcapa "mycap.mybelief" ?rbel ?rtargetscope)
 				String	ref	= (String)state.getAttributeValue(mbel, OAVBDIMetaModel.elementreference_has_concrete);
+				if(ref==null)
+				{
+					throw new RuntimeException("Abstract belief sets not supported in conditions: "+name);
+				}
 				String	tmpbelname	= ref;
 				int	idx=tmpbelname.indexOf('.');
 				String	capname	= tmpbelname.substring(0, idx);
