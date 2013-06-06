@@ -85,10 +85,10 @@ public class MyTestClass
 //		return d;
 //	}
 //
-//	public boolean getboVal()
-//	{
-//		return false;
-//	}
+	public boolean getboVal()
+	{
+		return false;
+	}
 //
 //	public char getcVal()
 //	{

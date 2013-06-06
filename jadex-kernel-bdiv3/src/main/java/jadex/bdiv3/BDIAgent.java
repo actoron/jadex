@@ -504,6 +504,10 @@ public class BDIAgent extends MicroAgent
 //		System.out.println("getAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name+", "+type);
 		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
 		String	belname	= bdimodel.getBeliefMappings().get(capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+		if(belname==null)
+		{
+			throw new RuntimeException("No mapping for abstract belief: "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+		}
 		String	capaname	= belname.indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
 			? null : belname.substring(0, belname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
 		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
@@ -537,6 +541,10 @@ public class BDIAgent extends MicroAgent
 //		System.out.println("setAbstractBeliefValue(): "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
 		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
 		String	belname	= bdimodel.getBeliefMappings().get(capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+		if(belname==null)
+		{
+			throw new RuntimeException("No mapping for abstract belief: "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
+		}
 		String	capaname	= belname.indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
 			? null : belname.substring(0, belname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
 		MBelief	bel	= bdimodel.getCapability().getBelief(belname);

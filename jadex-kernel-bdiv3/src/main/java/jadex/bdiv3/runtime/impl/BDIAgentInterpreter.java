@@ -66,6 +66,7 @@ import jadex.rules.eca.annotations.CombinedCondition;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -342,6 +343,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							Method um = agent.getClass().getMethod(name, initcall.getFirstEntity());
 //							System.out.println("Init: "+um);
 							um.invoke(agent, initcall.getSecondEntity());
+						}
+						catch(InvocationTargetException e)
+						{
+							e.getTargetException().printStackTrace();
 						}
 						catch(Exception e)
 						{

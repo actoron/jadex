@@ -4,6 +4,7 @@ import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
@@ -260,6 +261,10 @@ public class MBelief extends MElement
 			{
 				Method m = mgetter.getMethod(cl);
 				ret = m.invoke(object, new Object[0]);
+			}
+			catch(InvocationTargetException e)
+			{
+				e.getTargetException().printStackTrace();
 			}
 			catch(Exception e)
 			{

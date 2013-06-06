@@ -744,7 +744,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 							nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Boolean", "TYPE", "Ljava/lang/Class;"));
 							nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
 							nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Boolean"));
-							nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()I"));
+							nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z"));
 							nl.add(new InsnNode(Opcodes.IRETURN));
 						}
 						else if(ret.getClassName().equals("long"))
@@ -775,6 +775,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						{
 							nl.add(new LdcInsnNode(ret));
 							nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+							nl.add(new TypeInsnNode(Opcodes.CHECKCAST, ret.getInternalName()));
 							nl.add(new InsnNode(Opcodes.ARETURN));
 						}
 						

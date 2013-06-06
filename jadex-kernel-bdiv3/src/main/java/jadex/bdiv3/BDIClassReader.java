@@ -237,8 +237,12 @@ public class BDIClassReader extends MicroClassReader
 						for(Mapping mapping : acap.beliefmapping())
 						{
 							String	source	= mapping.value();
-							String	target	= fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+(mapping.target().equals("") ? source : mapping.target());
-							bdimodel.addBeliefMapping(target, source);	// Store inverse mapping
+							String	target	= mapping.target().equals("") ? source : mapping.target();
+							if(cap.getCapability().getBelief(target)==null)
+							{
+								throw new RuntimeException("No such belief for mapping from "+source+" to "+fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target);
+							}
+							bdimodel.addBeliefMapping(fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping
 						}
 						
 						bdimodel.addSubcapability(new FieldInfo(fields[i]), cap);
@@ -279,13 +283,13 @@ public class BDIClassReader extends MicroClassReader
 				{
 					Belief bel = getAnnotation(methods[i], Belief.class, cl);
 					
-					String name = methods[i].getName().substring(3);
+					String name = methods[i].getName().substring(methods[i].getName().startsWith("is") ? 2 : 3);
 					name = name.substring(0, 1).toLowerCase()+name.substring(1);
 					
 					MBelief mbel = bdimodel.getCapability().getBelief(name);
 					if(mbel!=null)
 					{
-						if(methods[i].getName().startsWith("get"))
+						if(methods[i].getName().startsWith("get") || methods[i].getName().startsWith("is"))
 						{
 							mbel.setGetter(new MethodInfo(methods[i]));
 						}
@@ -530,12 +534,58 @@ public class BDIClassReader extends MicroClassReader
 			
 			for(MPlan plan : capa.getCapability().getPlans())
 			{
-				MPlan	plan2	= new MPlan(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(), plan.getTrigger(), plan.getWaitqueue(), plan.getPriority());
+				MPlan	plan2	= new MPlan(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
+					copyTrigger(bdimodel, name, plan.getTrigger()), copyTrigger(bdimodel, name, plan.getWaitqueue()),
+					plan.getPriority());
 				bdimodel.getCapability().addPlan(plan2);
-				// Todo: map events of plan trigger / waitqueue
 			}
-			capa.getCapability().getPlans();	// todo
 		}
+	}
+
+	/**
+	 *  Coyp a plan trigger or waitqueue and map the events.
+	 */
+	protected MTrigger	copyTrigger(BDIModel bdimodel, String capa, MTrigger trigger)
+	{
+		MTrigger trigger2	= null;
+		if(trigger!=null)
+		{
+			trigger2	= new MTrigger();
+			if(trigger.getFactAddeds()!=null)
+			{
+				for(String event: trigger.getFactAddeds())
+				{
+					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+					trigger2.addFactAdded(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
+				}
+			}
+			if(trigger.getFactChangeds()!=null)
+			{
+				for(String event: trigger.getFactChangeds())
+				{
+					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+					trigger2.addFactChangeds(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
+				}
+			}
+			if(trigger.getFactRemoveds()!=null)
+			{
+				for(String event: trigger.getFactRemoveds())
+				{
+					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+					trigger2.addFactRemoved(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
+				}
+			}
+			if(trigger.getGoals()!=null)
+			{
+				for(MGoal goal: trigger.getGoals())
+				{
+					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName();
+					trigger2.addGoal(bdimodel.getCapability().getGoal(mapped));
+				}
+			}
+		}
+		
+		return trigger2;
 	}
 	
 	/**
