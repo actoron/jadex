@@ -76,10 +76,11 @@ public class MGoal extends MClassBasedElement
 	protected Map<String, List<MCondition>> conditions;
 	
 	// hack?!
-	protected boolean declarative;
+//	protected boolean declarative;
+//	protected boolean target;
 	
 	// hack?!
-	protected boolean maintain;
+//	protected boolean maintain;
 	
 	/**
 	 *  Create a new belief.
@@ -198,35 +199,36 @@ public class MGoal extends MClassBasedElement
 	 */
 	public boolean isDeclarative()
 	{
-		return declarative;
+		return conditions!=null && (conditions.get(CONDITION_TARGET)!=null || conditions.get(CONDITION_TARGET)!=null);
+//		return declarative;
 	}
 
-	/**
-	 *  Set the declarative.
-	 *  @param declarative The declarative to set.
-	 */
-	public void setDeclarative(boolean declarative)
-	{
-		this.declarative = declarative;
-	}
+//	/**
+//	 *  Set the declarative.
+//	 *  @param declarative The declarative to set.
+//	 */
+//	public void setDeclarative(boolean declarative)
+//	{
+//		this.declarative = declarative;
+//	}
 
-	/**
-	 *  Get the maintain.
-	 *  @return The maintain.
-	 */
-	public boolean isMaintain()
-	{
-		return maintain;
-	}
-
-	/**
-	 *  Set the maintain.
-	 *  @param maintain The maintain to set.
-	 */
-	public void setMaintain(boolean maintain)
-	{
-		this.maintain = maintain;
-	}
+//	/**
+//	 *  Get the maintain.
+//	 *  @return The maintain.
+//	 */
+//	public boolean isMaintain()
+//	{
+//		return maintain;
+//	}
+//
+//	/**
+//	 *  Set the maintain.
+//	 *  @param maintain The maintain to set.
+//	 */
+//	public void setMaintain(boolean maintain)
+//	{
+//		this.maintain = maintain;
+//	}
 	
 	/**
 	 *  Get the pojo result access, i.e. the method or field

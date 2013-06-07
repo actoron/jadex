@@ -706,8 +706,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //			boolean fin = false;
 			
 			final Class<?> gcl = mgoal.getTargetClass(getClassLoader());
-			boolean declarative = false;
-			boolean maintain = false;
+//			boolean declarative = false;
+//			boolean maintain = false;
 			
 			Constructor<?>[] cons = gcl.getConstructors();
 			for(final Constructor<?> c: cons)
@@ -1074,8 +1074,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			}
 			
 			// todo: do not write from instance level!
-			mgoal.setDeclarative(declarative);
-			mgoal.setMaintain(maintain);
+//			mgoal.setDeclarative(declarative);
+//			mgoal.setMaintain(maintain);
 		}
 		
 		// Observe plan types
