@@ -555,8 +555,12 @@ public class StarterPanel extends JLayeredPane
 //		content.add(new JScrollPane(middle), new GridBagConstraints(0, y, 5, 1, 1, 1, GridBagConstraints.WEST,
 //			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
-		componentnamel.setMinimumSize(confl.getMinimumSize());
-		componentnamel.setPreferredSize(confl.getPreferredSize());
+		componentnamel.setMinimumSize(confdummy.getMinimumSize());
+		componentnamel.setPreferredSize(confdummy.getPreferredSize());
+		filenamel.setMinimumSize(confdummy.getMinimumSize());
+		filenamel.setPreferredSize(confdummy.getPreferredSize());
+		confl.setMinimumSize(confdummy.getMinimumSize());
+		confl.setPreferredSize(confdummy.getPreferredSize());
 		
 		/*y++;
 		componentnamel = new JLabel("Component name");
