@@ -997,7 +997,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							return IFuture.DONE;
 						}
 					});
-					rule.setEvents(cond.getEvents());
+					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
 				}
 			}
@@ -1073,7 +1075,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							return IFuture.DONE;
 						}
 					});
-					rule.setEvents(cond.getEvents());
+					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
 					
 					// if has no own target condition
