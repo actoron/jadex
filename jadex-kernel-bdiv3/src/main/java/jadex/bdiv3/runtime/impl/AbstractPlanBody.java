@@ -1,6 +1,8 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.model.MElement;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
@@ -8,6 +10,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+
+import java.util.Map;
 
 /**
  *  Abstract base class for plan body implementations.
@@ -225,7 +229,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		// Guess parameters
 //		Class<?>[] ptypes = body.getParameterTypes();
 		
-		final Object reason = rplan.getReason();
+		Object reason = rplan.getReason();
 		Object pojope = null;
 		if(reason instanceof RProcessableElement)
 			pojope = ((RProcessableElement)reason).getPojoElement();
@@ -236,6 +240,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 		{
 			if(reason!=null && SReflect.isSupertype(reason.getClass(), ptypes[i]))
 			{
+				reason =  ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
+					.adaptToCapability(reason, rplan.getModelElement());
+				
 				params[i] = reason;
 			}
 			else if(pojope!=null && SReflect.isSupertype(pojope.getClass(), ptypes[i]))

@@ -1857,6 +1857,21 @@ public class DecoupledComponentManagementService implements IComponentManagement
 //		System.out.println("getExternalAccess: "+this+", "+cid);
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
+		ret.addResultListener(new IResultListener<IExternalAccess>()
+		{
+			public void resultAvailable(IExternalAccess result)
+			{
+				if(result==null)
+				{
+					System.err.println("ea is null in cms!!!");
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
+		
 		if(cid==null)
 		{
 			ret.setException(new IllegalArgumentException("Identifier is null."));

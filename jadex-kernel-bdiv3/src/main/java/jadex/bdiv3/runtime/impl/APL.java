@@ -370,7 +370,7 @@ public class APL
 		// Guess parameters
 //		Class<?>[] ptypes = body.getParameterTypes();
 		
-		Object pojope = ((RProcessableElement)element).getPojoElement();
+		Object pojope = element.getPojoElement();
 		
 		Object[] params = new Object[ptypes.length];
 		

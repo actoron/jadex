@@ -16,6 +16,7 @@ import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
@@ -224,6 +225,51 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		return ret;
 	}
 	
+	/**
+	 * 	Adapt element for use in inner capabilities.
+	 *  @param obj	The object to adapt (e.g. a change event)
+	 *  @param melement	The element to adapt the object for (e.g. a plan)
+	 */
+	protected Object adaptToCapability(Object obj, MElement melement)
+	{
+		if(obj instanceof ChangeEvent && melement.getName().indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)!=-1)
+		{
+			ChangeEvent	ce	= (ChangeEvent)obj;
+			int	idx	= melement.getName().lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
+			String	capa	= melement.getName().substring(0, idx);
+			String	source	= (String)ce.getSource();
+			// For concrete belief just strip capability prefix.
+			if(source.startsWith(capa))
+			{
+				source	= source.substring(capa.length()+1);
+			}
+			// For abstract belief find corresponding mapping.
+			else
+			{
+				Map<String, String>	map	= getBDIModel().getBeliefMappings();
+				for(String target: map.keySet())
+				{
+					if(source.equals(map.get(target)))
+					{
+						int	idx2	= target.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
+						String	capa2	= target.substring(0, idx2);
+						if(capa.equals(capa2))
+						{
+							source	= target.substring(capa.length()+1);
+							break;
+						}
+					}
+				}
+			}
+			
+			ChangeEvent	ce2	= new ChangeEvent();
+			ce2.setType(ce.getType());
+			ce2.setSource(source);
+			ce2.setValue(ce.getValue());
+			obj	= ce2;
+		}
+		return obj;
+	}
 	
 	/**
 	 *  Get the component fetcher.
