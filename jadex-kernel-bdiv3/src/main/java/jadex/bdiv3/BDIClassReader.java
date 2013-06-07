@@ -176,8 +176,8 @@ public class BDIClassReader extends MicroClassReader
 //		List<Class> goals = new ArrayList<Class>();
 //		List<Method> plans = new ArrayList<Method>();
 		
-		try
-		{
+//		try
+//		{
 		
 		Map<String, BDIModel>	capas	= new LinkedHashMap<String, BDIModel>();
 		
@@ -563,11 +563,13 @@ public class BDIClassReader extends MicroClassReader
 			}
 		}
 		
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		System.out.println("endend");
+		
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 	}
 
 	/**
