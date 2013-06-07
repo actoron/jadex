@@ -52,6 +52,19 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>jadex-android-platformapp</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>jadex-android-platformapp</finalName>
+							<descriptors>
+								<descriptor>src/main/assembly/dist-assembly-androidplatformapk.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+					<execution>
 						<id>sources</id>
 						<phase>package</phase>
 						<goals>
