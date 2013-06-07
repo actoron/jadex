@@ -76,7 +76,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -166,7 +165,7 @@ public class BDIClassReader extends MicroClassReader
 	 *  Fill the model details using annotation.
 	 *  // called with dummy classloader (that was used to load cma first time)
 	 */
-	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, final Class<?> cma, ClassLoader cl,  IResourceIdentifier rid, IComponentIdentifier root)
+	protected void fillBDIModelFromAnnotations(BDIModel bdimodel, String model, Class<?> cma, ClassLoader cl,  IResourceIdentifier rid, IComponentIdentifier root)
 	{
 //		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
@@ -189,15 +188,18 @@ public class BDIClassReader extends MicroClassReader
 		Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs = new HashMap<ClassInfo, List<Tuple2<MGoal, String>>>();
 		
 		List<Class<?>> agtcls = new ArrayList<Class<?>>();
-		Class<?> clazz = cma;
-		while(clazz!=null && !clazz.equals(Object.class) && !clazz.equals(getClass(BDIAgent.class, cl)))
+		while(cma!=null && !cma.equals(Object.class) && !cma.equals(getClass(BDIAgent.class, cl)))
 		{
-			if(isAnnotationPresent(clazz, Agent.class, cl)
-				|| isAnnotationPresent(clazz, Capability.class, cl))
+			if(isAnnotationPresent(cma, Agent.class, cl)
+				|| isAnnotationPresent(cma, Capability.class, cl))
 			{
-				agtcls.add(0, clazz);
+				agtcls.add(0, cma);
 			}
-			
+			cma = cma.getSuperclass();
+		}
+		
+		for(Class<?> clazz: agtcls)
+		{
 			// Find beliefs
 			Field[] fields = clazz.getDeclaredFields();
 			for(int i=0; i<fields.length; i++)
@@ -409,8 +411,6 @@ public class BDIClassReader extends MicroClassReader
 					}
 				}
 			}
-			
-			clazz = clazz.getSuperclass();
 		}
 		
 		// init deliberation of goals
