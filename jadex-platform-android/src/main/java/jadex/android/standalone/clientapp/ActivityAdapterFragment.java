@@ -54,7 +54,12 @@ class ActivityAdapterFragment extends android.support.v4.app.Fragment
 		return getActivity().stopService(service);
 	}
 	
-	
+	/**
+	 * Calls getActivity().finish();
+	 */
+	protected void finish() {
+		getActivity().finish();
+	}
 
 	/**
 	 * Calls getActivity().setProgressBarIndeterminateVisibility()
@@ -62,6 +67,11 @@ class ActivityAdapterFragment extends android.support.v4.app.Fragment
 	public void setProgressBarIndeterminateVisibility(boolean indeterminate)
 	{
 		getActivity().setProgressBarIndeterminate(indeterminate);
+	}
+	
+	public void setProgressBarIndeterminate(boolean value)
+	{
+		getActivity().setProgressBarIndeterminate(value);
 	}
 
 	/**

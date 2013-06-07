@@ -2,12 +2,14 @@ package jadex.android.standalone.clientapp;
 
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
 import android.app.Activity;
+import android.app.LauncherActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.Window;
 
 public class ClientAppFragment extends ActivityAdapterFragment
@@ -126,10 +128,20 @@ public class ClientAppFragment extends ActivityAdapterFragment
 			return super.stopService(service);
 		}
 	}
-
+	
 	public void setUniversalClientService(UniversalClientServiceBinder service)
 	{
 		this.universalService = service;
 	}
-
+	
+	@Override
+	public LayoutInflater getLayoutInflater(Bundle savedInstanceState)
+	{
+		LayoutInflater layoutInflater = super.getLayoutInflater(savedInstanceState);
+//		LayoutInflater userInflater = LayoutInflater.from(getContext());
+//		
+//		userInflater.setFactory(layoutInflater.getFactory());
+		return layoutInflater;
+	}
+	
 }

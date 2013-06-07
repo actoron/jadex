@@ -1,14 +1,12 @@
 package jadex.android.applications.chat.filetransfer;
 
 import jadex.android.applications.chat.AndroidChatService;
+import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
 import jadex.android.applications.chat.ChatUser;
 import jadex.android.applications.chat.ChatUserArrayAdapter;
 import jadex.android.applications.chat.IAndroidChatService;
 import jadex.android.applications.chat.R;
-import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
-import jadex.android.applications.chat.R.id;
-import jadex.android.applications.chat.R.layout;
-import jadex.android.applications.chat.R.string;
+import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.future.IResultListener;
@@ -22,25 +20,26 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SendFileActivity extends Activity implements ServiceConnection, ChatEventListener
+public class SendFileActivity extends ClientAppFragment implements ServiceConnection, ChatEventListener
 {
 	// --- UI Widgets ---
 	private IAndroidChatService service;
@@ -58,36 +57,49 @@ public class SendFileActivity extends Activity implements ServiceConnection, Cha
 	private boolean transferring;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	public void onPrepare(Activity mainActivity)
+	{
+		super.onPrepare(mainActivity);
+		mainActivity.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setTitle(R.string.sendFile_title);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setContentView(R.layout.sendfile);
+		uiHandler = new Handler();
+		startService(new Intent(getActivity(), AndroidChatService.class));
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+//		inflater = inflater.cloneInContext(getContext());
+		View view = inflater.inflate(R.layout.sendfile, container, false);
 
-		transferInfoItem = (TransferInfoItemWidget) findViewById(R.id.sendfile_transferInfoItem);
-		bottomBar = (LinearLayout) findViewById(R.id.sendfile_bottomBar);
+		transferInfoItem = (TransferInfoItemWidget) view.findViewById(R.id.sendfile_transferInfoItem);
+		bottomBar = (LinearLayout) view.findViewById(R.id.sendfile_bottomBar);
 		setTransferring(false);
 
-		adapter = new ChatUserArrayAdapter(getApplicationContext());
+		adapter = new ChatUserArrayAdapter(getActivity());
 
-		contactsListView = (ListView) findViewById(R.id.sendfile_contactslist);
+		contactsListView = (ListView) view.findViewById(R.id.sendfile_contactslist);
 		contactsListView.setAdapter(adapter);
 		contactsListView.setOnItemClickListener(onChatUserClickListener);
 
-		statusTextView = (TextView) findViewById(R.id.sendfile_statustext);
+		statusTextView = (TextView) view.findViewById(R.id.sendfile_statustext);
 
-		refreshButton = (Button) findViewById(R.id.sendfile_refreshButton);
+		refreshButton = (Button) view.findViewById(R.id.sendfile_refreshButton);
 		refreshButton.setOnClickListener(onRefreshClickListener);
-		infoTextView = (TextView) findViewById(R.id.sendfile_infotext);
+		infoTextView = (TextView) view.findViewById(R.id.sendfile_infotext);
 
-		uiHandler = new Handler();
-
-		startService(new Intent(this, AndroidChatService.class));
+		
+		return view;
 	}
 
 	@Override
-	protected void onResume()
+	public void onResume()
 	{
 		super.onResume();
 		refreshButton.setEnabled(false);
@@ -128,34 +140,33 @@ public class SendFileActivity extends Activity implements ServiceConnection, Cha
 			}
 		}
 
-		bindService(new Intent(this, AndroidChatService.class), this, 0);
+		bindService(new Intent(getActivity(), AndroidChatService.class), this, 0);
 	}
 
 	@Override
-	protected void onPause()
+	public void onPause()
 	{
 		super.onPause();
 		unbindService(this);
 	}
 
 	@Override
-	protected void onDestroy()
+	public void onDestroy()
 	{
 		super.onDestroy();
-		stopService(new Intent(this, AndroidChatService.class));
+		stopService(new Intent(getActivity(), AndroidChatService.class));
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		menu.add("Show Transfers");
-		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		startActivity(new Intent(SendFileActivity.this, TransferActivity.class));
+		startActivity(new Intent(getActivity(), TransferActivity.class));
 		return true;
 	}
 
@@ -210,7 +221,7 @@ public class SendFileActivity extends Activity implements ServiceConnection, Cha
 						if (ti.getState().equals(TransferInfo.STATE_COMPLETED))
 						{
 							statusTextView.setText(R.string.sendFile_transferComplete);
-							Toast.makeText(SendFileActivity.this, R.string.sendFile_transferComplete, Toast.LENGTH_LONG).show();
+							Toast.makeText(getActivity(), R.string.sendFile_transferComplete, Toast.LENGTH_LONG).show();
 							setTransferring(false);
 							finish();
 						} else if (ti.getState().equals(TransferInfo.STATE_ABORTED))
@@ -314,6 +325,22 @@ public class SendFileActivity extends Activity implements ServiceConnection, Cha
 							}
 						});
 					}
+
+					@Override
+					public void exceptionOccurred(Exception exception)
+					{
+						super.exceptionOccurred(exception);
+						uiHandler.post(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								setProgressBarIndeterminateVisibility(false);
+								statusTextView.setText(R.string.sendFile_chooseReceiver);
+								refreshButton.setEnabled(true);
+							}
+						});
+					}
 				});
 			}
 		}).start();
@@ -329,10 +356,10 @@ public class SendFileActivity extends Activity implements ServiceConnection, Cha
 		{
 			if (transferring)
 			{
-				Toast.makeText(SendFileActivity.this, R.string.sendFile_alreadyTransferring, Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), R.string.sendFile_alreadyTransferring, Toast.LENGTH_SHORT).show();
 			} else
 			{
-				final AlertDialog.Builder builder = new AlertDialog.Builder(SendFileActivity.this);
+				final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 				final ChatUser receiver = adapter.getItem(position);
 
 				builder.setTitle(String.format(getResources().getString(R.string.sendFile_confirmSend), path, receiver.getNickName()));

@@ -1,29 +1,24 @@
 package jadex.android.applications.chat;
 
-import java.io.FileInputStream;
-
 import jadex.android.applications.chat.AndroidChatService.ChatEventListener;
-import jadex.android.applications.chat.filetransfer.SendFileActivity;
 import jadex.android.applications.chat.filetransfer.TransferActivity;
+import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.bridge.service.types.chat.ChatEvent;
-import jadex.bridge.service.types.chat.IChatGuiService;
-import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.platform.service.chat.ChatService;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,7 +28,7 @@ import android.widget.ListView;
  * Activity (screen) for the jadex android benchmark app. Starts the platform
  * and allows launching the different benchmarks.
  */
-public class JadexAndroidChatActivity extends Activity implements ServiceConnection, ChatEventListener
+public class JadexAndroidChatActivity extends ClientAppFragment implements ServiceConnection, ChatEventListener
 {
 	// -------- attributes --------
 
@@ -49,6 +44,14 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	private boolean connected;
 
 	// -------- methods --------
+	
+	@Override
+	public void onPrepare(Activity mainActivity)
+	{
+		super.onPrepare(mainActivity);
+		mainActivity.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		
+	}
 
 	/**
 	 * Called when the activity is first created.
@@ -56,49 +59,54 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setContentView(R.layout.chat);
+		startService(new Intent(getActivity(), AndroidChatService.class));
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+		View view = inflater.inflate(R.layout.chat, container, false);
 
-		sendButton = (Button) findViewById(R.id.send);
-		messageEditText = (EditText) findViewById(R.id.chatmsg);
+		sendButton = (Button) view.findViewById(R.id.send);
+		messageEditText = (EditText) view.findViewById(R.id.chatmsg);
 		messageEditText.setEnabled(false);
 		sendButton.setEnabled(false);
 
 		sendButton.setOnClickListener(onSendMessageClickListener);
 
-		listView = (ListView) findViewById(R.id.chat_listView);
-		chatEventAdapter = new ChatEventArrayAdapter(this);
+		listView = (ListView) view.findViewById(R.id.chat_listView);
+		chatEventAdapter = new ChatEventArrayAdapter(getActivity());
 		listView.setAdapter(chatEventAdapter);
-		startService(new Intent(this, AndroidChatService.class));
+		
+		return view;
 	}
-
+	
 	@Override
-	protected void onResume()
+	public void onResume()
 	{
 		super.onResume();
 		setProgressBarIndeterminateVisibility(true);
-		bindService(new Intent(this, AndroidChatService.class), this, BIND_AUTO_CREATE);
+		bindService(new Intent(getActivity(), AndroidChatService.class), this, BIND_AUTO_CREATE);
 	}
 
 	@Override
-	protected void onPause()
+	public void onPause()
 	{
 		super.onPause();
 		if (service != null) {
 			service.removeMessageListener(this);
+			service.setStatus(ChatService.STATE_AWAY, null, null);
+			unbindService(this);
 		}
-		this.service.setStatus(ChatService.STATE_AWAY, null, null);
-		unbindService(this);
 	}
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		menu.add(Menu.NONE,0,Menu.NONE,"Shutdown Chat").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		menu.add(Menu.NONE,1,Menu.NONE,"Show Transfers").setIcon(android.R.drawable.ic_menu_share);
-		return true;
 	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -109,7 +117,7 @@ public class JadexAndroidChatActivity extends Activity implements ServiceConnect
 			finish();	
 			break;
 		case 1:
-			startActivity(new Intent(this, TransferActivity.class));
+			startActivity(new Intent(getActivity(), TransferActivity.class));
 			break;
 		default:
 			break;

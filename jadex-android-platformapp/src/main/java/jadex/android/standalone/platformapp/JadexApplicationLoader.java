@@ -9,6 +9,7 @@ import jadex.android.standalone.clientservice.UniversalClientService;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -24,7 +25,10 @@ import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.LayoutInflater.Factory;
+import android.view.View;
 import dalvik.system.DexClassLoader;
 
 public class JadexApplicationLoader extends FragmentActivity implements ServiceConnection
@@ -37,12 +41,15 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	private UniversalClientServiceBinder universalService;
 	private Resources resources;
 	private String className;
+	private ClassLoader cl;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		// set default layout inflater during onCreate()
+		// set default layout inflater and classLoader during onCreate()
 		userAppInflater = super.getLayoutInflater();
+		cl = this.getClassLoader();
+		
 		super.onCreate(savedInstanceState);
 
 		Intent intent = getIntent();
@@ -68,6 +75,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 
 			if (appPath != null)
 			{
+				this.cl = getClassLoaderForExternalDex(getClass().getClassLoader(), appPath);
 				ClientAppFragment act = loadAndCreateUserActivity(appPath, className);
 				act.setIntent(intent);
 				act.onPrepare(this);
@@ -97,11 +105,22 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	{
 		this.universalService = (UniversalClientServiceBinder) service;
 		defaultActivity.setUniversalClientService(universalService);
-
+		
+		try
+		{
+			Context userContext = getApplicationContext().createPackageContext(userAppPackage, Context.CONTEXT_IGNORE_SECURITY);
+			userAppContext = userContext;
+			initUserAppContext(userAppPackage);
+		}
+		catch (NameNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		
+		
 		FragmentManager manager = getSupportFragmentManager();
 		FragmentTransaction ta = manager.beginTransaction();
 
-		initUserAppContext(userAppPackage);
 
 		ta.add(R.id.fragmentContainer, defaultActivity);
 
@@ -119,15 +138,12 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 
 	private void initUserAppContext(String userApplicationPackage)
 	{
-		try
-		{
-			userAppContext = getApplicationContext().createPackageContext(userApplicationPackage, Context.CONTEXT_IGNORE_SECURITY);
-		}
-		catch (NameNotFoundException e)
-		{
-			e.printStackTrace();
-		}
+		// This LayoutInflater will make sure User Layouts are found
 		userAppInflater = LayoutInflater.from(userAppContext);
+		// This Factory will load custom Widget Classes, while android widgets
+		// are loaded by the ClassLoader inside the LayoutInflater.
+		userAppInflater.setFactory(layoutFactory);
+		// Enable the use of R.id.<layoutId> or R.string.<stringId> inside the user app
 		resources = new ResourceSet(getResources(), userAppContext.getResources());
 		// TODO: same with assets?
 	}
@@ -184,6 +200,13 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 			return super.getResources();
 		}
 	}
+	
+	@Override
+	public ClassLoader getClassLoader()
+	{
+		System.out.println("getClassLoader");
+		return cl;
+	}
 
 	@Override
 	public AssetManager getAssets()
@@ -194,7 +217,6 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 
 	private ClientAppFragment loadAndCreateUserActivity(String appPath, String className)
 	{
-		DexClassLoader cl = getClassLoaderForExternalDex(getClassLoader(), appPath);
 		JadexPlatformManager.getInstance().setAppClassLoader(appPath, cl);
 		try
 		{
@@ -215,8 +237,13 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		// Context.MODE_PRIVATE), "jadex.jar");
 		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
 
-		DexClassLoader cl = new DexClassLoader(appPath, optimizedDexOutputPath.getAbsolutePath(), null, parent);
-
+		DexClassLoader cl = new DexClassLoader(appPath, optimizedDexOutputPath.getAbsolutePath(), null, parent) {
+			@Override
+			public String toString()
+			{
+				return "Custom DexClassLoader " + super.toString();
+			}
+		};
 		return cl;
 	}
 
@@ -230,5 +257,35 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 
 		return new DexClassLoader(applicationInfo.sourceDir, optimizedDexOutputPath.getAbsolutePath(), null, parent);
 	}
+	
+	
+	private Factory layoutFactory = new Factory()
+	{
+		 private final Class[] mConstructorSignature = new Class[] {
+	            Context.class, AttributeSet.class};
+		 
+		 private final Object[] mConstructorArgs = new Object[2];
+		 
+		@Override
+		public View onCreateView(String name, Context context, AttributeSet attrs)
+		{
+			ClassLoader mCl = context.getClassLoader();
+			try
+			{
+				Class<?> loadClass = cl.loadClass(name);
+				Constructor<?> constructor = loadClass.getConstructor(mConstructorSignature);
+				Object[] args = mConstructorArgs;
+				args[0] = context;
+				args[1] = attrs;
+
+				return (View) constructor.newInstance(args);
+			}
+			catch (Exception e)
+			{
+				Logger.d("Class " + name + " not found in user application.");
+			}
+			return null;
+		}
+	};
 
 }

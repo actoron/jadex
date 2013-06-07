@@ -1,7 +1,8 @@
 package jadex.android.applications.chat;
 
 import jadex.android.commons.JadexPlatformOptions;
-import jadex.android.service.JadexPlatformManager;
+import jadex.android.exception.JadexAndroidError;
+import jadex.android.exception.JadexAndroidException;
 import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -191,7 +192,13 @@ public class AndroidChatService extends JadexPlatformService
 			
 			@Override
 			public IIntermediateFuture<IChatService> setStatus(String status, byte[] image, IComponentIdentifier[] receivers) {
-				return chatgui.status(status, image, receivers);
+				if (chatgui != null) {
+					return chatgui.status(status, image, receivers);
+				} else {
+					IntermediateFuture<IChatService> intermediateFuture = new IntermediateFuture<IChatService>();
+					intermediateFuture.setException(new JadexAndroidException("Chat is offline, cannot set status."));
+					return intermediateFuture;
+				}
 			}
 			
 			@Override

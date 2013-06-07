@@ -1,14 +1,9 @@
 package jadex.platform.service.context;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import jadex.bridge.service.types.context.IPreferences;
+
 import java.util.Map;
-import java.util.Set;
 
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-
-import jadex.bridge.service.types.context.IPreferences;
 
 public class AndroidSharedPreferencesWrapper implements IPreferences{
 	

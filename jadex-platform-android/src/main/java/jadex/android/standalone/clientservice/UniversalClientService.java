@@ -67,12 +67,11 @@ public class UniversalClientService extends Service
 		try
 		{
 			result = clientServiceClass.newInstance();
-			Context applicationContext = getApplicationContext();
 			Context baseContext = getBaseContext();
 			if (result instanceof JadexClientAppService) {
-				((JadexClientAppService) result).setContexts(applicationContext, baseContext);
+				((JadexClientAppService) result).attachBaseContext(baseContext);
 			} else if (result instanceof JadexPlatformService) {
-				((JadexPlatformService) result).setContexts(applicationContext, baseContext);
+				((JadexPlatformService) result).attachBaseContext(baseContext);
 			}
 		}
 		catch (Exception e)

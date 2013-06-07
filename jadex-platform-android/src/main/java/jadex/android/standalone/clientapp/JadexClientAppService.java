@@ -2,16 +2,22 @@ package jadex.android.standalone.clientapp;
 
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.os.Looper;
 
 public abstract class JadexClientAppService extends Service
 {
 
 
 	private Context applicationContext;
-	private Context baseContext;
+//	private Context baseContext;
 
 	@Override
 	protected void finalize() throws Throwable
@@ -49,24 +55,16 @@ public abstract class JadexClientAppService extends Service
 	}
 	
 	@Override
-	public Context getBaseContext()
+	public Object getSystemService(String name)
 	{
-		return baseContext;
-	}
-	
-	@Override
-	public Context getApplicationContext()
-	{
-		System.out.println("JadexClientAppService: getApplicationContext()");
-		return applicationContext;
+		return super.getSystemService(name);
 	}
 
-	public void setContexts(Context applicationContext, Context baseContext)
+	@Override
+	public void attachBaseContext(Context baseContext)
 	{
-		this.applicationContext = applicationContext;
-		this.baseContext = baseContext;
+		super.attachBaseContext(baseContext);
 	}
-	
 	
 
 }

@@ -41,10 +41,6 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 
 	private IComponentIdentifier platformId;
 
-	private Context baseContext;
-
-	private Context applicationContext;
-	
 	public JadexPlatformService()
 	{
 		jadexPlatformManager = JadexPlatformManager.getInstance();
@@ -333,30 +329,9 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 		}
 	}
 
-	public void setContexts(Context applicationContext, Context baseContext)
-	{
-		this.baseContext = baseContext;
-		this.applicationContext = applicationContext;
-	}
-	
 	@Override
-	public Context getBaseContext()
+	public void attachBaseContext(Context baseContext)
 	{
-		if (this.baseContext != null) {
-			return baseContext;
-		} else {
-			return super.getBaseContext();
-		}
+		super.attachBaseContext(baseContext);
 	}
-	
-	@Override
-	public Context getApplicationContext()
-	{
-		if (this.applicationContext != null) {
-			return applicationContext;
-		} else {
-			return super.getApplicationContext();
-		}
-	}
-
 }
