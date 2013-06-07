@@ -1404,8 +1404,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		{
 			m.setAccessible(true);
 			Object result = null;
-			if(m.getParameterTypes().length==0)
-				result = m.invoke(goal.getPojoElement(), m.getParameterTypes().length==0? new Object[0]: new Object[]{event.getContent()});
+			result = m.invoke(goal.getPojoElement(), m.getParameterTypes().length==0? new Object[0]: new Object[]{event.getContent()});
 			return ((Boolean)result).booleanValue();
 		}
 		catch(Exception e)
