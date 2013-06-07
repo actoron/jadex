@@ -4,12 +4,6 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.PojoBDIAgent;
 import jadex.bdiv3.annotation.Capability;
-import jadex.bdiv3.annotation.GoalContextCondition;
-import jadex.bdiv3.annotation.GoalCreationCondition;
-import jadex.bdiv3.annotation.GoalDropCondition;
-import jadex.bdiv3.annotation.GoalMaintainCondition;
-import jadex.bdiv3.annotation.GoalRecurCondition;
-import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
@@ -1066,8 +1060,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								{	
 									if(!executeGoalMethod(m, goal, event))
 									{
-	//										System.out.println("Goal maintain triggered: "+goal);
-	//										System.out.println("state was: "+getProcessingState());
+//										System.out.println("Goal maintain triggered: "+goal);
+//										System.out.println("state was: "+goal.getProcessingState());
 										goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.INPROCESS);
 									}
 								}

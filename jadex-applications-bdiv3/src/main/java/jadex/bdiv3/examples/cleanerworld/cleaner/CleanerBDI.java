@@ -403,7 +403,7 @@ public class CleanerBDI
 		/**
 		 *  Drop the goal when the wastebin is full.
 		 */
-		@GoalDropCondition(events="wastebin") // todo: check when parameter value changes
+//		@GoalDropCondition(events="wastebin") // todo: check when parameter value changes
 		public boolean checkContext()
 		{
 			return wastebin.isFull();

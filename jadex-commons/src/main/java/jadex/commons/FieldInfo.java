@@ -47,15 +47,23 @@ public class FieldInfo
 	 */
 	public Field getField(ClassLoader cl)
 	{
+		Field	ret	= null;
 		try
 		{
 			if(field==null)
 			{
 //				System.out.println("field: "+cl+" "+classname+" "+name);
 				Class<?> cla = SReflect.findClass(classname, null, cl);
-				field = cla.getDeclaredField(name);
+				ret = cla.getDeclaredField(name);
+				if(cl.getClass().getName().indexOf("DummyClassLoader")==-1)	// Hack!!! don't cache dummy field.
+				{
+					field	= ret;
+				}
 			}
-			return field;
+			else
+			{
+				ret	= field;
+			}
 		}
 		catch(RuntimeException e)
 		{
@@ -65,6 +73,8 @@ public class FieldInfo
 		{
 			throw new RuntimeException(e);
 		}
+		
+		return ret;
 	}
 	
 	/**

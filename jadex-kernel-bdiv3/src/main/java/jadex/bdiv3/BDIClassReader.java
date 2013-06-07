@@ -198,6 +198,22 @@ public class BDIClassReader extends MicroClassReader
 				agtcls.add(0, clazz);
 			}
 			
+			// Find beliefs
+			Field[] fields = clazz.getDeclaredFields();
+			for(int i=0; i<fields.length; i++)
+			{
+				if(isAnnotationPresent(fields[i], Belief.class, cl))
+				{
+//					System.out.println("found belief: "+fields[i].getName());
+					Belief bel = getAnnotation(fields[i], Belief.class, cl);
+					bdimodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i]), 
+						bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
+						bel.dynamic(), bel.events().length==0? null: bel.events()));
+//					beliefs.add(fields[i]);
+//					beliefnames.add(fields[i].getName());
+				}
+			}
+			
 			// Find external goals
 			if(isAnnotationPresent(clazz, Goals.class, cl))
 			{
@@ -227,7 +243,6 @@ public class BDIClassReader extends MicroClassReader
 			}
 			
 			// Find capabilities
-			Field[] fields = clazz.getDeclaredFields();
 			for(int i=0; i<fields.length; i++)
 			{
 				if(isAnnotationPresent(fields[i], Capability.class, cl))
@@ -259,21 +274,6 @@ public class BDIClassReader extends MicroClassReader
 				}
 			}
 
-			// Find beliefs
-			for(int i=0; i<fields.length; i++)
-			{
-				if(isAnnotationPresent(fields[i], Belief.class, cl))
-				{
-//					System.out.println("found belief: "+fields[i].getName());
-					Belief bel = getAnnotation(fields[i], Belief.class, cl);
-					bdimodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i]), 
-						bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-						bel.dynamic(), bel.events().length==0? null: bel.events()));
-//					beliefs.add(fields[i]);
-//					beliefnames.add(fields[i].getName());
-				}
-			}
-			
 			// Find method plans
 			Method[] methods = clazz.getDeclaredMethods();
 			for(int i=0; i<methods.length; i++)
@@ -972,11 +972,16 @@ public class BDIClassReader extends MicroClassReader
 	 */
 	public static void addBeliefEvents(MCapability mcapa, List<EventType> events, String belname, ClassLoader cl)
 	{
+		MBelief mbel = mcapa.getBelief(belname);
+		if(mbel==null)
+		{
+			throw new RuntimeException("No such belief: "+belname);
+		}
+		
 		events.add(new EventType(new String[]{ChangeEvent.BELIEFCHANGED, belname})); // the whole value was changed
 		events.add(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname})); // property change of a value
 		
-		MBelief mbel = mcapa.getBelief(belname);
-		if(mbel!=null && mbel.isMulti(cl))
+		if(mbel.isMulti(cl))
 		{
 			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
 			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
