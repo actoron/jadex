@@ -81,15 +81,21 @@ public class BpmnMenuBar extends JMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				final SettingsPanel spanel = new SettingsPanel(editorwindow.getGlobalCache(), editorwindow.getSettings());
+				final SettingsPanel spanel = new SettingsPanel(editorwindow.getSettings());
 				OptionDialog od = new OptionDialog(editorwindow, "Settings", true, spanel, new AbstractAction()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						spanel.applySettings();
+						boolean refreshclasses = spanel.applySettings();
+						
 						List<ModelContainer> containers = editorwindow.getModelContainers();
 						for (ModelContainer cont : containers)
 						{
+							if (refreshclasses)
+							{
+								cont.generateClassLoader();
+							}
+							
 							if (cont.getGraph().getSelectionCount() == 1)
 							{
 								cont.setPropertyPanel(SPropertyPanelFactory.createPanel(cont.getGraph().getSelectionCell(), cont));
@@ -99,7 +105,6 @@ public class BpmnMenuBar extends JMenuBar
 								cont.setPropertyPanel(SPropertyPanelFactory.createPanel(null, cont));
 							}
 							
-							cont.generateClassLoader();
 							cont.getGraph().refresh();
 						}
 					}

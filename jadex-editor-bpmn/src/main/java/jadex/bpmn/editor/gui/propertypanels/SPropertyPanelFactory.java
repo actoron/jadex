@@ -40,6 +40,12 @@ public class SPropertyPanelFactory
 			{
 				ret = new BpmnPropertyPanel(container);
 			}
+			else if ((velement instanceof VActivity &&
+					((MActivity) velement.getBpmnElement()).getActivityType() != null &&
+					((MActivity) velement.getBpmnElement()).getActivityType().matches("Event.*Error")))
+			{
+				ret = new ErrorEventPropertyPanel(container, (VActivity) velement);
+			}
 			else if ((velement instanceof VActivity && MBpmnModel.TASK.equals(((MActivity) velement.getBpmnElement()).getActivityType())) ||
 					  (velement instanceof VSubProcess) ||
 					  (velement instanceof VExternalSubProcess) ||

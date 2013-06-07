@@ -2,7 +2,6 @@ package jadex.bpmn.editor.gui;
 
 import jadex.bridge.service.annotation.ParameterInfo;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

@@ -4,17 +4,13 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.controllers.IdGenerator;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
-import jadex.commons.IFilter;
-import jadex.commons.SReflect;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -26,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -210,9 +205,6 @@ public class ModelContainer implements IModelContainer
 		ACTIVITY_MODES_TO_TYPES.put(EDIT_MODE_EXTERNAL_SUBPROCESS, MBpmnModel.SUBPROCESS);
 	}
 	
-	/** The global cache. */
-	protected GlobalCache globalcache;
-	
 	/** The global settings. */
 	protected Settings settings;
 	
@@ -258,6 +250,9 @@ public class ModelContainer implements IModelContainer
 	/** The interface classes. */
 	protected List<ClassInfo> interclasses;
 	
+	/** The exception classes. */
+	protected List<ClassInfo> exceptionclasses;
+	
 	/** The all classes. */
 	protected List<ClassInfo> allclasses;
 
@@ -265,9 +260,8 @@ public class ModelContainer implements IModelContainer
 	/**
 	 *  Creates a new container.
 	 */
-	public ModelContainer(GlobalCache globalcache, Settings settings)
+	public ModelContainer(Settings settings)
 	{
-		this.globalcache = globalcache;
 		this.settings = settings;
 		this.idgen = new IdGenerator();
 		//this.imageprovider = new ImageProvider();
@@ -275,10 +269,7 @@ public class ModelContainer implements IModelContainer
 		this.changelisteners = new ArrayList<ChangeListener>();
 		
 		// Scan additional model container dependent classes
-		List<ClassInfo>[] tmp = scanForClassInfos();
-		this.taskclasses = tmp[0];
-		this.interclasses = tmp[1];
-		this.allclasses = tmp[2];
+		setupClassInfos();
 	}
 	
 //	/**
@@ -348,92 +339,99 @@ public class ModelContainer implements IModelContainer
 	/**
 	 *  Scan for task classes.
 	 */
-	public List<ClassInfo>[] scanForClassInfos()
-	{
-		final List<ClassInfo> gtasks = new ArrayList<ClassInfo>(globalcache.getGlobalTaskClasses());
-		final List<ClassInfo> ginter = new ArrayList<ClassInfo>(globalcache.getGlobalInterfaces());
-		final List<ClassInfo> gall = new ArrayList<ClassInfo>(globalcache.getGlobalAllClasses());
-		
-		if(classloaderroot!=null)
-		{
-			try
-			{
-				ClassLoader cl = getProjectClassLoader();
-				Class<?>[] locals = SReflect.scanForClasses(new URL[]{classloaderroot.toURI().toURL()}, cl, new IFilter<Object>()
-				{
-					public boolean filter(Object obj)
-					{
-						String	fn	= "";
-						if(obj instanceof File)
-						{
-							File	f	= (File)obj;
-							fn	= f.getName();
-						}
-						else if(obj instanceof JarEntry)
-						{
-							JarEntry	je	= (JarEntry)obj;
-							fn	= je.getName();
-						}
-//						
-//						return fn.indexOf("Task")!=-1;
-//						return fn.endsWith(".class");
-						return true;
-					}
-				}, new IFilter<Class<?>>()
-				{
-					public boolean filter(Class<?> obj)
-					{
-						boolean ret = false;
-						try
-						{
-							if(!obj.isInterface())
-							{
-								if(!Modifier.isAbstract(obj.getModifiers()) && Modifier.isPublic(obj.getModifiers()))
-								{
-									ClassInfo ci = new ClassInfo(obj.getName());
-									if(!gall.contains(ci))
-										gall.add(ci);
-									if(!gtasks.contains(ci))
-									{
-										ClassLoader cl = obj.getClassLoader();
-										Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
-										ret = SReflect.isSupertype(taskcl, obj);
-										if(ret)
-										{
-											gtasks.add(new ClassInfo(obj.getName()));
-										}
-									}
-								}
-							}
-							else 
-							{
-								// collect interfaces
-								ClassInfo ci = new ClassInfo(obj.getName());
-								if(!gall.contains(ci))
-									gall.add(new ClassInfo(obj.getName()));
-								if(!ginter.contains(ci))
-									ginter.add(new ClassInfo(obj.getName()));
-							}
-						}
-						catch(Exception e)
-						{
-						}
-						return ret;
-					}
-				});
-				
-//				for(Class<?> cla: locals)
+//	public List<ClassInfo>[] scanForClassInfos()
+//	{
+//		final List<ClassInfo> gtasks = new ArrayList<ClassInfo>(globalcache.getGlobalTaskClasses());
+//		final List<ClassInfo> ginter = new ArrayList<ClassInfo>(globalcache.getGlobalInterfaces());
+//		final List<ClassInfo> gex = new ArrayList<ClassInfo>(globalcache.getGlobalExceptions());
+//		final List<ClassInfo> gall = new ArrayList<ClassInfo>(globalcache.getGlobalAllClasses());
+//		
+//		if(classloaderroot!=null)
+//		{
+//			try
+//			{
+//				ClassLoader cl = getProjectClassLoader();
+//				Class<?>[] locals = SReflect.scanForClasses(new URL[]{classloaderroot.toURI().toURL()}, cl, new IFilter<Object>()
 //				{
-//					globs.add(new ClassInfo(cla));
-//				}				
-			}
-			catch(Exception e)
-			{
-				// nop
-			}
-		}
-		return new List[]{gtasks, ginter, gall};
-	}
+//					public boolean filter(Object obj)
+//					{
+//						String	fn	= "";
+//						if(obj instanceof File)
+//						{
+//							File	f	= (File)obj;
+//							fn	= f.getName();
+//						}
+//						else if(obj instanceof JarEntry)
+//						{
+//							JarEntry	je	= (JarEntry)obj;
+//							fn	= je.getName();
+//						}
+////						
+////						return fn.indexOf("Task")!=-1;
+////						return fn.endsWith(".class");
+//						return true;
+//					}
+//				}, new IFilter<Class<?>>()
+//				{
+//					public boolean filter(Class<?> obj)
+//					{
+//						boolean ret = false;
+//						try
+//						{
+//							if(!obj.isInterface())
+//							{
+//								if(!Modifier.isAbstract(obj.getModifiers()) && Modifier.isPublic(obj.getModifiers()))
+//								{
+//									ClassInfo ci = new ClassInfo(obj.getName());
+//									if(!gall.contains(ci))
+//										gall.add(ci);
+//									if(!gtasks.contains(ci))
+//									{
+//										ClassLoader cl = obj.getClassLoader();
+//										Class<?> taskcl = Class.forName(ITask.class.getName(), true, cl);
+//										ret = SReflect.isSupertype(taskcl, obj);
+//										if(ret)
+//										{
+//											gtasks.add(new ClassInfo(obj.getName()));
+//										}
+//									}
+//								}
+//								
+//								if (SReflect.isSupertype(Exception.class, obj))
+//								{
+//									ClassInfo ci = new ClassInfo(obj.getName());
+//									gex.add(ci);
+//								}
+//							}
+//							else 
+//							{
+//								// collect interfaces
+//								ClassInfo ci = new ClassInfo(obj.getName());
+//								if(!gall.contains(ci))
+//									gall.add(new ClassInfo(obj.getName()));
+//								if(!ginter.contains(ci))
+//									ginter.add(new ClassInfo(obj.getName()));
+//							}
+//						}
+//						catch(Exception e)
+//						{
+//						}
+//						return ret;
+//					}
+//				});
+//				
+////				for(Class<?> cla: locals)
+////				{
+////					globs.add(new ClassInfo(cla));
+////				}				
+//			}
+//			catch(Exception e)
+//			{
+//				// nop
+//			}
+//		}
+//		return new List[]{gtasks, ginter, gex, gall};
+//	}
 	
 	/**
 	 *  Get the taskclasses.
@@ -453,6 +451,16 @@ public class ModelContainer implements IModelContainer
 		return interclasses;
 	}
 	
+	/**
+	 *  Gets the exceptions.
+	 *
+	 *  @return The exceptions.
+	 */
+	public List<ClassInfo> getExceptions()
+	{
+		return exceptionclasses;
+	}
+
 	/**
 	 *  Get the allclasses.
 	 *  @return The allclasses.
@@ -905,9 +913,36 @@ public class ModelContainer implements IModelContainer
 		{
 			model.setClassLoader(parent);
 		}
-		List<ClassInfo>[] tmp = scanForClassInfos();
-		taskclasses = tmp[0];
-		interclasses = tmp[1];
+		setupClassInfos();
+	}
+	
+	/**
+	 * 
+	 */
+	protected void setupClassInfos()
+	{
+		if (model != null &&
+			model.getClassLoader() != null &&
+			model.getClassLoader() != settings.getLibraryClassLoader() &&
+			model.getClassLoader() != Settings.class.getClassLoader())
+		{
+			Set<ClassInfo>[] infos = Settings.scanForClasses(model.getClassLoader(), false);
+			infos[0].addAll(settings.getGlobalTaskClasses());
+			infos[1].addAll(settings.getGlobalInterfaces());
+			infos[2].addAll(settings.getGlobalInterfaces());
+			infos[3].addAll(settings.getGlobalAllClasses());
+			taskclasses = new ArrayList(infos[0]);
+			interclasses = new ArrayList(infos[1]);
+			exceptionclasses = new ArrayList(infos[2]);
+			allclasses = new ArrayList(infos[3]);
+		}
+		else
+		{
+			taskclasses = settings.getGlobalTaskClasses();
+			interclasses = settings.getGlobalInterfaces();
+			exceptionclasses = settings.getGlobalInterfaces();
+			allclasses = settings.getGlobalAllClasses();
+		}
 	}
 	
 	/**

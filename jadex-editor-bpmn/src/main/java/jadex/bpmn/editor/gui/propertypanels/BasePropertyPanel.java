@@ -182,6 +182,8 @@ public class BasePropertyPanel extends JPanel
 		if (properties.containsKey("second_fill"))
 		{
 			gbc.fill = (Integer) properties.get("second_fill");
+			gbc.weightx = gbc.fill == GridBagConstraints.HORIZONTAL || gbc.fill == GridBagConstraints.BOTH? 1.0 : 0.0;
+			gbc.weighty = gbc.fill == GridBagConstraints.VERTICAL || gbc.fill == GridBagConstraints.BOTH? 1.0 : 0.0;
 		}
 		if (first == second)
 		{

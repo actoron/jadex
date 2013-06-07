@@ -1,9 +1,16 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.model.task.ITask;
 import jadex.bridge.ClassInfo;
+import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,13 +18,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.jar.JarEntry;
 
 import com.mxgraph.view.mxStylesheet;
 
@@ -77,6 +90,9 @@ public class Settings
 
 	/** Global interfaces */
 	protected List<ClassInfo> globalinterfaces;
+	
+	/** Global exceptions. */
+	protected List<ClassInfo> globalexceptions;
 	
 	/** Global allclasses */
 	protected List<ClassInfo> globalallclasses;
@@ -341,6 +357,33 @@ public class Settings
 	}
 	
 	/**
+	 *  Scans for the global classes.
+	 */
+	public void scanForClasses()
+	{
+		Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
+		{
+			public int compare(ClassInfo o1, ClassInfo o2)
+			{
+				String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
+				String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
+				return str1.compareTo(str2);
+			}
+		};
+		Set<ClassInfo>[] tmp = Settings.scanForClasses(getLibraryClassLoader(), true);
+		List<ClassInfo>[] stmp = new List[tmp.length];
+		for (int i = 0; i < tmp.length; ++i)
+		{
+			stmp[i] = new ArrayList<ClassInfo>(tmp[i]);
+			Collections.sort(stmp[i], comp);
+		}
+		setGlobalTaskClasses(stmp[0]);
+		setGlobalInterfaces(stmp[1]);
+		setGlobalInterfaces(stmp[2]);
+		setGlobalAllClasses(stmp[3]);
+	}
+	
+	/**
 	 *  Sets the library entries.
 	 *  @param entries The entries.
 	 */
@@ -406,6 +449,26 @@ public class Settings
 		this.globalinterfaces = globalinterfaces;
 	}
 	
+	/**
+	 *  Gets the globalexceptions.
+	 *
+	 *  @return The globalexceptions.
+	 */
+	public List<ClassInfo> getGlobalExceptions()
+	{
+		return globalexceptions;
+	}
+
+	/**
+	 *  Sets the globalexceptions.
+	 *
+	 *  @param globalexceptions The globalexceptions.
+	 */
+	public void setGlobalExceptions(List<ClassInfo> globalexceptions)
+	{
+		this.globalexceptions = globalexceptions;
+	}
+
 	/**
 	 *  Get the allclasses.
 	 *  @return The allclasses.
@@ -536,6 +599,15 @@ public class Settings
 			{
 				ClassInfo gt = globaltaskclasses.get(i);
 				ccprops.put("gt"+i, gt.getTypeName());
+			}
+		}
+		
+		if(globalexceptions!=null && globalexceptions.size()>0)
+		{
+			for(int i=0; i<globalexceptions.size(); i++)
+			{
+				ClassInfo gt = globalexceptions.get(i);
+				ccprops.put("ge"+i, gt.getTypeName());
 			}
 		}
 		
@@ -728,6 +800,7 @@ public class Settings
 			
 			List<ClassInfo> gis = new ArrayList<ClassInfo>();
 			List<ClassInfo> gts = new ArrayList<ClassInfo>();
+			List<ClassInfo> ges = new ArrayList<ClassInfo>();
 			List<ClassInfo> ac = new ArrayList<ClassInfo>();
 			for(Object okey: props.keySet())
 			{
@@ -742,6 +815,10 @@ public class Settings
 					{
 						gts.add(new ClassInfo(props.getProperty(key)));
 					}
+					else if(key.startsWith("ge"))
+					{
+						ges.add(new ClassInfo(props.getProperty(key)));
+					}
 					else if(key.startsWith("ac"))
 					{
 						ac.add(new ClassInfo(props.getProperty(key)));
@@ -750,6 +827,7 @@ public class Settings
 			}
 			ret.setGlobalInterfaces(gis);
 			ret.setGlobalTaskClasses(gts);
+			ret.setGlobalExceptions(ges);
 			ret.setGlobalAllClasses(ac);
 		}
 		catch (IOException e)
@@ -757,5 +835,138 @@ public class Settings
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Scan for task classes.
+	 */
+	public static final Set<ClassInfo>[] scanForClasses(ClassLoader cl, final boolean includeboot)
+	{
+		final Set<ClassInfo> res1 = new HashSet<ClassInfo>();
+		final Set<ClassInfo> res2 = new HashSet<ClassInfo>();
+		final Set<ClassInfo> res3 = new HashSet<ClassInfo>();
+		final Set<ClassInfo> res4 = new HashSet<ClassInfo>();
+		
+		scanForClasses(cl, new FileFilter("$", false), new IFilter<Class<?>>()
+		{
+			public boolean filter(final Class<?> obj)
+			{
+				boolean ret = false;
+				try
+				{
+					if(!obj.isInterface())
+					{
+						if (SReflect.isSupertype(Exception.class, obj))
+						{
+							ClassInfo ci = new ClassInfo(obj.getName());
+							res3.add(ci);
+						}
+						
+						if(!Modifier.isAbstract(obj.getModifiers()) && Modifier.isPublic(obj.getModifiers()))
+						{
+							ClassInfo ci = new ClassInfo(obj.getName());
+							res4.add(ci);
+							if(!res1.contains(ci))
+							{
+								ClassLoader cl = obj.getClassLoader();
+								Class<?> taskcl = Class.forName(ITask.class.getName(), includeboot, cl);
+								ret = SReflect.isSupertype(taskcl, obj);
+								if(ret)
+								{
+									res1.add(ci);
+								}
+							}
+						}
+					}
+					else
+					{
+						// collect interfaces
+						ClassInfo ci = new ClassInfo(obj.getName());
+						res2.add(ci);
+						res4.add(ci);
+					}
+				}
+				catch(Exception e)
+				{
+				}
+				return ret;
+			}
+		});
+		
+		return new Set[]{res1, res2, res3, res4};
+	}
+	
+	/**
+	 *  Scan for task classes.
+	 */
+	protected static final List<ClassInfo> scanForClasses(ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter)
+	{
+		final List<ClassInfo> taskclasses = new ArrayList<ClassInfo>();
+		
+		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, true);
+		fut.addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
+		{
+			public void intermediateResultAvailable(Class<?> result)
+			{
+//				System.out.println("Found: "+result.getName());
+				taskclasses.add(new ClassInfo(result));
+			}
+			public void finished()
+			{
+			}
+			public void resultAvailable(Collection<Class<?>> result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		}));
+		fut.get(new ThreadSuspendable());
+		
+		return taskclasses;
+	}
+	
+	/**
+	 * 
+	 */
+	private static class FileFilter implements IFilter<Object>
+	{
+		/** The filename. */
+		protected String filename;
+		
+		/** The contains flag. */
+		protected boolean contains;
+		
+		/**
+		 * 
+		 */
+		public FileFilter(String filename, boolean contains)
+		{
+			this.filename = filename;
+			this.contains = contains;
+		}
+		
+		/**
+		 * 
+		 */
+		public boolean filter(Object obj)
+		{
+			if(filename==null)
+				return true;
+			
+			String	fn	= "";
+			if(obj instanceof File)
+			{
+				File	f	= (File)obj;
+				fn	= f.getName();
+			}
+			else if(obj instanceof JarEntry)
+			{
+				JarEntry	je	= (JarEntry)obj;
+				fn	= je.getName();
+			}
+			
+			return fn.endsWith(".class") && (contains? fn.indexOf(filename)!=-1: fn.indexOf(filename)==-1);
+		}
 	}
 }

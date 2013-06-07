@@ -10,10 +10,8 @@ import jadex.bpmn.editor.model.visual.BpmnVisualModelGenerator;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
-import jadex.bridge.ClassInfo;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.ResourceInfo;
-import jadex.commons.SReflect;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -32,10 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,9 +64,6 @@ public class BpmnEditorWindow extends JFrame
 	/** The tab pane showing the models. */
 	protected JTabbedPane tabpane;
 	
-	/** The global cache. */
-	protected GlobalCache globalcache;
-	
 	/** The global settings. */
 	protected Settings settings;
 	
@@ -89,47 +81,24 @@ public class BpmnEditorWindow extends JFrame
 		BpmnEditor.initialize();
 		
 		settings = Settings.load();
-		
-		globalcache = new GlobalCache();
 	
-		Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
-		{
-			public int compare(ClassInfo o1, ClassInfo o2)
-			{
-				String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
-				String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
-				return str1.compareTo(str2);
-			}
-		};
+//		Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
+//		{
+//			public int compare(ClassInfo o1, ClassInfo o2)
+//			{
+//				String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
+//				String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
+//				return str1.compareTo(str2);
+//			}
+//		};
 		
 		if(settings.getGlobalInterfaces()==null || settings.getGlobalInterfaces().size()==0)// || true)
 		{
 			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "Scanning classes start...");
 			long start = System.currentTimeMillis();
-			Set<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getLibraryClassLoader());
-			globalcache.getGlobalTaskClasses().addAll(tmp[0]);
-			globalcache.getGlobalInterfaces().addAll(tmp[1]);
-			globalcache.getGlobalAllClasses().addAll(tmp[2]);
-			Collections.sort(globalcache.getGlobalTaskClasses(), comp);
-			Collections.sort(globalcache.getGlobalInterfaces(), comp);
-			Collections.sort(globalcache.getGlobalAllClasses(), comp);
-			settings.setGlobalTaskClasses(globalcache.getGlobalTaskClasses());
-			settings.setGlobalInterfaces(globalcache.getGlobalInterfaces());
-			settings.setGlobalAllClasses(globalcache.getGlobalAllClasses());
+			settings.scanForClasses();
 			long needed = System.currentTimeMillis()-start;
 			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "... scanning classes end, needed: "+needed/1000+" secs");
-		}
-		else
-		{
-			globalcache.getGlobalTaskClasses().clear();
-			globalcache.getGlobalTaskClasses().addAll(settings.getGlobalTaskClasses());
-			globalcache.getGlobalInterfaces().clear();
-			globalcache.getGlobalInterfaces().addAll(settings.getGlobalInterfaces());
-			globalcache.getGlobalAllClasses().clear();
-			globalcache.getGlobalAllClasses().addAll(settings.getGlobalAllClasses());
-			Collections.sort(globalcache.getGlobalTaskClasses(), comp);
-			Collections.sort(globalcache.getGlobalInterfaces(), comp);
-			Collections.sort(globalcache.getGlobalAllClasses(), comp);
 		}
 		
 		getContentPane().setLayout(new BorderLayout());
@@ -250,10 +219,10 @@ public class BpmnEditorWindow extends JFrame
 							{
 								try
 								{
-									long ts = System.currentTimeMillis();
+//									long ts = System.currentTimeMillis();
 									SBpmnModelReader.readModel(file, null);
 //									System.out.println(file.toString() + " " + (System.currentTimeMillis() - ts));
-									ts = System.currentTimeMillis();
+//									ts = System.currentTimeMillis();
 									loadModel(file);
 //									System.out.println(file.toString() + " " + (System.currentTimeMillis() - ts));
 								}
@@ -314,17 +283,6 @@ public class BpmnEditorWindow extends JFrame
 		
 		return ret;
 	}
-	
-	
-	/**
-	 *  Gets the global cache.
-	 *
-	 *  @return The global cache.
-	 */
-	public GlobalCache getGlobalCache()
-	{
-		return globalcache;
-	}
 
 	/**
 	 *  Gets the settings.
@@ -374,7 +332,7 @@ public class BpmnEditorWindow extends JFrame
 		boolean createpool = false;
 		if (modelcontainer == null)
 		{
-			modelcontainer = new ModelContainer(globalcache, settings);
+			modelcontainer = new ModelContainer(settings);
 			createpool = true;
 		}
 		modelcontainer.setEditingToolbar(bpmntoolbar);
@@ -580,7 +538,7 @@ public class BpmnEditorWindow extends JFrame
 			}
 		}
 		
-		ModelContainer modelcontainer = new ModelContainer(globalcache, settings);
+		ModelContainer modelcontainer = new ModelContainer(settings);
 		mxStylesheet sheet = null;
 		for (int i = 0; i < BpmnEditor.STYLE_SHEETS.length; ++i)
 		{

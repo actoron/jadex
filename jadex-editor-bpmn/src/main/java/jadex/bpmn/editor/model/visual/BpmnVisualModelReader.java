@@ -26,7 +26,6 @@ import javax.xml.namespace.QName;
 
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.util.mxPoint;
-import com.mxgraph.view.mxGraph;
 
 /**
  *  Reader for the visual BPMN model.

@@ -1,7 +1,6 @@
 package jadex.bpmn.editor.model.visual;
 
 import jadex.bpmn.editor.gui.BpmnGraph;
-import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.io.IBpmnVisualModelWriter;
 import jadex.bpmn.model.io.SBpmnModelWriter;

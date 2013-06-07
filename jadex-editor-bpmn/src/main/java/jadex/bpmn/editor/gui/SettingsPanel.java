@@ -1,8 +1,5 @@
 package jadex.bpmn.editor.gui;
 
-import jadex.bridge.ClassInfo;
-import jadex.commons.SReflect;
-
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,8 +8,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +16,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -33,6 +29,9 @@ import javax.swing.table.AbstractTableModel;
 
 public class SettingsPanel extends JPanel
 {
+	/** Maximum search depth for developer project search. */
+	protected static final int MAX_DEV_SEARCH_DEPTH = 3; 
+	
 	/** The library entry table. */
 	protected JTable libentrytable;
 	
@@ -54,16 +53,12 @@ public class SettingsPanel extends JPanel
 	/** Name/Type data edge box. */
 	protected JCheckBox ntbox;
 	
-	/** The global cache. */
-	protected GlobalCache globalcache;
-	
 	/** The settings */
 	protected Settings settings;
 	
-	public SettingsPanel(GlobalCache globalcache, Settings settings)
+	public SettingsPanel(Settings settings)
 	{
 		super(new GridBagLayout());
-		this.globalcache = globalcache;
 		this.libentries = new ArrayList<File>();
 		if (settings.getLibraryEntries() != null)
 		{
@@ -164,30 +159,52 @@ public class SettingsPanel extends JPanel
 						}
 					}
 					
-					if (entries.isEmpty())
+					int depth = MAX_DEV_SEARCH_DEPTH;
+					List<File> libdirs = new ArrayList<File>();
+					libdirs.add(libdir);
+					while (entries.isEmpty() && depth > 0 && libdirs.size() > 0)
 					{
-						// Attempt developer-mode search.
-						File[] dirs = libdir.listFiles();
-						for (File dir : dirs)
+						--depth;
+						for (File ldir : libdirs)
 						{
-							if (dir.isDirectory())
+							searchDevMode(entries, ldir);
+						}
+						
+						if (entries.isEmpty() && depth > 0)
+						{
+							List<File> newlibdirs = new ArrayList<File>();
+							for (File ldir : libdirs)
 							{
-								File targetdir = new File(dir.getAbsolutePath() + File.separator + "target" + File.separator + "classes");
-								if (targetdir.exists() && targetdir.isDirectory())
+								File[] dirfiles = ldir.listFiles();
+								for (File dirfile : dirfiles)
 								{
-									entries.add(targetdir);
+									if (dirfile.isDirectory())
+									{
+										newlibdirs.add(dirfile);
+									}
 								}
 							}
+							libdirs = newlibdirs;
 						}
 					}
 					
-					entries.removeAll(libentries);
-					int start = libentries.size();
-					libentries.addAll(entries);
-					if (start < libentries.size())
+					if (entries.size() > 0)
 					{
-						((ClassPathTableModel) libentrytable.getModel()).fireTableRowsInserted(start, libentries.size() - 1);
-						changeaction.actionPerformed(e);
+						entries.removeAll(libentries);
+						int start = libentries.size();
+						libentries.addAll(entries);
+						if (start < libentries.size())
+						{
+							((ClassPathTableModel) libentrytable.getModel()).fireTableRowsInserted(start, libentries.size() - 1);
+							changeaction.actionPerformed(e);
+						}
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(getParent(),
+							    "No classpath was found in this project folder.",
+							    "Project classpaths not found",
+							    JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			}
@@ -366,8 +383,9 @@ public class SettingsPanel extends JPanel
 	/**
 	 *  Applies the settings.
 	 */
-	public void applySettings()
+	public boolean applySettings()
 	{
+		boolean ret = false;
 //		String pf = libpathfield.getText();
 //		pf = pf != null && pf.length() == 0 ? null : pf;
 //		if ((pf != null && settings.getLibraryHome() == null) ||
@@ -383,30 +401,36 @@ public class SettingsPanel extends JPanel
 		if (!cand.equals(orig))
 		{
 			settings.setLibraryEntries(libentries);
-			
-			Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
-			{
-				public int compare(ClassInfo o1, ClassInfo o2)
-				{
-					String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
-					String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
-					return str1.compareTo(str2);
-				}
-			};
-			Set<ClassInfo>[] tmp = GlobalCache.scanForClasses(settings.getLibraryClassLoader());
-			globalcache.getGlobalTaskClasses().addAll(tmp[0]);
-			globalcache.getGlobalInterfaces().addAll(tmp[1]);
-			Collections.sort(globalcache.getGlobalTaskClasses(), comp);
-			Collections.sort(globalcache.getGlobalInterfaces(), comp);
-			settings.setGlobalTaskClasses(globalcache.getGlobalTaskClasses());
-			settings.setGlobalInterfaces(globalcache.getGlobalInterfaces());
-			settings.setGlobalAllClasses(globalcache.getGlobalAllClasses());
+			settings.scanForClasses();
+			ret = true;
 		}
 		settings.setSmoothZoom(szbox.isSelected());
 		settings.setDirectSequenceAutoConnect(dsbox.isSelected());
 		settings.setSequenceEdges(sebox.isSelected());
 		settings.setNameTypeDataAutoConnect(ntbox.isSelected());
 		settings.setDataEdges(debox.isSelected());
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void searchDevMode(Set<File> entries, File libdir)
+	{
+		// Attempt developer-mode search.
+		File[] dirs = libdir.listFiles();
+		for (File dir : dirs)
+		{
+			if (dir.isDirectory())
+			{
+				File targetdir = new File(dir.getAbsolutePath() + File.separator + "target" + File.separator + "classes");
+				if (targetdir.exists() && targetdir.isDirectory())
+				{
+					entries.add(targetdir);
+				}
+			}
+		}
 	}
 	
 	/**

@@ -38,7 +38,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class ImageProvider
 	public static final Shape SHAPE_ELLIPSE;
 	
 	/** Darkening factor for non-highlighted icons */
-	protected static final float NON_HIGHLIGHT_DARKENING_FACTOR = 0.85f;
+	protected static final float NON_HIGHLIGHT_DARKENING_FACTOR = 0.92f;
 	
 	/** The base icon size. */
 	protected static final int BASE_ICON_SIZE = 128;
@@ -230,7 +229,7 @@ public class ImageProvider
 	 */
 	public Icon[] generateGenericFlatImageIconSet(int iconsize, int frametype, String symbol, Color symbolcolor)
 	{
-		return generateGenericFlatImageIconSet(iconsize, frametype, symbol, symbolcolor, 0.8f);
+		return generateGenericFlatImageIconSet(iconsize, frametype, symbol, symbolcolor, NON_HIGHLIGHT_DARKENING_FACTOR);
 	}
 	
 	/**
