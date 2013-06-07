@@ -1485,14 +1485,14 @@ public class MicroClassReader
 		Annotation[][] ret = null;
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		Annotation[][] annos = m.getParameterAnnotations();
-		if(annos[0].length>0)
+		if(annos.length> 0 && annos[0].length>0)
 		{
 			ret = new Annotation[annos.length][annos[0].length];
 			for(int i=0; i<annos.length; i++)
 			{
 				for(int j=0; j<annos[0].length; j++)
 				{
-					ret[i][j] = getProxyAnnotation(annos[i][j], cl);
+					ret[i][j] = getProxyAnnotation(annos[i][j], cl2);
 				}
 			}
 		}
@@ -1507,14 +1507,14 @@ public class MicroClassReader
 		Annotation[][] ret = null;
 		ClassLoader cl2 = cl instanceof DummyClassLoader? ((DummyClassLoader)cl).getOriginal(): cl;
 		Annotation[][] annos = c.getParameterAnnotations();
-		if(annos[0].length>0)
+		if(annos.length> 0 && annos[0].length>0)
 		{
 			ret = new Annotation[annos.length][annos[0].length];
 			for(int i=0; i<annos.length; i++)
 			{
 				for(int j=0; j<annos[0].length; j++)
 				{
-					ret[i][j] = getProxyAnnotation(annos[i][j], cl);
+					ret[i][j] = getProxyAnnotation(annos[i][j], cl2);
 				}
 			}
 		}

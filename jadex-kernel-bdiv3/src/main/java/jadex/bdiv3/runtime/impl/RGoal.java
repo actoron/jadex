@@ -259,7 +259,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
-//		System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
+		System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 //		if(RGoal.GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate) && RGoal.GOALLIFECYCLESTATE_NEW.equals(getLifecycleState()))
 //			Thread.dumpStack();
 //		if(RGoal.GOALLIFECYCLESTATE_ADOPTED.equals(lifecyclestate) && RGoal.GOALLIFECYCLESTATE_DROPPING.equals(getLifecycleState()))
@@ -677,7 +677,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	 */
 	public boolean onActivate()
 	{
-		return !getMGoal().isMaintain(); // for perform, achieve, query
+		return getMGoal().getConditions(MGoal.CONDITION_MAINTAIN)==null; // for perform, achieve, query
 	}
 	
 	/**
@@ -778,7 +778,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	public void targetConditionTriggered(IInternalAccess ia, IEvent event, IRule<Void> rule, Object context)
 	{
 //		System.out.println("Goal target triggered: "+RGoal.this);
-		if(getMGoal().isMaintain())
+		if(getMGoal().getConditions(MGoal.CONDITION_MAINTAIN)!=null)
 		{
 			setProcessingState(ia, GoalProcessingState.IDLE);
 		}

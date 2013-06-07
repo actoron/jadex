@@ -76,6 +76,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -175,6 +176,9 @@ public class BDIClassReader extends MicroClassReader
 //		final Set<String> beliefnames = new HashSet<String>();
 //		List<Class> goals = new ArrayList<Class>();
 //		List<Method> plans = new ArrayList<Method>();
+		
+		try
+		{
 		
 		Map<String, BDIModel>	capas	= new LinkedHashMap<String, BDIModel>();
 		
@@ -541,7 +545,7 @@ public class BDIClassReader extends MicroClassReader
 						List<MCondition> conds = goal.getConditions(type);
 						for(MCondition cond: conds)
 						{
-							MCondition ccond = new MCondition(cond.getName(), convertEvents(name, cond.getEvents(), bdimodel).toArray(new String[0]));
+							MCondition ccond = new MCondition(cond.getName(), convertEventTypes(name, cond.getEvents(), bdimodel));
 							goal2.addCondition(type, ccond);
 						}
 					}
@@ -557,6 +561,12 @@ public class BDIClassReader extends MicroClassReader
 					plan.getPriority());
 				bdimodel.getCapability().addPlan(plan2);
 			}
+		}
+		
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 
@@ -619,6 +629,21 @@ public class BDIClassReader extends MicroClassReader
 		}
 		return events;
 	}
+	
+	/**
+	 * 
+	 */
+	protected List<EventType> convertEventTypes(String name, Collection<EventType> evs, BDIModel bdimodel)
+	{
+		List<EventType>	events	= new ArrayList<EventType>();
+		for(EventType event: events)
+		{
+			String	mapped = name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event.toString();
+			events.add(new EventType(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped));
+		}
+		return events;
+	}
+	
 	
 	/**
 	 * 
@@ -846,7 +871,7 @@ public class BDIClassReader extends MicroClassReader
 				{
 					addBeliefEvents(model.getCapability(), events, ev, cl);
 				}
-				MCondition cond = new MCondition("creation_"+c.toString(), events.toArray(new String[events.size()]));
+				MCondition cond = new MCondition("creation_"+c.toString(), events);
 				cond.setConstructorTarget(new ConstructorInfo(c));
 				mgoal.addCondition(MGoal.CONDITION_CREATION, cond);
 			}
@@ -882,7 +907,7 @@ public class BDIClassReader extends MicroClassReader
 			}
 			else if(isAnnotationPresent(m, GoalRecurCondition.class, cl))
 			{
-				addMethodCondition(mgoal, MGoal.CONDITION_TARGET, getAnnotation(m, 
+				addMethodCondition(mgoal, MGoal.CONDITION_RECUR, getAnnotation(m, 
 					GoalRecurCondition.class, cl).events(), model, m, cl);
 			}
 		}
@@ -900,9 +925,9 @@ public class BDIClassReader extends MicroClassReader
 		{
 			addBeliefEvents(model.getCapability(), events, ev, cl);
 		}
-		MCondition cond = new MCondition(condtype+"_"+m.toString(), events.toArray(new String[events.size()]));
+		MCondition cond = new MCondition(condtype+"_"+m.toString(), events);
 		cond.setMethodTarget(new MethodInfo(m));
-		mgoal.addCondition(MGoal.CONDITION_CREATION, cond);
+		mgoal.addCondition(condtype, cond);
 	}
 	
 	/**
@@ -911,22 +936,25 @@ public class BDIClassReader extends MicroClassReader
 	public static List<EventType> readAnnotationEvents(MCapability capa, Annotation[][] annos, ClassLoader cl)
 	{
 		List<EventType> events = new ArrayList<EventType>();
-		for(Annotation[] ana: annos)
+		if(annos!=null)
 		{
-			for(Annotation an: ana)
+			for(Annotation[] ana: annos)
 			{
-				if(an instanceof jadex.rules.eca.annotations.Event)
+				for(Annotation an: ana)
 				{
-					jadex.rules.eca.annotations.Event ev = (jadex.rules.eca.annotations.Event)an;
-					String name = ev.value();
-					String type = ev.type();
-					if(type.isEmpty())
+					if(an instanceof jadex.rules.eca.annotations.Event)
 					{
-						addBeliefEvents(capa, events, name, cl);
-					}
-					else
-					{
-						events.add(new EventType(new String[]{type, name}));
+						jadex.rules.eca.annotations.Event ev = (jadex.rules.eca.annotations.Event)an;
+						String name = ev.value();
+						String type = ev.type();
+						if(type.isEmpty())
+						{
+							addBeliefEvents(capa, events, name, cl);
+						}
+						else
+						{
+							events.add(new EventType(new String[]{type, name}));
+						}
 					}
 				}
 			}

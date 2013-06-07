@@ -1,6 +1,8 @@
 package jadex.bdiv3.model;
 
-import java.util.HashSet;
+import jadex.rules.eca.EventType;
+
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -9,7 +11,8 @@ import java.util.Set;
 public class MCondition extends MElement
 {
 	/** The events this condition depends on. */
-	protected Set<String> events;
+//	protected Set<String> events;
+	protected List<EventType> events;
 	
 	/** The target method. */
 	protected MethodInfo mtarget;
@@ -20,17 +23,10 @@ public class MCondition extends MElement
 	/**
 	 *  Create a new mcondition. 
 	 */
-	public MCondition(String name, String[] events)
+	public MCondition(String name, List<EventType> events)
 	{
 		super(name);
-		if(events!=null && events.length>0)
-		{
-			this.events = new HashSet<String>();
-			for(String ev: events)
-			{
-				this.events.add(ev);
-			}
-		}
+		this.events = events;
 	}
 
 	/**
@@ -73,10 +69,8 @@ public class MCondition extends MElement
 	 *  Get the events.
 	 *  @return The events.
 	 */
-	public Set<String> getEvents()
+	public List<EventType> getEvents()
 	{
 		return events;
 	}
-	
-	
 }
