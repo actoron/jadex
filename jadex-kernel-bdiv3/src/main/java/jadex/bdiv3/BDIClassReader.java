@@ -200,6 +200,124 @@ public class BDIClassReader extends MicroClassReader
 		
 		for(Class<?> clazz: agtcls)
 		{
+			Field[] fields = clazz.getDeclaredFields();
+
+			// Find capabilities
+			for(int i=0; i<fields.length; i++)
+			{
+				if(isAnnotationPresent(fields[i], Capability.class, cl))
+				{
+					try
+					{
+						BDIModel cap = loader.loadComponentModel(fields[i].getType().getName()+".class", null, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root});
+//							System.out.println("found capability: "+fields[i].getName()+", "+cap);
+						capas.put(fields[i].getName(), cap);
+						
+						Capability acap	= getAnnotation(fields[i], Capability.class, cl);
+						for(Mapping mapping : acap.beliefmapping())
+						{
+							String	source	= mapping.value();
+							String	target	= mapping.target().equals("") ? source : mapping.target();
+							if(cap.getCapability().getBelief(target)==null)
+							{
+								throw new RuntimeException("No such belief for mapping from "+source+" to "+fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target);
+							}
+							bdimodel.addBeliefMapping(fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping
+						}
+						
+						bdimodel.addSubcapability(new FieldInfo(fields[i]), cap);
+					}
+					catch(Exception e)
+					{
+						throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+					}
+				}
+			}
+		}
+		
+		// Add elements from capabilities.
+		for(String name: capas.keySet())
+		{
+			BDIModel	capa	= capas.get(name);
+			
+			capa.getModelInfo().getExtensionTypes(); //???
+			capa.getModelInfo().getConfigurations();	// todo!!!
+
+			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
+			{
+				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish());
+				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
+			}
+			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
+			{
+				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding());
+				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
+			}
+			
+			for(MBelief bel: capa.getCapability().getBeliefs())
+			{
+//				List<String>	events	= new ArrayList<String>();
+//				for(String event: bel.getEvents())
+//				{
+//					String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
+//					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
+//				}
+				List<String> events = convertEvents(name, bel.getEvents(), bdimodel);
+				
+				MBelief	bel2;
+				if(bel.getField()!=null)
+				{
+					bel2	= new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), events.toArray(new String[events.size()]));
+				}
+				else
+				{
+					bel2	= new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), events.toArray(new String[events.size()]));
+					bel2.setSetter(bel.getSetter());
+				}
+				bel2.setName(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+bel2.getName());
+				
+				bdimodel.getCapability().addBelief(bel2);
+			}
+			
+			for(String target: capa.getBeliefMappings().keySet())
+			{
+				bdimodel.addBeliefMapping(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target, name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
+			}
+			
+			for(MGoal goal: capa.getCapability().getGoals())
+			{
+				MGoal goal2	= new MGoal(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
+					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
+					goal.getRetryDelay(), goal.getRecurDelay(), goal.isSucceedOnPassed(), goal.isUnique(), goal.getDeliberation());
+						
+				// Convert goal condition events
+				if(goal.getConditions()!=null)
+				{
+					for(String type: goal.getConditions().keySet())
+					{
+						List<MCondition> conds = goal.getConditions(type);
+						for(MCondition cond: conds)
+						{
+							MCondition ccond = new MCondition(cond.getName(), convertEventTypes(name, cond.getEvents(), bdimodel));
+							goal2.addCondition(type, ccond);
+						}
+					}
+				}
+
+				bdimodel.getCapability().addGoal(goal2);
+			}
+			
+			for(MPlan plan : capa.getCapability().getPlans())
+			{
+				MPlan plan2	= new MPlan(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
+					copyTrigger(bdimodel, name, plan.getTrigger()), copyTrigger(bdimodel, name, plan.getWaitqueue()),
+					plan.getPriority());
+				bdimodel.getCapability().addPlan(plan2);
+			}
+		}
+		
+		for(Class<?> clazz: agtcls)
+		{
 			// Find beliefs
 			Field[] fields = clazz.getDeclaredFields();
 			for(int i=0; i<fields.length; i++)
@@ -244,38 +362,6 @@ public class BDIClassReader extends MicroClassReader
 				}
 			}
 			
-			// Find capabilities
-			for(int i=0; i<fields.length; i++)
-			{
-				if(isAnnotationPresent(fields[i], Capability.class, cl))
-				{
-					try
-					{
-						BDIModel	cap	= loader.loadComponentModel(fields[i].getType().getName()+".class", null, ((DummyClassLoader)cl).getOriginal(), new Object[]{rid, root});
-//						System.out.println("found capability: "+fields[i].getName()+", "+cap);
-						capas.put(fields[i].getName(), cap);
-						
-						Capability acap	= getAnnotation(fields[i], Capability.class, cl);
-						for(Mapping mapping : acap.beliefmapping())
-						{
-							String	source	= mapping.value();
-							String	target	= mapping.target().equals("") ? source : mapping.target();
-							if(cap.getCapability().getBelief(target)==null)
-							{
-								throw new RuntimeException("No such belief for mapping from "+source+" to "+fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target);
-							}
-							bdimodel.addBeliefMapping(fields[i].getName()+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target, source);	// Store inverse mapping
-						}
-						
-						bdimodel.addSubcapability(new FieldInfo(fields[i]), cap);
-					}
-					catch(Exception e)
-					{
-						throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
-					}
-				}
-			}
-
 			// Find method plans
 			Method[] methods = clazz.getDeclaredMethods();
 			for(int i=0; i<methods.length; i++)
@@ -482,88 +568,7 @@ public class BDIClassReader extends MicroClassReader
 		
 //		System.out.println("genclazz: "+genclazz);
 		
-		// Add elements from capabilities.
-		for(String name: capas.keySet())
-		{
-			BDIModel	capa	= capas.get(name);
-			
-			capa.getModelInfo().getExtensionTypes(); //???
-			capa.getModelInfo().getConfigurations();	// todo!!!
-
-			for(ProvidedServiceInfo	psi: capa.getModelInfo().getProvidedServices())
-			{
-				ProvidedServiceInfo	psi2	= new ProvidedServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+psi.getName(), psi.getType(), psi.getImplementation(), psi.getPublish());
-				((ModelInfo)bdimodel.getModelInfo()).addProvidedService(psi2);
-			}
-			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
-			{
-				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding());
-				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
-			}
-			
-			for(MBelief bel: capa.getCapability().getBeliefs())
-			{
-//				List<String>	events	= new ArrayList<String>();
-//				for(String event: bel.getEvents())
-//				{
-//					String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
-//					events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
-//				}
-				List<String> events = convertEvents(name, bel.getEvents(), bdimodel);
-				
-				MBelief	bel2;
-				if(bel.getField()!=null)
-				{
-					bel2	= new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), events.toArray(new String[events.size()]));
-				}
-				else
-				{
-					bel2	= new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), events.toArray(new String[events.size()]));
-					bel2.setSetter(bel.getSetter());
-				}
-				bel2.setName(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+bel2.getName());
-				
-				bdimodel.getCapability().addBelief(bel2);
-			}
-			
-			for(String target: capa.getBeliefMappings().keySet())
-			{
-				bdimodel.addBeliefMapping(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+target, name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+capa.getBeliefMappings().get(target));
-			}
-			
-			for(MGoal goal: capa.getCapability().getGoals())
-			{
-				MGoal goal2	= new MGoal(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
-					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
-					goal.getRetryDelay(), goal.getRecurDelay(), goal.isSucceedOnPassed(), goal.isUnique(), goal.getDeliberation());
-						
-				// Convert goal condition events
-				if(goal.getConditions()!=null)
-				{
-					for(String type: goal.getConditions().keySet())
-					{
-						List<MCondition> conds = goal.getConditions(type);
-						for(MCondition cond: conds)
-						{
-							MCondition ccond = new MCondition(cond.getName(), convertEventTypes(name, cond.getEvents(), bdimodel));
-							goal2.addCondition(type, ccond);
-						}
-					}
-				}
-
-				bdimodel.getCapability().addGoal(goal2);
-			}
-			
-			for(MPlan plan : capa.getCapability().getPlans())
-			{
-				MPlan plan2	= new MPlan(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+plan.getName(), plan.getBody(),
-					copyTrigger(bdimodel, name, plan.getTrigger()), copyTrigger(bdimodel, name, plan.getWaitqueue()),
-					plan.getPriority());
-				bdimodel.getCapability().addPlan(plan2);
-			}
-		}
-		
-		System.out.println("endend");
+//		System.out.println("endend");
 		
 //		}
 //		catch(Exception e)

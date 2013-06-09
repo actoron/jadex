@@ -135,7 +135,7 @@ public class MCapability extends MElement
 		{
 			for(MGoal goal: goals)
 			{
-				if(goal.getName().equals(name))
+				if(goal.getName().endsWith(name))
 				{
 					ret = goal;
 					break;
