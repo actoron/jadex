@@ -667,7 +667,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		
 		try
 		{
-			Class<?> clazz = SReflect.classForName(taskname, null);
+			Class<?> clazz = SReflect.classForName(taskname, modelcontainer.getProjectClassLoader());
 
 			if(modelcontainer.getProjectTaskMetaInfos() != null && modelcontainer.getProjectTaskMetaInfos().size() > 0)
 			{
@@ -704,7 +704,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		}
 		catch(Exception e)
 		{
-			//e.printStackTrace();
+//			e.printStackTrace();
 			// ignore
 		}
 		

@@ -379,7 +379,7 @@ public class Settings
 		}
 		setGlobalTaskClasses(stmp[0]);
 		setGlobalInterfaces(stmp[1]);
-		setGlobalInterfaces(stmp[2]);
+		setGlobalExceptions(stmp[2]);
 		setGlobalAllClasses(stmp[3]);
 	}
 	
@@ -620,6 +620,8 @@ public class Settings
 			}
 		}
 		
+		ccprops.put("build", String.valueOf(BpmnEditor.BUILD));
+		
 		OutputStream os = new FileOutputStream(tmpfile);
 		props.store(os, "Jadex BPMN Editor Settings");
 		os.close();
@@ -798,37 +800,47 @@ public class Settings
 			props.load(is);
 			is.close();
 			
-			List<ClassInfo> gis = new ArrayList<ClassInfo>();
-			List<ClassInfo> gts = new ArrayList<ClassInfo>();
-			List<ClassInfo> ges = new ArrayList<ClassInfo>();
-			List<ClassInfo> ac = new ArrayList<ClassInfo>();
-			for(Object okey: props.keySet())
+			try
 			{
-				if(okey instanceof String)
+				if (Integer.parseInt(props.getProperty("build")) == BpmnEditor.BUILD)
 				{
-					String key = (String) okey;
-					if(key.startsWith("gi"))
+				
+					List<ClassInfo> gis = new ArrayList<ClassInfo>();
+					List<ClassInfo> gts = new ArrayList<ClassInfo>();
+					List<ClassInfo> ges = new ArrayList<ClassInfo>();
+					List<ClassInfo> ac = new ArrayList<ClassInfo>();
+					for(Object okey: props.keySet())
 					{
-						gis.add(new ClassInfo(props.getProperty(key)));
+						if(okey instanceof String)
+						{
+							String key = (String) okey;
+							if(key.startsWith("gi"))
+							{
+								gis.add(new ClassInfo(props.getProperty(key)));
+							}
+							else if(key.startsWith("gt"))
+							{
+								gts.add(new ClassInfo(props.getProperty(key)));
+							}
+							else if(key.startsWith("ge"))
+							{
+								ges.add(new ClassInfo(props.getProperty(key)));
+							}
+							else if(key.startsWith("ac"))
+							{
+								ac.add(new ClassInfo(props.getProperty(key)));
+							}
+						}
 					}
-					else if(key.startsWith("gt"))
-					{
-						gts.add(new ClassInfo(props.getProperty(key)));
-					}
-					else if(key.startsWith("ge"))
-					{
-						ges.add(new ClassInfo(props.getProperty(key)));
-					}
-					else if(key.startsWith("ac"))
-					{
-						ac.add(new ClassInfo(props.getProperty(key)));
-					}
+					ret.setGlobalInterfaces(gis);
+					ret.setGlobalTaskClasses(gts);
+					ret.setGlobalExceptions(ges);
+					ret.setGlobalAllClasses(ac);
 				}
 			}
-			ret.setGlobalInterfaces(gis);
-			ret.setGlobalTaskClasses(gts);
-			ret.setGlobalExceptions(ges);
-			ret.setGlobalAllClasses(ac);
+			catch (Exception e)
+			{
+			}
 		}
 		catch (IOException e)
 		{
@@ -854,6 +866,8 @@ public class Settings
 				boolean ret = false;
 				try
 				{
+					if (obj.getName().contains("IChatS"))
+						System.out.println("ofound");
 					if(!obj.isInterface())
 					{
 						if (SReflect.isSupertype(Exception.class, obj))

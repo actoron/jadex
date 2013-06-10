@@ -1044,22 +1044,22 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			conftable.getCellEditor().stopCellEditing();
 		}
 		
-		if (conftable.isEditing())
+		if (paramtable.isEditing())
 		{
 			paramtable.getCellEditor().stopCellEditing();
 		}
 		
-		if (conftable.isEditing())
+		if (proptable.isEditing())
 		{
 			proptable.getCellEditor().stopCellEditing();
 		}
 		
-		if (conftable.isEditing())
+		if (pstable.isEditing())
 		{
 			pstable.getCellEditor().stopCellEditing();
 		}
 		
-		if (conftable.isEditing())
+		if (rstable.isEditing())
 		{
 			rstable.getCellEditor().stopCellEditing();
 		}
