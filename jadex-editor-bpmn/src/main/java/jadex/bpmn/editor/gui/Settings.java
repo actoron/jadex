@@ -866,8 +866,6 @@ public class Settings
 				boolean ret = false;
 				try
 				{
-					if (obj.getName().contains("IChatS"))
-						System.out.println("ofound");
 					if(!obj.isInterface())
 					{
 						if (SReflect.isSupertype(Exception.class, obj))
