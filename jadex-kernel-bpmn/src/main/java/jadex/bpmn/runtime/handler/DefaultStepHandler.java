@@ -11,6 +11,7 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.SReflect;
 
 import java.util.Iterator;
 import java.util.List;
@@ -91,6 +92,7 @@ public class DefaultStepHandler implements IStepHandler
 				else
 				{
 					List<MActivity>	handlers	= activity.getEventHandlers();
+					MActivity nexthandler = null;
 					for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
 					{
 						MActivity	handler	= handlers.get(i);
@@ -98,8 +100,27 @@ public class DefaultStepHandler implements IStepHandler
 						{
 							// Todo: match exception types.
 	//						Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
-							next	= handler;
+							if (handler.getClazz() == null)
+							{
+								if (nexthandler == null)
+								{
+									nexthandler = handler;
+								}
+							}
+							else if (handler.getClazz().getType(instance.getClassLoader()).equals(ex.getClass()))
+							{
+								nexthandler = handler;
+								break;
+							}
+							else if (SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader()), ex.getClass()))
+							{
+								nexthandler = handler;
+							}
 						}
+					}
+					if (nexthandler != null)
+					{
+						next	= nexthandler;
 					}
 				}
 				
