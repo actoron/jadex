@@ -61,22 +61,36 @@ public class ComponentSuspendable implements ISuspendable
 	 */
 	public void resume(final IFuture<?> future)
 	{
-		adapter.invokeLater(new Runnable()
+//		System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
+		if(adapter.isExternalThread())
 		{
-			public void run()
+			adapter.invokeLater(new Runnable()
 			{
-//				System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
-				synchronized(this)
+				public void run()
 				{
-					// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
-					if(future==ComponentSuspendable.this.future)
+					synchronized(ComponentSuspendable.this)
 					{
-						adapter.unblock(this);
+						// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
+						if(future==ComponentSuspendable.this.future)
+						{
+							adapter.unblock(ComponentSuspendable.this);
+						}
 					}
 				}
-//				System.out.println("ComponentSuspendable.unresume "+Thread.currentThread());
-			}
-		});
+			});
+		}
+		else
+		{
+			synchronized(this)
+			{
+				// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
+				if(future==this.future)
+				{
+					adapter.unblock(this);
+				}
+			}			
+		}
+//		System.out.println("ComponentSuspendable.unresume "+Thread.currentThread());
 	}
 	
 	/**
