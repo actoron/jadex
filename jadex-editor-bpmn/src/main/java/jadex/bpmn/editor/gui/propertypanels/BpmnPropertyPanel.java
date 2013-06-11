@@ -1426,13 +1426,14 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
+			Object oldval = getValueAt(rowIndex, columnIndex);
 			CachedParameter param = (CachedParameter) paramcche.get(rowIndex);
 			removeParameter(param.name);
 			switch(columnIndex)
 			{
 				case 0:
 				default:
-					if (!value.equals(getValueAt(rowIndex, columnIndex)))
+					if (!value.equals(oldval))
 					{
 						param.name = createFreeName((String) value, new BasePropertyPanel.IndexMapContains(paramcche));
 					}
