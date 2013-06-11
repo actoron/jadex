@@ -612,7 +612,7 @@ public class SCreationController
 		
 		if (autoseqedge)
 		{
-			Set<VNode> rnodes = getReverseSequenceFlowNodes(vtactivity, null);
+			Set<VNode> rnodes = getReverseSequenceFlowNodes(vtactivity, null, vsactivity);
 			if (!rnodes.contains(vsactivity))
 			{
 				MSequenceEdge medge = new MSequenceEdge();
@@ -628,7 +628,7 @@ public class SCreationController
 		return vedge;
 	}
 	
-	protected static final Set<VNode> getReverseSequenceFlowNodes(VNode start, Set<VNode> visited)
+	protected static final Set<VNode> getReverseSequenceFlowNodes(VNode start, Set<VNode> visited, VNode match)
 	{
 		if (visited == null)
 		{
@@ -644,7 +644,12 @@ public class SCreationController
 				if (start.getEdgeAt(i) instanceof VSequenceEdge &&
 					start.equals(((VSequenceEdge) start.getEdgeAt(i)).getTarget()))
 				{
-					getReverseSequenceFlowNodes((VNode) ((VSequenceEdge) start.getEdgeAt(i)).getSource(), visited);
+					if (match != null && visited.contains(match))
+					{
+						return visited;
+					}
+					
+					getReverseSequenceFlowNodes((VNode) ((VSequenceEdge) start.getEdgeAt(i)).getSource(), visited, match);
 				}
 			}
 		}

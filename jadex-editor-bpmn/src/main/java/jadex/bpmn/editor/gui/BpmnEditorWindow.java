@@ -220,7 +220,7 @@ public class BpmnEditorWindow extends JFrame
 								try
 								{
 //									long ts = System.currentTimeMillis();
-									SBpmnModelReader.readModel(file, null);
+//									SBpmnModelReader.readModel(file, null);
 //									System.out.println(file.toString() + " " + (System.currentTimeMillis() - ts));
 //									ts = System.currentTimeMillis();
 									loadModel(file);
