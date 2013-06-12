@@ -793,7 +793,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	{
 		Object rgoal = ((GoalFlyweight)goal).getHandle();
 		interpreter.startMonitorConsequences();
-		GoalLifecycleRules.adoptGoal(state, rcapa, rgoal);
+		GoalLifecycleRules.adoptGoal(state, ((GoalFlyweight)goal).getScope(), rgoal);
 		interpreter.endMonitorConsequences();
 	}
 

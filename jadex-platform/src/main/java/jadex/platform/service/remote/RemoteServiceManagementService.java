@@ -352,7 +352,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			public void customResultAvailable(Object result)
 			{
-				ret.setResult((IExternalAccess)result);
+				if(result!=null)
+				{
+					ret.setResult((IExternalAccess)result);
+				}
+				else
+				{
+					System.err.println("exta is null in rms!!! "+cid);
+					ret.setException(new RuntimeException("exta is null in rms!!! "+cid));
+				}
 			}
 		});
 		

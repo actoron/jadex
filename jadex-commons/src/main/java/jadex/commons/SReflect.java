@@ -267,7 +267,7 @@ public class SReflect
 		if(name==null)
 			throw new IllegalArgumentException("Class name must not be null.");
 		
-//		if(name.indexOf("Maven")!=-1)
+//		if(name.indexOf("AgentPlan")!=-1)
 //			System.out.println("+++fC: "+name+" "+classloader);
 		
 		Object ret = basictypes.get(name);
@@ -317,7 +317,8 @@ public class SReflect
 					}
 					catch(Throwable e)
 					{
-//						e.printStackTrace();
+//						if(name.indexOf("AgentPlan")!=-1)
+//							e.printStackTrace();
 						// Catch anything as sometimes strange errors appear
 						// E.g. (http://pastebin.com/6xkRhJqG)
 						// Exception in thread "AWT-EventQueue-0" java.lang.InternalError: Unable to find plugin native libraries

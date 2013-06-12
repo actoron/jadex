@@ -560,7 +560,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	{
 		Object rgoal = ((GoalFlyweight)goal).getHandle();
 		interpreter.startMonitorConsequences();
-		GoalLifecycleRules.adoptGoal(state, rcapa, rgoal);
+		GoalLifecycleRules.adoptGoal(state, ((GoalFlyweight)goal).getScope(), rgoal);
 		interpreter.endMonitorConsequences();
 	}
 

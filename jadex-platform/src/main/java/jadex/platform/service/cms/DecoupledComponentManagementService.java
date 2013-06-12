@@ -1863,7 +1863,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 			{
 				if(result==null)
 				{
-					System.err.println("ea is null in cms!!!");
+					System.err.println("ea is null in cms!!! "+cid);
 				}
 			}
 			
