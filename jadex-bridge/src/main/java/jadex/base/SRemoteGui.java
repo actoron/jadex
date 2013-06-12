@@ -73,10 +73,10 @@ public class SRemoteGui
 	 */
 	public static IFuture<Object[]>	getServiceInfos(IExternalAccess ea)
 	{
-		if(ea==null)
-		{
-			System.err.println("ea is null in remote gui!!!");
-		}
+//		if(ea==null)
+//		{
+//			System.err.println("ea is null in remote gui!!!");
+//		}
 		return ea.scheduleImmediate(new IComponentStep<Object[]>()
 		{
 			@Classname("getServiceInfos")
