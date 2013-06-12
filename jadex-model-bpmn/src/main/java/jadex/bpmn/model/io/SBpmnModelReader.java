@@ -1015,7 +1015,7 @@ public class SBpmnModelReader
 	{
 		if (vreader != null)
 		{
-			long ts = System.currentTimeMillis();
+//			long ts = System.currentTimeMillis();
 			Map<String, Object> vbuffer = (Map<String, Object>) buffer.get("vbuffer");
 			if (vbuffer == null)
 			{
