@@ -136,7 +136,12 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				vnode.setCollapsed(!expanded);
 			}
 			
-			mxGeometry geo = new mxGeometry(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());;
+			mxGeometry geo = null;
+			if (bounds != null)
+			{
+				geo = new mxGeometry(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());;
+			}
+			
 			mxGeometry oldgeo = vnode.getGeometry();
 			if (geo != null)
 			{
