@@ -363,6 +363,11 @@ public class BpmnStylesheetColor extends mxStylesheet
 					{
 						Rectangle2D linebounds = fm.getStringBounds(lines[i], g);
 						double tx = rect.x + (rect.width - linebounds.getWidth()) * halignfac;
+						if (lines[i].length() == 0)
+						{
+							lines[i] = " ";
+						}
+						
 						TextLayout tl = new TextLayout(lines[i], scaledFont, g.getFontRenderContext());
 						
 						if (!hz)

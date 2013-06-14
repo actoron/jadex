@@ -39,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 13;
+	public static final int BUILD = 16;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -1125,19 +1125,19 @@ public class SBpmnModelWriter
 			}
 			
 			boolean istask = MBpmnModel.TASK.equals(activity.getActivityType()) || issubproc;
-			boolean hastaskclass = istask && activity.getClazz()!=null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
+			boolean hasclass = activity.getClazz()!=null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
 			boolean hastaskparams = istask && activity.getParameters()!=null && activity.getParameters().size()>0;
 			boolean hastaskprops = istask && activity.getProperties()!=null && activity.getProperties().size()>0;
 			
-			if(hastaskclass || hastaskparams || hastaskprops || procref != null)
+			if(hasclass || hastaskparams || hastaskprops || procref != null)
 			{
 				out.println(getIndent(baseind + 1) + "<semantic:extensionElements>");
 				
-				if(hastaskclass)
+				if(hasclass)
 				{
-					out.print(getIndent(baseind + 2) + "<jadex:taskclass>");
+					out.print(getIndent(baseind + 2) + "<jadex:class>");
 					out.print(escapeString(activity.getClazz().getTypeName()));
-					out.println("</jadex:taskclass>");
+					out.println("</jadex:class>");
 				}
 				
 				if(hastaskparams)
@@ -1306,8 +1306,6 @@ public class SBpmnModelWriter
 			out.println(getIndent(baseind) + "</semantic:messageFlow>");
 		}
 	}
-	
-	
 	
 	/**
 	 *  Gets all activities in a pool.

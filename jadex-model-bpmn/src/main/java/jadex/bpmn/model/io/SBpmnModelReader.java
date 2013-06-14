@@ -30,6 +30,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -55,6 +56,15 @@ public class SBpmnModelReader
 	
 	/** Key for visual internalized parameters. */
 	public static final String INTERNAL_PARAMETERS_KEY = "internalparameters";
+	
+	/** Tag aliases. */
+	public static final Map<String, String> TAG_ALIASES;
+	static
+	{
+		Map<String, String> aliases = new HashMap<String, String>();
+		aliases.put("taskclass", "class");
+		TAG_ALIASES = Collections.unmodifiableMap(aliases);
+	}
 	
 	/** Activity type mapping. */
 	public static final Map<String, String> ACT_TYPE_MAPPING = new HashMap<String, String>();
@@ -336,9 +346,9 @@ public class SBpmnModelReader
 			
 			act.setActivityType(ACT_TYPE_MAPPING.get(tag.getLocalPart()));
 			
-			if(buffer.containsKey("taskclass"))
+			if(buffer.containsKey("class"))
 			{
-				act.setClazz(new ClassInfo((String) buffer.remove("taskclass")));
+				act.setClazz(new ClassInfo((String) buffer.remove("class")));
 			}
 			
 			if(buffer.containsKey("parameters"))
@@ -372,6 +382,11 @@ public class SBpmnModelReader
 				evt.setName(attrs.get("name"));
 			}
 			evt.setId(attrs.get("id"));
+			
+			if(buffer.containsKey("class"))
+			{
+				evt.setClazz(new ClassInfo((String) buffer.remove("class")));
+			}
 			
 			String acttype = "Event";
 			if (tag.getLocalPart().startsWith("end") || tag.getLocalPart().contains("Throw"))
@@ -626,9 +641,9 @@ public class SBpmnModelReader
 			}
 			mappings.put(attrs.get("name"), content);
 		}
-		else if ("taskclass".equals(tag.getLocalPart()))
+		else if (matchLTag("class", tag))
 		{
-			buffer.put(tag.getLocalPart(), content);
+			buffer.put("class", content);
 		}
 		else if ("modelname".equals(tag.getLocalPart()))
 		{
@@ -1212,6 +1227,21 @@ public class SBpmnModelReader
 			SJavaParser.parseExpression(exp, imports, cl);
 		}
 		return exp;
+	}
+	
+	/**
+	 *  Matches local part of the tag.
+	 *  TODO: Do this for all tags.
+	 */
+	protected static final boolean matchLTag(String tagname, QName tag)
+	{
+		String oltag = tag.getLocalPart();
+		String ltag = TAG_ALIASES.get(oltag);
+		if (ltag == null)
+		{
+			ltag = oltag;
+		}
+		return tagname.equals(ltag);
 	}
 	
 	/**
