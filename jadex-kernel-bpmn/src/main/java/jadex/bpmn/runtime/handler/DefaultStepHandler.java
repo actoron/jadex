@@ -98,23 +98,31 @@ public class DefaultStepHandler implements IStepHandler
 						MActivity	handler	= handlers.get(i);
 						if(handler.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_ERROR))//"EventIntermediateError"))
 						{
-							// Todo: match exception types.
+							// Attempt at "closest match" handler behavior
+							
 	//						Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
-							if (handler.getClazz() == null)
-							{
-								if (nexthandler == null)
-								{
-									nexthandler = handler;
-								}
-							}
-							else if (handler.getClazz().getType(instance.getClassLoader()).equals(ex.getClass()))
+//							if (handler.getClazz() == null)
+//							{
+//								if (nexthandler == null)
+//								{
+//									nexthandler = handler;
+//								}
+//							}
+//							else if (handler.getClazz().getType(instance.getClassLoader()).equals(ex.getClass()))
+//							{
+//								nexthandler = handler;
+//								break;
+//							}
+//							else if (SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader()), ex.getClass()))
+//							{
+//								nexthandler = handler;
+//							}
+							
+							// Java-style "first matching handler" behavior
+							if (handler.getClazz() == null || SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader()), ex.getClass()))
 							{
 								nexthandler = handler;
 								break;
-							}
-							else if (SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader()), ex.getClass()))
-							{
-								nexthandler = handler;
 							}
 						}
 					}
