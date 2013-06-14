@@ -868,7 +868,7 @@ public class Settings
 				{
 					if(!obj.isInterface())
 					{
-						if (SReflect.isSupertype(Exception.class, obj))
+						if (SReflect.isSupertype(Throwable.class, obj))
 						{
 							ClassInfo ci = new ClassInfo(obj.getName());
 							res3.add(ci);

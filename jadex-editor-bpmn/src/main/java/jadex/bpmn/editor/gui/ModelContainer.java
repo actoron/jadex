@@ -929,7 +929,7 @@ public class ModelContainer implements IModelContainer
 			Set<ClassInfo>[] infos = Settings.scanForClasses(model.getClassLoader(), false);
 			infos[0].addAll(settings.getGlobalTaskClasses());
 			infos[1].addAll(settings.getGlobalInterfaces());
-			infos[2].addAll(settings.getGlobalInterfaces());
+			infos[2].addAll(settings.getGlobalExceptions());
 			infos[3].addAll(settings.getGlobalAllClasses());
 			taskclasses = new ArrayList(infos[0]);
 			interclasses = new ArrayList(infos[1]);
@@ -940,7 +940,7 @@ public class ModelContainer implements IModelContainer
 		{
 			taskclasses = settings.getGlobalTaskClasses();
 			interclasses = settings.getGlobalInterfaces();
-			exceptionclasses = settings.getGlobalInterfaces();
+			exceptionclasses = settings.getGlobalExceptions();
 			allclasses = settings.getGlobalAllClasses();
 		}
 	}
