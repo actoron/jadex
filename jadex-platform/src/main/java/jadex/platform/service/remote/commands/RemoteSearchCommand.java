@@ -11,6 +11,7 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.TypeResultSelector;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
@@ -90,32 +91,39 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 */
 	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
-		Security	sec	= null;
-		// Try to find security level.
-		// Todo: support other result selectors!?
-		if(selector instanceof TypeResultSelector)
+		try
 		{
-			List<Class<?>>	classes	= new ArrayList<Class<?>>();
-			classes.add(((TypeResultSelector)selector).getType());
-			for(int i=0; sec==null && i<classes.size(); i++)
+			Security	sec	= null;
+			// Try to find security level.
+			// Todo: support other result selectors!?
+			if(selector instanceof TypeResultSelector)
 			{
-				Class<?>	clazz	= classes.get(i);
-				sec	= clazz.getAnnotation(Security.class);
-				if(sec==null)
+				List<Class<?>>	classes	= new ArrayList<Class<?>>();
+				classes.add(((TypeResultSelector)selector).getType());
+				for(int i=0; sec==null && i<classes.size(); i++)
 				{
-					classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
-					if(clazz.getSuperclass()!=null)
+					Class<?>	clazz	= classes.get(i);
+					sec	= clazz.getAnnotation(Security.class);
+					if(sec==null)
 					{
-						classes.add(clazz.getSuperclass());
+						classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
+						if(clazz.getSuperclass()!=null)
+						{
+							classes.add(clazz.getSuperclass());
+						}
 					}
 				}
 			}
+			
+			// Default to max security if not found.
+			securitylevel	= sec!=null ? sec.value() : Security.PASSWORD;
+			
+			return IFuture.DONE;
 		}
-		
-		// Default to max security if not found.
-		securitylevel	= sec!=null ? sec.value() : Security.PASSWORD;
-		
-		return IFuture.DONE;
+		catch(Exception e)
+		{
+			return new Future<Void>(e);
+		}
 	}
 
 	/**
