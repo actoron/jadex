@@ -18,6 +18,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -41,6 +42,7 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
+import jadex.micro.annotation.AgentService;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -427,8 +429,25 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 							
 							public void exceptionOccurred(Exception e)
 							{
-								getLogger().warning("Field injection failed: "+e);
-								lis2.exceptionOccurred(e);
+								if(!(e instanceof ServiceNotFoundException)
+									|| f.getAnnotation(AgentService.class).required())
+								{
+									getLogger().warning("Field injection failed: "+e);
+									lis2.exceptionOccurred(e);
+								}
+								else
+								{
+									if(SReflect.isSupertype(f.getType(), List.class))
+									{
+										// Call self with empty list as result.
+										resultAvailable(Collections.EMPTY_LIST);
+									}
+									else
+									{
+										// Don't set any value.
+										lis2.resultAvailable(null);
+									}
+								}
 							}
 						});
 					}

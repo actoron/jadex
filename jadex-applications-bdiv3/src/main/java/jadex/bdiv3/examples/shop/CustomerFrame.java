@@ -1,9 +1,7 @@
 package jadex.bdiv3.examples.shop;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.IFuture;

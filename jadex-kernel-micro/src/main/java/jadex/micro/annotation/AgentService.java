@@ -16,4 +16,9 @@ public @interface AgentService
 	 *  The argument name.
 	 */
 	public String name() default "";
+	
+	/**
+	 *  Fail at startup if no service is found?
+	 */
+	public boolean required() default true;
 }

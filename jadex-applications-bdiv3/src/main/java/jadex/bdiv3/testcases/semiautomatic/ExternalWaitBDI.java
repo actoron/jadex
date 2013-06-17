@@ -5,7 +5,6 @@ import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
