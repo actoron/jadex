@@ -1279,6 +1279,10 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 								param.inivals.put(cinfo.getName(), val);
 							}
 						}
+						
+						((AbstractTableModel) paramtable.getModel()).fireTableStructureChanged();
+						((AbstractTableModel) pstable.getModel()).fireTableStructureChanged();
+						((AbstractTableModel) rstable.getModel()).fireTableStructureChanged();
 					}
 					break;
 				case 2:

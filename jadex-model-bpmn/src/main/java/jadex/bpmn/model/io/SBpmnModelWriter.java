@@ -639,7 +639,7 @@ public class SBpmnModelWriter
 						
 						--ind;
 						out.print(getIndent(ind));
-						out.println("<jadex:argumentvalues>");
+						out.println("</jadex:argumentvalues>");
 					}
 					
 					UnparsedExpression[] res = conf.getResults();
@@ -664,7 +664,7 @@ public class SBpmnModelWriter
 						
 						--ind;
 						out.print(getIndent(ind));
-						out.println("<jadex:resultvalues>");
+						out.println("</jadex:resultvalues>");
 					}
 					
 					Map<String, String> confctvmap = ctvconfexp.get(conf.getName());

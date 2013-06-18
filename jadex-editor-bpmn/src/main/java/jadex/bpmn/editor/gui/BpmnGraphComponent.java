@@ -20,6 +20,7 @@ import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -234,7 +235,7 @@ public class BpmnGraphComponent extends mxGraphComponent
 			public Stroke createStroke(Map<String, Object> style)
 			{
 				float strokewidth = mxUtils.getFloat(style, mxConstants.STYLE_STROKEWIDTH, 1);
-				
+				String a = "load data local infile '%FILE%' into table stage.robinson_and_declines fields terminated by '|' lines terminated by '\\n' " + "(auto_id, media, @delivery_dt, vname, nname, strasse, plz, ort) set delivery_dt = if(@delivery_dt='', null, STR_TO_DATE(@delivery_dt, '%y%m%d')), filler=@delivery_dt;";
 				if (mxUtils.isTrue(style, mxConstants.STYLE_DASHED))
 				{
 					float[] dashpattern = null;
@@ -249,15 +250,18 @@ public class BpmnGraphComponent extends mxGraphComponent
 							mxConstants.STYLE_DASH_PATTERN,
 							mxConstants.DEFAULT_DASHED_PATTERN, " ");
 					}
+					System.out.println(Arrays.toString(dashpattern));
 					float[] scaleddashpattern = new float[dashpattern.length];
 
 					for (int i = 0; i < dashpattern.length; i++)
 					{
-						scaleddashpattern[i] = (float) (dashpattern[i]* strokewidth * scale);
+						scaleddashpattern[i] = (float) Math.max(1.0f, (dashpattern[i]* strokewidth * scale));
 					}
-
+					
 					return new BasicStroke(strokewidth, BasicStroke.CAP_ROUND,
 							BasicStroke.JOIN_ROUND, 10.0f, scaleddashpattern, 0.0f);
+//					return new BasicStroke(strokewidth, BasicStroke.CAP_BUTT,
+//							BasicStroke.JOIN_BEVEL, 0.0f, scaleddashpattern, 0.0f);
 				}
 				else
 				{

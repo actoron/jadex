@@ -573,10 +573,10 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STARTARROW, mxConstants.NONE);
 		style.put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_OVAL);
 		style.put(mxConstants.STYLE_ENDSIZE, ARROW_SIZE);
-		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
-		style.put(mxConstants.STYLE_DASH_PATTERN, new float[] { 10.0f, 10.0f });
+//		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
+//		style.put(mxConstants.STYLE_DASH_PATTERN, new float[] { 10.0f, 10.0f });
 		style.put(mxConstants.STYLE_ROUNDED, Boolean.TRUE);
-		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
+		style.put(mxConstants.STYLE_STROKECOLOR, "#707070");
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
 //		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);
@@ -592,10 +592,10 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_STARTARROW, mxConstants.NONE);
 		style.put(mxConstants.STYLE_ENDARROW, "Empty Arrow");
 		style.put(mxConstants.STYLE_ENDSIZE, ARROW_SIZE);
-		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
-		style.put(mxConstants.STYLE_DASH_PATTERN, new float[] { 5.0f, 5.0f });
+//		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
+//		style.put(mxConstants.STYLE_DASH_PATTERN, new float[] { 5.0f, 5.0f });
 		style.put(mxConstants.STYLE_ROUNDED, Boolean.TRUE);
-		style.put(mxConstants.STYLE_STROKECOLOR, "#000000");
+		style.put(mxConstants.STYLE_STROKECOLOR, "#707070");
 		style.put(mxConstants.STYLE_FONTFAMILY, FONT);
 		style.put(mxConstants.STYLE_FONTCOLOR, "#000000");
 //		style.put(mxConstants.STYLE_NOLABEL, Boolean.TRUE);

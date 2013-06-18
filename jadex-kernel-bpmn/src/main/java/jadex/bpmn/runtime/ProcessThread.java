@@ -786,7 +786,7 @@ public class ProcessThread	implements ITaskContext
 					{
 						try
 						{
-							setParameterValue(param.getName(), param.getInitialValue()==null? null: ((IParsedExpression) param.getInitialValue().getParsed()).getValue(fetcher));
+							setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getParsed() == null? null: ((IParsedExpression) param.getInitialValue().getParsed()).getValue(fetcher));
 							before.remove(param.getName());
 						}
 						catch(RuntimeException e)
