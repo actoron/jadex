@@ -29,6 +29,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.FieldInfo;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -37,6 +38,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
@@ -47,7 +49,10 @@ import jadex.micro.annotation.AgentService;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -376,11 +381,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	
 			for(int i=0; i<sernames.length; i++)
 			{
-				final FieldInfo[] fields = model.getServiceInjections(sernames[i]);
-				final CounterResultListener<Void> lis2 = new CounterResultListener<Void>(fields.length, lis);
+				final Object[] infos = model.getServiceInjections(sernames[i]);
+				final CounterResultListener<Void> lis2 = new CounterResultListener<Void>(infos.length, lis);
 
 				RequiredServiceInfo	info	= model.getModelInfo().getRequiredService(sernames[i]);				
-				IFuture<Object>	sfut;
+				final IFuture<Object>	sfut;
 				if(info!=null && info.isMultiple())
 				{
 					IFuture	ifut	= getServiceContainer().getRequiredServices(sernames[i]);
@@ -391,65 +396,186 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					sfut	= getServiceContainer().getRequiredService(sernames[i]);					
 				}
 				
-				for(int j=0; j<fields.length; j++)
+				for(int j=0; j<infos.length; j++)
 				{
-					final Field	f	= fields[j].getField(getClassLoader());
-					if(SReflect.isSupertype(IFuture.class, f.getType()))
+					if(infos[j] instanceof FieldInfo)
 					{
-						try
+						final Field	f	= ((FieldInfo)infos[j]).getField(getClassLoader());
+						if(SReflect.isSupertype(IFuture.class, f.getType()))
 						{
-							f.setAccessible(true);
-							f.set(agent, sfut);
-							lis2.resultAvailable(null);
-						}
-						catch(Exception e)
-						{
-							getLogger().warning("Field injection failed: "+e);
-							lis2.exceptionOccurred(e);
-						}	
-					}
-					else
-					{
-						sfut.addResultListener(new IResultListener<Object>()
-						{
-							public void resultAvailable(Object result)
+							try
 							{
-								try
-								{
-									f.setAccessible(true);
-									f.set(agent, result);
-									lis2.resultAvailable(null);
-								}
-								catch(Exception e)
-								{
-									getLogger().warning("Field injection failed: "+e);
-									lis2.exceptionOccurred(e);
-								}	
+								f.setAccessible(true);
+								f.set(agent, sfut);
+								lis2.resultAvailable(null);
 							}
-							
-							public void exceptionOccurred(Exception e)
+							catch(Exception e)
 							{
-								if(!(e instanceof ServiceNotFoundException)
-									|| f.getAnnotation(AgentService.class).required())
+								getLogger().warning("Field injection failed: "+e);
+								lis2.exceptionOccurred(e);
+							}	
+						}
+						else
+						{
+							sfut.addResultListener(new IResultListener<Object>()
+							{
+								public void resultAvailable(Object result)
 								{
-									getLogger().warning("Field injection failed: "+e);
-									lis2.exceptionOccurred(e);
-								}
-								else
-								{
-									if(SReflect.isSupertype(f.getType(), List.class))
+									try
 									{
-										// Call self with empty list as result.
-										resultAvailable(Collections.EMPTY_LIST);
+										f.setAccessible(true);
+										f.set(agent, result);
+										lis2.resultAvailable(null);
+									}
+									catch(Exception e)
+									{
+										getLogger().warning("Field injection failed: "+e);
+										lis2.exceptionOccurred(e);
+									}	
+								}
+								
+								public void exceptionOccurred(Exception e)
+								{
+									if(!(e instanceof ServiceNotFoundException)
+										|| f.getAnnotation(AgentService.class).required())
+									{
+										getLogger().warning("Field injection failed: "+e);
+										lis2.exceptionOccurred(e);
 									}
 									else
 									{
-										// Don't set any value.
-										lis2.resultAvailable(null);
+										if(SReflect.isSupertype(f.getType(), List.class))
+										{
+											// Call self with empty list as result.
+											resultAvailable(Collections.EMPTY_LIST);
+										}
+										else
+										{
+											// Don't set any value.
+											lis2.resultAvailable(null);
+										}
 									}
 								}
-							}
-						});
+							});
+						}
+					}
+					else if(infos[j] instanceof MethodInfo)
+					{
+						final Method	m	= SReflect.getMethod(agent.getClass(), ((MethodInfo)infos[j]).getName(), ((MethodInfo)infos[j]).getParameterTypes());
+						if(info.isMultiple())
+						{
+							lis2.resultAvailable(null);
+							IFuture	tfut	= sfut;
+							final IIntermediateFuture<Object>	ifut	= (IIntermediateFuture<Object>)tfut;
+							
+							ifut.addResultListener(new IIntermediateResultListener<Object>()
+							{
+								public void intermediateResultAvailable(final Object result)
+								{
+									if(SReflect.isSupertype(m.getParameterTypes()[0], result.getClass()))
+									{
+										microagent.scheduleStep(new IComponentStep<Void>()
+										{
+											public IFuture<Void> execute(IInternalAccess ia)
+											{
+												try
+												{
+													m.setAccessible(true);
+													m.invoke(agent, new Object[]{result});
+												}
+												catch(Throwable t)
+												{
+													t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
+													throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+												}
+												return IFuture.DONE;
+											}
+										});
+									}
+								}
+								
+								public void resultAvailable(Collection<Object> result)
+								{
+									finished();
+								}
+								
+								public void finished()
+								{
+									if(SReflect.isSupertype(m.getParameterTypes()[0], Collection.class))
+									{
+										microagent.scheduleStep(new IComponentStep<Void>()
+										{
+											public IFuture<Void> execute(IInternalAccess ia)
+											{
+												try
+												{
+													m.setAccessible(true);
+													m.invoke(agent, new Object[]{ifut.getIntermediateResults()});
+												}
+												catch(Throwable t)
+												{
+													t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
+													throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+												}
+												return IFuture.DONE;
+											}
+										});
+									}
+								}
+								
+								public void exceptionOccurred(Exception e)
+								{
+									if(!(e instanceof ServiceNotFoundException)
+										|| m.getAnnotation(AgentService.class).required())
+									{
+										getLogger().warning("Field injection failed: "+e);
+									}
+									else
+									{
+										// Call self with empty list as result.
+										finished();
+									}
+								}
+							});
+
+						}
+						else
+						{
+							lis2.resultAvailable(null);
+							sfut.addResultListener(new IResultListener<Object>()
+							{
+								public void resultAvailable(final Object result)
+								{
+									microagent.scheduleStep(new IComponentStep<Void>()
+									{
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											try
+											{
+												m.setAccessible(true);
+												m.invoke(agent, new Object[]{result});
+												lis2.resultAvailable(null);
+											}
+											catch(Throwable t)
+											{
+												t	= t instanceof InvocationTargetException ? ((InvocationTargetException)t).getTargetException() : t;
+												throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+											}
+											return IFuture.DONE;
+										}
+									});
+								}
+								
+								public void exceptionOccurred(Exception e)
+								{
+									if(!(e instanceof ServiceNotFoundException)
+										|| m.getAnnotation(AgentService.class).required())
+									{
+										getLogger().warning("Method service injection failed: "+e);
+									}
+								}
+							});
+						}
 					}
 				}
 			}

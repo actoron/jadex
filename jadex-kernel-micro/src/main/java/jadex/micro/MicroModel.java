@@ -2,6 +2,7 @@ package jadex.micro;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.FieldInfo;
+import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -33,7 +34,7 @@ public class MicroModel extends CacheableKernelModel
 	protected Map<String, Tuple3<FieldInfo, String, String>> resultinjections;
 	
 	/** The service injection targets. */
-	protected Map<String, FieldInfo> serviceinjections;
+	protected Map<String, Object> serviceinjections;
 	
 	/** The breakpoint method. */
 	protected Method bpmethod;
@@ -167,13 +168,25 @@ public class MicroModel extends CacheableKernelModel
 	}
 	
 	/**
-	 *  Get the service injection fields.
-	 *  @return The fields.
+	 *  Add an injection field.
+	 *  @param name The name.
+	 *  @param method The method. 
 	 */
-	public FieldInfo[] getServiceInjections(String name)
+	public void addServiceInjection(String name, MethodInfo method)
+	{
+		if(serviceinjections==null)
+			serviceinjections = new MultiCollection();
+		serviceinjections.put(name, method);
+	}
+	
+	/**
+	 *  Get the service injection fields.
+	 *  @return The field or method infos.
+	 */
+	public Object[] getServiceInjections(String name)
 	{
 		Collection col = serviceinjections==null? null: (Collection)serviceinjections.get(name);
-		return col==null? new FieldInfo[0]: (FieldInfo[])col.toArray(new FieldInfo[col.size()]);
+		return col==null? new Object[0]: (Object[])col.toArray(new Object[col.size()]);
 	}
 	
 	/**

@@ -20,6 +20,7 @@ import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Value;
 import jadex.commons.FieldInfo;
 import jadex.commons.IValueFetcher;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
@@ -645,7 +646,7 @@ public class MicroClassReader
 				{
 					micromodel.addAgentInjection(new FieldInfo(fields[i]));
 				}
-				if(isAnnotationPresent(fields[i], Parent.class, cl))
+				else if(isAnnotationPresent(fields[i], Parent.class, cl))
 				{
 					micromodel.addParentInjection(new FieldInfo(fields[i]));
 				}
@@ -674,10 +675,40 @@ public class MicroClassReader
 					}
 				}
 			}
-			
+
+			// Find method injection targets by reflection (services)
+			Method[] methods = cma.getDeclaredMethods();
+			for(int i=0; i<methods.length; i++)
+			{
+				if(isAnnotationPresent(methods[i], AgentService.class, cl))
+				{
+					AgentService ser = getAnnotation(methods[i], AgentService.class, cl);
+					String name;
+					if(ser.name().length()>0)
+					{
+						 name	= ser.name();
+					}
+					else
+					{
+						name	= methods[i].getName();
+						name	= name.toLowerCase();
+						if(name.startsWith("add"))
+						{
+							name	= name.substring(3);
+							name	= SUtil.getPlural(name);
+						}
+						else if(name.startsWith("set"))
+						{
+							name	= name.substring(3);							
+						}
+					}
+					micromodel.addServiceInjection(name, new MethodInfo(methods[i]));
+				}
+			}
+
 			if(micromodel.getBreakpointMethod()==null)
 			{
-				Method[] methods = cma.getDeclaredMethods();
+//				Method[] methods = cma.getDeclaredMethods();
 				for(int i=0; i<methods.length; i++)
 				{
 					final Method method = methods[i];

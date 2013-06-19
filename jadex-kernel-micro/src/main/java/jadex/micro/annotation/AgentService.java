@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  *  The service annotation.
  */
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AgentService
 {
