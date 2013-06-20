@@ -89,7 +89,7 @@ public class Count2BDI
 	@AgentBody
 	public void body()
 	{
-		IFuture<CountGoal> fut = agent.dispatchTopLevelGoal(new CountGoal(10, 5));
+		IFuture<CountGoal> fut = agent.dispatchTopLevelGoal(new Count2Goal(10, 5));
 		fut.addResultListener(new IResultListener<CountGoal>()
 		{
 			public void resultAvailable(CountGoal goal)

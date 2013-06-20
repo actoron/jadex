@@ -358,8 +358,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				}
 				else
 				{
-					System.err.println("exta is null in rms!!! "+cid);
-					ret.setException(new RuntimeException("exta is null in rms!!! "+cid));
+					// may happen with incompatible platform versions.
+					ret.setException(new RuntimeException("Cannot get external access: "+cid));
 				}
 			}
 		});

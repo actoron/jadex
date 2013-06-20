@@ -23,10 +23,11 @@ public class BlockingTimeUserAgent
 	@AgentService
 	public void	addTimeService(ITimeService timeservice)
 	{
-		ISubscriptionIntermediateFuture<Date>	sub	= timeservice.subscribe();
-		while(sub.hasNextIntermediateResult())
+		ISubscriptionIntermediateFuture<Date>	subscription	= timeservice.subscribe();
+		while(subscription.hasNextIntermediateResult())
 		{
-			System.out.println("New time received from "+timeservice.getName()+": "+sub.getNextIntermediateResult());			
+			Date	date	= subscription.getNextIntermediateResult();
+			System.out.println("New time received from "+timeservice.getName()+": "+date);			
 		}
 	}
 }
