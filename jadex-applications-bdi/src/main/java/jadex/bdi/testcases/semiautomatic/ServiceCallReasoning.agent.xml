@@ -32,7 +32,7 @@
 	
 	<services>
 		<providedservice name="printservice" class="IPrintHelloService">
-			<implementation>new PrintHelloService($scope.getServiceProvider())
+			<implementation class="PrintHelloService">
 				<interceptor>new BDIReasoningInterceptor($scope)</interceptor>
 			</implementation>
 		</providedservice>
@@ -54,7 +54,7 @@
 			</plans>
 			<services>
 				<providedservice name="printservice" class="IPrintHelloService">
-					<implementation>new PrintHelloService($scope.getServiceProvider())</implementation>
+					<implementation class="PrintHelloService"/>
 				</providedservice>
 			</services>
 		</configuration>

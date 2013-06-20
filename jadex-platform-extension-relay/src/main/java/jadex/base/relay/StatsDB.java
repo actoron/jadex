@@ -338,6 +338,7 @@ public class StatsDB
 			}
 			catch(Exception e)
 			{
+				e.printStackTrace();
 				// Ignore errors and let relay work without stats.
 				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
 				List<PlatformInfo> list = Collections.emptyList();
@@ -411,6 +412,7 @@ public class StatsDB
 			}
 			catch(Exception e)
 			{
+				e.printStackTrace();
 				// Ignore errors and let relay work without stats.
 				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
 			}
