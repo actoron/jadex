@@ -557,6 +557,22 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		Map<String, Object>	props	= getProperties();
 		return props!=null ? props.get(name) : null;
 	}
+	
+	/**
+	 *  Create a service proxy for registering a provided service.
+	 */
+	public IInternalService	createInternalService(Object service, Class<?> type)
+	{
+		boolean moni = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring().booleanValue(): false;
+
+		IInternalService	is	= BasicServiceInvocationHandler.createProvidedServiceProxy(
+			getInternalAccess(), getComponentAdapter(), service, null,
+			type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,
+			null, isCopy(), isRealtime(),
+			getModel().getResourceIdentifier(), moni, null);
+		
+		return is;
+	}
 
 	//-------- internally used methods --------
 	

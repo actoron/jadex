@@ -40,7 +40,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  The service is started, if the container is already running.
 	 *  @param service The service.
 	 *  @param info The provided service info.
-	 *  @param componentfetcher	 Helper to fetch corrent object for component injection based on field type.
+	 *  @param componentfetcher	 Optional helper to fetch correct object for component injection based on field type.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
 	public IFuture<Void>	addService(IInternalService service, ProvidedServiceInfo info, IResultCommand<Object, Class<?>> componentfetcher);
