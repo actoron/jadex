@@ -1,22 +1,14 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 
 /**
  *  Simple print hello service.
  */
-public class PrintHelloService extends BasicService implements IPrintHelloService
+@Service
+public class PrintHelloService	implements IPrintHelloService
 {
-	/**
-	 *  Create a new service.
-	 */
-	public PrintHelloService(IServiceProvider provider)
-	{
-		super(provider.getId(), IPrintHelloService.class, null);
-	}
-	
 	/**
 	 *  Print hello.
 	 */
