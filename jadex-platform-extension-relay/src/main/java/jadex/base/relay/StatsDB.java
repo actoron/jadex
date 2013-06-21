@@ -354,7 +354,7 @@ public class StatsDB
 	}
 	
 	/**
-	 *  Get cumulated platform infos per prefix to use for display (sorted by recency, newest first).
+	 *  Get cumulated platform infos per ip to use for display (sorted by recency, newest first).
 	 *  @param limit	Limit the number of results (-1 for no limit);
 	 *  @return Up to limit platform infos.
 	 */

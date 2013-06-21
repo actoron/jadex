@@ -359,7 +359,7 @@ public class PlatformInfo
 	{
 		if(!hostip.equals(this.hostip))
 		{
-			throw new RuntimeException("Platform already connected from different ip: "+this.hostip);
+			throw new RuntimeException("Platform "+id+" already connected from different ip: "+this.hostip);
 		}
 //		this.hostip	= hostip;
 		this.hostname	= hostname;
