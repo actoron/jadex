@@ -379,11 +379,11 @@ public class StatsDB
 						if(pi.getId().indexOf(rs.getString("PLATFORM"))==-1)
 						{
 							pi.setId(pi.getId()+", "+rs.getString("PLATFORM"));
-							if(rs.getTimestamp("CONTIME").getTime()>pi.getConnectDate().getTime())
+							if(rs.getTimestamp("CONTIME")!=null && rs.getTimestamp("CONTIME").getTime()>pi.getConnectDate().getTime())
 							{
 								pi.setConnectDate(rs.getTimestamp("CONTIME"));
 							}
-							if(rs.getTimestamp("DISTIME").getTime()<pi.getDisconnectDate().getTime())
+							if(rs.getTimestamp("DISTIME")!=null && rs.getTimestamp("DISTIME").getTime()<pi.getDisconnectDate().getTime())
 							{
 								pi.setDisconnectDate(rs.getTimestamp("DISTIME"));
 							}
