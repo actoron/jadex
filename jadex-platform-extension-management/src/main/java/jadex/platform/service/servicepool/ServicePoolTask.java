@@ -12,14 +12,11 @@ import jadex.bpmn.model.task.annotation.TaskPropertyGui;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -32,35 +29,23 @@ import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 import jadex.javaparser.SJavaParser;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTree;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import javax.swing.plaf.metal.MetalComboBoxEditor;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 /**
@@ -148,8 +133,8 @@ public class ServicePoolTask implements ITask
 		/** The panel. */
 		protected JPanel panel;
 		
-		/** The model. */
-		protected IModelInfo model;
+		/** The model container. */
+		protected IModelContainer modelcontainer;
 		
 		/** The task. */
 		protected MActivity task;
@@ -157,9 +142,9 @@ public class ServicePoolTask implements ITask
 		/**
 		 *  Once called to init the component.
 		 */
-		public void init(final IModelContainer container, final MActivity task, final ClassLoader cl)
+		public void init(IModelContainer container, final MActivity task, final ClassLoader cl)
 		{
-			this.model = container.getBpmnModel().getModelInfo();
+			this.modelcontainer = container;
 			this.task = task;
 			
 			panel = new JPanel(new GridBagLayout());
@@ -209,6 +194,7 @@ public class ServicePoolTask implements ITask
 				public void actionPerformed(ActionEvent e)
 				{
 					tm.addEntry(new Object[2]);
+					modelcontainer.setDirty(true);
 				}
 			};
 			Action remaction = new AbstractAction("Remove")
@@ -217,6 +203,7 @@ public class ServicePoolTask implements ITask
 				{
 					int[] rows = table.getSelectedRows();
 					tm.removeRows(rows);
+					modelcontainer.setDirty(true);
 				}
 			};
 			
@@ -349,7 +336,8 @@ public class ServicePoolTask implements ITask
 				UnparsedExpression uexp = new UnparsedExpression(null, 
 					String[].class, buf.toString(), null);
 				mprop.setInitialValue(uexp);
-			
+				
+				modelcontainer.setDirty(true);
 				fireTableCellUpdated(rowIndex, columnIndex);
 			}
 			

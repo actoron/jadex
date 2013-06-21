@@ -80,6 +80,9 @@ public class ProcessThread	implements ITaskContext
 	/** The data of the current or last activity. */
 	protected Map<String, Object> data;
 	
+	/** The data of the current data edges. */
+	protected Map<String, Object> dataedges;
+	
 	/** The thread context. */
 	protected ThreadContext	context;
 	
@@ -330,6 +333,7 @@ public class ProcessThread	implements ITaskContext
 		ProcessThread	ret	= new ProcessThread(id+"."+idcnt++, activity, context, instance);
 		ret.edge	= edge;
 		ret.data	= data!=null? new HashMap<String, Object>(data): null;
+		ret.dataedges	= dataedges!=null? new HashMap<String, Object>(dataedges): null;
 		ret.splitinfos	= splitinfos!=null ? new LinkedHashMap<String, SplitInfo>(splitinfos) : null;
 		return ret;
 	}
@@ -737,10 +741,10 @@ public class ProcessThread	implements ITaskContext
 						
 						for(MDataEdge de: ds)
 						{
-							if(data.containsKey(de.getId()))
+							if(dataedges.containsKey(de.getId()))
 							{
 								String pname = de.getTargetParameter();
-								Object val = data.remove(de.getId());
+								Object val = dataedges.remove(de.getId());
 								
 								// if already contains value must be identical
 								if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
@@ -761,9 +765,11 @@ public class ProcessThread	implements ITaskContext
 			IndexMap<String, MParameter> params = getActivity().getParameters();
 			if(params!=null)
 			{
+				Set<String> initialized = new HashSet<String>();
 				for(Iterator it=params.values().iterator(); it.hasNext(); )
 				{
 					MParameter param = (MParameter)it.next();
+					
 					if(passedparams!=null && passedparams.containsKey(param.getName()))
 					{
 						if(indexparams!=null && indexparams.contains(param.getName()))
@@ -781,8 +787,14 @@ public class ProcessThread	implements ITaskContext
 							setParameterValue(param.getName(), passedparams.get(param.getName()));
 							before.remove(param.getName());
 						}
+						initialized.add(param.getName());
 					}
-					else
+				}
+				// 2-pass to ensure correct expression evaluation?
+				for(Iterator it=params.values().iterator(); it.hasNext(); )
+				{
+					MParameter param = (MParameter)it.next();
+					if (!initialized.contains(param.getName()))
 					{
 						try
 						{
@@ -892,9 +904,9 @@ public class ProcessThread	implements ITaskContext
 							}
 						}
 					
-						if(data==null)
-							data = new HashMap<String, Object>();
-						data.put(de.getId(), value);	
+						if(dataedges==null)
+							dataedges = new HashMap<String, Object>();
+						dataedges.put(de.getId(), value);	
 					}
 				}
 			}
@@ -1002,6 +1014,8 @@ public class ProcessThread	implements ITaskContext
 		buf.append(activity);
 		buf.append(", data=");
 		buf.append(data);
+		buf.append(", dataedges=");
+		buf.append(dataedges);
 		buf.append(", waiting=");
 		buf.append(waiting);
 		buf.append(")");

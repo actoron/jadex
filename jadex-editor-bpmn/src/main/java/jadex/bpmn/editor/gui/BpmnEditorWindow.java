@@ -81,16 +81,6 @@ public class BpmnEditorWindow extends JFrame
 		BpmnEditor.initialize();
 		
 		settings = Settings.load();
-	
-//		Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
-//		{
-//			public int compare(ClassInfo o1, ClassInfo o2)
-//			{
-//				String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
-//				String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
-//				return str1.compareTo(str2);
-//			}
-//		};
 		
 		if(settings.getGlobalInterfaces()==null || settings.getGlobalInterfaces().size()==0)// || true)
 		{
@@ -103,38 +93,6 @@ public class BpmnEditorWindow extends JFrame
 		
 		getContentPane().setLayout(new BorderLayout());
 		
-//		final JSplitPanel statuspane = new JSplitPanel(JSplitPane.VERTICAL_SPLIT)
-//		{
-//			/* Bug fix goodness for Swing. */
-//			@SuppressWarnings("deprecation")
-//			public void reshape(int x, int y, int w, int h)
-//			{
-//				final double divloc = getProportionalDividerLocation();
-//				super.reshape(x, y, w, h);
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						setDividerLocation(divloc);
-//					}
-//				});
-//			}
-//		};
-//		statuspane.setOneTouchExpandable(true);
-//		statuspane.setBottomComponent(new StatusArea());
-		
-//		getContentPane().add(statuspane, BorderLayout.CENTER);
-		
-//		statuspane.addComponentListener(new ComponentAdapter()
-//		{
-//			public void componentResized(ComponentEvent e)
-//			{
-//				JSplitPanel panel = (JSplitPanel) e.getSource();
-//				System.out.println(panel.getProportionalDividerLocation());
-//				panel.setDividerLocation(panel.getProportionalDividerLocation());
-//			}
-//		});
-		
 		bpmntoolbar = new BpmnToolbar(settings.getToolbarIconSize());
 		//bpmntoolbar.getInfoPanel().setLayout(new BoxLayout(bpmntoolbar.getInfoPanel(), BoxLayout.LINE_AXIS));
 		getContentPane().add(bpmntoolbar, BorderLayout.PAGE_START);
@@ -142,27 +100,6 @@ public class BpmnEditorWindow extends JFrame
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		
 		tabpane = new JTabbedPane();
-//		{
-//			public String getTitleAt(int index)
-//			{
-//				String ret = "New Model";
-//				BpmnEditorPanel panel = (BpmnEditorPanel) getTabComponentAt(index);
-//				if (panel != null)
-//				{
-//					File file = panel.getModelContainer().getFile();
-//					if (file != null)
-//					{
-//						ret = file.getName();
-//					}
-//					if (panel.getModelContainer().isDirty())
-//					{
-//						ret += "*";
-//					}
-//				}
-//				return ret;
-//			}
-//		};
-//		statuspane.setTopComponent(tabpane);
 		getContentPane().add(tabpane, BorderLayout.CENTER);
 		
 		addWindowListener(new WindowAdapter()
@@ -205,13 +142,6 @@ public class BpmnEditorWindow extends JFrame
 				{
 					public void run()
 					{
-//						statuspane.repaint();
-//						statuspane.revalidate();
-//						statuspane.setDividerLocation(statuspane.getHeight());
-//						statuspane.setDividerLocation(1.0);
-//						statuspane.repaint();
-//						statuspane.revalidate();
-						
 						File[] openedfiles = settings.getOpenedFiles();
 						if (openedfiles != null && openedfiles.length > 0)
 						{
@@ -575,6 +505,7 @@ public class BpmnEditorWindow extends JFrame
 		
 		modelcontainer.setFile(file);
 		getSettings().setLastFile(file);
+		
 		
 		newModelTab(modelcontainer);
 		initializeNewModel(modelcontainer);

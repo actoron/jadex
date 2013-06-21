@@ -36,6 +36,13 @@ public interface IModelContainer
 	 */
 	public MBpmnModel getBpmnModel();
 	
+	/** 
+	 *  Sets the dirty model state.
+	 *  
+	 *  @param dirty The dirty state.
+	 */
+	public void setDirty(boolean dirty);
+	
 	/**
 	 *  Tests if the state is dirty.
 	 *  @return True, if dirty.

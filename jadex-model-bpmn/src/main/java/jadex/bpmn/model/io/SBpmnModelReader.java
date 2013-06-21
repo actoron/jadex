@@ -1000,16 +1000,27 @@ public class SBpmnModelReader
 				edge.setParameterMapping(exp);
 			}
 			
-			if(src != null)
+			if (src != null &&
+				tgt != null &&
+				src.getParameters().get(edge.getSourceParameter()) != null &&
+				tgt.getParameters().get(edge.getTargetParameter()) != null)
 			{
-				src.addOutgoingDataEdge(edge);
-			}
-			if(tgt != null)
-			{
-				tgt.addIncomingDataEdge(edge);
-			}
 			
-			emap.put(edge.getId(), edge);
+				if(src != null)
+				{
+					src.addOutgoingDataEdge(edge);
+				}
+				if(tgt != null)
+				{
+					tgt.addIncomingDataEdge(edge);
+				}
+				
+				emap.put(edge.getId(), edge);
+			}
+			else
+			{
+				System.err.println("Dangling data edge: " + edge.getId());
+			}
 		}
 		else if ("dataFlowValueMapping".equals(tag.getLocalPart()))
 		{

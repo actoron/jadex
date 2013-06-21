@@ -1,11 +1,13 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.Settings.BpmnClassFilter;
 import jadex.bpmn.editor.gui.controllers.IdGenerator;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
+import jadex.commons.SReflect;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -245,16 +247,16 @@ public class ModelContainer implements IModelContainer
 	protected List<ChangeListener> changelisteners;
 	
 	/** The task classes. */
-	protected List<ClassInfo> taskclasses;
+	protected volatile List<ClassInfo> taskclasses;
 
 	/** The interface classes. */
-	protected List<ClassInfo> interclasses;
+	protected volatile List<ClassInfo> interclasses;
 	
 	/** The exception classes. */
-	protected List<ClassInfo> exceptionclasses;
+	protected volatile List<ClassInfo> exceptionclasses;
 	
 	/** The all classes. */
-	protected List<ClassInfo> allclasses;
+	protected volatile List<ClassInfo> allclasses;
 
 	
 	/**
@@ -921,12 +923,48 @@ public class ModelContainer implements IModelContainer
 	 */
 	protected void setupClassInfos()
 	{
+		taskclasses = settings.getGlobalTaskClasses();
+		interclasses = settings.getGlobalInterfaces();
+		exceptionclasses = settings.getGlobalExceptions();
+		allclasses = settings.getGlobalAllClasses();
+		
+//		if (model != null &&
+//			model.getClassLoader() != null &&
+//			model.getClassLoader() != settings.getLibraryClassLoader() &&
+//			model.getClassLoader() != Settings.class.getClassLoader())
+//		{
+//			long ts = System.currentTimeMillis();
+//			Set<ClassInfo>[] infos = Settings.scanForClasses(model.getClassLoader(), false);
+//			System.out.println("WEF " +(System.currentTimeMillis() - ts));
+//			infos[0].addAll(settings.getGlobalTaskClasses());
+//			infos[1].addAll(settings.getGlobalInterfaces());
+//			infos[2].addAll(settings.getGlobalExceptions());
+//			infos[3].addAll(settings.getGlobalAllClasses());
+//			taskclasses = new ArrayList(infos[0]);
+//			interclasses = new ArrayList(infos[1]);
+//			exceptionclasses = new ArrayList(infos[2]);
+//			allclasses = new ArrayList(infos[3]);
+//		}
+//		else
+//		{
+//			taskclasses = settings.getGlobalTaskClasses();
+//			interclasses = settings.getGlobalInterfaces();
+//			exceptionclasses = settings.getGlobalExceptions();
+//			allclasses = settings.getGlobalAllClasses();
+//		}
+		
 		if (model != null &&
 			model.getClassLoader() != null &&
 			model.getClassLoader() != settings.getLibraryClassLoader() &&
-			model.getClassLoader() != Settings.class.getClassLoader())
+			model.getClassLoader() != Settings.class.getClassLoader() &&
+			model.getClassLoader() instanceof URLClassLoader)
 		{
-			Set<ClassInfo>[] infos = Settings.scanForClasses(model.getClassLoader(), false);
+			final ClassLoader cl = model.getClassLoader();
+			
+			Set<ClassInfo>[] infos = new Set[] { new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>() };
+			URL[] urls = ((URLClassLoader)cl).getURLs();
+			SReflect.scanForClasses(urls, cl, new Settings.FileFilter("$", false), new BpmnClassFilter(infos[0], infos[1], infos[2], infos[3], false));
+			
 			infos[0].addAll(settings.getGlobalTaskClasses());
 			infos[1].addAll(settings.getGlobalInterfaces());
 			infos[2].addAll(settings.getGlobalExceptions());
@@ -935,13 +973,25 @@ public class ModelContainer implements IModelContainer
 			interclasses = new ArrayList(infos[1]);
 			exceptionclasses = new ArrayList(infos[2]);
 			allclasses = new ArrayList(infos[3]);
-		}
-		else
-		{
-			taskclasses = settings.getGlobalTaskClasses();
-			interclasses = settings.getGlobalInterfaces();
-			exceptionclasses = settings.getGlobalExceptions();
-			allclasses = settings.getGlobalAllClasses();
+			
+//			(new Thread(new Runnable()
+//			{
+//				public void run()
+//				{
+//					Set<ClassInfo>[] infos = new Set[] { new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>() };
+//					URL[] urls = ((URLClassLoader)cl).getURLs();
+//					SReflect.scanForClasses(urls, cl, new Settings.FileFilter("$", false), new BpmnClassFilter(infos[0], infos[1], infos[2], infos[3], false));
+//					
+//					infos[0].addAll(settings.getGlobalTaskClasses());
+//					infos[1].addAll(settings.getGlobalInterfaces());
+//					infos[2].addAll(settings.getGlobalExceptions());
+//					infos[3].addAll(settings.getGlobalAllClasses());
+//					taskclasses = new ArrayList(infos[0]);
+//					interclasses = new ArrayList(infos[1]);
+//					exceptionclasses = new ArrayList(infos[2]);
+//					allclasses = new ArrayList(infos[3]);
+//				}
+//			})).start();
 		}
 	}
 	

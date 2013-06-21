@@ -225,8 +225,8 @@ public abstract class AbstractGatewayActivityHandler
 									Object origval =thread.getParameterValue(key);
 									if(!SUtil.equals(origval, value))
 									{
-		//								System.out.println("origact: "+thread.getModelElement());
-		//								System.out.println("act: "+pt.getModelElement());
+//										System.out.println("origact: "+thread.getModelElement());
+//										System.out.println("act: "+pt.getModelElement());
 										throw new RuntimeException("Inconsistent parameter values from threads cannot be unified in AND/OR join: "+key+" "+value+" "+origval+" "+activity);
 									}
 								}

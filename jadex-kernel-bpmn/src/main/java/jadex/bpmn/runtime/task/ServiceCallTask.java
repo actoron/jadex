@@ -32,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -153,7 +154,18 @@ public class ServiceCallTask implements ITask
 		{
 			public void customResultAvailable(Object result)
 			{
-				Method	m	= SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
+				Class<?> servicetype = process.getServiceContainer().getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader());
+				Method[] methods = servicetype.getMethods();
+				Method m = null;
+				for (Method method : methods)
+				{
+					if (method.toString().equals(fmethod))
+					{
+						m = method;
+						break;
+					}
+				}
+//				SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
 				if(m==null)
 				{
 					throw new RuntimeException("Method "+fmethod+argtypes+" not found for service "+fservice+": "+context);
@@ -183,6 +195,16 @@ public class ServiceCallTask implements ITask
 				catch(InvocationTargetException ite)
 				{
 					ret.setException((Exception)ite.getTargetException());
+				}
+				catch(IllegalArgumentException e)
+				{
+					Class<?>[] types = new Class<?>[args.size()];
+					for (int i = 0; i < args.size(); ++i)
+					{
+						types[i] = args.get(i) != null? args.get(i).getClass() : null;
+					}
+					System.err.println("Argument mismatch: " + fmethod + "\n input=" + Arrays.toString(types));
+					ret.setException(e);
 				}
 				catch(Exception e)
 				{

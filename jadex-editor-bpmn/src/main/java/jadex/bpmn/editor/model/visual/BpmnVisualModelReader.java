@@ -335,13 +335,16 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 //				graph.addCell(vedge);
 //				vedge.setParent(vedge.getEdgeParent());
 //				cells.add(vedge);
+				
 				graph.addCell(vedge, vedge.getEdgeParent());
+				
 //				graph.getModel().endUpdate();
 			}
 			else
 			{
 				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Visual element found for unknown data edge ID " + id);
 			}
+			
 		}
 	}
 }

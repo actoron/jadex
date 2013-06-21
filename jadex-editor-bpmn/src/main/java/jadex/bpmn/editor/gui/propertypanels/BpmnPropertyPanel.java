@@ -136,7 +136,20 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		bpmnpanel.add(column);
 		tabpane.addTab("BPMN", bpmnpanel);
 		
-		JLabel label = new JLabel("Description");
+		JLabel label = new JLabel("Name");
+		JTextField textfield = new JTextField();
+		textfield.setText(getModelInfo().getName() != null? getModelInfo().getName() : "");
+		textfield.getDocument().addDocumentListener(new DocumentAdapter()
+		{
+			public void update(DocumentEvent e)
+			{
+				getModelInfo().setName(getText(e.getDocument()));
+				modelcontainer.setDirty(true);
+			}
+		});
+		configureAndAddInputLine(column, label, textfield, y++);
+		
+		label = new JLabel("Description");
 		JTextArea textarea = new JTextArea();
 		textarea.setWrapStyleWord(true);
 		textarea.setLineWrap(true);
@@ -157,7 +170,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		sp.setMinimumSize(textarea.getPreferredSize());
 		
 		label = new JLabel("Package");
-		JTextField textfield = new JTextField();
+		textfield = new JTextField();
 		textfield.setText(getModelInfo().getPackage() != null? getModelInfo().getPackage() : "");
 		textfield.getDocument().addDocumentListener(new DocumentAdapter()
 		{

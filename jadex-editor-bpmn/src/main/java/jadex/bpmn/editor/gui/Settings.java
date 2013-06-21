@@ -859,51 +859,7 @@ public class Settings
 		final Set<ClassInfo> res3 = new HashSet<ClassInfo>();
 		final Set<ClassInfo> res4 = new HashSet<ClassInfo>();
 		
-		scanForClasses(cl, new FileFilter("$", false), new IFilter<Class<?>>()
-		{
-			public boolean filter(final Class<?> obj)
-			{
-				boolean ret = false;
-				try
-				{
-					if(!obj.isInterface())
-					{
-						if (SReflect.isSupertype(Throwable.class, obj))
-						{
-							ClassInfo ci = new ClassInfo(obj.getName());
-							res3.add(ci);
-						}
-						
-						if(!Modifier.isAbstract(obj.getModifiers()) && Modifier.isPublic(obj.getModifiers()))
-						{
-							ClassInfo ci = new ClassInfo(obj.getName());
-							res4.add(ci);
-							if(!res1.contains(ci))
-							{
-								ClassLoader cl = obj.getClassLoader();
-								Class<?> taskcl = Class.forName(ITask.class.getName(), includeboot, cl);
-								ret = SReflect.isSupertype(taskcl, obj);
-								if(ret)
-								{
-									res1.add(ci);
-								}
-							}
-						}
-					}
-					else
-					{
-						// collect interfaces
-						ClassInfo ci = new ClassInfo(obj.getName());
-						res2.add(ci);
-						res4.add(ci);
-					}
-				}
-				catch(Exception e)
-				{
-				}
-				return ret;
-			}
-		});
+		scanForClasses(cl, new FileFilter("$", false), new BpmnClassFilter(res1, res2, res3, res4, includeboot), includeboot);
 		
 		return new Set[]{res1, res2, res3, res4};
 	}
@@ -911,11 +867,11 @@ public class Settings
 	/**
 	 *  Scan for task classes.
 	 */
-	protected static final List<ClassInfo> scanForClasses(ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter)
+	protected static final List<ClassInfo> scanForClasses(ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
 	{
 		final List<ClassInfo> taskclasses = new ArrayList<ClassInfo>();
 		
-		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, true);
+		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, includeboot);
 		fut.addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
 		{
 			public void intermediateResultAvailable(Class<?> result)
@@ -941,7 +897,71 @@ public class Settings
 	/**
 	 * 
 	 */
-	private static class FileFilter implements IFilter<Object>
+	public static class BpmnClassFilter implements IFilter<Class<?>>
+	{
+		private Collection<ClassInfo> task;
+		private Collection<ClassInfo> iface;
+		private Collection<ClassInfo> exception;
+		private Collection<ClassInfo> all;
+		private boolean includeboot;
+		
+		public BpmnClassFilter(Collection<ClassInfo> task, Collection<ClassInfo> iface, Collection<ClassInfo> exception, Collection<ClassInfo> all, boolean includeboot)
+		{
+			this.task = task;
+			this.iface = iface;
+			this.exception = exception;
+			this.all = all;
+			this.includeboot = includeboot;
+		}
+		
+		public boolean filter(final Class<?> obj)
+		{
+			boolean ret = false;
+			try
+			{
+				if(!obj.isInterface())
+				{
+					if (SReflect.isSupertype(Exception.class, obj))
+					{
+						ClassInfo ci = new ClassInfo(obj.getName());
+						exception.add(ci);
+					}
+					
+					if(!Modifier.isAbstract(obj.getModifiers()) && Modifier.isPublic(obj.getModifiers()))
+					{
+						ClassInfo ci = new ClassInfo(obj.getName());
+						all.add(ci);
+						if(!task.contains(ci))
+						{
+							ClassLoader cl = obj.getClassLoader();
+							Class<?> taskcl = Class.forName(ITask.class.getName(), includeboot, cl);
+							ret = SReflect.isSupertype(taskcl, obj);
+							if(ret)
+							{
+								task.add(ci);
+							}
+						}
+					}
+				}
+				else
+				{
+					// collect interfaces
+					ClassInfo ci = new ClassInfo(obj.getName());
+					iface.add(ci);
+					all.add(ci);
+				}
+			}
+			catch(Exception e)
+			{
+			}
+			return ret;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class FileFilter implements IFilter<Object>
 	{
 		/** The filename. */
 		protected String filename;

@@ -31,7 +31,7 @@ public class DataEdgePropertyPanel extends BasePropertyPanel
 		int colnum = 0;
 		JPanel column = createColumn(colnum++);
 		
-		JLabel label = new JLabel("Value Mapping");
+		JLabel label = new JLabel("Value Mapping");// + " " + getBpmnDataEdge().getId());
 		JTextArea textarea = new JTextArea();
 		
 		if (getBpmnDataEdge().getParameterMapping() != null)
