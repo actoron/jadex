@@ -90,6 +90,7 @@ public class RelayServlet extends HttpServlet
 				{
 					int	cnt	= 20;
 					int	startid	= -1;
+					int	endid	= -1;
 					try
 					{
 						cnt	= Integer.parseInt(request.getParameter("cnt"));
@@ -104,12 +105,19 @@ public class RelayServlet extends HttpServlet
 					catch(RuntimeException e)
 					{
 					}
-					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos(cnt, startid));
+					try
+					{
+						endid	= Integer.parseInt(request.getParameter("endid"));
+					}
+					catch(RuntimeException e)
+					{
+					}
+					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos(cnt, startid, endid));
 					view	= "/WEB-INF/jsp/history.jsp";
 				}
 				else if("/history_all".equals(request.getServletPath()))
 				{
-					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos(-1, -1));
+					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos(-1, -1, -1));
 					view	= "/WEB-INF/jsp/history.jsp";
 				}
 				else if("/export".equals(request.getServletPath()))

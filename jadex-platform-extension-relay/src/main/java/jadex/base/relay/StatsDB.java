@@ -357,10 +357,16 @@ public class StatsDB
 	 *  Get cumulated platform infos per ip to use for display (sorted by recency, newest first).
 	 *  @param limit	Limit the number of results (-1 for no limit);
 	 *  @param startid	Start id (-1 for all entries);
+	 *  @param endid	End id (-1 for all entries);
 	 *  @return Up to limit platform infos.
 	 */
-	public PlatformInfo[]	getPlatformInfos(int limit, int startid)
+	public PlatformInfo[]	getPlatformInfos(int limit, int startid, int endid)
 	{
+		if(endid==-1)
+		{
+			endid	= Integer.MAX_VALUE;
+		}
+		
 		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
 		
 		if(con!=null)
@@ -371,7 +377,7 @@ public class StatsDB
 				ResultSet	rs	= con.createStatement().executeQuery(
 					"select max(id) as ID, prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
 					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
-					+"from relay.platforminfo where id>="+startid+" "
+					+"from relay.platforminfo where id>="+startid+" AND id<="+endid+" "
 					+"group by hostip, prefix order by CONTIME desc");
 				while(rs.next() && (limit==-1 || ret.size()<limit))
 				{
@@ -495,9 +501,9 @@ public class StatsDB
 	//		pi.addMessage(123, 456);
 	//		
 	//		pi.disconnect();
-			printPlatformInfos(db.getPlatformInfos(5, -1));
+			printPlatformInfos(db.getPlatformInfos(5, -1, -1));
 			System.out.println("---");
-			printPlatformInfos(db.getPlatformInfos(-1, -1));
+			printPlatformInfos(db.getPlatformInfos(-1, -1, -1));
 			
 			printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
 			DatabaseMetaData	meta	= db.con.getMetaData();
