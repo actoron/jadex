@@ -877,7 +877,10 @@ public class Settings
 			public void intermediateResultAvailable(Class<?> result)
 			{
 //				System.out.println("Found: "+result.getName());
-				taskclasses.add(new ClassInfo(result));
+				if (result != null)
+				{
+					taskclasses.add(new ClassInfo(result.getCanonicalName()));
+				}
 			}
 			public void finished()
 			{
