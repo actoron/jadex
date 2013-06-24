@@ -867,20 +867,13 @@ public class Settings
 	/**
 	 *  Scan for task classes.
 	 */
-	protected static final List<ClassInfo> scanForClasses(ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
+	protected static final void scanForClasses(ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
 	{
-		final List<ClassInfo> taskclasses = new ArrayList<ClassInfo>();
-		
 		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, includeboot);
-		fut.addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
+		fut.addResultListener(new IIntermediateResultListener<Class<?>>()
 		{
 			public void intermediateResultAvailable(Class<?> result)
 			{
-//				System.out.println("Found: "+result.getName());
-				if (result != null)
-				{
-					taskclasses.add(new ClassInfo(result.getCanonicalName()));
-				}
 			}
 			public void finished()
 			{
@@ -891,10 +884,8 @@ public class Settings
 			public void exceptionOccurred(Exception exception)
 			{
 			}
-		}));
+		});
 		fut.get(new ThreadSuspendable());
-		
-		return taskclasses;
 	}
 	
 	/**
@@ -919,7 +910,6 @@ public class Settings
 		
 		public boolean filter(final Class<?> obj)
 		{
-			boolean ret = false;
 			try
 			{
 				if(!obj.isInterface())
@@ -937,9 +927,8 @@ public class Settings
 						if(!task.contains(ci))
 						{
 							ClassLoader cl = obj.getClassLoader();
-							Class<?> taskcl = Class.forName(ITask.class.getName(), includeboot, cl);
-							ret = SReflect.isSupertype(taskcl, obj);
-							if(ret)
+							Class<?> taskcl = Class.forName(ITask.class.getName(), false, cl);
+							if(SReflect.isSupertype(taskcl, obj))
 							{
 								task.add(ci);
 							}
@@ -957,7 +946,7 @@ public class Settings
 			catch(Exception e)
 			{
 			}
-			return ret;
+			return false;
 		}
 	}
 	

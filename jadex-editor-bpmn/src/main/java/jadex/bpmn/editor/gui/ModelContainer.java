@@ -959,11 +959,15 @@ public class ModelContainer implements IModelContainer
 			model.getClassLoader() != Settings.class.getClassLoader() &&
 			model.getClassLoader() instanceof URLClassLoader)
 		{
-			final ClassLoader cl = model.getClassLoader();
+			//final ClassLoader cl = model.getClassLoader();
 			
 			Set<ClassInfo>[] infos = new Set[] { new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>(), new HashSet<ClassInfo>() };
-			URL[] urls = ((URLClassLoader)cl).getURLs();
-			SReflect.scanForClasses(urls, cl, new Settings.FileFilter("$", false), new BpmnClassFilter(infos[0], infos[1], infos[2], infos[3], false));
+			URL[] urls = ((URLClassLoader)model.getClassLoader()).getURLs();
+			for (URL url : urls)
+			{
+				URLClassLoader cl = new URLClassLoader(new URL[] { url });
+				SReflect.scanForClasses(cl.getURLs(), cl, new Settings.FileFilter("$", false), new BpmnClassFilter(infos[0], infos[1], infos[2], infos[3], false));
+			}
 			
 			infos[0].addAll(settings.getGlobalTaskClasses());
 			infos[1].addAll(settings.getGlobalInterfaces());
