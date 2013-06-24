@@ -101,6 +101,11 @@ public class ActivityParameterTable extends JTable
 	 */
 	public void addParameter(MParameter param)
 	{
+		if (isEditing())
+		{
+			getCellEditor().stopCellEditing();
+		}
+		
 		int row = getRowCount();
 		getBpmnActivity().addParameter(param);
 		((ParameterTableModel) getModel()).fireTableRowsInserted(row, row);
@@ -115,6 +120,11 @@ public class ActivityParameterTable extends JTable
 	 */
 	public void removeParameters(int[] ind)
 	{
+		if (isEditing())
+		{
+			getCellEditor().stopCellEditing();
+		}
+		
 		Arrays.sort(ind);
 		Set<MParameter> params = new HashSet<MParameter>();
 		for(int i = ind.length - 1; i >= 0; --i)
