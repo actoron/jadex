@@ -122,6 +122,8 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				stopEditing(maptable);
+				
 				String name = createFreeName("name", new BasePropertyPanel.IndexMapContains(getBpmnSequenceEdge().getParameterMappings()));
 				int row = maptable.getRowCount();
 				getBpmnSequenceEdge().addParameterMapping(name, new UnparsedExpression(name, "java.lang.Object", "", null), null);
@@ -132,6 +134,8 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				stopEditing(maptable);
+				
 				int[] ind = maptable.getSelectedRows();
 				Arrays.sort(ind);
 				

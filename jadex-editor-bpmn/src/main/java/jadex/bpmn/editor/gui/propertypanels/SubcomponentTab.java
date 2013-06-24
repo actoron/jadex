@@ -53,6 +53,8 @@ public class SubcomponentTab extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				BasePropertyPanel.stopEditing(sctypetable);
+				
 				int row = sctypetable.getRowCount();
 				ModelInfo modelinfo = (ModelInfo) modelcontainer.getBpmnModel().getModelInfo();
 				String name = BasePropertyPanel.createFreeName("name", new SubcomponentTypesContains(modelinfo.getSubcomponentTypes()));
@@ -67,6 +69,8 @@ public class SubcomponentTab extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				BasePropertyPanel.stopEditing(sctypetable);
+				
 				int[] ind = sctypetable.getSelectedRows();
 				Arrays.sort(ind);
 				ModelInfo modelinfo = (ModelInfo) modelcontainer.getBpmnModel().getModelInfo();

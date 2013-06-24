@@ -326,6 +326,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int row = importtable.getRowCount();
 				getModelInfo().addImport("jadex.*");
 				modelcontainer.setDirty(true);
@@ -336,6 +338,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int[] ind = importtable.getSelectedRows();
 				Arrays.sort(ind);
 				
@@ -381,6 +385,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int row = conftable.getRowCount();
 				ConfigurationInfo conf = new ConfigurationInfo(createFreeName("name", new ConfigurationContains(confcache)));
 				conf.setSuspend(getModelInfo().getSuspend());
@@ -398,6 +404,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int[] ind = conftable.getSelectedRows();
 				Arrays.sort(ind);
 				
@@ -464,6 +472,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int row = paramtable.getRowCount();
 				CachedParameter param = new CachedParameter(createFreeName("name", new BasePropertyPanel.IndexMapContains(paramcche)), false, false, "", "");
 				addParameter(param, null);
@@ -475,6 +485,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int[] ind = paramtable.getSelectedRows();
 				Arrays.sort(ind);
 				
@@ -607,6 +619,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int row = propertynames.size();
 				String name = createFreeName("name", new BasePropertyPanel.MapContains(getModelInfo().getProperties()));
 				getModelInfo().addProperty(new UnparsedExpression(name, "", "", null));
@@ -619,6 +633,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int[] ind = proptable.getSelectedRows();
 				
 				Arrays.sort(ind);
@@ -705,6 +721,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				ProvidedServiceImplementation psimpl = new ProvidedServiceImplementation();
 				psimpl.setProxytype(BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED);
 				String name = createFreeName("name", new PSContains());
@@ -723,6 +741,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int[] ind = pstable.getSelectedRows();
 				
 				Arrays.sort(ind);
@@ -805,6 +825,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				String name = createFreeName("name", new RSContains());
 				RequiredServiceInfo rs = new RequiredServiceInfo();
 				rs.setName(name);
@@ -819,6 +841,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				terminateEditing();
+				
 				int[] ind = rstable.getSelectedRows();
 				
 				Arrays.sort(ind);
@@ -1047,35 +1071,12 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	 */
 	public void terminateEditing()
 	{
-		if (importtable.isEditing())
-		{
-			importtable.getCellEditor().stopCellEditing();
-		}
-		
-		if (conftable.isEditing())
-		{
-			conftable.getCellEditor().stopCellEditing();
-		}
-		
-		if (paramtable.isEditing())
-		{
-			paramtable.getCellEditor().stopCellEditing();
-		}
-		
-		if (proptable.isEditing())
-		{
-			proptable.getCellEditor().stopCellEditing();
-		}
-		
-		if (pstable.isEditing())
-		{
-			pstable.getCellEditor().stopCellEditing();
-		}
-		
-		if (rstable.isEditing())
-		{
-			rstable.getCellEditor().stopCellEditing();
-		}
+		stopEditing(importtable);
+		stopEditing(conftable);
+		stopEditing(paramtable);
+		stopEditing(proptable);
+		stopEditing(pstable);
+		stopEditing(rstable);
 	}
 	
 	/**

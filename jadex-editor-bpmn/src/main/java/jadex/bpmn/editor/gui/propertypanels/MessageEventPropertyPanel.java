@@ -188,6 +188,8 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				stopEditing(paramtable);
+				
 				int row = paramtable.getRowCount();
 				String name = BasePropertyPanel.createFreeName("name", new MapContains(getMEventProperties().getAsMap()));
 				MProperty prop = new MProperty(null, name, null);
@@ -202,6 +204,8 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				stopEditing(paramtable);
+				
 				int[] ind = paramtable.getSelectedRows();
 				Arrays.sort(ind);
 				
