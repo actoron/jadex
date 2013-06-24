@@ -18,6 +18,7 @@ import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -26,6 +27,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
+import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -41,7 +43,10 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -648,5 +653,30 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		}
 		
 		return fut;
+	}
+	
+	/**
+	 *  Load a model from an input stream.
+	 *  @param name	The simple model name.
+	 *  @param input	The stream with the agent xml.
+	 *  @param filename	The full name for accessing the model after loading.
+	 *  @param rid	The resource identifier for loading referenced classes etc.
+	 *  @return	The startable agent model.
+	 */
+	public @Reference IFuture<IModelInfo>	loadAgentModel(final String name, @Reference final InputStream input, final String filename, final IResourceIdentifier rid)
+	{
+		final Future<IModelInfo>	ret	= new Future<IModelInfo>();
+		libservice.getClassLoader(rid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
+		{
+			public void customResultAvailable(ClassLoader cl)
+			{
+				ResourceInfo	res	= new ResourceInfo(null, input,	System.currentTimeMillis());
+				OAVCapabilityModel	model	= (OAVCapabilityModel)loader.doLoadModel(name, null, res, cl, new Object[]{rid, root});
+				loader.registerModel(filename, model);
+				((ModelInfo)model.getModelInfo()).setFilename(filename);
+				ret.setResult(model.getModelInfo());
+			}
+		});
+		return ret;
 	}
 }
