@@ -39,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 17;
+	public static final int BUILD = 18;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -1154,7 +1154,7 @@ public class SBpmnModelWriter
 						out.print(escapeString(param.getClazz().getTypeName()));
 						out.print("\"");
 						
-						String inival = param.getInitialValue().getValue();
+						String inival = param.getInitialValue() != null? param.getInitialValue().getValue() : null;
 						if (inival != null && inival.length() > 0)
 						{
 							out.print(">");
@@ -1257,7 +1257,7 @@ public class SBpmnModelWriter
 			}
 			
 //			Map<String, Tuple2<UnparsedExpression, UnparsedExpression>> mappings = edge.getParameterMappings();
-			IndexMap mappings = edge.getParameterMappings();
+			IndexMap<String, Tuple2<UnparsedExpression, UnparsedExpression>> mappings = edge.getParameterMappings();
 			if(mappings != null && mappings.size() > 0)
 			{
 				out.println(getIndent(baseind + 1) + "<semantic:extensionElements>");
