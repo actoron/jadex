@@ -7,10 +7,6 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,14 +19,21 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarEntry;
+
+import org.kohsuke.asm4.ClassReader;
+import org.kohsuke.asm4.ClassVisitor;
+import org.kohsuke.asm4.Opcodes;
 
 import com.mxgraph.view.mxStylesheet;
 
@@ -852,7 +855,7 @@ public class Settings
 	/**
 	 *  Scan for task classes.
 	 */
-	public static final Set<ClassInfo>[] scanForClasses(ClassLoader cl, final boolean includeboot)
+	public static final Set<ClassInfo>[] scanForClasses(final ClassLoader cl, final boolean includeboot)
 	{
 		final Set<ClassInfo> res1 = new HashSet<ClassInfo>();
 		final Set<ClassInfo> res2 = new HashSet<ClassInfo>();
@@ -869,23 +872,155 @@ public class Settings
 	 */
 	protected static final void scanForClasses(ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
 	{
-		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, includeboot);
-		fut.addResultListener(new IIntermediateResultListener<Class<?>>()
+		URL[] urls = SUtil.getClasspathURLs(cl, includeboot).toArray(new URL[0]);
+		scanForClasses(urls, filefilter, classfilter, includeboot);
+	}
+	
+	/**
+	 *  Scan for task classes.
+	 */
+	protected static final void scanForClasses(URL[] urls, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
+	{	
+		final BpmnClassFilter cf = ((BpmnClassFilter) classfilter);
+		
+		URLClassLoader rcl = new URLClassLoader(urls, null);
+		
+		String[] filenames = SReflect.scanForFiles(urls, filefilter);
+		
+		Map<String, Set<String>> ifacecache = new HashMap<String, Set<String>>();
+		
+		for (String filename : filenames)
 		{
-			public void intermediateResultAvailable(Class<?> result)
+			filename = filename.replace(File.separator, ".");
+			final String cname = filename.substring(0, filename.length() - 6);
+			filename = filename.replace(".", "/");
+			filename = filename.replace("/class", ".class");
+			
+			final Set<String> ifaces = getInterfaces(filename, rcl, ifacecache);
+			
+			Set<String> sclasses = getSuperClasses(filename, rcl);
+			if (sclasses.contains("java/lang/Exception"))
+			{
+				cf.exception.add(new ClassInfo(cname));
+			}
+			
+			InputStream is = rcl.getResourceAsStream(filename);
+			try
+			{
+				ClassReader cr = new ClassReader(is);
+				cf.all.add(new ClassInfo(cname));
+				
+				ClassVisitor cv = new ClassVisitor(Opcodes.ASM4)
+				{
+					public void visit(int version, int access, String name,
+							String signature, String superName,
+							String[] interfaces)
+					{
+						if ((access & Opcodes.ACC_ABSTRACT) == 0 &&
+							(access & Opcodes.ACC_PUBLIC) > 0 &&
+							ifaces.contains("jadex/bpmn/model/task/ITask"))
+						{
+							cf.task.add(new ClassInfo(cname));
+						}
+						
+						if ((access & Opcodes.ACC_INTERFACE) > 0)
+						{
+							cf.iface.add(new ClassInfo(cname));
+						}
+					}
+				};
+				
+				cr.accept(cv, 0);
+			}
+			catch (Exception e)
 			{
 			}
-			public void finished()
+		}
+		//****
+		
+//		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, includeboot);
+//		fut.addResultListener(new IIntermediateResultListener<Class<?>>()
+//		{
+//			public void intermediateResultAvailable(Class<?> result)
+//			{
+//			}
+//			public void finished()
+//			{
+//			}
+//			public void resultAvailable(Collection<Class<?>> result)
+//			{
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//			}
+//		});
+//		fut.get(new ThreadSuspendable());
+	}
+	
+	protected static final Set<String> getSuperClasses(String cname, URLClassLoader rcl)
+	{
+		Set<String> ret = new HashSet<String>();
+		
+		try
+		{
+			InputStream is = rcl.getResourceAsStream(cname);
+			ClassReader cr = new ClassReader(is);
+			is.close();
+			
+			String sname = cr.getSuperName();
+			if (sname != null)
 			{
+				ret.add(sname);
+				ret.addAll(getSuperClasses(sname + ".class", rcl));
 			}
-			public void resultAvailable(Collection<Class<?>> result)
+		}
+		catch (Exception e)
+		{
+		}
+	
+		return ret;
+	}
+	
+	protected static final Set<String> getInterfaces(String cname, URLClassLoader rcl, Map<String, Set<String>> cache)
+	{
+		Set<String> ret = cache.get(cname);
+		if (ret == null)
+		{
+			ret = new HashSet<String>();
+			
+			try
 			{
+				InputStream is = rcl.getResourceAsStream(cname);
+				ClassReader cr = new ClassReader(is);
+				is.close();
+				
+				String[] ifaces = cr.getInterfaces();
+				for (String iface : ifaces)
+				{
+					ret.addAll(getInterfaces(iface + ".class", rcl, cache));
+				}
+				
+				ret.addAll(Arrays.asList(ifaces));
+				String sname = cr.getSuperName();
+				if (sname != null)
+				{
+					sname += ".class";
+					ret.addAll(getInterfaces(sname, rcl, cache));
+				}
+				
+				cache.put(cname, ret);
 			}
-			public void exceptionOccurred(Exception exception)
+			catch(NullPointerException e)
 			{
+				e.printStackTrace();
 			}
-		});
-		fut.get(new ThreadSuspendable());
+			catch (Exception e)
+			{
+//				e.printStackTrace();
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -893,11 +1028,11 @@ public class Settings
 	 */
 	public static class BpmnClassFilter implements IFilter<Class<?>>
 	{
-		private Collection<ClassInfo> task;
-		private Collection<ClassInfo> iface;
-		private Collection<ClassInfo> exception;
-		private Collection<ClassInfo> all;
-		private boolean includeboot;
+		protected Collection<ClassInfo> task;
+		protected Collection<ClassInfo> iface;
+		protected Collection<ClassInfo> exception;
+		protected Collection<ClassInfo> all;
+		protected boolean includeboot;
 		
 		public BpmnClassFilter(Collection<ClassInfo> task, Collection<ClassInfo> iface, Collection<ClassInfo> exception, Collection<ClassInfo> all, boolean includeboot)
 		{
@@ -916,13 +1051,13 @@ public class Settings
 				{
 					if (SReflect.isSupertype(Exception.class, obj))
 					{
-						ClassInfo ci = new ClassInfo(obj.getName());
+						ClassInfo ci = new ClassInfo(new String(obj.getName()));
 						exception.add(ci);
 					}
 					
 					if(!Modifier.isAbstract(obj.getModifiers()) && Modifier.isPublic(obj.getModifiers()))
 					{
-						ClassInfo ci = new ClassInfo(obj.getName());
+						ClassInfo ci = new ClassInfo(new String(obj.getName()));
 						all.add(ci);
 						if(!task.contains(ci))
 						{
@@ -938,7 +1073,7 @@ public class Settings
 				else
 				{
 					// collect interfaces
-					ClassInfo ci = new ClassInfo(obj.getName());
+					ClassInfo ci = new ClassInfo(new String(obj.getName()));
 					iface.add(ci);
 					all.add(ci);
 				}
