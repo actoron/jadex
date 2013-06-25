@@ -5,12 +5,12 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ConfigureGoal;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.SUtil;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
 
 
 /**
@@ -93,7 +93,8 @@ public class BenchmarkPlan
 					}
 				}
 
-				ConfigureGoal configure = new ConfigureGoal(table, table.getAllBlocks());
+				Set<Block> bs = SUtil.arrayToSet(table.getAllBlocks());
+				ConfigureGoal configure = capa.new ConfigureGoal(table, bs);
 				rplan.dispatchSubgoal(configure).get();
 			}
 

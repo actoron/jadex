@@ -1,9 +1,10 @@
 package jadex.bdiv3.examples.blocksworld;
 
 import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
 
 import java.awt.Color;
-import jadex.commons.beans.PropertyChangeListener;
+import java.util.Map;
 
 
 /**
@@ -64,6 +65,24 @@ public class Block
 		this.pcs = new SimplePropertyChangeSupport(this);
 		stackOn(lower);
 	}
+	
+	/**
+	 *  Create a new block as clone.
+	 */
+	public Block(Block b, Map<Integer, Block> blocks)
+	{
+		this.number	= b.number;
+		this.color	= b.color;
+		Block lb = blocks.get(b.getLower().number);
+		if(lb==null)
+		{
+			lb = new Block(b.getLower(), blocks);
+			blocks.put(lb.number, lb);
+		}
+		this.pcs = new SimplePropertyChangeSupport(this);
+		stackOn(lb);
+	}
+
 
 	//-------- methods --------
 

@@ -3,6 +3,7 @@ package jadex.bdiv3.examples.blocksworld;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ClearGoal;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.StackGoal;
@@ -32,13 +33,34 @@ public class StackBlocksPlan
 	//-------- methods --------
 
 	/**
+	 * 
+	 */
+	@PlanPrecondition
+	public boolean checkExistsBlock()
+	{
+		boolean ret = false;
+		for(Block block: capa.getBlocks())
+		{
+			if(block.getLower().equals(goal.getBlock()))
+			{
+				ret = true;
+				break;
+			}
+		}
+		return ret;
+	}
+//<precondition>
+//	(select one Block $block from $beliefbase.blocks
+//	where $block.getLower()==$goal.block)!=null
+//</precondition>
+	
+	/**
 	 *  The plan body.
 	 */
 	@PlanBody
 	public void body()
 	{
 		// Clear blocks.
-		
 		
 		ClearGoal clear = capa.new ClearGoal(goal.getBlock());
 		rplan.dispatchSubgoal(clear).get();

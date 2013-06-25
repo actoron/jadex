@@ -4,8 +4,10 @@ import jadex.commons.SUtil;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -73,6 +75,20 @@ public class Table	extends Block
 		super(-1, color, null);
 		this.name	= name;
 		this.blocks	= new ArrayList();
+	}
+	
+	/**
+	 *  Create a new table.
+	 */
+	public Table(Table old)
+	{
+		this(old.name, old.color);
+		Map<Integer, Block> clones = new HashMap<Integer, Block>();
+		clones.put(this.number, this);
+		for(Block b: old.getAllBlocks())
+		{
+			blocks.add(new Block(b, clones));
+		}
 	}
 
 	//-------- methods --------

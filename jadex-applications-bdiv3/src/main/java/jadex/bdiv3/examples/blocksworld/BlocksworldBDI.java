@@ -2,8 +2,12 @@ package jadex.bdiv3.examples.blocksworld;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalTargetCondition;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
@@ -16,10 +20,75 @@ import java.awt.Color;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
+
+//<plan name="clear">
+//<parameter name="block" class="Block">
+//	<value>
+//		select one Block $block from $beliefbase.blocks
+//		where $block.getLower()==$goal.block
+//	</value>
+//</parameter>
+//<parameter name="target" class="Block">
+//	<value>$beliefbase.table</value>
+//</parameter>
+//<body class="StackBlocksPlan"/>
+//<trigger>
+//	<goal ref="clear"/>
+//</trigger>
+//<precondition>
+//	(select one Block $block from $beliefbase.blocks
+//	where $block.getLower()==$goal.block)!=null
+//</precondition>
+//</plan>
+
+//<!-- Stack one block on another one. -->
+//<plan name="stack">
+//	<parameter name="block" class="Block">
+//		<goalmapping ref="stack.block"/>
+//	</parameter>
+//	<parameter name="target" class="Block">
+//		<goalmapping ref="stack.target"/>
+//	</parameter>
+//	<body class="StackBlocksPlan"/>
+//	<trigger>
+//		<goal ref="stack"/>
+//	</trigger>
+//</plan>
+
+//<!-- Plan for stacking towards a certain configuration. -->
+//<plan name="configure">
+//	<parameter name="configuration" class="Table">
+//		<goalmapping ref="configure.configuration"/>
+//	</parameter>
+//	<body class="ConfigureBlocksPlan" />
+//	<trigger>
+//		<goal ref="configure"/>
+//	</trigger>
+//</plan>
+
+//<!-- Plan for running test benchmarks. -->
+//<plan name="benchmark">
+//	<parameter name="runs" class="int">
+//		<value>10</value>
+//	</parameter>
+//	<parameter name="goals" class="int">
+//		<value>10</value>
+//	</parameter>
+//	<body class="BenchmarkPlan" />
+//</plan>
+//</plans>
+
 /**
  * 
  */
 @Agent
+@Plans({
+	@Plan(body=@Body(StackBlocksPlan.class), trigger=@Trigger(goals=BlocksworldBDI.ClearGoal.class)),
+	@Plan(body=@Body(StackBlocksPlan.class), trigger=@Trigger(goals=BlocksworldBDI.StackGoal.class)),
+	@Plan(body=@Body(ConfigureBlocksPlan.class), trigger=@Trigger(goals=BlocksworldBDI.ConfigureGoal.class)),
+	@Plan(body=@Body(BenchmarkPlan.class))
+})
 @RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 public class BlocksworldBDI
 {
@@ -43,9 +112,9 @@ public class BlocksworldBDI
 	@Belief
 	protected Set<Block> blocks = new HashSet<Block>();
 	
-	/** The gui (if any). */
-	@Belief
-	protected BlocksworldGui gui;
+//	/** The gui (if any). */
+//	@Belief
+//	protected BlocksworldGui gui;
 	
 	/** The agent. */
 	@Agent
@@ -163,74 +232,6 @@ public class BlocksworldBDI
 		}
 	}
 
-//<plans>
-//	<!-- Plan to clear a block, by moving to the table whats on top of it. -->
-//	<plan name="clear">
-//		<parameter name="block" class="Block">
-//			<value>
-//				select one Block $block from $beliefbase.blocks
-//				where $block.getLower()==$goal.block
-//			</value>
-//		</parameter>
-//		<parameter name="target" class="Block">
-//			<value>$beliefbase.table</value>
-//		</parameter>
-//		<body class="StackBlocksPlan"/>
-//		<trigger>
-//			<goal ref="clear"/>
-//		</trigger>
-//		<precondition>
-//			(select one Block $block from $beliefbase.blocks
-//			where $block.getLower()==$goal.block)!=null
-//		</precondition>
-//	</plan>
-//	
-//	<!-- Stack one block on another one. -->
-//	<plan name="stack">
-//		<parameter name="block" class="Block">
-//			<goalmapping ref="stack.block"/>
-//		</parameter>
-//		<parameter name="target" class="Block">
-//			<goalmapping ref="stack.target"/>
-//		</parameter>
-//		<body class="StackBlocksPlan"/>
-//		<trigger>
-//			<goal ref="stack"/>
-//		</trigger>
-//	</plan>
-//	
-//	<!-- Plan for stacking towards a certain configuration. -->
-//	<plan name="configure">
-//		<parameter name="configuration" class="Table">
-//			<goalmapping ref="configure.configuration"/>
-//		</parameter>
-//		<body class="ConfigureBlocksPlan" />
-//		<trigger>
-//			<goal ref="configure"/>
-//		</trigger>
-//	</plan>
-//	
-//	<!-- Plan for running test benchmarks. -->
-//	<plan name="benchmark">
-//		<parameter name="runs" class="int">
-//			<value>10</value>
-//		</parameter>
-//		<parameter name="goals" class="int">
-//			<value>10</value>
-//		</parameter>
-//		<body class="BenchmarkPlan" />
-//	</plan>
-//</plans>
-//
-//<events>
-//	<!-- Event that indicates an execution step can be done. -->
-//	<internalevent name="step"/>
-//</events>
-//
-//<properties>
-//	<property name="debugging">false</property>
-//</properties>
-//
 //<configurations>
 //	<!-- GUI configuration. Uses gui plan to show frame, and verbose stack plans. -->
 //	<configuration name="gui">
@@ -315,6 +316,14 @@ public class BlocksworldBDI
 	//	<fact>new Block(new Color(240, 16, 240), (Table)$beliefbase.bucket)</fact>
 	//	<fact>new Block(new Color(16, 240, 240), (Table)$beliefbase.bucket)</fact>
 	//	<fact>new Block(new Color(240, 240, 240), (Table)$beliefbase.bucket)</fact>
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				new BlocksworldGui(agent.getExternalAccess());
+			}
+		});
 	}
 
 	/**
@@ -324,6 +333,15 @@ public class BlocksworldBDI
 	public Mode getMode()
 	{
 		return mode;
+	}
+	
+	/**
+	 *  Set the mode.
+	 *  @param mode The mode to set.
+	 */
+	public void setMode(Mode mode)
+	{
+		this.mode = mode;
 	}
 
 	/**
@@ -370,4 +388,5 @@ public class BlocksworldBDI
 	{
 		return agent;
 	}
+	
 }

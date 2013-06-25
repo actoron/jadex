@@ -6,7 +6,6 @@ import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
-import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
@@ -948,4 +947,16 @@ public class RGoal extends RProcessableElement implements IGoal
 			return ret;
 		}
 	}
+	
+//	public static void main(String[] args)
+//	{
+//		 PrintWriter out = new PrintWriter(System.err); 
+//		List<MemoryPoolMXBean> pools = ManagementFactory.getMemoryPoolMXBeans();
+//         for (MemoryPoolMXBean pool : pools) {
+//           MemoryUsage peak = pool.getPeakUsage();
+//           out.printf("Peak %s memory used: %,d%n", pool.getName(), peak.getUsed());
+//           out.printf("Peak %s memory reserved: %,d%n", pool.getName(), peak.getCommitted());
+//         }
+//         out.close();
+//	}
 }

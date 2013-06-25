@@ -1,18 +1,18 @@
 package jadex.bdiv3.examples.blocksworld;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ConfigureGoal;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.micro.IPojoMicroAgent;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -29,6 +29,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -60,7 +61,7 @@ public class BlocksworldGui	extends JFrame
 	/**
 	 *  Create the blocksworld gui.
 	 */
-	public BlocksworldGui(final IBDIExternalAccess agent)
+	public BlocksworldGui(final IExternalAccess agent)
 	{
 		super();
 		initGui(agent);
@@ -70,7 +71,7 @@ public class BlocksworldGui	extends JFrame
 	 *  Init the gui.
 	 *  Method runs on AWT thread.
 	 */
-	protected void	initGui(final IBDIExternalAccess agent)
+	protected void	initGui(final IExternalAccess agent)
 	{
 		// HACK!! ensure that agent is inited
 //		try
@@ -89,11 +90,12 @@ public class BlocksworldGui	extends JFrame
 			@Classname("start")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				final Block[] blocks = (Block[])bia.getBeliefbase().getBeliefSet("blocks").getFacts();
-				final Table table = (Table)bia.getBeliefbase().getBelief("table").getFact();
-				final Object md = bia.getBeliefbase().getBelief("mode").getFact();
-				final Table buck = (Table)bia.getBeliefbase().getBelief("bucket").getFact();
+				BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+				final Block[] blocks = (Block[])pag.getBlocks().toArray(new Block[0]);
+				final Table table = new Table(pag.getTable());
+				final Object md = pag.getMode();
+				final Table buck = new Table(pag.getBucket());
+				
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -182,8 +184,10 @@ public class BlocksworldGui	extends JFrame
 									@Classname("clear")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										final Block[]	blocks = (Block[])bia.getBeliefbase().getBeliefSet("blocks").getFacts();
+										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										final Block[] blocks = (Block[])pag.getBlocks().toArray(new Block[0]);
+//										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+//										final Block[]	blocks = (Block[])bia.getBeliefbase().getBeliefSet("blocks").getFacts();
 										SwingUtilities.invokeLater(new Runnable()
 										{
 											public void run()
@@ -222,12 +226,17 @@ public class BlocksworldGui	extends JFrame
 									@Classname("configure")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										IGoal achieve = bia.getGoalbase().createGoal("configure");
-										achieve.getParameter("configuration").setValue(newtable);
-										// Hack!!! Blocks must be in state directly.
-										achieve.getParameterSet("blocks").addValues(newtable.getAllBlocks());
-										bia.getGoalbase().dispatchTopLevelGoal(achieve);
+										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+//										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										
+										Set<Block> bls = SUtil.arrayToSet(newtable.getAllBlocks());
+										ConfigureGoal conf = pag.new ConfigureGoal(newtable, bls);
+										pag.getAgent().dispatchTopLevelGoal(conf);
+//										IGoal achieve = bia.getGoalbase().createGoal("configure");
+//										achieve.getParameter("configuration").setValue(newtable);
+//										// Hack!!! Blocks must be in state directly.
+//										achieve.getParameterSet("blocks").addValues(newtable.getAllBlocks());
+//										bia.getGoalbase().dispatchTopLevelGoal(achieve);
 										return IFuture.DONE;
 									}
 								});
@@ -285,10 +294,9 @@ public class BlocksworldGui	extends JFrame
 									@Classname("createBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										Table table = (Table)bia.getBeliefbase().getBelief("table").getFact();
-										final Block block = new Block(showcol.getBackground(), table);
-										bia.getBeliefbase().getBeliefSet("blocks").addFact(block);
+										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										final Block block = new Block(showcol.getBackground(), pag.getTable());
+										pag.getBlocks().add(block);
 										
 										SwingUtilities.invokeLater(new Runnable()
 										{
@@ -348,8 +356,8 @@ public class BlocksworldGui	extends JFrame
 									@Classname("deleteBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										bia.getBeliefbase().getBeliefSet("blocks").removeFact(block);
+										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										pag.getBlocks().remove(block);
 										clear.doClick();
 										return IFuture.DONE;
 									}
@@ -359,8 +367,8 @@ public class BlocksworldGui	extends JFrame
 							}
 						});
 						// Execution mode components
-						final JComboBox	mode	= new JComboBox(new String[]
-							{StackBlocksPlan.MODE_NORMAL, StackBlocksPlan.MODE_STEP, StackBlocksPlan.MODE_SLOW});
+						final JComboBox	mode	= new JComboBox(new BlocksworldBDI.Mode[]
+							{BlocksworldBDI.Mode.NORMAL, BlocksworldBDI.Mode.STEP, BlocksworldBDI.Mode.SLOW});
 						
 						mode.setSelectedItem(md);
 //						agent.getBeliefbase().getBeliefFact("mode").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
@@ -371,20 +379,20 @@ public class BlocksworldGui	extends JFrame
 //							}
 //						});
 						final JButton	step	= new JButton("step");
-						step.setEnabled(mode.getSelectedItem().equals(StackBlocksPlan.MODE_STEP));
+						step.setEnabled(mode.getSelectedItem().equals(BlocksworldBDI.Mode.STEP));
 						mode.addItemListener(new ItemListener()
 						{
 							public void	itemStateChanged(ItemEvent ie)
 							{
-								step.setEnabled(mode.getSelectedItem().equals(StackBlocksPlan.MODE_STEP));
-								final Object sel = mode.getSelectedItem();
+								step.setEnabled(mode.getSelectedItem().equals(BlocksworldBDI.Mode.STEP));
+								final BlocksworldBDI.Mode sel = (BlocksworldBDI.Mode)mode.getSelectedItem();
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@Classname("mode")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										bia.getBeliefbase().getBelief("mode").setFact(sel);
+										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										pag.setMode(sel);
 										return IFuture.DONE;
 									}
 								});
@@ -400,9 +408,12 @@ public class BlocksworldGui	extends JFrame
 									@Classname("step")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										IInternalEvent ie = bia.getEventbase().createInternalEvent("step");
-										bia.getEventbase().dispatchInternalEvent(ie);
+										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
+										
+										// todo: step goal
+										
+//										IInternalEvent ie = bia.getEventbase().createInternalEvent("step");
+//										bia.getEventbase().dispatchInternalEvent(ie);
 										return IFuture.DONE;
 									}
 								});
@@ -480,7 +491,7 @@ public class BlocksworldGui	extends JFrame
 							@Classname("disp")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+//								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 //								bia.addComponentListener(new TerminationAdapter()
 //								{
 //									public void componentTerminated()
@@ -494,7 +505,7 @@ public class BlocksworldGui	extends JFrame
 //										});
 //									}
 //								});
-								bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+								ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
 									.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 								{
 									public void intermediateResultAvailable(IMonitoringEvent result)
