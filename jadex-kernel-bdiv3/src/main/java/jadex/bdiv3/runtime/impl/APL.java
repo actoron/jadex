@@ -270,7 +270,7 @@ public class APL
 					MPlan mplan = mplans.get(i);
 					MTrigger mtrigger = mplan.getTrigger();
 					
-					if(element instanceof RGoal)
+					if(element instanceof RGoal && mtrigger!=null)
 					{
 						List<MGoal> mgoals = mtrigger.getGoals();
 						if(mgoals!=null && mgoals.contains(element.getModelElement()))

@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.blocksworld;
 
+import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
@@ -7,16 +8,13 @@ import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ClearGoal;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.StackGoal;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveDropWaste;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 
 
 /**
  *  Stack a block on top of another.
  */
-
+@Plan
 public class StackBlocksPlan	
 {
 	//-------- attributes --------

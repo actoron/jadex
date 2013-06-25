@@ -66,22 +66,22 @@ public class Block
 		stackOn(lower);
 	}
 	
-	/**
-	 *  Create a new block as clone.
-	 */
-	public Block(Block b, Map<Integer, Block> blocks)
-	{
-		this.number	= b.number;
-		this.color	= b.color;
-		Block lb = blocks.get(b.getLower().number);
-		if(lb==null)
-		{
-			lb = new Block(b.getLower(), blocks);
-			blocks.put(lb.number, lb);
-		}
-		this.pcs = new SimplePropertyChangeSupport(this);
-		stackOn(lb);
-	}
+//	/**
+//	 *  Create a new block as clone.
+//	 */
+//	public Block(Block b, Map<Integer, Block> blocks)
+//	{
+//		this.number	= b.number;
+//		this.color	= b.color;
+//		Block lb = blocks.get(b.getLower().number);
+//		if(lb==null)
+//		{
+//			lb = new Block(b.getLower(), blocks);
+//			blocks.put(lb.number, lb);
+//		}
+//		this.pcs = new SimplePropertyChangeSupport(this);
+//		stackOn(lb);
+//	}
 
 
 	//-------- methods --------

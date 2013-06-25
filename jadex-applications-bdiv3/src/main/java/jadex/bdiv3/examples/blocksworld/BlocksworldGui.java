@@ -92,9 +92,9 @@ public class BlocksworldGui	extends JFrame
 			{
 				BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
 				final Block[] blocks = (Block[])pag.getBlocks().toArray(new Block[0]);
-				final Table table = new Table(pag.getTable());
+				final Table table = pag.getTable();//new Table(pag.getTable());
 				final Object md = pag.getMode();
-				final Table buck = new Table(pag.getBucket());
+				final Table buck = pag.getBucket();//new Table(pag.getBucket());
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{

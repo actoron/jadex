@@ -77,19 +77,19 @@ public class Table	extends Block
 		this.blocks	= new ArrayList();
 	}
 	
-	/**
-	 *  Create a new table.
-	 */
-	public Table(Table old)
-	{
-		this(old.name, old.color);
-		Map<Integer, Block> clones = new HashMap<Integer, Block>();
-		clones.put(this.number, this);
-		for(Block b: old.getAllBlocks())
-		{
-			blocks.add(new Block(b, clones));
-		}
-	}
+//	/**
+//	 *  Create a new table.
+//	 */
+//	public Table(Table old)
+//	{
+//		this(old.name, old.color);
+//		Map<Integer, Block> clones = new HashMap<Integer, Block>();
+//		clones.put(this.number, this);
+//		for(Block b: old.getAllBlocks())
+//		{
+//			blocks.add(new Block(b, clones));
+//		}
+//	}
 
 	//-------- methods --------
 
