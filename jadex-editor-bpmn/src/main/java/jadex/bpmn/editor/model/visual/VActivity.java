@@ -265,85 +265,159 @@ public class VActivity extends VNamedNode
 	 */
 	public void refreshParameterObjectGeometry()
 	{
-		List<VOutParameter> outparameters = new ArrayList<VOutParameter>();
-		List<VInParameter> inparameters = new ArrayList<VInParameter>();
-		
+		Map<String, Object[]> parametermap = new HashMap<String, Object[]>();
 		for (int i = 0; i < getChildCount(); ++i)
 		{
 			mxICell child = getChildAt(i);
 			if (child instanceof VOutParameter)
 			{
-				outparameters.add((VOutParameter) child);
+				Object[] parampair = parametermap.get(((VOutParameter) child).getParameter().getName());
+				if (parampair == null)
+				{
+					parampair = new Object[2];
+					parametermap.put(((VOutParameter) child).getParameter().getName(), parampair);
+				}
+				parampair[1] = child;
 			}
 			else if (child instanceof VInParameter)
 			{
-				inparameters.add((VInParameter) child);
+				Object[] parampair = parametermap.get(((VInParameter) child).getParameter().getName());
+				if (parampair == null)
+				{
+					parampair = new Object[2];
+					parametermap.put(((VInParameter) child).getParameter().getName(), parampair);
+				}
+				parampair[0] = child;
 			}
 		}
 		
 		double height = getGeometry().getHeight();
-		int outfirstsize = (int) Math.ceil(outparameters.size() * 0.5);
-		int outsecondsize = outparameters.size() - outfirstsize;
-		double outpadding = height * 0.5 - (outfirstsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
-		outpadding /= outfirstsize + 1;
-		double outpadding2 = height * 0.5 - (outsecondsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
-		outpadding2 /= outsecondsize + 1;
-		
-		double outposx = getGeometry().getWidth() - BpmnStylesheetColor.PARAMETER_PORT_SIZE;
-		double outposy = 0.0;
-		double outposy2 = height * 0.5;
-		
-		for (VOutParameter vparam : outparameters)
-		{
-			if (outfirstsize == 0)
-			{
-				outposy = outposy2;
-				outpadding = outpadding2;
-			}
-			
-			outposy += outpadding;
-			vparam.getGeometry().setX(outposx);
-			vparam.getGeometry().setY(outposy);
-			outposy += BpmnStylesheetColor.PARAMETER_PORT_SIZE;
-			
-			insert(vparam);
-			
-			--outfirstsize;
-		}
-		
-		int infirstsize = (int) Math.ceil(inparameters.size() * 0.5);
-		int insecondsize = inparameters.size() - infirstsize;
-		double inpadding = height * 0.5 - (infirstsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
-		inpadding /= infirstsize + 1;
-		double inpadding2 = height * 0.5 - (insecondsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
-		inpadding2 /= insecondsize + 1;
+		int firstsize = (int) Math.ceil(parametermap.size() * 0.5);
+		int secondsize = parametermap.size() - firstsize;
+		double padding = height * 0.5 - (firstsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
+		padding /=firstsize + 1;
+		double padding2 = height * 0.5 - (secondsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
+		padding2 /= secondsize + 1;
 		
 		double inposx = 0.0;
-		double inposy = 0.0;
-		double inposy2 = height * 0.5;
+		double outposx = getGeometry().getWidth() - BpmnStylesheetColor.PARAMETER_PORT_SIZE;
+		double posy = 0.0;
+		double posy2 = height * 0.5;
 		
-		for (VInParameter vparam : inparameters)
+		for (Object[] pair : parametermap.values())
 		{
-			if (infirstsize == 0)
+			
+			if (firstsize == 0)
 			{
-				inposy = inposy2;
-				inpadding = inpadding2;
+				posy = posy2;
+				padding = padding2;
 			}
 			
-			inposy += inpadding;
-			vparam.getGeometry().setX(inposx);
-			vparam.getGeometry().setY(inposy);
-			inposy += BpmnStylesheetColor.PARAMETER_PORT_SIZE;
+			VInParameter inparam = (VInParameter) pair[0];
+			VOutParameter outparam = (VOutParameter) pair[1];
 			
-			insert(vparam);
+			posy += padding;
 			
-			--infirstsize;
+			if (inparam != null)
+			{
+				inparam.getGeometry().setX(inposx);
+				inparam.getGeometry().setY(posy);
+			
+				insert(inparam);
+			}
+			
+			if (outparam != null)
+			{
+				outparam.getGeometry().setX(outposx);
+				outparam.getGeometry().setY(posy);
+				
+				insert(outparam);
+			}
+			
+			posy += BpmnStylesheetColor.PARAMETER_PORT_SIZE;
+			
+			--firstsize;
 		}
 		
-		if (graph != null)
-		{
-			((BpmnGraph) graph).refreshCellView(this);
-		}
+//		List<VOutParameter> outparameters = new ArrayList<VOutParameter>();
+//		List<VInParameter> inparameters = new ArrayList<VInParameter>();
+//		
+//		for (int i = 0; i < getChildCount(); ++i)
+//		{
+//			mxICell child = getChildAt(i);
+//			if (child instanceof VOutParameter)
+//			{
+//				outparameters.add((VOutParameter) child);
+//			}
+//			else if (child instanceof VInParameter)
+//			{
+//				inparameters.add((VInParameter) child);
+//			}
+//		}
+//		
+//		double height = getGeometry().getHeight();
+//		int outfirstsize = (int) Math.ceil(outparameters.size() * 0.5);
+//		int outsecondsize = outparameters.size() - outfirstsize;
+//		double outpadding = height * 0.5 - (outfirstsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
+//		outpadding /= outfirstsize + 1;
+//		double outpadding2 = height * 0.5 - (outsecondsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
+//		outpadding2 /= outsecondsize + 1;
+//		
+//		double outposx = getGeometry().getWidth() - BpmnStylesheetColor.PARAMETER_PORT_SIZE;
+//		double outposy = 0.0;
+//		double outposy2 = height * 0.5;
+//		
+//		for (VOutParameter vparam : outparameters)
+//		{
+//			if (outfirstsize == 0)
+//			{
+//				outposy = outposy2;
+//				outpadding = outpadding2;
+//			}
+//			
+//			outposy += outpadding;
+//			vparam.getGeometry().setX(outposx);
+//			vparam.getGeometry().setY(outposy);
+//			outposy += BpmnStylesheetColor.PARAMETER_PORT_SIZE;
+//			
+//			insert(vparam);
+//			
+//			--outfirstsize;
+//		}
+//		
+//		int infirstsize = (int) Math.ceil(inparameters.size() * 0.5);
+//		int insecondsize = inparameters.size() - infirstsize;
+//		double inpadding = height * 0.5 - (infirstsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
+//		inpadding /= infirstsize + 1;
+//		double inpadding2 = height * 0.5 - (insecondsize * BpmnStylesheetColor.PARAMETER_PORT_SIZE);
+//		inpadding2 /= insecondsize + 1;
+//		
+//		double inposx = 0.0;
+//		double inposy = 0.0;
+//		double inposy2 = height * 0.5;
+//		
+//		for (VInParameter vparam : inparameters)
+//		{
+//			if (infirstsize == 0)
+//			{
+//				inposy = inposy2;
+//				inpadding = inpadding2;
+//			}
+//			
+//			inposy += inpadding;
+//			vparam.getGeometry().setX(inposx);
+//			vparam.getGeometry().setY(inposy);
+//			inposy += BpmnStylesheetColor.PARAMETER_PORT_SIZE;
+//			
+//			insert(vparam);
+//			
+//			--infirstsize;
+//		}
+//		
+//		if (graph != null)
+//		{
+//			((BpmnGraph) graph).refreshCellView(this);
+//		}
 	}
 	
 	/**

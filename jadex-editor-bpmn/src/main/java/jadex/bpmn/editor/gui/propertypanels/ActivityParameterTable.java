@@ -46,6 +46,10 @@ public class ActivityParameterTable extends JTable
 		getColumnModel().getColumn(3).setPreferredWidth(5000);
 		getColumnModel().getColumn(4).setPreferredWidth(500);
 		
+		JComboBox<String> dircombo = new JComboBox<String>(new String[] { MParameter.DIRECTION_IN, MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT });
+		dircombo.setEditable(false);
+		getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(dircombo));
+		
 //		System.out.println("size: "+modelcontainer.getAllClasses().size());
 		
 		final AutoCompleteCombo acc = new AutoCompleteCombo(null, null);
@@ -110,7 +114,7 @@ public class ActivityParameterTable extends JTable
 		getBpmnActivity().addParameter(param);
 		((ParameterTableModel) getModel()).fireTableRowsInserted(row, row);
 		
-		getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(new JComboBox(new Object[] { MParameter.DIRECTION_IN, MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT })));
+//		getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(new JComboBox(new Object[] { MParameter.DIRECTION_IN, MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT })));
 		activity.addedParameter(param);
 	}
 	
