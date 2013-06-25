@@ -741,7 +741,7 @@ public class ProcessThread	implements ITaskContext
 						
 						for(MDataEdge de: ds)
 						{
-							if(dataedges.containsKey(de.getId()))
+							if(dataedges!=null && dataedges.containsKey(de.getId()))
 							{
 								String pname = de.getTargetParameter();
 								Object val = dataedges.remove(de.getId());
@@ -845,8 +845,6 @@ public class ProcessThread	implements ITaskContext
 							sf.setValue(pname, value);
 							IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, sf);
 							IParsedExpression exp = (IParsedExpression)de.getParameterMapping().getParsed();
-//							UnparsedExpression uiexp =  de.getParameterMapping().getSecondEntity();
-//							IParsedExpression iexp = uiexp!=null? (IParsedExpression)uiexp.getParsed(): null;
 							try
 							{
 								value	= exp.getValue(fetcher);
@@ -855,14 +853,6 @@ public class ProcessThread	implements ITaskContext
 							{
 								throw new RuntimeException("Error parsing parameter value: "+instance+", "+this+", "+pname+", "+exp, e);
 							}
-//							try
-//							{
-//								index	= iexp!=null ? iexp.getValue(fetcher) : null;
-//							}
-//							catch(RuntimeException e)
-//							{
-//								throw new RuntimeException("Error parsing parameter index: "+instance+", "+this+", "+name+", "+iexp, e);
-//							}
 						}
 						
 						// Test if parameter value type fits

@@ -33,7 +33,7 @@ public class DefaultStepHandler implements IStepHandler
 		
 //		System.out.println(instance.getComponentIdentifier().getLocalName()+": step "+activity+", data "+thread.getData());
 		
-		// Hack!!! Should be in interpreter/thread?
+//		// Hack!!! Should be in interpreter/thread?
 		thread.updateParametersAfterStep(activity, instance);
 		
 		MNamedIdElement	next	= null;
@@ -173,7 +173,7 @@ public class DefaultStepHandler implements IStepHandler
 //				}
 			}
 		}
-
+		
 		// Remove inner context(s), if any.
 		if(remove!=null)
 		{
@@ -222,7 +222,7 @@ public class DefaultStepHandler implements IStepHandler
 				}
 			}
 		}
-		
+			
 		// Perform step settings, i.e. set next edge/activity or remove thread.
 		if(next instanceof MSequenceEdge)
 		{
