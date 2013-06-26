@@ -331,7 +331,7 @@ public class BpmnMenuBar extends JMenuBar
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
 				filter = new FileNameExtensionFilter("Legacy BPMN model file", "bpmn");
-				//fc.addChoosableFileFilter(filter);
+				fc.addChoosableFileFilter(filter);
 				int result = fc.showOpenDialog(getParent());
 				if (JFileChooser.APPROVE_OPTION == result)
 				{

@@ -682,7 +682,8 @@ public class SBpmnModelReader
 				props = new ArrayList<MProperty>();
 				buffer.put("properties", props);
 			}
-			ClassInfo clazz = new ClassInfo(attrs.get("type"));
+			String type = attrs.get("type");
+			ClassInfo clazz = type != null? new ClassInfo(type) : null;
 			String name = attrs.get("name");
 			UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), content, null);
 			parseExp(exp, model.getModelInfo().getAllImports(), cl);

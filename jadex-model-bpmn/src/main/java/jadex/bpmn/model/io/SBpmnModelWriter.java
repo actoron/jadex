@@ -39,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 18;
+	public static final int BUILD = 19;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -1176,8 +1176,11 @@ public class SBpmnModelWriter
 						MProperty prop = props.get(key);
 						out.print(getIndent(baseind + 2) + "<jadex:property name=\"");
 						out.print(escapeString(prop.getName()));
-						out.print("\" type=\"");
-						out.print(escapeString(prop.getClazz().getTypeName()));
+						if (prop.getClazz() != null)
+						{
+							out.print("\" type=\"");
+							out.print(escapeString(prop.getClazz().getTypeName()));
+						}
 						out.print("\"");
 						
 						String inival = prop.getInitialValue().getValue();
