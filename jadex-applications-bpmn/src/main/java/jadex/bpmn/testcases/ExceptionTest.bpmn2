@@ -30,32 +30,21 @@
       <semantic:incoming>_vLsMwRGCEd-qQOr2ZLx-Mw</semantic:incoming>
       <semantic:outgoing>_BnHmShGDEd-qQOr2ZLx-Mw</semantic:outgoing>
       <semantic:task name="Sub 1" id="_omlhAxGCEd-qQOr2ZLx-Mw">
-        <semantic:outgoing>_BiPQ0RGEEd-qQOr2ZLx-Mw</semantic:outgoing>
+        <semantic:outgoing>qwK395PJGJbozg6z</semantic:outgoing>
       </semantic:task>
-      <semantic:intermediateCatchEvent name="Throw exception" id="_ApKTwRGEEd-qQOr2ZLx-Mw">
-        <semantic:incoming>_BiPQ0RGEEd-qQOr2ZLx-Mw</semantic:incoming>
-        <semantic:outgoing>_BvpasRGEEd-qQOr2ZLx-Mw</semantic:outgoing>
+      <semantic:endEvent id="tG/UpGJhtkZYgzud">
+        <semantic:incoming>qwK395PJGJbozg6z</semantic:incoming>
         <semantic:errorEventDefinition/>
-      </semantic:intermediateCatchEvent>
-      <semantic:task name="Sub 3" id="_1E1xcRGCEd-qQOr2ZLx-Mw">
-        <semantic:incoming>_BvpasRGEEd-qQOr2ZLx-Mw</semantic:incoming>
-      </semantic:task>
+        <semantic:extensionElements>
+          <jadex:class>java.lang.RuntimeException</jadex:class>
+        </semantic:extensionElements>
+      </semantic:endEvent>
     </semantic:subProcess>
     <semantic:boundaryEvent name="Catch Exception" id="__Z3EgRGCEd-qQOr2ZLx-Mw" attachedToRef="_omlhARGCEd-qQOr2ZLx-Mw">
       <semantic:outgoing>_AeQgwRGDEd-qQOr2ZLx-Mw</semantic:outgoing>
       <semantic:outgoing>ZSWrKCtwoYJVa52l</semantic:outgoing>
       <semantic:errorEventDefinition/>
     </semantic:boundaryEvent>
-    <semantic:task name="Success" id="_9c_IIRGCEd-qQOr2ZLx-Mw">
-      <semantic:incoming>_AeQgwRGDEd-qQOr2ZLx-Mw</semantic:incoming>
-      <semantic:incoming>ZSWrKCtwoYJVa52l</semantic:incoming>
-      <semantic:outgoing>_Ph6tMRGDEd-qQOr2ZLx-Mw</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:class>WriteContextTask</jadex:class>
-        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
-        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Exception test.&quot;, true, null)})</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
     <semantic:startEvent id="_kU2mERGCEd-qQOr2ZLx-Mw">
       <semantic:outgoing>_vLsMwRGCEd-qQOr2ZLx-Mw</semantic:outgoing>
     </semantic:startEvent>
@@ -68,25 +57,33 @@
         <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Exception test.&quot;, false, &quot;Exception did not occur.&quot;)})</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
+    <semantic:task name="Success" id="_9c_IIRGCEd-qQOr2ZLx-Mw">
+      <semantic:incoming>_AeQgwRGDEd-qQOr2ZLx-Mw</semantic:incoming>
+      <semantic:incoming>ZSWrKCtwoYJVa52l</semantic:incoming>
+      <semantic:outgoing>_Ph6tMRGDEd-qQOr2ZLx-Mw</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:class>WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Exception test.&quot;, true, null)})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
     <semantic:endEvent id="_NyTJsRGDEd-qQOr2ZLx-Mw">
       <semantic:incoming>_Ph6tMRGDEd-qQOr2ZLx-Mw</semantic:incoming>
       <semantic:incoming>_O7BFQRGDEd-qQOr2ZLx-Mw</semantic:incoming>
     </semantic:endEvent>
     <semantic:sequenceFlow sourceRef="_omlhARGCEd-qQOr2ZLx-Mw" targetRef="_BnHmQRGDEd-qQOr2ZLx-Mw" id="_BnHmShGDEd-qQOr2ZLx-Mw">
     </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_omlhAxGCEd-qQOr2ZLx-Mw" targetRef="_ApKTwRGEEd-qQOr2ZLx-Mw" id="_BiPQ0RGEEd-qQOr2ZLx-Mw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_ApKTwRGEEd-qQOr2ZLx-Mw" targetRef="_1E1xcRGCEd-qQOr2ZLx-Mw" id="_BvpasRGEEd-qQOr2ZLx-Mw">
+    <semantic:sequenceFlow sourceRef="_omlhAxGCEd-qQOr2ZLx-Mw" targetRef="tG/UpGJhtkZYgzud" id="qwK395PJGJbozg6z">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="__Z3EgRGCEd-qQOr2ZLx-Mw" targetRef="_9c_IIRGCEd-qQOr2ZLx-Mw" id="_AeQgwRGDEd-qQOr2ZLx-Mw">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="__Z3EgRGCEd-qQOr2ZLx-Mw" targetRef="_9c_IIRGCEd-qQOr2ZLx-Mw" id="ZSWrKCtwoYJVa52l">
     </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_9c_IIRGCEd-qQOr2ZLx-Mw" targetRef="_NyTJsRGDEd-qQOr2ZLx-Mw" id="_Ph6tMRGDEd-qQOr2ZLx-Mw">
-    </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_kU2mERGCEd-qQOr2ZLx-Mw" targetRef="_omlhARGCEd-qQOr2ZLx-Mw" id="_vLsMwRGCEd-qQOr2ZLx-Mw">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_BnHmQRGDEd-qQOr2ZLx-Mw" targetRef="_NyTJsRGDEd-qQOr2ZLx-Mw" id="_O7BFQRGDEd-qQOr2ZLx-Mw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_9c_IIRGCEd-qQOr2ZLx-Mw" targetRef="_NyTJsRGDEd-qQOr2ZLx-Mw" id="_Ph6tMRGDEd-qQOr2ZLx-Mw">
     </semantic:sequenceFlow>
     <semantic:extensionElements>
     </semantic:extensionElements>
@@ -97,40 +94,44 @@
         <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_omlhARGCEd-qQOr2ZLx-Mw" isExpanded="true">
-        <dc:Bounds height="300.0" width="590.0" x="390.0" y="40.0"/>
-        <dc:Bounds height="100.0" width="160.0" x="0.0" y="0.0"/>
+        <dc:Bounds height="260.0" width="360.0" x="390.0" y="80.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="__Z3EgRGCEd-qQOr2ZLx-Mw">
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_omlhAxGCEd-qQOr2ZLx-Mw">
         <dc:Bounds height="100.0" width="160.0" x="30.0" y="100.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_ApKTwRGEEd-qQOr2ZLx-Mw">
+      <bpmndi:BPMNShape bpmnElement="tG/UpGJhtkZYgzud">
         <dc:Bounds height="40.0" width="40.0" x="270.0" y="130.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_1E1xcRGCEd-qQOr2ZLx-Mw">
-        <dc:Bounds height="100.0" width="160.0" x="410.0" y="100.0"/>
+      <bpmndi:BPMNShape bpmnElement="_kU2mERGCEd-qQOr2ZLx-Mw">
+        <dc:Bounds height="40.0" width="40.0" x="170.0" y="190.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_9c_IIRGCEd-qQOr2ZLx-Mw">
-        <dc:Bounds height="100.0" width="160.0" x="1110.0" y="360.0"/>
+      <bpmndi:BPMNShape bpmnElement="_BnHmQRGDEd-qQOr2ZLx-Mw">
+        <dc:Bounds height="100.0" width="160.0" x="870.0" y="160.0"/>
         <di:extension>
           <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
           <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
         </di:extension>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_kU2mERGCEd-qQOr2ZLx-Mw">
-        <dc:Bounds height="40.0" width="40.0" x="150.0" y="170.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_BnHmQRGDEd-qQOr2ZLx-Mw">
-        <dc:Bounds height="100.0" width="160.0" x="1110.0" y="140.0"/>
+      <bpmndi:BPMNShape bpmnElement="_9c_IIRGCEd-qQOr2ZLx-Mw">
+        <dc:Bounds height="100.0" width="160.0" x="870.0" y="350.0"/>
         <di:extension>
           <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
           <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
         </di:extension>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_NyTJsRGDEd-qQOr2ZLx-Mw">
-        <dc:Bounds height="40.0" width="40.0" x="1430.0" y="270.0"/>
+        <dc:Bounds height="40.0" width="40.0" x="1210.0" y="280.0"/>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_AeQgwRGDEd-qQOr2ZLx-Mw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_BvpasRGEEd-qQOr2ZLx-Mw">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="ZSWrKCtwoYJVa52l">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="qwK395PJGJbozg6z">
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_vLsMwRGCEd-qQOr2ZLx-Mw">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_BnHmShGDEd-qQOr2ZLx-Mw">
@@ -138,14 +139,6 @@
       <bpmndi:BPMNEdge bpmnElement="_Ph6tMRGDEd-qQOr2ZLx-Mw">
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="_O7BFQRGDEd-qQOr2ZLx-Mw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_AeQgwRGDEd-qQOr2ZLx-Mw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_BiPQ0RGEEd-qQOr2ZLx-Mw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_BvpasRGEEd-qQOr2ZLx-Mw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="ZSWrKCtwoYJVa52l">
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -34,21 +34,6 @@
     <semantic:startEvent id="_RMrAERDZEd-hjJU8_9Katg">
       <semantic:outgoing>_R0Tn0RDZEd-hjJU8_9Katg</semantic:outgoing>
     </semantic:startEvent>
-    <semantic:task name="Count" id="_MkR4oxDZEd-hjJU8_9Katg">
-      <semantic:incoming>_R0Tn0RDZEd-hjJU8_9Katg</semantic:incoming>
-      <semantic:incoming>_fYdk0RDjEd-hjJU8_9Katg</semantic:incoming>
-      <semantic:outgoing>_d1OQchDjEd-hjJU8_9Katg</semantic:outgoing>
-      <semantic:extensionElements>
-        <jadex:parameter direction="inout" name="cnt" type="int">!$thread.hasParameterValue(&quot;cnt&quot;)? 0: cnt+1</jadex:parameter>
-        <jadex:parameter direction="inout" name="i" type="String">0</jadex:parameter>
-        <jadex:parameter direction="in" name="text" type="String">&quot;&quot;+cnt</jadex:parameter>
-      </semantic:extensionElements>
-    </semantic:task>
-    <semantic:exclusiveGateway id="_d1EfcRDjEd-hjJU8_9Katg" default="_r_9Q0RDjEd-hjJU8_9Katg">
-      <semantic:incoming>_d1OQchDjEd-hjJU8_9Katg</semantic:incoming>
-      <semantic:outgoing>_fYdk0RDjEd-hjJU8_9Katg</semantic:outgoing>
-      <semantic:outgoing>_r_9Q0RDjEd-hjJU8_9Katg</semantic:outgoing>
-    </semantic:exclusiveGateway>
     <semantic:exclusiveGateway id="_Z2Dk0RDmEd-qQOr2ZLx-Mw" default="_t9_3IRFtEd-qQOr2ZLx-Mw">
       <semantic:incoming>_r_9Q0RDjEd-hjJU8_9Katg</semantic:incoming>
       <semantic:outgoing>_cq9VYRDmEd-qQOr2ZLx-Mw</semantic:outgoing>
@@ -84,17 +69,22 @@
         <jadex:parameter direction="in" name="text" type="String">&quot;Succeeded&quot;</jadex:parameter>
       </semantic:extensionElements>
     </semantic:task>
-    <semantic:sequenceFlow sourceRef="_RMrAERDZEd-hjJU8_9Katg" targetRef="_MkR4oxDZEd-hjJU8_9Katg" id="_R0Tn0RDZEd-hjJU8_9Katg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_MkR4oxDZEd-hjJU8_9Katg" targetRef="_d1EfcRDjEd-hjJU8_9Katg" id="_d1OQchDjEd-hjJU8_9Katg">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_d1EfcRDjEd-hjJU8_9Katg" targetRef="_MkR4oxDZEd-hjJU8_9Katg" id="_fYdk0RDjEd-hjJU8_9Katg">
-      <semantic:conditionExpression>i+1&lt;length</semantic:conditionExpression>
+    <semantic:task name="Count" id="_MkR4oxDZEd-hjJU8_9Katg">
+      <semantic:incoming>_R0Tn0RDZEd-hjJU8_9Katg</semantic:incoming>
+      <semantic:incoming>_fYdk0RDjEd-hjJU8_9Katg</semantic:incoming>
+      <semantic:outgoing>_d1OQchDjEd-hjJU8_9Katg</semantic:outgoing>
       <semantic:extensionElements>
-        <jadex:parametermapping name="i">i+1</jadex:parametermapping>
+        <jadex:parameter direction="inout" name="cnt" type="int">!$thread.hasParameterValue(&quot;cnt&quot;)? 0: cnt+1</jadex:parameter>
+        <jadex:parameter direction="inout" name="i" type="String">0</jadex:parameter>
+        <jadex:parameter direction="in" name="text" type="String">&quot;&quot;+cnt</jadex:parameter>
       </semantic:extensionElements>
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="_d1EfcRDjEd-hjJU8_9Katg" targetRef="_Z2Dk0RDmEd-qQOr2ZLx-Mw" id="_r_9Q0RDjEd-hjJU8_9Katg">
+    </semantic:task>
+    <semantic:exclusiveGateway id="_d1EfcRDjEd-hjJU8_9Katg" default="_r_9Q0RDjEd-hjJU8_9Katg">
+      <semantic:incoming>_d1OQchDjEd-hjJU8_9Katg</semantic:incoming>
+      <semantic:outgoing>_r_9Q0RDjEd-hjJU8_9Katg</semantic:outgoing>
+      <semantic:outgoing>_fYdk0RDjEd-hjJU8_9Katg</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:sequenceFlow sourceRef="_RMrAERDZEd-hjJU8_9Katg" targetRef="_MkR4oxDZEd-hjJU8_9Katg" id="_R0Tn0RDZEd-hjJU8_9Katg">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_Z2Dk0RDmEd-qQOr2ZLx-Mw" targetRef="_Dze68RDlEd-qQOr2ZLx-Mw" id="_cq9VYRDmEd-qQOr2ZLx-Mw">
       <semantic:conditionExpression>cnt+1==length</semantic:conditionExpression>
@@ -104,6 +94,16 @@
     <semantic:sequenceFlow sourceRef="_Dze68RDlEd-qQOr2ZLx-Mw" targetRef="_r_zf0RDjEd-hjJU8_9Katg" id="_IcnCMRDlEd-qQOr2ZLx-Mw">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_zfsG4RDlEd-qQOr2ZLx-Mw" targetRef="_xGKg8RF4Ed-qQOr2ZLx-Mw" id="_gBYeoRDmEd-qQOr2ZLx-Mw">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_MkR4oxDZEd-hjJU8_9Katg" targetRef="_d1EfcRDjEd-hjJU8_9Katg" id="_d1OQchDjEd-hjJU8_9Katg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_d1EfcRDjEd-hjJU8_9Katg" targetRef="_Z2Dk0RDmEd-qQOr2ZLx-Mw" id="_r_9Q0RDjEd-hjJU8_9Katg">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_d1EfcRDjEd-hjJU8_9Katg" targetRef="_MkR4oxDZEd-hjJU8_9Katg" id="_fYdk0RDjEd-hjJU8_9Katg">
+      <semantic:conditionExpression>i+1&lt;length</semantic:conditionExpression>
+      <semantic:extensionElements>
+        <jadex:parametermapping name="i">i+1</jadex:parametermapping>
+      </semantic:extensionElements>
     </semantic:sequenceFlow>
     <semantic:extensionElements>
       <jadex:dataFlow id="NPyfvexp/S007R+k" sourceRef="_MkR4oxDZEd-hjJU8_9Katg" sourceParam="cnt" targetRef="_MkR4oxDZEd-hjJU8_9Katg" targetParam="cnt">
@@ -118,15 +118,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_RMrAERDZEd-hjJU8_9Katg">
         <dc:Bounds height="40.0" width="40.0" x="100.0" y="260.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_MkR4oxDZEd-hjJU8_9Katg">
-        <dc:Bounds height="100.0" width="160.0" x="220.0" y="230.0"/>
-        <di:extension>
-          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
-        </di:extension>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_d1EfcRDjEd-hjJU8_9Katg">
-        <dc:Bounds height="60.0" width="60.0" x="450.0" y="250.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_Z2Dk0RDmEd-qQOr2ZLx-Mw">
         <dc:Bounds height="60.0" width="60.0" x="580.0" y="250.0"/>
@@ -156,6 +147,15 @@
         <di:extension>
           <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
         </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_MkR4oxDZEd-hjJU8_9Katg">
+        <dc:Bounds height="100.0" width="160.0" x="230.0" y="230.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>text</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_d1EfcRDjEd-hjJU8_9Katg">
+        <dc:Bounds height="60.0" width="60.0" x="440.0" y="250.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_d1OQchDjEd-hjJU8_9Katg">
       </bpmndi:BPMNEdge>
