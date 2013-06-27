@@ -243,7 +243,7 @@ public class ModelContainer implements IModelContainer
 	/** The property panel container. */
 	protected JPanel propertypanelcontainer;
 	
-	/** The image provider. */
+	/** The change listeners. */
 	protected List<ChangeListener> changelisteners;
 	
 	/** The task classes. */
@@ -969,7 +969,7 @@ public class ModelContainer implements IModelContainer
 //				SReflect.scanForClasses(cl.getURLs(), cl, new Settings.FileFilter("$", false), new BpmnClassFilter(infos[0], infos[1], infos[2], infos[3], false));
 //			}
 			
-			Settings.scanForClasses(urls, new FileFilter("$", false), new BpmnClassFilter(infos[0], infos[1], infos[2], infos[3], false), false);
+			Settings.scanForClasses(settings, urls, new FileFilter("$", false), new BpmnClassFilter(infos[0], infos[1], infos[2], infos[3], false), false);
 			
 			infos[0].addAll(settings.getGlobalTaskClasses());
 			infos[1].addAll(settings.getGlobalInterfaces());

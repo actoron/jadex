@@ -80,7 +80,10 @@ public class BpmnEditorWindow extends JFrame
 		statusarea = new StatusArea();
 		BpmnEditor.initialize();
 		
+		BackgroundProgressBar bgprogressbar = new BackgroundProgressBar();
+		
 		settings = Settings.load();
+		settings.setProgressBar(bgprogressbar);
 		
 		if(settings.getGlobalInterfaces()==null || settings.getGlobalInterfaces().size()==0)// || true)
 		{
@@ -119,11 +122,15 @@ public class BpmnEditorWindow extends JFrame
 		statusbar.setFloatable(false);
 		add(statusbar, BorderLayout.PAGE_END);
 		GridBagConstraints g = new GridBagConstraints();
+		g.fill = GridBagConstraints.NONE;
+		statusbar.add(bgprogressbar, g);
+		g = new GridBagConstraints();
 		g.fill = GridBagConstraints.HORIZONTAL;
+		g.gridx = 1;
 		g.weightx = 1.0;
 		statusbar.add(new JPanel(), g);
 		g = new GridBagConstraints();
-		g.gridx = 1;
+		g.gridx = 2;
 		g.fill = GridBagConstraints.NONE;
 		statusbar.add(new ZoomSlider(this), g);
 		

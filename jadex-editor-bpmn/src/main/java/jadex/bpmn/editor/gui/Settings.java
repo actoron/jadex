@@ -49,6 +49,9 @@ public class Settings
 	/** The class cache file name. */
 	protected static final String CLASS_CACHE_FILE_NAME = "classes.cache";
 	
+	/** The progress bar for background tasks. */
+	protected BackgroundProgressBar bgprogressbar;
+	
 	/** The last file opened or saved. */
 	protected File lastfile;
 	
@@ -99,6 +102,26 @@ public class Settings
 	
 	/** Global allclasses */
 	protected List<ClassInfo> globalallclasses;
+	
+	/**
+	 *  Gets the progress bar.
+	 *
+	 *  @return The progress bar.
+	 */
+	public BackgroundProgressBar getProgressBar()
+	{
+		return bgprogressbar;
+	}
+
+	/**
+	 *  Sets the progress bar.
+	 *
+	 *  @param bgprogressbar The progress bar.
+	 */
+	public void setProgressBar(BackgroundProgressBar progressbar)
+	{
+		this.bgprogressbar = progressbar;
+	}
 	
 	/**
 	 *  Gets the selected style sheet.
@@ -373,7 +396,7 @@ public class Settings
 				return str1.compareTo(str2);
 			}
 		};
-		Set<ClassInfo>[] tmp = Settings.scanForClasses(getLibraryClassLoader(), true);
+		Set<ClassInfo>[] tmp = Settings.scanForClasses(this, getLibraryClassLoader(), true);
 		List<ClassInfo>[] stmp = new List[tmp.length];
 		for (int i = 0; i < tmp.length; ++i)
 		{
@@ -855,14 +878,14 @@ public class Settings
 	/**
 	 *  Scan for task classes.
 	 */
-	public static final Set<ClassInfo>[] scanForClasses(final ClassLoader cl, final boolean includeboot)
+	public static final Set<ClassInfo>[] scanForClasses(Settings settings, final ClassLoader cl, final boolean includeboot)
 	{
 		final Set<ClassInfo> res1 = new HashSet<ClassInfo>();
 		final Set<ClassInfo> res2 = new HashSet<ClassInfo>();
 		final Set<ClassInfo> res3 = new HashSet<ClassInfo>();
 		final Set<ClassInfo> res4 = new HashSet<ClassInfo>();
 		
-		scanForClasses(cl, new FileFilter("$", false), new BpmnClassFilter(res1, res2, res3, res4, includeboot), includeboot);
+		scanForClasses(settings, cl, new FileFilter("$", false), new BpmnClassFilter(res1, res2, res3, res4, includeboot), includeboot);
 		
 		return new Set[]{res1, res2, res3, res4};
 	}
@@ -870,91 +893,106 @@ public class Settings
 	/**
 	 *  Scan for task classes.
 	 */
-	protected static final void scanForClasses(ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
+	protected static final void scanForClasses(Settings settings, ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
 	{
 		URL[] urls = SUtil.getClasspathURLs(cl, includeboot).toArray(new URL[0]);
-		scanForClasses(urls, filefilter, classfilter, includeboot);
+		scanForClasses(settings, urls, filefilter, classfilter, includeboot);
 	}
 	
 	/**
 	 *  Scan for task classes.
 	 */
-	protected static final void scanForClasses(URL[] urls, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
-	{	
-		final BpmnClassFilter cf = ((BpmnClassFilter) classfilter);
-		
-		URLClassLoader rcl = new URLClassLoader(urls, null);
-		
-		String[] filenames = SReflect.scanForFiles(urls, filefilter);
-		
-		Map<String, Set<String>> ifacecache = new HashMap<String, Set<String>>();
-		
-		for (String filename : filenames)
+	protected static final void scanForClasses(final Settings settings, final URL[] urls, final IFilter<Object> filefilter, final IFilter<Class<?>> classfilter, boolean includeboot)
+	{
+		(new Thread(new Runnable()
 		{
-			filename = filename.replace(File.separator, ".");
-			final String cname = filename.substring(0, filename.length() - 6);
-			filename = filename.replace(".", "/");
-			filename = filename.replace("/class", ".class");
-			
-			final Set<String> ifaces = getInterfaces(filename, rcl, ifacecache);
-			
-			Set<String> sclasses = getSuperClasses(filename, rcl);
-			if (sclasses.contains("java/lang/Exception"))
+			public void run()
 			{
-				cf.exception.add(new ClassInfo(cname));
-			}
-			
-			InputStream is = rcl.getResourceAsStream(filename);
-			try
-			{
-				ClassReader cr = new ClassReader(is);
-				cf.all.add(new ClassInfo(cname));
+				final BpmnClassFilter cf = ((BpmnClassFilter) classfilter);
 				
-				ClassVisitor cv = new ClassVisitor(Opcodes.ASM4)
+				URLClassLoader rcl = new URLClassLoader(urls, null);
+				
+				String[] filenames = SReflect.scanForFiles(urls, filefilter);
+				
+				Map<String, Set<String>> ifacecache = new HashMap<String, Set<String>>();
+				
+				synchronized (settings.getProgressBar().getMonitor())
 				{
-					public void visit(int version, int access, String name,
-							String signature, String superName,
-							String[] interfaces)
+					settings.getProgressBar().start("Scanning classes...", filenames.length);
+					int count = 0;
+					for (String filename : filenames)
 					{
-						if ((access & Opcodes.ACC_ABSTRACT) == 0 &&
-							(access & Opcodes.ACC_PUBLIC) > 0 &&
-							ifaces.contains("jadex/bpmn/model/task/ITask"))
+						filename = filename.replace(File.separator, ".");
+						final String cname = filename.substring(0, filename.length() - 6);
+						filename = filename.replace(".", "/");
+						filename = filename.replace("/class", ".class");
+						
+						final Set<String> ifaces = getInterfaces(filename, rcl, ifacecache);
+						
+						Set<String> sclasses = getSuperClasses(filename, rcl);
+						if (sclasses.contains("java/lang/Exception"))
 						{
-							cf.task.add(new ClassInfo(cname));
+							cf.exception.add(new ClassInfo(cname));
 						}
 						
-						if ((access & Opcodes.ACC_INTERFACE) > 0)
+						InputStream is = rcl.getResourceAsStream(filename);
+						try
 						{
-							cf.iface.add(new ClassInfo(cname));
+							ClassReader cr = new ClassReader(is);
+							cf.all.add(new ClassInfo(cname));
+							
+							ClassVisitor cv = new ClassVisitor(Opcodes.ASM4)
+							{
+								public void visit(int version, int access, String name,
+										String signature, String superName,
+										String[] interfaces)
+								{
+									if ((access & Opcodes.ACC_ABSTRACT) == 0 &&
+										(access & Opcodes.ACC_PUBLIC) > 0 &&
+										ifaces.contains("jadex/bpmn/model/task/ITask"))
+									{
+										cf.task.add(new ClassInfo(cname));
+									}
+									
+									if ((access & Opcodes.ACC_INTERFACE) > 0)
+									{
+										cf.iface.add(new ClassInfo(cname));
+									}
+								}
+							};
+							
+							cr.accept(cv, 0);
 						}
+						catch (Exception e)
+						{
+						}
+						settings.getProgressBar().update(++count);
 					}
-				};
-				
-				cr.accept(cv, 0);
+					settings.getProgressBar().finish();
+					
+					//****
+					
+//					ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, includeboot);
+//					fut.addResultListener(new IIntermediateResultListener<Class<?>>()
+//					{
+//						public void intermediateResultAvailable(Class<?> result)
+//						{
+//						}
+//						public void finished()
+//						{
+//						}
+//						public void resultAvailable(Collection<Class<?>> result)
+//						{
+//						}
+//						public void exceptionOccurred(Exception exception)
+//						{
+//						}
+//					});
+//					fut.get(new ThreadSuspendable());
+				}
 			}
-			catch (Exception e)
-			{
-			}
-		}
-		//****
+		})).start();
 		
-//		ISubscriptionIntermediateFuture<Class<?>> fut = SReflect.asyncScanForClasses(cl, filefilter, classfilter, -1, includeboot);
-//		fut.addResultListener(new IIntermediateResultListener<Class<?>>()
-//		{
-//			public void intermediateResultAvailable(Class<?> result)
-//			{
-//			}
-//			public void finished()
-//			{
-//			}
-//			public void resultAvailable(Collection<Class<?>> result)
-//			{
-//			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//			}
-//		});
-//		fut.get(new ThreadSuspendable());
 	}
 	
 	protected static final Set<String> getSuperClasses(String cname, URLClassLoader rcl)
