@@ -61,6 +61,9 @@ public class Settings
 	/** The last file opened or saved. */
 	protected int toolbariconsize = GuiConstants.DEFAULT_ICON_SIZE;
 	
+	/** The name of the look and feel */
+	protected String lfname = "Metal";
+	
 	/** Sequence edge enabled flag. */
 	protected boolean sequenceedges = true;
 	
@@ -163,6 +166,26 @@ public class Settings
 		this.openedfiles = openedfiles;
 	}
 	
+	/**
+	 *  Gets the look and feel name.
+	 *
+	 *  @return The name.
+	 */
+	public String getLfName()
+	{
+		return lfname;
+	}
+
+	/**
+	 *  Sets the look and feel name.
+	 *
+	 *  @param lfname The name.
+	 */
+	public void setLfName(String lfname)
+	{
+		this.lfname = lfname;
+	}
+
 	/**
 	 * 
 	 * @return
@@ -577,6 +600,8 @@ public class Settings
 //			props.put("homepath", libraryhome.getPath());
 //		}
 		
+		props.put("lfname", lfname);
+		
 		props.put("smoothzoom", String.valueOf(smoothzoom));
 		
 		props.put("sequenceedges", String.valueOf(sequenceedges));
@@ -690,6 +715,12 @@ public class Settings
 			if (prop != null)
 			{
 				ret.setSaveSettingsOnExit(Boolean.parseBoolean(prop));
+			}
+			
+			prop = props.getProperty("lfname");
+			if (prop != null)
+			{
+				ret.setLfName(prop);
 			}
 			
 //			prop = props.getProperty("homepath");

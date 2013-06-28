@@ -114,6 +114,16 @@ public class SValidation
 		{
 			error = "Event handlers can only be sources for sequence edges.";
 		}
+		else if (((MActivity) ((VActivity) source).getBpmnElement()).getActivityType() != null &&
+				 ((MActivity) ((VActivity) source).getBpmnElement()).getActivityType().startsWith("EventEnd"))
+		{
+			error = "End events cannot be the source of a sequence.";
+		}
+		else if (((MActivity) ((VActivity) target).getBpmnElement()).getActivityType() != null &&
+				 ((MActivity) ((VActivity) target).getBpmnElement()).getActivityType().startsWith("EventStart"))
+		{
+			error = "Start events cannot be the target of a sequence.";
+		}
 		else
 		{
 			VActivity sa = (VActivity) source;
@@ -217,6 +227,14 @@ public class SValidation
 			if (!tp.equals(sp))
 			{
 				error = "No data edges allowed between pools.";
+			}
+		}
+		
+		if (error == null)
+		{
+			if (((VInParameter) target).getEdgeCount() > 0)
+			{
+				error = "Only one incoming data edge allowed.";
 			}
 		}
 		

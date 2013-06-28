@@ -35,6 +35,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -45,6 +47,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
@@ -83,6 +87,23 @@ public class BpmnEditorWindow extends JFrame
 		BackgroundProgressBar bgprogressbar = new BackgroundProgressBar();
 		
 		settings = Settings.load();
+		
+		LookAndFeelInfo lfinfo = BpmnEditor.LOOK_AND_FEELS.get(settings.getLfName());
+		if (lfinfo != null)
+		{
+			try
+			{
+				UIManager.setLookAndFeel(lfinfo.getClassName());
+			}
+			catch (Exception e1)
+			{
+			}
+		}
+		else
+		{
+			settings.setLfName(UIManager.getLookAndFeel().getName());
+		}
+		
 		settings.setProgressBar(bgprogressbar);
 		
 		if(settings.getGlobalInterfaces()==null || settings.getGlobalInterfaces().size()==0)// || true)
@@ -118,21 +139,16 @@ public class BpmnEditorWindow extends JFrame
 		setJMenuBar(menubar);
 		
 		JToolBar statusbar = new JToolBar();
-		statusbar.setLayout(new GridBagLayout());
+		statusbar.setLayout(new BoxLayout(statusbar, BoxLayout.LINE_AXIS));
 		statusbar.setFloatable(false);
 		add(statusbar, BorderLayout.PAGE_END);
-		GridBagConstraints g = new GridBagConstraints();
-		g.fill = GridBagConstraints.NONE;
-		statusbar.add(bgprogressbar, g);
-		g = new GridBagConstraints();
-		g.fill = GridBagConstraints.HORIZONTAL;
-		g.gridx = 1;
-		g.weightx = 1.0;
-		statusbar.add(new JPanel(), g);
-		g = new GridBagConstraints();
-		g.gridx = 2;
-		g.fill = GridBagConstraints.NONE;
-		statusbar.add(new ZoomSlider(this), g);
+		statusbar.add(bgprogressbar);
+//		statusbar.add(Box.createHorizontalGlue());
+		ZoomSlider zs = new ZoomSlider(this);
+		zs.setMaximumSize(zs.getPreferredSize());
+		statusbar.add(zs);
+		statusbar.doLayout();
+		
 		
 		pack();
 		Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();

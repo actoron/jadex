@@ -9,6 +9,7 @@ import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VOutParameter;
+import jadex.bpmn.model.MActivity;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -110,6 +111,7 @@ public class EdgeController extends mxConnectionHandler
 			connectPreview.getPreviewState() != null &&
 			((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(false) == null &&
 			((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(true) instanceof VActivity &&
+			!(((MActivity)((VActivity)((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(true)).getBpmnElement()).getActivityType() != null && ((MActivity)((VActivity)((mxICell) connectPreview.getPreviewState().getCell()).getTerminal(true)).getBpmnElement()).getActivityType().startsWith("EventEnd")) &&
 			!ModelContainer.EDIT_MODE_MESSAGING_EDGE.equals(modelcontainer.getEditMode()))
 		{
 			graphComponent.getGraph().getModel().beginUpdate();

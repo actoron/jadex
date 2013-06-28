@@ -19,6 +19,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+
 import com.mxgraph.view.mxStylesheet;
 
 /**
@@ -28,7 +32,7 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 59;
+	public static final int BUILD = 60;
 	
 	/** Console logging flag. */
 	public static final boolean CONSOLE_LOGGING = false;
@@ -82,6 +86,9 @@ public class BpmnEditor
 															"jadex.wfms.client.task.WorkitemTask"
 													   	  };
 	
+	/** Available look and feels. */
+	public static final Map<String, LookAndFeelInfo> LOOK_AND_FEELS = new HashMap<String, UIManager.LookAndFeelInfo>();
+	
 	/** Task informations. */
 	public static Map<String, TaskMetaInfo> TASK_INFOS;
 	
@@ -101,21 +108,21 @@ public class BpmnEditor
 			HOME_DIR = WINDOWS_HOME_DIR;
 		}
 
-//		try
-//		{
-//			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
-//			{
-//				System.out.println(info.getName());
+		try
+		{
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
+			{
+				LOOK_AND_FEELS.put(info.getName(), info);
 //		        if ("Nimbus".equals(info.getName()))
 //		        {
 //		            UIManager.setLookAndFeel(info.getClassName());
 //		            break;
 //		        }
-//		    }
-//		}
-//		catch (Exception e)
-//		{
-//		}
+		    }
+		}
+		catch (Exception e)
+		{
+		}
 		
 		EventQueue.invokeLater(new Runnable()
 		{

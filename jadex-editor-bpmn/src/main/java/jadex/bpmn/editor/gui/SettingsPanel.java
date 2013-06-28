@@ -1,6 +1,9 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.BpmnEditor;
+
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,11 +19,14 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
@@ -37,6 +43,9 @@ public class SettingsPanel extends JPanel
 	
 	/** The new library entries. */
 	protected List<File> libentries;
+	
+	/** Look and feel box. */
+	protected JComboBox<String> lookandfeelbox;
 	
 	/** Smooth zoom box. */
 	protected JCheckBox szbox;
@@ -309,11 +318,20 @@ public class SettingsPanel extends JPanel
 		g.fill = GridBagConstraints.VERTICAL;
 		cppanel.add(new JPanel(), g);
 		
+		lookandfeelbox = new JComboBox<String>(BpmnEditor.LOOK_AND_FEELS.keySet().toArray(new String[0]));
+		lookandfeelbox.setEditable(false);
+		lookandfeelbox.setSelectedItem(settings.getLfName());
+		lookandfeelbox.addActionListener(changeaction);
+		g = new GridBagConstraints();
+		g.anchor = GridBagConstraints.WEST;
+		generalpanel.add(lookandfeelbox, g);
+		
 		szbox = new JCheckBox(changeaction);
 		szbox.setText("Smooth Zoom");
 		szbox.setSelected(settings.isSmoothZoom());
 		g = new GridBagConstraints();
 		g.anchor = GridBagConstraints.WEST;
+		g.gridy = 1;
 		generalpanel.add(szbox, g);
 		
 		g = new GridBagConstraints();
@@ -409,6 +427,33 @@ public class SettingsPanel extends JPanel
 		settings.setSequenceEdges(sebox.isSelected());
 		settings.setNameTypeDataAutoConnect(ntbox.isSelected());
 		settings.setDataEdges(debox.isSelected());
+		
+		if (lookandfeelbox.getSelectedItem() != null &&
+			!settings.getLfName().equals(lookandfeelbox.getSelectedItem()) &&
+			BpmnEditor.LOOK_AND_FEELS.containsKey(lookandfeelbox.getSelectedItem()))
+		{
+			try
+			{
+				Object odf = UIManager.getDefaults().get("defaultFont");
+				UIManager.setLookAndFeel(BpmnEditor.LOOK_AND_FEELS.get(lookandfeelbox.getSelectedItem()).getClassName());
+				if (UIManager.getDefaults().get("defaultFont") == null)
+				{
+					// Swing bug?
+					UIManager.getDefaults().put("defaultFont", odf);
+				}
+				Container c = getParent();
+				while (!(c instanceof BpmnEditorWindow))
+				{
+					c = c.getParent();
+				}
+				SwingUtilities.updateComponentTreeUI(c);
+				settings.setLfName((String) lookandfeelbox.getSelectedItem());
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 		
 		return ret;
 	}
