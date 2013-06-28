@@ -4,7 +4,6 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.ClearGoal;
 import jadex.bdiv3.examples.blocksworld.BlocksworldBDI.StackGoal;
@@ -26,32 +25,10 @@ public class StackBlocksPlan
 	protected IPlan rplan;
 	
 	@PlanReason
-	protected StackGoal goal;
+	protected Object goal;
 	
 	//-------- methods --------
 
-	/**
-	 * 
-	 */
-	@PlanPrecondition
-	public boolean checkExistsBlock()
-	{
-		boolean ret = false;
-		for(Block block: capa.getBlocks())
-		{
-			if(block.getLower().equals(goal.getBlock()))
-			{
-				ret = true;
-				break;
-			}
-		}
-		return ret;
-	}
-//<precondition>
-//	(select one Block $block from $beliefbase.blocks
-//	where $block.getLower()==$goal.block)!=null
-//</precondition>
-	
 	/**
 	 *  The plan body.
 	 */
@@ -60,10 +37,14 @@ public class StackBlocksPlan
 	{
 		// Clear blocks.
 		
-		ClearGoal clear = capa.new ClearGoal(goal.getBlock());
+		try
+		{
+		System.out.println(getClass().getName()+" "+getBlock()+" "+getTarget());
+		
+		ClearGoal clear = capa.new ClearGoal(getBlock());
 		rplan.dispatchSubgoal(clear).get();
 		
-		clear = capa.new ClearGoal(goal.getTarget());
+		clear = capa.new ClearGoal(getTarget());
 		rplan.dispatchSubgoal(clear).get();
 
 		
@@ -80,12 +61,33 @@ public class StackBlocksPlan
 
 		// Now move block.
 		if(!capa.isQuiet())
-			System.out.println("Moving '"+goal.getBlock()+"' to '"+goal.getTarget()+"'");
+			System.out.println("Moving '"+getBlock()+"' to '"+getTarget()+"'");
 
 		// This operation has to be performed atomic,
 		// because it fires bean changes on several affected blocks. 
 //		startAtomic();
-		goal.getBlock().stackOn(goal.getTarget());
+		getBlock().stackOn(getTarget());
 //		endAtomic();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public Block getBlock()
+	{
+		return ((StackGoal)goal).getBlock();
+	}
+	
+	/**
+	 * 
+	 */
+	public Block getTarget()
+	{
+		return ((StackGoal)goal).getTarget();
 	}
 }

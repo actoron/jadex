@@ -134,6 +134,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			injectAgent(pa, agent, model, null);
 		}
 		
+		wrapCollections(((BDIModel)model).getCapability(), agent);
+		
 		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
 		
@@ -447,7 +449,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							}
 						});
 					}
-				});
+				});				
 			}
 			catch(Exception e)
 			{
@@ -463,178 +465,17 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
-	 *  Dispatch a goal wait for its result.
+	 * 
 	 */
-	public <T, E> IFuture<E> dispatchTopLevelGoal(final T goal)
+	protected void wrapCollections(MCapability mcapa, Object agent)
 	{
-		final Future<E> ret = new Future<E>();
-		
-		final MGoal mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
-		if(mgoal==null)
-			throw new RuntimeException("Unknown goal type: "+goal);
-		final RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null);
-		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, E>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				Object res = RGoal.getGoalResult(goal, mgoal, bdimodel.getClassloader());
-				ret.setResult((E)res);
-			}
-		});
-
-//		System.out.println("adopt goal");
-		RGoal.adoptGoal(rgoal, getInternalAccess());
-		
-		return ret;
-	}
-	
-	/**
-	 *  Start the component behavior.
-	 */
-	public void startBehavior()
-	{
-		super.startBehavior();
-		
-		try
-		{
-		
-		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
-				
-		// Init bdi configuration
-		String confname = getConfiguration();
-		if(confname!=null)
-		{
-			MConfiguration mconf = bdimodel.getCapability().getConfiguration(confname);
-			
-			// Set initial belief values
-			List<UnparsedExpression> ibels = mconf.getInitialBeliefs();
-			if(ibels!=null)
-			{
-				for(UnparsedExpression uexp: ibels)
-				{
-					try
-					{
-						MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
-						Object val = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader()).getValue(null);
-//						Field f = mbel.getTarget().getField(getClassLoader());
-//						f.setAccessible(true);
-//						f.set(agent, val);
-						mbel.setValue(agent, val, getClassLoader());
-					}
-					catch(RuntimeException e)
-					{
-						throw e;
-					}
-					catch(Exception e)
-					{
-						throw new RuntimeException(e);
-					}
-				}
-			}
-			
-			// Create initial goals
-			List<UnparsedExpression> igoals = mconf.getInitialGoals();
-			if(igoals!=null)
-			{
-				for(UnparsedExpression uexp: igoals)
-				{
-					MGoal mgoal = null;
-					Object goal = null;
-					Class<?> gcl = null;
-					
-					// Create goal if expression available
-					if(uexp.getValue()!=null && uexp.getValue().length()>0)
-					{
-						goal = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader());
-						gcl = goal.getClass();
-					}
-					
-					if(gcl==null && uexp.getClazz()!=null)
-					{
-						gcl = uexp.getClazz().getType(getClassLoader(), getModel().getAllImports());
-					}
-					if(gcl==null)
-					{
-						// try to fetch via name
-						mgoal = bdimodel.getCapability().getGoal(uexp.getName());
-						if(mgoal==null && uexp.getName().indexOf(".")==-1)
-						{
-							// try with package
-							mgoal = bdimodel.getCapability().getGoal(getModel().getPackage()+"."+uexp.getName());
-						}
-						if(mgoal!=null)
-						{
-							gcl = mgoal.getTargetClass(getClassLoader());
-						}
-					}
-					if(mgoal==null)
-					{
-						mgoal = bdimodel.getCapability().getGoal(gcl.getName());
-					}
-					if(goal==null)
-					{
-						try
-						{
-							Class<?> agcl = agent.getClass();
-							Constructor<?>[] cons = gcl.getDeclaredConstructors();
-							for(Constructor<?> c: cons)
-							{
-								Class<?>[] params = c.getParameterTypes();
-								if(params.length==0)
-								{
-									// perfect found empty con
-									goal = gcl.newInstance();
-									break;
-								}
-								else if(params.length==1 && params[0].equals(agcl))
-								{
-									// found (first level) inner class constructor
-									goal = c.newInstance(new Object[]{agent});
-									break;
-								}
-							}
-						}
-						catch(RuntimeException e)
-						{
-							throw e;
-						}
-						catch(Exception e)
-						{
-							throw new RuntimeException(e);
-						}
-					}
-					
-					if(mgoal==null || goal==null)
-						throw new RuntimeException("Could not create initial goal: ");
-					
-					RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null);
-					RGoal.adoptGoal(rgoal, getInternalAccess());
-				}
-			}
-			
-			// Create initial plans
-			List<UnparsedExpression> iplans = mconf.getInitialPlans();
-			if(iplans!=null)
-			{
-				for(UnparsedExpression uexp: iplans)
-				{
-					MPlan mplan = bdimodel.getCapability().getPlan(uexp.getName());
-					// todo: allow Java plan constructor calls
-//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
-				
-					RPlan rplan = RPlan.createRPlan(mplan, mplan, null, getInternalAccess());
-					RPlan.executePlan(rplan, getInternalAccess());
-				}
-			}
-		}
-				
 		// Inject belief collections.
-		List<MBelief> mbels = bdimodel.getCapability().getBeliefs();
+		List<MBelief> mbels = mcapa.getBeliefs();
 		for(MBelief mbel: mbels)
 		{
 			try
 			{
-				Object	capa	= agent;
+				Object capa = agent;
 				int	i	= mbel.getName().indexOf(CAPABILITY_SEPARATOR);
 				if(i!=-1)
 				{
@@ -670,19 +511,19 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				{
 					String bname = mbel.getName();
 //					f.set(agent, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
-					mbel.setValue(capa, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
+					mbel.setValue(capa, new ListWrapper((List<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
 //					f.set(agent, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
-					mbel.setValue(capa, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
+					mbel.setValue(capa, new SetWrapper((Set<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
 //					f.set(agent, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
-					mbel.setValue(capa, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
+					mbel.setValue(capa, new MapWrapper((Map<?,?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
 				}
 			}
 			catch(RuntimeException e)
@@ -694,7 +535,177 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				throw new RuntimeException(e);
 			}
 		}
+	}
+	
+	/**
+	 *  Dispatch a goal wait for its result.
+	 */
+	public <T, E> IFuture<E> dispatchTopLevelGoal(final T goal)
+	{
+		final Future<E> ret = new Future<E>();
+		
+		final MGoal mgoal = ((MCapability)capa.getModelElement()).getGoal(goal.getClass().getName());
+		if(mgoal==null)
+			throw new RuntimeException("Unknown goal type: "+goal);
+		final RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null);
+		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, E>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				Object res = RGoal.getGoalResult(goal, mgoal, bdimodel.getClassloader());
+				ret.setResult((E)res);
+			}
+		});
 
+//		System.out.println("adopt goal");
+		RGoal.adoptGoal(rgoal, getInternalAccess());
+		
+		return ret;
+	}
+	
+	/**
+	 *  Start the component behavior.
+	 */
+	public void startBehavior()
+	{
+		super.startBehavior();
+		
+//		try
+//		{
+		
+		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
+				
+		// Init bdi configuration
+		String confname = getConfiguration();
+		if(confname!=null)
+		{
+			MConfiguration mconf = bdimodel.getCapability().getConfiguration(confname);
+			
+			if(mconf!=null)
+			{
+				// Set initial belief values
+				List<UnparsedExpression> ibels = mconf.getInitialBeliefs();
+				if(ibels!=null)
+				{
+					for(UnparsedExpression uexp: ibels)
+					{
+						try
+						{
+							MBelief mbel = bdimodel.getCapability().getBelief(uexp.getName());
+							Object val = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader()).getValue(null);
+	//						Field f = mbel.getTarget().getField(getClassLoader());
+	//						f.setAccessible(true);
+	//						f.set(agent, val);
+							mbel.setValue(agent, val, getClassLoader());
+						}
+						catch(RuntimeException e)
+						{
+							throw e;
+						}
+						catch(Exception e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+				}
+				
+				// Create initial goals
+				List<UnparsedExpression> igoals = mconf.getInitialGoals();
+				if(igoals!=null)
+				{
+					for(UnparsedExpression uexp: igoals)
+					{
+						MGoal mgoal = null;
+						Object goal = null;
+						Class<?> gcl = null;
+						
+						// Create goal if expression available
+						if(uexp.getValue()!=null && uexp.getValue().length()>0)
+						{
+							goal = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader());
+							gcl = goal.getClass();
+						}
+						
+						if(gcl==null && uexp.getClazz()!=null)
+						{
+							gcl = uexp.getClazz().getType(getClassLoader(), getModel().getAllImports());
+						}
+						if(gcl==null)
+						{
+							// try to fetch via name
+							mgoal = bdimodel.getCapability().getGoal(uexp.getName());
+							if(mgoal==null && uexp.getName().indexOf(".")==-1)
+							{
+								// try with package
+								mgoal = bdimodel.getCapability().getGoal(getModel().getPackage()+"."+uexp.getName());
+							}
+							if(mgoal!=null)
+							{
+								gcl = mgoal.getTargetClass(getClassLoader());
+							}
+						}
+						if(mgoal==null)
+						{
+							mgoal = bdimodel.getCapability().getGoal(gcl.getName());
+						}
+						if(goal==null)
+						{
+							try
+							{
+								Class<?> agcl = agent.getClass();
+								Constructor<?>[] cons = gcl.getDeclaredConstructors();
+								for(Constructor<?> c: cons)
+								{
+									Class<?>[] params = c.getParameterTypes();
+									if(params.length==0)
+									{
+										// perfect found empty con
+										goal = gcl.newInstance();
+										break;
+									}
+									else if(params.length==1 && params[0].equals(agcl))
+									{
+										// found (first level) inner class constructor
+										goal = c.newInstance(new Object[]{agent});
+										break;
+									}
+								}
+							}
+							catch(RuntimeException e)
+							{
+								throw e;
+							}
+							catch(Exception e)
+							{
+								throw new RuntimeException(e);
+							}
+						}
+						
+						if(mgoal==null || goal==null)
+							throw new RuntimeException("Could not create initial goal: ");
+						
+						RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null);
+						RGoal.adoptGoal(rgoal, getInternalAccess());
+					}
+				}
+				
+				// Create initial plans
+				List<UnparsedExpression> iplans = mconf.getInitialPlans();
+				if(iplans!=null)
+				{
+					for(UnparsedExpression uexp: iplans)
+					{
+						MPlan mplan = bdimodel.getCapability().getPlan(uexp.getName());
+						// todo: allow Java plan constructor calls
+	//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
+					
+						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, getInternalAccess());
+						RPlan.executePlan(rplan, getInternalAccess());
+					}
+				}
+			}
+		}
+		
 		// Observe dynamic beliefs
 		List<MBelief> beliefs = bdimodel.getCapability().getBeliefs();
 		
@@ -1388,11 +1399,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //		getCapability().dumpGoalsPeriodically(getInternalAccess());
 //		getCapability().dumpPlansPeriodically(getInternalAccess());
 		
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 	}
 	
 	/**
@@ -1706,3 +1717,4 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 	}
 }
+

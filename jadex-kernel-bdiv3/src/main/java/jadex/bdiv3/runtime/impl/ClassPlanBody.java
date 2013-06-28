@@ -126,34 +126,39 @@ public class ClassPlanBody extends AbstractPlanBody
 				}
 				
 				// inject plan elements
-				Field[] fields = body.getDeclaredFields();
-				for(Field f: fields)
+				Class<?> bcl = body;
+				while(!Object.class.equals(bcl))
 				{
-					if(f.isAnnotationPresent(PlanAPI.class))
+					Field[] fields = bcl.getDeclaredFields();
+					for(Field f: fields)
 					{
-						f.setAccessible(true);
-						f.set(plan, getRPlan());
-					}
-					else if(f.isAnnotationPresent(PlanCapability.class))
-					{
-						f.setAccessible(true);
-						f.set(plan, agent);
-					}
-					else if(f.isAnnotationPresent(PlanReason.class))
-					{
-						Object r = getRPlan().getReason();
-						if(r instanceof RProcessableElement)
+						if(f.isAnnotationPresent(PlanAPI.class))
 						{
-							Object reason = ((RProcessableElement)r).getPojoElement();
-							if(reason!=null)
+							f.setAccessible(true);
+							f.set(plan, getRPlan());
+						}
+						else if(f.isAnnotationPresent(PlanCapability.class))
+						{
+							f.setAccessible(true);
+							f.set(plan, agent);
+						}
+						else if(f.isAnnotationPresent(PlanReason.class))
+						{
+							Object r = getRPlan().getReason();
+							if(r instanceof RProcessableElement)
 							{
-								f.setAccessible(true);
-								f.set(plan, reason);
+								Object reason = ((RProcessableElement)r).getPojoElement();
+								if(reason!=null)
+								{
+									f.setAccessible(true);
+									f.set(plan, reason);
+								}
 							}
 						}
 					}
+					
+					bcl = bcl.getSuperclass();
 				}
-				
 			}
 			catch(RuntimeException e)
 			{

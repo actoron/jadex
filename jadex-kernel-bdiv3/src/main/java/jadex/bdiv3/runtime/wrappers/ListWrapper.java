@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.wrappers;
 
+import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.RuleSystem;
 
@@ -15,10 +16,10 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 	/**
 	 *  Create a new list wrapper.
 	 */
-	public ListWrapper(List<T> delegate, RuleSystem rulesystem, 
+	public ListWrapper(List<T> delegate, BDIAgentInterpreter interpreter, 
 		String addevent, String remevent, String changeevent)
 	{
-		super(delegate, rulesystem, addevent, remevent, changeevent);
+		super(delegate, interpreter, addevent, remevent, changeevent);
 	}
 
 	/**
@@ -52,7 +53,9 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 	public T set(int index, T element)
 	{
 		T ret = getList().set(index, element);
-		rulesystem.addEvent(new Event(changeevent, new Object[]{ret, element, new Integer(index)}));
+		unobserveValue(ret);
+		observeValue(element);
+		getRuleSystem().addEvent(new Event(changeevent, new Object[]{ret, element, new Integer(index)}));
 		return ret;
 	}
 
@@ -62,7 +65,8 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 	public void add(int index, T element)
 	{
 		getList().add(index, element);
-		rulesystem.addEvent(new Event(addevent, element));
+		observeValue(element);
+		getRuleSystem().addEvent(new Event(addevent, element));
 	}
 
 	/**
@@ -71,7 +75,8 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 	public T remove(int index)
 	{
 		T ret = getList().remove(index);
-		rulesystem.addEvent(new Event(remevent, ret));
+		unobserveValue(ret);
+		getRuleSystem().addEvent(new Event(remevent, ret));
 		return ret;
 	}
 

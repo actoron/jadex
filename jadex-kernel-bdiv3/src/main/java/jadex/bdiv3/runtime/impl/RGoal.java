@@ -159,6 +159,12 @@ public class RGoal extends RProcessableElement implements IGoal
 		if(getProcessingState().equals(processingstate))
 			return;
 		
+		if(GoalProcessingState.FAILED.equals(getProcessingState())
+			|| GoalProcessingState.SUCCEEDED.equals(getProcessingState()))
+		{
+			throw new RuntimeException("Final proc state cannot be changed: "+getProcessingState()+" "+processingstate);
+		}
+			
 //		this.processingstate = processingstate;
 	
 		// If was inprocess -> now stop processing.
@@ -258,7 +264,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
-//		System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
+		System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 //		if(RGoal.GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate) && RGoal.GOALLIFECYCLESTATE_NEW.equals(getLifecycleState()))
 //			Thread.dumpStack();
 //		if(RGoal.GOALLIFECYCLESTATE_ADOPTED.equals(lifecyclestate) && RGoal.GOALLIFECYCLESTATE_DROPPING.equals(getLifecycleState()))

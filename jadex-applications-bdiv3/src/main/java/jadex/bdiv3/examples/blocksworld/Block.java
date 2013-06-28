@@ -4,7 +4,6 @@ import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.beans.PropertyChangeListener;
 
 import java.awt.Color;
-import java.util.Map;
 
 
 /**
@@ -103,6 +102,15 @@ public class Block
 	{
 		return lower;
 	}
+	
+	/**
+	 *  Get the upper.
+	 *  @return The upper.
+	 */
+	public Block getUpper()
+	{
+		return upper;
+	}
 
 	/**
 	 *  Check if this block is clear.
@@ -188,6 +196,7 @@ public class Block
 	public String	toString()
 	{
 		return "Block "+number;
+//		return "Block "+color.toString();
 	}
 
 	/**

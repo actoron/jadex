@@ -336,14 +336,21 @@ public class MBody
 	{
 		MethodInfo ret = null;
 		
-		Method[] ms = body.getDeclaredMethods();
-		for(Method m: ms)
+		Class<?> bcl = body;
+		
+		while(!Object.class.equals(bcl) && ret==null)
 		{
-			if(m.isAnnotationPresent(type))
+			Method[] ms = bcl.getDeclaredMethods();
+			for(Method m: ms)
 			{
-				ret = new MethodInfo(m);
-				break;
+				if(m.isAnnotationPresent(type))
+				{
+					ret = new MethodInfo(m);
+					break;
+				}
 			}
+			
+			bcl = bcl.getSuperclass();
 		}
 		
 		return ret;

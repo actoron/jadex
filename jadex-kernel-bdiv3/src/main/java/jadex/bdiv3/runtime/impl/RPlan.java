@@ -115,6 +115,7 @@ public class RPlan extends RElement implements IPlan
 		MBody mbody = mplan.getBody();
 		
 		IPlanBody body = null;
+
 		if(candidate.getClass().isAnnotationPresent(Plan.class))
 		{
 			body = new ClassPlanBody(ia, rplan, candidate);

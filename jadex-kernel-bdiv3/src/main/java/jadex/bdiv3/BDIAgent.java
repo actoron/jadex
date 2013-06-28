@@ -3,10 +3,12 @@ package jadex.bdiv3;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
@@ -56,7 +58,6 @@ public class BDIAgent extends MicroAgent
 		return ret;
 	}
 
-	
 	/**
 	 *  Dispatch a goal wait for its result.
 	 */
@@ -64,6 +65,20 @@ public class BDIAgent extends MicroAgent
 	{
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 		return ip.dispatchTopLevelGoal(goal);
+	}
+	
+	/**
+	 *  Dispatch a goal wait for its result.
+	 */
+	public <T> void adoptPlan(T plan)
+	{
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
+		MPlan mplan = ip.getBDIModel().getCapability().getPlan(plan.getClass().getName());
+		if(mplan==null)
+			throw new RuntimeException("Plan model not found for: "+plan);
+		
+		RPlan rplan = RPlan.createRPlan(mplan, mplan, null, ip.getInternalAccess());
+		RPlan.executePlan(rplan, getInterpreter().getInternalAccess());
 	}
 	
 	/**
@@ -206,23 +221,7 @@ public class BDIAgent extends MicroAgent
 			}
 			
 			// observe new value for property changes
-			if(val!=null)
-			{
-				rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
-				{
-					public IFuture<IEvent> execute(final PropertyChangeEvent event)
-					{
-						return scheduleStep(new IComponentStep<IEvent>()
-						{
-							public IFuture<IEvent> execute(IInternalAccess ia)
-							{
-								Event ev = new Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, fieldname}), event.getNewValue());
-								return new Future<IEvent>(ev);
-							}
-						});
-					}
-				});
-			}
+			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+fieldname);
 			
 			// initiate a step to reevaluate the conditions
 			scheduleStep(new IComponentStep()
@@ -374,24 +373,7 @@ public class BDIAgent extends MicroAgent
 					final String fieldname = (String)write[1];
 					Object val = write[0];
 					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+fieldname, val));
-					if(val!=null)
-					{
-						rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
-						{
-							public IFuture<IEvent> execute(final PropertyChangeEvent event)
-							{
-								return agent.scheduleStep(new IComponentStep<IEvent>()
-								{
-									public IFuture<IEvent> execute(IInternalAccess ia)
-									{
-			//							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
-										Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
-										return new Future<IEvent>(ev);
-									}
-								});
-							}
-						});
-					}
+					observeValue(rs, val, (BDIAgentInterpreter)agent.getInterpreter(), ChangeEvent.FACTCHANGED+"."+fieldname);
 				}
 			}
 		}
@@ -406,9 +388,12 @@ public class BDIAgent extends MicroAgent
 	{
 		try
 		{
+			final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+			RuleSystem rs = ip.getRuleSystem();
 //			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
 			
 			Object oldval = Array.get(array, index);
+			rs.unobserveObject(oldval);	
 			
 			Class<?> ct = array.getClass().getComponentType();
 			if(boolean.class.equals(ct))
@@ -421,12 +406,10 @@ public class BDIAgent extends MicroAgent
 			}
 			
 			Array.set(array, index, val);
+			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+fieldname);
 			
 			if(!SUtil.equals(val, oldval))
 			{
-				BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-				RuleSystem rs = ip.getRuleSystem();
-				
 				Event ev = new Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, fieldname}), val); // todo: index
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
@@ -463,6 +446,32 @@ public class BDIAgent extends MicroAgent
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public static void observeValue(RuleSystem rs, Object val, final BDIAgentInterpreter agent, final String etype)
+	{
+		if(val!=null)
+		{
+			rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
+			{
+				public IFuture<IEvent> execute(final PropertyChangeEvent event)
+				{
+					return agent.scheduleStep(new IComponentStep<IEvent>()
+					{
+						public IFuture<IEvent> execute(IInternalAccess ia)
+						{
+	//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
+	//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
+							Event ev = new Event(etype, event.getNewValue());
+							return new Future<IEvent>(ev);
+						}
+					});
+				}
+			});
+		}
+	}
 
 	/**
 	 *  Create a belief changed event.
@@ -476,24 +485,7 @@ public class BDIAgent extends MicroAgent
 		
 		RuleSystem rs = ((BDIAgentInterpreter)agent.getInterpreter()).getRuleSystem();
 		rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
-		if(val!=null)
-		{
-			rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
-			{
-				public IFuture<IEvent> execute(final PropertyChangeEvent event)
-				{
-					return agent.scheduleStep(new IComponentStep<IEvent>()
-					{
-						public IFuture<IEvent> execute(IInternalAccess ia)
-						{
-//							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
-							Event ev = new Event(ChangeEvent.FACTCHANGED+"."+belname, event.getNewValue());
-							return new Future<IEvent>(ev);
-						}
-					});
-				}
-			});
-		}
+		observeValue(rs, val, (BDIAgentInterpreter)agent.getInterpreter(), ChangeEvent.FACTCHANGED+"."+belname);
 	}
 	
 	/**

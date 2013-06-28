@@ -704,24 +704,32 @@ public class BDIClassReader extends MicroClassReader
 		Body body = p.body();
 		ServicePlan sp = body.service();
 		String	component	= body.component();
+		
+		// Generate the plan name:
+		
 		if(mi!=null)
 		{
+			// Method name if plan is method
 			name = mi.getName();
 		}
 		else if(ci!=null)
 		{
+			// Class name if is class
 			name = ci.getTypeName();
 		}
 		else if(!Object.class.equals(body.value()))
 		{
+			// Class name if is class 
 			name = SReflect.getInnerClassName(body.value());
 		}
 		else if(sp.name().length()>0)
 		{
+			// Service plan name if is service
 			name = sp.name()+"_"+sp.method();
 		}
 		else if(component.length()>0)
 		{
+			// Plan is subcomponent
 			name = component;
 			if(name.indexOf("/")!=-1)
 			{

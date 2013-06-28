@@ -90,7 +90,14 @@ public class ConfigureBlocksPlan
 		{
 			// Create stack goal.
 			StackGoal stack = capa.new StackGoal(i.next(), bucket);
+			try
+			{
 			rplan.dispatchSubgoal(stack).get();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 }
