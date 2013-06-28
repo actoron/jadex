@@ -46,7 +46,7 @@ public class ActivityParameterTable extends JTable
 		getColumnModel().getColumn(3).setPreferredWidth(5000);
 		getColumnModel().getColumn(4).setPreferredWidth(500);
 		
-		JComboBox<String> dircombo = new JComboBox<String>(new String[] { MParameter.DIRECTION_IN, MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT });
+		JComboBox dircombo = new JComboBox(new String[] { MParameter.DIRECTION_IN, MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT });
 		dircombo.setEditable(false);
 		getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(dircombo));
 		

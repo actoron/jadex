@@ -503,7 +503,7 @@ public class HttpRelayTransport implements ITransport
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
+//						e.printStackTrace();
 						component.getLogger().info("HTTP relay: No connection to "+address+", "+e);
 						addresses.put(address, new Long(-System.currentTimeMillis()));
 					}
