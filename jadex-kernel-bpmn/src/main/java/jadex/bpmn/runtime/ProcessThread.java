@@ -857,7 +857,7 @@ public class ProcessThread	implements ITaskContext
 						
 						// Test if parameter value type fits
 						MParameter mparam = de.getTarget().getParameters().get(de.getTargetParameter());
-						Class<?> mpclz = mparam.getClazz().getType(instance.getClassLoader());
+						Class<?> mpclz = mparam.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports());
 						if(!SReflect.isSupertype(mpclz, value.getClass()))
 						{
 							// Autoconvert basic from string

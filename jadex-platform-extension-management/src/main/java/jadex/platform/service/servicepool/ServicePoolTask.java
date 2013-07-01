@@ -98,7 +98,7 @@ public class ServicePoolTask implements ITask
 									{
 										ClassInfo ci = maps[i]==null? null: new ClassInfo(maps[i++]);
 										String fi = maps[i]==null? null: maps[i];
-										sps.addServiceType(ci.getType(process.getClassLoader()), fi).addResultListener(lis);
+										sps.addServiceType(ci.getType(process.getClassLoader(), process.getModel().getAllImports()), fi).addResultListener(lis);
 									}
 								}
 								else

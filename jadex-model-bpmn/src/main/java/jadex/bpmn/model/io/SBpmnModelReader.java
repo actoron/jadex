@@ -669,8 +669,12 @@ public class SBpmnModelReader
 			}
 			ClassInfo clazz = new ClassInfo(attrs.get("type"));
 			String name = attrs.get("name");
-			UnparsedExpression exp = new UnparsedExpression(name, clazz.getTypeName(), content, null);
-			parseExp(exp, model.getModelInfo().getAllImports(), cl);
+			UnparsedExpression exp = null;
+			if(content!=null && content.length()>0)
+			{
+				exp = new UnparsedExpression(name, clazz.getTypeName(), content, null);
+				parseExp(exp, model.getModelInfo().getAllImports(), cl);
+			}
 			MParameter param = new MParameter(attrs.get("direction"), clazz, name, exp);
 			params.add(param);
 		}
@@ -686,8 +690,14 @@ public class SBpmnModelReader
 			ClassInfo clazz = type != null? new ClassInfo(type) : null;
 			String typename = clazz != null? clazz.getTypeName() : null;
 			String name = attrs.get("name");
-			UnparsedExpression exp = new UnparsedExpression(name, typename, content, null);
-			parseExp(exp, model.getModelInfo().getAllImports(), cl);
+//			UnparsedExpression exp = new UnparsedExpression(name, typename, content, null);
+//			parseExp(exp, model.getModelInfo().getAllImports(), cl);
+			UnparsedExpression exp = null;
+			if(content!=null && content.length()>0)
+			{
+				exp = new UnparsedExpression(name, typename, content, null);
+				parseExp(exp, model.getModelInfo().getAllImports(), cl);
+			}
 			MProperty prop = new MProperty(clazz, name, exp);
 			props.add(prop);
 		}

@@ -30,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -389,6 +390,17 @@ public class ServiceCallTask implements ITask
 									String retname = modelcontainer.getReturnValueName(m);
 									Type[] ptypes = m.getGenericParameterTypes();
 									Type pret = m.getGenericReturnType();
+									
+									// Unwrap generic type if is future call
+									if(SReflect.isSupertype(IFuture.class, m.getReturnType()))
+									{
+										if(pret instanceof ParameterizedType)
+										{
+											ParameterizedType pt = (ParameterizedType)pret;
+											Type[] pts = pt.getActualTypeArguments();
+											pret = pts[0]; // Hack, but works for IFuture etc.
+										}
+									}
 									
 									for(int j=0; j<ptypes.length; j++)
 									{
