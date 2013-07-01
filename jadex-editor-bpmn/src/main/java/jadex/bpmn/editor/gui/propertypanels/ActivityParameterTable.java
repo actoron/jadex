@@ -297,7 +297,14 @@ public class ActivityParameterTable extends JTable
 					param.setClazz((ClassInfo)value);
 					break;
 				case 3:
-					param.getInitialValue().setValue((String) value);
+					if (param.getInitialValue() != null)
+					{
+						param.getInitialValue().setValue((String) value);
+					}
+					else
+					{
+						param.setInitialValue(new UnparsedExpression(param.getName(), param.getClazz() != null? param.getClazz().getTypeName() : null, (String) value, null));
+					}
 					break;
 				case 4:
 					if (Boolean.TRUE.equals(value))

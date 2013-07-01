@@ -122,7 +122,8 @@ public class SequenceEdgeStyleFunction implements mxEdgeStyleFunction
 				}
 			}
 			else if (sourcenode.getBpmnElement() != null &&
-					 ((MActivity) sourcenode.getBpmnElement()).isEventHandler())
+					 ((MActivity) sourcenode.getBpmnElement()).isEventHandler() &&
+					 sourcenode.getParent() != null)
 			{
 				mxGeometry pgeo = sourcenode.getParent().getGeometry();
 				mxPoint ppos = new mxPoint(pgeo.getX() * scale, pgeo.getY() * scale);
