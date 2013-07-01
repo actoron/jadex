@@ -3,6 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.IBDIClassGenerator;
 import jadex.bdiv3.PojoBDIAgent;
+import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.model.BDIModel;
@@ -19,6 +20,7 @@ import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.RGoal.GoalLifecycleState;
+import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
@@ -1421,6 +1423,27 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //			e.printStackTrace();
 //		}
 	}
+	
+	/**
+	 *  Called before blocking the component thread.
+	 */
+	public void	beforeBlock()
+	{
+	}
+	
+	/**
+	 *  Called after unblocking the component thread.
+	 */
+	public void	afterBlock()
+	{
+		// Throw error to exit body method of aborted plan.
+		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
+		if(rplan!=null && rplan.aborted && rplan.getLifecycleState()==PlanLifecycleState.BODY)
+		{
+			throw new BodyAborted();
+		}
+	}
+
 	
 	/**
 	 *  Execute a goal method.

@@ -88,7 +88,7 @@ public class BlocksworldBDI
 		 * 
 		 * @return True, if clear.
 		 */
-		@GoalTargetCondition
+		@GoalTargetCondition(events="blocks")
 		public boolean checkClear()
 		{
 			System.out.println("clear target condition for: "+block+" "+block.isClear());
