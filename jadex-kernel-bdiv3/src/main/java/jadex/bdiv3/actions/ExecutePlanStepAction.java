@@ -8,7 +8,6 @@ import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -20,6 +19,9 @@ import jadex.commons.future.IResultListener;
  */
 public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 {
+	/** The rplans for plan threads. */
+	public static final ThreadLocal<RPlan>	RPLANS	= new ThreadLocal<RPlan>();
+	
 	/** The plan. */
 	protected RPlan rplan;
 	
@@ -103,23 +105,39 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 			ip.getCapability().addPlan(rplan);
 			rplan.setLifecycleState(RPlan.PlanLifecycleState.BODY);
 			IPlanBody body = rplan.getBody();
-			body.executePlan().addResultListener(new IResultListener<Void>()
+			try
 			{
-				public void resultAvailable(Void result)
+				RPLANS.set(rplan);
+				body.executePlan().addResultListener(new IResultListener<Void>()
 				{
-					ip.getCapability().removePlan(rplan);
-					Object reason = rplan.getReason();
-					if(reason instanceof RProcessableElement)
-						((RProcessableElement)reason).planFinished(ia, rplan);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					resultAvailable(null);
-				}
-			});
+					public void resultAvailable(Void result)
+					{
+						ip.getCapability().removePlan(rplan);
+						Object reason = rplan.getReason();
+						if(reason instanceof RProcessableElement)
+							((RProcessableElement)reason).planFinished(ia, rplan);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						resultAvailable(null);
+					}
+				});
+			}
+			finally
+			{
+				RPLANS.set(null);
+			}
 		}
 		
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Get the rplan.
+	 */
+	public RPlan	getRPlan()
+	{
+		return rplan;
 	}
 }

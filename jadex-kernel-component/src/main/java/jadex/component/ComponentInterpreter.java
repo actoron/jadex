@@ -340,4 +340,18 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		return ret;
 	}
 
+	/**
+	 *  Called before blocking the component thread.
+	 */
+	public void	beforeBlock()
+	{
+	}
+	
+	/**
+	 *  Called after unblocking the component thread.
+	 */
+	public void	afterBlock()
+	{
+	}
+
 }

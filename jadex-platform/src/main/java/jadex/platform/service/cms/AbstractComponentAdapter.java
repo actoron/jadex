@@ -748,6 +748,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			throw new RuntimeException("Cannot block: no executor");
 		}
 		
+		component.beforeBlock();
+		
 		this.executing	= false;
 		this.componentthread	= null;
 		
@@ -760,6 +762,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		}
 		this.executing	= true;
 		this.componentthread	= Thread.currentThread();
+		
+		component.afterBlock();
 	}
 	
 	/**

@@ -738,6 +738,20 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 	
 	/**
+	 *  Called before blocking the component thread.
+	 */
+	public void	beforeBlock()
+	{
+	}
+	
+	/**
+	 *  Called after unblocking the component thread.
+	 */
+	public void	afterBlock()
+	{
+	}
+
+	/**
 	 *  Get the value fetcher.
 	 */
 	public IValueFetcher getFetcher()

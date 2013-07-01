@@ -598,6 +598,20 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	}
 	
 	/**
+	 *  Called before blocking the component thread.
+	 */
+	public void	beforeBlock()
+	{
+	}
+	
+	/**
+	 *  Called after unblocking the component thread.
+	 */
+	public void	afterBlock()
+	{
+	}
+
+	/**
 	 *  Init context variables.
 	 */
 	protected void initContextVariables()
