@@ -201,8 +201,14 @@ public class Future<E> implements IFuture<E>, ICommandFuture
     			if(CALLER_QUEUED.equals(state))
     			{
     	    	   	callers.put(caller, CALLER_SUSPENDED);
-    				caller.suspend(this, timeout);
-    	    	   	callers.remove(caller);
+    	    	   	try
+    	    	   	{
+    	    	   		caller.suspend(this, timeout);
+    	    	   	}
+    	    	   	finally
+    	    	   	{
+    	    	   		callers.remove(caller);
+    	    	   	}
     			}
     			// else already resumed.
     		}
