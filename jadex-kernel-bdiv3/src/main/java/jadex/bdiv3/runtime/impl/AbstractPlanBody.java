@@ -175,6 +175,10 @@ public abstract class AbstractPlanBody implements IPlanBody
 		{
 			ret.setException(e);
 		}
+		catch(BodyAborted ba)
+		{
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}
