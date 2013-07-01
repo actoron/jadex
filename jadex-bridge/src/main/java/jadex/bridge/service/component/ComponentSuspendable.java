@@ -50,8 +50,14 @@ public class ComponentSuspendable implements ISuspendable
 //				this.wait(timeout);
 //			}
 			
-			adapter.block(this);
-			this.future	= null;
+			try
+			{
+				adapter.block(this);
+			}
+			finally
+			{
+				this.future	= null;
+			}
 		}
 //		System.out.println("ComponentSuspendable.unsuspend "+Thread.currentThread());
 	}

@@ -143,4 +143,15 @@ public interface IComponentInstance
 	 *  @return True, if called from an external (i.e. non-synchronized) thread.
 	 */
 	public boolean isExternalThread();
+	
+	/**
+	 *  Called before blocking the component thread.
+	 */
+	public void	beforeBlock();
+	
+	/**
+	 *  Called after unblocking the component thread.
+	 */
+	public void	afterBlock();
+
 }
