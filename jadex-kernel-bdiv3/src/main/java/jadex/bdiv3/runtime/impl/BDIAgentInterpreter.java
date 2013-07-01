@@ -134,8 +134,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			injectAgent(pa, agent, model, null);
 		}
 		
-		wrapCollections(((BDIModel)model).getCapability(), agent);
-		
 		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
 		
@@ -461,6 +459,24 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			ret.setResult(null);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Add extra init code after components.
+	 */
+	public IFuture<Void> initComponents(final IModelInfo model, String config)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		super.initComponents(model, config).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
+				wrapCollections(bdimodel.getCapability(), agent);
+				ret.setResult(null);
+			}
+		});
 		return ret;
 	}
 	

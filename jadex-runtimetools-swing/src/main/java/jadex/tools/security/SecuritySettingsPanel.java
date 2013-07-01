@@ -854,7 +854,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		spv.add(sph);
 		
 		((JTabbedPane)inner).addTab("Password", plocal);
-		((JTabbedPane)inner).addTab("Keystore", spv);
+		((JTabbedPane)inner).addTab("Key Store", spv);
 		((JTabbedPane)inner).addTab("Remote Passwords", ppp);
 		((JTabbedPane)inner).addTab("Network Names", npp);
 			

@@ -42,7 +42,6 @@
     </semantic:subProcess>
     <semantic:boundaryEvent name="Catch Exception" id="__Z3EgRGCEd-qQOr2ZLx-Mw" attachedToRef="_omlhARGCEd-qQOr2ZLx-Mw">
       <semantic:outgoing>_AeQgwRGDEd-qQOr2ZLx-Mw</semantic:outgoing>
-      <semantic:outgoing>ZSWrKCtwoYJVa52l</semantic:outgoing>
       <semantic:errorEventDefinition/>
     </semantic:boundaryEvent>
     <semantic:startEvent id="_kU2mERGCEd-qQOr2ZLx-Mw">
@@ -59,7 +58,6 @@
     </semantic:task>
     <semantic:task name="Success" id="_9c_IIRGCEd-qQOr2ZLx-Mw">
       <semantic:incoming>_AeQgwRGDEd-qQOr2ZLx-Mw</semantic:incoming>
-      <semantic:incoming>ZSWrKCtwoYJVa52l</semantic:incoming>
       <semantic:outgoing>_Ph6tMRGDEd-qQOr2ZLx-Mw</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>WriteContextTask</jadex:class>
@@ -76,8 +74,6 @@
     <semantic:sequenceFlow sourceRef="_omlhAxGCEd-qQOr2ZLx-Mw" targetRef="tG/UpGJhtkZYgzud" id="qwK395PJGJbozg6z">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="__Z3EgRGCEd-qQOr2ZLx-Mw" targetRef="_9c_IIRGCEd-qQOr2ZLx-Mw" id="_AeQgwRGDEd-qQOr2ZLx-Mw">
-    </semantic:sequenceFlow>
-    <semantic:sequenceFlow sourceRef="__Z3EgRGCEd-qQOr2ZLx-Mw" targetRef="_9c_IIRGCEd-qQOr2ZLx-Mw" id="ZSWrKCtwoYJVa52l">
     </semantic:sequenceFlow>
     <semantic:sequenceFlow sourceRef="_kU2mERGCEd-qQOr2ZLx-Mw" targetRef="_omlhARGCEd-qQOr2ZLx-Mw" id="_vLsMwRGCEd-qQOr2ZLx-Mw">
     </semantic:sequenceFlow>
@@ -125,10 +121,7 @@
         <dc:Bounds height="40.0" width="40.0" x="1210.0" y="280.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_AeQgwRGDEd-qQOr2ZLx-Mw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_BvpasRGEEd-qQOr2ZLx-Mw">
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="ZSWrKCtwoYJVa52l">
+        <di:waypoint x="40.0" y="320.0"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="qwK395PJGJbozg6z">
       </bpmndi:BPMNEdge>

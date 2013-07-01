@@ -11,7 +11,6 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
@@ -20,7 +19,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 import java.awt.Color;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.SwingUtilities;
@@ -178,8 +176,8 @@ public class BlocksworldBDI
 			this.blocks = blocks;
 		}
 
-		@GoalTargetCondition
-		public boolean checkClear()
+		@GoalTargetCondition(events="blocks")
+		public boolean checkConfiguration()
 		{
 			return table.configurationEquals(configuration);
 		}
