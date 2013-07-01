@@ -396,6 +396,20 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	}
 	
 	/**
+	 *  Called before blocking the component thread.
+	 */
+	public void	beforeBlock()
+	{
+	}
+	
+	/**
+	 *  Called after unblocking the component thread.
+	 */
+	public void	afterBlock()
+	{
+	}
+	
+	/**
 	 *  Extended init procedure including subcapabilities.
 	 */
 	public IFuture init(IModelInfo model,String config)
