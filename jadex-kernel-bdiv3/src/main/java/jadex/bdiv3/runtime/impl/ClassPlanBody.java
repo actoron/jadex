@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
@@ -7,9 +8,11 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
+import jadex.micro.IPojoMicroAgent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -76,6 +79,8 @@ public class ClassPlanBody extends AbstractPlanBody
 		mi = ((MPlan)rplan.getModelElement()).getBody().getAbortedMethod(ia.getClassLoader());
 		if(mi!=null)
 			abortedmethod = mi.getMethod(ia.getClassLoader());
+		
+//		injectElements(((IPojoMicroAgent)ia).getPojoAgent());
 	}
 	
 	//-------- methods --------
@@ -125,40 +130,7 @@ public class ClassPlanBody extends AbstractPlanBody
 						throw new RuntimeException("Plan body has no empty constructor: "+body);
 				}
 				
-				// inject plan elements
-				Class<?> bcl = body;
-				while(!Object.class.equals(bcl))
-				{
-					Field[] fields = bcl.getDeclaredFields();
-					for(Field f: fields)
-					{
-						if(f.isAnnotationPresent(PlanAPI.class))
-						{
-							f.setAccessible(true);
-							f.set(plan, getRPlan());
-						}
-						else if(f.isAnnotationPresent(PlanCapability.class))
-						{
-							f.setAccessible(true);
-							f.set(plan, agent);
-						}
-						else if(f.isAnnotationPresent(PlanReason.class))
-						{
-							Object r = getRPlan().getReason();
-							if(r instanceof RProcessableElement)
-							{
-								Object reason = ((RProcessableElement)r).getPojoElement();
-								if(reason!=null)
-								{
-									f.setAccessible(true);
-									f.set(plan, reason);
-								}
-							}
-						}
-					}
-					
-					bcl = bcl.getSuperclass();
-				}
+				injectElements(agent);
 			}
 			catch(RuntimeException e)
 			{
@@ -173,6 +145,46 @@ public class ClassPlanBody extends AbstractPlanBody
 		
 		return plan;
 	}
+
+	/**
+	 *  Inject plan elements.
+	 */
+	protected void injectElements(Object agent) throws IllegalAccessException
+	{
+		Class<?> bcl = body;
+		while(!Object.class.equals(bcl))
+		{
+			Field[] fields = bcl.getDeclaredFields();
+			for(Field f: fields)
+			{
+				if(f.isAnnotationPresent(PlanAPI.class))
+				{
+					f.setAccessible(true);
+					f.set(plan, getRPlan());
+				}
+				else if(f.isAnnotationPresent(PlanCapability.class))
+				{
+					f.setAccessible(true);
+					f.set(plan, agent);
+				}
+				else if(f.isAnnotationPresent(PlanReason.class))
+				{
+					Object r = getRPlan().getReason();
+					if(r instanceof RProcessableElement)
+					{
+						Object reason = ((RProcessableElement)r).getPojoElement();
+						if(reason!=null)
+						{
+							f.setAccessible(true);
+							f.set(plan, reason);
+						}
+					}
+				}
+			}
+			
+			bcl = bcl.getSuperclass();
+		}
+	}
 	
 	/**
 	 *  Invoke the body.
@@ -185,14 +197,10 @@ public class ClassPlanBody extends AbstractPlanBody
 			bodymethod.setAccessible(true);
 			return bodymethod.invoke(plan, params);
 		}
-		catch(RuntimeException e)
-		{
-			throw e;
-		}
 		catch(Exception e)
 		{
-//			e.printStackTrace();
-			throw new RuntimeException(e);
+			Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+			throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
 		}
 	}
 	
@@ -209,14 +217,10 @@ public class ClassPlanBody extends AbstractPlanBody
 				passedmethod.setAccessible(true);
 				ret = passedmethod.invoke(plan, params);			
 			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
 			catch(Exception e)
 			{
-//				e.printStackTrace();
-				throw new RuntimeException(e);
+				Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+				throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
 			}
 		}
 		return ret;
@@ -235,14 +239,10 @@ public class ClassPlanBody extends AbstractPlanBody
 				failedmethod.setAccessible(true);
 				ret = failedmethod.invoke(plan, params);			
 			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
 			catch(Exception e)
 			{
-//				e.printStackTrace();
-				throw new RuntimeException(e);
+				Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+				throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
 			}
 		}
 		return ret;
@@ -261,14 +261,10 @@ public class ClassPlanBody extends AbstractPlanBody
 				abortedmethod.setAccessible(true);
 				ret = abortedmethod.invoke(plan, params);			
 			}
-			catch(RuntimeException e)
-			{
-				throw e;
-			}
 			catch(Exception e)
 			{
-//				e.printStackTrace();
-				throw new RuntimeException(e);
+				Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+				throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
 			}
 		}
 		return ret;
