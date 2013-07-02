@@ -720,7 +720,8 @@ public class BDIClassReader extends MicroClassReader
 		else if(!Object.class.equals(body.value()))
 		{
 			// Class name if is class 
-			name = SReflect.getInnerClassName(body.value());
+//			name = SReflect.getInnerClassName(body.value());
+			name = body.value().getName();
 		}
 		else if(sp.name().length()>0)
 		{

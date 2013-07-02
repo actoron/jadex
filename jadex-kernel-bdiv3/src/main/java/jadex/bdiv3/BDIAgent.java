@@ -77,7 +77,7 @@ public class BDIAgent extends MicroAgent
 		if(mplan==null)
 			throw new RuntimeException("Plan model not found for: "+plan);
 		
-		RPlan rplan = RPlan.createRPlan(mplan, mplan, null, ip.getInternalAccess());
+		RPlan rplan = RPlan.createRPlan(mplan, plan, null, ip.getInternalAccess());
 		RPlan.executePlan(rplan, getInterpreter().getInternalAccess());
 	}
 	
