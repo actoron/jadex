@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,7 @@ public class SettingsPanel extends JPanel
 		if (settings.getLibraryEntries() != null)
 		{
 			libentries.addAll(Arrays.asList(settings.getLibraryEntries()));
+			Collections.sort(libentries);
 		}
 		
 		JTabbedPane tabpane = new JTabbedPane();
@@ -419,7 +421,6 @@ public class SettingsPanel extends JPanel
 		if (!cand.equals(orig))
 		{
 			settings.setLibraryEntries(libentries);
-			settings.scanForClasses();
 			ret = true;
 		}
 		settings.setSmoothZoom(szbox.isSelected());

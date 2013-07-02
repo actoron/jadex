@@ -7,6 +7,10 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -95,16 +99,16 @@ public class Settings
 	protected ClassLoader libclassloader;
 	
 	/** Global task classes */
-	protected List<ClassInfo> globaltaskclasses;
+	protected List<ClassInfo> globaltaskclasses = new ArrayList<ClassInfo>();
 
 	/** Global interfaces */
-	protected List<ClassInfo> globalinterfaces;
+	protected List<ClassInfo> globalinterfaces = new ArrayList<ClassInfo>();
 	
 	/** Global exceptions. */
-	protected List<ClassInfo> globalexceptions;
+	protected List<ClassInfo> globalexceptions = new ArrayList<ClassInfo>();
 	
 	/** Global allclasses */
-	protected List<ClassInfo> globalallclasses;
+	protected List<ClassInfo> globalallclasses = new ArrayList<ClassInfo>();
 	
 	/**
 	 *  Gets the progress bar.
@@ -408,28 +412,45 @@ public class Settings
 	/**
 	 *  Scans for the global classes.
 	 */
-	public void scanForClasses()
+	public IFuture<Void> scanForClasses()
 	{
-		Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
+//		Set<ClassInfo>[] tmp = Settings.scanForClasses(this, getLibraryClassLoader(), true);
+		final List<ClassInfo>[] stmp = new List[4];
+		for (int i = 0; i < 4; ++i)
 		{
-			public int compare(ClassInfo o1, ClassInfo o2)
-			{
-				String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
-				String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
-				return str1.compareTo(str2);
-			}
-		};
-		Set<ClassInfo>[] tmp = Settings.scanForClasses(this, getLibraryClassLoader(), true);
-		List<ClassInfo>[] stmp = new List[tmp.length];
-		for (int i = 0; i < tmp.length; ++i)
-		{
-			stmp[i] = new ArrayList<ClassInfo>(tmp[i]);
-			Collections.sort(stmp[i], comp);
+			stmp[i] = new ArrayList<ClassInfo>();
 		}
-		setGlobalTaskClasses(stmp[0]);
-		setGlobalInterfaces(stmp[1]);
-		setGlobalExceptions(stmp[2]);
-		setGlobalAllClasses(stmp[3]);
+		IFuture<Void> ret = Settings.scanForClasses(this, getLibraryClassLoader(), new FileFilter("$", false), new BpmnClassFilter(stmp, true), true);
+		
+		ret.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				Comparator<ClassInfo> comp = new Comparator<ClassInfo>()
+				{
+					public int compare(ClassInfo o1, ClassInfo o2)
+					{
+						String str1 = SReflect.getUnqualifiedTypeName(o1.toString());
+						String str2 = SReflect.getUnqualifiedTypeName(o2.toString());
+						return str1.compareTo(str2);
+					}
+				};
+				for (int i = 0; i < 4; ++i)
+				{
+					Collections.sort(stmp[i], comp);
+				}
+				setGlobalTaskClasses(stmp[0]);
+				setGlobalInterfaces(stmp[1]);
+				setGlobalExceptions(stmp[2]);
+				setGlobalAllClasses(stmp[3]);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -859,13 +880,12 @@ public class Settings
 			
 			try
 			{
+				List<ClassInfo> gis = new ArrayList<ClassInfo>();
+				List<ClassInfo> gts = new ArrayList<ClassInfo>();
+				List<ClassInfo> ges = new ArrayList<ClassInfo>();
+				List<ClassInfo> ac = new ArrayList<ClassInfo>();
 				if (Integer.parseInt(props.getProperty("build")) == BpmnEditor.BUILD)
 				{
-				
-					List<ClassInfo> gis = new ArrayList<ClassInfo>();
-					List<ClassInfo> gts = new ArrayList<ClassInfo>();
-					List<ClassInfo> ges = new ArrayList<ClassInfo>();
-					List<ClassInfo> ac = new ArrayList<ClassInfo>();
 					for(Object okey: props.keySet())
 					{
 						if(okey instanceof String)
@@ -909,32 +929,33 @@ public class Settings
 	/**
 	 *  Scan for task classes.
 	 */
-	public static final Set<ClassInfo>[] scanForClasses(Settings settings, final ClassLoader cl, final boolean includeboot)
-	{
-		final Set<ClassInfo> res1 = new HashSet<ClassInfo>();
-		final Set<ClassInfo> res2 = new HashSet<ClassInfo>();
-		final Set<ClassInfo> res3 = new HashSet<ClassInfo>();
-		final Set<ClassInfo> res4 = new HashSet<ClassInfo>();
-		
-		scanForClasses(settings, cl, new FileFilter("$", false), new BpmnClassFilter(res1, res2, res3, res4, includeboot), includeboot);
-		
-		return new Set[]{res1, res2, res3, res4};
-	}
+//	public static final Set<ClassInfo>[] scanForClasses(Settings settings, final ClassLoader cl, final boolean includeboot)
+//	{
+//		final Set<ClassInfo> res1 = new HashSet<ClassInfo>();
+//		final Set<ClassInfo> res2 = new HashSet<ClassInfo>();
+//		final Set<ClassInfo> res3 = new HashSet<ClassInfo>();
+//		final Set<ClassInfo> res4 = new HashSet<ClassInfo>();
+//		
+//		scanForClasses(settings, cl, new FileFilter("$", false), new BpmnClassFilter(res1, res2, res3, res4, includeboot), includeboot);
+//		
+//		return new Set[]{res1, res2, res3, res4};
+//	}
 	
 	/**
 	 *  Scan for task classes.
 	 */
-	protected static final void scanForClasses(Settings settings, ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
+	protected static final IFuture<Void> scanForClasses(Settings settings, ClassLoader cl, IFilter<Object> filefilter, IFilter<Class<?>> classfilter, boolean includeboot)
 	{
 		URL[] urls = SUtil.getClasspathURLs(cl, includeboot).toArray(new URL[0]);
-		scanForClasses(settings, urls, filefilter, classfilter, includeboot);
+		return scanForClasses(settings, urls, filefilter, classfilter, includeboot);
 	}
 	
 	/**
 	 *  Scan for task classes.
 	 */
-	protected static final void scanForClasses(final Settings settings, final URL[] urls, final IFilter<Object> filefilter, final IFilter<Class<?>> classfilter, boolean includeboot)
+	protected static final IFuture<Void> scanForClasses(final Settings settings, final URL[] urls, final IFilter<Object> filefilter, final IFilter<Class<?>> classfilter, boolean includeboot)
 	{
+		final Future<Void> ret = new Future<Void>();
 		(new Thread(new Runnable()
 		{
 			public void run()
@@ -1000,6 +1021,7 @@ public class Settings
 						settings.getProgressBar().update(++count);
 					}
 					settings.getProgressBar().finish();
+					ret.setResult(null);
 					
 					//****
 					
@@ -1023,7 +1045,7 @@ public class Settings
 				}
 			}
 		})).start();
-		
+		return ret;
 	}
 	
 	protected static final Set<String> getSuperClasses(String cname, URLClassLoader rcl)
@@ -1109,6 +1131,15 @@ public class Settings
 			this.iface = iface;
 			this.exception = exception;
 			this.all = all;
+			this.includeboot = includeboot;
+		}
+		
+		public BpmnClassFilter(Collection<ClassInfo>[] classes, boolean includeboot)
+		{
+			this.task = classes[0];
+			this.iface = classes[1];
+			this.exception = classes[2];
+			this.all = classes[3];
 			this.includeboot = includeboot;
 		}
 		

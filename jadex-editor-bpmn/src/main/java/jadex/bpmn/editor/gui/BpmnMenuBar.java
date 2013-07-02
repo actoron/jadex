@@ -1,10 +1,11 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.model.io.SBpmnModelWriter;
 import jadex.commons.SUtil;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.Dimension;
 import java.awt.Event;
@@ -88,25 +89,24 @@ public class BpmnMenuBar extends JMenuBar
 					{
 						boolean refreshclasses = spanel.applySettings();
 						
-						List<ModelContainer> containers = editorwindow.getModelContainers();
-						for (ModelContainer cont : containers)
+						if (refreshclasses)
 						{
-							if (refreshclasses)
+							editorwindow.getSettings().scanForClasses().addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 							{
-								cont.generateClassLoader();
-							}
-							
-							if (cont.getGraph().getSelectionCount() == 1)
-							{
-								cont.setPropertyPanel(SPropertyPanelFactory.createPanel(cont.getGraph().getSelectionCell(), cont));
-							}
-							else
-							{
-								cont.setPropertyPanel(SPropertyPanelFactory.createPanel(null, cont));
-							}
-							
-							cont.getGraph().refresh();
+								public void resultAvailable(Void result)
+								{
+									for (ModelContainer container : editorwindow.getModelContainers())
+									{
+										container.generateClassLoader();
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+								}
+							}));
 						}
+							
 					}
 				});
 				

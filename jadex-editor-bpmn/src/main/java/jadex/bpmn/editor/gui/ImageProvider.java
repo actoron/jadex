@@ -1342,7 +1342,7 @@ public class ImageProvider
 				String svgname = name + ".svg";
 				try
 				{
-					InputStream svgstream = this.getClass().getClassLoader().getResourceAsStream(IMAGE_DIR + svgname);
+					InputStream svgstream = ImageProvider.class.getClassLoader().getResourceAsStream(IMAGE_DIR + svgname);
 					if (svgstream != null)
 					{
 						final BufferedImage[] bfimg = new BufferedImage[1];

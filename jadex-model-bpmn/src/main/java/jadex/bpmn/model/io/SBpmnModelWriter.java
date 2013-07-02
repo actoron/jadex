@@ -39,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 20;
+	public static final int BUILD = 21;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -1077,7 +1077,6 @@ public class SBpmnModelWriter
 				}
 				else if (activity.getActivityType().contains("Compensation"))
 				{
-					out.print(getIndent(baseind + 1));
 					out.println("<semantic:compensateEventDefinition/>");
 				}
 				else if (activity.getActivityType().contains("Cancel"))
@@ -1127,9 +1126,9 @@ public class SBpmnModelWriter
 			boolean istask = MBpmnModel.TASK.equals(activity.getActivityType()) || issubproc;
 			boolean hasclass = activity.getClazz()!=null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
 			boolean hastaskparams = istask && activity.getParameters()!=null && activity.getParameters().size()>0;
-			boolean hastaskprops = istask && activity.getProperties()!=null && activity.getProperties().size()>0;
+			boolean hasprops = (istask || MBpmnModel.EVENT_END_ERROR.equals(activity.getActivityType())) && activity.getProperties()!=null && activity.getProperties().size()>0;
 			
-			if(hasclass || hastaskparams || hastaskprops || procref != null)
+			if(hasclass || hastaskparams || hasprops || procref != null)
 			{
 				out.println(getIndent(baseind + 1) + "<semantic:extensionElements>");
 				
@@ -1168,7 +1167,7 @@ public class SBpmnModelWriter
 					}
 				}
 				
-				if(hastaskprops)
+				if(hasprops)
 				{
 					IndexMap<String, MProperty> props = activity.getProperties();
 					for(String key: props.keySet())

@@ -107,6 +107,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** Constant for event intermediate multiple. */
 	public static final String EVENT_INTERMEDIATE_MULTIPLE = "EventIntermediateMultiple";
 	
+	/** Property name for error events. */
+	public static final String PROPERTY_EVENT_ERROR = "exception";
+	
 	/** The process trigger name. Used to put the trigger event in the process arguments. */
 	public static final String TRIGGER = "_process_trigger";
 	

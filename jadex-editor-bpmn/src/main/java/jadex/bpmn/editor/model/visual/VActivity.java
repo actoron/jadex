@@ -94,6 +94,16 @@ public class VActivity extends VNamedNode
 	}
 	
 	/**
+	 *  Returns the MActivity.
+	 * 
+	 *  @return The MActivity.
+	 */
+	public MActivity getMActivity()
+	{
+		return (MActivity) getBpmnElement();
+	}
+	
+	/**
 	 *  Sets the parent.
 	 */
 	public void setParent(mxICell parent)

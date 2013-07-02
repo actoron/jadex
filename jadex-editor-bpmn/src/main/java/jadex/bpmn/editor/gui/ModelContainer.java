@@ -4,6 +4,7 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.Settings.BpmnClassFilter;
 import jadex.bpmn.editor.gui.Settings.FileFilter;
 import jadex.bpmn.editor.gui.controllers.IdGenerator;
+import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.task.info.TaskMetaInfo;
@@ -916,6 +917,20 @@ public class ModelContainer implements IModelContainer
 			model.setClassLoader(parent);
 		}
 		setupClassInfos();
+		
+		if (propertypanelcontainer != null && propertypanelcontainer.getComponentCount() > 0)
+		{
+			if (getGraph().getSelectionCount() == 1)
+			{
+				setPropertyPanel(SPropertyPanelFactory.createPanel(getGraph().getSelectionCell(), this));
+			}
+			else
+			{
+				setPropertyPanel(SPropertyPanelFactory.createPanel(null, this));
+			}
+		}
+		
+		getGraph().refresh();
 	}
 	
 	/**

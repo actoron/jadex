@@ -1,8 +1,13 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.ProcessThreadValueFetcher;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.IValueFetcher;
+import jadex.javaparser.IParsedExpression;
 
 /**
  *  On error end propagate an exception.
@@ -15,7 +20,7 @@ public class EventIntermediateErrorActivityHandler extends DefaultActivityHandle
 	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		// Do catch exception when the activity is an event handler.
-		if(activity.isEventHandler())
+		if(activity.isEventHandler() || !activity.isThrowing())
 		{
 			thread.setParameterValue("$exception", thread.getException());
 			thread.setException(null);
@@ -24,7 +29,17 @@ public class EventIntermediateErrorActivityHandler extends DefaultActivityHandle
 		// Otherwise throw an exception.
 		else
 		{
-			Exception ex = (Exception)thread.getPropertyValue("exception", activity);
+			Exception ex = null;
+			if (thread.getPropertyValue(MBpmnModel.PROPERTY_EVENT_ERROR, activity) instanceof UnparsedExpression)
+			{
+				UnparsedExpression excexp = (UnparsedExpression) thread.getPropertyValue(MBpmnModel.PROPERTY_EVENT_ERROR, activity);
+				IValueFetcher fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
+				ex = (Exception) ((IParsedExpression) excexp.getParsed()).getValue(fetcher);
+			}
+			else if (thread.getPropertyValue(MBpmnModel.PROPERTY_EVENT_ERROR, activity) instanceof Exception)
+			{
+				ex = (Exception)thread.getPropertyValue(MBpmnModel.PROPERTY_EVENT_ERROR, activity);
+			}
 			if(ex==null)
 				ex = new EventIntermediateErrorException(activity.getDescription());
 			thread.setException(ex);

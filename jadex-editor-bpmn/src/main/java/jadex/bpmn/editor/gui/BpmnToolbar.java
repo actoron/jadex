@@ -219,9 +219,9 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		tasks.add(new IconGenerationTask(imgprovider, true , row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_EMPTY, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
 				"Empty Intermediate Event", iconsize));
 		
-		sym = "bolt";
-		tasks.add(new IconGenerationTask(imgprovider, false , row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_ERROR, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
-				"Error Intermediate Event", iconsize));
+//		sym = "bolt";
+//		tasks.add(new IconGenerationTask(imgprovider, false , row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_ERROR, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),
+//				"Error Intermediate Event", iconsize));
 		
 		sym = "letter";
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_INTERMEDIATE_MESSAGE, ImageProvider.SHAPE_ELLIPSE, ImageProvider.DOUBLE_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.INTERMEDIATE_EVENT_COLOR),

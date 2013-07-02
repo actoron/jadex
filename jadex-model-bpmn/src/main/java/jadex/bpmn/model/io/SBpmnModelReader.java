@@ -421,7 +421,8 @@ public class SBpmnModelReader
 			}
 			else if (evttypes.size() == 1)
 			{
-				acttype += evttypes.get(0).getFirstEntity();
+				Tuple2<String, String> type = evttypes.get(0);
+				acttype += type.getFirstEntity();
 			}
 			else
 			{
@@ -434,6 +435,15 @@ public class SBpmnModelReader
 				UnparsedExpression exp = parseExp(new UnparsedExpression("duration", "java.lang.Number", dur, null),model.getModelInfo().getAllImports(), cl);
 				MProperty mprop = new MProperty(exp.getClazz(), exp.getName(), exp);
 				evt.addProperty(mprop);
+			}
+			
+			if(buffer.containsKey("properties"))
+			{
+				List<MProperty> props = (List<MProperty>) buffer.remove("properties");
+				for(MProperty prop : props)
+				{
+					evt.addProperty(prop);
+				}
 			}
 			
 			evt.setActivityType(acttype);
@@ -469,7 +479,7 @@ public class SBpmnModelReader
 			}
 			else if ("errorEventDefinition".equals(tag.getLocalPart()))
 			{
-				evttypes.add(new Tuple2("Error", null));
+				evttypes.add(new Tuple2("Error", content));
 			}
 			else if ("compensateEventDefinition".equals(tag.getLocalPart()))
 			{

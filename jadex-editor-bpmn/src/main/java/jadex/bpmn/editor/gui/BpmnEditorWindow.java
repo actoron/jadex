@@ -12,6 +12,8 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bridge.ResourceIdentifier;
 import jadex.commons.ResourceInfo;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -109,10 +111,23 @@ public class BpmnEditorWindow extends JFrame
 		if(settings.getGlobalInterfaces()==null || settings.getGlobalInterfaces().size()==0)// || true)
 		{
 			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "Scanning classes start...");
-			long start = System.currentTimeMillis();
-			settings.scanForClasses();
-			long needed = System.currentTimeMillis()-start;
-			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "... scanning classes end, needed: "+needed/1000+" secs");
+			final long start = System.currentTimeMillis();
+			settings.scanForClasses().addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					long needed = System.currentTimeMillis()-start;
+					Logger.getLogger(BpmnEditor.APP_NAME).log(Level.INFO, "... scanning classes end, needed: "+needed/1000+" secs");
+					for (ModelContainer container : getModelContainers())
+					{
+						container.generateClassLoader();
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			}));
 		}
 		
 		getContentPane().setLayout(new BorderLayout());
