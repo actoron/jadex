@@ -1,6 +1,5 @@
 package jadex.bdiv3.runtime.impl;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
@@ -80,7 +79,7 @@ public class ClassPlanBody extends AbstractPlanBody
 		if(mi!=null)
 			abortedmethod = mi.getMethod(ia.getClassLoader());
 		
-//		injectElements(((IPojoMicroAgent)ia).getPojoAgent());
+		injectElements(((IPojoMicroAgent)ia).getPojoAgent());
 	}
 	
 	//-------- methods --------
@@ -149,40 +148,52 @@ public class ClassPlanBody extends AbstractPlanBody
 	/**
 	 *  Inject plan elements.
 	 */
-	protected void injectElements(Object agent) throws IllegalAccessException
+	protected void injectElements(Object agent)
 	{
-		Class<?> bcl = body;
-		while(!Object.class.equals(bcl))
+		try
 		{
-			Field[] fields = bcl.getDeclaredFields();
-			for(Field f: fields)
+			Class<?> bcl = body;
+			while(!Object.class.equals(bcl))
 			{
-				if(f.isAnnotationPresent(PlanAPI.class))
+				Field[] fields = bcl.getDeclaredFields();
+				for(Field f: fields)
 				{
-					f.setAccessible(true);
-					f.set(plan, getRPlan());
-				}
-				else if(f.isAnnotationPresent(PlanCapability.class))
-				{
-					f.setAccessible(true);
-					f.set(plan, agent);
-				}
-				else if(f.isAnnotationPresent(PlanReason.class))
-				{
-					Object r = getRPlan().getReason();
-					if(r instanceof RProcessableElement)
+					if(f.isAnnotationPresent(PlanAPI.class))
 					{
-						Object reason = ((RProcessableElement)r).getPojoElement();
-						if(reason!=null)
+						f.setAccessible(true);
+						f.set(plan, getRPlan());
+					}
+					else if(f.isAnnotationPresent(PlanCapability.class))
+					{
+						f.setAccessible(true);
+						f.set(plan, agent);
+					}
+					else if(f.isAnnotationPresent(PlanReason.class))
+					{
+						Object r = getRPlan().getReason();
+						if(r instanceof RProcessableElement)
 						{
-							f.setAccessible(true);
-							f.set(plan, reason);
+							Object reason = ((RProcessableElement)r).getPojoElement();
+							if(reason!=null)
+							{
+								f.setAccessible(true);
+								f.set(plan, reason);
+							}
 						}
 					}
 				}
+				
+				bcl = bcl.getSuperclass();
 			}
-			
-			bcl = bcl.getSuperclass();
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 	
