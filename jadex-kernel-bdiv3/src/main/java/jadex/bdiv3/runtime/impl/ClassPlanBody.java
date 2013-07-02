@@ -79,7 +79,8 @@ public class ClassPlanBody extends AbstractPlanBody
 		if(mi!=null)
 			abortedmethod = mi.getMethod(ia.getClassLoader());
 		
-		injectElements(((IPojoMicroAgent)ia).getPojoAgent());
+		if(plan!=null)
+			injectElements(((IPojoMicroAgent)ia).getPojoAgent());
 	}
 	
 	//-------- methods --------

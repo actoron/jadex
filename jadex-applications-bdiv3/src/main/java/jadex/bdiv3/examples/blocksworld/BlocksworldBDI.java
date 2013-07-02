@@ -91,7 +91,7 @@ public class BlocksworldBDI
 		@GoalTargetCondition(events="blocks")
 		public boolean checkClear()
 		{
-			System.out.println("clear target condition for: "+block+" "+block.isClear());
+//			System.out.println("clear target condition for: "+block+" "+block.isClear());
 			return block.isClear();
 		}
 
@@ -135,7 +135,7 @@ public class BlocksworldBDI
 		@GoalTargetCondition(events="blocks")
 		public boolean checkOn()
 		{
-			System.out.println("stack target condition for: "+block+" "+target+" "+block.getLower().equals(target));
+//			System.out.println("stack target condition for: "+block+" "+target+" "+block.getLower().equals(target));
 			return block.getLower().equals(target);
 		}
 
@@ -179,6 +179,9 @@ public class BlocksworldBDI
 		@GoalTargetCondition(events="blocks")
 		public boolean checkConfiguration()
 		{
+//			System.out.println("check configure goal: "+table.configurationEquals(configuration));
+//			System.out.println(table);
+//			System.out.println(configuration);
 			return table.configurationEquals(configuration);
 		}
 

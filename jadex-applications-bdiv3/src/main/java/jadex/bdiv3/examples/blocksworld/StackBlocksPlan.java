@@ -37,9 +37,9 @@ public class StackBlocksPlan
 	{
 		// Clear blocks.
 		
-		try
-		{
-		System.out.println(getClass().getName()+" "+getBlock()+" "+getTarget());
+//		try
+//		{
+//		System.out.println(getClass().getName()+" "+getBlock()+" "+getTarget());
 		
 		ClearGoal clear = capa.new ClearGoal(getBlock());
 		rplan.dispatchSubgoal(clear).get();
@@ -68,11 +68,11 @@ public class StackBlocksPlan
 //		startAtomic();
 		getBlock().stackOn(getTarget());
 //		endAtomic();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 	}
 
 	/**

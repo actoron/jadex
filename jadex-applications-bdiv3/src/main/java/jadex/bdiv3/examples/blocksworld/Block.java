@@ -201,13 +201,25 @@ public class Block
 
 	/**
 	 *  Check for equality.
-	 * /
+	 */
 	public boolean	equals(Object o)
 	{
 		return o instanceof Block
 			&& ((Block)o).number==number
 			&& ((Block)o).getColor().equals(getColor());
-	}*/
+	}
+	
+	/** 
+	 * 
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((color == null) ? 0 : color.hashCode());
+		result = prime * result + number;
+		return result;
+	}
 
 	//-------- property methods --------
 

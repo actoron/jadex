@@ -39,6 +39,8 @@ public class ConfigureBlocksPlan
 	@PlanBody
 	public void body()
 	{
+		try
+		{
 		Table configuration	= goal.getConfiguration();
 //		getParameterSet("blocks").addValues(configuration.getAllBlocks());
 		
@@ -99,5 +101,11 @@ public class ConfigureBlocksPlan
 				e.printStackTrace();
 			}
 		}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
+	
 }

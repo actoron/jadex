@@ -106,7 +106,17 @@ public class Table	extends Block
 	 */
 	public String	toString()
 	{
-		return name;
+		StringBuffer buf = new StringBuffer();
+
+		buf.append(name).append("\n");
+		
+		Block[][] stacks = getStacks();
+		for(Block[] stack: stacks)
+		{
+			buf.append(SUtil.arrayToString(stack));
+		}
+		
+		return buf.toString();
 	}
 
 	/**
@@ -243,5 +253,6 @@ public class Table	extends Block
 		}
 		return ret;
 	}*/
+	
 }
 

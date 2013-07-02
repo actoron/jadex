@@ -17,7 +17,7 @@ public class ClearBlocksPlan extends StackBlocksPlan
     public boolean checkExistsBlock()
     {
         boolean ret = ((ClearGoal)goal).getBlock().getUpper()!=null;
-        System.out.println("do clear: "+ret);
+//        System.out.println("do clear: "+ret);
         return ret;
     }
 
