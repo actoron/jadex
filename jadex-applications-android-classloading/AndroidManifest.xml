@@ -12,24 +12,12 @@
     <application
         android:debuggable="true"
         android:icon="@drawable/icon"
-        android:label="ClientAppDemo"
+        android:label="Sokrates"
         android:screenOrientation="portrait" >
         <activity android:name="jadex.android.clientapp.MyApplication" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-             <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-			    <data android:mimeType="application/*" />
-			    <data android:mimeType="audio/*" />
-			    <data android:mimeType="image/*" />
-			    <data android:mimeType="message/*" />
-			    <data android:mimeType="multipart/*" />
-			    <data android:mimeType="text/*" />
-			    <data android:mimeType="video/*" />
             </intent-filter>
         </activity>
         

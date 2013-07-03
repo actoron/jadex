@@ -14,6 +14,7 @@ public abstract class JadexApplication extends Activity
 	public static final String EXTRA_KEY_ACTIVITYCLASS = "net.sourceforge.jadex.EXTRA_KEY_ACTIVITYCLASS";
 	public static final String EXTRA_KEY_ORIGINALACTION = "net.sourceforge.jadex.EXTRA_KEY_ORIGINALACTION";
 	public static final String EXTRA_KEY_APPLICATIONINFO = "net.sourceforge.jadex.EXTRA_KEY_APPLICATIONINFO";
+	public static final String EXTRA_KEY_WINDOWFEATURES = "net.sourceforge.jadex.EXTRA_KEY_WINDOWFEATURES";
 	
 	public static final String INTENT_ACTION_LOADAPP = "net.sourceforge.jadex.LOAD_APPLICATION";
 	
@@ -34,6 +35,7 @@ public abstract class JadexApplication extends Activity
 		
 		intent.putExtras(getIntent());
 		intent.putExtra(EXTRA_KEY_ORIGINALACTION, getIntent().getAction());
+		intent.putExtra(EXTRA_KEY_WINDOWFEATURES, getWindowFeatures());
 		
 //		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -49,4 +51,12 @@ public abstract class JadexApplication extends Activity
 	 * @return the class name
 	 */
 	protected abstract String getClassName();
+	
+	/**
+	 * Due to the nature of android, window features can only be requested
+	 * before ClientAppFragments are instantiated.
+	 * So, if you need window features such as Window.FEATURE_INDETERMINATE_PROGRESS,
+	 * please return them here in an array.
+	 */
+	protected abstract int[] getWindowFeatures();
 }

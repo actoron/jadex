@@ -27,6 +27,8 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 
 	protected boolean platformRunning;
 
+	private Button startDemoButton;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -35,6 +37,7 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 		Intent intent = new Intent(getContext(), MyPlatformService.class);
 
 		bindService(intent, this, BIND_AUTO_CREATE);
+		startService(intent);
 	}
 
 	@Override
@@ -42,10 +45,10 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 	{
 		System.out.println("MyActivity onCreateView");
 		setTitle(R.string.app_title);
-		int userlayout = R.layout.mylayout2;
+		int userlayout = R.layout.mainapp;
 		View view = inflater.inflate(userlayout, container, false);
 		statusTextView = (TextView) view.findViewById(R.id.statusTextView);
-		callServicesButton = (Button) view.findViewById(R.id.callServicesButton);
+		callServicesButton = (Button) view.findViewById(R.id.callServiceButton);
 		callServicesButton.setOnClickListener(new OnClickListener()
 		{
 
@@ -57,6 +60,21 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 				}
 			}
 		});
+		
+		startDemoButton = (Button) view.findViewById(R.id.startDemoButton);
+		startDemoButton.setOnClickListener(new OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+				Intent i = new Intent(getContext(),SokratesActivity.class);
+				startActivity(i);
+ 			}
+		});
+		
+		startDemoButton.setEnabled(false);
+		callServicesButton.setEnabled(false);
 		return view;
 	}
 
@@ -67,6 +85,8 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 		if (service != null)
 		{
 			unbindService(this);
+			Intent intent = new Intent(getContext(), MyPlatformService.class);
+			stopService(intent);
 		}
 	}
 
@@ -93,7 +113,9 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 			@Override
 			public void run()
 			{
-				statusTextView.setText("Platofrm started.");
+				startDemoButton.setEnabled(true);
+				callServicesButton.setEnabled(true);
+				statusTextView.setText("Platform started.");
 			}
 		});
 		platformRunning = true;
@@ -107,7 +129,7 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 			@Override
 			public void run()
 			{
-				statusTextView.setText("Platofrm Starting");
+				statusTextView.setText("Platform Starting");
 			}
 		});
 	}

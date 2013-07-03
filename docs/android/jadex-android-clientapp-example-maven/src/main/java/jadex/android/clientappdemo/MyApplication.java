@@ -26,4 +26,10 @@ public class MyApplication extends JadexApplication
 			return "jadex.android.clientappdemo.ServiceActivity";
 		}
 	}
+
+	@Override
+	protected int[] getWindowFeatures()
+	{
+		return null;
+	}
 }

@@ -10,6 +10,7 @@ import jadex.android.standalone.clientservice.UniversalClientService.UniversalCl
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,10 +23,12 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.LayoutInflater.Factory;
 import android.view.View;
@@ -37,11 +40,12 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	private LayoutInflater userAppInflater;
 	private String userAppPackage;
 	private Context userAppContext;
-	private ClientAppFragment defaultActivity;
+	private ClientAppFragment clientFragment;
 	private UniversalClientServiceBinder universalService;
 	private Resources resources;
-	private String className;
+//	private String className;
 	private ClassLoader cl;
+private boolean contentViewSet;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -60,32 +64,41 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 			userAppPackage = info.packageName;
 			String className = intent.getStringExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
 			String originalAction = intent.getStringExtra(JadexApplication.EXTRA_KEY_ORIGINALACTION);
+			int[] windowFeatures = intent.getIntArrayExtra(JadexApplication.EXTRA_KEY_WINDOWFEATURES);
 
 			intent.setAction(originalAction);
 			intent.removeExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
 			intent.removeExtra(JadexApplication.EXTRA_KEY_ORIGINALACTION);
 			intent.removeExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
+			intent.removeExtra(JadexApplication.EXTRA_KEY_WINDOWFEATURES);
 
 			if (className == null)
 			{
 				className = defaultEntryActivityName;
 			}
 
-			this.className = className;
+//			this.className = className;
 
 			if (appPath != null)
 			{
 				this.cl = getClassLoaderForExternalDex(getClass().getClassLoader(), appPath);
-				ClientAppFragment act = loadAndCreateUserActivity(appPath, className);
-				act.setIntent(intent);
-				act.onPrepare(this);
-				this.defaultActivity = act;
+				JadexPlatformManager.getInstance().setAppClassLoader(appPath, cl);
+				ClientAppFragment act = createClientFragment(className, intent);
+		
+				this.clientFragment = act;
 			}
 			else
 			{
 				Logger.e("Please specify an Activity class to start with EXTRA_KEY_ACTIVITYCLASS!");
 				finish();
 				return;
+			}
+			
+			if (windowFeatures != null) {
+				for (int i = 0; i < windowFeatures.length; i++)
+				{
+					requestWindowFeature(windowFeatures[i]);
+				}
 			}
 
 		}
@@ -104,7 +117,6 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	public void onServiceConnected(ComponentName name, IBinder service)
 	{
 		this.universalService = (UniversalClientServiceBinder) service;
-		defaultActivity.setUniversalClientService(universalService);
 		
 		try
 		{
@@ -117,15 +129,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 			e.printStackTrace();
 		}
 		
-		
-		FragmentManager manager = getSupportFragmentManager();
-		FragmentTransaction ta = manager.beginTransaction();
-
-
-		ta.add(R.id.fragmentContainer, defaultActivity);
-
-		setContentView(R.layout.loaderlayout);
-		ta.commit();
+		activateClientFragment(clientFragment);
 	}
 
 	@Override
@@ -175,9 +179,9 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		{
 			unbindService(this);
 		}
-		if (defaultActivity != null)
+		if (clientFragment != null)
 		{
-			defaultActivity.onDestroy();
+			clientFragment.onDestroy();
 		}
 		super.onDestroy();
 	}
@@ -215,20 +219,48 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		return getApplicationContext().getAssets();
 	}
 
-	private ClientAppFragment loadAndCreateUserActivity(String appPath, String className)
+	/**
+	 * Instantiates a {@link ClientAppFragment} and starts its lifecycle.
+	 * @param className Classname of the ClientAppFragment
+	 * @param intent The Intent to pass to the Fragment.
+	 * @return
+	 */
+	private ClientAppFragment createClientFragment(String className, Intent intent)
 	{
-		JadexPlatformManager.getInstance().setAppClassLoader(appPath, cl);
+		ClientAppFragment act = null;
 		try
 		{
 			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
-			ClientAppFragment act = actClass.newInstance();
-			return act;
+			act = actClass.newInstance();
 		}
-		catch (Exception e)
+		catch (IllegalAccessException e)
 		{
 			e.printStackTrace();
 		}
-		return null;
+		catch (InstantiationException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ClassNotFoundException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		act.setIntent(intent);
+		act.onPrepare(this);
+		return act;
+	}
+	
+	private void activateClientFragment(ClientAppFragment fragment)
+	{
+		fragment.setUniversalClientService(universalService);
+		FragmentManager manager = getSupportFragmentManager();
+		FragmentTransaction ta = manager.beginTransaction();
+		ta.add(R.id.fragmentContainer, fragment);
+		setContentView(R.layout.loaderlayout);
+		contentViewSet = true;
+		ta.commit();
 	}
 
 	private DexClassLoader getClassLoaderForExternalDex(ClassLoader parent, String appPath)
@@ -270,22 +302,66 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		public View onCreateView(String name, Context context, AttributeSet attrs)
 		{
 			ClassLoader mCl = context.getClassLoader();
+			View result = null;
+			Class<?> loadClass;
 			try
 			{
-				Class<?> loadClass = cl.loadClass(name);
+				loadClass = cl.loadClass(name);
 				Constructor<?> constructor = loadClass.getConstructor(mConstructorSignature);
 				Object[] args = mConstructorArgs;
 				args[0] = context;
 				args[1] = attrs;
-
-				return (View) constructor.newInstance(args);
+				result = (View) constructor.newInstance(args);
 			}
-			catch (Exception e)
+			catch (ClassNotFoundException e)
 			{
-				Logger.d("Class " + name + " not found in user application.");
+				Logger.d("Class not found in user classes: " + name);
 			}
-			return null;
+			catch (SecurityException e)
+			{
+				Logger.d("Cannot access class: " + name);
+			}
+			catch (NoSuchMethodException e)
+			{
+				Logger.d("Cannot instanciate class (wrong constructor?): " + name);
+			}
+			catch (IllegalArgumentException e)
+			{
+				Logger.d("Cannot instanciate class (wrong constructor?): " + name);
+			}
+			catch (InstantiationException e)
+			{
+				Logger.d("Cannot instanciate class (wrong constructor?): " + name);
+			}
+			catch (IllegalAccessException e)
+			{
+				Logger.d("Cannot access class: " + name);
+			}
+			catch (InvocationTargetException e)
+			{
+				Logger.d("Cannot instanciate class (wrong constructor?): " + name);
+			}
+			
+			return result;
 		}
 	};
+	
+	// methods that are called from clientappfragments
+	
+	public void startActivity(Intent intent) {
+		System.out.println("JadexAppLoader: startActivity");
+		super.startActivity(intent);
+	};
+	
+	@Override
+	public void startActivityFromFragment(Fragment fragment, Intent intent, int requestCode)
+	{
+		System.out.println("JadexAppLoader: startActivityFromFragment");
+		String className = intent.getComponent().getClassName();
+		ClientAppFragment newFragment = createClientFragment(className, intent);
+		clientFragment = newFragment;
+		//TODO: disable old fragment, put it to a stack.
+		activateClientFragment(newFragment);
+	}
 
 }

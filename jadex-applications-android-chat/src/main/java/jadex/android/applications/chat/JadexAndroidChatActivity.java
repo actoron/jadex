@@ -159,7 +159,7 @@ public class JadexAndroidChatActivity extends ClientAppFragment implements Servi
 						public void run()
 						{
 							messageEditText.setEnabled(true);
-							messageEditText.setEnabled(true);
+							sendButton.setEnabled(true);
 							setProgressBarIndeterminateVisibility(false);
 						}
 					});

@@ -1,6 +1,7 @@
 package jadex.android.clientapp;
 
 import android.content.Intent;
+import android.view.Window;
 import jadex.android.standalone.JadexApplication;
 
 public class MyApplication extends JadexApplication
@@ -10,10 +11,12 @@ public class MyApplication extends JadexApplication
 	{
 		Intent intent = getIntent();
 		String action = intent.getAction();
-		if (Intent.ACTION_SEND.equals(action)) {
-			return "jadex.android.clientapp.MySendActivity";
-		} else {
-			return "jadex.android.clientapp.MyServiceActivity";
-		}
+		return "jadex.android.clientapp.MyServiceActivity";
+	}
+
+	@Override
+	protected int[] getWindowFeatures()
+	{
+		return new int[]{Window.FEATURE_INDETERMINATE_PROGRESS};
 	}
 }

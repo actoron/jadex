@@ -27,8 +27,7 @@ public class MyPlatformService extends JadexPlatformService
 	{
 		setPlatformAutostart(false);
 		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BDI);
-		setPlatformOptions("-chat true");
-		setPlatformName("ClientAppChat");
+		setPlatformName("Sokrates");
 		handler = new Handler();
 	}
 	
@@ -47,6 +46,10 @@ public class MyPlatformService extends JadexPlatformService
 		
 		public IFuture<IComponentIdentifier> startAgent() {
 			return MyPlatformService.this.startComponent(platformId, "Component", "jadex/android/clientapp/bditest/HelloWorld.agent.xml");
+		}
+		
+		public IFuture<IComponentIdentifier> startSokrates() {
+			return MyPlatformService.this.startComponent(platformId, "Sokrates", "jadex/bdi/examples/puzzle/Sokrates.agent.xml");
 		}
 		
 		public void setPlatformListener (PlatformListener l) {

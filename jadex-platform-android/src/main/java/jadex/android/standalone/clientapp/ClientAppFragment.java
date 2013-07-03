@@ -36,8 +36,6 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	/**
 	 * This method is called upon instantiation of the Fragment and before the
 	 * default Fragment Lifecycle comes into play. 
-	 * Tasks that should be run before the layout of the Activity is set must be
-	 * performed here, such as requesting Window Features.
 	 * 
 	 * Note that getActivity() will return null during this method, use the given parameter
 	 * instead.
@@ -46,7 +44,6 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	 */
 	public void onPrepare(Activity mainActivity)
 	{
-		mainActivity.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 	}
 
 	protected Context getContext()
@@ -142,6 +139,19 @@ public class ClientAppFragment extends ActivityAdapterFragment
 //		
 //		userInflater.setFactory(layoutInflater.getFactory());
 		return layoutInflater;
+	}
+	
+	@Override
+	public void startActivity(Intent intent)
+	{
+		startActivityForResult(intent, -1);
+	}
+	
+	@Override
+	public void startActivityForResult(Intent intent, int requestCode)
+	{
+		
+		super.startActivityForResult(intent, requestCode);
 	}
 	
 }

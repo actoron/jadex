@@ -1,6 +1,7 @@
 package jadex.android.applications.chat;
 
 import android.content.Intent;
+import android.view.Window;
 import jadex.android.standalone.JadexApplication;
 
 public class JadexChatApplication extends JadexApplication
@@ -20,5 +21,11 @@ public class JadexChatApplication extends JadexApplication
 			result = "jadex.android.applications.chat.JadexAndroidChatActivity";
 		}
 		return result;
+	}
+
+	@Override
+	protected int[] getWindowFeatures()
+	{
+		return new int[]{Window.FEATURE_INDETERMINATE_PROGRESS};
 	}
 }
