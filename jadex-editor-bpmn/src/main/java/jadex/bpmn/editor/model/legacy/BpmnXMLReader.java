@@ -890,6 +890,17 @@ public class BpmnXMLReader
 				}
 			}
 			
+			try
+			{
+				if (act.hasProperty("isThrowing") && Boolean.TRUE.equals(act.getParsedPropertyValue("isThrowing")))
+				{
+					act.setThrowing(true);
+				}
+			}
+			catch (Exception e)
+			{
+			}
+			
 			return null;
 		}
 		

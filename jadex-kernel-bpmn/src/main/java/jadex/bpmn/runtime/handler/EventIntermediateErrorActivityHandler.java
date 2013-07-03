@@ -20,7 +20,7 @@ public class EventIntermediateErrorActivityHandler extends DefaultActivityHandle
 	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		// Do catch exception when the activity is an event handler.
-		if(activity.isEventHandler())// || !activity.isThrowing())
+		if(activity.isEventHandler() || !activity.isThrowing())
 		{
 			thread.setParameterValue("$exception", thread.getException());
 			thread.setException(null);

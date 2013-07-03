@@ -30,6 +30,7 @@
       <vertices xmi:type="bpmn:Activity" xmi:id="_ApKTwRGEEd-qQOr2ZLx-Mw" iD="_ApKTwBGEEd-qQOr2ZLx-Mw" outgoingEdges="_BvpasRGEEd-qQOr2ZLx-Mw" incomingEdges="_BiPQ0RGEEd-qQOr2ZLx-Mw" name="Throw exception" activityType="EventIntermediateError">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QUdpkBI1Ed-3Ruc_856dPQ" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QUdpkhI1Ed-3Ruc_856dPQ" key="exception" value="new RuntimeException()"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QUdpkhI1Ed-3Ruc_856dPQ" key="isThrowing" value="true"/>
         </eAnnotations>
       </vertices>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_AeQgwRGDEd-qQOr2ZLx-Mw" iD="_AeQgwBGDEd-qQOr2ZLx-Mw"/>
