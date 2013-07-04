@@ -153,10 +153,23 @@ public class MethodCallTask implements ITask
 		{
 			public void customResultAvailable(Object result)
 			{
-				Method	m	= SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
+				Class<?> servicetype = process.getServiceContainer().getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader());
+				//Method	m	= SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
+				
+				Method[] methods = servicetype.getMethods();
+				Method m = null;
+				for (Method method : methods)
+				{
+					if (method.toString().equals(fmethod))
+					{
+						m = method;
+						break;
+					}
+				}
+				
 				if(m==null)
 				{
-					throw new RuntimeException(""+ String.valueOf(process.getModel().getFilename()) + " Method "+fmethod+argtypes+" not found for service "+fservice+": "+context);
+					throw new RuntimeException("MCT: "+ String.valueOf(process.getModel().getFilename()) + " Method "+fmethod+argtypes+" not found for service "+fservice+ " "  + fservice + ": "+context);
 				}
 				try
 				{

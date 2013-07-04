@@ -169,7 +169,7 @@ public class ServiceCallTask implements ITask
 //				SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
 				if(m==null)
 				{
-					throw new RuntimeException(""+ String.valueOf(process.getModel().getFilename()) + " Method "+fmethod+argtypes+" not found for service "+fservice+": "+context);
+					throw new RuntimeException("SCT: "+ String.valueOf(process.getModel().getFilename()) + " Method "+fmethod+argtypes+" not found for service "+fservice+": "+context);
 				}
 				try
 				{
