@@ -156,7 +156,7 @@ public class MethodCallTask implements ITask
 				Method	m	= SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
 				if(m==null)
 				{
-					throw new RuntimeException("Method "+fmethod+argtypes+" not found for service "+fservice+": "+context);
+					throw new RuntimeException(""+ String.valueOf(process.getModel().getFilename()) + " Method "+fmethod+argtypes+" not found for service "+fservice+": "+context);
 				}
 				try
 				{
