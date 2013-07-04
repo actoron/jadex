@@ -99,6 +99,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/** The bdi state. */
 	protected RCapability capa;
 	
+	/** Is the agent inited and allowed to execute rules? */
+	protected boolean	inited;
+	
 	//-------- constructors --------
 	
 	/**
@@ -1413,6 +1416,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		// perform init write fields (after injection of bdiagent)
 		BDIAgent.performInitWrites((BDIAgent)microagent);
+		
+		// Start rule system
+		inited	= true;
 	
 //		getCapability().dumpGoalsPeriodically(getInternalAccess());
 //		getCapability().dumpPlansPeriodically(getInternalAccess());
@@ -1488,7 +1494,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //		if(aborted)
 //			getCapability().dumpGoals();
 		
-		if(rulesystem!=null)
+		if(inited && rulesystem!=null)
 			rulesystem.processAllEvents();
 		
 //		if(steps!=null && steps.size()>0)
@@ -1497,7 +1503,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //		}
 		boolean ret = super.executeStep();
 
-		return ret || (rulesystem!=null && rulesystem.isEventAvailable());
+		return ret || (inited && rulesystem!=null && rulesystem.isEventAvailable());
 	}
 	
 	/**
