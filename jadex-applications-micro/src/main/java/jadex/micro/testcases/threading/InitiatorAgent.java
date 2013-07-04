@@ -63,6 +63,8 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
+		System.out.println("Test local: "+agent.getModel().getFullName());
+		
 		performTest(agent.getComponentIdentifier().getRoot(), testno, max, true)
 			.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
@@ -82,11 +84,15 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
+		System.out.println("Test remote: "+agent.getModel().getFullName());
+		
 		createPlatform(new String[]{"-ssltcptransport", "false"}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
+				System.out.println("Test remote1: "+agent.getModel().getFullName());
+				
 				performTest(platform.getComponentIdentifier(), testno, max, false)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
@@ -152,6 +158,8 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
+		System.out.println("Call service: "+agent.getModel().getFullName());
+		
 		final TestReport tr = new TestReport("#"+testno, "Test if secure transmission works "+(hassectrans? "with ": "without ")+"secure transport.");
 		
 		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
@@ -190,6 +198,8 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
+		System.out.println("Invoke: "+agent.getModel().getFullName());
+
 		final IComponentIdentifier caller = IComponentIdentifier.LOCAL.get();
 		
 		final int[] errcnt = new int[1];
@@ -200,12 +210,12 @@ public class InitiatorAgent extends TestAgent
 				if(!caller.equals(IComponentIdentifier.LOCAL.get()))
 				{
 					errcnt[0]++;
-//					System.out.println("err: "+caller+" "+IComponentIdentifier.LOCAL.get());
+					System.out.println("err: "+caller+" "+IComponentIdentifier.LOCAL.get());
 				}
-//				else
-//				{
-//					System.out.println("ok: "+i);
-//				}
+				else
+				{
+					System.out.println("ok: "+i);
+				}
 				
 				if(i<max)
 				{
