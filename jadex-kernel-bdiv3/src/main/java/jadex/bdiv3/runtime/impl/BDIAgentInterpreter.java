@@ -24,12 +24,18 @@ import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.FieldInfo;
@@ -769,6 +775,62 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				});
 				rule.setEvents(events);
 				getRuleSystem().getRulebase().addRule(rule);
+			}
+			
+			if(mbel.getUpdaterate()>0)
+			{
+				Object	ocapa	= agent;
+				int	i	= mbel.getName().indexOf(CAPABILITY_SEPARATOR);
+				if(i!=-1)
+				{
+					ocapa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)));
+				}
+				final Object	capa	= ocapa;
+
+				SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener<IClockService>()
+				{
+					public void resultAvailable(final IClockService cs)
+					{
+						cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
+						{
+							ITimedObject	self	= this;
+							public void timeEventOccurred(long currenttime)
+							{
+								try
+								{
+									scheduleStep(new IComponentStep<Void>()
+									{
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											try
+											{
+												Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
+												um.invoke(capa, new Object[0]);
+											}
+											catch(Exception e)
+											{
+												e.printStackTrace();
+											}
+											
+											cs.createTimer(mbel.getUpdaterate(), self);
+											return IFuture.DONE;
+										}
+									});
+								}
+								catch(ComponentTerminatedException cte)
+								{
+									
+								}
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						getLogger().severe("Cannot update belief "+mbel.getName()+": "+exception);
+					}
+				});
 			}
 		}
 		

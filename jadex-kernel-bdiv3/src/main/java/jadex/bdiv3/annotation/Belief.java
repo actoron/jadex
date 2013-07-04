@@ -27,4 +27,8 @@ public @interface Belief
 	 */
 	public String[] events() default {};
 	
+	/**
+	 *  An update rate causes the belief to be reevaluated periodically.
+	 */
+	public long	updaterate()	default 0;
 }

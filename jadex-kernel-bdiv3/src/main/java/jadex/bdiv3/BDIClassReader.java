@@ -267,11 +267,11 @@ public class BDIClassReader extends MicroClassReader
 				MBelief	bel2;
 				if(bel.getField()!=null)
 				{
-					bel2	= new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), events.toArray(new String[events.size()]));
+					bel2	= new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]));
 				}
 				else
 				{
-					bel2	= new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), events.toArray(new String[events.size()]));
+					bel2	= new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]));
 					bel2.setSetter(bel.getSetter());
 				}
 				bel2.setName(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+bel2.getName());
@@ -326,9 +326,10 @@ public class BDIClassReader extends MicroClassReader
 				{
 //					System.out.println("found belief: "+fields[i].getName());
 					Belief bel = getAnnotation(fields[i], Belief.class, cl);
+					boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;
 					bdimodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i]), 
 						bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-						bel.dynamic(), bel.events().length==0? null: bel.events()));
+						dynamic, bel.updaterate(), bel.events().length==0? null: bel.events()));
 //					beliefs.add(fields[i]);
 //					beliefnames.add(fields[i].getName());
 				}
@@ -362,7 +363,7 @@ public class BDIClassReader extends MicroClassReader
 				}
 			}
 			
-			// Find method plans
+			// Find method plans or beliefs
 			Method[] methods = clazz.getDeclaredMethods();
 			for(int i=0; i<methods.length; i++)
 			{
@@ -393,9 +394,10 @@ public class BDIClassReader extends MicroClassReader
 					}
 					else
 					{
+						boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;
 						bdimodel.getCapability().addBelief(new MBelief(new MethodInfo(methods[i]), 
 							bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-							bel.dynamic(), bel.events().length==0? null: bel.events()));
+							dynamic, bel.updaterate(), bel.events().length==0? null: bel.events()));
 					}
 				}
 			}

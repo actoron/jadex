@@ -31,6 +31,9 @@ public class MBelief extends MElement
 	/** The dynamic flag. */
 	protected boolean dynamic;
 	
+	/** The update rate. */
+	protected long	updaterate;
+	
 	/** Flag if is multi. */
 	protected Boolean multi;
 	
@@ -40,12 +43,13 @@ public class MBelief extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(FieldInfo target, String impl, boolean dynamic, String[] events)
+	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, String[] events)
 	{
 		super(target!=null? target.getName(): null);
 		this.ftarget = target;
 		this.impl = impl;
 		this.dynamic = dynamic;
+		this.updaterate	= updaterate;
 		this.events = new HashSet<String>();
 		if(events!=null)
 		{
@@ -62,9 +66,9 @@ public class MBelief extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(MethodInfo target, String impl, boolean dynamic, String[] events)
+	public MBelief(MethodInfo target, String impl, boolean dynamic, long updaterate, String[] events)
 	{
-		this((FieldInfo)null, impl, dynamic, events);
+		this((FieldInfo)null, impl, dynamic, updaterate, events);
 		
 		if(target.getName().startsWith("get"))
 		{
@@ -174,6 +178,24 @@ public class MBelief extends MElement
 	public void setDynamic(boolean dynamic)
 	{
 		this.dynamic = dynamic;
+	}
+	
+	/**
+	 *  Get the updaterate.
+	 *  @return The updaterate.
+	 */
+	public long getUpdaterate()
+	{
+		return updaterate;
+	}
+
+	/**
+	 *  Set the updaterate.
+	 *  @param updaterate The updaterate to set.
+	 */
+	public void setUpdaterate(long updaterate)
+	{
+		this.updaterate = updaterate;
 	}
 	
 	/**
