@@ -1993,12 +1993,19 @@ public class SUtil
 		if(urls==null)
 			return null;
 		
-		URL[] ret = new URL[urls.length];
+		List<URL> res = new ArrayList<URL>();
 		for(int i=0; i<urls.length; i++)
 		{
-			ret[i] = toURL(urls[i]);
+			try
+			{
+				res.add(toURL(urls[i]));
+			}
+			catch(Exception e)
+			{
+				System.out.println("Warning, invalid URL found: "+urls[i]);
+			}
 		}
-		return ret;
+		return res.toArray(new URL[res.size()]);
 	}
 		
 	/**
@@ -2026,7 +2033,6 @@ public class SUtil
 			jar	= string.startsWith("jar:file:");
 			url	= jar ? new File(string.substring(9))
 				: string.startsWith("file:") ? new File(string.substring(5)) : null;
-			
 			
 			if(url==null)
 			{
