@@ -27,6 +27,7 @@ public class BPMNTest	extends ComponentTestSuite
 				"Result",
 				"_diagram",
 				"load",
+				"Flow2", // Broken workflow
 				"ExecuteRequestRandom",
 				"StreamTest",	// ???
 				"CustomTask",	// Uses modal dialog that blocks execution.
