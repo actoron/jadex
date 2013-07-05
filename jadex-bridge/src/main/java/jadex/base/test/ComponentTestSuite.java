@@ -155,7 +155,7 @@ public class ComponentTestSuite extends TestSuite
 //			System.out.println("todo: "+abspath);
 			boolean	exclude	= false;
 			
-			exclude	= !file.isDirectory() && (abspath.indexOf("threading")==-1 || abspath.indexOf("Initiator")==-1);
+//			exclude	= !file.isDirectory() && (abspath.indexOf("threading")==-1 || abspath.indexOf("Initiator")==-1);
 			
 			for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
 			{

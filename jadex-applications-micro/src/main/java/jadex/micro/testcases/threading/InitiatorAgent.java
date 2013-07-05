@@ -86,7 +86,7 @@ public class InitiatorAgent extends TestAgent
 		
 		System.out.println("Test remote: "+agent.getModel().getFullName());
 		
-		createPlatform(new String[]{"-ssltcptransport", "false"}).addResultListener(agent.createResultListener(
+		createPlatform(null).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
