@@ -632,6 +632,7 @@ public class HttpRelayTransport implements ITransport
 								conman.postMessage(address, targetid, data);
 								addresses.put(address, new Long(System.currentTimeMillis()));
 								ret.setResult(null);
+								System.out.println("Sent with HTTP Relay: "+System.currentTimeMillis()+", "+address);
 							}
 							catch(Exception e)
 							{

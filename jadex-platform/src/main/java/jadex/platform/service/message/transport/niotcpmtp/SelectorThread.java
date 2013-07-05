@@ -533,7 +533,7 @@ public class SelectorThread implements Runnable
 						if(buffers.isEmpty())
 						{
 							queue.remove(task);
-//							System.out.println("Sent with NIO TCP: "+con.address);
+							System.out.println("Sent with NIO TCP: "+System.currentTimeMillis()+", "+con.address);
 							fut.setResult(null);
 						}
 					}
