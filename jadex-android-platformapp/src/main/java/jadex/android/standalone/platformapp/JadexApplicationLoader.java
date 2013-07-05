@@ -136,7 +136,7 @@ private boolean contentViewSet;
 	public void onServiceDisconnected(ComponentName name)
 	{
 		universalService = null;
-		System.err.println("UniversalClientService disconnected. User Service bindings may be invalid.");
+		Logger.e("UniversalClientService disconnected. User Service bindings may be invalid.");
 		// TODO: crash here!?
 	}
 
@@ -161,7 +161,6 @@ private boolean contentViewSet;
 		}
 		else
 		{
-			System.out.println("Custom context returned");
 			return userAppContext;
 		}
 	}
@@ -208,14 +207,12 @@ private boolean contentViewSet;
 	@Override
 	public ClassLoader getClassLoader()
 	{
-		System.out.println("getClassLoader");
 		return cl;
 	}
 
 	@Override
 	public AssetManager getAssets()
 	{
-		System.out.println("getAssets");
 		return getApplicationContext().getAssets();
 	}
 
@@ -349,14 +346,12 @@ private boolean contentViewSet;
 	// methods that are called from clientappfragments
 	
 	public void startActivity(Intent intent) {
-		System.out.println("JadexAppLoader: startActivity");
 		super.startActivity(intent);
 	};
 	
 	@Override
 	public void startActivityFromFragment(Fragment fragment, Intent intent, int requestCode)
 	{
-		System.out.println("JadexAppLoader: startActivityFromFragment");
 		String className = intent.getComponent().getClassName();
 		ClientAppFragment newFragment = createClientFragment(className, intent);
 		clientFragment = newFragment;

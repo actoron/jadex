@@ -199,7 +199,8 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	
 
 	/**
-	 * Start a new Component on a given platform.
+	 * Start a new Component on a given platform with default {@link CreationInfo}.
+	 * If available, the belief "androidContext" will be set to <b>this</b>. 
 	 * 
 	 * @param platformId
 	 *            Identifier of the jadex platform
@@ -211,17 +212,37 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	 */
 	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath)
 	{
+		return startComponent(platformId, name, modelPath, new CreationInfo());
+	}
+	
+	/**
+	 * Start a new Component on a given platform.
+	 * 
+	 * @param platformId
+	 *            Identifier of the jadex platform
+	 * @param name
+	 *            name of the newly created agent
+	 * @param modelPath
+	 *            Path to the bpmn model file of the new agent
+	 * @param creationInfo
+	 * 			  {@link CreationInfo} to pass to the started Component.
+	 * @return ComponendIdentifier of the created agent.
+	 */
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath, final CreationInfo creationInfo)
+	{
 		checkIfPlatformIsRunning(platformId, "startComponent()");
+		Map<String, Object> arguments = creationInfo.getArguments();
+		if (!arguments.containsKey("androidContext")) {
+			arguments.put("androidContext", this);
+		}
+		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		jadexPlatformManager.getCMS(platformId)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				HashMap<String, Object> args = new HashMap<String, Object>();
-
-				args.put("androidContext", JadexPlatformService.this);
-				cms.createComponent(name, modelPath, new CreationInfo(args), null)
+				cms.createComponent(name, modelPath, creationInfo, null)
 					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 			}
 		});
