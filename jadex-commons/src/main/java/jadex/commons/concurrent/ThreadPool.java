@@ -182,7 +182,7 @@ public class ThreadPool implements IThreadPool
 						{
 							addThreads(5);
 							strategy.workersAdded(5);
-							System.out.println("Added threads due to starving task in queue: "+task+", "+strategy);
+							System.out.println("Added threads due to starving task in queue: "+task+", "+strategy+", pool="+pool.size()+", parked="+parked.size()+", tasks="+tasks.size());
 						}
 					}
 				}
