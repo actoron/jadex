@@ -4,6 +4,7 @@ import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
+import java.awt.HeadlessException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -136,6 +137,9 @@ public class JavaParserTest extends TestCase
 						retval	= node.getValue(fetcher);
 						evaluated	= true;
 						assertFalse("Expected evaluation exception", evalex);
+					}
+					catch(HeadlessException e) {
+						// ignore
 					}
 					catch(Exception e)
 					{
