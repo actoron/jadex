@@ -215,17 +215,27 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			StringTokenizer	stok	= new StringTokenizer(name, CAPABILITY_SEPARATOR);
 			while(stok.hasMoreTokens())
 			{
-				try
+				name	= stok.nextToken();
+				
+				boolean found = false;
+				Class<?> cl = ret.getClass();
+				while(!found & !Object.class.equals(cl))
 				{
-					name	= stok.nextToken();
-					Field	f	= ret.getClass().getDeclaredField(name);
-					f.setAccessible(true);
-					ret	= f.get(ret);
+					try
+					{
+						Field	f	= cl.getDeclaredField(name);
+						f.setAccessible(true);
+						ret	= f.get(ret);
+						found = true;
+						break;
+					}
+					catch(Exception e)
+					{
+						cl.getSuperclass();
+					}
 				}
-				catch(Exception e)
-				{
-					throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
-				}
+				if(!found)
+					throw new RuntimeException("Could not fetch capability object: "+name);
 			}
 		}
 		return ret;

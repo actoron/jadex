@@ -130,7 +130,8 @@ public class MovementCapability
 	 */
 	protected long getTime()
 	{
-		IClockService cs =  (IClockService)capa.getAgent().getServiceContainer().getRequiredService("clockser").get();
+		// todo:
+		IClockService cs =  (IClockService)capa.getAgent().getServiceContainer().getRequiredService("movecapa/clockser").get();
 		return cs.getTime();
 	}
 	
