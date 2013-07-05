@@ -162,7 +162,7 @@ public class ThreadPool implements IThreadPool
 		this.pool = new ArrayList<ServiceThread>();
 //		this.threads = new Hashtable();
 		this.enqueuetimes = Collections.synchronizedMap(new IdentityHashMap<Runnable, Long>());
-		this.maxparked = 500;
+//		this.maxparked = 500;
 		this.parked = new ArrayList<ServiceThread>();
 		this.timer = new Timer(true);
 		this.maxwait = maxwait;
@@ -446,7 +446,13 @@ public class ThreadPool implements IThreadPool
 //				System.out.println("exit: "+exit+" "+pool.size()+" "+parked.size()+" "+strategy);
 				if(exit)
 				{
-					if(running && parked.size()<maxparked)
+					boolean	park;
+					synchronized(ThreadPool.this)
+					{
+						park	= running && parked.size()<maxparked;
+					}
+
+					if(park)
 					{
 						park();
 						
