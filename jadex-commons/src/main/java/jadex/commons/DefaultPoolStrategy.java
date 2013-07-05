@@ -143,7 +143,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 //			System.out.println("Capacity(tA2): "+capacity+" "+workercnt);
 		}
 		
-//		System.out.println("Capacity: "+capacity+" "+workercnt);
+		System.out.println("Capacity: "+capacity+" "+workercnt);
 		
 		return ret;
 	}
