@@ -111,9 +111,10 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 									{
 										public void run()
 										{
-											if(ada.getComponentIdentifier().getName().indexOf("rms")!=-1)
+											if(ada.getComponentIdentifier().getName().indexOf("rms")!=-1 ||
+												ada.getDescription().getModelName().indexOf("testcases.threading")!=-1)
 											{
-												System.out.println("resched: "+sic.getMethod().getName()+", "+listener+", "+System.currentTimeMillis());
+												System.out.println("resched: "+sic.getMethod().getName()+", "+System.currentTimeMillis());
 											}
 											CallAccess.setServiceCall(sic.getLastServiceCall());
 											listener.resultAvailable(null);

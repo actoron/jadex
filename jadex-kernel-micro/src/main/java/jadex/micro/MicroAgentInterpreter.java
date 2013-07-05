@@ -890,7 +890,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 							CallAccess.setServiceCall(sc);
 						}
 						
-						if(getComponentIdentifier().getName().indexOf("rms")!=-1)
+						if(getComponentIdentifier().getName().indexOf("rms")!=-1 ||
+							getModel().getFullName().indexOf("testcases.threading")!=-1)
 						{
 							System.out.println("Step: "+step.getStep()+", "+System.currentTimeMillis());
 						}

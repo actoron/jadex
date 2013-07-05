@@ -569,7 +569,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
-		if(getComponentIdentifier().toString().indexOf("rms")!=-1)
+		if(getComponentIdentifier().toString().indexOf("rms")!=-1 ||
+			getModel().getFullName().indexOf("testcases.threading")!=-1)
 			System.out.println("Enter: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 		
 		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(this));
@@ -720,7 +721,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		executing	= false;
 		ISuspendable.SUSPENDABLE.set(null);
 
-		if(getComponentIdentifier().toString().indexOf("rms")!=-1)
+		if(getComponentIdentifier().toString().indexOf("rms")!=-1 ||
+			getModel().getFullName().indexOf("testcases.threading")!=-1)
 			System.out.println("Leave: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 		
 //		System.out.println("Again: "+getComponentIdentifier()+", "+ret+", "+Thread.currentThread());
@@ -815,7 +817,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					try
 					{
-						if(getComponentIdentifier().getName().indexOf("rms")!=-1)
+						if(getComponentIdentifier().getName().indexOf("rms")!=-1 ||
+							getModel().getFullName().indexOf("testcases.threading")!=-1)
 						{
 							System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
 						}
@@ -847,7 +850,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //					}
 //					if(platform)
 //						System.out.println(entries[i]+" "+entries[i].getClass());
-					if(getComponentIdentifier().getName().indexOf("rms")!=-1)
+					if(getComponentIdentifier().getName().indexOf("rms")!=-1 ||
+						getModel().getFullName().indexOf("testcases.threading")!=-1)
 					{
 						System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
 					}
