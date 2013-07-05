@@ -86,7 +86,7 @@ public class InitiatorAgent extends TestAgent
 		
 		System.out.println("Test remote: "+agent.getModel().getFullName());
 		
-		createPlatform(new String[]{"-ssltcptransport", "false"}).addResultListener(agent.createResultListener(
+		createPlatform(null).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -120,7 +120,7 @@ public class InitiatorAgent extends TestAgent
 	 *  Create provider agent
 	 *  Call methods on it
 	 */
-	protected IFuture<TestReport> performTest(final IComponentIdentifier root, final int testno, final int max, final boolean hassectrans)
+	protected IFuture<TestReport> performTest(final IComponentIdentifier root, final int testno, final int max, final boolean local)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -130,7 +130,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				TestReport tr = new TestReport("#"+testno, "Tests if secure transport works.");
+				TestReport tr = new TestReport("#"+testno, "Test if "+(local? "local": "remote")+" thread decoupling works.");
 				tr.setReason(exception.getMessage());
 				super.resultAvailable(tr);
 			}
@@ -144,7 +144,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				callService(cid, hassectrans, testno, max).addResultListener(new DelegationResultListener<TestReport>(ret));
+				callService(cid, local, testno, max).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 		});
 		
@@ -154,13 +154,13 @@ public class InitiatorAgent extends TestAgent
 	/**
 	 *  Call the service methods.
 	 */
-	protected IFuture<TestReport> callService(IComponentIdentifier cid, final boolean hassectrans, int testno, final int max)
+	protected IFuture<TestReport> callService(IComponentIdentifier cid, final boolean local, int testno, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
 		System.out.println("Call service: "+agent.getModel().getFullName());
 		
-		final TestReport tr = new TestReport("#"+testno, "Test if secure transmission works "+(hassectrans? "with ": "without ")+"secure transport.");
+		final TestReport tr = new TestReport("#"+testno, "Test if "+(local? "local": "remote")+" thread decoupling works.");
 		
 		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		fut.addResultListener(new ExceptionDelegationResultListener<ITestService, TestReport>(ret)
@@ -229,6 +229,7 @@ public class InitiatorAgent extends TestAgent
 		
 			public void exceptionOccurred(Exception exception)
 			{
+				errcnt[0]++;
 				System.out.println("ex: "+exception);
 				resultAvailable(null);
 			}
