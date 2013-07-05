@@ -569,8 +569,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
-//		if(getComponentIdentifier().toString().indexOf("mon")!=-1)
-//			System.out.println("Enter: "+getComponentIdentifier()+", "+Thread.currentThread());
+		if(getComponentIdentifier().toString().indexOf("rms")!=-1)
+			System.out.println("Enter: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 		
 		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(this));
 		
@@ -720,8 +720,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		executing	= false;
 		ISuspendable.SUSPENDABLE.set(null);
 
-//		if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
-//			System.out.println("Leave: "+getComponentIdentifier()+", "+Thread.currentThread());
+		if(getComponentIdentifier().toString().indexOf("rms")!=-1)
+			System.out.println("Leave: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 		
 //		System.out.println("Again: "+getComponentIdentifier()+", "+ret+", "+Thread.currentThread());
 		
@@ -815,6 +815,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					try
 					{
+						if(getComponentIdentifier().getName().indexOf("rms")!=-1)
+						{
+							System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
+						}
+						
 						entries[i].run();
 					}
 					catch(Exception e)
@@ -842,6 +847,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //					}
 //					if(platform)
 //						System.out.println(entries[i]+" "+entries[i].getClass());
+					if(getComponentIdentifier().getName().indexOf("rms")!=-1)
+					{
+						System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
+					}
 					entries[i].run();
 				}
 				catch(Exception e)

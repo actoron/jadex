@@ -890,6 +890,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 							CallAccess.setServiceCall(sc);
 						}
 						
+						if(getComponentIdentifier().getName().indexOf("rms")!=-1)
+						{
+							System.out.println("Step: "+step.getStep()+", "+System.currentTimeMillis());
+						}
+						
 						IFuture<?>	res	= ((IComponentStep<?>)step.getStep()).execute(microagent);
 
 						FutureFunctionality.connectDelegationFuture(future, res);
