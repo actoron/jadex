@@ -47,7 +47,7 @@ public class MovementCapability
 	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());
 
 	/** The mission end. */
-	@Belief(dynamic=true) // update rate 1000
+	@Belief(dynamic=true, updaterate=1000) 
 	protected boolean missionend = ((Long)env.getSpaceObjectsByType("homebase")[0].getProperty("missiontime")).longValue()<=getTime();
 
 	/** The targets. */
@@ -131,7 +131,7 @@ public class MovementCapability
 	protected long getTime()
 	{
 		// todo:
-		IClockService cs =  (IClockService)capa.getAgent().getServiceContainer().getRequiredService("movecapa/clockser").get();
+		IClockService cs =  (IClockService)capa.getServiceContainer().getRequiredService("clockser").get();
 		return cs.getTime();
 	}
 	
