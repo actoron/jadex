@@ -26,6 +26,8 @@ public class ProviderAgent implements ITestService
 	 */
 	public IFuture<Void> test()
 	{
+		System.out.println("Provider.test()");
+		
 		Future<Void> ret = new Future<Void>();
 		
 		if(agent.getComponentIdentifier().equals(IComponentIdentifier.LOCAL.get()))
