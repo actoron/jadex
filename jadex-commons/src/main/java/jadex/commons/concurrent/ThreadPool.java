@@ -162,7 +162,7 @@ public class ThreadPool implements IThreadPool
 		this.pool = new ArrayList<ServiceThread>();
 //		this.threads = new Hashtable();
 		this.enqueuetimes = Collections.synchronizedMap(new IdentityHashMap<Runnable, Long>());
-//		this.maxparked = 500;
+		this.maxparked = 500;
 		this.parked = new ArrayList<ServiceThread>();
 		this.timer = new Timer(true);
 		this.maxwait = maxwait;
@@ -326,7 +326,7 @@ public class ThreadPool implements IThreadPool
 			pool.add(thread);
 			thread.start();
 //			System.out.println("pool: "+toString()+" "+pool.size());
-		}
+		}		
 	}
 
 //	/**
@@ -599,42 +599,42 @@ public class ThreadPool implements IThreadPool
 //		}
 		
 		final ThreadPool tp	= new ThreadPool(new DefaultPoolStrategy(10, 100, 10000, 4));
-		int max = 10000;
-		todo = max;
-		final long start = System.currentTimeMillis();
-		for(int i=0; i<max; i++)
-		{
-			tp.execute(new Runnable()
-			{
-				int n = cnt++;
-				public void run()
-				{
-					String t = Thread.currentThread().toString();
-					System.out.println("a_"+this+" : "+t);
-					
-					long cnt = 0;
-					for(int i=0; i<1000000; i++)
-					{
-						cnt++;
-					}
-					
-//					try{Thread.sleep(100);}
-//					catch(InterruptedException e){}
-					System.out.println("b_"+this+" : "+t);
-					synchronized(tp)
-					{
-						todo--;
-						if(todo==0)
-							System.out.println("Execution finished. Needed: "+(System.currentTimeMillis()-start));
-					}
-				}
-
-				public String toString()
-				{
-					return "Task_"+n;
-				}
-			});
-		}
+//		int max = 10000;
+//		todo = max;
+//		final long start = System.currentTimeMillis();
+//		for(int i=0; i<max; i++)
+//		{
+//			tp.execute(new Runnable()
+//			{
+//				int n = cnt++;
+//				public void run()
+//				{
+//					String t = Thread.currentThread().toString();
+//					System.out.println("a_"+this+" : "+t);
+//					
+//					long cnt = 0;
+//					for(int i=0; i<1000000; i++)
+//					{
+//						cnt++;
+//					}
+//					
+////					try{Thread.sleep(100);}
+////					catch(InterruptedException e){}
+//					System.out.println("b_"+this+" : "+t);
+//					synchronized(tp)
+//					{
+//						todo--;
+//						if(todo==0)
+//							System.out.println("Execution finished. Needed: "+(System.currentTimeMillis()-start));
+//					}
+//				}
+//
+//				public String toString()
+//				{
+//					return "Task_"+n;
+//				}
+//			});
+//		}
 	}
 	
 	class TPTimerTask

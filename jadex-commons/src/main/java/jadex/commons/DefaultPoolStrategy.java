@@ -267,58 +267,52 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	 */
 	public synchronized boolean workerTimeoutOccurred()
 	{
-		// Use same behavior as for finished tasks.
-		return taskFinished();
+		boolean ret = false;
+
+		boolean ok = false;
+		if(capacity>desfree)
+		{
+			if(defer)
+			{
+				int dt = workercnt/desfree;
+				if(dt>2)
+				{
+					if(deferdec==0)
+					{
+						int max = maxcnt>0? maxcnt: 1000;
+						deferdectarget = Math.max(10, (int)(1.0/dt*max));
+//						System.out.println("defertarget: "+deferdectarget+" "+workercnt+" "+desfree);
+					}
+					deferdec++;
+					if(deferdec==deferinctarget)
+					{
+						deferdec=0;
+						ok = true;
+					}
+				}
+				else
+				{
+					ok = true;
+					deferdec = 0;
+				}
+			}
+			else
+			{
+				ok = true;
+			}
+		}
 		
-////		workercnt--;
-////		capacity--;
-////		return true;
-////		
-////		boolean ret = false;
-////		
-//		boolean ok = false;
-//		if(capacity>=desfree)
-//		{
-//			int dt = workercnt/desfree;
-//			if(dt>2)
-//			{
-//				if(deferdec==0)
-//				{
-//					deferdectarget = Math.max(10, 1/dt*500);
-//				}
-//				deferdec++;
-//				if(deferdec==deferinctarget)
-//				{
-//					deferdec=0;
-//					ok = true;
-//				}
-//			}
-//			else
-//			{
-//				ok = true;
-//				deferinc = 0;
-//			}
-//		}
-////		
-////		if(ok)
-////		{
-////			workercnt--;
-////			capacity--;
-////			ret = true;
-////		}
-//////		System.out.println("Capacity(tTO): "+capacity+" "+workercnt);
-////		return ret;
-//		
-////		boolean ret = false;
-////		
-////		if(capacity>desfree)
-////		{
-////			ret = true;
-////			workercnt--;
-//////			System.out.println("Capacity: "+capacity+" "+workercnt);
-////		}
-////		
-//		return ok;
+//		If more free workers than desired capacity let worker end.
+		if(ok)
+		{
+			ret = true;
+			workercnt--;
+			capacity--;
+		}
+		
+//		System.out.println("Capacity: "+capacity+" "+workercnt);
+		
+		return ret;
 	}
 	
 	//-------- getter/setter --------
