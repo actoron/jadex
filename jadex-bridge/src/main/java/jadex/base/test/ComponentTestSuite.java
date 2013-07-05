@@ -72,7 +72,7 @@ public class ComponentTestSuite extends TestSuite
 			"-simulation", "true",
 			"-asyncexecution", "true",
 //			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-			"-logging", "true",
+//			"-logging", "true",
 //			"-debugfutures", "true",
 //			"-nostackcompaction", "true",
 			"-gui", "false",
