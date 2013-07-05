@@ -336,7 +336,7 @@ private boolean contentViewSet;
 			}
 			catch (InvocationTargetException e)
 			{
-				Logger.d("Cannot instanciate class (wrong constructor?): " + name);
+				e.printStackTrace();
 			}
 			
 			return result;

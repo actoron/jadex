@@ -1,5 +1,6 @@
 package jadex.bdi.examples.puzzle;
 
+import jadex.bdi.examples.puzzle.ui.GuiProxy;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -9,12 +10,18 @@ import jadex.bdi.runtime.Plan;
  */
 public class PlayGamePlan extends Plan
 {
+	
+	private GuiProxy proxy;
+	public PlayGamePlan()
+	{
+		proxy = (GuiProxy) getBeliefbase().getBelief("gui_proxy").getFact();
+	}
 	/**
 	 *  The plan body.
 	 */
 	public void body()
 	{
-		System.out.println("Now puzzling:");
+		proxy.showMessage("Now puzzling:");
 		long	start	= getTime();
 		long	startmem	= Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 		IGoal play = createGoal("makemove");
@@ -22,23 +29,23 @@ public class PlayGamePlan extends Plan
 		try
 		{
 			dispatchSubgoalAndWait(play);
-//			System.out.println("Found a solution: "
+//			proxy.showMessage("Found a solution: "
 //				+board.getMoves().size()+" "+board.getMoves());
 		}
 //		catch(GoalFailureException gfe)
 		catch(Exception gfe)
 		{
-			System.out.println("No solution found :-( "+gfe);
+			proxy.showMessage("No solution found :-( "+gfe);
 		}
 		
 		long end = getTime();
-		System.out.println("Needed: "+(end-start)+" millis.");
+		proxy.showMessage("Needed: "+(end-start)+" millis.");
 		if(getBeliefbase().containsBelief("endmem"))
 		{
 			Long	endmem	= (Long) getBeliefbase().getBelief("endmem").getFact();
 			if(endmem!=null)
 			{
-				System.out.println("Needed: "+(((endmem.longValue()-startmem)*10/1024)/1024)/10.0+" Mb.");
+				proxy.showMessage("Needed: "+(((endmem.longValue()-startmem)*10/1024)/1024)/10.0+" Mb.");
 			}
 		}
 

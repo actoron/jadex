@@ -1,5 +1,6 @@
 package jadex.bdi.examples.puzzle;
 
+import jadex.bdi.examples.puzzle.ui.GuiProxy;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -23,6 +24,8 @@ public class MovePlan extends Plan
 	/** The board. */
 	protected IBoard board;
 
+	private GuiProxy proxy;
+
 	//-------- constrcutors --------
 
 	/**
@@ -34,6 +37,8 @@ public class MovePlan extends Plan
 		this.depth = ((Integer)getParameter("depth").getValue()).intValue();
 		this.delay = ((Long)getBeliefbase().getBelief("move_delay").getFact()).longValue();
 		this.board = (IBoard)getBeliefbase().getBelief("board").getFact();
+		this.proxy = (GuiProxy) getBeliefbase().getBelief("gui_proxy").getFact();
+		
 	}
 
 	//-------- methods --------
@@ -112,8 +117,12 @@ public class MovePlan extends Plan
 	 */
 	protected void print(String text, int indent)
     {
-        for(int x=0; x<indent; x++)
-            System.out.print(" ");
-        System.out.println(text);
+		StringBuilder sb = new StringBuilder();
+        for(int x=0; x<indent; x++) {
+            sb.append(" ");
+        }
+        sb.append(text);
+        
+        proxy.showMessage(sb.toString());
     }
 }

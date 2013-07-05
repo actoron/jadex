@@ -26,7 +26,7 @@ public class Board implements IBoard, Serializable
 	protected int size;
 
 	/** The hole position. */
-	protected Position hole_pos;
+	public Position hole_pos;
 
 	/** The helper object for bean events. */
 	//public ConcurrentPropertyChangeSupport pcs;
