@@ -11,6 +11,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
@@ -105,6 +106,9 @@ public class RPlan extends RElement implements IPlan
 	// hack?
 	/** The internal access. */
 	protected IInternalAccess ia;
+	
+	/** The plan listeners. */
+	protected List<IPlanListener> listeners;
 	
 	/**
 	 *  Create a new rplan based on an mplan.
@@ -286,6 +290,20 @@ public class RPlan extends RElement implements IPlan
 	public void setLifecycleState(PlanLifecycleState lifecyclestate)
 	{
 		this.lifecyclestate = lifecyclestate;
+		
+		// todo: where to notify listeners
+		if(listeners!=null && listeners.size()>0)
+		{
+			if(PlanLifecycleState.PASSED.equals(lifecyclestate)
+				|| PlanLifecycleState.FAILED.equals(lifecyclestate)
+				|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
+			{
+				for(IPlanListener lis: listeners)
+				{
+					lis.planFinished();
+				}
+			}
+		}
 	}
 	
 	/**
@@ -1150,6 +1168,16 @@ public class RPlan extends RElement implements IPlan
 				timer.cancel();
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void addPlanListener(IPlanListener listener)
+	{
+		if(listeners==null)
+			listeners = new ArrayList<IPlanListener>();
+		listeners.add(listener);
 	}
 	
 //	/**

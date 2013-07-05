@@ -135,4 +135,8 @@ public interface IPlan
 	 */
 	public <T> IFuture<T> invokeInterruptable(IResultCommand<IFuture<T>, Void> command);
 
+	/**
+	 * 
+	 */
+	public void addPlanListener(IPlanListener listener);
 }

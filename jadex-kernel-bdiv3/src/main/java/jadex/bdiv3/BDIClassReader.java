@@ -990,6 +990,7 @@ public class BDIClassReader extends MicroClassReader
 	 */
 	public static void addBeliefEvents(MCapability mcapa, List<EventType> events, String belname, ClassLoader cl)
 	{
+		belname = belname.replace(".", "/");
 		MBelief mbel = mcapa.getBelief(belname);
 		if(mbel==null)
 		{
