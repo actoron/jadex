@@ -11,6 +11,6 @@ public interface ITestService
 	/**
 	 * 
 	 */
-	public IFuture<Void> test();
+	public IFuture<Void> testThreading();
 	
 }

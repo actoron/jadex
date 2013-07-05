@@ -24,9 +24,9 @@ public class ProviderAgent implements ITestService
 	
 	/**
 	 */
-	public IFuture<Void> test()
+	public IFuture<Void> testThreading()
 	{
-		System.out.println("Provider.test()");
+		System.out.println("Provider.testThreading(): "+System.currentTimeMillis());
 		
 		Future<Void> ret = new Future<Void>();
 		

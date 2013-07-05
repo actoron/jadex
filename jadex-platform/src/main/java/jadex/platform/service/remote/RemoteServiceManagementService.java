@@ -57,6 +57,7 @@ import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.OutputConnection;
 import jadex.platform.service.remote.commands.AbstractRemoteCommand;
 import jadex.platform.service.remote.commands.RemoteGetExternalAccessCommand;
+import jadex.platform.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.platform.service.remote.commands.RemoteSearchCommand;
 import jadex.platform.service.remote.xml.RMIPostProcessor;
 import jadex.platform.service.remote.xml.RMIPreProcessor;
@@ -532,7 +533,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public void sendMessage(final IComponentIdentifier receiver, final IComponentIdentifier realrec, final Object content,
 		final String callid, final long to, final Future<Object> future, final Map<String, Object> nonfunc)
 	{
-//		System.out.println("RMS sending: "+content+" "+receiver);
+		if(content instanceof RemoteMethodInvocationCommand && ((RemoteMethodInvocationCommand)content).getMethodName().equals("testThreading"))
+		{
+			System.out.println("RMS sending: "+System.currentTimeMillis()+", "+content+" "+receiver);
+		}
 		
 		try
 		{
@@ -629,6 +633,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 															{
 																public void customResultAvailable(Void result)
 																{
+																	if(content instanceof RemoteMethodInvocationCommand && ((RemoteMethodInvocationCommand)content).getMethodName().equals("testThreading"))
+																	{
+																		System.out.println("RMS sent: "+System.currentTimeMillis()+", "+content+" "+receiver);
+																	}
 	//																System.out.println("sent: "+callid);
 																	// ok message could be sent.
 																	if(to>=0)
