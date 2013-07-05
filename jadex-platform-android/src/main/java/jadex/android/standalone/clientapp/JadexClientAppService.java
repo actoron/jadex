@@ -12,7 +12,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Looper;
 
-public abstract class JadexClientAppService extends Service
+public abstract class JadexClientAppService extends Service 
 {
 
 
@@ -46,7 +46,7 @@ public abstract class JadexClientAppService extends Service
 	@Override
 	public boolean onUnbind(Intent intent)
 	{
-		return true;
+		return false;
 	}
 
 	@Override

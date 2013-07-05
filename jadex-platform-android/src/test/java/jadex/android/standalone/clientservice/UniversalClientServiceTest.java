@@ -114,6 +114,15 @@ public class UniversalClientServiceTest
 		service.unbindClientService(conn);
 		assertFalse(conn.bound);
 	}
+	
+	@Test
+	public void testBindUnbindCycle()
+	{
+		MyServiceConnection conn = new MyServiceConnection();
+		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE);
+		service.unbindClientService(conn);
+		assertFalse(service.isClientServiceConnection(conn));
+	}
 
 	private Intent getIntent()
 	{

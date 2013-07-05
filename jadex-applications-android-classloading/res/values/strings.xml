@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="status_label">Status: </string>
-    <string name="app_title">User App</string>
+    <string name="app_title">Sokrates</string>
     <string name="app_sendtitle">Send Activity</string>
     <string name="status_loading">Loading Platform...</string>
     <string name="status_started">Platform started!</string>
     <string name="call_service">Call Agent</string>
     <string name="start_demo">Start Demo</string>
-    <string name="demo_title">Sokrates</string>
 </resources>

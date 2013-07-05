@@ -19,6 +19,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 
 public class SokratesActivity extends ClientAppFragment implements ServiceConnection
 {
@@ -30,20 +31,28 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		Intent i = new Intent(getContext(), MyPlatformService.class);
-		bindService(i, this, 0);
+		
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		setTitle(R.string.demo_title);
 		View view = inflater.inflate(R.layout.sokrates, container, false);
 
+		return view;
+	}
+	
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		setTitle(R.string.app_title);
+		Intent i = new Intent(getContext(), MyPlatformService.class);
+		bindService(i, this, 0);
+		View view = getView();
 		sokratesView = (SokratesView) view.findViewById(R.id.sokrates_gameView);
 		statusTextView = (TextView) view.findViewById(R.id.sokrates_statusTextView);
 		statusTextView.setText("starting Platform...");
-		return view;
 	}
 
 	@Override
@@ -69,6 +78,8 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 		super.onDestroy();
 		if (service != null)
 		{
+			ThreadSuspendable suspendable = new ThreadSuspendable();
+			service.stopSokrates().get(suspendable);
 			unbindService(this);
 		}
 	}

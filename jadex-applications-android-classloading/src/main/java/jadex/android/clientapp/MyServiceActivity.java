@@ -21,32 +21,37 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 
 	private Button callServicesButton;
 
-	private ServiceConnection sc1;
-
 	private MyPlatformService.PlatformBinder service;
 
 	protected boolean platformRunning;
 
 	private Button startDemoButton;
 
+	private Intent serviceIntent; 
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		System.out.println("MyActivity onCreate");
-		Intent intent = new Intent(getContext(), MyPlatformService.class);
+		serviceIntent = new Intent(getContext(), MyPlatformService.class);
 
-		bindService(intent, this, BIND_AUTO_CREATE);
-		startService(intent);
+		startService(serviceIntent);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		System.out.println("MyActivity onCreateView");
 		setTitle(R.string.app_title);
 		int userlayout = R.layout.mainapp;
 		View view = inflater.inflate(userlayout, container, false);
+		return view;
+	}
+	
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		View view = getView();
 		statusTextView = (TextView) view.findViewById(R.id.statusTextView);
 		callServicesButton = (Button) view.findViewById(R.id.callServiceButton);
 		callServicesButton.setOnClickListener(new OnClickListener()
@@ -75,8 +80,19 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 		
 		startDemoButton.setEnabled(false);
 		callServicesButton.setEnabled(false);
-		return view;
+		statusTextView.setText("Connecting to Service...");
+		bindService(serviceIntent, this, 0);
 	}
+	
+	@Override
+	public void onPause()
+	{
+		super.onPause();
+		if (service != null) {
+			unbindService(this);
+		}
+	}
+	
 
 	@Override
 	public void onDestroy()
@@ -95,8 +111,9 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 	{
 		this.service = (PlatformBinder) service;
 		this.service.setPlatformListener(this);
+		
+		statusTextView.setText("Connected.");
 		this.service.startPlatform();
-
 	}
 
 	@Override

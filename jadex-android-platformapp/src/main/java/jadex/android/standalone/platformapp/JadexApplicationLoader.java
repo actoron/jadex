@@ -11,6 +11,7 @@ import jadex.android.standalone.clientservice.UniversalClientService.UniversalCl
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Stack;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -38,14 +39,15 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 {
 	private static String defaultEntryActivityName = "jadex.android.platformapp.DefaultApplication";
 	private LayoutInflater userAppInflater;
-	private String userAppPackage;
 	private Context userAppContext;
 	private ClientAppFragment clientFragment;
 	private UniversalClientServiceBinder universalService;
 	private Resources resources;
 //	private String className;
 	private ClassLoader cl;
-private boolean contentViewSet;
+	
+	private ApplicationInfo userAppInfo;
+	private Stack<ClientAppFragment> fragmentStack = new Stack<ClientAppFragment>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -59,9 +61,8 @@ private boolean contentViewSet;
 		Intent intent = getIntent();
 		if (intent != null && JadexApplication.INTENT_ACTION_LOADAPP.equals(intent.getAction()))
 		{
-			ApplicationInfo info = intent.getParcelableExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
-			String appPath = info.sourceDir;
-			userAppPackage = info.packageName;
+			userAppInfo = intent.getParcelableExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
+			String appPath = userAppInfo.sourceDir;
 			String className = intent.getStringExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
 			String originalAction = intent.getStringExtra(JadexApplication.EXTRA_KEY_ORIGINALACTION);
 			int[] windowFeatures = intent.getIntArrayExtra(JadexApplication.EXTRA_KEY_WINDOWFEATURES);
@@ -120,16 +121,16 @@ private boolean contentViewSet;
 		
 		try
 		{
-			Context userContext = getApplicationContext().createPackageContext(userAppPackage, Context.CONTEXT_IGNORE_SECURITY);
+			Context userContext = getApplicationContext().createPackageContext(userAppInfo.packageName, Context.CONTEXT_IGNORE_SECURITY);
 			userAppContext = userContext;
-			initUserAppContext(userAppPackage);
+			initUserAppContext(userAppInfo.packageName);
 		}
 		catch (NameNotFoundException e)
 		{
 			e.printStackTrace();
 		}
 		
-		activateClientFragment(clientFragment);
+		activateClientFragment(clientFragment, false);
 	}
 
 	@Override
@@ -178,10 +179,10 @@ private boolean contentViewSet;
 		{
 			unbindService(this);
 		}
-		if (clientFragment != null)
-		{
-			clientFragment.onDestroy();
-		}
+//		if (clientFragment != null)
+//		{
+//			clientFragment.onDestroy();
+//		}
 		super.onDestroy();
 	}
 
@@ -249,17 +250,21 @@ private boolean contentViewSet;
 		return act;
 	}
 	
-	private void activateClientFragment(ClientAppFragment fragment)
+	
+	private void activateClientFragment(ClientAppFragment newFragment, boolean addToBackStack)
 	{
-		fragment.setUniversalClientService(universalService);
+		clientFragment = newFragment;
+		newFragment.setUniversalClientService(universalService);
 		FragmentManager manager = getSupportFragmentManager();
 		FragmentTransaction ta = manager.beginTransaction();
-		ta.add(R.id.fragmentContainer, fragment);
+		ta.replace(R.id.fragmentContainer, newFragment);
+		if (addToBackStack) {
+			ta.addToBackStack(null);
+		}
 		setContentView(R.layout.loaderlayout);
-		contentViewSet = true;
 		ta.commit();
 	}
-
+	
 	private DexClassLoader getClassLoaderForExternalDex(ClassLoader parent, String appPath)
 	{
 		// File dexInternalStoragePath = new File(getDir("dex",
@@ -343,20 +348,18 @@ private boolean contentViewSet;
 		}
 	};
 	
+	
 	// methods that are called from clientappfragments
 	
-	public void startActivity(Intent intent) {
-		super.startActivity(intent);
-	};
 	
 	@Override
 	public void startActivityFromFragment(Fragment fragment, Intent intent, int requestCode)
 	{
-		String className = intent.getComponent().getClassName();
+		final String className = intent.getComponent().getClassName();
+		
 		ClientAppFragment newFragment = createClientFragment(className, intent);
-		clientFragment = newFragment;
-		//TODO: disable old fragment, put it to a stack.
-		activateClientFragment(newFragment);
+		
+		activateClientFragment(newFragment, true);
 	}
-
+	
 }

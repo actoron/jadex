@@ -1,5 +1,6 @@
 package jadex.android.standalone.clientapp;
 
+import jadex.android.exception.JadexAndroidError;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
 import android.app.Activity;
 import android.app.LauncherActivity;
@@ -66,7 +67,7 @@ public class ClientAppFragment extends ActivityAdapterFragment
 			if (universalService.isClientServiceConnection(conn))
 			{
 				// TODO: check for valid clientServiceName
-				return false;
+				throw new JadexAndroidError("already bound: " + clientServiceName);
 			}
 			else
 			{

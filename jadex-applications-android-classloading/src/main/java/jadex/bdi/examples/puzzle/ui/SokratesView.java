@@ -109,6 +109,7 @@ public class SokratesView extends TileView
 			}
 		}
 		updatePos(board.hole_pos);
+		mRedrawHandler.obtainMessage().sendToTarget();
 	}
 
 	@Override

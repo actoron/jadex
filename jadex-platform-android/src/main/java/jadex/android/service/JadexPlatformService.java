@@ -167,6 +167,16 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 		return jadexPlatformManager.getExternalPlatformAccess(platformId);
 	}
 	
+	protected IFuture<IMessageService> getMS()
+	{
+		return jadexPlatformManager.getMS(platformId);
+	}
+
+	protected IFuture<IComponentManagementService> getCMS()
+	{
+		return jadexPlatformManager.getCMS(platformId);
+	}
+	
 	/**
 	 * Start a new micro agent on a given platform.
 	 * 

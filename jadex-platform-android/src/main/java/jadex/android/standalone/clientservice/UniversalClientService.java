@@ -128,16 +128,17 @@ public class UniversalClientService extends Service
 			if (service != null)
 			{
 				Intent clientIntent = clientIntents.get(conn);
-				boolean isUnbound = service.onUnbind(clientIntent);
-				if (isUnbound) {
+				boolean onUnbind = service.onUnbind(clientIntent);
+				// onUnbind returns false by default, so don't respect it
+//				if (onUnbind) {
 					conn.onServiceDisconnected(componentNames.get(conn));
 					serviceConnections.remove(conn);
 					componentNames.remove(conn);
 					clientIntents.remove(conn);
 					
 					checkDestroyService(service);
-				}
-				result = isUnbound;
+//				}
+				result = onUnbind;
 			}
 			else
 			{

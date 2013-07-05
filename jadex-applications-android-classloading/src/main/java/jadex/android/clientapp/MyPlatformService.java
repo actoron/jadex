@@ -6,11 +6,14 @@ import jadex.bdi.examples.puzzle.Board;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import android.content.Intent;
 import android.os.Binder;
@@ -23,6 +26,7 @@ public class MyPlatformService extends JadexPlatformService
 	private IComponentIdentifier platformId;
 	private Handler handler;
 	public SokratesListener soListener;
+	protected IComponentIdentifier sokratesComponent;
 	
 	public interface PlatformListener
 	{
@@ -57,7 +61,15 @@ public class MyPlatformService extends JadexPlatformService
 		
 
 		public IFuture<IExternalAccess> startPlatform() {
-			return MyPlatformService.this.startPlatform();
+			IFuture<IExternalAccess> result;
+			if (platformId != null) {
+				listener.platformStarting();
+				listener.platformStarted();
+				result = new Future<IExternalAccess>(getPlatformAccess(platformId));
+			} else {
+				result = MyPlatformService.this.startPlatform();
+			}
+			return result;
 		}
 		
 		public IFuture<IComponentIdentifier> startAgent() {
@@ -74,6 +86,31 @@ public class MyPlatformService extends JadexPlatformService
 		
 		public void setSokratesListener (SokratesListener l) {
 			soListener = l;
+		}
+
+		public IFuture<Void> stopSokrates()
+		{
+			final Future<Void> result = new Future<Void>();
+			if (platformId != null && sokratesComponent != null) {
+				getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
+				{
+
+					@Override
+					public void resultAvailable(IComponentManagementService cms)
+					{
+						cms.destroyComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String,Object>>()
+						{
+
+							@Override
+							public void resultAvailable(Map<String, Object> cmsResult)
+							{
+								result.setResult(null);
+							}
+						});
+					}
+				});
+			}
+			return result;
 		}
 	}
 	
@@ -110,7 +147,7 @@ public class MyPlatformService extends JadexPlatformService
 			@Override
 			public void resultAvailable(IComponentIdentifier result)
 			{
-				getPlatformAccess(platformId);
+				sokratesComponent = result;
 			}
 		});
 		
