@@ -152,7 +152,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	 *  Called when a new worker was added proactively to the pool.
 	 *  @param cnt The number of new workers.
 	 */
-	public void workersAdded(int cnt)
+	public synchronized void workersAdded(int cnt)
 	{
 		workercnt += cnt;
 		capacity += cnt;

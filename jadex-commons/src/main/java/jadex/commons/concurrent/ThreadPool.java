@@ -176,12 +176,13 @@ public class ThreadPool implements IThreadPool
 					// If there are tasks and the last served task is too long ago
 					if(running && tasks.size()>0)
 					{
-						Long start = enqueuetimes.get(tasks.peek());
+						Runnable	task	= tasks.peek();
+						Long start = enqueuetimes.get(task);
 						if(start!=null && start.longValue()+maxwait<System.currentTimeMillis())
 						{
 							addThreads(5);
 							strategy.workersAdded(5);
-							System.out.println("Added threads due to starving task in queue: "+strategy);
+							System.out.println("Added threads due to starving task in queue: "+task+", "+strategy);
 						}
 					}
 				}
