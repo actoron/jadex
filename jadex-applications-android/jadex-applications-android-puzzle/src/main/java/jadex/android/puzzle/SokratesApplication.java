@@ -1,17 +1,17 @@
-package jadex.android.clientapp;
+package jadex.android.puzzle;
 
 import android.content.Intent;
 import android.view.Window;
 import jadex.android.standalone.JadexApplication;
 
-public class MyApplication extends JadexApplication
+public class SokratesApplication extends JadexApplication
 {
 	@Override
 	protected String getClassName()
 	{
 		Intent intent = getIntent();
 		String action = intent.getAction();
-		return "jadex.android.clientapp.MyServiceActivity";
+		return "jadex.android.puzzle.SokratesLoaderActivity";
 	}
 
 	@Override

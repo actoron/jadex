@@ -1,4 +1,4 @@
-package jadex.android.clientapp;
+package jadex.android.puzzle;
 
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.service.JadexPlatformService;
@@ -20,7 +20,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 
-public class MyPlatformService extends JadexPlatformService
+public class SokratesService extends JadexPlatformService
 {
 	private PlatformListener listener;
 	private IComponentIdentifier platformId;
@@ -44,7 +44,7 @@ public class MyPlatformService extends JadexPlatformService
 		public void showMessage(String text);
 	}
 
-	public MyPlatformService()
+	public SokratesService()
 	{
 		setPlatformAutostart(false);
 		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BDI);
@@ -72,7 +72,7 @@ public class MyPlatformService extends JadexPlatformService
 			}
 			else
 			{
-				result = MyPlatformService.this.startPlatform();
+				result = SokratesService.this.startPlatform();
 			}
 			return result;
 		}
@@ -153,7 +153,7 @@ public class MyPlatformService extends JadexPlatformService
 			HashMap<String, Object> args = new HashMap<String, Object>();
 			args.put("gui_listener", soListener);
 			ci.setArguments(args);
-			IFuture<IComponentIdentifier> future = MyPlatformService.this.startComponent(platformId, "Sokrates",
+			IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
 					"jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci);
 
 			future.addResultListener(new DefaultResultListener<IComponentIdentifier>()

@@ -20,7 +20,7 @@
 
 	<imports>
 		<import>jadex.bdi.runtime.*</import>
-		<import>jadex.bdi.examples.puzzle.ui.GuiProxy</import>
+		<import>jadex.android.puzzle.ui.GuiProxy</import>
 	</imports>
 
 	<beliefs>
@@ -33,10 +33,10 @@
 <!-- 			<fact>new jadex.commons.gui.GuiCreator(BoardGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class, IBoard.class},  -->
 <!-- 				new Object[]{$scope.getExternalAccess(), $beliefbase.board})</fact> -->
 <!-- 		</belief> -->
-		<belief name="gui_listener" class="jadex.android.clientapp.MyPlatformService$SokratesListener" exported="true" argument="true">
+		<belief name="gui_listener" class="jadex.android.puzzle.SokratesService$SokratesListener" exported="true" argument="true">
 		</belief>
-		<belief name="gui_proxy" class="jadex.bdi.examples.puzzle.ui.GuiProxy">
-			<fact>new jadex.bdi.examples.puzzle.ui.GuiProxy($beliefbase.board, $beliefbase.gui_listener, $scope.getExternalAccess())</fact>
+		<belief name="gui_proxy" class="jadex.android.puzzle.ui.GuiProxy">
+			<fact>new jadex.android.puzzle.ui.GuiProxy($beliefbase.board, $beliefbase.gui_listener, $scope.getExternalAccess())</fact>
 		</belief>
 		<!-- The number of moves already tried. -->
 		<belief name="triescnt" class="int">

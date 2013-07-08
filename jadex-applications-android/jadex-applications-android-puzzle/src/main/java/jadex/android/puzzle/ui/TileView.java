@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package jadex.bdi.examples.puzzle.ui;
+package jadex.android.puzzle.ui;
 
 import jadex.android.clientapp.R;
 import android.content.Context;

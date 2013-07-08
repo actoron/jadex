@@ -12,9 +12,9 @@
     <application
         android:debuggable="true"
         android:icon="@drawable/puzzle20x20"
-        android:label="Sokrates"
+        android:label="Puzzle"
         android:screenOrientation="portrait" >
-        <activity android:name="jadex.android.clientapp.MyApplication" >
+        <activity android:name="jadex.android.puzzle.SokratesApplication" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,7 +22,7 @@
         </activity>
         
         <service
-            android:name="jadex.android.clientapp.MyService"
+            android:name="jadex.android.puzzle.MyService"
             android:label="MyService" >
         </service>
         

@@ -1,4 +1,4 @@
-package jadex.bdi.examples.puzzle.ui;
+package jadex.android.puzzle.ui;
 
 import jadex.bdi.examples.puzzle.Board;
 import jadex.bdi.examples.puzzle.Move;

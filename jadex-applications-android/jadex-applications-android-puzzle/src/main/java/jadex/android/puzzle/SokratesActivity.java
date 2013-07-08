@@ -1,11 +1,12 @@
-package jadex.android.clientapp;
+package jadex.android.puzzle;
 
-import jadex.android.clientapp.MyPlatformService.PlatformBinder;
-import jadex.android.clientapp.MyPlatformService.SokratesListener;
+import jadex.android.clientapp.R;
+import jadex.android.puzzle.SokratesService.PlatformBinder;
+import jadex.android.puzzle.SokratesService.SokratesListener;
+import jadex.android.puzzle.ui.SokratesView;
 import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.bdi.examples.puzzle.Board;
 import jadex.bdi.examples.puzzle.Move;
-import jadex.bdi.examples.puzzle.ui.SokratesView;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.ThreadSuspendable;
 import android.content.ComponentName;
@@ -30,7 +31,7 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		serviceIntent = new Intent(getContext(), MyPlatformService.class);
+		serviceIntent = new Intent(getContext(), SokratesService.class);
 	}
 
 	@Override
@@ -67,7 +68,7 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder binder)
 	{
-		this.service = (MyPlatformService.PlatformBinder) binder;
+		this.service = (SokratesService.PlatformBinder) binder;
 		this.service.setSokratesListener(sokratesListener);
 		if (!service.isSokratesRunning()) {
 			statusTextView.setText("starting Game...");

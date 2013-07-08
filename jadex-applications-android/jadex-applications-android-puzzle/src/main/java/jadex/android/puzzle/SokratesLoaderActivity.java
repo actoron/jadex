@@ -1,7 +1,8 @@
-package jadex.android.clientapp;
+package jadex.android.puzzle;
 
-import jadex.android.clientapp.MyPlatformService.PlatformBinder;
-import jadex.android.clientapp.MyPlatformService.PlatformListener;
+import jadex.android.clientapp.R;
+import jadex.android.puzzle.SokratesService.PlatformBinder;
+import jadex.android.puzzle.SokratesService.PlatformListener;
 import jadex.android.standalone.clientapp.ClientAppFragment;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -15,11 +16,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MyServiceActivity extends ClientAppFragment implements ServiceConnection, PlatformListener
+public class SokratesLoaderActivity extends ClientAppFragment implements ServiceConnection, PlatformListener
 {
 	private TextView statusTextView;
 
-	private MyPlatformService.PlatformBinder service;
+	private SokratesService.PlatformBinder service;
 
 	protected boolean platformRunning;
 
@@ -31,7 +32,7 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		serviceIntent = new Intent(getContext(), MyPlatformService.class);
+		serviceIntent = new Intent(getContext(), SokratesService.class);
 		startService(serviceIntent);
 	}
 
@@ -85,7 +86,7 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 		if (service != null)
 		{
 			unbindService(this);
-			Intent intent = new Intent(getContext(), MyPlatformService.class);
+			Intent intent = new Intent(getContext(), SokratesService.class);
 			stopService(intent);
 		}
 	}

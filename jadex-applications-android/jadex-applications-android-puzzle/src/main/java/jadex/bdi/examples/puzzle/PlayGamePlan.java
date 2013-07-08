@@ -1,6 +1,6 @@
 package jadex.bdi.examples.puzzle;
 
-import jadex.bdi.examples.puzzle.ui.GuiProxy;
+import jadex.android.puzzle.ui.GuiProxy;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 

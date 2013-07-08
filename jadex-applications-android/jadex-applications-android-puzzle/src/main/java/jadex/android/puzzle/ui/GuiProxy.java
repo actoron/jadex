@@ -1,6 +1,6 @@
-package jadex.bdi.examples.puzzle.ui;
+package jadex.android.puzzle.ui;
 
-import jadex.android.clientapp.MyPlatformService.SokratesListener;
+import jadex.android.puzzle.SokratesService.SokratesListener;
 import jadex.bdi.examples.puzzle.Board;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBelief;

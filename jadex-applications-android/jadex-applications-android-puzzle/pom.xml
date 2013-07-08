@@ -47,6 +47,12 @@
 			<scope>provided</scope>
 		</dependency>
 		
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-kernel-bdiv3</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 		</dependency> -->
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools-android</artifactId>
