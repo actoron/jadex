@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
@@ -86,7 +87,7 @@ public class MovementCapability
 	 *  The walk goal.
 	 *  Walk around without target when nothing else to do.
 	 */
-	@Goal
+	@Goal(succeedonpassed=false, excludemode=MProcessableElement.EXCLUDE_NEVER)
 	public class WalkAround
 	{
 		/**

@@ -138,15 +138,6 @@ public class MGoal extends MClassBasedElement
 	}
 	
 	/**
-	 *  Get the exlcude mode.
-	 *  @return The exclude mode.
-	 */
-	public String getExcludeMode()
-	{
-		return excludemode;
-	}
-
-	/**
 	 *  Get the succeed on passed.
 	 *  @return The succeedonpassed.
 	 */

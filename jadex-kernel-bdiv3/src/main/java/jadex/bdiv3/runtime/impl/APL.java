@@ -398,7 +398,7 @@ public class APL
 	{
 		// Use the plan priorities to sort the candidates.
 		// If the priority is the same use the following rank order:
-		// running plan - waitque of running plan - passive plan
+		// running plan - waitqueue of running plan - passive plan
 
 		// first find the list of highest ranked candidates
 		// then choose one or more of them

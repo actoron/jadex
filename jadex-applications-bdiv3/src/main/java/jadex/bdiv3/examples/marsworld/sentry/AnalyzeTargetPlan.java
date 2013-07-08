@@ -5,7 +5,6 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.Move;
 import jadex.bdiv3.examples.marsworld.producer.IProduceService;
 import jadex.bdiv3.examples.marsworld.sentry.SentryBDI.AnalyzeTarget;
@@ -34,7 +33,7 @@ public class AnalyzeTargetPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected MovementCapability capa;
+	protected SentryBDI sentry;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -51,7 +50,7 @@ public class AnalyzeTargetPlan
 		ISpaceObject target = goal.getTarget();
 
 		// Move to the target.
-		Move move = capa.new Move((IVector2)target.getProperty(Space2D.PROPERTY_POSITION));
+		Move move = sentry.getMoveCapa().new Move((IVector2)target.getProperty(Space2D.PROPERTY_POSITION));
 		rplan.dispatchSubgoal(move).get();
 
 		// Analyse the target.
@@ -59,11 +58,11 @@ public class AnalyzeTargetPlan
 		{
 			Future<Void> fut = new Future<Void>();
 			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut);
-			ISpaceObject	myself	= capa.getMyself();
+			ISpaceObject	myself	= sentry.getMoveCapa().getMyself();
 			Map props = new HashMap();
 			props.put(AnalyzeTargetTask.PROPERTY_TARGET, target);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
-			IEnvironmentSpace space = capa.getEnvironment();
+			IEnvironmentSpace space = sentry.getMoveCapa().getEnvironment();
 			Object	taskid	= space.createObjectTask(AnalyzeTargetTask.PROPERTY_TYPENAME, props, myself.getId());
 			space.addTaskListener(taskid, myself.getId(), lis);
 			fut.get();
@@ -88,7 +87,7 @@ public class AnalyzeTargetPlan
 	{
 //		System.out.println("Calling some Production Agent...");
 
-		IFuture<Collection<IProduceService>> fut = capa.getCapability().getServiceContainer().getRequiredServices("targetser");
+		IFuture<Collection<IProduceService>> fut = sentry.getMoveCapa().getCapability().getServiceContainer().getRequiredServices("targetser");
 		Collection<IProduceService> ansers = fut.get();
 		
 		for(IProduceService anser: ansers)

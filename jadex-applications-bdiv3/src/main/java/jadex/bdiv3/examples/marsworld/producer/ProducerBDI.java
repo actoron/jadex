@@ -1,6 +1,5 @@
 package jadex.bdiv3.examples.marsworld.producer;
 
-import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
@@ -12,11 +11,8 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.marsworld.BaseBDI;
-import jadex.bdiv3.examples.marsworld.carry.CarryBDI;
 import jadex.bdiv3.examples.marsworld.carry.CarryOrePlan;
-import jadex.bdiv3.examples.marsworld.carry.ICarryService;
 import jadex.bdiv3.examples.marsworld.carry.InformNewTargetPlan;
-import jadex.bdiv3.examples.marsworld.carry.CarryBDI.CarryOre;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.WalkAround;
 import jadex.bdiv3.examples.marsworld.sentry.SentryBDI.AnalyzeTarget;

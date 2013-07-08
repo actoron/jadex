@@ -9,9 +9,6 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.marsworld.BaseBDI;
-import jadex.bdiv3.examples.marsworld.carry.CarryBDI;
-import jadex.bdiv3.examples.marsworld.carry.CarryOrePlan;
-import jadex.bdiv3.examples.marsworld.carry.InformNewTargetPlan;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
@@ -20,8 +17,7 @@ import jadex.micro.annotation.Agent;
 @Agent
 @Plans(
 {
-	@Plan(trigger=@Trigger(goals=CarryBDI.CarryOre.class), body=@Body(CarryOrePlan.class)),
-	@Plan(trigger=@Trigger(factaddeds="movecapa.mytargets"), body=@Body(InformNewTargetPlan.class))
+	@Plan(trigger=@Trigger(goals=SentryBDI.AnalyzeTarget.class), body=@Body(AnalyzeTargetPlan.class))
 })
 public class SentryBDI extends BaseBDI
 {
@@ -38,7 +34,7 @@ public class SentryBDI extends BaseBDI
 		protected ISpaceObject target;
 
 		/**
-		 *  Create a new CarryOre. 
+		 *  Create a new AnalyzeTarget. 
 		 */
 		// todo: allow direct goal creation on fact added
 		@GoalCreationCondition(events="movecapa.mytargets")
