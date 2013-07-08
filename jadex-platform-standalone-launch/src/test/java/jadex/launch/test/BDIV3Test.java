@@ -23,6 +23,9 @@ public class BDIV3Test	extends	ComponentTestSuite
 			new String[]
 			{
 				"ComponentPlanAgent",	// sub agent
+				"Carry",	// sub agent
+				"Producer",	// sub agent
+				"Sentry",	// sub agent
 				"CreationBDI"	// should only be run as separate benchmark
 			});
 	}

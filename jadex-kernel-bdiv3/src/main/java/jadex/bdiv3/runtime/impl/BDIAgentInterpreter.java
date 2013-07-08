@@ -231,7 +231,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					}
 					catch(Exception e)
 					{
-						cl.getSuperclass();
+						cl	= cl.getSuperclass();
 					}
 				}
 				if(!found)

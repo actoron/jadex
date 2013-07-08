@@ -15,7 +15,7 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent
 @RequiredServices(@RequiredService(name="targetser", multiple=true, type=ITargetAnnouncementService.class))
-public class BaseBDI implements ITargetAnnouncementService
+public abstract class BaseBDI implements ITargetAnnouncementService
 {
 	@Agent 
 	protected BDIAgent agent;
