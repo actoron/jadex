@@ -104,6 +104,14 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>${maven-gpg-plugin.version}</version>
+				<configuration>
+					<homedir>${basedir}/../../docs/keys</homedir>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
