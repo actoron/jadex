@@ -7,7 +7,6 @@ import jadex.bdi.examples.puzzle.Board;
 import jadex.bdi.examples.puzzle.Move;
 import jadex.bdi.examples.puzzle.ui.SokratesView;
 import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import android.content.ComponentName;
 import android.content.Intent;

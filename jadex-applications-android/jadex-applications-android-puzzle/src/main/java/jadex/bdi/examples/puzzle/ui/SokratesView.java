@@ -1,36 +1,18 @@
 package jadex.bdi.examples.puzzle.ui;
 
-import jadex.android.clientapp.MyPlatformService;
-import jadex.android.clientapp.MyPlatformService.SokratesListener;
 import jadex.bdi.examples.puzzle.Board;
 import jadex.bdi.examples.puzzle.Move;
 import jadex.bdi.examples.puzzle.Piece;
 import jadex.bdi.examples.puzzle.Position;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.gui.SGUI;
-import android.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.view.View;
 
 public class SokratesView extends TileView 
 {
-
-	// /** The image icons. */
-	// public static UIDefaults icons = new UIDefaults(new Object[]
-	// {
-	// "white_piece", SGUI.makeIcon(BoardPanel.class,
-	// "/jadex/bdi/examples/puzzle/images/white_piece.png"),
-	// "red_piece", SGUI.makeIcon(BoardPanel.class,
-	// "/jadex/bdi/examples/puzzle/images/red_piece.png"),
-	// "empty_field", SGUI.makeIcon(BoardPanel.class,
-	// "/jadex/bdi/examples/puzzle/images/empty_field.png")
-	// });
-	//
 
 	/**
 	 * Labels for the drawables that will be loaded into the TileView class

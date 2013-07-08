@@ -11,7 +11,7 @@
 
     <application
         android:debuggable="true"
-        android:icon="@drawable/icon"
+        android:icon="@drawable/puzzle20x20"
         android:label="Sokrates"
         android:screenOrientation="portrait" >
         <activity android:name="jadex.android.clientapp.MyApplication" >

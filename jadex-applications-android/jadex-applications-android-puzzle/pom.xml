@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jadex-applications-android-classloading</artifactId>
+	<artifactId>jadex-applications-android-puzzle</artifactId>
 	<packaging>apk</packaging>
-	<name>jadex-applications-android-classloading</name>
+	<name>jadex-applications-android-puzzle</name>
 
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
@@ -72,13 +72,6 @@
 
 	<build>
 		<resources>
-<!-- 			<resource> -->
-<!-- 				<directory>res</directory> -->
-<!-- 				<includes> -->
-<!-- 					<include>**/*.xml</include> -->
-<!-- 				</includes> -->
-<!-- 				<targetPath>userRes</targetPath> -->
-<!-- 			</resource> -->
 			<resource>
 				<directory>src/main/java</directory>
 				<excludes>

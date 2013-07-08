@@ -206,11 +206,37 @@
 				<module>jadex-platform</module>
 				<module>jadex-platform-extension-webservice</module>
 
+				<!-- ready-to-run apps -->
 				<module>jadex-applications-android-demos</module>
-				<module>jadex-applications-android-chat</module>
 				<module>jadex-android-platformapp</module>
 			</modules>
 		</profile>
+		
+		<profile>
+			<id>development</id>
+			<activation>
+				<file>
+					<exists>jadex-applications-android</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>jadex-applications-android/jadex-applications-android-chat</module>
+				<module>jadex-applications-android/jadex-applications-android-puzzle</module>
+			</modules>
+		</profile>
+		
+		<profile>
+			<id>enduser</id>
+			<activation>
+				<file>
+					<missing>jadex-applications-android</missing>
+				</file>
+			</activation>
+			<modules>
+				<module>jadex-applications-android-chat</module>
+				<module>jadex-applications-android-puzzle</module>
+			</modules>
+		</profile>		
 		
 		<!-- ======== integration test ======== -->
 		

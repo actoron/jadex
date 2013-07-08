@@ -19,8 +19,6 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 {
 	private TextView statusTextView;
 
-	private Button callServicesButton;
-
 	private MyPlatformService.PlatformBinder service;
 
 	protected boolean platformRunning;
@@ -66,7 +64,6 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 		});
 		
 		startDemoButton.setEnabled(false);
-		callServicesButton.setEnabled(false);
 		statusTextView.setText("Connecting to Service...");
 		bindService(serviceIntent, this, 0);
 	}
@@ -118,7 +115,6 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 			public void run()
 			{
 				startDemoButton.setEnabled(true);
-				callServicesButton.setEnabled(true);
 				statusTextView.setText("Platform started.");
 			}
 		});

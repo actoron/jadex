@@ -9,19 +9,21 @@
 		<format>zip</format>
 	</formats>
 
-	<includeBaseDirectory>false</includeBaseDirectory>
-	
+	<includeBaseDirectory>true</includeBaseDirectory>
+
 	<moduleSets>
 		<moduleSet>
-		<excludes>
-			<exclude>net.sourceforge.jadex:jadex-android-example-project-maven</exclude>
-			<exclude>net.sourceforge.jadex:jadex-android-integration-test</exclude>
-		</excludes>
+			<excludes>
+				<exclude>net.sourceforge.jadex:jadex-android-example-project-maven</exclude>
+				<exclude>net.sourceforge.jadex:jadex-android-integration-test</exclude>
+			</excludes>
 			<sources>
-				<includeModuleDirectory>false</includeModuleDirectory>
+				<includeModuleDirectory>true</includeModuleDirectory>
+				<excludeSubModuleDirectories>false</excludeSubModuleDirectories>
 				<fileSets>
 					<fileSet>
-						<outputDirectory>sources/${module.artifactId}</outputDirectory>
+						<!-- <outputDirectory>sources/${module.artifactId}</outputDirectory> -->
+						<!-- <outputDirectory>sources</outputDirectory> -->
 						<includes>
 							<include>src/**</include>
 							<include>res/**</include>
@@ -44,79 +46,75 @@
 	<fileSets>
 		<fileSet>
 			<directory>docs/android/</directory>
-			<outputDirectory>sources/docs/android/</outputDirectory>
 			<excludes>
 				<exclude>**/bin/**</exclude>
 				<exclude>**/target/**</exclude>
 			</excludes>
 		</fileSet>
-<!-- 		<fileSet> -->
-<!-- 			<directory>docs/android/</directory> -->
-<!-- 			<outputDirectory>sources/docs/android/</outputDirectory> -->
-<!-- 		</fileSet> -->
 	</fileSets>
-	
+
 	<files>
 		<file>
 			<source>pom.xml</source>
-			<outputDirectory>sources/</outputDirectory>
 			<destName>pom.xml</destName>
 		</file>
-		
+
 		<file>
 			<source>docs/android/readme-building.txt</source>
-			<outputDirectory>sources</outputDirectory>
 		</file>
-				
+
 		<!-- Copy files required for distribution build -->
 		<file>
 			<source>docs/junit-3.8.1.jar</source>
-			<outputDirectory>sources/docs</outputDirectory>
+			<outputDirectory>docs</outputDirectory>
 		</file>
 		<file>
 			<source>docs/readme.txt</source>
-			<outputDirectory>sources/docs</outputDirectory>
+			<outputDirectory>docs</outputDirectory>
 		</file>
 		<file>
 			<source>docs/license.txt</source>
-			<outputDirectory>sources/docs</outputDirectory>
+			<outputDirectory>docs</outputDirectory>
 		</file>
 		<file>
 			<source>docs/api-changes.txt</source>
-			<outputDirectory>sources/docs</outputDirectory>
+			<outputDirectory>docs</outputDirectory>
 		</file>
 		<file>
 			<source>docs/jcc.settings.xml</source>
-			<outputDirectory>sources/docs</outputDirectory>
+			<outputDirectory>docs</outputDirectory>
 		</file>
 		<file>
 			<source>docs/default.settings.xml</source>
-			<outputDirectory>sources/docs</outputDirectory>
+			<outputDirectory>docs</outputDirectory>
 		</file>
 		<file>
 			<source>docs/xs3p.xsl</source>
-			<outputDirectory>sources/docs</outputDirectory>
+			<outputDirectory>docs</outputDirectory>
 		</file>
 		<file>
 			<source>docs/android/readme-building.txt</source>
-			<outputDirectory>sources/docs/android</outputDirectory>
+			<outputDirectory>docs/android</outputDirectory>
 		</file>
 
 		<file>
 			<source>src/main/assembly/dist-assembly-androidsrczip.xml</source>
-			<outputDirectory>sources/src/main/assembly</outputDirectory>
+			<outputDirectory>src/main/assembly</outputDirectory>
 		</file>
 		<file>
 			<source>src/main/assembly/dist-assembly-android.xml</source>
-			<outputDirectory>sources/src/main/assembly</outputDirectory>
+			<outputDirectory>src/main/assembly</outputDirectory>
 		</file>
 		<file>
 			<source>src/main/assembly/dist-assembly-androidexampleprojectzip.xml</source>
-			<outputDirectory>sources/src/main/assembly</outputDirectory>
+			<outputDirectory>src/main/assembly</outputDirectory>
+		</file>
+		<file>
+			<source>src/main/assembly/dist-assembly-androidplatformapk.xml</source>
+			<outputDirectory>src/main/assembly</outputDirectory>
 		</file>
 		<file>
 			<source>pom-android-dist.xml</source>
-			<outputDirectory>sources</outputDirectory>
 		</file>
 	</files>
 
