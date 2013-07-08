@@ -27,19 +27,20 @@ public class MyPlatformService extends JadexPlatformService
 	private Handler handler;
 	public SokratesListener soListener;
 	protected IComponentIdentifier sokratesComponent;
-	
+	private boolean sokratesRunning;
+
 	public interface PlatformListener
 	{
 		public void platformStarted();
 		public void platformStarting();
 	}
-	
+
 	public interface SokratesListener
 	{
 		public void handleEvent(PropertyChangeEvent event);
 
 		public void setBoard(Board board);
-		
+
 		public void showMessage(String text);
 	}
 
@@ -50,55 +51,64 @@ public class MyPlatformService extends JadexPlatformService
 		setPlatformName("Sokrates");
 		handler = new Handler();
 	}
-	
+
 	@Override
 	public IBinder onBind(Intent intent)
 	{
 		return new PlatformBinder();
 	}
-	
-	public class PlatformBinder extends Binder {
-		
 
-		public IFuture<IExternalAccess> startPlatform() {
+	public class PlatformBinder extends Binder
+	{
+
+		public IFuture<IExternalAccess> startPlatform()
+		{
 			IFuture<IExternalAccess> result;
-			if (platformId != null) {
+			if (platformId != null)
+			{
 				listener.platformStarting();
 				listener.platformStarted();
 				result = new Future<IExternalAccess>(getPlatformAccess(platformId));
-			} else {
+			}
+			else
+			{
 				result = MyPlatformService.this.startPlatform();
 			}
 			return result;
 		}
-		
-		public IFuture<IComponentIdentifier> startAgent() {
-			return MyPlatformService.this.startComponent(platformId, "Component", "jadex/android/clientapp/bditest/HelloWorld.agent.xml");
-		}
-		
-		public IFuture<Void> startSokrates() {
+
+		public IFuture<Void> startSokrates()
+		{
 			return createSokratesGame();
 		}
-		
-		public void setPlatformListener (PlatformListener l) {
+
+		public void setPlatformListener(PlatformListener l)
+		{
 			listener = l;
 		}
-		
-		public void setSokratesListener (SokratesListener l) {
+
+		public void setSokratesListener(SokratesListener l)
+		{
 			soListener = l;
 		}
 
-		public IFuture<Void> stopSokrates()
+		public boolean isSokratesRunning()
+		{
+			return sokratesRunning;
+		}
+
+		public synchronized IFuture<Void> stopSokrates()
 		{
 			final Future<Void> result = new Future<Void>();
-			if (platformId != null && sokratesComponent != null) {
+			if (platformId != null && sokratesComponent != null)
+			{
 				getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
 
 					@Override
 					public void resultAvailable(IComponentManagementService cms)
 					{
-						cms.destroyComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String,Object>>()
+						cms.destroyComponent(sokratesComponent).addResultListener(new DefaultResultListener<Map<String, Object>>()
 						{
 
 							@Override
@@ -110,10 +120,11 @@ public class MyPlatformService extends JadexPlatformService
 					}
 				});
 			}
+			sokratesRunning = false;
 			return result;
 		}
 	}
-	
+
 	@Override
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
@@ -121,38 +132,44 @@ public class MyPlatformService extends JadexPlatformService
 		this.platformId = platform.getComponentIdentifier();
 		listener.platformStarted();
 	}
-	
+
 	@Override
 	protected void onPlatformStarting()
 	{
 		super.onPlatformStarting();
 		listener.platformStarting();
 	}
-	
+
 	public void post(Runnable runnable)
 	{
 		handler.post(runnable);
 	}
-	
-	private IFuture<Void> createSokratesGame() {
-		CreationInfo ci = new CreationInfo();
-		HashMap<String, Object> args = new HashMap<String,Object>();
-		args.put("gui_listener", soListener);
-		ci.setArguments(args);
-		IFuture<IComponentIdentifier> future = MyPlatformService.this.startComponent(platformId, "Sokrates", "jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci);
-		
-		future.addResultListener(new DefaultResultListener<IComponentIdentifier>()
-		{
 
-			@Override
-			public void resultAvailable(IComponentIdentifier result)
+	private synchronized IFuture<Void> createSokratesGame()
+	{
+		if (!sokratesRunning)
+		{
+			CreationInfo ci = new CreationInfo();
+			HashMap<String, Object> args = new HashMap<String, Object>();
+			args.put("gui_listener", soListener);
+			ci.setArguments(args);
+			IFuture<IComponentIdentifier> future = MyPlatformService.this.startComponent(platformId, "Sokrates",
+					"jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci);
+
+			future.addResultListener(new DefaultResultListener<IComponentIdentifier>()
 			{
-				sokratesComponent = result;
-			}
-		});
-		
+
+				@Override
+				public void resultAvailable(IComponentIdentifier result)
+				{
+					sokratesComponent = result;
+				}
+			});
+
+			sokratesRunning = true;
+		}
 		return IFuture.DONE;
-		
+
 	}
 
 }

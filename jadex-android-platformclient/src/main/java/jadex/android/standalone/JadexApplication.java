@@ -44,6 +44,12 @@ public abstract class JadexApplication extends Activity
 		finish();
 	}
 	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+	}
+	
 	/**
 	 * Please provide the name of the class which represents your main
 	 * activity here.

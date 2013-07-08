@@ -34,7 +34,6 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 	{
 		super.onCreate(savedInstanceState);
 		serviceIntent = new Intent(getContext(), MyPlatformService.class);
-
 		startService(serviceIntent);
 	}
 
@@ -53,18 +52,6 @@ public class MyServiceActivity extends ClientAppFragment implements ServiceConne
 		super.onResume();
 		View view = getView();
 		statusTextView = (TextView) view.findViewById(R.id.statusTextView);
-		callServicesButton = (Button) view.findViewById(R.id.callServiceButton);
-		callServicesButton.setOnClickListener(new OnClickListener()
-		{
-
-			@Override
-			public void onClick(View v)
-			{
-				if (service != null && platformRunning) {
-					service.startAgent();
-				}
-			}
-		});
 		
 		startDemoButton = (Button) view.findViewById(R.id.startDemoButton);
 		startDemoButton.setOnClickListener(new OnClickListener()

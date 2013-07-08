@@ -11,7 +11,6 @@ import jadex.android.standalone.clientservice.UniversalClientService.UniversalCl
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Stack;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,7 +28,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.LayoutInflater.Factory;
 import android.view.View;
@@ -43,11 +41,9 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	private ClientAppFragment clientFragment;
 	private UniversalClientServiceBinder universalService;
 	private Resources resources;
-//	private String className;
 	private ClassLoader cl;
 	
 	private ApplicationInfo userAppInfo;
-	private Stack<ClientAppFragment> fragmentStack = new Stack<ClientAppFragment>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -77,8 +73,6 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 			{
 				className = defaultEntryActivityName;
 			}
-
-//			this.className = className;
 
 			if (appPath != null)
 			{
@@ -166,11 +160,11 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		}
 	}
 
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-	}
+//	@Override
+//	protected void onResume()
+//	{
+//		super.onResume();
+//	}
 
 	@Override
 	protected void onDestroy()
@@ -179,10 +173,6 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		{
 			unbindService(this);
 		}
-//		if (clientFragment != null)
-//		{
-//			clientFragment.onDestroy();
-//		}
 		super.onDestroy();
 	}
 

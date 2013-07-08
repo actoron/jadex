@@ -1,5 +1,14 @@
 package jadex.android.clientapp;
 
+import jadex.android.clientapp.MyPlatformService.PlatformBinder;
+import jadex.android.clientapp.MyPlatformService.SokratesListener;
+import jadex.android.standalone.clientapp.ClientAppFragment;
+import jadex.bdi.examples.puzzle.Board;
+import jadex.bdi.examples.puzzle.Move;
+import jadex.bdi.examples.puzzle.ui.SokratesView;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -9,29 +18,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import jadex.android.clientapp.MyPlatformService.PlatformBinder;
-import jadex.android.clientapp.MyPlatformService.SokratesListener;
-import jadex.android.standalone.clientapp.ClientAppFragment;
-import jadex.bdi.examples.puzzle.Board;
-import jadex.bdi.examples.puzzle.Move;
-import jadex.bdi.examples.puzzle.ui.SokratesView;
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 
 public class SokratesActivity extends ClientAppFragment implements ServiceConnection
 {
 	private PlatformBinder service;
 	private TextView statusTextView;
 	private SokratesView sokratesView;
+	
+	private Intent serviceIntent;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
+		serviceIntent = new Intent(getContext(), MyPlatformService.class);
 	}
 
 	@Override
@@ -47,23 +47,33 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 	{
 		super.onResume();
 		setTitle(R.string.app_title);
-		Intent i = new Intent(getContext(), MyPlatformService.class);
-		bindService(i, this, 0);
+		bindService(serviceIntent, this, 0);
 		View view = getView();
 		sokratesView = (SokratesView) view.findViewById(R.id.sokrates_gameView);
 		statusTextView = (TextView) view.findViewById(R.id.sokrates_statusTextView);
 		statusTextView.setText("starting Platform...");
+	}
+	
+	@Override
+	public void onPause()
+	{
+		super.onPause();
+		if (!isRemoving()) {
+			// if isRemoving, onDestroy will be called where
+			// we want to stop sokrates before unbinding
+			unbindService(this);
+		}
 	}
 
 	@Override
 	public void onServiceConnected(ComponentName name, IBinder binder)
 	{
 		this.service = (MyPlatformService.PlatformBinder) binder;
-		statusTextView.setText("starting Game...");
-
 		this.service.setSokratesListener(sokratesListener);
-
-		IFuture<Void> startSokrates = this.service.startSokrates();
+		if (!service.isSokratesRunning()) {
+			statusTextView.setText("starting Game...");
+			this.service.startSokrates();
+		}
 	}
 
 	@Override
@@ -124,5 +134,6 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 		}
 
 	};
+	
 
 }
