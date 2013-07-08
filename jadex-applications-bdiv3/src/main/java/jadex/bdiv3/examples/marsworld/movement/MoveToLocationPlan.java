@@ -44,7 +44,7 @@ public class MoveToLocationPlan
 	public IFuture<Void> body()
 	{
 		Future<Void> ret = new Future<Void>();
-//		System.out.println("MoveToLocation: "+getComponentIdentifier());
+//		System.out.println("MoveToLocation: "+capa.getMyself());
 		
 		ISpaceObject myself	= capa.getMyself();
 		IVector2 dest = goal.getDestination();
@@ -55,13 +55,17 @@ public class MoveToLocationPlan
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
 		IEnvironmentSpace space = capa.getEnvironment();
 		
-		CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
-		
+		Future<Void>	rotate	= new Future<Void>();
 		Object rtaskid = space.createObjectTask(RotationTask.PROPERTY_TYPENAME, props, myself.getId());
-		space.addTaskListener(rtaskid, myself.getId(), lis);
+		space.addTaskListener(rtaskid, myself.getId(), new DelegationResultListener<Void>(rotate));
+		rotate.get();
 		
+		Future<Void>	move	= new Future<Void>();
 		Object mtaskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
-		space.addTaskListener(mtaskid, myself.getId(), lis);
+		space.addTaskListener(mtaskid, myself.getId(), new DelegationResultListener<Void>(move));
+		move.get();
+		
+//		System.out.println("Moved to location: "+capa.getMyself());
 		
 		return ret;
 	}

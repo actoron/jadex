@@ -297,11 +297,12 @@
 	 			</env:envspace>
 			</extensions>
 			<components>
-				<component type="Sentry" number="1"/>
 				<!-- 
+			    <component type="Sentry" number="1"/>
   				<component type="Producer" number="2"/>
 				<component type="Carry" number="3"/>
 				 -->
+				<component type="Carry" number="1"/>
 			</components>
  		</configuration>
 
