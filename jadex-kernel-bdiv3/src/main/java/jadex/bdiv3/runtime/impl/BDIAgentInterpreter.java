@@ -789,13 +789,19 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			
 			if(mbel.getUpdaterate()>0)
 			{
-				Object	ocapa	= agent;
 				int	i	= mbel.getName().indexOf(CAPABILITY_SEPARATOR);
+				final String	name;
+				final Object	capa;
 				if(i!=-1)
 				{
-					ocapa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)));
+					capa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)));
+					name	= mbel.getName().substring(mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)+1); 
 				}
-				final Object	capa	= ocapa;
+				else
+				{
+					capa	= agent;
+					name	= mbel.getName();
+				}
 
 				SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new IResultListener<IClockService>()
@@ -815,7 +821,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 										{
 											try
 											{
-												Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
+												Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(name), new Class[0]);
 												um.invoke(capa, new Object[0]);
 											}
 											catch(Exception e)

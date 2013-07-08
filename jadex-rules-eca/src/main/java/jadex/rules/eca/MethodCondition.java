@@ -33,8 +33,8 @@ public class MethodCondition implements ICondition
 	 */
 	public MethodCondition(Object object, Method method, boolean invert)
 	{
-		if(object==null)
-			System.out.println("hetre");
+//		if(object==null)
+//			System.out.println("hetre");
 		
 		this.object = object;
 		this.method = method;

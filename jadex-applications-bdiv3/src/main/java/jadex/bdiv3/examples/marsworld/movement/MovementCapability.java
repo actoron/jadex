@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Capability
 @Plans({
-	@Plan(trigger=@Trigger(goals=MovementCapability.Missionend.class), body=@Body(MoveToLocationPlan.class)),
+	@Plan(trigger=@Trigger(goals=MovementCapability.Move.class), body=@Body(MoveToLocationPlan.class)),
 	@Plan(trigger=@Trigger(goals=MovementCapability.WalkAround.class), body=@Body(RandomWalkPlan.class))
 })
 @RequiredServices(@RequiredService(name="clockser", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))

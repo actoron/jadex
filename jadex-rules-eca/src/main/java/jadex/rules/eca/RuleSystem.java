@@ -409,7 +409,7 @@ public class RuleSystem
 			IEvent event = events.remove(0);
 			
 //			if(event.getType().getType(0).startsWith("goal"))
-//				System.out.println("here");
+//				System.out.println("Processing event: "+event);
 			
 			List<IRule<?>> rules = rulebase.getRules(event.getType());
 			

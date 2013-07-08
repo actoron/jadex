@@ -299,6 +299,8 @@ public class BDIClassReader extends MicroClassReader
 						for(MCondition cond: conds)
 						{
 							MCondition ccond = new MCondition(cond.getName(), convertEventTypes(name, cond.getEvents(), bdimodel));
+							ccond.setConstructorTarget(cond.getConstructorTarget());
+							ccond.setMethodTarget(cond.getMethodTarget());
 							goal2.addCondition(type, ccond);
 						}
 					}

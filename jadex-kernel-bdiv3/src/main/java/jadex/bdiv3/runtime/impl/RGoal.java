@@ -168,8 +168,7 @@ public class RGoal extends RProcessableElement implements IGoal
 //		this.processingstate = processingstate;
 	
 		// If was inprocess -> now stop processing.
-//		Object	curstate	= state.getAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_processingstate);
-//		System.out.println("changeprocstate: "+rgoal+" "+newstate+" "+curstate);
+//		System.out.println("changeprocstate: "+this+" "+processingstate+" "+getProcessingState());
 
 		if(!RGoal.GoalProcessingState.INPROCESS.equals(processingstate))
 		{
@@ -710,7 +709,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		
 		// todo: perform goals
 		if(isProceduralGoal() && getMGoal().isSucceedOnPassed() 
-			&& !getTriedPlans().isEmpty())
+			&& getTriedPlans()!=null && !getTriedPlans().isEmpty())
 		{
 			RPlan rplan = getTriedPlans().get(getTriedPlans().size()-1);
 			ret = rplan.isPassed();

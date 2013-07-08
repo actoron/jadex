@@ -577,7 +577,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	public boolean	execute()
 	{
 //		if(getComponentIdentifier().toString().indexOf("rms")!=-1)
-////			getModel().getFullName().indexOf("testcases.threading")!=-1)
+//		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
 //		{
 //			System.out.println("Enter: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 //		}
@@ -731,7 +731,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		ISuspendable.SUSPENDABLE.set(null);
 
 //		if(getComponentIdentifier().toString().indexOf("rms")!=-1)
-////			getModel().getFullName().indexOf("testcases.threading")!=-1)
+//		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
 //		{
 //			System.out.println("Leave: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 //		}
@@ -766,7 +766,17 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		this.executing	= false;
 		this.componentthread	= null;
 		
+//		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
+//		{
+//			System.out.println("Blocking: "+getComponentIdentifier()+", "+System.currentTimeMillis());
+//		}
+		
 		exe.blockThread(monitor);
+		
+//		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
+//		{
+//			System.out.println("Unblocked: "+getComponentIdentifier()+", "+System.currentTimeMillis());
+//		}
 		
 		if(executing)
 		{

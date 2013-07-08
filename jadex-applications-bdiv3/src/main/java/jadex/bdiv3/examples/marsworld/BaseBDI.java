@@ -1,12 +1,12 @@
 package jadex.bdiv3.examples.marsworld;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -45,7 +45,7 @@ public abstract class BaseBDI implements ITargetAnnouncementService
 	/**
 	 * 
 	 */
-	@Body
+	@AgentBody
 	public void body()
 	{
 		agent.dispatchTopLevelGoal(movecapa.new WalkAround());
