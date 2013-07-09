@@ -19,12 +19,13 @@ public class PlanFinishedTaskCondition implements IBooleanCondition
 	 *  Create a plan finished task condition.
 	 *  @param plan	The plan.
 	 */
-	public PlanFinishedTaskCondition(IPlan plan)
+	public PlanFinishedTaskCondition(final IPlan plan)
 	{
 		plan.addPlanListener(new IPlanListener()
 		{	
 			public void planFinished()
 			{
+				System.out.println("plan fini: "+plan);
 				finished	= true;
 			}
 		});

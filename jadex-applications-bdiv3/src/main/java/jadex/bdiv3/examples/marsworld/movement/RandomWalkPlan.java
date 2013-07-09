@@ -46,10 +46,10 @@ public class RandomWalkPlan
 	@PlanBody
 	public void body()
 	{
-//		System.out.println("RandomWalk: "+getComponentIdentifier());
+		System.out.println("RandomWalk: "+capa.getCapability().getAgent().getComponentIdentifier());
 		IVector2	dest	= capa.getEnvironment().getRandomPosition(Vector2Int.ZERO);
 		Move moveto = capa.new Move(dest);
 		rplan.dispatchSubgoal(moveto).get();
-//		rplan.getLogger().info("Reached point: "+dest);
+		System.out.println("Reached point: "+dest);
 	}
 }

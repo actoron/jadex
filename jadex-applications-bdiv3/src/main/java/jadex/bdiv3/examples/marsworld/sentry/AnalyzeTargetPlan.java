@@ -47,6 +47,8 @@ public class AnalyzeTargetPlan
 	@PlanBody
 	public void body()
 	{
+		System.out.println("analyze target plan start");
+		
 		ISpaceObject target = goal.getTarget();
 
 		// Move to the target.
@@ -87,12 +89,19 @@ public class AnalyzeTargetPlan
 	{
 //		System.out.println("Calling some Production Agent...");
 
-		IFuture<Collection<IProduceService>> fut = sentry.getMoveCapa().getCapability().getServiceContainer().getRequiredServices("targetser");
-		Collection<IProduceService> ansers = fut.get();
-		
-		for(IProduceService anser: ansers)
+		try
 		{
-			anser.doProduce(target);
+			IFuture<Collection<IProduceService>> fut = sentry.getAgent().getServiceContainer().getRequiredServices("targetser");
+			Collection<IProduceService> ansers = fut.get();
+			
+			for(IProduceService anser: ansers)
+			{
+				anser.doProduce(target);
+			}
+		}
+		catch(RuntimeException e)
+		{
+			System.out.println("No producer found");
 		}
 	}
 }

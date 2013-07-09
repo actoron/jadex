@@ -50,4 +50,13 @@ public abstract class BaseBDI implements ITargetAnnouncementService
 	{
 		agent.dispatchTopLevelGoal(movecapa.new WalkAround());
 	}
+
+	/**
+	 *  Get the agent.
+	 *  @return The agent.
+	 */
+	public BDIAgent getAgent()
+	{
+		return agent;
+	}
 }

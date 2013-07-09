@@ -2,6 +2,7 @@ package jadex.bdiv3.examples.marsworld.movement;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
@@ -43,7 +44,6 @@ public class MoveToLocationPlan
 	@PlanBody
 	public IFuture<Void> body()
 	{
-		Future<Void> ret = new Future<Void>();
 //		System.out.println("MoveToLocation: "+capa.getMyself());
 		
 		ISpaceObject myself	= capa.getMyself();
@@ -55,18 +55,26 @@ public class MoveToLocationPlan
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
 		IEnvironmentSpace space = capa.getEnvironment();
 		
-		Future<Void>	rotate	= new Future<Void>();
+		Future<Void> fut = new Future<Void>();
+		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut);
 		Object rtaskid = space.createObjectTask(RotationTask.PROPERTY_TYPENAME, props, myself.getId());
-		space.addTaskListener(rtaskid, myself.getId(), new DelegationResultListener<Void>(rotate));
-		rotate.get();
+		space.addTaskListener(rtaskid, myself.getId(), lis);
+		fut.get();
 		
-		Future<Void>	move	= new Future<Void>();
+		fut = new Future<Void>();
+		lis = new DelegationResultListener<Void>(fut);
 		Object mtaskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
-		space.addTaskListener(mtaskid, myself.getId(), new DelegationResultListener<Void>(move));
-		move.get();
+		space.addTaskListener(mtaskid, myself.getId(), lis);
+		fut.get();
 		
 //		System.out.println("Moved to location: "+capa.getMyself());
 		
-		return ret;
+		return IFuture.DONE;
+	}
+	
+	@PlanAborted
+	public void aborted()
+	{
+		System.out.println("aborted: "+this);
 	}
 }

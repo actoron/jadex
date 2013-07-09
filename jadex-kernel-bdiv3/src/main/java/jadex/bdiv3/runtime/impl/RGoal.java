@@ -165,10 +165,13 @@ public class RGoal extends RProcessableElement implements IGoal
 			throw new RuntimeException("Final proc state cannot be changed: "+getProcessingState()+" "+processingstate);
 		}
 			
+//		if(getId().indexOf("AnalyzeTarget")!=-1)
+//			System.out.println("changeprocstate: "+this+" "+processingstate+" "+getProcessingState());
+		
 //		this.processingstate = processingstate;
 	
 		// If was inprocess -> now stop processing.
-//		System.out.println("changeprocstate: "+this+" "+processingstate+" "+getProcessingState());
+		System.out.println("changeprocstate: "+this+" "+processingstate+" "+getProcessingState());
 
 		if(!RGoal.GoalProcessingState.INPROCESS.equals(processingstate))
 		{
@@ -263,7 +266,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
-//		System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
+		System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 //		if(RGoal.GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate) && RGoal.GOALLIFECYCLESTATE_NEW.equals(getLifecycleState()))
 //			Thread.dumpStack();
 //		if(RGoal.GOALLIFECYCLESTATE_ADOPTED.equals(lifecyclestate) && RGoal.GOALLIFECYCLESTATE_DROPPING.equals(getLifecycleState()))
@@ -276,6 +279,8 @@ public class RGoal extends RProcessableElement implements IGoal
 //		if(getId().indexOf("Battery")!=-1 && GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate))
 //			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 //		if(getId().indexOf("AchieveCleanup")!=-1)
+//			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
+//		if(getId().indexOf("WalkAround")!=-1)
 //			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
@@ -512,7 +517,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		}
 		
 //		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
-//			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
+			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
 	}
 	
 	/**
