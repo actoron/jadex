@@ -3,8 +3,10 @@ package jadex.bpmn.editor.model.visual;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.io.IBpmnVisualModelWriter;
-import jadex.bpmn.model.io.SBpmnModelWriter;
+import jadex.bpmn.model.io.SVisualWriterHelper;
 
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +42,9 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 	 *  @param out The output.
 	 *  @param vmodel The visual model.
 	 */
-	public void writeVisualMode(PrintStream out)
+	public void writeVisualModel(PrintStream out)
 	{
-		out.println(SBpmnModelWriter.getIndent(1) + "<bpmndi:BPMNDiagram>");
-		out.println(SBpmnModelWriter.getIndent(2) + "<bpmndi:BPMNPlane>");
+		SVisualWriterHelper.beginVisualSection(out);
 		
 		mxCell parent = (mxCell) vmodel.getDefaultParent();
 		List<VNode> nodes = new ArrayList<VNode>();
@@ -52,129 +53,76 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 		
 		for (VNode node : nodes)
 		{
-			out.print(SBpmnModelWriter.getIndent(3));
-			out.print("<bpmndi:BPMNShape bpmnElement=\"");
-			out.print(node.getBpmnElement().getId());
+			String bpmnid = node.getBpmnElement().getId();
+			Boolean expanded = null;
 			if (node instanceof VSubProcess)// || node instanceof VExternalSubProcess)
 			{
-				out.print("\" isExpanded=\"");
-				out.print(!node.isCollapsed());
+				expanded = !node.isCollapsed();
 			}
-			out.println("\">");
 			
+			Rectangle2D bounds = null;
+			Rectangle2D altbounds = null;
 			if (!(node instanceof VActivity && ((MActivity) ((VActivity) node).getBpmnElement()).isEventHandler()))
 			{
 				mxGeometry geo = node.getGeometry();
-				out.print(SBpmnModelWriter.getIndent(4));
-				out.print("<dc:Bounds height=\"");
-				out.print(geo.getHeight());
-				out.print("\" width=\"");
-				out.print(geo.getWidth());
-				out.print("\" x=\"");
-				out.print(geo.getX());
-				out.print("\" y=\"");
-				out.print(geo.getY());
-				out.println("\"/>");
-			
-			
+				bounds = new Rectangle2D.Double(geo.getX(), geo.getY(), geo.getWidth(), geo.getHeight());
+				
 				mxRectangle alt = geo.getAlternateBounds();
 				if (alt != null)
 				{
-					out.print(SBpmnModelWriter.getIndent(4));
-					out.print("<dc:Bounds height=\"");
-					out.print(alt.getHeight());
-					out.print("\" width=\"");
-					out.print(alt.getWidth());
-					out.print("\" x=\"");
-					out.print(alt.getX());
-					out.print("\" y=\"");
-					out.print(alt.getY());
-					out.println("\"/>");
+					bounds = new Rectangle2D.Double(alt.getX(), alt.getY(), alt.getWidth(), alt.getHeight());
 				}
 			}
 			
+			Set<String> intparams = null;
 			if (node instanceof VActivity)
 			{
-				Set<String> intparams = ((VActivity) node).getInternalParameters();
-				if (intparams != null && intparams.size() > 0)
-				{
-					out.print(SBpmnModelWriter.getIndent(4));
-					out.println("<di:extension>");
-					for (String intparam : intparams)
-					{
-						out.print(SBpmnModelWriter.getIndent(5));
-						out.print("<jadexvisual:internalParameter>");
-						out.print(intparam);
-						out.println("</jadexvisual:internalParameter>");
-					}
-					out.print(SBpmnModelWriter.getIndent(4));
-					out.println("</di:extension>");
-				}
+				intparams = ((VActivity) node).getInternalParameters();
 			}
 			
-			//FIXME: Necessary?
-//			out.print(SBpmnModelWriter.getIndent(4));
-//			out.println("<bpmndi:BPMNLabel/>");
-			
-			out.print(SBpmnModelWriter.getIndent(3));
-			out.println("</bpmndi:BPMNShape>");
+			SVisualWriterHelper.writeBpmnShape(bpmnid, bounds, altbounds, intparams, expanded, out);
 		}
 		
 		for (VEdge edge : edges)
 		{
-			String ns = "bpmndi";
-			String tagname = "BPMNEdge";
-			String refname = "bpmnElement";
-			String typestring = "";
+			boolean dataedge = false;
 			if (edge instanceof VDataEdge)
 			{
-				ns = "di";
-				tagname = "Edge";
-				refname = "jadexElement";
-				typestring = " type=\"data\"";
+				dataedge = true;
 			}
 			
-			out.print(SBpmnModelWriter.getIndent(3));
-			out.print("<" + ns + ":" + tagname + typestring + " " + refname + "=\"");
-			out.print(edge.getBpmnElement().getId());
-			out.println("\">");
+			String bpmnid = edge.getBpmnElement().getId();
 			
+			List<Point2D> points = null;
 			mxGeometry geo = edge.getGeometry();
 			if (geo != null)
 			{
-				List<mxPoint> points = edge.getGeometry().getPoints();
-				if (points != null)
+				List<mxPoint> mxpoints = edge.getGeometry().getPoints();
+				if (mxpoints != null)
 				{
-					for (mxPoint point : points)
+					for (mxPoint mxpoint : mxpoints)
 					{
-						out.print(SBpmnModelWriter.getIndent(4));
-						out.print("<di:waypoint x=\"");
-						out.print(point.getX());
-						out.print("\" y=\"");
-						out.print(point.getY());
-						out.println("\"/>");
+						if (points == null)
+						{
+							points = new ArrayList<Point2D>();
+						}
+						Point2D point = new Point2D.Double(mxpoint.getX(), mxpoint.getY());
+						points.add(point);
 					}
 				}
 			}
 			
-//			System.out.println(vmodel.getView().getState(edge).getLabelBounds());
-			//FIXME: Necessary?
-//			out.print(SBpmnModelWriter.getIndent(4));
-//			out.println("<bpmndi:BPMNLabel/>");
-			
-			out.print(SBpmnModelWriter.getIndent(3));
-			out.println("</" + ns + ":" + tagname + ">");
+			SVisualWriterHelper.writeEdge(bpmnid, dataedge, points, out);
 		}
 		
-		out.println(SBpmnModelWriter.getIndent(2) + "</bpmndi:BPMNPlane>");
-		out.println(SBpmnModelWriter.getIndent(1) + "</bpmndi:BPMNDiagram>");
+		SVisualWriterHelper.endVisualSection(out);
 	}
 	
 	/**
 	 *  Recursively finds the visual elements.
 	 *  
 	 *  @param parent The parent node.
-	 *  @param nodes List of the nodes.
+	 *  @param nodes List of thre nodes.
 	 *  @param edges List of the edges.
 	 */
 	protected static final void getVisualElements(mxCell parent, List<VNode> nodes, List<VEdge> edges)

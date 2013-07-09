@@ -14,5 +14,5 @@ public interface IBpmnVisualModelWriter
 	 *  @param out The output.
 	 *  @param vmodel The visual model.
 	 */
-	public abstract void writeVisualMode(PrintStream out);
+	public abstract void writeVisualModel(PrintStream out);
 }
