@@ -116,7 +116,7 @@ public class BlockingIntermediateFutureTest extends TestCase
 			{
 				ISuspendable.SUSPENDABLE.set(new ThreadSuspendable()
 				{
-					public void suspend(IFuture<?> future, long timeout)
+					public void suspend(Future<?> future, long timeout)
 					{
 						suspended	= true;
 						super.suspend(future, timeout);
@@ -212,7 +212,7 @@ public class BlockingIntermediateFutureTest extends TestCase
 			{
 				ISuspendable.SUSPENDABLE.set(new ThreadSuspendable()
 				{
-					public void suspend(IFuture<?> future, long timeout)
+					public void suspend(Future<?> future, long timeout)
 					{
 						suspended	= true;
 						super.suspend(future, timeout);

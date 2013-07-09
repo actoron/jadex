@@ -73,6 +73,9 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	{
 //		System.out.println("execute candidate: "+rplan);
 		
+		if(rplan.getId().indexOf("Move")!=-1)
+			System.out.println("move plan exe");
+		
 		// problem plan context for steps needed that allows to know
 		// when a plan has completed 
 		

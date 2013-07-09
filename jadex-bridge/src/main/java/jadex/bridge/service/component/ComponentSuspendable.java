@@ -1,23 +1,25 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 
 /**
  *  Allow waiting for futures by blocking a component.
- * @author Alex
- *
  */
 public class ComponentSuspendable implements ISuspendable
 {
+	/** The component suspendables. */
+	public static final ThreadLocal<ComponentSuspendable> COMSUPS = new ThreadLocal<ComponentSuspendable>();
+	
 	//-------- attributes --------
 	
 	/** The component adapter. */
 	protected IComponentAdapter	adapter;
 	
 	/** The current future. */
-	protected IFuture<?>	future;
+	protected Future<?>	future;
 	
 	//-------- constructors --------
 	
@@ -36,7 +38,7 @@ public class ComponentSuspendable implements ISuspendable
 	 *  @param future	The future to wait for.
 	 *  @param timeout The timeout.
 	 */
-	public void suspend(IFuture<?> future, long timeout)
+	public void suspend(Future<?> future, long timeout)
 	{
 //		System.out.println("ComponentSuspendable.suspend "+Thread.currentThread());
 		
@@ -52,6 +54,7 @@ public class ComponentSuspendable implements ISuspendable
 			
 			try
 			{
+				COMSUPS.set(this);
 				adapter.block(this);
 			}
 			finally
@@ -65,7 +68,7 @@ public class ComponentSuspendable implements ISuspendable
 	/**
 	 *  Resume the execution of the suspendable.
 	 */
-	public void resume(final IFuture<?> future)
+	public void resume(final Future<?> future)
 	{
 //		System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
 		if(adapter.isExternalThread())
@@ -106,5 +109,14 @@ public class ComponentSuspendable implements ISuspendable
 	public Object getMonitor()
 	{
 		return this;
+	}
+
+	/**
+	 *  Get the future.
+	 *  @return The future.
+	 */
+	public Future<?> getFuture()
+	{
+		return future;
 	}
 }

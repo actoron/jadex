@@ -535,12 +535,15 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public void abort()
 	{
+		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("Move")!=-1)
+			System.out.println("abort move plan: "+this);
+		
 		if(!isFinished())
 		{
 			aborted = true;
 			
 //			setLifecycleState(PLANLIFECYCLESTATE_ABORTED);
-			setException(new PlanAbortedException());
+			setException(new PlanAbortedException()); // todo: BodyAborted
 			
 			if(subgoals!=null)
 			{
@@ -553,6 +556,7 @@ public class RPlan extends RElement implements IPlan
 			// If plan is waiting interrupt waiting
 			if(PlanProcessingState.WAITING.equals(getProcessingState()))
 			{
+				System.out.println("performing abort: "+this);
 				RPlan.executePlan(this, ia);
 			}
 		}
@@ -613,7 +617,9 @@ public class RPlan extends RElement implements IPlan
 
 //	Exception first = null;
 	/**
-	 * 
+	 *  Sets a resume command for continuing a plan.
+	 *  Cleans dispatched element.
+	 *  Sets processing state to WAITING.
 	 */
 	public void setResumeCommand(ICommand<Void> com)
 	{
@@ -1151,7 +1157,7 @@ public class RPlan extends RElement implements IPlan
 			
 			if(getException()!=null)
 			{
-				waitfuture.setException(getException());
+				waitfuture.setExceptionIfUndone(getException());
 			}
 			else
 			{

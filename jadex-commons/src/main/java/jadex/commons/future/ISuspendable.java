@@ -19,13 +19,13 @@ public interface ISuspendable
 	 *  @param future	The future to wait for.
 	 *  @param timeout The timeout.
 	 */
-	public void suspend(IFuture<?> future, long timeout);
+	public void suspend(Future<?> future, long timeout);
 	
 	/**
 	 *  Resume the execution of the suspendable.
 	 *  @param future	The future that issues the resume.
 	 */
-	public void resume(IFuture<?> future);
+	public void resume(Future<?> future);
 	
 	/**
 	 *  Get the monitor for waiting.

@@ -17,7 +17,7 @@ public class ThreadSuspendable implements ISuspendable
 	 *  Suspend the execution of the suspendable.
 	 *  @param timeout The timeout.
 	 */
-	public void suspend(IFuture<?> future, long timeout)
+	public void suspend(Future<?> future, long timeout)
 	{
 		synchronized(this)
 		{
@@ -48,7 +48,7 @@ public class ThreadSuspendable implements ISuspendable
 	/**
 	 *  Resume the execution of the suspendable.
 	 */
-	public void resume(IFuture<?> future)
+	public void resume(Future<?> future)
 	{
 		synchronized(this)
 		{

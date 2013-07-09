@@ -8,12 +8,12 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.commons.beans.PropertyChangeListener;
+import jadex.commons.beans.PropertyChangeSupport;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
-
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.beans.PropertyChangeSupport;
 
 import java.util.Collection;
 
@@ -529,13 +529,13 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	/** Property change listener handling support. */
 //    private PropertyChangeSupport pcs	= new PropertyChangeSupport(this);
     protected SyncResultListener lis;
-    protected IFuture future;
+    protected IFuture<?> future;
     
 	/**
 	 *  Suspend the execution of the plan.
 	 *  @param timeout The timeout.
 	 */
-	public void suspend(IFuture future, long timeout)
+	public void suspend(Future<?> future, long timeout)
 	{
 		if(lis==null)
 		{
@@ -580,7 +580,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	/**
 	 *  Resume the execution of the plan.
 	 */
-	public void resume(IFuture future)
+	public void resume(Future<?> future)
 	{
 		// Only wake up if still waiting for same futur
 		// (invalid resume might be called from outdated future after timeout already occurred or body aborted).

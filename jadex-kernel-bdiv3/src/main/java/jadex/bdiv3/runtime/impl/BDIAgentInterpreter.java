@@ -21,6 +21,8 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.RGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
+import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
+import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
@@ -33,6 +35,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -1513,6 +1516,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public void	beforeBlock()
 	{
+		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
+		ComponentSuspendable sus = ComponentSuspendable.COMSUPS.get();
+		if(rplan!=null && sus!=null && !RPlan.PlanProcessingState.WAITING.equals(rplan.getProcessingState()))
+		{
+			Future fut = sus.getFuture();
+			final ResumeCommand<Void> rescom = rplan.new ResumeCommand<Void>(fut);
+			rplan.setResumeCommand(rescom);
+		}
 	}
 	
 	/**
@@ -1524,6 +1535,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
 		if(rplan!=null && rplan.aborted && rplan.getLifecycleState()==PlanLifecycleState.BODY)
 		{
+			System.out.println("aborting after block: "+rplan);
 			throw new BodyAborted();
 		}
 	}
