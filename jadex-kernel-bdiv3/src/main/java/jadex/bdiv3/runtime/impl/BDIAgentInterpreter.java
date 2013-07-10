@@ -1534,6 +1534,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public void	afterBlock()
 	{
 		testBodyAborted();
+		RPlan rplan = ExecutePlanStepAction.RPLANS.get();
+		if(rplan!=null)
+		{
+			rplan.setProcessingState(PlanProcessingState.RUNNING);
+			rplan.resumecommand = null;
+		}
 	}
 	
 	/**

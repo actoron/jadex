@@ -142,22 +142,22 @@ public abstract class AbstractPlanBody implements IPlanBody
 			Object res = null;
 			if(part==0) 
 			{
-				System.out.println("body of: "+rplan);
+//				System.out.println("body of: "+rplan);
 				res = invokeBody(agent, guessParameters(getBodyParameterTypes()));
 			}
 			else if(part==1)
 			{
-				System.out.println("passed of: "+rplan);
+//				System.out.println("passed of: "+rplan);
 				res = invokePassed(agent, guessParameters(getPassedParameterTypes()));
 			}
 			else if(part==2)
 			{
-				System.out.println("failed of: "+rplan);
+//				System.out.println("failed of: "+rplan);
 				res = invokeFailed(agent, guessParameters(getFailedParameterTypes()));
 			}
 			else if(part==3)
 			{
-				System.out.println("aborted of: "+rplan);
+//				System.out.println("aborted of: "+rplan);
 				res = invokeAborted(agent, guessParameters(getAbortedParameterTypes()));
 			}
 			

@@ -305,12 +305,12 @@ public class RPlan extends RElement implements IPlan
 			}
 		}
 		
-		if(PlanLifecycleState.PASSED.equals(lifecyclestate)
-			|| PlanLifecycleState.FAILED.equals(lifecyclestate)
-			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
-		{
-			System.out.println("plan lifecycle: "+lifecyclestate);
-		}
+//		if(PlanLifecycleState.PASSED.equals(lifecyclestate)
+//			|| PlanLifecycleState.FAILED.equals(lifecyclestate)
+//			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
+//		{
+//			System.out.println("plan lifecycle: "+lifecyclestate);
+//		}
 	}
 	
 	/**
@@ -542,8 +542,8 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public void abort()
 	{
-		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("Move")!=-1)
-			System.out.println("abort move plan: "+this);
+//		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("Move")!=-1)
+//			System.out.println("abort move plan: "+this);
 		
 		if(!isFinished())
 		{
