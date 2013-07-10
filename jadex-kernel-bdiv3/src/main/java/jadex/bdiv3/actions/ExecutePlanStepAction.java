@@ -58,8 +58,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 //			}
 //		}
 			
-//		if(!ret)
-//			System.out.println("not valid: "+this+" "+element);
+		if(!ret)
+			System.out.println("not valid: "+rplan);
 		
 		return ret;
 	}
@@ -73,8 +73,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	{
 //		System.out.println("execute candidate: "+rplan);
 		
-		if(rplan.getId().indexOf("Move")!=-1)
-			System.out.println("move plan exe");
+		if(rplan.toString().indexOf("Move")!=-1)
+			System.out.println("plan exe: "+rplan);
 		
 		// problem plan context for steps needed that allows to know
 		// when a plan has completed 

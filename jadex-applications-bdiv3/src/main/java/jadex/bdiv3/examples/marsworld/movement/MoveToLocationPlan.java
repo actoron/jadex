@@ -55,6 +55,9 @@ public class MoveToLocationPlan
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
 		IEnvironmentSpace space = capa.getEnvironment();
 		
+		try
+		{
+		
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut);
 		Object rtaskid = space.createObjectTask(RotationTask.PROPERTY_TYPENAME, props, myself.getId());
@@ -66,6 +69,12 @@ public class MoveToLocationPlan
 		Object mtaskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
 		space.addTaskListener(mtaskid, myself.getId(), lis);
 		fut.get();
+		
+		}
+		catch(Throwable t)
+		{
+			t.printStackTrace();
+		}
 		
 //		System.out.println("Moved to location: "+capa.getMyself());
 		

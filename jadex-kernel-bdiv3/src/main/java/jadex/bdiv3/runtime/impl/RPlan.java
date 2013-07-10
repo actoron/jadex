@@ -304,6 +304,13 @@ public class RPlan extends RElement implements IPlan
 				}
 			}
 		}
+		
+		if(PlanLifecycleState.PASSED.equals(lifecyclestate)
+			|| PlanLifecycleState.FAILED.equals(lifecyclestate)
+			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
+		{
+			System.out.println("plan lifecycle: "+lifecyclestate);
+		}
 	}
 	
 	/**
@@ -556,7 +563,8 @@ public class RPlan extends RElement implements IPlan
 			// If plan is waiting interrupt waiting
 			if(PlanProcessingState.WAITING.equals(getProcessingState()))
 			{
-				System.out.println("performing abort: "+this);
+				if(this.toString().indexOf("Move")!=-1)
+					System.out.println("performing abort: "+this);
 				RPlan.executePlan(this, ia);
 			}
 		}
