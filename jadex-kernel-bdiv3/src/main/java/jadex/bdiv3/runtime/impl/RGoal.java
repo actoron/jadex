@@ -517,7 +517,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		}
 		
 //		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
-			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
+//			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
 	}
 	
 	/**

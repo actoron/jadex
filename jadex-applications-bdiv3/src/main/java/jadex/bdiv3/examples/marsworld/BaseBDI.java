@@ -2,6 +2,8 @@ package jadex.bdiv3.examples.marsworld;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Capability;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -58,5 +60,11 @@ public abstract class BaseBDI implements ITargetAnnouncementService
 	public BDIAgent getAgent()
 	{
 		return agent;
+	}
+	
+	@Plan(trigger=@Trigger(factchangeds="movecapa.missionend"))
+	public void missionend()
+	{
+		System.out.println("missionend: "+((Long)movecapa.getEnvironment().getSpaceObjectsByType("homebase")[0].getProperty("missiontime")));
 	}
 }

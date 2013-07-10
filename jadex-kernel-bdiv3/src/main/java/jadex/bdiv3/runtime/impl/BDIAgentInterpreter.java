@@ -1551,7 +1551,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
 		if(rplan!=null && rplan.aborted && rplan.getLifecycleState()==PlanLifecycleState.BODY)
 		{
-			System.out.println("aborting after block: "+rplan);
+//			System.out.println("aborting after block: "+rplan);
 			throw new BodyAborted();
 		}
 	}

@@ -101,6 +101,7 @@ public class SentryBDI extends BaseBDI
 		@GoalDropCondition(events="movecapa.missionend")
 		public boolean checkDrop()
 		{
+			System.out.println("dropping: "+outer.getMoveCapa().isMissionend());
 			return outer.getMoveCapa().isMissionend();
 		}
 
@@ -152,5 +153,6 @@ public class SentryBDI extends BaseBDI
 			return ret;
 		}
 	}
+
 }
 
