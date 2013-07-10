@@ -201,7 +201,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	/**
 	 *  Invoke the body.
 	 */
-	public Object invokeBody(Object agent, Object[] params)
+	public Object invokeBody(Object agent, Object[] params) throws BodyAborted
 	{
 		try
 		{
@@ -212,7 +212,19 @@ public class ClassPlanBody extends AbstractPlanBody
 		catch(Exception e)
 		{
 			Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
-			throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+			if(t instanceof BodyAborted)
+			{
+				throw (BodyAborted)t;
+			}
+			else if(t instanceof RuntimeException)
+			{
+				throw (RuntimeException)t;
+			}
+			else
+			{
+				throw new RuntimeException(t);
+			}
+//			throw t instanceof BodyAborted? (BodyAborted)t: t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
 		}
 	}
 	

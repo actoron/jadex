@@ -142,18 +142,22 @@ public abstract class AbstractPlanBody implements IPlanBody
 			Object res = null;
 			if(part==0) 
 			{
+				System.out.println("body of: "+rplan);
 				res = invokeBody(agent, guessParameters(getBodyParameterTypes()));
 			}
 			else if(part==1)
 			{
+				System.out.println("passed of: "+rplan);
 				res = invokePassed(agent, guessParameters(getPassedParameterTypes()));
 			}
 			else if(part==2)
 			{
+				System.out.println("failed of: "+rplan);
 				res = invokeFailed(agent, guessParameters(getFailedParameterTypes()));
 			}
 			else if(part==3)
 			{
+				System.out.println("aborted of: "+rplan);
 				res = invokeAborted(agent, guessParameters(getAbortedParameterTypes()));
 			}
 			
@@ -178,7 +182,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		}
 		catch(BodyAborted ba)
 		{
-			ret.setResult(null);
+			ret.setException(new PlanAbortedException());
 		}
 		
 		return ret;
@@ -187,7 +191,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 	/**
 	 *  Invoke the plan body.
 	 */
-	public abstract Object invokeBody(Object agent, Object[] params);
+	public abstract Object invokeBody(Object agent, Object[] params) throws BodyAborted;
 
 	/**
 	 *  Invoke the plan passed method.

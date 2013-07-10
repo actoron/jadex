@@ -5,11 +5,12 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
+import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.Move;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -55,26 +56,29 @@ public class MoveToLocationPlan
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
 		IEnvironmentSpace space = capa.getEnvironment();
 		
-		try
-		{
-		
+//		try
+//		{
+		System.out.println("move body start: "+rplan);
+			
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut);
 		Object rtaskid = space.createObjectTask(RotationTask.PROPERTY_TYPENAME, props, myself.getId());
 		space.addTaskListener(rtaskid, myself.getId(), lis);
 		fut.get();
+		System.out.println("move after first task: "+rplan);
 		
 		fut = new Future<Void>();
 		lis = new DelegationResultListener<Void>(fut);
 		Object mtaskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
 		space.addTaskListener(mtaskid, myself.getId(), lis);
 		fut.get();
+		System.out.println("move after second task: "+rplan);
 		
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
-		}
+//		}
+//		catch(Throwable t)
+//		{
+//			t.printStackTrace();
+//		}
 		
 //		System.out.println("Moved to location: "+capa.getMyself());
 		
@@ -85,5 +89,17 @@ public class MoveToLocationPlan
 	public void aborted()
 	{
 		System.out.println("aborted: "+this);
+	}
+	
+	@PlanFailed
+	public void failed()
+	{
+		System.out.println("failed: "+this);
+	}
+	
+	@PlanPassed
+	public void passed()
+	{
+		System.out.println("passed: "+this);
 	}
 }

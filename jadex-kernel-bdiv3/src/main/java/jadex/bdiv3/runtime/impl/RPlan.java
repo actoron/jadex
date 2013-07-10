@@ -1169,7 +1169,7 @@ public class RPlan extends RElement implements IPlan
 			}
 			else
 			{
-				waitfuture.setResult((T)getDispatchedElement());
+				waitfuture.setResultIfUndone((T)getDispatchedElement());
 			}
 			
 			if(rulename!=null)

@@ -15,4 +15,10 @@ public class BodyAborted	extends	ThreadDeath
 //	{
 //		return super.toString()+"@"+hashCode();
 //	}
+	
+	public void printStackTrace()
+	{
+		Thread.dumpStack();
+		super.printStackTrace();
+	}
 }

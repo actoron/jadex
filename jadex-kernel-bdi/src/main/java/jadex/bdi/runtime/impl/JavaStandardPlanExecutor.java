@@ -850,6 +850,12 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 //		{
 //			return super.toString()+"@"+hashCode();
 //		}
+		
+		public void printStackTrace()
+		{
+			Thread.dumpStack();
+			super.printStackTrace();
+		}
 	}
 	
 	/**

@@ -1516,6 +1516,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public void	beforeBlock()
 	{
+		testBodyAborted();
+		
 		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
 		ComponentSuspendable sus = ComponentSuspendable.COMSUPS.get();
 		if(rplan!=null && sus!=null && !RPlan.PlanProcessingState.WAITING.equals(rplan.getProcessingState()))
@@ -1531,6 +1533,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public void	afterBlock()
 	{
+		testBodyAborted();
+	}
+	
+	/**
+	 * 
+	 */
+	protected void testBodyAborted()
+	{
 		// Throw error to exit body method of aborted plan.
 		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
 		if(rplan!=null && rplan.aborted && rplan.getLifecycleState()==PlanLifecycleState.BODY)
@@ -1539,7 +1549,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			throw new BodyAborted();
 		}
 	}
-
 	
 	/**
 	 *  Execute a goal method.
