@@ -102,6 +102,17 @@ public class BDIClassReader extends MicroClassReader
 	public BDIClassReader(BDIModelLoader loader)
 	{
 //		this.gen = new JavassistBDIClassGenerator();
+		if (SReflect.isAndroid()) {
+			Class<?> clazz = SReflect.classForName0("jadex.bdiv3.AsmDexBdiClassGenerator", this.getClass().getClassLoader());
+			try
+			{
+				this.gen = (IBDIClassGenerator) clazz.newInstance();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 		this.gen = new ASMBDIClassGenerator();
 		this.loader	= loader;
 	}

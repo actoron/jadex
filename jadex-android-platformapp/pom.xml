@@ -57,6 +57,12 @@
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdiv3-android</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-antlr</artifactId>
 			<version>${project.version}</version>
 		</dependency>
