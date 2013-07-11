@@ -408,7 +408,7 @@ public class RuleSystem
 		{
 			IEvent event = events.remove(0);
 			
-//			if(event.getType().getType(0).startsWith("goal"))
+//			if(event.getType().getType(0).indexOf("elief")!=-1)
 //				System.out.println("Processing event: "+event);
 			
 			List<IRule<?>> rules = rulebase.getRules(event.getType());
@@ -515,7 +515,7 @@ public class RuleSystem
 	 */
 	public void addEvent(IEvent event)
 	{
-//		System.out.println("added: "+event);
+		System.out.println("added: "+event);
 		events.add(event);
 	}
 	

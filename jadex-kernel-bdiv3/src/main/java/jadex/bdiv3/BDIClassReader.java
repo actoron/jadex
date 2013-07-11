@@ -644,7 +644,7 @@ public class BDIClassReader extends MicroClassReader
 	protected List<String> convertEvents(String name, Collection<String> evs, BDIModel bdimodel)
 	{
 		List<String>	events	= new ArrayList<String>();
-		for(String event: events)
+		for(String event: evs)
 		{
 			String	mapped	= name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event;
 			events.add(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped);
@@ -658,10 +658,12 @@ public class BDIClassReader extends MicroClassReader
 	protected List<EventType> convertEventTypes(String name, Collection<EventType> evs, BDIModel bdimodel)
 	{
 		List<EventType>	events	= new ArrayList<EventType>();
-		for(EventType event: events)
+		for(EventType event: evs)
 		{
-			String	mapped = name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+event.toString();
-			events.add(new EventType(bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped));
+			String[]	types	= event.getTypes().clone();
+			String	mapped = name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+types[types.length-1];
+			types[types.length-1]	= bdimodel.getBeliefMappings().containsKey(mapped) ? bdimodel.getBeliefMappings().get(mapped) : mapped;
+			events.add(new EventType(types));
 		}
 		return events;
 	}

@@ -196,7 +196,7 @@ public class BDIAgent extends MicroAgent
 	 *  Method that is called automatically when a belief 
 	 *  is written as field access.
 	 */
-	protected void writeField(Object val, final String fieldname, Object obj)
+	protected void writeField(Object val, String belname, String fieldname, Object obj)
 	{
 		assert isComponentThread();
 		
@@ -215,13 +215,13 @@ public class BDIAgent extends MicroAgent
 			
 			if(!SUtil.equals(val, oldval))
 			{
-				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+fieldname, val));
+				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 
 			}
 			
 			// observe new value for property changes
-			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+fieldname);
+			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname);
 			
 			// initiate a step to reevaluate the conditions
 			scheduleStep(new IComponentStep()
@@ -318,16 +318,32 @@ public class BDIAgent extends MicroAgent
 	 *  Method that is called automatically when a belief 
 	 *  is written as field access.
 	 */
-	public static void writeField(Object val, final String fieldname, Object obj, BDIAgent agent)
+	public static void writeField(Object val, String fieldname, Object obj, BDIAgent agent)
 	{
 //		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
+		
+		String	gn	= null;
+		try
+		{
+			Field	gnf	= obj.getClass().getField("__globalname");
+			gnf.setAccessible(true);
+			gn	= (String)gnf.get(obj);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		String belname	= gn!=null ? gn + BDIAgentInterpreter.CAPABILITY_SEPARATOR + fieldname : fieldname;
 
 		if(agent!=null)
 		{
-			agent.writeField(val, fieldname, obj);
+			agent.writeField(val, belname, fieldname, obj);
 		}
 		else
 		{
+			// In init set field immediately but throw events later, when agent is available.
+			
 			try
 			{
 				setFieldValue(obj, fieldname, val);
@@ -345,7 +361,7 @@ public class BDIAgent extends MicroAgent
 					inits = new ArrayList<Object[]>();
 					initwrites.put(obj, inits);
 				}
-				inits.add(new Object[]{val, fieldname, obj});	
+				inits.add(new Object[]{val, belname, obj});	
 			}
 		}
 	}
@@ -370,10 +386,10 @@ public class BDIAgent extends MicroAgent
 //					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
 //					agent.writeField(write[0], (String)write[1], write[2]);
 					RuleSystem rs = ((BDIAgentInterpreter)agent.getInterpreter()).getRuleSystem();
-					final String fieldname = (String)write[1];
+					final String belname = (String)write[1];
 					Object val = write[0];
-					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+fieldname, val));
-					observeValue(rs, val, (BDIAgentInterpreter)agent.getInterpreter(), ChangeEvent.FACTCHANGED+"."+fieldname);
+					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
+					observeValue(rs, val, (BDIAgentInterpreter)agent.getInterpreter(), ChangeEvent.FACTCHANGED+"."+belname);
 				}
 			}
 		}
