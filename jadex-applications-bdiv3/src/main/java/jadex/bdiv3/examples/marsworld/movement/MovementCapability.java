@@ -48,7 +48,8 @@ public class MovementCapability
 	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());
 
 	/** The mission end. */
-	@Belief(dynamic=true, updaterate=1000) 
+//	@Belief(dynamic=true, updaterate=1000) 
+	@Belief(updaterate=1000) 
 	protected boolean missionend = ((Long)env.getSpaceObjectsByType("homebase")[0].getProperty("missiontime")).longValue()<=getTime();
 
 	/** The targets. */
@@ -187,6 +188,9 @@ public class MovementCapability
 	public void addTarget(ISpaceObject target)
 	{
 		if(!mytargets.contains(target))
+		{
+			System.out.println("added target: "+capa.getAgent().getAgentName()+" "+target);
 			mytargets.add(target);
+		}
 	}
 }

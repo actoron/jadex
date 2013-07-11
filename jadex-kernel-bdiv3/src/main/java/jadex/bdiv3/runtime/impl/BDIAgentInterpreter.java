@@ -79,6 +79,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -940,7 +941,52 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						final Method m = cond.getMethodTarget().getMethod(getClassLoader());
 						
 						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
-							new MethodCondition(null, m), new IAction<Void>()
+							new MethodCondition(null, m)
+						{
+							public Object[] guessParameterValues(IEvent event)
+							{
+								Class<?>[] ptypes = method.getParameterTypes();
+								
+								BDIAgent agent = (BDIAgent)getAgent();
+								Object pojo = null;
+								if(agent instanceof IPojoMicroAgent)
+									pojo = ((IPojoMicroAgent)agent).getPojoAgent();
+								Object content = event.getContent();
+								
+								Object[] params = new Object[ptypes.length];
+								
+								for(int i=0; i<ptypes.length; i++)
+								{
+									if(pojo!=null && SReflect.isSupertype(pojo.getClass(), ptypes[i]))
+									{
+										params[i] = pojo;
+									}
+									else if(SReflect.isSupertype(IEvent.class, ptypes[i]))
+									{
+										params[i] = event;
+									}
+									else if(content!=null && SReflect.isSupertype(content.getClass(), ptypes[i]))
+									{
+										params[i] = content;
+									}
+									else if(content!=null && SReflect.isIterable(content))
+									{
+										for(Iterator<?> it = SReflect.getIterator(content); it.hasNext(); )
+										{
+											Object ob = it.next();
+											if(ob!=null && SReflect.isSupertype(ob.getClass(), ptypes[i]))
+											{
+												params[i] = ob;
+												break;
+											}
+										}
+									}
+								}
+										
+								return params;
+							}
+						}
+						, new IAction<Void>()
 						{
 							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
 							{

@@ -87,11 +87,11 @@ public class AnalyzeTargetPlan
 	 */
 	private void callProducerAgent(ISpaceObject target)
 	{
-//		System.out.println("Calling some Production Agent...");
+		System.out.println("Calling some Production Agent...");
 
 		try
 		{
-			IFuture<Collection<IProduceService>> fut = sentry.getAgent().getServiceContainer().getRequiredServices("targetser");
+			IFuture<Collection<IProduceService>> fut = sentry.getAgent().getServiceContainer().getRequiredServices("produceser");
 			Collection<IProduceService> ansers = fut.get();
 			
 			for(IProduceService anser: ansers)

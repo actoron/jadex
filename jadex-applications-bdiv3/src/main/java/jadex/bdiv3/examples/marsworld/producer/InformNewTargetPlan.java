@@ -5,8 +5,8 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.marsworld.ITargetAnnouncementService;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
+import jadex.bdiv3.examples.marsworld.sentry.ITargetAnnouncementService;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -39,11 +39,19 @@ public class InformNewTargetPlan
 	public void body()
 	{
 		IFuture<Collection<ITargetAnnouncementService>> fut = capa.getCapability().getServiceContainer().getRequiredServices("targetser");
-		Collection<ITargetAnnouncementService> ansers = fut.get();
 		
-		for(ITargetAnnouncementService anser: ansers)
+		try
 		{
-			anser.announceNewTarget(target);
+			Collection<ITargetAnnouncementService> ansers = fut.get();
+			
+			for(ITargetAnnouncementService anser: ansers)
+			{
+				anser.announceNewTarget(target);
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println("No target announcement services found");
 		}
 		
 //		System.out.println("Informing sentries: "+getScope().getAgentName());

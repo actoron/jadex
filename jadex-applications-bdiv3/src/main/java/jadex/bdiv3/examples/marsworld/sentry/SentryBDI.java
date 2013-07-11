@@ -9,22 +9,36 @@ import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveCleanup;
 import jadex.bdiv3.examples.marsworld.BaseBDI;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
+import jadex.bdiv3.examples.marsworld.producer.IProduceService;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 @Agent
 @Plans(
 {
 	@Plan(trigger=@Trigger(goals=SentryBDI.AnalyzeTarget.class), body=@Body(AnalyzeTargetPlan.class))
 })
-public class SentryBDI extends BaseBDI
+@RequiredServices(@RequiredService(name="produceser", multiple=true, type=IProduceService.class))
+public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 {
+	/**
+	 * 
+	 */
+	public IFuture<Void> announceNewTarget(ISpaceObject target)
+	{
+		System.out.println("Sentry was informed about new target: "+target);
+		movecapa.addTarget(target);
+		return IFuture.DONE;
+	}
+	
 	/**
 	 * 
 	 */
@@ -41,26 +55,28 @@ public class SentryBDI extends BaseBDI
 		 *  Create a new AnalyzeTarget. 
 		 */
 		// todo: allow direct goal creation on fact added
-		@GoalCreationCondition(events="movecapa.mytargets")
+//		@GoalCreationCondition(events="movecapa.mytargets")
 		public AnalyzeTarget(SentryBDI outer, ISpaceObject target)
 		{
-			System.out.println("new analyze target goal: "+target);
+//			System.out.println("new analyze target goal: "+target);
+			if(target==null)
+				System.out.println("target nulls");
 			this.outer = outer;
 			this.target = target;
 		}
 		
-//		/**
-//		 * 
-//		 */
-//		@GoalCreationCondition(events="movecapa.mytargets")
-//		public static AnalyzeTarget checkCreate(SentryBDI outer)
-//		{
-//			for(ISpaceObject so: outer.getMoveCapa().getMyTargets())
-//			{
-//				if(so.)
-//			}
-//		}
-//		
+		/**
+		 * 
+		 */
+		@GoalCreationCondition(events="movecapa.mytargets")
+		public static AnalyzeTarget checkCreate(SentryBDI outer, ISpaceObject target)
+		{
+			AnalyzeTarget ret = null;
+			if(target.getProperty("state").equals("unknown"))
+				ret = new AnalyzeTarget(outer, target);
+			return ret;
+		}
+
 		/**
 		 * 
 		 */

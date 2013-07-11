@@ -1,5 +1,7 @@
 package jadex.rules.eca;
 
+import jadex.commons.IMethodParameterGuesser;
+
 import java.lang.reflect.Method;
 
 /**
@@ -18,6 +20,9 @@ public class MethodCondition implements ICondition
 	/** The invert flag. Inverts method result. */
 	protected boolean invert;
 	
+	/** The parameter guesser. */
+	protected IMethodParameterGuesser guesser;
+	
 	//-------- constructors --------
 	
 	/**
@@ -33,12 +38,21 @@ public class MethodCondition implements ICondition
 	 */
 	public MethodCondition(Object object, Method method, boolean invert)
 	{
+		this(object, method, invert, null);
+	}
+	
+	/**
+	 *  Create a new method condition.
+	 */
+	public MethodCondition(Object object, Method method, boolean invert, IMethodParameterGuesser guesser)
+	{
 //		if(object==null)
 //			System.out.println("hetre");
 		
 		this.object = object;
 		this.method = method;
 		this.invert = invert;
+		this.guesser = guesser;
 	}
 
 	//-------- methods --------
@@ -59,7 +73,17 @@ public class MethodCondition implements ICondition
 			}
 			else
 			{
-				result = method.invoke(object, new Object[]{((Event)event).getContent()});
+				Object[] params = null;
+				if(guesser!=null)
+				{
+					params = guesser.guessParameters();
+				}
+				else
+				{
+					params = new Object[]{((Event)event).getContent()};
+				}
+				
+				result = method.invoke(object, params);
 			}
 			
 			ret = ((Boolean)result).booleanValue();

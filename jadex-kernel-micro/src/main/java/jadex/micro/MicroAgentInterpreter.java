@@ -1618,6 +1618,15 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	}
 	
 	/**
+	 *  Get the agent.
+	 *  @return The agent.
+	 */
+	public MicroAgent getAgent()
+	{
+		return microagent;
+	}
+
+	/**
 	 *  Info struct for steps.
 	 */
 	public static class StepInfo

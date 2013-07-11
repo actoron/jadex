@@ -11,25 +11,28 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.marsworld.BaseBDI;
-import jadex.bdiv3.examples.marsworld.carry.CarryOrePlan;
-import jadex.bdiv3.examples.marsworld.carry.InformNewTargetPlan;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.WalkAround;
 import jadex.bdiv3.examples.marsworld.sentry.SentryBDI.AnalyzeTarget;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 /**
  * 
  */
 @Agent
-@Plans(
-{
-	@Plan(trigger=@Trigger(goals=ProducerBDI.ProduceOre.class), body=@Body(CarryOrePlan.class)),
-	@Plan(trigger=@Trigger(factaddeds="movecapa.mytargets"), body=@Body(InformNewTargetPlan.class))
+@Service
+@ProvidedServices(@ProvidedService(type=IProduceService.class, implementation=@Implementation(expression="$pojoagent")))
+@Plans({
+	@Plan(trigger=@Trigger(goals=ProducerBDI.ProduceOre.class), body=@Body(ProduceOrePlan.class)),
+	@Plan(trigger=@Trigger(factaddeds="movecapa/mytargets"), body=@Body(InformNewTargetPlan.class))
 })
 public class ProducerBDI extends BaseBDI implements IProduceService
 {

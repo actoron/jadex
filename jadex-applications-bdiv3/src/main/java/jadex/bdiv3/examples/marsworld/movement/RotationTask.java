@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.marsworld.movement;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -80,6 +81,9 @@ public class RotationTask extends AbstractTask
 				setFinished(space, obj, true);
 			}
 		}
+		
+		final IExternalAccess agent = (IExternalAccess)getProperty(MoveTask.PROPERTY_SCOPE);
+		MoveTask.processVision(space, obj, agent);
 	}
 	
 	/**

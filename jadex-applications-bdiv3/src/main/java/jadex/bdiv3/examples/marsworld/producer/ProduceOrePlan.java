@@ -2,6 +2,7 @@ package jadex.bdiv3.examples.marsworld.producer;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
@@ -41,6 +42,7 @@ public class ProduceOrePlan
 	/**
 	 *  The plan body.
 	 */
+	@PlanBody
 	public void body()
 	{
 		ISpaceObject target = goal.getTarget();
@@ -51,7 +53,7 @@ public class ProduceOrePlan
 		
 		// Produce ore at the target.
 		Future<Void> fut = new Future<Void>();
-		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut);
+		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 		ISpaceObject	myself	= capa.getMyself();
 		Map props = new HashMap();
 		props.put(ProduceOreTask.PROPERTY_TARGET, target);

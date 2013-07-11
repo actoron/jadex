@@ -58,8 +58,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 //			}
 //		}
 			
-		if(!ret)
-			System.out.println("not valid: "+rplan);
+//		if(!ret)
+//			System.out.println("not valid: "+rplan);
 		
 		return ret;
 	}

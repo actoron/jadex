@@ -234,7 +234,7 @@
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								10000 + $properties.clock.getTime()
+								900000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target">
@@ -298,8 +298,8 @@
 			</extensions>
 			<components>
 			    <component type="Sentry" number="1"/>
-  				<!-- <component type="Producer" number="2"/>
-				<component type="Carry" number="3"/> -->
+  				<component type="Producer" number="1"/>
+				<!-- <component type="Carry" number="3"/> -->
 			</components>
  		</configuration>
 

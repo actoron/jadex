@@ -81,6 +81,17 @@ public class MoveTask extends AbstractTask
 			newloc = loc; 
 		}
 		
+		processVision(space, obj, agent);
+		
+		if(newloc==destination || fin)
+			setFinished(space, obj, true);
+	}
+	
+	/**
+	 * 
+	 */
+	protected static void processVision(IEnvironmentSpace space, ISpaceObject obj, IExternalAccess agent)
+	{
 		// Process vision at new location.
 		double	vision	= ((Number)obj.getProperty(PROPERTY_VISION)).doubleValue();
 		final Set objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
@@ -97,54 +108,13 @@ public class MoveTask extends AbstractTask
 						final ISpaceObject so = it.next();
 						if(so.getType().equals("target"))
 						{
-							if(!ba.getMoveCapa().getMyTargets().contains(so))
-							{
-								ba.getMoveCapa().getMyTargets().add(so);
-							}
-//							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+							ba.getMoveCapa().addTarget(so);
+//									System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
 						}
 					}
 					return IFuture.DONE;
 				}
 			});
-			
-//			for(Iterator it=objects.iterator(); it.hasNext(); )
-//			{
-//				final ISpaceObject so = (ISpaceObject)it.next();
-//				if(so.getType().equals("target"))
-//				{
-//					agent.getBeliefbase().containsBeliefSetFact("my_targets", so).addResultListener(new DefaultResultListener()
-//					{
-//						public void resultAvailable(Object source, Object result)
-//						{
-//							if(!((Boolean)result).booleanValue())
-//								agent.getBeliefbase().addBeliefSetFact("my_targets", so);
-//						}
-//					});
-////					System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-//					
-//				}
-//			}
-			
-//			scope.invokeLater(new Runnable()
-//			{
-//				public void run()
-//				{
-//					IBeliefSet	targetsbel	= scope.getBeliefbase().getBeliefSet("my_targets");
-//					for(Iterator it=objects.iterator(); it.hasNext(); )
-//					{
-//						ISpaceObject so = (ISpaceObject)it.next();
-//						if(so.getType().equals("target") && !targetsbel.containsFact(so))
-//						{
-////							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-//							targetsbel.addFact(so);
-//						}
-//					}
-//				}
-//			});
 		}
-		
-		if(newloc==destination || fin)
-			setFinished(space, obj, true);
 	}
 }

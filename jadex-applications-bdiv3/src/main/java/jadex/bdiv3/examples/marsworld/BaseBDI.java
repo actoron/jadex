@@ -5,6 +5,7 @@ import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
+import jadex.bdiv3.examples.marsworld.sentry.ITargetAnnouncementService;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.annotation.Agent;
@@ -17,7 +18,7 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Agent
 @RequiredServices(@RequiredService(name="targetser", multiple=true, type=ITargetAnnouncementService.class))
-public abstract class BaseBDI implements ITargetAnnouncementService
+public abstract class BaseBDI 
 {
 	@Agent 
 	protected BDIAgent agent;
@@ -25,15 +26,6 @@ public abstract class BaseBDI implements ITargetAnnouncementService
 	/** The customer capability. */
 	@Capability
 	protected MovementCapability movecapa = new MovementCapability();
-	
-	/**
-	 * 
-	 */
-	public IFuture<Void> announceNewTarget(ISpaceObject target)
-	{
-		movecapa.addTarget(target);
-		return IFuture.DONE;
-	}
 
 	/**
 	 *  Get the movecapa.

@@ -61,6 +61,8 @@ public class MBelief extends MElement
 				this.events.add(ev);
 			}
 		}
+		
+		System.out.println("bel: "+target.getName()+" "+dynamic);
 	}
 
 	/**
