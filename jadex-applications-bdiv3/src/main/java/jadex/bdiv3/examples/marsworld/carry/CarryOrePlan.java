@@ -47,6 +47,8 @@ public class CarryOrePlan
 	@PlanBody
 	public void body()
 	{	
+		try
+		{
 		ISpaceObject target = goal.getTarget();
 		boolean	finished = false;
 		MovementCapability capa = carry.getMoveCapa();
@@ -63,7 +65,7 @@ public class CarryOrePlan
 			ISpaceObject	myself	= capa.getMyself();
 			
 			Future<Void> fut = new Future<Void>();
-			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut);
+			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 //			myself.addTask(new LoadOreTask(target, true, res));
 			Map props = new HashMap();
 			props.put(LoadOreTask.PROPERTY_TARGET, target);
@@ -85,15 +87,20 @@ public class CarryOrePlan
 			
 			// Unload ore at the homebase.
 			fut = new Future<Void>();
-			lis = new DelegationResultListener<Void>(fut);
+			lis = new DelegationResultListener<Void>(fut, true);
 			props = new HashMap();
-			props.put(LoadOreTask.PROPERTY_TARGET, capa.getHomebasePosition());
+			props.put(LoadOreTask.PROPERTY_TARGET, capa.getHomebase());
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.FALSE);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
 			taskid	= env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
 			env.addTaskListener(taskid, myself.getId(), lis);
 			fut.get();
 //			System.out.println("Unloaded ore at homebase: "+getAgentName()+", "+ore+" ore unloaded.");
+		}
+		}
+		catch(Throwable t)
+		{
+			t.printStackTrace();
 		}
 	}
 }

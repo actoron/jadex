@@ -44,7 +44,7 @@ public class InformNewTargetPlan
 			
 			for(ITargetAnnouncementService anser: ansers)
 			{
-				anser.announceNewTarget(target);
+//				anser.announceNewTarget(target);
 			}
 		}
 		catch(Exception e)

@@ -41,7 +41,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 	 */
 	public IFuture<Void> announceNewTarget(ISpaceObject target)
 	{
-		System.out.println("Sentry was informed about new target: "+target);
+//		System.out.println("Sentry was informed about new target: "+target);
 		movecapa.addTarget(target);
 		return IFuture.DONE;
 	}
@@ -65,9 +65,9 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 //		@GoalCreationCondition(events="movecapa.mytargets")
 		public AnalyzeTarget(SentryBDI outer, ISpaceObject target)
 		{
-			System.out.println("new analyze target goal: "+target);
-			if(target==null)
-				System.out.println("target nulls");
+//			System.out.println("new analyze target goal: "+target);
+//			if(target==null)
+//				System.out.println("target nulls");
 			this.outer = outer;
 			this.target = target;
 		}

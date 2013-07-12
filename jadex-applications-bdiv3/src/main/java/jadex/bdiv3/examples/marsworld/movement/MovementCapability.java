@@ -130,6 +130,14 @@ public class MovementCapability
 	/**
 	 * 
 	 */
+	public ISpaceObject getHomebase()
+	{
+		return env.getSpaceObjectsByType("homebase")[0];
+	}
+	
+	/**
+	 * 
+	 */
 	protected long getTime()
 	{
 		// todo:
@@ -189,7 +197,7 @@ public class MovementCapability
 	{
 		if(!mytargets.contains(target))
 		{
-			System.out.println("added target: "+capa.getAgent().getAgentName()+" "+target);
+//			System.out.println("added target: "+capa.getAgent().getAgentName()+" "+target);
 			mytargets.add(target);
 		}
 	}

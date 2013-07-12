@@ -563,8 +563,8 @@ public class RPlan extends RElement implements IPlan
 			// If plan is waiting interrupt waiting
 			if(PlanProcessingState.WAITING.equals(getProcessingState()))
 			{
-				if(this.toString().indexOf("Move")!=-1)
-					System.out.println("performing abort: "+this);
+//				if(this.toString().indexOf("Move")!=-1)
+//					System.out.println("performing abort: "+this);
 				RPlan.executePlan(this, ia);
 			}
 		}

@@ -47,7 +47,7 @@ public class AnalyzeTargetPlan
 	@PlanBody
 	public void body()
 	{
-		System.out.println("analyze target plan start");
+//		System.out.println("analyze target plan start");
 		
 		ISpaceObject target = goal.getTarget();
 
