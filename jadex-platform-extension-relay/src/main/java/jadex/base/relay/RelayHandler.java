@@ -332,17 +332,20 @@ public class RelayHandler
 			IBlockingQueue<Message>	queue	= map.get(targetid);
 			if(queue!=null)
 			{
+				long	start	= System.currentTimeMillis();
 				try
 				{
 					Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
-//					System.out.println("queing message to:"+targetid);
+//					System.out.println("queing message to: "+targetid);
 					queue.enqueue(msg);
 					msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
 					sent	= true;
+					System.out.println("message sent to: "+targetid+", "+(System.currentTimeMillis()-start));
 				}
 				catch(Exception e)
 				{
 					// timeout or platform just disconnected
+					System.out.println("message not sent to: "+targetid+", "+(System.currentTimeMillis()-start)+", "+e);
 //					e.printStackTrace();
 				}
 			}
