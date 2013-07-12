@@ -12,21 +12,27 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.marsworld.BaseBDI;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.producer.IProduceService;
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.rules.eca.IEvent;
 
 @Agent
+@Service
 @Plans(
 {
 	@Plan(trigger=@Trigger(goals=SentryBDI.AnalyzeTarget.class), body=@Body(AnalyzeTargetPlan.class))
 })
+@ProvidedServices(@ProvidedService(type=ITargetAnnouncementService.class, implementation=@Implementation(expression="$pojoagent")))
 @RequiredServices(@RequiredService(name="produceser", multiple=true, type=IProduceService.class))
 public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 {
@@ -59,7 +65,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 //		@GoalCreationCondition(events="movecapa.mytargets")
 		public AnalyzeTarget(SentryBDI outer, ISpaceObject target)
 		{
-//			System.out.println("new analyze target goal: "+target);
+			System.out.println("new analyze target goal: "+target);
 			if(target==null)
 				System.out.println("target nulls");
 			this.outer = outer;

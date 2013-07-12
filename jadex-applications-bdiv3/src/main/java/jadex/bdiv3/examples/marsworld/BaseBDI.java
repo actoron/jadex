@@ -54,9 +54,9 @@ public abstract class BaseBDI
 		return agent;
 	}
 	
-	@Plan(trigger=@Trigger(factchangeds="movecapa.missionend"))
-	public void missionend()
-	{
-		System.out.println("missionend: "+((Long)movecapa.getEnvironment().getSpaceObjectsByType("homebase")[0].getProperty("missiontime")));
-	}
+//	@Plan(trigger=@Trigger(factchangeds="movecapa.missionend"))
+//	public void missionend()
+//	{
+//		System.out.println("missionend: "+((Long)movecapa.getEnvironment().getSpaceObjectsByType("homebase")[0].getProperty("missiontime")));
+//	}
 }
