@@ -10,7 +10,7 @@
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
 		<version>2.4-SNAPSHOT</version>
-		<relativePath>../jadex-android-parent/pom.xml</relativePath>
+		<relativePath>../../jadex-android-parent/pom.xml</relativePath>
 	</parent>
 
 	<description>
@@ -47,11 +47,12 @@
 			<scope>provided</scope>
 		</dependency>
 		
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-kernel-bdiv3</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdiv3-android</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
