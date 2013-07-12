@@ -42,10 +42,12 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.FieldInfo;
+import jadex.commons.IMethodParameterGuesser;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.SimpleMethodParameterGuesser;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -772,7 +774,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
 					ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 //						System.out.println("belief update: "+event);
 						try
@@ -879,7 +881,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
 							ICondition.TRUE_CONDITION, new IAction<Void>()
 						{
-							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 							{
 	//							System.out.println("create: "+context);
 								
@@ -940,83 +942,96 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						final Method m = cond.getMethodTarget().getMethod(getClassLoader());
 						
+						List<Object> vals = new ArrayList<Object>();
+						if(agent!=null)
+							vals.add(agent);
+						vals.add(getExternalAccess());
+						
+						SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(m.getParameterTypes(), vals);
+						
 						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
-							new MethodCondition(null, m)
+							new MethodCondition(null, m, g)
 						{
-							public Object[] guessParameterValues(IEvent event)
+							public List<Object> getExtraValues(IEvent event)
 							{
-								Class<?>[] ptypes = method.getParameterTypes();
-								
-								BDIAgent agent = (BDIAgent)getAgent();
-								Object pojo = null;
-								if(agent instanceof IPojoMicroAgent)
-									pojo = ((IPojoMicroAgent)agent).getPojoAgent();
-								Object content = event.getContent();
-								
-								Object[] params = new Object[ptypes.length];
-								
-								for(int i=0; i<ptypes.length; i++)
+								List<Object> vals = super.getExtraValues(event);
+								String type = event.getType().getType(1);
+								int idx = type.lastIndexOf(CAPABILITY_SEPARATOR);
+								if(idx!=-1)
 								{
-									if(pojo!=null && SReflect.isSupertype(pojo.getClass(), ptypes[i]))
-									{
-										params[i] = pojo;
-									}
-									else if(SReflect.isSupertype(IEvent.class, ptypes[i]))
-									{
-										params[i] = event;
-									}
-									else if(content!=null && SReflect.isSupertype(content.getClass(), ptypes[i]))
-									{
-										params[i] = content;
-									}
-									else if(content!=null && SReflect.isIterable(content))
-									{
-										for(Iterator<?> it = SReflect.getIterator(content); it.hasNext(); )
-										{
-											Object ob = it.next();
-											if(ob!=null && SReflect.isSupertype(ob.getClass(), ptypes[i]))
-											{
-												params[i] = ob;
-												break;
-											}
-										}
-									}
+									String capaname = type.substring(0, idx);
+									Object capa = getCapabilityObject(capaname);
+									vals.add(new CapabilityWrapper((BDIAgent)getAgent(), capa, type));
 								}
-										
-								return params;
+								else
+								{
+									vals.add(new CapabilityWrapper((BDIAgent)getAgent(), capa, null));
+								}
+									
+								return vals;
 							}
-						}
-						, new IAction<Void>()
+							
+							public Tuple2<Boolean, Object> prepareResult(Object res)
+							{
+								Tuple2<Boolean, Object> ret = null;
+								if(res!=null)
+								{
+									ret = new Tuple2<Boolean, Object>(Boolean.TRUE, res);
+								}
+								else
+								{
+									ret = new Tuple2<Boolean, Object>(Boolean.FALSE, null);
+								}
+								return ret;
+							}
+						}, new IAction<Void>()
 						{
-							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 							{
 		//						System.out.println("create: "+context);
 								
-								Object pojogoal = null;
-								if(event.getContent()!=null)
+								if(condresult!=null)
 								{
-									try
+									if(SReflect.isIterable(condresult))
 									{
-										Class<?> evcl = event.getContent().getClass();
-										Constructor<?> c = gcl.getConstructor(new Class[]{evcl});
-										pojogoal = c.newInstance(new Object[]{event.getContent()});
+										for(Iterator<Object> it = SReflect.getIterator(condresult); it.hasNext(); )
+										{
+											Object pojogoal = it.next();
+											dispatchTopLevelGoal(pojogoal);
+										}
 									}
-									catch(Exception e)
+									else
 									{
-										e.printStackTrace();
+										dispatchTopLevelGoal(condresult);
 									}
 								}
 								else
 								{
-									// todo:
-		//							Constructor<?>[] cons = gcl.getConstructors();
-		//							for(Constructor c: cons)
-		//							{
-		//							}
-									throw new RuntimeException("Unknown how to create goal: "+gcl);
+									Object pojogoal = null;
+									if(event.getContent()!=null)
+									{
+										try
+										{
+											Class<?> evcl = event.getContent().getClass();
+											Constructor<?> c = gcl.getConstructor(new Class[]{evcl});
+											pojogoal = c.newInstance(new Object[]{event.getContent()});
+											dispatchTopLevelGoal(pojogoal);
+										}
+										catch(Exception e)
+										{
+											e.printStackTrace();
+										}
+									}
+									else
+									{
+										// todo:
+			//							Constructor<?>[] cons = gcl.getConstructors();
+			//							for(Constructor c: cons)
+			//							{
+			//							}
+										throw new RuntimeException("Unknown how to create goal: "+gcl);
+									}
 								}
-								
-								dispatchTopLevelGoal(pojogoal);
 								
 								return IFuture.DONE;
 							}
@@ -1037,7 +1052,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_drop", 
 						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
@@ -1071,7 +1086,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					Rule<?> rule = new Rule<Void>(mgoal.getName()+"_goal_suspend", 
 						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
@@ -1095,7 +1110,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					rule = new Rule<Void>(mgoal.getName()+"_goal_option", 
 						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
@@ -1139,7 +1154,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						}),
 						new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
@@ -1172,7 +1187,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	//							new MethodCondition(getPojoElement(), m),
 	//						}), new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
@@ -1210,7 +1225,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	//							new MethodCondition(getPojoElement(), mcond, true),
 	//						}), new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
@@ -1241,7 +1256,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							new GoalsExistCondition(mgoal, capa), new IAction<Void>()
 	//							new MethodCondition(getPojoElement(), mcond), new IAction<Void>()
 						{
-							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 							{
 								for(RGoal goal: getCapability().getGoals(mgoal))
 								{
@@ -1267,7 +1282,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			
 			IAction<Void> createplan = new IAction<Void>()
 			{
-				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 				{
 					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), getInternalAccess());
 					RPlan.executePlan(rplan, getInternalAccess());
@@ -1329,13 +1344,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				
 				IAction<Void> abortplans = new IAction<Void>()
 				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						Collection<RPlan> coll = capa.getPlans(mplan);
 						
 						for(final RPlan plan: coll)
 						{
-							Set<Object> vals = new HashSet<Object>();
+							List<Object> vals = new ArrayList<Object>();
 							vals.add(agent);
 							vals.add(plan);
 							invokeBooleanMethod(plan.getBody().getBody(agent), mi.getMethod(getClassLoader()), vals)
@@ -1381,7 +1396,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				Rule<Void> rule = new Rule<Void>("goal_addinitialinhibitors", 
 					ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						// create the complete inhibitorset for a newly adopted goal
 						
@@ -1408,7 +1423,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				rule = new Rule<Void>("goal_addinhibitor", 
 					new ICondition()
 					{
-						public boolean evaluate(IEvent event)
+						public Tuple2<Boolean, Object> evaluate(IEvent event)
 						{
 	//						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
 	//							System.out.println("maintain");
@@ -1419,11 +1434,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							RGoal goal = (RGoal)event.getContent();
 							ret = ChangeEvent.GOALACTIVE.equals(type.getType(0)) && RGoal.GoalProcessingState.INPROCESS.equals(goal.getProcessingState())
 								|| (ChangeEvent.GOALINPROCESS.equals(type.getType(0)) && RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState()));
-							return ret;
+							return ret? ICondition.TRUE: ICondition.FALSE;
 						}
 					}, new IAction<Void>()
 				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						RGoal goal = (RGoal)event.getContent();
 //						if(goal.getId().indexOf("PerformPatrol")!=-1)
@@ -1453,7 +1468,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				rule = new Rule<Void>("goal_removeinhibitor", 
 					new ICondition()
 					{
-						public boolean evaluate(IEvent event)
+						public Tuple2<Boolean, Object> evaluate(IEvent event)
 						{
 							// return true when other goal is active and inprocess
 							boolean ret = false;
@@ -1464,11 +1479,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								ret = ChangeEvent.GOALSUSPENDED.equals(type.getType(0)) || ChangeEvent.GOALOPTION.equals(type.getType(0))
 									|| !RGoal.GoalProcessingState.INPROCESS.equals(goal.getProcessingState());
 							}
-							return ret;
+							return ret? ICondition.TRUE: ICondition.FALSE;
 						}
 					}, new IAction<Void>()
 				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						// Remove inhibitions of this goal 
 						RGoal goal = (RGoal)event.getContent();
@@ -1501,7 +1516,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				rule = new Rule<Void>("goal_inhibit", 
 					new LifecycleStateCondition(RGoal.GoalLifecycleState.ACTIVE), new IAction<Void>()
 				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						RGoal goal = (RGoal)event.getContent();
 	//					System.out.println("optionizing: "+goal+" "+goal.inhibitors);
@@ -1518,15 +1533,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					new LifecycleStateCondition(RGoal.GoalLifecycleState.OPTION),
 					new ICondition()
 					{
-						public boolean evaluate(IEvent event)
+						public Tuple2<Boolean, Object> evaluate(IEvent event)
 						{
 							RGoal goal = (RGoal)event.getContent();
-							return !goal.isInhibited();
+							return !goal.isInhibited()? ICondition.TRUE: ICondition.FALSE;
 						}
 					}
 				}), new IAction<Void>()
 			{
-				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 				{
 					RGoal goal = (RGoal)event.getContent();
 //					if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
@@ -1684,41 +1699,42 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		return capa;
 	}
 	
-	/**
-	 *  Method that tries to guess the parameters for the method call.
-	 */
-	public Object[] guessMethodParameters(Object pojo, Class<?>[] ptypes, Set<Object> values)
-	{
-		if(ptypes==null || values==null)
-			return null;
-		
-		Object[] params = new Object[ptypes.length];
-		
-		for(int i=0; i<ptypes.length; i++)
-		{
-			for(Object val: values)
-			{
-				if(SReflect.isSupertype(val.getClass(), ptypes[i]))
-				{
-					params[i] = val;
-					break;
-				}
-			}
-		}
-				
-		return params;
-	}
+//	/**
+//	 *  Method that tries to guess the parameters for the method call.
+//	 */
+//	public Object[] guessMethodParameters(Object pojo, Class<?>[] ptypes, Set<Object> values)
+//	{
+//		if(ptypes==null || values==null)
+//			return null;
+//		
+//		Object[] params = new Object[ptypes.length];
+//		
+//		for(int i=0; i<ptypes.length; i++)
+//		{
+//			for(Object val: values)
+//			{
+//				if(SReflect.isSupertype(val.getClass(), ptypes[i]))
+//				{
+//					params[i] = val;
+//					break;
+//				}
+//			}
+//		}
+//				
+//		return params;
+//	}
 	
 	/**
 	 * 
 	 */
-	protected IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, Set<Object> vals)
+	protected IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, Collection<Object> vals)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
 		try
 		{
 			m.setAccessible(true);
-			Object app = m.invoke(pojo, guessMethodParameters(pojo, m.getParameterTypes(), vals));
+			IMethodParameterGuesser g = new SimpleMethodParameterGuesser(m.getParameterTypes(), vals);
+			Object app = m.invoke(pojo, g.guessParameters());
 			if(app instanceof Boolean)
 			{
 				ret.setResult((Boolean)app);
@@ -1855,13 +1871,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		/**
 		 *  Evaluate the condition.
 		 */
-		public boolean evaluate(IEvent event)
+		public Tuple2<Boolean, Object> evaluate(IEvent event)
 		{
 			RGoal goal = (RGoal)event.getContent();
 			boolean ret = states.contains(goal.getLifecycleState());
 			if(!allowed)
 				ret = !ret;
-			return ret;
+			return ret? ICondition.TRUE: ICondition.FALSE;
 		}
 	}
 	
@@ -1883,9 +1899,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		/**
 		 * 
 		 */
-		public boolean evaluate(IEvent event)
+		public Tuple2<Boolean, Object> evaluate(IEvent event)
 		{
-			return !capa.getGoals(mgoal).isEmpty();
+			boolean res = !capa.getGoals(mgoal).isEmpty();
+			return res? ICondition.TRUE: ICondition.FALSE;
 		}
 	}
 	
@@ -1907,9 +1924,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		/**
 		 * 
 		 */
-		public boolean evaluate(IEvent event)
+		public Tuple2<Boolean, Object> evaluate(IEvent event)
 		{
-			return !capa.getPlans(mplan).isEmpty();
+			return !capa.getPlans(mplan).isEmpty()? ICondition.TRUE: ICondition.FALSE;
 		}
 	}
 }

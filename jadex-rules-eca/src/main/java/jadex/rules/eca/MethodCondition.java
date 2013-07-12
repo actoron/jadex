@@ -1,8 +1,15 @@
 package jadex.rules.eca;
 
 import jadex.commons.IMethodParameterGuesser;
+import jadex.commons.IParameterGuesser;
+import jadex.commons.SReflect;
+import jadex.commons.SimpleParameterGuesser;
+import jadex.commons.Tuple2;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *  Condition implementation that invokes a predefined method.
@@ -36,6 +43,14 @@ public class MethodCondition implements ICondition
 	/**
 	 *  Create a new method condition.
 	 */
+	public MethodCondition(Object object, Method method, IMethodParameterGuesser guesser)
+	{
+		this(object, method, false, guesser);
+	}
+	
+	/**
+	 *  Create a new method condition.
+	 */
 	public MethodCondition(Object object, Method method, boolean invert)
 	{
 		this(object, method, invert, null);
@@ -44,7 +59,8 @@ public class MethodCondition implements ICondition
 	/**
 	 *  Create a new method condition.
 	 */
-	public MethodCondition(Object object, Method method, boolean invert, IMethodParameterGuesser guesser)
+	public MethodCondition(Object object, Method method, boolean invert, 
+		IMethodParameterGuesser guesser)
 	{
 //		if(object==null)
 //			System.out.println("hetre");
@@ -60,41 +76,90 @@ public class MethodCondition implements ICondition
 	/**
 	 *  Evaluate the condition.
 	 */
-	public boolean evaluate(IEvent event)
+	public Tuple2<Boolean, Object> evaluate(IEvent event)
 	{
-		boolean ret = false;
+		Tuple2<Boolean, Object> ret = ICondition.FALSE;
 		try
 		{
 			method.setAccessible(true);
-			Object result = null;
 			if(method.getParameterTypes().length==0)
 			{
-				result = method.invoke(object, new Object[0]);
+				ret = prepareResult(method.invoke(object, new Object[0]));
 			}
 			else
 			{
 				Object[] params = null;
-				if(guesser!=null)
+				if(getGuesser()!=null)
 				{
-					params = guesser.guessParameters();
+					SimpleParameterGuesser g = new SimpleParameterGuesser(getExtraValues(event));
+					getGuesser().getGuesser().setParent(g);
+
+					params = getGuesser().guessParameters();
 				}
 				else
 				{
 					params = new Object[]{((Event)event).getContent()};
 				}
 				
-				result = method.invoke(object, params);
+				ret = prepareResult(method.invoke(object, params));
 			}
 			
-			ret = ((Boolean)result).booleanValue();
 			if(invert)
 			{
-				ret = !ret;
+				Boolean b = ret.getFirstEntity().booleanValue()? Boolean.FALSE: Boolean.TRUE;
+				ret = new Tuple2<Boolean, Object>(b, ret.getSecondEntity());
 			}
 		}
 		catch(Exception e)
 		{
 			throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IMethodParameterGuesser getGuesser()
+	{
+		return guesser;
+	}
+	
+	/**
+	 * 
+	 */
+	public List<Object> getExtraValues(IEvent event)
+	{
+		List<Object> vals = new ArrayList<Object>();
+		vals.add(event);
+		if(event.getContent()!=null)
+		{
+			vals.add(event.getContent());
+			if(SReflect.isIterable(event.getContent()))
+			{
+				for(Iterator<Object> it = SReflect.getIterator(event.getContent()); it.hasNext(); )
+				{
+					vals.add(it.next());
+				}
+			}
+		}
+		return vals;
+	}
+	
+	/**
+	 * 
+	 */
+	public Tuple2<Boolean, Object> prepareResult(Object res)
+	{
+		Tuple2<Boolean, Object> ret;
+		if(res instanceof Tuple2)
+		{
+			ret = (Tuple2<Boolean, Object>)res;
+		}
+		else 
+		{
+			boolean bs = ((Boolean)res).booleanValue();
+			ret = bs? ICondition.TRUE: ICondition.FALSE;
 		}
 		return ret;
 	}

@@ -2,6 +2,8 @@ package jadex.rules.eca;
 
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.IValueFetcher;
+import jadex.commons.Tuple2;
+import jadex.commons.transformation.B;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -29,14 +31,23 @@ public class ExpressionCondition implements ICondition
 	/**
 	 *  Evaluate the condition.
 	 */
-	public boolean evaluate(IEvent event)
+	public Tuple2<Boolean, Object> evaluate(IEvent event)
 	{
-		boolean ret = false;
+		Tuple2<Boolean, Object> ret = null;
 		try
 		{
 			fetcher.setValue("$event", event);
 			IParsedExpression exp = SJavaParser.parseExpression(expression, null, null); // todo: classloader?
-			ret = ((Boolean)exp.getValue(fetcher)).booleanValue();
+			Object res = exp.getValue(fetcher);
+			if(res instanceof Tuple2)
+			{
+				ret = (Tuple2<Boolean, Object>)res;
+			}
+			else 
+			{
+				boolean bs = ((Boolean)res).booleanValue();
+				ret = bs? ICondition.TRUE: ICondition.FALSE;
+			}
 		}
 		catch(Exception e)
 		{

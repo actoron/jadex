@@ -9,8 +9,20 @@ public interface IParameterGuesser
 	/**
 	 *  Guess a parameter.
 	 *  @param type The type.
+	 *  @param exact Test with exact 
 	 *  @return The mapped value. 
-	 *  (Throws exception if no value could be found to support null value).
 	 */
-	public Object guessParameter(Class<?> type);
+	public Object guessParameter(Class<?> type, boolean exact);
+	
+	/**
+	 *  Get the parent guesser.
+	 *  @return The parent guesser.
+	 */
+	public IParameterGuesser getParent();
+	
+	/**
+	 *  Set the parent.
+	 *  @param parent The parent.
+	 */
+	public void setParent(IParameterGuesser parent);
 }

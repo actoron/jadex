@@ -9,6 +9,7 @@ import jadex.commons.Tuple3;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.platform.service.cron.jobs.CreateCommand;
+import jadex.rules.eca.CommandAction.CommandData;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 
@@ -19,7 +20,7 @@ import java.util.Collection;
  *  
  *  Wraps a create command in a rule engine friendly version.
  */
-public class RuleCreateCommand implements IResultCommand<IFuture<IComponentIdentifier>, Tuple3<IEvent, IRule<?>, Object>>
+public class RuleCreateCommand implements IResultCommand<IFuture<IComponentIdentifier>, CommandData>
 {
 	/** The name. */
 	protected CreateCommand command;
@@ -45,9 +46,9 @@ public class RuleCreateCommand implements IResultCommand<IFuture<IComponentIdent
 	 *  Execute the command.
 	 *  @param args The argument(s) for the call.
 	 */
-	public IFuture<IComponentIdentifier> execute(final Tuple3<IEvent, IRule<?>, Object> args)
+	public IFuture<IComponentIdentifier> execute(final CommandData args)
 	{
-		return command.execute((IInternalAccess)args.getThirdEntity());
+		return command.execute((IInternalAccess)args.getContext());
 	}
 
 	/**

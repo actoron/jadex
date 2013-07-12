@@ -451,9 +451,10 @@ public class RuleSystem
 		
 		if(i<rules.length)
 		{
-			if(rules[i].getCondition()==null || rules[i].getCondition().evaluate(event))
+			Tuple2<Boolean, Object> cres = rules[i].getCondition()==null? ICondition.TRUE: rules[i].getCondition().evaluate(event);
+			if(cres.getFirstEntity().booleanValue())
 			{
-				IFuture<Object> fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context);
+				IFuture<Object> fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, cres.getSecondEntity());
 				
 				fut.addResultListener(new IResultListener<Object>()
 				{
@@ -515,7 +516,7 @@ public class RuleSystem
 	 */
 	public void addEvent(IEvent event)
 	{
-		System.out.println("added: "+event);
+//		System.out.println("added: "+event);
 		events.add(event);
 	}
 	

@@ -1,5 +1,6 @@
 package jadex.rules.eca.annotations;
 
+import jadex.commons.Tuple2;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 
@@ -22,11 +23,11 @@ public class CombinedCondition implements ICondition
 	/**
 	 * 
 	 */
-	public boolean evaluate(IEvent event)
+	public Tuple2<Boolean, Object> evaluate(IEvent event)
 	{
-		boolean ret = true;
+		Tuple2<Boolean, Object> ret = ICondition.TRUE;
 		
-		for(int i=0; ret && i<conditions.length; i++)
+		for(int i=0; ret.getFirstEntity().booleanValue() && i<conditions.length; i++)
 		{
 			ret = conditions[i].evaluate(event);
 		}

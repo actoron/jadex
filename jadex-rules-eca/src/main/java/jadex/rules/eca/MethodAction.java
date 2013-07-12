@@ -28,12 +28,12 @@ public class MethodAction<T> implements IAction<T>
 	/**
 	 * 
 	 */
-	public IFuture<T> execute(IEvent event, IRule rule, Object context)
+	public IFuture<T> execute(IEvent event, IRule rule, Object context, Object condresult)
 	{
 		try
 		{
 			method.setAccessible(true);
-			Object result = method.invoke(object, new Object[]{event, rule, context});
+			Object result = method.invoke(object, new Object[]{event, rule, context, condresult});
 			if(result instanceof IFuture)
 			{
 				return (Future<T>)result;

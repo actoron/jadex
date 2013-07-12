@@ -1,5 +1,7 @@
 package jadex.commons;
 
+import java.util.Collection;
+
 
 /**
  *  Simple method parameter guesser that uses a parameter guesser
@@ -12,6 +14,14 @@ public class SimpleMethodParameterGuesser implements IMethodParameterGuesser
 
 	/** The parameter types. */
 	protected Class<?>[] ptypes;
+	
+	/**
+	 *  Create a new guesser.
+	 */
+	public SimpleMethodParameterGuesser(Class<?>[] ptypes, Collection<?> vals)
+	{
+		this(ptypes, new SimpleParameterGuesser(vals));
+	}
 	
 	/**
 	 *  Create a new guesser.
@@ -40,14 +50,28 @@ public class SimpleMethodParameterGuesser implements IMethodParameterGuesser
 			{
 				try
 				{
-					ret[i] = pguesser.guessParameter(ptypes[i]);
+					ret[i] = pguesser.guessParameter(ptypes[i], true);
+					if(ret[i]==null)
+					{
+						ret[i] = pguesser.guessParameter(ptypes[i], false);
+					}
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 				}
 			}
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Get the guesser.
+	 *  @return The guesser.
+	 */
+	public IParameterGuesser getGuesser()
+	{
+		return pguesser;
 	}
 }

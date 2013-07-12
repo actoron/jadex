@@ -20,6 +20,7 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.rules.eca.IEvent;
 
 @Agent
 @Plans(
@@ -68,9 +69,14 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 		/**
 		 * 
 		 */
+		// todo: support directly factadded etc.
 		@GoalCreationCondition(events="movecapa.mytargets")
-		public static AnalyzeTarget checkCreate(SentryBDI outer, ISpaceObject target)
+		public static AnalyzeTarget checkCreate(SentryBDI outer, ISpaceObject target, IEvent event)
 		{
+			if(target==null)
+				return null;
+//				System.out.println("here:: "+event);
+			
 			AnalyzeTarget ret = null;
 			if(target.getProperty("state").equals("unknown"))
 				ret = new AnalyzeTarget(outer, target);

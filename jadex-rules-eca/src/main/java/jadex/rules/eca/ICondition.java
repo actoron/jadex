@@ -1,22 +1,28 @@
 package jadex.rules.eca;
 
+import jadex.commons.Tuple2;
+
 /**
  *  Interface for a condition part of a rule.
  */
 public interface ICondition
 {
+	public static Tuple2<Boolean, Object> TRUE = new Tuple2<Boolean, Object>(Boolean.TRUE, null);
+	
+	public static Tuple2<Boolean, Object> FALSE = new Tuple2<Boolean, Object>(Boolean.FALSE, null);
+	
 	public static ICondition TRUE_CONDITION = new ICondition()
 	{
-		public boolean evaluate(IEvent event)
+		public Tuple2<Boolean, Object> evaluate(IEvent event)
 		{
-			return true;
+			return TRUE;
 		}
 	};
 	
 	/**
 	 *  Evaluation the condition.
 	 *  @param event The event.
-	 *  @return True, if condition is met.
+	 *  @return True, if condition is met (plus additional user data).
 	 */
-	public boolean evaluate(IEvent event);
+	public Tuple2<Boolean, Object> evaluate(IEvent event);
 }

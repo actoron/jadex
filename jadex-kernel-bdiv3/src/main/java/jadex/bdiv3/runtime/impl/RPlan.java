@@ -202,7 +202,7 @@ public class RPlan extends RElement implements IPlan
 				final String rulename = rplan.getId()+"_waitqueue";
 				Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
-					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 						System.out.println("Added to waitqueue: "+event);
 						rplan.addToWaitqueue(new ChangeEvent(event));				
@@ -899,7 +899,7 @@ public class RPlan extends RElement implements IPlan
 					
 					Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 							if(rescom.equals(getResumeCommand()))
 							{
@@ -975,7 +975,7 @@ public class RPlan extends RElement implements IPlan
 					
 					Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 							if(rescom.equals(getResumeCommand()))
 							{
@@ -1034,7 +1034,7 @@ public class RPlan extends RElement implements IPlan
 					
 					Rule<Void> rule = new Rule<Void>(rulename, cond!=null? cond: ICondition.TRUE_CONDITION, new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
 							if(rescom.equals(getResumeCommand()))
 							{

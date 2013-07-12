@@ -8,7 +8,14 @@ public interface IMethodParameterGuesser
 {
 	/**
 	 *  Guess the parameters of a method call. 
+	 *  @return The parameters.
 	 */
 	public Object[] guessParameters();
+	
+	/**
+	 *  Get the parameter guesser.
+	 *  @return The parameter guesser.
+	 */
+	public IParameterGuesser getGuesser();
 	
 }

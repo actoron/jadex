@@ -14,7 +14,7 @@ public class SimpleParameterGuesser implements IParameterGuesser
 	protected Collection<?> values;
 	
 	/**
-	 * 
+	 *  Create a new guesser.
 	 */
 	public SimpleParameterGuesser(IParameterGuesser parent)
 	{
@@ -22,7 +22,15 @@ public class SimpleParameterGuesser implements IParameterGuesser
 	}
 	
 	/**
-	 * 
+	 *  Create a new guesser.
+	 */
+	public SimpleParameterGuesser(Collection<?> values)
+	{
+		this(null, values);
+	}
+	
+	/**
+	 *  Create a new guesser.
 	 */
 	public SimpleParameterGuesser(IParameterGuesser parent, Collection<?> values)
 	{
@@ -35,24 +43,45 @@ public class SimpleParameterGuesser implements IParameterGuesser
 	 *  @param type The type.
 	 *  @return The mapped value. 
 	 */
-	public Object guessParameter(Class<?> type)
+	public Object guessParameter(Class<?> type, boolean exact)
 	{
 		Object ret = null;
-		if(parent!=null)
-		{
-			ret = parent.guessParameter(type);
-		}
-		else if(values!=null)
+		boolean found = false;
+		if(values!=null)
 		{
 			for(Object val: values)
 			{
-				if(val!=null && SReflect.isSupertype(val.getClass(), type))
+				if(val!=null && ((exact && val.getClass().equals(type))
+					|| (!exact && type.isInstance(val))))
 				{
 					ret = val;
+					found = true;
 					break;
 				}
 			}
 		}
+		if(!found && parent!=null)
+			ret = parent.guessParameter(type, exact);
+		
 		return ret;
 	}
+	
+	/**
+	 *  Get the parent guesser.
+	 *  @return The parent guesser.
+	 */
+	public IParameterGuesser getParent()
+	{
+		return parent;
+	}
+	
+	/**
+	 *  Set the parent.
+	 *  @param parent The parent.
+	 */
+	public void setParent(IParameterGuesser parent)
+	{
+		this.parent = parent;
+	}
+	
 }

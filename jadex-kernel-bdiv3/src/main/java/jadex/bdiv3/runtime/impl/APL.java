@@ -11,7 +11,10 @@ import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IMethodParameterGuesser;
 import jadex.commons.SReflect;
+import jadex.commons.SimpleMethodParameterGuesser;
+import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -311,7 +314,13 @@ public class APL
 				try
 				{
 					m.setAccessible(true);
-					Object app = m.invoke(pojo, guessParameters(m.getParameterTypes()));
+					
+					List<Object> vals = new ArrayList<Object>();
+					vals.add(element);
+					vals.add(element.getPojoElement());
+					IMethodParameterGuesser g = new SimpleMethodParameterGuesser(m.getParameterTypes(), vals);
+					
+					Object app = m.invoke(pojo, g.guessParameters());
 					if(app instanceof Boolean)
 					{
 						if(((Boolean)app).booleanValue())
@@ -360,34 +369,34 @@ public class APL
 		return ret;
 	}
 	
-	/**
-	 *  Method that tries to guess the parameters for the method call.
-	 */
-	public Object[] guessParameters(Class<?>[] ptypes)
-	{
-		if(ptypes==null)
-			return null;
-		// Guess parameters
-//		Class<?>[] ptypes = body.getParameterTypes();
-		
-		Object pojope = element.getPojoElement();
-		
-		Object[] params = new Object[ptypes.length];
-		
-		for(int i=0; i<ptypes.length; i++)
-		{
-			if(SReflect.isSupertype(element.getClass(), ptypes[i]))
-			{
-				params[i] = element;
-			}
-			else if(pojope!=null && SReflect.isSupertype(pojope.getClass(), ptypes[i]))
-			{
-				params[i] = pojope;
-			}
-		}
-				
-		return params;
-	}
+//	/**
+//	 *  Method that tries to guess the parameters for the method call.
+//	 */
+//	public Object[] guessParameters(Class<?>[] ptypes)
+//	{
+//		if(ptypes==null)
+//			return null;
+//		// Guess parameters
+////		Class<?>[] ptypes = body.getParameterTypes();
+//		
+//		Object pojope = element.getPojoElement();
+//		
+//		Object[] params = new Object[ptypes.length];
+//		
+//		for(int i=0; i<ptypes.length; i++)
+//		{
+//			if(SReflect.isSupertype(element.getClass(), ptypes[i]))
+//			{
+//				params[i] = element;
+//			}
+//			else if(pojope!=null && SReflect.isSupertype(pojope.getClass(), ptypes[i]))
+//			{
+//				params[i] = pojope;
+//			}
+//		}
+//				
+//		return params;
+//	}
 	
 	/**
 	 *  Get the next candidate with respect to the plan

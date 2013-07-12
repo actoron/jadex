@@ -101,7 +101,7 @@ public class BDIAgent extends MicroAgent
 		Rule<Void> rule = new Rule<Void>(rulename, 
 			ICondition.TRUE_CONDITION, new IAction<Void>()
 		{
-			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context)
+			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 			{
 				if(!multi)
 				{

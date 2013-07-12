@@ -45,6 +45,7 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.cron.TimePatternFilter;
 import jadex.platform.service.cron.jobs.CronCreateCommand;
 import jadex.rules.eca.CommandAction;
+import jadex.rules.eca.CommandAction.CommandData;
 import jadex.rules.eca.ExpressionCondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
@@ -533,7 +534,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 		ret = new RuleCreateCommand(null, model, ci, killis)
 		{
 			@Classname("RuleCreateCommand")
-			public IFuture<IComponentIdentifier> execute(Tuple3<IEvent, IRule<?>, Object> args)
+			public IFuture<IComponentIdentifier> execute(CommandData args)
 			{
 				Map<String, Object> vs = getCommand().getInfo().getArguments();
 				if(vs==null)
@@ -541,7 +542,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 					vs = new HashMap<String, Object>();
 					getCommand().getInfo().setArguments(vs);
 				}
-				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getSecondEntity().getName(), args.getFirstEntity()));
+				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), args.getEvent()));
 				return super.execute(args);
 			}
 		};

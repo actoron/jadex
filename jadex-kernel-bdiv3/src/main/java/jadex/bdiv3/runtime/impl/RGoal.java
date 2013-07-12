@@ -12,6 +12,7 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IResultListener;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.ICondition;
@@ -893,12 +894,12 @@ public class RGoal extends RProcessableElement implements IGoal
 		/**
 		 * 
 		 */
-		public boolean evaluate(IEvent event)
+		public Tuple2<Boolean, Object> evaluate(IEvent event)
 		{
 			boolean ret = states.contains(getLifecycleState());
 			if(!allowed)
 				ret = !ret;
-			return ret;
+			return ret? ICondition.TRUE: ICondition.FALSE;
 		}
 	}
 	
@@ -949,12 +950,12 @@ public class RGoal extends RProcessableElement implements IGoal
 		/**
 		 * 
 		 */
-		public boolean evaluate(IEvent event)
+		public Tuple2<Boolean, Object> evaluate(IEvent event)
 		{
 			boolean ret = states.contains(getProcessingState());
 			if(!allowed)
 				ret = !ret;
-			return ret;
+			return ret? ICondition.TRUE: ICondition.FALSE;
 		}
 	}
 	

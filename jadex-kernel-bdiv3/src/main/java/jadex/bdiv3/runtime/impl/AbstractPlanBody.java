@@ -1,18 +1,17 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.model.MElement;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
+import jadex.commons.SimpleMethodParameterGuesser;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Abstract base class for plan body implementations.
@@ -235,40 +234,23 @@ public abstract class AbstractPlanBody implements IPlanBody
 	{
 		if(ptypes==null)
 			return null;
-		// Guess parameters
-//		Class<?>[] ptypes = body.getParameterTypes();
 		
 		Object reason = rplan.getReason();
 		Object pojope = null;
 		if(reason instanceof RProcessableElement)
 			pojope = ((RProcessableElement)reason).getPojoElement();
 		
-		Object[] params = new Object[ptypes.length];
+		List<Object> vals = new ArrayList<Object>();
+		vals.add(reason);
+		if(pojope!=null)
+			vals.add(pojope);
+		vals.add(rplan);
+		if(rplan.getException()!=null)
+			vals.add(rplan.getException());
 		
-		for(int i=0; i<ptypes.length; i++)
-		{
-			if(reason!=null && SReflect.isSupertype(reason.getClass(), ptypes[i]))
-			{
-				reason =  ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
-					.adaptToCapability(reason, rplan.getModelElement());
-				
-				params[i] = reason;
-			}
-			else if(pojope!=null && SReflect.isSupertype(pojope.getClass(), ptypes[i]))
-			{
-				params[i] = pojope;
-			}
-			else if(SReflect.isSupertype(IPlan.class, ptypes[i]))
-			{
-				params[i] = rplan;
-			}
-			else if(SReflect.isSupertype(Exception.class, ptypes[i]))
-			{
-				params[i] = rplan.getException();
-			}
-		}
-				
-		return params;
+		SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(ptypes, vals);
+		
+		return g.guessParameters();
 	}
 
 	/**
