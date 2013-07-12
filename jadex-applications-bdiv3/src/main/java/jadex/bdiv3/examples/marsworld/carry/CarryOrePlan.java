@@ -33,7 +33,7 @@ public class CarryOrePlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected MovementCapability capa;
+	protected CarryBDI carry;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -49,7 +49,8 @@ public class CarryOrePlan
 	{	
 		ISpaceObject target = goal.getTarget();
 		boolean	finished = false;
-
+		MovementCapability capa = carry.getMoveCapa();
+		
 		while(!finished)
 		{
 			IEnvironmentSpace env = capa.getEnvironment();

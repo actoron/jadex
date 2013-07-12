@@ -87,7 +87,7 @@ public class AnalyzeTargetPlan
 	 */
 	private void callProducerAgent(ISpaceObject target)
 	{
-		System.out.println("Calling some Production Agent...");
+//		System.out.println("Calling some Production Agent...");
 
 		try
 		{

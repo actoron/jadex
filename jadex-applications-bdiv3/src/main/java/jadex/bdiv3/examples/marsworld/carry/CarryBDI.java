@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.marsworld.BaseBDI;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.WalkAround;
+import jadex.bdiv3.examples.marsworld.sentry.ITargetAnnouncementService;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
@@ -17,6 +18,8 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 /**
  * 
@@ -24,6 +27,7 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(type=ICarryService.class, implementation=@Implementation(expression="$pojoagent")))
+@RequiredServices(@RequiredService(name="targetser", type=ITargetAnnouncementService.class, multiple=true))
 @Plans({
 	@Plan(trigger=@Trigger(goals=CarryBDI.CarryOre.class), body=@Body(CarryOrePlan.class)),
 	@Plan(trigger=@Trigger(factaddeds="movecapa.mytargets"), body=@Body(InformNewTargetPlan.class))

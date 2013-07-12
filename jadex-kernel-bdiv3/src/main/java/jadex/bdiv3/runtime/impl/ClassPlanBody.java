@@ -5,6 +5,7 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MethodInfo;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.micro.IPojoMicroAgent;
@@ -179,6 +180,19 @@ public class ClassPlanBody extends AbstractPlanBody
 							{
 								f.setAccessible(true);
 								f.set(plan, reason);
+							}
+						}
+						else if(r instanceof ChangeEvent)
+						{
+							Class<?> ft = f.getType();
+							f.setAccessible(true);
+							if(ft.equals(ChangeEvent.class))
+							{
+								f.set(plan, r);
+							}
+							else
+							{
+								f.set(plan, ((ChangeEvent)r).getValue());
 							}
 						}
 					}

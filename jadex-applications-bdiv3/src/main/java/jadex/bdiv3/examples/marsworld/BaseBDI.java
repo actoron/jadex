@@ -17,7 +17,6 @@ import jadex.micro.annotation.RequiredServices;
  * 
  */
 @Agent
-@RequiredServices(@RequiredService(name="targetser", multiple=true, type=ITargetAnnouncementService.class))
 public abstract class BaseBDI 
 {
 	@Agent 

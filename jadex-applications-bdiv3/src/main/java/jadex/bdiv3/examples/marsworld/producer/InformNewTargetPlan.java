@@ -5,7 +5,6 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.sentry.ITargetAnnouncementService;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.IFuture;
@@ -22,7 +21,7 @@ public class InformNewTargetPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected MovementCapability capa;
+	protected ProducerBDI producer;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -38,10 +37,9 @@ public class InformNewTargetPlan
 	@PlanBody
 	public void body()
 	{
-		IFuture<Collection<ITargetAnnouncementService>> fut = capa.getCapability().getServiceContainer().getRequiredServices("targetser");
-		
 		try
 		{
+			IFuture<Collection<ITargetAnnouncementService>> fut = producer.getAgent().getServiceContainer().getRequiredServices("targetser");
 			Collection<ITargetAnnouncementService> ansers = fut.get();
 			
 			for(ITargetAnnouncementService anser: ansers)

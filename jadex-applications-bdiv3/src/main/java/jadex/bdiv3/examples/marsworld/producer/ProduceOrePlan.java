@@ -5,6 +5,7 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.examples.marsworld.carry.ICarryService;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.Move;
 import jadex.bdiv3.examples.marsworld.producer.ProducerBDI.ProduceOre;
@@ -12,12 +13,14 @@ import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +34,7 @@ public class ProduceOrePlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected MovementCapability capa;
+	protected ProducerBDI producer;
 	
 	@PlanAPI
 	protected IPlan rplan;
@@ -47,6 +50,8 @@ public class ProduceOrePlan
 	{
 		ISpaceObject target = goal.getTarget();
 
+		MovementCapability capa = producer.getMoveCapa();
+		
 		// Move to the target.
 		Move move = capa.new Move((IVector2)target.getProperty(Space2D.PROPERTY_POSITION));
 		rplan.dispatchSubgoal(move).get();
@@ -63,5 +68,32 @@ public class ProduceOrePlan
 		space.addTaskListener(taskid, myself.getId(), lis);
 		fut.get();
 //		System.out.println("Produced ore at target: "+getAgentName()+", "+ore+" ore produced.");
+		
+		callCarryAgent(target);
+	}
+
+	/**
+	 *  Sending a location to the Producer Agent.
+	 *  Therefore it has first to be looked up in the DF.
+	 *  @param target
+	 */
+	private void callCarryAgent(ISpaceObject target)
+	{
+//		System.out.println("Calling some Production Agent...");
+
+		try
+		{
+			IFuture<Collection<ICarryService>> fut = producer.getAgent().getServiceContainer().getRequiredServices("carryser");
+			Collection<ICarryService> ansers = fut.get();
+			
+			for(ICarryService anser: ansers)
+			{
+				anser.doCarry(target);
+			}
+		}
+		catch(RuntimeException e)
+		{
+			System.out.println("No carry found");
+		}
 	}
 }
