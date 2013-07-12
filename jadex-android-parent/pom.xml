@@ -21,6 +21,13 @@
 		<munge-default-includes>**/*.java,**/*.xml,**/*.bpmn,**/*.gpmn</munge-default-includes>
 		<munge-generated-sources-dir>src/gen/java</munge-generated-sources-dir>
 	</properties>
+	
+	<repositories>
+		<repository>
+			<id>jadex-android</id>
+			<url>http://jadex.julakali.org/nexus/content/groups/public/</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
