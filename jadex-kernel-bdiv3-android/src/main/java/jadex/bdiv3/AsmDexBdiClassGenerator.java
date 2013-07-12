@@ -1,12 +1,12 @@
 package jadex.bdiv3;
 
+import jadex.android.commons.JadexDexClassLoader;
+import jadex.android.commons.Logger;
 import jadex.bdiv3.android.DexLoader;
 import jadex.bdiv3.android.MethodInsManager;
 import jadex.bdiv3.android.MyApplicationVisitor;
 import jadex.bdiv3.model.BDIModel;
-import jadex.commons.SUtil;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -28,11 +27,8 @@ import org.ow2.asmdex.ApplicationReader;
 import org.ow2.asmdex.ApplicationVisitor;
 import org.ow2.asmdex.ApplicationWriter;
 import org.ow2.asmdex.Opcodes;
-import org.ow2.asmdex.lowLevelUtils.DexFileReader;
 
 import android.util.Log;
-
-import com.android.dx.dex.file.DexFile;
 
 public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 {
@@ -41,28 +37,28 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 	public static String APP_PATH;
 	public static File OUTPATH;
 
-//	static
-//	{
-//		try
-//		{
-//			AccessController.doPrivileged(new PrivilegedExceptionAction<Object>()
-//			{
-//				public Object run() throws Exception
-//				{
-//					Class<?> cl = Class.forName("java.lang.ClassLoader");
-//					methoddc1 = cl.getDeclaredMethod("defineClass", new Class[]
-//					{String.class, byte[].class, int.class, int.class});
-//					methoddc2 = cl.getDeclaredMethod("defineClass", new Class[]
-//					{String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
-//					return null;
-//				}
-//			});
-//		}
-//		catch (PrivilegedActionException e)
-//		{
-//			throw new RuntimeException(e);
-//		}
-//	}
+	static
+	{
+		try
+		{
+			AccessController.doPrivileged(new PrivilegedExceptionAction<Object>()
+			{
+				public Object run() throws Exception
+				{
+					Class<?> cl = Class.forName("java.lang.ClassLoader");
+					methoddc1 = cl.getDeclaredMethod("defineClass", new Class[]
+					{String.class, byte[].class, int.class, int.class});
+					methoddc2 = cl.getDeclaredMethod("defineClass", new Class[]
+					{String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
+					return null;
+				}
+			});
+		}
+		catch (PrivilegedActionException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 
 	@Override
 	public Class<?> generateBDIClass(String classname, BDIModel micromodel, ClassLoader cl)
@@ -71,7 +67,8 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 	}
 
 	/**
-	 * Generate class.
+	 * Generate class. Generated class should be available in the given
+	 * classLoader at the end of this method.
 	 */
 	public Class<?> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl, final Set<String> done)
 	{
@@ -101,8 +98,21 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 			byte[] dex = aw.toByteArray();
 
 			ClassLoader newCl = DexLoader.load(cl, dex, OUTPATH);
+			Class<?> generatedClass = newCl.loadClass(clname);
+			ret = generatedClass;
+			
+			ClassLoader parent = cl.getParent();
+			JadexDexClassLoader found = JadexDexClassLoader.findJadexDexClassLoader(parent);
+			if (found != null) {
+				found.defineClass(clname, generatedClass);
+			}
 		}
 		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (ClassNotFoundException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -115,31 +125,38 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 	{
 		InputStream result = null;
 		String desiredFile = "classes.dex";
-		 try  { 
-		      FileInputStream fin = new FileInputStream(apkFile); 
-		      ZipInputStream zin = new ZipInputStream(fin); 
-		      ZipEntry ze = null; 
-		      while ((ze = zin.getNextEntry()) != null) { 
-		        Log.v("AsmDexBdi","Unzipping " + ze.getName()); 
+		try
+		{
+			FileInputStream fin = new FileInputStream(apkFile);
+			@SuppressWarnings("resource")
+			// Resource is closed later
+			ZipInputStream zin = new ZipInputStream(fin);
+			ZipEntry ze = null;
+			while ((ze = zin.getNextEntry()) != null)
+			{
+				Logger.d("Unzipping " + ze.getName());
 
-		        if(!ze.isDirectory()) { 
+				if (!ze.isDirectory())
+				{
 
-		            /**** Changes made below ****/  
-		              if (ze.getName().toString().equals(desiredFile)) {                  
-		                result = zin;
-		                break;
-		              }
+					/**** Changes made below ****/
+					if (ze.getName().toString().equals(desiredFile))
+					{
+						result = zin;
+						break;
+					}
 
-		          }
+				}
 
-		          zin.closeEntry(); 
-//		        } 
+				zin.closeEntry();
 
-		      } 
-//		      zin.close(); 
-		    } catch(Exception e) { 
-		      Log.e("Decompress", "unzip", e); 
-		    }
+			}
+			// zin.close();
+		}
+		catch (Exception e)
+		{
+			Log.e("Decompress", "unzip", e);
+		}
 
 		return result;
 	}

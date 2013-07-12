@@ -101,19 +101,7 @@ public class BDIClassReader extends MicroClassReader
 	 */
 	public BDIClassReader(BDIModelLoader loader)
 	{
-//		this.gen = new JavassistBDIClassGenerator();
-		if (SReflect.isAndroid()) {
-			Class<?> clazz = SReflect.classForName0("jadex.bdiv3.AsmDexBdiClassGenerator", this.getClass().getClassLoader());
-			try
-			{
-				this.gen = (IBDIClassGenerator) clazz.newInstance();
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-		this.gen = new ASMBDIClassGenerator();
+		this.gen = BDIClassGeneratorFactory.getInstance().createBDIClassGenerator();
 		this.loader	= loader;
 	}
 	
@@ -127,8 +115,13 @@ public class BDIClassReader extends MicroClassReader
 	{
 		// use dummy classloader that will not be visisble outside
 		List<URL> urls = SUtil.getClasspathURLs(classloader, false);
-		DummyClassLoader cl = new DummyClassLoader((URL[])urls.toArray(new URL[urls.size()]), null, classloader);
+		DummyClassLoader cl = createDummyClassLoader(classloader, null, urls);
 		return super.read(model, imports, cl, rid, root);
+	}
+
+	protected DummyClassLoader createDummyClassLoader(ClassLoader original, ClassLoader parent, List<URL> urls)
+	{
+		return new DummyClassLoader((URL[])urls.toArray(new URL[urls.size()]), parent, original);
 	}
 	
 	/**

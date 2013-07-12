@@ -152,6 +152,7 @@
 				<module>jadex-android-platformclient</module>
 				<module>jadex-runtimetools-android</module>
 				<module>jadex-platform-extension-webservice-android</module>
+				<module>jadex-kernel-bdiv3-android</module>
 			</modules>
 		</profile>
 	
@@ -200,6 +201,7 @@
 				<module>jadex-kernel-micro</module>
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-bdi</module>
+				<module>jadex-kernel-bdiv3</module>
 				<module>jadex-kernel-bdiv3-android</module>
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-model-bpmn</module>

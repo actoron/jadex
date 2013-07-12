@@ -18,12 +18,14 @@ public interface ISimpleDelegationClassLoader
 	 * @param del
 	 */
 	public void setDelegate(ISimpleDelegationClassLoader del);
-
+	public ISimpleDelegationClassLoader getDelegate();
+	
 	// ----- delegate methods -----
 	
 	public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException;
 	public URL getResource(String name);
 	public InputStream getResourceAsStream(String name);
 	public Enumeration<URL> getResources(String name) throws IOException;
+
 
 }

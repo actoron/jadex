@@ -21,6 +21,11 @@ public class DelegationClassLoader extends ChangeableURLClassLoader implements I
 		this.delegate = del;
 	}
 	
+	public ISimpleDelegationClassLoader getDelegate()
+	{
+		return delegate;
+	}
+
 	@Override
 	public synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
 	{

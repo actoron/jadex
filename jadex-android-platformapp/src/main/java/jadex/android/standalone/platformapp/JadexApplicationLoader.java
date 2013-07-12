@@ -1,5 +1,6 @@
 package jadex.android.standalone.platformapp;
 
+import jadex.android.commons.JadexDexClassLoader;
 import jadex.android.commons.Logger;
 import jadex.android.platformapp.R;
 import jadex.android.service.JadexPlatformManager;
@@ -7,6 +8,7 @@ import jadex.android.standalone.JadexApplication;
 import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.android.standalone.clientservice.UniversalClientService;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
+import jadex.bdiv3.AsmDexBdiClassGenerator;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -44,6 +46,9 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	private ClassLoader cl;
 	
 	private ApplicationInfo userAppInfo;
+	
+	//** TODO: remove **/
+	public static ApplicationInfo APPINFO;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -59,6 +64,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		{
 			userAppInfo = intent.getParcelableExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
 			String appPath = userAppInfo.sourceDir;
+			AsmDexBdiClassGenerator.APP_PATH = userAppInfo.sourceDir;
 			String className = intent.getStringExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
 			String originalAction = intent.getStringExtra(JadexApplication.EXTRA_KEY_ORIGINALACTION);
 			int[] windowFeatures = intent.getIntArrayExtra(JadexApplication.EXTRA_KEY_WINDOWFEATURES);
@@ -260,27 +266,22 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		// File dexInternalStoragePath = new File(getDir("dex",
 		// Context.MODE_PRIVATE), "jadex.jar");
 		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
+		AsmDexBdiClassGenerator.OUTPATH = optimizedDexOutputPath;
 
-		DexClassLoader cl = new DexClassLoader(appPath, optimizedDexOutputPath.getAbsolutePath(), null, parent) {
-			@Override
-			public String toString()
-			{
-				return "Custom DexClassLoader " + super.toString();
-			}
-		};
+		DexClassLoader cl = new JadexDexClassLoader(appPath, optimizedDexOutputPath.getAbsolutePath(), null, parent);
 		return cl;
 	}
 
-	private ClassLoader getClassLoaderForInternalClasses(ClassLoader parent)
-	{
-		PackageManager pm = getPackageManager();
-
-		ApplicationInfo applicationInfo = this.getApplicationInfo();
-
-		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
-
-		return new DexClassLoader(applicationInfo.sourceDir, optimizedDexOutputPath.getAbsolutePath(), null, parent);
-	}
+//	private ClassLoader getClassLoaderForInternalClasses(ClassLoader parent)
+//	{
+//		PackageManager pm = getPackageManager();
+//
+//		ApplicationInfo applicationInfo = this.getApplicationInfo();
+//
+//		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
+//
+//		return new DexClassLoader(applicationInfo.sourceDir, optimizedDexOutputPath.getAbsolutePath(), null, parent);
+//	}
 	
 	
 	private Factory layoutFactory = new Factory()

@@ -186,7 +186,7 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	 *            name of the newly created agent
 	 * @param clazz
 	 *            class of the agent to instantiate
-	 * @return ComponendIdentifier of the created agent.
+	 * @return ComponentIdentifier of the created agent.
 	 */
 	public IFuture<IComponentIdentifier> startMicroAgent(final IComponentIdentifier platformId, final String name, final Class<?> clazz)
 	{
@@ -205,6 +205,43 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 		});
 
 		return ret;
+	}
+	
+	/**
+	 * Start a new Component on a given platform with default {@link CreationInfo}.
+	 * If available, the belief "androidContext" will be set to <b>this</b>. 
+	 * 
+	 * @param platformId
+	 *            Identifier of the jadex platform
+	 * @param name
+	 *            name of the newly created agent
+	 * @param modelPath
+	 *            Path to the bpmn model file of the new agent
+	 * @return ComponentIdentifier of the created agent.
+	 */
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final Class<?> clazz)
+	{
+		return startComponent(platformId, name, clazz, new CreationInfo());
+	}
+	
+	/**
+	 * Start a new Component on a given platform.
+	 * If available, the belief "androidContext" will be set to <b>this</b>. 
+	 * 
+	 * @param platformId
+	 *            Identifier of the jadex platform
+	 * @param name
+	 *            name of the newly created agent
+	 * @param modelPath
+	 *            Path to the bpmn model file of the new agent
+	 *            	 * @param creationInfo
+	 * 			  {@link CreationInfo} to pass to the started Component.
+	 * @return ComponentIdentifier of the created agent.
+	 */
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final Class<?> clazz, final CreationInfo creationInfo)
+	{
+		String modelPath = clazz.getName().replaceAll("\\.", "/") + ".class";
+		return startComponent(platformId, name, modelPath, creationInfo);
 	}
 	
 
@@ -236,7 +273,7 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	 *            Path to the bpmn model file of the new agent
 	 * @param creationInfo
 	 * 			  {@link CreationInfo} to pass to the started Component.
-	 * @return ComponendIdentifier of the created agent.
+	 * @return ComponentIdentifier of the created agent.
 	 */
 	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath, final CreationInfo creationInfo)
 	{
