@@ -1,5 +1,6 @@
 package jadex.android.puzzle.ui;
 
+import jadex.android.puzzle.R;
 import jadex.bdi.examples.puzzle.Board;
 import jadex.bdi.examples.puzzle.Move;
 import jadex.bdi.examples.puzzle.Piece;
@@ -51,9 +52,9 @@ public class SokratesView extends TileView
 		super(context, attrs);
 		resetTiles(4);
 		Resources r = this.getContext().getResources();
-		loadTile(EMPTY_FIELD, r.getDrawable(jadex.android.clientapp.R.drawable.empty_field));
-		loadTile(RED_PIECE, r.getDrawable(jadex.android.clientapp.R.drawable.red_piece));
-		loadTile(WHITE_PIECE, r.getDrawable(jadex.android.clientapp.R.drawable.white_piece));
+		loadTile(EMPTY_FIELD, r.getDrawable(R.drawable.empty_field));
+		loadTile(RED_PIECE, r.getDrawable(R.drawable.red_piece));
+		loadTile(WHITE_PIECE, r.getDrawable(R.drawable.white_piece));
 	}
 
 	public void updatePos(Position pos)

@@ -1,6 +1,7 @@
 package jadex.commons.collection;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 import java.lang.ref.ReferenceQueue;
 import java.util.AbstractCollection;
@@ -214,7 +215,7 @@ public class WeakValueMap<K, V>	implements Map<K, V>
 					{
 						final Entry<K, WeakEntry<V>> ret = oit.next();
 						final WeakEntry<V> we = ret.getValue();
-						if(SReflect.isAndroid() && SReflect.getAndroidVersion() <= 8)	// todo: only for android 8
+						if(SReflect.isAndroid() && SUtil.androidUtils().getAndroidVersion() <= 8)
 						{
 							return new Entry<K, V>() {
 								public K getKey() {

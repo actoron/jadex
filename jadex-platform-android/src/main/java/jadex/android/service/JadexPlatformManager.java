@@ -13,6 +13,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.platform.IJadexPlatformManager;
+import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -189,7 +190,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 								if (defaultAppPath !=null) {
 									try
 									{
-										URL url = new URL("file", "localhost,", defaultAppPath);
+										URL url = SUtil.androidUtils().urlFromApkPath(defaultAppPath);
 										result.addTopLevelURL(url);
 									}
 									catch (MalformedURLException e)

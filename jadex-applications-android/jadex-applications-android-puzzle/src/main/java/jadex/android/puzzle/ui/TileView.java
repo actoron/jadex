@@ -16,7 +16,7 @@
 
 package jadex.android.puzzle.ui;
 
-import jadex.android.clientapp.R;
+import jadex.android.puzzle.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;

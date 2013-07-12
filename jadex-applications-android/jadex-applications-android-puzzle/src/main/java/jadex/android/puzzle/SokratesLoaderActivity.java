@@ -1,6 +1,6 @@
 package jadex.android.puzzle;
 
-import jadex.android.clientapp.R;
+import jadex.android.puzzle.R;
 import jadex.android.puzzle.SokratesService.PlatformBinder;
 import jadex.android.puzzle.SokratesService.PlatformListener;
 import jadex.android.standalone.clientapp.ClientAppFragment;

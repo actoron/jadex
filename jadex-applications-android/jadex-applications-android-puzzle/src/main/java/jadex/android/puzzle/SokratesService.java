@@ -3,6 +3,7 @@ package jadex.android.puzzle;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.service.JadexPlatformService;
 import jadex.bdi.examples.puzzle.Board;
+import jadex.bdiv3.examples.puzzle.SokratesBDI;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -47,7 +48,7 @@ public class SokratesService extends JadexPlatformService
 	public SokratesService()
 	{
 		setPlatformAutostart(false);
-		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BDI);
+		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BDI, JadexPlatformOptions.KERNEL_BDIV3);
 		setPlatformName("Sokrates");
 		handler = new Handler();
 	}
@@ -80,6 +81,11 @@ public class SokratesService extends JadexPlatformService
 		public IFuture<Void> startSokrates()
 		{
 			return createSokratesGame();
+		}
+		
+		public IFuture<Void> startSokratesV3()
+		{
+			return createSokratesGameV3();
 		}
 
 		public void setPlatformListener(PlatformListener l)
@@ -155,6 +161,39 @@ public class SokratesService extends JadexPlatformService
 			ci.setArguments(args);
 			IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
 					"jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci);
+
+			future.addResultListener(new DefaultResultListener<IComponentIdentifier>()
+			{
+
+				@Override
+				public void resultAvailable(IComponentIdentifier result)
+				{
+					sokratesComponent = result;
+				}
+				
+				@Override
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+				}
+			});
+
+			sokratesRunning = true;
+		}
+		return IFuture.DONE;
+
+	}
+	
+	private synchronized IFuture<Void> createSokratesGameV3()
+	{
+		if (!sokratesRunning)
+		{
+			CreationInfo ci = new CreationInfo();
+			HashMap<String, Object> args = new HashMap<String, Object>();
+			args.put("gui_listener", soListener);
+			ci.setArguments(args);
+			IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
+					SokratesBDI.class, ci);
 
 			future.addResultListener(new DefaultResultListener<IComponentIdentifier>()
 			{

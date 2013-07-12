@@ -110,7 +110,7 @@ public class MessageService extends BasicService implements IMessageService
         new jadex.platform.service.message.contentcodecs.NuggetsXMLContentCodec(),
 		new jadex.platform.service.message.contentcodecs.JadexBinaryContentCodec()
     }
-    : SReflect.hasXmlSupport()
+    : SUtil.androidUtils().hasXmlSupport()
 	    ? new IContentCodec[]
 	    {
 	    		new jadex.platform.service.message.contentcodecs.JadexBinaryContentCodec()

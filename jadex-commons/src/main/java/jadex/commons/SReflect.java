@@ -1791,87 +1791,18 @@ public class SReflect
 //	}
 	
 	/** Cached flag for android check. */
-	protected static Boolean isandroid;
+	protected static Boolean isAndroid;
 	
 	/**
 	 *  Test if running on android.
 	 */
 	public static boolean	isAndroid()
 	{
-		if(isandroid==null)
+		if(isAndroid==null)
 		{
-			isandroid	= new Boolean(classForName0("android.app.Activity", SReflect.class.getClassLoader())!=null);
-//			System.out.println("Android: "+isandroid);
+			isAndroid	= new Boolean(classForName0("android.app.Activity", SReflect.class.getClassLoader())!=null);
 		}
-		return isandroid.booleanValue();
-	}
-	
-	/** Cached android version */
-	protected static Integer androidVersion;
-
-	/**
-	 * Get Android API version. Possible values:
-	 * http://developer.android.com/reference/android/os/Build.VERSION_CODES.htm
-	 * 
-	 * @return Android API version or -1, if not running on Android
-	 */
-	public static int getAndroidVersion()
-	{
-		if (androidVersion == null)
-		{
-			androidVersion = -1;
-			if (isAndroid())
-			{
-				Class build = classForName0("android.os.Build", SReflect.class.getClassLoader());
-				Class[] staticClasses = build.getDeclaredClasses();
-				for (Class sclass : staticClasses)
-				{
-					if ("VERSION".equals(sclass.getSimpleName()))
-					{
-						try
-						{
-							androidVersion = (Integer) sclass.getField("SDK_INT").get(null);
-						} catch (Exception e)
-						{
-						}
-					}
-				}
-			}
-		}
-		return androidVersion.intValue();
-	}
-	
-	/** Cached flag for xml support */
-	protected static Boolean hasXmlSupport;
-	
-	/**
-	 * Checks wether the Platform has the necessary classes to provide XML
-	 * encoding and decoding support.
-	 * @return true, if platform supports xml
-	 */
-	public static boolean hasXmlSupport() 
-	{
-		if (hasXmlSupport == null)
-		{
-			try
-			{
-				classForName("jadex.xml.reader.XMLReaderFactoryAndroid", null);
-				classForName("jadex.xml.writer.XMLWriterFactoryAndroid", null);
-				hasXmlSupport = true;
-			} 
-			catch (ClassNotFoundException e)
-			{
-				hasXmlSupport = false;
-			} 
-			finally 
-			{
-				return hasXmlSupport.booleanValue();
-			}
-		} 
-		else
-		{
-			return hasXmlSupport.booleanValue();
-		}
+		return isAndroid.booleanValue();
 	}
 }
 

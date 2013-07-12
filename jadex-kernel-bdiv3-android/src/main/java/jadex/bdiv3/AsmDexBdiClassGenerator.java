@@ -6,6 +6,7 @@ import jadex.bdiv3.android.DexLoader;
 import jadex.bdiv3.android.MethodInsManager;
 import jadex.bdiv3.android.MyApplicationVisitor;
 import jadex.bdiv3.model.BDIModel;
+import jadex.commons.SUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -102,7 +103,7 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 			ret = generatedClass;
 			
 			ClassLoader parent = cl.getParent();
-			JadexDexClassLoader found = JadexDexClassLoader.findJadexDexClassLoader(parent);
+			JadexDexClassLoader found = (JadexDexClassLoader) SUtil.androidUtils().findJadexDexClassLoader(parent);
 			if (found != null) {
 				found.defineClass(clname, generatedClass);
 			}

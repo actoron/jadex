@@ -33,6 +33,7 @@ import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -1489,41 +1490,11 @@ public class SUtil
 			classloader = SUtil.class.getClassLoader();
 
 		Set<URL> cps = new LinkedHashSet<URL>(); 
-				
-		StringTokenizer stok = new StringTokenizer(System.getProperty("java.class.path"), System.getProperty("path.separator"));
-		while(stok.hasMoreTokens())
-		{
-			try
-			{
-				String entry = stok.nextToken();
-				File file = new File(entry);
-				cps.add(file.getCanonicalFile().toURI().toURL());
-				
-				// Code below does not work for paths with spaces in it.
-				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
-//				if(file.isDirectory()
-//						&& !entry
-//								.endsWith(System.getProperty("file.separator")))
-//				{
-//					// Normalize, that directories end with "/".
-//					entry += System.getProperty("file.separator");
-//				}
-//				cps.add(new URL("file:///" + entry));
-			}
-			catch(MalformedURLException e)
-			{
-				// Maybe invalid classpath entries --> just ignore.
-				// Hack!!! Print warning?
-				// e.printStackTrace();
-			}
-			catch(IOException e)
-			{
-			}
-		}
-		
-		if(includebootpath)
-		{
-			stok = new StringTokenizer(System.getProperty("sun.boot.class.path"), System.getProperty("path.separator"));
+	
+		if (SReflect.isAndroid()) {
+			cps.addAll(androidUtils().collectDexPathUrls(classloader));
+		} else {
+			StringTokenizer stok = new StringTokenizer(System.getProperty("java.class.path"), System.getProperty("path.separator"));
 			while(stok.hasMoreTokens())
 			{
 				try
@@ -1551,6 +1522,40 @@ public class SUtil
 				}
 				catch(IOException e)
 				{
+				}
+			}
+			
+			if(includebootpath)
+			{
+				stok = new StringTokenizer(System.getProperty("sun.boot.class.path"), System.getProperty("path.separator"));
+				while(stok.hasMoreTokens())
+				{
+					try
+					{
+						String entry = stok.nextToken();
+						File file = new File(entry);
+						cps.add(file.getCanonicalFile().toURI().toURL());
+						
+						// Code below does not work for paths with spaces in it.
+						// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
+		//				if(file.isDirectory()
+		//						&& !entry
+		//								.endsWith(System.getProperty("file.separator")))
+		//				{
+		//					// Normalize, that directories end with "/".
+		//					entry += System.getProperty("file.separator");
+		//				}
+		//				cps.add(new URL("file:///" + entry));
+					}
+					catch(MalformedURLException e)
+					{
+						// Maybe invalid classpath entries --> just ignore.
+						// Hack!!! Print warning?
+						// e.printStackTrace();
+					}
+					catch(IOException e)
+					{
+					}
 				}
 			}
 		}
@@ -2616,7 +2621,7 @@ public class SUtil
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		if(!SReflect.isAndroid() || SReflect.getAndroidVersion() > 8)
+		if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
 		{
 			ret	= SNonAndroid.getNetworkPrefixLength(iadr);
 		}
@@ -3587,7 +3592,7 @@ public class SUtil
 	{
 		if(mac==null)
 		{
-			if(!SReflect.isAndroid() || SReflect.getAndroidVersion() > 8)
+			if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
 			{
 				mac	= SNonAndroid.getMacAddress();
 			}
@@ -3603,6 +3608,73 @@ public class SUtil
 	{
 		 return Pattern.compile("^\\Q" 
 			+glob.replace("*", "\\E.*\\Q").replace("?", "\\E.\\Q")+"\\E$");
+	}
+	
+	/** Cached AndroidUtils */
+	protected static AndroidUtils androidUtils;
+	
+	/**
+	 * Get the AndroidUtils, if available.
+	 * @return AndroidUtils
+	 */
+	public static AndroidUtils androidUtils() {
+		if (androidUtils == null && SReflect.isAndroid()) {
+			Class<?> clazz = SReflect.classForName0("jadex.android.commons.AndroidUtilsImpl", SReflect.class.getClassLoader());
+			try
+			{
+				androidUtils = (AndroidUtils) clazz.newInstance();
+			}
+			catch (InstantiationException e)
+			{
+				e.printStackTrace();
+			}
+			catch (IllegalAccessException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return androidUtils;
+	}
+	
+	public interface AndroidUtils {
+
+		/**
+		 * Get Android API version. Possible values:
+		 * http://developer.android.com/reference/android/os/Build.VERSION_CODES.htm
+		 * 
+		 * @return Android API version
+		 */
+		int getAndroidVersion();
+
+		/**
+		 * Traverse the Hierarchy of the given classloader and collect all
+		 * DexPaths that are found as URLs.
+		 * @param classloader
+		 * @return URLs
+		 */
+		Collection<? extends URL> collectDexPathUrls(ClassLoader classloader);
+
+		/**
+		 * Checks whether the Platform has the necessary classes to provide XML
+		 * encoding and decoding support.
+		 * @return true, if platform supports xml
+		 */
+		boolean hasXmlSupport();
+
+		/**
+		 * Looks up the ClassLoader Hierarchy and tries to find a JadexDexClassLoader in it.
+		 * @param cl
+		 * @return {@link JadexDexClassLoader} or <code>null</code>, if none found.
+		 */
+		ClassLoader findJadexDexClassLoader(ClassLoader cl);
+
+		/**
+		 * Creates an URL object from a given Path to an android APK file
+		 * @param defaultAppPath
+		 * @return {@link URL}
+		 * @throws MalformedURLException
+		 */
+		URL urlFromApkPath(String defaultAppPath) throws MalformedURLException;
 	}
 	
 	/**

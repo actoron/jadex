@@ -1,6 +1,6 @@
 package jadex.android.puzzle;
 
-import jadex.android.clientapp.R;
+import jadex.android.puzzle.R;
 import jadex.android.puzzle.SokratesService.PlatformBinder;
 import jadex.android.puzzle.SokratesService.SokratesListener;
 import jadex.android.puzzle.ui.SokratesView;
@@ -72,6 +72,7 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 		this.service.setSokratesListener(sokratesListener);
 		if (!service.isSokratesRunning()) {
 			statusTextView.setText("starting Game...");
+//			this.service.startSokratesV3();
 			this.service.startSokrates();
 		}
 	}

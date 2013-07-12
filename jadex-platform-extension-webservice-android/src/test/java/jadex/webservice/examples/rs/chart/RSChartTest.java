@@ -64,7 +64,7 @@ public class RSChartTest extends TestCase
 	
 	private class SReflectSub extends SReflect {
 		public void setIsAndroid(Boolean b) {
-			isandroid = b;
+			isAndroid = b;
 		}
 	}
 }

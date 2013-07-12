@@ -2,6 +2,7 @@ package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 
 import java.lang.reflect.Field;
@@ -69,7 +70,7 @@ public class CodecFactory
 			// dynamically decide if JadexXMLCodec is available
 			codecs = !SReflect.isAndroid()
 				? new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class}
-				: SReflect.hasXmlSupport()
+				: SUtil.androidUtils().hasXmlSupport()
 						? new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class, JadexXMLCodec.class}
 						: new Class[]{SerialCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
 		}
