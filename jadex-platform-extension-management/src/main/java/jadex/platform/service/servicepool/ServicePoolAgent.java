@@ -1,20 +1,17 @@
 package jadex.platform.service.servicepool;
 
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.IPoolStrategy;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -84,13 +81,34 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	/**
 	 *  Add a new service type and a strategy.
 	 *  @param servicetype The service type.
+	 *  @param componentmodel The component model.
+	 */
+	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel, CreationInfo info)
+	{
+		return addServiceType(servicetype, new DefaultPoolStrategy(5, 35000, 10), componentmodel, info);
+	}
+	
+	/**
+	 *  Add a new service type and a strategy.
+	 *  @param servicetype The service type.
 	 *  @param strategy The service pool strategy.
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel)
 	{
+		return addServiceType(servicetype, strategy, componentmodel, null);
+	}
+	
+	
+	/**
+	 *  Add a new service type and a strategy.
+	 *  @param servicetype The service type.
+	 *  @param strategy The service pool strategy.
+	 */
+	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info)
+	{
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
-		ServiceHandler handler = new ServiceHandler(this, servicetype, strategy, componentmodel);
+		ServiceHandler handler = new ServiceHandler(this, servicetype, strategy, componentmodel, info);
 		servicetypes.put(servicetype, handler);
 
 		// add service proxy

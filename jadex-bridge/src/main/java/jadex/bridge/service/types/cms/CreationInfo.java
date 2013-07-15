@@ -87,6 +87,7 @@ public class CreationInfo
 			this.imports	= info.getImports();
 			this.bindings = info.getRequiredServiceBindings();
 			this.rid = info.getResourceIdentifier();
+			this.localtype = info.getLocalType();
 		}
 	}
 

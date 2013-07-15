@@ -518,7 +518,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		}
 		
 //		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
-//			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
+			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
 	}
 	
 	/**
@@ -535,7 +535,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		{
 			if(inhibitors.remove(inhibitor) && inhibitors.size()==0)
 			{
-//				System.out.println("goal not inhibited: "+this);
+				System.out.println("goal not inhibited: "+this);
 				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALNOTINHIBITED, this));
 			}
@@ -815,28 +815,35 @@ public class RGoal extends RProcessableElement implements IGoal
 			MDeliberation delib = getMGoal().getDeliberation();
 			if(delib!=null)
 			{
-				Set<MGoal> minh = delib.getInhibitions();
-				MGoal mother = other.getMGoal();
-				if(minh.contains(mother))
+				if(delib.isCardinalityOne())
 				{
 					ret = true;
-					
-					// check if instance relation
-					Map<String, MethodInfo> dms = delib.getInhibitionMethods();
-					if(dms!=null)
+				}
+				else
+				{
+					Set<MGoal> minh = delib.getInhibitions();
+					MGoal mother = other.getMGoal();
+					if(minh.contains(mother))
 					{
-						MethodInfo mi = dms.get(mother.getName());
-						if(mi!=null)
+						ret = true;
+						
+						// check if instance relation
+						Map<String, MethodInfo> dms = delib.getInhibitionMethods();
+						if(dms!=null)
 						{
-							Method dm = mi.getMethod(ia.getClassLoader());
-							try
+							MethodInfo mi = dms.get(mother.getName());
+							if(mi!=null)
 							{
-								dm.setAccessible(true);
-								ret = ((Boolean)dm.invoke(getPojoElement(), new Object[]{other.getPojoElement()})).booleanValue();
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
+								Method dm = mi.getMethod(ia.getClassLoader());
+								try
+								{
+									dm.setAccessible(true);
+									ret = ((Boolean)dm.invoke(getPojoElement(), new Object[]{other.getPojoElement()})).booleanValue();
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+								}
 							}
 						}
 					}

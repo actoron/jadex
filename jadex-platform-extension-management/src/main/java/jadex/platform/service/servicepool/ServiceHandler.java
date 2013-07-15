@@ -63,13 +63,16 @@ public class ServiceHandler implements InvocationHandler
 	/** The clock service. */
 	protected IClockService clock;
 	
+	/** The creation info. */
+	protected CreationInfo info;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service handler.
 	 */
 	public ServiceHandler(IInternalAccess component, Class<?> servicetype, 
-		IPoolStrategy strategy, String componentname)
+		IPoolStrategy strategy, String componentname, CreationInfo info)
 	{
 		this.component = component;
 		this.servicetype = servicetype;
@@ -77,6 +80,7 @@ public class ServiceHandler implements InvocationHandler
 		this.componentname = componentname;
 		this.servicepool = new LinkedHashMap<IService, ITimer>();
 		this.queue = new LinkedList<Object[]>();
+		this.info = info;
 	}
 	
 	//-------- methods --------
@@ -111,7 +115,8 @@ public class ServiceHandler implements InvocationHandler
 			{
 				public void customResultAvailable(final IComponentManagementService cms)
 				{
-					CreationInfo ci  = new CreationInfo(inta.getComponentIdentifier());
+					CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
+					ci.setParent(inta.getComponentIdentifier());
 					ci.setImports(inta.getModel().getAllImports());
 					cms.createComponent(null, componentname, ci, null)
 						.addResultListener(inta.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
@@ -211,7 +216,7 @@ public class ServiceHandler implements InvocationHandler
 		
 		final Future<Void> ret = new Future<Void>();
 		
-		if(strategy.getWorkerTimeout()>0 && false)
+		if(strategy.getWorkerTimeout()>0)// && false)
 		{
 			// Add service with timer to pool
 			createTimer(strategy.getWorkerTimeout(), new ITimedObject()
