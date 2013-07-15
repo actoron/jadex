@@ -49,7 +49,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 	/**
 	 * 
 	 */
-	@Goal(unique=true, deliberation=@Deliberation(inhibits=MovementCapability.WalkAround.class))
+	@Goal(unique=true, deliberation=@Deliberation(inhibits=MovementCapability.WalkAround.class, cardinalityone=true))
 	public static class AnalyzeTarget
 	{
 		/** The sentry agent. */

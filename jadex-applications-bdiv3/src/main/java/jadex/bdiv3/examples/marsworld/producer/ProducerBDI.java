@@ -41,7 +41,7 @@ public class ProducerBDI extends BaseBDI implements IProduceService
 	/**
 	 * 
 	 */
-	@Goal(deliberation=@Deliberation(inhibits=WalkAround.class))
+	@Goal(deliberation=@Deliberation(inhibits=WalkAround.class, cardinalityone=true))
 	public class ProduceOre
 	{
 		/** The target. */

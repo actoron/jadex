@@ -37,7 +37,7 @@ public class CarryBDI extends BaseBDI implements ICarryService
 	/**
 	 * 
 	 */
-	@Goal(deliberation=@Deliberation(inhibits=WalkAround.class))
+	@Goal(deliberation=@Deliberation(inhibits=WalkAround.class, cardinalityone=true))
 	public class CarryOre
 	{
 		/** The target. */

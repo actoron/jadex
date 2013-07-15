@@ -845,9 +845,9 @@ public class BDIClassReader extends MicroClassReader
 				inhnames.add(icl.getName());
 			}
 		}
+		boolean cardinalityone = del.cardinalityone();
 		MDeliberation mdel = null;
-//		if(del.cardinality()>0 || inhnames!=null)
-		if(inhnames!=null)
+		if(inhnames!=null || cardinalityone)
 		{
 			// scan for instance delib methods
 			Map<String, MethodInfo> inhms = new HashMap<String, MethodInfo>();
@@ -861,8 +861,7 @@ public class BDIClassReader extends MicroClassReader
 					inhms.put(icl.getName(), new MethodInfo(m));
 				}
 			}
-//			mdel = new MDeliberation(del.cardinality(), inhnames, inhms.isEmpty()? null: inhms);
-			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms);
+			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms, cardinalityone);
 		}
 
 		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
