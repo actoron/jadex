@@ -23,6 +23,7 @@ import jadex.platform.service.message.transport.httprelaymtp.SRelay;
 import jadex.xml.bean.JavaReader;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -344,9 +345,25 @@ public class RelayHandler
 				}
 				catch(Exception e)
 				{
-					// timeout or platform just disconnected
-					System.out.println("message not sent to: "+targetid+", "+(System.currentTimeMillis()-start)+", "+e);
-//					e.printStackTrace();
+					try
+					{
+						// timeout or platform just disconnected
+						System.out.println("message not sent to: "+targetid+", "+(System.currentTimeMillis()-start)+", "+e);
+	
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						byte[] buffer = new byte[8192];
+						int length = 0;
+						while((length=in.read(buffer))!=-1)
+						{
+							baos.write(buffer, 0, length);
+						}
+						System.out.println("message: "+new String(baos.toByteArray()));
+						//					e.printStackTrace();
+					}
+					catch(Exception e2)
+					{
+						
+					}
 				}
 			}
 		}
