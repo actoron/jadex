@@ -170,7 +170,7 @@ public class ImageProvider
 	}
 	
 	/** The singleton instance */
-	protected static ImageProvider instance;
+//	protected static ImageProvider instance;
 	
 	/** The image cache. */
 	protected Map<Object, Image> imagecache = Collections.synchronizedMap(new HashMap<Object, Image>());
@@ -184,7 +184,7 @@ public class ImageProvider
 	/** The icon font used. */
 	protected Font iconfont;
 	
-	protected ImageProvider()
+	public ImageProvider()
 	{
 		try
 		{
@@ -201,22 +201,22 @@ public class ImageProvider
 	/**
 	 *  Gets the singleton instance.
 	 */
-	public static final ImageProvider getInstance()
-	{
-		ImageProvider ret = instance;
-		if (ret == null)
-		{
-			synchronized(ImageProvider.class)
-			{
-				if (instance == null)
-				{
-					instance = new ImageProvider();
-					ret = instance;
-				}
-			}
-		}
-		return ret;
-	}
+//	public static final ImageProvider getInstance()
+//	{
+//		ImageProvider ret = instance;
+//		if (ret == null)
+//		{
+//			synchronized(ImageProvider.class)
+//			{
+//				if (instance == null)
+//				{
+//					instance = new ImageProvider();
+//					ret = instance;
+//				}
+//			}
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Generates a generic flat image icon set in the order off, on, highlight.

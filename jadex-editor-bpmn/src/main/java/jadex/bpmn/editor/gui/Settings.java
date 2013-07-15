@@ -10,7 +10,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.future.SwingResultListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +54,9 @@ public class Settings
 	
 	/** The progress bar for background tasks. */
 	protected BackgroundProgressBar bgprogressbar;
+	
+	/** The image provider. */
+	protected ImageProvider imageprovider = new ImageProvider();
 	
 	/** The last file opened or saved. */
 	protected File lastfile;
@@ -128,6 +130,16 @@ public class Settings
 	public void setProgressBar(BackgroundProgressBar progressbar)
 	{
 		this.bgprogressbar = progressbar;
+	}
+	
+	/**
+	 *  Returns the image provider.
+	 *  
+	 * 	@return The image provider.
+	 */
+	public ImageProvider getImageProvider()
+	{
+		return imageprovider;
 	}
 	
 	/**

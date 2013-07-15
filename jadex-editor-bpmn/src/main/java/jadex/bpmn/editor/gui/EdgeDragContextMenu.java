@@ -48,7 +48,7 @@ public class EdgeDragContextMenu extends JPopupMenu
 		
 		if (defaultitems == null)
 		{
-			ImageProvider imgprov = ImageProvider.getInstance();
+			ImageProvider imgprov = modelcontainer.getSettings().getImageProvider();
 			List<Tuple3<String, String, Icon>> defitems = new ArrayList<Tuple3<String, String, Icon>>();
 			List<Tuple3<String, String, Icon>> ieitems = new ArrayList<Tuple3<String, String, Icon>>();
 			List<Tuple3<String, String, Icon>> eeitems = new ArrayList<Tuple3<String, String, Icon>>();

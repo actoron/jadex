@@ -220,7 +220,7 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 		
 		Action setdefaultparametersaction = new AbstractAction()
 		{
@@ -245,7 +245,7 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 				((ParameterTableModel) paramtable.getModel()).fireTableStructureChanged();
 			}
 		};
-		Icon[] icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), ImageProvider.EMPTY_FRAME_TYPE, "page", buttonpanel.getIconColor());
+		Icon[] icons = modelcontainer.getSettings().getImageProvider().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), ImageProvider.EMPTY_FRAME_TYPE, "page", buttonpanel.getIconColor());
 		defaultparameterbutton.setAction(setdefaultparametersaction);
 		defaultparameterbutton.setIcon(icons[0]);
 		defaultparameterbutton.setPressedIcon(icons[1]);

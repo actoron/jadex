@@ -37,7 +37,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -132,7 +131,7 @@ public class BpmnEditorWindow extends JFrame
 		
 		getContentPane().setLayout(new BorderLayout());
 		
-		bpmntoolbar = new BpmnToolbar(settings.getToolbarIconSize());
+		bpmntoolbar = new BpmnToolbar(settings);
 		//bpmntoolbar.getInfoPanel().setLayout(new BoxLayout(bpmntoolbar.getInfoPanel(), BoxLayout.LINE_AXIS));
 		getContentPane().add(bpmntoolbar, BorderLayout.PAGE_START);
 		
@@ -364,7 +363,7 @@ public class BpmnEditorWindow extends JFrame
 					}
 				});
 				
-				Icon[] icons = ImageProvider.getInstance().
+				Icon[] icons = settings.getImageProvider().
 						generateGenericFlatImageIconSet(16,
 														ImageProvider.THIN_FRAME_TYPE,
 														"invEVT_X",

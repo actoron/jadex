@@ -128,7 +128,7 @@ public class SettingsPanel extends JPanel
 			}
 		});
 		pathbutton.setToolTipText("Add Path");
-		Icon[] icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "folder", Color.BLACK);
+		Icon[] icons = settings.getImageProvider().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "folder", Color.BLACK);
 		pathbutton.setIcon(icons[0]);
 		pathbutton.setPressedIcon(icons[1]);
 		pathbutton.setRolloverIcon(icons[2]);
@@ -220,7 +220,7 @@ public class SettingsPanel extends JPanel
 				}
 			}
 		});
-		icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "user-home", Color.BLACK);
+		icons = settings.getImageProvider().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "user-home", Color.BLACK);
 		projectbutton.setToolTipText("Add Project");
 		projectbutton.setIcon(icons[0]);
 		projectbutton.setPressedIcon(icons[1]);
@@ -248,7 +248,7 @@ public class SettingsPanel extends JPanel
 				}
 			}
 		});
-		icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "folder-forbidden", Color.BLACK);
+		icons = settings.getImageProvider().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "folder-forbidden", Color.BLACK);
 		removebutton.setToolTipText("Remove Paths");
 		removebutton.setIcon(icons[0]);
 		removebutton.setPressedIcon(icons[1]);
@@ -266,7 +266,7 @@ public class SettingsPanel extends JPanel
 				changeaction.actionPerformed(e);
 			}
 		});
-		icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "user-trash", Color.BLACK);
+		icons = settings.getImageProvider().generateGenericFlatImageIconSet(32, ImageProvider.EMPTY_FRAME_TYPE, "user-trash", Color.BLACK);
 		clearbutton.setToolTipText("Clear");
 		clearbutton.setIcon(icons[0]);
 		clearbutton.setPressedIcon(icons[1]);

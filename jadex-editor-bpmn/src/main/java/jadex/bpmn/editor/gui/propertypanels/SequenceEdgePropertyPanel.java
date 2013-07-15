@@ -1,6 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VSequenceEdge;
@@ -146,7 +145,7 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 				}
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;

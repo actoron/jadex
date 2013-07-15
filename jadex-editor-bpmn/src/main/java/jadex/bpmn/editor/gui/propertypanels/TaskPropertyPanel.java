@@ -36,7 +36,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -391,7 +390,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 		Action setDefaultParametersAction = new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -402,7 +401,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		};
 		if (!isSubprocess())
 		{
-			Icon[] icons = ImageProvider.getInstance().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), ImageProvider.EMPTY_FRAME_TYPE, "page", buttonpanel.getIconColor());
+			Icon[] icons = modelcontainer.getSettings().getImageProvider().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), ImageProvider.EMPTY_FRAME_TYPE, "page", buttonpanel.getIconColor());
 			defaultParameterButton.setAction(setDefaultParametersAction);
 			defaultParameterButton.setIcon(icons[0]);
 			defaultParameterButton.setPressedIcon(icons[1]);

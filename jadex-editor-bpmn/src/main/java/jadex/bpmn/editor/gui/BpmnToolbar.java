@@ -24,15 +24,19 @@ public class BpmnToolbar extends AbstractEditingToolbar
 	/** The icon size. */
 	protected int iconsize;
 	
+	/** The settings. */
+	protected Settings settings;
+	
 	/**
 	 *  Creates a new tool bar for editing tools.
 	 *  
 	 *  @param modelcontainer The model container.
 	 */
-	public BpmnToolbar(int iconsize)
+	public BpmnToolbar(Settings settings)
 	{
 		super();
-		this.iconsize = iconsize;
+		this.iconsize = settings.getToolbarIconSize();
+		this.settings = settings;
 		
 		addBpmnTools();
 	}
@@ -57,7 +61,7 @@ public class BpmnToolbar extends AbstractEditingToolbar
 	{
 		long ts = System.currentTimeMillis();
 		
-		ImageProvider imgprovider = ImageProvider.getInstance();
+		ImageProvider imgprovider = settings.getImageProvider();
 		
 		List<IconGenerationTask> tasks = getTaskList(imgprovider, iconsize);
 		

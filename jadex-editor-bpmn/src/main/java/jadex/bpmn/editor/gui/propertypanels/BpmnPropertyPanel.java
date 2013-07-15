@@ -1,6 +1,5 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.bpmn.editor.gui.ImageProvider;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
@@ -354,7 +353,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.fill = GridBagConstraints.NONE;
@@ -444,7 +443,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 			}
 		};
-		JPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		JPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -592,7 +591,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			}
 		}
 		
-		JPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		JPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -660,7 +659,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				}
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -771,7 +770,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;
@@ -871,7 +870,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		};
-		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(ImageProvider.getInstance(), addaction, removeaction);
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
 		gc = new GridBagConstraints();
 		gc.gridx = 1;
 		gc.gridy = 1;

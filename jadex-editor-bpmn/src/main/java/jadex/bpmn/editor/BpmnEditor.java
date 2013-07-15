@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
@@ -32,7 +31,7 @@ import com.mxgraph.view.mxStylesheet;
 public class BpmnEditor
 {
 	/** Current version. */
-	public static final int BUILD = 64;
+	public static final int BUILD = 65;
 	
 	/** Console logging flag. */
 	public static final boolean CONSOLE_LOGGING = false;
