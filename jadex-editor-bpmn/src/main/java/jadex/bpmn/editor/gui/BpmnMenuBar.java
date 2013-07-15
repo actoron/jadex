@@ -106,7 +106,11 @@ public class BpmnMenuBar extends JMenuBar
 								}
 							}));
 						}
-							
+						
+						for (ModelContainer container : editorwindow.getModelContainers())
+						{
+							container.getGraphComponent().refresh();
+						}
 					}
 				});
 				
