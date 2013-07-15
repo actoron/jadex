@@ -381,6 +381,17 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		JScrollPane tablescrollpane = new JScrollPane(conftable);
 		tablepanel.add(tablescrollpane, gc);
 		
+		conftable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				if (paramtable != null)
+				{
+					((ParameterTableModel) paramtable.getModel()).fireTableStructureChanged();
+				}
+			}
+		});
+		
 		Action addaction = new AbstractAction("Add Configuration")
 		{
 			public void actionPerformed(ActionEvent e)
@@ -510,7 +521,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			for (ConfigurationInfo conf : getModelInfo().getConfigurations())
 			{
 				//UnparsedExpression exp = model.getContextVariableExpression(cvname, conf.getName());
-				UnparsedExpression exp = cv.getValue(conf.getName());
+				UnparsedExpression exp = cv.getConfigValue(conf.getName());
 				if (exp != null)
 				{
 					cparam.inivals.put(conf.getName(), exp.getValue());
@@ -888,24 +899,36 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	{
 		String defval = param.inivals.get(null);
 		
+		if (!param.arg && !param.res && getModel().getContextVariable(param.name) == null)
+		{
+			MContextVariable cv = new MContextVariable(param.name, param.desc, param.type, defval);
+			getModel().addContextVariable(cv);
+		}
+		
 		for (ConfigurationInfo conf : confcache)
 		{
 			if (param.inivals.containsKey(conf.getName()))
 			{
 				String inival = param.inivals.get(conf.getName());
-				
-				if (param.arg)
+				UnparsedExpression exp = new UnparsedExpression(param.name, param.type, inival, null);
+				if (param.arg || param.res)
 				{
-					conf.addArgument(new UnparsedExpression(param.name, param.type, inival, null));
+					if (param.arg)
+					{
+						conf.addArgument(exp);
+					}
+					if (param.res)
+					{
+						conf.addResult(exp);
+					}
 				}
-				if (param.res)
+				else
 				{
-					conf.addResult(new UnparsedExpression(param.name, param.type, inival, null));
+					MContextVariable cv = getModel().getContextVariable(param.name);
+					cv.setValue(conf.getName(), exp);
 				}
 			}
 		}
-		
-		
 		
 		if (param.arg)
 		{
@@ -916,13 +939,6 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		if (param.res)
 		{
 			getModelInfo().addResult(new Argument(param.name, param.desc, param.type, defval));
-		}
-		
-		if (!param.arg && !param.res)
-		{
-			MContextVariable cv = new MContextVariable(param.name, param.desc, param.type, defval);
-			getModel().addContextVariable(cv);
-			//getModel().addContextVariable(param.name, new ClassInfo(param.type), new UnparsedExpression(param.name, param.type, defval, null), param.inivals);
 		}
 		
 		if (index != null)

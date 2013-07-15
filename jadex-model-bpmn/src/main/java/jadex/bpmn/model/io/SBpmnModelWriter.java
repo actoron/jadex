@@ -39,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 22;
+	public static final int BUILD = 23;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -541,7 +541,7 @@ public class SBpmnModelWriter
 				for (int i = 0; i < configurations.length; ++i)
 				{
 					//UnparsedExpression cexp = mmodel.getContextVariableExpression(ctvname, configurations[i].getName());
-					UnparsedExpression cexp = ctv.getValue(configurations[i].getName());
+					UnparsedExpression cexp = ctv.getConfigValue(configurations[i].getName());
 					if (cexp != null && cexp.getValue() != null && cexp.getValue().length() > 0)
 					{
 						Map<String, String> confctvs = ctvconfexp.get(configurations[i].getName());
@@ -615,7 +615,7 @@ public class SBpmnModelWriter
 					out.println("</jadex:poollane>");
 				}
 				
-				if (conf.getArguments().length > 0 || conf.getResults().length > 0 || ctvconfexp.containsKey(conf))
+				if (conf.getArguments().length > 0 || conf.getResults().length > 0 || ctvconfexp.containsKey(conf.getName()))
 				{
 					UnparsedExpression[] args = conf.getArguments();
 					if (args.length > 0)

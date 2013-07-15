@@ -45,7 +45,18 @@ public class MContextVariable extends Argument
 	 */
 	public UnparsedExpression getValue(String config)
 	{
-		return configinitialvalues != null? configinitialvalues.get(config) : this;
+		return configinitialvalues != null? configinitialvalues.get(config) != null? configinitialvalues.get(config) : this : this;
+	}
+	
+	/**
+	 *  Get the value for a specific configuration only.
+	 *  
+	 *  @param config The configuration.
+	 *  @return The expression.
+	 */
+	public UnparsedExpression getConfigValue(String config)
+	{
+		return configinitialvalues != null? configinitialvalues.get(config) : null;
 	}
 	
 	/**
