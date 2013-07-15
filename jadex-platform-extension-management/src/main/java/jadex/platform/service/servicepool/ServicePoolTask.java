@@ -59,7 +59,14 @@ public class ServicePoolTask implements ITask
 	//-------- constants --------
 	
 	/** Parameter for mappings. */
-	public static final String PROPERTY_MAPPINGS	= "mappings"; 
+	public static final String PROPERTY_OLD_MAPPINGS	= "mappings";
+	
+	/** Parameter for class infos. */
+	public static final String PROPERTY_CLASS_INFOS	= "classinfos";
+	/** Parameter for file infos. */
+	public static final String PROPERTY_FILE_INFOS	= "fileinfos";
+	/** Parameter for monitoring flags. */
+	public static final String PROPERTY_MONITORINGS	= "monitorings";
 	
 	//-------- ITask interface --------
 	
@@ -90,15 +97,20 @@ public class ServicePoolTask implements ITask
 						{
 							public void customResultAvailable(IServicePoolService sps)
 							{
-								String[] maps = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_MAPPINGS);
-								if(maps!=null && maps.length>0)
+								String[] oldmaps = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_OLD_MAPPINGS);
+								String[] classinfos = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_CLASS_INFOS);
+								String[] fileinfos = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_FILE_INFOS);
+								Boolean[] monitorings = (Boolean[])context.getActivity().getParsedPropertyValue(PROPERTY_MONITORINGS);
+								List<MappingEntry> mappingentries = getMappingEntries(oldmaps, classinfos, fileinfos, monitorings);
+								
+								if(mappingentries.size() > 0)
 								{
-									CounterResultListener<Void> lis = new CounterResultListener<Void>(maps.length/2, new DelegationResultListener<Void>(ret));
-									for(int i=0; i<maps.length; i++)
+									CounterResultListener<Void> lis = new CounterResultListener<Void>(mappingentries.size(), new DelegationResultListener<Void>(ret));
+									for(MappingEntry mentry : mappingentries)
 									{
-										ClassInfo ci = maps[i]==null? null: new ClassInfo(maps[i++]);
-										String fi = maps[i]==null? null: maps[i];
-										sps.addServiceType(ci.getType(process.getClassLoader(), process.getModel().getAllImports()), fi).addResultListener(lis);
+										CreationInfo cinfo = new CreationInfo();
+										cinfo.setMonitoring(mentry.isMonitoring());
+										sps.addServiceType(mentry.getClassinfo().getType(process.getClassLoader(), process.getModel().getAllImports()), mentry.getFileinfo()).addResultListener(lis);
 									}
 								}
 								else
@@ -125,6 +137,99 @@ public class ServicePoolTask implements ITask
 		return IFuture.DONE;
 	}
 	
+	public static final String generateExpressionString(int colnum, List<MappingEntry> entries)
+	{
+		StringBuffer buf = new StringBuffer();
+		if (colnum == 2)
+		{
+			buf.append("new Boolean[]{");
+		}
+		else
+		{
+			buf.append("new String[]{");
+		}
+		if(entries.size()>0)
+		{
+			for(MappingEntry entry : entries)
+			{
+				Object ent = null;
+				switch (colnum)
+				{
+					case 0:
+					default:
+						ent = entry.getClassinfo() != null? entry.getClassinfo().getTypeName() : null;
+						break;
+					case 1:
+						ent = entry.getFileinfo();
+						break;
+					case 2:
+						ent = entry.isMonitoring();
+						break;
+				}
+				if (colnum == 2)
+				{
+					if (ent == null)
+					{
+						buf.append("null");
+					}
+					else
+					{
+						buf.append(ent.toString());
+					}
+				}
+				else
+				{
+					buf.append("\"").append(ent==null? "null": String.valueOf(ent)).append("\"");
+				}
+//				if(i+1<entries.size())
+				buf.append(",");
+			}
+			buf.replace(buf.length() - 1, buf.length(), "}");
+//			buf.append("}");
+		}
+		
+		
+		return buf.toString();
+	}
+	
+	/**
+	 *  Retrieve mapping entries.
+	 */
+	public static final List<MappingEntry> getMappingEntries(String[] oldmaps, String[] classinfos, String[] fileinfos, Boolean[] monitorings)
+	{
+		List<MappingEntry> mappingentries = new ArrayList<ServicePoolTask.MappingEntry>();
+		
+		if (oldmaps != null && oldmaps.length > 0)
+		{
+			for (int i = 0; i < oldmaps.length; ++i)
+			{
+				ClassInfo ci = oldmaps[i]==null? null: new ClassInfo(oldmaps[i++]);
+				String fi = oldmaps[i]==null? null: oldmaps[i];
+				mappingentries.add(new MappingEntry(ci, fi, null));
+			}
+		}
+		
+		if (classinfos != null && classinfos.length > 0)
+		{
+			for (int i = 0; i < classinfos.length; ++i)
+			{
+				ClassInfo ci = classinfos[i]==null? null: new ClassInfo(classinfos[i]);
+				String fi = null;
+				if (fileinfos != null && fileinfos.length > i && fileinfos[i] != null)
+				{
+					fi = fileinfos[i];
+				}
+				Boolean mon = null;
+				if (monitorings != null && monitorings.length > i && monitorings[i] != null)
+				{
+					mon = monitorings[i];
+				}
+				mappingentries.add(new MappingEntry(ci, fi, mon));
+			}
+		}
+		return mappingentries;
+	}
+	
 	/**
 	 *  The swing gui for the service task.
 	 */
@@ -148,7 +253,6 @@ public class ServicePoolTask implements ITask
 			this.task = task;
 			
 			panel = new JPanel(new GridBagLayout());
-			
 			final MappingsTableModel tm = new MappingsTableModel();
 			final JTable table = new JTable(tm);
 			panel.add(new JScrollPane(table), new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHEAST, GridBagConstraints.BOTH, new Insets(0,5,5,0), 0, 0));
@@ -174,26 +278,52 @@ public class ServicePoolTask implements ITask
 //			final JComboBox box = new JComboBox(container.getInterfaces().toArray());
 //			box.setEditable(true);
 			
-			MProperty mprop = task.getProperties().get(PROPERTY_MAPPINGS);
-			if(mprop.getInitialValue()!=null)
+			MProperty mprop = task.getProperties().removeKey(PROPERTY_OLD_MAPPINGS);
+			String[] oldmaps = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
+			mprop = task.getProperties().removeKey(PROPERTY_CLASS_INFOS);
+			String[] classinfos = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
+			mprop = task.getProperties().removeKey(PROPERTY_FILE_INFOS);
+			String[] fileinfos = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
+			mprop = task.getProperties().removeKey(PROPERTY_MONITORINGS);
+			Boolean[] monitorings = mprop == null ? null : mprop.getInitialValue()!=null ? (Boolean[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
+			
+			List<MappingEntry> mappingentries = getMappingEntries(oldmaps, classinfos, fileinfos, monitorings);
+			if(mappingentries.size() > 0)
 			{
-				String[] vals = (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null);
-				if(vals!=null)
+				for(MappingEntry mentry : mappingentries)
 				{
-					for(int i=0; i<vals.length; i++)
-					{
-						ClassInfo ci = vals[i]==null? null: new ClassInfo(vals[i++]);
-						String fi = vals[i]==null? null: vals[i];
-						tm.addEntry(new Object[]{ci, fi});
-					}
+					tm.addEntry(mentry);
 				}
 			}
+			UnparsedExpression uexp = new UnparsedExpression(null, 
+					String[].class, generateExpressionString(0, mappingentries), null);
+			task.setPropertyValue(PROPERTY_CLASS_INFOS, uexp);
+			uexp = new UnparsedExpression(null, 
+					String[].class, generateExpressionString(1, mappingentries), null);
+			task.setPropertyValue(PROPERTY_FILE_INFOS, uexp);
+			uexp = new UnparsedExpression(null, 
+					String[].class, generateExpressionString(2, mappingentries), null);
+			task.setPropertyValue(PROPERTY_MONITORINGS, uexp);
+			
+//			if(mprop.getInitialValue()!=null)
+//			{
+//				String[] vals = (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null);
+//				if(vals!=null)
+//				{
+//					for(int i=0; i<vals.length; i++)
+//					{
+//						ClassInfo ci = vals[i]==null? null: new ClassInfo(vals[i++]);
+//						String fi = vals[i]==null? null: vals[i];
+//						tm.addEntry(new Object[]{ci, fi});
+//					}
+//				}
+//			}
 			
 			Action addaction = new AbstractAction("Add")
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					tm.addEntry(new Object[2]);
+					tm.addEntry(new MappingEntry());
 					modelcontainer.setDirty(true);
 				}
 			};
@@ -237,9 +367,13 @@ public class ServicePoolTask implements ITask
 		 */
 		protected class MappingsTableModel extends AbstractTableModel
 		{
-			protected String[] colnames = new String[]{"Service Interface", "Component Filename"};
+			protected String[] colnames = new String[]{"Service Interface", "Component Filename", "Monitoring"};
 			
-			protected List<Object[]> entries = new ArrayList<Object[]>();
+			protected List<MappingEntry> entries = new ArrayList<MappingEntry>();
+			
+			public MappingsTableModel()
+			{
+			}
 			
 			/**
 			 *  Gets the column name.
@@ -248,6 +382,18 @@ public class ServicePoolTask implements ITask
 			public String getColumnName(int column)
 			{
 				return colnames[column];
+			}
+			
+			/**
+			 *  Gets the column class.
+			 */
+			public Class<?> getColumnClass(int columnIndex)
+			{
+				if (columnIndex == 2)
+				{
+					return Boolean.class;
+				}
+				return super.getColumnClass(columnIndex);
 			}
 			
 			/**
@@ -276,7 +422,7 @@ public class ServicePoolTask implements ITask
 			 */
 			public int getColumnCount()
 			{
-				return 2;
+				return 3;
 			}
 			
 			/**
@@ -287,7 +433,29 @@ public class ServicePoolTask implements ITask
 			 */
 			public Object getValueAt(int rowIndex, int columnIndex)
 			{
-				return entries.get(rowIndex)[columnIndex];
+				Object ret = null;
+				switch (columnIndex)
+				{
+					case 0:
+					default:
+					{
+						ClassInfo ci = entries.get(rowIndex).getClassinfo();
+//						String type = ci != null ? ci.getTypeName() != null? ci.getTypeName() : "" : "";
+						ret = ci;
+						break;
+					}
+					case 1:
+					{
+						ret = entries.get(rowIndex).getFileinfo();
+						break;
+					}
+					case 2:
+					{
+						ret = entries.get(rowIndex).isMonitoring();
+						break;
+					}
+				}
+				return ret;
 			}
 			
 			/**
@@ -301,41 +469,95 @@ public class ServicePoolTask implements ITask
 //				if(value!=null)
 //					System.out.println("setValue: "+value+" "+value.getClass());
 				
-				Object[] val;
-				if(rowIndex<entries.size())
-				{
-					val = entries.get(rowIndex);
-				}
-				else
-				{
-					val = new Object[2];
-					entries.add(val);
-				}
-
-				val[columnIndex] = value;
+				MappingEntry val = entries.get(rowIndex);
+//				if(rowIndex<entries.size())
+//				{
+//					val = entries.get(rowIndex);
+//				}
+//				else
+//				{
+//					val = new Object[2];
+//					entries.add(val);
+//				}
 				
-				MProperty mprop = task.getProperties().get(PROPERTY_MAPPINGS);
-				
-				StringBuffer buf = new StringBuffer();
-				buf.append("new String[]{");
-				if(entries.size()>0)
+				switch (columnIndex)
 				{
-					for(int i=0; i<entries.size(); i++)
+					case 0:
+					default:
 					{
-						Object[] entry = entries.get(i);
-						buf.append("\"").append(entry[0]==null? "null": ((ClassInfo)entry[0]).getTypeName()).append("\",");
-						buf.append("\"").append(entry[1]==null? "null": (String)entry[1]).append("\"");
-						if(i+1<entries.size())
-							buf.append(",");
+//						if (value instanceof String && ((String) value).length() > 0)
+						if (value instanceof ClassInfo)
+						{
+							val.setClassinfo((ClassInfo) value);
+						}
+						else
+						{
+							val.setClassinfo(null);
+						}
+						
+						UnparsedExpression uexp = new UnparsedExpression(null, 
+								String[].class, generateExpressionString(columnIndex, entries), null);
+						task.setPropertyValue(PROPERTY_CLASS_INFOS, uexp);
+						break;
+					}
+					case 1:
+					{
+						if (value instanceof String && ((String) value).length() > 0)
+						{
+							val.setFileinfo((String) value);
+						}
+						else
+						{
+							val.setFileinfo(null);
+						}
+						
+						UnparsedExpression uexp = new UnparsedExpression(null, 
+								String[].class, generateExpressionString(columnIndex, entries), null);
+						task.setPropertyValue(PROPERTY_FILE_INFOS, uexp);
+						break;
+					}
+					case 2:
+					{
+						if (value != null)
+						{
+							val.setMonitoring((Boolean) value);
+						}
+						else
+						{
+							val.setMonitoring(null);
+						}
+						
+						UnparsedExpression uexp = new UnparsedExpression(null, 
+								String[].class, generateExpressionString(columnIndex, entries), null);
+						task.setPropertyValue(PROPERTY_MONITORINGS, uexp);
+						break;
 					}
 				}
-				buf.append("}");
+
+//				val[columnIndex] = value;
+				
+//				MProperty mprop = task.getProperties().get(PROPERTY_MAPPINGS);
+//				
+//				StringBuffer buf = new StringBuffer();
+//				buf.append("new String[]{");
+//				if(entries.size()>0)
+//				{
+//					for(int i=0; i<entries.size(); i++)
+//					{
+//						Object[] entry = entries.get(i);
+//						buf.append("\"").append(entry[0]==null? "null": ((ClassInfo)entry[0]).getTypeName()).append("\",");
+//						buf.append("\"").append(entry[1]==null? "null": (String)entry[1]).append("\"");
+//						if(i+1<entries.size())
+//							buf.append(",");
+//					}
+//				}
+//				buf.append("}");
 				
 //				System.out.println(buf.toString());
 				
-				UnparsedExpression uexp = new UnparsedExpression(null, 
-					String[].class, buf.toString(), null);
-				mprop.setInitialValue(uexp);
+//				UnparsedExpression uexp = new UnparsedExpression(null, 
+//					String[].class, buf.toString(), null);
+//				mprop.setInitialValue(uexp);
 				
 				modelcontainer.setDirty(true);
 				fireTableCellUpdated(rowIndex, columnIndex);
@@ -344,7 +566,7 @@ public class ServicePoolTask implements ITask
 			/**
 			 * 
 			 */
-			protected void addEntry(Object[] entry)
+			protected void addEntry(MappingEntry entry)
 			{
 				entries.add(entry);
 				fireTableRowsInserted(entries.size()-1, entries.size()-1);
@@ -371,6 +593,54 @@ public class ServicePoolTask implements ITask
 					fireTableRowsDeleted(rows[i], rows[i]);
 				}
 			}
+		}
+	}
+	
+	protected static class MappingEntry
+	{
+		protected ClassInfo classinfo;
+		protected String fileinfo;
+		protected Boolean monitoring;
+		
+		public MappingEntry()
+		{
+		}
+		
+		public MappingEntry(ClassInfo classinfo, String fileinfo, Boolean monitoring)
+		{
+			this.classinfo = classinfo;
+			this.fileinfo = fileinfo;
+			this.monitoring = monitoring;
+		}
+
+		public ClassInfo getClassinfo()
+		{
+			return classinfo;
+		}
+
+		public String getFileinfo()
+		{
+			return fileinfo;
+		}
+
+		public void setClassinfo(ClassInfo classinfo)
+		{
+			this.classinfo = classinfo;
+		}
+
+		public void setFileinfo(String fileinfo)
+		{
+			this.fileinfo = fileinfo;
+		}
+
+		public void setMonitoring(Boolean monitoring)
+		{
+			this.monitoring = monitoring;
+		}
+
+		public Boolean isMonitoring()
+		{
+			return monitoring;
 		}
 	}
 	
