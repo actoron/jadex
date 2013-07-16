@@ -243,14 +243,24 @@ public abstract class AbstractPlanBody implements IPlanBody
 		List<Object> vals = new ArrayList<Object>();
 		vals.add(reason);
 		if(pojope!=null)
+		{
 			vals.add(pojope);
+		}
 		vals.add(rplan);
 		if(rplan.getException()!=null)
+		{
 			vals.add(rplan.getException());
+		}
 		
 		SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
 		
-		return g.guessParameters(ptypes);
+		Object[]	ret	= g.guessParameters(ptypes);
+		for(int i=0; i<ret.length; i++)
+		{
+			ret[i]	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).adaptToCapability(ret[i], rplan.getModelElement());
+		}
+		
+		return ret;
 	}
 
 	/**
