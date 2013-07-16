@@ -82,6 +82,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1674,6 +1675,81 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 *  Get possible values for injection into method calls.
+	 */
+	protected Collection<Object>	getInjectionValues(MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
+	{
+		Collection<Object> vals = new LinkedHashSet<Object>();
+		
+		// Find capability based on model element (or use agent).
+		String	capaname	= null;
+		if(melement!=null)
+		{
+			int idx = melement.getName().lastIndexOf(CAPABILITY_SEPARATOR);
+			if(idx!=-1)
+			{
+				capaname = melement.getName().substring(0, idx);
+			}
+		}
+		Object capa = capaname!=null ? getCapabilityObject(capaname)
+			: getAgent() instanceof PojoBDIAgent? ((PojoBDIAgent)getAgent()).getPojoAgent(): getAgent();
+		vals.add(capa);
+		vals.add(new CapabilityWrapper((BDIAgent)getAgent(), capa, capaname));
+		vals.add(getExternalAccess());
+
+		
+		// Add event values
+		if(event!=null)
+		{
+			vals.add(event);
+			vals.add(event.getValue());
+		}
+
+		// Todo: cond result!?
+		
+
+		// Add plan values if any.
+		if(rplan!=null)
+		{
+			Object reason = rplan.getReason();
+			if(reason instanceof RProcessableElement && rpe==null)
+			{
+				rpe	= (RProcessableElement)reason;
+			}
+			
+			vals.add(reason);
+			vals.add(rplan);
+			if(rplan.getException()!=null)
+			{
+				vals.add(rplan.getException());
+			}
+		}
+		
+		// Add processable element values if any (for plan and APL).
+		if(rpe!=null)
+		{
+			vals.add(rpe);
+			if(rpe.getPojoElement()!=null)
+			{
+				vals.add(rpe.getPojoElement());
+			}
+		}
+
+		// Adapt values (e.g. change events) to capability.
+		if(melement!=null)
+		{
+			Collection<Object>	tmp	= vals;
+			vals = new LinkedHashSet<Object>();
+			for(Object val: tmp)
+			{
+				vals.add(adaptToCapability(val, melement));
+			}
+		}
+		
+		return vals;
 	}
 	
 	/**

@@ -1,17 +1,14 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SReflect;
 import jadex.commons.SimpleMethodParameterGuesser;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  *  Abstract base class for plan body implementations.
@@ -235,32 +232,12 @@ public abstract class AbstractPlanBody implements IPlanBody
 		if(ptypes==null)
 			return null;
 		
-		Object reason = rplan.getReason();
-		Object pojope = null;
-		if(reason instanceof RProcessableElement)
-			pojope = ((RProcessableElement)reason).getPojoElement();
-		
-		List<Object> vals = new ArrayList<Object>();
-		vals.add(reason);
-		if(pojope!=null)
-		{
-			vals.add(pojope);
-		}
-		vals.add(rplan);
-		if(rplan.getException()!=null)
-		{
-			vals.add(rplan.getException());
-		}
+		Collection<Object>	vals	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
+			.getInjectionValues(rplan.getModelElement(), null, rplan, null);
 		
 		SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
 		
-		Object[]	ret	= g.guessParameters(ptypes);
-		for(int i=0; i<ret.length; i++)
-		{
-			ret[i]	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).adaptToCapability(ret[i], rplan.getModelElement());
-		}
-		
-		return ret;
+		return g.guessParameters(ptypes);
 	}
 
 	/**

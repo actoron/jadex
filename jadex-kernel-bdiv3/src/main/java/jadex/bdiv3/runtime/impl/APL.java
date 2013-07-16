@@ -315,9 +315,8 @@ public class APL
 				{
 					m.setAccessible(true);
 					
-					List<Object> vals = new ArrayList<Object>();
-					vals.add(element);
-					vals.add(element.getPojoElement());
+					Collection<Object>	vals	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
+						.getInjectionValues(element.getModelElement(), null, null, element);
 					IMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
 					
 					Object app = m.invoke(pojo, g.guessParameters(m.getParameterTypes()));
