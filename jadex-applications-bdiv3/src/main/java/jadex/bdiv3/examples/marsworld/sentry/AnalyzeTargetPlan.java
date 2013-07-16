@@ -59,7 +59,7 @@ public class AnalyzeTargetPlan
 		try
 		{
 			Future<Void> fut = new Future<Void>();
-			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut);
+			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 			ISpaceObject	myself	= sentry.getMoveCapa().getMyself();
 			Map props = new HashMap();
 			props.put(AnalyzeTargetTask.PROPERTY_TARGET, target);

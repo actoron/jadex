@@ -1076,14 +1076,18 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
-								if(executeGoalMethod(m, goal, event))
+								if(!RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
+									 && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
 								{
-	//								System.out.println("Goal dropping triggered: "+goal);
-	//								rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
-									if(!goal.isFinished())
+									if(executeGoalMethod(m, goal, event))
 									{
-										goal.setException(new GoalFailureException("drop condition: "+m.getName()));
-										goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.FAILED);
+//										System.out.println("Goal dropping triggered: "+goal);
+		//								rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
+										if(!goal.isFinished())
+										{
+											goal.setException(new GoalFailureException("drop condition: "+m.getName()));
+											goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.FAILED);
+										}
 									}
 								}
 							}
@@ -1091,8 +1095,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							return IFuture.DONE;
 						}
 					});
-					rule.setEvents(cond.getEvents());
+					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
+//					rule.setEvents(cond.getEvents());
+//					getRuleSystem().getRulebase().addRule(rule);
 				}
 			}
 			
@@ -1110,7 +1118,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 							for(RGoal goal: getCapability().getGoals(mgoal))
 							{
-								if(!RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState()))
+								if(!RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState())
+								  && !RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
+								  && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
 								{	
 									if(!executeGoalMethod(m, goal, event))
 									{
@@ -1124,8 +1134,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							return IFuture.DONE;
 						}
 					});
-					rule.setEvents(cond.getEvents());
+					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
+					
+//					rule.setEvents(cond.getEvents());
+//					getRuleSystem().getRulebase().addRule(rule);
 					
 					rule = new Rule<Void>(mgoal.getName()+"_goal_option", 
 						new GoalsExistCondition(mgoal, capa), new IAction<Void>()
@@ -1149,8 +1164,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							return IFuture.DONE;
 						}
 					});
-					rule.setEvents(cond.getEvents());
+					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
+					
+//					rule.setEvents(cond.getEvents());
+//					getRuleSystem().getRulebase().addRule(rule);
 				}
 			}
 			
@@ -1601,8 +1619,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// Start rule system
 		inited	= true;
 	
-		if(getComponentIdentifier().getName().indexOf("Sentry")!=-1)
-			getCapability().dumpGoalsPeriodically(getInternalAccess());
+//		if(getComponentIdentifier().getName().indexOf("Sentry")!=-1)
+//			getCapability().dumpGoalsPeriodically(getInternalAccess());
 //		getCapability().dumpPlansPeriodically(getInternalAccess());
 		
 //		}

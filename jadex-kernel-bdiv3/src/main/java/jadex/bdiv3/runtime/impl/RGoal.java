@@ -160,6 +160,9 @@ public class RGoal extends RProcessableElement implements IGoal
 		if(getProcessingState().equals(processingstate))
 			return;
 		
+//		if(GoalProcessingState.FAILED.equals(processingstate))
+//			System.out.println("failed: "+this);
+		
 		if(GoalProcessingState.FAILED.equals(getProcessingState())
 			|| GoalProcessingState.SUCCEEDED.equals(getProcessingState()))
 		{
@@ -267,6 +270,11 @@ public class RGoal extends RProcessableElement implements IGoal
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
+		if(GoalLifecycleState.DROPPED.equals(getLifecycleState()))
+			throw new RuntimeException("Final proc state cannot be changed: "+getLifecycleState()+" "+lifecyclestate);
+		if(GoalLifecycleState.DROPPING.equals(getLifecycleState()) && !GoalLifecycleState.DROPPED.equals(lifecyclestate))
+			throw new RuntimeException("Final proc state cannot be changed: "+getLifecycleState()+" "+lifecyclestate);
+		
 //		System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 //		if(RGoal.GOALLIFECYCLESTATE_DROPPING.equals(lifecyclestate) && RGoal.GOALLIFECYCLESTATE_NEW.equals(getLifecycleState()))
 //			Thread.dumpStack();
@@ -315,7 +323,6 @@ public class RGoal extends RProcessableElement implements IGoal
 			abortPlans();
 			setProcessingState(ia, GoalProcessingState.IDLE);
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALOPTION, this));
-			
 		}
 		else if(GoalLifecycleState.SUSPENDED.equals(lifecyclestate))
 		{

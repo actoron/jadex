@@ -234,7 +234,7 @@
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								20000 + $properties.clock.getTime()
+								90000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target">

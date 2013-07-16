@@ -79,9 +79,9 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 		@GoalCreationCondition(events="movecapa.mytargets")
 		public static AnalyzeTarget checkCreate(SentryBDI outer, ISpaceObject target, IEvent event)
 		{
-			if(target==null)
+			if(target==null)// ||  outer.getMoveCapa().isMissionend())
 				return null;
-//				System.out.println("here:: "+event);
+//			System.out.println(":: "+event);
 			
 			AnalyzeTarget ret = null;
 			if(target.getProperty("state").equals("unknown"))
@@ -129,7 +129,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 		@GoalDropCondition(events="movecapa.missionend")
 		public boolean checkDrop()
 		{
-			System.out.println("dropping: "+this+" "+outer.getMoveCapa().isMissionend());
+//			System.out.println("dropping: "+this+" "+outer.getMoveCapa().isMissionend());
 			return outer.getMoveCapa().isMissionend();
 		}
 
