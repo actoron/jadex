@@ -258,7 +258,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			{
 //				executeInitStep2();
 				// Initialize context variables.
-				variables.put("$interpreter", this);
+				variables.put("$interpreter", BpmnInterpreter.this);
 				init(getModel(), getConfiguration(), arguments)
 					.addResultListener(createResultListener(new DelegationResultListener<Void>(inited)
 				{
