@@ -10,7 +10,7 @@ public interface IMethodParameterGuesser
 	 *  Guess the parameters of a method call. 
 	 *  @return The parameters.
 	 */
-	public Object[] guessParameters();
+	public Object[] guessParameters(Class<?>[] ptypes);
 	
 	/**
 	 *  Get the parameter guesser.

@@ -12,30 +12,29 @@ public class SimpleMethodParameterGuesser implements IMethodParameterGuesser
 	/** The parameter guesser. */
 	protected IParameterGuesser pguesser;
 
-	/** The parameter types. */
-	protected Class<?>[] ptypes;
+//	/** The parameter types. */
+//	protected Class<?>[] ptypes;
 	
 	/**
 	 *  Create a new guesser.
 	 */
-	public SimpleMethodParameterGuesser(Class<?>[] ptypes, Collection<?> vals)
+	public SimpleMethodParameterGuesser(Collection<?> vals)//Class<?>[] ptypes, Collection<?> vals)
 	{
-		this(ptypes, new SimpleParameterGuesser(vals));
+		this(new SimpleParameterGuesser(vals));
 	}
 	
 	/**
 	 *  Create a new guesser.
 	 */
-	public SimpleMethodParameterGuesser(Class<?>[] ptypes, IParameterGuesser pguesser)
+	public SimpleMethodParameterGuesser(IParameterGuesser pguesser)
 	{
-		this.ptypes = ptypes;
 		this.pguesser = pguesser;
 	}
 	
 	/**
 	 *  Guess the parameters of a method call. 
 	 */
-	public Object[] guessParameters()
+	public Object[] guessParameters(Class<?>[] ptypes)
 	{
 		Object[] ret = null;
 		

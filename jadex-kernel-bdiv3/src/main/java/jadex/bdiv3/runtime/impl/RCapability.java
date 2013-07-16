@@ -352,6 +352,14 @@ public class RCapability extends RElement
 			for(RGoal goal: goals)
 			{
 				System.out.println(goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState()+" "+goal.getParentPlan());
+//				if(goal.getInhibitors()!=null)
+//				{
+//					for(RGoal g: goal.getInhibitors())
+//					{
+//						System.out.print(g+" "+g.getLifecycleState()+" "+g.getProcessingState());
+//					}
+//					System.out.println();
+//				}
 				System.out.println(goal.getInhibitors());
 				System.out.println("--------");
 			}

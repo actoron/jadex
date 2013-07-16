@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Capability
 @Plans({
-	@Plan(trigger=@Trigger(goals=MovementCapability.Move.class), body=@Body(MoveToLocationPlan.class)),
+	@Plan(trigger=@Trigger(goals={MovementCapability.Move.class, MovementCapability.Missionend.class}), body=@Body(MoveToLocationPlan.class)),
 	@Plan(trigger=@Trigger(goals=MovementCapability.WalkAround.class), body=@Body(RandomWalkPlan.class))
 })
 @RequiredServices(@RequiredService(name="clockser", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
@@ -61,7 +61,7 @@ public class MovementCapability
 	 *  Move to a certain location.
 	 */
 	@Goal
-	public class Move
+	public class Move implements IDestinationGoal
 	{
 		/** The destination. */
 		protected IVector2 destination;
@@ -107,8 +107,19 @@ public class MovementCapability
 	 *  Move to homebase on end.
 	 */
 	@Goal(unique=true)
-	public static class Missionend
+	public static class Missionend implements IDestinationGoal
 	{
+		/** The movement capability. */
+		protected MovementCapability capa;
+		
+		/**
+		 *  Create a new goal.
+		 */
+		public Missionend(MovementCapability capa)
+		{
+			this.capa = capa;
+		}
+		
 		/**
 		 *  Create a new Move. 
 		 */
@@ -116,6 +127,15 @@ public class MovementCapability
 		public static boolean checkCreate(MovementCapability capa)
 		{
 			return capa.missionend && !capa.myself.getProperty("position").equals(capa.getHomebasePosition());
+		}
+		
+		/**
+		 *  Get the destination.
+		 *  @return The destination.
+		 */
+		public IVector2 getDestination()
+		{
+			return capa.getHomebasePosition();
 		}
 	}
 

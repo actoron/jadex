@@ -281,8 +281,9 @@ public class RGoal extends RProcessableElement implements IGoal
 //			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 //		if(getId().indexOf("AchieveCleanup")!=-1)
 //			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
-		if(getId().indexOf("Analyze")!=-1)
-			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
+//		if(getId().indexOf("Analyze")!=-1)
+//		if(ia.getExternalAccess().getComponentIdentifier().getLocalName().indexOf("Sentry")!=-1)
+//			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		setLifecycleState(lifecyclestate);
@@ -518,7 +519,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		}
 		
 //		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
-			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
+//			System.out.println("add inhibit: "+getId()+" "+inhibitor.getId()+" "+inhibitors);
 	}
 	
 	/**
@@ -535,7 +536,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		{
 			if(inhibitors.remove(inhibitor) && inhibitors.size()==0)
 			{
-				System.out.println("goal not inhibited: "+this);
+//				System.out.println("goal not inhibited: "+this);
 				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALNOTINHIBITED, this));
 			}
@@ -815,7 +816,7 @@ public class RGoal extends RProcessableElement implements IGoal
 			MDeliberation delib = getMGoal().getDeliberation();
 			if(delib!=null)
 			{
-				if(delib.isCardinalityOne())
+				if(delib.isCardinalityOne() && other.getMGoal().equals(getMGoal()))
 				{
 					ret = true;
 				}

@@ -248,9 +248,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 		if(rplan.getException()!=null)
 			vals.add(rplan.getException());
 		
-		SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(ptypes, vals);
+		SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
 		
-		return g.guessParameters();
+		return g.guessParameters(ptypes);
 	}
 
 	/**

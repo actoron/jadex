@@ -80,7 +80,7 @@ public class ProducerBDI extends BaseBDI implements IProduceService
 	 */
 	public IFuture<Void> doProduce(@Reference ISpaceObject target)
 	{
-		System.out.println("producer received produce command: "+target);
+//		System.out.println("producer received produce command: "+target);
 		agent.dispatchTopLevelGoal(new ProduceOre(target));
 		return IFuture.DONE;
 	}

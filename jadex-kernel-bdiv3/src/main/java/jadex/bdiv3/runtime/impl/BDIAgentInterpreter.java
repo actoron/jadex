@@ -947,7 +947,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							vals.add(agent);
 						vals.add(getExternalAccess());
 						
-						SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(m.getParameterTypes(), vals);
+						final SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
 						
 						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
 							new MethodCondition(null, m, g)
@@ -962,6 +962,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 									String capaname = type.substring(0, idx);
 									Object capa = getCapabilityObject(capaname);
 									vals.add(new CapabilityWrapper((BDIAgent)getAgent(), capa, type));
+									vals.add(capa);
 								}
 								else
 								{
@@ -974,7 +975,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							public Tuple2<Boolean, Object> prepareResult(Object res)
 							{
 								Tuple2<Boolean, Object> ret = null;
-								if(res!=null)
+								if(res instanceof Boolean)
+								{
+									ret = new Tuple2<Boolean, Object>((Boolean)res, null);
+								}
+								else if(res!=null)
 								{
 									ret = new Tuple2<Boolean, Object>(Boolean.TRUE, res);
 								}
@@ -1007,31 +1012,41 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								}
 								else
 								{
-									Object pojogoal = null;
-									if(event.getContent()!=null)
-									{
-										try
+//									Object pojogoal = null;
+//									if(event.getContent()!=null)
+//									{
+//										try
+//										{
+//											Class<?> evcl = event.getContent().getClass();
+//											Constructor<?> c = gcl.getConstructor(new Class[]{evcl});
+//											pojogoal = c.newInstance(new Object[]{event.getContent()});
+//											dispatchTopLevelGoal(pojogoal);
+//										}
+//										catch(Exception e)
+//										{
+//											e.printStackTrace();
+//										}
+//									}
+//									else
+//									{
+										Constructor<?>[] cons = gcl.getConstructors();
+										Object pojogoal = null;
+										for(Constructor<?> c: cons)
 										{
-											Class<?> evcl = event.getContent().getClass();
-											Constructor<?> c = gcl.getConstructor(new Class[]{evcl});
-											pojogoal = c.newInstance(new Object[]{event.getContent()});
-											dispatchTopLevelGoal(pojogoal);
+											try
+											{
+												pojogoal = c.newInstance(g.guessParameters(c.getParameterTypes()));
+												dispatchTopLevelGoal(pojogoal);
+												break;
+											}
+											catch(Exception e)
+											{
+											}
 										}
-										catch(Exception e)
-										{
-											e.printStackTrace();
-										}
+										if(pojogoal==null)
+											throw new RuntimeException("Unknown how to create goal: "+gcl);
 									}
-									else
-									{
-										// todo:
-			//							Constructor<?>[] cons = gcl.getConstructors();
-			//							for(Constructor c: cons)
-			//							{
-			//							}
-										throw new RuntimeException("Unknown how to create goal: "+gcl);
-									}
-								}
+//								}
 								
 								return IFuture.DONE;
 							}
@@ -1405,7 +1420,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 	//						if(other.getLifecycleState().equals(RGoal.GOALLIFECYCLESTATE_ACTIVE) 
 	//							&& other.getProcessingState().equals(RGoal.GOALPROCESSINGSTATE_INPROCESS)
-							if(other.inhibits(goal, getInternalAccess()))
+							if(!other.isInhibitedBy(goal) && other.inhibits(goal, getInternalAccess()))
 							{
 								goal.addInhibitor(other, getInternalAccess());
 							}
@@ -1452,7 +1467,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								Collection<RGoal> goals = getCapability().getGoals(inh);
 								for(RGoal other: goals)
 								{
-									if(!other.isInhibitedBy(goal) && goal.inhibits(other, getInternalAccess()))
+//									if(!other.isInhibitedBy(goal) && goal.inhibits(other, getInternalAccess()))
+									if(!goal.isInhibitedBy(other) && goal.inhibits(other, getInternalAccess()))
 									{
 										other.addInhibitor(goal, getInternalAccess());
 									}
@@ -1505,7 +1521,25 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 										other.removeInhibitor(goal, getInternalAccess());
 								}
 							}
+							
+							// Remove inhibitor from goals of same type if cardinality is used
+							if(delib.isCardinalityOne())
+							{
+								Collection<RGoal> goals = getCapability().getGoals(goal.getMGoal());
+								if(goals!=null)
+								{
+									for(RGoal other: goals)
+									{
+										if(goal.equals(other))
+											continue;
+										
+										if(other.isInhibitedBy(goal))
+											other.removeInhibitor(goal, getInternalAccess());
+									}
+								}
+							}
 						}
+					
 						return IFuture.DONE;
 					}
 				});
@@ -1562,7 +1596,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// Start rule system
 		inited	= true;
 	
-//		getCapability().dumpGoalsPeriodically(getInternalAccess());
+		if(getComponentIdentifier().getName().indexOf("Sentry")!=-1)
+			getCapability().dumpGoalsPeriodically(getInternalAccess());
 //		getCapability().dumpPlansPeriodically(getInternalAccess());
 		
 //		}
@@ -1733,8 +1768,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		try
 		{
 			m.setAccessible(true);
-			IMethodParameterGuesser g = new SimpleMethodParameterGuesser(m.getParameterTypes(), vals);
-			Object app = m.invoke(pojo, g.guessParameters());
+			IMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
+			Object app = m.invoke(pojo, g.guessParameters(m.getParameterTypes()));
 			if(app instanceof Boolean)
 			{
 				ret.setResult((Boolean)app);

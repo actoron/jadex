@@ -1,7 +1,6 @@
 package jadex.rules.eca;
 
 import jadex.commons.IMethodParameterGuesser;
-import jadex.commons.IParameterGuesser;
 import jadex.commons.SReflect;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple2;
@@ -94,7 +93,7 @@ public class MethodCondition implements ICondition
 					SimpleParameterGuesser g = new SimpleParameterGuesser(getExtraValues(event));
 					getGuesser().getGuesser().setParent(g);
 
-					params = getGuesser().guessParameters();
+					params = getGuesser().guessParameters(method.getParameterTypes());
 				}
 				else
 				{

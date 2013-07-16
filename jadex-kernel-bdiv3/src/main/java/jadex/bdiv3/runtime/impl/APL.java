@@ -318,9 +318,9 @@ public class APL
 					List<Object> vals = new ArrayList<Object>();
 					vals.add(element);
 					vals.add(element.getPojoElement());
-					IMethodParameterGuesser g = new SimpleMethodParameterGuesser(m.getParameterTypes(), vals);
+					IMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
 					
-					Object app = m.invoke(pojo, g.guessParameters());
+					Object app = m.invoke(pojo, g.guessParameters(m.getParameterTypes()));
 					if(app instanceof Boolean)
 					{
 						if(((Boolean)app).booleanValue())
