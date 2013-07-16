@@ -966,7 +966,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								}
 								else
 								{
-									vals.add(new CapabilityWrapper((BDIAgent)getAgent(), capa, null));
+									BDIAgent ag = (BDIAgent)getAgent();
+									if(ag instanceof IPojoMicroAgent)
+									{
+										vals.add(new CapabilityWrapper((BDIAgent)getAgent(), ((IPojoMicroAgent)ag).getPojoAgent(), null));
+									}
 								}
 									
 								return vals;

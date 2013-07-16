@@ -37,7 +37,7 @@ public class MoveToLocationPlan
 	protected IPlan rplan;
 	
 	@PlanReason
-	protected Move goal;
+	protected IDestinationGoal goal;
 	
 	/**
 	 *  The plan body.

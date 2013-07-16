@@ -129,7 +129,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 		@GoalDropCondition(events="movecapa.missionend")
 		public boolean checkDrop()
 		{
-			System.out.println("dropping: "+outer.getMoveCapa().isMissionend());
+			System.out.println("dropping: "+this+" "+outer.getMoveCapa().isMissionend());
 			return outer.getMoveCapa().isMissionend();
 		}
 
