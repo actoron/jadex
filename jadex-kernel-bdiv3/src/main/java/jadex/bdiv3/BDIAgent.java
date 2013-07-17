@@ -516,11 +516,8 @@ public class BDIAgent extends MicroAgent
 		{
 			throw new RuntimeException("No mapping for abstract belief: "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
 		}
-		String	capaname	= belname.indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
-			? null : belname.substring(0, belname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
 		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
-		Object	ocapa	= ((BDIAgentInterpreter)getInterpreter()).getCapabilityObject(capaname);
-		Object	ret	= bel.getValue(ocapa, getClassLoader());
+		Object	ret	= bel.getValue((BDIAgentInterpreter)getInterpreter());
 		
 		if(ret==null)
 		{
@@ -553,15 +550,12 @@ public class BDIAgent extends MicroAgent
 		{
 			throw new RuntimeException("No mapping for abstract belief: "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
 		}
-		String	capaname	= belname.indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
-			? null : belname.substring(0, belname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
 		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
-		Object	ocapa	= ((BDIAgentInterpreter)getInterpreter()).getCapabilityObject(capaname);
 
 		// Maybe unobserve old value
-		Object	old	= bel.getValue(ocapa, getClassLoader());
+		Object	old	= bel.getValue((BDIAgentInterpreter)getInterpreter());
 
-		boolean	field	= bel.setValue(ocapa, value, getClassLoader());
+		boolean	field	= bel.setValue((BDIAgentInterpreter)getInterpreter(), value);
 		
 		if(field)
 		{

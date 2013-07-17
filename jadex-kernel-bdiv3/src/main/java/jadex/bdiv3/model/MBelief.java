@@ -1,5 +1,6 @@
 package jadex.bdiv3.model;
 
+import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.commons.FieldInfo;
 import jadex.commons.SReflect;
 
@@ -261,7 +262,17 @@ public class MBelief extends MElement
 	}
 	
 	/**
-	 *  Set the value of the belief.
+	 *  Get the value of the belief.
+	 */
+	public Object getValue(BDIAgentInterpreter bai)
+	{
+		String	capaname	= getName().indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
+			? null : getName().substring(0, getName().lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
+		return getValue(bai.getCapabilityObject(capaname), bai.getClassLoader());
+	}
+
+	/**
+	 *  Get the value of the belief.
 	 */
 	public Object getValue(Object object, ClassLoader cl)
 	{
@@ -298,6 +309,16 @@ public class MBelief extends MElement
 		return ret;
 	}
 	
+	/**
+	 *  Set the value of the belief.
+	 */
+	public boolean setValue(BDIAgentInterpreter bai, Object value)
+	{
+		String	capaname	= getName().indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)==-1
+			? null : getName().substring(0, getName().lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
+		return setValue(bai.getCapabilityObject(capaname), value, bai.getClassLoader());
+	}
+
 	/**
 	 *  Set the value of the belief.
 	 */

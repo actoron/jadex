@@ -520,13 +520,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		{
 			try
 			{
-				Object capa = agent;
-				int	i	= mbel.getName().indexOf(CAPABILITY_SEPARATOR);
-				if(i!=-1)
-				{
-					capa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)));
-				}
-				Object val = mbel.getValue(capa, getClassLoader());
+				Object val = mbel.getValue(this);
 				if(val==null)
 				{
 					String impl = mbel.getImplClassName();
@@ -555,20 +549,17 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(val instanceof List)
 				{
 					String bname = mbel.getName();
-//					f.set(agent, new ListWrapper((List<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
-					mbel.setValue(capa, new ListWrapper((List<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
+					mbel.setValue(this, new ListWrapper((List<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
-//					f.set(agent, new SetWrapper((Set<?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
-					mbel.setValue(capa, new SetWrapper((Set<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
+					mbel.setValue(this, new SetWrapper((Set<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
-//					f.set(agent, new MapWrapper((Map<?,?>)val, rulesystem, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
-					mbel.setValue(capa, new MapWrapper((Map<?,?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname), getClassLoader());
+					mbel.setValue(this, new MapWrapper((Map<?,?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
 				}
 			}
 			catch(RuntimeException e)
@@ -641,7 +632,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	//						Field f = mbel.getTarget().getField(getClassLoader());
 	//						f.setAccessible(true);
 	//						f.set(agent, val);
-							mbel.setValue(agent, val, getClassLoader());
+							mbel.setValue(this, val);
 						}
 						catch(RuntimeException e)
 						{
@@ -1839,13 +1830,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					else
 					{
 						MBelief	mbel	= getBDIModel().getCapability().getBelief(source);
-						String	belcapaname	= null;
-						int	idx	= mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR);
-						if(idx!=-1)
-						{
-							belcapaname	= mbel.getName().substring(0, idx);
-						}
-						ret[i]	= mbel.getValue(getCapabilityObject(belcapaname), getClassLoader());
+						ret[i]	= mbel.getValue(this);
 
 					}
 				}
