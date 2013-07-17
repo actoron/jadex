@@ -25,10 +25,10 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.micro.MicroAgent;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -235,14 +235,15 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 												Space2D	space2d	= (Space2D)space;
 												IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 												Set	seen = space2d.getNearObjects(mypos, vision);
-												for(Object known: facts)
+												for(Iterator<?> it=facts.iterator(); it.hasNext(); )
 												{
+													Object	known	= it.next();
 													IVector2	knownpos	= (IVector2)((ISpaceObject)known).getProperty(Space2D.PROPERTY_POSITION);
 													// Hack!!! Shouldn't react to knownpos==null
 													if(!seen.contains(known) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
 													{
 //														System.out.println("Removing disappeared object: "+percept+", "+known[j]);
-														facts.remove(known);
+														it.remove();
 													}
 												}
 											}
