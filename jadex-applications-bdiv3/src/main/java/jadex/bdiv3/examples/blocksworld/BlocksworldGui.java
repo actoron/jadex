@@ -410,7 +410,7 @@ public class BlocksworldGui	extends JFrame
 									{
 										BlocksworldBDI pag = (BlocksworldBDI)((IPojoMicroAgent)ia).getPojoAgent();
 										
-										// todo: step goal
+										pag.steps.addIntermediateResult(null);
 										
 //										IInternalEvent ie = bia.getEventbase().createInternalEvent("step");
 //										bia.getEventbase().dispatchInternalEvent(ie);

@@ -389,10 +389,10 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
     				caller.suspend(this, -1);
     	    	   	icallers.remove(caller);
-    		    	ret	= hasNextIntermediateResult();
     			}
     			// else already resumed.
     		}
+	    	ret	= hasNextIntermediateResult();
     	}
     	
     	return ret;
@@ -478,10 +478,10 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
     				caller.suspend(this, -1);
     	    	   	icallers.remove(caller);
-    		    	ret	= doGetNextIntermediateResult(index);
     			}
     			// else already resumed.
     		}
+	    	ret	= doGetNextIntermediateResult(index);
     	}
     	
     	return ret;

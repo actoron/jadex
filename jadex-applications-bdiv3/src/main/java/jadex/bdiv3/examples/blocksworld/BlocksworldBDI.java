@@ -10,6 +10,7 @@ import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
@@ -61,6 +62,9 @@ public class BlocksworldBDI
 	/** The currently existing blocks. */
 	@Belief
 	protected Set<Block> blocks;// = new HashSet<Block>();
+	
+	/** The future to communicate step events from gui to plan. */
+	protected SubscriptionIntermediateFuture<Void>	steps	= new SubscriptionIntermediateFuture<Void>();
 	
 //	/** The gui (if any). */
 //	@Belief

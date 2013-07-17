@@ -56,6 +56,7 @@ public class StackBlocksPlan
 		}
 		else if(capa.getMode().equals(BlocksworldBDI.Mode.STEP))
 		{
+			capa.steps.getNextIntermediateResult();
 //			waitForInternalEvent("step");
 		}
 

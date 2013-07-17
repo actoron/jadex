@@ -123,8 +123,13 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	
 		ISuspendable	caller	= null;
 		List<E>	ownres;
+    	boolean first;
+
     	synchronized(this)
     	{
+			first = storeforfirst;
+			storeforfirst	= false;
+    		
     		Integer	index	= indices!=null ? indices.get(Thread.currentThread()) : null;
     		if(index==null)
     		{
@@ -150,6 +155,11 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		}
     	}
     	
+		if(first)
+		{
+			results=null;
+		}
+    	
     	if(suspend)
     	{
     		synchronized(this)
@@ -174,14 +184,14 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
     				caller.suspend(this, -1);
     	    	   	icallers.remove(caller);
-    		    	ret	= hasNextIntermediateResult();
     			}
     			// else already resumed.
     		}
+	    	ret	= hasNextIntermediateResult();
     	}
     	
     	return ret;
-    }	
+    }
 	
     /**
      *  Perform the get without increasing the index.
@@ -193,9 +203,14 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	
     	List<E>	ownres;
 		ISuspendable	caller	= null;
+    	boolean first;
+
     	synchronized(this)
     	{
-    		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
+			first = storeforfirst;
+			storeforfirst	= false;
+
+			ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
     		if(ownres!=null && !ownres.isEmpty())
     		{
     			ret	= ownres.remove(0);
@@ -229,6 +244,11 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		}
    		}
     	
+		if(first)
+		{
+			results=null;
+		}
+    	
     	if(suspend)
     	{
     		synchronized(this)
@@ -253,9 +273,14 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
     				caller.suspend(this, -1);
     	    	   	icallers.remove(caller);
-    		    	ret	= doGetNextIntermediateResult(index);
     			}
     			// else already resumed.
+    		}
+	    	
+	    	ret	= doGetNextIntermediateResult(index);
+    		synchronized(this)
+    		{
+    			ownresults.remove(Thread.currentThread());
     		}
     	}
     	
