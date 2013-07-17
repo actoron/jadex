@@ -1,7 +1,13 @@
 package jadex.bdiv3.examples.garbagecollector;
 
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
+import jadex.bdiv3.examples.marsworld.carry.CarryBDI.CarryOre;
+import jadex.bdiv3.runtime.IPlan;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Int;
@@ -9,22 +15,34 @@ import jadex.extension.envsupport.math.Vector2Int;
 /**
  *  Check the grid for garbage.
  */
-public class CheckingPlanEnv extends Plan
+@Plan
+public class CheckingPlanEnv
 {
+	//-------- attributes --------
+
+	@PlanCapability
+	protected GarbageCollectorBDI collector;
+	
+	@PlanAPI
+	protected IPlan rplan;
+	
+	@PlanReason
+	protected CarryOre goal;
+	
 	/**
 	 *  The plan body.
 	 */
+	@PlanBody
 	public void body()
 	{
-		Space2D env = (Space2D)getBeliefbase().getBelief("env").getFact();
+		Space2D env = collector.getEnvironment();
 		IVector2 size = env.getAreaSize();
-		IVector2 mypos = (IVector2)getBeliefbase().getBelief("pos").getFact();
+		IVector2 mypos = collector.getPosition();
 		IVector2 newpos = computeNextPosition(mypos, size.getXAsInteger(), size.getYAsInteger());
 
 //		System.out.println("Moving from "+mypos+" to: "+newpos);
-		IGoal go = createGoal("go");
-		go.getParameter("pos").setValue(newpos);
-		dispatchSubgoalAndWait(go);
+		Go go = collector.new Go(newpos);
+		rplan.dispatchSubgoal(go).get();
 //		System.out.println("Moved to: "+newpos);
 	}
 

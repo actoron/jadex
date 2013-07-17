@@ -126,7 +126,7 @@ public class GarbageBurnerBDI
 	 *  Get the env.
 	 *  @return The env.
 	 */
-	public ContinuousSpace2D getEnvironment()
+	public Grid2D getEnvironment()
 	{
 		return env;
 	}

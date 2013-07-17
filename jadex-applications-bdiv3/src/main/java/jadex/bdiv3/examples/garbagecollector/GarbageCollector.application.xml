@@ -13,7 +13,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.4.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.4.xsd"
-	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
+	name="GarbageCollector" package="jadex.bdiv3.examples.garbagecollector">
 	
 	<imports>
 		<import>jadex.bridge.IComponentIdentifier</import>
@@ -24,7 +24,6 @@
 		<import>jadex.bridge.service.clock.IClockService</import>
 		<import>jadex.extension.envsupport.dataview.*</import>
 		<import>jadex.extension.envsupport.observer.perspective.*</import>
-		<import>jadex.bdi.planlib.*</import>
 	</imports>
 	
 	<!-- Space types of this application. Spaces are shared by agents of the same application. -->
@@ -151,8 +150,8 @@
 				<env:perspective name="icons" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="collector" width="1.0" height="1.0" rotation="rotation">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
-						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdi/examples/garbagecollector/images/collector.png" />
-						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.3" imagepath="jadex/bdi/examples/garbagecollector/images/garbage.png">
+						<env:texturedrectangle layer="2" x="0" y="-0.1" width="0.8" height="0.8" imagepath="jadex/bdiv3/examples/garbagecollector/images/collector.png" />
+						<env:texturedrectangle layer="3" width="0.5" height="0.5" x="0.3" y="-0.3" imagepath="jadex/bdiv3/examples/garbagecollector/images/garbage.png">
 							<env:drawcondition>$object.garbage!=null</env:drawcondition> 
 						</env:texturedrectangle>
 <!-- 						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/> -->
@@ -160,18 +159,18 @@
 					</env:drawable>
 					<env:drawable objecttype="burner" width="1" height="1">
 						<env:property name="vision_size" dynamic="true">new Vector2Double($object.vision_range*2+1)</env:property>
-						<env:texturedrectangle width="0.8" height="0.8" layer="1" imagepath="jadex/bdi/examples/garbagecollector/images/burner.png" />
-						<env:texturedrectangle width="0.6" height="0.6" layer="2" imagepath="jadex/bdi/examples/garbagecollector/images/flames.png" >
+						<env:texturedrectangle width="0.8" height="0.8" layer="1" imagepath="jadex/bdiv3/examples/garbagecollector/images/burner.png" />
+						<env:texturedrectangle width="0.6" height="0.6" layer="2" imagepath="jadex/bdiv3/examples/garbagecollector/images/flames.png" >
 							<env:drawcondition>$object.garbage!=null</env:drawcondition> 
 						</env:texturedrectangle>
 <!-- 						<env:text layer="4" x="0.0" y="0.4" color="black" text="$owner$"/> -->
 						<env:rectangle layer="-1" size="vision_size" color="#ffff007f" />
 					</env:drawable>
 					<env:drawable objecttype="garbage" width="0.7" height="0.7">
-						<env:texturedrectangle layer="0" imagepath="jadex/bdi/examples/garbagecollector/images/garbage.png" />
+						<env:texturedrectangle layer="0" imagepath="jadex/bdiv3/examples/garbagecollector/images/garbage.png" />
 					</env:drawable>
 					<env:prelayers>
-						<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdi/examples/garbagecollector/images/bg.jpg" />
+						<env:tiledlayer width="3.5" height="3.5" imagepath="jadex/bdiv3/examples/garbagecollector/images/bg.jpg" />
 						<env:gridlayer width="1.0" height="1.0" color="white" />
 					</env:prelayers>
 				</env:perspective>
@@ -211,8 +210,8 @@
 	
 	<!-- Agent types of the application. -->
 	<componenttypes>
-		<componenttype name="Collector" filename="jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml"/>
-		<componenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml"/>
+		<componenttype name="Collector" filename="jadex/bdiv3/examples/garbagecollector/GarbageCollectorBDI.class"/>
+		<componenttype name="Burner" filename="jadex/bdiv3/examples/garbagecollector/GarbageBurnerBDI.class"/>
 	</componenttypes>
 	
 	<!-- Application instance definitions. -->

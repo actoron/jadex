@@ -1577,18 +1577,21 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						if(delib!=null)
 						{
 							Set<MGoal> inhs = delib.getInhibitions();
-							for(MGoal inh: inhs)
+							if(inhs!=null)
 							{
-	//							if(goal.getId().indexOf("AchieveCleanup")!=-1)
-	//								System.out.println("reminh: "+goal);
-								Collection<RGoal> goals = getCapability().getGoals(inh);
-								for(RGoal other: goals)
+								for(MGoal inh: inhs)
 								{
-									if(goal.equals(other))
-										continue;
-									
-									if(other.isInhibitedBy(goal))
-										other.removeInhibitor(goal, getInternalAccess());
+		//							if(goal.getId().indexOf("AchieveCleanup")!=-1)
+		//								System.out.println("reminh: "+goal);
+									Collection<RGoal> goals = getCapability().getGoals(inh);
+									for(RGoal other: goals)
+									{
+										if(goal.equals(other))
+											continue;
+										
+										if(other.isInhibitedBy(goal))
+											other.removeInhibitor(goal, getInternalAccess());
+									}
 								}
 							}
 							

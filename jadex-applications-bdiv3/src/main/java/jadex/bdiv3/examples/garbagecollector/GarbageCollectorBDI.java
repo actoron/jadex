@@ -19,6 +19,7 @@ import java.util.List;
 /**
  * 
  */
+@Agent
 public class GarbageCollectorBDI
 {
 	@Agent
@@ -55,7 +56,7 @@ public class GarbageCollectorBDI
 		@GoalCreationCondition(events="garbages")
 		public static boolean checkCreate(GarbageCollectorBDI outer, ISpaceObject garbage, IEvent event)
 		{
-			return outer.isDirty() && outer.getEnv().getSpaceObjectsByGridPosition(outer.pos, "burner")==null;
+			return outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.pos, "burner")==null;
 		}
 	}
 	
@@ -103,9 +104,10 @@ public class GarbageCollectorBDI
 		/**
 		 * 
 		 */
-		@GoalDropCondition
+		@GoalDropCondition(events="garbages")
 		public boolean checkDrop()
 		{
+			return !isDirty() && !hasGarbage();
 			//!$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
 		}
 	}
@@ -119,11 +121,47 @@ public class GarbageCollectorBDI
 	}
 	
 	/**
+	 * 
+	 */
+	protected boolean hasGarbage()
+	{
+		return myself.getProperty("has_garbage")!=null;
+	}
+	
+	/**
 	 *  Get the env.
 	 *  @return The env.
 	 */
-	public Grid2D getEnv()
+	public Grid2D getEnvironment()
 	{
 		return env;
 	}
+
+	/**
+	 *  Get the pos.
+	 *  @return The pos.
+	 */
+	public IVector2 getPosition()
+	{
+		return pos;
+	}
+
+	/**
+	 *  Get the myself.
+	 *  @return The myself.
+	 */
+	public ISpaceObject getMyself()
+	{
+		return myself;
+	}
+
+	/**
+	 *  Get the agent.
+	 *  @return The agent.
+	 */
+	public BDIAgent getAgent()
+	{
+		return agent;
+	}
+	
 }
