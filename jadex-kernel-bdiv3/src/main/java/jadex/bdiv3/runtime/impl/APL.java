@@ -14,7 +14,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.IMethodParameterGuesser;
 import jadex.commons.SReflect;
 import jadex.commons.SimpleMethodParameterGuesser;
-import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -315,11 +314,8 @@ public class APL
 				{
 					m.setAccessible(true);
 					
-					Collection<Object>	vals	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
-						.getInjectionValues(element.getModelElement(), null, null, element);
-					IMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
-					
-					Object app = m.invoke(pojo, g.guessParameters(m.getParameterTypes()));
+					Object app = m.invoke(pojo, ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
+						.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element));
 					if(app instanceof Boolean)
 					{
 						if(((Boolean)app).booleanValue())

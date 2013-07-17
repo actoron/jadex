@@ -47,8 +47,6 @@ public class CarryOrePlan
 	@PlanBody
 	public void body()
 	{	
-		try
-		{
 		ISpaceObject target = goal.getTarget();
 		boolean	finished = false;
 		MovementCapability capa = carry.getMoveCapa();
@@ -96,11 +94,6 @@ public class CarryOrePlan
 			env.addTaskListener(taskid, myself.getId(), lis);
 			fut.get();
 //			System.out.println("Unloaded ore at homebase: "+getAgentName()+", "+ore+" ore unloaded.");
-		}
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
 		}
 	}
 }

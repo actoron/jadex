@@ -2,13 +2,10 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SimpleMethodParameterGuesser;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.Collection;
 
 /**
  *  Abstract base class for plan body implementations.
@@ -57,7 +54,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 			? null : pname.substring(0, pname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
 		final Object agent	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).getCapabilityObject(capaname);
 
-		internalInvokePart(agent, guessParameters(getBodyParameterTypes()), 0).addResultListener(new IResultListener<Void>()
+		internalInvokePart(agent, 0).addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -68,7 +65,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 				}
 				else
 				{
-					internalInvokePart(agent, guessParameters(getBodyParameterTypes()), 1)
+					internalInvokePart(agent, 1)
 						.addResultListener(new IResultListener<Void>()
 					{
 						public void resultAvailable(Void result)
@@ -97,7 +94,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 //				int next = rplan.getException() instanceof PlanAbortedException? 3: 2;
 				int next = exception instanceof PlanAbortedException? 3: 2;
 				
-				internalInvokePart(agent, guessParameters(getBodyParameterTypes()), next)
+				internalInvokePart(agent, next)
 					.addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
@@ -129,7 +126,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 	/**
 	 * 
 	 */
-	protected IFuture<Void> internalInvokePart(Object agent, Object[] params, int part)
+	protected IFuture<Void> internalInvokePart(Object agent, int part)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -227,17 +224,14 @@ public abstract class AbstractPlanBody implements IPlanBody
 	/**
 	 *  Method that tries to guess the parameters for the method call.
 	 */
+	// Todo: parameter annotations (currently only required for event injection)
 	public Object[] guessParameters(Class<?>[] ptypes)
 	{
 		if(ptypes==null)
 			return null;
 		
-		Collection<Object>	vals	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
-			.getInjectionValues(rplan.getModelElement(), null, rplan, null);
-		
-		SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
-		
-		return g.guessParameters(ptypes);
+		return ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
+			.getInjectionValues(ptypes, null, rplan.getModelElement(), null, rplan, null);
 	}
 
 	/**

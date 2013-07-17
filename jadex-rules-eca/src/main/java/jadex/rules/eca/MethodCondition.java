@@ -1,13 +1,12 @@
 package jadex.rules.eca;
 
 import jadex.commons.IMethodParameterGuesser;
-import jadex.commons.SReflect;
+import jadex.commons.SimpleMethodParameterGuesser;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple2;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -80,28 +79,7 @@ public class MethodCondition implements ICondition
 		Tuple2<Boolean, Object> ret = ICondition.FALSE;
 		try
 		{
-			method.setAccessible(true);
-			if(method.getParameterTypes().length==0)
-			{
-				ret = prepareResult(method.invoke(object, new Object[0]));
-			}
-			else
-			{
-				Object[] params = null;
-				if(getGuesser()!=null)
-				{
-					SimpleParameterGuesser g = new SimpleParameterGuesser(getExtraValues(event));
-					getGuesser().getGuesser().setParent(g);
-
-					params = getGuesser().guessParameters(method.getParameterTypes());
-				}
-				else
-				{
-					params = new Object[]{((Event)event).getContent()};
-				}
-				
-				ret = prepareResult(method.invoke(object, params));
-			}
+			ret	= prepareResult(invokeMethod(event));
 			
 			if(invert)
 			{
@@ -117,32 +95,30 @@ public class MethodCondition implements ICondition
 	}
 	
 	/**
-	 * 
+	 *  Do the method invocation.
 	 */
-	public IMethodParameterGuesser getGuesser()
+	protected Object	invokeMethod(IEvent event)	throws Exception
 	{
-		return guesser;
-	}
-	
-	/**
-	 * 
-	 */
-	public List<Object> getExtraValues(IEvent event)
-	{
+		method.setAccessible(true);
+		Object[] params = null;
 		List<Object> vals = new ArrayList<Object>();
 		vals.add(event);
 		if(event.getContent()!=null)
 		{
 			vals.add(event.getContent());
-			if(SReflect.isIterable(event.getContent()))
-			{
-				for(Iterator<Object> it = SReflect.getIterator(event.getContent()); it.hasNext(); )
-				{
-					vals.add(it.next());
-				}
-			}
 		}
-		return vals;
+		if(guesser==null)
+		{
+			params = new SimpleMethodParameterGuesser(vals).guessParameters(method.getParameterTypes());
+		}
+		else
+		{
+			// Hack!!! what if already has a parent?
+			guesser.getGuesser().setParent(new SimpleParameterGuesser(vals));
+			params = guesser.guessParameters(method.getParameterTypes());
+		}
+			
+		return method.invoke(object, params);
 	}
 	
 	/**

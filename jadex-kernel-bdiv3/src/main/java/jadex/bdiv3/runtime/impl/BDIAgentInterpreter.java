@@ -42,12 +42,11 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.FieldInfo;
-import jadex.commons.IMethodParameterGuesser;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.SimpleMethodParameterGuesser;
+import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -71,6 +70,7 @@ import jadex.rules.eca.MethodCondition;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleSystem;
 import jadex.rules.eca.annotations.CombinedCondition;
+import jadex.rules.eca.annotations.Event;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -251,35 +251,36 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 * 	Adapt element for use in inner capabilities.
 	 *  @param obj	The object to adapt (e.g. a change event)
-	 *  @param melement	The element to adapt the object for (e.g. a plan)
+	 *  @param capa	The capability name or null for agent.
 	 */
-	protected Object adaptToCapability(Object obj, MElement melement)
+	protected Object adaptToCapability(Object obj, String capa)
 	{
-		if(obj instanceof ChangeEvent && melement.getName().indexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR)!=-1)
+		if(obj instanceof ChangeEvent && capa!=null)
 		{
 			ChangeEvent	ce	= (ChangeEvent)obj;
-			int	idx	= melement.getName().lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
-			String	capa	= melement.getName().substring(0, idx);
 			String	source	= (String)ce.getSource();
-			// For concrete belief just strip capability prefix.
-			if(source.startsWith(capa))
+			if(source!=null)
 			{
-				source	= source.substring(capa.length()+1);
-			}
-			// For abstract belief find corresponding mapping.
-			else
-			{
-				Map<String, String>	map	= getBDIModel().getBeliefMappings();
-				for(String target: map.keySet())
+				// For concrete belief just strip capability prefix.
+				if(source.startsWith(capa))
 				{
-					if(source.equals(map.get(target)))
+					source	= source.substring(capa.length()+1);
+				}
+				// For abstract belief find corresponding mapping.
+				else
+				{
+					Map<String, String>	map	= getBDIModel().getBeliefMappings();
+					for(String target: map.keySet())
 					{
-						int	idx2	= target.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
-						String	capa2	= target.substring(0, idx2);
-						if(capa.equals(capa2))
+						if(source.equals(map.get(target)))
 						{
-							source	= target.substring(capa.length()+1);
-							break;
+							int	idx2	= target.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
+							String	capa2	= target.substring(0, idx2);
+							if(capa.equals(capa2))
+							{
+								source	= target.substring(capa.length()+1);
+								break;
+							}
 						}
 					}
 				}
@@ -943,40 +944,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						final Method m = cond.getMethodTarget().getMethod(getClassLoader());
 						
-						List<Object> vals = new ArrayList<Object>();
-						if(agent!=null)
-							vals.add(agent);
-						vals.add(getExternalAccess());
-						
-						final SimpleMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
-						
 						Rule<Void> rule = new Rule<Void>(mgoal.getName()+"_goal_create", 
-							new MethodCondition(null, m, g)
+							new MethodCondition(null, m)
 						{
-							public List<Object> getExtraValues(IEvent event)
+							protected Object invokeMethod(IEvent event) throws Exception
 							{
-								List<Object> vals = super.getExtraValues(event);
-								String type = event.getType().getType(1);
-								int idx = type.lastIndexOf(CAPABILITY_SEPARATOR);
-								if(idx!=-1)
-								{
-									String capaname = type.substring(0, idx);
-									Object capa = getCapabilityObject(capaname);
-									vals.add(new CapabilityWrapper((BDIAgent)getAgent(), capa, type));
-									vals.add(capa);
-								}
-								else
-								{
-									BDIAgent ag = (BDIAgent)getAgent();
-									if(ag instanceof IPojoMicroAgent)
-									{
-										vals.add(new CapabilityWrapper((BDIAgent)getAgent(), ((IPojoMicroAgent)ag).getPojoAgent(), null));
-									}
-								}
-									
-								return vals;
+								m.setAccessible(true);
+								return m.invoke(null, getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
+									mgoal, new ChangeEvent(event), null, null));
 							}
-							
+														
 							public Tuple2<Boolean, Object> prepareResult(Object res)
 							{
 								Tuple2<Boolean, Object> ret = null;
@@ -1040,7 +1017,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 										{
 											try
 											{
-												pojogoal = c.newInstance(g.guessParameters(c.getParameterTypes()));
+												pojogoal = c.newInstance(getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(),
+													mgoal, new ChangeEvent(event), null, null));
 												dispatchTopLevelGoal(pojogoal);
 												break;
 											}
@@ -1074,21 +1052,32 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
-							for(RGoal goal: getCapability().getGoals(mgoal))
+							for(final RGoal goal: getCapability().getGoals(mgoal))
 							{
 								if(!RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
 									 && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
 								{
-									if(executeGoalMethod(m, goal, event))
+									executeGoalMethod(m, goal, event)
+										.addResultListener(new IResultListener<Boolean>()
 									{
-//										System.out.println("Goal dropping triggered: "+goal);
-		//								rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
-										if(!goal.isFinished())
+										public void resultAvailable(Boolean result)
 										{
-											goal.setException(new GoalFailureException("drop condition: "+m.getName()));
-											goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.FAILED);
+											if(result.booleanValue())
+											{
+//												System.out.println("Goal dropping triggered: "+goal);
+				//								rgoal.setLifecycleState(BDIAgent.this, rgoal.GOALLIFECYCLESTATE_DROPPING);
+												if(!goal.isFinished())
+												{
+													goal.setException(new GoalFailureException("drop condition: "+m.getName()));
+													goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.FAILED);
+												}
+											}
 										}
-									}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+										}
+									});
 								}
 							}
 							
@@ -1116,19 +1105,30 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
-							for(RGoal goal: getCapability().getGoals(mgoal))
+							for(final RGoal goal: getCapability().getGoals(mgoal))
 							{
 								if(!RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState())
 								  && !RGoal.GoalLifecycleState.DROPPING.equals(goal.getLifecycleState())
 								  && !RGoal.GoalLifecycleState.DROPPED.equals(goal.getLifecycleState()))
 								{	
-									if(!executeGoalMethod(m, goal, event))
+									executeGoalMethod(m, goal, event)
+										.addResultListener(new IResultListener<Boolean>()
 									{
-	//									if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-	//										System.out.println("Goal suspended: "+goal);
-										goal.setLifecycleState(getInternalAccess(), RGoal.GoalLifecycleState.SUSPENDED);
-										goal.setState(RGoal.State.INITIAL);
-									}
+										public void resultAvailable(Boolean result)
+										{
+											if(!result.booleanValue())
+											{
+//												if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
+//													System.out.println("Goal suspended: "+goal);
+												goal.setLifecycleState(getInternalAccess(), RGoal.GoalLifecycleState.SUSPENDED);
+												goal.setState(RGoal.State.INITIAL);
+											}
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+										}
+									});
 								}
 							}
 							return IFuture.DONE;
@@ -1147,17 +1147,28 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
-							for(RGoal goal: getCapability().getGoals(mgoal))
+							for(final RGoal goal: getCapability().getGoals(mgoal))
 							{
 								if(RGoal.GoalLifecycleState.SUSPENDED.equals(goal.getLifecycleState()))
 								{	
-									if(executeGoalMethod(m, goal, event))
+									executeGoalMethod(m, goal, event)
+										.addResultListener(new IResultListener<Boolean>()
 									{
-	//									if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
-	//										System.out.println("Goal made option: "+goal);
-										goal.setLifecycleState(getInternalAccess(), RGoal.GoalLifecycleState.OPTION);
-	//									setState(ia, PROCESSABLEELEMENT_INITIAL);
-									}
+										public void resultAvailable(Boolean result)
+										{
+											if(result.booleanValue())
+											{
+//												if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
+//													System.out.println("Goal made option: "+goal);
+												goal.setLifecycleState(getInternalAccess(), RGoal.GoalLifecycleState.OPTION);
+//												setState(ia, PROCESSABLEELEMENT_INITIAL);
+											}
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+										}
+									});
 								}
 							}
 							
@@ -1192,12 +1203,25 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						}),
 						new IAction<Void>()
 					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+						public IFuture<Void> execute(final IEvent event, final IRule<Void> rule, final Object context, Object condresult)
 						{
-							for(RGoal goal: getCapability().getGoals(mgoal))
+							for(final RGoal goal: getCapability().getGoals(mgoal))
 							{
-								if(executeGoalMethod(m, goal, event))
-									goal.targetConditionTriggered(getInternalAccess(), event, rule, context);
+								executeGoalMethod(m, goal, event)
+									.addResultListener(new IResultListener<Boolean>()
+								{
+									public void resultAvailable(Boolean result)
+									{
+										if(result.booleanValue())
+										{
+											goal.targetConditionTriggered(getInternalAccess(), event, rule, context);
+										}
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+									}
+								});
 							}
 						
 							return IFuture.DONE;
@@ -1227,17 +1251,28 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
-							for(RGoal goal: getCapability().getGoals(mgoal))
+							for(final RGoal goal: getCapability().getGoals(mgoal))
 							{
 								if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
 									&& RGoal.GoalProcessingState.PAUSED.equals(goal.getProcessingState()))
 								{	
-									if(executeGoalMethod(m, goal, event))
+									executeGoalMethod(m, goal, event)
+										.addResultListener(new IResultListener<Boolean>()
 									{
-										goal.setTriedPlans(null);
-										goal.setApplicablePlanList(null);
-										goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.INPROCESS);
-									}
+										public void resultAvailable(Boolean result)
+										{
+											if(result.booleanValue())
+											{
+												goal.setTriedPlans(null);
+												goal.setApplicablePlanList(null);
+												goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.INPROCESS);
+											}
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+										}
+									});
 								}
 							}
 							return IFuture.DONE;
@@ -1265,17 +1300,28 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
-							for(RGoal goal: getCapability().getGoals(mgoal))
+							for(final RGoal goal: getCapability().getGoals(mgoal))
 							{
 								if(RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState())
 									&& RGoal.GoalProcessingState.IDLE.equals(goal.getProcessingState()))
 								{	
-									if(!executeGoalMethod(m, goal, event))
+									executeGoalMethod(m, goal, event)
+										.addResultListener(new IResultListener<Boolean>()
 									{
-//										System.out.println("Goal maintain triggered: "+goal);
-//										System.out.println("state was: "+goal.getProcessingState());
-										goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.INPROCESS);
-									}
+										public void resultAvailable(Boolean result)
+										{
+											if(!result.booleanValue())
+											{
+//												System.out.println("Goal maintain triggered: "+goal);
+//												System.out.println("state was: "+goal.getProcessingState());
+												goal.setProcessingState(getInternalAccess(), RGoal.GoalProcessingState.INPROCESS);
+											}
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+										}
+									});
 								}
 							}
 							return IFuture.DONE;
@@ -1294,12 +1340,25 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							new GoalsExistCondition(mgoal, capa), new IAction<Void>()
 	//							new MethodCondition(getPojoElement(), mcond), new IAction<Void>()
 						{
-							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+							public IFuture<Void> execute(final IEvent event, final IRule<Void> rule, final Object context, Object condresult)
 							{
-								for(RGoal goal: getCapability().getGoals(mgoal))
+								for(final RGoal goal: getCapability().getGoals(mgoal))
 								{
-									if(executeGoalMethod(m, goal, event))
-										goal.targetConditionTriggered(getInternalAccess(), event, rule, context);
+									executeGoalMethod(m, goal, event)
+										.addResultListener(new IResultListener<Boolean>()
+									{
+										public void resultAvailable(Boolean result)
+										{
+											if(result.booleanValue())
+											{
+												goal.targetConditionTriggered(getInternalAccess(), event, rule, context);
+											}
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+										}
+									});
 								}
 								
 								return IFuture.DONE;
@@ -1388,10 +1447,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						
 						for(final RPlan plan: coll)
 						{
-							List<Object> vals = new ArrayList<Object>();
-							vals.add(agent);
-							vals.add(plan);
-							invokeBooleanMethod(plan.getBody().getBody(agent), mi.getMethod(getClassLoader()), vals)
+							invokeBooleanMethod(plan.getBody().getBody(agent), mi.getMethod(getClassLoader()), plan.getModelElement(), event, plan)
 								.addResultListener(new IResultListener<Boolean>()
 							{
 								public void resultAvailable(Boolean result)
@@ -1678,27 +1734,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 *  Execute a goal method.
 	 */
-	protected boolean executeGoalMethod(Method m, RGoal goal, IEvent event)
+	protected IFuture<Boolean> executeGoalMethod(Method m, RGoal goal, IEvent event)
 	{
-		try
-		{
-			m.setAccessible(true);
-			Object result = null;
-			result = m.invoke(goal.getPojoElement(), m.getParameterTypes().length==0? new Object[0]: new Object[]{event.getContent()});
-			return ((Boolean)result).booleanValue();
-		}
-		catch(Exception e)
-		{
-			System.err.println("method: "+m);
-			e.printStackTrace();
-			return false;
-		}
+		return invokeBooleanMethod(goal.getPojoElement(), m, goal.getModelElement(), event, null);
 	}
 	
 	/**
-	 *  Get possible values for injection into method calls.
+	 *  Get parameter values for injection into method and constructor calls.
 	 */
-	protected Collection<Object>	getInjectionValues(MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
+	protected Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
 	{
 		Collection<Object> vals = new LinkedHashSet<Object>();
 		
@@ -1755,19 +1799,75 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				vals.add(rpe.getPojoElement());
 			}
 		}
-
-		// Adapt values (e.g. change events) to capability.
-		if(melement!=null)
+		
+		// Fill in values from annotated events or using parameter guesser.
+		Object[]	ret	= new Object[ptypes.length];
+		SimpleParameterGuesser	g	= new SimpleParameterGuesser(vals);
+		for(int i=0; i<ptypes.length; i++)
 		{
-			Collection<Object>	tmp	= vals;
-			vals = new LinkedHashSet<Object>();
-			for(Object val: tmp)
+			boolean	done	= false;
+			for(int j=0; !done && anns!=null && j<anns[i].length; j++)
 			{
-				vals.add(adaptToCapability(val, melement));
+				if(anns[i][j] instanceof Event)
+				{
+					done	= true;
+					String	source	= ((Event)anns[i][j]).value();
+					if(capaname!=null)
+					{
+						source	= capaname + CAPABILITY_SEPARATOR + source;
+					}
+					if(getBDIModel().getBeliefMappings().containsKey(source))
+					{
+						source	= getBDIModel().getBeliefMappings().get(source);
+					}
+					
+					if(event!=null && event.getSource()!=null && event.getSource().equals(source))
+					{
+						if(SReflect.getWrappedType(ptypes[i]).isInstance(event.getValue()))
+						{
+							ret[i]	= event.getValue();
+						}
+						else if(SReflect.isSupertype(ptypes[i], ChangeEvent.class))
+						{
+							ret[i]	= event;
+						}
+						else
+						{
+							throw new IllegalArgumentException("Unexpected type for event injection: "+event+", "+ptypes[i]);
+						}
+					}
+					else
+					{
+						MBelief	mbel	= getBDIModel().getCapability().getBelief(source);
+						String	belcapaname	= null;
+						int	idx	= mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR);
+						if(idx!=-1)
+						{
+							belcapaname	= mbel.getName().substring(0, idx);
+						}
+						ret[i]	= mbel.getValue(getCapabilityObject(belcapaname), getClassLoader());
+
+					}
+				}
+			}
+			
+			if(!done)
+			{
+				ret[i]	= g.guessParameter(ptypes[i], false);
 			}
 		}
 		
-		return vals;
+
+		// Adapt values (e.g. change events) to capability.
+		if(capaname!=null)
+		{
+			for(int i=0; i<ret.length; i++)
+			{
+				ret[i]	= adaptToCapability(ret[i], capaname);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -1860,14 +1960,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 * 
 	 */
-	protected IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, Collection<Object> vals)
+	protected IFuture<Boolean> invokeBooleanMethod(Object pojo, Method m, MElement modelelement, IEvent event, RPlan rplan)
 	{
 		final Future<Boolean> ret = new Future<Boolean>();
 		try
 		{
 			m.setAccessible(true);
-			IMethodParameterGuesser g = new SimpleMethodParameterGuesser(vals);
-			Object app = m.invoke(pojo, g.guessParameters(m.getParameterTypes()));
+			
+			Object[]	vals	= getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
+				modelelement, event!=null ? new ChangeEvent(event) : null, rplan, null);
+			Object app = m.invoke(pojo, vals);
 			if(app instanceof Boolean)
 			{
 				ret.setResult((Boolean)app);
@@ -1879,6 +1981,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		catch(Exception e)
 		{
+			System.err.println("method: "+m);
+			e.printStackTrace();
 			ret.setException(e);
 		}
 		return ret;

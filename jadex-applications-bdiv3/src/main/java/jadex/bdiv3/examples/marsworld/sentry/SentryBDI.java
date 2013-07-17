@@ -100,18 +100,21 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 			IVector2 npos = null;
 			for(ISpaceObject so: outer.getMoveCapa().getMyTargets())
 			{
-				if(nearest==null)
+				if(so.getProperty("state").equals("unknown"))
 				{
-					nearest = so;
-					npos = (IVector2)nearest.getProperty(Space2D.PROPERTY_POSITION);
-				}
-				else
-				{
-					IVector2 spos = (IVector2)so.getProperty(Space2D.PROPERTY_POSITION);
-					if(mypos.getDistance(spos).less(mypos.getDistance(npos)))
+					if(nearest==null)
 					{
 						nearest = so;
 						npos = (IVector2)nearest.getProperty(Space2D.PROPERTY_POSITION);
+					}
+					else
+					{
+						IVector2 spos = (IVector2)so.getProperty(Space2D.PROPERTY_POSITION);
+						if(mypos.getDistance(spos).less(mypos.getDistance(npos)))
+						{
+							nearest = so;
+							npos = (IVector2)nearest.getProperty(Space2D.PROPERTY_POSITION);
+						}
 					}
 				}
 			}
