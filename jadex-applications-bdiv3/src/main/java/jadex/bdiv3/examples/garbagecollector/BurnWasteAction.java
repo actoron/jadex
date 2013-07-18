@@ -22,7 +22,7 @@ public class BurnWasteAction extends SimplePropertyObject implements ISpaceActio
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{
-		System.out.println("burn waste action: "+parameters);
+//		System.out.println("burn waste action: "+parameters);
 		
 		Grid2D grid = (Grid2D)space;
 		

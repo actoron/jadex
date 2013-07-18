@@ -38,7 +38,7 @@ public class BurnPlanEnv
 	@PlanBody
 	public void body()
 	{
-		System.out.println("Burn plan activated!");
+//		System.out.println("Burn plan activated!");
 		
 		IEnvironmentSpace env = burner.getEnvironment();
 
