@@ -39,7 +39,7 @@ public interface IExecutionService	extends IService
 	 *  Get the currently running or waiting tasks.
 	 */
 	@Excluded
-	public IExecutable[]	getTasks();
+	public IExecutable[]	getRunningTasks();
 	
 //	/**
 //	 *  Test if the executor is currently idle.

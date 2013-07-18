@@ -260,7 +260,9 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	 */
 	protected static void	monitorExecution(IExternalAccess ea, IExecutionService exe)
 	{
-		IExecutable[]	tasks	= exe.getTasks();
+//		System.out.println("Monitoring execution...");
+
+		IExecutable[]	tasks	= exe.getRunningTasks();
 		for(IExecutable task: tasks)
 		{
 			// Only print warning for sub-components
@@ -272,7 +274,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 				{
 					test	= test.getParent();
 				}
-				if(test!=null)
+				if(test!=null && !cid.equals(ea.getComponentIdentifier()))
 				{
 					System.out.println("Non-idle component at time switch: "+cid);
 				}

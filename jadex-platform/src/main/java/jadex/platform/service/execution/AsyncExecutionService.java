@@ -15,7 +15,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  The asynchronous executor service that executes all tasks in separate executors.
@@ -43,7 +42,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	protected IServiceProvider provider;
 	
 	/** The running (i.e. non-blocked) executors. */
-	protected Set<Executor>	runningexes;
+	protected Map<IExecutable, Executor>	runningexes;
 	
 	//-------- constructors --------
 	
@@ -65,7 +64,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		this.provider = provider;
 		this.running	= false;
 		this.executors	= SCollection.createHashMap();
-		this.runningexes	= SCollection.createHashSet();
+		this.runningexes	= SCollection.createHashMap();
 	}
 
 	//-------- methods --------
@@ -94,7 +93,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				{
 					synchronized(AsyncExecutionService.this)
 					{
-						runningexes.add(this);
+						runningexes.put(task, this);
 					}
 					super.run();
 					
@@ -112,13 +111,13 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 								{
 									executors.remove(task);
 								}
-								runningexes.remove(this);
+								runningexes.remove(task);
 								
 								idf	= checkIdleFuture();
 							}
 							else if(executors!=null && executors.get(task)!=this)
 							{
-								runningexes.remove(this);								
+								runningexes.remove(task);								
 							}
 						}
 					}
@@ -139,7 +138,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				boolean	exec	= exe.execute();
 				if(exec)
 				{
-					runningexes.add(exe);
+					runningexes.put(task, exe);
 				}
 			}
 		}
@@ -205,11 +204,11 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	}
 	
 	/**
-	 *  Get the currently running or waiting tasks.
+	 *  Get the currently running tasks.
 	 */
-	public synchronized IExecutable[]	getTasks()
+	public synchronized IExecutable[]	getRunningTasks()
 	{
-		return (IExecutable[])executors.keySet().toArray(new IExecutable[executors.size()]);
+		return (IExecutable[])runningexes.keySet().toArray(new IExecutable[runningexes.size()]);
 	}
 	
 	/**

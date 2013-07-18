@@ -148,7 +148,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	/**
 	 *  Get the currently running or waiting tasks.
 	 */
-	public synchronized IExecutable[]	getTasks()
+	public synchronized IExecutable[]	getRunningTasks()
 	{
 		return (IExecutable[])queue.toArray(new IExecutable[queue.size()]);
 	}
