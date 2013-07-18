@@ -56,7 +56,7 @@
 		<belief name="has_garbage" class="boolean" evaluationmode="push">
  			<fact language="jcl">
  				$beliefbase.myself.garbage!=null
-  				//$beliefbase.myself.getProperty("has_garbage")
+  				//$beliefbase.myself.getProperty("garbage")
 			</fact>
 		</belief>
 	</beliefs>

@@ -42,7 +42,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	 *  whenever the actual position is dirty and there is no
 	 *  burner present.
 	 */
-	@Goal(deliberation=@Deliberation(inhibits={Check.class}))
+	@Goal(unique=true, deliberation=@Deliberation(inhibits={Check.class}))
 	public static class Take
 	{
 		/**
@@ -56,6 +56,22 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 			if(ret)
 				System.out.println("collector creating new take goal");
 			return ret;
+		}
+		
+		/**
+		 *  Get the hashcode. 
+		 */
+		public int hashCode()
+		{
+			return 31;
+		}
+		
+		/**
+		 *  Test if equal to other object.
+		 */
+		public boolean equals(Object obj)
+		{
+			return obj instanceof Take;
 		}
 	}
 	
@@ -136,7 +152,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	 */
 	protected boolean hasGarbage()
 	{
-		return myself.getProperty("has_garbage")!=null;
+		return myself.getProperty("garbage")!=null;
 	}
 	
 }
