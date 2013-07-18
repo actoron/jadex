@@ -73,7 +73,7 @@ public class GoAction extends SimplePropertyObject implements ISpaceAction
 		
 		obj.setProperty("lastmove", dir);
 		
-//		System.out.println("Go action: "+obj.getProperty(ISpaceAction.ACTOR_ID)+" "+pos);
+		System.out.println("Go action: "+obj.getProperty(ISpaceAction.ACTOR_ID)+" "+pos);
 		
 //		obj.fireObjectEvent(new ObjectEvent(POSITION_CHANGED));
 		

@@ -2,24 +2,40 @@ package jadex.bdiv3.examples.garbagecollector;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.rules.eca.IEvent;
 
 import java.util.List;
 
 /**
- * 
+ *  Garbage collector agent.</H3>
+ *  Runs a predefined way on the grid and searches for
+ *  garbage. Whenever it sees garbage at its actual position
+ *  it tries to pick it up and brings it to one of the available
+ *  garbage burners (chosen randomly).
  */
 @Agent
+@Plans(
+{
+	@Plan(trigger=@Trigger(goals=GarbageCollectorBDI.Check.class), body=@Body(CheckingPlanEnv.class)),
+	@Plan(trigger=@Trigger(goals=GarbageCollectorBDI.Take.class), body=@Body(TakePlanEnv.class)),
+	@Plan(trigger=@Trigger(goals=GarbageCollectorBDI.Go.class), body=@Body(GoPlanEnv.class)),
+	@Plan(trigger=@Trigger(goals=GarbageCollectorBDI.Pick.class), body=@Body(PickUpPlanEnv.class))
+})
 public class GarbageCollectorBDI
 {
 	@Agent
@@ -31,9 +47,9 @@ public class GarbageCollectorBDI
 	/** The environment. */
 	protected ISpaceObject myself = env.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
 
-	/** The position. */
-	@Belief(dynamic=true)
-	protected IVector2 pos = (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
+//	/** The position. */
+//	@Belief(dynamic=true)
+//	protected IVector2 pos = (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 
 	/** The garbages. */
 	@Belief
@@ -56,7 +72,7 @@ public class GarbageCollectorBDI
 		@GoalCreationCondition(events="garbages")
 		public static boolean checkCreate(GarbageCollectorBDI outer, ISpaceObject garbage, IEvent event)
 		{
-			return outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.pos, "burner")==null;
+			return outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.getPosition(), "burner")==null;
 		}
 	}
 	
@@ -113,6 +129,15 @@ public class GarbageCollectorBDI
 	}
 	
 	/**
+	 *  The agent body.
+	 */
+	@AgentBody
+	public void body()
+	{
+		agent.dispatchTopLevelGoal(new Check());
+	}
+	
+	/**
 	 * 
 	 */
 	protected boolean isDirty()
@@ -143,7 +168,8 @@ public class GarbageCollectorBDI
 	 */
 	public IVector2 getPosition()
 	{
-		return pos;
+		return (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
+//		return pos;
 	}
 
 	/**

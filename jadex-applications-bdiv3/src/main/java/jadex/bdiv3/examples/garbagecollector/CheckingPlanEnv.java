@@ -5,8 +5,8 @@ import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Check;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
-import jadex.bdiv3.examples.marsworld.carry.CarryBDI.CarryOre;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
@@ -26,8 +26,8 @@ public class CheckingPlanEnv
 	@PlanAPI
 	protected IPlan rplan;
 	
-	@PlanReason
-	protected CarryOre goal;
+//	@PlanReason
+//	protected Check goal;
 	
 	/**
 	 *  The plan body.
@@ -40,10 +40,10 @@ public class CheckingPlanEnv
 		IVector2 mypos = collector.getPosition();
 		IVector2 newpos = computeNextPosition(mypos, size.getXAsInteger(), size.getYAsInteger());
 
-//		System.out.println("Moving from "+mypos+" to: "+newpos);
+		System.out.println("Moving from "+mypos+" to: "+newpos);
 		Go go = collector.new Go(newpos);
 		rplan.dispatchSubgoal(go).get();
-//		System.out.println("Moved to: "+newpos);
+		System.out.println("Moved to: "+newpos);
 	}
 
 	/**

@@ -73,7 +73,7 @@ public class GoPlanEnv
 				}
 			}
 
-//			System.out.println("Wants to go: "+dir+" "+mypos+" "+target);
+			System.out.println("Wants to go: "+dir+" "+mypos+" "+target);
 			
 			Future<Void> fut = new Future<Void>();
 			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
@@ -82,6 +82,8 @@ public class GoPlanEnv
 			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(collector.getAgent().getComponentDescription()).getId());
 			env.performSpaceAction("go", params, lis); 
 			fut.get();
+			
+			System.out.println("after go");
 		}
 	}
 }

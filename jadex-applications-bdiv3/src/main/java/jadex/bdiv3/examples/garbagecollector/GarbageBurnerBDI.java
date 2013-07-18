@@ -12,7 +12,6 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.commons.SUtil;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
