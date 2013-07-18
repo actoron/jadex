@@ -123,8 +123,8 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 		public boolean checkDrop()
 		{
 			boolean ret = !isDirty() && !hasGarbage();
-			if(ret)
-				System.out.println("drop");
+//			if(ret)
+//				System.out.println("drop: "+isDirty()+", "+hasGarbage());
 			return ret;
 			//!$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
 		}

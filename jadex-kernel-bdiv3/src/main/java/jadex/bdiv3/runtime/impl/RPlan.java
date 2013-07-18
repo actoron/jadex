@@ -543,7 +543,7 @@ public class RPlan extends RElement implements IPlan
 	public void abort()
 	{
 //		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("Move")!=-1)
-//			System.out.println("abort move plan: "+this);
+//			System.out.println("abort plan: "+this);
 		
 		if(!isFinished())
 		{
@@ -755,59 +755,64 @@ public class RPlan extends RElement implements IPlan
 		final ResumeCommand<E> rescom = new ResumeCommand<E>(ret);
 		setResumeCommand(rescom);
 		
+		final	PlanLifecycleState lcs	= getLifecycleState();
+		
 		IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
 		cont.addResultListener(new DefaultResultListener<ITimer>()
 		{
 			public void resultAvailable(final ITimer timer)
 			{
-				if(timer!=null)
-					rescom.setTimer(timer);
-				
-//				rgoal.addGoalListener(new TimeoutResultListener<Void>(
-//					timeout, ia.getExternalAccess(), new IResultListener<Void>()
-				rgoal.addGoalListener(new IResultListener<Void>()
+				if(lcs.equals(getLifecycleState()))
 				{
-					public void resultAvailable(Void result)
-					{
-						if(rescom.equals(getResumeCommand()))
-						{
-							if(rgoal.isFinished() && getException()==null)
-							{
-								Object o = RGoal.getGoalResult(goal, mgoal, ia.getClassLoader());
-								setDispatchedElement(o);
-							}
-							else if(getException()==null)
-							{
-								setException(new PlanAbortedException());
-							}
-								
-							RPlan.executePlan(RPlan.this, ia);
-							
-	//						if(!rgoal.isFinished() && (isAborted() || isFailed()))
-	//						{
-	//							setException(new PlanFailureException());
-	//						}
-	//						else
-	//						{
-	//							Object o = RGoal.getGoalResult(goal, mgoal, ia.getClassLoader());
-	//							ret.setResult((E)o);
-	//						}
-						}
-					}
+					if(timer!=null)
+						rescom.setTimer(timer);
 					
-					public void exceptionOccurred(Exception exception)
+	//				rgoal.addGoalListener(new TimeoutResultListener<Void>(
+	//					timeout, ia.getExternalAccess(), new IResultListener<Void>()
+					rgoal.addGoalListener(new IResultListener<Void>()
 					{
-						if(rescom.equals(getResumeCommand()))
+						public void resultAvailable(Void result)
 						{
-							setException(exception);
-							RPlan.executePlan(RPlan.this, ia);
+							if(rescom.equals(getResumeCommand()))
+							{
+								if(rgoal.isFinished() && getException()==null)
+								{
+									Object o = RGoal.getGoalResult(goal, mgoal, ia.getClassLoader());
+									setDispatchedElement(o);
+								}
+								else if(getException()==null)
+								{
+									setException(new PlanAbortedException());
+								}
+									
+								RPlan.executePlan(RPlan.this, ia);
+								
+		//						if(!rgoal.isFinished() && (isAborted() || isFailed()))
+		//						{
+		//							setException(new PlanFailureException());
+		//						}
+		//						else
+		//						{
+		//							Object o = RGoal.getGoalResult(goal, mgoal, ia.getClassLoader());
+		//							ret.setResult((E)o);
+		//						}
+							}
 						}
-					}
-				});
-
-				addSubgoal(rgoal);
-				
-				ip.scheduleStep(new AdoptGoalAction(rgoal));
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(rescom.equals(getResumeCommand()))
+							{
+								setException(exception);
+								RPlan.executePlan(RPlan.this, ia);
+							}
+						}
+					});
+	
+					addSubgoal(rgoal);
+					
+					ip.scheduleStep(new AdoptGoalAction(rgoal));
+				}
 			}
 		});
 		

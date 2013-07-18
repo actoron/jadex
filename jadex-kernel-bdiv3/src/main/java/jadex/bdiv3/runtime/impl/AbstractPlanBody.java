@@ -101,7 +101,10 @@ public abstract class AbstractPlanBody implements IPlanBody
 					public void resultAvailable(Void result)
 					{
 						if(!rplan.isFinished())
-							rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
+						{
+							rplan.setLifecycleState(exception instanceof PlanAbortedException
+								? RPlan.PlanLifecycleState.ABORTED : RPlan.PlanLifecycleState.FAILED);
+						}
 //						if(reason instanceof RProcessableElement)
 //							((RProcessableElement)reason).planFinished(ia, rplan);
 						ret.setException(exception);
@@ -110,7 +113,10 @@ public abstract class AbstractPlanBody implements IPlanBody
 					public void exceptionOccurred(Exception ex)
 					{
 						if(!rplan.isFinished())
-							rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
+						{
+							rplan.setLifecycleState(exception instanceof PlanAbortedException
+								? RPlan.PlanLifecycleState.ABORTED : RPlan.PlanLifecycleState.FAILED);
+						}
 //						if(reason instanceof RProcessableElement)
 //							((RProcessableElement)reason).planFinished(ia, rplan);
 						ret.setException(exception);

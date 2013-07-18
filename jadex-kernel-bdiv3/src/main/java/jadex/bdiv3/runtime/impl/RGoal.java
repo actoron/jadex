@@ -270,6 +270,13 @@ public class RGoal extends RProcessableElement implements IGoal
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
+//		if(/*this.toString().indexOf("Go")!=-1 && */GoalLifecycleState.ACTIVE.equals(getLifecycleState())
+//			&& GoalLifecycleState.OPTION.equals(lifecyclestate))
+//		{
+//			System.out.println("plan to abort: "+childplan+", "+this);
+//			((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).getCapability().dumpGoals();
+//		}
+		
 		if(GoalLifecycleState.DROPPED.equals(getLifecycleState()))
 			throw new RuntimeException("Final proc state cannot be changed: "+getLifecycleState()+" "+lifecyclestate);
 		if(GoalLifecycleState.DROPPING.equals(getLifecycleState()) && !GoalLifecycleState.DROPPED.equals(lifecyclestate))
@@ -289,9 +296,9 @@ public class RGoal extends RProcessableElement implements IGoal
 //			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 //		if(getId().indexOf("AchieveCleanup")!=-1)
 //			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
-		if(getId().indexOf("Pick")!=-1)
+//		if(getId().indexOf("Pick")!=-1)
 //		if(ia.getExternalAccess().getComponentIdentifier().getLocalName().indexOf("Sentry")!=-1)
-			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
+//			System.out.println("goal state change: "+this.getId()+" "+getLifecycleState()+" "+lifecyclestate);
 
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 		setLifecycleState(lifecyclestate);
@@ -381,7 +388,9 @@ public class RGoal extends RProcessableElement implements IGoal
 	protected void abortPlans()
 	{
 		if(childplan!=null)
+		{
 			childplan.abort();
+		}
 	}
 	
 	/**

@@ -93,6 +93,7 @@ public class GoPlanEnv
 	@PlanAborted
 	public void	aborted()
 	{
+//		System.out.println("go aborted "+this+", "+action);
 		if(action!=-1)
 		{
 			collector.getEnvironment().cancelSpaceAction(action);
