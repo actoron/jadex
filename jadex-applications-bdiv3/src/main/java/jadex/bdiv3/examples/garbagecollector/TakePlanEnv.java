@@ -74,12 +74,12 @@ public class TakePlanEnv
 		rplan.dispatchSubgoal(goback).get();
 	}
 
-	@PlanAborted
-	@PlanFailed
-	public void aborted()
-	{
-		System.out.println("aborted: "+collector.getAgent().getAgentName()+" "+this);
-	}
+//	@PlanAborted
+//	@PlanFailed
+//	public void aborted()
+//	{
+//		System.out.println("aborted: "+collector.getAgent().getAgentName()+" "+this);
+//	}
 //
 //	public void failed()
 //	{
