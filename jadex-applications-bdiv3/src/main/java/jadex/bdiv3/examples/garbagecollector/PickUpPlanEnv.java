@@ -59,9 +59,9 @@ public class PickUpPlanEnv
 //		System.out.println("pickup plan end");
 	}
 
-	@PlanFailed
-	public void failed(Exception e)
-	{
-		e.printStackTrace();
-	}
+//	@PlanFailed
+//	public void failed(Exception e)
+//	{
+//		e.printStackTrace();
+//	}
 }
