@@ -173,7 +173,8 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 				}
 
 
-				// Set the Material
+				// Set the Material if it is not one of the "Specials"
+				//TODO: evil hack!
 				if((spatial instanceof Geometry) && primitive.getType() != 6
 						&& primitive.getType() != 8 && primitive.getType() != 9 && primitive.getType() != Primitive3d.PRIMITIVE_TYPE_EFFECT) 
 					
@@ -219,6 +220,35 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 					}
 //					Material mat2 = mat_tt.clone();
 					spatial.setMaterial(mat_tt);
+					
+					
+					
+					String matpath = ((String)dc.getBoundValue(sobj, ((Primitive3d)primitive).getMaterialPath(), vp));
+						if(matpath==null || matpath.equals(""))
+						{
+							matpath = (String)((Primitive3d) primitive).getMaterialPath();
+						}
+						
+						Material mat;
+						
+						if(!matpath.equals(""))
+						{
+							if(vp.materials.containsKey(matpath))
+							{
+								mat = vp.materials.get(matpath);
+							}
+							else
+							{
+								Material tmp = assetManager.loadMaterial(matpath);
+								vp.materials.put(matpath, tmp);
+								mat = tmp;
+							}
+
+
+							spatial.setMaterial(mat);
+						}
+						
+						
 				}
 				
 				

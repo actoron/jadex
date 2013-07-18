@@ -7,6 +7,7 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
 
 import com.jme3.bounding.BoundingBox;
+import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
@@ -22,6 +23,9 @@ public class BoxJMonkeyRenderer extends AbstractJMonkeyRenderer
 			SpaceObject sobj, ViewportJMonkey vp)
 	{
 
+		
+
+		
 		// Unit Cube
 		box = new Box(Vector3f.ZERO, 1, 1, 1);
 
