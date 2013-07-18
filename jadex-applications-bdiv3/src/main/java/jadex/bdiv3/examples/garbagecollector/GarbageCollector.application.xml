@@ -203,7 +203,7 @@
 			<!-- A space executor defines the space execution policy (e.g. roundbased vs. continuous). -->
 			<env:spaceexecutor class="RoundBasedExecutor">
 				<env:property name="space">$space</env:property>
-				<env:property name="execution_monitoring">false</env:property>
+				<!-- <env:property name="execution_monitoring">false</env:property> -->
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</extensiontypes>

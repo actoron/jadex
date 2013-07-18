@@ -4,9 +4,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.garbagecollector.GarbageBurnerBDI.Pick;
-import jadex.bdiv3.examples.marsworld.carry.CarryBDI.CarryOre;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -30,8 +28,8 @@ public class BurnPlanEnv
 	@PlanAPI
 	protected IPlan rplan;
 	
-	@PlanReason
-	protected CarryOre goal;
+//	@PlanReason
+//	protected Burn goal;
 	
 	
 	/**

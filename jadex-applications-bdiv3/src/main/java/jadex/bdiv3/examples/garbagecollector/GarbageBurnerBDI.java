@@ -96,7 +96,7 @@ public class GarbageBurnerBDI extends BaseAgentBDI
 	/**
 	 *  The goal for picking up waste. Tries endlessly to pick up. 
 	 */
-	@Goal(excludemode=MProcessableElement.EXCLUDE_NEVER)
+	@Goal(excludemode=MProcessableElement.EXCLUDE_NEVER, retrydelay=100)
 	public class Pick
 	{
 	}

@@ -831,7 +831,7 @@ public class RGoal extends RProcessableElement implements IGoal
 				{
 					Set<MGoal> minh = delib.getInhibitions();
 					MGoal mother = other.getMGoal();
-					if(minh.contains(mother))
+					if(minh!=null && minh.contains(mother))
 					{
 						ret = true;
 						

@@ -4,8 +4,6 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanReason;
-import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Pick;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.commons.future.DelegationResultListener;
@@ -30,8 +28,8 @@ public class PickUpPlanEnv
 	@PlanAPI
 	protected IPlan rplan;
 		
-	@PlanReason
-	protected Pick goal;
+//	@PlanReason
+//	protected Pick goal;
 	
 	/**
 	 *  The plan body.
