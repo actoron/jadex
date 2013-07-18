@@ -8,15 +8,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
@@ -26,7 +23,6 @@ import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 
@@ -56,9 +52,6 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	
 	/** The flag indicating that the executor is terminated. */
 	protected boolean terminated;
-	
-	/** The execution monitor (if any). */
-	protected IChangeListener<Object>	mon;
 	
 	//-------- constructors--------
 	
@@ -101,146 +94,152 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final IServiceProvider provider	= space.getExternalAccess().getServiceProvider();
 		
-		if(Boolean.TRUE.equals(getProperty(PROPERTY_EXECUTION_MONITORING)!=null))
+		SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IExecutionService>()
 		{
-			mon	= addExecutionMonitor(space.getExternalAccess());			
-		}
-
-		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IExecutionService exeservice)
 			{
-				final IClockService clockservice = (IClockService)result;
-
-				Comparator comp = (Comparator)getProperty("comparator");
-				if(comp!=null)
+				SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DefaultResultListener<IClockService>()
 				{
-					space.getComponentActionList().setOrdering(comp);
-				}
-				
-				if(MODE_LASTACTION.equals(getProperty(PROPERTY_MODE)))
-				{
-					space.getComponentActionList().setScheduleCommand(new ICommand()
+					public void resultAvailable(final IClockService clockservice)
 					{
-						public void execute(Object args)
+						Comparator comp = (Comparator)getProperty("comparator");
+						if(comp!=null)
 						{
-							ActionEntry	entry	= (ActionEntry)args;
-							ActionEntry	entries[]	= space.getComponentActionList().getActionEntries();
-							
-							if(entries.length>0)
-							{
-								IComponentDescription actor	= entry.parameters!=null ?
-									(IComponentDescription)entry.parameters.get(ISpaceAction.ACTOR_ID) : null;
-								
-								for(int i=0; actor!=null && i<entries.length; i++)
-								{
-									IComponentDescription actor2 = entries[i].parameters!=null ?
-										(IComponentDescription)entries[i].parameters.get(ISpaceAction.ACTOR_ID) : null;
-									if(actor.equals(actor2))
-									{
-		//								System.out.println("Removing duplicate action: "+entries[i]);
-										space.getComponentActionList().removeComponentAction(entries[i]);
-									}
-								}
-							}
-							space.getComponentActionList().addComponentAction(entry);
+							space.getComponentActionList().setOrdering(comp);
 						}
-					});
-				}
-				
-				timestamp = clockservice.getTime();
-				
-				// Start the processes.
-				Object[] procs = space.getProcesses().toArray();
-				for(int i = 0; i < procs.length; ++i)
-				{
-					ISpaceProcess process = (ISpaceProcess) procs[i];
-					process.start(clockservice, space);
-				}
-
-				new IComponentStep<Void>()
-				{
-					boolean first = true;
-
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-		//				System.out.println("---+++--- New round: "+currenttime+" ---+++---");
 						
-						long progress = currenttime - timestamp;
-						timestamp = currenttime;
-						
-						synchronized(space.getMonitor())
+						if(MODE_LASTACTION.equals(getProperty(PROPERTY_MODE)))
 						{
-							// In the first round only percepts are distributed.
-							if(!first)
+							space.getComponentActionList().setScheduleCommand(new ICommand()
 							{
-								// Update the environment objects.
-								Object[] objs = space.getSpaceObjectsCollection().toArray();
-								for(int i = 0; i < objs.length; ++i)
+								public void execute(Object args)
 								{
-									SpaceObject obj = (SpaceObject)objs[i];
-									obj.updateObject(space, progress, clockservice);
+									ActionEntry	entry	= (ActionEntry)args;
+									ActionEntry	entries[]	= space.getComponentActionList().getActionEntries();
+									
+									if(entries.length>0)
+									{
+										IComponentDescription actor	= entry.parameters!=null ?
+											(IComponentDescription)entry.parameters.get(ISpaceAction.ACTOR_ID) : null;
+										
+										for(int i=0; actor!=null && i<entries.length; i++)
+										{
+											IComponentDescription actor2 = entries[i].parameters!=null ?
+												(IComponentDescription)entries[i].parameters.get(ISpaceAction.ACTOR_ID) : null;
+											if(actor.equals(actor2))
+											{
+				//								System.out.println("Removing duplicate action: "+entries[i]);
+												space.getComponentActionList().removeComponentAction(entries[i]);
+											}
+										}
+									}
+									space.getComponentActionList().addComponentAction(entry);
 								}
-								
-								// Execute the scheduled component actions.
-								space.getComponentActionList().executeActions(null, false);
-								
-								// Execute the processes.
-								Object[] procs = space.getProcesses().toArray();
-								for(int i = 0; i < procs.length; ++i)
-								{
-									ISpaceProcess process = (ISpaceProcess) procs[i];
-									process.execute(clockservice, space);
-								}
-								
-								// Update the views.
-								for(Iterator it = space.getViews().iterator(); it.hasNext(); )
-								{
-									IDataView view = (IDataView) it.next();
-									view.update(space);
-								}
-								
-								// Execute the data consumers.
-								for(Iterator it = space.getDataConsumers().iterator(); it.hasNext(); )
-								{
-									ITableDataConsumer consumer = (ITableDataConsumer)it.next();
-									consumer.consumeData(currenttime, clockservice.getTick());
-								}
-							}
-							
-							// Send the percepts to the components.
-							space.getPerceptList().processPercepts(null);
-		
-							// Wakeup the components.
-							space.getComponentActionList().wakeupComponents(null);
-							
-							first = false;
+							});
 						}
-		//				System.out.println("-------------------------------------------");
 						
-						final IComponentStep step = this;
-						timer = clockservice.createTickTimer(new ITimedObject()
+						timestamp = clockservice.getTime();
+						
+						// Start the processes.
+						Object[] procs = space.getProcesses().toArray();
+						for(int i = 0; i < procs.length; ++i)
 						{
-							public void timeEventOccurred(long currenttime)
+							ISpaceProcess process = (ISpaceProcess) procs[i];
+							process.start(clockservice, space);
+						}
+	
+						new IComponentStep<Void>()
+						{
+							boolean first = true;
+	
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								if(!terminated)
+				//				System.out.println("---+++--- New round: "+currenttime+" ---+++---");
+								
+								if(Boolean.TRUE.equals(getProperty(PROPERTY_EXECUTION_MONITORING)))
 								{
-									RoundBasedExecutor.this.currenttime = currenttime;
-									try
-									{
-										space.getExternalAccess().scheduleStep(step);
-									}
-									catch(ComponentTerminatedException cte)
-									{
-									}
+									monitorExecution(space.getExternalAccess(), exeservice);			
 								}
+								
+								long progress = currenttime - timestamp;
+								timestamp = currenttime;
+								
+								synchronized(space.getMonitor())
+								{
+									// In the first round only percepts are distributed.
+									if(!first)
+									{
+										// Update the environment objects.
+										Object[] objs = space.getSpaceObjectsCollection().toArray();
+										for(int i = 0; i < objs.length; ++i)
+										{
+											SpaceObject obj = (SpaceObject)objs[i];
+											obj.updateObject(space, progress, clockservice);
+										}
+										
+										// Execute the scheduled component actions.
+										space.getComponentActionList().executeActions(null, false);
+										
+										// Execute the processes.
+										Object[] procs = space.getProcesses().toArray();
+										for(int i = 0; i < procs.length; ++i)
+										{
+											ISpaceProcess process = (ISpaceProcess) procs[i];
+											process.execute(clockservice, space);
+										}
+										
+										// Update the views.
+										for(Iterator it = space.getViews().iterator(); it.hasNext(); )
+										{
+											IDataView view = (IDataView) it.next();
+											view.update(space);
+										}
+										
+										// Execute the data consumers.
+										for(Iterator it = space.getDataConsumers().iterator(); it.hasNext(); )
+										{
+											ITableDataConsumer consumer = (ITableDataConsumer)it.next();
+											consumer.consumeData(currenttime, clockservice.getTick());
+										}
+									}
+									
+									// Send the percepts to the components.
+									space.getPerceptList().processPercepts(null);
+				
+									// Wakeup the components.
+									space.getComponentActionList().wakeupComponents(null);
+									
+									first = false;
+								}
+				//				System.out.println("-------------------------------------------");
+								
+								final IComponentStep step = this;
+								timer = clockservice.createTickTimer(new ITimedObject()
+								{
+									public void timeEventOccurred(long currenttime)
+									{
+										if(!terminated)
+										{
+											RoundBasedExecutor.this.currenttime = currenttime;
+											try
+											{
+												space.getExternalAccess().scheduleStep(step);
+											}
+											catch(ComponentTerminatedException cte)
+											{
+											}
+										}
+									}
+								});
+								return IFuture.DONE;
 							}
-						});
-						return IFuture.DONE;
+						}.execute(null);				
 					}
-				}.execute(null);				
+				});				
 			}
-		});
+		});		
 	}
 	
 	/**
@@ -254,84 +253,30 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		{
 			timer.cancel();
 		}
-		if(mon!=null)
-		{
-			removeExecutionMonitor(((AbstractEnvironmentSpace)getProperty("space")).getExternalAccess(), mon);
-		}
 	}
 	
 	/**
-	 *  Add a listener to the clock and check if no agent is running whenever the clock advances.
+	 *  Check if no agent is running whenever the clock advances.
 	 */
-	protected static IChangeListener<Object>	addExecutionMonitor(final IExternalAccess ea)
+	protected static void	monitorExecution(IExternalAccess ea, IExecutionService exe)
 	{
-		final IClockService[]	clock	= new IClockService[1];
-		final IExecutionService[]	exe	= new IExecutionService[1];
-		
-		final IChangeListener<Object>	ret	= new IChangeListener<Object>()
+		IExecutable[]	tasks	= exe.getTasks();
+		for(IExecutable task: tasks)
 		{
-			long last	= 0;
-			public void changeOccurred(ChangeEvent<Object> event)
+			// Only print warning for sub-components
+			if(task instanceof IComponentAdapter)
 			{
-				long	cur	= clock[0].getTime();
-				if(cur!=last && IClock.EVENT_TYPE_NEXT_TIMEPOINT.equals(event.getType()))
+				IComponentIdentifier	cid	= ((IComponentAdapter)task).getComponentIdentifier();
+				IComponentIdentifier	test	= cid;
+				while(test!=null && !test.equals(ea.getComponentIdentifier()))
 				{
-					IExecutable[]	tasks	= exe[0].getTasks();
-					for(IExecutable task: tasks)
-					{
-						// Only print warning for sub-components
-						if(task instanceof IComponentAdapter)
-						{
-							IComponentIdentifier	cid	= ((IComponentAdapter)task).getComponentIdentifier();
-							IComponentIdentifier	test	= cid;
-							while(test!=null && !test.equals(ea.getComponentIdentifier()))
-							{
-								test	= test.getParent();
-							}
-							if(test!=null)
-							{
-								System.out.println("Non-idle component at time switch: "+cid);
-							}
-						}
-					}
+					test	= test.getParent();
 				}
-				last	= cur;
-			}
-		};
-		
-		SServiceProvider.getService(ea.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DefaultResultListener<IExecutionService>()
-		{
-			public void resultAvailable(IExecutionService result)
-			{
-				exe[0]	= result;
-				SServiceProvider.getService(ea.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DefaultResultListener<IClockService>()
+				if(test!=null)
 				{
-					public void resultAvailable(IClockService result)
-					{
-						clock[0]	= result;
-						clock[0].addChangeListener(ret);
-					}
-				});
+					System.out.println("Non-idle component at time switch: "+cid);
+				}
 			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Remove the clock listener.
-	 */
-	protected static void	removeExecutionMonitor( IExternalAccess ea, final IChangeListener<Object> mon)
-	{
-		SServiceProvider.getService(ea.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DefaultResultListener<IClockService>()
-		{
-			public void resultAvailable(final IClockService clock)
-			{
-				clock.removeChangeListener(mon);
-			}
-		});
+		}
 	}
 }
