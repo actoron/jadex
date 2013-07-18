@@ -4,6 +4,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.commons.future.DelegationResultListener;
@@ -56,5 +57,11 @@ public class PickUpPlanEnv
 //			fail();
 		
 //		System.out.println("pickup plan end");
+	}
+
+	@PlanFailed
+	public void failed(Exception e)
+	{
+		e.printStackTrace();
 	}
 }

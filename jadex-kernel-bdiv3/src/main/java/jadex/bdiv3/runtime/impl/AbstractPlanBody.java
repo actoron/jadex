@@ -94,6 +94,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 //				int next = rplan.getException() instanceof PlanAbortedException? 3: 2;
 				int next = exception instanceof PlanAbortedException? 3: 2;
 				
+				rplan.setException(exception);
 				internalInvokePart(agent, next)
 					.addResultListener(new IResultListener<Void>()
 				{
@@ -101,7 +102,6 @@ public abstract class AbstractPlanBody implements IPlanBody
 					{
 						if(!rplan.isFinished())
 							rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
-						rplan.setException(exception);
 //						if(reason instanceof RProcessableElement)
 //							((RProcessableElement)reason).planFinished(ia, rplan);
 						ret.setException(exception);
@@ -111,7 +111,6 @@ public abstract class AbstractPlanBody implements IPlanBody
 					{
 						if(!rplan.isFinished())
 							rplan.setLifecycleState(RPlan.PlanLifecycleState.FAILED);
-						rplan.setException(exception);
 //						if(reason instanceof RProcessableElement)
 //							((RProcessableElement)reason).planFinished(ia, rplan);
 						ret.setException(exception);
