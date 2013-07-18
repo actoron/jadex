@@ -191,16 +191,22 @@ public interface IEnvironmentSpace extends IPropertyObject, IExtensionInstance
 	 * @param name Id of the action
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
+	 * @return The id of the action instance for later access.
 	 */
-	public void performSpaceAction(String name, Map parameters, IResultListener listener);
+	public int performSpaceAction(String name, Map parameters, IResultListener listener);
 
 	/**
-	 * Performs a space action.
-	 * @param name Id of the action
-	 * @param parameters parameters for the action (may be null)
-	 * @return return value of the action
+	 * Cancel a queued space action.
 	 */
-	public Object performSpaceAction(String name, Map parameters);
+	public void cancelSpaceAction(int id);
+
+//	/**
+//	 * Performs a space action.
+//	 * @param name Id of the action
+//	 * @param parameters parameters for the action (may be null)
+//	 * @return return value of the action
+//	 */
+//	public Object performSpaceAction(String name, Map parameters);
 	
 	/**
 	 *  Get the owner of an object.

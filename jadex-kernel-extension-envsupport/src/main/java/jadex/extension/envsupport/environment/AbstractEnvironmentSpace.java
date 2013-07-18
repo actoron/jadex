@@ -2039,12 +2039,23 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
 	 */
-	public void performSpaceAction(String id, Map parameters, IResultListener listener)
+	public int performSpaceAction(String id, Map parameters, IResultListener listener)
 	{
 		synchronized(monitor)
 		{
-			actionlist.scheduleComponentAction(getSpaceAction(id), parameters, listener);
+			return actionlist.scheduleComponentAction(getSpaceAction(id), parameters, listener);
 		}
+	}
+	
+	/**
+	 * Cancel a queued space action.
+	 */
+	public void cancelSpaceAction(int id)
+	{
+		synchronized(monitor)
+		{
+			actionlist.cancelComponentAction(id);
+		}		
 	}
 	
 	/**

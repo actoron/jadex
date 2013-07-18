@@ -28,10 +28,10 @@ public class ComponentActionList
 	protected IEnvironmentSpace	space;
 
 	/** The scheduled actions. */
-	protected Set	actions;
+	protected Set<ActionEntry>	actions;
 	
 	/** The executed actions where actors still need to be woken up. */
-	protected Collection	executed;
+	protected Collection<ActionEntry>	executed;
 	
 	/** The schedule command. */
 	protected ICommand	cmd;
@@ -54,7 +54,7 @@ public class ComponentActionList
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
 	 */
-	public void scheduleComponentAction(ISpaceAction action, Map parameters, IResultListener listener)
+	public int scheduleComponentAction(ISpaceAction action, Map parameters, IResultListener listener)
 	{
 		ActionEntry	entry	= new ActionEntry(action, parameters, listener);
 		
@@ -65,7 +65,24 @@ public class ComponentActionList
 		// Otherwise queue action (default).
 		else
 			addComponentAction(entry);
+		
+		return entry.id;
 	}
+	
+	/**
+	 * Cancels a component action.
+	 */
+	public void cancelComponentAction(int id)
+	{
+		for(ActionEntry entry: actions)
+		{
+			if(entry.id==id)
+			{
+				entry.invalid	= true;
+			}
+		}
+	}
+
 	
 	/**
 	 * Add an component action.
@@ -74,7 +91,7 @@ public class ComponentActionList
 	public void addComponentAction(ActionEntry entry)
 	{
 		if(actions==null)
-			actions	= new LinkedHashSet();
+			actions	= new LinkedHashSet<ActionEntry>();
 		
 		actions.add(entry);
 	}
@@ -116,13 +133,13 @@ public class ComponentActionList
 	{
 		if(actions!=null)
 		{
-			Set	tmp	= new TreeSet(comp);
+			Set<ActionEntry>	tmp	= new TreeSet<ActionEntry>(comp);
 			tmp.addAll(actions);
 			actions	= tmp;
 		}
 		else
 		{
-			actions	= new TreeSet(comp);
+			actions	= new TreeSet<ActionEntry>(comp);
 		}
 	}
 	

@@ -2,6 +2,7 @@ package jadex.bdiv3.examples.garbagecollector;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
@@ -35,6 +36,8 @@ public class GoPlanEnv
 	
 	@PlanReason
 	protected Go goal;
+	
+	protected int	action	= -1;
 	
 	/**
 	 *  The plan body.
@@ -73,17 +76,26 @@ public class GoPlanEnv
 				}
 			}
 
-//			System.out.println("Wants to go: "+dir+" "+mypos+" "+target);
+//			System.out.println("Wants to go: "+dir+" "+mypos+" "+target+", "+this);
 			
 			Future<Void> fut = new Future<Void>();
 			DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 			Map params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
 			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(collector.getAgent().getComponentDescription()).getId());
-			env.performSpaceAction("go", params, lis); 
+			action	= env.performSpaceAction("go", params, lis); 
 			fut.get();
 			
-//			System.out.println("after go");
+//			System.out.println("after go "+this);
+		}
+	}
+	
+	@PlanAborted
+	public void	aborted()
+	{
+		if(action!=-1)
+		{
+			collector.getEnvironment().cancelSpaceAction(action);
 		}
 	}
 }
