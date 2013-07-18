@@ -7,6 +7,7 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Pick;
 import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -43,13 +44,15 @@ public class PickUpPlanEnv
 		IEnvironmentSpace env = collector.getEnvironment();
 		// todo: garbage as parameter?
 		
-		Future<Void> fut = new Future<Void>();
-		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
+		Future<Boolean> fut = new Future<Boolean>();
+		DelegationResultListener<Boolean> lis = new DelegationResultListener<Boolean>(fut, true);
 		Map params = new HashMap();
 		params.put(ISpaceAction.ACTOR_ID, collector.getAgent().getComponentDescription());
 		env.performSpaceAction("pickup", params, lis); // todo: garbage as parameter?
-		fut.get();  
-		
+		Boolean done = fut.get();  
+		if(!done.booleanValue())
+			throw new PlanFailureException();
+			
 		// todo: handle result
 //		if(!((Boolean)srl.waitForResult()).booleanValue()) 
 //			fail();

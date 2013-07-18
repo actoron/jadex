@@ -72,14 +72,17 @@ public class GarbageCollectorBDI
 		@GoalCreationCondition(events="garbages")
 		public static boolean checkCreate(GarbageCollectorBDI outer, ISpaceObject garbage, IEvent event)
 		{
-			return outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.getPosition(), "burner")==null;
+			boolean ret = outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.getPosition(), "burner")==null;
+			if(ret)
+				System.out.println("ggg");
+			return ret;
 		}
 	}
 	
 	/**
 	 *  Goal for running around on the grid and searching for garbage.
 	 */
-	@Goal(excludemode=MProcessableElement.EXCLUDE_NEVER)
+	@Goal(excludemode=MProcessableElement.EXCLUDE_NEVER, succeedonpassed=false)
 	public class Check
 	{
 	}

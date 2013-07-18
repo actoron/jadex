@@ -40,10 +40,10 @@ public class CheckingPlanEnv
 		IVector2 mypos = collector.getPosition();
 		IVector2 newpos = computeNextPosition(mypos, size.getXAsInteger(), size.getYAsInteger());
 
-		System.out.println("Moving from "+mypos+" to: "+newpos);
+//		System.out.println("Moving from "+mypos+" to: "+newpos);
 		Go go = collector.new Go(newpos);
 		rplan.dispatchSubgoal(go).get();
-		System.out.println("Moved to: "+newpos);
+//		System.out.println("Moved to: "+newpos);
 	}
 
 	/**

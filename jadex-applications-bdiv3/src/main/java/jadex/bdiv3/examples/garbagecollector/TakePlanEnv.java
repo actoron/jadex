@@ -7,7 +7,7 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Pick;
-import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Take;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -34,7 +34,7 @@ public class TakePlanEnv
 	protected IPlan rplan;
 		
 	@PlanReason
-	protected Pick goal;
+	protected Take goal;
 	
 	/**
 	 *  The plan body.
