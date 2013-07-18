@@ -144,7 +144,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 											if(!facts.contains(percept) && (cond==null || evaluate(cond, fetcher)))
 											{
 												((Collection<Object>)facts).add(percept);
-//												System.out.println("added: "+percept+" to: "+belset);
+												System.out.println(agent.getName()+": added "+percept+" to: "+name);
 											}
 											return IFuture.DONE;
 										}
@@ -166,7 +166,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 											if(facts.contains(percept) && (cond==null || evaluate(cond, fetcher)))
 											{
 												((Collection<Object>)facts).remove(percept);
-//												System.out.println("removed: "+percept+" from: "+belset);
+												System.out.println(agent.getName()+": removed "+percept+" from: "+name);
 											}
 											return IFuture.DONE;
 										}
@@ -188,7 +188,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 											if(cond==null || evaluate(cond, fetcher))
 											{
 												mbel.setValue(bai, percept);
-//												System.out.println("set: "+percept+" on: "+bel);
+												System.out.println(agent.getName()+": set "+percept+" on: "+name);
 											}
 											return IFuture.DONE;
 										}
@@ -210,7 +210,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 											if(cond==null || evaluate(cond, fetcher))
 											{
 												mbel.setValue(bai, null);
-//												System.out.println("unset: "+percept+" on: "+bel);
+												System.out.println(agent.getName()+": unset "+percept+" on: "+name);
 											}
 											return IFuture.DONE;
 										}
@@ -242,7 +242,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 													// Hack!!! Shouldn't react to knownpos==null
 													if(!seen.contains(known) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
 													{
-//														System.out.println("Removing disappeared object: "+percept+", "+known[j]);
+														System.out.println(agent.getName()+": Removing disappeared object: "+percept+", "+known);
 														it.remove();
 													}
 												}

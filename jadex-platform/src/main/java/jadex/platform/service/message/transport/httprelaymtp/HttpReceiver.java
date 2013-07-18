@@ -226,6 +226,7 @@ public class HttpReceiver
 				try
 				{
 					AwarenessInfo	info	= (AwarenessInfo)MapSendTask.decodeMessage(data, codecs, getClass().getClassLoader(), IErrorReporter.IGNORE);
+//					System.out.println("Received awareness info: "+info);
 					awa.addAwarenessInfo(info);
 				}
 				catch(Exception e)
