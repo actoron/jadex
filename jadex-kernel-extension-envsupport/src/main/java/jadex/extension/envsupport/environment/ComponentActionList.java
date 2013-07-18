@@ -163,7 +163,7 @@ public class ComponentActionList
 						it.remove();
 						try
 						{
-							System.out.println("Action: "+entry);
+//							System.out.println("Action: "+entry);
 							if(!entry.isInvalid())
 							{
 								Object ret = entry.action.perform(entry.parameters, space);

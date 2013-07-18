@@ -59,7 +59,7 @@ public class GarbageBurnerBDI extends BaseAgentBDI
 		@GoalCreationCondition(events="garbages")
 		public static Burn checkCreate(GarbageBurnerBDI outer, ISpaceObject garbage, IEvent event)
 		{
-			return new Burn(outer, garbage);
+			return garbage==null? null: new Burn(outer, garbage);
 		}
 		
 		// hashcode and equals implementation for unique flag

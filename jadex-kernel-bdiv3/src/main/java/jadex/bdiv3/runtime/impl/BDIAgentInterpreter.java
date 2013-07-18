@@ -1671,8 +1671,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		// Start rule system
 		inited	= true;
-		if(getComponentIdentifier().getName().indexOf("Collector")!=-1 && getComponentIdentifier().getName().indexOf("Burner")==-1)
-			getCapability().dumpGoalsPeriodically(getInternalAccess());
+//		if(getComponentIdentifier().getName().indexOf("Collector")!=-1 && getComponentIdentifier().getName().indexOf("Burner")==-1)
+//			getCapability().dumpGoalsPeriodically(getInternalAccess());
 //		if(getComponentIdentifier().getName().indexOf("Collector")!=-1)
 //		{
 //			getCapability().dumpGoalsPeriodically(getInternalAccess());
