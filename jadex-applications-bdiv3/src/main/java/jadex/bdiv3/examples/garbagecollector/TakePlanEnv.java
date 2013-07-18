@@ -2,8 +2,10 @@ package jadex.bdiv3.examples.garbagecollector;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Pick;
@@ -45,10 +47,10 @@ public class TakePlanEnv
 		Space2D grid = (Space2D)collector.getEnvironment();
 
 		// Pickup the garbarge.
-//		System.out.println("Pick started: "+getAgentName());
+		System.out.println("Pick started: "+collector.getAgent().getAgentName());
 		Pick pick = collector.new Pick();
 		rplan.dispatchSubgoal(pick).get();
-//		System.out.println("Pick ended: "+getAgentName());
+		System.out.println("Pick ended: "+collector.getAgent().getAgentName());
 
 		// Go to the burner.
 		ISpaceObject myself = collector.getMyself();
@@ -59,7 +61,7 @@ public class TakePlanEnv
 		rplan.dispatchSubgoal(go).get();
 
 		// Put down the garbarge.
-//		System.out.println("Calling drop: "+getAgentName());
+		System.out.println("Calling drop: "+collector.getAgent().getAgentName());
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 		Map params = new HashMap();
@@ -72,10 +74,12 @@ public class TakePlanEnv
 		rplan.dispatchSubgoal(goback).get();
 	}
 
-//	public void aborted()
-//	{
-//		System.out.println("aborted: "+getAgentName()+" "+this);
-//	}
+	@PlanAborted
+	@PlanFailed
+	public void aborted()
+	{
+		System.out.println("aborted: "+collector.getAgent().getAgentName()+" "+this);
+	}
 //
 //	public void failed()
 //	{

@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *  Runtime element for storing goal ans plan instances.
@@ -312,16 +314,25 @@ public class RCapability extends RElement
 	 */
 	protected void dumpGoalsPeriodically(IInternalAccess ia)
 	{
-		IComponentStep<Void> step = new IComponentStep<Void>()
+		Timer t = new Timer();
+		t.scheduleAtFixedRate(new TimerTask()
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			public void run()
 			{
 				dumpGoals();
-				ia.waitForDelay(500, this);
-				return IFuture.DONE;
 			}
-		};
-		ia.getExternalAccess().scheduleStep(step);
+		}, 500, 500);
+		
+//		IComponentStep<Void> step = new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				dumpGoals();
+//				ia.waitForDelay(500, this);
+//				return IFuture.DONE;
+//			}
+//		};
+//		ia.getExternalAccess().scheduleStep(step);
 	}
 	
 	/**
@@ -329,16 +340,25 @@ public class RCapability extends RElement
 	 */
 	protected void dumpPlansPeriodically(IInternalAccess ia)
 	{
-		IComponentStep<Void> step = new IComponentStep<Void>()
+		Timer t = new Timer();
+		t.scheduleAtFixedRate(new TimerTask()
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			public void run()
 			{
 				dumpPlans();
-				ia.waitForDelay(500, this);
-				return IFuture.DONE;
 			}
-		};
-		ia.getExternalAccess().scheduleStep(step);
+		}, 500, 500);
+		
+//		IComponentStep<Void> step = new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				dumpPlans();
+//				ia.waitForDelay(500, this);
+//				return IFuture.DONE;
+//			}
+//		};
+//		ia.getExternalAccess().scheduleStep(step);
 	}
 	
 	/**

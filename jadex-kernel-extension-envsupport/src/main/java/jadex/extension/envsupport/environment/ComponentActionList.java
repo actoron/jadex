@@ -163,8 +163,8 @@ public class ComponentActionList
 						it.remove();
 						try
 						{
-//							System.out.println("Action: "+entry);
-							if(!entry.invalid)
+							System.out.println("Action: "+entry);
+							if(!entry.isInvalid())
 							{
 								Object ret = entry.action.perform(entry.parameters, space);
 								if(entry.listener!=null)
@@ -308,7 +308,7 @@ public class ComponentActionList
 		public int	id;
 		
 		/** Flag indicating that the action is invalid (e.g. when actor was destroyed in meantime). */
-		public boolean invalid;
+		private boolean invalid;
 		
 		//-------- constructors --------
 		
@@ -338,6 +338,24 @@ public class ComponentActionList
 		
 		//-------- methods --------
 		
+		/**
+		 *  Get the invalid.
+		 *  @return The invalid.
+		 */
+		public boolean isInvalid()
+		{
+			return invalid;
+		}
+
+		/**
+		 *  Set the invalid.
+		 *  @param invalid The invalid to set.
+		 */
+		public void setInvalid(boolean invalid)
+		{
+			this.invalid = invalid;
+		}
+
 		/**
 		 *  Create a string representation of the action.
 		 */

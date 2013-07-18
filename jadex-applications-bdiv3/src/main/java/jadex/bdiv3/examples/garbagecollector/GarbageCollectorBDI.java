@@ -42,7 +42,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	 *  whenever the actual position is dirty and there is no
 	 *  burner present.
 	 */
-	@Goal(deliberation=@Deliberation(inhibits=Check.class))
+	@Goal(deliberation=@Deliberation(inhibits={Check.class}))
 	public static class Take
 	{
 		/**
@@ -53,8 +53,8 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 		public static boolean checkCreate(GarbageCollectorBDI outer, ISpaceObject garbage, IEvent event)
 		{
 			boolean ret = outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.getPosition(), "burner")==null;
-//			if(ret)
-//				System.out.println("collector creating new take goal");
+			if(ret)
+				System.out.println("collector creating new take goal");
 			return ret;
 		}
 	}
@@ -106,7 +106,10 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 		@GoalDropCondition(events="garbages")
 		public boolean checkDrop()
 		{
-			return !isDirty() && !hasGarbage();
+			boolean ret = !isDirty() && !hasGarbage();
+			if(ret)
+				System.out.println("drop");
+			return ret;
 			//!$beliefbase.is_dirty &amp;&amp; !$beliefbase.has_garbage
 		}
 	}

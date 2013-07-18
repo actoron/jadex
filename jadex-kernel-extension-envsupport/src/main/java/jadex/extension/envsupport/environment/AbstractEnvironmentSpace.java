@@ -1842,10 +1842,6 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			{
 				String componenttype = desc.getLocalType();
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
-				if(mapping==null)
-				{
-					System.out.println("gruetzi");
-				}
 				if(mapping.isKillComponent())
 				{
 					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
@@ -1875,7 +1871,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						Object avatarid = so.getId();
 						if(avatarid==id)
 						{
-							actions[i].invalid = true;
+							actions[i].setInvalid(true);
 						}
 					}
 				}
