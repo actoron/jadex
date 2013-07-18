@@ -1,7 +1,5 @@
 package jadex.bdiv3.examples.garbagecollector;
 
-import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
@@ -12,13 +10,8 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.commons.SUtil;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.Grid2D;
-import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.rules.eca.IEvent;
-
-import java.util.List;
 
 /**
  * 
@@ -29,25 +22,12 @@ import java.util.List;
 	@Plan(trigger=@Trigger(goals=GarbageBurnerBDI.Burn.class), body=@Body(BurnPlanEnv.class)),
 	@Plan(trigger=@Trigger(goals=GarbageBurnerBDI.Pick.class), body=@Body(PickUpPlanEnv.class))
 })
-public class GarbageBurnerBDI
+public class GarbageBurnerBDI extends BaseAgentBDI
 {
-	@Agent
-	protected BDIAgent agent;
-	
-	/** The environment. */
-	protected Grid2D env = (Grid2D)agent.getParentAccess().getExtension("mygc2dspace").get();
-	
-	/** The environment. */
-	protected ISpaceObject myself = env.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
+//	/** The position. */
+//	@Belief
+//	protected IVector2 pos = (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 
-	/** The position. */
-	@Belief
-	protected IVector2 pos = (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
-
-	/** The garbages. */
-	@Belief
-	protected List<ISpaceObject> garbages;
-	
 	/** 
 	 *  The burn waste goal. For every garbage occurring at
 	 *  its position a new goal is craeted (see binding).
@@ -119,24 +99,6 @@ public class GarbageBurnerBDI
 	@Goal(excludemode=MProcessableElement.EXCLUDE_NEVER)
 	public class Pick
 	{
-	}
-
-	/**
-	 *  Get the env.
-	 *  @return The env.
-	 */
-	public Grid2D getEnvironment()
-	{
-		return env;
-	}
-
-	/**
-	 *  Get the agent.
-	 *  @return The agent.
-	 */
-	public BDIAgent getAgent()
-	{
-		return agent;
 	}
 	
 }

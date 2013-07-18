@@ -25,7 +25,7 @@ public class PickUpPlanEnv
 	//-------- attributes --------
 
 	@PlanCapability
-	protected GarbageCollectorBDI collector;
+	protected BaseAgentBDI agent;
 		
 	@PlanAPI
 	protected IPlan rplan;
@@ -41,13 +41,13 @@ public class PickUpPlanEnv
 	{
 //		System.out.println("Pickup plan: "+getAgentName()+" "+getReason());
 		
-		IEnvironmentSpace env = collector.getEnvironment();
+		IEnvironmentSpace env = agent.getEnvironment();
 		// todo: garbage as parameter?
 		
 		Future<Boolean> fut = new Future<Boolean>();
 		DelegationResultListener<Boolean> lis = new DelegationResultListener<Boolean>(fut, true);
 		Map params = new HashMap();
-		params.put(ISpaceAction.ACTOR_ID, collector.getAgent().getComponentDescription());
+		params.put(ISpaceAction.ACTOR_ID, agent.getAgent().getComponentDescription());
 		env.performSpaceAction("pickup", params, lis); // todo: garbage as parameter?
 		Boolean done = fut.get();  
 		if(!done.booleanValue())

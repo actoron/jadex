@@ -1,7 +1,5 @@
 package jadex.bdiv3.examples.garbagecollector;
 
-import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
@@ -12,14 +10,10 @@ import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.Grid2D;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.rules.eca.IEvent;
-
-import java.util.List;
 
 /**
  *  Garbage collector agent.</H3>
@@ -36,26 +30,12 @@ import java.util.List;
 	@Plan(trigger=@Trigger(goals=GarbageCollectorBDI.Go.class), body=@Body(GoPlanEnv.class)),
 	@Plan(trigger=@Trigger(goals=GarbageCollectorBDI.Pick.class), body=@Body(PickUpPlanEnv.class))
 })
-public class GarbageCollectorBDI
+public class GarbageCollectorBDI extends BaseAgentBDI
 {
-	@Agent
-	protected BDIAgent agent;
-	
-	/** The environment. */
-	protected Grid2D env = (Grid2D)agent.getParentAccess().getExtension("mygc2dspace").get();
-	
-	/** The environment. */
-	protected ISpaceObject myself = env.getAvatar(agent.getComponentDescription(), agent.getModel().getFullName());
-
 //	/** The position. */
 //	@Belief(dynamic=true)
 //	protected IVector2 pos = (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 
-	/** The garbages. */
-	@Belief
-	protected List<ISpaceObject> garbages;
-	
-	
 	/**
 	 *  Goal for picking up a piece of waste, bringing it
 	 *  to some burner and going back. A new goal is created
@@ -73,8 +53,8 @@ public class GarbageCollectorBDI
 		public static boolean checkCreate(GarbageCollectorBDI outer, ISpaceObject garbage, IEvent event)
 		{
 			boolean ret = outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.getPosition(), "burner")==null;
-			if(ret)
-				System.out.println("ggg");
+//			if(ret)
+//				System.out.println("collector creating new take goal");
 			return ret;
 		}
 	}
@@ -154,43 +134,6 @@ public class GarbageCollectorBDI
 	protected boolean hasGarbage()
 	{
 		return myself.getProperty("has_garbage")!=null;
-	}
-	
-	/**
-	 *  Get the env.
-	 *  @return The env.
-	 */
-	public Grid2D getEnvironment()
-	{
-		return env;
-	}
-
-	/**
-	 *  Get the pos.
-	 *  @return The pos.
-	 */
-	public IVector2 getPosition()
-	{
-		return (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
-//		return pos;
-	}
-
-	/**
-	 *  Get the myself.
-	 *  @return The myself.
-	 */
-	public ISpaceObject getMyself()
-	{
-		return myself;
-	}
-
-	/**
-	 *  Get the agent.
-	 *  @return The agent.
-	 */
-	public BDIAgent getAgent()
-	{
-		return agent;
 	}
 	
 }
