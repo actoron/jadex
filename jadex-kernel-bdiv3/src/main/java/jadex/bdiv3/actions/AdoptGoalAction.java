@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.GoalAPI;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
+import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
@@ -19,12 +20,17 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 	/** The goal. */
 	protected RGoal goal;
 	
+	/** The state. */
+	protected PlanLifecycleState state;
+	
 	/**
 	 *  Create a new action.
 	 */
 	public AdoptGoalAction(RGoal goal)
 	{
 		this.goal = goal;
+		if(goal.getParentPlan()!=null)
+			this.state = goal.getParentPlan().getLifecycleState();
 	}
 	
 	/**
@@ -33,7 +39,8 @@ public class AdoptGoalAction implements IConditionalComponentStep<Void>
 	 */
 	public boolean isValid()
 	{
-		return RGoal.GoalLifecycleState.NEW.equals(goal.getLifecycleState());
+		return (state==null|| state.equals(goal.getParentPlan().getLifecycleState())) 
+			&& RGoal.GoalLifecycleState.NEW.equals(goal.getLifecycleState());
 	}
 	
 	/**

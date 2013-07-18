@@ -47,10 +47,10 @@ public class TakePlanEnv
 		Space2D grid = (Space2D)collector.getEnvironment();
 
 		// Pickup the garbarge.
-		System.out.println("Pick started: "+collector.getAgent().getAgentName());
+//		System.out.println("Pick started: "+collector.getAgent().getAgentName());
 		Pick pick = collector.new Pick();
 		rplan.dispatchSubgoal(pick).get();
-		System.out.println("Pick ended: "+collector.getAgent().getAgentName());
+//		System.out.println("Pick ended: "+collector.getAgent().getAgentName());
 
 		// Go to the burner.
 		ISpaceObject myself = collector.getMyself();
@@ -61,7 +61,7 @@ public class TakePlanEnv
 		rplan.dispatchSubgoal(go).get();
 
 		// Put down the garbarge.
-		System.out.println("Calling drop: "+collector.getAgent().getAgentName());
+//		System.out.println("Calling drop: "+collector.getAgent().getAgentName());
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 		Map params = new HashMap();

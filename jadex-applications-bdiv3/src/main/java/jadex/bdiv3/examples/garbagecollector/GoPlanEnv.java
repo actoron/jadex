@@ -85,7 +85,7 @@ public class GoPlanEnv
 			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(collector.getAgent().getComponentDescription()).getId());
 			action	= env.performSpaceAction("go", params, lis); 
 			fut.get();
-			
+
 //			System.out.println("after go "+this);
 		}
 	}
@@ -96,6 +96,7 @@ public class GoPlanEnv
 //		System.out.println("go aborted "+this+", "+action);
 		if(action!=-1)
 		{
+//			System.out.println("canceling action: "+action);
 			collector.getEnvironment().cancelSpaceAction(action);
 		}
 	}

@@ -38,7 +38,7 @@ public class PickUpPlanEnv
 	@PlanBody
 	public void body()
 	{
-		System.out.println("Pickup plan: "+agent.getAgent().getAgentName());
+//		System.out.println("Pickup plan: "+agent.getAgent().getAgentName());
 		
 		IEnvironmentSpace env = agent.getEnvironment();
 		// todo: garbage as parameter?

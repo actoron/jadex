@@ -53,8 +53,8 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 		public static boolean checkCreate(GarbageCollectorBDI outer, ISpaceObject garbage, IEvent event)
 		{
 			boolean ret = outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.getPosition(), "burner")==null;
-			if(ret)
-				System.out.println("collector creating new take goal");
+//			if(ret)
+//				System.out.println("collector creating new take goal");
 			return ret;
 		}
 		
