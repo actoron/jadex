@@ -119,7 +119,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 				}
 			}
 			
-			return nearest.equals(target);
+			return nearest!=null && nearest.equals(target);
 			
 			//			(select one Target $target from $beliefbase.my_targets
 			// order by $beliefbase.my_location.getDistance($target.getLocation()))
