@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.marsworld.producer;
 
+import jadex.bdiv3.examples.marsworld.SVector;
 import jadex.bdiv3.examples.marsworld.sentry.AnalyzeTargetTask;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractTask;
@@ -62,10 +63,10 @@ public class ProduceOreTask extends AbstractTask
 	{
 		ISpaceObject target = (ISpaceObject)getProperty(PROPERTY_TARGET);
 		
-		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
-		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
+		Object	loc	= obj.getProperty(Space2D.PROPERTY_POSITION);
+		Object	tloc	= target.getProperty(Space2D.PROPERTY_POSITION);
 		double r = 0.05;
-		if(loc.getDistance(tloc).getAsDouble()>r)
+		if(SVector.getDistance(loc, tloc)>r)
 			throw new RuntimeException("Not at location: "+obj+", "+target);
 		
 		int	ore	= ((Number)target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue();

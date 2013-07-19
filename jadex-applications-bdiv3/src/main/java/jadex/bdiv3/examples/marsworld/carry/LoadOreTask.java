@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.marsworld.carry;
 
+import jadex.bdiv3.examples.marsworld.SVector;
 import jadex.bdiv3.examples.marsworld.producer.ProduceOreTask;
 import jadex.bdiv3.examples.marsworld.sentry.AnalyzeTargetTask;
 import jadex.bridge.service.types.clock.IClockService;
@@ -7,7 +8,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector2;
 
 /**
  *  Move an object towards a destination.
@@ -68,10 +68,10 @@ public class LoadOreTask extends AbstractTask
 		ISpaceObject target = (ISpaceObject)getProperty(PROPERTY_TARGET);
 		boolean load = ((Boolean)getProperty(PROPERTY_LOAD)).booleanValue();
 		
-		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
-		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
+		Object	loc	= obj.getProperty(Space2D.PROPERTY_POSITION);
+		Object	tloc	= target.getProperty(Space2D.PROPERTY_POSITION);
 		double r = 0.05;
-		if(loc.getDistance(tloc).getAsDouble()>r)
+		if(SVector.getDistance(loc, tloc)>r)
 			throw new RuntimeException("Not at location: "+obj+", "+target);
 		
 		String	targetcapprop	= load ? ProduceOreTask.PROPERTY_CAPACITY : AnalyzeTargetTask.PROPERTY_ORE;

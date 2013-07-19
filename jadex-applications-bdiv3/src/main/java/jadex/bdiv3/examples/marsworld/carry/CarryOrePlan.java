@@ -56,7 +56,7 @@ public class CarryOrePlan
 			IEnvironmentSpace env = capa.getEnvironment();
 			
 			// Move to the target.
-			Move move = capa.new Move((IVector2)target.getProperty(Space2D.PROPERTY_POSITION));
+			Move move = capa.new Move(target.getProperty(Space2D.PROPERTY_POSITION));
 			rplan.dispatchSubgoal(move).get();
 	
 			// Load ore at the target.

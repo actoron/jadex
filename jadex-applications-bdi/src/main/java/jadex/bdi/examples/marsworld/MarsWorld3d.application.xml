@@ -163,7 +163,7 @@
 				</env:drawable3d>
 				
 				<!--ERZVORKOMMEN  -->
-				<env:drawable3d objecttype="target" width="0.1" height="0.1" depth="0.1" rotation3d="false" isDynamic="false">
+				<env:drawable3d objecttype="target" width="0.1" height="0.1" depth="0.1" rotation3d="false" isDynamic="true">
 				  	<env:property name="oresize" dynamic="true">new Vector3Double(0.2,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/2000.0),0.2)</env:property>
 				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0),Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/800.0),Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0))</env:property>
 				  	<env:property name="capapos" dynamic="true">new Vector3Double(0,-0.1,0)</env:property>

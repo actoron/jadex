@@ -231,7 +231,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 						
 						Material mat;
 						
-						if(!matpath.equals(""))
+						if(!matpath.equals("")&&texturepath.equals(""))
 						{
 							if(vp.materials.containsKey(matpath))
 							{
@@ -239,9 +239,17 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 							}
 							else
 							{
-								Material tmp = assetManager.loadMaterial(matpath);
-								vp.materials.put(matpath, tmp);
-								mat = tmp;
+								try
+								{
+									Material tmp = assetManager.loadMaterial(matpath);
+									vp.materials.put(matpath, tmp);
+									mat = tmp;
+								}
+								catch(RuntimeException e)
+								{
+									throw e;
+								}
+								
 							}
 
 

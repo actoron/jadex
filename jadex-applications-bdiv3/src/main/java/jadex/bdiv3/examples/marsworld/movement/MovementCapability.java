@@ -13,6 +13,7 @@ import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector2;
@@ -42,7 +43,7 @@ public class MovementCapability
 	protected ICapability	capa;
 	
 	/** The environment. */
-	protected ContinuousSpace2D env = (ContinuousSpace2D)capa.getAgent().getParentAccess().getExtension("my2dspace").get();
+	protected AbstractEnvironmentSpace env = (AbstractEnvironmentSpace)capa.getAgent().getParentAccess().getExtension("myspace").get();
 	
 	/** The environment. */
 	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());
@@ -64,12 +65,12 @@ public class MovementCapability
 	public class Move implements IDestinationGoal
 	{
 		/** The destination. */
-		protected IVector2 destination;
+		protected Object destination;
 
 		/**
 		 *  Create a new Move. 
 		 */
-		public Move(IVector2 destination)
+		public Move(Object destination)
 		{
 			this.destination = destination;
 		}
@@ -78,7 +79,7 @@ public class MovementCapability
 		 *  Get the destination.
 		 *  @return The destination.
 		 */
-		public IVector2 getDestination()
+		public Object getDestination()
 		{
 			return destination;
 		}
@@ -133,7 +134,7 @@ public class MovementCapability
 		 *  Get the destination.
 		 *  @return The destination.
 		 */
-		public IVector2 getDestination()
+		public Object getDestination()
 		{
 			return capa.getHomebasePosition();
 		}
@@ -142,9 +143,9 @@ public class MovementCapability
 	/**
 	 * 
 	 */
-	public IVector2 getHomebasePosition()
+	public Object getHomebasePosition()
 	{
-		return (IVector2)env.getSpaceObjectsByType("homebase")[0].getProperty("position");
+		return env.getSpaceObjectsByType("homebase")[0].getProperty("position");
 	}
 	
 	/**
@@ -169,7 +170,7 @@ public class MovementCapability
 	 *  Get the env.
 	 *  @return The env.
 	 */
-	public ContinuousSpace2D getEnvironment()
+	public AbstractEnvironmentSpace getEnvironment()
 	{
 		return env;
 	}

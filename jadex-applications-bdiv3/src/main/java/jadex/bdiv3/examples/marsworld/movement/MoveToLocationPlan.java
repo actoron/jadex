@@ -48,7 +48,7 @@ public class MoveToLocationPlan
 //		System.out.println("MoveToLocation: "+capa.getMyself());
 		
 		ISpaceObject myself	= capa.getMyself();
-		IVector2 dest = goal.getDestination();
+		Object dest = goal.getDestination();
 		
 		Map props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);

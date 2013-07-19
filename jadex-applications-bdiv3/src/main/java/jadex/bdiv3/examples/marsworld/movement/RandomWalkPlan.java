@@ -8,8 +8,10 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.Move;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability.WalkAround;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.environment.space3d.Space3D;
 import jadex.extension.envsupport.math.Vector2Int;
+import jadex.extension.envsupport.math.Vector3Int;
 
 /**
  *  Wander around randomly.
@@ -47,7 +49,15 @@ public class RandomWalkPlan
 	public void body()
 	{
 //		System.out.println("RandomWalk: "+capa.getCapability().getAgent().getComponentIdentifier());
-		IVector2	dest	= capa.getEnvironment().getRandomPosition(Vector2Int.ZERO);
+		Object	dest;
+		if(capa.getEnvironment() instanceof Space3D)
+		{
+			dest	= ((Space3D)capa.getEnvironment()).getRandomPosition(Vector3Int.ZERO);			
+		}
+		else
+		{
+			dest	= ((Space2D)capa.getEnvironment()).getRandomPosition(Vector2Int.ZERO);
+		}
 		Move moveto = capa.new Move(dest);
 		rplan.dispatchSubgoal(moveto).get();
 //		System.out.println("Reached point: "+dest);

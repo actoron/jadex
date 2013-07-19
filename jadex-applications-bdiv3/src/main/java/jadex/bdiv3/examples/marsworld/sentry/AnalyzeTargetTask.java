@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.marsworld.sentry;
 
+import jadex.bdiv3.examples.marsworld.SVector;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
@@ -73,11 +74,10 @@ public class AnalyzeTargetTask extends AbstractTask
 		this.target = (ISpaceObject)getProperty(PROPERTY_TARGET);
 		this.time = TIME;
 
-		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
-		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
-		
+		Object	loc	= obj.getProperty(Space2D.PROPERTY_POSITION);
+		Object	tloc	= target.getProperty(Space2D.PROPERTY_POSITION);
 		double r = 0.05;
-		if(loc.getDistance(tloc).getAsDouble()>r)
+		if(SVector.getDistance(loc, tloc)>r)
 			throw new RuntimeException("Not at location: "+obj+", "+target);
 		
 		if(!target.getProperty(PROPERTY_STATE).equals(STATE_UNKNOWN))
@@ -95,10 +95,10 @@ public class AnalyzeTargetTask extends AbstractTask
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
-		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
-		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
+		Object	loc	= obj.getProperty(Space2D.PROPERTY_POSITION);
+		Object	tloc	= target.getProperty(Space2D.PROPERTY_POSITION);
 		double r = 0.05;
-		if(loc.getDistance(tloc).getAsDouble()>r)
+		if(SVector.getDistance(loc, tloc)>r)
 			throw new RuntimeException("Not at location: "+obj+", "+target);
 		
 		time	-= progress;

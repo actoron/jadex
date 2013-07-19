@@ -10,6 +10,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.marsworld.BaseBDI;
+import jadex.bdiv3.examples.marsworld.SVector;
 import jadex.bdiv3.examples.marsworld.movement.MovementCapability;
 import jadex.bdiv3.examples.marsworld.producer.IProduceService;
 import jadex.bridge.service.annotation.Service;
@@ -17,7 +18,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
@@ -95,9 +95,9 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 		@GoalContextCondition
 		public boolean checkContext()
 		{
-			IVector2 mypos = (IVector2)outer.getMoveCapa().getMyself().getProperty(Space2D.PROPERTY_POSITION);
+			Object mypos = outer.getMoveCapa().getMyself().getProperty(Space2D.PROPERTY_POSITION);
 			ISpaceObject nearest = null;
-			IVector2 npos = null;
+			Object npos = null;
 			for(ISpaceObject so: outer.getMoveCapa().getMyTargets())
 			{
 				if(so.getProperty("state").equals("unknown"))
@@ -105,15 +105,15 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 					if(nearest==null)
 					{
 						nearest = so;
-						npos = (IVector2)nearest.getProperty(Space2D.PROPERTY_POSITION);
+						npos = nearest.getProperty(Space2D.PROPERTY_POSITION);
 					}
 					else
 					{
-						IVector2 spos = (IVector2)so.getProperty(Space2D.PROPERTY_POSITION);
-						if(mypos.getDistance(spos).less(mypos.getDistance(npos)))
+						Object spos = so.getProperty(Space2D.PROPERTY_POSITION);
+						if(SVector.getDistance(mypos, spos)<SVector.getDistance(mypos, npos))
 						{
 							nearest = so;
-							npos = (IVector2)nearest.getProperty(Space2D.PROPERTY_POSITION);
+							npos = nearest.getProperty(Space2D.PROPERTY_POSITION);
 						}
 					}
 				}

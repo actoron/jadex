@@ -21,7 +21,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.4.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.4.xsd"
-	name="MarsWorld" package="jadex.bdiv3.examples.marsworld">
+	name="MarsWorld3d" package="jadex.bdiv3.examples.marsworld">
 	
 	<imports>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
@@ -50,26 +50,31 @@
 		
 			<env:objecttypes>
 				<env:objecttype name="target">
+					<env:property name="abbau" class="boolean" dynamic="true">								
+						$object.getProperty("state").equals("analyzed")
+						&amp;&amp; ($object.getProperty("ore")!=0 &amp;&amp; $object.getProperty("capacity")!=0)
+					</env:property>
 					<env:property name="ore" class="int">0</env:property>
 					<env:property name="capacity" class="int">0</env:property>
 					<env:property name="state" class="String">"unknown"</env:property>
 				</env:objecttype>
 				<env:objecttype name="sentry">
-					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.1*(($properties.clock.getTick())%10),0.01,0.1*(($properties.clock.getTick())%10))
-					</env:property>	
-					<env:property name="rotation" class="IVector2">new Vector2Double(-1.111, -1.111)</env:property>
+					<env:property name="rotation" class="IVector2"></env:property>
+					<env:property name="status" class="String">"drive"</env:property>
 					<env:property name="vision" class="double">0.1</env:property>
 					<env:property name="speed" class="double">0.05</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
-					<env:property name="rotation" class="IVector2">new Vector2Double(-1.111, -1.111)</env:property>
+					<env:property name="rotation" class="IVector2"/>
+					<env:property name="status" class="String">"drive"</env:property>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.1</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="carry">
-					<env:property name="rotation" class="IVector2">new Vector2Double(-1.111, -1.111)</env:property>
+					<env:property name="rotation" class="IVector2"/>
+					<env:property name="status" class="String">"drive"</env:property>
 					<env:property name="vision" class="double">0.05</env:property>
 					<env:property name="speed" class="double">0.15</env:property>
 					<env:property name="ore" class="int">0</env:property>
@@ -105,85 +110,125 @@
 			</env:avatarmappings>
 			
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D">
+			<env:perspective3d name="Complex3D" class="Perspective3D" >
+				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
+					<env:sky skypath="jadex3d/textures/sky/sky01/" west="west.jpg" east="east.jpg" north="north.jpg" south="south.jpg" up="up.jpg" down="down.jpg" isSphere="false" />  
+					<env:rndterrain width="2" height="0.1" depth="2"  
+		 		tiles="512" iterations="1000" minradius="25" maxradius="100" seed="4"
+					terrapath="jadex3d/textures/terrain/terrain01/" alphamap="alphamap.png" 
+					texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" tex02val="32" texture03="road.jpg" tex03val="128" shadowtype="Receive"/>
+					
+					  
+					<env:sound3d soundfile="jadex3d/sounds/misc/windboe.ogg" loop="true" volume="0.2" continuosly="true" positional="false" />
 				
-					<!-- Target -->
-					<env:drawable objecttype="target" width="0.1" height="0.1">
-						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0))</env:property>
-						<env:property name="oreposition" dynamic="true">new Vector2Double(-0.5, 0.1-Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0)/2)</env:property>
-						<env:ellipse layer="0" width="0.2" height="0.2" color="#C8000096">
-							<env:drawcondition>!$object.getProperty("state").equals("analyzed") || $object.getProperty("ore")!=0</env:drawcondition>
-						</env:ellipse>
-						<env:ellipse layer="0" width="0.2" height="0.2" color="#32323296">
-							<env:drawcondition>$object.getProperty("state").equals("analyzed") &amp;&amp; $object.getProperty("ore")==0</env:drawcondition>
-						</env:ellipse>
-						<env:texturedrectangle layer="1" height="0.5" width="0.25" x="0.11" y="-0.24" imagepath="jadex/bdiv3/examples/marsworld/images/flag.png">
+				</env:drawable3d>
+				
+				<!-- H O M E B A S E -->
+				<env:drawable3d objecttype="homebase" width="0.2" height="0.2" depth="0.2" rotation3d="false">
+					<env:property name="oresize" dynamic="true">new Vector3Double(0.52f,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/2000.0),0.52f)</env:property>
+					<env:property name="textda" dynamic="true">$object.getProperty("text")</env:property>
+
+					
+					<env:object3d width=".3" height=".3" depth=".3"  x="-2" y="0" z="2" rotation="$deg45y" modelpath="jadex3d/models/buildings/homebase/base.j3o" hasLightMaterials="true" shadowtype="Cast">
+					
+					</env:object3d>			
+	
+					
+					<env:object3d width=".03" height=".03" depth=".03" x="-0.5" y="0.0" z="0.5" rotation="$deg180y" modelpath="jadex3d/models/buildings/mixed/jadexflag.j3o" hasLightMaterials="true" shadowtype="Cast">
+							<env:animation name="Wave" channel="chan01" loop="true"/>
+					</env:object3d>			
+					<!-- TODO: text schein schrott zu sein
+					<env:text3d  width="2" height="2" depth="1" rotation="$deg90y" x="0" y="4" z="0" text="$object.getProperty("text")" color="#FFFFFFFF" ></env:text3d>
+					<env:text3d  width="2" height="2" depth="1" rotation="$deg270y" x="0" y="4" z="0" text="$object.getProperty("text")" color="#FFFFFFFF" ></env:text3d>
+					 -->
+					 
+					<!-- Box for Ore -->
+					<env:dome size="oresize" x="-2" y="0.15" z="2"  color="#FFFFFFFF" radius="1" samples="32" planes="16" texturepath="jadex3d/textures/solid/oretex.jpg" shadowtype="Cast">
+									<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+						</env:dome>
+	
+				
+				</env:drawable3d>
+				
+				<!--ERZVORKOMMEN  -->
+				<env:drawable3d objecttype="target" width="0.1" height="0.1" depth="0.1" rotation3d="false" isDynamic="true">
+				  	<env:property name="oresize" dynamic="true">new Vector3Double(0.2,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/2000.0),0.2)</env:property>
+				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0),Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/800.0),Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0))</env:property>
+				  	<env:property name="capapos" dynamic="true">new Vector3Double(0,-0.1,0)</env:property>
+
+<!-- 						Nullpunkt  -->
+						<env:sphere width="0.06" height="0.1" depth="0.06" x="0" y="0" z="0" color="#FFB90FFF" >
+							<env:drawcondition>$object.getProperty("state").equals("unknown")</env:drawcondition>
+						</env:sphere>
+						
+<!-- 						Abgebautes erz  -->
+						<env:dome size="capa" position="capapos" color="#FFFFFFFF" radius="1" samples="10" planes="10" texturepath="jadex3d/textures/solid/oretex.jpg" shadowtype="Cast">
+							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
+						</env:dome>
+						
+						<env:object3d width=".5" height=".5" depth=".5"  modelpath="jadex3d/models/buildings/mixed/flag.j3o" hasLightMaterials="true" shadowtype="Cast">
+							<env:animation name="Wave" channel="chan" loop="true">
+							</env:animation>
 							<env:drawcondition>
-								$object.getProperty("state").equals("analyzed")
+							$object.getProperty("state").equals("analyzed")
 								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
 							</env:drawcondition>
-						</env:texturedrectangle>
-						<env:text layer="2" x="0.02" y="-0.01" size="8" font="Arial" abssize="true" text="ore: $ore$\ncapacity: $capacity$" align="left" color="black">
-							<env:drawcondition>
-								$object.getProperty("state").equals("analyzed")
-							</env:drawcondition>
-						</env:text>
-						<env:texturedrectangle layer="1" size="oresize" position="oreposition" imagepath="jadex/bdiv3/examples/marsworld/images/ore.png">
-							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
-						</env:texturedrectangle>
-					</env:drawable>
-
-					<!-- Homebase -->
-					<env:drawable objecttype="homebase" width="0.14" height="0.12">
-						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
-						<env:property name="oreposition" dynamic="true">new Vector2Double(0, 0.3-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
-						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
-						<env:text layer="2" x="-0.07" y="0.09" size="8" font="Arial" abssize="true" text="$text$" align="left" color="black"/>
-						<env:texturedrectangle layer="1" size="oresize" position="oreposition" imagepath="jadex/bdiv3/examples/marsworld/images/ore.png">
-							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
-						</env:texturedrectangle>
-					</env:drawable>
-
-					<!-- Sentry -->
-					<env:drawable objecttype="sentry" width="0.07" height="0.07">
-						<!-- <env:property name="rot" dynamic="true" class="double">new Vector3Double($object.getProperty("rotation").getXAsDouble(), 0, $object.getProperty("rotation").getYAsDouble())</env:property>  -->
-						<env:property name="rot" dynamic="true" class="double">new Vector3Double(0,0,$object.getProperty("rotation").getDirectionAsDouble()-Math.PI/2)</env:property>
-						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
+						</env:object3d>
 						
-						<env:ellipse layer="1" size="visionsize" abssize="true" color="#FAFA1E32" />
-						<env:texturedrectangle layer="2" imagepath="jadex/bdiv3/examples/marsworld/images/sentry.png" />
-					</env:drawable>
+					<env:sound3d soundfile="jadex3d/sounds/misc/dadum.ogg" loop="false" volume="0.4" continuosly="false" positional="true" >
+						<env:soundcondition>
+							$object.getProperty("state").equals("analyzing")
+								&amp;&amp; ($object.getProperty("ore")!=0 )
+						</env:soundcondition>
+					</env:sound3d>
+					
+					<env:sound3d soundfile="jadex3d/sounds/misc/binglow.ogg" loop="false" volume="0.4" continuosly="false" positional="true" >
+						<env:soundcondition>
+							$object.getProperty("state").equals("analyzing")
+								&amp;&amp; ($object.getProperty("ore")==0 )
+						</env:soundcondition>
+					</env:sound3d>
+				   	
+			</env:drawable3d>
+				
 
-					<!-- Producer -->
-					<env:drawable objecttype="producer" width="0.07" height="0.07">
-					<env:property name="rot" dynamic="true" class="double">new Vector3Double(0,0,$object.getProperty("rotation").getDirectionAsDouble()-Math.PI/2)</env:property>
-						
-						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
-						<env:ellipse layer="1" size="visionsize" abssize="true" color="#FAFA1E32" />
-						<env:texturedrectangle layer="2" imagepath="jadex/bdiv3/examples/marsworld/images/producer.png" />
-						
-					</env:drawable>
+				<env:drawable3d objecttype="sentry" width="0.16" height="0.16" depth="0.16" autoRotation="false"> 
+					<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
+					<env:object3d width="0.8" height="0.8" depth="0.8" x="0" y="0.0" z="0.0" rotation="$deg180y" modelpath="jadex3d/models/vehicles/tank/apc.j3o" hasLightMaterials="true" shadowtype="Cast"/> 
+				</env:drawable3d>
+					
+				<env:drawable3d objecttype="carry" width="0.15" height="0.15" depth="0.15" autoRotation="false">
+					<env:object3d width="1.5" height="1.5" depth="1.5" rotation="$deg270y" modelpath="jadex3d/models/vehicles/forklift/forklift.j3o"  shadowtype="Cast"/> 
+					<env:object3d width="0.8" height="0.8" depth="0.8" x="0.0" y="0.1" z="0.4" rotation="$deg90y" modelpath="jadex3d/models/props/box/woodbox.j3o" shadowtype="Cast">
+						<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+					</env:object3d> 
+<!-- 					<env:sound3d soundfile="jadex3d/sounds/misc/drop1.ogg" loop="true" volume="10" continuosly="false" positional="true" > -->
+<!-- 						<env:soundcondition>$object.getProperty("status").equals("unloading")</env:soundcondition> -->
+<!-- 					</env:sound3d> -->
+<!-- 					<env:sound3d soundfile="jadex3d/sounds/misc/cratesmash.ogg" loop="false" volume="10" continuosly="false" positional="true" > -->
+<!-- 						<env:soundcondition>$object.getProperty("status").equals("loading")</env:soundcondition> -->
+<!-- 					</env:sound3d> -->
+				</env:drawable3d>
+					
+				<env:drawable3d objecttype="producer" width="0.15" height="0.15" depth="0.15" autoRotation="false">
+					<env:object3d width="0.25" height="0.25" depth="0.25" x="0" y="0.03" z="0.0"   modelpath="jadex3d/models/vehicles/tractor/tractor.j3o" hasLightMaterials="true" shadowtype="Cast"> 
+					<env:animation name="DigAll" channel="chan01" loop="false">
+						<env:animationcondition>$object.getProperty("status").equals("ore")</env:animationcondition>
+					</env:animation>
+					<env:animation name="Idle" channel="chan01" loop="false">
+						<env:animationcondition>$object.getProperty("status").equals("drive")</env:animationcondition>
+					</env:animation>
+					</env:object3d>
+					<env:sound3d soundfile="jadex3d/sounds/misc/digging.ogg" loop="false" volume="0.4" continuosly="false" positional="true" >
+						<env:soundcondition>$object.getProperty("status").equals("ore")</env:soundcondition>
+					</env:sound3d>
+					</env:drawable3d>	
 
-					<!-- Carry -->
-					<env:drawable objecttype="carry" width="0.07" height="0.07">
-					<env:property name="rot" dynamic="true" class="double">new Vector3Double(0,0,$object.getProperty("rotation").getDirectionAsDouble()-Math.PI/2)</env:property>
-						
-						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
-						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
-						<env:property name="oreposition" dynamic="true">new Vector2Double(0.3, -0.08-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
-						<env:ellipse layer="1" size="visionsize" abssize="true" color="#FAFA1E32" />
-						<env:texturedrectangle layer="2" imagepath="jadex/bdiv3/examples/marsworld/images/carry.png" />
-						<env:texturedrectangle layer="1" size="oresize" position="oreposition" imagepath="jadex/bdiv3/examples/marsworld/images/ore.png">
-							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
-						</env:texturedrectangle>
-						
-					</env:drawable>
 
-					<env:prelayers>
-						<env:tiledlayer width="0.6" height="0.6" imagepath="jadex/bdiv3/examples/marsworld/images/mars.png" />
-					</env:prelayers>
-				</env:perspective>		
+				</env:perspective3d>	
+
 			</env:perspectives>
+				
 
 			<!-- executor -->
 			<env:spaceexecutor class="DeltaTimeExecutor">
@@ -214,7 +259,7 @@
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								90000 + $properties.clock.getTime()
+								300000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target">
@@ -277,7 +322,7 @@
 	 			</env:envspace>
 			</extensions>
 			<components>
-			    <component type="Sentry" number="1"/>
+				<component type="Sentry" number="1"/>
   				<component type="Producer" number="2"/>
 				<component type="Carry" number="3"/>
 			</components>

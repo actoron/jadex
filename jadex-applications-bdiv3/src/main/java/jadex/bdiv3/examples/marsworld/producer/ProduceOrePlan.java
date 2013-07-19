@@ -18,7 +18,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector2;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,7 +52,7 @@ public class ProduceOrePlan
 		MovementCapability capa = producer.getMoveCapa();
 		
 		// Move to the target.
-		Move move = capa.new Move((IVector2)target.getProperty(Space2D.PROPERTY_POSITION));
+		Move move = capa.new Move(target.getProperty(Space2D.PROPERTY_POSITION));
 		rplan.dispatchSubgoal(move).get();
 		
 		// Produce ore at the target.

@@ -33,7 +33,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 
 		if(so.getProperty("garbage")!=null)
 		{
-//			System.out.println("Agent picked up failed: Has already garbage.");
+			System.out.println("Agent picked up failed: Has already garbage.");
 		}
 		else
 		{
@@ -60,7 +60,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 			}
 			else
 			{
-//				System.out.println("Agent picked up failed: no waste on position");
+				System.out.println("Agent picked up failed: no waste on position");
 			}
 		}
 
