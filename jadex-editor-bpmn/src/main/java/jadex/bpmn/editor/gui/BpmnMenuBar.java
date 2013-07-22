@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.BpmnEditor;
+import jadex.bpmn.editor.gui.propertypanels.BasePropertyPanel;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
 import jadex.bpmn.model.io.SBpmnModelWriter;
 import jadex.commons.SUtil;
@@ -375,6 +376,7 @@ public class BpmnMenuBar extends JMenuBar
 					{
 						try
 						{
+							((BasePropertyPanel) modelcontainer.getPropertyPanel()).terminate();
 							SBpmnModelWriter.writeModel(modelcontainer.getFile(), modelcontainer.getBpmnModel(), new BpmnVisualModelWriter(modelcontainer.getGraph()));
 							editorwindow.getSettings().setLastFile(modelcontainer.getFile());
 							modelcontainer.setDirty(false);
@@ -582,6 +584,8 @@ public class BpmnMenuBar extends JMenuBar
 		ModelContainer modelcontainer = editorwindow.getSelectedModelContainer();
 		if (modelcontainer != null)
 		{
+			((BasePropertyPanel) modelcontainer.getPropertyPanel()).terminate();
+			
 			BetterFileChooser fc = new BetterFileChooser(modelcontainer.getFile());
 			FileFilter filter = new FileNameExtensionFilter("BPMN model file (*.bpmn2)", "bpmn2");
 			fc.addChoosableFileFilter(filter);

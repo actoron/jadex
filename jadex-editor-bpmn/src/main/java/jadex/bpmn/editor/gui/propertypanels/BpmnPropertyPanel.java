@@ -23,12 +23,15 @@ import jadex.commons.gui.autocombo.AutoCompleteCombo;
 import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -102,6 +105,9 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	
 	/** The configurations table. */
 	protected JTable conftable;
+	
+	/** The configuration models for configuration choosers */
+	protected List<ConfigurationModel> confmodels = new ArrayList<ConfigurationModel>();
 	
 	/** The parameter table. */
 	protected JTable paramtable;
@@ -386,7 +392,11 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			{
 				if (paramtable != null)
 				{
-					((ParameterTableModel) paramtable.getModel()).fireTableStructureChanged();
+//					((ParameterTableModel) paramtable.getModel()).fireTableStructureChanged();
+					for (ConfigurationModel model : confmodels)
+					{
+						model.fireModelChange();
+					}
 				}
 			}
 		});
@@ -459,9 +469,21 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected void setupParametersTable(JTabbedPane tabpane)
 	{
 		JPanel tablepanel = new JPanel(new GridBagLayout());
-		paramcche = new IndexMap();
-		paramtable = new JTable(new ParameterTableModel());
+		
+		ConfigurationModel confmodel = new ConfigurationModel(modelcontainer.getBpmnModel().getModelInfo());
+		ParameterTableModel pmodel = new ParameterTableModel(confmodel);
+		confmodels.add(confmodel);
+		ConfigComboBox confbox = new ConfigComboBox(confmodel, pmodel);
 		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx = 0;
+		gc.anchor = GridBagConstraints.WEST;
+		gc.fill = GridBagConstraints.NONE;
+		gc.insets = new Insets(0, 5, 5, 0);
+		tablepanel.add(confbox, gc);
+		
+		paramcche = new IndexMap();
+		paramtable = new JTable(pmodel);
+		gc = new GridBagConstraints();
 		gc.gridy = 1;
 		gc.gridheight = 2;
 		gc.weightx = 1.0;
@@ -681,7 +703,19 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected void setupProvidedServicesTable(JTabbedPane tabpane)
 	{
 		JPanel tablepanel = new JPanel(new GridBagLayout());
+		
+		ConfigurationModel confmodel = new ConfigurationModel(modelcontainer.getBpmnModel().getModelInfo());
+		ProvidedServicesTableModel pmodel = new ProvidedServicesTableModel(confmodel);
+		confmodels.add(confmodel);
+		ConfigComboBox confbox = new ConfigComboBox(confmodel, pmodel);
 		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx = 0;
+		gc.anchor = GridBagConstraints.WEST;
+		gc.fill = GridBagConstraints.NONE;
+		gc.insets = new Insets(0, 5, 5, 0);
+		tablepanel.add(confbox, gc);
+		
+		gc = new GridBagConstraints();
 		gc.gridy = 1;
 		gc.gridheight = 2;
 		gc.weightx = 1.0;
@@ -690,7 +724,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 5, 5, 0);
 		JComboBox proxybox = new JComboBox(PROXY_TYPES);
 		final DefaultCellEditor proxyeditor = new DefaultCellEditor(proxybox);
-		pstable = new JTable(new ProvidedServicesTableModel())
+		pstable = new JTable(pmodel)
 		{
 			public TableCellEditor getCellEditor(int row, int column)
 			{
@@ -786,7 +820,19 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected void setupRequiredServicesTable(JTabbedPane tabpane)
 	{
 		JPanel tablepanel = new JPanel(new GridBagLayout());
+		
+		ConfigurationModel confmodel = new ConfigurationModel(modelcontainer.getBpmnModel().getModelInfo());
+		RequiredServicesTableModel rmodel = new RequiredServicesTableModel(confmodel);
+		confmodels.add(confmodel);
+		ConfigComboBox confbox = new ConfigComboBox(confmodel, rmodel);
 		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx = 0;
+		gc.anchor = GridBagConstraints.WEST;
+		gc.fill = GridBagConstraints.NONE;
+		gc.insets = new Insets(0, 5, 5, 0);
+		tablepanel.add(confbox, gc);
+		
+		gc = new GridBagConstraints();
 		gc.gridy = 1;
 		gc.gridheight = 2;
 		gc.weightx = 1.0;
@@ -801,7 +847,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		}
 		JComboBox scopebox = new JComboBox(scopeboxscopes);
 		final DefaultCellEditor scopeeditor = new DefaultCellEditor(scopebox);
-		rstable = new JTable(new RequiredServicesTableModel())
+		rstable = new JTable(rmodel)
 		{
 			public TableCellEditor getCellEditor(int row, int column)
 			{
@@ -1039,38 +1085,6 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected boolean convBool(Object value)
 	{
 		return value != null? ((Boolean) value).booleanValue(): false;
-	}
-	
-	/**
-	 *  Returns the selected configuration.
-	 *  
-	 *  @return Selected configuration.
-	 */
-	protected ConfigurationInfo getSelectedConfiguration()
-	{
-		int sel = conftable.getSelectedRow();
-		ConfigurationInfo ret = null;
-		if (sel >= 0)
-		{
-			ret = confcache.get(sel);
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Returns the selected configuration name.
-	 *  
-	 *  @return Selected configuration name.
-	 */
-	protected String getSelectedConfigurationName()
-	{
-		int sel = conftable.getSelectedRow();
-		ConfigurationInfo conf = null;
-		if (sel >= 0)
-		{
-			conf = confcache.get(sel);
-		}
-		return conf != null? conf.getName() : null;
 	}
 	
 	/**
@@ -1340,8 +1354,15 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	 */
 	protected class ParameterTableModel extends AbstractTableModel
 	{
-		public ParameterTableModel()
+		/** The configuration model. */
+		protected ConfigurationModel confmodel;
+		
+		/**
+		 * 
+		 */
+		public ParameterTableModel(ConfigurationModel confmodel)
 		{
+			this.confmodel = confmodel;
 			conftable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
 			{
 				public void valueChanged(ListSelectionEvent e)
@@ -1379,7 +1400,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			String ret = PARAMETERS_COLUMN_NAMES[column];
 			if (column == 5)
 			{
-				String confname = getSelectedConfigurationName();
+				String confname = (String) confmodel.getSelectedItem();
 				if (confname != null)
 				{
 					ret += " [" + confname + "]";
@@ -1444,7 +1465,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				case 4:
 					return new ClassInfo(param.type);
 				case 5:
-					String confname = getSelectedConfigurationName();
+					String confname = (String) confmodel.getSelectedItem();
 					Object ret = param.inivals.get(confname);
 					return ret != null? ret: "";
 			}
@@ -1484,7 +1505,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					param.type = value!=null? ((ClassInfo)value).getTypeName(): null;
 					break;
 				case 5:
-					String confname = getSelectedConfigurationName();
+					String confname = (String) confmodel.getSelectedItem();
 					param.inivals.put(confname, (String) value);
 					break;
 			}
@@ -1606,6 +1627,17 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	 */
 	protected class ProvidedServicesTableModel extends AbstractTableModel
 	{
+		/** The configuration model. */
+		protected ConfigurationModel confmodel;
+		
+		/**
+		 * 
+		 */
+		public ProvidedServicesTableModel(ConfigurationModel confmodel)
+		{
+			this.confmodel = confmodel;
+		}
+		
 		/**
 		 *  Gets the column name.
 		 *  
@@ -1614,7 +1646,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		public String getColumnName(int column)
 		{
 			String ret = PROVIDED_SERVICES_COLUMN_NAMES[column];
-			String confname = getSelectedConfigurationName();
+			String confname = (String) confmodel.getSelectedItem();
 			if (confname != null && column > 1)
 			{
 				ret += " [" + confname + "]";
@@ -1664,7 +1696,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
 			ProvidedServiceInfo ps = getModelInfo().getProvidedServices()[rowIndex];
-			ProvidedServiceInfo cs = getProvService(ps.getName(), getSelectedConfiguration());
+			ProvidedServiceInfo cs = getProvService(ps.getName(), getModel().getModelInfo().getConfiguration((String) confmodel.getSelectedItem()));
 			switch (columnIndex)
 			{
 				case 0:
@@ -1724,8 +1756,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
 			ProvidedServiceInfo ps = getModelInfo().getProvidedServices()[rowIndex];
-			ConfigurationInfo conf = getSelectedConfiguration();
-			ProvidedServiceInfo cs = getProvService(ps.getName(), getSelectedConfiguration());
+			ConfigurationInfo conf = getModel().getModelInfo().getConfiguration((String) confmodel.getSelectedItem());
+			ProvidedServiceInfo cs = getProvService(ps.getName(), conf);
 			if ((columnIndex == 2 ||
 				columnIndex == 3) &&
 				cs == null &&
@@ -1848,6 +1880,17 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	 */
 	protected class RequiredServicesTableModel extends AbstractTableModel
 	{
+		/** The configuration model. */
+		protected ConfigurationModel confmodel;
+		
+		/**
+		 * 
+		 */
+		public RequiredServicesTableModel(ConfigurationModel confmodel)
+		{
+			this.confmodel = confmodel;
+		}
+		
 		/**
 		 *  Gets the column name.
 		 *  
@@ -1856,7 +1899,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		public String getColumnName(int column)
 		{
 			String ret = REQUIRED_SERVICES_COLUMN_NAMES[column];
-			String confname = getSelectedConfigurationName();
+			String confname = (String) confmodel.getSelectedItem();
 			if (confname != null && column == 3)
 			{
 				ret += " [" + confname + "]";
@@ -1918,7 +1961,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
 			RequiredServiceInfo rs = getModelInfo().getRequiredServices()[rowIndex];
-			RequiredServiceInfo cs = getReqService(rs.getName(), getSelectedConfiguration());
+			RequiredServiceInfo cs = getReqService(rs.getName(), getModel().getModelInfo().getConfiguration((String) confmodel.getSelectedItem()));
 			switch (columnIndex)
 			{
 				case 0:
@@ -1958,8 +2001,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
 			RequiredServiceInfo rs = getModelInfo().getRequiredServices()[rowIndex];
-			ConfigurationInfo conf = getSelectedConfiguration();
-			RequiredServiceInfo cs = getReqService(rs.getName(), getSelectedConfiguration());
+			ConfigurationInfo conf = getModel().getModelInfo().getConfiguration((String) confmodel.getSelectedItem());
+			RequiredServiceInfo cs = getReqService(rs.getName(), conf);
 			if (columnIndex == 3 &&
 				cs == null &&
 				conf != null)
@@ -2026,6 +2069,49 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 					}
 				}
 			}
+		}
+	}
+	
+	protected class ConfigComboBox extends JPanel
+	{
+		protected JComboBox<String> combobox;
+		
+		public ConfigComboBox(ConfigurationModel model, final AbstractTableModel tmodel)
+		{
+			setLayout(new GridBagLayout());
+			JLabel label = new JLabel("Configuration");
+			GridBagConstraints gc = new GridBagConstraints();
+			add(label, gc);
+			combobox = new JComboBox<String>(model);
+			combobox.setMinimumSize(new Dimension(200, (int) combobox.getMinimumSize().getHeight()));
+			gc = new GridBagConstraints();
+			gc.gridx = 1;
+			gc.weightx = 1.0;
+			gc.weighty = 1.0;
+			gc.fill = GridBagConstraints.BOTH;
+			gc.insets = new Insets(5, 5, 0, 0);
+			add(combobox, gc);
+			
+			if (tmodel != null)
+			{
+				combobox.addItemListener(new ItemListener()
+				{
+					public void itemStateChanged(ItemEvent e)
+					{
+						tmodel.fireTableStructureChanged();
+					}
+				});
+			}
+		}
+		
+		public void addItemListener(ItemListener l)
+		{
+			combobox.addItemListener(l);
+		}
+		
+		public ConfigurationModel getConfigModel()
+		{
+			return (ConfigurationModel) combobox.getModel();
 		}
 	}
 	

@@ -768,6 +768,16 @@ public class ModelContainer implements IModelContainer
 		propertypanelcontainer.removeAll();
 		propertypanelcontainer.add(panel, BorderLayout.CENTER);
 	}
+	
+	/**
+	 *  Gets the current property panel.
+	 *  
+	 *  @return The panel.
+	 */
+	public JComponent getPropertyPanel()
+	{
+		return (JComponent) getPropertypanelcontainer().getComponent(0);
+	}
 
 	/**
 	 *  Gets the property panel container.
