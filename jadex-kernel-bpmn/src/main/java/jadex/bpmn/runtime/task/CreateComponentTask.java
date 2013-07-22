@@ -4,6 +4,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
+import jadex.bpmn.model.task.annotation.TaskParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
@@ -34,6 +35,35 @@ import java.util.Set;
 /**
  *  Task for creating a component.
  */
+@Task(description="This task can be used to create new component instances.",
+parameters={
+	@TaskParameter(name="name", clazz=String.class, direction=TaskParameter.DIRECTION_IN,
+	description="The name of the new component instance (optional)."),
+	@TaskParameter(name="model", clazz=String.class, direction=TaskParameter.DIRECTION_IN,
+	description="The model location of the component."),
+	@TaskParameter(name="configuration", clazz=String.class, direction=TaskParameter.DIRECTION_IN,
+	description="The configuration of the new component instance (optional)."),
+	@TaskParameter(name="subcomponent", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
+	description="Flag indicating if the new component instance should be a subcomponent of the workflow (default=false)."),
+	@TaskParameter(name="wait", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
+	description="Flag indicating if the task should wait for the subcomponent to terminate (default=false, true if result mappings are available)."),
+	@TaskParameter(name="suspend", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
+	description="Flag indicating if the new component instance is started in suspended mode (default=false)."),
+	@TaskParameter(name="master", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
+	description="Flag indicating if the new component instance is started as a master (default=false)."),
+	@TaskParameter(name="daemon", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
+	description="Flag indicating if the new component instance is started as daemon (default=false)."),
+	@TaskParameter(name="autoshutdown", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
+	description="Flag indicating if the platform should shutdown when the component terminates (default=false)."),
+	@TaskParameter(name="monitoring", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
+	description="Flag indicating if monitoring should be enabled for the new component (default=false)."),
+	@TaskParameter(name="synchronous", clazz=Boolean.class, direction=TaskParameter.DIRECTION_IN,
+	description="Flag indicating if the new component instance is started in synchronous mode (default=false)."),
+	@TaskParameter(name="killlistener", clazz=IResultListener.class, direction=TaskParameter.DIRECTION_IN,
+	description="An optional kill listener."),
+	@TaskParameter(name="value", clazz=Object.class, direction=TaskParameter.DIRECTION_IN,
+	description="The value that is written to the context variable.")}
+)
 public class CreateComponentTask implements ITask
 {
 	/** Future called when the component is created to allow compensation (i.e. killing the component). */
