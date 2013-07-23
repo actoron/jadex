@@ -26,6 +26,7 @@ public class BDIV3Test	extends	ComponentTestSuite
 				"Carry",	// sub agent
 				"Producer",	// sub agent
 				"Sentry",	// sub agent
+				"3d",	// OpenGL problems on termination?
 				"CreationBDI"	// should only be run as separate benchmark
 			});
 	}
