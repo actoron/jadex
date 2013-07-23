@@ -27,7 +27,7 @@ public @interface ProvidedService
 	/**
 	 *  The service implementation.
 	 */
-	public Implementation implementation();
+	public Implementation implementation() default @Implementation(expression="$pojoagent!=null? $pojoagent: $component");
 	
 	/**
 	 *  Publish details.
