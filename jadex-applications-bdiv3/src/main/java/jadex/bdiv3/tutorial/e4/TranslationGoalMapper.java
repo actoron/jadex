@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial;
+package jadex.bdiv3.tutorial.e4;
 
 import java.lang.reflect.Method;
 
@@ -7,12 +7,12 @@ import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
 /**
  * 
  */
-public class TranslationGoalMapperB2 implements IServiceParameterMapper<TranslationGoalB2>
+public class TranslationGoalMapper implements IServiceParameterMapper<TranslationGoal>
 {
 	/**
 	 *  Create service parameters.
 	 */
-	public Object[] createServiceParameters(TranslationGoalB2 obj, Method m)
+	public Object[] createServiceParameters(TranslationGoal obj, Method m)
 	{
 		return new Object[]{obj.getEWord()};
 	}
@@ -20,7 +20,7 @@ public class TranslationGoalMapperB2 implements IServiceParameterMapper<Translat
 	/**
 	 *  Create service result.
 	 */
-	public void handleServiceResult(TranslationGoalB2 obj, Method m, Object result)
+	public void handleServiceResult(TranslationGoal obj, Method m, Object result)
 	{
 		obj.setGWord((String)result);
 	}

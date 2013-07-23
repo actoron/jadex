@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial;
+package jadex.bdiv3.tutorial.e3;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
@@ -31,10 +31,12 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**
- *  The translation agent E3 in V3.
+ *  The translation agent E3. 
+ *  
+ *  Uses a maintain goal to limit the number of entries in its database.
  */
 @Agent
-public class TranslationE3BDI
+public class TranslationBDI
 {
 	/** The injected agent. */
 	@Agent

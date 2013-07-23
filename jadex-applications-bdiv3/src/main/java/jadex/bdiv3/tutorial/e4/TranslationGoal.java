@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial;
+package jadex.bdiv3.tutorial.e4;
 
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
@@ -7,7 +7,7 @@ import jadex.bdiv3.annotation.GoalResult;
  * 
  */
 @Goal
-public class TranslationGoalB2
+public class TranslationGoal
 {
 	protected String gword;
 	
@@ -16,7 +16,7 @@ public class TranslationGoalB2
 	/**
 	 *  Create a new TranslateGoal. 
 	 */
-	public TranslationGoalB2(String eword)
+	public TranslationGoal(String eword)
 	{
 		this.eword = eword;
 	}

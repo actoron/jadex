@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial;
+package jadex.bdiv3.tutorial.b4;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bridge.service.annotation.Service;
@@ -6,6 +6,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -14,17 +15,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  The translation agent B1.
+ *  The translation agent B4.
  *  
  *  Translation agent that implements itself the translation
  *  service. Just looks up translation word in hashtable and
  *  returns the corresponding entry.
  */
+@Description("The translation agent B4. <br> Translation agent that implements itself the translation service. Just looks up translation word in hashtable and returns the corresponding entry.")
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITranslationService.class, 
-	implementation=@Implementation(expression="$pojoagent")))
-public class TranslationB1BDI implements ITranslationService
+@ProvidedServices(@ProvidedService(type=ITranslationService.class))
+public class TranslationBDI implements ITranslationService
 {
 	//-------- attributes --------
 

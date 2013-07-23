@@ -73,7 +73,7 @@ public class BDIAgent extends MicroAgent
 	public <T> void adoptPlan(T plan)
 	{
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-		MPlan mplan = ip.getBDIModel().getCapability().getPlan(plan.getClass().getName());
+		MPlan mplan = ip.getBDIModel().getCapability().getPlan(plan instanceof String? (String)plan: plan.getClass().getName());
 		if(mplan==null)
 			throw new RuntimeException("Plan model not found for: "+plan);
 		

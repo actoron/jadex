@@ -1,22 +1,16 @@
-package jadex.bdiv3.tutorial;
+package jadex.bdiv3.tutorial.b5;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
-import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Description;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -33,7 +27,8 @@ import javax.swing.SwingUtilities;
  *  translation service of the translation agent.
  */
 @Agent
-public class UserB1BDI
+@Description("User agent that presents a gui for using the translation service of the translation agent.")
+public class UserBDI
 {
 	//-------- attributes --------
 
@@ -43,7 +38,7 @@ public class UserB1BDI
 	//-------- methods ---------
 	
 	/**
-	 * 
+	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()
@@ -52,7 +47,7 @@ public class UserB1BDI
 		{
 			public void run()
 			{
-				final JFrame f = new JFrame();
+				JFrame f = new JFrame();
 				
 				PropertiesPanel pp = new PropertiesPanel();
 				final JTextField tfe = pp.createTextField("English Word", "dog", true);
@@ -106,36 +101,6 @@ public class UserB1BDI
 				f.pack();
 				f.setLocation(SGUI.calculateMiddlePosition(f));
 				f.setVisible(true);
-				
-				// Dispose frame on exception.
-				IResultListener<Void>	dislis	= new IResultListener<Void>()
-				{
-					public void exceptionOccurred(Exception exception)
-					{
-						f.dispose();
-					}
-					public void resultAvailable(Void result)
-					{
-					}
-				};
-				
-				agent.scheduleStep(new IComponentStep<Void>()
-				{
-					@Classname("dispose")
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
-							.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
-						{
-							public void intermediateResultAvailable(IMonitoringEvent result)
-							{
-								f.dispose();
-							}
-						}));
-						
-						return IFuture.DONE;
-					}
-				}).addResultListener(dislis);
 			}
 		});
 	}

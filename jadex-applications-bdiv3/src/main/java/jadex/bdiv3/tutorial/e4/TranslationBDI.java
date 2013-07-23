@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial;
+package jadex.bdiv3.tutorial.e4;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
@@ -14,15 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  The translation agent B2.
+ *  The translation agent B5.
  *  
  *  BDI goal that is automatically published as service.
  */
 @Agent
 @Service
-@Goals(@Goal(clazz=TranslationGoalB2.class, 
+@Goals(@Goal(clazz=TranslationGoal.class, 
 	publish=@Publish(type=ITranslationService.class, method="translateEnglishGerman")))
-public class TranslationB2BDI 
+public class TranslationBDI 
 {
 	//-------- attributes --------
 
@@ -54,8 +54,8 @@ public class TranslationB2BDI
 	 *  translation goal.
 	 *  @param tg The translation goal.
 	 */
-	@Plan(trigger=@Trigger(goals=TranslationGoalB2.class))
-	public void translatePlan(TranslationGoalB2 tg)
+	@Plan(trigger=@Trigger(goals=TranslationGoal.class))
+	public void translatePlan(TranslationGoal tg)
 	{
 		String eword = wordtable.get(tg.getEWord());
 		tg.setGWord(eword);

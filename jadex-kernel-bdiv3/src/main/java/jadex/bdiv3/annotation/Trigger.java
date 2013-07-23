@@ -31,4 +31,9 @@ public @interface Trigger
 	 *  The fact changed belief names.
 	 */
 	public String[] factchangeds() default {};
+	
+	/**
+	 * 
+	 */
+	public ServiceTrigger service() default @ServiceTrigger();
 }
