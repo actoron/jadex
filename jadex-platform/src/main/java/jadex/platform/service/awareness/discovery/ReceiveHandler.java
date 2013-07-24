@@ -172,7 +172,7 @@ public abstract class ReceiveHandler
 				received_self	= true;
 //				return;
 			}
-//			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+//			System.out.println("RH: "+System.currentTimeMillis()+" "+agent.getMicroAgent().getComponentIdentifier()+" received: "+info.getSender());
 		}	
 //		System.out.println("received awa info: "+getComponentIdentifier().getLocalName()+" "+info.getSender());
 	}
@@ -189,7 +189,7 @@ public abstract class ReceiveHandler
 			if(info.getSender().equals(agent.getRoot()))
 				received_self	= true;
 			
-//			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+//			System.out.println(System.currentTimeMillis()+" "+agent.getMicroAgent().getComponentIdentifier()+" received: "+info.getSender());
 			
 			IFuture<IAwarenessManagementService>	msfut	= agent.getMicroAgent().getRequiredService("management");
 			msfut.addResultListener(new IResultListener<IAwarenessManagementService>()

@@ -41,7 +41,7 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 				received_self	= true;
 				return;
 			}
-//			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+//			System.out.println("MSRH: "+System.currentTimeMillis()+" "+getAgent().getMicroAgent().getComponentIdentifier()+" received: "+info.getSender());
 		}	
 
 		// Received awareness info

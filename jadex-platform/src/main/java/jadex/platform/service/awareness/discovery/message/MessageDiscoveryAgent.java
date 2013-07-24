@@ -74,6 +74,8 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 				{
 					public void intermediateResultAvailable(DiscoveryInfo di)
 					{
+//						System.out.println("discovery info: "+di);
+						
 						if(di.isAlive())
 						{
 							long	time	= di.getDelay()==-1 ? -1 : di.getTime()+di.getDelay();
@@ -241,7 +243,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 			if(info.getSender().equals(getRoot()))
 				received_self	= true;
 			
-//			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
+//			System.out.println(System.currentTimeMillis()+" "+getMicroAgent().getComponentIdentifier()+" received: "+info.getSender());
 			
 			IFuture<IAwarenessManagementService>	msfut	= getMicroAgent().getRequiredService("management");
 			msfut.addResultListener(new DefaultResultListener<IAwarenessManagementService>(getMicroAgent().getLogger())
