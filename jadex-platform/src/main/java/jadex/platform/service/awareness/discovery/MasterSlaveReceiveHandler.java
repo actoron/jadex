@@ -55,6 +55,8 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 		{
 			if(address.equals(SUtil.getInetAddress()))
 			{
+//				System.out.println("from slave: "+address);
+				
 				// If awareness message comes from local slave.
 				getAgent().getLocals().addOrUpdateEntry(new DiscoveryEntry(info, getAgent().getClockTime(), sa));
 				
@@ -63,15 +65,17 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 			}
 			else
 			{
-				// If awareness message comes from remode node.
+//				System.out.println("from remote: "+address+", "+SUtil.getInetAddress());
+
+				// If awareness message comes from remote node.
 				getAgent().getRemotes().addOrUpdateEntry(new DiscoveryEntry(info, getAgent().getClockTime(), sa));
 			
 				// Forward remote update to local slaves.
 				((MasterSlaveSendHandler)getAgent().getSender()).sendToLocals(data);
 			}
-			
-//			System.out.println("to locals, from: "+address+" "+port+" "+info.getSender());
-			((MasterSlaveSendHandler)getAgent().getSender()).sendToLocals(data);
+//			
+////			System.out.println("to locals, from: "+address+" "+port+" "+info.getSender());
+//			((MasterSlaveSendHandler)getAgent().getSender()).sendToLocals(data);
 		}
 		else
 		{
