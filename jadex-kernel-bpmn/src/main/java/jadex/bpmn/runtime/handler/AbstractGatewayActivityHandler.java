@@ -260,7 +260,7 @@ public abstract class AbstractGatewayActivityHandler
 								}
 								else
 								{
-									thread.setParameterValue(key, value);
+									thread.setDataEdgeValue(key, value);
 								}
 							}
 						}

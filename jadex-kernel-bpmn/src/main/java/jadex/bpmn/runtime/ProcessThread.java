@@ -381,6 +381,20 @@ public class ProcessThread	implements ITaskContext
 			getThreadContext().getInitiator()!=null? 
 			getThreadContext().getInitiator().getParameterValue(name): null;
 	}
+	
+	/**
+	 *  Set the value of a parameter.
+	 *  @param name	The parameter name. 
+	 *  @param value	The parameter value. 
+	 */
+	public void	setDataEdgeValue(String name, Object value)
+	{
+		if (dataedges == null)
+		{
+			dataedges = new HashMap<String, Object>();
+		}
+		dataedges.put(name, value);
+	}
 
 	/**
 	 *  Set the value of a parameter.
@@ -580,6 +594,15 @@ public class ProcessThread	implements ITaskContext
 	public BpmnInterpreter getInstance()
 	{
 		return this.instance;
+	}
+	
+	/**
+	 *  Get the data edges.
+	 *  @return The data edges.
+	 */
+	public Map<String, Object> getDataEdges()
+	{
+		return this.dataedges;
 	}
 	
 	/**
