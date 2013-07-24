@@ -278,32 +278,35 @@ public class ServicePoolTask implements ITask
 //			final JComboBox box = new JComboBox(container.getInterfaces().toArray());
 //			box.setEditable(true);
 			
-			MProperty mprop = task.getProperties().removeKey(PROPERTY_OLD_MAPPINGS);
-			String[] oldmaps = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
-			mprop = task.getProperties().removeKey(PROPERTY_CLASS_INFOS);
-			String[] classinfos = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
-			mprop = task.getProperties().removeKey(PROPERTY_FILE_INFOS);
-			String[] fileinfos = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
-			mprop = task.getProperties().removeKey(PROPERTY_MONITORINGS);
-			Boolean[] monitorings = mprop == null ? null : mprop.getInitialValue()!=null ? (Boolean[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
-			
-			List<MappingEntry> mappingentries = getMappingEntries(oldmaps, classinfos, fileinfos, monitorings);
-			if(mappingentries.size() > 0)
+			if(task.getProperties()!=null)
 			{
-				for(MappingEntry mentry : mappingentries)
+				MProperty mprop = task.getProperties().removeKey(PROPERTY_OLD_MAPPINGS);
+				String[] oldmaps = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
+				mprop = task.getProperties().removeKey(PROPERTY_CLASS_INFOS);
+				String[] classinfos = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
+				mprop = task.getProperties().removeKey(PROPERTY_FILE_INFOS);
+				String[] fileinfos = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
+				mprop = task.getProperties().removeKey(PROPERTY_MONITORINGS);
+				Boolean[] monitorings = mprop == null ? null : mprop.getInitialValue()!=null ? (Boolean[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
+				
+				List<MappingEntry> mappingentries = getMappingEntries(oldmaps, classinfos, fileinfos, monitorings);
+				if(mappingentries.size() > 0)
 				{
-					tm.addEntry(mentry);
+					for(MappingEntry mentry : mappingentries)
+					{
+						tm.addEntry(mentry);
+					}
 				}
+				UnparsedExpression uexp = new UnparsedExpression(null, 
+						String[].class, generateExpressionString(0, mappingentries), null);
+				task.setPropertyValue(PROPERTY_CLASS_INFOS, uexp);
+				uexp = new UnparsedExpression(null, 
+						String[].class, generateExpressionString(1, mappingentries), null);
+				task.setPropertyValue(PROPERTY_FILE_INFOS, uexp);
+				uexp = new UnparsedExpression(null, 
+						String[].class, generateExpressionString(2, mappingentries), null);
+				task.setPropertyValue(PROPERTY_MONITORINGS, uexp);
 			}
-			UnparsedExpression uexp = new UnparsedExpression(null, 
-					String[].class, generateExpressionString(0, mappingentries), null);
-			task.setPropertyValue(PROPERTY_CLASS_INFOS, uexp);
-			uexp = new UnparsedExpression(null, 
-					String[].class, generateExpressionString(1, mappingentries), null);
-			task.setPropertyValue(PROPERTY_FILE_INFOS, uexp);
-			uexp = new UnparsedExpression(null, 
-					String[].class, generateExpressionString(2, mappingentries), null);
-			task.setPropertyValue(PROPERTY_MONITORINGS, uexp);
 			
 //			if(mprop.getInitialValue()!=null)
 //			{

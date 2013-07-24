@@ -741,16 +741,23 @@ public class ProcessThread	implements ITaskContext
 						
 						for(MDataEdge de: ds)
 						{
-							if(dataedges!=null && dataedges.containsKey(de.getId()))
+							if(dataedges!=null)
 							{
-								String pname = de.getTargetParameter();
-								Object val = dataedges.remove(de.getId());
+								if(dataedges.containsKey(de.getId()))
+								{
+									String pname = de.getTargetParameter();
+									Object val = dataedges.remove(de.getId());
 								
-								// if already contains value must be identical
-								if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
-									throw new RuntimeException("Different edges have different values");
+									// if already contains value must be identical
+									if(passedparams.containsKey(pname) && !SUtil.equals(passedparams.get(pname), val))
+										throw new RuntimeException("Different edges have different values");
 								
-								passedparams.put(pname, val);
+									passedparams.put(pname, val);
+								}
+								else
+								{
+									throw new RuntimeException("Could not find data edge value for: "+de.getId());
+								}
 							}
 						}
 					}
@@ -893,11 +900,10 @@ public class ProcessThread	implements ITaskContext
 								}
 							}
 						}
-					
-						if(dataedges==null)
-							dataedges = new HashMap<String, Object>();
-						dataedges.put(de.getId(), value);	
 					}
+					if(dataedges==null)
+						dataedges = new HashMap<String, Object>();
+					dataedges.put(de.getId(), value);	
 				}
 			}
 			
