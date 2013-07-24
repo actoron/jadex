@@ -238,6 +238,34 @@ public abstract class AbstractGatewayActivityHandler
 						}
 					}
 					
+					Map<String, Object> dataedges = pt.getDataEdges();
+					if(dataedges!=null)
+					{
+						for(Iterator<String> keys=dataedges.keySet().iterator(); keys.hasNext(); )
+						{
+							String key = keys.next();
+							if(ignore==null || !ignore.contains(key))
+							{
+								Object value = dataedges.get(key);
+								
+								if(thread.hasParameterValue(key))
+								{
+									Object origval =thread.getParameterValue(key);
+									if(!SUtil.equals(origval, value))
+									{
+//										System.out.println("origact: "+thread.getModelElement());
+//										System.out.println("act: "+pt.getModelElement());
+										throw new RuntimeException("Inconsistent data edge values from threads cannot be unified in AND/OR join: "+key+" "+value+" "+origval+" "+activity);
+									}
+								}
+								else
+								{
+									thread.setParameterValue(key, value);
+								}
+							}
+						}
+					}
+					
 					thread.getThreadContext().removeThread(pt);
 //					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 //						thread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(pt));
