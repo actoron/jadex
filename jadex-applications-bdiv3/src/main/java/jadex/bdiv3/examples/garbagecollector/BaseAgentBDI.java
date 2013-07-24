@@ -14,7 +14,7 @@ import jadex.micro.annotation.Agent;
  * 
  */
 @Agent
-public class BaseAgentBDI
+public abstract class BaseAgentBDI
 {
 	@Agent
 	protected BDIAgent agent;

@@ -4,6 +4,7 @@ import jadex.base.test.TestReport;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
+import jadex.bdiv3.annotation.Mapping;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -18,6 +19,11 @@ import java.util.Map;
 @Capability
 public class AbstractBeliefsCapability
 {
+	//-------- capabilities --------
+	
+	@Capability(beliefmapping=@Mapping(value="string2", target="string"))
+	protected AbstractBeliefsSubcapability	capa	= new AbstractBeliefsSubcapability();
+
 	//-------- attributes --------
 	
 	/** The test results. */
@@ -74,6 +80,9 @@ public class AbstractBeliefsCapability
 	public native String[]	getArray();
 	@Belief
 	public native void	setArray(String[] a);
+	
+	@Belief
+	protected String	string2;
 
 	//-------- constructors --------
 	

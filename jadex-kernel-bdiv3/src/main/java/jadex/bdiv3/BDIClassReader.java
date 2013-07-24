@@ -278,7 +278,7 @@ public class BDIClassReader extends MicroClassReader
 					bel2	= new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]));
 					bel2.setSetter(bel.getSetter());
 				}
-				bel2.setName(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+bel2.getName());
+				bel2.setName(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+bel.getName());
 				
 				bdimodel.getCapability().addBelief(bel2);
 			}

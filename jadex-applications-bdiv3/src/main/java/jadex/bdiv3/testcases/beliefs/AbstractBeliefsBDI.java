@@ -21,7 +21,7 @@ public class AbstractBeliefsBDI
 		@Mapping(value="intb", target="int"), @Mapping(value="longb", target="long"),
 		@Mapping(value="floatb", target="float"), @Mapping(value="doubleb", target="double"),
 		@Mapping(value="charb", target="char"), @Mapping(value="booleanb", target="boolean"),
-		@Mapping(value="stringb", target="string"), @Mapping("array")})
+		@Mapping(value="string"), @Mapping("array")})
 	protected AbstractBeliefsCapability	capa	= new AbstractBeliefsCapability();
 	
 	//-------- beliefs --------
@@ -51,10 +51,11 @@ public class AbstractBeliefsBDI
 	protected boolean	booleanb;
 	
 	@Belief
-	protected String	stringb;
+	protected String	string;
 	
 	@Belief
 	protected String[]	array;
+
 	
 	//-------- constructors --------
 	

@@ -309,7 +309,7 @@ public class RPlan extends RElement implements IPlan
 //			|| PlanLifecycleState.FAILED.equals(lifecyclestate)
 //			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
 //		{
-			System.out.println("plan lifecycle: "+lifecyclestate+", "+this);
+//			System.out.println("plan lifecycle: "+lifecyclestate+", "+this);
 //		}
 	}
 	
