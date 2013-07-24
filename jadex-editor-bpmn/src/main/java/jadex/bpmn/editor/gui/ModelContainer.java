@@ -3,10 +3,10 @@ package jadex.bpmn.editor.gui;
 import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.Settings.BpmnClassFilter;
 import jadex.bpmn.editor.gui.Settings.FileFilter;
-import jadex.bpmn.editor.gui.controllers.IdGenerator;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.model.IModelContainer;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.io.IdGenerator;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.ClassInfo;
 
