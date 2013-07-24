@@ -1,14 +1,30 @@
 package jadex.bpmn.model;
 
+import jadex.bpmn.model.io.IdGenerator;
+
 /**
  *  Base model element with an id. 
  */
 public class MIdElement
 {
+	/** ID generator. */
+	protected static final IdGenerator ID_GENERATOR = new IdGenerator();
+	
 	//-------- attributes --------
 	
 	/** The id. */
 	protected String id;
+	
+	/**
+	 *  Generates an ID element.
+	 */
+	protected MIdElement()
+	{
+		synchronized (ID_GENERATOR)
+		{
+			id = ID_GENERATOR.generateId();
+		}
+	}
 
 	//-------- methods ---------
 	
