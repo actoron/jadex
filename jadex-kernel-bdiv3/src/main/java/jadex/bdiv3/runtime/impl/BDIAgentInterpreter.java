@@ -600,6 +600,21 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
+	 *  Drop a pojo goal.
+	 */
+	public void dropGoal(Object goal)
+	{
+		for(RGoal rgoal: getCapability().getGoals(goal.getClass()))
+		{
+			if(goal.equals(rgoal.getPojoElement()))
+			{
+				rgoal.drop();
+			}
+		}
+	}
+
+	
+	/**
 	 *  Start the component behavior.
 	 */
 	public void startBehavior()
@@ -1760,6 +1775,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			: getAgent() instanceof PojoBDIAgent? ((PojoBDIAgent)getAgent()).getPojoAgent(): getAgent();
 		vals.add(capa);
 		vals.add(new CapabilityWrapper((BDIAgent)getAgent(), capa, capaname));
+		vals.add(getAgent());
 		vals.add(getExternalAccess());
 
 		

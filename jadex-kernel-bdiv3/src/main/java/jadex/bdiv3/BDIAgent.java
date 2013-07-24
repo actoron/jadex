@@ -68,6 +68,15 @@ public class BDIAgent extends MicroAgent
 	}
 	
 	/**
+	 *  Drop a goal.
+	 */
+	public void dropGoal(Object goal)
+	{
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
+		ip.dropGoal(goal);
+	}
+	
+	/**
 	 *  Dispatch a goal wait for its result.
 	 */
 	public <T> void adoptPlan(T plan)

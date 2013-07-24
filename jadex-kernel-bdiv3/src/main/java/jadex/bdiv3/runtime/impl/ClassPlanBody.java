@@ -1,11 +1,13 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
 import jadex.micro.IPojoMicroAgent;
@@ -150,6 +152,7 @@ public class ClassPlanBody extends AbstractPlanBody
 	/**
 	 *  Inject plan elements.
 	 */
+	// Todo: plan in subcapabilities!
 	protected void injectElements(Object agent)
 	{
 		try
@@ -168,7 +171,15 @@ public class ClassPlanBody extends AbstractPlanBody
 					else if(f.isAnnotationPresent(PlanCapability.class))
 					{
 						f.setAccessible(true);
-						f.set(plan, agent);
+						Class<?> ft = f.getType();
+						if(ft.equals(ICapability.class))
+						{
+							f.set(plan, new CapabilityWrapper((BDIAgent)ia, agent, null));
+						}
+						else
+						{
+							f.set(plan, agent);
+						}
 					}
 					else if(f.isAnnotationPresent(PlanReason.class))
 					{
