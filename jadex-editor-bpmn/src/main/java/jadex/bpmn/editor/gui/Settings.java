@@ -455,6 +455,14 @@ public class Settings
 				setGlobalInterfaces(stmp[1]);
 				setGlobalExceptions(stmp[2]);
 				setGlobalAllClasses(stmp[3]);
+				
+				try
+				{
+					save();
+				}
+				catch (IOException e)
+				{
+				}
 			}
 			
 			public void exceptionOccurred(Exception exception)

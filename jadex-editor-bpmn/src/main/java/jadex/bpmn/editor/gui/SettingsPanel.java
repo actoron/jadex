@@ -326,6 +326,7 @@ public class SettingsPanel extends JPanel
 		lookandfeelbox.addActionListener(changeaction);
 		g = new GridBagConstraints();
 		g.anchor = GridBagConstraints.WEST;
+		g.insets = new Insets(5, 5, 5, 5);
 		generalpanel.add(lookandfeelbox, g);
 		
 		szbox = new JCheckBox(changeaction);
@@ -334,11 +335,14 @@ public class SettingsPanel extends JPanel
 		g = new GridBagConstraints();
 		g.anchor = GridBagConstraints.WEST;
 		g.gridy = 1;
+		g.insets = new Insets(5, 5, 5, 5);
+		szbox.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
+		szbox.setMargin(new Insets(0, 0, 0, 0));
 		generalpanel.add(szbox, g);
 		
 		g = new GridBagConstraints();
 		g.gridwidth = 2;
-		g.gridy = 1;
+		g.gridy = 2;
 		g.weightx = 1.0;
 		g.weighty = 1.0;
 		g.fill = GridBagConstraints.BOTH;
