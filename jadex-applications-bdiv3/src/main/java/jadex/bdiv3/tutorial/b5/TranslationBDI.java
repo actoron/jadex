@@ -26,7 +26,8 @@ import java.util.Map;
 @Description("The translation agent B4. <br> Translation agent that implements itself the translation service. Just looks up translation word in hashtable and returns the corresponding entry.")
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(name="transser", type=ITranslationService.class, implementation=@Implementation(expression="BDIPlanManager")))
+@ProvidedServices(@ProvidedService(name="transser", type=ITranslationService.class, 
+	implementation=@Implementation(BDIServicePlan.class)))
 public class TranslationBDI
 {
 	//-------- attributes --------
