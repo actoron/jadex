@@ -13,6 +13,7 @@ import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ import java.util.Map;
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(name="transser", type=ITranslationService.class, 
-	implementation=@Implementation(BDIServicePlan.class)))
+	implementation=@Implementation(expression="$pojoagent.createService(ITranslationService.class)")))
 public class TranslationBDI
 {
 	//-------- attributes --------
@@ -89,6 +90,16 @@ public class TranslationBDI
 	public void internetTranslate(String eword)
 	{
 		System.out.println("eword: "+eword);
+	}
+	
+	
+	/**
+	 *  Create a wrapper service implementation.
+	 */
+	public Object createService(Class<?> iface)
+	{
+		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{iface}, 
+			new BDIServiceInvocationHandler(agent, iface));
 	}
 }
 

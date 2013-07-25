@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
  */
 public class MethodInfo
 {
-	/** The field name. */
+	/** The method name. */
 	protected String name;
 	
 	/** The fully qualified parameter clazz names. */
