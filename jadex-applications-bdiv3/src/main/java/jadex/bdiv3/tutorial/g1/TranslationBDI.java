@@ -1,0 +1,237 @@
+package jadex.bdiv3.tutorial.g1;
+
+import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Trigger;
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+<H3>TranslationAgent: Lesson G1.</H3>
+Using a separate thread to accept http connections.
+<H4>Explanation</H4>
+The agent opens a server connection at port 9099 and waits
+for translation requests.<br>
+Direct your browser to e.g.
+<a href="http://localhost:9099/dog">http://localhost:9099/dog</a>
+to perform a translation.
+*/
+@Agent
+public class TranslationBDI
+{
+	//-------- attributes --------
+
+	@Agent
+	protected BDIAgent agent;
+	
+	/** The wordtable. */
+	protected Map<String, String> wordtable;
+
+	//-------- methods --------
+
+	/**
+	 * 
+	 */
+	@Goal
+	public class Translate
+	{
+		protected Socket client;
+
+		/**
+		 *  Create a new Translate. 
+		 */
+		public Translate(Socket client)
+		{
+			this.client = client;
+		}
+
+		/**
+		 *  Get the client.
+		 *  @return The client.
+		 */
+		public Socket getClient()
+		{
+			return client;
+		}
+
+		/**
+		 *  Set the client.
+		 *  @param client The client to set.
+		 */
+		public void setClient(Socket client)
+		{
+			this.client = client;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	@AgentCreated
+	public void init()
+	{
+//		System.out.println("Created: "+this);
+		this.wordtable = new HashMap<String, String>();
+		this.wordtable.put("coffee", "Kaffee");
+		this.wordtable.put("milk", "Milch");
+		this.wordtable.put("cow", "Kuh");
+		this.wordtable.put("cat", "Katze");
+		this.wordtable.put("dog", "Hund");
+		
+		final int port = 9099;
+		
+		Runnable run = new Runnable()
+		{
+			ServerSocket server;
+			
+			/**
+			 *  The server code.
+			 *  This method runs on the separate thread,
+			 *  and repeatedly blocks until a client connects.
+			 *  @see Runnable
+			 */
+			public void	run()
+			{
+				try
+				{
+					server	= new ServerSocket(port);
+				}
+				catch(IOException e)
+				{
+					throw new RuntimeException(e.getMessage());
+				}
+				
+//				logger.info("Created: "+Thread.currentThread());
+
+				// Repeatedly listen for connections, until the server has been closed.
+				try
+				{
+					// Accept connections while server is active.
+					while(true)
+					{
+						final Socket client	= server.accept();
+						agent.scheduleStep(new IComponentStep<Void>()
+						{
+							@Classname("translate")
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								agent.dispatchTopLevelGoal(new Translate(client));
+								return IFuture.DONE;
+							}
+						});
+					}
+				}
+				catch(IOException e)
+				{
+					// Server has been closed.
+					e.printStackTrace();
+//					logger.info("Exited: "+Thread.currentThread());
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// Agent has died: close server.
+					close();
+				}
+			}
+			
+			protected void close()
+			{
+				if(server!=null)
+				{
+					try
+					{
+						server.close();
+					}
+					catch(Exception e)
+					{
+					}
+				}
+			}
+		};
+		
+		Thread t = new Thread(run);
+		t.start();
+	}
+	
+	/**
+	 * 
+	 */
+	@Plan(trigger=@Trigger(goals=Translate.class))
+	public void translate(Translate trans)
+	{
+		Socket client = trans.getClient();
+
+		try
+		{
+			BufferedReader	in	= new BufferedReader(new InputStreamReader(client.getInputStream()));
+			String	request	= in.readLine();
+			int	slash	= request.indexOf("/");
+			int	space	= request.indexOf(" ", slash);
+			String	eword	= request.substring(slash+1, space);
+//			String	gword	= (String)queryword.execute("$eword", eword);
+			String gword = wordtable.get(eword);
+			System.out.println(request);
+//			while(request!=null)
+//				System.out.println(request	= in.readLine());
+			
+			PrintStream	out	= new PrintStream(client.getOutputStream());
+			out.print("HTTP/1.0 200 OK\r\n");
+			out.print("Content-type: text/html\r\n");
+			out.println("\r\n");
+			out.println("<html><head><title>TranslationM1 - "+eword+"</title></head><body>");
+			out.println("<p>Translated from english to german: "+eword+" = "+gword+".");
+			out.println("</p></body></html>");
+			out.flush();
+			client.close();
+		}
+		catch(IOException e)
+		{
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+}
+
+//<!-- Initial plan for starting a server thread waiting for client connections.
+//		Adds new sockets with the new connection to the client belief set. -->
+//<plan name="server">
+//	<parameter name="port" class="int">
+//		<value>9099</value>
+//	</parameter>
+//	<body class="ServerPlanG1"/>
+//</plan>
+//</plans>
+//
+//<expressions>
+//<!-- This query selects the first matching entry from the English - German
+//	dictionary, whereby the parameter $eword is compared to the first
+//	element of a belief set tuple. -->
+//<expression name="query_egword">
+//	select one $wordpair.get(1)
+//	from Tuple $wordpair in $beliefbase.getBeliefSet("egwords").getFacts()
+//	where $wordpair.get(0).equals($eword)
+//	<!-- <parameter name="$eword" class="String"/> -->
+//</expression>
+//</expressions>
+//
+//<configurations>
+//<configuration name="default">
+//	<plans>
+//		<initialplan ref="server"/>
+//	</plans>
+//</configuration>
+//</configurations>
