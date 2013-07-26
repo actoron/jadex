@@ -1814,6 +1814,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				vals.add(rpe.getPojoElement());
 			}
+			if(rpe.getPojoElement() instanceof InvocationInfo)
+			{
+				vals.add(((InvocationInfo)rpe.getPojoElement()).getParams());
+			}
 		}
 		
 		// Fill in values from annotated events or using parameter guesser.

@@ -1,11 +1,15 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.model.MGoal;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  *  Abstract base class for plan body implementations.
@@ -54,9 +58,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 			? null : pname.substring(0, pname.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR));
 		final Object agent	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).getCapabilityObject(capaname);
 
-		internalInvokePart(agent, 0).addResultListener(new IResultListener<Void>()
+		internalInvokePart(agent, 0).addResultListener(new IResultListener<Object>()
 		{
-			public void resultAvailable(Void result)
+			public void resultAvailable(Object result)
 			{
 //				if(RPlan.PLANLIFECYCLESTATE_ABORTED.equals(rplan.getLifecycleState()))
 				if(rplan.getException()!=null)
@@ -65,10 +69,47 @@ public abstract class AbstractPlanBody implements IPlanBody
 				}
 				else
 				{
-					internalInvokePart(agent, 1)
-						.addResultListener(new IResultListener<Void>()
+					// Automatically set goal result if goal has @GoalResult
+					if(result!=null)
 					{
-						public void resultAvailable(Void result)
+						if(rplan.getReason() instanceof RGoal)
+						{
+							RGoal rgoal = (RGoal)rplan.getReason();
+							MGoal mgoal = (MGoal)rgoal.getModelElement();
+							Object wa = mgoal.getPojoResultWriteAccess(ia.getClassLoader());
+							if(wa instanceof Field)
+							{
+								try
+								{
+									Field f = (Field)wa;
+									f.setAccessible(true);
+									f.set(rgoal.getPojoElement(), result);
+								}
+								catch(Exception e)
+								{
+									throw new RuntimeException(e);
+								}
+							}
+							else if(wa instanceof Method)
+							{
+								try
+								{
+									Method m = (Method)wa;
+									BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+									Object[] params = bai.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), rplan.getModelElement(), null, rplan, null);
+									m.invoke(rgoal.getPojoElement(), params);
+								}
+								catch(Exception e)
+								{
+									throw new RuntimeException(e);
+								}
+							}
+						}
+					}
+					internalInvokePart(agent, 1)
+						.addResultListener(new IResultListener<Object>()
+					{
+						public void resultAvailable(Object result)
 						{
 							rplan.setLifecycleState(RPlan.PlanLifecycleState.PASSED);
 //							if(reason instanceof RProcessableElement)
@@ -96,9 +137,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 				
 				rplan.setException(exception);
 				internalInvokePart(agent, next)
-					.addResultListener(new IResultListener<Void>()
+					.addResultListener(new IResultListener<Object>()
 				{
-					public void resultAvailable(Void result)
+					public void resultAvailable(Object result)
 					{
 						if(!rplan.isFinished())
 						{
@@ -131,9 +172,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 	/**
 	 * 
 	 */
-	protected IFuture<Void> internalInvokePart(Object agent, int part)
+	protected IFuture<Object> internalInvokePart(Object agent, int part)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<Object> ret = new Future<Object>();
 		
 		try
 		{			
@@ -161,17 +202,11 @@ public abstract class AbstractPlanBody implements IPlanBody
 			
 			if(res instanceof IFuture)
 			{
-				((IFuture)res).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						ret.setResult(null);
-					}
-				});
+				((IFuture)res).addResultListener(new DelegationResultListener<Object>(ret));
 			}
 			else
 			{
-				ret.setResult(null);
+				ret.setResult(res);
 			}
 		}
 		catch(Exception e)

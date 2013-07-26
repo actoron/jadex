@@ -70,7 +70,8 @@ public class MGoal extends MClassBasedElement
 	protected MDeliberation deliberation;
 	
 	/** The pojo result access (field or method). */
-	protected Object pojoresultaccess;
+	protected Object pojoresultreadaccess;
+	protected Object pojoresultwriteaccess;
 	
 	/** The goal conditions. */
 	protected Map<String, List<MCondition>> conditions;
@@ -225,37 +226,95 @@ public class MGoal extends MClassBasedElement
 	 *  Get the pojo result access, i.e. the method or field
 	 *  annotated with @GoalResult.
 	 */
-	public Object getPojoResultAccess(ClassLoader cl)
+	public Object getPojoResultReadAccess(ClassLoader cl)
 	{
-		if(pojoresultaccess==null)
+		if(pojoresultreadaccess==null)
 		{
 			Class<?> pojocl = getTargetClass(cl);
 			for(Method m: pojocl.getDeclaredMethods())
 			{
 				if(m.isAnnotationPresent(GoalResult.class))
 				{
-					pojoresultaccess = m;
-					break;
+					if(void.class.equals(m.getReturnType()))
+					{
+						pojoresultwriteaccess = m;
+					}
+					else
+					{
+						pojoresultreadaccess = m;
+						break;
+					}
 				}
 			}
-			if(pojoresultaccess==null)
+			if(pojoresultreadaccess==null)
 			{
 				for(Field f: pojocl.getDeclaredFields())
 				{
 					if(f.isAnnotationPresent(GoalResult.class))
 					{
-						pojoresultaccess = f;
+						pojoresultreadaccess = f;
+						pojoresultwriteaccess = f;
 						break;
 					}
 				}
-				if(pojoresultaccess==null)
-					pojoresultaccess = Boolean.FALSE;
+				if(pojoresultreadaccess==null)
+					pojoresultreadaccess = Boolean.FALSE;
 			}
 		}
 		
-		if(!Boolean.FALSE.equals(pojoresultaccess))
+		if(!Boolean.FALSE.equals(pojoresultreadaccess))
 		{
-			return pojoresultaccess;
+			return pojoresultreadaccess;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/**
+	 *  Get the pojo result write access, i.e. the method or field
+	 *  annotated with @GoalResult.
+	 */
+	public Object getPojoResultWriteAccess(ClassLoader cl)
+	{
+		if(pojoresultwriteaccess==null)
+		{
+			Class<?> pojocl = getTargetClass(cl);
+			for(Method m: pojocl.getDeclaredMethods())
+			{
+				if(m.isAnnotationPresent(GoalResult.class))
+				{
+					if(void.class.equals(m.getReturnType()))
+					{
+						pojoresultwriteaccess = m;
+						break;
+					}
+					else
+					{
+						pojoresultreadaccess = m;
+					}
+				}
+			}
+			if(pojoresultwriteaccess==null)
+			{
+				for(Field f: pojocl.getDeclaredFields())
+				{
+					if(f.isAnnotationPresent(GoalResult.class))
+					{
+						pojoresultreadaccess = f;
+						pojoresultwriteaccess = f;
+						break;
+					}
+				}
+				if(pojoresultwriteaccess==null)
+					pojoresultwriteaccess = Boolean.FALSE;
+			}
+		}
+		
+		if(!Boolean.FALSE.equals(pojoresultwriteaccess))
+		{
+			return pojoresultwriteaccess;
 		}
 		else
 		{

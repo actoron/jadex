@@ -756,7 +756,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	public static Object getGoalResult(Object pojo, MGoal mgoal, ClassLoader cl)
 	{
 		Object ret = pojo;
-		Object pac = mgoal.getPojoResultAccess(cl);
+		Object pac = mgoal.getPojoResultReadAccess(cl);
 		if(pac instanceof Field)
 		{
 			try
