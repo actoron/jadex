@@ -9,6 +9,7 @@ import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
@@ -20,6 +21,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Implementation;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
@@ -50,7 +52,7 @@ public class BDIAgent extends MicroAgent
 	{
 		Collection<RGoal>	rgoals	= ((BDIAgentInterpreter)getInterpreter()).getCapability().getGoals(clazz);
 		List<T>	ret	= new ArrayList<T>();
-		for(RGoal rgoal: rgoals)
+		for(RProcessableElement rgoal: rgoals)
 		{
 			ret.add((T)rgoal.getPojoElement());
 		}

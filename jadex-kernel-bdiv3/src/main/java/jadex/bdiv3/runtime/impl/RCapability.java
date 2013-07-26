@@ -419,7 +419,7 @@ public class RCapability extends RElement
 			if(rg.isFinished())
 				System.out.println("fini goal"+" "+reason+" "+orig);
 			RPlan pp = rg.getParentPlan();
-			buf.append(" reason is: "+((RGoal)reason).getId()+rg.lifecyclestate);
+			buf.append(" reason is: "+((RProcessableElement)reason).getId()+rg.lifecyclestate);
 			if(pp!=null)
 			{
 				if(pp.isFinished())

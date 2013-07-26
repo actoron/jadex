@@ -10,6 +10,7 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
@@ -554,7 +555,7 @@ public class RPlan extends RElement implements IPlan
 			
 			if(subgoals!=null)
 			{
-				for(RGoal subgoal: subgoals)
+				for(IGoal subgoal: subgoals)
 				{
 					subgoal.drop();
 				}
@@ -769,7 +770,7 @@ public class RPlan extends RElement implements IPlan
 					
 	//				rgoal.addGoalListener(new TimeoutResultListener<Void>(
 	//					timeout, ia.getExternalAccess(), new IResultListener<Void>()
-					rgoal.addGoalListener(new IResultListener<Void>()
+					rgoal.addListener(new IResultListener<Void>()
 					{
 						public void resultAvailable(Void result)
 						{

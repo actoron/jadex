@@ -1314,7 +1314,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		try
 		{
-			final ProvidedServiceImplementation	impl	= info.getImplementation();
+			final ProvidedServiceImplementation	impl = info.getImplementation();
 			// Virtual service (e.g. promoted)
 			if(impl!=null && impl.getBinding()!=null)
 			{
@@ -1328,25 +1328,27 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			}
 			else
 			{
-				Object	ser	= null;
-				if(impl!=null && impl.getValue()!=null)
-				{
-					// todo: other Class imports, how can be found out?
-					try
-					{
-						ser = SJavaParser.getParsedValue(impl, model.getAllImports(), getFetcher(), getClassLoader());
-//								System.out.println("added: "+ser+" "+model.getName());
-					}
-					catch(RuntimeException e)
-					{
-						e.printStackTrace();
-						throw new RuntimeException("Service creation error: "+info, e);
-					}
-				}
-				else if(impl!=null && impl.getClazz().getType(getClassLoader())!=null)
-				{
-					ser = impl.getClazz().getType(getClassLoader()).newInstance();
-				}
+				Object ser = createServiceImplementation(info, model);
+				
+//				Object ser = null;
+//				if(impl!=null && impl.getValue()!=null)
+//				{
+//					// todo: other Class imports, how can be found out?
+//					try
+//					{
+//						ser = SJavaParser.getParsedValue(impl, model.getAllImports(), getFetcher(), getClassLoader());
+////								System.out.println("added: "+ser+" "+model.getName());
+//					}
+//					catch(RuntimeException e)
+//					{
+//						e.printStackTrace();
+//						throw new RuntimeException("Service creation error: "+info, e);
+//					}
+//				}
+//				else if(impl!=null && impl.getClazz().getType(getClassLoader())!=null)
+//				{
+//					ser = impl.getClazz().getType(getClassLoader()).newInstance();
+//				}
 				
 				// Implementation may null to disable service in some configurations.
 				if(ser!=null)
@@ -1387,11 +1389,47 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		catch(Exception e)
 		{
-//					e.printStackTrace();
+//			e.printStackTrace();
 			ret.setException(e);
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Create a service implementation from description.
+	 */
+	protected Object createServiceImplementation(ProvidedServiceInfo info, IModelInfo model)
+	{
+		Object	ser	= null;
+		ProvidedServiceImplementation impl = info.getImplementation();
+		if(impl!=null && impl.getValue()!=null)
+		{
+			// todo: other Class imports, how can be found out?
+			try
+			{
+				ser = SJavaParser.getParsedValue(impl, model.getAllImports(), getFetcher(), getClassLoader());
+//						System.out.println("added: "+ser+" "+model.getName());
+			}
+			catch(RuntimeException e)
+			{
+				e.printStackTrace();
+				throw new RuntimeException("Service creation error: "+info, e);
+			}
+		}
+		else if(impl!=null && impl.getClazz().getType(getClassLoader())!=null)
+		{
+			try
+			{
+				ser = impl.getClazz().getType(getClassLoader()).newInstance();
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return ser;
 	}
 	
 //	/**

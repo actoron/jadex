@@ -32,6 +32,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -77,6 +78,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -319,7 +321,27 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		};
 	}
 	
-
+	/**
+	 *  Create a service implementation from description.
+	 */
+	protected Object createServiceImplementation(ProvidedServiceInfo info, IModelInfo model)
+	{
+		// Support special case that BDI should implement provided service with plans.
+		Object ret = null;
+		ProvidedServiceImplementation impl = info.getImplementation();
+		if(impl!=null && impl.getClazz().getType(getClassLoader()).equals(BDIAgent.class))
+		{
+			Class<?> iface = info.getType().getType(getClassLoader());
+			ret = Proxy.newProxyInstance(getClassLoader(), new Class[]{iface}, 
+				new BDIServiceInvocationHandler(this, iface));
+		}
+		else
+		{
+			ret = super.createServiceImplementation(info, model);
+		}
+		return ret;
+	}
+	
 	/**
 	 *  Init a service.
 	 */
@@ -584,7 +606,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		if(mgoal==null)
 			throw new RuntimeException("Unknown goal type: "+goal);
 		final RGoal rgoal = new RGoal(getInternalAccess(), mgoal, goal, null);
-		rgoal.addGoalListener(new ExceptionDelegationResultListener<Void, E>(ret)
+		rgoal.addListener(new ExceptionDelegationResultListener<Void, E>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
@@ -1127,7 +1149,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //												if(goal.getMGoal().getName().indexOf("AchieveCleanup")!=-1)
 //													System.out.println("Goal suspended: "+goal);
 												goal.setLifecycleState(getInternalAccess(), RGoal.GoalLifecycleState.SUSPENDED);
-												goal.setState(RGoal.State.INITIAL);
+												goal.setState(RProcessableElement.State.INITIAL);
 											}
 										}
 										
@@ -1749,7 +1771,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 *  Execute a goal method.
 	 */
-	protected IFuture<Boolean> executeGoalMethod(Method m, RGoal goal, IEvent event)
+	protected IFuture<Boolean> executeGoalMethod(Method m, RProcessableElement goal, IEvent event)
 	{
 		return invokeBooleanMethod(goal.getPojoElement(), m, goal.getModelElement(), event, null);
 	}

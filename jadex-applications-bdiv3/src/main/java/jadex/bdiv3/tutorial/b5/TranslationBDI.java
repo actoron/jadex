@@ -4,7 +4,6 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanPrecondition;
-import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.annotation.ServiceTrigger;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
@@ -18,23 +17,22 @@ import jadex.micro.annotation.ProvidedServices;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  The translation agent B4.
+ *  The translation agent B5.
  *  
  *  Translation agent that implements itself the translation
  *  service indirectly using plans. In each plan a service trigger
  *  is specified that defines to which service calls it should react to.
  */
-@Description("The translation agent B4. <br> Translation agent that implements itself the translation service. Just looks up translation word in hashtable and returns the corresponding entry.")
+@Description("The translation agent B5. <br> Translation agent that implements itself the translation service. Just looks up translation word in hashtable and returns the corresponding entry.")
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(name="transser", type=ITranslationService.class, 
-	implementation=@Implementation(expression="$pojoagent.createService(ITranslationService.class)")))
+	implementation=@Implementation(BDIAgent.class)))
 public class TranslationBDI
 {
 	//-------- attributes --------
@@ -86,11 +84,12 @@ public class TranslationBDI
 		 */
 		@PlanBody
 //		public void body(String eword)
-		public void body(Object[] params)
+		public String body(Object[] params)
 		{
 			String eword = (String)params[0];
 			String gword = wordtable.get(eword);
 			System.out.println("Translated with internal dictionary dictionary: "+eword+" - "+gword);
+			return gword;
 		}
 	}
 	
@@ -101,9 +100,10 @@ public class TranslationBDI
 	 */
 	@Plan(trigger=@Trigger(service=@ServiceTrigger(type=ITranslationService.class)))
 //	public void internetTranslate(String eword)
-	public void internetTranslate(Object[] params)
+	public String internetTranslate(Object[] params)
 	{
 		String eword = (String)params[0];
+		String ret = null;
 		try
 		{
 			//URL dict = new URL("http://dict.leo.org/?search="+eword);
@@ -126,7 +126,8 @@ public class TranslationBDI
 						String wordb = inline.substring(start, end==-1? inline.length()-1: end);
 						wordb = wordb.replaceAll("<b>", "");
 						wordb = wordb.replaceAll("</b>", "");
-						System.out.println(worda+" - "+wordb);
+//						System.out.println(worda+" - "+wordb);
+						ret = worda;
 						System.out.println("Translated with internet dictionary: "+worda+" - "+wordb);
 					}
 					catch(Exception e)
@@ -142,16 +143,7 @@ public class TranslationBDI
 			e.printStackTrace();
 			throw new PlanFailureException(e.getMessage());
 		}
-	}
-	
-	
-	/**
-	 *  Create a wrapper service implementation.
-	 */
-	public Object createService(Class<?> iface)
-	{
-		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{iface}, 
-			new BDIServiceInvocationHandler(agent, iface));
+		return ret;
 	}
 }
 

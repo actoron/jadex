@@ -13,7 +13,6 @@ import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.future.IResultListener;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -21,9 +20,7 @@ import jadex.rules.eca.IRule;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,24 +57,14 @@ public class RGoal extends RProcessableElement implements IGoal
 	/** The processing state. */
 	protected GoalProcessingState processingstate;
 
-	/** The exception. */
-	protected Exception exception;
-	
 //	/** The observing rules. */
 //	protected List<String> rulenames;
-	
-	/** The goal listeners. */
-	protected List<IResultListener<Void>> listeners;
 	
 	/** The parent plan. */
 	protected RPlan parentplan;
 	
 	/** The child plan. */
 	protected RPlan childplan;
-	
-	/** Flag if goal is declarative. */
-//	protected boolean declarative;
-//	protected boolean maintain; // hack remove me
 	
 	/** The set of inhibitors. */
 	protected Set<RGoal> inhibitors;
@@ -177,7 +164,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		// If was inprocess -> now stop processing.
 //		System.out.println("changeprocstate: "+this+" "+processingstate+" "+getProcessingState());
 
-		if(!RGoal.GoalProcessingState.INPROCESS.equals(processingstate))
+		if(!GoalProcessingState.INPROCESS.equals(processingstate))
 		{
 			// todo: introduce some state for finished?!
 //			state.setAttributeValue(rgoal, OAVBDIRuntimeModel.processableelement_has_state, null);
@@ -240,7 +227,7 @@ public class RGoal extends RProcessableElement implements IGoal
 //		state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_processingstate, newstate);
 		
 		// If now is inprocess -> start processing
-		if(RGoal.GoalProcessingState.INPROCESS.equals(processingstate))
+		if(GoalProcessingState.INPROCESS.equals(processingstate))
 		{
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("activating: "+this);
@@ -252,8 +239,8 @@ public class RGoal extends RProcessableElement implements IGoal
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALNOTINPROCESS, this));
 		}
 		
-		if(RGoal.GoalProcessingState.SUCCEEDED.equals(processingstate)
-			|| RGoal.GoalProcessingState.FAILED.equals(processingstate))
+		if(GoalProcessingState.SUCCEEDED.equals(processingstate)
+			|| GoalProcessingState.FAILED.equals(processingstate))
 		{
 			setLifecycleState(ia, GoalLifecycleState.DROPPING);
 		}
@@ -360,24 +347,14 @@ public class RGoal extends RProcessableElement implements IGoal
 		}
 		else if(GoalLifecycleState.DROPPED.equals(lifecyclestate))
 		{
-			if(listeners!=null)
+			if(getListeners()!=null)
 			{
 				if(!isFinished())
 				{
 					setProcessingState(GoalProcessingState.FAILED);
 					setException(new GoalFailureException());
 				}
-				for(IResultListener<Void> lis: listeners)
-				{
-					if(isSucceeded())
-					{
-						lis.resultAvailable(null);
-					}
-					else if(isFailed())
-					{
-						lis.exceptionOccurred(exception);
-					}
-				}
+				super.notifyListeners();
 			}
 		}
 	}
@@ -424,24 +401,6 @@ public class RGoal extends RProcessableElement implements IGoal
 	{
 		return isSucceeded() || isFailed();
 	}
-	
-	/**
-	 *  Get the exception.
-	 *  @return The exception.
-	 */
-	public Exception getException()
-	{
-		return exception;
-	}
-
-	/**
-	 *  Set the exception.
-	 *  @param exception The exception to set.
-	 */
-	public void setException(Exception exception)
-	{
-		this.exception = exception;
-	}
 
 //	/**
 //	 *  Add a rule.
@@ -471,37 +430,6 @@ public class RGoal extends RProcessableElement implements IGoal
 //		}
 //	}
 
-	/**
-	 * 
-	 */
-	public void addGoalListener(IResultListener<Void> listener)
-	{
-		if(listeners==null)
-			listeners = new ArrayList<IResultListener<Void>>();
-		
-		if(isSucceeded())
-		{
-			listener.resultAvailable(null);
-		}
-		else if(isFailed())
-		{
-			listener.exceptionOccurred(exception);
-		}
-		else
-		{
-			listeners.add(listener);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public void removeGoalListener(IResultListener<Void> listener)
-	{
-		if(listeners!=null)
-			listeners.remove(listener);
-	}
-	
 	/**
 	 *  Get the childplan.
 	 *  @return The childplan.
@@ -600,7 +528,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		boolean ret = false;
 		if(obj instanceof RGoal)
 		{
-			ret = getMGoal().isUnique()? getPojoElement().equals(((RGoal)obj).getPojoElement()): super.equals(obj);
+			ret = getMGoal().isUnique()? getPojoElement().equals(((RProcessableElement)obj).getPojoElement()): super.equals(obj);
 		}
 		return ret;
 	}
@@ -694,6 +622,27 @@ public class RGoal extends RProcessableElement implements IGoal
 			}
 		}
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public void addGoalListener(IResultListener<Void> listener)
+//	{
+//		super.addGoalListener(listener);
+//		
+//		if(isSucceeded())
+//		{
+//			listener.resultAvailable(null);
+//		}
+//		else if(isFailed())
+//		{
+//			listener.exceptionOccurred(exception);
+//		}
+//		else
+//		{
+//			listeners.add(listener);
+//		}
+//	}
 	
 	//-------- methods that are goal specific --------
 

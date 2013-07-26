@@ -72,9 +72,15 @@ public abstract class AbstractPlanBody implements IPlanBody
 					// Automatically set goal result if goal has @GoalResult
 					if(result!=null)
 					{
-						if(rplan.getReason() instanceof RGoal)
+						if(rplan.getReason() instanceof RServiceCall)
 						{
-							RGoal rgoal = (RGoal)rplan.getReason();
+							RServiceCall sc = (RServiceCall)rplan.getReason();
+							InvocationInfo ii = sc.getInvocationInfo();
+							ii.setResult(result);
+						}
+						else if(rplan.getReason() instanceof RGoal)
+						{
+							RProcessableElement rgoal = (RProcessableElement)rplan.getReason();
 							MGoal mgoal = (MGoal)rgoal.getModelElement();
 							Object wa = mgoal.getPojoResultWriteAccess(ia.getClassLoader());
 							if(wa instanceof Field)
