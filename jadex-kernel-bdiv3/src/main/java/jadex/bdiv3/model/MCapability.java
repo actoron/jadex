@@ -9,12 +9,19 @@ import java.util.List;
  */
 public class MCapability extends MElement
 {
-	protected List<MBelief> beliefs;;
+	/** The beliefs. */
+	protected List<MBelief> beliefs;
 
-	protected List<MGoal> goals;;
+	/** The goals. */
+	protected List<MGoal> goals;
 	
-	protected List<MPlan> plans;;
+	/** The plans. */
+	protected List<MPlan> plans;
+
+	/** The services. */
+	protected List<MServiceCall> services;
 	
+	/** The configurations. */
 	protected List<MConfiguration> configurations;
 	
 	/**
@@ -241,5 +248,54 @@ public class MCapability extends MElement
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 *  Get the services.
+	 *  @return The services.
+	 */
+	public List<MServiceCall> getServices()
+	{
+		return services;
+	}
+
+	/**
+	 *  Set the services.
+	 *  @param services The services to set.
+	 */
+	public void setServices(List<MServiceCall> services)
+	{
+		this.services = services;
+	}
+
+	/**
+	 *  Get the plan for its name.
+	 *  @return The plan.
+	 */
+	public MServiceCall getService(String name)
+	{
+		MServiceCall ret = null;
+		if(services!=null)
+		{
+			for(MServiceCall ser: services)
+			{
+				if(ser.getName().equals(name))
+				{
+					ret = ser;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Add a service.
+	 */
+	public void addservice(MServiceCall ser)
+	{
+		if(services==null)
+			services = new ArrayList<MServiceCall>();
+		services.add(ser);
 	}
 }

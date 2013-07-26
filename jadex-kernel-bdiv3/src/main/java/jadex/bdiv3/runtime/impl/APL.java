@@ -7,13 +7,12 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
+import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.IMethodParameterGuesser;
 import jadex.commons.SReflect;
-import jadex.commons.SimpleMethodParameterGuesser;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -276,6 +275,15 @@ public class APL
 					{
 						List<MGoal> mgoals = mtrigger.getGoals();
 						if(mgoals!=null && mgoals.contains(element.getModelElement()))
+						{
+							precandidates.add(mplan);
+//							res.add(mplan);
+						}
+					}
+					else if(element instanceof RServiceCall && mtrigger!=null)
+					{
+						List<MServiceCall> msers = mtrigger.getServices();
+						if(msers!=null && msers.contains(element.getModelElement()))
 						{
 							precandidates.add(mplan);
 //							res.add(mplan);

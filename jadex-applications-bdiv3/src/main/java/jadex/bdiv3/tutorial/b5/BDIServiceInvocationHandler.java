@@ -1,6 +1,11 @@
 package jadex.bdiv3.tutorial.b5;
 
 import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.actions.FindApplicableCandidatesAction;
+import jadex.bdiv3.model.MServiceCall;
+import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.impl.InvocationInfo;
+import jadex.bdiv3.runtime.impl.RServiceCall;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 
@@ -50,10 +55,12 @@ public class BDIServiceInvocationHandler implements InvocationHandler
 		final Future<Object> ret = new Future<Object>();
 		
 		// Find fitting MServiceCall
-//		MServiceCall msc = agent.getBDIModel().getCapability().getServiceCall();
-//		RServiceCall sc = new RServiceCall(msc, new InvocationInfo(args));
-//		FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(sc);
-//		agent.scheduleStep(fac);
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+		String mn = method.toString();
+		MServiceCall msc = ip.getBDIModel().getCapability().getService(mn);
+		RServiceCall sc = new RServiceCall(msc, new InvocationInfo(args));
+		FindApplicableCandidatesAction fac = new FindApplicableCandidatesAction(sc);
+		agent.scheduleStep(fac);
 		
 //		ip.getCapability().addGoal(goal);
 //		goal.setLifecycleState(ia, RGoal.GoalLifecycleState.ADOPTED);

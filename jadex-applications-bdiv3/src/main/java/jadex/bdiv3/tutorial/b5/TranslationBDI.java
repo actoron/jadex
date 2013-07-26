@@ -3,6 +3,7 @@ package jadex.bdiv3.tutorial.b5;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.annotation.ServiceTrigger;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.service.annotation.Service;
@@ -64,6 +65,7 @@ public class TranslationBDI
 		/**
 		 * @return True, if word map is applicable.
 		 */
+		@PlanPrecondition
 		public boolean checkPrecondition(Object[] params)
 		{
 			return wordtable.containsKey(params[0]);
@@ -77,7 +79,7 @@ public class TranslationBDI
 		@PlanBody
 		public void body(String eword)
 		{
-			System.out.println("eword: "+eword);
+			System.out.println("eword 1: "+eword);
 		}
 	}
 	
@@ -89,7 +91,7 @@ public class TranslationBDI
 	@Plan(trigger=@Trigger(service=@ServiceTrigger(type=ITranslationService.class)))
 	public void internetTranslate(String eword)
 	{
-		System.out.println("eword: "+eword);
+		System.out.println("eword 2: "+eword);
 	}
 	
 	

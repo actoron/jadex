@@ -23,6 +23,8 @@ public class MTrigger
 	
 	protected List<String> factchangeds;
 	
+	protected List<MServiceCall> services;
+	
 	/**
 	 * 
 	 */
@@ -145,5 +147,23 @@ public class MTrigger
 	public List<String>	getFactChangeds()
 	{
 		return factchangeds==null? Collections.EMPTY_LIST: factchangeds;
+	}
+	
+	/**
+	 * 
+	 */
+	public void addService(MServiceCall service)
+	{
+		if(services==null)
+			this.services = new ArrayList<MServiceCall>();
+		services.add(service);
+	}
+	
+	/**
+	 *  Get the fact service calls.
+	 */
+	public List<MServiceCall>	getServices()
+	{
+		return services==null? Collections.EMPTY_LIST: services;
 	}
 }

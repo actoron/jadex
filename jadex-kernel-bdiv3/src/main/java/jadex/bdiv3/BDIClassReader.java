@@ -19,6 +19,7 @@ import jadex.bdiv3.annotation.Mapping;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
+import jadex.bdiv3.annotation.ServiceTrigger;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.ConstructorInfo;
@@ -30,6 +31,8 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MProcessableElement;
+import jadex.bdiv3.model.MServiceCall;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -626,6 +629,14 @@ public class BDIClassReader extends MicroClassReader
 					trigger2.addGoal(bdimodel.getCapability().getGoal(mapped));
 				}
 			}
+			if(trigger.getServices()!=null)
+			{
+				for(MServiceCall ser: trigger.getServices())
+				{
+					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+ser.getName();
+					trigger2.addService(bdimodel.getCapability().getService(mapped));
+				}
+			}
 		}
 		
 		return trigger2;
@@ -673,8 +684,10 @@ public class BDIClassReader extends MicroClassReader
 		String[] fas = trigger.factaddeds();
 		String[] frs = trigger.factremoveds();
 		String[] fcs = trigger.factchangeds();
+		ServiceTrigger st = trigger.service();
 		
-		if(gs.length>0 || fas.length>0 || frs.length>0 || fcs.length>0)
+		if(gs.length>0 || fas.length>0 || frs.length>0 || fcs.length>0 
+			|| st.name().length()>0 || !Object.class.equals(st.type()))
 		{
 			tr = new MTrigger();
 			
@@ -699,9 +712,73 @@ public class BDIClassReader extends MicroClassReader
 			{
 				tr.addFactChangeds(fcs[j]);
 			}
+			
+			MServiceCall sc = getServiceCall(bdimodel, st);
+			if(sc!=null)
+			{
+				tr.addService(sc);
+			}
 		}
 		
 		return tr;
+	}
+	
+	/**
+	 * 
+	 */
+	protected MServiceCall getServiceCall(BDIModel bdimodel, ServiceTrigger st)
+	{
+		String sn = st.name().length()>0? st.name(): null;
+		Class<?> sty = !Object.class.equals(st.type())? st.type(): null;
+		String mn = st.method().length()>0? st.method(): null;
+
+		Class<?> stype = sty;
+		if(sty==null && sn!=null)
+		{
+			ProvidedServiceInfo[] provs = bdimodel.getModelInfo().getProvidedServices();
+			for(ProvidedServiceInfo prov: provs)
+			{
+				if(prov.getName().equals(sn))
+				{
+					stype = prov.getType().getType(bdimodel.getClassloader(), bdimodel.getModelInfo().getAllImports());
+					break;
+				}
+			}
+		}
+		
+		Method m = null;
+		if(stype!=null)
+		{
+			if(mn!=null)
+			{
+				Method[] ms = SReflect.getMethods(stype, mn);
+				if(ms.length>0)
+				{
+					m = ms[0];
+				}
+			}
+			else
+			{
+				Method[] ms = stype.getDeclaredMethods();
+				if(ms.length>0)
+				{
+					m = ms[0];
+				}
+			}
+		}
+		
+		MServiceCall ret = null;
+		if(m!=null)
+		{
+			ret = bdimodel.getCapability().getService(m.toString());
+			if(ret==null)
+			{
+				ret = new MServiceCall(m.toString(), false, false, MProcessableElement.EXCLUDE_WHEN_TRIED);
+				bdimodel.getCapability().addservice(ret);
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
