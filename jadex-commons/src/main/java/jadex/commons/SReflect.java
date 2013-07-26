@@ -410,7 +410,7 @@ public class SReflect
 		{
 			String left = name.substring(0, lpos);
 			
-			left = processName(left);
+			left = cutPackageFromClassName(makeNiceArrayNotation(left));
 			
 			String right = name.substring(lpos+1);
 			right = getUnqualifiedTypeName(right);
@@ -418,7 +418,7 @@ public class SReflect
 		}
 		else
 		{
-			name = processName(name);
+			name = cutPackageFromClassName(makeNiceArrayNotation(name));
 		}
 		
 		int pos = name.lastIndexOf(".");
@@ -429,9 +429,9 @@ public class SReflect
 	}
 
 	/**
-	 * 
+	 *  Process a type name and replace array notation with nice one.
 	 */
-	protected static String processName(String name)
+	public static String makeNiceArrayNotation(String name)
 	{
 		int found = 0;
 		for(int i=0; name.charAt(i)=='['; i++)
@@ -443,7 +443,9 @@ public class SReflect
 			for(int i=1; name.charAt(name.length()-i)=='>'; i++)
 				paren++;
 			
-			name = name.substring(found, name.length()-paren);
+			int start = name.charAt(found)=='L'? found+1: found;
+			name = name.substring(start, name.length()-paren);
+			
 			if(name.endsWith(";"))
 				name = name.substring(0, name.length()-1); // cut optionally ; from array, but not if basic array types <[I>
 			for(int i=0; i<found; i++)
@@ -451,6 +453,14 @@ public class SReflect
 			for(int i=0; i<paren; i++)
 				name = name+">";
 		}
+		return name;
+	}
+	
+	/**
+	 *  Cut package off from classname.
+	 */
+	public static String cutPackageFromClassName(String name)
+	{
 		int pos = name.lastIndexOf(".");
 		if(pos!=-1)
 			name = name.substring(pos+1);
@@ -459,9 +469,26 @@ public class SReflect
 	
 	public static void main(String[] args)
 	{
-		System.out.println(getUnqualifiedTypeName("a.b.c.D<aa.F<ab.V><a.B>>>"));
-		System.out.println(getUnqualifiedTypeName("a.b.c.D<[[Laa.F;<ab.V><a.B>>>"));
-		System.out.println(String[][].class.getName()+" "+getUnqualifiedTypeName(String[][].class.getName()));
+//		System.out.println(getUnqualifiedTypeName("a.b.c.D<aa.F<ab.V><a.B>>>"));
+//		System.out.println(getUnqualifiedTypeName("a.b.c.D<[[Laa.F;<ab.V><a.B>>>"));
+//		System.out.println(String[][].class.getName()+" "+getUnqualifiedTypeName(String[][].class.getName()));
+	
+	
+		String a1 = Object[].class.getName();
+		String a2 = String[].class.getName();
+		String a3 = Integer[].class.getName();
+		String a4 = int[].class.getName();
+		String a5 = double[].class.getName();
+		String a6 = byte[].class.getName();
+		String a7 = Byte[].class.getName();
+		
+		System.out.println(makeNiceArrayNotation(a1));
+		System.out.println(makeNiceArrayNotation(a2));
+		System.out.println(makeNiceArrayNotation(a3));
+		System.out.println(makeNiceArrayNotation(a4));
+		System.out.println(makeNiceArrayNotation(a5));
+		System.out.println(makeNiceArrayNotation(a6));
+		System.out.println(makeNiceArrayNotation(a7));
 	}
 	
 	/**
@@ -780,6 +807,8 @@ public class SReflect
 	 */
 	public static <T> Class<T>	findClass0(String clname, String[] imports, ClassLoader classloader)
 	{
+		clname = makeNiceArrayNotation(clname);
+		
 		Class	clazz	= null;
 		Map	cache	= (Map)classcache.get(classloader);
 		if(cache==null)
@@ -1804,6 +1833,7 @@ public class SReflect
 		}
 		return isAndroid.booleanValue();
 	}
+	
 }
 
 
