@@ -76,6 +76,9 @@ public class MGoal extends MClassBasedElement
 	/** The goal conditions. */
 	protected Map<String, List<MCondition>> conditions;
 	
+	/** The parameters. */
+	protected List<MParameter> parameters;
+	
 	// hack?!
 //	protected boolean declarative;
 //	protected boolean target;
@@ -88,7 +91,7 @@ public class MGoal extends MClassBasedElement
 	 */
 	public MGoal(String name, String target, boolean posttoall, boolean randomselection, String excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
-		boolean succeedonpassed, boolean unique, MDeliberation deliberation)
+		boolean succeedonpassed, boolean unique, MDeliberation deliberation, List<MParameter> parameters)
 	{
 		super(name, target, posttoall, randomselection, excludemode);
 		this.retry = retry;
@@ -98,6 +101,7 @@ public class MGoal extends MClassBasedElement
 		this.succeedonpassed = succeedonpassed;
 		this.unique = unique;
 		this.deliberation = deliberation;
+		this.parameters = parameters;
 		
 //		System.out.println("create: "+target);
 	}
@@ -352,5 +356,23 @@ public class MGoal extends MClassBasedElement
 	public Map<String, List<MCondition>> getConditions()
 	{
 		return conditions;
+	}
+
+	/**
+	 *  Get the parameters.
+	 *  @return The parameters.
+	 */
+	public List<MParameter> getParameters()
+	{
+		return parameters;
+	}
+
+	/**
+	 *  Set the parameters.
+	 *  @param parameters The parameters to set.
+	 */
+	public void setParameters(List<MParameter> parameters)
+	{
+		this.parameters = parameters;
 	}
 }

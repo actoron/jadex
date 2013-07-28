@@ -12,6 +12,7 @@ import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
+import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalRecurCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Goals;
@@ -30,6 +31,7 @@ import jadex.bdiv3.model.MCondition;
 import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MServiceCall;
@@ -295,7 +297,7 @@ public class BDIClassReader extends MicroClassReader
 			{
 				MGoal goal2	= new MGoal(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
 					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
-					goal.getRetryDelay(), goal.getRecurDelay(), goal.isSucceedOnPassed(), goal.isUnique(), goal.getDeliberation());
+					goal.getRetryDelay(), goal.getRecurDelay(), goal.isSucceedOnPassed(), goal.isUnique(), goal.getDeliberation(), goal.getParameters()); // clone params?
 						
 				// Convert goal condition events
 				if(goal.getConditions()!=null)
@@ -940,9 +942,26 @@ public class BDIClassReader extends MicroClassReader
 			}
 			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms, cardinalityone);
 		}
-
+		
+		List<MParameter> params = new ArrayList<MParameter>();
+		Class<?> tmpcl = gcl;
+		while(!Object.class.equals(tmpcl))
+		{
+			Field[] fields = gcl.getDeclaredFields();
+			for(Field f: fields)
+			{
+				if(isAnnotationPresent(f, GoalParameter.class, cl))
+				{
+					GoalParameter gp = getAnnotation(f, GoalParameter.class, cl);
+					MParameter param = new MParameter(new FieldInfo(f));
+					params.add(param);
+				}
+			}
+			tmpcl = tmpcl.getSuperclass();
+		}
+		
 		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
-			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.succeedonpassed(), goal.unique(), mdel);
+			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.succeedonpassed(), goal.unique(), mdel, params);
 		
 		jadex.bdiv3.annotation.Publish pub = goal.publish();
 		if(!Object.class.equals(pub.type()))

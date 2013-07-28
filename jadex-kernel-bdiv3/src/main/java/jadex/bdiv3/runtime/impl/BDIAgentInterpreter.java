@@ -14,7 +14,9 @@ import jadex.bdiv3.model.MConfiguration;
 import jadex.bdiv3.model.MDeliberation;
 import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
+import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -1776,6 +1778,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		return invokeBooleanMethod(goal.getPojoElement(), m, goal.getModelElement(), event, null);
 	}
 	
+	// todo: support parameter names via annotation in guesser (guesser with meta information)
 	/**
 	 *  Get parameter values for injection into method and constructor calls.
 	 */
@@ -1835,6 +1838,17 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			if(rpe.getPojoElement()!=null)
 			{
 				vals.add(rpe.getPojoElement());
+				if(rpe instanceof RGoal)
+				{
+					Object pojo = rpe.getPojoElement();
+					MGoal mgoal = (MGoal)rpe.getModelElement();
+					List<MParameter> params = mgoal.getParameters();
+					for(MParameter param: params)
+					{
+						Object val = param.getValue(pojo, getClassLoader());
+						vals.add(val);
+					}
+				}
 			}
 			if(rpe.getPojoElement() instanceof InvocationInfo)
 			{
