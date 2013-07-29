@@ -192,13 +192,13 @@ public class BasicService implements IInternalService
 	 */
 	public<T extends Object> IFuture<T> getNonFunctionalPropertyValue(String name, Class<T> type)
 	{
-		Future ret = new Future<T>();
+		Future<T> ret = new Future<T>();
 		
 		INFProperty prop = nfproperties != null? nfproperties.get(name) : null;
 		
 		try
 		{
-			ret.setResult(prop != null? prop.getValue(type) : null);
+			ret.setResult((T) (prop != null? prop.getValue(type) : null));
 		}
 		catch (Exception e)
 		{
@@ -218,13 +218,13 @@ public class BasicService implements IInternalService
 	 */
 	public<T extends Object, U extends Object> IFuture<T> getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit)
 	{
-		Future ret = new Future<T>();
+		Future<T> ret = new Future<T>();
 		
 		INFProperty prop = nfproperties != null? nfproperties.get(name) : null;
 		
 		try
 		{
-			ret.setResult(prop != null? prop.getValue(type, unit) : null);
+			ret.setResult((T) (prop != null? prop.getValue(type, unit) : null));
 		}
 		catch (Exception e)
 		{
