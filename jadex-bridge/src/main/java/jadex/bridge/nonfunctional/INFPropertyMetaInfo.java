@@ -39,6 +39,4 @@ public interface INFPropertyMetaInfo
 	 *  @return The update rate.
 	 */
 	public long getUpdateRate();
-	
-	
 }

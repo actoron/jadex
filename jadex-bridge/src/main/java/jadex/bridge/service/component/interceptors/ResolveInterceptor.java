@@ -52,6 +52,10 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("createServiceIdentifier", new Class[]{String.class, Class.class, IResourceIdentifier.class, Class.class}));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("getNonFunctionalPropertyNames", new Class[0]));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("getNfPropertyMetaInfo", new Class[] { String.class }));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("getNonFunctionalPropertyValue", new Class[] { String.class, Class.class }));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("getNonFunctionalPropertyValue", new Class[] { String.class, Class.class, Class.class }));
 		}
 		catch(Exception e)
 		{

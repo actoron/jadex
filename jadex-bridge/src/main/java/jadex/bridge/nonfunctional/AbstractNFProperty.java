@@ -7,7 +7,7 @@ package jadex.bridge.nonfunctional;
  *  the signature INFProperty(String name) to allow the service
  *  to initialize the property during creation.
  */
-public abstract class AbstractNFProperty implements INFProperty
+public abstract class AbstractNFProperty<T extends Object, U extends Object> implements INFProperty<T, U>
 {
 	/** Name of the property. */
 	protected String name;
@@ -38,7 +38,7 @@ public abstract class AbstractNFProperty implements INFProperty
 	 *  @param type Type of the value.
 	 *  @return The current value of the property.
 	 */
-	public<T extends Object> Class<T> getValue(Class<T> type)
+	public T getValue(Class<T> type)
 	{
 		return getValue(type, null);
 	}
