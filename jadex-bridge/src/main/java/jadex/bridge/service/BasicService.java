@@ -2,6 +2,8 @@ package jadex.bridge.service;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
@@ -46,6 +48,9 @@ public class BasicService implements IInternalService
 	
 	/** The service id. */
 	protected IServiceIdentifier sid;
+	
+	/** Non-functional properties. */
+	protected Map<String, INFProperty> nfproperties;
 	
 	/** The service properties. */
 	protected Map<String, Object> properties;
@@ -155,6 +160,79 @@ public class BasicService implements IInternalService
 	public IComponentIdentifier getProviderId()
 	{
 		return providerid;
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNonFunctionalPropertyNames()
+	{
+		return new Future<String[]>(nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0]);
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<INFPropertyMetaInfo> getNfPropertyMetaInfo(String name)
+	{
+		return new Future<INFPropertyMetaInfo>(nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null);
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public<T extends Object> IFuture<T> getNonFunctionalPropertyValue(String name, Class<T> type)
+	{
+		Future ret = new Future<T>();
+		
+		INFProperty prop = nfproperties != null? nfproperties.get(name) : null;
+		
+		try
+		{
+			ret.setResult(prop != null? prop.getValue(type) : null);
+		}
+		catch (Exception e)
+		{
+			ret.setException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public<T extends Object, U extends Object> IFuture<T> getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit)
+	{
+		Future ret = new Future<T>();
+		
+		INFProperty prop = nfproperties != null? nfproperties.get(name) : null;
+		
+		try
+		{
+			ret.setResult(prop != null? prop.getValue(type, unit) : null);
+		}
+		catch (Exception e)
+		{
+			ret.setException(e);
+//			ret.setException(new ClassCastException("Requested value type (" + String.valueOf(type) + ") does not match value type (" + String.valueOf(reto.getClass()) + ") for this non-functional property: " + name));
+		}
+		
+		return ret;
 	}
 
 	/**
