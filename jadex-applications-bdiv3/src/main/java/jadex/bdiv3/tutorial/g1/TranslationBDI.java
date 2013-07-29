@@ -11,6 +11,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,6 +42,9 @@ public class TranslationBDI
 	
 	/** The wordtable. */
 	protected Map<String, String> wordtable;
+
+	/** The server socket. */
+	protected ServerSocket server;
 
 	//-------- methods --------
 
@@ -96,9 +100,7 @@ public class TranslationBDI
 		final int port = 9099;
 		
 		Runnable run = new Runnable()
-		{
-			ServerSocket server;
-			
+		{			
 			/**
 			 *  The server code.
 			 *  This method runs on the separate thread,
@@ -139,8 +141,8 @@ public class TranslationBDI
 				catch(IOException e)
 				{
 					// Server has been closed.
-					e.printStackTrace();
-//					logger.info("Exited: "+Thread.currentThread());
+//					e.printStackTrace();
+					agent.getLogger().info("Exited: "+Thread.currentThread());
 				}
 				catch(ComponentTerminatedException e)
 				{
@@ -169,7 +171,25 @@ public class TranslationBDI
 	}
 	
 	/**
-	 * 
+	 *  Called when the agent is terminated.
+	 */
+	@AgentKilled
+	public void killed()
+	{
+		if(server!=null)
+		{
+			try
+			{
+				server.close();
+			}
+			catch(Exception e)
+			{
+			}
+		}
+	}
+	
+	/**
+	 *  Plan that translates a request.
 	 */
 	@Plan(trigger=@Trigger(goals=Translate.class))
 	public void translate(Translate trans)
