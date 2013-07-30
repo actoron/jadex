@@ -1,10 +1,8 @@
 package jadex.commons;
 
-import java.lang.management.OperatingSystemMXBean;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -18,7 +16,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
 
-import javax.management.MBeanServerConnection;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
@@ -264,31 +261,5 @@ public class SNonAndroid
 		}
 			
 		return res.isEmpty()? SUtil.NULL: res.first();
-	}
-	
-	/** Cache OSBean instance **/
-	public static JadexOSBean osBeanInstance;
-	
-	public static JadexOSBean getOSBean() throws Exception {
-		if (osBeanInstance == null) {
-			MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
-			com.sun.management.OperatingSystemMXBean osb = ManagementFactory.newPlatformMXBeanProxy(mbsc, 
-				ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, com.sun.management.OperatingSystemMXBean.class);
-			
-			osBeanInstance = new JadexOSBean(osb);
-		}
-		return osBeanInstance;
-	}
-	
-	public static class JadexOSBean {
-		private com.sun.management.OperatingSystemMXBean sunBean;
-		public JadexOSBean(com.sun.management.OperatingSystemMXBean sunBean)
-		{
-			this.sunBean = sunBean;
-		}
-		public double getSystemCpuLoad() {
-			return sunBean.getSystemCpuLoad();
-		}
-			
 	}
 }

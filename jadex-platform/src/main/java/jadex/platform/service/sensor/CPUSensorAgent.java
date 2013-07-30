@@ -1,11 +1,16 @@
 package jadex.platform.service.sensor;
 
+import java.lang.management.ManagementFactory;
+
+//import java.lang.management.OperatingSystemMXBean;
+import com.sun.management.OperatingSystemMXBean.*;
+
+import javax.management.MBeanServerConnection;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
-import jadex.commons.SNonAndroid;
-import jadex.commons.SNonAndroid.JadexOSBean;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -32,8 +37,10 @@ public class CPUSensorAgent
 	@AgentBody
 	public void body() throws Exception
 	{
-		final JadexOSBean osb = SNonAndroid.getOSBean();
-		
+		MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
+		final com.sun.management.OperatingSystemMXBean osb = ManagementFactory.newPlatformMXBeanProxy(mbsc, 
+			ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, com.sun.management.OperatingSystemMXBean.class);
+
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
