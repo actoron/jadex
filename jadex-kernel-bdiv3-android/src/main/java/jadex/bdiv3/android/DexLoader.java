@@ -12,9 +12,9 @@ import com.android.dx.dex.DexFormat;
 public class DexLoader
 {
 	
-	public static final String classLoaderName = "dalvik.system.DexClassLoader";
+//	public static final String classLoaderName = "dalvik.system.DexClassLoader";
 	
-//	public static final String classLoaderName = ParentLastDexClassLoader.class.getCanonicalName();
+	public static final String classLoaderName = ParentLastDexClassLoader.class.getCanonicalName();
 	
 	
     public static ClassLoader load(ClassLoader parent, byte[] dex, File dexCache) throws IOException {

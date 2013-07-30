@@ -1,5 +1,7 @@
 package jadex.bdiv3;
 
+import jadex.bridge.service.IServiceProvider;
+
 public class BDIClassGeneratorFactoryDesktop extends BDIClassGeneratorFactory
 {
 
@@ -13,6 +15,12 @@ public class BDIClassGeneratorFactoryDesktop extends BDIClassGeneratorFactory
 	public IBDIClassGenerator createBDIClassGenerator()
 	{
 		return new ASMBDIClassGenerator();
+	}
+
+	@Override
+	public BDIAgentFactory createBDIAgentFactory(IServiceProvider provider)
+	{
+		return new BDIAgentFactory(provider);
 	}
 
 }

@@ -1,5 +1,6 @@
 package jadex.bdiv3;
 
+import jadex.bridge.service.IServiceProvider;
 import jadex.commons.SReflect;
 
 import java.util.logging.Level;
@@ -67,4 +68,11 @@ public abstract class BDIClassGeneratorFactory
 	 * @return {@link IBDIClassGenerator}
 	 */
 	public abstract IBDIClassGenerator createBDIClassGenerator();
+	
+	/**
+	 * Create a new, platform-specific BDIAgentFactory object.
+	 * @return {@link BDIAgentFactory}
+	 */
+	public abstract BDIAgentFactory createBDIAgentFactory(IServiceProvider provider);
+
 }

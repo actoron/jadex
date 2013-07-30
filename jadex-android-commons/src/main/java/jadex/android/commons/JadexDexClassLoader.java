@@ -37,8 +37,8 @@ public class JadexDexClassLoader extends DexClassLoader
 	public void defineClass(String className, Class<?> clazz)
 	{
 		generatedClasses.put(className, clazz);
-		// resolve to get dependencies
-		resolveClass(clazz);
+		// resolve to get dependencies?
+//		resolveClass(clazz);
 	}
 
 	public String getDexPath()
