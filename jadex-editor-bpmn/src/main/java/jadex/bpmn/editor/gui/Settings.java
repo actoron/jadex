@@ -994,7 +994,7 @@ public class Settings
 					int count = 0;
 					for (String filename : filenames)
 					{
-						filename = filename.replace(File.separator, ".");
+						filename = filename.replace("/", ".");
 						final String cname = filename.substring(0, filename.length() - 6);
 						filename = filename.replace(".", "/");
 						filename = filename.replace("/class", ".class");
