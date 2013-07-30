@@ -64,7 +64,6 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		{
 			userAppInfo = intent.getParcelableExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
 			String appPath = userAppInfo.sourceDir;
-			AsmDexBdiClassGenerator.APP_PATH = userAppInfo.sourceDir;
 			String className = intent.getStringExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
 			String originalAction = intent.getStringExtra(JadexApplication.EXTRA_KEY_ORIGINALACTION);
 			int[] windowFeatures = intent.getIntArrayExtra(JadexApplication.EXTRA_KEY_WINDOWFEATURES);

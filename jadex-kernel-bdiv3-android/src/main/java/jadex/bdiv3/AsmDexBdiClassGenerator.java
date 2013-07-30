@@ -6,13 +6,17 @@ import jadex.bdiv3.android.DexLoader;
 import jadex.bdiv3.android.MethodInsManager;
 import jadex.bdiv3.android.MyApplicationVisitor;
 import jadex.bdiv3.model.BDIModel;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -24,18 +28,26 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.h2.util.IOUtils;
+import org.objectweb.asm.Type;
+import org.ow2.asmdex.AnnotationVisitor;
 import org.ow2.asmdex.ApplicationReader;
 import org.ow2.asmdex.ApplicationVisitor;
 import org.ow2.asmdex.ApplicationWriter;
+import org.ow2.asmdex.ClassVisitor;
+import org.ow2.asmdex.FieldVisitor;
+import org.ow2.asmdex.MethodVisitor;
 import org.ow2.asmdex.Opcodes;
 
+import com.android.dx.merge.TypeList;
+
 import android.util.Log;
+import antlr.ByteBuffer;
 
 public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 {
 	protected static Method methoddc1;
 	protected static Method methoddc2;
-	public static String APP_PATH;
 	public static File OUTPATH;
 
 	static
@@ -84,29 +96,164 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 		// InputStream is;
 		try
 		{
+			JadexDexClassLoader androidCl = (JadexDexClassLoader) SUtil.androidUtils().findJadexDexClassLoader(cl.getParent());
 			// is = SUtil.getResource(APP_PATH, cl);
-			InputStream is = getFileInputStream(new File(APP_PATH));
-			MethodInsManager rm = new MethodInsManager(); // Rules to apply
+			String appPath = ((JadexDexClassLoader) androidCl).getDexPath();
+			InputStream is = getFileInputStream(new File(appPath));
+			// MethodInsManager rm = new MethodInsManager(); // Rules to apply
 			ApplicationReader ar = new ApplicationReader(api, is);
 			ApplicationWriter aw = new ApplicationWriter();
-			ApplicationVisitor aa = new MyApplicationVisitor(api, rm, aw);
+			ApplicationVisitor aa = new ApplicationVisitor(api, aw)
+			{
 
-			// ar.accept(aa, new String[]
-			// {"Ljadex/android/asmdexdemo/HelloWorld;"}, 0);
+				@Override
+				public void visit()
+				{
+					super.visit();
+				}
 
-			ar.accept(aa, new String[]
-			{iname}, 0);
+				@Override
+				public ClassVisitor visitClass(int access, String name, String[] signature, String superName, String[] interfaces)
+				{
+					return new ClassVisitor(api, super.visitClass(access, name, signature, superName, interfaces))
+					{
+
+						@Override
+						public FieldVisitor visitField(int access, String name, String desc, String[] signature, Object value)
+						{
+							return super.visitField(access, name, desc, signature, value);
+						}
+
+						@Override
+						public MethodVisitor visitMethod(int access, String name, String desc, String[] signature, String[] exceptions)
+						{
+							return new MethodVisitor(api, super.visitMethod(access, name, desc, signature, exceptions))
+							{
+								
+								@Override
+								public void visitFieldInsn(int opcode, String owner, String name, String desc, int valueRegister,
+										int objectRegister)
+								{
+									// objectRegister = reference to instance (ignored when static), valueRegister = index of value to put!
+									 if (isInstancePut(opcode) &&
+									 model.getCapability().hasBelief(name)
+									 &&
+									 model.getCapability().getBelief(name).isFieldBelief())
+									 {
+									//
+									 // possibly transform basic value
+									 if (SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl))) {
+										 visitMethodInsn(Opcodes.INSN_INVOKE_STATIC,
+										 "Ljadex/commons/SReflect;", "wrapValue",
+										 "Ljava/lang/Object;" + desc, new int[]{valueRegister});
+									 }
+									 
+									 super.visitFieldInsn(opcode, owner, name, desc, valueRegister, objectRegister);
+									//
+//									 visitInsn(Opcodes.SWAP);
+									//
+									// // fetch bdi agent value from field
+									//
+									// // this pop aload is necessary in inner
+									// // classes!
+									// visitInsn(Opcodes.POP);
+									// visitVarInsn(Opcodes.ALOAD, 0);
+									// super.visitFieldInsn(Opcodes.GETFIELD,
+									// iclname, "__agent",
+									// Type.getDescriptor(BDIAgent.class));
+									// // add field name
+									// visitLdcInsn(name);
+									// visitInsn(Opcodes.SWAP);
+									// // add this
+									// visitVarInsn(Opcodes.ALOAD, 0);
+									// visitInsn(Opcodes.SWAP);
+									//
+									// // invoke method
+									// visitMethodInsn(Opcodes.INVOKESTATIC,
+									// "jadex/bdiv3/BDIAgent", "writeField",
+									// "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
+									 }
+									 else
+									 {
+										 super.visitFieldInsn(opcode, owner, name,
+										 desc, valueRegister, objectRegister);
+									 }
+								}
+
+								@Override
+								public void visitInsn(int opcode)
+								{
+									super.visitInsn(opcode);
+								}
+
+								@Override
+								public void visitMethodInsn(int opcode, String owner, String name, String desc, int[] arguments)
+								{
+									super.visitMethodInsn(opcode, owner, name, desc, arguments);
+								}
+
+								@Override
+								public void visitEnd()
+								{
+									super.visitEnd();
+								}
+
+								@Override
+								public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack)
+								{
+									super.visitFrame(type, nLocal, local, nStack, stack);
+								}
+
+							};
+						}
+
+						@Override
+						public void visitInnerClass(String name, String outerName, String innerName, int access)
+						{
+							System.out.println("vic: " + name + " " + outerName + " " + innerName + " " + access);
+							String icln = name.replace("/", ".");
+							if (!done.contains(icln))
+								todo.add(icln);
+							super.visitInnerClass(name, outerName, innerName, access);// Opcodes.ACC_PUBLIC);
+																						// does
+																						// not
+																						// work
+						}
+
+						@Override
+						public void visitEnd()
+						{
+							visitField(Opcodes.ACC_PUBLIC, "__agent", Type.getDescriptor(BDIAgent.class), null, null);
+							visitField(Opcodes.ACC_PUBLIC, "__globalname", Type.getDescriptor(String.class), null, null);
+							super.visitEnd();
+						}
+
+					};
+				}
+
+				@Override
+				public void visitEnd()
+				{
+					super.visitEnd();
+				}
+
+			};
+
+			ar.accept(aa, new String[]{iname}, 0);
 			byte[] dex = aw.toByteArray();
 
-			ClassLoader newCl = DexLoader.load(cl, dex, OUTPATH);
+			ClassLoader newCl = DexLoader.load(this.getClass().getClassLoader(), dex, OUTPATH);
+			
 			Class<?> generatedClass = newCl.loadClass(clname);
 			ret = generatedClass;
-			
-			ClassLoader parent = cl.getParent();
-			JadexDexClassLoader found = (JadexDexClassLoader) SUtil.androidUtils().findJadexDexClassLoader(parent);
-			if (found != null) {
-				found.defineClass(clname, generatedClass);
+
+			if (androidCl != null)
+			{
+				androidCl.defineClass(clname, generatedClass);
 			}
+			
+			
+			
 		}
 		catch (IOException e)
 		{
@@ -160,5 +307,21 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 		}
 
 		return result;
+	}
+	
+	private static boolean isInstancePut(int opcode) {
+		switch (opcode) {
+			case Opcodes.INSN_IPUT:
+			case Opcodes.INSN_IPUT_BOOLEAN:
+			case Opcodes.INSN_IPUT_BYTE:
+			case Opcodes.INSN_IPUT_CHAR:
+			case Opcodes.INSN_IPUT_OBJECT:
+			case Opcodes.INSN_IPUT_SHORT:
+			case Opcodes.INSN_IPUT_WIDE:
+				return true;
+			default:
+				return false;
+		}
+		
 	}
 }

@@ -7,7 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import dalvik.system.DexClassLoader;
-
+import dalvik.system.PathClassLoader;
 import jadex.bridge.service.types.library.ISimpleDelegationClassLoader;
 import jadex.commons.SUtil.AndroidUtils;
 import android.os.Build;
@@ -100,26 +100,37 @@ public class AndroidUtilsImpl implements AndroidUtils
 
 	private void collectDexPathUrls(ClassLoader classloader, Set<URL> ret)
 	{
-		JadexDexClassLoader dexCl = findJadexDexClassLoader(classloader);
-		if (dexCl != null)
-		{
-
+		if (classloader instanceof JadexDexClassLoader) {
+			// JadexDexClassLoader provides dex Path directly, add this
+			JadexDexClassLoader dexCl = (JadexDexClassLoader) classloader;
 			URL url = urlFromApkPath0(dexCl.getDexPath());
 			ret.add(url);
-			ClassLoader parent = dexCl.getParent();
-			if (parent != null)
+		} else if (classloader instanceof ISimpleDelegationClassLoader) {
+			// check the delegate
+			ClassLoader delegate = (ClassLoader) ((ISimpleDelegationClassLoader) classloader).getDelegate();
+			if (delegate != null)
 			{
-				collectDexPathUrls(parent, ret);
-				if (parent instanceof DexClassLoader && !(parent instanceof JadexDexClassLoader))
-				{
-					// we have the main application classloader now
-					String string = parent.toString();
-					int begin = string.indexOf('[');
-					int end = string.indexOf(']');
-					String dexPath = string.substring(begin, end);
-					System.out.println(dexPath);
-				}
+				collectDexPathUrls(delegate, ret);
 			}
+		}
+		
+		if ((classloader instanceof DexClassLoader && !(classloader instanceof JadexDexClassLoader))
+				|| classloader instanceof PathClassLoader)
+		{
+			// we have the main application classloader now
+			String string = classloader.toString();
+			int begin = string.indexOf('[');
+			int end = string.indexOf(']');
+			String dexPath = string.substring(begin+1, end);
+			URL url = urlFromApkPath0(dexPath);
+			ret.add(url);
+		}
+		
+		// and always go up the hierarchy
+		ClassLoader parent = classloader.getParent();
+		if (parent != null)
+		{
+			collectDexPathUrls(parent, ret);
 		}
 	}
 

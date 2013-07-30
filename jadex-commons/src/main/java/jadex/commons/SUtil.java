@@ -1558,16 +1558,15 @@ public class SUtil
 					}
 				}
 			}
+			if(classloader instanceof URLClassLoader)
+			{
+				URL[] urls = ((URLClassLoader)classloader).getURLs();
+				for(int i = 0; i < urls.length; i++)
+					cps.add(urls[i]);
+			}
+			cps.addAll(collectClasspathURLs(classloader));
 		}
 		
-		if(classloader instanceof URLClassLoader)
-		{
-			URL[] urls = ((URLClassLoader)classloader).getURLs();
-			for(int i = 0; i < urls.length; i++)
-				cps.add(urls[i]);
-		}
-		
-		cps.addAll(collectClasspathURLs(classloader));
 		return new ArrayList<URL>(cps);
 	}
 	

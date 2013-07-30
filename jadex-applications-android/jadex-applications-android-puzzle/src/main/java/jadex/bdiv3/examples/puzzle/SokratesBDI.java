@@ -49,6 +49,9 @@ public class SokratesBDI
 	@Belief
 	protected SokratesListener	gui_listener;
 	
+	@Belief
+	protected int	primitive;
+	
 	/** The number of tried moves. */
 	protected int	triescnt;
 	
@@ -74,6 +77,12 @@ public class SokratesBDI
 
 		strategy = agent.getConfiguration();
 		createGui(agent);
+		
+		primitive = 42;
+		
+		System.out.println(primitive);
+		
+		Object test = test(primitive);
 		
 		System.out.println("Now puzzling:");
 		final long	start	= System.currentTimeMillis();
@@ -109,6 +118,10 @@ public class SokratesBDI
 //				new BoardGui(agent.getExternalAccess(), board);
 //			}
 //		});
+	}
+	
+	public Object test(int value) {
+		return new Integer(value);
 	}
 	
 	//-------- goals --------

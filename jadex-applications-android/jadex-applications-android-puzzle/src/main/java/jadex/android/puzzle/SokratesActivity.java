@@ -72,8 +72,8 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 		this.service.setSokratesListener(sokratesListener);
 		if (!service.isSokratesRunning()) {
 			statusTextView.setText("starting Game...");
-//			this.service.startSokratesV3();
-			this.service.startSokrates();
+			this.service.startSokratesV3();
+//			this.service.startSokrates();
 		}
 	}
 

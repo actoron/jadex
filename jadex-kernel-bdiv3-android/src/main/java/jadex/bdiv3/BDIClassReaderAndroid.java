@@ -1,5 +1,6 @@
 package jadex.bdiv3;
 
+import jadex.android.commons.JadexDexClassLoader;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MCapability;
 import jadex.bridge.IComponentIdentifier;
@@ -8,6 +9,7 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -31,7 +33,10 @@ public class BDIClassReaderAndroid extends BDIClassReader
 	@Override
 	protected DummyClassLoader createDummyClassLoader(ClassLoader original, ClassLoader parent, List<URL> urls)
 	{
-		DexClassLoader androidParentClassloader = new DexClassLoader(AsmDexBdiClassGenerator.APP_PATH, AsmDexBdiClassGenerator.OUTPATH.getAbsolutePath(), null, original);
+		JadexDexClassLoader jadexDexClassLoader = (JadexDexClassLoader) SUtil.androidUtils().findJadexDexClassLoader(original);
+		String dexPath = jadexDexClassLoader.getDexPath();
+		// dummyclassloader must have NO REFERENCE to a existing classloader which knows about users classes
+		JadexDexClassLoader androidParentClassloader = new JadexDexClassLoader(dexPath, AsmDexBdiClassGenerator.OUTPATH.getAbsolutePath(), null, getClass().getClassLoader());
 		DummyClassLoader cl = new DummyClassLoader((URL[])urls.toArray(new URL[urls.size()]), androidParentClassloader, original);
 		return cl;
 	}

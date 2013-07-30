@@ -26,20 +26,19 @@ public class JadexDexClassLoader extends DexClassLoader
 	@Override
 	protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException
 	{
-		Class<?> gen = generatedClasses.get(className);
-		if (gen != null)
+		Class<?> result = generatedClasses.get(className);
+		if (result == null)
 		{
-			return gen;
+			result = super.loadClass(className, resolve);
 		}
-		else
-		{
-			return super.loadClass(className, resolve);
-		}
+		return result;
 	}
-
+	
 	public void defineClass(String className, Class<?> clazz)
 	{
 		generatedClasses.put(className, clazz);
+		// resolve to get dependencies
+		resolveClass(clazz);
 	}
 
 	public String getDexPath()
