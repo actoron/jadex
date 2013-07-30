@@ -97,8 +97,8 @@ public class ServiceHandler implements InvocationHandler
 			return new Future<Object>(new IllegalArgumentException("Return type must be future: "+method.getName()));
 		
 		final ServiceCall sc = ServiceCall.getCurrentInvocation();
-		if(sc!=null && !component.getComponentIdentifier().getParent().equals(sc.getCaller()))
-			System.out.println("wrong call: "+component.getComponentIdentifier()+" "+sc.getCaller());
+//		if(sc!=null && !component.getComponentIdentifier().getParent().equals(sc.getCaller()))
+//			System.out.println("wrong call: "+component.getComponentIdentifier()+" "+sc.getCaller());
 		
 		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
 		
