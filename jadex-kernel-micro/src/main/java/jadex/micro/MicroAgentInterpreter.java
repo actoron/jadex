@@ -18,7 +18,10 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -1198,6 +1201,36 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				getComponentDescription().getCause()!=null? getComponentDescription().getCause().createNext(step.toString()): null;
 			addStep(new StepInfo(step, ret, sc, cause));
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Schedule a step of the component.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the component.
+	 *  @param delay The delay to wait before step should be done.
+	 *  @return The result of the step.
+	 */
+	public <T>	IFuture<T> scheduleStep(final IComponentStep<T> step, final long delay)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IClockService cs = (IClockService)result;
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+		}));
+		
 		return ret;
 	}
 

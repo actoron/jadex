@@ -2,6 +2,7 @@ package jadex.bridge.modelinfo;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SUtil;
@@ -60,6 +61,9 @@ public class ModelInfo extends Startable implements IModelInfo
 	
 	/** The properties. */
 	protected Map<String, Object> properties;
+	
+	/** The nf properties. */
+	protected List<NFPropertyInfo> nfproperties;
 	
 	/** The classloader. */
 //	protected ClassLoader classloader;
@@ -375,6 +379,8 @@ public class ModelInfo extends Startable implements IModelInfo
 		return SJavaParser.getProperty(getProperties(), name, getAllImports(), null, cl);
 	}
 
+	
+	
 //	/**
 //	 *  Return the class loader corresponding to the model.
 //	 *  @return The class loader corresponding to the model.
@@ -384,6 +390,24 @@ public class ModelInfo extends Startable implements IModelInfo
 //		return classloader;
 //	}
 	
+	/**
+	 *  Get the nfproperties.
+	 *  @return The nfproperties.
+	 */
+	public List<NFPropertyInfo> getNFProperties()
+	{
+		return nfproperties;
+	}
+
+	/**
+	 *  Set the nfproperties.
+	 *  @param nfproperties The nfproperties to set.
+	 */
+	public void setNFProperties(List<NFPropertyInfo> nfproperties)
+	{
+		this.nfproperties = nfproperties;
+	}
+
 	/**
 	 *  Return the resource identifier.
 	 *  @return The resource identifier.

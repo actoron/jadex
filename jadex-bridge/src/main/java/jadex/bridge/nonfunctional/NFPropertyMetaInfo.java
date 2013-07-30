@@ -18,6 +18,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	/** Flag indicating if the property is dynamic. */
 	protected boolean dynamic;
 	
+	/** The update rate. */
 	protected long updaterate;
 	
 	

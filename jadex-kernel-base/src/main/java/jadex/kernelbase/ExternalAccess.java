@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
@@ -773,6 +774,172 @@ public class ExternalAccess implements IExternalAccess
 		else
 		{
 			ret.setResult(interpreter.getResults());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNonFunctionalPropertyNames()
+	{
+		final Future<String[]> ret = new Future<String[]>();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.getNonFunctionalPropertyNames());
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setResult(interpreter.getNonFunctionalPropertyNames());
+//						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.getNonFunctionalPropertyNames());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<INFPropertyMetaInfo> getNfPropertyMetaInfo(final String name)
+	{
+		final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.getNfPropertyMetaInfo(name));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setResult(interpreter.getNfPropertyMetaInfo(name));
+//						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.getNfPropertyMetaInfo(name));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public <T> IFuture<T> getNonFunctionalPropertyValue(final String name, final Class<T> type)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type));
+//						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public <T, U> IFuture<T> getNonFunctionalPropertyValue(final String name, final Class<T> type, final Class<U> unit)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type, unit));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type, unit));
+//						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type, unit));
 		}
 		
 		return ret;

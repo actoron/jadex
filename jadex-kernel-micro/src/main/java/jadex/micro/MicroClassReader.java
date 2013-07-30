@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
@@ -8,8 +9,12 @@ import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.NFPropertyInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.annotation.NFProperties;
+import jadex.bridge.nonfunctional.annotation.NFProperty;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
@@ -241,6 +246,7 @@ public class MicroClassReader
 		boolean confdone = false;
 		boolean compdone = false;
 		boolean breaksdone = false;
+		boolean nfpropsdone = false;
 		
 		while(cma!=null && !cma.equals(Object.class) && !cma.equals(getClass(MicroAgent.class, cl)))
 		{
@@ -332,6 +338,27 @@ public class MicroClassReader
 						props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), vals[i].clazz().getName(), vals[i].value(), null) );
 					}
 				}
+			}
+			
+			// Take all, upper replace lower
+			if(!nfpropsdone && isAnnotationPresent(cma, NFProperties.class, cl))
+			{
+				NFProperties val = (NFProperties)getAnnotation(cma, NFProperties.class, cl);
+				
+				List nfps = (List)toset.get("nfproperties");
+				if(nfps==null)
+				{
+					nfps = new ArrayList();
+					toset.put("nfproperties", nfps);
+				}
+				
+				for(NFProperty prop: val.value())
+				{
+					nfps.add(new NFPropertyInfo(prop.name(), new ClassInfo(prop.type().getName())));
+				}
+				
+				// todo!
+//				nfpropsdone = val.replace();
 			}
 			
 			// Take newest version
@@ -736,6 +763,10 @@ public class MicroClassReader
 		}
 		if(props!=null)
 			modelinfo.setProperties(props);
+		
+		List nfprops = (List)toset.get("nfproperties");
+		if(nfprops!=null)
+			modelinfo.setNFProperties(nfprops);
 		
 		Map rsers = (Map)toset.get("reqservices");
 		if(rsers!=null)

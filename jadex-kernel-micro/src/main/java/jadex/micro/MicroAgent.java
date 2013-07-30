@@ -7,6 +7,8 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
@@ -624,6 +626,16 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	}
 	
 	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 */
+	public <T> IFuture<T> scheduleStep(IComponentStep<T> step, long delay)
+	{
+		return interpreter.scheduleStep(step, delay);		
+	}
+	
+	/**
 	 *  Add a service to the platform.
 	 *  If under the same name and type a service was contained,
 	 *  the old one is removed and shutdowned.
@@ -949,4 +961,58 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 		return interpreter.subscribeToEvents(filter, initial);
 	}
 
+	
+	//-------- nf properties --------
+	
+	/**
+	 *  Get the nf property.
+	 *  @param name Name of the property.
+	 *  @return The property.
+	 */
+	public INFProperty<?, ?> getNfProperty(String name)
+	{
+		return interpreter.getNfProperty(name);
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public String[] getNonFunctionalPropertyNames()
+	{
+		return interpreter.getNonFunctionalPropertyNames();
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public INFPropertyMetaInfo getNfPropertyMetaInfo(String name)
+	{
+		return interpreter.getNfPropertyMetaInfo(name);
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public<T extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type)
+	{
+		return interpreter.getNonFunctionalPropertyValue(name, type);
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public<T extends Object, U extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit)
+	{
+		return interpreter.getNonFunctionalPropertyValue(name, type, unit);
+	}
 }

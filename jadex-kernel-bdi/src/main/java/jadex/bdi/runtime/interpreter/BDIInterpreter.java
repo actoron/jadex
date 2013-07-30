@@ -31,6 +31,8 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -2355,4 +2357,64 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			}
 		}
 	}
+	
+	//-------- nf properties --------
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public String[] getNonFunctionalPropertyNames()
+	{
+		throw new UnsupportedOperationException();
+//		return nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public INFPropertyMetaInfo getNfPropertyMetaInfo(String name)
+	{
+		throw new UnsupportedOperationException();
+//		return nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public<T extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type)
+	{
+		throw new UnsupportedOperationException();
+//		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
+//		return prop != null? prop.getValue(type) : null;
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public<T extends Object, U extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit)
+	{
+		throw new UnsupportedOperationException();
+//		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
+//		return prop != null? prop.getValue(type, unit) : null;
+	}
+	
+	/**
+	 *  Add a new nf property.
+	 *  @param nfprop The nf property.
+	 */
+	public void addNFProperty(INFProperty<?, ?> nfprop)
+	{
+		throw new UnsupportedOperationException();
+	}
+
 }

@@ -1000,6 +1000,7 @@ public class Settings
 						filename = filename.replace("/class", ".class");
 						
 						final Set<String> ifaces = getInterfaces(filename, rcl, ifacecache);
+//						System.out.println("found interfaces: "+ifacecache.size());
 						
 						Set<String> sclasses = getSuperClasses(filename, rcl);
 						if (sclasses.contains("java/lang/Exception"))

@@ -2,10 +2,12 @@ package jadex.bridge.modelinfo;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -140,6 +142,12 @@ public interface IModelInfo
 	 */
 	public Object	getProperty(String name, ClassLoader cl);
 
+	/**
+	 *  Get the nf properties.
+	 *  @return The nf properties.
+	 */
+	public List<NFPropertyInfo> getNFProperties();
+	
 //	/**
 //	 *  Return the class loader corresponding to the model.
 //	 *  @return The class loader corresponding to the model.

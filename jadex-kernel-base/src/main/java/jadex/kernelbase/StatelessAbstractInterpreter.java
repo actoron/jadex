@@ -16,8 +16,11 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IExtensionInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.NFPropertyInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
@@ -62,6 +65,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -1005,11 +1009,31 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	}
 	
 	/**
-	 *  Init the future properties.
+	 *  Init the (future) properties.
 	 */
 	public IFuture<Void> initFutureProperties(IModelInfo model)
 	{
 		assert !getComponentAdapter().isExternalThread();
+		
+		// Init nf props
+		List<NFPropertyInfo> nfprops = model.getNFProperties();
+		if(nfprops!=null)
+		{
+			for(NFPropertyInfo nfprop: nfprops)
+			{
+				try
+				{
+					Class<?> clazz = nfprop.getClazz().getType(getClassLoader());
+					Constructor<?> con = clazz.getConstructor(String.class);
+					INFProperty<?, ?> nfp = (INFProperty<?, ?>)con.newInstance(nfprop.getName());
+					addNFProperty(nfp);
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		}
 		
 		Future<Void> ret = new Future<Void>();
 		
@@ -2226,5 +2250,47 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		return ret;
 	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public abstract String[] getNonFunctionalPropertyNames();
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public abstract INFPropertyMetaInfo getNfPropertyMetaInfo(String name);
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public abstract <T extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type);
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public abstract <T extends Object, U extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit);
+	
+	/**
+	 *  Add a new nf property.
+	 *  @param nfprop The nf property.
+	 */
+	public abstract void addNFProperty(INFProperty<?, ?> nfprop);
+	
+//	/**
+//	 *  Add a new nf property.
+//	 *  @param nfprop The nf property.
+//	 */
+//	public abstract void removeNFProperty(String name);
 
 }

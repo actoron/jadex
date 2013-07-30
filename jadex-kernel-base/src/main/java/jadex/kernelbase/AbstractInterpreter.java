@@ -4,6 +4,8 @@ import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -19,11 +21,13 @@ import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -52,6 +56,9 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	
 	/** The properties. */
 	protected Map<String, Object> properties;
+	
+	/** Non-functional properties. */
+	protected Map<String, INFProperty<?, ?>> nfproperties;
 	
 	/** The parent component. */
 	protected IExternalAccess parent;
@@ -604,5 +611,82 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		if(subscriptions==null || !subscriptions.containsKey(fut))
 			throw new RuntimeException("Subscriber not known: "+fut);
 		subscriptions.remove(fut);
+	}
+	
+	//-------- nf properties --------
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public String[] getNonFunctionalPropertyNames()
+	{
+		return nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public INFPropertyMetaInfo getNfPropertyMetaInfo(String name)
+	{
+		return nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public<T extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type)
+	{
+		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
+		return prop != null? prop.getValue(type) : null;
+	}
+	
+	/**
+	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+	 *  @param name Name of the property.
+	 *  @param type Type of the property value.
+	 *  @param unit Unit of the property value.
+	 *  @return The current value of a non-functional property of this service.
+	 */
+	public<T extends Object, U extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit)
+	{
+		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
+		return prop != null? prop.getValue(type, unit) : null;
+	}
+	
+	/**
+	 *  Add a new nf property.
+	 *  @param nfprop The nf property.
+	 */
+	public void addNFProperty(INFProperty<?, ?> nfprop)
+	{
+		if(nfproperties == null)
+			nfproperties = new HashMap<String, INFProperty<?,?>>();
+		nfproperties.put(nfprop.getName(), nfprop);
+	}
+	
+	/**
+	 *  Add a new nf property.
+	 *  @param nfprop The nf property.
+	 */
+	public void removeNFProperty(String name)
+	{
+		if(nfproperties != null)
+			nfproperties.remove(name);
+	}
+	
+	/**
+	 *  Get the nf property.
+	 *  @param name Name of the property.
+	 *  @return The property.
+	 */
+	public INFProperty<?, ?> getNfProperty(String name)
+	{
+		return nfproperties!=null? nfproperties.get(name): null;
 	}
 }

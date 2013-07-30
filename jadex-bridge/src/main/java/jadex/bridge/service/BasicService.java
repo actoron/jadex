@@ -16,12 +16,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -115,39 +111,76 @@ public class BasicService implements IInternalService
 			this.properties.put("componentviewer.viewerclass", guiClasses);
 		}
 		
-		if (type.isAnnotationPresent(NFProperties.class) || this.getClass().isAnnotationPresent(NFProperties.class))
+		if(this.getClass().isAnnotationPresent(NFProperties.class))
 		{
-			List<NFProperty> nfprops = new ArrayList<NFProperty>();
-			NFProperties typenfprops = type.getAnnotation(NFProperties.class);
-			if (typenfprops != null)
+			if(nfproperties==null)
+				nfproperties = new HashMap<String, INFProperty<?,?>>();
+			addNFProperties(this.getClass().getAnnotation(NFProperties.class), nfproperties);
+		}
+		if(this.getClass().isAnnotationPresent(NFProperties.class))
+		{
+			if(nfproperties==null)
+				nfproperties = new HashMap<String, INFProperty<?,?>>();
+			addNFProperties(type.getAnnotation(NFProperties.class), nfproperties);
+		}
+		
+//		if(type.isAnnotationPresent(NFProperties.class) || this.getClass().isAnnotationPresent(NFProperties.class))
+//		{
+//			List<NFProperty> nfprops = new ArrayList<NFProperty>();
+//			NFProperties typenfprops = type.getAnnotation(NFProperties.class);
+//			if(typenfprops != null)
+//			{
+//				nfprops.addAll((Collection<? extends NFProperty>)Arrays.asList(typenfprops.value()));
+//			}
+//			Class<?> clazz = this.getClass();
+//			typenfprops = this.getClass().getAnnotation(NFProperties.class);
+//			if(typenfprops != null)
+//			{
+//				nfprops.addAll((Collection<? extends NFProperty>)Arrays.asList(typenfprops.value()));
+//			}
+//			
+//			for(NFProperty nfprop : nfprops)
+//			{
+//				clazz = nfprop.type();
+//				try
+//				{
+//					Constructor<?> con = clazz.getConstructor(String.class);
+//					INFProperty<?, ?> prop = (INFProperty<?, ?>)con.newInstance(nfprop.name());
+//					
+//					if(nfproperties == null)
+//					{
+//						nfproperties = new HashMap<String, INFProperty<?,?>>();
+//					}
+//					nfproperties.put(nfprop.name(), prop);
+//				}
+//				catch (Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+	}
+	
+	/**
+	 *  Add nf properties from a type.
+	 */
+	public void addNFProperties(NFProperties nfprops, Map<String, INFProperty<?, ?>> nfps)
+	{
+		for(NFProperty nfprop : nfprops.value())
+		{
+			Class<?> clazz = nfprop.type();
+			try
 			{
-				nfprops.addAll((Collection<? extends NFProperty>) Arrays.asList(typenfprops.value()));
+				Constructor<?> con = clazz.getConstructor(String.class);
+				INFProperty<?, ?> prop = (INFProperty<?, ?>)con.newInstance(nfprop.name());
+				
+				if(nfps == null)
+					nfps = new HashMap<String, INFProperty<?,?>>();
+				nfps.put(nfprop.name(), prop);
 			}
-			Class<?> clazz = this.getClass();
-			typenfprops = this.getClass().getAnnotation(NFProperties.class);
-			if (typenfprops != null)
+			catch(Exception e)
 			{
-				nfprops.addAll((Collection<? extends NFProperty>) Arrays.asList(typenfprops.value()));
-			}
-			
-			for (NFProperty nfprop : nfprops)
-			{
-				clazz = nfprop.type();
-				try
-				{
-					Constructor<?> con = clazz.getConstructor(String.class);
-					INFProperty<?, ?> prop = (INFProperty<?, ?>) con.newInstance(nfprop.name());
-					
-					if (nfproperties == null)
-					{
-						nfproperties = new HashMap<String, INFProperty<?,?>>();
-					}
-					nfproperties.put(nfprop.name(), prop);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -207,7 +240,6 @@ public class BasicService implements IInternalService
 	
 	/**
 	 *  Returns the names of all non-functional properties of this service.
-	 *  
 	 *  @return The names of the non-functional properties of this service.
 	 */
 	public IFuture<String[]> getNonFunctionalPropertyNames()
@@ -217,7 +249,6 @@ public class BasicService implements IInternalService
 	
 	/**
 	 *  Returns the meta information about a non-functional property of this service.
-	 *  
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.
 	 */
@@ -228,7 +259,6 @@ public class BasicService implements IInternalService
 	
 	/**
 	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-	 *  
 	 *  @param name Name of the property.
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
@@ -253,7 +283,6 @@ public class BasicService implements IInternalService
 	
 	/**
 	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-	 *  
 	 *  @param name Name of the property.
 	 *  @param type Type of the property value.
 	 *  @param unit Unit of the property value.

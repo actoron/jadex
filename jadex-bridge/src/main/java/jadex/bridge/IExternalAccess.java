@@ -5,6 +5,7 @@ import java.util.Map;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Timeout;
@@ -17,7 +18,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
  *  The interface for accessing components from the outside.
  */
 @Reference
-public interface IExternalAccess //extends IRemotable
+public interface IExternalAccess extends INFPropertyProvider//extends IRemotable
 {
 	//-------- cache --------
 	
