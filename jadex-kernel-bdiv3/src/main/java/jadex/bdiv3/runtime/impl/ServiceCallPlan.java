@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bridge.IInternalAccess;
@@ -18,6 +19,7 @@ import java.util.Collection;
  *  Default plan for realizing a service call.
  *  Finds and calls a service.
  */
+@Plan
 public class ServiceCallPlan
 {
 	@PlanReason

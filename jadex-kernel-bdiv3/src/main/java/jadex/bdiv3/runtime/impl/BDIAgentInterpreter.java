@@ -331,7 +331,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		// Support special case that BDI should implement provided service with plans.
 		Object ret = null;
 		ProvidedServiceImplementation impl = info.getImplementation();
-		if(impl!=null && impl.getClazz().getType(getClassLoader()).equals(BDIAgent.class))
+		if(impl!=null && impl.getClazz()!=null && impl.getClazz().getType(getClassLoader()).equals(BDIAgent.class))
 		{
 			Class<?> iface = info.getType().getType(getClassLoader());
 			ret = Proxy.newProxyInstance(getClassLoader(), new Class[]{iface}, 

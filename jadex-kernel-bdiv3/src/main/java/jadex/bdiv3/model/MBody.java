@@ -6,6 +6,7 @@ import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.annotation.PlanPrecondition;
+import jadex.bdiv3.runtime.impl.ServiceCallPlan;
 import jadex.bridge.ClassInfo;
 
 import java.lang.annotation.Annotation;
@@ -68,6 +69,10 @@ public class MBody
 		this.servicemethodname = servicemethodname;
 		this.mapperclass = mapperclass;
 		this.component	= component;
+		
+		// Hack?
+		if(servicename!=null)
+			this.clazz = new ClassInfo(ServiceCallPlan.class);
 	}
 
 	/**

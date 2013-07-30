@@ -121,7 +121,7 @@ public abstract class ReceiveHandler
 									if(e instanceof ConnectionException)
 									{
 										// todo: make customizable
-										System.out.println("ConnectionException sleeping");
+//										System.out.println("ConnectionException sleeping");
 										Thread.sleep(60000);
 									}
 									

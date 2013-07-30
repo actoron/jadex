@@ -117,6 +117,11 @@ public class RPlan extends RElement implements IPlan
 	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia)
 	{
 		final RPlan rplan = new RPlan(mplan, candidate);
+		
+		rplan.setReason(reason);
+		rplan.setDispatchedElement(reason);
+		rplan.setInternalAccess(ia);
+		
 		MBody mbody = mplan.getBody();
 		
 		IPlanBody body = null;
@@ -125,7 +130,7 @@ public class RPlan extends RElement implements IPlan
 		{
 			body = new ClassPlanBody(ia, rplan, candidate);
 		}
-		else if(mbody.getClazz()!=null)
+		else if(mbody.getClazz()!=null && mbody.getServiceName()==null)
 		{
 			Class<?>	clazz	= (Class<?>)mbody.getClazz().getType(ia.getClassLoader());
 			if(clazz.isAnnotationPresent(Plan.class))
@@ -216,9 +221,6 @@ public class RPlan extends RElement implements IPlan
 		}
 		
 		rplan.setBody(body);
-		rplan.setReason(reason);
-		rplan.setDispatchedElement(reason);
-		rplan.setInternalAccess(ia);
 		
 //		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 //		Collection<RPlan> pls = ip.getCapability().getPlans(mplan);

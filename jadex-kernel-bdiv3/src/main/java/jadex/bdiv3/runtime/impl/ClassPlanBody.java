@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -70,15 +71,15 @@ public class ClassPlanBody extends AbstractPlanBody
 		this.body = body;
 		this.plan = plan;
 //		Class<?> mbd = body!=null? body: plan.getClass();
-		bodymethod = ((MPlan)rplan.getModelElement()).getBody()
-			.getBodyMethod(ia.getClassLoader()).getMethod(ia.getClassLoader());
-		MethodInfo mi = ((MPlan)rplan.getModelElement()).getBody().getPassedMethod(ia.getClassLoader());
+		MBody mbody = ((MPlan)rplan.getModelElement()).getBody();
+		bodymethod = mbody.getBodyMethod(ia.getClassLoader()).getMethod(ia.getClassLoader());
+		MethodInfo mi = mbody.getPassedMethod(ia.getClassLoader());
 		if(mi!=null)
 			passedmethod = mi.getMethod(ia.getClassLoader());
-		mi = ((MPlan)rplan.getModelElement()).getBody().getFailedMethod(ia.getClassLoader());
+		mi = mbody.getFailedMethod(ia.getClassLoader());
 		if(mi!=null)
 			failedmethod = mi.getMethod(ia.getClassLoader());
-		mi = ((MPlan)rplan.getModelElement()).getBody().getAbortedMethod(ia.getClassLoader());
+		mi = mbody.getAbortedMethod(ia.getClassLoader());
 		if(mi!=null)
 			abortedmethod = mi.getMethod(ia.getClassLoader());
 		
