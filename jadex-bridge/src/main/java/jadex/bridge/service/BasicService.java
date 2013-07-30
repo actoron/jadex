@@ -132,7 +132,7 @@ public class BasicService implements IInternalService
 			
 			for (NFProperty nfprop : nfprops)
 			{
-				Class<?> clazz = nfprop.type();
+				clazz = nfprop.type();
 				try
 				{
 					Constructor<?> con = clazz.getConstructor(String.class);
