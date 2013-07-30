@@ -108,7 +108,7 @@ public class SettingsPanel extends JPanel
 				BetterFileChooser fc = new BetterFileChooser(last);
 				fc.setDialogType(BetterFileChooser.OPEN_DIALOG);
 				fc.setFileSelectionMode(BetterFileChooser.FILES_AND_DIRECTORIES);
-				FileFilter filter = new FileNameExtensionFilter("BPMN model file", "bpmn2");
+				FileFilter filter = new FileNameExtensionFilter("Java *.jar file", "jar");
 				fc.addChoosableFileFilter(filter);
 				fc.setFileFilter(filter);
 				
