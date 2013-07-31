@@ -3,7 +3,10 @@ package jadex.bdiv3;
 import jadex.android.commons.JadexDexClassLoader;
 import jadex.android.commons.Logger;
 import jadex.bdiv3.android.DexLoader;
+import jadex.bdiv3.android.LogClassWriter;
+import jadex.bdiv3.asmdex.ClassNodeWrapper;
 import jadex.bdiv3.model.BDIModel;
+import jadex.bdiv3.model.MBelief;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
@@ -17,6 +20,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,17 +33,22 @@ import org.ow2.asmdex.ApplicationReader;
 import org.ow2.asmdex.ApplicationVisitor;
 import org.ow2.asmdex.ApplicationWriter;
 import org.ow2.asmdex.ClassVisitor;
-import org.ow2.asmdex.ClassWriter;
-import org.ow2.asmdex.FieldVisitor;
 import org.ow2.asmdex.MethodVisitor;
 import org.ow2.asmdex.Opcodes;
+import org.ow2.asmdex.tree.AbstractInsnNode;
 import org.ow2.asmdex.tree.ApplicationNode;
 import org.ow2.asmdex.tree.ClassNode;
+import org.ow2.asmdex.tree.FieldInsnNode;
+import org.ow2.asmdex.tree.FieldNode;
+import org.ow2.asmdex.tree.InsnList;
+import org.ow2.asmdex.tree.LabelNode;
+import org.ow2.asmdex.tree.MethodInsnNode;
 import org.ow2.asmdex.tree.MethodNode;
+import org.ow2.asmdex.tree.VarInsnNode;
 
 import android.util.Log;
 
-public class AsmDexBdiClassGenerator implements IBDIClassGenerator
+public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 {
 	protected static Method methoddc1;
 	protected static Method methoddc2;
@@ -86,7 +95,7 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 		done.add(clname);
 
 		int api = Opcodes.ASM4;
-
+		final String iclname = clname.replace(".", "/");
 		final String iname = "L" + clname.replace('.', '/') + ";";
 
 		// pattern to accept all inner classes
@@ -129,11 +138,9 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 									public void visitFieldInsn(int opcode, String owner, String name, String desc, int valueRegister,
 											int objectRegister)
 									{
-										// objectRegister = reference to
-										// instance (ignored when static),
-										// valueRegister = index of value to
-										// put!
-										if (isInstancePut(opcode) && model.getCapability().hasBelief(name)
+										// objectRegister = reference to instance (ignored when static),
+										// valueRegister = index of value to put!
+										if (isInstancePutField(opcode) && model.getCapability().hasBelief(name)
 												&& model.getCapability().getBelief(name).isFieldBelief())
 										{
 											//
@@ -143,14 +150,13 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 												visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, "Ljadex/commons/SReflect;", "wrapValue",
 														"Ljava/lang/Object;" + desc, new int[]
 														{valueRegister});
+												visitMethodInsn(Opcodes.INSN_MOVE_RESULT_OBJECT, null, null, null, new int[]{1});
+												
+												// log:
+									 			visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "Vjava/lang/Object;", new int[]{1});
 											}
 
-											super.visitFieldInsn(opcode, owner, name, desc, valueRegister, objectRegister);
-											//
-											// visitInsn(Opcodes.SWAP);
-											//
-											// // fetch bdi agent value from
-											// field
+											 // fetch bdi agent value from field
 											//
 											// // this pop aload is necessary in
 											// inner
@@ -160,6 +166,14 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 											// super.visitFieldInsn(Opcodes.GETFIELD,
 											// iclname, "__agent",
 											// Type.getDescriptor(BDIAgent.class));
+											
+											super.visitFieldInsn(Opcodes.INSN_IGET_OBJECT, iname, "__agent", Type.getDescriptor(BDIAgent.class), 0, 2);
+											
+											// log:
+											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "Vjava/lang/Object;", new int[]{2});
+											
+											
+											
 											// // add field name
 											// visitLdcInsn(name);
 											// visitInsn(Opcodes.SWAP);
@@ -222,7 +236,7 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 			aw.visit();
 			for (ClassNode classNode : classes)
 			{
-				transformClassNode(classNode, iname, model);
+				transformClassNode(classNode, iclname, model);
 				String[] signature = classNode.signature == null? null : classNode.signature.toArray(new String[classNode.signature.size()]);
 				String[] interfaces = classNode.interfaces == null ? null :classNode.interfaces.toArray(new String[classNode.interfaces.size()]);
 				System.out.println("write class: " + classNode.name);
@@ -259,28 +273,202 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 		return ret;
 	}
 
-	private void transformClassNode(ClassNode cn, String iname, BDIModel model)
+	private void transformClassNode(ClassNode cn, String iclname, BDIModel model)
 	{
 		// Some transformations are only applied to the agent class and not its
 		// inner classes.
-		boolean agentclass = false;
-		if (cn.visibleAnnotations != null)
-		{
-			for (org.ow2.asmdex.tree.AnnotationNode an : cn.visibleAnnotations)
-			{
-				if ("Ljadex/micro/annotation/Agent;".equals(an.desc) || "Ljadex/bdiv3/annotation/Capability;".equals(an.desc))
-				{
-					agentclass = true;
-					break;
-				}
-			}
-		}
+		boolean agentclass = isAgentClass(ClassNodeWrapper.wrap(cn));
 
 //		final String iclname = iname.replace(".", "/");
 
 		// Check method for array store access of beliefs and replace with
 		// static method call
 		MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
+		
+		// TODO arraystorage
+		
+		
+		if(agentclass)
+		{
+			// Check if there are dynamic beliefs
+			// and enhance getter/setter beliefs by adding event call to setter
+			List<String> tododyn = new ArrayList<String>();
+			List<String> todoset = new ArrayList<String>();
+			List<String> todoget = new ArrayList<String>();
+			List<MBelief> mbels = model.getCapability().getBeliefs();
+			for(MBelief mbel: mbels)
+			{
+				Collection<String> evs = mbel.getEvents();
+				if(evs!=null && !evs.isEmpty() || mbel.isDynamic())
+				{
+					tododyn.add(mbel.getName());
+				}
+				
+				if(!mbel.isFieldBelief())
+				{
+					todoset.add(mbel.getSetter().getName());
+				}
+				
+				if(!mbel.isFieldBelief())
+				{
+					todoget.add(mbel.getGetter().getName());
+				}
+			}
+			
+			cn.fields.add(new FieldNode(Opcodes.ACC_PROTECTED, "__initargs", "Ljava/util/List;", new String[]{"Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;"}, null));
+			
+			for(MethodNode mn: mths)
+			{
+//				System.out.println(mn.name);
+				
+				// search constructor (should not have multiple ones) 
+				// and extract field assignments for dynamic beliefs
+				// will be incarnated as new update methods 
+				if(mn.name.equals("<init>"))
+				{
+					InsnList l = mn.instructions;
+					LabelNode begin = null;
+					int foundcon = -1;
+					
+					for(int i=0; i<l.size(); i++)
+					{
+						AbstractInsnNode n = l.get(i);
+						
+						if(begin==null && n instanceof LabelNode)
+						{
+							begin = (LabelNode)n;
+						}
+						
+						// find first constructor call
+						if(Opcodes.INSN_INVOKE_DIRECT==n.getOpcode() && foundcon==-1)
+						{
+							foundcon = i;
+							begin = null;
+						}
+						else if(n instanceof MethodInsnNode && ((MethodInsnNode)n).name.equals("writeField"))
+						{
+							MethodInsnNode min = (MethodInsnNode)n;
+							
+//							System.out.println("found writeField node: "+min.name+" "+min.getOpcode());
+							AbstractInsnNode start = min;
+							String name = null;
+							List<String> evs = new ArrayList<String>(); 
+							while(!start.equals(begin))
+							{
+								// find method name via last constant load
+								if (name == null) {
+									System.out.println(start);
+									// TODO: find method name !!
+								}
+//								if(name==null && start instanceof LdcInsnNode)
+//									name = (String)((LdcInsnNode)start).cst;
+								if(isInstanceGetField(start.getOpcode()))
+								{
+									String bn = ((FieldInsnNode)start).name;
+									if(model.getCapability().hasBelief(bn))
+									{
+										evs.add(bn);
+									}
+								}
+								start = start.getPrevious();
+							}
+							
+							// TODO: dynamic beliefs
+//							if(tododyn.remove(name))
+//							{
+//								MBelief mbel = model.getCapability().getBelief(name);
+//								mbel.getEvents().addAll(evs);
+//								
+//								MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX
+//									+SUtil.firstToUpperCase(name), Type.getMethodDescriptor(Type.VOID_TYPE), null, null);
+//								
+//								// First labels are cloned
+//								AbstractInsnNode cur = start;
+//								Map<LabelNode, LabelNode> labels = new HashMap<LabelNode, LabelNode>();
+//								while(!cur.equals(min))
+//								{
+//									if(cur instanceof LabelNode)
+//										labels.put((LabelNode)cur, new LabelNode(new Label()));
+//									cur = cur.getNext();
+//								}
+//								// Then code is cloned
+//								cur = start;
+//								while(!cur.equals(min))
+//								{
+//									AbstractInsnNode clone = cur.clone(labels);
+//									mnode.instructions.add(clone);
+//									cur = cur.getNext();
+//								}
+//								mnode.instructions.add(cur.clone(labels));
+//								mnode.visitInsn(Opcodes.RETURN);
+//								
+//								cn.methods.add(mnode);
+//							}
+							
+							begin = null;
+						}
+					}
+					
+					// Move init code to separate method for being called after injections. 
+					if(foundcon!=-1 && foundcon+1<l.size())
+					{
+						String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+iclname.replace("/", "_").replace(".", "_");
+//						System.out.println("Init method: "+name);
+						MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, name, mn.desc, mn.signature, null);
+						cn.methods.add(mnode);
+
+						while(l.size()>foundcon+1)
+						{
+							AbstractInsnNode	node	= l.get(foundcon+1);
+							if(isReturn(node.getOpcode()))
+							{
+								mnode.visitInsn(node.getOpcode());
+								break;
+							}
+							l.remove(node);
+							mnode.instructions.add(node);
+						}						
+						
+//						// Add code to store arguments in field.
+//						Type[]	args	= Type.getArgumentTypes(mn.desc); // fails
+						InsnList	init	= new InsnList();
+//
+						// obj param
+//						init.add(new VarInsnNode(Opcodes.ALOAD, 0));
+//						
+//						// clazz param
+//						init.add(new LdcInsnNode(Type.getType("L"+iclname+";")));
+//						
+//						// argtypes param
+//						init.add(new LdcInsnNode(args.length));
+//						init.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Class"));
+//						for(int i=0; i<args.length; i++)
+//						{
+//							init.add(new InsnNode(Opcodes.DUP));
+//							init.add(new LdcInsnNode(i));
+//							init.add(new LdcInsnNode(args[i]));
+//							init.add(new InsnNode(Opcodes.AASTORE));
+//						}
+//						
+//						// args param
+//						init.add( new LdcInsnNode(args.length));
+//						init.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Object"));
+//						for(int i=0; i<args.length; i++)
+//						{
+//							init.add(new InsnNode(Opcodes.DUP));
+//							init.add(new LdcInsnNode(i));
+//							init.add(new VarInsnNode(Opcodes.ALOAD, i+1));	// 0==this, 1==arg0, ...
+//							init.add(new InsnNode(Opcodes.AASTORE));
+//						}
+//						
+//						// Invoke method.
+						init.add(new MethodInsnNode(Opcodes.INSN_INVOKE_STATIC, "jadex/bdiv3/BDIAgent", "addInitArgs", "(Ljava/lang/Object;Ljava/lang/Class;[Ljava/lang/Class;[Ljava/lang/Object;)V", new int[]{1})); // TODO: register
+//						
+						l.insertBefore(l.get(foundcon+1), init);
+					}
+				} // constructor end
+			}
+		}
 	}
 
 	private InputStream getFileInputStream(File apkFile)
@@ -323,7 +511,7 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 		return result;
 	}
 
-	private static boolean isInstancePut(int opcode)
+	protected boolean isInstancePutField(int opcode)
 	{
 		switch (opcode)
 		{
@@ -338,6 +526,38 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 			default :
 				return false;
 		}
-
 	}
+	
+	protected boolean isInstanceGetField(int opcode)
+	{
+		switch (opcode)
+		{
+			case Opcodes.INSN_IGET :
+			case Opcodes.INSN_IGET_BOOLEAN :
+			case Opcodes.INSN_IGET_BYTE :
+			case Opcodes.INSN_IGET_CHAR :
+			case Opcodes.INSN_IGET_OBJECT :
+			case Opcodes.INSN_IGET_SHORT :
+			case Opcodes.INSN_IGET_WIDE :
+				return true;
+			default :
+				return false;
+		}
+	}
+	
+	protected boolean isReturn(int opcode)
+	{
+		switch (opcode)
+		{
+			case Opcodes.INSN_RETURN :
+			case Opcodes.INSN_RETURN_OBJECT :
+			case Opcodes.INSN_RETURN_VOID :
+			case Opcodes.INSN_RETURN_WIDE :
+				return true;
+			default :
+				return false;
+		}
+	}
+
+	
 }

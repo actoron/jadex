@@ -5,7 +5,7 @@ import org.ow2.asmdex.ApplicationVisitor;
 public class LogClassWriter
 {
 
-	public static final String LOG_CLASSNAME = null;
+	public static final String LOG_CLASSNAME = "jadex.bdiv3.android.LogClassWriter";
 
 	public LogClassWriter(MethodInsManager rm, ApplicationVisitor av)
 	{
@@ -16,6 +16,10 @@ public class LogClassWriter
 	{
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public static void log(Object o) {
+		System.out.println(o.toString());
 	}
 
 }

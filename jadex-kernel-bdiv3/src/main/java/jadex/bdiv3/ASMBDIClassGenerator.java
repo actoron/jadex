@@ -1,5 +1,7 @@
 package jadex.bdiv3;
 
+import jadex.bdiv3.asm.ClassNodeWrapper;
+import jadex.bdiv3.asm.IClassNode;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.commons.SReflect;
@@ -48,7 +50,7 @@ import org.kohsuke.asm4.util.TraceClassVisitor;
 /**
  * 
  */
-public class ASMBDIClassGenerator implements IBDIClassGenerator
+public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 {
     protected static Method methoddc1; 
     protected static Method methoddc2;
@@ -124,7 +126,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						public void visitFieldInsn(int opcode, String owner, String name, String desc)
 						{
 							// if is a putfield and is belief and not is in init (__agent field is not available)
-							if(Opcodes.PUTFIELD==opcode && model.getCapability().hasBelief(name) 
+							if(isInstancePutField(opcode) && model.getCapability().hasBelief(name) 
 								&& model.getCapability().getBelief(name).isFieldBelief())
 							{
 //								visitInsn(Opcodes.POP);
@@ -300,141 +302,43 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 	protected void transformClassNode(ClassNode cn, final String clname, final BDIModel model)
 	{
 		// Some transformations are only applied to the agent class and not its inner classes.
-		boolean	agentclass	= false;
-		if(cn.visibleAnnotations!=null)
-		{
-			for(AnnotationNode an: cn.visibleAnnotations)
-			{
-				if("Ljadex/micro/annotation/Agent;".equals(an.desc)
-					|| "Ljadex/bdiv3/annotation/Capability;".equals(an.desc))
-				{
-					agentclass	= true;
-					break;
-				}
-			}
-		}
+		boolean	agentclass	= isAgentClass(ClassNodeWrapper.wrap(cn));
 		
 		final String iclname = clname.replace(".", "/");
 				
 		// Check method for array store access of beliefs and replace with static method call
 		MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
-		for(MethodNode mn: mths)
-		{
-//			System.out.println(mn.name);
-			
-			InsnList ins = mn.instructions;
-			LabelNode lab = null;
-			List<String> belnames = new ArrayList<String>();
-			
-			AbstractInsnNode[] nodes = ins.toArray();
-			for(AbstractInsnNode n: nodes)
-			{
-				if(lab==null && n instanceof LabelNode)
-				{
-					lab = (LabelNode)n;
-					belnames.clear();
-				}
-				
-				if(n.getOpcode()==Opcodes.GETFIELD)
-				{
-					String bn = ((FieldInsnNode)n).name;
-					if(model.getCapability().hasBelief(bn))
-					{
-						belnames.add(bn);
-					}
-				}
-				
-				if(!belnames.isEmpty())
-				{
-					InsnList newins = null;
-					
-					if(Opcodes.IASTORE==n.getOpcode() || Opcodes.BASTORE==n.getOpcode()) // for int, byte and boolean :-((	
-					{
-						newins = new InsnList();
-						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(I)Ljava/lang/Object;"));
-					}
-					else if(Opcodes.LASTORE==n.getOpcode())
-					{
-						newins = new InsnList();
-						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(J)Ljava/lang/Object;"));
-					}
-					else if(Opcodes.FASTORE==n.getOpcode())
-					{
-						newins = new InsnList();
-						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(F)Ljava/lang/Object;"));
-					}
-					else if(Opcodes.DASTORE==n.getOpcode())
-					{
-						newins = new InsnList();
-						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(D)Ljava/lang/Object;"));
-					}
-					else if(Opcodes.CASTORE==n.getOpcode())
-					{
-						newins = new InsnList();
-						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(C)Ljava/lang/Object;"));
-					}
-					else if(Opcodes.SASTORE==n.getOpcode())
-					{
-						newins = new InsnList();
-						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(S)Ljava/lang/Object;"));
-					}
-					else if(Opcodes.AASTORE==n.getOpcode())
-					{
-						newins = new InsnList();
-					}
-					
-					if(newins!=null)
-					{
-	//					// on stack: arrayref, index, value 
-	//					System.out.println("found: "+belnames);
-						String belname = belnames.get(0);
-						
-						newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
-						newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
-						newins.add(new LdcInsnNode(belname));
-						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
-							"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
-						
-						ins.insert(n.getPrevious(), newins);
-						ins.remove(n); // remove old Xastore
-						
-						lab = null;
-						belnames.clear();
-					}
-				}
-			}
-		}
-		
-		// Check if there are dynamic beliefs
-		// and enhance getter/setter beliefs by adding event call to setter
-		List<String> tododyn = new ArrayList<String>();
-		List<String> todoset = new ArrayList<String>();
-		List<String> todoget = new ArrayList<String>();
-		List<MBelief> mbels = model.getCapability().getBeliefs();
-		for(MBelief mbel: mbels)
-		{
-			Collection<String> evs = mbel.getEvents();
-			if(evs!=null && !evs.isEmpty() || mbel.isDynamic())
-			{
-				tododyn.add(mbel.getName());
-			}
-			
-			if(!mbel.isFieldBelief())
-			{
-				todoset.add(mbel.getSetter().getName());
-			}
-			
-			if(!mbel.isFieldBelief())
-			{
-				todoget.add(mbel.getGetter().getName());
-			}
-		}
+		transformArrayStores(mths, model, iclname);
 		
 		if(agentclass)
 		{
+			// Check if there are dynamic beliefs
+			// and enhance getter/setter beliefs by adding event call to setter
+			List<String> tododyn = new ArrayList<String>();
+			List<String> todoset = new ArrayList<String>();
+			List<String> todoget = new ArrayList<String>();
+			List<MBelief> mbels = model.getCapability().getBeliefs();
+			for(MBelief mbel: mbels)
+			{
+				Collection<String> evs = mbel.getEvents();
+				if(evs!=null && !evs.isEmpty() || mbel.isDynamic())
+				{
+					tododyn.add(mbel.getName());
+				}
+				
+				if(!mbel.isFieldBelief())
+				{
+					todoset.add(mbel.getSetter().getName());
+				}
+				
+				if(!mbel.isFieldBelief())
+				{
+					todoget.add(mbel.getGetter().getName());
+				}
+			}
+			
 			cn.fields.add(new FieldNode(Opcodes.ACC_PROTECTED, "__initargs", "Ljava/util/List;", "Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;", null));
 			
-//			MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
 			for(MethodNode mn: mths)
 			{
 //				System.out.println(mn.name);
@@ -533,7 +437,7 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 						while(l.size()>foundcon+1)
 						{
 							AbstractInsnNode	node	= l.get(foundcon+1);
-							if(node.getOpcode()==Opcodes.RETURN)
+							if(isReturn(node.getOpcode()))
 							{
 								break;
 							}
@@ -786,6 +690,97 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 		}
 	}
 	
+	
+	protected void transformArrayStores(MethodNode[] mths, BDIModel model, String iclname)
+	{
+		for(MethodNode mn: mths)
+		{
+//			System.out.println(mn.name);
+			
+			InsnList ins = mn.instructions;
+			LabelNode lab = null;
+			List<String> belnames = new ArrayList<String>();
+			
+			AbstractInsnNode[] nodes = ins.toArray();
+			for(AbstractInsnNode n: nodes)
+			{
+				if(lab==null && n instanceof LabelNode)
+				{
+					lab = (LabelNode)n;
+					belnames.clear();
+				}
+				
+				if(n.getOpcode()==Opcodes.GETFIELD)
+				{
+					String bn = ((FieldInsnNode)n).name;
+					if(model.getCapability().hasBelief(bn))
+					{
+						belnames.add(bn);
+					}
+				}
+				
+				if(!belnames.isEmpty())
+				{
+					InsnList newins = null;
+					
+					if(Opcodes.IASTORE==n.getOpcode() || Opcodes.BASTORE==n.getOpcode()) // for int, byte and boolean :-((	
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(I)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.LASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(J)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.FASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(F)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.DASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(D)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.CASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(C)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.SASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "(S)Ljava/lang/Object;"));
+					}
+					else if(Opcodes.AASTORE==n.getOpcode())
+					{
+						newins = new InsnList();
+					}
+					
+					if(newins!=null)
+					{
+	//					// on stack: arrayref, index, value 
+	//					System.out.println("found: "+belnames);
+						String belname = belnames.get(0);
+						
+						newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
+						newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+						newins.add(new LdcInsnNode(belname));
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
+							"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+						
+						ins.insert(n.getPrevious(), newins);
+						ins.remove(n); // remove old Xastore
+						
+						lab = null;
+						belnames.clear();
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * 
 	 */
@@ -1007,4 +1002,23 @@ public class ASMBDIClassGenerator implements IBDIClassGenerator
 //		m.setAccessible(true);
 //		m.invoke(null, new Object[]{new String[0]});
 	}
+
+	@Override
+	protected boolean isInstancePutField(int opcode)
+	{
+		return Opcodes.PUTFIELD == opcode;
+	}
+
+	@Override
+	protected boolean isInstanceGetField(int opcode)
+	{
+		return Opcodes.GETFIELD == opcode;
+	}
+
+	@Override
+	protected boolean isReturn(int opcode)
+	{
+		return Opcodes.RETURN == opcode;
+	}
+
 }

@@ -63,9 +63,9 @@
 <!-- 		</dependency> -->
 
 		<dependency>
-			<groupId>asm</groupId>
+			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>asm-dex</artifactId>
-			<version>1.0</version>
+			<version>1.0-1</version>
 		</dependency>
 
 		<dependency>
