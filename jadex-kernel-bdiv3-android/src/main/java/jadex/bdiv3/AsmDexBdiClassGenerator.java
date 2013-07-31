@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -30,9 +29,13 @@ import org.ow2.asmdex.ApplicationReader;
 import org.ow2.asmdex.ApplicationVisitor;
 import org.ow2.asmdex.ApplicationWriter;
 import org.ow2.asmdex.ClassVisitor;
+import org.ow2.asmdex.ClassWriter;
 import org.ow2.asmdex.FieldVisitor;
 import org.ow2.asmdex.MethodVisitor;
 import org.ow2.asmdex.Opcodes;
+import org.ow2.asmdex.tree.ApplicationNode;
+import org.ow2.asmdex.tree.ClassNode;
+import org.ow2.asmdex.tree.MethodNode;
 
 import android.util.Log;
 
@@ -85,7 +88,7 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 		int api = Opcodes.ASM4;
 
 		final String iname = "L" + clname.replace('.', '/') + ";";
-		
+
 		// pattern to accept all inner classes
 		final Pattern classPattern = Pattern.compile("L" + clname.replace('.', '/') + ";?\\$?.*");
 
@@ -95,10 +98,13 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 			// is = SUtil.getResource(APP_PATH, cl);
 			String appPath = ((JadexDexClassLoader) androidCl).getDexPath();
 			InputStream is = getFileInputStream(new File(appPath));
-			// MethodInsManager rm = new MethodInsManager(); // Rules to apply
 			ApplicationReader ar = new ApplicationReader(api, is);
 			ApplicationWriter aw = new ApplicationWriter();
-			ApplicationVisitor aa = new ApplicationVisitor(api, aw)
+			ApplicationNode an = new ApplicationNode(api);
+			
+			final ArrayList<ClassNode> classes = new ArrayList<ClassNode>();
+			
+			ApplicationVisitor av = new ApplicationVisitor(api, an)
 			{
 
 				@Override
@@ -107,14 +113,11 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 					if (classPattern.matcher(name).matches())
 					{
 						System.out.println("visit class: " + name);
-						return new ClassVisitor(api, super.visitClass(access, name, signature, superName, interfaces))
+						final ClassNode cn = new ClassNode(api, access, name, signature, superName, interfaces);
+						classes.add(cn);
+						final ClassVisitor superVisitor = super.visitClass(access, iname, signature, superName, interfaces);
+						ClassVisitor cv = new ClassVisitor(api, cn)
 						{
-
-							@Override
-							public FieldVisitor visitField(int access, String name, String desc, String[] signature, Object value)
-							{
-								return super.visitField(access, name, desc, signature, value);
-							}
 
 							@Override
 							public MethodVisitor visitMethod(int access, String name, String desc, String[] signature, String[] exceptions)
@@ -176,37 +179,14 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 										}
 									}
 
-									@Override
-									public void visitInsn(int opcode)
-									{
-										super.visitInsn(opcode);
-									}
-
-									@Override
-									public void visitMethodInsn(int opcode, String owner, String name, String desc, int[] arguments)
-									{
-										super.visitMethodInsn(opcode, owner, name, desc, arguments);
-									}
-
-									@Override
-									public void visitEnd()
-									{
-										super.visitEnd();
-									}
-
-									@Override
-									public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack)
-									{
-										super.visitFrame(type, nLocal, local, nStack, stack);
-									}
-
 								};
 							}
 
 							@Override
 							public void visitInnerClass(String name, String outerName, String innerName, int access)
 							{
-//								System.out.println("vic: " + name + " " + outerName + " " + innerName + " " + access);
+								// System.out.println("vic: " + name + " " +
+								// outerName + " " + innerName + " " + access);
 								String icln = (name == null ? null : name.replace("/", "."));
 								if (!done.contains(icln))
 									todo.add(icln);
@@ -225,16 +205,32 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 							}
 
 						};
+
+						return cv;
 					}
 					else
 					{
 						return null;
 					}
 				}
+
 			};
 
-			// ar.accept(aa, new String[]{iname}, 0);
-			ar.accept(aa, null, 0); // visit all classes
+//			 ar.accept(aa, new String[]{iname}, 0);
+			ar.accept(av, null, 0); // visit all classes
+			
+			aw.visit();
+			for (ClassNode classNode : classes)
+			{
+				transformClassNode(classNode, iname, model);
+				String[] signature = classNode.signature == null? null : classNode.signature.toArray(new String[classNode.signature.size()]);
+				String[] interfaces = classNode.interfaces == null ? null :classNode.interfaces.toArray(new String[classNode.interfaces.size()]);
+				System.out.println("write class: " + classNode.name);
+				ClassVisitor visitClass = aw.visitClass(classNode.access, classNode.name, signature, classNode.superName, interfaces);
+				classNode.accept(visitClass);
+			}
+			aw.visitEnd();
+
 			byte[] dex = aw.toByteArray();
 
 			// we need the android user loader as parent here, because class
@@ -261,6 +257,30 @@ public class AsmDexBdiClassGenerator implements IBDIClassGenerator
 		}
 
 		return ret;
+	}
+
+	private void transformClassNode(ClassNode cn, String iname, BDIModel model)
+	{
+		// Some transformations are only applied to the agent class and not its
+		// inner classes.
+		boolean agentclass = false;
+		if (cn.visibleAnnotations != null)
+		{
+			for (org.ow2.asmdex.tree.AnnotationNode an : cn.visibleAnnotations)
+			{
+				if ("Ljadex/micro/annotation/Agent;".equals(an.desc) || "Ljadex/bdiv3/annotation/Capability;".equals(an.desc))
+				{
+					agentclass = true;
+					break;
+				}
+			}
+		}
+
+//		final String iclname = iname.replace(".", "/");
+
+		// Check method for array store access of beliefs and replace with
+		// static method call
+		MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
 	}
 
 	private InputStream getFileInputStream(File apkFile)
