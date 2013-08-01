@@ -77,14 +77,14 @@ public class RPlan extends RElement implements IPlan
 	protected WaitAbstraction waitabstraction;
 //		
 //	/** The plan has a waitqueue wait abstraction attribute. */
-//	protected WaitAbstraction waitqueuewa;
+	protected WaitAbstraction waitqueuewa;
 	
 	/** The waitqueue. */
 	protected List<Object> waitqueue;
 	
 	/** The wait future (to resume execution). */
 //	protected Future<?> waitfuture;
-	protected ICommand<Void> resumecommand;
+	protected ICommand<Boolean> resumecommand;
 	
 	/** The plan has exception attribute. */
 	protected Exception exception;
@@ -611,7 +611,7 @@ public class RPlan extends RElement implements IPlan
 //		}
 		
 		assert resumecommand!=null;
-		ICommand<Void> com = resumecommand;
+		ICommand<Boolean> com = resumecommand;
 		resumecommand = null;
 		setProcessingState(PlanProcessingState.RUNNING);
 		com.execute(null);
@@ -621,7 +621,7 @@ public class RPlan extends RElement implements IPlan
 	 *  Get the resumecommand.
 	 *  @return The resumecommand.
 	 */
-	public ICommand<Void> getResumeCommand()
+	public ICommand<Boolean> getResumeCommand()
 	{
 		return resumecommand;
 	}
@@ -632,7 +632,7 @@ public class RPlan extends RElement implements IPlan
 	 *  Cleans dispatched element.
 	 *  Sets processing state to WAITING.
 	 */
-	public void setResumeCommand(ICommand<Void> com)
+	public void setResumeCommand(ICommand<Boolean> com)
 	{
 //		if(resumecommand!=null)
 //		{
@@ -1075,7 +1075,7 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 * 
 	 */
-	protected IFuture<ITimer> createTimer(long timeout, final BDIAgentInterpreter ip, final ICommand<Void> rescom)
+	protected IFuture<ITimer> createTimer(long timeout, final BDIAgentInterpreter ip, final ICommand<Boolean> rescom)
 	{
 		final Future<ITimer> ret = new Future<ITimer>();
 		if(timeout>-1)
@@ -1114,7 +1114,7 @@ public class RPlan extends RElement implements IPlan
 	{
 		final Future<T> ret = new Future<T>();
 		
-		final ICommand<Void> rescom = new ResumeCommand<T>(ret, null);
+		final ICommand<Boolean> rescom = new ResumeCommand<T>(ret, null);
 		setResumeCommand(rescom);
 		
 		command.execute(null).addResultListener(ia.createResultListener(new IResultListener<T>()
@@ -1144,7 +1144,7 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 * 
 	 */
-	class ResumeCommand<T> implements ICommand<Void>
+	class ResumeCommand<T> implements ICommand<Boolean>
 	{
 		protected Future<T> waitfuture;
 		protected String rulename;
@@ -1167,27 +1167,30 @@ public class RPlan extends RElement implements IPlan
 			this.timer = timer;
 		}
 
-		public void execute(Void args)
+		public void execute(Boolean args)
 		{
 //			System.out.println("exe: "+this+" "+RPlan.this.getId());
-			
-			if(getException()!=null)
-			{
-				waitfuture.setExceptionIfUndone(getException());
-			}
-			else
-			{
-				waitfuture.setResultIfUndone((T)getDispatchedElement());
-			}
-			
 			if(rulename!=null)
 			{
+				System.out.println("rem rule: "+rulename);
 				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				ip.getRuleSystem().getRulebase().removeRule(rulename);
 			}
 			if(timer!=null)
 			{
 				timer.cancel();
+			}
+			
+			if(args==null || args.booleanValue())
+			{
+				if(getException()!=null)
+				{
+					waitfuture.setExceptionIfUndone(getException());
+				}
+				else
+				{
+					waitfuture.setResultIfUndone((T)getDispatchedElement());
+				}
 			}
 		}
 	}

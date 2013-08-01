@@ -1,5 +1,7 @@
-package jadex.bdiv3.testcases.semiautomatic;
+package jadex.bdiv3.testcases.misc;
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
@@ -8,15 +10,21 @@ import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 import jadex.rules.eca.annotations.Event;
 
 /**
- *  Hello World with goal driven print out.
+ *  Goal driven print out.
  *  
  *  class is checked for annotations
  *  goal, plan type declarations from annotations or inline plans 
@@ -26,6 +34,7 @@ import jadex.rules.eca.annotations.Event;
 @Agent
 @Imports({"java.util.logging.*"})
 @Properties({@NameValue(name="logging.level", value="Level.INFO")})
+@Results(@Result(name="testresults", clazz=Testcase.class))
 public class InnerClassChangeBDI
 {
 	/** The bdi agent. */
@@ -35,6 +44,10 @@ public class InnerClassChangeBDI
 	/** The text that is printed. */
 	@Belief
 	private String sayhello = "first";
+	
+	/** The test report. */
+	protected TestReport[] tr = new TestReport[]{new TestReport("#1", "Test first goal."), 
+		new TestReport("#2", "Test second goal.")};
 	
 	/**
 	 *  Simple hello world goal.
@@ -51,8 +64,9 @@ public class InnerClassChangeBDI
 		/**
 		 *  Create a new goal whenever sayhello belief is changed.
 		 */
-		@GoalCreationCondition
-		public HelloGoal(@Event("sayhello") String text)
+		@GoalCreationCondition(events="sayhello")
+//		public HelloGoal(@Event("sayhello") String text)
+		public HelloGoal(String text)
 		{
 			this.text = text;
 			
@@ -79,12 +93,51 @@ public class InnerClassChangeBDI
 	}
 	
 	/**
+	 *  The plan body.
+	 */
+	@AgentBody
+	public void body()
+	{
+		agent.waitFor(3000, new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				agent.killAgent();
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
+	 *  Called when agent is killed.
+	 */
+	@AgentKilled
+	public void	destroy(BDIAgent agent)
+	{
+		for(TestReport ter: tr)
+		{
+			if(!ter.isFinished())
+				ter.setFailed("Plan not activated");
+		}
+		agent.setResultValue("testresults", new Testcase(tr.length, tr));
+	}
+	
+	/**
 	 *  First plan. Fails with exception.
 	 */
 	@Plan(trigger=@Trigger(goals=HelloGoal.class))
 	protected IFuture<Void> printHello1(HelloGoal goal)
 	{
 		System.out.println(goal.getText());
+		if(!tr[0].isFinished())
+		{
+			tr[0].setSucceeded(true);
+		}
+		else
+		{
+			tr[1].setSucceeded(true);
+			agent.killAgent();
+		}
 		return IFuture.DONE;
 	}
 }

@@ -1,5 +1,7 @@
-package jadex.bdiv3.testcases.semiautomatic;
+package jadex.bdiv3.testcases.goals;
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
@@ -10,6 +12,8 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -17,6 +21,9 @@ import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 import jadex.rules.eca.annotations.Event;
 
 import java.awt.BorderLayout;
@@ -36,6 +43,7 @@ import javax.swing.SwingUtilities;
  *  
  */
 @Agent
+@Results(@Result(name="testresults", clazz=Testcase.class))
 public class RecurBDI
 {
 	/** The bdi agent. */
@@ -53,11 +61,13 @@ public class RecurBDI
 	/** The items in store. */
 	protected List<Item> store;
 	
+	protected TestReport tr = new TestReport("#1", "Test if recur works");
+	
 	/**
 	 *  A buy items goal that is responsible for buying
 	 *  a number of items.
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_WHEN_FAILED)
+	@Goal(excludemode=MGoal.EXCLUDE_WHEN_FAILED, recur=true)
 	public class BuyItemsGoal
 	{
 		protected int num;
@@ -129,54 +139,84 @@ public class RecurBDI
 			public void resultAvailable(BuyItemsGoal result)
 			{
 				System.out.println("succ: "+result);
+				tr.setSucceeded(true);
+				agent.killAgent();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
+				agent.killAgent();
 			}
 		});
 		
-		agent.addBeliefListener("items", new BeliefAdapter()
+//		agent.addBeliefListener("items", new BeliefAdapter()
+//		{
+//			public void factAdded(Object value)
+//			{
+//				System.out.println("added: "+value);
+//			}
+//		});
+		
+		agent.waitFor(2000, new IComponentStep<Void>()
 		{
-			public void factAdded(Object value)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("added: "+value);
+				setMoney(getMoney()+5);
+				return IFuture.DONE;
 			}
 		});
 		
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				JFrame f = new JFrame();
-				PropertiesPanel pp = new PropertiesPanel();
-				
-				final JTextField tfm = pp.createTextField("money", ""+money);
-				final NumberFormat formatter = NumberFormat.getCurrencyInstance();
-				agent.addBeliefListener("money", new BeliefAdapter()
-				{
-					public void beliefChanged(Object val)
-					{
-						tfm.setText(formatter.format(((Double)val).doubleValue()));
-					}
-				});
-				
-				final JButton bu = pp.createButton("add", "Add money");
-				bu.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						setMoney(getMoney()+5);
-					}
-				});
-				
-				f.add(pp, BorderLayout.CENTER);
-				f.pack();
-				f.setLocation(SGUI.calculateMiddlePosition(f));
-				f.setVisible(true);
-			}
-		});
+//		SwingUtilities.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				JFrame f = new JFrame();
+//				PropertiesPanel pp = new PropertiesPanel();
+//				
+//				final JTextField tfm = pp.createTextField("money", ""+money);
+//				final NumberFormat formatter = NumberFormat.getCurrencyInstance();
+//				agent.addBeliefListener("money", new BeliefAdapter()
+//				{
+//					public void beliefChanged(Object val)
+//					{
+//						tfm.setText(formatter.format(((Double)val).doubleValue()));
+//					}
+//				});
+//				
+//				final JButton bu = pp.createButton("add", "Add money");
+//				bu.addActionListener(new ActionListener()
+//				{
+//					public void actionPerformed(ActionEvent e)
+//					{
+//						agent.scheduleStep(new IComponentStep<Void>()
+//						{
+//							public IFuture<Void> execute(IInternalAccess ia)
+//							{
+//								setMoney(getMoney()+5);
+//								return IFuture.DONE;
+//							}
+//						});
+//					}
+//				});
+//				
+//				f.add(pp, BorderLayout.CENTER);
+//				f.pack();
+//				f.setLocation(SGUI.calculateMiddlePosition(f));
+//				f.setVisible(true);
+//			}
+//		});
+	}
+	
+	/**
+	 *  Called when agent is killed.
+	 */
+	@AgentKilled
+	public void	destroy(BDIAgent agent)
+	{
+		if(!tr.isFinished())
+			tr.setFailed("Recur did not occur");
+		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 	
 	/**

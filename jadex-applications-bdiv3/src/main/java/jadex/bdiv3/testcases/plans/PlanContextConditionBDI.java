@@ -1,9 +1,12 @@
-package jadex.bdiv3.testcases.semiautomatic;
+package jadex.bdiv3.testcases.plans;
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.Trigger;
@@ -13,11 +16,13 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 @Agent
+@Results(@Result(name="testresults", clazz=Testcase.class))
 public class PlanContextConditionBDI
 {
 	/** The agent. */
@@ -33,34 +38,44 @@ public class PlanContextConditionBDI
 	{
 	}
 	
+	boolean aborted = false;
+	
 	/**
 	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchTopLevelGoal(new SomeGoal()).addResultListener(new IResultListener<Object>()
-		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println("succ: "+result);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("fail: "+exception);
-//				exception.printStackTrace();
-			}
-		});
+		TestReport tr = new TestReport("#1", "Test if context condition works.");
 		
 		agent.waitFor(500, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				incCounter();
+				counter++;
+//				incCounter();
 				return IFuture.DONE;
 			}
 		});
+				
+		try
+		{
+			agent.dispatchTopLevelGoal(new SomeGoal()).get();
+		}
+		catch(Exception e)
+		{
+			if(aborted)
+			{
+				tr.setSucceeded(true);
+			}
+			else
+			{
+				tr.setFailed("Plan was not aborted due to invalid context.");
+			}
+		}
+		
+		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.killAgent();
 	}
 	
 	@Plan(trigger=@Trigger(goals=SomeGoal.class))
@@ -89,13 +104,20 @@ public class PlanContextConditionBDI
 			
 			return ret;
 		}
+		
+		@PlanAborted
+		protected void aborted()
+		{
+			aborted = true;
+			System.out.println("aborted: "+this);
+		}
 	}
 	
-	/**
-	 * 
-	 */
-	protected void incCounter()
-	{
-		counter++;
-	}
+//	/**
+//	 * 
+//	 */
+//	protected void incCounter()
+//	{
+//		counter++;
+//	}
 }

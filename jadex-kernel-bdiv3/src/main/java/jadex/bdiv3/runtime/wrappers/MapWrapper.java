@@ -98,7 +98,14 @@ public class MapWrapper<T, E> implements Map<T, E>
 		E ret = delegate.put(key, value);
 		unobserveValue(ret);
 		observeValue(value);
-		getRuleSystem().addEvent(new Event(addevent, new Tuple3<T, E, E>(key, value, ret)));
+		if(ret==null)
+		{
+			getRuleSystem().addEvent(new Event(addevent, new Tuple3<T, E, E>(key, value, ret)));
+		}
+		else
+		{
+			getRuleSystem().addEvent(new Event(changeevent, new Tuple3<T, E, E>(key, value, ret)));
+		}
 		return ret;
 	}
 

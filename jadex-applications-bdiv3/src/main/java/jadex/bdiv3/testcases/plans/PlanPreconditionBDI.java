@@ -1,5 +1,7 @@
-package jadex.bdiv3.testcases.semiautomatic;
+package jadex.bdiv3.testcases.plans;
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
@@ -9,16 +11,20 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 @Agent
+@Results(@Result(name="testresults", clazz=Testcase.class))
 public class PlanPreconditionBDI
 {
 	/** The agent. */
 	@Agent
 	protected BDIAgent agent;
+
+	protected String res = "";
 	
 	@Goal
 	protected class SomeGoal
@@ -31,18 +37,18 @@ public class PlanPreconditionBDI
 	@AgentBody
 	public void body()
 	{
-		agent.dispatchTopLevelGoal(new SomeGoal()).addResultListener(new IResultListener<Object>()
+		TestReport tr = new TestReport("#1", "Test if plan precondition works.");
+		agent.dispatchTopLevelGoal(new SomeGoal()).get();
+		if("AC".equals(res))
 		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println("succ: "+result);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		});
+			tr.setSucceeded(true);
+		}
+		else
+		{
+			tr.setFailed("Wrong plans executed: "+res);
+		}
+		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.killAgent();
 	}
 	
 	@Plan(trigger=@Trigger(goals=SomeGoal.class))
@@ -58,6 +64,7 @@ public class PlanPreconditionBDI
 		protected IFuture<Void> body()
 		{
 			System.out.println("Plan A");
+			res += "A";
 			return new Future<Void>(new PlanFailureException());
 //			return IFuture.DONE;
 		}
@@ -76,6 +83,7 @@ public class PlanPreconditionBDI
 		protected IFuture<Void> body()
 		{
 			System.out.println("Plan B");
+			res += "B";
 			return IFuture.DONE;
 		}
 	}
@@ -93,6 +101,7 @@ public class PlanPreconditionBDI
 		protected IFuture<Void> body()
 		{
 			System.out.println("Plan C");
+			res += "C";
 			return IFuture.DONE;
 		}
 	}

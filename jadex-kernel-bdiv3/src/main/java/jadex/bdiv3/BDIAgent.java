@@ -347,7 +347,9 @@ public class BDIAgent extends MicroAgent
 		
 		String belname	= gn!=null ? gn + BDIAgentInterpreter.CAPABILITY_SEPARATOR + fieldname : fieldname;
 
-		if(agent!=null)
+		// agent is not null any more due to deferred exe of init expressions but rules are
+		// available only after startBehavior
+		if(agent!=null && ((BDIAgentInterpreter)agent.getInterpreter()).isInited())
 		{
 			agent.writeField(val, belname, fieldname, obj);
 		}

@@ -1,5 +1,7 @@
-package jadex.bdiv3.testcases.semiautomatic;
+package jadex.bdiv3.testcases.plans;
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
@@ -13,14 +15,18 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 import java.util.List;
 
 /**
- *  Agent that tests plan waiting.
+ *  Agent that tests plan waiting for fact added and removed.
  */
 @Agent
+@Results(@Result(name="testresults", clazz=Testcase.class))
 @BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitPlan")))
 //@BDIConfigurations(@BDIConfiguration(name="def", initialplans=@NameValue(name="waitqueuePlan")))
 public class WaitBDI
@@ -31,12 +37,17 @@ public class WaitBDI
 	@Belief
 	protected List<String> names;
 	
+	protected TestReport[] tr = new TestReport[2];
+	
 	/**
 	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()
 	{
+		tr[0] = new TestReport("#1", "Test waitForFactAdded");
+		tr[1] = new TestReport("#2", "Test waitForFactRemoved");
+		
 		agent.waitFor(1000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -50,12 +61,36 @@ public class WaitBDI
 					{
 						System.out.println("Removing");
 						removeName("a");
+						
+						agent.waitFor(1000, new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								agent.killAgent();
+								return IFuture.DONE;
+							}
+						});
+						
 						return IFuture.DONE;
 					}
 				});
 				return IFuture.DONE;
 			}
 		});
+	}
+	
+	/**
+	 *  Called when agent is killed.
+	 */
+	@AgentKilled
+	public void	destroy(BDIAgent agent)
+	{
+		for(TestReport ter: tr)
+		{
+			if(!ter.isFinished())
+				ter.setFailed("Plan not activated");
+		}
+		agent.setResultValue("testresults", new Testcase(tr.length, tr));
 	}
 	
 	/**
@@ -98,11 +133,13 @@ public class WaitBDI
 			public void customResultAvailable(Object result)
 			{
 				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
+				tr[0].setSucceeded(true);
 				rplan.waitForFactRemoved("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
+						tr[1].setSucceeded(true);
 						ret.setResult(null);
 					}
 				});

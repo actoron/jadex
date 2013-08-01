@@ -1752,7 +1752,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		if(rplan!=null)
 		{
 			rplan.setProcessingState(PlanProcessingState.RUNNING);
-			rplan.resumecommand = null;
+			if(rplan.resumecommand!=null)
+			{
+				rplan.resumecommand.execute(Boolean.FALSE);
+				rplan.resumecommand = null;
+			}
 		}
 	}
 	
@@ -2006,6 +2010,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //				
 //		return params;
 //	}
+	
+	/**
+	 *  Get the inited.
+	 *  @return The inited.
+	 */
+	public boolean isInited()
+	{
+		return inited;
+	}
 	
 	/**
 	 * 

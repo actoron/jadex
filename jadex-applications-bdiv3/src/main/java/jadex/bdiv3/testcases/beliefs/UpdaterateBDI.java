@@ -39,6 +39,9 @@ public class UpdaterateBDI
 		
 	//-------- constructors --------
 	
+	/**
+	 *  The agent body.
+	 */
 	@AgentBody
 	public void	body(BDIAgent agent)
 	{
@@ -47,6 +50,9 @@ public class UpdaterateBDI
 		agent.killComponent();
 	}
 	
+	/**
+	 *  Called when agent is killed.
+	 */
 	@AgentKilled
 	public void	destroy(BDIAgent agent)
 	{
@@ -55,6 +61,9 @@ public class UpdaterateBDI
 	
 	//-------- plans --------
 	
+	/**
+	 *  Plan that is triggered when fact changes.
+	 */
 	@Plan(trigger=@Trigger(factchangeds={"cntbel"}))
 	public void	beliefChanged(ChangeEvent event)
 	{
