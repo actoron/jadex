@@ -1,9 +1,10 @@
 package jadex.platform.service.sensor;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
 
 //import java.lang.management.OperatingSystemMXBean;
-import com.sun.management.OperatingSystemMXBean.*;
+//import com.sun.management.OperatingSystemMXBean.*;
 
 import javax.management.MBeanServerConnection;
 
@@ -38,20 +39,33 @@ public class CPUSensorAgent
 	public void body() throws Exception
 	{
 		MBeanServerConnection mbsc = ManagementFactory.getPlatformMBeanServer();
-		final com.sun.management.OperatingSystemMXBean osb = ManagementFactory.newPlatformMXBeanProxy(mbsc, 
-			ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, com.sun.management.OperatingSystemMXBean.class);
-
+//		final com.sun.management.OperatingSystemMXBean osb = ManagementFactory.newPlatformMXBeanProxy(mbsc, 
+//			ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, com.sun.management.OperatingSystemMXBean.class);
+		
+		Class<?> cl= Class.forName("com.sun.management.OperatingSystemMXBean");
+		final Object osb = ManagementFactory.newPlatformMXBeanProxy(mbsc, 
+			ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, cl);
+		final Method m = osb.getClass().getMethod("getSystemCpuLoad", new Class[0]);
+		
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				System.out.println(osb.getSystemLoadAverage());
-				double load = osb.getSystemCpuLoad();
-				CPULoadProperty cp = (CPULoadProperty)agent.getNfProperty("cpuload");
-				cp.setLoad(load);
-				
-				System.out.println(load);
-				agent.scheduleStep(this, 5000);
+				try
+				{
+	//				System.out.println(osb.getSystemLoadAverage());
+	//				double load = osb.getSystemCpuLoad();
+					double load = ((Double)m.invoke(osb, new Object[0])).doubleValue();
+					CPULoadProperty cp = (CPULoadProperty)agent.getNfProperty("cpuload");
+					cp.setLoad(load);
+					
+					System.out.println(load);
+					agent.scheduleStep(this, 5000);
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
 				return IFuture.DONE;
 			}
 		};
