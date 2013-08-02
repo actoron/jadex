@@ -8,6 +8,7 @@ import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ICommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
@@ -25,13 +26,17 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	/** The plan. */
 	protected RPlan rplan;
 	
+	/** The resume command. */
+	protected ICommand<Boolean> rescom;
+	
 	/**
 	 *  Create a new action.
 	 */
-	public ExecutePlanStepAction(RPlan rplan)
+	public ExecutePlanStepAction(RPlan rplan, ICommand<Boolean> rescom)
 	{
 //		this.element = element;
 		this.rplan = rplan;
+		this.rescom = rescom;
 	}
 	
 	/**
@@ -93,7 +98,8 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 		
 		if(RPlan.PlanProcessingState.WAITING.equals(rplan.getProcessingState()))
 		{
-			rplan.continueAfterWait();
+			rescom.execute(null);
+//			rplan.continueAfterWait(rescom);
 		}
 		else if(RPlan.PlanLifecycleState.NEW.equals(rplan.getLifecycleState()))
 		{
@@ -131,6 +137,10 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 			{
 				RPLANS.set(null);
 			}
+		}
+		else
+		{
+			System.out.println("Plan proc state invalid: "+rplan.getProcessingState());
 		}
 		
 		return IFuture.DONE;

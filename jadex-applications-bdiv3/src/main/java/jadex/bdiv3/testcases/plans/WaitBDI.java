@@ -10,6 +10,8 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -120,55 +122,89 @@ public class WaitBDI
 		final Future<Void> ret = new Future<Void>();
 		System.out.println("plan waiting: "+rplan.getId());
 		
-//		rplan.waitForCondition(null, new String[]{ChangeEvent.FACTADDED+".names"}).addResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				System.out.println("continued");
-//			}
-//		});
+		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
 		
-		rplan.waitForFactAdded("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		rplan.waitForFactAdded("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
 				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
 				tr[0].setSucceeded(true);
-				rplan.waitForFactRemoved("names").addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
-						tr[1].setSucceeded(true);
-						ret.setResult(null);
-					}
-				});
+				lis.resultAvailable(null);
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		});
+		}));
 		
-//		rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
-//		{
-//			public void customResultAvailable(ChangeEvent result)
-//			{
-//				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
-//				rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
-//				{
-//					public void customResultAvailable(ChangeEvent result)
-//					{
-//						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
-//						ret.setResult(null);
-//					}
-//				});
-//			}
-//		});
+		rplan.waitForFactRemoved("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				System.out.println("plan continues 2: "+rplan.getId()+" "+result);
+				tr[1].setSucceeded(true);
+				lis.resultAvailable(null);
+			}
+		}));
 		
 		return ret;
 	}
+	
+//	/**
+//	 *  Plan that waits for addition and removal of a name.
+//	 */
+//	@Plan
+//	protected IFuture<Void> waitPlan(final RPlan rplan)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		System.out.println("plan waiting: "+rplan.getId());
+//		
+////		rplan.waitForCondition(null, new String[]{ChangeEvent.FACTADDED+".names"}).addResultListener(new DelegationResultListener<Void>(ret)
+////		{
+////			public void customResultAvailable(Void result)
+////			{
+////				System.out.println("continued");
+////			}
+////		});
+//		
+//		rplan.waitForFactAdded("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
+//				tr[0].setSucceeded(true);
+//				rplan.waitForFactRemoved("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
+//						tr[1].setSucceeded(true);
+//						ret.setResult(null);
+//					}
+//				}));
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				exception.printStackTrace();
+//			}
+//		}));
+//		
+////		rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
+////		{
+////			public void customResultAvailable(ChangeEvent result)
+////			{
+////				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
+////				rplan.waitForFactAddedOrRemoved("names").addResultListener(new ExceptionDelegationResultListener<ChangeEvent, Void>(ret)
+////				{
+////					public void customResultAvailable(ChangeEvent result)
+////					{
+////						System.out.println("plan continues 2: "+rplan.getId()+" "+result);
+////						ret.setResult(null);
+////					}
+////				});
+////			}
+////		});
+//		
+//		return ret;
+//	}
 	
 //	/**
 //	 *  Plan that waits with waitqueue for addition of a name.

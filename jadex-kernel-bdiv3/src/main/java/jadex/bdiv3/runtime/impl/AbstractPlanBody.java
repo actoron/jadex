@@ -2,8 +2,8 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -141,6 +141,9 @@ public abstract class AbstractPlanBody implements IPlanBody
 //				int next = rplan.getException() instanceof PlanAbortedException? 3: 2;
 				int next = exception instanceof PlanAbortedException? 3: 2;
 				
+				if(next==3)
+					System.out.println("exe abort of: "+rplan.getId());
+				
 				rplan.setException(exception);
 				internalInvokePart(agent, next)
 					.addResultListener(new IResultListener<Object>()
@@ -208,7 +211,24 @@ public abstract class AbstractPlanBody implements IPlanBody
 			
 			if(res instanceof IFuture)
 			{
-				((IFuture)res).addResultListener(new DelegationResultListener<Object>(ret));
+				IFuture<Object> fut = (IFuture<Object>)res;
+				if(!fut.isDone())
+				{
+					// When future is not done set state to (non-blocking) waiting.
+					rplan.setProcessingState(PlanProcessingState.WAITING);
+				}
+				fut.addResultListener(new IResultListener<Object>()
+				{
+					public void resultAvailable(Object result)
+					{
+						ret.setResult(result);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
 			}
 			else
 			{

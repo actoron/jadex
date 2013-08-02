@@ -347,7 +347,7 @@ public class RCapability extends RElement
 			{
 				dumpPlans();
 			}
-		}, 500, 500);
+		}, 5000, 5000);
 		
 //		IComponentStep<Void> step = new IComponentStep<Void>()
 //		{

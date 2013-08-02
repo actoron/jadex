@@ -199,8 +199,6 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						}
 					};
 					
-					
-					
 					Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);
 					sic.setResult(fut);
 				}

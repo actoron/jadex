@@ -1,9 +1,12 @@
 package jadex.bdiv3.examples.cleanerworld.cleaner;
 
+import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
@@ -35,7 +38,7 @@ public class MoveToLocationPlan
 	 */
 	public MoveToLocationPlan()
 	{
-//		getLogger().info("Created: "+this);
+//		capa.getAgent().getLogger().info("Created: "+this);
 	}
 
 	//-------- methods --------
@@ -62,6 +65,8 @@ public class MoveToLocationPlan
 		
 		if(!myloc.isNear(target))
 		{
+//			if(ExecutePlanStepAction.RPLANS.get()==null)
+//			System.out.println("before: "+ExecutePlanStepAction.RPLANS.get());
 			oneStepToTarget().addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
@@ -116,13 +121,13 @@ public class MoveToLocationPlan
 		return ret;
 	}
 	
-//	@PlanFailed
-//	@PlanAborted
-//	public void failedaborted()
-//	{
-//		System.out.println("failed+aborted: "+rplan.getId());
+	@PlanFailed
+	@PlanAborted
+	public void failedaborted()
+	{
+		System.out.println("failed+aborted: "+rplan.getId());
 //		rplan.getException().printStackTrace();
-//	}
+	}
 	
 	
 	//-------- helper methods --------

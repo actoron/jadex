@@ -2,8 +2,11 @@ package jadex.bdiv3.examples.cleanerworld.cleaner;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
+import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveMoveTo;
 import jadex.bdiv3.examples.cleanerworld.world.Location;
 import jadex.bdiv3.runtime.IPlan;
@@ -37,6 +40,7 @@ public class PatrolPlan
 	public PatrolPlan()
 	{
 //		getLogger().info("Created: "+this);
+		System.out.println("created: "+this);
 	}
 
 	//-------- methods --------
@@ -80,5 +84,13 @@ public class PatrolPlan
 		}
 		
 		return ret;
+	}
+	
+	@PlanPassed
+	@PlanFailed
+	@PlanAborted
+	public void end()
+	{
+		System.out.println("patrol end");
 	}
 }

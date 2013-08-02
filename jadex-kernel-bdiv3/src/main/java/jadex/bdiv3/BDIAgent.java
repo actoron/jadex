@@ -19,6 +19,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Implementation;
@@ -89,7 +90,7 @@ public class BDIAgent extends MicroAgent
 			throw new RuntimeException("Plan model not found for: "+plan);
 		
 		RPlan rplan = RPlan.createRPlan(mplan, plan, null, ip.getInternalAccess());
-		RPlan.executePlan(rplan, getInterpreter().getInternalAccess());
+		RPlan.executePlan(rplan, getInterpreter().getInternalAccess(), null);
 	}
 	
 	/**

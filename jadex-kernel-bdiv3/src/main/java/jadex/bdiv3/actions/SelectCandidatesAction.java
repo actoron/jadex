@@ -77,14 +77,14 @@ public class SelectCandidatesAction implements IConditionalComponentStep<Void>
 				{
 					MPlan mplan = (MPlan)cand;
 					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
-					RPlan.executePlan(rplan, ia);
+					RPlan.executePlan(rplan, ia, null);
 					ret.setResult(null);
 				}
 				else if(cand.getClass().isAnnotationPresent(Plan.class))
 				{
 					MPlan mplan = mcapa.getPlan(cand.getClass().getName());
 					RPlan rplan = RPlan.createRPlan(mplan, cand, element, ia);
-					RPlan.executePlan(rplan, ia);
+					RPlan.executePlan(rplan, ia, null);
 					ret.setResult(null);
 				}
 //				else if(cand instanceof RPlan)

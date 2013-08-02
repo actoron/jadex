@@ -28,6 +28,7 @@ import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -775,7 +776,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	//						Object val = SJavaParser.parseExpression(uexp, model.getModelInfo().getAllImports(), getClassLoader());
 					
 						RPlan rplan = RPlan.createRPlan(mplan, mplan, null, getInternalAccess());
-						RPlan.executePlan(rplan, getInternalAccess());
+						RPlan.executePlan(rplan, getInternalAccess(), null);
 					}
 				}
 			}
@@ -1412,7 +1413,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 				{
 					RPlan rplan = RPlan.createRPlan(mplan, mplan, new ChangeEvent(event), getInternalAccess());
-					RPlan.executePlan(rplan, getInternalAccess());
+					RPlan.executePlan(rplan, getInternalAccess(), null);
 					return IFuture.DONE;
 				}
 			};
@@ -1710,7 +1711,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		// Start rule system
 		inited	= true;
-//		if(getComponentIdentifier().getName().indexOf("Collector")!=-1 && getComponentIdentifier().getName().indexOf("Burner")==-1)
+//		if(getComponentIdentifier().getName().indexOf("Cleaner")!=-1)// && getComponentIdentifier().getName().indexOf("Burner")==-1)
 //			getCapability().dumpPlansPeriodically(getInternalAccess());
 //		if(getComponentIdentifier().getName().indexOf("Collector")!=-1)
 //		{
@@ -1730,15 +1731,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public void	beforeBlock()
 	{
-		testBodyAborted();
-		
 		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
+		testBodyAborted(rplan);
 		ComponentSuspendable sus = ComponentSuspendable.COMSUPS.get();
 		if(rplan!=null && sus!=null && !RPlan.PlanProcessingState.WAITING.equals(rplan.getProcessingState()))
 		{
 			Future fut = sus.getFuture();
-			final ResumeCommand<Void> rescom = rplan.new ResumeCommand<Void>(fut);
-			rplan.setResumeCommand(rescom);
+			final ResumeCommand<Void> rescom = rplan.new ResumeCommand<Void>(fut, false);
+			rplan.setProcessingState(PlanProcessingState.WAITING);
+			rplan.resumecommand = rescom;
 		}
 	}
 	
@@ -1747,8 +1748,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public void	afterBlock()
 	{
-		testBodyAborted();
 		RPlan rplan = ExecutePlanStepAction.RPLANS.get();
+		testBodyAborted(rplan);
 		if(rplan!=null)
 		{
 			rplan.setProcessingState(PlanProcessingState.RUNNING);
@@ -1763,10 +1764,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	/**
 	 * 
 	 */
-	protected void testBodyAborted()
+	protected void testBodyAborted(RPlan rplan)
 	{
 		// Throw error to exit body method of aborted plan.
-		RPlan	rplan	= ExecutePlanStepAction.RPLANS.get();
 		if(rplan!=null && rplan.aborted && rplan.getLifecycleState()==PlanLifecycleState.BODY)
 		{
 //			System.out.println("aborting after block: "+rplan);
@@ -2018,6 +2018,24 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public boolean isInited()
 	{
 		return inited;
+	}
+	
+	/**
+	 *  Create a result listener which is executed as an component step.
+	 *  @param The original listener to be called.
+	 *  @return The listener.
+	 */
+	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
+	{
+		// Must override method to ensure that plan steps are executed with planstepactions
+		if(ExecutePlanStepAction.RPLANS.get()!=null && !(listener instanceof BDIComponentResultListener))
+		{
+			return new BDIComponentResultListener(listener, this);
+		}
+		else
+		{
+			return super.createResultListener(listener);
+		}
 	}
 	
 	/**
