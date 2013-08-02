@@ -4,6 +4,7 @@ import jadex.android.commons.JadexDexClassLoader;
 import jadex.android.commons.Logger;
 import jadex.bdiv3.android.DexLoader;
 import jadex.bdiv3.android.LogClassWriter;
+import jadex.bdiv3.android.MethodSignature;
 import jadex.bdiv3.asmdex.ClassNodeWrapper;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
@@ -45,6 +46,7 @@ import org.ow2.asmdex.tree.LabelNode;
 import org.ow2.asmdex.tree.MethodInsnNode;
 import org.ow2.asmdex.tree.MethodNode;
 import org.ow2.asmdex.tree.VarInsnNode;
+import org.ow2.asmdex.util.RegisterShiftMethodAdapter;
 
 import android.util.Log;
 
@@ -129,17 +131,40 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 						{
 
 							@Override
-							public MethodVisitor visitMethod(int access, String name, String desc, String[] signature, String[] exceptions)
+							public MethodVisitor visitMethod(int access, String name, final String mDesc, final String[] signature, String[] exceptions)
 							{
-								return new MethodVisitor(api, super.visitMethod(access, name, desc, signature, exceptions))
+								MethodVisitor mv = new MethodVisitor(api, super.visitMethod(access, name, mDesc, signature, exceptions))
 								{
+									
+									private int maxStackIndex;
 
+									public void visitMaxs(int maxStack, int maxLocals) {
+										this.maxStackIndex = maxStack-1;
+										super.visitMaxs(maxStack, maxLocals);
+									};
+									
+									public void visitParameters(String[] parameters) {
+										super.visitParameters(parameters);
+									};
+									
 									@Override
 									public void visitFieldInsn(int opcode, String owner, String name, String desc, int valueRegister,
 											int objectRegister)
 									{
 										// objectRegister = reference to instance (ignored when static),
 										// valueRegister = index of value to put!
+										// Parameters are put in the last registers. So if we have 5 registers and 1 param = p0,
+										// v0,v1,v2,v3 are free and v4 = p0
+										
+										// After increasing the registers by 2, we should have 2 unused local registers:
+										String mydesc = mDesc;
+										Type[] argumentTypes = Type.getArgumentTypes(mydesc);
+										
+										int occupiedRegisters = (argumentTypes != null ? argumentTypes.length : 0) +1 ;
+										int v0 = maxStackIndex - occupiedRegisters;
+										int v1 = v0 - 1;
+										
+										
 										if (isInstancePutField(opcode) && model.getCapability().hasBelief(name)
 												&& model.getCapability().getBelief(name).isFieldBelief())
 										{
@@ -150,42 +175,35 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 												visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, "Ljadex/commons/SReflect;", "wrapValue",
 														"Ljava/lang/Object;" + desc, new int[]
 														{valueRegister});
-												visitMethodInsn(Opcodes.INSN_MOVE_RESULT_OBJECT, null, null, null, new int[]{1});
 												
-												// log:
-									 			visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "Vjava/lang/Object;", new int[]{1});
+												visitIntInsn(Opcodes.INSN_RETURN_OBJECT, valueRegister); // move result, replace given primitive value in register
+												
+												// log what is in register maxStack:
+//									 			visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{valueRegister});
 											}
 
-											 // fetch bdi agent value from field
-											//
-											// // this pop aload is necessary in
-											// inner
-											// // classes!
-											// visitInsn(Opcodes.POP);
-											// visitVarInsn(Opcodes.ALOAD, 0);
-											// super.visitFieldInsn(Opcodes.GETFIELD,
-											// iclname, "__agent",
-											// Type.getDescriptor(BDIAgent.class));
+											// move __agent to register
+											super.visitFieldInsn(Opcodes.INSN_IGET_OBJECT, iname, "__agent", Type.getDescriptor(BDIAgent.class), 0, v0);
 											
-											super.visitFieldInsn(Opcodes.INSN_IGET_OBJECT, iname, "__agent", Type.getDescriptor(BDIAgent.class), 0, 2);
+											// get field name
+											visitStringInsn(Opcodes.INSN_CONST_STRING, v1, name);
 											
-											// log:
-											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "Vjava/lang/Object;", new int[]{2});
-											
-											
-											
-											// // add field name
-											// visitLdcInsn(name);
-											// visitInsn(Opcodes.SWAP);
-											// // add this
-											// visitVarInsn(Opcodes.ALOAD, 0);
-											// visitInsn(Opcodes.SWAP);
 											//
 											// // invoke method
 											// visitMethodInsn(Opcodes.INVOKESTATIC,
 											// "jadex/bdiv3/BDIAgent",
 											// "writeField",
 											// "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
+											
+											// log:
+											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{valueRegister});
+											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{v0});
+											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{v1});
+											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{0});
+											
+											
+											super.visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, "Ljadex/bdiv3/BDIAgent;", "writeField", "VLjava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;", new int[]{valueRegister, v1, 0, v0});
+//											super.visitFieldInsn(opcode, owner, name, desc, valueRegister, objectRegister);
 										}
 										else
 										{
@@ -194,13 +212,13 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 									}
 
 								};
+								
+								return new RegisterShiftMethodAdapter(api, mv, 2);
 							}
 
 							@Override
 							public void visitInnerClass(String name, String outerName, String innerName, int access)
 							{
-								// System.out.println("vic: " + name + " " +
-								// outerName + " " + innerName + " " + access);
 								String icln = (name == null ? null : name.replace("/", "."));
 								if (!done.contains(icln))
 									todo.add(icln);
@@ -415,23 +433,23 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 						String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+iclname.replace("/", "_").replace(".", "_");
 //						System.out.println("Init method: "+name);
 						MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, name, mn.desc, mn.signature, null);
-						cn.methods.add(mnode);
+//						cn.methods.add(mnode); // TODO add method
 
-						while(l.size()>foundcon+1)
-						{
-							AbstractInsnNode	node	= l.get(foundcon+1);
-							if(isReturn(node.getOpcode()))
-							{
-								mnode.visitInsn(node.getOpcode());
-								break;
-							}
-							l.remove(node);
-							mnode.instructions.add(node);
-						}						
+//						while(l.size()>foundcon+1)
+//						{
+//							AbstractInsnNode	node	= l.get(foundcon+1);
+//							if(isReturn(node.getOpcode()))
+//							{
+//								mnode.visitInsn(node.getOpcode());
+//								break;
+//							}
+//							l.remove(node);
+//							mnode.instructions.add(node);
+//						}						
 						
 //						// Add code to store arguments in field.
 //						Type[]	args	= Type.getArgumentTypes(mn.desc); // fails
-						InsnList	init	= new InsnList();
+//						InsnList	init	= new InsnList();
 //
 						// obj param
 //						init.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -462,9 +480,9 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 //						}
 //						
 //						// Invoke method.
-						init.add(new MethodInsnNode(Opcodes.INSN_INVOKE_STATIC, "jadex/bdiv3/BDIAgent", "addInitArgs", "(Ljava/lang/Object;Ljava/lang/Class;[Ljava/lang/Class;[Ljava/lang/Object;)V", new int[]{1})); // TODO: register
+//						init.add(new MethodInsnNode(Opcodes.INSN_INVOKE_STATIC, "jadex/bdiv3/BDIAgent", "addInitArgs", "VLjava/lang/Object;Ljava/lang/Class;[Ljava/lang/Class;[Ljava/lang/Object;", new int[]{1,2,3,4})); // TODO: register
 //						
-						l.insertBefore(l.get(foundcon+1), init);
+//						l.insertBefore(l.get(foundcon+1), init);
 					}
 				} // constructor end
 			}

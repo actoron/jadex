@@ -106,6 +106,10 @@ public class SokratesBDI
 		return ret;
 	}
 	
+	private void arrayMethod(int zahl, BDIAgent[] agentArray) {
+		System.out.println("nothing");
+	}
+	
 	/**
 	 *  Create the GUI (if any).
 	 */

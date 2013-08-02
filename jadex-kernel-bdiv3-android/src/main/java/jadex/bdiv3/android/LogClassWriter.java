@@ -5,7 +5,7 @@ import org.ow2.asmdex.ApplicationVisitor;
 public class LogClassWriter
 {
 
-	public static final String LOG_CLASSNAME = "jadex.bdiv3.android.LogClassWriter";
+	public static final String LOG_CLASSNAME = "Ljadex/bdiv3/android/LogClassWriter;";
 
 	public LogClassWriter(MethodInsManager rm, ApplicationVisitor av)
 	{
