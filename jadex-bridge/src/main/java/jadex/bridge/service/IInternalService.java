@@ -1,6 +1,8 @@
 package jadex.bridge.service;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 
 /**
@@ -19,6 +21,13 @@ public interface IInternalService extends IService
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
 	public IFuture<Void>	shutdownService();
+	
+	/**
+	 *  Sets the access for the component.
+	 *  
+	 *  @param access Component access.
+	 */
+	public IFuture<Void> setComponentAccess(@Reference IInternalAccess access);
 	
 	/**
 	 *  Set the service identifier.

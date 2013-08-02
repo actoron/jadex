@@ -836,7 +836,23 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.getNfPropertyMetaInfo(name));
+						INFPropertyMetaInfo mi = interpreter.getNfPropertyMetaInfo(name);
+						if (mi == null)
+						{
+							IExternalAccess parent = adapter.getParent();
+							if (parent != null)
+							{
+								parent.getNfPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+							}
+							else
+							{
+								ret.setResult(null);
+							}
+						}
+						else
+						{
+							ret.setResult(mi);
+						}
 					}
 				});
 			}
@@ -854,7 +870,23 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.getNfPropertyMetaInfo(name));
+			INFPropertyMetaInfo mi = interpreter.getNfPropertyMetaInfo(name);
+			if (mi == null)
+			{
+				IExternalAccess parent = adapter.getParent();
+				if (parent != null)
+				{
+					parent.getNfPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+				}
+				else
+				{
+					ret.setResult(null);
+				}
+			}
+			else
+			{
+				ret.setResult(mi);
+			}
 		}
 		
 		return ret;
@@ -878,7 +910,23 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type));
+						T val = interpreter.getNonFunctionalPropertyValue(name, type);
+						if (val == null)
+						{
+							IExternalAccess parent = adapter.getParent();
+							if (parent != null)
+							{
+								parent.getNonFunctionalPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
+							}
+							else
+							{
+								ret.setResult(null);
+							}
+						}
+						else
+						{
+							ret.setResult(val);
+						}
 					}
 				});
 			}
@@ -896,7 +944,23 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type));
+			T val = interpreter.getNonFunctionalPropertyValue(name, type);
+			if (val == null)
+			{
+				IExternalAccess parent = adapter.getParent();
+				if (parent != null)
+				{
+					parent.getNonFunctionalPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
+				}
+				else
+				{
+					ret.setResult(null);
+				}
+			}
+			else
+			{
+				ret.setResult(val);
+			}
 		}
 		
 		return ret;
@@ -921,7 +985,23 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type, unit));
+						T val = interpreter.getNonFunctionalPropertyValue(name, type, unit);
+						if (val == null)
+						{
+							IExternalAccess parent = adapter.getParent();
+							if (parent != null)
+							{
+								parent.getNonFunctionalPropertyValue(name, type, unit).addResultListener(new DelegationResultListener<T>(ret));
+							}
+							else
+							{
+								ret.setResult(null);
+							}
+						}
+						else
+						{
+							ret.setResult(val);
+						}
 					}
 				});
 			}
@@ -939,7 +1019,23 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.getNonFunctionalPropertyValue(name, type, unit));
+			T val = interpreter.getNonFunctionalPropertyValue(name, type, unit);
+			if (val == null)
+			{
+				IExternalAccess parent = adapter.getParent();
+				if (parent != null)
+				{
+					parent.getNonFunctionalPropertyValue(name, type, unit).addResultListener(new DelegationResultListener<T>(ret));
+				}
+				else
+				{
+					ret.setResult(null);
+				}
+			}
+			else
+			{
+				ret.setResult(val);
+			}
 		}
 		
 		return ret;

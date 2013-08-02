@@ -1,6 +1,7 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
@@ -42,6 +43,8 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 			ALWAYSOK.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
 			ALWAYSOK.add(IInternalService.class.getMethod("startService", new Class[0]));
 			ALWAYSOK.add(IInternalService.class.getMethod("shutdownService", new Class[0]));
+			ALWAYSOK.add(IInternalService.class.getMethod("setComponentAccess", new Class[] { IInternalAccess.class }));
+			ALWAYSOK.add(IInternalService.class.getMethod("setComponentAccess", new Class[] { IInternalAccess.class }));
 			ALWAYSOK.add(IService.class.getMethod("isValid", new Class[0]));
 		}
 		catch(Exception e)

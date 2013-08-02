@@ -25,6 +25,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -529,7 +530,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	public String	getType()
 	{
 		return type;
-	}	
+	}
 	
 	/**
 	 *  Start the service.
@@ -650,6 +651,14 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 //			}
 //		});
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IInternalAccess getComponent()
+	{
+		return instance;
 	}
 	
 	/**

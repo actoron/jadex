@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
@@ -56,6 +57,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getNfPropertyMetaInfo", new Class[] { String.class }));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getNonFunctionalPropertyValue", new Class[] { String.class, Class.class }));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getNonFunctionalPropertyValue", new Class[] { String.class, Class.class, Class.class }));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("setComponentAccess", new Class[] { IInternalAccess.class }));
 		}
 		catch(Exception e)
 		{

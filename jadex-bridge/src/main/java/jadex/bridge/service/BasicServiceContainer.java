@@ -2,6 +2,7 @@ package jadex.bridge.service;
 
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
@@ -164,12 +165,18 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 					
 					if(started)
 					{
-						service.startService().addResultListener(new DelegationResultListener<Void>(ret)
+						service.setComponentAccess(getComponent()).addResultListener(new DelegationResultListener<Void>(ret)
 						{
 							public void customResultAvailable(Void result)
 							{
-								serviceStarted(service).addResultListener(new DelegationResultListener<Void>(ret));
-							}
+								service.startService().addResultListener(new DelegationResultListener<Void>(ret)
+								{
+									public void customResultAvailable(Void result)
+									{
+										serviceStarted(service).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+								});
+							};
 						});
 					}
 					else
@@ -332,25 +339,31 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		{
 			final IInternalService	is	= services.next();
 			getLogger().info("Starting service: "+is.getServiceIdentifier());
-			is.startService().addResultListener(new IResultListener<Void>()
+			is.setComponentAccess(getComponent()).addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				public void resultAvailable(Void result)
+				public void customResultAvailable(Void result)
 				{
-					getLogger().info("Started service: "+is.getServiceIdentifier());
-					serviceStarted(is).addResultListener(new DelegationResultListener<Void>(ret)
+					is.startService().addResultListener(new IResultListener<Void>()
 					{
-						public void customResultAvailable(Void result)
+						public void resultAvailable(Void result)
 						{
-							initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
+							getLogger().info("Started service: "+is.getServiceIdentifier());
+							serviceStarted(is).addResultListener(new DelegationResultListener<Void>(ret)
+							{
+								public void customResultAvailable(Void result)
+								{
+									initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
+								}
+							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setException(exception);
+//									getLogger().warning("Exception in service init : "+is.getServiceIdentifier());
+//									initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					});
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
-//					getLogger().warning("Exception in service init : "+is.getServiceIdentifier());
-//					initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -925,6 +938,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 		return handler.getInterceptors();
 	}
+	
+	/**
+	 * 
+	 */
+	public abstract IInternalAccess getComponent();
 	
 	/**
 	 * 

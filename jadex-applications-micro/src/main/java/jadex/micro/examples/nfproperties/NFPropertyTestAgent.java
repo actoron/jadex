@@ -1,22 +1,21 @@
-package jadex.micro.testcases.nfproperties;
+package jadex.micro.examples.nfproperties;
 
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.testcases.serviceimpl.IInfoService;
 
 @Agent
-@Service
-@ProvidedServices(@ProvidedService(type=ICoreDependentService.class))
-public class NFPropertyTestAgent implements ICoreDependentService
+@ProvidedServices(@ProvidedService(type=ICoreDependentService.class, implementation=@Implementation(NFPropertyTestService.class)))
+@NFProperties(@NFProperty(name="componentcores", type=CoreNumberProperty.class))
+public class NFPropertyTestAgent
 {
 	@Agent
 	protected MicroAgent agent;
@@ -35,7 +34,9 @@ public class NFPropertyTestAgent implements ICoreDependentService
 		}
 		System.out.println("Finished list of non-functional properties.");
 		
-		System.out.println("Value: " + iscds.getNonFunctionalPropertyValue("cores", Integer.class).get());
+		System.out.println("Service Value: " + iscds.getNonFunctionalPropertyValue("cores", Integer.class).get());
+		
+		System.out.println("Component Value, requested from Service: " + iscds.getNonFunctionalPropertyValue("componentcores", Integer.class).get());
 		
 		return IFuture.DONE;
 	}

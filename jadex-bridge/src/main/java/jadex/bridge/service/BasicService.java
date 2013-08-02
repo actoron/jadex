@@ -1,6 +1,7 @@
 package jadex.bridge.service;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
@@ -11,6 +12,7 @@ import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SReflect;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -42,6 +44,9 @@ public class BasicService implements IInternalService
 
 	/** The id counter. */
 	protected static long idcnt;
+	
+	/** Internal access to its component. */
+	protected IInternalAccess internalaccess;
 	
 	/** The started state. */
 	protected boolean started;
@@ -111,54 +116,25 @@ public class BasicService implements IInternalService
 			this.properties.put("componentviewer.viewerclass", guiClasses);
 		}
 		
-		if(this.getClass().isAnnotationPresent(NFProperties.class))
-		{
-			if(nfproperties==null)
-				nfproperties = new HashMap<String, INFProperty<?,?>>();
-			addNFProperties(this.getClass().getAnnotation(NFProperties.class), nfproperties);
-		}
-		if(this.getClass().isAnnotationPresent(NFProperties.class))
+		if(type.isAnnotationPresent(NFProperties.class))
 		{
 			if(nfproperties==null)
 				nfproperties = new HashMap<String, INFProperty<?,?>>();
 			addNFProperties(type.getAnnotation(NFProperties.class), nfproperties);
 		}
 		
-//		if(type.isAnnotationPresent(NFProperties.class) || this.getClass().isAnnotationPresent(NFProperties.class))
-//		{
-//			List<NFProperty> nfprops = new ArrayList<NFProperty>();
-//			NFProperties typenfprops = type.getAnnotation(NFProperties.class);
-//			if(typenfprops != null)
-//			{
-//				nfprops.addAll((Collection<? extends NFProperty>)Arrays.asList(typenfprops.value()));
-//			}
-//			Class<?> clazz = this.getClass();
-//			typenfprops = this.getClass().getAnnotation(NFProperties.class);
-//			if(typenfprops != null)
-//			{
-//				nfprops.addAll((Collection<? extends NFProperty>)Arrays.asList(typenfprops.value()));
-//			}
-//			
-//			for(NFProperty nfprop : nfprops)
-//			{
-//				clazz = nfprop.type();
-//				try
-//				{
-//					Constructor<?> con = clazz.getConstructor(String.class);
-//					INFProperty<?, ?> prop = (INFProperty<?, ?>)con.newInstance(nfprop.name());
-//					
-//					if(nfproperties == null)
-//					{
-//						nfproperties = new HashMap<String, INFProperty<?,?>>();
-//					}
-//					nfproperties.put(nfprop.name(), prop);
-//				}
-//				catch (Exception e)
-//				{
-//					e.printStackTrace();
-//				}
-//			}
-//		}
+		Class<?> sclazz = this.getClass();
+		
+		while (sclazz != null)
+		{
+			if(sclazz.isAnnotationPresent(NFProperties.class))
+			{
+				if(nfproperties==null)
+					nfproperties = new HashMap<String, INFProperty<?,?>>();
+				addNFProperties(this.getClass().getAnnotation(NFProperties.class), nfproperties);
+			}
+			sclazz = sclazz.getSuperclass();
+		}
 	}
 	
 	/**
@@ -254,7 +230,20 @@ public class BasicService implements IInternalService
 	 */
 	public IFuture<INFPropertyMetaInfo> getNfPropertyMetaInfo(String name)
 	{
-		return new Future<INFPropertyMetaInfo>(nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null);
+		Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
+		
+		INFPropertyMetaInfo mi = nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
+		
+		if (mi == null)
+		{
+			internalaccess.getExternalAccess().getNfPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+		}
+		else
+		{
+			ret.setResult(mi);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -269,13 +258,20 @@ public class BasicService implements IInternalService
 		
 		INFProperty<T, ?> prop = (INFProperty<T, ?>) (nfproperties != null? nfproperties.get(name) : null);
 		
-		try
+		if (prop != null)
 		{
-			ret.setResult(prop != null? prop.getValue(type) : null);
+			try
+			{
+				ret.setResult(prop.getValue(type));
+			}
+			catch (Exception e)
+			{
+				ret.setException(e);
+			}
 		}
-		catch (Exception e)
+		else
 		{
-			ret.setException(e);
+			internalaccess.getExternalAccess().getNonFunctionalPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
 		}
 		
 		return ret;
@@ -294,17 +290,36 @@ public class BasicService implements IInternalService
 		
 		INFProperty<T, U> prop = (INFProperty<T, U>) (nfproperties != null? nfproperties.get(name) : null);
 		
-		try
+		if (prop != null)
 		{
-			ret.setResult(prop != null? prop.getValue(type, unit) : null);
+			try
+			{
+				ret.setResult(prop != null? prop.getValue(type, unit) : null);
+			}
+			catch (Exception e)
+			{
+				ret.setException(e);
+		//			ret.setException(new ClassCastException("Requested value type (" + String.valueOf(type) + ") does not match value type (" + String.valueOf(reto.getClass()) + ") for this non-functional property: " + name));
+			}
 		}
-		catch (Exception e)
+		else
 		{
-			ret.setException(e);
-//			ret.setException(new ClassCastException("Requested value type (" + String.valueOf(type) + ") does not match value type (" + String.valueOf(reto.getClass()) + ") for this non-functional property: " + name));
+			internalaccess.getExternalAccess().getNonFunctionalPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Sets the access for the component.
+	 *  
+	 *  @param access Component access.
+	 * @return 
+	 */
+	public IFuture<Void> setComponentAccess(IInternalAccess access)
+	{
+		internalaccess = access;
+		return IFuture.DONE;
 	}
 
 	/**
