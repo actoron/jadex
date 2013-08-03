@@ -104,6 +104,7 @@ public class HelloWorld3BDI
 	protected IFuture<Void> printHello2(HelloGoal goal)
 	{
 		System.out.println("Plan body: "+goal.getText());
+		agent.killAgent();
 		return IFuture.DONE;
 	}
 }
