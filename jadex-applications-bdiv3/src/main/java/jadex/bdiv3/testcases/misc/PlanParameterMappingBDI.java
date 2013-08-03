@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.misc;
 
+import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
@@ -79,15 +80,15 @@ public class PlanParameterMappingBDI
 		String res = (String)agent.dispatchTopLevelGoal(new AGoal("hello")).get();
 		System.out.println("res: "+res);
 		
-//		TestReport	tr	= new TestReport("#1", "Test if constructor calls work.");
-//		if("[A, B, C, D]".equals(calls.toString()))
-//		{			
-//			tr.setSucceeded(true);
-//		}
-//		else
-//		{
-//			tr.setReason("Calls do not match: [A, B, C, D], "+calls.toString());
-//		}
-//		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		TestReport tr = new TestReport("#1", "Test if goal plan parameter mappings work.");
+		if("hellohello".equals(res))
+		{			
+			tr.setSucceeded(true);
+		}
+		else
+		{
+			tr.setReason("Wrong mapping, "+res);
+		}
+		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }

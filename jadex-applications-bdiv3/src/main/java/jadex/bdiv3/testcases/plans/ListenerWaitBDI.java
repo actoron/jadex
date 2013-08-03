@@ -57,10 +57,13 @@ public class ListenerWaitBDI
 			{
 				System.out.println("after cms: "+cms);
 				ret.setResult(null);
+				tr.setSucceeded(true);
+				agent.killAgent();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				agent.killAgent();
 			}
 		});
 		
@@ -82,7 +85,7 @@ public class ListenerWaitBDI
 	public void	destroy(BDIAgent agent)
 	{
 		if(!tr.isFinished())
-				tr.setFailed("Plan not activated");
+			tr.setFailed("Plan not activated");
 		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 	}
 }
