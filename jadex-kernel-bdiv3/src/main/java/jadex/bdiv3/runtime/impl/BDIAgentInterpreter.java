@@ -2020,23 +2020,23 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		return inited;
 	}
 	
-	/**
-	 *  Create a result listener which is executed as an component step.
-	 *  @param The original listener to be called.
-	 *  @return The listener.
-	 */
-	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
-	{
-		// Must override method to ensure that plan steps are executed with planstepactions
-		if(ExecutePlanStepAction.RPLANS.get()!=null && !(listener instanceof BDIComponentResultListener))
-		{
-			return new BDIComponentResultListener(listener, this);
-		}
-		else
-		{
-			return super.createResultListener(listener);
-		}
-	}
+//	/**
+//	 *  Create a result listener which is executed as an component step.
+//	 *  @param The original listener to be called.
+//	 *  @return The listener.
+//	 */
+//	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
+//	{
+//		// Must override method to ensure that plan steps are executed with planstepactions
+//		if(ExecutePlanStepAction.RPLANS.get()!=null && !(listener instanceof BDIComponentResultListener))
+//		{
+//			return new BDIComponentResultListener(listener, this);
+//		}
+//		else
+//		{
+//			return super.createResultListener(listener);
+//		}
+//	}
 	
 	/**
 	 * 
