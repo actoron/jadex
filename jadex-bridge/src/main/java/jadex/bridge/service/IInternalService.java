@@ -24,7 +24,6 @@ public interface IInternalService extends IService
 	
 	/**
 	 *  Sets the access for the component.
-	 *  
 	 *  @param access Component access.
 	 */
 	public IFuture<Void> setComponentAccess(@Reference IInternalAccess access);

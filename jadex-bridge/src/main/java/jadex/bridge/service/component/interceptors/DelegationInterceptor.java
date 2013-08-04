@@ -234,6 +234,14 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 					return IFuture.DONE;
 				}
 			});
+			ret.put(IInternalService.class.getMethod("setComponentAccess", new Class[]{IInternalAccess.class}), new AbstractApplicableInterceptor()
+			{
+				public IFuture execute(ServiceInvocationContext context)
+				{
+					context.setResult(IFuture.DONE);
+					return IFuture.DONE;
+				}
+			});
 			
 			ret.put(Object.class.getMethod("toString", new Class[0]), new AbstractApplicableInterceptor()
 			{
