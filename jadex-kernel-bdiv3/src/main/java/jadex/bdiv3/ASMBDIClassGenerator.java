@@ -119,7 +119,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
 				{
-//					System.out.println(desc+" "+methodname);
+					if(clname.indexOf("PlanPrecondition")!=-1)
+						System.out.println(desc+" "+methodname);
 					
 					return new MethodVisitor(api, super.visitMethod(access, methodname, desc, signature, exceptions))
 					{
