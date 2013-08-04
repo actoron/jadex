@@ -119,8 +119,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
 				{
-					if(clname.indexOf("PlanPrecondition")!=-1)
-						System.out.println(desc+" "+methodname);
+//					if(clname.indexOf("PlanPrecondition")!=-1)
+//						System.out.println(desc+" "+methodname);
 					
 					return new MethodVisitor(api, super.visitMethod(access, methodname, desc, signature, exceptions))
 					{
@@ -212,6 +212,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public void visitInnerClass(String name, String outerName, String innerName, int access)
 				{
+					if(clname.indexOf("PlanPrecondition")!=-1)
+						System.out.println("XYZplanprecond "+innerName);
+
 //					System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
 					String icln = name.replace("/", ".");
 					if(!done.contains(icln))
