@@ -51,7 +51,7 @@ public class PlanPreconditionBDI
 		agent.killAgent();
 	}
 	
-	@Plan(trigger=@Trigger(goals=SomeGoal.class))
+	@Plan(trigger=@Trigger(goals=SomeGoal.class), priority=2)
 	protected class PlanA
 	{
 		@PlanPrecondition
@@ -70,7 +70,7 @@ public class PlanPreconditionBDI
 		}
 	}
 	
-	@Plan(trigger=@Trigger(goals=SomeGoal.class))
+	@Plan(trigger=@Trigger(goals=SomeGoal.class), priority=1)
 	protected class PlanB
 	{
 		@PlanPrecondition
@@ -88,7 +88,7 @@ public class PlanPreconditionBDI
 		}
 	}
 	
-	@Plan(trigger=@Trigger(goals=SomeGoal.class))
+	@Plan(trigger=@Trigger(goals=SomeGoal.class), priority=0)
 	protected class PlanC
 	{
 		@PlanPrecondition
