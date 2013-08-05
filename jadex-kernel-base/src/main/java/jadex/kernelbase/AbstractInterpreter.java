@@ -20,6 +20,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -619,7 +620,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Returns the names of all non-functional properties of this service.
 	 *  @return The names of the non-functional properties of this service.
 	 */
-	public String[] getNonFunctionalPropertyNames()
+	public String[] getNFPropertyNames()
 	{
 		return nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
 	}
@@ -629,7 +630,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.
 	 */
-	public INFPropertyMetaInfo getNfPropertyMetaInfo(String name)
+	public INFPropertyMetaInfo getNFPropertyMetaInfo(String name)
 	{
 		return nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
 	}
@@ -640,10 +641,19 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public<T extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type)
+	public <T> IFuture<T> getNFPropertyValue(String name, Class<T> type)
 	{
+		Future<T> ret = new Future<T>();
 		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
-		return prop != null? prop.getValue(type) : null;
+		if(prop != null)
+		{
+			prop.getValue(type).addResultListener(new DelegationResultListener<T>(ret));
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Unknown property: "+name));
+		}
+		return ret;
 	}
 	
 	/**
@@ -653,10 +663,19 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public<T extends Object, U extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit)
+	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<T> type, Class<U> unit)
 	{
+		Future<T> ret = new Future<T>();
 		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
-		return prop != null? prop.getValue(type, unit) : null;
+		if(prop != null)
+		{
+			prop.getValue(type, unit).addResultListener(new DelegationResultListener<T>(ret));
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Unknown property: "+name));
+		}
+		return ret;
 	}
 	
 	/**

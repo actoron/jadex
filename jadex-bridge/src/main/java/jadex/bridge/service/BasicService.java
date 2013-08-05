@@ -218,7 +218,7 @@ public class BasicService implements IInternalService
 	 *  Returns the names of all non-functional properties of this service.
 	 *  @return The names of the non-functional properties of this service.
 	 */
-	public IFuture<String[]> getNonFunctionalPropertyNames()
+	public IFuture<String[]> getNFPropertyNames()
 	{
 		return new Future<String[]>(nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0]);
 	}
@@ -228,7 +228,7 @@ public class BasicService implements IInternalService
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.
 	 */
-	public IFuture<INFPropertyMetaInfo> getNfPropertyMetaInfo(String name)
+	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(String name)
 	{
 		Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
 		
@@ -236,7 +236,7 @@ public class BasicService implements IInternalService
 		
 		if (mi == null)
 		{
-			internalaccess.getExternalAccess().getNfPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
+			internalaccess.getExternalAccess().getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 		}
 		else
 		{
@@ -252,7 +252,7 @@ public class BasicService implements IInternalService
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public<T extends Object> IFuture<T> getNonFunctionalPropertyValue(String name, Class<T> type)
+	public <T> IFuture<T> getNFPropertyValue(String name, Class<T> type)
 	{
 		Future<T> ret = new Future<T>();
 		
@@ -262,7 +262,7 @@ public class BasicService implements IInternalService
 		{
 			try
 			{
-				ret.setResult(prop.getValue(type));
+				prop.getValue(type).addResultListener(new DelegationResultListener<T>(ret));
 			}
 			catch (Exception e)
 			{
@@ -271,7 +271,7 @@ public class BasicService implements IInternalService
 		}
 		else
 		{
-			internalaccess.getExternalAccess().getNonFunctionalPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
+			internalaccess.getExternalAccess().getNFPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
 		}
 		
 		return ret;
@@ -284,17 +284,17 @@ public class BasicService implements IInternalService
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public<T extends Object, U extends Object> IFuture<T> getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit)
+	public<T, U> IFuture<T> getNFPropertyValue(String name, Class<T> type, Class<U> unit)
 	{
 		Future<T> ret = new Future<T>();
 		
 		INFProperty<T, U> prop = (INFProperty<T, U>) (nfproperties != null? nfproperties.get(name) : null);
 		
-		if (prop != null)
+		if(prop != null)
 		{
 			try
 			{
-				ret.setResult(prop != null? prop.getValue(type, unit) : null);
+				prop.getValue(type, unit).addResultListener(new DelegationResultListener<T>(ret));
 			}
 			catch (Exception e)
 			{
@@ -304,10 +304,22 @@ public class BasicService implements IInternalService
 		}
 		else
 		{
-			internalaccess.getExternalAccess().getNonFunctionalPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
+			internalaccess.getExternalAccess().getNFPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Add a non-functional property.
+	 *  @param metainfo The metainfo.
+	 */
+	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop)
+	{
+		if(nfproperties==null)
+			nfproperties = new HashMap<String, INFProperty<?,?>>();
+		nfproperties.put(nfprop.getName(), nfprop);
+		return IFuture.DONE;
 	}
 	
 	/**

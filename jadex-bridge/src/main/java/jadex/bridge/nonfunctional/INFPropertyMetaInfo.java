@@ -1,5 +1,7 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.nonfunctional.INFProperty.Target;
+
 /**
  * Meta information about a non-functional property.
  */
@@ -35,4 +37,12 @@ public interface INFPropertyMetaInfo
 	 *  @return The update rate.
 	 */
 	public long getUpdateRate();
+	
+	/**
+	 *  Get the target of the property. If the target is not
+	 *  the element itself a reference will be created.
+	 *  @return The target where the nf property is declared.
+	 *  (This element will collect the data).
+	 */
+	public Target getTarget();
 }

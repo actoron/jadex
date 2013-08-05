@@ -1,5 +1,7 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.nonfunctional.INFProperty.Target;
+
 
 /**
  * Meta information about a non-functional property.
@@ -20,6 +22,9 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	
 	/** The update rate. */
 	protected long updaterate;
+	
+	/** The target. */
+	protected Target target;
 	
 	
 	/**
@@ -49,13 +54,14 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *  @param dynamic Flag if the property is dynamic.
 	 *  @param updaterate Update rate of the property.
 	 */
-	public NFPropertyMetaInfo(String name, Class<?> type, Class<?> unit, boolean dynamic, long updaterate)
+	public NFPropertyMetaInfo(String name, Class<?> type, Class<?> unit, boolean dynamic, long updaterate, Target target)
 	{
 		this.name = name;
 		this.type = type;
 		this.unit = unit;
 		this.dynamic = dynamic;
 		this.updaterate = updaterate;
+		this.target = target;
 	}
 	
 	/**
@@ -157,6 +163,22 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	{
 		this.updaterate = updaterate;
 	}
-	
-	
+
+	/**
+	 *  Get the target.
+	 *  @return The target.
+	 */
+	public Target getTarget()
+	{
+		return target==null? Target.Self: target;
+	}
+
+	/**
+	 *  Set the target.
+	 *  @param target The target to set.
+	 */
+	public void setTarget(Target target)
+	{
+		this.target = target;
+	}
 }

@@ -2,6 +2,7 @@ package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -53,11 +54,12 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("createServiceIdentifier", new Class[]{String.class, Class.class, IResourceIdentifier.class, Class.class}));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("getNonFunctionalPropertyNames", new Class[0]));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("getNfPropertyMetaInfo", new Class[] { String.class }));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("getNonFunctionalPropertyValue", new Class[] { String.class, Class.class }));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("getNonFunctionalPropertyValue", new Class[] { String.class, Class.class, Class.class }));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("setComponentAccess", new Class[] { IInternalAccess.class }));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyNames", new Class[0]));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("addNFProperty", new Class[]{INFProperty.class}));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyMetaInfo", new Class[]{String.class}));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyValue", new Class[]{String.class, Class.class}));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyValue", new Class[]{String.class, Class.class, Class.class}));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("setComponentAccess", new Class[]{IInternalAccess.class}));
 		}
 		catch(Exception e)
 		{

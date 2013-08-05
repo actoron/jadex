@@ -1,13 +1,14 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
+import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ import java.util.List;
  *  the signature INFProperty(String name) to allow the service
  *  to initialize the property during creation.
  */
-public abstract class AbstractNFProperty<T extends Object, U extends Object> implements INFProperty<T, U>
+public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 {
 	/** Name of the property. */
 	protected NFPropertyMetaInfo metainfo;
@@ -45,7 +46,7 @@ public abstract class AbstractNFProperty<T extends Object, U extends Object> imp
 	 *  @param type Type of the value.
 	 *  @return The current value of the property.
 	 */
-	public T getValue(Class<T> type)
+	public IFuture<T> getValue(Class<T> type)
 	{
 		return getValue(type, null);
 	}
@@ -62,7 +63,7 @@ public abstract class AbstractNFProperty<T extends Object, U extends Object> imp
 	/**
 	 *  Create nf properties form a class with nf annotations.
 	 */
-	public static List<INFProperty<?, ?>> readNFProperties(Class<?> type)
+	public static List<INFProperty<?, ?>> readNFProperties(Class<?> type, IInternalAccess comp)
 	{
 		List<INFProperty<?, ?>> ret = null;
 		
@@ -76,22 +77,43 @@ public abstract class AbstractNFProperty<T extends Object, U extends Object> imp
 			for(NFProperty nfprop : nfprops)
 			{
 				Class<?> clazz = nfprop.type();
-				try
-				{
-					Constructor<?> con = clazz.getConstructor(String.class);
-					INFProperty<?, ?> prop = (INFProperty<?, ?>)con.newInstance(nfprop.name());
-					
-					if(ret==null)
-						ret = new ArrayList<INFProperty<?,?>>();
-					ret.add(prop);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
+				INFProperty<?, ?> prop = createProperty(clazz, comp);
+				
+				if(ret==null)
+					ret = new ArrayList<INFProperty<?,?>>();
+				ret.add(prop);
 			}
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Create a property instance from its type.
+	 */
+	public static INFProperty<?, ?> createProperty(Class<?> clazz, IInternalAccess comp)
+	{
+		INFProperty<?, ?> prop = null;
+		try
+		{
+			Constructor<?> con = clazz.getConstructor();
+			prop = (INFProperty<?, ?>)con.newInstance();
+		}
+		catch(Exception e)
+		{
+			try
+			{
+				Constructor<?> con = clazz.getConstructor(IInternalAccess.class);
+				prop = (INFProperty<?, ?>)con.newInstance(comp);
+			}
+			catch(Exception ex)
+			{
+			}
+		}
+		
+		if(prop==null)
+			throw new RuntimeException("Property has no suitable constructor: "+clazz);
+		
+		return prop;
 	}
 }

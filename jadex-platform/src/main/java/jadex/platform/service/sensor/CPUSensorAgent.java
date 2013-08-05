@@ -21,7 +21,7 @@ import jadex.micro.annotation.AgentBody;
  * 
  */
 @Agent
-@NFProperties(@NFProperty(name="cpuload", type=CPULoadProperty.class))
+@NFProperties(@NFProperty(name="cpuload", type=CPULoadProperty.class))//, target=Target.Root))
 public class CPUSensorAgent
 {
 	/** The agent. */
@@ -56,7 +56,7 @@ public class CPUSensorAgent
 	//				System.out.println(osb.getSystemLoadAverage());
 	//				double load = osb.getSystemCpuLoad();
 					double load = ((Double)m.invoke(osb, new Object[0])).doubleValue();
-					CPULoadProperty cp = (CPULoadProperty)agent.getNfProperty("cpuload");
+					CPULoadProperty cp = (CPULoadProperty)agent.getNfProperty(CPULoadProperty.CPULOAD);
 					cp.setLoad(load);
 					
 					System.out.println(load);

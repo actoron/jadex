@@ -25,7 +25,7 @@ public class NFPropertyTestAgent
 	{
 		ICoreDependentService cds = SServiceProvider.getService(agent.getServiceProvider(), ICoreDependentService.class).get();
 		IService iscds = (IService) cds;
-		String[] names = iscds.getNonFunctionalPropertyNames().get();
+		String[] names = iscds.getNFPropertyNames().get();
 		
 		System.out.println("Begin list of non-functional properties:");
 		for (String name : names)
@@ -34,9 +34,9 @@ public class NFPropertyTestAgent
 		}
 		System.out.println("Finished list of non-functional properties.");
 		
-		System.out.println("Service Value: " + iscds.getNonFunctionalPropertyValue("cores", Integer.class).get());
+		System.out.println("Service Value: " + iscds.getNFPropertyValue("cores", Integer.class).get());
 		
-		System.out.println("Component Value, requested from Service: " + iscds.getNonFunctionalPropertyValue("componentcores", Integer.class).get());
+		System.out.println("Component Value, requested from Service: " + iscds.getNFPropertyValue("componentcores", Integer.class).get());
 		
 		return IFuture.DONE;
 	}

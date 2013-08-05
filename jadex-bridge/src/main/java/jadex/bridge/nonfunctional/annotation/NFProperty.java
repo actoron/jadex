@@ -1,5 +1,7 @@
 package jadex.bridge.nonfunctional.annotation;
 
+import jadex.bridge.nonfunctional.INFProperty;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -20,5 +22,6 @@ public @interface NFProperty
 	/**
 	 *  The type of the property.
 	 */
-	public Class<?> type();
+	public Class<? extends INFProperty> type();
+	
 }

@@ -34,6 +34,12 @@ public interface IExternalAccess extends INFPropertyProvider//extends IRemotable
 //	 */
 //	public IComponentIdentifier getParent();
 	
+//	/**
+//	 *  Get the parent access (if any).
+//	 *  @return The parent access.
+//	 */
+//	public IExternalAccess getParentAccess();
+	
 	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.

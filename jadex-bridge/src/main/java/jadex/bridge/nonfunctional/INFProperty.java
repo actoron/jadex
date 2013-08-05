@@ -1,5 +1,7 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.commons.future.IFuture;
+
 /**
  *  A non-functional property.
  *  
@@ -9,6 +11,8 @@ package jadex.bridge.nonfunctional;
  */
 public interface INFProperty<T extends Object, U extends Object>
 {
+	public static enum Target{Self, Root} // todo: support COMPONENT, Parent
+	
 	/**
 	 *  Gets the name of the property.
 	 *
@@ -29,7 +33,7 @@ public interface INFProperty<T extends Object, U extends Object>
 	 *  @param type Type of the value.
 	 *  @return The current value of the property.
 	 */
-	public T getValue(Class<T> type);
+	public IFuture<T> getValue(Class<T> type);
 	
 	/**
 	 *  Returns the current value of the property, performs unit conversion if necessary.
@@ -39,5 +43,6 @@ public interface INFProperty<T extends Object, U extends Object>
 	 *  
 	 *  @return The current value of the property.
 	 */
-	public T getValue(Class<T> type, Class<U> unit);
+	public IFuture<T> getValue(Class<T> type, Class<U> unit);
+	
 }

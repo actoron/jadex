@@ -2,6 +2,8 @@ package jadex.micro.examples.nfproperties;
 
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.util.Properties;
 
@@ -11,7 +13,7 @@ public class CoreNumberProperty extends AbstractNFProperty<Integer, Void>
 	
 	public CoreNumberProperty(String name)
 	{
-		super(new NFPropertyMetaInfo(name, int.class, null, false, -1));
+		super(new NFPropertyMetaInfo(name, int.class, null, false, -1, null));
 		cores = Runtime.getRuntime().availableProcessors();
 		
 		Properties props = System.getProperties();
@@ -22,8 +24,8 @@ public class CoreNumberProperty extends AbstractNFProperty<Integer, Void>
 		
 	}
 
-	public Integer getValue(Class<Integer> type, Class<Void> unit)
+	public IFuture<Integer> getValue(Class<Integer> type, Class<Void> unit)
 	{
-		return cores;
+		return new Future<Integer>(cores);
 	}
 }

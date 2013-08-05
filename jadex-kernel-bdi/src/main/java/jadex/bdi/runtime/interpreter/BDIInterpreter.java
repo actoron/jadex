@@ -2364,7 +2364,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  Returns the names of all non-functional properties of this service.
 	 *  @return The names of the non-functional properties of this service.
 	 */
-	public String[] getNonFunctionalPropertyNames()
+	public String[] getNFPropertyNames()
 	{
 		throw new UnsupportedOperationException();
 //		return nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
@@ -2375,7 +2375,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.
 	 */
-	public INFPropertyMetaInfo getNfPropertyMetaInfo(String name)
+	public INFPropertyMetaInfo getNFPropertyMetaInfo(String name)
 	{
 		throw new UnsupportedOperationException();
 //		return nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
@@ -2387,9 +2387,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public<T extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type)
+	public <T> IFuture<T> getNFPropertyValue(String name, Class<T> type)
 	{
-		throw new UnsupportedOperationException();
+		return new Future(new UnsupportedOperationException());
 //		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
 //		return prop != null? prop.getValue(type) : null;
 	}
@@ -2401,9 +2401,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public<T extends Object, U extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit)
+	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<T> type, Class<U> unit)
 	{
-		throw new UnsupportedOperationException();
+		return new Future(new UnsupportedOperationException());
 //		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
 //		return prop != null? prop.getValue(type, unit) : null;
 	}

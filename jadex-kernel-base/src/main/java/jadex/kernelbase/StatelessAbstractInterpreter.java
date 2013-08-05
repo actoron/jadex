@@ -19,6 +19,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.NFPropertyInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.BasicService;
@@ -1021,17 +1022,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			for(NFPropertyInfo nfprop: nfprops)
 			{
-				try
-				{
-					Class<?> clazz = nfprop.getClazz().getType(getClassLoader());
-					Constructor<?> con = clazz.getConstructor(String.class);
-					INFProperty<?, ?> nfp = (INFProperty<?, ?>)con.newInstance(nfprop.getName());
-					addNFProperty(nfp);
-				}
-				catch(Exception e)
-				{
-					throw new RuntimeException(e);
-				}
+				Class<?> clazz = nfprop.getClazz().getType(getClassLoader());
+				INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess());
+				addNFProperty(nfp);
 			}
 		}
 		
@@ -2255,14 +2248,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Returns the names of all non-functional properties of this service.
 	 *  @return The names of the non-functional properties of this service.
 	 */
-	public abstract String[] getNonFunctionalPropertyNames();
+	public abstract String[] getNFPropertyNames();
 	
 	/**
 	 *  Returns the meta information about a non-functional property of this service.
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.
 	 */
-	public abstract INFPropertyMetaInfo getNfPropertyMetaInfo(String name);
+	public abstract INFPropertyMetaInfo getNFPropertyMetaInfo(String name);
 	
 	/**
 	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
@@ -2270,7 +2263,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public abstract <T extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type);
+	public abstract <T> IFuture<T> getNFPropertyValue(String name, Class<T> type);
 	
 	/**
 	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
@@ -2279,7 +2272,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public abstract <T extends Object, U extends Object> T getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit);
+	public abstract <T, U> IFuture<T> getNFPropertyValue(String name, Class<T> type, Class<U> unit);
 	
 	/**
 	 *  Add a new nf property.
