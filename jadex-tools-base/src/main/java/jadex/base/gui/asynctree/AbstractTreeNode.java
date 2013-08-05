@@ -215,27 +215,29 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	protected void setChildren(List<? extends ITreeNode> newchildren)
 	{
-
+//		System.out.println("childs: "+getId()+" "+newchildren.size()+" "+newchildren);
+		
 		List<ITreeNode> oldcs = children != null ? new ArrayList<ITreeNode>(children) : null;
 		List<ITreeNode> newcs = newchildren != null ? new ArrayList<ITreeNode>(newchildren) : null;
 
 		assert false || checkChildren(oldcs, newcs);
 
 		searching = false;
-		if (dirty)
+		if(dirty)
 		{
 			// Restart search when nodes have been added/removed in the mean
 			// time.
 			dirty = false;
 			// System.out.println("searchChildren: "+getId());
 			searchChildren();
-		} else
+		} 
+		else
 		{
 			// System.err.println(""+model.hashCode()+" setChildren executing: "+parent+"/"+AbstractTreeNode.this+", "+children+", "+newcs);
 			boolean dorecurse = recurse;
 			recurse = false;
 
-			if (children == null)
+			if(children == null)
 				children = new ArrayList<ITreeNode>();
 
 			// New update algorithm (can cope with changing orderings)
@@ -243,19 +245,21 @@ public abstract class AbstractTreeNode implements ITreeNode
 			// Traverse through source list and remove changed nodes
 			int newidx = 0; // Pointer to target list.
 			int removed = 0; // Counter for correct tree event index
-			for (int i = 0; oldcs != null && i < oldcs.size(); i++)
+			List<ITreeNode> rems = new ArrayList<ITreeNode>();
+			for(int i = 0; oldcs != null && i < oldcs.size(); i++)
 			{
 				ITreeNode node = (ITreeNode) oldcs.get(i);
-				if (newcs != null && newidx < newcs.size() && node.equals(newcs.get(newidx)))
+				if(newcs != null && newidx < newcs.size() && node.equals(newcs.get(newidx)))
 				{
 					// Node at correct position -> move on
 					newidx++;
-				} else
+				} 
+				else
 				{
 					// Node removed or moved -> remove (moved nodes will be
 					// re-added later at correct position)
 					children.remove(node);
-					model.deregisterNode(node);
+					rems.add(node);
 					model.fireNodeRemoved(AbstractTreeNode.this, node, i - removed);
 					removed++;
 					changed = true;
@@ -263,23 +267,29 @@ public abstract class AbstractTreeNode implements ITreeNode
 			}
 
 			// Traverse through target list and add missing nodes
-			for (int i = 0; newcs != null && i < newcs.size(); i++)
+			for(int i = 0; newcs != null && i < newcs.size(); i++)
 			{
 				ITreeNode node = (ITreeNode) newcs.get(i);
 				if (i >= children.size() || !node.equals(children.get(i)))
 				{
 					children.add(i, node);
+					rems.remove(node);
 					model.addNode(node);
 					model.fireNodeAdded(AbstractTreeNode.this, node, i);
 					changed = true;
 				}
 			}
-
+			
+			// Only deregister really removed nodes
+			for(ITreeNode node: rems)
+			{
+				model.deregisterNode(node);
+			}
 		
 			if (changed)
 				model.fireNodeChanged(AbstractTreeNode.this);
 
-			if (childrenfuture != null)
+			if(childrenfuture != null)
 			{
 				childrenfuture.setResult(new ArrayList<ITreeNode>(children));
 				childrenfuture = null;

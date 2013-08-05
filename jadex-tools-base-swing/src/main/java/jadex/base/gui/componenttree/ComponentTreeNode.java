@@ -330,7 +330,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 				{
 					public int compare(IComponentDescription o1, IComponentDescription o2)
 					{
-						return o1.getName().getName().compareTo(o2.getName().getName());
+						return o1.getName().getName().toLowerCase().compareTo(o2.getName().getName().toLowerCase());
 					}
 				});
 				
@@ -407,31 +407,31 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 													});
 													
 													node.setChildren(results);
-													cont(ea);
+													cont(ea, node, results);
 												}
 												
 												public void exceptionOccurred(Exception exception)
 												{
-													cont(ea);
+													cont(ea, null, null);
 												}
 											});
 										}
 										else
 										{
-											cont(ea);
+											cont(ea, null, null);
 										}
 									}
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										cont(ea);
+										cont(ea, null, null);
 									}
 								}));
 							}
 							
-							public void cont(final IExternalAccess ea)
+							public void cont(final IExternalAccess ea, final NFPropertyContainerNode pcnode, final List<ISwingTreeNode> pcchilds)
 							{
-									SRemoteGui.getServiceInfos(ea)
+								SRemoteGui.getServiceInfos(ea)
 									.addResultListener(new SwingResultListener<Object[]>(new IResultListener<Object[]>()
 								{
 									public void resultAvailable(final Object[] res)
@@ -507,6 +507,8 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 												public void resultAvailable(List<ITreeNode> result)
 												{
 													node.setChildren(subchildren);
+													if(pcnode!=null)
+														pcnode.setChildren(pcchilds);
 												}
 												public void exceptionOccurred(Exception exception)
 												{
@@ -624,7 +626,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			{
 				final ISwingTreeNode node = getModel().getNodeOrAddZombie(desc.getName());
 //				if(desc.getName().toString().startsWith("ANDTest@"))
-//					System.out.println("Component removed0: "+desc.getName().getName()+", zombie="+(node==null));
+//				System.out.println("Component removed0: "+desc.getName().getName()+", zombie="+(node==null));
 				if(node!=null)
 				{
 					SwingUtilities.invokeLater(new Runnable()

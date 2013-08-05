@@ -61,7 +61,7 @@ public class CPUSensorAgent
 					CPULoadProperty cp = (CPULoadProperty)agent.getNfProperty(CPULoadProperty.CPULOAD);
 					cp.setLoad(load);
 					
-					System.out.println(load);
+//					System.out.println(load);
 					agent.scheduleStep(this, 5000);
 				}
 				catch(Exception e)
@@ -75,11 +75,11 @@ public class CPUSensorAgent
 		agent.scheduleStep(step, 5000);
 	}
 	
-	@AgentKilled
-	public void killed()
-	{
-		System.out.println("killed: "+agent.getComponentIdentifier());
-	}
+//	@AgentKilled
+//	public void killed()
+//	{
+//		System.out.println("killed: "+agent.getComponentIdentifier());
+//	}
 	
 //	/**
 //	 * 

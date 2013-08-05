@@ -320,9 +320,6 @@ public class AsyncSwingTreeModel extends AsyncTreeModel implements TreeModel
 		super.dispose();
 	}
 	
-	
-
-	
 	@Override
 	public ISwingTreeNode getNodeOrAddZombie(Object id)
 	{
