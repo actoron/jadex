@@ -8,6 +8,8 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -16,6 +18,7 @@ import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -26,6 +29,7 @@ import jadex.commons.gui.future.SwingResultListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -373,6 +377,52 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 							{
 	//							System.out.println("search childs: "+ea);
 								
+								ea.getNFPropertyNames().addResultListener(new SwingResultListener<String[]>(new IResultListener<String[]>()
+								{
+									public void resultAvailable(String[] names)
+									{
+										if(names!=null && names.length>0)
+										{
+											NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
+											if(cn==null)
+												cn = new NFPropertyContainerNode(ComponentTreeNode.this, getModel(), getTree());
+											children.add(0, cn);
+											final NFPropertyContainerNode node = cn;
+											
+											final List<ISwingTreeNode>	results	= new ArrayList<ISwingTreeNode>();
+											Iterator<String> it = SReflect.getIterator(names);
+											
+											createNFPropertyNodes(it, results, ea, rootea, cn).addResultListener(new IResultListener<Void>()
+											{
+												public void resultAvailable(Void result)
+												{
+													Collections.sort(results, new java.util.Comparator<ISwingTreeNode>()
+													{
+														public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+														{
+															String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
+															String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
+															return si1.compareTo(si2);
+														}
+													});
+													
+													node.setChildren(results);
+												}
+												
+												public void exceptionOccurred(Exception exception)
+												{
+												}
+											});
+											
+//													
+										}
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+									}
+								}));
+								
 								SRemoteGui.getServiceInfos(ea)
 									.addResultListener(new SwingResultListener<Object[]>(new IResultListener<Object[]>()
 								{
@@ -505,6 +555,50 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			}
 		}));
 		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> createNFPropertyNodes(final Iterator<String> names, final List<ISwingTreeNode> results, 
+		final IExternalAccess provider, final IExternalAccess rootea, final NFPropertyContainerNode cn)
+	{
+		final Future<Void> ret = new Future<Void>();
+		if(names.hasNext())
+		{
+			final String name = names.next();
+			String id = NFPropertyNode.getId(cn, name);
+			NFPropertyNode nfpn	= (NFPropertyNode)getModel().getNode(id);
+			if(nfpn==null)
+			{
+				provider.getNFPropertyMetaInfo(name).addResultListener(new SwingResultListener<INFPropertyMetaInfo>(new IResultListener<INFPropertyMetaInfo>()
+				{
+					public void resultAvailable(INFPropertyMetaInfo pmi) 
+					{
+//						NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), pmi, rootea);
+						NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), pmi, provider);
+						results.add(nfpn);
+						createNFPropertyNodes(names, results, provider, rootea, cn).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("Could not fetch nf property meta info: "+name);
+						createNFPropertyNodes(names, results, provider, rootea, cn).addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				}));
+			}
+			else
+			{
+				results.add(nfpn);
+				createNFPropertyNodes(names, results, provider, rootea, cn).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		return ret;
 	}
 	

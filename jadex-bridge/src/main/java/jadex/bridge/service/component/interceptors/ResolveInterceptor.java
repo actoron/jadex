@@ -57,8 +57,8 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyNames", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("addNFProperty", new Class[]{INFProperty.class}));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyMetaInfo", new Class[]{String.class}));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyValue", new Class[]{String.class}));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyValue", new Class[]{String.class, Class.class}));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyValue", new Class[]{String.class, Class.class, Class.class}));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("setComponentAccess", new Class[]{IInternalAccess.class}));
 		}
 		catch(Exception e)

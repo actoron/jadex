@@ -213,7 +213,7 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 * Set the children. No children should be represented as empty list to
 	 * avoid ongoing search for children.
 	 */
-	protected void setChildren(List<ITreeNode> newchildren)
+	protected void setChildren(List<? extends ITreeNode> newchildren)
 	{
 
 		List<ITreeNode> oldcs = children != null ? new ArrayList<ITreeNode>(children) : null;

@@ -154,7 +154,7 @@ public abstract class AbstractSwingTreeNode	extends AbstractTreeNode implements 
 	 *  ongoing search for children.
 	 */
 	@Override
-	protected void	setChildren(List<ITreeNode> newchildren)
+	protected void	setChildren(List<? extends ITreeNode> newchildren)
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 

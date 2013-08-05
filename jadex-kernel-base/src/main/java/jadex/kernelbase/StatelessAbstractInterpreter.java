@@ -66,7 +66,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -2263,7 +2262,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public abstract <T> IFuture<T> getNFPropertyValue(String name, Class<T> type);
+	public abstract <T> IFuture<T> getNFPropertyValue(String name);
 	
 	/**
 	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
@@ -2272,7 +2271,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public abstract <T, U> IFuture<T> getNFPropertyValue(String name, Class<T> type, Class<U> unit);
+	public abstract <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
 	
 	/**
 	 *  Add a new nf property.
@@ -2280,10 +2279,10 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public abstract void addNFProperty(INFProperty<?, ?> nfprop);
 	
-//	/**
-//	 *  Add a new nf property.
-//	 *  @param nfprop The nf property.
-//	 */
-//	public abstract void removeNFProperty(String name);
+	/**
+	 *  Add a new nf property.
+	 *  @param nfprop The nf property.
+	 */
+	public abstract void removeNFProperty(String name);
 
 }

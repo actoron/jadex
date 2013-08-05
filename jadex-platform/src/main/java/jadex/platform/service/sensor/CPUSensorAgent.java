@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 //import java.lang.management.OperatingSystemMXBean;
 //import com.sun.management.OperatingSystemMXBean.*;
 
+
 import javax.management.MBeanServerConnection;
 
 import jadex.bridge.IComponentStep;
@@ -16,6 +17,7 @@ import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 
 /**
  * 
@@ -71,6 +73,12 @@ public class CPUSensorAgent
 		};
 		
 		agent.scheduleStep(step, 5000);
+	}
+	
+	@AgentKilled
+	public void killed()
+	{
+		System.out.println("killed: "+agent.getComponentIdentifier());
 	}
 	
 //	/**

@@ -641,13 +641,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T> IFuture<T> getNFPropertyValue(String name, Class<T> type)
+	public <T> IFuture<T> getNFPropertyValue(String name)
 	{
 		Future<T> ret = new Future<T>();
 		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
 		if(prop != null)
 		{
-			prop.getValue(type).addResultListener(new DelegationResultListener<T>(ret));
+			prop.getValue().addResultListener(new DelegationResultListener<T>(ret));
 		}
 		else
 		{
@@ -663,13 +663,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<T> type, Class<U> unit)
+	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit)
 	{
 		Future<T> ret = new Future<T>();
 		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
 		if(prop != null)
 		{
-			prop.getValue(type, unit).addResultListener(new DelegationResultListener<T>(ret));
+			prop.getValue(unit).addResultListener(new DelegationResultListener<T>(ret));
 		}
 		else
 		{

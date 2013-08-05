@@ -798,10 +798,9 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	/**
 	 *  Returns the current value of a non-functional property of this service.
 	 *  @param name Name of the property.
-	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T> IFuture<T> getNFPropertyValue(final String name, final Class<T> type)
+	public <T> IFuture<T> getNFPropertyValue(final String name)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -813,7 +812,8 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run() 
 					{
-						getInterpreter().getNFPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
+						IFuture<T> fut = getInterpreter().getNFPropertyValue(name);
+						fut.addResultListener(new DelegationResultListener<T>(ret));
 					}
 				});
 			}
@@ -823,7 +823,8 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run()
 					{
-						getInterpreter().getNFPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
+						IFuture<T> fut = getInterpreter().getNFPropertyValue(name);
+						fut.addResultListener(new DelegationResultListener<T>(ret));
 //						ret.setException(e);
 					}
 				});
@@ -831,7 +832,8 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		}
 		else
 		{
-			getInterpreter().getNFPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
+			IFuture<T> fut = getInterpreter().getNFPropertyValue(name);
+			fut.addResultListener(new DelegationResultListener<T>(ret));
 		}
 		
 		return ret;
@@ -841,10 +843,9 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
 	 *  @param name Name of the property.
 	 *  @param type Type of the property value.
-	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(final String name, final Class<T> type, final Class<U> unit)
+	public <T, U> IFuture<T> getNFPropertyValue(final String name, final Class<U> unit)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -856,7 +857,8 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run() 
 					{
-						getInterpreter().getNFPropertyValue(name, type, unit).addResultListener(new DelegationResultListener<T>(ret));
+						IFuture<T> fut = getInterpreter().getNFPropertyValue(name, unit);
+						fut.addResultListener(new DelegationResultListener<T>(ret));
 					}
 				});
 			}
@@ -866,7 +868,8 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run()
 					{
-						getInterpreter().getNFPropertyValue(name, type, unit).addResultListener(new DelegationResultListener<T>(ret));
+						IFuture<T> fut = getInterpreter().getNFPropertyValue(name, unit);
+						fut.addResultListener(new DelegationResultListener<T>(ret));
 //						ret.setException(e);
 					}
 				});
@@ -874,7 +877,8 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		}
 		else
 		{
-			getInterpreter().getNFPropertyValue(name, type, unit).addResultListener(new DelegationResultListener<T>(ret));
+			IFuture<T> fut = getInterpreter().getNFPropertyValue(name, unit);
+			fut.addResultListener(new DelegationResultListener<T>(ret));
 		}
 		
 		return ret;
@@ -916,6 +920,48 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		else
 		{
 			getInterpreter().addNFProperty(nfprop);
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a non-functional property.
+	 *  @param metainfo The metainfo.
+	 */
+	public IFuture<Void> removeNFProperty(final String name)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						getInterpreter().removeNFProperty(name);
+						ret.setResult(null);
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(getInterpreter().getAgentAdapter().getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						getInterpreter().removeNFProperty(name);
+						ret.setResult(null);
+					}
+				});
+			}
+		}
+		else
+		{
+			getInterpreter().removeNFProperty(name);
 			ret.setResult(null);
 		}
 		

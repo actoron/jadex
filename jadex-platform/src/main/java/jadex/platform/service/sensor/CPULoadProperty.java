@@ -43,7 +43,7 @@ public class CPULoadProperty extends AbstractNFProperty<Double, Void>
 				{
 					public void resultAvailable(IExternalAccess root)
 					{
-						root.addNFProperty(new CPULoadPropertyRef(comp.getExternalAccess()));
+						root.addNFProperty(new CPULoadPropertyRef(comp.getExternalAccess(), root));
 					}
 				});
 			}
@@ -53,7 +53,7 @@ public class CPULoadProperty extends AbstractNFProperty<Double, Void>
 	/**
 	 *  Get the value.
 	 */
-	public IFuture<Double> getValue(Class<Double> type, Class<Void> unit)
+	public IFuture<Double> getValue(Class<Void> unit)
 	{
 		return new Future<Double>(new Double(load));
 	}

@@ -2387,7 +2387,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T> IFuture<T> getNFPropertyValue(String name, Class<T> type)
+	public <T> IFuture<T> getNFPropertyValue(String name)
 	{
 		return new Future(new UnsupportedOperationException());
 //		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
@@ -2401,7 +2401,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<T> type, Class<U> unit)
+	public <T, U> IFuture<T> getNFPropertyValue(String name,  Class<U> unit)
 	{
 		return new Future(new UnsupportedOperationException());
 //		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
@@ -2413,6 +2413,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param nfprop The nf property.
 	 */
 	public void addNFProperty(INFProperty<?, ?> nfprop)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Add a new nf property.
+	 *  @param nfprop The nf property.
+	 */
+	public void removeNFProperty(String name)
 	{
 		throw new UnsupportedOperationException();
 	}

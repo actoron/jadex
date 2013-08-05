@@ -43,12 +43,11 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 	
 	/**
 	 *  Returns the current value of the property.
-	 *  @param type Type of the value.
 	 *  @return The current value of the property.
 	 */
-	public IFuture<T> getValue(Class<T> type)
+	public IFuture<T> getValue()
 	{
-		return getValue(type, null);
+		return getValue(null);
 	}
 
 	/**

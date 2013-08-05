@@ -999,9 +999,9 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T> IFuture<T> getNonFunctionalPropertyValue(String name, Class<T> type)
+	public <T> IFuture<T> getNonFunctionalPropertyValue(String name)
 	{
-		return interpreter.getNFPropertyValue(name, type);
+		return interpreter.getNFPropertyValue(name);
 	}
 	
 	/**
@@ -1011,8 +1011,8 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T, U> IFuture<T> getNonFunctionalPropertyValue(String name, Class<T> type, Class<U> unit)
+	public <T, U> IFuture<T> getNonFunctionalPropertyValue(String name, Class<U> unit)
 	{
-		return interpreter.getNFPropertyValue(name, type, unit);
+		return interpreter.getNFPropertyValue(name, unit);
 	}
 }

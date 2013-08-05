@@ -30,7 +30,7 @@ public interface INFPropertyProvider
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T> IFuture<T> getNFPropertyValue(String name, Class<T> type);
+	public <T> IFuture<T> getNFPropertyValue(String name);
 	
 	/**
 	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
@@ -39,11 +39,17 @@ public interface INFPropertyProvider
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<T> type, Class<U> unit);
+	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
 	
 	/**
 	 *  Add a non-functional property.
-	 *  @param metainfo The metainfo.
+	 *  @param nfprop The property.
 	 */
 	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop);
+	
+	/**
+	 *  Remove a non-functional property.
+	 *  @param The name.
+	 */
+	public IFuture<Void> removeNFProperty(String name);
 }

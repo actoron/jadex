@@ -120,6 +120,7 @@ public class SRemoteGui
 			}
 		});		
 	}
+	
 	/**
 	 *  Install the remote listener.
 	 *  @param cid	The remote component id.
@@ -1310,4 +1311,5 @@ public class SRemoteGui
 			SUtil.removeSystemErrListener(this);
 		}
 	}
+	
 }

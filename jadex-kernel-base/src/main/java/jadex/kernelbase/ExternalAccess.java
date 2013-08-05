@@ -778,8 +778,8 @@ public class ExternalAccess implements IExternalAccess
 					public void run()
 					{
 						// Should be possible to get the results even if component is already terminated?!
-						ret.setResult(interpreter.getResults());
-//						ret.setException(e);
+//						ret.setResult(interpreter.getResults());
+						ret.setException(e);
 					}
 				});
 			}
@@ -818,8 +818,8 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run()
 					{
-						ret.setResult(interpreter.getNFPropertyNames());
-//						ret.setException(e);
+//						ret.setResult(interpreter.getNFPropertyNames());
+						ret.setException(e);
 					}
 				});
 			}
@@ -875,8 +875,8 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run()
 					{
-						ret.setResult(interpreter.getNFPropertyMetaInfo(name));
-//						ret.setException(e);
+//						ret.setResult(interpreter.getNFPropertyMetaInfo(name));
+						ret.setException(e);
 					}
 				});
 			}
@@ -908,10 +908,9 @@ public class ExternalAccess implements IExternalAccess
 	/**
 	 *  Returns the current value of a non-functional property of this service.
 	 *  @param name Name of the property.
-	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T> IFuture<T> getNFPropertyValue(final String name, final Class<T> type)
+	public <T> IFuture<T> getNFPropertyValue(final String name)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -923,7 +922,8 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.getNFPropertyValue(name, type).addResultListener(new IResultListener<T>()
+						IFuture<T> fut = interpreter.getNFPropertyValue(name);
+						fut.addResultListener(new IResultListener<T>()
 						{
 							public void resultAvailable(T result)
 							{
@@ -935,7 +935,8 @@ public class ExternalAccess implements IExternalAccess
 								IExternalAccess parent = adapter.getParent();
 								if (parent != null)
 								{
-									parent.getNFPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
+									IFuture<T> fut = parent.getNFPropertyValue(name);
+									fut.addResultListener(new DelegationResultListener<T>(ret));
 								}
 								else
 								{
@@ -952,15 +953,17 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run()
 					{
-						interpreter.getNFPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
-//						ret.setException(e);
+//						IFuture<T> fut = interpreter.getNFPropertyValue(name);
+//						fut.addResultListener(new DelegationResultListener<T>(ret));
+						ret.setException(e);
 					}
 				});
 			}
 		}
 		else
 		{
-			interpreter.getNFPropertyValue(name, type).addResultListener(new IResultListener<T>()
+			IFuture<T> fut = interpreter.getNFPropertyValue(name);
+			fut.addResultListener(new IResultListener<T>()
 			{
 				public void resultAvailable(T result)
 				{
@@ -972,7 +975,8 @@ public class ExternalAccess implements IExternalAccess
 					IExternalAccess parent = adapter.getParent();
 					if (parent != null)
 					{
-						parent.getNFPropertyValue(name, type).addResultListener(new DelegationResultListener<T>(ret));
+						IFuture<T> fut = parent.getNFPropertyValue(name);
+						fut.addResultListener(new DelegationResultListener<T>(ret));
 					}
 					else
 					{
@@ -992,7 +996,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(final String name, final Class<T> type, final Class<U> unit)
+	public <T, U> IFuture<T> getNFPropertyValue(final String name, final Class<U> unit)
 	{
 		final Future<T> ret = new Future<T>();
 		
@@ -1004,7 +1008,8 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.getNFPropertyValue(name, type, unit).addResultListener(new IResultListener<T>()
+						IFuture<T> fut = interpreter.getNFPropertyValue(name, unit);
+						fut.addResultListener(new IResultListener<T>()
 						{
 							public void resultAvailable(T result)
 							{
@@ -1016,7 +1021,8 @@ public class ExternalAccess implements IExternalAccess
 								IExternalAccess parent = adapter.getParent();
 								if (parent != null)
 								{
-									parent.getNFPropertyValue(name, type, unit).addResultListener(new DelegationResultListener<T>(ret));
+									IFuture<T> fut = parent.getNFPropertyValue(name, unit);
+									fut.addResultListener(new DelegationResultListener<T>(ret));
 								}
 								else
 								{
@@ -1033,15 +1039,17 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run()
 					{
-						interpreter.getNFPropertyValue(name, type, unit).addResultListener(new DelegationResultListener<T>(ret));
-//						ret.setException(e);
+//						IFuture<T> fut = interpreter.getNFPropertyValue(name, unit);
+//						fut.addResultListener(new DelegationResultListener<T>(ret));
+						ret.setException(e);
 					}
 				});
 			}
 		}
 		else
 		{
-			interpreter.getNFPropertyValue(name, type, unit).addResultListener(new IResultListener<T>()
+			IFuture<T> fut = interpreter.getNFPropertyValue(name, unit);
+			fut.addResultListener(new IResultListener<T>()
 			{
 				public void resultAvailable(T result)
 				{
@@ -1053,7 +1061,8 @@ public class ExternalAccess implements IExternalAccess
 					IExternalAccess parent = adapter.getParent();
 					if (parent != null)
 					{
-						parent.getNFPropertyValue(name, type, unit).addResultListener(new DelegationResultListener<T>(ret));
+						IFuture<T> fut = parent.getNFPropertyValue(name, unit);
+						fut.addResultListener(new DelegationResultListener<T>(ret));
 					}
 					else
 					{
@@ -1093,9 +1102,9 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run()
 					{
-						interpreter.addNFProperty(nfprop);
-						ret.setResult(null);
-//						ret.setException(e);
+//						interpreter.addNFProperty(nfprop);
+//						ret.setResult(null);
+						ret.setException(e);
 					}
 				});
 			}
@@ -1103,6 +1112,49 @@ public class ExternalAccess implements IExternalAccess
 		else
 		{
 			interpreter.addNFProperty(nfprop);
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Remove a non-functional property.
+	 *  @param The name.
+	 */
+	public IFuture<Void> removeNFProperty(final String name)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						interpreter.removeNFProperty(name);
+						ret.setResult(null);
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+//						interpreter.removeNFProperty(name);
+//						ret.setResult(null);
+						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			interpreter.removeNFProperty(name);
 			ret.setResult(null);
 		}
 		
