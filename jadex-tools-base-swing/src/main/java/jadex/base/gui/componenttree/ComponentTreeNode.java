@@ -407,23 +407,31 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 													});
 													
 													node.setChildren(results);
+													cont(ea);
 												}
 												
 												public void exceptionOccurred(Exception exception)
 												{
+													cont(ea);
 												}
 											});
-											
-//													
+										}
+										else
+										{
+											cont(ea);
 										}
 									}
 									
 									public void exceptionOccurred(Exception exception)
 									{
+										cont(ea);
 									}
 								}));
-								
-								SRemoteGui.getServiceInfos(ea)
+							}
+							
+							public void cont(final IExternalAccess ea)
+							{
+									SRemoteGui.getServiceInfos(ea)
 									.addResultListener(new SwingResultListener<Object[]>(new IResultListener<Object[]>()
 								{
 									public void resultAvailable(final Object[] res)

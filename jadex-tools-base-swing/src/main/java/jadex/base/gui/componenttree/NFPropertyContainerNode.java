@@ -5,10 +5,6 @@ import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.bridge.nonfunctional.INFPropertyProvider;
-import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 
 import java.util.List;
@@ -33,20 +29,15 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 		"service-container", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/nonfunc.png"),
 	});
 	
-	//-------- attributes --------
-	
-	/** The nf provider. */
-//	protected INFPropertyProvider nfprovider;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public NFPropertyContainerNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree)//, INFPropertyProvider nfprovider)
+	public NFPropertyContainerNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree)
 	{
 		super(parent, model, tree);
-//		this.nfprovider = nfprovider;
 		model.registerNode(this);
 	}
 	
@@ -57,7 +48,6 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	 */
 	public Object getId()
 	{
-//		return ((ComponentTreeNode)getParent()).getDescription().getName().getName()+toString();
 		return getParent().getId()+NAME;
 	}
 	
