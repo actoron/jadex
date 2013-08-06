@@ -19,7 +19,7 @@ public class LogClassWriter
 	}
 	
 	public static void log(Object o) {
-		System.out.println(o.toString());
+		System.out.println(o == null ? "null" : o.toString());
 	}
 
 }

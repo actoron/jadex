@@ -137,7 +137,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 								{
 									
 									private int maxStackIndex;
-
+									// stack will be shifted by 2
 									public void visitMaxs(int maxStack, int maxLocals) {
 										this.maxStackIndex = maxStack-1;
 										super.visitMaxs(maxStack, maxLocals);
@@ -161,8 +161,8 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 										Type[] argumentTypes = Type.getArgumentTypes(mydesc);
 										
 										int occupiedRegisters = (argumentTypes != null ? argumentTypes.length : 0) +1 ;
-										int v0 = maxStackIndex - occupiedRegisters;
-										int v1 = v0 - 1;
+										int v0 = 0;
+										int v1 = 1;
 										
 										
 										if (isInstancePutField(opcode) && model.getCapability().hasBelief(name)
@@ -176,33 +176,30 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 														"Ljava/lang/Object;" + desc, new int[]
 														{valueRegister});
 												
-												visitIntInsn(Opcodes.INSN_RETURN_OBJECT, valueRegister); // move result, replace given primitive value in register
+												// valueRegister = wrapped primitive parameter
+												visitIntInsn(Opcodes.INSN_MOVE_RESULT_OBJECT, valueRegister); // move result, replace given primitive value in register
 												
-												// log what is in register maxStack:
 //									 			visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{valueRegister});
 											}
 
-											// move __agent to register
-											super.visitFieldInsn(Opcodes.INSN_IGET_OBJECT, iname, "__agent", Type.getDescriptor(BDIAgent.class), 0, v0);
+											// v0 = __agent
+											super.visitFieldInsn(Opcodes.INSN_IGET_OBJECT, iname, "__agent", Type.getDescriptor(BDIAgent.class), v0, objectRegister);
 											
-											// get field name
+											// v1 = field name
 											visitStringInsn(Opcodes.INSN_CONST_STRING, v1, name);
 											
-											//
-											// // invoke method
-											// visitMethodInsn(Opcodes.INVOKESTATIC,
-											// "jadex/bdiv3/BDIAgent",
-											// "writeField",
-											// "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
-											
-											// log:
+											// log everything:
 											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{valueRegister});
 											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{v0});
 											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{v1});
-											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{0});
+											visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, LogClassWriter.LOG_CLASSNAME, "log", "VLjava/lang/Object;", new int[]{objectRegister});
 											
+											// objectRegister = reference to instance (ignored when static),
+											// valueRegister = wrapped primitive parameter
+											// v0 = __agent
+											// v1 = field name
 											
-											super.visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, "Ljadex/bdiv3/BDIAgent;", "writeField", "VLjava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;", new int[]{valueRegister, v1, 0, v0});
+											super.visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, "Ljadex/bdiv3/BDIAgent;", "writeField", "VLjava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;", new int[]{valueRegister, v1, objectRegister, v0});
 //											super.visitFieldInsn(opcode, owner, name, desc, valueRegister, objectRegister);
 										}
 										else
