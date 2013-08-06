@@ -12,6 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.IServiceIdentifier;
@@ -52,10 +53,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.Tuple2Future;
 import jadex.kernelbase.IBootstrapFactory;
 
 import java.util.ArrayList;
@@ -290,6 +290,54 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(String model, CreationInfo info)
+	{
+		return createComponent(null, model, info);
+	}
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  @param name The component name or null for automatic generation.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(String name, String model, CreationInfo info)
+	{
+		final Tuple2Future<IComponentIdentifier, Map<String, Object>> ret = new Tuple2Future<IComponentIdentifier, Map<String,Object>>();
+		createComponent(name, model, info, new IResultListener<Collection<Tuple2<String,Object>>>()
+		{
+			public void resultAvailable(Collection<jadex.commons.Tuple2<String,Object>> result) 
+			{
+				ret.setSecondResult(Argument.convertArguments(result));
+			}
+			
+			public void exceptionOccurred(Exception exception) 
+			{
+				ret.setExceptionIfUndone(exception);
+			}
+		}).addResultListener(new IResultListener<IComponentIdentifier>()
+		{
+			public void resultAvailable(IComponentIdentifier result)
+			{
+				ret.setFirstResult(result);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setExceptionIfUndone(exception);
+			}
+		});
+		return ret;
+	}
+	
 	
 	/**
 	 *  Create a new component on the platform.

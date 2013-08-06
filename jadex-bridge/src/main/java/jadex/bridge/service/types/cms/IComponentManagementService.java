@@ -11,6 +11,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITuple2Future;
 
 import java.util.Collection;
 import java.util.Map;
@@ -32,15 +33,33 @@ public interface IComponentManagementService //extends IService
 
 	/**
 	 *  Create a new component on the platform.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(String model, CreationInfo info);
+
+	/**
+	 *  Create a new component on the platform.
+	 *  @param name The component name or null for automatic generation.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The id of the component and the results after the component has been killed.
+	 */
+	public ITuple2Future<IComponentIdentifier, Map<String, Object>> createComponent(String name, String model, CreationInfo info);
+	
+	/**
+	 *  Create a new component on the platform.
 	 *  @param name The component name or null for automatic generation.
 	 *  @param model The model identifier (e.g. file name).
 	 *  @param info Additional start information such as parent component or arguments (optional).
 	 *  @param resultlistener The result listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 *  @return The id of the component as future result, when the component has been created and initialized.
+	 *  @deprecated Use other createComponent methods.
 	 */
 	public IFuture<IComponentIdentifier> createComponent(String name, String model, CreationInfo info, 
 		IResultListener<Collection<Tuple2<String, Object>>> resultlistener);
-		
+	
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param componentid	The component to destroy.

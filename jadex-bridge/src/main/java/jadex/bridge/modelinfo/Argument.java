@@ -115,7 +115,7 @@ public class Argument	extends UnparsedExpression	implements IArgument
 	public static Map<String, Object> convertArguments(Collection<Tuple2<String, Object>> results)
 	{
 		Map<String, Object> ret = new HashMap<String, Object>();
-		
+
 		for(Iterator<Tuple2<String, Object>> it=results.iterator(); it.hasNext(); )
 		{
 			Tuple2<String, Object> tup = it.next();

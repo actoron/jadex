@@ -1,18 +1,16 @@
 package jadex.micro.testcases;
 
-import java.util.Collection;
-
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.modelinfo.Argument;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.Tuple2;
+import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITuple2Future;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -21,6 +19,8 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+
+import java.util.Map;
 
 /**
  *  Test if result back transfer from injected fields works.
@@ -52,13 +52,18 @@ public class TestInjectedResultsAgent
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(null, "jadex/micro/testcases/InjectedResultsAgent.class", 
-					new CreationInfo(agent.getComponentIdentifier()), agent.createResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
+				ITuple2Future<IComponentIdentifier, Map<String, Object>> fut = cms.createComponent(InjectedResultsAgent.class.getName()+".class", 
+					new CreationInfo(agent.getComponentIdentifier()));
+				fut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 				{
-					public void resultAvailable(Collection<Tuple2<String, Object>> results)
+					public void firstResultAvailable(IComponentIdentifier result)
 					{
-						Object myres = Argument.getResult(results, "myres");
-						Object myint = Argument.getResult(results, "myint");
+					}
+					
+					public void secondResultAvailable(Map<String, Object> result)
+					{
+						Object myres = result.get("myres");
+						Object myint = result.get("myint");
 						
 						if("def_val".equals(myres) && new Integer(99).equals(myint))
 						{
@@ -79,7 +84,35 @@ public class TestInjectedResultsAgent
 						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 						ret.setResult(null);
 					}
-				}));
+				});
+				
+//				, agent.createResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
+//				{
+//					public void resultAvailable(Collection<Tuple2<String, Object>> results)
+//					{
+//						Object myres = Argument.getResult(results, "myres");
+//						Object myint = Argument.getResult(results, "myint");
+//						
+//						if("def_val".equals(myres) && new Integer(99).equals(myint))
+//						{
+//							tr.setSucceeded(true);
+//						}
+//						else
+//						{
+//							tr.setFailed("Wrong result values: myres="+myres+", myint="+myint);
+//						}
+//						
+//						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+//						ret.setResult(null);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						tr.setFailed("Exception occurred: "+exception);
+//						agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+//						ret.setResult(null);
+//					}
+//				}));
 			}
 		});
 		
