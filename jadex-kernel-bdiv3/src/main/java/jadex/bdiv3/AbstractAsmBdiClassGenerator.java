@@ -22,7 +22,8 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	
 //	protected abstract void transformArrayStores(IMethodNode[] mths, BDIModel model, String iclname);
 	
-	protected boolean isAgentClass(IClassNode classNode) {
+	protected boolean isAgentClass(IClassNode classNode) 
+	{
 		boolean result = false;
 		List<IAnnotationNode> visibleAnnotations = classNode.getVisibleAnnotations();
 		if(visibleAnnotations!=null)
@@ -31,6 +32,24 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			{
 				if("Ljadex/micro/annotation/Agent;".equals(an.getDescription())
 					|| "Ljadex/bdiv3/annotation/Capability;".equals(an.getDescription()))
+				{
+					result	= true;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	protected boolean isPlanClass(IClassNode classNode) 
+	{
+		boolean result = false;
+		List<IAnnotationNode> visibleAnnotations = classNode.getVisibleAnnotations();
+		if(visibleAnnotations!=null)
+		{
+			for(IAnnotationNode an: visibleAnnotations)
+			{
+				if("Ljadex/bdiv3/annotation/Plan;".equals(an.getDescription()))
 				{
 					result	= true;
 					break;

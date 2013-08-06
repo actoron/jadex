@@ -40,6 +40,7 @@ import org.kohsuke.asm4.tree.InsnList;
 import org.kohsuke.asm4.tree.InsnNode;
 import org.kohsuke.asm4.tree.LabelNode;
 import org.kohsuke.asm4.tree.LdcInsnNode;
+import org.kohsuke.asm4.tree.LineNumberNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
 import org.kohsuke.asm4.tree.MethodNode;
 import org.kohsuke.asm4.tree.TypeInsnNode;
@@ -212,9 +213,6 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public void visitInnerClass(String name, String outerName, String innerName, int access)
 				{
-					if(clname.indexOf("PlanPrecondition")!=-1)
-						System.out.println("XYZplanprecond "+innerName);
-
 //					System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
 					String icln = name.replace("/", ".");
 					if(!done.contains(icln))
@@ -240,6 +238,10 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //				TraceClassVisitor tcv2 = new TraceClassVisitor(cv, new PrintWriter(System.out));
 //				TraceClassVisitor tcv3 = new TraceClassVisitor(null, new PrintWriter(System.out));
 //				cr.accept(tcv2, 0);
+				
+//				if(clname.indexOf("PlanPrecondition")!=-1)
+//					System.out.println("XYZplanprecond "+clname);
+				
 				cr.accept(cv, 0);
 				transformClassNode(cn, iclname, model);
 				cn.accept(cw);
@@ -307,12 +309,36 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	{
 		// Some transformations are only applied to the agent class and not its inner classes.
 		boolean	agentclass	= isAgentClass(ClassNodeWrapper.wrap(cn));
+		boolean	planclass	= isPlanClass(ClassNodeWrapper.wrap(cn));
 		
 		final String iclname = clname.replace(".", "/");
 				
 		// Check method for array store access of beliefs and replace with static method call
 		MethodNode[] mths = cn.methods.toArray(new MethodNode[0]);
 		transformArrayStores(mths, model, iclname);
+		
+		if(planclass)
+		{
+			for(MethodNode mn: mths)
+			{
+				if(mn.name.equals("<init>"))
+				{
+					InsnList l = mn.instructions;
+					
+					for(int i=0; i<l.size(); i++)
+					{
+						AbstractInsnNode n = l.get(i);
+						
+						if(n instanceof LineNumberNode)
+						{
+							LineNumberNode lnn = (LineNumberNode)n;
+							System.out.println("Line is: "+clname+" "+lnn.line);
+							break;
+						}
+					}
+				}
+			}
+		}
 		
 		if(agentclass)
 		{
@@ -355,6 +381,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 					InsnList l = mn.instructions;
 					LabelNode begin = null;
 					int foundcon = -1;
+					boolean firstln = true;
 					
 					for(int i=0; i<l.size(); i++)
 					{
@@ -848,11 +875,11 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		System.out.println(int.class.getName());
 		
 //		Method m = SReflect.getMethods(BDIAgent.class, "writeArrayField")[0];
-		Method[] ms = SReflect.getMethods(SReflect.class, "wrapValue");
-		for(Method m: ms)
-		{
-			System.out.println(m.toString()+" "+Type.getMethodDescriptor(m));
-		}
+//		Method[] ms = SReflect.getMethods(SReflect.class, "wrapValue");
+//		for(Method m: ms)
+//		{
+//			System.out.println(m.toString()+" "+Type.getMethodDescriptor(m));
+//		}
 				
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 //		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));
