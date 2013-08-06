@@ -26,10 +26,10 @@ public class AAgent extends MicroAgent implements IAService
 	/**
 	 *  Init service method.
 	 */
-	public IFuture test()
+	public IFuture<Void> test()
 	{
 		String reason = getComponentAdapter().isExternalThread()? "Wrong thread: "+Thread.currentThread(): null;
-		List tests = new ArrayList();
+		List<TestReport> tests = new ArrayList<TestReport>();
 		tests.add(new TestReport("#A1", "Test if service is called on component thread.", !getComponentAdapter().isExternalThread(), reason));
 		setResultValue("testcases", tests);
 		

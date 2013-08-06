@@ -55,66 +55,54 @@ public class DependendServicesAgent extends MicroAgent
     /**
      *  Init code.
      */
-    public IFuture agentCreated()
+    public IFuture<Void> agentCreated()
     {
-        final Future ret = new Future();
-        getChildrenAccesses().addResultListener(createResultListener(new DefaultResultListener()
+        final Future<Void> ret = new Future<Void>();
+        getChildrenAccesses().addResultListener(createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
         {
-            public void resultAvailable(Object result)
+            public void resultAvailable(Collection<IExternalAccess> result)
             {
-            	IExternalAccess[] childs = (IExternalAccess[])((Collection)result).toArray(new IExternalAccess[0]);
+            	IExternalAccess[] childs = (IExternalAccess[])result.toArray(new IExternalAccess[0]);
 //   			System.out.println("childs: "+SUtil.arrayToString(childs));
-                final CollectionResultListener lis = new CollectionResultListener(childs.length, true, new DefaultResultListener()
+                final CollectionResultListener<Collection<TestReport>> lis = new CollectionResultListener<Collection<TestReport>>(childs.length, true, 
+                	createResultListener(new DefaultResultListener<Collection<Collection<TestReport>>>()
                 {
-                    public void resultAvailable(Object result)
+                    public void resultAvailable(Collection<Collection<TestReport>> result)
                     {
 //						System.out.println("fini: "+result);
-						List tests = new ArrayList();
-						Collection col = (Collection)result;
-						for(Iterator it=col.iterator(); it.hasNext(); )
+						List<TestReport> tests = new ArrayList<TestReport>();
+//						Collection<TestReport> col = (Collection<TestReport>)result;
+						for(Iterator<Collection<TestReport>> it=result.iterator(); it.hasNext(); )
 						{
-							Collection tmp = (Collection)it.next();
+							Collection<TestReport> tmp = (Collection<TestReport>)it.next();
 							tests.addAll(tmp);
 						}
 						setResultValue("testresults", new Testcase(tests.size(), (TestReport[])tests.toArray(new TestReport[tests.size()])));
 						
 						killAgent();
                     }
-                });
+                }));
 
                 for(int i=0; i<childs.length; i++)
                 {
                     final IExternalAccess child = childs[i];
-//                    child.addComponentListener(new TerminationAdapter()
-//                    {
-//                        public void componentTerminated()
-//                        {
-//                            child.getResults().addResultListener(createResultListener(new DefaultResultListener()
-//                            {
-//                                public void resultAvailable(Object result)
-//                                {
-////                                  System.out.println("del: "+child.getComponentIdentifier()+" "+result);
-//                                    Map res = (Map)result;
-//                                    List tests = (List)res.get("testcases");
-//                                    lis.resultAvailable(tests);
-//                                }
-//                            }));
-//                        }
-//                    });
-                    
                     child.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
 						.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 					{
 						public void intermediateResultAvailable(IMonitoringEvent result)
 						{
-							child.getResults().addResultListener(createResultListener(new DefaultResultListener()
+							child.getResults().addResultListener(createResultListener(new IResultListener<Map<String, Object>>()
                             {
-                                public void resultAvailable(Object result)
+                                public void resultAvailable(Map<String, Object> res)
                                 {
 //                                  System.out.println("del: "+child.getComponentIdentifier()+" "+result);
-                                    Map res = (Map)result;
-                                    List tests = (List)res.get("testcases");
+//                                    Map res = (Map)result;
+                                    List<TestReport> tests = (List<TestReport>)res.get("testcases");
                                     lis.resultAvailable(tests);
+                                }
+                                public void exceptionOccurred(Exception exception)
+                                {
+                                	lis.exceptionOccurred(exception);
                                 }
                             }));
 						}
@@ -131,11 +119,11 @@ public class DependendServicesAgent extends MicroAgent
      */
     public IFuture<Void> executeBody()
     {
-        getChildrenAccesses().addResultListener(createResultListener(new DefaultResultListener()
+        getChildrenAccesses().addResultListener(createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
         {
-            public void resultAvailable(Object result)
+            public void resultAvailable(Collection<IExternalAccess> result)
             {
-                IExternalAccess[] childs = (IExternalAccess[])((Collection)result).toArray(new IExternalAccess[0]);
+                IExternalAccess[] childs = (IExternalAccess[])result.toArray(new IExternalAccess[0]);
                 for(int i=0; i<childs.length; i++)
                 {
                     childs[i].killComponent();

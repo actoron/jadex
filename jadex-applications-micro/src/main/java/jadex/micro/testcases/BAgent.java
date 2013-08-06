@@ -35,24 +35,24 @@ public class BAgent extends MicroAgent implements IBService
 	 *  Init service method.
 	 */
 	@ServiceStart
-	public IFuture start()
+	public IFuture<Void> start()
 	{
-		final List tests = new ArrayList();
+		final List<TestReport> tests = new ArrayList<TestReport>();
 
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		access.getServiceContainer().searchService(IAService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener()
+			.addResultListener(new IResultListener<IAService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IAService ser)
 			{
 //				System.out.println("found service");
-				final IAService ser = (IAService)result;
+//				final IAService ser = (IAService)result;
 				String reason = getComponentAdapter().isExternalThread()? "Wrong thread: "+Thread.currentThread(): null;
 				tests.add(new TestReport("#B1", "Test if service could be found in init.", !getComponentAdapter().isExternalThread(), reason));
 
-				ser.test().addResultListener(new IResultListener()
+				ser.test().addResultListener(new IResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
 						String reason = getComponentAdapter().isExternalThread()? "Wrong thread: "+Thread.currentThread(): null;
 						tests.add(new TestReport("#B2", "Test if comes back on component thread.", !getComponentAdapter().isExternalThread(), reason));

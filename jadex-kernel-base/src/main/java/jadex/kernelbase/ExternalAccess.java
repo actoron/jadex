@@ -778,8 +778,8 @@ public class ExternalAccess implements IExternalAccess
 					public void run()
 					{
 						// Should be possible to get the results even if component is already terminated?!
-//						ret.setResult(interpreter.getResults());
-						ret.setException(e);
+						ret.setResult(interpreter.getResults());
+//						ret.setException(e);
 					}
 				});
 			}
