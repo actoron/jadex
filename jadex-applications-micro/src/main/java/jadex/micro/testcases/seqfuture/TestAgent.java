@@ -1,6 +1,8 @@
 package jadex.micro.testcases.seqfuture;
 
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.future.ISequenceFuture;
+import jadex.commons.future.SequenceFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;

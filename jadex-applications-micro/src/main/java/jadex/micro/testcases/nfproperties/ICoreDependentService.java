@@ -1,4 +1,4 @@
-package jadex.micro.examples.nfproperties;
+package jadex.micro.testcases.nfproperties;
 
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;

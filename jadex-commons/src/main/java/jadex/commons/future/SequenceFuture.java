@@ -1,7 +1,5 @@
-package jadex.micro.testcases.seqfuture;
+package jadex.commons.future;
 
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IntermediateFuture;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -47,7 +45,14 @@ public class SequenceFuture<E,F> extends IntermediateFuture<Object> implements I
      */
     public E getFirstResult()
     {
-    	return (E)getNextIntermediateResult();
+    	if(results!=null && results.size()>0)
+    	{
+    		return (E)results.iterator().next();
+    	}
+    	else
+    	{
+    		return (E)getNextIntermediateResult();
+    	}
     }
     
     /**
@@ -57,7 +62,18 @@ public class SequenceFuture<E,F> extends IntermediateFuture<Object> implements I
      */
     public F getSecondResult()
     {
-    	return (F)getNextIntermediateResult();
+    	if(results!=null && results.size()>1)
+    	{
+    		Iterator<Object> it = results.iterator(); 
+    		it.next();
+    		return (F)it.next();
+    	}
+    	else
+    	{
+    		if(results==null || results.size()==0)
+    			getNextIntermediateResult();
+    		return (F)getNextIntermediateResult();
+    	}
     }
 	
 	/**

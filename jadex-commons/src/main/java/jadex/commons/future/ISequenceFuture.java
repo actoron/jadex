@@ -1,6 +1,5 @@
-package jadex.micro.testcases.seqfuture;
+package jadex.commons.future;
 
-import jadex.commons.future.IIntermediateFuture;
 
 import java.util.NoSuchElementException;
 

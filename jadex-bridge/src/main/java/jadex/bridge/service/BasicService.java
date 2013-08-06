@@ -3,6 +3,7 @@ package jadex.bridge.service;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
@@ -145,19 +146,21 @@ public class BasicService implements IInternalService
 		for(NFProperty nfprop : nfprops.value())
 		{
 			Class<?> clazz = nfprop.type();
-			try
-			{
-				Constructor<?> con = clazz.getConstructor(String.class);
-				INFProperty<?, ?> prop = (INFProperty<?, ?>)con.newInstance(nfprop.name());
-				
-				if(nfps == null)
-					nfps = new HashMap<String, INFProperty<?,?>>();
-				nfps.put(nfprop.name(), prop);
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
+			
+			AbstractNFProperty.createProperty(clazz, internalaccess);
+//			try
+//			{
+//				Constructor<?> con = clazz.getConstructor(String.class);
+//				INFProperty<?, ?> prop = (INFProperty<?, ?>)con.newInstance(nfprop.name());
+//				
+//				if(nfps == null)
+//					nfps = new HashMap<String, INFProperty<?,?>>();
+//				nfps.put(nfprop.name(), prop);
+//			}
+//			catch(Exception e)
+//			{
+//				throw new RuntimeException(e);
+//			}
 		}
 	}
 	

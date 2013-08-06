@@ -9,6 +9,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISequenceFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -16,6 +17,7 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.PullIntermediateDelegationFuture;
 import jadex.commons.future.PullSubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.SequenceFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableDelegationResultListener;
@@ -24,6 +26,8 @@ import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.util.Collection;
 import java.util.logging.Logger;
+
+import org.omg.CORBA.DynAnyPackage.InvalidSeq;
 
 /**
  *  Default future functionality.
@@ -195,6 +199,10 @@ public class FutureFunctionality
 	{
 		Future ret = null;
 		
+//		if(orig instanceof ISequenceFuture)
+//		{
+//			Sequence
+//		}
 		if(orig instanceof IPullSubscriptionIntermediateFuture)
 		{
 			PullSubscriptionIntermediateDelegationFuture<Object> fut = new DelegatingPullSubscriptionIntermediateDelegationFuture((IPullSubscriptionIntermediateFuture)orig, func);
@@ -1704,5 +1712,189 @@ class DelegatingFuture extends Future<Object>
 			}
 		});
 	}
+};
+
+/**
+ * 
+ */
+class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
+{
+	/** The future functionality. */
+	protected FutureFunctionality func;
+	
+	/**
+	 * 
+	 */
+	public DelegatingSequenceFuture(FutureFunctionality func)
+	{
+		if(func==null)
+			throw new IllegalArgumentException("Func must not null.");
+		this.func = func;
+	}
+	
+	/**
+	 * 
+	 */
+	public void	setResult(Collection<Object> result)
+	{
+		try
+		{
+			Collection<Object> res = (Collection<Object>)func.setResult(result);
+			DelegatingSequenceFuture.super.setResult(res);
+		}
+		catch(Exception e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean	setResultIfUndone(Collection<Object> result)
+	{
+		boolean ret = false;
+		
+		try
+		{
+			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
+			ret = DelegatingSequenceFuture.super.setResultIfUndone(res);
+		}
+		catch(Exception e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public void addIntermediateResult(Object result)
+	{
+		try
+		{
+			Object res = func.addIntermediateResult(result);
+			DelegatingSequenceFuture.super.addIntermediateResult(res);
+		}
+		catch(RuntimeException e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean addIntermediateResultIfUndone(Object result)
+	{
+		boolean ret = false;
+		
+		try
+		{
+			Object res = func.addIntermediateResultIfUndone(result);
+			ret = DelegatingSequenceFuture.super.addIntermediateResultIfUndone(res);
+		}
+		catch(Exception e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+		
+		return ret;
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public void setFinished()
+	{
+		try
+		{
+			func.setFinished((Collection<Object>)getIntermediateResults());
+			DelegatingSequenceFuture.super.setFinished();
+		}
+		catch(Exception e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean setFinishedIfUndone()
+	{
+		boolean ret = false;
+		
+		try
+		{
+			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
+			ret = DelegatingSequenceFuture.super.setFinishedIfUndone();
+		}
+		catch(Exception e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public void setException(Exception exception)
+	{
+		try
+		{
+			Exception ex = func.setException(exception);
+			DelegatingSequenceFuture.super.setException(ex);
+		}
+		catch(Exception e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean setExceptionIfUndone(Exception exception)
+	{
+		boolean ret = false;
+		
+		try
+		{
+			func.setExceptionIfUndone(exception);
+			ret = DelegatingSequenceFuture.super.setExceptionIfUndone(exception);
+		}
+		catch(Exception e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+     *  Start scheduled listener notifications if not already running.
+     *  Must not be called from synchronized block.
+     */
+    protected void startScheduledNotifications()
+    {
+    	func.startScheduledNotifications(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				DelegatingSequenceFuture.super.startScheduledNotifications();
+			}
+	
+			public void exceptionOccurred(Exception exception)
+			{
+				DelegatingSequenceFuture.super.setExceptionIfUndone(exception);
+			}
+		});
+    }
 };
 
