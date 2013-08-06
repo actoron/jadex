@@ -4,9 +4,11 @@ package jadex.commons.future;
 import java.util.NoSuchElementException;
 
 /**
- * 
+ *  A tuple future has a defined number of results of possibly different types.
+ *  
+ *  The future is considered as finished when all tuple elements have been set.
  */
-public interface ISequenceFuture<E, F> extends IIntermediateFuture<Object>
+public interface ITuple2Future<E, F> extends IIntermediateFuture<TupleResult>
 {
 	/**
      *  Get the first result.

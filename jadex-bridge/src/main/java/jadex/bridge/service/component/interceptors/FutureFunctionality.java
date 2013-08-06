@@ -9,7 +9,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISequenceFuture;
+import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -17,7 +17,8 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.PullIntermediateDelegationFuture;
 import jadex.commons.future.PullSubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.SequenceFuture;
+import jadex.commons.future.Tuple2Future;
+import jadex.commons.future.TupleResult;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableDelegationResultListener;
@@ -248,10 +249,10 @@ public class FutureFunctionality
 //			((Future<Object>)orig).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)orig));
 			ret	= fut;
 		}
-		else if(orig instanceof ISequenceFuture)
+		else if(orig instanceof ITuple2Future)
 		{
-			SequenceFuture<Object, Object> fut = new DelegatingSequenceFuture(func);
-			((SequenceFuture<Object, Object>)orig).addResultListener(new IntermediateDelegationResultListener<Object>(fut));
+			Tuple2Future<Object, Object> fut = new DelegatingTupleFuture(func);
+			((Tuple2Future<Object, Object>)orig).addResultListener(new IntermediateDelegationResultListener<TupleResult>(fut));
 			ret = fut;
 		}
 		else if(orig instanceof IIntermediateFuture)
@@ -277,9 +278,9 @@ public class FutureFunctionality
 	{
 		Future<?> ret = null;
 		
-		if(SReflect.isSupertype(ISequenceFuture.class, clazz))
+		if(SReflect.isSupertype(ITuple2Future.class, clazz))
 		{
-			ret = new DelegatingSequenceFuture(func);
+			ret = new DelegatingTupleFuture(func);
 		}
 		else if(SReflect.isSupertype(IPullSubscriptionIntermediateFuture.class, clazz))
 		{
@@ -1737,7 +1738,7 @@ class DelegatingFuture extends Future<Object>
 /**
  * 
  */
-class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
+class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 {
 	/** The future functionality. */
 	protected FutureFunctionality func;
@@ -1745,7 +1746,7 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
 	/**
 	 * 
 	 */
-	public DelegatingSequenceFuture(FutureFunctionality func)
+	public DelegatingTupleFuture(FutureFunctionality func)
 	{
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
@@ -1762,13 +1763,12 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
     	try
 		{
 			Object res = func.setFirstResult(result);
-			DelegatingSequenceFuture.super.setFirstResult(res);
+			DelegatingTupleFuture.super.setFirstResult(res);
 		}
 		catch(Exception e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
-    	addIntermediateResult(result);
     }
     
     /**
@@ -1781,45 +1781,45 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
     	try
 		{
 			Object res = func.setSecondResult(result);
-			DelegatingSequenceFuture.super.setSecondResult(res);
+			DelegatingTupleFuture.super.setSecondResult(res);
 		}
 		catch(Exception e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
     }
 	
 	/**
 	 * 
 	 */
-	public void	setResult(Collection<Object> result)
+	public void	setResult(Collection<TupleResult> result)
 	{
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResult(result);
-			DelegatingSequenceFuture.super.setResult(res);
+			Collection<TupleResult> res = (Collection<TupleResult>)func.setResult(result);
+			DelegatingTupleFuture.super.setResult(res);
 		}
 		catch(Exception e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
 	}
 	
 	/**
 	 * 
 	 */
-	public boolean	setResultIfUndone(Collection<Object> result)
+	public boolean	setResultIfUndone(Collection<TupleResult> result)
 	{
 		boolean ret = false;
 		
 		try
 		{
-			Collection<Object> res = (Collection<Object>)func.setResultIfUndone(result);
-			ret = DelegatingSequenceFuture.super.setResultIfUndone(res);
+			Collection<TupleResult> res = (Collection<TupleResult>)func.setResultIfUndone(result);
+			ret = DelegatingTupleFuture.super.setResultIfUndone(res);
 		}
 		catch(Exception e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
 		
 		return ret;
@@ -1828,34 +1828,34 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
 	/**
 	 * 
 	 */
-	public void addIntermediateResult(Object result)
+	public void addIntermediateResult(TupleResult result)
 	{
 		try
 		{
-			Object res = func.addIntermediateResult(result);
-			DelegatingSequenceFuture.super.addIntermediateResult(res);
+			TupleResult res = (TupleResult)func.addIntermediateResult(result);
+			DelegatingTupleFuture.super.addIntermediateResult(res);
 		}
 		catch(RuntimeException e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
 	}
 	
 	/**
 	 * 
 	 */
-	public boolean addIntermediateResultIfUndone(Object result)
+	public boolean addIntermediateResultIfUndone(TupleResult result)
 	{
 		boolean ret = false;
 		
 		try
 		{
-			Object res = func.addIntermediateResultIfUndone(result);
-			ret = DelegatingSequenceFuture.super.addIntermediateResultIfUndone(res);
+			TupleResult res = (TupleResult)func.addIntermediateResultIfUndone(result);
+			ret = DelegatingTupleFuture.super.addIntermediateResultIfUndone(res);
 		}
 		catch(Exception e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
 		
 		return ret;
@@ -1869,12 +1869,13 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
 	{
 		try
 		{
-			func.setFinished((Collection<Object>)getIntermediateResults());
-			DelegatingSequenceFuture.super.setFinished();
+			Collection col = getIntermediateResults();
+			func.setFinished((Collection<Object>)col);
+			DelegatingTupleFuture.super.setFinished();
 		}
 		catch(Exception e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
 	}
 	
@@ -1887,12 +1888,13 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
 		
 		try
 		{
-			func.setFinishedIfUndone((Collection<Object>)getIntermediateResults());
-			ret = DelegatingSequenceFuture.super.setFinishedIfUndone();
+			Collection col = getIntermediateResults();
+			func.setFinishedIfUndone((Collection<Object>)col);
+			ret = DelegatingTupleFuture.super.setFinishedIfUndone();
 		}
 		catch(Exception e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
 		
 		return ret;
@@ -1906,11 +1908,11 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
 		try
 		{
 			Exception ex = func.setException(exception);
-			DelegatingSequenceFuture.super.setException(ex);
+			DelegatingTupleFuture.super.setException(ex);
 		}
 		catch(Exception e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
 	}
 	
@@ -1924,11 +1926,11 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
 		try
 		{
 			func.setExceptionIfUndone(exception);
-			ret = DelegatingSequenceFuture.super.setExceptionIfUndone(exception);
+			ret = DelegatingTupleFuture.super.setExceptionIfUndone(exception);
 		}
 		catch(Exception e)
 		{
-			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+			DelegatingTupleFuture.super.setExceptionIfUndone(e);
 		}
 		
 		return ret;
@@ -1944,12 +1946,12 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
 		{
 			public void resultAvailable(Void result)
 			{
-				DelegatingSequenceFuture.super.startScheduledNotifications();
+				DelegatingTupleFuture.super.startScheduledNotifications();
 			}
 	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingSequenceFuture.super.setExceptionIfUndone(exception);
+				DelegatingTupleFuture.super.setExceptionIfUndone(exception);
 			}
 		});
     }
