@@ -2,6 +2,9 @@ package jadex.bdi.examples.puzzle;
 
 import jadex.bdi.runtime.ICandidateInfo;
 import jadex.bdi.runtime.Plan;
+import jadex.bdiv3.examples.puzzle.IBoard;
+import jadex.bdiv3.examples.puzzle.Move;
+import jadex.bdiv3.examples.puzzle.Piece;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;

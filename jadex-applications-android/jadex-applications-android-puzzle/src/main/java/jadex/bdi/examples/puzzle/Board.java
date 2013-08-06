@@ -1,8 +1,12 @@
 package jadex.bdi.examples.puzzle;
 
+import jadex.bdiv3.examples.puzzle.IBoard;
+import jadex.bdiv3.examples.puzzle.Move;
+import jadex.bdiv3.examples.puzzle.Piece;
+import jadex.bdiv3.examples.puzzle.Position;
 import jadex.commons.SimplePropertyChangeSupport;
-
 import jadex.commons.beans.PropertyChangeListener;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;

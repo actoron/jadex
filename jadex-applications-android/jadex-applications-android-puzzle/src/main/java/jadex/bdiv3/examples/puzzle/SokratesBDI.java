@@ -1,6 +1,7 @@
 package jadex.bdiv3.examples.puzzle;
 
 import jadex.android.puzzle.SokratesService.SokratesListener;
+import jadex.android.puzzle.ui.GuiProxy;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
@@ -50,6 +51,9 @@ public class SokratesBDI
 	protected SokratesListener	gui_listener;
 	
 	@Belief
+	protected GuiProxy gui_proxy;
+	
+	@Belief
 	protected int	primitive;
 	
 	/** The number of tried moves. */
@@ -66,6 +70,13 @@ public class SokratesBDI
 	protected String strategy; // = MoveComparator.STRATEGY_SAME_LONG;
 	
 	//-------- methods --------
+	
+	public SokratesBDI()
+	{
+		super();
+		System.out.println("Sokrates old constructor");
+		gui_proxy = new GuiProxy(board, gui_listener);
+	}
 	
 	/**
 	 *  Setup the gui and start playing.
@@ -107,7 +118,8 @@ public class SokratesBDI
 	}
 	
 	private void arrayMethod(int zahl, BDIAgent[] agentArray) {
-		System.out.println("nothing");
+		BDIAgent[] test = new BDIAgent[5];
+		test[0] = agentArray[1];
 	}
 	
 	/**

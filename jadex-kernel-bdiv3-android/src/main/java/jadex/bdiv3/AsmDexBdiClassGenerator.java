@@ -10,6 +10,7 @@ import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.javaparser.javaccimpl.ConstantNode;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,6 +30,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javassist.bytecode.Opcode;
+
 import org.objectweb.asm.Type;
 import org.ow2.asmdex.ApplicationReader;
 import org.ow2.asmdex.ApplicationVisitor;
@@ -38,13 +41,18 @@ import org.ow2.asmdex.MethodVisitor;
 import org.ow2.asmdex.Opcodes;
 import org.ow2.asmdex.tree.AbstractInsnNode;
 import org.ow2.asmdex.tree.ApplicationNode;
+import org.ow2.asmdex.tree.ArrayOperationInsnNode;
 import org.ow2.asmdex.tree.ClassNode;
 import org.ow2.asmdex.tree.FieldInsnNode;
 import org.ow2.asmdex.tree.FieldNode;
 import org.ow2.asmdex.tree.InsnList;
+import org.ow2.asmdex.tree.InsnNode;
+import org.ow2.asmdex.tree.IntInsnNode;
 import org.ow2.asmdex.tree.LabelNode;
 import org.ow2.asmdex.tree.MethodInsnNode;
 import org.ow2.asmdex.tree.MethodNode;
+import org.ow2.asmdex.tree.StringInsnNode;
+import org.ow2.asmdex.tree.TypeInsnNode;
 import org.ow2.asmdex.tree.VarInsnNode;
 import org.ow2.asmdex.util.RegisterShiftMethodAdapter;
 
@@ -200,7 +208,6 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 											// v1 = field name
 											
 											super.visitMethodInsn(Opcodes.INSN_INVOKE_STATIC, "Ljadex/bdiv3/BDIAgent;", "writeField", "VLjava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;", new int[]{valueRegister, v1, objectRegister, v0});
-//											super.visitFieldInsn(opcode, owner, name, desc, valueRegister, objectRegister);
 										}
 										else
 										{
@@ -210,7 +217,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 
 								};
 								
-								return new RegisterShiftMethodAdapter(api, mv, 2);
+								return new RegisterShiftMethodAdapter(api, mv, 2); // shifts all register access by 2
 							}
 
 							@Override
@@ -266,13 +273,20 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 			// dependencies for the agent could exist
 			ClassLoader newCl = DexLoader.load(androidCl, dex, OUTPATH);
 
+			for (ClassNode classNode : classes) {
+				// load all generated classes, including inner classes
+				String className = Type.getType(classNode.name).getClassName();
+				Class<?> clazz = newCl.loadClass(className);
+				androidCl.defineClass(className, clazz);
+			}
+			
 			Class<?> generatedClass = newCl.loadClass(clname);
 			ret = generatedClass;
 
-			if (androidCl != null)
-			{
-				androidCl.defineClass(clname, generatedClass);
-			}
+//			if (androidCl != null)
+//			{
+//				androidCl.defineClass(clname, generatedClass);
+//			}
 		}
 		catch (IOException e)
 		{
@@ -332,22 +346,22 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			cn.fields.add(new FieldNode(Opcodes.ACC_PROTECTED, "__initargs", "Ljava/util/List;", new String[]{"Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;"}, null));
 			
-			for(MethodNode mn: mths)
+			for(MethodNode constructorNode: mths)
 			{
 //				System.out.println(mn.name);
 				
 				// search constructor (should not have multiple ones) 
 				// and extract field assignments for dynamic beliefs
 				// will be incarnated as new update methods 
-				if(mn.name.equals("<init>"))
+				if(constructorNode.name.equals("<init>"))
 				{
-					InsnList l = mn.instructions;
+					InsnList instructions = constructorNode.instructions;
 					LabelNode begin = null;
-					int foundcon = -1;
+					int superConstructorIndex = -1;
 					
-					for(int i=0; i<l.size(); i++)
+					for(int i=0; i<instructions.size(); i++)
 					{
-						AbstractInsnNode n = l.get(i);
+						AbstractInsnNode n = instructions.get(i);
 						
 						if(begin==null && n instanceof LabelNode)
 						{
@@ -355,39 +369,39 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 						}
 						
 						// find first constructor call
-						if(Opcodes.INSN_INVOKE_DIRECT==n.getOpcode() && foundcon==-1)
+						if(Opcodes.INSN_INVOKE_DIRECT==n.getOpcode() && superConstructorIndex==-1)
 						{
-							foundcon = i;
+							superConstructorIndex = i;
 							begin = null;
 						}
 						else if(n instanceof MethodInsnNode && ((MethodInsnNode)n).name.equals("writeField"))
 						{
-							MethodInsnNode min = (MethodInsnNode)n;
-							
-//							System.out.println("found writeField node: "+min.name+" "+min.getOpcode());
-							AbstractInsnNode start = min;
-							String name = null;
-							List<String> evs = new ArrayList<String>(); 
-							while(!start.equals(begin))
-							{
-								// find method name via last constant load
-								if (name == null) {
-									System.out.println(start);
-									// TODO: find method name !!
-								}
-//								if(name==null && start instanceof LdcInsnNode)
-//									name = (String)((LdcInsnNode)start).cst;
-								if(isInstanceGetField(start.getOpcode()))
-								{
-									String bn = ((FieldInsnNode)start).name;
-									if(model.getCapability().hasBelief(bn))
-									{
-										evs.add(bn);
-									}
-								}
-								start = start.getPrevious();
-							}
-							
+//							MethodInsnNode min = (MethodInsnNode)n;
+//							
+//							AbstractInsnNode start = min;
+//							String name = null;
+//							List<String> events = new ArrayList<String>();
+//							// get name of method and events?
+//							while(!start.equals(begin))
+//							{
+//								// find method name via last constant load
+//								if (name == null) {
+//									System.out.println(start);
+//									// TODO: find method name !!
+//								}
+////								if(name==null && start instanceof LdcInsnNode)
+////									name = (String)((LdcInsnNode)start).cst;
+//								if(isInstanceGetField(start.getOpcode()))
+//								{
+//									String bn = ((FieldInsnNode)start).name;
+//									if(model.getCapability().hasBelief(bn))
+//									{
+//										events.add(bn);
+//									}
+//								}
+//								start = start.getPrevious();
+//							}
+							// start is the first labelNode before min (the 'writeField' Insn)
 							// TODO: dynamic beliefs
 //							if(tododyn.remove(name))
 //							{
@@ -425,61 +439,104 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 					}
 					
 					// Move init code to separate method for being called after injections. 
-					if(foundcon!=-1 && foundcon+1<l.size())
+					if(superConstructorIndex!=-1 && superConstructorIndex+1<instructions.size())
 					{
-						String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_"+iclname.replace("/", "_").replace(".", "_");
-//						System.out.println("Init method: "+name);
-						MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, name, mn.desc, mn.signature, null);
-//						cn.methods.add(mnode); // TODO add method
-
-//						while(l.size()>foundcon+1)
-//						{
-//							AbstractInsnNode	node	= l.get(foundcon+1);
-//							if(isReturn(node.getOpcode()))
-//							{
-//								mnode.visitInsn(node.getOpcode());
-//								break;
-//							}
-//							l.remove(node);
-//							mnode.instructions.add(node);
-//						}						
+						String name	= IBDIClassGenerator.INIT_EXPRESSIONS_METHOD_PREFIX+"_" + iclname.replace("/", "_").replace(".", "_");
+						System.out.println("creating Init method: "+name);
+						MethodNode initMethodNode = new MethodNode(Opcodes.ACC_PUBLIC, name, constructorNode.desc, constructorNode.signature, null);
+						cn.methods.add(initMethodNode);
+						initMethodNode.visitMaxs(constructorNode.maxStack, 0);
 						
-//						// Add code to store arguments in field.
-//						Type[]	args	= Type.getArgumentTypes(mn.desc); // fails
-//						InsnList	init	= new InsnList();
-//
-						// obj param
-//						init.add(new VarInsnNode(Opcodes.ALOAD, 0));
-//						
-//						// clazz param
-//						init.add(new LdcInsnNode(Type.getType("L"+iclname+";")));
-//						
-//						// argtypes param
-//						init.add(new LdcInsnNode(args.length));
-//						init.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Class"));
-//						for(int i=0; i<args.length; i++)
-//						{
-//							init.add(new InsnNode(Opcodes.DUP));
-//							init.add(new LdcInsnNode(i));
-//							init.add(new LdcInsnNode(args[i]));
-//							init.add(new InsnNode(Opcodes.AASTORE));
-//						}
-//						
-//						// args param
-//						init.add( new LdcInsnNode(args.length));
-//						init.add(new TypeInsnNode(Opcodes.ANEWARRAY, "java/lang/Object"));
-//						for(int i=0; i<args.length; i++)
-//						{
-//							init.add(new InsnNode(Opcodes.DUP));
-//							init.add(new LdcInsnNode(i));
-//							init.add(new VarInsnNode(Opcodes.ALOAD, i+1));	// 0==this, 1==arg0, ...
-//							init.add(new InsnNode(Opcodes.AASTORE));
-//						}
-//						
-//						// Invoke method.
-//						init.add(new MethodInsnNode(Opcodes.INSN_INVOKE_STATIC, "jadex/bdiv3/BDIAgent", "addInitArgs", "VLjava/lang/Object;Ljava/lang/Class;[Ljava/lang/Class;[Ljava/lang/Object;", new int[]{1,2,3,4})); // TODO: register
-//						
-//						l.insertBefore(l.get(foundcon+1), init);
+						constructorNode.visitMaxs(constructorNode.maxStack + 3, 0); // need 3 more registers, got 2 from shift before 
+						int maxStackIndex = constructorNode.maxStack - 1;
+						int p0 = maxStackIndex - (initMethodNode.signature == null ? 0 : initMethodNode.signature.length - 1); // this
+						
+						int v0 = 0; 
+						int v1 = 1;
+						int v2 = 2;
+						int v3 = 3;
+						int v4 = 4;
+						
+						// move all instructions except super call to new init method
+						while(instructions.size()>superConstructorIndex+1)
+						{
+							AbstractInsnNode	node	= instructions.get(superConstructorIndex+1);
+							if(isReturn(node.getOpcode()))
+							{
+								initMethodNode.visitInsn(node.getOpcode());
+								break;
+							}
+							instructions.remove(node);
+							initMethodNode.instructions.add(node);
+						}
+						
+						// shift constructor call registers:
+						MethodInsnNode superConstructorCall = (MethodInsnNode) instructions.get(superConstructorIndex);
+						int[] arguments = superConstructorCall.arguments;
+						int[] newArguments = new int[arguments.length];
+						for (int i = 0; i < newArguments.length; i++)
+						{
+							newArguments[i] = arguments[i] + 3;
+						}
+						superConstructorCall.arguments = newArguments;
+//						instructions.remove(superConstructorCall);
+//						RegisterShiftMethodAdapter shift = new RegisterShiftMethodAdapter(1, constructorNode, 3); // shift by 3 registers
+//						shift.visitMethodInsn(superConstructorCall.getOpcode(), superConstructorCall.owner, superConstructorCall.name, superConstructorCall.desc, superConstructorCall.arguments);
+						// end shift
+						
+						// Add code to store all arguments that are needed for the new init method in a field.
+						Type[]	args	= Type.getArgumentTypes(constructorNode.desc);
+						InsnList	init	= new InsnList();
+						
+						// argtypes param
+						
+						init.add(new VarInsnNode(Opcodes.INSN_CONST, v0, args.length));
+						// v0 = length of array
+						String arrayDesc = Type.getDescriptor(Class[].class);
+						init.add(new TypeInsnNode(Opcodes.INSN_NEW_ARRAY, v1, -1, v0, arrayDesc));
+						// v1 = argtypes array
+						for(int i=0; i<args.length; i++)
+						{
+							String descriptor = args[i].getDescriptor();
+							
+							init.add(new TypeInsnNode(Opcodes.INSN_CONST_CLASS, v4, -1, -1, descriptor));
+							// v4 = class of parameter i
+							init.add(new VarInsnNode(Opcodes.INSN_CONST, v3, i));
+							// v3 = i
+							// aput-object class(descriptor), array, i 
+							init.add(new ArrayOperationInsnNode(Opcodes.INSN_APUT_OBJECT, v4, v1, v3));
+						}
+						
+						// args param
+						init.add(new TypeInsnNode(Opcodes.INSN_NEW_ARRAY, v2, -1, v0, Type.getDescriptor(Object[].class)));
+						// v2 = args array
+						
+						for(int i=0; i<args.length; i++)
+						{
+							init.add(new VarInsnNode(Opcodes.INSN_CONST, v3, i));
+							// v3 = i
+							
+							int valueRegister = p0 + 1 + i; // i-th parameter of constructor is in this register
+							
+							// aput-object class(descriptor), array, i 
+							init.add(new ArrayOperationInsnNode(Opcodes.INSN_APUT_OBJECT, valueRegister, v2, v3));
+						}
+						
+						// now we have 
+						// v0 = length of args
+						// v1 = argtypes array
+						// v2 = args array
+						
+						init.add(new TypeInsnNode(Opcodes.INSN_CONST_CLASS, v0, -1, -1, "L"+iclname+";"));
+						// v0 = class
+						
+						// p0 = this
+						// v0 = class
+						// v1 = argument types
+						// v2 = argument values
+						// Invoke method.
+						init.add(new MethodInsnNode(Opcodes.INSN_INVOKE_STATIC, "Ljadex/bdiv3/BDIAgent;", "addInitArgs", "VLjava/lang/Object;Ljava/lang/Class;[Ljava/lang/Class;[Ljava/lang/Object;", new int[]{p0,v0,v1,v2}));
+						instructions.insertBefore(instructions.get(superConstructorIndex+1), init);
 					}
 				} // constructor end
 			}

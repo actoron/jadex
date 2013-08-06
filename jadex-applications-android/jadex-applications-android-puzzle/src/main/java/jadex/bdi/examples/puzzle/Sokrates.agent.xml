@@ -36,7 +36,7 @@
 		<belief name="gui_listener" class="jadex.android.puzzle.SokratesService$SokratesListener" exported="true" argument="true">
 		</belief>
 		<belief name="gui_proxy" class="jadex.android.puzzle.ui.GuiProxy">
-			<fact>new jadex.android.puzzle.ui.GuiProxy($beliefbase.board, $beliefbase.gui_listener, $scope.getExternalAccess())</fact>
+			<fact>new jadex.android.puzzle.ui.GuiProxy($beliefbase.board, $beliefbase.gui_listener)</fact>
 		</belief>
 		<!-- The number of moves already tried. -->
 		<belief name="triescnt" class="int">

@@ -3,6 +3,8 @@ package jadex.bdi.examples.puzzle;
 import jadex.android.puzzle.ui.GuiProxy;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bdiv3.examples.puzzle.IBoard;
+import jadex.bdiv3.examples.puzzle.Move;
 
 
 /**

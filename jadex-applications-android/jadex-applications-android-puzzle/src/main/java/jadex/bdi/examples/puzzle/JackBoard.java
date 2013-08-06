@@ -1,8 +1,12 @@
 package jadex.bdi.examples.puzzle;
 
+import jadex.bdiv3.examples.puzzle.IBoard;
+import jadex.bdiv3.examples.puzzle.Move;
+import jadex.bdiv3.examples.puzzle.Piece;
+import jadex.bdiv3.examples.puzzle.Position;
 import jadex.commons.SimplePropertyChangeSupport;
-
 import jadex.commons.beans.PropertyChangeListener;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -284,7 +288,7 @@ public class JackBoard implements IBoard, Serializable
 
 	int get(Position s)
 	{
-		return get(s.x, s.y);
+		return get(s.getX(), s.getY());
 	}
 
 	void set(int v, int x, int y)
@@ -294,7 +298,7 @@ public class JackBoard implements IBoard, Serializable
 
 	void set(int v, Position s)
 	{
-		set(v, s.x, s.y);
+		set(v, s.getX(), s.getY());
 	}
 
 	boolean solution()
@@ -314,19 +318,19 @@ public class JackBoard implements IBoard, Serializable
 
 	Vector moves(Position hole)
 	{
-		return moves(hole.x, hole.y);
+		return moves(hole.getX(), hole.getY());
 	}
 
 	boolean isJumpMove(int x, int y)
 	{
-		int dx = Math.abs((the_hole.x-x));
-		int dy = Math.abs((the_hole.y-y));
+		int dx = Math.abs((the_hole.getX()-x));
+		int dy = Math.abs((the_hole.getY()-y));
 		return ((dx==2) || (dy==2));
 	}
 
 	boolean isJumpMove(Position s)
 	{
-		return isJumpMove(s.x, s.y);
+		return isJumpMove(s.getX(), s.getY());
 	}
 
 	//-------- property methods --------

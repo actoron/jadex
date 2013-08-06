@@ -3,6 +3,7 @@ package jadex.android.puzzle;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.service.JadexPlatformService;
 import jadex.bdi.examples.puzzle.Board;
+import jadex.bdiv3.examples.puzzle.IBoard;
 import jadex.bdiv3.examples.puzzle.SokratesBDI;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -40,7 +41,7 @@ public class SokratesService extends JadexPlatformService
 	{
 		public void handleEvent(PropertyChangeEvent event);
 
-		public void setBoard(Board board);
+		public void setBoard(IBoard board);
 
 		public void showMessage(String text);
 	}

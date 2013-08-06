@@ -1,12 +1,12 @@
 package jadex.android.puzzle;
 
-import jadex.android.puzzle.R;
 import jadex.android.puzzle.SokratesService.PlatformBinder;
 import jadex.android.puzzle.SokratesService.SokratesListener;
 import jadex.android.puzzle.ui.SokratesView;
 import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.bdi.examples.puzzle.Board;
-import jadex.bdi.examples.puzzle.Move;
+import jadex.bdiv3.examples.puzzle.IBoard;
+import jadex.bdiv3.examples.puzzle.Move;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.ThreadSuspendable;
 import android.content.ComponentName;
@@ -99,7 +99,7 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 	{
 
 		@Override
-		public void setBoard(Board board)
+		public void setBoard(IBoard board)
 		{
 			runOnUiThread(new Runnable()
 			{

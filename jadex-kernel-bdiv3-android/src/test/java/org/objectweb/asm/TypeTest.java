@@ -22,7 +22,7 @@ public class TypeTest
 		Type[] argumentTypes;
 
 		argumentTypes = Type.getArgumentTypes("VLjava/lang/Object;");
-		Assert.assertEquals(Type.OBJECT, argumentTypes[0].getSort() );
+		Assert.assertEquals(Type.OBJECT, argumentTypes[0].getSort());
 	}
 
 	@Test
@@ -57,5 +57,12 @@ public class TypeTest
 		argumentTypes = Type.getArgumentTypes("Ljava/lang/Object;Lorg/objectweb/asm/Type;");
 		Assert.assertEquals(Type.OBJECT, argumentTypes[0].getSort());
 		Assert.assertEquals(Type.class.getCanonicalName(), argumentTypes[0].getClassName());
+	}
+
+	@Test
+	public void testArrayDescriptor()
+	{
+		String descriptor = Type.getDescriptor(Object[].class);
+		Assert.assertEquals("[Ljava/lang/Object;", descriptor);
 	}
 }

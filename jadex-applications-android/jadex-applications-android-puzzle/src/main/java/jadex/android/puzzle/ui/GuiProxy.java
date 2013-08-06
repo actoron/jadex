@@ -2,20 +2,15 @@ package jadex.android.puzzle.ui;
 
 import jadex.android.puzzle.SokratesService.SokratesListener;
 import jadex.bdi.examples.puzzle.Board;
-import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IBelief;
-import jadex.bdi.runtime.IBeliefbase;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
+import jadex.bdiv3.examples.puzzle.IBoard;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.future.IFuture;
 
 public class GuiProxy
 {
 	private SokratesListener sokratesListener;
 
-	public GuiProxy(final Board board, final SokratesListener sokratesListener, jadex.bdi.runtime.IBDIExternalAccess access)
+	public GuiProxy(final IBoard board, final SokratesListener sokratesListener)
 	{
 		this.sokratesListener = sokratesListener;
 		sokratesListener.setBoard(board);

@@ -2,9 +2,10 @@ package jadex.android.puzzle.ui;
 
 import jadex.android.puzzle.R;
 import jadex.bdi.examples.puzzle.Board;
-import jadex.bdi.examples.puzzle.Move;
-import jadex.bdi.examples.puzzle.Piece;
-import jadex.bdi.examples.puzzle.Position;
+import jadex.bdiv3.examples.puzzle.IBoard;
+import jadex.bdiv3.examples.puzzle.Move;
+import jadex.bdiv3.examples.puzzle.Piece;
+import jadex.bdiv3.examples.puzzle.Position;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -22,7 +23,7 @@ public class SokratesView extends TileView
 	private static final int RED_PIECE = 2;
 	private static final int WHITE_PIECE = 3;
 
-	private Board board;
+	private IBoard board;
 
 	/**
 	 * Create a simple handler that we can use to cause animation to happen. We
@@ -91,7 +92,7 @@ public class SokratesView extends TileView
 					}
 			}
 		}
-		updatePos(board.hole_pos);
+		updatePos(((Board)board).hole_pos);
 		mRedrawHandler.obtainMessage().sendToTarget();
 	}
 
@@ -113,7 +114,7 @@ public class SokratesView extends TileView
 		mRedrawHandler.obtainMessage().sendToTarget();
 	}
 
-	public void setBoard(Board board)
+	public void setBoard(IBoard board)
 	{
 		this.board = board;
 		initBoard();
