@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 /**
  *  Default implementation of an intermediate future.
  */
-public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIntermediateFuture<E>
+public class IntermediateFuture<E> extends Future<Collection <E>> implements IIntermediateFuture<E> 
 {
 	//-------- attributes --------
 	

@@ -27,8 +27,6 @@ import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import org.omg.CORBA.DynAnyPackage.InvalidSeq;
-
 /**
  *  Default future functionality.
  */
@@ -195,14 +193,26 @@ public class FutureFunctionality
 	/**
 	 * 
 	 */
+	public Object setFirstResult(Object result)
+	{
+		return result;
+	}
+	
+	/**
+	 * 
+	 */
+	public Object setSecondResult(Object result)
+	{
+		return result;
+	}
+	
+	/**
+	 * 
+	 */
 	public static Future getDelegationFuture(IFuture<?> orig, final FutureFunctionality func)
 	{
 		Future ret = null;
 		
-//		if(orig instanceof ISequenceFuture)
-//		{
-//			Sequence
-//		}
 		if(orig instanceof IPullSubscriptionIntermediateFuture)
 		{
 			PullSubscriptionIntermediateDelegationFuture<Object> fut = new DelegatingPullSubscriptionIntermediateDelegationFuture((IPullSubscriptionIntermediateFuture)orig, func);
@@ -238,6 +248,12 @@ public class FutureFunctionality
 //			((Future<Object>)orig).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)orig));
 			ret	= fut;
 		}
+		else if(orig instanceof ISequenceFuture)
+		{
+			SequenceFuture<Object, Object> fut = new DelegatingSequenceFuture(func);
+			((SequenceFuture<Object, Object>)orig).addResultListener(new IntermediateDelegationResultListener<Object>(fut));
+			ret = fut;
+		}
 		else if(orig instanceof IIntermediateFuture)
 		{
 			IntermediateFuture<Object>	fut	= new DelegatingIntermediateFuture(func);
@@ -261,7 +277,11 @@ public class FutureFunctionality
 	{
 		Future<?> ret = null;
 		
-		if(SReflect.isSupertype(IPullSubscriptionIntermediateFuture.class, clazz))
+		if(SReflect.isSupertype(ISequenceFuture.class, clazz))
+		{
+			ret = new DelegatingSequenceFuture(func);
+		}
+		else if(SReflect.isSupertype(IPullSubscriptionIntermediateFuture.class, clazz))
 		{
 			ret = new DelegatingPullSubscriptionIntermediateDelegationFuture(func);
 		}
@@ -1731,6 +1751,43 @@ class DelegatingSequenceFuture extends SequenceFuture<Object, Object>
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
 	}
+	
+	/**
+     *  Set the result. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
+     */
+    public void	setFirstResult(Object result)
+    {
+    	try
+		{
+			Object res = func.setFirstResult(result);
+			DelegatingSequenceFuture.super.setFirstResult(res);
+		}
+		catch(Exception e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+    	addIntermediateResult(result);
+    }
+    
+    /**
+     *  Set the result. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
+     */
+    public void	setSecondResult(Object result)
+    {
+    	try
+		{
+			Object res = func.setSecondResult(result);
+			DelegatingSequenceFuture.super.setSecondResult(res);
+		}
+		catch(Exception e)
+		{
+			DelegatingSequenceFuture.super.setExceptionIfUndone(e);
+		}
+    }
 	
 	/**
 	 * 

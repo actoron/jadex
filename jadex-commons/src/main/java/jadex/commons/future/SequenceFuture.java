@@ -2,6 +2,7 @@ package jadex.commons.future;
 
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -138,5 +139,10 @@ public class SequenceFuture<E,F> extends IntermediateFuture<Object> implements I
     	{
     		throw new RuntimeException();
     	}
+    }
+    
+    public void	addResultListener(IResultListener<Collection<Object>> listener)
+    {
+    	super.addResultListener(listener);
     }
 }
