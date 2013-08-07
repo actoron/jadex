@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  *  The provided services annotation.
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NFProperties
 {

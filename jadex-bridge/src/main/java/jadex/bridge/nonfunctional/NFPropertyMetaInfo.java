@@ -53,6 +53,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *  @param unit Unit of the property.
 	 *  @param dynamic Flag if the property is dynamic.
 	 *  @param updaterate Update rate of the property.
+	 *  @param target Target of the property.
 	 */
 	public NFPropertyMetaInfo(String name, Class<?> type, Class<?> unit, boolean dynamic, long updaterate, Target target)
 	{

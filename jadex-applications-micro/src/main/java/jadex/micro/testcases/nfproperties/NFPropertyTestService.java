@@ -7,13 +7,18 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.commons.future.IFuture;
 
 @Service
-@NFProperties(@NFProperty(name="cores", type=CoreNumberProperty.class))
 public class NFPropertyTestService implements ICoreDependentService
 {
 	@ServiceStart
 	public IFuture<Void> x()
 	{
 		System.out.println("SSTASD");
+		return IFuture.DONE;
+	}
+
+	@NFProperties(@NFProperty(name="methodspeed", type=MethodSpeedProperty.class))
+	public IFuture<Void> testMethod()
+	{
 		return IFuture.DONE;
 	}
 }

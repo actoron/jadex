@@ -14,7 +14,7 @@ import jadex.micro.annotation.ProvidedServices;
 
 @Agent
 @ProvidedServices(@ProvidedService(type=ICoreDependentService.class, implementation=@Implementation(NFPropertyTestService.class)))
-@NFProperties(@NFProperty(name="componentcores", type=CoreNumberProperty.class))
+@NFProperties(@NFProperty(name="componentcores", type=CoreNumberProperty2.class))
 public class NFPropertyTestAgent
 {
 	@Agent
@@ -34,9 +34,17 @@ public class NFPropertyTestAgent
 		}
 		System.out.println("Finished list of non-functional properties.");
 		
-		System.out.println("Service Value: " + iscds.getNFPropertyValue("cores", Integer.class).get());
+		System.out.println("Service Value: " + iscds.getNFPropertyValue("cores").get());
 		
-		System.out.println("Component Value, requested from Service: " + iscds.getNFPropertyValue("componentcores", Integer.class).get());
+		System.out.println("Component Value, requested from Service: " + iscds.getNFPropertyValue("componentcores").get());
+//		try
+//		{
+//			System.out.println("Speed Value for method: " +iscds.getNFPropertyValue(ICoreDependentService.class.getMethod("testMethod", new Class<?>[0]), "methodspeed").get());
+//		}
+//		catch (Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 		
 		return IFuture.DONE;
 	}

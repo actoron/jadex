@@ -1,5 +1,6 @@
 package jadex.bridge.service;
 
+import jadex.bridge.nonfunctional.IMethodNFPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
@@ -11,7 +12,7 @@ import java.util.Map;
  *  The interface for platform services.
  */
 @Reference
-public interface IService extends INFPropertyProvider //extends IRemotable
+public interface IService extends INFPropertyProvider, IMethodNFPropertyProvider //extends IRemotable
 {
 	//-------- constants --------
 	
