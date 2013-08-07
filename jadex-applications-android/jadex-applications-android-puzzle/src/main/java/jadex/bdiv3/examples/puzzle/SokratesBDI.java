@@ -21,7 +21,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +35,10 @@ import java.util.List;
  *  by recursiveky applying means-end-reasoning.
  */
 @Agent
+//@Arguments(
+//{
+//	@Argument(name="gui_listener", clazz=SokratesListener.class, description="Listener for the puzzle gui")
+//})
 @BDIConfigurations(
 {
 	@BDIConfiguration(name=MoveComparator.STRATEGY_DEFAULT),
@@ -39,6 +46,7 @@ import java.util.List;
 	@BDIConfiguration(name=MoveComparator.STRATEGY_SAME_LONG),
 	@BDIConfiguration(name=MoveComparator.STRATEGY_ALTER_LONG)
 })
+
 public class SokratesBDI
 {
 	//-------- attributes --------
@@ -47,14 +55,11 @@ public class SokratesBDI
 	@Belief
 	protected IBoard	board	= new JackBoard();
 	
-	@Belief
+	@AgentArgument
 	protected SokratesListener	gui_listener;
 	
 	@Belief
 	protected GuiProxy gui_proxy;
-	
-	@Belief
-	protected int	primitive;
 	
 	/** The number of tried moves. */
 	protected int	triescnt;
@@ -74,7 +79,6 @@ public class SokratesBDI
 	public SokratesBDI()
 	{
 		super();
-		System.out.println("Sokrates old constructor");
 		gui_proxy = new GuiProxy(board, gui_listener);
 	}
 	
@@ -88,12 +92,6 @@ public class SokratesBDI
 
 		strategy = agent.getConfiguration();
 		createGui(agent);
-		
-		primitive = 42;
-		
-		System.out.println(primitive);
-		
-		Object test = test(primitive);
 		
 		System.out.println("Now puzzling:");
 		final long	start	= System.currentTimeMillis();
@@ -117,11 +115,6 @@ public class SokratesBDI
 		return ret;
 	}
 	
-	private void arrayMethod(int zahl, BDIAgent[] agentArray) {
-		BDIAgent[] test = new BDIAgent[5];
-		test[0] = agentArray[1];
-	}
-	
 	/**
 	 *  Create the GUI (if any).
 	 */
@@ -134,10 +127,6 @@ public class SokratesBDI
 //				new BoardGui(agent.getExternalAccess(), board);
 //			}
 //		});
-	}
-	
-	public Object test(int value) {
-		return new Integer(value);
 	}
 	
 	//-------- goals --------

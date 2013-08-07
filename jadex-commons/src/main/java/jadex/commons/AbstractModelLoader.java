@@ -288,6 +288,9 @@ public abstract class AbstractModelLoader
 				// Associate cached model to new key (name/extension/imports).
 				modelcache.put(keytuple, cached);
 			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 			finally
 			{
 				info.cleanup();

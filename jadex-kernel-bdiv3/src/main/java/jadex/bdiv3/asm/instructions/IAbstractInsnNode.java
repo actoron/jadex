@@ -1,4 +1,7 @@
-package jadex.bdiv3.asm;
+package jadex.bdiv3.asm.instructions;
+
+import java.util.Map;
+
 
 public interface IAbstractInsnNode
 {
@@ -8,5 +11,7 @@ public interface IAbstractInsnNode
 	IAbstractInsnNode getPrevious();
 
 	IAbstractInsnNode getNext();
+
+	IAbstractInsnNode clone(Map<ILabelNode, ILabelNode> labels);
 
 }

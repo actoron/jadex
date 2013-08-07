@@ -1,10 +1,15 @@
 package jadex.bdiv3.asm;
 
+import jadex.bdiv3.asm.instructions.IAbstractInsnNode;
 
-public interface IInsnList
+
+
+
+public interface IInsnList extends Iterable<IAbstractInsnNode>
 {
 
-	IAbstractInsnNode[] toArray();
+//	IAbstractInsnNode[] toArray();
+	int size();
 
 	void remove(IAbstractInsnNode n);
 
@@ -12,8 +17,13 @@ public interface IInsnList
 
 	void add(IAbstractInsnNode methodInsnNode);
 
-	int size();
 
 	IAbstractInsnNode get(int i);
+
+	IAbstractInsnNode getFirst();
+
+	IAbstractInsnNode getLast();
+
+	void insertBefore(IAbstractInsnNode first, IInsnList nl);
 
 }

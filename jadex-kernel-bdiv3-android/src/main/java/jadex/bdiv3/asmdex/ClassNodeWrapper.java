@@ -2,6 +2,8 @@ package jadex.bdiv3.asmdex;
 
 import jadex.bdiv3.asm.IAnnotationNode;
 import jadex.bdiv3.asm.IClassNode;
+import jadex.bdiv3.asm.IFieldNode;
+import jadex.bdiv3.asm.IInnerClassNode;
 import jadex.bdiv3.asm.IMethodNode;
 
 import java.util.List;
@@ -42,5 +44,23 @@ public class ClassNodeWrapper implements IClassNode
 	public void addMethod(IMethodNode mnode)
 	{
 		classNode.methods.add(((MethodNodeWrapper)mnode).methodNode);
+	}
+
+	@Override
+	public void addField(IFieldNode fieldNode)
+	{
+		classNode.fields.add(((FieldNodeWrapper)fieldNode).fieldNode);
+	}
+
+	@Override
+	public String getName()
+	{
+		return classNode.name;
+	}
+
+	@Override
+	public List<IInnerClassNode> getInnerClasses()
+	{
+		return InnerClassNodeWrapper.wrapList(classNode.innerClasses);
 	}
 }

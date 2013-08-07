@@ -1,14 +1,17 @@
 package jadex.bdiv3.asmdex;
 
-import jadex.bdiv3.asm.IAbstractInsnNode;
-import jadex.bdiv3.asm.IInsnList;
+import java.util.Iterator;
 
+import jadex.bdiv3.asm.IInsnList;
+import jadex.bdiv3.asm.instructions.IAbstractInsnNode;
+
+import org.ow2.asmdex.tree.AbstractInsnNode;
 import org.ow2.asmdex.tree.InsnList;
 
 public class InsnListWrapper implements IInsnList
 {
 
-	private InsnList instructions;
+	public InsnList instructions;
 
 	public InsnListWrapper(InsnList instructions)
 	{
@@ -20,11 +23,11 @@ public class InsnListWrapper implements IInsnList
 		return new InsnListWrapper(instructions);
 	}
 
-	@Override
-	public IAbstractInsnNode[] toArray()
-	{
-		return AbstractInsnNodeWrapper.wrapArray(instructions.toArray());
-	}
+//	@Override
+//	public IAbstractInsnNode[] toArray()
+//	{
+//		return AbstractInsnNodeWrapper.wrapArray(instructions.toArray());
+//	}
 
 	@Override
 	public void remove(IAbstractInsnNode n)
@@ -56,4 +59,48 @@ public class InsnListWrapper implements IInsnList
 		return AbstractInsnNodeWrapper.wrap(instructions.get(i));
 	}
 
+	@Override
+	public Iterator<IAbstractInsnNode> iterator()
+	{
+		return new Iterator<IAbstractInsnNode>()
+		{
+			Iterator<AbstractInsnNode> it = instructions.iterator();
+			
+			@Override
+			public boolean hasNext()
+			{
+				return it.hasNext();
+			}
+
+			@Override
+			public IAbstractInsnNode next()
+			{
+				return AbstractInsnNodeWrapper.wrap(it.next());
+			}
+
+			@Override
+			public void remove()
+			{
+				it.remove();
+			}
+		};
+	}
+
+	@Override
+	public IAbstractInsnNode getFirst()
+	{
+		return AbstractInsnNodeWrapper.wrap(instructions.getFirst());
+	}
+
+	@Override
+	public IAbstractInsnNode getLast()
+	{
+		return AbstractInsnNodeWrapper.wrap(instructions.getLast());
+	}
+
+	@Override
+	public void insertBefore(IAbstractInsnNode first, IInsnList nl)
+	{
+		instructions.insertBefore(((AbstractInsnNodeWrapper)first).insnNode, ((InsnListWrapper)nl).instructions);
+	}
 }

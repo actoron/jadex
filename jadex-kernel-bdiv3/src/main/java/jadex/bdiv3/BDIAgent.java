@@ -162,6 +162,11 @@ public class BDIAgent extends MicroAgent
 	
 	/**
 	 *  Add an entry to the init calls.
+	 *  
+	 *  @param obj object instance that owns the field __initargs
+	 *  @param clazz Class definition of the obj object
+	 *  @param argtypes Signature of the init method
+	 *  @param args Actual argument values for the init method
 	 */
 	public static void	addInitArgs(Object obj, Class<?> clazz, Class<?>[] argtypes, Object[] args)
 	{

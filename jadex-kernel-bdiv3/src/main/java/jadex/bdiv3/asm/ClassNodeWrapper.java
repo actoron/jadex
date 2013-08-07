@@ -18,15 +18,13 @@ public class ClassNodeWrapper implements IClassNode
 	@Override
 	public List<IAnnotationNode> getVisibleAnnotations()
 	{
-		List<AnnotationNode> visibleAnnotations = classNode.visibleAnnotations;
-		return AnnotationNodeWrapper.wrapList(visibleAnnotations);
+		return AnnotationNodeWrapper.wrapList(classNode.visibleAnnotations);
 	}
 
 	@Override
 	public List<IMethodNode> getMethods()
 	{
-		List<MethodNode> methods = classNode.methods;
-		return MethodNodeWrapper.wrapList(methods);
+		return MethodNodeWrapper.wrapList(classNode.methods);
 	}
 	
 	public static IClassNode wrap(ClassNode cn)
@@ -38,5 +36,23 @@ public class ClassNodeWrapper implements IClassNode
 	public void addMethod(IMethodNode mnode)
 	{
 		classNode.methods.add(((MethodNodeWrapper)mnode).methodNode);
+	}
+
+	@Override
+	public void addField(IFieldNode fieldNode)
+	{
+		classNode.fields.add(((FieldNodeWrapper) fieldNode).fieldNode);
+	}
+
+	@Override
+	public String getName()
+	{
+		return classNode.name;
+	}
+
+	@Override
+	public List<IInnerClassNode> getInnerClasses()
+	{
+		return InnerClassNodeWrapper.wrapList(classNode.innerClasses);
 	}
 }

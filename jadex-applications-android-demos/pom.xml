@@ -15,6 +15,7 @@
 	
 	<description>
 	This project contains an android application to demonstrate some jadex features.
+	This is not based on jadex-clientapp, so it can be executed from within eclipse.
 	</description>
 
 	<dependencies>

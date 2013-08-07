@@ -1,7 +1,6 @@
 package jadex.android.puzzle.ui;
 
 import jadex.android.puzzle.R;
-import jadex.bdi.examples.puzzle.Board;
 import jadex.bdiv3.examples.puzzle.IBoard;
 import jadex.bdiv3.examples.puzzle.Move;
 import jadex.bdiv3.examples.puzzle.Piece;
@@ -92,7 +91,8 @@ public class SokratesView extends TileView
 					}
 			}
 		}
-		updatePos(((Board)board).hole_pos);
+		updatePos(new Position(2, 2));
+//		updatePos(((Board)board).hole_pos);
 		mRedrawHandler.obtainMessage().sendToTarget();
 	}
 

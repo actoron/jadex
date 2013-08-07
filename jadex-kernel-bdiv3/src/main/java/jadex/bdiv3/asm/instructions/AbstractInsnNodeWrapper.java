@@ -1,18 +1,17 @@
-package jadex.bdiv3.asmdex;
+package jadex.bdiv3.asm.instructions;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import jadex.bdiv3.asm.instructions.IAbstractInsnNode;
-import jadex.bdiv3.asm.instructions.ILabelNode;
+import org.kohsuke.asm4.tree.AbstractInsnNode;
+import org.kohsuke.asm4.tree.FieldInsnNode;
+import org.kohsuke.asm4.tree.LabelNode;
+import org.kohsuke.asm4.tree.LdcInsnNode;
+import org.kohsuke.asm4.tree.LineNumberNode;
+import org.kohsuke.asm4.tree.MethodInsnNode;
 
-import org.ow2.asmdex.tree.AbstractInsnNode;
-import org.ow2.asmdex.tree.FieldInsnNode;
-import org.ow2.asmdex.tree.LabelNode;
-import org.ow2.asmdex.tree.LineNumberNode;
-import org.ow2.asmdex.tree.MethodInsnNode;
 
 public class AbstractInsnNodeWrapper implements IAbstractInsnNode
 {
@@ -53,11 +52,14 @@ public class AbstractInsnNodeWrapper implements IAbstractInsnNode
 			case AbstractInsnNode.FIELD_INSN:
 				result = new FieldInsnNodeWrapper((FieldInsnNode)insnNode);
 				break;
-			case AbstractInsnNode.LABEL_INSN:
+			case AbstractInsnNode.LABEL:
 				result = new LabelNodeWrapper((LabelNode) insnNode);
 				break;
 			case AbstractInsnNode.METHOD_INSN:
 				result = new MethodInsnNodeWrapper((MethodInsnNode) insnNode);
+				break;
+			case AbstractInsnNode.LDC_INSN:
+				result = new LdcInsnNodeWrapper((LdcInsnNode) insnNode);
 				break;
 			case AbstractInsnNode.LINE:
 				result = new LineNumberNodeWrapper((LineNumberNode) insnNode);
@@ -102,7 +104,11 @@ public class AbstractInsnNodeWrapper implements IAbstractInsnNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		return insnNode.equals(obj);
+		if (obj instanceof AbstractInsnNodeWrapper) {
+			return insnNode.equals(((AbstractInsnNodeWrapper) obj).insnNode);
+		} else {
+			return insnNode.equals(obj);
+		}
 	}
 
 	@Override
@@ -110,5 +116,4 @@ public class AbstractInsnNodeWrapper implements IAbstractInsnNode
 	{
 		return insnNode.hashCode();
 	}
-
 }
