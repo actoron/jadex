@@ -360,4 +360,39 @@ public class MBody
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the line number of the declaration.
+	 */
+	public int getLineNumber(ClassLoader cl)
+	{
+		int ret = -1;
+		if(clazz!=null)
+		{
+			try
+			{
+				Class<?> c = (Class<?>)clazz.getType(cl);
+				Method m = c.getMethod("__getLineNumber", new Class[0]);
+				ret = ((Integer)m.invoke(null, new Object[0])).intValue();
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		else if(method!=null)
+		{
+			try
+			{
+				Method met = method.getMethod(cl);
+				Class<?> c = met.getDeclaringClass();
+				Method m = c.getMethod("__getLineNumber"+method.getName(), new Class[0]);
+				ret = ((Integer)m.invoke(null, new Object[0])).intValue();
+			}
+			catch(Exception e)
+			{
+			}
+		}
+			
+		return ret;
+	}
 }

@@ -39,7 +39,7 @@ public class PlanPreconditionBDI
 	{
 		TestReport tr = new TestReport("#1", "Test if plan precondition works.");
 		agent.dispatchTopLevelGoal(new SomeGoal()).get();
-		if("AC".equals(res))
+		if("AD".equals(res))
 		{
 			tr.setSucceeded(true);
 		}
@@ -51,7 +51,7 @@ public class PlanPreconditionBDI
 		agent.killAgent();
 	}
 	
-	@Plan(trigger=@Trigger(goals=SomeGoal.class), priority=2)
+	@Plan(trigger=@Trigger(goals=SomeGoal.class))
 	protected class PlanA
 	{
 		@PlanPrecondition
@@ -70,7 +70,16 @@ public class PlanPreconditionBDI
 		}
 	}
 	
-	@Plan(trigger=@Trigger(goals=SomeGoal.class), priority=1)
+	@Plan(trigger=@Trigger(goals=SomeGoal.class))
+	protected IFuture<Void> planB()
+	{
+		System.out.println("Plan B");
+		res += "B";
+		return new Future<Void>(new PlanFailureException());
+//			return IFuture.DONE;
+	}
+	
+	@Plan(trigger=@Trigger(goals=SomeGoal.class))
 	protected class PlanB
 	{
 		@PlanPrecondition
@@ -82,13 +91,13 @@ public class PlanPreconditionBDI
 		@PlanBody
 		protected IFuture<Void> body()
 		{
-			System.out.println("Plan B");
-			res += "B";
+			System.out.println("Plan C");
+			res += "C";
 			return IFuture.DONE;
 		}
 	}
 	
-	@Plan(trigger=@Trigger(goals=SomeGoal.class), priority=0)
+	@Plan(trigger=@Trigger(goals=SomeGoal.class))
 	protected class PlanC
 	{
 		@PlanPrecondition
@@ -100,8 +109,8 @@ public class PlanPreconditionBDI
 		@PlanBody
 		protected IFuture<Void> body()
 		{
-			System.out.println("Plan C");
-			res += "C";
+			System.out.println("Plan D");
+			res += "D";
 			return IFuture.DONE;
 		}
 	}

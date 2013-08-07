@@ -579,6 +579,10 @@ public class BDIClassReader extends MicroClassReader
 //			System.out.println("genclazz: "+acl.hashCode()+" "+acl.getClassLoader());
 		}
 		
+		// Sort the plans according to their declaration order in the source file
+		// Must be done after class enhancement to contain the "__getLineNumber()" method
+		bdimodel.getCapability().sortPlans(classloader);
+		
 //		System.out.println("genclazz: "+genclazz);
 		
 //		System.out.println("endend");

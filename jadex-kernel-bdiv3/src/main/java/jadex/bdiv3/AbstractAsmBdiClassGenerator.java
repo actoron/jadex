@@ -6,10 +6,14 @@ import jadex.bdiv3.model.BDIModel;
 
 import java.util.List;
 
+import org.kohsuke.asm4.tree.AnnotationNode;
+import org.kohsuke.asm4.tree.MethodNode;
+
+/**
+ * 
+ */
 public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 {
-
-	@Override
 	public abstract Class<?> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl);
 	
 	protected abstract boolean isInstancePutField(int opcode);
@@ -52,6 +56,24 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				if("Ljadex/bdiv3/annotation/Plan;".equals(an.getDescription()))
 				{
 					result	= true;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	protected boolean isPlanMethod(MethodNode methodNode) 
+	{
+		boolean result = false;
+		List<AnnotationNode> visibleAnnotations = methodNode.visibleAnnotations;
+		if(visibleAnnotations!=null)
+		{
+			for(AnnotationNode an: visibleAnnotations)
+			{
+				if("Ljadex/bdiv3/annotation/Plan;".equals(an.desc))
+				{
+					result = true;
 					break;
 				}
 			}

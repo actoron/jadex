@@ -1,7 +1,6 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.asm.ClassNodeWrapper;
-import jadex.bdiv3.asm.IClassNode;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.commons.SReflect;
@@ -32,10 +31,10 @@ import org.kohsuke.asm4.MethodVisitor;
 import org.kohsuke.asm4.Opcodes;
 import org.kohsuke.asm4.Type;
 import org.kohsuke.asm4.tree.AbstractInsnNode;
-import org.kohsuke.asm4.tree.AnnotationNode;
 import org.kohsuke.asm4.tree.ClassNode;
 import org.kohsuke.asm4.tree.FieldInsnNode;
 import org.kohsuke.asm4.tree.FieldNode;
+import org.kohsuke.asm4.tree.InnerClassNode;
 import org.kohsuke.asm4.tree.InsnList;
 import org.kohsuke.asm4.tree.InsnNode;
 import org.kohsuke.asm4.tree.LabelNode;
@@ -272,6 +271,19 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 //				System.out.println("toClass: "+clname+" "+found);
 				ret = toClass(clname, data, found, null);
+				
+				if(ret.getName().indexOf("$")!=-1)
+				{
+					try
+					{
+						Method m = ret.getMethod("__getLineNumber", new Class[0]);
+						Object o = m.invoke(null, new Object[0]);
+						System.out.println("Line is: "+ret.getName()+" "+o);
+					}
+					catch(Exception e)
+					{
+					}
+				}
 			}
 			catch(Exception e)
 			{
@@ -319,23 +331,49 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		
 		if(planclass)
 		{
-			for(MethodNode mn: mths)
+			boolean isinner = false;
+			if(cn.innerClasses!=null)
 			{
-				if(mn.name.equals("<init>"))
+				for(InnerClassNode icn: cn.innerClasses)
 				{
-					InsnList l = mn.instructions;
-					
-					for(int i=0; i<l.size(); i++)
+					if(icn.name.equals(clname))
 					{
-						AbstractInsnNode n = l.get(i);
+						isinner = true;
+						break;
+					}
+				}
+			}
+			
+			if(isinner)
+			{
+				for(MethodNode mn: mths)
+				{
+					if(mn.name.equals("<init>"))
+					{
+						InsnList l = mn.instructions;
 						
-						if(n instanceof LineNumberNode)
+						for(int i=0; i<l.size(); i++)
 						{
-							LineNumberNode lnn = (LineNumberNode)n;
-							System.out.println("Line is: "+clname+" "+lnn.line);
-							break;
+							AbstractInsnNode n = l.get(i);
+							
+							if(n instanceof LineNumberNode)
+							{
+								LineNumberNode lnn = (LineNumberNode)n;
+	//							System.out.println("Line is: "+clname+" "+lnn.line);
+								
+								MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC+Opcodes.ACC_STATIC, 
+									"__getLineNumber", Type.getMethodDescriptor(Type.INT_TYPE), null, null);
+								
+								mnode.visitIntInsn(Opcodes.SIPUSH, lnn.line);
+								mnode.visitInsn(Opcodes.IRETURN);
+								
+								cn.methods.add(mnode);
+								
+								break;
+							}
 						}
 					}
+					break;
 				}
 			}
 		}
@@ -372,6 +410,32 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			for(MethodNode mn: mths)
 			{
 //				System.out.println(mn.name);
+			
+				if(isPlanMethod(mn))
+				{
+					int ln = -1;
+					InsnList l = mn.instructions;
+					for(int i=0; i<l.size(); i++)
+					{
+						AbstractInsnNode n = l.get(i);
+						if(n instanceof LineNumberNode)
+						{
+							ln = ((LineNumberNode)n).line;
+							break;
+						}
+					}
+					
+					if(ln!=-1)
+					{
+						MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC+Opcodes.ACC_STATIC, 
+							"__getLineNumber"+mn.name, Type.getMethodDescriptor(Type.INT_TYPE), null, null);
+							
+						mnode.visitIntInsn(Opcodes.SIPUSH, ln);
+						mnode.visitInsn(Opcodes.IRETURN);
+							
+						cn.methods.add(mnode);
+					}
+				}
 				
 				// search constructor (should not have multiple ones) 
 				// and extract field assignments for dynamic beliefs

@@ -2,6 +2,7 @@ package jadex.bdiv3.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -199,6 +200,23 @@ public class MCapability extends MElement
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Sorts plans according to their line numbers in the source
+	 *  to guarantee their natural declaration order.
+	 */
+	public void sortPlans(final ClassLoader cl)
+	{
+		Collections.sort(plans, new Comparator<MPlan>()
+		{
+			public int compare(MPlan p1, MPlan p2)
+			{
+				int ln1 = p1.getBody().getLineNumber(cl);
+				int ln2 = p2.getBody().getLineNumber(cl);
+				return ln1-ln2;
+			}
+		});
 	}
 
 	/**
