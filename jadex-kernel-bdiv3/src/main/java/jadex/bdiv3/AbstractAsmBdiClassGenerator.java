@@ -2,6 +2,7 @@ package jadex.bdiv3;
 
 import jadex.bdiv3.asm.IAnnotationNode;
 import jadex.bdiv3.asm.IClassNode;
+import jadex.bdiv3.asm.IFieldNode;
 import jadex.bdiv3.asm.IInnerClassNode;
 import jadex.bdiv3.asm.IMethodNode;
 import jadex.bdiv3.model.BDIModel;
@@ -11,11 +12,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
 /**
  * 
  */
 public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 {
+	protected OpcodeHelper opHelp = OpcodeHelper.getInstance();
+	
+	protected NodeHelper nodeHelp = NodeHelper.getInstance();
+	
 	public abstract Class<?> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl);
 
 	protected void transformClassNode(IClassNode cn, final String iclname, final BDIModel model)
@@ -60,13 +66,18 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				}
 			}
 
-			addInitArgsField(cn);
-
+			IFieldNode initArgsField = nodeHelp.createField(OpcodeHelper.ACC_PROTECTED, "__initargs", "Ljava/util/List;", new String[]{"Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;"}, null);
+			cn.addField(initArgsField);		
+			
 			for (IMethodNode mn : mths)
 			{
 				if(isPlanMethod(mn))
 				{
-					transformPlanMethod(cn, mn);
+					int line = nodeHelp.getLineNumberOfMethod(mn);
+					if (line != -1) {
+						IMethodNode lineNumberMethod = nodeHelp.createReturnConstantMethod("__getLineNumber"+mn.getName(), line);
+						cn.addMethod(lineNumberMethod);
+					}
 				}
 				
 				// search constructor (should not have multiple ones)
@@ -78,39 +89,42 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				}
 				else if (todoset.contains(mn.getName()))
 				{
-					transformSetter(iclname, mn);
+					String belname = mn.getName().substring(3);
+					belname = belname.substring(0,1).toLowerCase()+belname.substring(1);
+					if(opHelp.isNative(mn.getAccess()))
+					{
+						replaceNativeSetter(iclname, mn, belname);
+					} else {
+						enhanceSetter(iclname, mn, belname);
+					}
 				}
 				// Enhance native getter method
 				else if (todoget.contains(mn.getName()))
 				{
-					transformGetter(iclname, mn);
+					if(opHelp.isNative(mn.getAccess()))
+					{
+						String belname = mn.getName().startsWith("is") ? mn.getName().substring(2) : mn.getName().substring(3);
+						belname = belname.substring(0,1).toLowerCase()+belname.substring(1);
+						
+						replaceNativeGetter(iclname, mn, belname);
+					}
 				}
 			}
 		}
 		
 		if(planclass)
 		{
-			boolean isinner = false;
-			List<IInnerClassNode> innerClasses = cn.getInnerClasses();
-			if(innerClasses!=null)
-			{
-				for(IInnerClassNode icn: innerClasses)
-				{
-					if(icn.getName().equals(iclname))
-					{
-						isinner = true;
-						break;
-					}
-				}
-			}
-			
-			if(isinner)
+			if(isInnerClass(cn, iclname))
 			{
 				for(IMethodNode mn: mths)
 				{
 					if(mn.getName().equals("<init>"))
 					{
-						transformInnerPlanConstructor(cn, mn);
+						int line = nodeHelp.getLineNumberOfMethod(mn);
+						if (line != -1) {
+							IMethodNode lineNumberMethod = nodeHelp.createReturnConstantMethod("__getLineNumber", line);
+							cn.addMethod(lineNumberMethod);
+						}
 					}
 					break;
 				}
@@ -118,12 +132,6 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		}
 
 	}
-
-	protected abstract void transformPlanMethod(IClassNode cn, IMethodNode mn);
-
-	protected abstract void transformInnerPlanConstructor(IClassNode cn, IMethodNode mn);
-
-	protected abstract void addInitArgsField(IClassNode cn);
 
 	protected abstract void transformArrayStores(IMethodNode mn, BDIModel model, String iclname);
 
@@ -135,18 +143,32 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	 */
 	protected abstract void transformConstructor(IClassNode cn, IMethodNode mn, BDIModel model, List<String> tododyn);
 
-	protected abstract void transformGetter(String iclname, IMethodNode mn);
+	/**
+	 * Replace native getter for abstract belief. 
+	 * @param iclname
+	 * @param nativeSetter
+	 * @param belname
+	 */
+	protected abstract void replaceNativeGetter(String iclname, IMethodNode nativeGetter, String belname);
 
-	protected abstract void transformSetter(String iclname, IMethodNode mn);
+	/**
+	 * Replace native setter for abstract belief. 
+	 * @param iclname
+	 * @param nativeSetter
+	 * @param belname
+	 */
+	protected abstract void replaceNativeSetter(String iclname, IMethodNode nativeSetter, String belname);
+	
+	/**
+	 * Enhance setter method with unobserve oldvalue at the beginning and event call at the end
+	 * @param iclname
+	 * @param setter
+	 * @param belname
+	 */
+	protected abstract void enhanceSetter(String iclname, IMethodNode setter, String belname);
 
 
 	// ----- Helper methods ------
-	
-	protected abstract boolean isInstancePutField(int opcode);
-	
-	protected abstract boolean isInstanceGetField(int opcode);
-	
-	protected abstract boolean isReturn(int opcode);
 	
 	protected boolean isAgentClass(IClassNode classNode)
 	{
@@ -201,6 +223,24 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			}
 		}
 		return result;
+	}
+	
+	private boolean isInnerClass(IClassNode parent, final String iclname)
+	{
+		boolean isinner = false;
+		List<IInnerClassNode> innerClasses = parent.getInnerClasses();
+		if(innerClasses!=null)
+		{
+			for(IInnerClassNode icn: innerClasses)
+			{
+				if(icn.getName().equals(iclname))
+				{
+					isinner = true;
+					break;
+				}
+			}
+		}
+		return isinner;
 	}
 
 }

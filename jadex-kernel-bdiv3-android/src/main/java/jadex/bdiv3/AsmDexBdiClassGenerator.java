@@ -4,6 +4,7 @@ import jadex.android.commons.JadexDexClassLoader;
 import jadex.android.commons.Logger;
 import jadex.bdiv3.android.DexLoader;
 import jadex.bdiv3.asm.IClassNode;
+import jadex.bdiv3.asm.IFieldNode;
 import jadex.bdiv3.asm.IInsnList;
 import jadex.bdiv3.asm.IMethodNode;
 import jadex.bdiv3.asm.instructions.IAbstractInsnNode;
@@ -33,6 +34,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.hamcrest.core.Is;
 import org.objectweb.asm.Type;
 import org.ow2.asmdex.ApplicationReader;
 import org.ow2.asmdex.ApplicationVisitor;
@@ -109,13 +111,13 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 
 		// pattern to accept all inner classes
 		final Pattern classPattern = Pattern.compile("L" + clname.replace('.', '/') + ";?\\$?.*");
-
+		InputStream is = null;
 		try
 		{
 			JadexDexClassLoader androidCl = (JadexDexClassLoader) SUtil.androidUtils().findJadexDexClassLoader(cl.getParent());
 			// is = SUtil.getResource(APP_PATH, cl);
 			String appPath = ((JadexDexClassLoader) androidCl).getDexPath();
-			InputStream is = getFileInputStream(new File(appPath));
+			is = getFileInputStream(new File(appPath));
 			ApplicationReader ar = new ApplicationReader(api, is);
 			ApplicationWriter aw = new ApplicationWriter();
 			ApplicationNode an = new ApplicationNode(api);
@@ -161,7 +163,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 										int v1 = 1;
 										
 										
-										if (isInstancePutField(opcode) && model.getCapability().hasBelief(name)
+										if (opHelp.isPutField(opcode) && model.getCapability().hasBelief(name)
 												&& model.getCapability().getBelief(name).isFieldBelief())
 										{
 											// possibly transform basic value
@@ -269,30 +271,27 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 			Class<?> generatedClass = newCl.loadClass(clname);
 			ret = generatedClass;
 
-//			if (androidCl != null)
-//			{
-//				androidCl.defineClass(clname, generatedClass);
-//			}
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (ClassNotFoundException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}finally{
+			if (is != null) {
+				try
+				{
+					is.close();
+				}
+				catch (Exception e)
+				{
+				}
+			}
 		}
 
 		return ret;
-	}
-
-	@Override
-	protected void addInitArgsField(IClassNode cn)
-	{
-		FieldNode fieldNode = new FieldNode(Opcodes.ACC_PROTECTED, "__initargs", "Ljava/util/List;", new String[]{"Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;"}, null);
-		cn.addField(FieldNodeWrapper.wrap(fieldNode));		
 	}
 
 	@Override
@@ -334,12 +333,12 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 				while(!start.equals(begin))
 				{
 					// find method name via last constant load
-					if (name == null && isConstantLoad(start)) {
+					if (name == null && opHelp.isLoadConstant(start.getOpcode())) {
 						StringInsnNode stringNode = (StringInsnNode)(start);
 						name = stringNode.string;
 						System.out.println("found writeField for field: " + name);
 					}
-					if(isInstanceGetField(start.getOpcode()))
+					if(opHelp.isGetField(start.getOpcode()))
 					{
 						String bn = ((FieldInsnNode)start).name;
 						if(model.getCapability().hasBelief(bn))
@@ -412,7 +411,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 			while(instructions.size()>superConstructorIndex+1)
 			{
 				IAbstractInsnNode	node	= instructions.get(superConstructorIndex+1);
-				if(isReturn(node.getOpcode()))
+				if(opHelp.isReturn(node.getOpcode()))
 				{
 					initMethodNode.visitInsn(node.getOpcode());
 					break;
@@ -488,16 +487,6 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 		}
 	}
 
-	@Override
-	protected void transformGetter(String iclname, IMethodNode mn)
-	{
-	}
-
-	@Override
-	protected void transformSetter(String iclname, IMethodNode mn)
-	{
-	}
-
 	private InputStream getFileInputStream(File apkFile)
 	{
 		InputStream result = null;
@@ -538,88 +527,25 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 		return result;
 	}
 
-	protected boolean isInstancePutField(int opcode)
+	@Override
+	protected void replaceNativeGetter(String iclname, IMethodNode mn, String belname)
 	{
-		switch (opcode)
-		{
-			case Opcodes.INSN_IPUT :
-			case Opcodes.INSN_IPUT_BOOLEAN :
-			case Opcodes.INSN_IPUT_BYTE :
-			case Opcodes.INSN_IPUT_CHAR :
-			case Opcodes.INSN_IPUT_OBJECT :
-			case Opcodes.INSN_IPUT_SHORT :
-			case Opcodes.INSN_IPUT_WIDE :
-				return true;
-			default :
-				return false;
-		}
-	}
-	
-	protected boolean isInstanceGetField(int opcode)
-	{
-		switch (opcode)
-		{
-			case Opcodes.INSN_IGET :
-			case Opcodes.INSN_IGET_BOOLEAN :
-			case Opcodes.INSN_IGET_BYTE :
-			case Opcodes.INSN_IGET_CHAR :
-			case Opcodes.INSN_IGET_OBJECT :
-			case Opcodes.INSN_IGET_SHORT :
-			case Opcodes.INSN_IGET_WIDE :
-				return true;
-			default :
-				return false;
-		}
-	}
-	
-	protected boolean isReturn(int opcode)
-	{
-		switch (opcode)
-		{
-			case Opcodes.INSN_RETURN :
-			case Opcodes.INSN_RETURN_OBJECT :
-			case Opcodes.INSN_RETURN_VOID :
-			case Opcodes.INSN_RETURN_WIDE :
-				return true;
-			default :
-				return false;
-		}
-	}
-	
-	protected boolean isConstantLoad(AbstractInsnNode start)
-	{
-		switch (start.getOpcode())
-		{
-			case Opcodes.INSN_CONST:
-			case Opcodes.INSN_CONST_16:
-			case Opcodes.INSN_CONST_4:
-			case Opcodes.INSN_CONST_CLASS:
-			case Opcodes.INSN_CONST_HIGH16:
-			case Opcodes.INSN_CONST_STRING:
-			case Opcodes.INSN_CONST_STRING_JUMBO:
-			case Opcodes.INSN_CONST_WIDE:
-			case Opcodes.INSN_CONST_WIDE_16:
-			case Opcodes.INSN_CONST_WIDE_32:
-			case Opcodes.INSN_CONST_WIDE_HIGH16:
-				return true;
-			default:
-				return false;
-		}
+		// TODO Auto-generated method stub
 	}
 
 	@Override
-	protected void transformPlanMethod(IClassNode cn, IMethodNode mn)
+	protected void replaceNativeSetter(String iclname, IMethodNode nativeSetter, String belname)
 	{
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
-	protected void transformInnerPlanConstructor(IClassNode cn, IMethodNode mn)
+	protected void enhanceSetter(String iclname, IMethodNode setter, String belname)
 	{
 		// TODO Auto-generated method stub
-		
 	}
+	
+	
 
 	
 }
