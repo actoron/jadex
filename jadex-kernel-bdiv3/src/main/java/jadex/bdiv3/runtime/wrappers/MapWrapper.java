@@ -4,8 +4,6 @@ import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
-import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -93,18 +91,20 @@ public class MapWrapper<T, E> implements Map<T, E>
 	/** 
 	 * 
 	 */
-	public E put(T key, E value)
+	public E put(final T key, final E value)
 	{
 		E ret = delegate.put(key, value);
 		unobserveValue(ret);
 		observeValue(value);
 		if(ret==null)
 		{
-			getRuleSystem().addEvent(new Event(addevent, new Tuple3<T, E, E>(key, value, ret)));
+			getRuleSystem().addEvent(new Event(addevent, new MapEntry<T, E>(key, value, ret)));
+//			getRuleSystem().addEvent(new Event(addevent, new Tuple3<T, E, E>(key, value, ret)));
 		}
 		else
 		{
-			getRuleSystem().addEvent(new Event(changeevent, new Tuple3<T, E, E>(key, value, ret)));
+//			getRuleSystem().addEvent(new Event(changeevent, new Tuple3<T, E, E>(key, value, ret)));
+			getRuleSystem().addEvent(new Event(changeevent, new MapEntry<T, E>(key, value, ret)));
 		}
 		return ret;
 	}
@@ -116,7 +116,8 @@ public class MapWrapper<T, E> implements Map<T, E>
 	{
 		E ret = delegate.remove(key);
 		unobserveValue(ret);
-		getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>((T)key, ret)));
+//		getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>((T)key, ret)));
+		getRuleSystem().addEvent(new Event(remevent, new MapEntry<T, E>((T)key, ret, null)));
 		return ret;
 	}
 
@@ -142,7 +143,8 @@ public class MapWrapper<T, E> implements Map<T, E>
 		for(Map.Entry<? extends T, ? extends E> e : s)
 		{
 			unobserveValue(e.getValue());
-			getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>(e.getKey(), e.getValue())));
+//			getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>(e.getKey(), e.getValue())));
+			getRuleSystem().addEvent(new Event(remevent, new MapEntry<T, E>(e.getKey(), e.getValue(), null)));
 		}
 	}
 
@@ -255,5 +257,57 @@ public class MapWrapper<T, E> implements Map<T, E>
 	public void unobserveValue(Object val)
 	{
 		getRuleSystem().unobserveObject(val);
+	}
+
+	/**
+	 * 
+	 */
+	public static class MapEntry<T, E> implements Map.Entry<T, E>
+	{
+		protected T key;
+		protected E value;
+		protected E oldvalue;
+		
+		/**
+		 *  Create a new MapEntry.
+		 */
+		public MapEntry(T key, E value, E oldvalue)
+		{
+			this.key = key;
+			this.value = value;
+			this.oldvalue = oldvalue;
+		}
+		
+		/**
+		 *  Get the key.
+		 *  @return The key.
+		 */
+		public T getKey()
+		{
+			return key;
+		}
+
+		/**
+		 *  Get the value.
+		 *  @return The value.
+		 */
+		public E getValue()
+		{
+			return value;
+		}
+
+		/**
+		 *  Get the oldvalue.
+		 *  @return The oldvalue.
+		 */
+		public E getOldValue()
+		{
+			return oldvalue;
+		}
+
+		public E setValue(E value)
+		{
+			throw new UnsupportedOperationException();
+		}
 	}
 }

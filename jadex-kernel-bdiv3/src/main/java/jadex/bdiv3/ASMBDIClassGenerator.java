@@ -281,18 +281,18 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //				System.out.println("toClass: "+clname+" "+found);
 				ret = toClass(clname, data, found, null);
 				
-				if(ret.getName().indexOf("$")!=-1)
-				{
-					try
-					{
-						Method m = ret.getMethod("__getLineNumber", new Class[0]);
-						Object o = m.invoke(null, new Object[0]);
-						System.out.println("Line is: "+ret.getName()+" "+o);
-					}
-					catch(Exception e)
-					{
-					}
-				}
+//				if(ret.getName().indexOf("$")!=-1)
+//				{
+//					try
+//					{
+//						Method m = ret.getMethod("__getLineNumber", new Class[0]);
+//						Object o = m.invoke(null, new Object[0]);
+//						System.out.println("Line is: "+ret.getName()+" "+o);
+//					}
+//					catch(Exception e)
+//					{
+//					}
+//				}
 			}
 			catch(Exception e)
 			{

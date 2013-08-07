@@ -1807,17 +1807,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		vals.add(getAgent());
 		vals.add(getExternalAccess());
 
-		
-		// Add event values
-		if(event!=null)
-		{
-			vals.add(event);
-			vals.add(event.getValue());
-		}
-
-		// Todo: cond result!?
-		
-
 		// Add plan values if any.
 		if(rplan!=null)
 		{
@@ -1826,15 +1815,29 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				rpe	= (RProcessableElement)reason;
 			}
-			
 			vals.add(reason);
 			vals.add(rplan);
+			
 			if(rplan.getException()!=null)
 			{
 				vals.add(rplan.getException());
 			}
+			
+			Object delem = rplan.getDispatchedElement();
+			if(delem instanceof ChangeEvent && event==null)
+			{
+				event = (ChangeEvent)delem;
+			}
 		}
+		// Todo: cond result!?
 		
+		// Add event values
+		if(event!=null)
+		{
+			vals.add(event);
+			vals.add(event.getValue());
+		}
+
 		// Add processable element values if any (for plan and APL).
 		if(rpe!=null)
 		{
