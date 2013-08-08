@@ -124,7 +124,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, cn)
 			{
 				boolean isagentorcapa = false;
-				Set<String> fields = new HashSet<String>();
+//				Set<String> fields = new HashSet<String>();
 				
 	//			public void visit(int version, int access, String name,
 	//				String signature, String superName, String[] interfaces)
@@ -132,12 +132,12 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	//				super.visit(version, access, name, null, superName, interfaces);
 	//			}
 				
-				public FieldVisitor visitField(int access, String name,
-						String desc, String signature, Object value)
-				{
-					fields.add(name);
-					return super.visitField(access, name, desc, signature, value);
-				}
+//				public FieldVisitor visitField(int access, String name,
+//						String desc, String signature, Object value)
+//				{
+//					fields.add(name);
+//					return super.visitField(access, name, desc, signature, value);
+//				}
 				
 			    public AnnotationVisitor visitAnnotation(String desc, boolean visible) 
 			    {
@@ -161,7 +161,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 							// if is a putfield and is belief and not is in init (__agent field is not available)
 							if(ophelper.isPutField(opcode) && model.getCapability().hasBelief(name) 
 								&& model.getCapability().getBelief(name).isFieldBelief()
-								&& (isagentorcapa || !fields.contains(name)))
+								&& (isagentorcapa || !owner.equals(iclname))) // either is itself agent/capa or is not field of non-agent
 							{
 								// possibly transform basic value
 								if(SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))

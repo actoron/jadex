@@ -52,7 +52,7 @@ public class RecurBDI
 	
 	/** The list of items. */
 	@Belief
-	protected List<Item> items;
+	protected List<Item> items = new ArrayList<Item>();
 	
 	/** The initial money. */
 	@Belief
