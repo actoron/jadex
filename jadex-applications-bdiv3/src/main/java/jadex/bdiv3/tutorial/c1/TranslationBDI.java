@@ -7,7 +7,6 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 
@@ -15,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  The translation agent C1.
+ *  The translation agent C1. (Belief that triggers plan)
  *  
  *  This translation agent allows for adding word pairs to extend
  *  its dictionary.
@@ -48,18 +47,8 @@ public class TranslationBDI
 		wordtable.put("cat", "Katze");
 		wordtable.put("dog", "Hund");
 		
-		wordtable.put("pig", "Schwein");
 		wordtable.put("bugger", "Flegel");
-
 	}
-	
-//	/**
-//	 *  The agent body.
-//	 */
-//	@AgentBody
-//	public void body()
-//	{
-//	}
 	
 	/**
 	 *  Add a new word pair to the dictionary.
