@@ -1,6 +1,8 @@
 package jadex.commons;
 
 
+import jadex.bridge.ClassInfo;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -15,7 +17,7 @@ public class MethodInfo
 	protected String name;
 	
 	/** The parameter classes. */
-	protected Class<?>[] parametertypes;
+	protected ClassInfo[] parametertypes;
 	
 	//-------- constructors --------
 	
@@ -40,6 +42,19 @@ public class MethodInfo
 	public MethodInfo(String name, Class<?>[] parametertypes)
 	{
 		this.name = name;
+		this.parametertypes = new ClassInfo[parametertypes.length];
+		for (int i = 0; i < parametertypes.length; ++i)
+		{
+			this.parametertypes[i] = new ClassInfo(parametertypes[i]);
+		}
+	}
+	
+	/**
+	 *  Create a new method info.
+	 */
+	public MethodInfo(String name, ClassInfo[] parametertypes)
+	{
+		this.name = name;
 		this.parametertypes = parametertypes.clone();
 	}
 
@@ -62,12 +77,26 @@ public class MethodInfo
 	{
 		this.name = name;
 	}
+	
+	/**
+	 *  Get the parametertypes as classes.
+	 *  @return the parametertypes.
+	 */
+	public Class<?>[] getParameterTypeClasses(ClassLoader cl)
+	{
+		Class<?>[] typeclasses = new Class<?>[parametertypes.length];
+		for (int i = 0; i < parametertypes.length; ++i)
+		{
+			typeclasses[i] = parametertypes[i].getType(cl);
+		}
+		return typeclasses;
+	}
 
 	/**
 	 *  Get the parametertypes.
 	 *  @return the parametertypes.
 	 */
-	public Class<?>[] getParameterTypes()
+	public ClassInfo[] getParameterTypes()
 	{
 		return parametertypes;
 	}
@@ -76,9 +105,12 @@ public class MethodInfo
 	 *  Set the parametertypes.
 	 *  @param parametertypes The parametertypes to set.
 	 */
-	public void setParameterTypes(Class<?>[] parametertypes)
+	public void setParameterTypes(ClassInfo[] parametertypes)
 	{
-		this.parametertypes = parametertypes.clone();
+		//Shallow copy ok?
+//		this.parametertypes = parametertypes.clone();
+		this.parametertypes = new ClassInfo[parametertypes.length];
+		System.arraycopy(parametertypes, 0, this.parametertypes, 0, parametertypes.length);
 	}
 	
 	/**
