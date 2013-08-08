@@ -17,6 +17,7 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +31,7 @@ public class BeliefMapBDI
 	protected BDIAgent agent;
 	
 	@Belief
-	protected Map<String, String> names;
+	protected Map<String, String> names = new HashMap<String, String>();
 	
 	/** The test report. */
 	protected TestReport[] tr = new TestReport[3];

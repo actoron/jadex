@@ -18,12 +18,18 @@ import java.util.List;
  */
 public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 {
-	protected OpcodeHelper opHelp = OpcodeHelper.getInstance();
+	protected OpcodeHelper ophelper = OpcodeHelper.getInstance();
 	
-	protected NodeHelper nodeHelp = NodeHelper.getInstance();
+	protected NodeHelper nodehelper = NodeHelper.getInstance();
 	
 	public abstract Class<?> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl);
 
+	/**
+	 * 
+	 * @param cn
+	 * @param iclname
+	 * @param model
+	 */
 	protected void transformClassNode(IClassNode cn, final String iclname, final BDIModel model)
 	{
 		// Some transformations are only applied to the agent class and not its
@@ -34,12 +40,12 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		// static method call
 		List<IMethodNode> mths = cn.getMethods();
 
-		for (IMethodNode mn : mths)
+		for(IMethodNode mn : mths)
 		{
 			transformArrayStores(mn, model, iclname);
 		}
 
-		if (agentclass)
+		if(agentclass)
 		{
 			// Check if there are dynamic beliefs
 			// and enhance getter/setter beliefs by adding event call to setter
@@ -50,32 +56,33 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			for (MBelief mbel : mbels)
 			{
 				Collection<String> evs = mbel.getEvents();
-				if (evs != null && !evs.isEmpty() || mbel.isDynamic())
+				if(evs != null && !evs.isEmpty() || mbel.isDynamic())
 				{
 					tododyn.add(mbel.getName());
 				}
 
-				if (!mbel.isFieldBelief())
+				if(!mbel.isFieldBelief())
 				{
 					todoset.add(mbel.getSetter().getName());
 				}
 
-				if (!mbel.isFieldBelief())
+				if(!mbel.isFieldBelief())
 				{
 					todoget.add(mbel.getGetter().getName());
 				}
 			}
 
-			IFieldNode initArgsField = nodeHelp.createField(OpcodeHelper.ACC_PROTECTED, "__initargs", "Ljava/util/List;", new String[]{"Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;"}, null);
+			IFieldNode initArgsField = nodehelper.createField(OpcodeHelper.ACC_PROTECTED, "__initargs", "Ljava/util/List;", new String[]{"Ljava/util/List<Ljadex/commons/Tuple3<Ljava/lang/Class<*>;[Ljava/lang/Class<*>;[Ljava/lang/Object;>;>;"}, null);
 			cn.addField(initArgsField);		
 			
-			for (IMethodNode mn : mths)
+			for(IMethodNode mn : mths)
 			{
 				if(isPlanMethod(mn))
 				{
-					int line = nodeHelp.getLineNumberOfMethod(mn);
-					if (line != -1) {
-						IMethodNode lineNumberMethod = nodeHelp.createReturnConstantMethod("__getLineNumber"+mn.getName(), line);
+					int line = nodehelper.getLineNumberOfMethod(mn);
+					if(line != -1) 
+					{
+						IMethodNode lineNumberMethod = nodehelper.createReturnConstantMethod("__getLineNumber"+mn.getName(), line);
 						cn.addMethod(lineNumberMethod);
 					}
 				}
@@ -83,25 +90,27 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				// search constructor (should not have multiple ones)
 				// and extract field assignments for dynamic beliefs
 				// will be incarnated as new update methods
-				if (mn.getName().equals("<init>"))
+				if(mn.getName().equals("<init>"))
 				{
 					transformConstructor(cn, mn, model, tododyn);
 				}
-				else if (todoset.contains(mn.getName()))
+				else if(todoset.contains(mn.getName()))
 				{
 					String belname = mn.getName().substring(3);
 					belname = belname.substring(0,1).toLowerCase()+belname.substring(1);
-					if(opHelp.isNative(mn.getAccess()))
+					if(ophelper.isNative(mn.getAccess()))
 					{
 						replaceNativeSetter(iclname, mn, belname);
-					} else {
+					} 
+					else 
+					{
 						enhanceSetter(iclname, mn, belname);
 					}
 				}
 				// Enhance native getter method
-				else if (todoget.contains(mn.getName()))
+				else if(todoget.contains(mn.getName()))
 				{
-					if(opHelp.isNative(mn.getAccess()))
+					if(ophelper.isNative(mn.getAccess()))
 					{
 						String belname = mn.getName().startsWith("is") ? mn.getName().substring(2) : mn.getName().substring(3);
 						belname = belname.substring(0,1).toLowerCase()+belname.substring(1);
@@ -120,9 +129,10 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				{
 					if(mn.getName().equals("<init>"))
 					{
-						int line = nodeHelp.getLineNumberOfMethod(mn);
-						if (line != -1) {
-							IMethodNode lineNumberMethod = nodeHelp.createReturnConstantMethod("__getLineNumber", line);
+						int line = nodehelper.getLineNumberOfMethod(mn);
+						if(line != -1) 
+						{
+							IMethodNode lineNumberMethod = nodehelper.createReturnConstantMethod("__getLineNumber", line);
 							cn.addMethod(lineNumberMethod);
 						}
 					}
@@ -170,6 +180,11 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 
 	// ----- Helper methods ------
 	
+	/**
+	 * 
+	 * @param classNode
+	 * @return
+	 */
 	protected boolean isAgentClass(IClassNode classNode)
 	{
 		boolean result = false;
@@ -189,6 +204,11 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		return result;
 	}
 	
+	/**
+	 * 
+	 * @param classNode
+	 * @return
+	 */
 	protected boolean isPlanClass(IClassNode classNode) 
 	{
 		boolean result = false;
@@ -207,6 +227,11 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		return result;
 	}
 	
+	/**
+	 * 
+	 * @param methodNode
+	 * @return
+	 */
 	protected boolean isPlanMethod(IMethodNode methodNode) 
 	{
 		boolean result = false;
@@ -225,6 +250,12 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		return result;
 	}
 	
+	/**
+	 * 
+	 * @param parent
+	 * @param iclname
+	 * @return
+	 */
 	private boolean isInnerClass(IClassNode parent, final String iclname)
 	{
 		boolean isinner = false;

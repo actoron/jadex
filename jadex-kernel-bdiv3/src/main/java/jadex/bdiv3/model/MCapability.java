@@ -208,15 +208,18 @@ public class MCapability extends MElement
 	 */
 	public void sortPlans(final ClassLoader cl)
 	{
-		Collections.sort(plans, new Comparator<MPlan>()
+		if(plans!=null)
 		{
-			public int compare(MPlan p1, MPlan p2)
+			Collections.sort(plans, new Comparator<MPlan>()
 			{
-				int ln1 = p1.getBody().getLineNumber(cl);
-				int ln2 = p2.getBody().getLineNumber(cl);
-				return ln1-ln2;
-			}
-		});
+				public int compare(MPlan p1, MPlan p2)
+				{
+					int ln1 = p1.getBody().getLineNumber(cl);
+					int ln2 = p2.getBody().getLineNumber(cl);
+					return ln1-ln2;
+				}
+			});
+		}
 	}
 
 	/**

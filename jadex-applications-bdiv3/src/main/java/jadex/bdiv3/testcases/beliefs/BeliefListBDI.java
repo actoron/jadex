@@ -17,6 +17,7 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class BeliefListBDI
 	protected BDIAgent agent;
 	
 	@Belief
-	protected List<String> names;
+	protected List<String> names = new ArrayList<String>();
 	
 	/** The test report. */
 	protected TestReport[] tr = new TestReport[3];

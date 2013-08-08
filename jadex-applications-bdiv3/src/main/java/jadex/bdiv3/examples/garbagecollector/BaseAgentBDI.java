@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.garbagecollector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jadex.bdiv3.BDIAgent;
@@ -27,7 +28,7 @@ public abstract class BaseAgentBDI
 
 	/** The garbages. */
 	@Belief
-	protected List<ISpaceObject> garbages;
+	protected List<ISpaceObject> garbages = new ArrayList<ISpaceObject>();
 	
 	/**
 	 *  Get the env.

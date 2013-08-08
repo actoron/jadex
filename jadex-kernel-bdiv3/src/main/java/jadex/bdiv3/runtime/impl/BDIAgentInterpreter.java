@@ -16,7 +16,6 @@ import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.model.MProcessableElement;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -28,7 +27,6 @@ import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -214,6 +212,25 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				break;
 			}
 		}
+		// Add hidden agent field also to contained inner classes (goals, plans)
+		// Does not work as would have to be inserted in each object of that type :-(
+//		Class<?>[] inners = agent.getClass().getDeclaredClasses();
+//		if(inners!=null)
+//		{
+//			for(Class<?> icl: inners)
+//			{
+//				try
+//				{
+//					Field field = icl.getDeclaredField("__agent");
+//					field.setAccessible(true);
+//					field.set(icl, pa);
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//			}
+//		}
 	}
 	
 	/**
@@ -527,7 +544,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			public void customResultAvailable(Void result)
 			{
 				Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
-				wrapCollections(bdimodel.getCapability(), agent);
+//				wrapCollections(bdimodel.getCapability(), agent);
 				ret.setResult(null);
 			}
 		});

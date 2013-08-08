@@ -35,9 +35,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.kohsuke.asm4.AnnotationVisitor;
 import org.kohsuke.asm4.ClassReader;
 import org.kohsuke.asm4.ClassVisitor;
 import org.kohsuke.asm4.ClassWriter;
+import org.kohsuke.asm4.FieldVisitor;
 import org.kohsuke.asm4.Label;
 import org.kohsuke.asm4.MethodVisitor;
 import org.kohsuke.asm4.Opcodes;
@@ -121,13 +123,33 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, cn)
 			{
+				boolean isagentorcapa = false;
+				Set<String> fields = new HashSet<String>();
+				
 	//			public void visit(int version, int access, String name,
 	//				String signature, String superName, String[] interfaces)
 	//			{
 	//				super.visit(version, access, name, null, superName, interfaces);
 	//			}
 				
-				public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
+				public FieldVisitor visitField(int access, String name,
+						String desc, String signature, Object value)
+				{
+					fields.add(name);
+					return super.visitField(access, name, desc, signature, value);
+				}
+				
+			    public AnnotationVisitor visitAnnotation(String desc, boolean visible) 
+			    {
+			    	if(visible && (desc.indexOf("Ljadex/micro/annotation/Agent;")!=-1
+			    		|| desc.indexOf("Ljadex/bdiv3/annotation/Capability;")!=-1))
+			    	{
+			    		isagentorcapa = true;
+			    	}
+			    	return super.visitAnnotation(desc, visible);
+			    }
+
+			    public MethodVisitor visitMethod(int access, final String methodname, String desc, String signature, String[] exceptions)
 				{
 //					if(clname.indexOf("PlanPrecondition")!=-1)
 //						System.out.println(desc+" "+methodname);
@@ -137,33 +159,10 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 						public void visitFieldInsn(int opcode, String owner, String name, String desc)
 						{
 							// if is a putfield and is belief and not is in init (__agent field is not available)
-							if(opHelp.isPutField(opcode) && model.getCapability().hasBelief(name) 
-								&& model.getCapability().getBelief(name).isFieldBelief())
+							if(ophelper.isPutField(opcode) && model.getCapability().hasBelief(name) 
+								&& model.getCapability().getBelief(name).isFieldBelief()
+								&& (isagentorcapa || !fields.contains(name)))
 							{
-//								visitInsn(Opcodes.POP);
-//								visitInsn(Opcodes.POP);
-								
-								// stack before putfield is object,value ()
-//								System.out.println("method: "+methodname+" "+name);
-
-								// must do both in constructor
-								// a) write init values also immediately to allow dependencies
-								// b) invoke writefield (agent=null) to create rule events later
-//								if("<init>".equals(methodname))
-//								{
-//									super.visitFieldInsn(opcode, owner, name, desc);
-//									visitLabel(new Label());
-//									visitVarInsn(Opcodes.ALOAD, 0);
-//									visitInsn(Opcodes.DUP);
-//									super.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
-//								}
-								// is already on stack (object + value)
-	//							mv.visitVarInsn(ALOAD, 0);
-	//							mv.visitIntInsn(BIPUSH, 25);
-								
-//								System.out.println("vis: "+opcode+" "+owner+" "+name+" "+desc);
-//								System.out.println(Type.getType(desc).getClassName());
-																
 								// possibly transform basic value
 								if(SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))
 									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
@@ -173,11 +172,17 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 								// fetch bdi agent value from field
 
 								// this pop aload is necessary in inner classes!
-								visitInsn(Opcodes.POP);
-								visitVarInsn(Opcodes.ALOAD, 0);
-								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
-//								super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", "L"+iclname+";");
-//								visitInsn(Opcodes.SWAP);
+								if(isagentorcapa)
+								{
+									visitInsn(Opcodes.POP);
+									visitVarInsn(Opcodes.ALOAD, 0);
+									super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
+								}
+								else
+								{
+									visitInsn(Opcodes.POP);
+									visitInsn(Opcodes.ACONST_NULL);
+								}
 								
 								// add field name	
 								visitLdcInsn(name);
@@ -186,13 +191,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 								visitVarInsn(Opcodes.ALOAD, 0);
 								visitInsn(Opcodes.SWAP);
 								
-								// invoke method
-//								String bdin = Type.getDescriptor(BDIAgent.class);
-//								System.out.println("bdin: "+bdin);
-//								visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(BDIAgent.class), "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;)V");
-//								visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(BDIAgent.class), "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;"+bdin+")V");
 								visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
-//								visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeField", "()V");
 							}
 							else
 							{
@@ -222,9 +221,6 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public void visitInnerClass(String name, String outerName, String innerName, int access)
 				{
-					if(clname.indexOf("PlanPrecondition")!=-1)
-						System.out.println("XYZplanprecond "+innerName);
-
 //					System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
 					String icln = name.replace("/", ".");
 					if(!done.contains(icln))
@@ -234,7 +230,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public void visitEnd()
 				{
-					visitField(Opcodes.ACC_PUBLIC, "__agent", Type.getDescriptor(BDIAgent.class), null, null);
+					if(isagentorcapa)
+						visitField(Opcodes.ACC_PUBLIC, "__agent", Type.getDescriptor(BDIAgent.class), null, null);
 					visitField(Opcodes.ACC_PUBLIC, "__globalname", Type.getDescriptor(String.class), null, null);
 					super.visitEnd();
 				}
@@ -323,96 +320,103 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		return ret;
 	}
 	
+	/**
+	 * 
+	 */
 	protected void replaceNativeGetter(String iclname, IMethodNode mn, String belname)
 	{
-			Type	ret	= Type.getReturnType(mn.getDesc());
+		Type	ret	= Type.getReturnType(mn.getDesc());
 
-			mn.setAccess(mn.getAccess()-Opcodes.ACC_NATIVE);
-			InsnList nl = new InsnList();
-			nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-			nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bdiv3/BDIAgent;"));
-			nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-			nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__globalname", "Ljava/lang/String;"));
-			nl.add(new LdcInsnNode(belname));
-			
-			if(ret.getClassName().equals("byte"))
-			{
-				nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Byte", "TYPE", "Ljava/lang/Class;"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "intValue", "()I"));
-				nl.add(new InsnNode(Opcodes.I2B));
-				nl.add(new InsnNode(Opcodes.IRETURN));
-			}
-			else if(ret.getClassName().equals("short"))
-			{
-				nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Short", "TYPE", "Ljava/lang/Class;"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "intValue", "()I"));
-				nl.add(new InsnNode(Opcodes.I2S));
-				nl.add(new InsnNode(Opcodes.IRETURN));
-			}
-			else if(ret.getClassName().equals("int"))
-			{
-				nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Integer", "TYPE", "Ljava/lang/Class;"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "intValue", "()I"));
-				nl.add(new InsnNode(Opcodes.IRETURN));
-			}
-			else if(ret.getClassName().equals("char"))
-			{
-				nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Character", "TYPE", "Ljava/lang/Class;"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Character"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C"));
-				nl.add(new InsnNode(Opcodes.IRETURN));
-			}
-			else if(ret.getClassName().equals("boolean"))
-			{
-				nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Boolean", "TYPE", "Ljava/lang/Class;"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Boolean"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z"));
-				nl.add(new InsnNode(Opcodes.IRETURN));
-			}
-			else if(ret.getClassName().equals("long"))
-			{
-				nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Long", "TYPE", "Ljava/lang/Class;"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "longValue", "()J"));
-				nl.add(new InsnNode(Opcodes.LRETURN));							
-			}
-			else if(ret.getClassName().equals("float"))
-			{
-				nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Float", "TYPE", "Ljava/lang/Class;"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "floatValue", "()F"));
-				nl.add(new InsnNode(Opcodes.FRETURN));							
-			}
-			else if(ret.getClassName().equals("double"))
-			{
-				nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Double", "TYPE", "Ljava/lang/Class;"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "doubleValue", "()D"));
-				nl.add(new InsnNode(Opcodes.DRETURN));
-			}
-			else // Object
-			{
-				nl.add(new LdcInsnNode(ret));
-				nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
-				nl.add(new TypeInsnNode(Opcodes.CHECKCAST, ret.getInternalName()));
-				nl.add(new InsnNode(Opcodes.ARETURN));
-			}
-			
-			mn.setInstructions(InsnListWrapper.wrap(nl));
+		mn.setAccess(mn.getAccess()-Opcodes.ACC_NATIVE);
+		InsnList nl = new InsnList();
+		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bdiv3/BDIAgent;"));
+		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__globalname", "Ljava/lang/String;"));
+		nl.add(new LdcInsnNode(belname));
+		
+		if(ret.getClassName().equals("byte"))
+		{
+			nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Byte", "TYPE", "Ljava/lang/Class;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "intValue", "()I"));
+			nl.add(new InsnNode(Opcodes.I2B));
+			nl.add(new InsnNode(Opcodes.IRETURN));
+		}
+		else if(ret.getClassName().equals("short"))
+		{
+			nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Short", "TYPE", "Ljava/lang/Class;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "intValue", "()I"));
+			nl.add(new InsnNode(Opcodes.I2S));
+			nl.add(new InsnNode(Opcodes.IRETURN));
+		}
+		else if(ret.getClassName().equals("int"))
+		{
+			nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Integer", "TYPE", "Ljava/lang/Class;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "intValue", "()I"));
+			nl.add(new InsnNode(Opcodes.IRETURN));
+		}
+		else if(ret.getClassName().equals("char"))
+		{
+			nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Character", "TYPE", "Ljava/lang/Class;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Character"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C"));
+			nl.add(new InsnNode(Opcodes.IRETURN));
+		}
+		else if(ret.getClassName().equals("boolean"))
+		{
+			nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Boolean", "TYPE", "Ljava/lang/Class;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Boolean"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z"));
+			nl.add(new InsnNode(Opcodes.IRETURN));
+		}
+		else if(ret.getClassName().equals("long"))
+		{
+			nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Long", "TYPE", "Ljava/lang/Class;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "longValue", "()J"));
+			nl.add(new InsnNode(Opcodes.LRETURN));							
+		}
+		else if(ret.getClassName().equals("float"))
+		{
+			nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Float", "TYPE", "Ljava/lang/Class;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "floatValue", "()F"));
+			nl.add(new InsnNode(Opcodes.FRETURN));							
+		}
+		else if(ret.getClassName().equals("double"))
+		{
+			nl.add(new FieldInsnNode(Opcodes.GETSTATIC, "java/lang/Double", "TYPE", "Ljava/lang/Class;"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/lang/Number"));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/lang/Number", "doubleValue", "()D"));
+			nl.add(new InsnNode(Opcodes.DRETURN));
+		}
+		else // Object
+		{
+			nl.add(new LdcInsnNode(ret));
+			nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "getAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;"));
+			nl.add(new TypeInsnNode(Opcodes.CHECKCAST, ret.getInternalName()));
+			nl.add(new InsnNode(Opcodes.ARETURN));
+		}
+		
+		mn.setInstructions(InsnListWrapper.wrap(nl));
 	}
 	
-	protected void replaceNativeSetter(String iclname, IMethodNode mn, String belname) {
+	/**
+	 * 
+	 */
+	protected void replaceNativeSetter(String iclname, IMethodNode mn, String belname) 
+	{
 		Type	arg	= Type.getArgumentTypes(mn.getDesc())[0];
 
 		mn.setAccess(mn.getAccess()-Opcodes.ACC_NATIVE);
@@ -475,20 +479,23 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		mn.setInstructions(InsnListWrapper.wrap(nl));
 	}
 
+	/**
+	 * 
+	 */
 	protected void enhanceSetter(String iclname, IMethodNode mn, String belname)
 	{
 		System.out.println("method acc: "+mn.getName()+" "+mn.getAccess());
 		
 		IInsnList l = mn.getInstructions();
 		
-//					System.out.println("icl: "+iclname);
+//		System.out.println("icl: "+iclname);
 		
 		InsnList nl = new InsnList();
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
 		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
 		nl.add(new LdcInsnNode(belname));
 		nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "unobserveValue", 
-//						"(Ljava/lang/String;)V"));
+//			"(Ljava/lang/String;)V"));
 			"(Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
 		l.insertBefore(l.getFirst(), InsnListWrapper.wrap(nl));
 		
@@ -499,8 +506,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		nl.add(new LdcInsnNode(belname));
 		nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
 			"(Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
-//					nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
-//						"()V"));
+//			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
+//				"()V"));
 
 		// Find return and insert call before that
 		IAbstractInsnNode n;
@@ -510,6 +517,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		l.insertBefore(n, InsnListWrapper.wrap(nl));
 	}
 
+	/**
+	 * 
+	 */
 	protected void transformConstructor(IClassNode cn, IMethodNode mn, BDIModel model, List<String> tododyn)
 	{
 		IInsnList l = mn.getInstructions();
@@ -604,7 +614,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			while(l.size()>foundcon+1)
 			{
 				IAbstractInsnNode	node	= l.get(foundcon+1);
-				if(opHelp.isReturn(node.getOpcode()))
+				if(ophelper.isReturn(node.getOpcode()))
 				{
 					break;
 				}
@@ -652,6 +662,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		}
 	}
 
+	/**
+	 * 
+	 */
 	protected void transformArrayStores(IMethodNode mn, BDIModel model, String iclname)
 	{
 		IInsnList ins = mn.getInstructions();
@@ -799,11 +812,11 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //		System.out.println(int.class.getName());
 		
 //		Method m = SReflect.getMethods(BDIAgent.class, "writeArrayField")[0];
-		Method[] ms = SReflect.getMethods(SReflect.class, "wrapValue");
-		for(Method m: ms)
-		{
-			System.out.println(m.toString()+" "+Type.getMethodDescriptor(m));
-		}
+//		Method[] ms = SReflect.getMethods(SReflect.class, "wrapValue");
+//		for(Method m: ms)
+//		{
+//			System.out.println(m.toString()+" "+Type.getMethodDescriptor(m));
+//		}
 				
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 //		TraceClassVisitor tcv = new TraceClassVisitor(cw, new PrintWriter(System.out));

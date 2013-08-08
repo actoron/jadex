@@ -141,8 +141,8 @@ public abstract class AbstractPlanBody implements IPlanBody
 //				int next = rplan.getException() instanceof PlanAbortedException? 3: 2;
 				int next = exception instanceof PlanAbortedException? 3: 2;
 				
-				if(next==3)
-					System.out.println("exe abort of: "+rplan.getId());
+//				if(next==3)
+//					System.out.println("exe abort of: "+rplan.getId());
 				
 				rplan.setException(exception);
 				internalInvokePart(agent, next)

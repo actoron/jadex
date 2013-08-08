@@ -19,9 +19,9 @@ public class MyTestClass
 
 //	protected List<Tuple3<Class<?>,Class<?>[], Object[]>>	initcalls;
 	
-	protected String	__globalname	= "huhu";
-	
-	protected BDIAgent	__agent;
+//	protected String	__globalname	= "huhu";
+//	
+//	protected BDIAgent	__agent;
 	
 	
 //	public MyTestClass(String name, List values)
@@ -43,11 +43,16 @@ public class MyTestClass
 ////		testfield = 22;
 //	}
 	
-	public void setVal(double val)
+	public static Object getNull()
 	{
-		String	belief	= "haha";
-		__agent.setAbstractBeliefValue(__globalname, belief, val);
+		return null;
 	}
+	
+//	public void setVal(double val)
+//	{
+//		String	belief	= "haha";
+//		__agent.setAbstractBeliefValue(__globalname, belief, val);
+//	}
 //	
 //	Integer	n	= new Integer(39784374);
 //	Character	c 	= new Character('d');

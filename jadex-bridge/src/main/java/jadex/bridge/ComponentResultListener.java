@@ -2,11 +2,10 @@ package jadex.bridge;
 
 import jadex.base.Starter;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.future.ICommandFuture;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ICommandFuture.Type;
 
 /**
  *  The result listener for executing listener invocations as a component step.

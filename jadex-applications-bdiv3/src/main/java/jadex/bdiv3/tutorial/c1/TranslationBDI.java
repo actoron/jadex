@@ -4,12 +4,14 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,30 +39,36 @@ public class TranslationBDI
 	@AgentCreated
 	public void init()
 	{
-//		System.out.println("Created: "+this);
+		// Do not create the map here (only as initial assignment)
+		this.wordtable = new HashMap<String, String>();
+		
 		wordtable.put("coffee", "Kaffee");
 		wordtable.put("milk", "Milch");
 		wordtable.put("cow", "Kuh");
 		wordtable.put("cat", "Katze");
 		wordtable.put("dog", "Hund");
-	}
-	
-	/**
-	 *  The agent body.
-	 */
-	@AgentBody
-	public void body()
-	{
+		
 		wordtable.put("pig", "Schwein");
 		wordtable.put("bugger", "Flegel");
+
 	}
+	
+//	/**
+//	 *  The agent body.
+//	 */
+//	@AgentBody
+//	public void body()
+//	{
+//	}
 	
 	/**
 	 *  Add a new word pair to the dictionary.
 	 */
 	@Plan(trigger=@Trigger(factaddeds="wordtable"))
-	public void checkWordPairPlan(Map.Entry<String, String> wordpair)
+//	public void checkWordPairPlan(Map.Entry<String, String> wordpair)
+	public void checkWordPairPlan(ChangeEvent event)
 	{
+		Map.Entry<String, String> wordpair = (Map.Entry<String, String>)event.getValue();
 		if(wordpair.getKey().equals("bugger"))
 			System.out.println("Warning, a colloquial word pair has been added: "+wordpair.getKey()+" "+wordpair.getValue());
 	}

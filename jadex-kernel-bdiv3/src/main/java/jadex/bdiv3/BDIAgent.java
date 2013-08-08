@@ -10,6 +10,9 @@ import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.bdiv3.runtime.wrappers.ListWrapper;
+import jadex.bdiv3.runtime.wrappers.MapWrapper;
+import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
@@ -40,6 +43,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Base class for application agents.
@@ -339,6 +343,20 @@ public class BDIAgent extends MicroAgent
 	{
 //		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
 		
+		// This is the case in inner classes
+		if(agent==null)
+		{
+			try
+			{
+				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, "__agent");
+				System.out.println("res: "+res);
+				agent = (BDIAgent)res.getFirstEntity().get(res.getSecondEntity());
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
 		String	gn	= null;
 		try
 		{
@@ -353,9 +371,28 @@ public class BDIAgent extends MicroAgent
 		
 		String belname	= gn!=null ? gn + BDIAgentInterpreter.CAPABILITY_SEPARATOR + fieldname : fieldname;
 
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+		
+		// Wrap collections of multi beliefs (if not already a wrapper)
+		if(ip.getBDIModel().getCapability().getBelief(belname).isMulti(ip.getClassLoader()))
+		{
+			if(val instanceof List && !(val instanceof ListWrapper))
+			{
+				val = new ListWrapper((List<?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname);
+			}
+			else if(val instanceof Set && !(val instanceof SetWrapper))
+			{
+				val = new SetWrapper((Set<?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname);
+			}
+			else if(val instanceof Map && !(val instanceof MapWrapper))
+			{
+				val = new MapWrapper((Map<?,?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname);
+			}
+		}
+		
 		// agent is not null any more due to deferred exe of init expressions but rules are
 		// available only after startBehavior
-		if(agent!=null && ((BDIAgentInterpreter)agent.getInterpreter()).isInited())
+		if(ip.isInited())
 		{
 			agent.writeField(val, belname, fieldname, obj);
 		}

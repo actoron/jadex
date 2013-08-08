@@ -75,19 +75,19 @@ public class CleanerBDI
 	
 	/** The set of wastes. */
 	@Belief
-	protected Set<Waste> wastes;
+	protected Set<Waste> wastes = new HashSet<Waste>();
 	
 	/** The known set of wastebins. */
 	@Belief
-	protected Set<Wastebin> wastebins;
+	protected Set<Wastebin> wastebins = new HashSet<Wastebin>();
 	
 	/** The known set of chargingstation. */
 	@Belief
-	protected Set<Chargingstation> chargingstations;
+	protected Set<Chargingstation> chargingstations = new HashSet<Chargingstation>();
 	
 	/** The known set of other cleaners. */
 	@Belief
-	protected Set<Cleaner> cleaners;
+	protected Set<Cleaner> cleaners = new HashSet<Cleaner>();
 	
 	/** The raster for memorizing positions. */
 	@Belief
@@ -125,7 +125,7 @@ public class CleanerBDI
 	
 	/** The patrol points. */
 	@Belief
-	protected List<Location> patrolpoints;
+	protected List<Location> patrolpoints = new ArrayList<Location>();
 	
 //	@Belief
 //	protected CleanerGui gui = new CleanerGui(agent.getExternalAccess());

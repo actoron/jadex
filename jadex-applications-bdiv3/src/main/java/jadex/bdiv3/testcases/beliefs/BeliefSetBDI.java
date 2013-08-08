@@ -17,6 +17,7 @@ import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -30,7 +31,7 @@ public class BeliefSetBDI
 	protected BDIAgent agent;
 	
 	@Belief
-	protected Set<String> names;
+	protected Set<String> names = new HashSet<String>();
 	
 	/** The test report. */
 	protected TestReport[] tr = new TestReport[2];

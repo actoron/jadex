@@ -560,7 +560,7 @@ public class RPlan extends RElement implements IPlan
 	public void abort()
 	{
 //		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("Go")!=-1)
-		System.out.println("abort move plan: "+getId());
+//		System.out.println("abort move plan: "+getId());
 		
 		if(!isFinished())
 		{
