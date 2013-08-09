@@ -1,34 +1,35 @@
-package jadex.bdiv3.tutorial.c2;
+package jadex.bdiv3.tutorial.c4;
 
 import jadex.bdiv3.annotation.Belief;
-import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  Belief with update rate.
+ *  Translation agent C4.
+ *  
+ *  Argument mapped to a field.
  */
-@Description("The clock agent C2. <br>  This translation agent uses a belief with update rate.")
+@Description("The clock agent C4. <br>  This translation agent uses an argument.")
 @Agent
 @Service
+@Arguments(@Argument(name="wordpair", clazz=String[].class, 
+	defaultvalue="new String[]{\"bugger\", \"Flegel\"}"))
 public class TranslationBDI
 {
 	/** The current time. */
 	@Belief
 	protected Map<String, String> wordtable = new HashMap<String, String>();
 
-	@Belief(dynamic=true)
-	protected boolean alarm = wordtable.containsKey("burgler");
+	@AgentArgument
+	protected String[] wordpair;
 	
 	//-------- methods --------
 
@@ -41,15 +42,8 @@ public class TranslationBDI
 		wordtable.put("cat", "Katze");
 		wordtable.put("dog", "Hund");
 		
-		wordtable.put("bugger", "Flegel");
-	}
-	
-	/**
-	 *  Initiate an alarm.
-	 */
-	@Plan(trigger=@Trigger(factchangeds="alarm"))
-	public void checkWordPairPlan()
-	{
-		System.out.println("Warning, a colloquial word pair has been added.");
+		wordtable.put(wordpair[0], wordpair[1]);
+		
+		System.out.println("dictionary is: "+wordtable);
 	}
 }

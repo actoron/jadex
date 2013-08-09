@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial.e4;
+package jadex.bdiv3.tutorial.d7;
 
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;

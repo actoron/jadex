@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 /**
  *  Belief with update rate.
  */
-@Description("The clock agent C2. <br>  This translation agent uses a belief with update rate.")
+@Description("The clock agent C3. <br>  This translation agent uses a belief with update rate.")
 @Agent
 @Service
 public class ClockBDI

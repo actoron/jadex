@@ -1,0 +1,105 @@
+package jadex.bdiv3.tutorial.d4;
+
+import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.GoalCreationCondition;
+import jadex.bdiv3.annotation.GoalParameter;
+import jadex.bdiv3.annotation.GoalResult;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Trigger;
+import jadex.bridge.service.annotation.Service;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.Description;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ *  Translation agent D3.
+ *  
+ *  Using a creation goal condition.
+ */
+@Description("Translation agent D4. <br>  This translation agent using a creation condition.")
+@Agent
+@Service
+public class TranslationBDI
+{
+	/** The agent. */
+	@Agent
+	protected BDIAgent agent;
+	
+	/** The current time. */
+	@Belief
+	protected Map<String, String> wordtable = new HashMap<String, String>();
+
+	@Belief
+	protected String eword;
+	
+	/**
+	 *  The translation goal.
+	 */
+	@Goal
+//	public static class Translate
+	public class Translate
+	{
+		/** The english word. */
+		@GoalParameter
+		protected String eword;
+		
+		/** The german word. */
+		@GoalResult
+		protected String gword;
+		
+		/**
+		 *  Create a new translate goal. 
+		 */
+		@GoalCreationCondition(events="eword")
+		public Translate(String eword)
+		{
+			this.eword = eword;
+		}
+		
+//		/**
+//		 *  Create a new goal.
+//		 */
+//		@GoalCreationCondition(events="eword")
+//		public static Translate createGoal(String eword)
+//		{
+//			return new Translate(eword);
+//		}
+	}
+	
+	//-------- methods --------
+	
+	@AgentCreated
+	public void init()
+	{
+		wordtable.put("coffee", "Kaffee");
+		wordtable.put("milk", "Milch");
+		wordtable.put("cow", "Kuh");
+		wordtable.put("cat", "Katze");
+		wordtable.put("dog", "Hund");
+	}
+	
+	/**
+	 *  The agent body.
+	 */
+	@AgentBody
+	public void body()
+	{
+		eword = "cat";
+		eword = "milk";
+	}
+	
+	/**
+	 *  Translate a word. Plan that translates.
+	 */
+	@Plan(trigger=@Trigger(goals=Translate.class))
+	protected void translateB(String eword)
+	{
+		System.out.println("Translated: "+eword+" "+wordtable.get(eword));
+	}
+}

@@ -14,6 +14,29 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Goal
 {
+	/** The exclude mode. */
+	public enum ExcludeMode
+	{
+		Never(MProcessableElement.EXCLUDE_NEVER), 
+		WhenTried(MProcessableElement.EXCLUDE_WHEN_TRIED), 
+		WhenSucceeded(MProcessableElement.EXCLUDE_WHEN_SUCCEEDED), 
+		WhenFailed(MProcessableElement.EXCLUDE_WHEN_FAILED);
+		
+		protected String str;
+		ExcludeMode(String str)
+		{
+			this.str = str;
+		}
+		/**
+		 *  Get the string representation.
+		 *  @return The string representation.
+		 */
+		public String getString()
+		{
+			return str;
+		}
+	}
+	
 	/**
 	 * 
 	 */
@@ -37,7 +60,7 @@ public @interface Goal
 	/**
 	 * 
 	 */
-	public String excludemode() default MProcessableElement.EXCLUDE_WHEN_TRIED;
+	public ExcludeMode excludemode() default ExcludeMode.WhenTried;//MProcessableElement.EXCLUDE_WHEN_TRIED;
 	
 	/** 
 	 * The retry flag. 

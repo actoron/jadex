@@ -14,6 +14,7 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
 import jadex.bdiv3.examples.cleanerworld.world.Cleaner;
 import jadex.bdiv3.examples.cleanerworld.world.Environment;
@@ -326,7 +327,7 @@ public class CleanerBDI
 	/**
 	 *  Goal that lets the cleaner look for waste.
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false)
+	@Goal(excludemode=ExcludeMode.Never, succeedonpassed=false)
 	public class PerformLookForWaste
 	{
 		/**
@@ -342,7 +343,7 @@ public class CleanerBDI
 	/**
 	 *  Goal that lets the agent perform patrol rounds.
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false)
+	@Goal(excludemode=ExcludeMode.Never, succeedonpassed=false)
 	public class PerformPatrol
 	{
 		/**
@@ -385,7 +386,7 @@ public class CleanerBDI
 	/**
 	 *  
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
+	@Goal(excludemode=ExcludeMode.Never)
 	public class AchieveDropWaste
 	{
 		/** The wastebin. */
@@ -461,7 +462,7 @@ public class CleanerBDI
 	/**
 	 *  
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
+	@Goal(excludemode=ExcludeMode.Never)
 	public class QueryWastebin
 	{
 		/** The wastebin. */
@@ -509,7 +510,7 @@ public class CleanerBDI
 		}
 	}
 	
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
+	@Goal(excludemode=ExcludeMode.Never)
 	public class QueryChargingStation
 	{
 		protected Chargingstation station;
@@ -626,7 +627,7 @@ public class CleanerBDI
 		}
 	}
 	
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER, succeedonpassed=false, retrydelay=300)
+	@Goal(excludemode=ExcludeMode.Never, succeedonpassed=false, retrydelay=300)
 	public class PerformMemorizePositions
 	{
 	}

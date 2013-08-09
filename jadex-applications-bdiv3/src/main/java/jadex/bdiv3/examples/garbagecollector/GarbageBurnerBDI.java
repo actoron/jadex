@@ -7,6 +7,7 @@ import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.commons.SUtil;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -96,7 +97,7 @@ public class GarbageBurnerBDI extends BaseAgentBDI
 	/**
 	 *  The goal for picking up waste. Tries endlessly to pick up. 
 	 */
-	@Goal(excludemode=MProcessableElement.EXCLUDE_NEVER, retrydelay=100)
+	@Goal(excludemode=ExcludeMode.Never, retrydelay=100)
 	public class Pick
 	{
 	}

@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.model.MProcessableElement;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.IVector2;
@@ -78,7 +79,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	/**
 	 *  Goal for running around on the grid and searching for garbage.
 	 */
-	@Goal(excludemode=MProcessableElement.EXCLUDE_NEVER, succeedonpassed=false)
+	@Goal(excludemode=ExcludeMode.Never, succeedonpassed=false)
 	public class Check
 	{
 	}
@@ -86,7 +87,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	/**
 	 *  Goal for going to a specified position.
 	 */
-	@Goal(excludemode=MProcessableElement.EXCLUDE_NEVER)
+	@Goal(excludemode=ExcludeMode.Never)
 	public class Go
 	{
 		/** The position. */
@@ -113,7 +114,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 	/**
 	 *  The goal for picking up waste. Tries endlessly to pick up.
 	 */
-	@Goal(excludemode=MProcessableElement.EXCLUDE_NEVER, retrydelay=100)
+	@Goal(excludemode=ExcludeMode.Never, retrydelay=100)
 	public class Pick
 	{
 		/**

@@ -1,14 +1,14 @@
-package jadex.bdiv3.tutorial.e3;
+package jadex.bdiv3.tutorial.d6;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.annotation.GoalContextCondition;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bridge.IComponentStep;
@@ -57,7 +57,7 @@ public class TranslationBDI
 	 *  Maintain goal that ensures that only maxstorage
 	 *  number of entries are in the table egwords.
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
+	@Goal(excludemode=ExcludeMode.Never)
 	public class MaintainStorageGoal
 	{
 		@GoalMaintainCondition
@@ -141,7 +141,7 @@ public class TranslationBDI
 	{
 		String key = egwords.keySet().iterator().next();
 		String val = egwords.remove(key);
-//		System.out.println("removed: "+key+" "+val+" "+egwords);
+		System.out.println("removed: "+key+" "+val+" "+egwords);
 	}
 	
 	/**

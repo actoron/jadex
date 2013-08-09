@@ -964,7 +964,7 @@ public class BDIClassReader extends MicroClassReader
 			tmpcl = tmpcl.getSuperclass();
 		}
 		
-		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode(), 
+		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode().getString(), 
 			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.succeedonpassed(), goal.unique(), mdel, params);
 		
 		jadex.bdiv3.annotation.Publish pub = goal.publish();

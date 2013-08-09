@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.model.MGoal;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
@@ -27,7 +28,7 @@ public class GoalBDI
 	/**
 	 *  Goal with target and drop condition.
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
+	@Goal(excludemode=ExcludeMode.Never)
 	public class Count2Goal
 	{
 		/** The target value. */

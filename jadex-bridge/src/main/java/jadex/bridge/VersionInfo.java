@@ -30,7 +30,7 @@ public class VersionInfo
 	//-------- attributes --------
 	
 	/** The version string (e.g. 2.2-RC1). */
-	protected String	version;
+	protected String version;
 
 	/** The release date. */
 	protected Date	date;

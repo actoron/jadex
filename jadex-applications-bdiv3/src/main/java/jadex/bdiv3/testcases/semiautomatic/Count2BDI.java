@@ -5,11 +5,11 @@ import jadex.bdiv3.annotation.BDIConfiguration;
 import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.model.MGoal;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
@@ -29,7 +29,7 @@ public class Count2BDI
 	/**
 	 *  Goal with target and drop condition.
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_NEVER)
+	@Goal(excludemode=ExcludeMode.Never)
 	public class Count2Goal
 	{
 		/** The target value. */

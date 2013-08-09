@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.annotation.GoalRecurCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
@@ -67,7 +68,7 @@ public class RecurBDI
 	 *  A buy items goal that is responsible for buying
 	 *  a number of items.
 	 */
-	@Goal(excludemode=MGoal.EXCLUDE_WHEN_FAILED, recur=true)
+	@Goal(excludemode=ExcludeMode.WhenFailed, recur=true)
 	public class BuyItemsGoal
 	{
 		protected int num;
