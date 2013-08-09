@@ -464,7 +464,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					}
 					else if(infos[j] instanceof MethodInfo)
 					{
-						final Method	m	= SReflect.getMethod(agent.getClass(), ((MethodInfo)infos[j]).getName(), ((MethodInfo)infos[j]).getParameterTypeClasses(getClassLoader()));
+						final Method	m	= SReflect.getMethod(agent.getClass(), ((MethodInfo)infos[j]).getName(), ((MethodInfo)infos[j]).getParameterTypes(getClassLoader()));
 						if(info.isMultiple())
 						{
 							lis2.resultAvailable(null);

@@ -42,11 +42,7 @@ public class MethodInfo
 	public MethodInfo(String name, Class<?>[] parametertypes)
 	{
 		this.name = name;
-		this.parametertypes = new ClassInfo[parametertypes.length];
-		for (int i = 0; i < parametertypes.length; ++i)
-		{
-			this.parametertypes[i] = new ClassInfo(parametertypes[i]);
-		}
+		setParameterTypes(parametertypes);
 	}
 	
 	/**
@@ -82,7 +78,7 @@ public class MethodInfo
 	 *  Get the parametertypes as classes.
 	 *  @return the parametertypes.
 	 */
-	public Class<?>[] getParameterTypeClasses(ClassLoader cl)
+	public Class<?>[] getParameterTypes(ClassLoader cl)
 	{
 		Class<?>[] typeclasses = new Class<?>[parametertypes.length];
 		for (int i = 0; i < parametertypes.length; ++i)
@@ -91,12 +87,25 @@ public class MethodInfo
 		}
 		return typeclasses;
 	}
+	
+	/**
+	 *  Get the parametertypes as classes.
+	 *  @return the parametertypes.
+	 */
+	public void setParameterTypes(Class<?>[] parametertypes)
+	{
+		this.parametertypes = new ClassInfo[parametertypes.length];
+		for (int i = 0; i < parametertypes.length; ++i)
+		{
+			this.parametertypes[i] = new ClassInfo(parametertypes[i]);
+		}
+	}
 
 	/**
 	 *  Get the parametertypes.
 	 *  @return the parametertypes.
 	 */
-	public ClassInfo[] getParameterTypes()
+	public ClassInfo[] getParameterTypeInfos()
 	{
 		return parametertypes;
 	}
@@ -105,7 +114,7 @@ public class MethodInfo
 	 *  Set the parametertypes.
 	 *  @param parametertypes The parametertypes to set.
 	 */
-	public void setParameterTypes(ClassInfo[] parametertypes)
+	public void setParameterTypeInfos(ClassInfo[] parametertypes)
 	{
 		//Shallow copy ok?
 //		this.parametertypes = parametertypes.clone();

@@ -428,9 +428,9 @@ public class DefaultRestServicePublishService implements IPublishService
 				{
 					annot = new Annotation(constpool, SJavassist.getCtClass(MethodMapper.class, pool));
 					annot.addMemberValue("value", new StringMemberValue(methodmapper.getName(), constpool));
-					Class<?>[] ptypes = methodmapper.getParameterTypeClasses(classloader);
+					Class<?>[] ptypes = methodmapper.getParameterTypes(classloader);
 					ArrayMemberValue vals = new ArrayMemberValue(new ClassMemberValue(constpool), constpool);
-					MemberValue[] mvals = new MemberValue[methodmapper.getParameterTypes().length];
+					MemberValue[] mvals = new MemberValue[methodmapper.getParameterTypeInfos().length];
 					for(int i=0; i<mvals.length; i++)
 					{
 						mvals[i] = new ClassMemberValue(ptypes[i].getName(), constpool);
