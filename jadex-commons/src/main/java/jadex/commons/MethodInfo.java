@@ -75,6 +75,16 @@ public class MethodInfo
 	}
 	
 	/**
+	 *  This method only exists for backward compatibility
+	 *  and decoding purposes only, do not use.
+	 */
+	@Deprecated
+	public Class<?>[] getParameterTypes()
+	{
+		throw new UnsupportedOperationException("This method only exists for backward compatibility and decoding purposes only, do not use.");
+	}
+	
+	/**
 	 *  Get the parametertypes as classes.
 	 *  @return the parametertypes.
 	 */
