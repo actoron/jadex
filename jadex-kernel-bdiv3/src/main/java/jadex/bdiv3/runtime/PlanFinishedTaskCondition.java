@@ -21,9 +21,9 @@ public class PlanFinishedTaskCondition implements IBooleanCondition
 	 */
 	public PlanFinishedTaskCondition(final IPlan plan)
 	{
-		plan.addPlanListener(new IPlanListener()
+		plan.addPlanListener(new IPlanListener<Object>()
 		{	
-			public void planFinished()
+			public void planFinished(Object result)
 			{
 //				System.out.println("plan fini: "+plan);
 				finished	= true;

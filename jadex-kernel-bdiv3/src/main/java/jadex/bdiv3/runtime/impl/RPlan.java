@@ -95,6 +95,9 @@ public class RPlan extends RElement implements IPlan
 	/** The plan has exception attribute. */
 	protected Exception exception;
 	
+	/** The result. */
+	protected Object result;
+	
 	/** The plan has lifecycle state attribute. */
 	protected PlanLifecycleState lifecyclestate;
 	
@@ -115,7 +118,7 @@ public class RPlan extends RElement implements IPlan
 	protected IInternalAccess ia;
 	
 	/** The plan listeners. */
-	protected List<IPlanListener> listeners;
+	protected List<IPlanListener<?>> listeners;
 	
 	/** The wait cnt for rule names. */
 	protected int cnt;
@@ -315,9 +318,9 @@ public class RPlan extends RElement implements IPlan
 				|| PlanLifecycleState.FAILED.equals(lifecyclestate)
 				|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
 			{
-				for(IPlanListener lis: listeners)
+				for(IPlanListener<?> lis: listeners)
 				{
-					lis.planFinished();
+					((IPlanListener)lis).planFinished(getResult());
 				}
 			}
 		}
@@ -1254,10 +1257,10 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 * 
 	 */
-	public void addPlanListener(IPlanListener listener)
+	public void addPlanListener(IPlanListener<?> listener)
 	{
 		if(listeners==null)
-			listeners = new ArrayList<IPlanListener>();
+			listeners = new ArrayList<IPlanListener<?>>();
 		listeners.add(listener);
 	}
 	
@@ -1298,6 +1301,24 @@ public class RPlan extends RElement implements IPlan
 		return resumecommand;
 	}
 	
+	/**
+	 *  Get the result.
+	 *  @return The result.
+	 */
+	public Object getResult()
+	{
+		return result;
+	}
+
+	/**
+	 *  Set the result.
+	 *  @param result The result to set.
+	 */
+	public void setResult(Object result)
+	{
+		this.result = result;
+	}
+	
 //	/**
 //	 * 
 //	 */
@@ -1328,8 +1349,6 @@ public class RPlan extends RElement implements IPlan
 //		}
 //	}
 	
-	
-
 	/**
 	 * 
 	 */

@@ -138,5 +138,5 @@ public interface IPlan
 	/**
 	 * 
 	 */
-	public void addPlanListener(IPlanListener listener);
+	public void addPlanListener(IPlanListener<?> listener);
 }

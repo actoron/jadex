@@ -73,6 +73,9 @@ public class TranslationBDI
 	
 	//-------- methods --------
 	
+	/**
+	 *  The init code.
+	 */
 	@AgentCreated
 	public void init()
 	{

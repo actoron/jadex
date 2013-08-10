@@ -6,6 +6,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
+import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
@@ -82,19 +83,44 @@ public class BDIAgent extends MicroAgent
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 		ip.dropGoal(goal);
 	}
+
+	/**
+	 *  Dispatch a goal wait for its result.
+	 */
+	public <T, E> IFuture<E> adoptPlan(T plan)
+	{
+		return adoptPlan(plan, null);
+	}
 	
 	/**
 	 *  Dispatch a goal wait for its result.
 	 */
-	public <T> void adoptPlan(T plan)
+	public <T, E> IFuture<E> adoptPlan(T plan, Object[] args)
 	{
+		final Future<E> ret = new Future<E>();
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 		MPlan mplan = ip.getBDIModel().getCapability().getPlan(plan instanceof String? (String)plan: plan.getClass().getName());
 		if(mplan==null)
 			throw new RuntimeException("Plan model not found for: "+plan);
 		
-		RPlan rplan = RPlan.createRPlan(mplan, plan, null, ip.getInternalAccess());
+		final RPlan rplan = RPlan.createRPlan(mplan, plan, null, ip.getInternalAccess());
+		rplan.addPlanListener(new IPlanListener<E>()
+		{
+			public void planFinished(E result)
+			{
+				if(rplan.getException()!=null)
+				{
+					ret.setException(rplan.getException());
+				}
+				else
+				{
+					ret.setResult(result);
+				}
+			}
+		});
+		rplan.setReason(new ChangeEvent(null, null, args));
 		RPlan.executePlan(rplan, getInterpreter().getInternalAccess(), null);
+		return ret;
 	}
 	
 	/**

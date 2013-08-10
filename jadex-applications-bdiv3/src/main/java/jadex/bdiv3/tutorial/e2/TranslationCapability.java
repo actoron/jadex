@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial.e1;
+package jadex.bdiv3.tutorial.e2;
 
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Capability;
@@ -17,13 +17,6 @@ import java.util.Map;
 @Capability
 public class TranslationCapability
 {
-	/** The capa api. */
-//	protected ICapability capa;
-	
-	/** The map of words. */
-	@Belief
-	protected Map<String, String> wordtable = new HashMap<String, String>();
-	
 	/**
 	 *  The translation goal.
 	 */
@@ -52,10 +45,6 @@ public class TranslationCapability
 	 */
 	public TranslationCapability()
 	{
-		wordtable.put("milk", "Milch");
-		wordtable.put("cow", "Kuh");
-		wordtable.put("cat", "Katze");
-		wordtable.put("dog", "Hund");
 	}
 	
 	/**
@@ -64,6 +53,18 @@ public class TranslationCapability
 	@Plan(trigger=@Trigger(goals=Translate.class))
 	protected String translate(String eword)
 	{
-		return wordtable.get(eword);
+		return getWordtable().get(eword);
 	}
+	
+	/**
+	 *  Get the wordtable.
+	 */
+	@Belief
+	public native Map<String, String> getWordtable();
+	
+	/**
+	 *  Set the wordtable.
+	 */
+	@Belief
+	public native void setWordtable(Map<String, String> wordtable);
 }

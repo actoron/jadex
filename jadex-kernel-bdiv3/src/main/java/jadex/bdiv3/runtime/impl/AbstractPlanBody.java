@@ -72,6 +72,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 					// Automatically set goal result if goal has @GoalResult
 					if(result!=null)
 					{
+						rplan.setResult(result);
 						if(rplan.getReason() instanceof RServiceCall)
 						{
 							RServiceCall sc = (RServiceCall)rplan.getReason();

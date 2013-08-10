@@ -70,6 +70,19 @@ public class ChangeEvent
 	}
 	
 	/**
+	 *  Create a new event.
+	 *  @param type
+	 *  @param source
+	 *  @param value
+	 */
+	public ChangeEvent(String type, Object source, Object value)
+	{
+		this.type = type;
+		this.source = source;
+		this.value = value;
+	}
+
+	/**
 	 *  Create a new ChangeEvent. 
 	 */
 	public ChangeEvent(IEvent event)
