@@ -159,7 +159,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 										int v1 = 1;
 										
 										
-										if (opHelp.isPutField(opcode) && model.getCapability().hasBelief(name)
+										if (ophelper.isPutField(opcode) && model.getCapability().hasBelief(name)
 												&& model.getCapability().getBelief(name).isFieldBelief())
 										{
 											// possibly transform basic value
@@ -329,12 +329,12 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 				while(!start.equals(begin))
 				{
 					// find method name via last constant load
-					if (name == null && opHelp.isLoadConstant(start.getOpcode())) {
+					if (name == null && ophelper.isLoadConstant(start.getOpcode())) {
 						StringInsnNode stringNode = (StringInsnNode)(start);
 						name = stringNode.string;
 						System.out.println("found writeField for field: " + name);
 					}
-					if(opHelp.isGetField(start.getOpcode()))
+					if(ophelper.isGetField(start.getOpcode()))
 					{
 						String bn = ((FieldInsnNode)start).name;
 						if(model.getCapability().hasBelief(bn))
@@ -407,7 +407,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 			while(instructions.size()>superConstructorIndex+1)
 			{
 				IAbstractInsnNode	node	= instructions.get(superConstructorIndex+1);
-				if(opHelp.isReturn(node.getOpcode()))
+				if(ophelper.isReturn(node.getOpcode()))
 				{
 					initMethodNode.visitInsn(node.getOpcode());
 					break;
