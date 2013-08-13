@@ -323,7 +323,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 			public void resultAvailable(final IComponentDescription[] achildren)
 			{
 //				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
-//					System.err.println("searchChildren queued2: "+ComponentTreeNode.this);
+//					System.err.println("searchChildren queued2: "+ComponentTreeNode.this+" "+achildren.length);
 //				final IComponentDescription[] achildren = (IComponentDescription[])result;
 				
 				Arrays.sort(achildren, new java.util.Comparator<IComponentDescription>()

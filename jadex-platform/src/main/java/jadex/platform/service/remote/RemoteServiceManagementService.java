@@ -294,6 +294,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //				});
 				
 				return fut;
+//				return new Future<Object>(null);
 			}
 		});
 		
@@ -312,12 +313,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope)
 	{
+		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
 		final Future<T>	ret	= new Future<T>();
 		getServiceProxies(cid, SServiceProvider.getSearchManager(false, scope), SServiceProvider.getVisitDecider(true, scope), 
 			new TypeResultSelector(service, true)).addResultListener(new ExceptionDelegationResultListener<Collection<IService>, T>(ret)
 		{
 			public void customResultAvailable(Collection<IService> result)
 			{
+				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
 				if(result!=null && !((Collection<?>)result).isEmpty())
 				{
 					Object	o	= ((Collection<?>)result).iterator().next();
@@ -327,6 +330,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				{
 					super.exceptionOccurred(new ServiceNotFoundException("No proxy for service found: "+cid+", "+service.getName()));
 				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("getServiceProxy end ex: "+cid+" "+service.getName());
+				super.exceptionOccurred(exception);
 			}
 		});
 		return ret;

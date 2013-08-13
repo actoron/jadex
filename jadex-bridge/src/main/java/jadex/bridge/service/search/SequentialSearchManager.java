@@ -100,7 +100,7 @@ public class SequentialSearchManager implements ISearchManager
 		final TerminableIntermediateFuture<IService> ret = new TerminableIntermediateFuture<IService>();
 //		System.out.println("search: "+selector+" "+provider.getId()+" "+ret.hashCode());
 //		System.out.println("search: "+ret.hashCode());
-			
+	
 		ret.addResultListener(new IResultListener<Collection<IService>>()
 		{
 			public void resultAvailable(Collection<IService> result)

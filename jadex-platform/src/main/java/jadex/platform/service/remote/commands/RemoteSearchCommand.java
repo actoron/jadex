@@ -14,6 +14,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.annotations.Alias;
@@ -133,10 +134,38 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IIntermediateFuture<IRemoteCommand> execute(final IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IIntermediateFuture<IRemoteCommand> execute(final IMicroExternalAccess component, final RemoteServiceManagementService rsms)
 	{
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
-			
+		
+		System.out.println("start rem search");
+		
+		// Remove call when finished
+		ret.addResultListener(new IResultListener<Collection<IRemoteCommand>>()
+		{
+			public void resultAvailable(Collection<IRemoteCommand> result)
+			{
+				System.out.println("fin: "+result.size());
+				rsms.removeProcessingCall(callid);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("fin exe"+exception);
+				rsms.removeProcessingCall(callid);
+			}
+		});
+		
+		// Remember invocation for termination invocation
+		rsms.putProcessingCall(callid, ret);
+		List<Runnable> cmds = rsms.removeFutureCommands(callid);
+		if(cmds!=null)
+		{
+			for(Runnable cmd: cmds)
+			{
+				cmd.run();
+			}
+		}
+		
 		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new IResultListener<IComponentManagementService>()
 //			.addResultListener(component.createResultListener(new IResultListener()
@@ -153,8 +182,19 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 						// start search on target component
 //						System.out.println("rem search start: "+manager+" "+decider+" "+selector);
 						exta.getServiceProvider().getServices(manager, decider, selector)
-							.addResultListener(new IResultListener<Collection<IService>>()
+							.addResultListener(new IIntermediateResultListener<IService>()
 						{
+							public void intermediateResultAvailable(IService result)
+							{
+								ret.addIntermediateResult(new RemoteResultCommand(null, result, null, callid, 
+									false, null, getNonFunctionalProperties()));
+							}
+							
+							public void finished()
+							{
+								ret.setFinished();
+							}
+							
 							public void resultAvailable(Collection<IService> result)
 							{
 //								System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);

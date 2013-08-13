@@ -2,17 +2,27 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.security.DefaultAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IFutureCommandResultListener;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteReferenceModule;
+import jadex.platform.service.remote.RemoteServiceManagementService;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**

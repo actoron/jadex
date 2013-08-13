@@ -11,6 +11,9 @@ import jadex.platform.service.remote.RemoteServiceManagementService;
 
 /**
  *  Command for executing a remote method.
+ *  
+ *  Fetches the future of the call via the callid
+ *  and forwards the termination on it.
  */
 @Alias("jadex.base.service.remote.commands.RemoteFutureTerminationCommand")
 public class RemoteFutureTerminationCommand extends AbstractRemoteCommand

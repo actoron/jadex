@@ -277,108 +277,110 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			
 			final Object res = method.invoke(target, parametervalues);
 			
-			// Remember invocation for termination invocation
-			if(terminable) // or pullable
-			{
-				rsms.putProcessingCall(callid, res);
-				List<Runnable> cmds = rsms.removeFutureCommands(callid);
-				if(cmds!=null)
-				{
-					for(Runnable cmd: cmds)
-					{
-						cmd.run();
-					}
-				}
-			}
+			handleResultFuture(terminable, rsms, callid, res, terminable, methodname, ridcom, ret, nonfunc);
 			
-			if(res instanceof IIntermediateFuture)
-			{
-				((IIntermediateFuture)res).addResultListener(new IIntermediateFutureCommandResultListener()
-				{
-					int cnt = 0;
-					public void intermediateResultAvailable(Object result)
-					{
-//						System.out.println("inter: "+result);
-						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, result, callid, 
-							returnisref, methodname, false, getNonFunctionalProperties(), (IFuture<?>)res, cnt++));
-					}
-					
-					public void finished()
-					{
-//						System.out.println("fin");
-						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, null, callid, 
-							returnisref, methodname, true, getNonFunctionalProperties(), (IFuture<?>)res, cnt));
-						ret.setFinished();
-						rsms.removeProcessingCall(callid);
-					}
-					
-					public void resultAvailable(Object result)
-					{
-//						System.out.println("ra");
-						ret.addIntermediateResult(new RemoteResultCommand(ridcom, result, null, callid, 
-							returnisref, methodname, getNonFunctionalProperties()));
-						ret.setFinished();
-						rsms.removeProcessingCall(callid);
-					}
-					
-					public void resultAvailable(Collection result)
-					{
-//						System.out.println("ra");
-						ret.addIntermediateResult(new RemoteResultCommand(ridcom, result, null, callid, 
-							returnisref, methodname, getNonFunctionalProperties()));
-						ret.setFinished();
-						rsms.removeProcessingCall(callid);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-//						System.out.println("ex: "+exception);
-						ret.addIntermediateResult(new RemoteResultCommand(ridcom, null, exception, callid, 
-							false, methodname, getNonFunctionalProperties()));
-						ret.setFinished();
-						rsms.removeProcessingCall(callid);
-					}
-					public void commandAvailable(Type command)
-					{
-						ret.addIntermediateResult(new RemoteFutureSourceCommand(ridcom, command, callid, 
-							returnisref, methodname, getNonFunctionalProperties()));
-					}
-				});
-			}
-			else if(res instanceof IFuture)
-			{
-				((IFuture)res).addResultListener(new IFutureCommandResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						ret.addIntermediateResult(new RemoteResultCommand(ridcom, result, null, callid, 
-							returnisref, methodname, getNonFunctionalProperties()));
-						ret.setFinished();
-						rsms.removeProcessingCall(callid);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.addIntermediateResult(new RemoteResultCommand(ridcom, null, exception, callid, 
-							false, methodname, getNonFunctionalProperties()));
-						ret.setFinished();
-						rsms.removeProcessingCall(callid);
-					}
-					
-					public void commandAvailable(Type command)
-					{
-						ret.addIntermediateResult(new RemoteFutureSourceCommand(ridcom, command, callid, 
-							returnisref, methodname, getNonFunctionalProperties()));
-					}
-				});
-			}
-			else
-			{
-				ret.addIntermediateResult(new RemoteResultCommand(ridcom, res, null, callid, 
-					returnisref, methodname, getNonFunctionalProperties()));
-				ret.setFinished();
-				rsms.removeProcessingCall(callid);
-			}
+//			// Remember invocation for termination invocation
+//			if(terminable) // or pullable
+//			{
+//				rsms.putProcessingCall(callid, res);
+//				List<Runnable> cmds = rsms.removeFutureCommands(callid);
+//				if(cmds!=null)
+//				{
+//					for(Runnable cmd: cmds)
+//					{
+//						cmd.run();
+//					}
+//				}
+//			}
+//			
+//			if(res instanceof IIntermediateFuture)
+//			{
+//				((IIntermediateFuture)res).addResultListener(new IIntermediateFutureCommandResultListener()
+//				{
+//					int cnt = 0;
+//					public void intermediateResultAvailable(Object result)
+//					{
+////						System.out.println("inter: "+result);
+//						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, result, callid, 
+//							returnisref, methodname, false, getNonFunctionalProperties(), (IFuture<?>)res, cnt++));
+//					}
+//					
+//					public void finished()
+//					{
+////						System.out.println("fin");
+//						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, null, callid, 
+//							returnisref, methodname, true, getNonFunctionalProperties(), (IFuture<?>)res, cnt));
+//						ret.setFinished();
+//						rsms.removeProcessingCall(callid);
+//					}
+//					
+//					public void resultAvailable(Object result)
+//					{
+////						System.out.println("ra");
+//						ret.addIntermediateResult(new RemoteResultCommand(ridcom, result, null, callid, 
+//							returnisref, methodname, getNonFunctionalProperties()));
+//						ret.setFinished();
+//						rsms.removeProcessingCall(callid);
+//					}
+//					
+//					public void resultAvailable(Collection result)
+//					{
+////						System.out.println("ra");
+//						ret.addIntermediateResult(new RemoteResultCommand(ridcom, result, null, callid, 
+//							returnisref, methodname, getNonFunctionalProperties()));
+//						ret.setFinished();
+//						rsms.removeProcessingCall(callid);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+////						System.out.println("ex: "+exception);
+//						ret.addIntermediateResult(new RemoteResultCommand(ridcom, null, exception, callid, 
+//							false, methodname, getNonFunctionalProperties()));
+//						ret.setFinished();
+//						rsms.removeProcessingCall(callid);
+//					}
+//					public void commandAvailable(Type command)
+//					{
+//						ret.addIntermediateResult(new RemoteFutureSourceCommand(ridcom, command, callid, 
+//							returnisref, methodname, getNonFunctionalProperties()));
+//					}
+//				});
+//			}
+//			else if(res instanceof IFuture)
+//			{
+//				((IFuture)res).addResultListener(new IFutureCommandResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						ret.addIntermediateResult(new RemoteResultCommand(ridcom, result, null, callid, 
+//							returnisref, methodname, getNonFunctionalProperties()));
+//						ret.setFinished();
+//						rsms.removeProcessingCall(callid);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						ret.addIntermediateResult(new RemoteResultCommand(ridcom, null, exception, callid, 
+//							false, methodname, getNonFunctionalProperties()));
+//						ret.setFinished();
+//						rsms.removeProcessingCall(callid);
+//					}
+//					
+//					public void commandAvailable(Type command)
+//					{
+//						ret.addIntermediateResult(new RemoteFutureSourceCommand(ridcom, command, callid, 
+//							returnisref, methodname, getNonFunctionalProperties()));
+//					}
+//				});
+//			}
+//			else
+//			{
+//				ret.addIntermediateResult(new RemoteResultCommand(ridcom, res, null, callid, 
+//					returnisref, methodname, getNonFunctionalProperties()));
+//				ret.setFinished();
+//				rsms.removeProcessingCall(callid);
+//			}
 		}
 		catch(Exception exception)
 		{
@@ -557,6 +559,118 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 		return "RemoteMethodInvocationCommand(remote reference=" + rr + ", methodname="
 			+ methodname + ", callid=" + callid + ")";
+	}
+	
+	/**
+	 *  Handle the result future by checking what future it is and
+	 *  sending intermediate results as commands. 
+	 */
+	public static void handleResultFuture(boolean terminable, final RemoteServiceManagementService rsms, final String callid, final Object res,
+		final boolean returnisref, final String methodname, final IComponentIdentifier rec, final IntermediateFuture<IRemoteCommand> ret,
+		final Map<String, Object> nonfunc)
+	{
+		// Remember invocation for termination invocation
+		if(terminable) // or pullable
+		{
+			rsms.putProcessingCall(callid, res);
+			List<Runnable> cmds = rsms.removeFutureCommands(callid);
+			if(cmds!=null)
+			{
+				for(Runnable cmd: cmds)
+				{
+					cmd.run();
+				}
+			}
+		}
+		
+		if(res instanceof IIntermediateFuture)
+		{
+			((IIntermediateFuture)res).addResultListener(new IIntermediateFutureCommandResultListener()
+			{
+				int cnt = 0;
+				public void intermediateResultAvailable(Object result)
+				{
+//					System.out.println("inter: "+result);
+					ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, result, callid, 
+						returnisref, methodname, false, nonfunc, (IFuture<?>)res, cnt++));
+				}
+				
+				public void finished()
+				{
+//					System.out.println("fin");
+					ret.addIntermediateResult(new RemoteIntermediateResultCommand(rec, null, callid, 
+						returnisref, methodname, true, nonfunc, (IFuture<?>)res, cnt));
+					ret.setFinished();
+					rsms.removeProcessingCall(callid);
+				}
+				
+				public void resultAvailable(Object result)
+				{
+//					System.out.println("ra");
+					ret.addIntermediateResult(new RemoteResultCommand(rec, result, null, callid, 
+						returnisref, methodname, nonfunc));
+					ret.setFinished();
+					rsms.removeProcessingCall(callid);
+				}
+				
+				public void resultAvailable(Collection result)
+				{
+//					System.out.println("ra");
+					ret.addIntermediateResult(new RemoteResultCommand(rec, result, null, callid, 
+						returnisref, methodname, nonfunc));
+					ret.setFinished();
+					rsms.removeProcessingCall(callid);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+//					System.out.println("ex: "+exception);
+					ret.addIntermediateResult(new RemoteResultCommand(rec, null, exception, callid, 
+						false, methodname, nonfunc));
+					ret.setFinished();
+					rsms.removeProcessingCall(callid);
+				}
+				public void commandAvailable(Type command)
+				{
+					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, command, callid, 
+						returnisref, methodname, nonfunc));
+				}
+			});
+		}
+		else if(res instanceof IFuture)
+		{
+			((IFuture)res).addResultListener(new IFutureCommandResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					ret.addIntermediateResult(new RemoteResultCommand(rec, result, null, callid, 
+						returnisref, methodname, nonfunc));
+					ret.setFinished();
+					rsms.removeProcessingCall(callid);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.addIntermediateResult(new RemoteResultCommand(rec, null, exception, callid, 
+						false, methodname, nonfunc));
+					ret.setFinished();
+					rsms.removeProcessingCall(callid);
+				}
+				
+				public void commandAvailable(Type command)
+				{
+					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, command, callid, 
+						returnisref, methodname, nonfunc));
+				}
+			});
+		}
+		else
+		{
+			ret.addIntermediateResult(new RemoteResultCommand(rec, res, null, callid, 
+				returnisref, methodname, nonfunc));
+			ret.setFinished();
+			rsms.removeProcessingCall(callid);
+		}
 	}
 	
 }
