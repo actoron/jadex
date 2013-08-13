@@ -609,6 +609,7 @@
 				<module>jadex-android-platformapp</module>
 				<module>jadex-platform-android</module>
 				<module>jadex-runtimetools-android</module>
+				<module>jadex-kernel-bdiv3-android</module>
 				<module>jadex-platform-extension-webservice-android</module>
 				<module>jadex-applications-android-demos</module>
 				<module>jadex-android-integration-test</module>
