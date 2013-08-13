@@ -92,9 +92,9 @@ public class BasicResultSelector<T> implements IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public IFuture<List<IService>> selectServices(Map<Class<?>, Collection<IService>> servicemap)
+	public IFuture<Collection<IService>> selectServices(Map<Class<?>, Collection<IService>> servicemap)
 	{
-		final Future<List<IService>> ret = new Future<List<IService>>();
+		final Future<Collection<IService>> ret = new Future<Collection<IService>>();
 		
 		IRemoteFilter fil = filter;
 		if(!remote)
@@ -118,7 +118,7 @@ public class BasicResultSelector<T> implements IResultSelector
 			if(oneresult)
 			{		
 				getOneResult(fil, services, 0)
-					.addResultListener(new ExceptionDelegationResultListener<IService, List<IService>>(ret)
+					.addResultListener(new ExceptionDelegationResultListener<IService, Collection<IService>>(ret)
 				{
 					public void customResultAvailable(IService result)
 					{
@@ -134,7 +134,7 @@ public class BasicResultSelector<T> implements IResultSelector
 //				if(services.length>0)
 //					System.out.println("adding: "+SUtil.arrayToString(services)+" "+this);
 				getAllResults(fil, services, 0)
-					.addResultListener(new DelegationResultListener(ret));
+					.addResultListener(new DelegationResultListener<Collection<IService>>(ret));
 			}
 		}
 		else
@@ -182,11 +182,11 @@ public class BasicResultSelector<T> implements IResultSelector
 	protected IIntermediateFuture<IService> getAllResults(final IRemoteFilter filter, final IService[] services, final int i)
 	{
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
-		filter.filter(services[i]).addResultListener(new DelegationResultListener(ret)
+		filter.filter(services[i]).addResultListener(new ExceptionDelegationResultListener<Boolean, Collection<IService>>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Boolean result)
 			{
-				if(((Boolean)result).booleanValue() && !ret.getIntermediateResults().contains(services[i]))
+				if(result.booleanValue() && !ret.getIntermediateResults().contains(services[i]))
 				{
 					ret.addIntermediateResult(services[i]);
 				}
@@ -194,7 +194,7 @@ public class BasicResultSelector<T> implements IResultSelector
 				if(i+1<services.length)
 				{
 					getAllResults(filter, services, i+1)
-						.addResultListener(new IntermediateDelegationResultListener(ret));
+						.addResultListener(new IntermediateDelegationResultListener<IService>(ret));
 				}
 				else
 				{

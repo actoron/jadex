@@ -4,7 +4,6 @@ import jadex.bridge.service.IService;
 import jadex.commons.future.IFuture;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,7 +16,7 @@ public interface IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public IFuture<List<IService>> selectServices(Map<Class<?>, Collection<IService>> services);
+	public IFuture<Collection<IService>> selectServices(Map<Class<?>, Collection<IService>> services);
 	
 //	/**
 //	 *  Get the result.

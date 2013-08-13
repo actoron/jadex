@@ -18,6 +18,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
+import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteReferenceModule;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 
@@ -132,37 +133,37 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IIntermediateFuture execute(final IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IIntermediateFuture<IRemoteCommand> execute(final IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
-		final IntermediateFuture ret = new IntermediateFuture();
+		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 			
 		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(new IResultListener()
+			.addResultListener(new IResultListener<IComponentManagementService>()
 //			.addResultListener(component.createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess((IComponentIdentifier)providerid).addResultListener(new IResultListener()
+//				IComponentManagementService cms = (IComponentManagementService)result;
+				cms.getExternalAccess((IComponentIdentifier)providerid).addResultListener(new IResultListener<IExternalAccess>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IExternalAccess exta)
 					{
-						IExternalAccess exta = (IExternalAccess)result;
+//						IExternalAccess exta = (IExternalAccess)result;
 						
 						// start search on target component
 //						System.out.println("rem search start: "+manager+" "+decider+" "+selector);
 						exta.getServiceProvider().getServices(manager, decider, selector)
-							.addResultListener(new IResultListener()
+							.addResultListener(new IResultListener<Collection<IService>>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(Collection<IService> result)
 							{
 //								System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);
 								// Create proxy info(s) for service(s)
 								Object content = null;
-								if(result instanceof Collection)
-								{
-									List res = new ArrayList();
-									for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+//								if(result instanceof Collection)
+//								{
+									List<IService> res = new ArrayList<IService>();
+									for(Iterator<IService> it=result.iterator(); it.hasNext(); )
 									{
 										IService service = (IService)it.next();
 //										RemoteServiceManagementService.getProxyInfo(component.getComponentIdentifier(), tmp, 
@@ -172,13 +173,13 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 										res.add(service);
 									}
 									content = res;
-								}
-								else //if(result instanceof Object[])
-								{
-									IService service = (IService)result;
-//									content = getProxyInfo(component.getComponentIdentifier(), tmp);
-									content = service;
-								}
+//								}
+//								else //if(result instanceof Object[])
+//								{
+//									IService service = (IService)result;
+////									content = getProxyInfo(component.getComponentIdentifier(), tmp);
+//									content = service;
+//								}
 								
 //								ret.setResult(new RemoteResultCommand(content, null , callid, false));
 								ret.addIntermediateResult(new RemoteResultCommand(null, content, null, callid, 

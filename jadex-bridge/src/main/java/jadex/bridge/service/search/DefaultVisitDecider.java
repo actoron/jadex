@@ -1,7 +1,7 @@
 package jadex.bridge.service.search;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 
 import java.util.Collection;
@@ -64,7 +64,7 @@ public class DefaultVisitDecider implements IVisitDecider
 	 *  @param target The target data provider.
 	 *  @param results The preliminary results.
 	 */
-	public synchronized boolean searchNode(IComponentIdentifier start, IComponentIdentifier source, IComponentIdentifier target, Collection results)
+	public synchronized boolean searchNode(IComponentIdentifier start, IComponentIdentifier source, IComponentIdentifier target, Collection<IService> results)
 	{
 		boolean ret = !(abort && results.size()>0);
 			

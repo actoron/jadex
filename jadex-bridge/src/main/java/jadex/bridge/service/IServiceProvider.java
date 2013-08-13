@@ -1,14 +1,14 @@
 package jadex.bridge.service;
 
-import java.util.Collection;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
+
+import java.util.Collection;
 
 /**
  *  Interface for service providers.
@@ -20,8 +20,7 @@ public interface IServiceProvider extends IRemotable
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	// todo: make terminable
-	public IIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
+	public ITerminableIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
 	
 	/**
 	 *  Get the parent service container.

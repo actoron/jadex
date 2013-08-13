@@ -3,9 +3,10 @@ package jadex.bridge.service.search;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -45,9 +46,9 @@ public class LocalSearchManager implements ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IIntermediateFuture<IService>	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services)
+	public ITerminableIntermediateFuture<IService>	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map<Class<?>, Collection<IService>> services)
 	{
-		IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
+		TerminableIntermediateFuture<IService> ret = new TerminableIntermediateFuture<IService>();
 		
 //		if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().toString().indexOf("IIntermediateResultService")!=-1)
 //		{
@@ -59,7 +60,7 @@ public class LocalSearchManager implements ISearchManager
 //		if(!selector.isFinished(results))// && decider.searchNode(null, provider, results))
 		
 		selector.selectServices(services)
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new DelegationResultListener<Collection<IService>>(ret));
 		
 //		if(selector instanceof TypeResultSelector && results.toString().indexOf("Add")!=-1)
 //			System.out.println("lsm: "+provider+" "+results);

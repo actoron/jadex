@@ -19,7 +19,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -74,7 +76,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param clazz The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+	public ITerminableIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
 	{
 		if(shutdowned)
 		{
@@ -83,7 +85,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //				System.err.println("getS: "+id);
 //				Thread.dumpStack();
 //			}
-			return new IntermediateFuture<IService>(new ComponentTerminatedException(id));
+			return new TerminableIntermediateFuture<IService>(new ComponentTerminatedException(id));
 		}
 		
 		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);

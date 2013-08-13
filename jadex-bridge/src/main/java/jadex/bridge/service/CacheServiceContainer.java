@@ -18,7 +18,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -68,9 +70,9 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture<IService> getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
+	public ITerminableIntermediateFuture<IService> getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
-		final IntermediateFuture ret = new IntermediateFuture();
+		final TerminableIntermediateFuture ret = new TerminableIntermediateFuture();
 		
 //		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
 //			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;

@@ -1,17 +1,23 @@
 package jadex.bridge.service.search;
 
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Searches up and/or down the provider tree in parallel (if results are provided in parallel).
@@ -43,6 +49,9 @@ public class ParallelSearchManager implements ISearchManager
 	/** The local search manager. */
 	protected ISearchManager lsm;
 	
+	/** The open search calls. */
+	protected Map<ITerminableIntermediateFuture<IService>, Set<ITerminableIntermediateFuture<IService>>> opencalls;
+	
 	//-------- constructors --------
 	
 	/**
@@ -70,6 +79,7 @@ public class ParallelSearchManager implements ISearchManager
 		this.down	= down;
 		this.forcedsearch = forcedsearch;
 		this.lsm = forcedsearch? LOCAL_SEARCH_MANAGER_FORCED: LOCAL_SEARCH_MANAGER;
+		this.opencalls = new HashMap<ITerminableIntermediateFuture<IService>, Set<ITerminableIntermediateFuture<IService>>>();
 	}
 	
 	//-------- ISearchManager interface --------
@@ -81,13 +91,51 @@ public class ParallelSearchManager implements ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IIntermediateFuture	searchServices(IServiceProvider provider, IVisitDecider decider, 
-		final IResultSelector selector, Map services)
+	public ITerminableIntermediateFuture<IService>	searchServices(IServiceProvider provider, IVisitDecider decider, 
+		final IResultSelector selector, Map<Class<?>, Collection<IService>> services)
 	{
-		final IntermediateFuture	ret	= new IntermediateFuture();
-		processNode(provider, null, provider, decider, selector, services, up, ret).addResultListener(new IResultListener()
+		final TerminableIntermediateFuture<IService>	ret	= new TerminableIntermediateFuture<IService>();
+		
+		ret.addResultListener(new IResultListener<Collection<IService>>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Collection<IService> result)
+			{
+//						System.out.println("search end: "+ret.hashCode());
+				opencalls.remove(ret);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+//						System.out.println("search end: "+ret.hashCode());
+				opencalls.remove(ret);
+			}
+		});
+		
+		ret.setTerminationCommand(new ITerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				Set<ITerminableIntermediateFuture<IService>> ocs = opencalls.get(ret);
+				if(ocs!=null)
+				{
+					for(ITerminableIntermediateFuture<IService> fut: ocs)
+					{
+						fut.terminate(reason);
+					}
+				}
+				opencalls.remove(ret);
+			}
+			
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
+			}
+		});
+		
+		processNode(provider, null, provider, decider, selector, services, up, ret)
+			.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
 			{
 //				Collection res = selector.getResult(results);
 //				if(res.size()>2 && res.iterator().next().getClass().toString().indexOf("Directory")!=-1)
@@ -149,10 +197,10 @@ public class ParallelSearchManager implements ISearchManager
 	/**
 	 *  Process a single node (provider).
 	 */
-	protected IFuture processNode(final IServiceProvider start, final IServiceProvider source, final IServiceProvider provider, final IVisitDecider decider, 
-		final IResultSelector selector, final Map services, final boolean up, final IntermediateFuture endret)
+	protected IFuture<Void> processNode(final IServiceProvider start, final IServiceProvider source, final IServiceProvider provider, final IVisitDecider decider, 
+		final IResultSelector selector, final Map<Class<?>, Collection<IService>> services, final boolean up, final TerminableIntermediateFuture<IService> endret)
 	{
-		final Future ret	= new Future();
+		final Future<Void> ret	= new Future<Void>();
 		final boolean[]	finished	= new boolean[3];
 		
 		if(!selector.isFinished(endret.getIntermediateResults()) && provider!=null 
@@ -161,15 +209,18 @@ public class ParallelSearchManager implements ISearchManager
 //			if(provider!=null && selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Component")!=-1)
 //				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
 			
-			provider.getServices(lsm, decider, selector).addResultListener(new IResultListener()
+			final ITerminableIntermediateFuture<IService> fut = provider.getServices(lsm, decider, selector);
+			addOpenCall(endret, fut);
+			fut.addResultListener(new IResultListener<Collection<IService>>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Collection<IService> result)
 				{
+					removeOpenCall(endret, fut);
 					if(result!=null)
 					{
-						for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+						for(Iterator<IService> it=((Collection<IService>)result).iterator(); it.hasNext(); )
 						{
-							Object next = it.next();
+							IService next = it.next();
 							
 							// Must recheck if already finished (otherwise duplicate results may occur).
 							if(!endret.getIntermediateResults().contains(next)
@@ -185,24 +236,25 @@ public class ParallelSearchManager implements ISearchManager
 				
 				public void exceptionOccurred(Exception exception)
 				{
+					removeOpenCall(endret, fut);
 					checkAndSetResults(ret, finished, 0);
 				}
 			});
 
 			if(up)
 			{
-				provider.getParent().addResultListener(new IResultListener()
+				provider.getParent().addResultListener(new IResultListener<IServiceProvider>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IServiceProvider target)
 					{
-						IServiceProvider target = (IServiceProvider)result;
+//						IServiceProvider target = (IServiceProvider)result;
 						// Do not go back to where we came from.
 						if(!SUtil.equals(source, target))
 						{
 							processNode(start, provider, target, decider, selector, services, up, endret)
-								.addResultListener(new IResultListener()
+								.addResultListener(new IResultListener<Void>()
 							{
-								public void resultAvailable(Object result)
+								public void resultAvailable(Void result)
 								{
 									checkAndSetResults(ret, finished, 1);
 								}
@@ -232,19 +284,19 @@ public class ParallelSearchManager implements ISearchManager
 			
 			if(down)
 			{
-				provider.getChildren().addResultListener(new IResultListener()
+				provider.getChildren().addResultListener(new IResultListener<Collection<IServiceProvider>>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Collection<IServiceProvider> coll)
 					{
-						if(result!=null)
+						if(coll!=null)
 						{
-							Collection	coll	= (Collection)result;
+//							Collection	coll	= (Collection)result;
 							// Do not go back to where we came from.
 							if(source!=null)
 								coll.remove(source);
-							IResultListener	crl	= new CounterResultListener(coll.size(), new IResultListener()
+							IResultListener<Void>	crl	= new CounterResultListener<Void>(coll.size(), new IResultListener<Void>()
 							{
-								public void resultAvailable(Object result)
+								public void resultAvailable(Void result)
 								{
 									checkAndSetResults(ret, finished, 2);
 								}
@@ -254,7 +306,7 @@ public class ParallelSearchManager implements ISearchManager
 									checkAndSetResults(ret, finished, 2);
 								}
 							});
-							for(Iterator it=coll.iterator(); it.hasNext(); )
+							for(Iterator<IServiceProvider> it=coll.iterator(); it.hasNext(); )
 							{
 								IServiceProvider target = (IServiceProvider)it.next();
 								processNode(start, provider, target, decider, selector, services, false, endret)
@@ -289,7 +341,7 @@ public class ParallelSearchManager implements ISearchManager
 	/**
 	 *  Test if all items are finished and set the result.
 	 */
-	protected void checkAndSetResults(Future ret, boolean[] finished, int num)
+	protected void checkAndSetResults(Future<Void> ret, boolean[] finished, int num)
 	{
 		boolean	set;
 		synchronized(finished)
@@ -299,5 +351,28 @@ public class ParallelSearchManager implements ISearchManager
 		}
 		if(set)
 			ret.setResult(null);
+	}
+	
+	/**
+	 * 
+	 */
+	public void addOpenCall(TerminableIntermediateFuture<IService> ret, ITerminableIntermediateFuture<IService> oc)
+	{
+		Set<ITerminableIntermediateFuture<IService>> ocs = opencalls.get(ret);
+		if(ocs==null)
+			ocs = new HashSet<ITerminableIntermediateFuture<IService>>();
+		ocs.add(oc);
+	}
+	
+	/**
+	 * 
+	 */
+	public void removeOpenCall(TerminableIntermediateFuture<IService> ret, ITerminableIntermediateFuture<IService> oc)
+	{
+		Set<ITerminableIntermediateFuture<IService>> ocs = opencalls.get(ret);
+		if(ocs!=null)
+		{
+			ocs.remove(oc);
+		}
 	}
 }

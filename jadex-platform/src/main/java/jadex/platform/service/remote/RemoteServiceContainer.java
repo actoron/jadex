@@ -18,8 +18,12 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -60,9 +64,9 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture<IService>	getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
+	public ITerminableIntermediateFuture<IService>	getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
-		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
+		final TerminableIntermediateFuture<IService> ret = new TerminableIntermediateFuture<IService>();
 		
 //		if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("IProxy")!=-1)
 //		{
@@ -95,43 +99,69 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 					}
 					
 					// Hack! Use user search manager.
-					rms.getServiceProxies(componentid, SServiceProvider.sequentialmanager, decider, selector)
-						.addResultListener(new IResultListener<Object>()
+					final ITerminableIntermediateFuture<IService> fut = rms.getServiceProxies(componentid, SServiceProvider.sequentialmanager, decider, selector);
+					
+					// Propagate termination to remote site
+					ret.setTerminationCommand(new ITerminationCommand()
 					{
-						public void resultAvailable(Object res)
+						public void terminated(Exception reason)
+						{
+							fut.terminate();
+						}
+						
+						public boolean checkTermination(Exception reason)
+						{
+							return true;
+						}
+					});
+					
+					fut.addResultListener(new IIntermediateResultListener<IService>()
+					{
+						public void intermediateResultAvailable(IService result) 
+						{
+							if(!ret.getIntermediateResults().contains(result))
+								ret.addIntermediateResultIfUndone(result);
+						}
+						
+						public void resultAvailable(Collection<IService> result) 
 						{
 //							System.out.println("remote search finished: "+componentid);
-							if(res instanceof Collection)
-							{
-								for(Iterator<?> it=((Collection<?>)res).iterator(); it.hasNext(); )
+//							if(result instanceof Collection)
+//							{
+								for(Iterator<IService> it= result.iterator(); it.hasNext(); )
 								{
 									Object next = it.next();
 //									System.out.println("add rem: "+next);
 									if(!ret.getIntermediateResults().contains(next))
-										ret.addIntermediateResult((IService)next);
+										ret.addIntermediateResultIfUndone((IService)next);
 								}
-							}
-							else if(res!=null)
-							{
-//								System.out.println("add rem: "+res);
-								if(!ret.getIntermediateResults().contains(res))
-									ret.addIntermediateResult((IService)res);
-							}
+//							}
+//							else if(result!=null)
+//							{
+////								System.out.println("add rem: "+res);
+//								if(!ret.getIntermediateResults().contains(res))
+//									ret.addIntermediateResult((IService)res);
+//							}
 							
-							if(res==null || res instanceof Collection && ((Collection)res).isEmpty())
-							{
+//							if(result==null || result instanceof Collection && ((Collection)result).isEmpty())
+//							{
 //								if(selector instanceof TypeResultSelector && ((TypeResultSelector) selector).getType().toString().indexOf("ILocalService")!=-1)
 //								{
 //									System.out.println("remote search has no result: "+componentid+", "+res);
 //								}
-							}
+//							}
 
 //							ret.setResult(selector.getResult(results));
 //							ret.setResult(results);
 							ret.setFinished();
 						}
 						
-						public void exceptionOccurred(Exception exception)
+						public void finished() 
+						{
+							ret.setFinished();
+						}
+						
+						public void exceptionOccurred(Exception exception) 
 						{
 //							if(selector instanceof TypeResultSelector && ((TypeResultSelector) selector).getType().toString().indexOf("ILocalService")!=-1)
 //							{

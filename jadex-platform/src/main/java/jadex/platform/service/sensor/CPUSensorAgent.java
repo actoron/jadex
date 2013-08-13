@@ -1,14 +1,5 @@
 package jadex.platform.service.sensor;
 
-import java.lang.management.ManagementFactory;
-import java.lang.reflect.Method;
-
-//import java.lang.management.OperatingSystemMXBean;
-//import com.sun.management.OperatingSystemMXBean.*;
-
-
-import javax.management.MBeanServerConnection;
-
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
@@ -17,7 +8,13 @@ import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentKilled;
+
+import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
+
+import javax.management.MBeanServerConnection;
+//import java.lang.management.OperatingSystemMXBean;
+//import com.sun.management.OperatingSystemMXBean.*;
 
 /**
  * 

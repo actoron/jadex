@@ -16,6 +16,7 @@ import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 import java.util.Collection;
 
@@ -227,7 +228,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+	public ITerminableIntermediateFuture<IService>	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
 	{
 		return interpreter.getServiceContainer().getServices(manager, decider, selector);
 	}

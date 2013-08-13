@@ -2,10 +2,14 @@ package jadex.bridge.service.types.remote;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
+
+import java.util.Collection;
 
 
 /**
@@ -22,7 +26,7 @@ public interface IRemoteServiceManagementService
 	 *  @param selector The result selector.
 	 *  @return Collection or single result (i.e. service proxies). 
 	 */
-	public IFuture<Object> getServiceProxies(IComponentIdentifier cid, 
+	public ITerminableIntermediateFuture<IService> getServiceProxies(IComponentIdentifier cid, 
 		ISearchManager manager, IVisitDecider decider, IResultSelector selector);
 	
 	/**
@@ -52,7 +56,7 @@ public interface IRemoteServiceManagementService
 	 *  @param service The service type.
 	 *  @return The service proxy.
 	 */
-	public IFuture<Object> getDeclaredServiceProxies(IComponentIdentifier cid);
+	public IFuture<Collection<IService>> getDeclaredServiceProxies(IComponentIdentifier cid);
 	
 	/**
 	 *  Get an external access proxy from a remote component.

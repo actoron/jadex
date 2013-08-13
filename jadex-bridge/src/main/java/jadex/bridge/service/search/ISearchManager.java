@@ -2,7 +2,7 @@ package jadex.bridge.service.search;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 import java.util.Collection;
 import java.util.Map;
@@ -19,7 +19,7 @@ public interface ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IIntermediateFuture<IService> searchServices(IServiceProvider provider, IVisitDecider decider, 
+	public ITerminableIntermediateFuture<IService> searchServices(IServiceProvider provider, IVisitDecider decider, 
 		IResultSelector selector, Map<Class<?>, Collection<IService>> services);
 
 	/**
