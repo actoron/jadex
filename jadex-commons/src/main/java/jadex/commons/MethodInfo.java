@@ -2,7 +2,6 @@ package jadex.commons;
 
 
 import jadex.bridge.ClassInfo;
-import jadex.commons.transformation.annotations.Exclude;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -80,10 +79,21 @@ public class MethodInfo
 	 *  and decoding purposes only, do not use.
 	 */
 	@Deprecated
-	@Exclude
 	public Class<?>[] getParameterTypes()
 	{
-		throw new UnsupportedOperationException("This method only exists for backward compatibility and decoding purposes only, do not use.");
+//		throw new UnsupportedOperationException("This method only exists for backward compatibility and decoding purposes only, do not use.");
+		Class<?>[] ret = new Class<?>[parametertypes.length];
+		for (int i = 0; i < parametertypes.length; ++i)
+		{
+			try
+			{
+				ret[i] = parametertypes[i].getType(Thread.currentThread().getContextClassLoader());
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		return ret;
 	}
 	
 	/**

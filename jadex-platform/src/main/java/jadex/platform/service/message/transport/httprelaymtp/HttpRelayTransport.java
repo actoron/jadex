@@ -422,7 +422,7 @@ public class HttpRelayTransport implements ITransport
 					else
 					{
 						// Connection dead.
-						System.err.println("Relay. Dead connection to: "+address+", "+time);
+//						System.err.println("Relay. Dead connection to: "+address+", "+time);
 						ret	= new Future<Void>(new RuntimeException("No connection to "+address));
 					}
 					
