@@ -8,8 +8,8 @@ import jadex.bdiv3.asm.IInsnList;
 import jadex.bdiv3.asm.IMethodNode;
 import jadex.bdiv3.asm.instructions.IAbstractInsnNode;
 import jadex.bdiv3.asm.instructions.IMethodInsnNode;
-import jadex.bdiv3.asmdex.InsnListWrapper;
 import jadex.bdiv3.asmdex.ClassNodeWrapper;
+import jadex.bdiv3.asmdex.InsnListWrapper;
 import jadex.bdiv3.asmdex.MethodNodeWrapper;
 import jadex.bdiv3.model.BDIModel;
 import jadex.commons.SReflect;
@@ -33,6 +33,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.objectweb.asm.Type;
+import org.ow2.asmdex.AnnotationVisitor;
 import org.ow2.asmdex.ApplicationReader;
 import org.ow2.asmdex.ApplicationVisitor;
 import org.ow2.asmdex.ApplicationWriter;
@@ -134,6 +135,16 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 						final ClassVisitor superVisitor = super.visitClass(access, iname, signature, superName, interfaces);
 						ClassVisitor cv = new ClassVisitor(api, cn)
 						{
+							boolean isagentorcapa = false;
+							
+						    public AnnotationVisitor visitAnnotation(String desc, boolean visible) 
+						    {
+						    	if(visible && isAgentOrCapa(desc))
+						    	{
+						    		isagentorcapa = true;
+						    	}
+						    	return super.visitAnnotation(desc, visible);
+						    }
 
 							@Override
 							public MethodVisitor visitMethod(int access, String name, final String mDesc, final String[] signature, String[] exceptions)
@@ -160,7 +171,8 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 										
 										
 										if (ophelper.isPutField(opcode) && model.getCapability().hasBelief(name)
-												&& model.getCapability().getBelief(name).isFieldBelief())
+												&& model.getCapability().getBelief(name).isFieldBelief()
+												&& (isagentorcapa || !owner.equals(iclname)))
 										{
 											// possibly transform basic value
 											if (SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))
@@ -174,8 +186,12 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 												
 											}
 
-											// v0 = __agent
-											super.visitFieldInsn(Opcodes.INSN_IGET_OBJECT, iname, "__agent", Type.getDescriptor(BDIAgent.class), v0, objectRegister);
+											// v0 = __agent or null
+											if (isagentorcapa) {
+												super.visitFieldInsn(Opcodes.INSN_IGET_OBJECT, iname, "__agent", Type.getDescriptor(BDIAgent.class), v0, objectRegister);
+											} else {
+												super.visitVarInsn(Opcodes.INSN_CONST, v0, 0);
+											}
 											
 											// v1 = field name
 											visitStringInsn(Opcodes.INSN_CONST_STRING, v1, name);

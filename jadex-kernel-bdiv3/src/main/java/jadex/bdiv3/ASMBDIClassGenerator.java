@@ -141,8 +141,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 			    public AnnotationVisitor visitAnnotation(String desc, boolean visible) 
 			    {
-			    	if(visible && (desc.indexOf("Ljadex/micro/annotation/Agent;")!=-1
-			    		|| desc.indexOf("Ljadex/bdiv3/annotation/Capability;")!=-1))
+			    	if(visible && isAgentOrCapa(desc))
 			    	{
 			    		isagentorcapa = true;
 			    	}

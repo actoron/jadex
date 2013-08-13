@@ -181,9 +181,9 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	// ----- Helper methods ------
 	
 	/**
-	 * 
+	 * Check whether a given ClassNode is an Agent (or Capability) class.
 	 * @param classNode
-	 * @return
+	 * @return true, if the given classNode is an Agent or Capability class.
 	 */
 	protected boolean isAgentClass(IClassNode classNode)
 	{
@@ -193,8 +193,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		{
 			for (IAnnotationNode an: visibleAnnotations)
 			{
-				if("Ljadex/micro/annotation/Agent;".equals(an.getDescription())
-						|| "Ljadex/bdiv3/annotation/Capability;".equals(an.getDescription()))
+				if(isAgentOrCapa(an.getDescription()))
 				{
 					result	= true;
 					break;
@@ -202,6 +201,17 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * Check whether a given Annotation marks an Agent or Capability.
+	 * @param annotationDescription description of the annotation
+	 * @return true, if the given annotationDescription marks an Agent or Capability class.
+	 */
+	protected boolean isAgentOrCapa(String annotationDescription)
+	{
+		return (annotationDescription.indexOf("Ljadex/micro/annotation/Agent;")!=-1
+	    		|| annotationDescription.indexOf("Ljadex/bdiv3/annotation/Capability;")!=-1);
 	}
 	
 	/**
