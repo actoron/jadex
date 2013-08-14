@@ -11,6 +11,7 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.TypeResultSelector;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Command for performing a remote service search.
@@ -138,20 +140,20 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	{
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
-		System.out.println("start rem search");
+//		System.out.println("start rem search: "+callid);
 		
 		// Remove call when finished
 		ret.addResultListener(new IResultListener<Collection<IRemoteCommand>>()
 		{
 			public void resultAvailable(Collection<IRemoteCommand> result)
 			{
-				System.out.println("fin: "+result.size());
+//				System.out.println("fin: "+result.size()+" "+callid);
 				rsms.removeProcessingCall(callid);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("fin exe"+exception);
-				rsms.removeProcessingCall(callid);
+//				System.out.println("fin exe"+exception);
+				rsms.removeProcessingCall(callid+" "+callid);
 			}
 		});
 		
@@ -184,14 +186,19 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 						exta.getServiceProvider().getServices(manager, decider, selector)
 							.addResultListener(new IIntermediateResultListener<IService>()
 						{
+							int cnt = 0;	
 							public void intermediateResultAvailable(IService result)
 							{
-								ret.addIntermediateResult(new RemoteResultCommand(null, result, null, callid, 
-									false, null, getNonFunctionalProperties()));
+//								System.out.println("result command of search: "+callid+" "+result);
+								ret.addIntermediateResult(new RemoteIntermediateResultCommand(null, result, callid, 
+									false, null, false, getNonFunctionalProperties(), ret, cnt++));
 							}
 							
 							public void finished()
 							{
+//								System.out.println("result command of search fini: "+callid);
+								ret.addIntermediateResult(new RemoteIntermediateResultCommand(null, null, callid, 
+									false, null, true, getNonFunctionalProperties(), ret, cnt++));
 								ret.setFinished();
 							}
 							

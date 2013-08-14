@@ -43,6 +43,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
@@ -226,7 +227,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		final IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 		
-		TerminableIntermediateDelegationFuture<IService> future = new TerminableIntermediateDelegationFuture<IService>()
+		final TerminableIntermediateDelegationFuture<IService> future = new TerminableIntermediateDelegationFuture<IService>()
 		{
 			public void terminate(final Exception e) 
 			{
@@ -272,13 +273,33 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			}
 		};
 		
+//		future.addResultListener(new IIntermediateResultListener<IService>()
+//		{
+//			public void intermediateResultAvailable(IService result)
+//			{
+//				System.out.println("inm res: "+result+" "+callid);
+//			}
+//			public void finished()
+//			{
+//				System.out.println("fini"+" "+callid);
+//			}
+//			public void resultAvailable(Collection<IService> result)
+//			{
+//				System.out.println("res: "+result+" "+callid);
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception+" "+callid);
+//			}
+//		});
+		
 //		System.out.println("gsp: "+cid);
 		component.scheduleStep(new IComponentStep<Object>()
 		{
 			@Classname("getServiceProxies")
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
-				final Future<Object> fut = new Future<Object>();
+				final Future fut = future;
 //				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(fut)
 //				{
@@ -288,13 +309,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
 							decider, selector, callid);
 						
-//						System.out.println("send to: "+rrms+" "+SUtil.arrayToString(rrms.getAddresses()));
+//						System.out.println("send to: "+rrms+" "+callid);
 						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null); // todo: non-func
 //					}
 //				});
 				
-				return fut;
-//				return new Future<Object>(null);
+//				return fut;
+				return new Future<Object>(null);
 			}
 		});
 		
@@ -313,14 +334,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope)
 	{
-		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
+//		System.out.println("getServiceProxy start: "+cid+" "+service.getName());
 		final Future<T>	ret	= new Future<T>();
 		getServiceProxies(cid, SServiceProvider.getSearchManager(false, scope), SServiceProvider.getVisitDecider(true, scope), 
 			new TypeResultSelector(service, true)).addResultListener(new ExceptionDelegationResultListener<Collection<IService>, T>(ret)
 		{
 			public void customResultAvailable(Collection<IService> result)
 			{
-				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
+//				System.out.println("getServiceProxy end: "+cid+" "+service.getName());
 				if(result!=null && !((Collection<?>)result).isEmpty())
 				{
 					Object	o	= ((Collection<?>)result).iterator().next();
@@ -334,7 +355,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("getServiceProxy end ex: "+cid+" "+service.getName());
+//				System.out.println("getServiceProxy end ex: "+cid+" "+service.getName());
 				super.exceptionOccurred(exception);
 			}
 		});
@@ -899,6 +920,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			if(cnt==num)
 			{
+				if(!(future instanceof IntermediateFuture))
+					System.out.println("sarsdgaf");
 				IntermediateFuture ifut = (IntermediateFuture)future;
 				cnt++;
 				if(fini)

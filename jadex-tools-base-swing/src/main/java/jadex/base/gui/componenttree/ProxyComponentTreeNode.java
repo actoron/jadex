@@ -166,12 +166,12 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			{
 				if(result!=null)
 				{
-					System.out.println("search: "+ProxyComponentTreeNode.this.hashCode());
+//					System.out.println("search: "+ProxyComponentTreeNode.this.hashCode());
 					searchChildren(cms, result).addResultListener(new IResultListener<List<ITreeNode>>()
 					{
 						public void resultAvailable(List<ITreeNode> result)
 						{
-							System.out.println("search end: "+ProxyComponentTreeNode.this.hashCode()+" "+result.size());
+//							System.out.println("search end: "+ProxyComponentTreeNode.this.hashCode()+" "+result.size());
 							Collections.sort(result, new Comparator<ITreeNode>()
 							{
 								public int compare(ITreeNode o1, ITreeNode o2) 
@@ -187,8 +187,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 						}
 						public void exceptionOccurred(Exception exception)
 						{
-							exception.printStackTrace();
-							System.out.println("search ex: "+ProxyComponentTreeNode.this.hashCode());
+//							exception.printStackTrace();
+//							System.out.println("search ex: "+ProxyComponentTreeNode.this.hashCode()+" "+exception.getClass().getName()+" "+cid);
 //							System.out.println("ex: "+exception);
 							busy	= false;
 //							state	= exception instanceof SecurityException? STATE_LOCKED : STATE_UNCONNECTED;
