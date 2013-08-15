@@ -2,6 +2,7 @@ package jadex.bdiv3.tutorial.b5;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
+import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
@@ -18,12 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  The translation agent B4.
+ *  The translation agent B5.
  *  
- *  Using plan context condition and other plan methods.
+ *  Using plan context conditions.
  */
 @Agent
-@Description("The translation agent B4. <br>  Use of plan pre and context conditions.")
+@Description("The translation agent B4. <br>  Using plan context conditions.")
 public class TranslationBDI
 {
 	//-------- attributes --------
@@ -41,6 +42,9 @@ public class TranslationBDI
 	
 	//-------- methods --------
 
+	/**
+	 *  Create method.
+	 */
 	@AgentCreated
 	public void init()
 	{
@@ -59,12 +63,23 @@ public class TranslationBDI
 	@AgentBody
 	public void body()
 	{
-		agent.adoptPlan("translateEnglishGerman");
+		try
+		{
+			agent.adoptPlan(new TranslatePlan("dog"));
+			agent.waitForDelay(1000).get();
+			context = false;
+			System.out.println("context set to false");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**
 	 *  Translate an English word to German.
 	 */
+	@Plan
 	public class TranslatePlan
 	{
 		/** The plan api. */
@@ -81,12 +96,12 @@ public class TranslationBDI
 		{
 			this.gword = gword;
 		}
-
+		
 		/**
 		 *  The context condition.
 		 */
 		@PlanContextCondition(events="context")
-		public boolean checkPrecondition()
+		public boolean checkCondition()
 		{
 			return context;
 		}
@@ -98,13 +113,13 @@ public class TranslationBDI
 		public String translateEnglishGerman()
 		{
 			System.out.println("Plan started.");
-			plan.waitFor(2000).get();
+			plan.waitFor(10000).get();
 			System.out.println("Plan resumed.");
 			return wordtable.get(gword);
 		}
 		
 		/**
-		 * 
+		 *  Called when plan passed.
 		 */
 		@PlanPassed
 		public void passed()
@@ -113,22 +128,21 @@ public class TranslationBDI
 		}
 		
 		/**
-		 * 
+		 *  Called when plan is aborted.
 		 */
 		@PlanAborted
 		public void aborted()
 		{
-			System.out.println("Plan finished successfully.");
+			System.out.println("Plan aborted.");
 		}
 		
 		/**
-		 * 
+		 *  Called when plan fails.
 		 */
 		@PlanFailed
 		public void failed()
 		{
-			System.out.println("Plan finished successfully.");
+			System.out.println("Plan failed.");
 		}
 	}
 }
-
