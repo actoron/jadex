@@ -1,4 +1,6 @@
-package jadex.bdiv3.tutorial.d7;
+package jadex.bdiv3.tutorial.f4;
+
+import java.lang.reflect.Method;
 
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalResult;
@@ -57,5 +59,22 @@ public class TranslationGoal
 	{
 		this.eword = eword;
 	}
-
+	
+	/**
+	 *  Create service parameters.
+	 */
+//	@GoalServiceParametersMapping(name="transser")
+	public Object[] createServiceParameters(Method m)
+	{
+		return new Object[]{getEWord()};
+	}
+	
+	/**
+	 *  Create service result.
+	 */
+//	@GoalServiceResultMapping(name="transser")
+	public void handleServiceResult(TranslationGoal obj, Method m, Object result)
+	{
+		setGWord((String)result);
+	}
 }

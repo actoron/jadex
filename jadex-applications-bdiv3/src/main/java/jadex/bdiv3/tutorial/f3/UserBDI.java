@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial.d7;
+package jadex.bdiv3.tutorial.f3;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Body;
@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.tutorial.f4.TranslationGoal;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

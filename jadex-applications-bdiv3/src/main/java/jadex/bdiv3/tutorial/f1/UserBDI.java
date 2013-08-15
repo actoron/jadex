@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial.b4;
+package jadex.bdiv3.tutorial.f1;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bridge.service.RequiredServiceInfo;

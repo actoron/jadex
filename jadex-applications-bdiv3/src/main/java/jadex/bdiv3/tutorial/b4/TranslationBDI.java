@@ -1,15 +1,15 @@
 package jadex.bdiv3.tutorial.b4;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bridge.service.annotation.Service;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
+import jadex.bdiv3.annotation.BDIConfiguration;
+import jadex.bdiv3.annotation.BDIConfigurations;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.tutorial.b2.TranslationBDI.TranslationPlan;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.NameValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,47 +17,56 @@ import java.util.Map;
 /**
  *  The translation agent B4.
  *  
- *  Translation agent that implements itself the translation
- *  service. Just looks up translation word in hashtable and
- *  returns the corresponding entry.
+ *  Using plan precondition and context condition.
  */
-@Description("The translation agent B4. <br> Translation agent that implements itself the translation service. Just looks up translation word in hashtable and returns the corresponding entry.")
 @Agent
-@Service
-@ProvidedServices(@ProvidedService(type=ITranslationService.class))
-public class TranslationBDI implements ITranslationService
+@Description("The translation agent B3. <br>  Declare and activate an inline plan (declared as method).")
+//@BDIConfigurations(@BDIConfiguration(name="default", 
+//	initialplans=@NameValue(name="translateEnglishGerman")))
+public class TranslationBDI
 {
 	//-------- attributes --------
-
-	@Agent
-	protected BDIAgent agent;
-	
-	/** The wordtable. */
-	protected Map<String, String> wordtable;
-
-	//-------- methods --------
-
-	@AgentCreated
-	public void init()
-	{
-//		System.out.println("Created: "+this);
-		this.wordtable = new HashMap<String, String>();
-		this.wordtable.put("coffee", "Kaffee");
-		this.wordtable.put("milk", "Milch");
-		this.wordtable.put("cow", "Kuh");
-		this.wordtable.put("cat", "Katze");
-		this.wordtable.put("dog", "Hund");
-	}
-	
-	/**
-	 *  Translate an English word to German.
-	 *  @param eword The english word.
-	 *  @return The german translation.
-	 */
-	public IFuture<String> translateEnglishGerman(String eword)
-	{
-		String gword = wordtable.get(eword);
-		return new Future<String>(gword);
-	}
+//
+//	/** The agent. */
+//	@Agent
+//	protected BDIAgent agent;
+//	
+//	/** The wordtable. */
+//	protected Map<String, String> wordtable;
+//
+//	//-------- methods --------
+//
+//	@AgentCreated
+//	public void init()
+//	{
+////		System.out.println("Created: "+this);
+//		this.wordtable = new HashMap<String, String>();
+//		this.wordtable.put("coffee", "Kaffee");
+//		this.wordtable.put("milk", "Milch");
+//		this.wordtable.put("cow", "Kuh");
+//		this.wordtable.put("cat", "Katze");
+//		this.wordtable.put("dog", "Hund");
+//	}
+//	
+//	
+//	/**
+//	 *  The agent body.
+//	 */
+//	@AgentBody
+//	public void body()
+//	{
+//		agent.adoptPlan("translateEnglishGerman");
+//	}
+//	
+//	/**
+//	 *  Translate an English word to German.
+//	 */
+//	@Plan
+//	public void translateEnglishGerman()
+//	{
+//		String eword = "dog";
+//		String gword = wordtable.get(eword);
+//		System.out.println("Translated: "+eword+" - "+gword);
+//	}
 }
 

@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial.d7;
+package jadex.bdiv3.tutorial.f3;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
@@ -6,6 +6,7 @@ import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Publish;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.tutorial.f4.TranslationGoal;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;

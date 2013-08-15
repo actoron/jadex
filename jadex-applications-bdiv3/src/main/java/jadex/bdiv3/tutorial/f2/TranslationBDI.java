@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial.b5;
+package jadex.bdiv3.tutorial.f2;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
@@ -22,13 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  The translation agent B5.
+ *  The translation agent F2.
  *  
  *  Translation agent that implements itself the translation
  *  service indirectly using plans. In each plan a service trigger
  *  is specified that defines to which service calls it should react to.
  */
-@Description("The translation agent B5. <br> Translation agent that implements itself the translation service. Just looks up translation word in hashtable and returns the corresponding entry.")
+@Description("The translation agent F2. <br> Translation agent that implements itself the translation service. Just looks up translation word in hashtable and returns the corresponding entry.")
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(name="transser", type=ITranslationService.class, 
