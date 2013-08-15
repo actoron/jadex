@@ -5,6 +5,7 @@ import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bdiv3.actions.DropGoalAction;
 import jadex.bdiv3.actions.SelectCandidatesAction;
 import jadex.bdiv3.model.MDeliberation;
+import jadex.bdiv3.model.MElement;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
@@ -18,6 +19,7 @@ import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -761,6 +763,52 @@ public class RGoal extends RProcessableElement implements IGoal
 		else
 		{
 			setProcessingState(ia, GoalProcessingState.SUCCEEDED);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param result
+	 * @param cl
+	 */
+	public void setGoalResult(Object result, ClassLoader cl)
+	{
+		setGoalResult(result, cl, null, null, null);
+	}
+	
+	/**
+	 * 
+	 */
+	public void setGoalResult(Object result, ClassLoader cl, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
+	{
+		MGoal mgoal = (MGoal)getModelElement();
+		Object wa = mgoal.getPojoResultWriteAccess(cl);
+		if(wa instanceof Field)
+		{
+			try
+			{
+				Field f = (Field)wa;
+				f.setAccessible(true);
+				f.set(getPojoElement(), result);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		else if(wa instanceof Method)
+		{
+			try
+			{
+				Method m = (Method)wa;
+				BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+				Object[] params = bai.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), rplan.getModelElement(), event, rplan, rpe);
+				m.invoke(getPojoElement(), params);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	

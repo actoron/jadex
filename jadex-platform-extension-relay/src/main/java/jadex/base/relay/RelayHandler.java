@@ -656,13 +656,13 @@ public class RelayHandler
 			byte[]	propinfo	= null;
 			byte[]	nopropinfo	= null;
 			
-			Map.Entry<String, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
-			for(int i=0; i<entries.length; i++)
+			Map.Entry<String, IBlockingQueue<Message>>[] platformentries = map.entrySet().toArray(new Map.Entry[0]);
+			for(int i=0; i<platformentries.length; i++)
 			{
 				// Send awareness to other platforms with awareness on.
-				PlatformInfo	p2	= platforms.get(entries[i].getKey());
+				PlatformInfo	p2	= platforms.get(platformentries[i].getKey());
 				AwarenessInfo	awainfo2	= p2!=null ? p2.getAwarenessInfo() : null;
-				if(awainfo2!=null && !id.equals(entries[i].getKey()))
+				if(awainfo2!=null && !id.equals(platformentries[i].getKey()))
 				{
 					try
 					{
@@ -703,7 +703,7 @@ public class RelayHandler
 						}
 						
 	//						System.out.println("queing awareness info to:"+entries[i].getKey());
-						entries[i].getValue().enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(awainfo2.getProperties()==null ? nopropinfo : propinfo)));
+						platformentries[i].getValue().enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(awainfo2.getProperties()==null ? nopropinfo : propinfo)));
 					}
 					catch(Exception e)
 					{

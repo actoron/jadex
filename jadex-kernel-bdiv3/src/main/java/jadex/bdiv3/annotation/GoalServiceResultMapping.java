@@ -6,15 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Marker for a field or method that should act as
- *  goal result.
- *  
- *  Is used for two directions. To write a plan
- *  result in the goal and to fetch the result for
- *  the call result of (dispatchGoal).
+ *  Mapping annotation for goals that helps feeding
+ *  back a result of a service invocation.
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GoalResult
+public @interface GoalServiceResultMapping
 {
+	/**
+	 *  The name of the service this mapping
+	 *  is used for. (Only necessary is multiple mappings are available).
+	 */
+	public String name() default "";
 }

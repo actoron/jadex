@@ -62,7 +62,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 	 *  Deregister when agent is killed.
 	 */
 	@AgentKilled
-	public IFuture<Void>	agentkilled()
+	public IFuture<Void>	agentKilled()
 	{
 		// Only wait 5 seconds for disconnect message.
 		Future<Void>	ret	= new Future<Void>();

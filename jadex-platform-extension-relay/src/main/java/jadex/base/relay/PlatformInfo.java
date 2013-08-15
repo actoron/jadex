@@ -208,7 +208,7 @@ public class PlatformInfo
 		}
 		else
 		{
-			return "";
+			return "false";
 		}
 	}
 	
@@ -232,7 +232,7 @@ public class PlatformInfo
 		}
 		else
 		{
-			return "";
+			return "false";
 		}
 	}
 	

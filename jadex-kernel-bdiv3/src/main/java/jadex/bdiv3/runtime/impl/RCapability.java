@@ -3,9 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MPlan;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.IFuture;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -102,13 +100,36 @@ public class RCapability extends RElement
 	}
 	
 	/**
+	 *  Get the rGoal for a pojogoal.
+	 */
+	public RGoal getRGoal(Object pojogoal)
+	{
+		RGoal ret = null;
+		Collection<RGoal> rgoals = getGoals(pojogoal.getClass());
+		if(rgoals!=null)
+		{
+			for(RGoal rgoal: rgoals)
+			{
+				if(rgoal.getPojoElement().equals(pojogoal))
+				{
+					ret = rgoal;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Test if a goal is contained.
 	 *  @param type The type.
 	 *  @return The goals.
 	 */
 	public boolean containsGoal(Object pojogoal)
 	{
-		return goals!=null? goals.contains(pojogoal): false;
+		RGoal rgoal = pojogoal instanceof RGoal? (RGoal)pojogoal: getRGoal(pojogoal);
+		return goals!=null? goals.contains(rgoal): false;
+//		return goals!=null? goals.contains(pojogoal): false;
 	}
 
 	/**

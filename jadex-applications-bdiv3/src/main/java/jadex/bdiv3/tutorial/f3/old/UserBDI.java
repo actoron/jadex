@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial.f4;
+package jadex.bdiv3.tutorial.f3.old;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Body;
@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.tutorial.f3.TranslationGoal;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -36,7 +37,7 @@ import javax.swing.SwingUtilities;
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @Goals(@Goal(clazz=TranslationGoal.class))
 @Plans(@Plan(trigger=@Trigger(goals=TranslationGoal.class), 
-	body=@Body(service=@ServicePlan(name="transser"))))
+	body=@Body(service=@ServicePlan(name="transser", mapper=TranslationGoalMapper.class))))
 public class UserBDI
 {
 	//-------- attributes --------

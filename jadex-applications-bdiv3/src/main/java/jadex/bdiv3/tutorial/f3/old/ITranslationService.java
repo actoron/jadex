@@ -1,4 +1,4 @@
-package jadex.bdiv3.tutorial.f4;
+package jadex.bdiv3.tutorial.f3.old;
 
 import jadex.commons.future.IFuture;
 

@@ -167,7 +167,16 @@ public class RPlan extends RElement implements IPlan
 		{
 			try
 			{
-				IServiceParameterMapper<Object> mapper = (IServiceParameterMapper<Object>)mbody.getMapperClass().getType(ia.getClassLoader()).newInstance();
+				IServiceParameterMapper<Object> mapper;
+				if(mbody.getMapperClass()!=null)
+				{
+					mapper = (IServiceParameterMapper<Object>)mbody.getMapperClass().getType(ia.getClassLoader()).newInstance();
+				}
+				else
+				{
+					final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+					mapper = new DefaultAnnotationMapper(mbody.getServiceName(), ip);
+				}
 				Object plan = new ServiceCallPlan(ia, mbody.getServiceName(), mbody.getServiceMethodName(), mapper);
 				body = new ClassPlanBody(ia, rplan, plan);
 			}

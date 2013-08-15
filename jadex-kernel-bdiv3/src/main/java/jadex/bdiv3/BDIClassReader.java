@@ -14,6 +14,8 @@ import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalParameter;
 import jadex.bdiv3.annotation.GoalRecurCondition;
+import jadex.bdiv3.annotation.GoalServiceParameterMapping;
+import jadex.bdiv3.annotation.GoalServiceResultMapping;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Mapping;
@@ -297,7 +299,8 @@ public class BDIClassReader extends MicroClassReader
 			{
 				MGoal goal2	= new MGoal(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName(), goal.getTarget(),
 					goal.isPostToAll(), goal.isRandomSelection(), goal.getExcludeMode(), goal.isRetry(), goal.isRecur(),
-					goal.getRetryDelay(), goal.getRecurDelay(), goal.isSucceedOnPassed(), goal.isUnique(), goal.getDeliberation(), goal.getParameters()); // clone params?
+					goal.getRetryDelay(), goal.getRecurDelay(), goal.isSucceedOnPassed(), goal.isUnique(), goal.getDeliberation(), goal.getParameters(),
+					goal.getServiceParameterMappings(), goal.getServiceResultMappings()); // clone params?
 						
 				// Convert goal condition events
 				if(goal.getConditions()!=null)
@@ -868,10 +871,10 @@ public class BDIClassReader extends MicroClassReader
 			
 			if(ci==null)
 				ci = Object.class.equals(body.value())? null: new ClassInfo(body.value().getName());
-			Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.equals(sp.mapper())? null: sp.mapper());
+//			Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.equals(sp.mapper())? null: sp.mapper());
+			Class<? extends IServiceParameterMapper<Object>> mapperclass = (Class<? extends IServiceParameterMapper<Object>>)(IServiceParameterMapper.class.getName().equals(sp.mapper().getName())? null: sp.mapper());
 			MBody mbody = new MBody(mi, ci, sp.name().length()==0? null: sp.name(), sp.method().length()==0? null: sp.method(), 
-				Object.class.equals(sp.mapper())? null: new ClassInfo(sp.mapper().getName()),
-				body.component().length()==0 ? null : body.component());
+				mapperclass==null? null: new ClassInfo(mapperclass), body.component().length()==0 ? null : body.component());
 			mplan = new MPlan(name, mbody, mtr, wmtr, p.priority());
 		}
 		
@@ -917,6 +920,9 @@ public class BDIClassReader extends MicroClassReader
 	{
 		assert model.getCapability().getGoal(gcl.getName())==null;
 		
+		Map<String, MethodInfo> spmappings = new HashMap<String, MethodInfo>();
+		Map<String, MethodInfo> srmappings = new HashMap<String, MethodInfo>();
+		
 		Deliberation del = goal.deliberation();
 		Class<?>[] inh = del.inhibits();
 		Set<String> inhnames = null;
@@ -943,6 +949,18 @@ public class BDIClassReader extends MicroClassReader
 					Class<?> icl = ginh.value();
 					inhms.put(icl.getName(), new MethodInfo(m));
 				}
+				
+				if(isAnnotationPresent(m, GoalServiceParameterMapping.class, cl))
+				{
+					GoalServiceParameterMapping gsm = getAnnotation(m, GoalServiceParameterMapping.class, cl);
+					spmappings.put(gsm.name(), new MethodInfo(m));
+				}
+				
+				if(isAnnotationPresent(m, GoalServiceResultMapping.class, cl))
+				{
+					GoalServiceResultMapping gsm = getAnnotation(m, GoalServiceResultMapping.class, cl);
+					srmappings.put(gsm.name(), new MethodInfo(m));
+				}
 			}
 			mdel = new MDeliberation(inhnames, inhms.isEmpty()? null: inhms, cardinalityone);
 		}
@@ -956,7 +974,7 @@ public class BDIClassReader extends MicroClassReader
 			{
 				if(isAnnotationPresent(f, GoalParameter.class, cl))
 				{
-					GoalParameter gp = getAnnotation(f, GoalParameter.class, cl);
+//					GoalParameter gp = getAnnotation(f, GoalParameter.class, cl);
 					MParameter param = new MParameter(new FieldInfo(f));
 					params.add(param);
 				}
@@ -965,13 +983,18 @@ public class BDIClassReader extends MicroClassReader
 		}
 		
 		MGoal mgoal = new MGoal(gcl.getName(), gcl.getName(), goal.posttoall(), goal.randomselection(), goal.excludemode().getString(), 
-			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.succeedonpassed(), goal.unique(), mdel, params);
+			goal.retry(), goal.recur(), goal.retrydelay(), goal.recurdelay(), goal.succeedonpassed(), goal.unique(), mdel, params,
+			spmappings.size()>0? spmappings: null, srmappings.size()>0? srmappings: null);
 		
 		jadex.bdiv3.annotation.Publish pub = goal.publish();
 		if(!Object.class.equals(pub.type()))
 		{
 			ClassInfo ci = new ClassInfo(pub.type().getName());
 			String method = pub.method().length()>0? pub.method(): null;
+			
+			// Just use first method if no name is given
+			if(method==null)
+				method = pub.type().getDeclaredMethods()[0].getName();
 			
 			List<Tuple2<MGoal, String>> tmp = pubs.get(ci);
 			if(tmp==null)

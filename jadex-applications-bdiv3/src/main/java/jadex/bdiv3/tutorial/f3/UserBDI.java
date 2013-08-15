@@ -8,10 +8,10 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.tutorial.f4.TranslationGoal;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.micro.annotation.Agent;
@@ -30,14 +30,14 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 /**
- * 
+ *  Agent that presents a gui and sends translation requests
+ *  via goal delegation to the translation agent.
  */
 @Agent
 @RequiredServices(@RequiredService(name="transser", type=ITranslationService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @Goals(@Goal(clazz=TranslationGoal.class))
-@Plans(@Plan(trigger=@Trigger(goals=TranslationGoal.class), 
-	body=@Body(service=@ServicePlan(name="transser", mapper=TranslationGoalMapper.class))))
+@Plans(@Plan(trigger=@Trigger(goals=TranslationGoal.class), body=@Body(service=@ServicePlan(name="transser"))))
 public class UserBDI
 {
 	//-------- attributes --------
@@ -47,13 +47,8 @@ public class UserBDI
 	
 	//-------- methods ---------
 
-//	@Plan(trigger=@Trigger(goals=TranslationGoalB2.class), 
-//		body=@Body(service=@ServicePlan(name="transser")))
-//	public native IFuture<String> translateEnglishGerman(
-//		@GoalMapping(clazz=TranslationGoalB2.class, val="gword") String eword);
-	
 	/**
-	 * 
+	 *  The plan body.
 	 */
 	@AgentBody
 	public void body()
@@ -73,20 +68,50 @@ public class UserBDI
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						IFuture<String> fut = agent.dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
-						fut.addResultListener(new IResultListener<String>()
+						agent.scheduleStep(new IComponentStep<Void>()
 						{
-							public void resultAvailable(String res) 
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								tfg.setText(res);
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								exception.printStackTrace();
-								tfg.setText(exception.getMessage());
+								try
+								{
+									final String gword = (String)agent.dispatchTopLevelGoal(new TranslationGoal(tfe.getText())).get();
+									SwingUtilities.invokeLater(new Runnable()
+									{
+										public void run()
+										{
+											tfg.setText(gword);
+										}
+									});
+								}
+								catch(final Exception e)
+								{
+									SwingUtilities.invokeLater(new Runnable()
+									{
+										public void run()
+										{
+											tfg.setText(e.getMessage());
+										}
+									});
+								}
+								
+								return IFuture.DONE;
 							}
 						});
+						
+//						IFuture<String> fut = agent.dispatchTopLevelGoal(new TranslationGoal(tfe.getText()));
+//						fut.addResultListener(new IResultListener<String>()
+//						{
+//							public void resultAvailable(String res) 
+//							{
+//								tfg.setText(res);
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								exception.printStackTrace();
+//								tfg.setText(exception.getMessage());
+//							}
+//						});
 					}
 				});
 				

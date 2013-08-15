@@ -81,36 +81,37 @@ public abstract class AbstractPlanBody implements IPlanBody
 						}
 						else if(rplan.getReason() instanceof RGoal)
 						{
-							RProcessableElement rgoal = (RProcessableElement)rplan.getReason();
-							MGoal mgoal = (MGoal)rgoal.getModelElement();
-							Object wa = mgoal.getPojoResultWriteAccess(ia.getClassLoader());
-							if(wa instanceof Field)
-							{
-								try
-								{
-									Field f = (Field)wa;
-									f.setAccessible(true);
-									f.set(rgoal.getPojoElement(), result);
-								}
-								catch(Exception e)
-								{
-									throw new RuntimeException(e);
-								}
-							}
-							else if(wa instanceof Method)
-							{
-								try
-								{
-									Method m = (Method)wa;
-									BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
-									Object[] params = bai.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), rplan.getModelElement(), null, rplan, null);
-									m.invoke(rgoal.getPojoElement(), params);
-								}
-								catch(Exception e)
-								{
-									throw new RuntimeException(e);
-								}
-							}
+							RGoal rgoal = (RGoal)rplan.getReason();
+//							MGoal mgoal = (MGoal)rgoal.getModelElement();
+							rgoal.setGoalResult(result, ia.getClassLoader(), null, rplan, null);
+//							Object wa = mgoal.getPojoResultWriteAccess(ia.getClassLoader());
+//							if(wa instanceof Field)
+//							{
+//								try
+//								{
+//									Field f = (Field)wa;
+//									f.setAccessible(true);
+//									f.set(rgoal.getPojoElement(), result);
+//								}
+//								catch(Exception e)
+//								{
+//									throw new RuntimeException(e);
+//								}
+//							}
+//							else if(wa instanceof Method)
+//							{
+//								try
+//								{
+//									Method m = (Method)wa;
+//									BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
+//									Object[] params = bai.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), rplan.getModelElement(), null, rplan, null);
+//									m.invoke(rgoal.getPojoElement(), params);
+//								}
+//								catch(Exception e)
+//								{
+//									throw new RuntimeException(e);
+//								}
+//							}
 						}
 					}
 					internalInvokePart(agent, 1)

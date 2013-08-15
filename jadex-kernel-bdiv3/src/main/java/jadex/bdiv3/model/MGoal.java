@@ -79,19 +79,19 @@ public class MGoal extends MClassBasedElement
 	/** The parameters. */
 	protected List<MParameter> parameters;
 	
-	// hack?!
-//	protected boolean declarative;
-//	protected boolean target;
+	/** The goal service parameter mappings. */
+	protected Map<String, MethodInfo> spmappings;
 	
-	// hack?!
-//	protected boolean maintain;
+	/** The goal service result mappings. */
+	protected Map<String, MethodInfo> srmappings;
 	
 	/**
 	 *  Create a new belief.
 	 */
 	public MGoal(String name, String target, boolean posttoall, boolean randomselection, String excludemode,
 		boolean retry, boolean recur, long retrydelay, long recurdelay, 
-		boolean succeedonpassed, boolean unique, MDeliberation deliberation, List<MParameter> parameters)
+		boolean succeedonpassed, boolean unique, MDeliberation deliberation, List<MParameter> parameters,
+		Map<String, MethodInfo> spmappings, Map<String, MethodInfo> srmappings)
 	{
 		super(name, target, posttoall, randomselection, excludemode);
 		this.retry = retry;
@@ -102,6 +102,8 @@ public class MGoal extends MClassBasedElement
 		this.unique = unique;
 		this.deliberation = deliberation;
 		this.parameters = parameters;
+		this.spmappings = spmappings;
+		this.srmappings = srmappings;
 		
 //		System.out.println("create: "+target);
 	}
@@ -375,4 +377,59 @@ public class MGoal extends MClassBasedElement
 	{
 		this.parameters = parameters;
 	}
+	
+	/**
+	 * 
+	 */
+	public void addServiceParameterMapping(String name, MethodInfo m)
+	{
+		if(spmappings==null)
+			spmappings = new HashMap<String, MethodInfo>();
+		spmappings.put(name, m);
+	}
+
+	/**
+	 * 
+	 */
+	public MethodInfo getServiceParameterMapping(String name)
+	{
+		return spmappings==null? null: spmappings.get(name);
+	}
+	
+	/**
+	 * 
+	 */
+	public void addServiceResultMapping(String name, MethodInfo m)
+	{
+		if(spmappings==null)
+			spmappings = new HashMap<String, MethodInfo>();
+		spmappings.put(name, m);
+	}
+	
+	/**
+	 * 
+	 */
+	public MethodInfo getServiceResultMapping(String name)
+	{
+		return srmappings==null? null: srmappings.get(name);
+	}
+
+	/**
+	 *  Get the spmappings.
+	 *  @return The spmappings.
+	 */
+	public Map<String, MethodInfo> getServiceParameterMappings()
+	{
+		return spmappings;
+	}
+
+	/**
+	 *  Get the srmappings.
+	 *  @return The srmappings.
+	 */
+	public Map<String, MethodInfo> getServiceResultMappings()
+	{
+		return srmappings;
+	}
+	
 }

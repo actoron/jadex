@@ -6,7 +6,6 @@ import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Publish;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.tutorial.f4.TranslationGoal;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -22,7 +21,7 @@ import java.util.Map;
 @Agent
 @Service
 @Goals(@Goal(clazz=TranslationGoal.class, 
-	publish=@Publish(type=ITranslationService.class, method="translateEnglishGerman")))
+	publish=@Publish(type=ITranslationService.class)))//, method="translateEnglishGerman")))
 public class TranslationBDI 
 {
 	//-------- attributes --------

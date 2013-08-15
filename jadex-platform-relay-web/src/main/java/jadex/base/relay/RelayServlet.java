@@ -79,7 +79,6 @@ public class RelayServlet extends HttpServlet
 		}
 		else
 		{
-	
 			String	id	= request.getParameter("id");
 			// Render status page.
 			if(id==null)

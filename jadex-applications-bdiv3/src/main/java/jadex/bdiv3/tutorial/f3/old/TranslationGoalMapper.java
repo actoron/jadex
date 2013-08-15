@@ -1,9 +1,9 @@
-package jadex.bdiv3.tutorial.f3;
+package jadex.bdiv3.tutorial.f3.old;
 
 import java.lang.reflect.Method;
 
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
-import jadex.bdiv3.tutorial.f4.TranslationGoal;
+import jadex.bdiv3.tutorial.f3.TranslationGoal;
 
 /**
  * 

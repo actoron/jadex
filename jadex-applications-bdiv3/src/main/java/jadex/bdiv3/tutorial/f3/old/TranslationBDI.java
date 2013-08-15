@@ -1,13 +1,12 @@
-package jadex.bdiv3.tutorial.f4;
+package jadex.bdiv3.tutorial.f3.old;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Goal;
-import jadex.bdiv3.annotation.GoalResult;
 import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Publish;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.tutorial.f4.TranslationBDI.TranslationGoal;
+import jadex.bdiv3.tutorial.f3.TranslationGoal;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -36,63 +35,6 @@ public class TranslationBDI
 
 	//-------- methods --------
 
-	/**
-	 * 
-	 */
-	@Goal
-	public class TranslationGoal
-	{
-		@GoalResult
-		protected String gword;
-		
-		protected String eword;
-
-		/**
-		 *  Create a new TranslateGoal. 
-		 */
-		public TranslationGoal(String eword)
-		{
-			this.eword = eword;
-		}
-
-		/**
-		 *  Get the gword.
-		 *  @return The gword.
-		 */
-		public String getGWord()
-		{
-			return gword;
-		}
-
-		/**
-		 *  Set the gword.
-		 *  @param gword The gword to set.
-		 */
-		public void setGWord(String gword)
-		{
-			this.gword = gword;
-		}
-
-		/**
-		 *  Get the eword.
-		 *  @return The eword.
-		 */
-		public String getEWord()
-		{
-			return eword;
-		}
-
-		/**
-		 *  Set the eword.
-		 *  @param eword The eword to set.
-		 */
-		public void setEWord(String eword)
-		{
-			this.eword = eword;
-		}
-
-	}
-	
 	/**
 	 *  Create a new plan.
 	 */
