@@ -1,14 +1,14 @@
-package jadex.bdiv3.tutorial.b4;
+package jadex.bdiv3.tutorial.b5;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanContextCondition;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
@@ -20,10 +20,10 @@ import java.util.Map;
 /**
  *  The translation agent B4.
  *  
- *  Using other plan methods.
+ *  Using plan context condition and other plan methods.
  */
 @Agent
-@Description("The translation agent B4. <br>  Using other plan methods.")
+@Description("The translation agent B4. <br>  Use of plan pre and context conditions.")
 public class TranslationBDI
 {
 	//-------- attributes --------
@@ -35,11 +35,12 @@ public class TranslationBDI
 	/** The wordtable. */
 	protected Map<String, String> wordtable;
 	
+	/** The context. */
+	@Belief
+	protected boolean context = true;
+	
 	//-------- methods --------
 
-	/**
-	 *  Create method.
-	 */
 	@AgentCreated
 	public void init()
 	{
@@ -58,20 +59,12 @@ public class TranslationBDI
 	@AgentBody
 	public void body()
 	{
-		try
-		{
-			agent.adoptPlan(new TranslatePlan("dog")).get();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		agent.adoptPlan("translateEnglishGerman");
 	}
 	
 	/**
 	 *  Translate an English word to German.
 	 */
-	@Plan
 	public class TranslatePlan
 	{
 		/** The plan api. */
@@ -90,17 +83,28 @@ public class TranslationBDI
 		}
 
 		/**
+		 *  The context condition.
+		 */
+		@PlanContextCondition(events="context")
+		public boolean checkPrecondition()
+		{
+			return context;
+		}
+		
+		/**
 		 *  The plan body.
 		 */
 		@PlanBody
 		public String translateEnglishGerman()
 		{
-			throw new PlanFailureException();
-//			return wordtable.get(gword);
+			System.out.println("Plan started.");
+			plan.waitFor(2000).get();
+			System.out.println("Plan resumed.");
+			return wordtable.get(gword);
 		}
 		
 		/**
-		 *  Called when plan passed.
+		 * 
 		 */
 		@PlanPassed
 		public void passed()
@@ -109,21 +113,21 @@ public class TranslationBDI
 		}
 		
 		/**
-		 *  Called when plan is aborted.
+		 * 
 		 */
 		@PlanAborted
 		public void aborted()
 		{
-			System.out.println("Plan aborted.");
+			System.out.println("Plan finished successfully.");
 		}
 		
 		/**
-		 *  Called when plan fails.
+		 * 
 		 */
 		@PlanFailed
 		public void failed()
 		{
-			System.out.println("Plan failed.");
+			System.out.println("Plan finished successfully.");
 		}
 	}
 }
