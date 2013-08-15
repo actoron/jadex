@@ -218,8 +218,15 @@ public class Future<E> implements IFuture<E>, ICommandFuture
     	{
 	    	if(exception!=null)
 	    	{
-	    		// Nest exception to have both calling and manually set exception stack trace.
-	    		throw new RuntimeException(exception.getMessage(), exception);
+	    		if(exception instanceof RuntimeException)
+	    		{
+	    			throw (RuntimeException)exception;
+	    		}
+	    		else
+	    		{
+	    			// Nest exception to have both calling and manually set exception stack trace.
+	    			throw new RuntimeException(exception.getMessage(), exception);
+	    		}
 	    	}
 	    	else if(isDone())
 	    	{
