@@ -5,11 +5,14 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.commons.SUtil;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.util.Collection;
@@ -94,20 +97,46 @@ public class ParallelSearchManager implements ISearchManager
 	public ITerminableIntermediateFuture<IService>	searchServices(IServiceProvider provider, IVisitDecider decider, 
 		final IResultSelector selector, Map<Class<?>, Collection<IService>> services)
 	{
-		final TerminableIntermediateFuture<IService>	ret	= new TerminableIntermediateFuture<IService>();
-		
-		ret.addResultListener(new IResultListener<Collection<IService>>()
+		final TerminableIntermediateFuture<IService> ret = new TerminableIntermediateFuture<IService>();
+		final TerminableIntermediateDelegationFuture<IService> del = new TerminableIntermediateDelegationFuture<IService>();
+		ret.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(del, ret)
 		{
-			public void resultAvailable(Collection<IService> result)
+			public void customResultAvailable(Collection<IService> result)
 			{
-//						System.out.println("search end: "+ret.hashCode());
+//				System.out.println("search end: "+ret.hashCode());
 				opencalls.remove(ret);
+				super.resultAvailable(result);
+			}
+			
+			public void customIntermediateResultAvailable(IService result) 
+			{
+				super.customIntermediateResultAvailable(result);
+			}
+			
+			public void finished() 
+			{
+				opencalls.remove(ret);
+				super.finished();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-//						System.out.println("search end: "+ret.hashCode());
+//				System.out.println("search end: "+ret.hashCode());
 				opencalls.remove(ret);
+				// If the future was terminated it is changed to finished to avoid
+				// getting exceptions outside as termination is used also internally
+				// to cut off the search when enough results have been found.
+				if(exception instanceof FutureTerminatedException)
+				{
+					if(ret.getIntermediateResults().size()>0)
+					{
+						finished();
+					}
+					else
+					{
+						super.exceptionOccurred(exception);
+					}
+				}
 			}
 		});
 		
@@ -142,7 +171,7 @@ public class ParallelSearchManager implements ISearchManager
 //					System.out.println("here: "+res.size());
 //				ret.setResult(results);
 //				ret.setResult(result);
-				ret.setFinished();
+				ret.setFinishedIfUndone();
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -153,15 +182,15 @@ public class ParallelSearchManager implements ISearchManager
 				// raise a timeout exception which is propagated here.
 				if(ret.getIntermediateResults().size()>0)
 				{
-					ret.setFinished();
+					ret.setFinishedIfUndone();
 				}
 				else
 				{
-					ret.setException(exception);
+					ret.setExceptionIfUndone(exception);
 				}
 			}
 		});
-		return ret;
+		return del;
 	}
 	
 	/**
@@ -203,7 +232,8 @@ public class ParallelSearchManager implements ISearchManager
 		final Future<Void> ret	= new Future<Void>();
 		final boolean[]	finished	= new boolean[3];
 		
-		if(!selector.isFinished(endret.getIntermediateResults()) && provider!=null 
+//		if(!selector.isFinished(endret.getIntermediateResults()) && provider!=null 
+		if(!checkFinished(selector, endret) && provider!=null 
 			&& decider.searchNode(start==null? null: start.getId(), source==null? null: source.getId(), provider==null? null: provider.getId(), endret.getIntermediateResults()))
 		{
 //			if(provider!=null && selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Component")!=-1)
@@ -224,7 +254,8 @@ public class ParallelSearchManager implements ISearchManager
 							
 							// Must recheck if already finished (otherwise duplicate results may occur).
 							if(!endret.getIntermediateResults().contains(next)
-								&& !selector.isFinished(endret.getIntermediateResults())) 
+//								&& !selector.isFinished(endret.getIntermediateResults())) 
+								&& !checkFinished(selector, endret)) 
 							{
 //								System.out.println("found: "+next);
 								endret.addIntermediateResult(next);
@@ -374,5 +405,19 @@ public class ParallelSearchManager implements ISearchManager
 		{
 			ocs.remove(oc);
 		}
+	}
+	
+	/**
+	 *  Checks if the search is finished and then
+	 *  automatically terminates the search future.
+	 */
+	protected boolean checkFinished(IResultSelector ressel, TerminableIntermediateFuture<IService> fut)
+	{
+		boolean ret = ressel.isFinished(fut.getIntermediateResults());
+		if(ret)
+		{
+			fut.terminate();
+		}
+		return ret;	
 	}
 }

@@ -470,14 +470,14 @@ public class SServiceProvider
 			provider.getServices(getSearchManager(true, scope), 
 				getVisitDecider(false, scope),
 				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter))
-					.addResultListener(new IntermediateDelegationResultListener(ret));
-	//				{
-	//					public void customResultAvailable(Object source, Object result)
-	//					{
-	//						System.out.println(6);
-	//						super.customResultAvailable(source, result);
-	//					}
-	//				});
+					.addResultListener(new IntermediateDelegationResultListener(ret)
+					{
+//						public void customResultAvailable(Object source, Object result)
+//						{
+//							System.out.println(6);
+//							super.customResultAvailable(source, result);
+//						}
+					});
 		}
 		catch(Exception e)
 		{

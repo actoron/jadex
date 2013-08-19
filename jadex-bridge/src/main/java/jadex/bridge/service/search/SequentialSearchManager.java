@@ -3,11 +3,14 @@ package jadex.bridge.service.search;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.SUtil;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.util.Collection;
@@ -98,24 +101,51 @@ public class SequentialSearchManager implements ISearchManager
 		final IResultSelector selector, Map<Class<?>, Collection<IService>> services)
 	{
 		final TerminableIntermediateFuture<IService> ret = new TerminableIntermediateFuture<IService>();
-//		System.out.println("search: "+selector+" "+provider.getId()+" "+ret.hashCode());
-//		System.out.println("search: "+ret.hashCode());
-	
-		ret.addResultListener(new IResultListener<Collection<IService>>()
+		final TerminableIntermediateDelegationFuture<IService> del = new TerminableIntermediateDelegationFuture<IService>();
+		ret.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(del, ret)
 		{
-			public void resultAvailable(Collection<IService> result)
+			public void customResultAvailable(Collection<IService> result)
 			{
 //				System.out.println("search end: "+ret.hashCode());
 				opencalls.remove(ret);
+				super.resultAvailable(result);
+			}
+			
+			public void customIntermediateResultAvailable(IService result) 
+			{
+				super.customIntermediateResultAvailable(result);
+			}
+			
+			public void finished() 
+			{
+				opencalls.remove(ret);
+				super.finished();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 //				System.out.println("search end: "+ret.hashCode());
 				opencalls.remove(ret);
+				// If the future was terminated it is changed to finished to avoid
+				// getting exceptions outside as termination is used also internally
+				// to cut off the search when enough results have been found.
+				if(exception instanceof FutureTerminatedException)
+				{
+					if(ret.getIntermediateResults().size()>0)
+					{
+						finished();
+					}
+					else
+					{
+						super.exceptionOccurred(exception);
+					}
+				}
 			}
 		});
-		
+
+//		System.out.println("search: "+selector+" "+provider.getId()+" "+ret.hashCode());
+//		System.out.println("search: "+ret.hashCode());
+	
 		ret.setTerminationCommand(new ITerminationCommand()
 		{
 			public void terminated(Exception reason)
@@ -148,7 +178,7 @@ public class SequentialSearchManager implements ISearchManager
 //				System.out.println("DEBUG searchServices: "+selector+" "+res);
 //			}
 //		});
-		return ret;
+		return del;
 	}
 	
 	/**
@@ -208,7 +238,8 @@ public class SequentialSearchManager implements ISearchManager
 //				System.out.println("here");
 //			}
 //		}
-		if(!context.selector.isFinished(ret.getIntermediateResults()) && provider!=null)
+//		if(!context.selector.isFinished(ret.getIntermediateResults()) && provider!=null)
+		if(!checkFinished(context.selector, ret) && provider!=null)
 		{
 			if(down)
 			{
@@ -326,7 +357,8 @@ public class SequentialSearchManager implements ISearchManager
 		final SearchContext context, final TerminableIntermediateFuture<IService> ret, final boolean up, final int callstack)//, final List res)
 	{
 		// When searching upwards, continue with parent.
-		if(!context.selector.isFinished(ret.getIntermediateResults()) && up)
+//		if(!context.selector.isFinished(ret.getIntermediateResults()) && up)
+		if(!checkFinished(context.selector, ret) && up)
 		{
 			// Use fut.isDone() to reduce stack depth
 			IFuture<IServiceProvider>	future	= provider.getParent();
@@ -380,11 +412,12 @@ public class SequentialSearchManager implements ISearchManager
 		final SearchContext context, final TerminableIntermediateFuture<IService> ret, final int callstack)//, final List res)
 	{
 		// Finished, when no more todo nodes.
-		if(context.selector.isFinished(ret.getIntermediateResults()) || context.todo.isEmpty())
+//		if(context.selector.isFinished(ret.getIntermediateResults()) || context.todo.isEmpty())
+		if(context.todo.isEmpty() || checkFinished(context.selector, ret))
 		{
 //			ret.setResult(context.selector.getResult(context.results));
 //			ret.setResult(context.results);
-			ret.setFinished();
+			ret.setFinishedIfUndone();
 //			if(context.selector instanceof TypeResultSelector && ((TypeResultSelector)context.selector).getType().toString().indexOf("IComponentMana")!=-1)
 //				System.out.println("found "+ret.getIntermediateResults());
 		}
@@ -454,7 +487,8 @@ public class SequentialSearchManager implements ISearchManager
 	protected void addChildren(IServiceProvider start, IServiceProvider source, IServiceProvider provider,
 		SearchContext context, TerminableIntermediateFuture<IService> ret, Collection<IServiceProvider> children, int callstack)//, List res)
 	{
-		if(!context.selector.isFinished(ret.getIntermediateResults()) && children!=null && !children.isEmpty())
+//		if(!context.selector.isFinished(ret.getIntermediateResults()) && children!=null && !children.isEmpty())
+		if(!checkFinished(context.selector, ret) && children!=null && !children.isEmpty())
 		{
 			List<IServiceProvider>	ccs	= new LinkedList<IServiceProvider>(children);
 			ccs.remove(source);
@@ -522,7 +556,8 @@ public class SequentialSearchManager implements ISearchManager
 	}
 	
 	/**
-	 * 
+	 *  Add an open call.
+	 *  An open call is a search on a node.
 	 */
 	public void addOpenCall(TerminableIntermediateFuture<IService> ret, ITerminableIntermediateFuture<IService> oc)
 	{
@@ -533,7 +568,8 @@ public class SequentialSearchManager implements ISearchManager
 	}
 	
 	/**
-	 * 
+	 *  Remove an open call.
+	 *  An open call is a search on a node.
 	 */
 	public void removeOpenCall(TerminableIntermediateFuture<IService> ret, ITerminableIntermediateFuture<IService> oc)
 	{
@@ -543,6 +579,21 @@ public class SequentialSearchManager implements ISearchManager
 			ocs.remove(oc);
 		}
 	}
+	
+	/**
+	 *  Checks if the search is finished and then
+	 *  automatically terminates the search future.
+	 */
+	protected boolean checkFinished(IResultSelector ressel, TerminableIntermediateFuture<IService> fut)
+	{
+		boolean ret = ressel.isFinished(fut.getIntermediateResults());
+		if(ret)
+		{
+			fut.terminate();
+		}
+		return ret;	
+	}
+
 	
 	//-------- helper classes --------
 	
