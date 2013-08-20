@@ -101,6 +101,7 @@ public class IdGenerator
 				random.nextBytes(rawid);
 				id = encoder.execute(rawid);
 			}
+			generatedIds.add(id);
 		}
 		
 		
