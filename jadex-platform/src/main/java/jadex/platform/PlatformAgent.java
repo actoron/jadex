@@ -136,6 +136,8 @@ import java.util.logging.Level;
 	@Argument(name="maven_dependencies", clazz=boolean.class, defaultvalue="false"),
 	
 	@Argument(name="monitoringcomp", clazz=boolean.class, defaultvalue="true"),
+	
+	@Argument(name="sensors", clazz=boolean.class, defaultvalue="false"),
 })
 
 @ComponentTypes({
@@ -156,7 +158,8 @@ import java.util.logging.Level;
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class"),
 	@ComponentType(name="rspublish", filename="jadex/extension/rs/publish/RSPublishAgent.class"),
 	@ComponentType(name="wspublish", filename="jadex/extension/ws/publish/WSPublishAgent.class"),
-	@ComponentType(name="cli", filename="jadex/platform/service/cli/CliAgent.class")
+	@ComponentType(name="cli", filename="jadex/platform/service/cli/CliAgent.class"),
+	@ComponentType(name="sensor", filename="jadex/platform/sensor/SensorHolderAgent.class")
 })
 
 @ProvidedServices({
@@ -222,7 +225,8 @@ import java.util.logging.Level;
 		@Component(name="rspub", type="rspublish", daemon=true, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 		@Component(name="wspub", type="wspublish", daemon=true, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
 		@Component(name="cli", type="cli", daemon=true, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
-			arguments={@NameValue(name="console", value="$args.cliconsole")})
+			arguments={@NameValue(name="console", value="$args.cliconsole")}),
+		@Component(name="sensors", type="sensor", daemon=true, number="Boolean.TRUE.equals($args.sensors)? 1: 0")
 	}),
 	@Configuration(name="fixed", arguments={
 		@NameValue(name="tcpport", value="0"),
@@ -254,7 +258,8 @@ import java.util.logging.Level;
 		@Component(name="rspub", type="rspublish", daemon=true, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 		@Component(name="wspub", type="wspublish", daemon=true, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
 		@Component(name="cli", type="cli", daemon=true, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
-			arguments={@NameValue(name="console", value="$args.cliconsole")})	
+			arguments={@NameValue(name="console", value="$args.cliconsole")}),
+		@Component(name="sensors", type="sensor", daemon=true, number="Boolean.TRUE.equals($args.sensors)? 1: 0")
 	})
 })
 public class PlatformAgent extends MicroAgent

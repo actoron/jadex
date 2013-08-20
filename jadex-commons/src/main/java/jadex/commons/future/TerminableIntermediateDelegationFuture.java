@@ -57,6 +57,15 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 	}
 	
 	/**
+	 *  Get the src.
+	 *  @return The src.
+	 */
+	public ITerminableIntermediateFuture<?> getSource()
+	{
+		return src;
+	}
+
+	/**
 	 *  Possibly notify the termination source.
 	 */
 	protected void doNotify()

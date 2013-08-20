@@ -1,9 +1,9 @@
 package jadex.bridge.service.search;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.IServiceSearchConstraints;
+import jadex.bridge.nonfunctional.ServiceSearchIntermediateResultListener;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
@@ -18,9 +18,11 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -422,7 +424,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type)
+	public static <T> ITerminableIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type)
 	{
 		return getServices(provider, type, null);
 	}
@@ -442,9 +444,9 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope)
+	public static <T> ITerminableIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope)
 	{
-		return getServices(provider, type, scope, null);
+		return getServices(provider, type, scope, (IFilter<T>)null);
 	}
 	
 	/**
@@ -452,14 +454,14 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope, IFilter<T> filter)
+	public static <T> ITerminableIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope, IFilter<T> filter)
 	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final IntermediateFuture<T> ret = new IntermediateFuture<T>();
+		final TerminableIntermediateDelegationFuture ret = new TerminableIntermediateDelegationFuture();
 		
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
@@ -467,17 +469,44 @@ public class SServiceProvider
 		
 		try
 		{
-			provider.getServices(getSearchManager(true, scope), 
+			ITerminableIntermediateFuture fut = provider.getServices(getSearchManager(true, scope), 
 				getVisitDecider(false, scope),
-				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter))
-					.addResultListener(new IntermediateDelegationResultListener(ret)
-					{
-//						public void customResultAvailable(Object source, Object result)
-//						{
-//							System.out.println(6);
-//							super.customResultAvailable(source, result);
-//						}
-					});
+				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), filter));
+			fut.addResultListener(new TerminableIntermediateDelegationResultListener(ret, fut));
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, 
+		String scope, IServiceSearchConstraints constraints)
+	{
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
+		final TerminableIntermediateDelegationFuture ret = new TerminableIntermediateDelegationFuture();
+		
+		// Hack->remove
+//		IVisitDecider contdecider = new DefaultVisitDecider(false);
+//		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
+		
+		try
+		{
+			ITerminableIntermediateFuture fut = provider.getServices(getSearchManager(true, scope), 
+				getVisitDecider(false, scope),
+				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), constraints.getFilter()));
+			ret.addResultListener(new ServiceSearchIntermediateResultListener(ret, fut, constraints));
 		}
 		catch(Exception e)
 		{

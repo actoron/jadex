@@ -48,6 +48,7 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.platform.service.awareness.RemotePlatformAgent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -842,7 +843,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			pcreatefut = new Future<IComponentIdentifier>();
 			CreationInfo	ci	= new CreationInfo(getComponentIdentifier().getRoot());
 			ci.setDaemon(Boolean.TRUE);
-			cms.createComponent("platforms", "jadex/platform/service/awareness/RemotePlatformAgent.class", ci, null)
+			cms.createComponent("platforms", RemotePlatformAgent.class.getName()+".class", ci, null)
 				.addResultListener(new DelegationResultListener<IComponentIdentifier>(pcreatefut));
 		}
 		

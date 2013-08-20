@@ -215,6 +215,9 @@
 		
 		<!-- Flag if global monitoring is turned on.  -->
 		<argument name="monitoringcomp" class="boolean">true</argument>
+		
+		<!-- Flag if sensors are turned on.  -->
+		<argument name="sensors" class="boolean">false</argument>
 	</arguments>
 	
 	<componenttypes>
@@ -237,6 +240,7 @@
 		<componenttype filename="jadex/extension/ws/publish/WSPublishAgent.class" name="wspublish"/>
 		<componenttype filename="jadex/platform/service/cli/CliAgent.class" name="cli"/>
 		<componenttype filename="jadex/platform/service/monitoring/MonitoringAgent.class" name="monitor"/>
+		<componenttype filename="jadex/platform/sensor/SensorHolderAgent.class" name="sensor"/>
 		
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
 	</componenttypes>
@@ -420,6 +424,7 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
+				<component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 			</components>
 		</configuration>
 		
@@ -462,6 +467,7 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
+				<component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 			</components>
 		</configuration>
 		
