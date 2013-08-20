@@ -59,6 +59,25 @@ public class MDataEdge extends MNamedIdElement
 	}
 	
 	/**
+	 *  Helper method disconnecting this edge.
+	 */
+	public void disconnect()
+	{
+		if (this.source != null)
+		{
+			this.source.removeOutgoingDataEdge(this);
+		}
+		
+		if (this.target != null)
+		{
+			this.target.removeIncomingDataEdge(this);
+		}
+		
+		this.source = null;
+		this.target = null;
+	}
+	
+	/**
 	 *  Get the source.
 	 *  @return The source.
 	 */

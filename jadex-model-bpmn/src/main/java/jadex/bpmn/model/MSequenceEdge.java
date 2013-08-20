@@ -60,6 +60,25 @@ public class MSequenceEdge extends MAssociationTarget
 		source.addOutgoingSequenceEdge(this);
 		target.addIncomingSequenceEdge(this);
 	}
+	
+	/**
+	 *  Helper method disconnecting this edge.
+	 */
+	public void disconnect()
+	{
+		if (this.source != null)
+		{
+			this.source.removeOutgoingSequenceEdge(this);
+		}
+		
+		if (this.target != null)
+		{
+			this.target.removeIncomingSequenceEdge(this);
+		}
+		
+		this.source = null;
+		this.target = null;
+	}
 
 	/**
 	 *  Get the source.
