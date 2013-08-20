@@ -1,6 +1,8 @@
 package jadex.bpmn.model.io;
 
 import jadex.commons.Base64;
+import jadex.commons.IResultCommand;
+import jadex.commons.SUtil;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -22,6 +24,8 @@ public class IdGenerator
 	
 	/** The selected id size. */
 	protected int idsize;
+	
+	protected IResultCommand<String, byte[]> encoder;
 	
 	/**
 	 *  Set of generated IDs to guarantee collision-free IDs.
@@ -76,6 +80,8 @@ public class IdGenerator
 		{
 			generatedIds = new HashSet<String>();
 		}
+		
+		base64Mode();
 	}
 	
 	/**
@@ -87,16 +93,17 @@ public class IdGenerator
 	{
 		byte[] rawid = new byte[idsize];
 		random.nextBytes(rawid);
-		
-		String id = new String(Base64.toCharArray(rawid));
+		String id = encoder.execute(rawid);
 		if (generatedIds != null)
 		{
 			while (generatedIds.contains(id))
 			{
-				id = new String(Base64.toCharArray(rawid));
+				random.nextBytes(rawid);
+				id = encoder.execute(rawid);
 			}
-			generatedIds.add(id);
 		}
+		
+		
 		return id;
 	}
 	
@@ -126,9 +133,50 @@ public class IdGenerator
 		}
 	}
 	
+	/**
+	 *  Switches the ID generator to BASE64 mode.
+	 */
+	public void base64Mode()
+	{
+		synchronized (this)
+		{
+			encoder = new IResultCommand<String, byte[]>()
+			{
+				public String execute(byte[] args)
+				{
+					String id = new String(Base64.toCharArray(args));
+					return id;
+				}
+			};
+		}
+	}
+	
+	/**
+	 *  Switches the ID generator to BASE16 mode.
+	 */
+	public void base16Mode()
+	{
+		synchronized (this)
+		{
+			encoder = new IResultCommand<String, byte[]>()
+			{
+				public String execute(byte[] args)
+				{
+					String id = SUtil.hex(args);
+					return id;
+				}
+			};
+		}
+	}
+	
 	public static void main(String[] args)
 	{
 		IdGenerator idgen = new IdGenerator();
+		for (int i = 0; i < 100; ++i)
+		{
+			System.out.println(idgen.generateId());
+		}
+		idgen.base16Mode();
 		for (int i = 0; i < 100; ++i)
 		{
 			System.out.println(idgen.generateId());
