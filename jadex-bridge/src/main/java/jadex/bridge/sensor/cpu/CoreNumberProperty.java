@@ -20,4 +20,12 @@ public class CoreNumberProperty extends NFRootProperty<Integer, Void>
 		super(comp, new NFPropertyMetaInfo(CPUCORES, int.class, null, false, -1, Target.Root));
 		setValue(new Integer(Runtime.getRuntime().availableProcessors()));
 	}
+	
+	/**
+	 *  Measure the value.
+	 */
+	public Integer measureValue()
+	{
+		return new Integer(Runtime.getRuntime().availableProcessors());
+	}
 }

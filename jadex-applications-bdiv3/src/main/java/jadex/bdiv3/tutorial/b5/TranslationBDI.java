@@ -24,7 +24,7 @@ import java.util.Map;
  *  Using plan context conditions.
  */
 @Agent
-@Description("The translation agent B4. <br>  Using plan context conditions.")
+@Description("The translation agent B5. <br>  Using plan context conditions.")
 public class TranslationBDI
 {
 	//-------- attributes --------

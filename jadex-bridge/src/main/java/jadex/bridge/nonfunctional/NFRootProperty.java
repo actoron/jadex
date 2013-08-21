@@ -10,19 +10,15 @@ import jadex.commons.future.DefaultResultListener;
 /**
  * 
  */
-public class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
+public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 {
-	/** The component. */
-	protected IInternalAccess comp;
-	
 	/**
 	 *  Create a new property.
 	 */
 	public NFRootProperty(final IInternalAccess comp, final NFPropertyMetaInfo mi)
 	{
 //		super(new NFPropertyMetaInfo(CPULOAD, double.class, null, true, -1, Target.Root));
-		super(mi);
-		this.comp = comp;
+		super(comp, mi);
 		
 		// Add property to root component
 		SServiceProvider.getService(comp.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)

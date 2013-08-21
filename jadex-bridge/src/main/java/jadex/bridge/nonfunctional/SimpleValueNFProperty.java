@@ -1,22 +1,50 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  * 
  */
-public class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, U>
+public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, U>
 {
 	/** The current value. */
 	protected T value;
 	
+	/** The component. */
+	protected IInternalAccess comp;
+	
 	/**
 	 *  Create a new property.
 	 */
-	public SimpleValueNFProperty(NFPropertyMetaInfo mi)
+	public SimpleValueNFProperty(final IInternalAccess comp, final NFPropertyMetaInfo mi)
 	{
 		super(mi);
+		this.comp = comp;
+		
+		if(mi.isDynamic())
+		{
+			IResultListener<Void> res = new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					setValue(measureValue());
+					comp.waitForDelay(mi.getUpdateRate()).addResultListener(this);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			};
+			
+			comp.waitForDelay(mi.getUpdateRate()).addResultListener(res);
+		}
+		else
+		{
+			setValue(measureValue());
+		}
 	}
 
 	/**
@@ -36,4 +64,9 @@ public class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, U>
 	{
 		this.value = value;
 	}
+	
+	/**
+	 *  Measure the value.
+	 */
+	public abstract T measureValue();
 }

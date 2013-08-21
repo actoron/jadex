@@ -51,7 +51,6 @@ public class TranslationBDI
 		this.wordtable.put("dog", "Hund");
 	}
 	
-	
 	/**
 	 *  The agent body.
 	 */
@@ -75,8 +74,8 @@ public class TranslationBDI
 	public class TranslatePlan
 	{
 		/** The plan api. */
-		@PlanAPI
-		protected IPlan plan;
+//		@PlanAPI
+//		protected IPlan plan;
 		
 		/** The German word. */
 		protected String gword;
@@ -121,9 +120,9 @@ public class TranslationBDI
 		 *  Called when plan fails.
 		 */
 		@PlanFailed
-		public void failed()
+		public void failed(Exception e)
 		{
-			System.out.println("Plan failed.");
+			System.out.println("Plan failed: "+e);
 		}
 	}
 }
