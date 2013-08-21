@@ -53,7 +53,8 @@ public class CPULoadProperty extends AbstractNFProperty<Double, Void>
 	/**
 	 *  Get the value.
 	 */
-	public IFuture<Double> getValue(Class<Void> unit)
+//	public IFuture<Double> getValue(Class<Void> unit)
+	public IFuture<Double> getValue(Void unit)
 	{
 		return new Future<Double>(new Double(load));
 	}

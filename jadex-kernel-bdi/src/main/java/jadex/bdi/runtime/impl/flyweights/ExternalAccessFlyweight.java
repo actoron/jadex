@@ -845,7 +845,8 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(final String name, final Class<U> unit)
+//	public <T, U> IFuture<T> getNFPropertyValue(final String name, final Class<U> unit)
+	public <T, U> IFuture<T> getNFPropertyValue(final String name, final U unit)
 	{
 		final Future<T> ret = new Future<T>();
 		

@@ -40,7 +40,8 @@ public class CPULoadPropertyRef extends AbstractNFProperty<Double, Void>
 	 *  
 	 *  @return The current value of the property.
 	 */
-	public IFuture<Double> getValue(Class<Void> unit)
+//	public IFuture<Double> getValue(Class<Void> unit)
+	public IFuture<Double> getValue(Void unit)
 	{
 		final Future<Double> ret = new Future<Double>();
 		IFuture<Double> fut = source.getNFPropertyValue(getName());

@@ -22,7 +22,8 @@ public class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, U>
 	/**
 	 *  Get the value.
 	 */
-	public IFuture<T> getValue(Class<U> unit)
+	public IFuture<T> getValue(U unit)
+//	public IFuture<T> getValue(Class<U> unit)
 	{
 		return new Future<T>(value);
 	}

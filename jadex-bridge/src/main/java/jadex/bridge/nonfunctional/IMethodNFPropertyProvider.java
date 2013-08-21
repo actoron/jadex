@@ -45,7 +45,8 @@ public interface IMethodNFPropertyProvider
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of the specified method.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, Class<U> unit);
+//	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, Class<U> unit);
+	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, U unit);
 	
 	/**
 	 *  Add a non-functional property.

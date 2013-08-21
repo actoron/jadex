@@ -37,10 +37,11 @@ public class NFPropertyRef<T, U> extends AbstractNFProperty<T, U>
 	 *  
 	 *  @return The current value of the property.
 	 */
-	public IFuture<T> getValue(Class<U> unit)
+//	public IFuture<T> getValue(Class<U> unit)
+	public IFuture<T> getValue(U unit)
 	{
 		final Future<T> ret = new Future<T>();
-		IFuture<T> fut = source.getNFPropertyValue(getName());
+		IFuture<T> fut = source.getNFPropertyValue(getName(), unit);
 		fut.addResultListener(new IResultListener<T>()
 		{
 			public void resultAvailable(T result)

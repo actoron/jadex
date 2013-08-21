@@ -10,7 +10,6 @@ import jadex.commons.future.IFuture;
  * 	This also demonstrates String properties, a real-world
  * 	implementation would probably use a quantifiable measure
  *  like response time.
- *
  */
 public class MethodSpeedProperty extends AbstractNFProperty<String, Void>
 {
@@ -22,7 +21,8 @@ public class MethodSpeedProperty extends AbstractNFProperty<String, Void>
 		speed = "Very fast, indeed!";
 	}
 
-	public IFuture<String> getValue(Class<Void> unit)
+//	public IFuture<String> getValue(Class<Void> unit)
+	public IFuture<String> getValue(Void unit)
 	{
 		return new Future<String>(speed);
 	}

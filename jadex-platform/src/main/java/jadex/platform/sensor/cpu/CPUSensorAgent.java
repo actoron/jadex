@@ -6,6 +6,7 @@ import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.sensor.cpu.CPULoadProperty;
 import jadex.bridge.sensor.cpu.CoreNumberProperty;
+import jadex.bridge.sensor.memory.MaxMemoryProperty;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -25,7 +26,8 @@ import javax.management.MBeanServerConnection;
 @NFProperties(
 {
 	@NFProperty(name="cpuload", type=CPULoadProperty.class),//, target=Target.Root))
-	@NFProperty(name="cpucores", type=CoreNumberProperty.class)
+	@NFProperty(name="cpucores", type=CoreNumberProperty.class),
+	@NFProperty(name="maxmem", type=MaxMemoryProperty.class),
 })
 public class CPUSensorAgent
 {
@@ -38,7 +40,7 @@ public class CPUSensorAgent
 	//protected double cpuload;
 	
 	/**
-	 * 
+	 *  The agent body.
 	 */
 	@AgentBody
 	public void body() throws Exception

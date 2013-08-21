@@ -23,7 +23,8 @@ public class CoreNumberProperty extends AbstractNFProperty<Integer, Void>
 		}
 	}
 
-	public IFuture<Integer> getValue(Class<Void> unit)
+//	public IFuture<Integer> getValue(Class<Void> unit)
+	public IFuture<Integer> getValue(Void unit)
 	{
 		return new Future<Integer>(cores);
 	}

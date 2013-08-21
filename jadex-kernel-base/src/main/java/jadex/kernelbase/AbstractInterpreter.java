@@ -663,7 +663,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit)
+//	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit)
+	public <T, U> IFuture<T> getNFPropertyValue(String name, U unit)
 	{
 		Future<T> ret = new Future<T>();
 		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);

@@ -357,7 +357,8 @@ public class BasicService implements IInternalService
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public<T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit)
+//	public<T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit)
+	public<T, U> IFuture<T> getNFPropertyValue(String name, U unit)
 	{
 		Future<T> ret = new Future<T>();
 		
@@ -471,7 +472,8 @@ public class BasicService implements IInternalService
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of the specified method.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, Class<U> unit)
+//	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, Class<U> unit)
+	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, U unit)
 	{
 		Future<T> ret = new Future<T>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;

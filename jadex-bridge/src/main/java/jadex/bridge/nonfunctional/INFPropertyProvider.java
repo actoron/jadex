@@ -39,7 +39,8 @@ public interface INFPropertyProvider
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
+//	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
+	public <T, U> IFuture<T> getNFPropertyValue(String name, U unit);
 	
 	/**
 	 *  Add a non-functional property.

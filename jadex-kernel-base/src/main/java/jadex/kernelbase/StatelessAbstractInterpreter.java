@@ -2271,7 +2271,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param unit Unit of the property value.
 	 *  @return The current value of a non-functional property of this service.
 	 */
-	public abstract <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
+//	public abstract <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
+	public abstract <T, U> IFuture<T> getNFPropertyValue(String name, U unit);
 	
 	/**
 	 *  Add a new nf property.

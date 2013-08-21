@@ -13,7 +13,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -23,6 +25,7 @@ import javax.swing.JTextField;
 public class NFPropertyProperties extends PropertiesPanel
 {
 	protected JButton bufetch;
+	protected JComboBox counits;
 	protected JTextField tfval;
 	protected IExternalAccess provider;
 	protected INFPropertyMetaInfo propmi;
@@ -43,10 +46,12 @@ public class NFPropertyProperties extends PropertiesPanel
 		
 		JPanel p = new JPanel(new GridBagLayout());
 		bufetch = new JButton("Fetch");
+		counits = new JComboBox(new DefaultComboBoxModel());
 		tfval = new JTextField();
 		tfval.setEditable(false);
 		p.add(tfval, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
-		p.add(bufetch, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+		p.add(counits, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+		p.add(bufetch, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 		addComponent("Value", p);
 		
 		bufetch.addActionListener(new ActionListener()
@@ -55,7 +60,8 @@ public class NFPropertyProperties extends PropertiesPanel
 			{
 				if(provider!=null && propmi!=null)
 				{
-					IFuture<Object> fut = provider.getNFPropertyValue(propmi.getName());
+					Object u = counits.getSelectedItem();
+					IFuture<Object> fut = provider.getNFPropertyValue(propmi.getName(), u);
 					fut.addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
 					{
 						public void resultAvailable(Object result)
@@ -85,7 +91,23 @@ public class NFPropertyProperties extends PropertiesPanel
 		getTextField("Name").setText(propmi.getName());
 		getTextField("Type").setText(propmi.getType().getName());
 		if(propmi.getUnit()!=null)
+		{
 			getTextField("Unit").setText(propmi.getUnit().toString());
+			Class<?> ucl = propmi.getUnit();
+			if(Enum.class.isAssignableFrom(ucl))
+			{
+				Object[] vals = ucl.getEnumConstants();
+				DefaultComboBoxModel com = (DefaultComboBoxModel)counits.getModel();
+				com.removeAllElements();
+				if(vals!=null)
+				{
+					for(Object v: vals)
+					{
+						com.addElement(v);
+					}
+				}
+			}
+		}
 		getTextField("Target").setText(propmi.getTarget().toString());
 	}
 }
