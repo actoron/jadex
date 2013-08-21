@@ -9,6 +9,7 @@ import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
@@ -26,7 +27,8 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	/** The service container icon. */
 	private static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"service", SGUI.makeIcon(ProvidedServiceInfoNode.class, "/jadex/base/gui/images/nfprop.png")
+		"service", SGUI.makeIcon(ProvidedServiceInfoNode.class, "/jadex/base/gui/images/nfprop.png"),
+		"dynamic", SGUI.makeIcon(ProvidedServiceInfoNode.class, "/jadex/base/gui/images/overlay_dynamic.png")
 	});
 	
 	//-------- attributes --------
@@ -85,7 +87,16 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	 */
 	public Icon	getSwingIcon()
 	{
-		return icons.getIcon("service");
+		Icon ret = null;
+		if(propmi.isDynamic())
+		{
+			ret = new CombiIcon(new Icon[]{icons.getIcon("service"), icons.getIcon("dynamic")});
+		}
+		else
+		{
+			ret = icons.getIcon("service");
+		}
+		return ret;
 	}
 
 	/**

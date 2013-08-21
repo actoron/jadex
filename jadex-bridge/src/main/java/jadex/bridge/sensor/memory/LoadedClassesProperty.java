@@ -7,7 +7,7 @@ import jadex.bridge.nonfunctional.NFRootProperty;
 import java.lang.management.ManagementFactory;
 
 /**
- * 
+ *  Property for the number of loaded classes in the JVM.
  */
 public class LoadedClassesProperty extends NFRootProperty<Integer, MemoryProperty.MemoryUnit>
 {
