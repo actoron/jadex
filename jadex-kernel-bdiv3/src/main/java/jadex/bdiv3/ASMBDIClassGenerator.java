@@ -1,7 +1,6 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.asm.ClassNodeWrapper;
-import jadex.bdiv3.asm.FieldNodeWrapper;
 import jadex.bdiv3.asm.IClassNode;
 import jadex.bdiv3.asm.IInsnList;
 import jadex.bdiv3.asm.IMethodNode;
@@ -11,7 +10,6 @@ import jadex.bdiv3.asm.instructions.IAbstractInsnNode;
 import jadex.bdiv3.asm.instructions.IFieldInsnNode;
 import jadex.bdiv3.asm.instructions.ILabelNode;
 import jadex.bdiv3.asm.instructions.ILdcInsnNode;
-import jadex.bdiv3.asm.instructions.ILineNumberNode;
 import jadex.bdiv3.asm.instructions.IMethodInsnNode;
 import jadex.bdiv3.asm.instructions.LabelNodeWrapper;
 import jadex.bdiv3.model.BDIModel;
@@ -39,14 +37,12 @@ import org.kohsuke.asm4.AnnotationVisitor;
 import org.kohsuke.asm4.ClassReader;
 import org.kohsuke.asm4.ClassVisitor;
 import org.kohsuke.asm4.ClassWriter;
-import org.kohsuke.asm4.FieldVisitor;
 import org.kohsuke.asm4.Label;
 import org.kohsuke.asm4.MethodVisitor;
 import org.kohsuke.asm4.Opcodes;
 import org.kohsuke.asm4.Type;
 import org.kohsuke.asm4.tree.ClassNode;
 import org.kohsuke.asm4.tree.FieldInsnNode;
-import org.kohsuke.asm4.tree.FieldNode;
 import org.kohsuke.asm4.tree.InsnList;
 import org.kohsuke.asm4.tree.InsnNode;
 import org.kohsuke.asm4.tree.LabelNode;
@@ -56,6 +52,7 @@ import org.kohsuke.asm4.tree.MethodNode;
 import org.kohsuke.asm4.tree.TypeInsnNode;
 import org.kohsuke.asm4.tree.VarInsnNode;
 import org.kohsuke.asm4.util.ASMifier;
+import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 
@@ -414,18 +411,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 * 
 	 */
-	protected void replaceNativeSetter(String iclname, IMethodNode mn, String belname) 
+	protected void makeObject(InsnList nl, Type arg)
 	{
-		Type	arg	= Type.getArgumentTypes(mn.getDesc())[0];
-
-		mn.setAccess(mn.getAccess()-Opcodes.ACC_NATIVE);
-		InsnList nl = new InsnList();
-		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bdiv3/BDIAgent;"));
-		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
-		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__globalname", "Ljava/lang/String;"));
-		nl.add(new LdcInsnNode(belname));
-		
 		if(arg.getClassName().equals("byte"))
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, 1));
@@ -440,7 +427,6 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		{
 			nl.add(new VarInsnNode(Opcodes.ILOAD, 1));
 			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;"));
-
 		}
 		else if(arg.getClassName().equals("char"))
 		{
@@ -471,6 +457,24 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		{
 			nl.add(new VarInsnNode(Opcodes.ALOAD, 1));
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void replaceNativeSetter(String iclname, IMethodNode mn, String belname) 
+	{
+		Type arg = Type.getArgumentTypes(mn.getDesc())[0];
+
+		mn.setAccess(mn.getAccess()-Opcodes.ACC_NATIVE);
+		InsnList nl = new InsnList();
+		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bdiv3/BDIAgent;"));
+		nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__globalname", "Ljava/lang/String;"));
+		nl.add(new LdcInsnNode(belname));
+		
+		makeObject(nl, arg);
 		
 		nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", "setAbstractBeliefValue", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V"));
 		nl.add(new InsnNode(Opcodes.RETURN));
@@ -484,6 +488,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	protected void enhanceSetter(String iclname, IMethodNode mn, String belname)
 	{
 		System.out.println("method acc: "+mn.getName()+" "+mn.getAccess());
+		
+		Type arg = Type.getArgumentTypes(mn.getDesc())[0];
 		
 		IInsnList l = mn.getInstructions();
 		
@@ -499,7 +505,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		l.insertBefore(l.getFirst(), InsnListWrapper.wrap(nl));
 		
 		nl = new InsnList();
-		nl.add(new VarInsnNode(Opcodes.ALOAD, 1)); // loads the argument (=parameter0)
+//		nl.add(new VarInsnNode(Opcodes.ALOAD, 1)); // loads the argument (=parameter0) does not work for other types than object
+		makeObject(nl, arg);
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
 		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
 		nl.add(new LdcInsnNode(belname));
