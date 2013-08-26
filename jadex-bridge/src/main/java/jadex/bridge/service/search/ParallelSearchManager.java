@@ -126,16 +126,14 @@ public class ParallelSearchManager implements ISearchManager
 				// If the future was terminated it is changed to finished to avoid
 				// getting exceptions outside as termination is used also internally
 				// to cut off the search when enough results have been found.
-				if(exception instanceof FutureTerminatedException)
+				if(exception instanceof FutureTerminatedException &&
+				   ret.getIntermediateResults().size()>0)
 				{
-					if(ret.getIntermediateResults().size()>0)
-					{
-						finished();
-					}
-					else
-					{
-						super.exceptionOccurred(exception);
-					}
+					finished();
+				}
+				else
+				{
+					super.exceptionOccurred(exception);
 				}
 			}
 		});

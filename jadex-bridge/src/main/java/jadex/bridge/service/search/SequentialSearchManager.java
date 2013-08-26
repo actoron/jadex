@@ -104,9 +104,11 @@ public class SequentialSearchManager implements ISearchManager
 		final TerminableIntermediateDelegationFuture<IService> del = new TerminableIntermediateDelegationFuture<IService>();
 		ret.addResultListener(new TerminableIntermediateDelegationResultListener<IService>(del, ret)
 		{
+			boolean tried = false;
+			
 			public void customResultAvailable(Collection<IService> result)
 			{
-//				System.out.println("search end: "+ret.hashCode());
+				System.out.println("search end: "+ret.hashCode());
 				opencalls.remove(ret);
 				super.resultAvailable(result);
 			}
@@ -118,27 +120,39 @@ public class SequentialSearchManager implements ISearchManager
 			
 			public void finished() 
 			{
+				System.out.println("search end fin: "+ret.hashCode() + " "  + tried);
+				if (selector instanceof TypeResultSelector)
+				{
+					System.out.println(((TypeResultSelector) selector).getType());
+				}
 				opencalls.remove(ret);
 				super.finished();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-//				System.out.println("search end: "+ret.hashCode());
+				System.out.println("search end ex: "+ret.hashCode() + " "  + tried);
+				if (selector instanceof TypeResultSelector)
+				{
+					if (((TypeResultSelector) selector).getType().getName().indexOf("IClockService") != -1)
+					{
+						Thread.dumpStack();
+					}
+					System.out.println(((TypeResultSelector) selector).getType());
+				}
 				opencalls.remove(ret);
 				// If the future was terminated it is changed to finished to avoid
 				// getting exceptions outside as termination is used also internally
 				// to cut off the search when enough results have been found.
-				if(exception instanceof FutureTerminatedException)
+				if(exception instanceof FutureTerminatedException &&
+				   ret.getIntermediateResults().size()>0 && !tried)
 				{
-					if(ret.getIntermediateResults().size()>0)
-					{
-						finished();
-					}
-					else
-					{
-						super.exceptionOccurred(exception);
-					}
+					tried = true;
+					finished();
+				}
+				else
+				{
+					super.exceptionOccurred(exception);
 				}
 			}
 		});
