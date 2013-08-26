@@ -98,7 +98,7 @@ public class TranslationBDI
 	 *  Translate a word. Plan that translates.
 	 */
 	@Plan(trigger=@Trigger(goals=Translate.class))
-	protected void translateB(String eword)
+	protected void translate(String eword)
 	{
 		System.out.println("Translated: "+eword+" "+wordtable.get(eword));
 	}

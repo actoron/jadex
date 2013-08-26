@@ -45,7 +45,7 @@ public class HelloWorldGoalBDI
 		 *  Create a new goal whenever sayhello belief is changed.
 		 */
 		@GoalCreationCondition
-		public HelloGoal(@Event("sayhello") String text)
+		public HelloGoal(String text)
 		{
 			this.text = text;
 		}

@@ -24,6 +24,7 @@ import jadex.rules.eca.annotations.Event;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JCheckBox;
@@ -44,14 +45,14 @@ public class TranslationBDI
 	
 	/** The map of words. */
 	@Belief
-	protected Map<String, String> egwords;
+	protected Map<String, String> egwords = new HashMap<String, String>();
 	
 	/** The max value of entries allowed in the map. */
-	@Belief
-	protected int maxstorage = 4;
+//	@Belief
+//	protected int maxstorage = 4;
 	
-	@Belief
-	protected boolean context = true;
+//	@Belief
+//	protected boolean context = true;
 	
 	/**
 	 *  Maintain goal that ensures that only maxstorage
@@ -64,7 +65,7 @@ public class TranslationBDI
 		protected boolean maintain(@Event("egwords") Object event)
 		{
 //			System.out.println("check maintain: "+egwords.size()+" "+(egwords.size()<=maxstorage));
-			return egwords.size()<=maxstorage;
+			return egwords.size()<=4;//maxstorage;
 		}
 		
 		@GoalTargetCondition
@@ -74,12 +75,12 @@ public class TranslationBDI
 			return egwords.size()<3;
 		}
 		
-		@GoalContextCondition
-		protected boolean context(@Event("context") Object event)
-		{
-			System.out.println("check context: "+context+" "+event);
-			return context;
-		}
+//		@GoalContextCondition
+//		protected boolean context(@Event("context") Object event)
+//		{
+//			System.out.println("check context: "+context+" "+event);
+//			return context;
+//		}
 	}
 	
 	/**
@@ -97,10 +98,10 @@ public class TranslationBDI
 
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
+			int cnt = 0;
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				String rand = SUtil.createUniqueId("abc_", 3);
-				egwords.put(rand, rand);
+				egwords.put("eword_#"+cnt, "gword_#"+cnt++);
 //				System.out.println("added: "+rand);
 				System.out.println("egwords: "+egwords);
 //				context = false;
@@ -111,26 +112,26 @@ public class TranslationBDI
 		
 		agent.waitFor(2000, step);
 		
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				JFrame f = new JFrame();
-				PropertiesPanel pp = new PropertiesPanel();
-				final JCheckBox cb = pp.createCheckBox("context", context, true);
-				cb.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						setContext(cb.isSelected());
-					}
-				});
-				f.add(pp, BorderLayout.CENTER);
-				f.pack();
-				f.setLocation(SGUI.calculateMiddlePosition(f));
-				f.setVisible(true);
-			}
-		});
+//		SwingUtilities.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				JFrame f = new JFrame();
+//				PropertiesPanel pp = new PropertiesPanel();
+//				final JCheckBox cb = pp.createCheckBox("context", context, true);
+//				cb.addActionListener(new ActionListener()
+//				{
+//					public void actionPerformed(ActionEvent e)
+//					{
+//						setContext(cb.isSelected());
+//					}
+//				});
+//				f.add(pp, BorderLayout.CENTER);
+//				f.pack();
+//				f.setLocation(SGUI.calculateMiddlePosition(f));
+//				f.setVisible(true);
+//			}
+//		});
 	}
 	
 	/**
@@ -144,11 +145,11 @@ public class TranslationBDI
 		System.out.println("removed: "+key+" "+val+" "+egwords);
 	}
 	
-	/**
-	 *  Set the context.
-	 */
-	protected void setContext(boolean context)
-	{
-		this.context = context;
-	}
+//	/**
+//	 *  Set the context.
+//	 */
+//	protected void setContext(boolean context)
+//	{
+//		this.context = context;
+//	}
 }
