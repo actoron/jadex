@@ -461,7 +461,8 @@ public abstract class DiscoveryAgent
 	 */
 	public static byte[] encodeObject(Object object, ICodec[] codecs, ClassLoader classloader)
 	{
-		return MapSendTask.encodeMessage(object, codecs, classloader);
+		// TODO: Hack? The encoding context probably needs to be target-based
+		return MapSendTask.encodeMessage(object, codecs, classloader, null);
 //		return GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(object, 
 //			classloader), classloader);
 	}

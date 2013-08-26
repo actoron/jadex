@@ -209,6 +209,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 					sending	= false;
 					if(!(exception instanceof ComponentTerminatedException))
 					{
+						exception.printStackTrace();
 						agent.getLogger().info("Sending awareness info to server...failed: "+exception);
 					}
 				}

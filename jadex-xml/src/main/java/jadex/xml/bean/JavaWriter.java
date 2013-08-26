@@ -2,6 +2,7 @@ package jadex.xml.bean;
 
 
 import jadex.commons.Base64;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
@@ -11,6 +12,8 @@ import jadex.commons.transformation.IObjectStringConverter;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
+import jadex.xml.IContext;
+import jadex.xml.IPostProcessor;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
@@ -162,6 +165,20 @@ public class JavaWriter
 				new SubobjectInfo(new AccessInfo("entries", AccessInfo.THIS), null, true)
 			}));
 			typeinfos.add(ti_set);
+			
+			// jadex.commons.MethodInfo
+			TypeInfo ti_mi = new TypeInfo(null, new ObjectInfo(MethodInfo.class), 
+			new MappingInfo(null, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("parameterTypes", "parameterTypes"), null, false),
+				new SubobjectInfo(new AccessInfo("parameterTypeInfos", "parameterTypeInfos"), null, false)
+			}));
+					
+//					new AttributeInfo[]{
+//					new AttributeInfo(new AccessInfo("parameterTypes", "parameterTypes")),
+//					new AttributeInfo(new AccessInfo("parameterTypeInfos", "parameterTypeInfos"))},
+//					null
+//				));
+			typeinfos.add(ti_mi);
 			
 			// Array
 			TypeInfo ti_array = new TypeInfo(null, new ObjectInfo(Object[].class),
@@ -795,7 +812,6 @@ public class JavaWriter
 	{
 		AWriter.objectToOutputStream(getInstance(), val, os, classloader, null, handler==null? getObjectHandler(): handler);
 	}
-	
 	
 	/**
 	 *  Get the default XML Writer.

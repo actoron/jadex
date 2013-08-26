@@ -11,6 +11,7 @@ import java.util.Set;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -39,6 +40,9 @@ public abstract class AbstractSendTask implements ISendTask
 	
 	/** The codecs. */
 	protected ICodec[] codecs;
+	
+	/** The encoding context */
+	protected IEncodingContext encodingcontext;
 	
 	/** The managed receivers. */
 	protected IComponentIdentifier[] receivers;
@@ -299,12 +303,12 @@ public abstract class AbstractSendTask implements ISendTask
 	/**
 	 *  Encode the object with the codecs.
 	 */
-	protected byte[] encode(Object obj)
+	protected byte[] encode(Object obj, IEncodingContext context)
 	{
 		Object enc_msg = obj;
 		for(int i=0; i<codecs.length; i++)
 		{
-			enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader());
+			enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader(), context);
 		}
 		return (byte[])enc_msg;
 	}

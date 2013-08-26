@@ -23,6 +23,12 @@ import java.util.Map;
 public class BeanReflectionIntrospector implements IBeanIntrospector
 {
 	// -------- attributes --------
+	
+	/** Flag for excluding getters. */
+	protected static final byte EXCLUDE_GETTER = 1;
+	
+	/** Flag for excluding setters. */
+	protected static final byte EXCLUDE_SETTER = 2;
 
 	/** The cache for saving time for multiple lookups. */
 	protected LRU	beaninfos;
@@ -83,60 +89,86 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	
 				if(includemethods)
 				{
+//					Method excludedmethod = getClass().getMethod("excludedMethod", new Class<?>[0]);
 					Method[] ms = clazz.getMethods();
-					HashMap getters = new HashMap();
-					ArrayList setters = new ArrayList();
+//					HashMap getters = new HashMap();
+//					ArrayList setters = new ArrayList();
+					Map<String, Tuple3<Method, Method, Byte>> methodprops = new HashMap<String, Tuple3<Method, Method, Byte>>();
 					for(int i = 0; i < ms.length; i++)
 					{
 						String method_name = ms[i].getName();
-						if((method_name.startsWith("is") || method_name.startsWith("get"))
-							&& ms[i].getParameterTypes().length == 0)
+//						if((method_name.startsWith("is") || method_name.startsWith("get"))
+//							&& ms[i].getParameterTypes().length == 0)
+//						{
+//							getters.put(method_name, ms[i]);
+//						}
+//						else if(method_name.startsWith("set")
+//							&& ms[i].getParameterTypes().length == 1)
+//						{
+//							setters.add(ms[i]);
+//						}
+						if(ms[i].getParameterTypes().length == 0)
 						{
-							getters.put(method_name, ms[i]);
+							String pname = null;
+							if(method_name.startsWith("is"))
+							{
+								pname = method_name.substring(2);
+							}
+							if(method_name.startsWith("get"))
+							{
+								pname = method_name.substring(3);
+							}
+							if (pname != null)
+							{
+								Tuple3<Method, Method, Byte> t = methodprops.get(pname);
+								Method setter = t == null? null : t.getSecondEntity();
+								Method getter = ms[i];
+								byte exclude = t != null? t.getThirdEntity() : 0;
+								if (ms[i].isAnnotationPresent(Exclude.class))
+								{
+									exclude |= EXCLUDE_GETTER;
+								}
+								t = new Tuple3<Method, Method, Byte>(getter, setter, exclude);
+								methodprops.put(pname, t);
+							}
 						}
 						else if(method_name.startsWith("set")
-							&& ms[i].getParameterTypes().length == 1)
+								&& ms[i].getParameterTypes().length == 1)
 						{
-							setters.add(ms[i]);
+							String pname = method_name.substring(3);
+							Tuple3<Method, Method, Byte> t = methodprops.get(pname);
+							Method getter = t == null? null : t.getFirstEntity();
+							Method setter = ms[i];
+							byte exclude = t != null? t.getThirdEntity() : 0;
+							if (ms[i].isAnnotationPresent(Exclude.class))
+							{
+								exclude |= EXCLUDE_SETTER;
+							}
+							t = new Tuple3<Method, Method, Byte>(getter, setter, exclude);
+							methodprops.put(pname, t);
 						}
 					}
 		
-					Iterator it = setters.iterator();
+					Iterator<Map.Entry<String, Tuple3<Method, Method, Byte>>> it = methodprops.entrySet().iterator();
 		
 					while(it.hasNext())
 					{
-						Method setter = (Method)it.next();
-						String setter_name = setter.getName();
-						String property_name = setter_name.substring(3);
-						Method getter = (Method)getters.get("get" + property_name);
-						if(getter == null)
-							getter = (Method)getters.get("is" + property_name);
-		
-						if(getter != null)
+						Map.Entry<String, Tuple3<Method, Method, Byte>> entry = it.next();
+						Tuple3<Method, Method, Byte> gettersetter = entry.getValue();
+						if (gettersetter.getFirstEntity() != null && gettersetter.getSecondEntity() != null)
 						{
-							Class[] setter_param_type = setter.getParameterTypes();
-							String property_java_name = Character.toLowerCase(property_name.charAt(0))
-								+ property_name.substring(1);
+							Method getter = gettersetter.getFirstEntity();
+							Method setter = gettersetter.getSecondEntity();
+							byte exclude = gettersetter.getThirdEntity();
+							String property_name = entry.getKey();
+							Class<?> setter_param_type = setter != null? setter.getParameterTypes()[0] : null;
 							
-							boolean exclude = false;
-							try
-							{
-								Field f = clazz.getField(property_name);
-								exclude = f.isAnnotationPresent(Exclude.class);
-							}
-							catch(NoSuchFieldException e)
-							{
-							}
-							if(!exclude)
-							{
-								exclude = getter.isAnnotationPresent(Exclude.class)
-									|| setter.isAnnotationPresent(Exclude.class);
-							}
-
-							if(!exclude)
+							String property_java_name = Character.toLowerCase(property_name.charAt(0)) + property_name.substring(1);
+							if ((exclude & EXCLUDE_GETTER) == 0 || (exclude & EXCLUDE_SETTER) == 0)
 							{
 								ret.put(property_java_name, createBeanProperty(property_java_name, 
-									getter.getReturnType(), getter, setter, setter_param_type[0]));
+										getter != null? getter.getReturnType() : null, getter,
+										setter, setter_param_type, exclude));
 							}
 						}
 					}
@@ -193,9 +225,9 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	 *  @param settertype The type used by the setter.
 	 *  @return The bean property.
 	 */
-	protected BeanProperty createBeanProperty(String name, Class type, Method getter, Method setter, Class settertype)
+	protected BeanProperty createBeanProperty(String name, Class type, Method getter, Method setter, Class settertype, byte exclude)
 	{
-		return new BeanProperty(name, type, getter, setter, settertype, null);
+		return new BeanProperty(name, type, getter, setter, settertype, null, (exclude & EXCLUDE_GETTER) == 0, (exclude & EXCLUDE_SETTER) == 0);
 	}
 	
 	/**

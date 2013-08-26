@@ -39,7 +39,7 @@ public class PlanPreconditionBDI
 	{
 		TestReport tr = new TestReport("#1", "Test if plan precondition works.");
 		agent.dispatchTopLevelGoal(new SomeGoal()).get();
-		if("AD".equals(res))
+		if("ABD".equals(res))
 		{
 			tr.setSucceeded(true);
 		}
@@ -80,7 +80,7 @@ public class PlanPreconditionBDI
 	}
 	
 	@Plan(trigger=@Trigger(goals=SomeGoal.class))
-	protected class PlanB
+	protected class PlanC
 	{
 		@PlanPrecondition
 		protected IFuture<Boolean> precondition()
@@ -98,7 +98,7 @@ public class PlanPreconditionBDI
 	}
 	
 	@Plan(trigger=@Trigger(goals=SomeGoal.class))
-	protected class PlanC
+	protected class PlanD
 	{
 		@PlanPrecondition
 		protected IFuture<Boolean> precondition()

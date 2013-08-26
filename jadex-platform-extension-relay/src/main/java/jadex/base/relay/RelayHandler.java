@@ -589,7 +589,7 @@ public class RelayHandler
 				{
 					if(peerinfo==null)
 					{
-						peerinfo	= MapSendTask.encodeMessage(info, defcodecs, getClass().getClassLoader());
+						peerinfo	= MapSendTask.encodeMessage(info, defcodecs, getClass().getClassLoader(), null);
 					}
 					peer.addDebugText("Sending platform info to peer "+info.getId());
 					new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfo", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
@@ -618,7 +618,7 @@ public class RelayHandler
 		try
 		{
 			peer.addDebugText("Sending platform infos to peer: "+infos.length);
-			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader());
+			byte[]	peerinfo	= MapSendTask.encodeMessage(infos, defcodecs, getClass().getClassLoader(), null);
 			new RelayConnectionManager().postMessage(peer.getUrl()+"platforminfos", new ComponentIdentifier(peers.getUrl()), new byte[][]{peerinfo});
 			peer.addDebugText("Sent platform infos.");
 		}
@@ -677,7 +677,7 @@ public class RelayHandler
 								awanoprop.setProperties(null);
 							}
 							
-							byte[]	data	= MapSendTask.encodeMessage(awanoprop, pcodecs, getClass().getClassLoader());
+							byte[]	data	= MapSendTask.encodeMessage(awanoprop, pcodecs, getClass().getClassLoader(), null);
 							nopropinfo	= new byte[data.length+4];
 							System.arraycopy(SUtil.intToBytes(data.length), 0, nopropinfo, 0, 4);
 							System.arraycopy(data, 0, nopropinfo, 4, data.length);
@@ -690,7 +690,7 @@ public class RelayHandler
 						}
 						else if(awainfo2.getProperties()!=null && propinfo==null)
 						{
-							byte[]	data	= MapSendTask.encodeMessage(awainfo, pcodecs, getClass().getClassLoader());
+							byte[]	data	= MapSendTask.encodeMessage(awainfo, pcodecs, getClass().getClassLoader(), null);
 							propinfo	= new byte[data.length+4];
 							System.arraycopy(SUtil.intToBytes(data.length), 0, propinfo, 0, 4);
 							System.arraycopy(data, 0, propinfo, 4, data.length);
@@ -721,7 +721,7 @@ public class RelayHandler
 							awainfo2.setProperties(null);
 						}
 						
-						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
+						byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader(), null);
 						byte[]	info2	= new byte[data2.length+4];
 						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
 						System.arraycopy(data2, 0, info2, 4, data2.length);
@@ -761,7 +761,7 @@ public class RelayHandler
 									awainfo2.setProperties(null);
 								}
 								
-								byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader());
+								byte[]	data2	= MapSendTask.encodeMessage(awainfo2, platform.getPreferredCodecs(), getClass().getClassLoader(), null);
 								byte[]	info2	= new byte[data2.length+4];
 								System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
 								System.arraycopy(data2, 0, info2, 4, data2.length);

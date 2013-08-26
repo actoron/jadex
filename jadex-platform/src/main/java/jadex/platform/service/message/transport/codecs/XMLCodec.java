@@ -1,6 +1,7 @@
 package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 
 import jadex.commons.beans.ExceptionListener;
 import jadex.commons.beans.XMLDecoder;
@@ -43,7 +44,7 @@ public class XMLCodec implements ICodec
 	 *  @throws IOException
 	 */
 //	public byte[] encode(Object val, ClassLoader classloader)
-	public Object encode(Object val, ClassLoader classloader)
+	public Object encode(Object val, ClassLoader classloader, IEncodingContext context)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    XMLEncoder enc = new XMLEncoder(baos);

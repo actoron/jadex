@@ -3,6 +3,7 @@ package jadex.platform.service.message;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.platform.service.message.transport.ITransport;
@@ -42,7 +43,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	 *  Create a new manager send task.
 	 */
 	public MapSendTask(Map<String, Object> message, MessageType messagetype, IComponentIdentifier[] receivers, 
-		ITransport[] transports, ICodec[] codecs, ClassLoader classloader)//, SendManager manager)
+		ITransport[] transports, ICodec[] codecs, ClassLoader classloader, IEncodingContext encodingcontext)//, SendManager manager)
 	{
 		super(receivers, transports, codecs, (Map<String, Object>)message.get(SFipa.X_NONFUNCTIONAL));
 		if(codecs==null || codecs.length==0)
@@ -51,6 +52,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 		this.message = message;
 		this.messagetype = messagetype;
 		this.classloader = classloader;
+		this.encodingcontext = encodingcontext;
 	}
 	
 	//-------- methods used by message service --------
@@ -87,7 +89,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 				if(data==null)
 				{
 					MessageEnvelope	envelope = new MessageEnvelope(message, Arrays.asList(receivers),  messagetype.getName());
-					data = createData(envelope, codecs, classloader);
+					data = createData(envelope, codecs, classloader, encodingcontext);
 				}
 			}
 		}
@@ -130,12 +132,12 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Create the data.
 	 */
-	public static byte[] createData(Object msg, ICodec[] codecs, ClassLoader cl)
+	public static byte[] createData(Object msg, ICodec[] codecs, ClassLoader cl, IEncodingContext context)
 	{
 		Object ret = msg;
 		for(int i=0; i<codecs.length; i++)
 		{
-			ret	= codecs[i].encode(ret, cl);
+			ret	= codecs[i].encode(ret, cl, context);
 		}
 		return (byte[])ret;
 	}
@@ -143,13 +145,13 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	/**
 	 *  Encode a message.
 	 */
-	public static byte[] encodeMessage(Object msg, ICodec[] codecs, ClassLoader cl)
+	public static byte[] encodeMessage(Object msg, ICodec[] codecs, ClassLoader cl, IEncodingContext context)
 	{
 		byte[] codecids = new byte[codecs.length];
 		for(int i=0; i<codecs.length; i++)
 			codecids[i] = codecs[i].getCodecId();
 		byte[] prolog = createProlog(codecids);
-		byte[] body = createData(msg, codecs, cl);
+		byte[] body = createData(msg, codecs, cl, context);
 		byte[] ret = new byte[prolog.length+body.length];
 		System.arraycopy(prolog, 0, ret, 0, prolog.length);
 		System.arraycopy(body, 0, ret, prolog.length, body.length);

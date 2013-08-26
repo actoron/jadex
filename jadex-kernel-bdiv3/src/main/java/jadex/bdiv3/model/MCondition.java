@@ -1,9 +1,9 @@
 package jadex.bdiv3.model;
 
+import jadex.commons.MethodInfo;
 import jadex.rules.eca.EventType;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 

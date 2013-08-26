@@ -1,6 +1,7 @@
 package jadex.platform.service.message.contentcodecs;
 
 import jadex.bridge.service.types.message.IContentCodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
@@ -59,7 +60,7 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info, IEncodingContext context)
 	{
 		if(otx==null)
 			init(classloader);

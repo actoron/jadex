@@ -124,6 +124,21 @@ public class BinarySerializer
 	 */
 	public static byte[] objectToByteArray(Object val, List<ITraverseProcessor> preprocessors, Object usercontext, ClassLoader classloader)
 	{
+		return objectToByteArray(val, preprocessors, null, usercontext, classloader);
+	}
+	
+	/**
+	 *  Convert an object to an encoded byte array.
+	 *  
+	 *  @param val The object being encoded.
+	 *  @param preprocessors List of processors called before the object is encoded, may be null.
+	 *  @param usercontext A user context, may be null.
+	 *  @param classloader The class loader used.
+	 *  @return Encoded byte array.
+	 */
+	public static byte[] objectToByteArray(Object val, List<ITraverseProcessor> preprocessors, List<ITraverseProcessor> encoderhandlers, Object usercontext, ClassLoader classloader)
+	{
+		encoderhandlers = encoderhandlers == null? ENCODER_HANDLERS : encoderhandlers;
 		EncodingContext context = new EncodingContext(val, usercontext, preprocessors, classloader);
 		
 		Traverser traverser = new Traverser()
@@ -149,7 +164,7 @@ public class BinarySerializer
 			}
 		};
 		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
-		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), ENCODER_HANDLERS, false, null, context);
+		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), encoderhandlers, false, null, context);
 		
 		return context.getBytes();
 	}
@@ -224,7 +239,7 @@ public class BinarySerializer
 	{
 		String classname = context.readClassname();
 		
-		Class clazz = null;
+		Class<?> clazz = null;
 		try
 		{
 			if (classname.equals(NULL_MARKER))
@@ -250,7 +265,7 @@ public class BinarySerializer
 	 *  @param context The decoding context.
 	 *  @return Decoded object.
 	 */
-	protected static Object decodeRawObject(Class clazz, DecodingContext context)
+	protected static Object decodeRawObject(Class<?> clazz, DecodingContext context)
 	{
 		Object dobject = null;
 		for (int i = 0; i < DECODER_HANDLERS.size(); ++i)

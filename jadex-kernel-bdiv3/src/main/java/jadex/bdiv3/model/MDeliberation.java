@@ -1,5 +1,7 @@
 package jadex.bdiv3.model;
 
+import jadex.commons.MethodInfo;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

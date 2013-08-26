@@ -281,12 +281,15 @@ public class BeanCodec extends AbstractCodec
 		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
 		{
 			BeanProperty prop = (BeanProperty)props.get(it.next());
-			Object val = prop.getPropertyValue(object);
-			if(val != null)
+			if (prop.isReadable())
 			{
-				names.add(prop.getName());
-				clazzes.add(prop.getType());
-				values.add(val);
+				Object val = prop.getPropertyValue(object);
+				if(val != null)
+				{
+					names.add(prop.getName());
+					clazzes.add(prop.getType());
+					values.add(val);
+				}
 			}
 		}
 		ec.writeVarInt(names.size());
@@ -316,11 +319,14 @@ public class BeanCodec extends AbstractCodec
 				try
 				{
 					BeanProperty	prop	= (BeanProperty)props.get(name);
-					if(prop==null)
+					if (prop.isWritable())
 					{
-						throw new RuntimeException("Unknown property '"+name+"' of class "+SReflect.getInnerClassName(clazz)+".");
+						prop.setPropertyValue(object, val);
 					}
-					prop.setPropertyValue(object, val);
+					else
+					{
+						throw new RuntimeException("Property is write-protected: " + prop.getName());
+					}
 				}
 				catch (Exception e)
 				{

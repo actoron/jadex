@@ -1,6 +1,7 @@
 package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.SReflect;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
@@ -64,7 +65,7 @@ public class NuggetsCodec implements ICodec
 	 *  @throws IOException
 	 */
 //	public byte[] encode(Object val, ClassLoader classloader)
-	public Object encode(Object val, ClassLoader classloader)
+	public Object encode(Object val, ClassLoader classloader, IEncodingContext context)
 	{
 		if(otx==null)
 			init(classloader);

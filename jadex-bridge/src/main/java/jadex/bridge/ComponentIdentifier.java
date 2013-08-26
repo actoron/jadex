@@ -3,6 +3,7 @@ package jadex.bridge;
 import jadex.commons.SUtil;
 
 import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -143,7 +144,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	{
 		this.addresses	= addresses;
 	}
-
+	
 //	/**
 //	 *  Get an addresses of this ComponentIdentifier.
 //	 *  @param idx The index.

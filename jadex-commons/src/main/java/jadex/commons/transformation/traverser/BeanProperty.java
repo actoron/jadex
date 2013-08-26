@@ -23,6 +23,12 @@ public class BeanProperty
 	/** The setter. */
 	protected Method setter;
 	
+	/** Readable flag */
+	protected boolean readable = true;
+	
+	/** Writable flag */
+	protected boolean writable = true;
+	
 	/** The setter type. */
 	protected Class	settertype;
 
@@ -45,7 +51,7 @@ public class BeanProperty
 	/**
 	 *  Create a new bean property.
 	 */
-	public BeanProperty(String name, Class type, Method getter, Method setter, Class settertype, IBeanDelegateProvider delegateprovider)
+	public BeanProperty(String name, Class type, Method getter, Method setter, Class settertype, IBeanDelegateProvider delegateprovider, boolean readable, boolean writable)
 	{
 		this.name = name;
 		this.type = type;
@@ -53,6 +59,8 @@ public class BeanProperty
 		this.setter = setter;
 		this.settertype = settertype;
 		this.delegateprovider = delegateprovider;
+		this.readable = readable;
+		this.writable = writable;
 	}
 	
 	/**
@@ -109,36 +117,56 @@ public class BeanProperty
 	 *  Get the getter.
 	 *  @return The getter.
 	 */
-	public Method getGetter()
-	{
-		return this.getter;
-	}
+//	public Method getGetter()
+//	{
+//		return this.getter;
+//	}
 
 	/**
 	 *  Set the getter.
 	 *  @param getter The getter to set.
 	 */
-	public void setGetter(Method getter)
-	{
-		this.getter = getter;
-	}
+//	public void setGetter(Method getter)
+//	{
+//		this.getter = getter;
+//	}
 
 	/**
 	 *  Get the setter.
 	 *  @return The setter.
 	 */
-	public Method getSetter()
-	{
-		return this.setter;
-	}
+//	public Method getSetter()
+//	{
+//		return this.setter;
+//	}
 
 	/**
 	 *  Set the setter.
 	 *  @param setter The setter to set.
 	 */
-	public void setSetter(Method setter)
+//	public void setSetter(Method setter)
+//	{
+//		this.setter = setter;
+//	}
+	
+	/**
+	 *  Tests if the property is writable.
+	 * 
+	 *  @return True, if the property is writable.
+	 */
+	public boolean isWritable()
 	{
-		this.setter = setter;
+		return readable;
+	}
+	
+	/**
+	 *  Tests if the property is readable.
+	 * 
+	 *  @return True, if the property is readable.
+	 */
+	public boolean isReadable()
+	{
+		return writable;
 	}
 
 	/**
@@ -201,11 +229,11 @@ public class BeanProperty
 			}
 		}
 		
-		else if (getGetter() != null)
+		else if (getter != null)
 		{
 			try
 			{
-				ret = getGetter().invoke(object, new Object[0]);
+				ret = getter.invoke(object, new Object[0]);
 			}
 			catch (Exception e)
 			{
@@ -244,11 +272,11 @@ public class BeanProperty
 		{
 			accdel.setPropertyValue(object, name, value);
 		}
-		else if (getGetter() != null)
+		else if (setter != null)
 		{
 			try
 			{
-				getSetter().invoke(object, new Object[] { value });
+				setter.invoke(object, new Object[] { value });
 			}
 			catch(Exception e)
 			{

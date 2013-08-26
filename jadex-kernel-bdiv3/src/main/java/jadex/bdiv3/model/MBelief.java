@@ -2,6 +2,7 @@ package jadex.bdiv3.model;
 
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.commons.FieldInfo;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 
 import java.lang.reflect.Field;

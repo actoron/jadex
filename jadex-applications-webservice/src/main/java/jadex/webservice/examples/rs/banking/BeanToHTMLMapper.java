@@ -34,13 +34,18 @@ public class BeanToHTMLMapper implements IValueMapper
 		for(Iterator<String> it=props.keySet().iterator(); it.hasNext(); )
 		{
 			String name = it.next();
-			Method getter = props.get(name).getGetter();
-			Object value = getter.invoke(result, new Object[0]);
-		
-			ret.append("<div>");
-			ret.append(name).append(" = ");
-			ret.append(SUtil.arrayToString(value));
-			ret.append("</div>");
+			BeanProperty prop = props.get(name);
+			if (prop.isReadable())
+			{
+	//			Method getter = props.get(name).getGetter();
+	//			Object value = getter.invoke(result, new Object[0]);
+				Object value = props.get(name).getPropertyValue(result);
+			
+				ret.append("<div>");
+				ret.append(name).append(" = ");
+				ret.append(SUtil.arrayToString(value));
+				ret.append("</div>");
+			}
 		}
 		
 		ret.append("</body>");

@@ -22,7 +22,7 @@ public interface IContentCodec
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info);
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info, IEncodingContext context);
 
 	/**
 	 *  Decode data with the codec.

@@ -294,7 +294,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				else //if(tmp instanceof Field)
 					field = (Field)tmp;
 			}
-			else if(attr instanceof BeanProperty)
+			else if(attr instanceof BeanProperty && ((BeanProperty) attr).isReadable())
 			{
 				value = ((BeanProperty)attr).getPropertyValue(object);
 				found = true;
@@ -447,8 +447,6 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	protected Collection getProperties(Object object, IContext context, boolean includemethods, boolean includefields)
 	{
 		Object o = introspector.getBeanProperties(object.getClass(), includemethods, includefields);
-		if(o==null)
-			System.out.println("ssss");
 		
 		return object==null? Collections.EMPTY_LIST: introspector.getBeanProperties(object.getClass(), includemethods, includefields).values();
 	}

@@ -210,13 +210,14 @@ import java.util.logging.Level;
 		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=true, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=true, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=true, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
-		@Component(name="rms", type="rms", daemon=true),
+//		@Component(name="rms", type="rms", daemon=true),
 		@Component(name="awa", type="awa", daemon=true, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
 				@NameValue(name="delay", value="$args.awadelay"),
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		@Component(name="rms", type="rms", daemon=true),
 		@Component(name="chat", type="chat", daemon=true, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0",
 			arguments={

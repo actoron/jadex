@@ -1,4 +1,4 @@
-package jadex.platform.optimizations;
+package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.BeanProperty;
@@ -84,7 +84,7 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 					getmethodsrc.append("if (\"");
 					getmethodsrc.append(propname);
 					getmethodsrc.append("\".equals(property)) { ");
-					if (prop.getGetter() != null)
+					if (prop.isReadable())
 					{
 						// Method access
 						getmethodsrc.append("return ");
@@ -98,7 +98,7 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 						getmethodsrc.append("((");
 						getmethodsrc.append(SReflect.getClassName(clazz));
 						getmethodsrc.append(") object).");
-						getmethodsrc.append(prop.getGetter().getName());
+						getmethodsrc.append(prop.getter.getName());
 						getmethodsrc.append("()");
 						if (prop.getType().isPrimitive())
 						{
@@ -129,13 +129,13 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 					setmethodsrc.append("if (\"");
 					setmethodsrc.append(propname);
 					setmethodsrc.append("\".equals(property)) { ");
-					if (prop.getSetter() != null)
+					if (prop.isWritable())
 					{
 						// Method access
 						setmethodsrc.append("((");
 						setmethodsrc.append(SReflect.getClassName(clazz));
 						setmethodsrc.append(") object).");
-						setmethodsrc.append(prop.getSetter().getName());
+						setmethodsrc.append(prop.setter.getName());
 						setmethodsrc.append("(");
 						if (boolean.class.equals(prop.getType()))
 						{
@@ -228,21 +228,6 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 		}
 		
 		return delegates.get(clazz);		
-	}
-	
-	/**
-	 *  Creates a bean property based on getter/setter.
-	 *  
-	 *  @param name Property name
-	 *  @param type Property type.
-	 *  @param getter The getter method.
-	 *  @param setter The setter method.
-	 *  @param settertype The type used by the setter.
-	 *  @return The bean property.
-	 */
-	protected BeanProperty createBeanProperty(String name, Class type, Method getter, Method setter, Class settertype)
-	{
-		return new BeanProperty(name, type, getter, setter, settertype, this);
 	}
 	
 	/**

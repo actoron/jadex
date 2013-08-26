@@ -1,6 +1,7 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.bridge.service.types.message.IContentCodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 import java.io.Serializable;
@@ -35,7 +36,7 @@ public class TestCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info, IEncodingContext context)
 	{
 		return "97".getBytes();
 	}

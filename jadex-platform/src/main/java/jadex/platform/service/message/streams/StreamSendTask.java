@@ -213,7 +213,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 					Object enc_msg = message;
 					for(int i=0; i<codecs.length; i++)
 					{
-						enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader());
+						enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader(), encodingcontext);
 					}
 					data = (byte[])enc_msg;
 				}

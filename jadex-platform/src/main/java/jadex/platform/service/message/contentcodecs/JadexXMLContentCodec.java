@@ -1,6 +1,7 @@
 package jadex.platform.service.message.contentcodecs;
 
 import jadex.bridge.service.types.message.IContentCodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.Tuple2;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.xml.TypeInfoPathManager;
@@ -41,7 +42,7 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info, IEncodingContext context)
 	{
 		Object[] infos = info==null? null: info.get(getClass());
 		IObjectWriterHandler handler = (IObjectWriterHandler)(infos!=null? infos[1]: null);

@@ -22,7 +22,7 @@ public interface ICodec
 	 *  @return The encoded object.
 	 */
 //	public byte[] encode(Object val, ClassLoader classloader);
-	public Object encode(Object val, ClassLoader classloader);
+	public Object encode(Object val, ClassLoader classloader, IEncodingContext context);
 	
 	/**
 	 *  Decode data with the codec.

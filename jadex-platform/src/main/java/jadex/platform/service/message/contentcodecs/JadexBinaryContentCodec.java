@@ -1,10 +1,12 @@
 package jadex.platform.service.message.contentcodecs;
 
 import jadex.bridge.service.types.message.IContentCodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.platform.service.message.transport.codecs.JadexBinaryCodec;
 
 import java.io.Serializable;
 import java.util.List;
@@ -39,11 +41,11 @@ public class JadexBinaryContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info, IEncodingContext context)
 	{
 		Object[] infos = info==null? null: info.get(getClass());
 		List<ITraverseProcessor> preprocessors = (List<ITraverseProcessor>)(infos!=null? infos[1]: null);
-		byte[] ret = BinarySerializer.objectToByteArray(val, preprocessors, null, classloader);
+		byte[] ret = BinarySerializer.objectToByteArray(val, preprocessors, JadexBinaryCodec.getEncoderChain(context), null, classloader);
 		if(DEBUG)
 			System.out.println("encode content: "+ret);
 		return ret;

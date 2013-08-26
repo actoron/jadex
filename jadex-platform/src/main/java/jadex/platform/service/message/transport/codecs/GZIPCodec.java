@@ -1,6 +1,7 @@
 package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
@@ -43,7 +44,7 @@ public class GZIPCodec implements ICodec
 	 *  @param obj The object.
 	 *  @throws IOException
 	 */
-	public Object encode(Object val, ClassLoader classloader)
+	public Object encode(Object val, ClassLoader classloader, IEncodingContext context)
 	{
 		return encodeBytes((byte[])val, classloader);
 	}

@@ -712,8 +712,8 @@ public class MessageEventRules
 					IContentCodec	codec	= mtype.findContentCodec(codecs, message, name);
 					if(codec!=null)
 					{
-						// todo: null? how to get the codec info?
-						message.put(name, codec.encode(value, state.getTypeModel().getClassLoader(), null));
+						// todo: null? how to get the codec info? and the context & Jadex version, is it needed or is default ok?
+						message.put(name, codec.encode(value, state.getTypeModel().getClassLoader(), null, null));
 					}
 				}
 				

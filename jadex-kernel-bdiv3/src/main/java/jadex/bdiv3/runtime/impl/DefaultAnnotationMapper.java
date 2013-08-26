@@ -3,7 +3,7 @@ package jadex.bdiv3.runtime.impl;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.model.MParameter;
-import jadex.bdiv3.model.MethodInfo;
+import jadex.commons.MethodInfo;
 
 import java.lang.reflect.Method;
 import java.util.List;

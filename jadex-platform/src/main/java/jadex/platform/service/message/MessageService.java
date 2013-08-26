@@ -19,14 +19,21 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.DiscoveryInfo;
+import jadex.bridge.service.types.awareness.IAwarenessManagementService;
+import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.message.EncodingContext;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IContentCodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.bridge.service.types.message.IMessageListener;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
@@ -77,6 +84,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -152,6 +160,12 @@ public class MessageService extends BasicService implements IMessageService
 	
 	/** The execution service. */
 	protected IExecutionService exeservice;
+	
+	/** The awareness service. */
+//	protected IAwarenessManagementService ams;
+	
+	/** Release date cache */
+	protected LRU<IComponentIdentifier, Date> releasedatecache = new LRU<IComponentIdentifier, Date>(100);
 	
 	/** The cms. */
 	protected IComponentManagementService cms;
@@ -327,14 +341,39 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param codecids The codecs to use for encoding (if different from default).
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
-	public IFuture<Void> sendMessage(Map<String, Object> origmsg, final MessageType type, 
-		IComponentIdentifier osender, final IResourceIdentifier rid, 
+	public IFuture<Void> sendMessage(final Map<String, Object> origmsg, final MessageType type, 
+		final IComponentIdentifier osender, final IResourceIdentifier rid, 
 		final IComponentIdentifier realrec, final byte[] codecids)//, final Map<String, Object> nonfunc)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
+//		IResultListener<DiscoveryInfo> disclistener = new IResultListener<DiscoveryInfo>()
+//		{
+//			public void resultAvailable(final DiscoveryInfo discoveryinfo)
+//			{
+//				
+//				
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				resultAvailable(null);
+//			}
+//		};
+//		
+//		if (ams != null)
+//		{
+//			ams.getPlatformInfo(realrec.getRoot()).addResultListener(disclistener);
+//		}
+//		else
+//		{
+//			disclistener.resultAvailable(null);
+//		}
+		
+
 //		System.err.println("send msg2: "+osender+" "+origmsg.get(SFipa.CONTENT));
 		final Map<String, Object> msg = new HashMap<String, Object>(origmsg);
 		
-		final Future<Void> ret = new Future<Void>();
 		final IComponentIdentifier sender = internalUpdateComponentIdentifier(osender);
 		
 		final IComponentIdentifier loc = IComponentIdentifier.LOCAL.get();
@@ -433,7 +472,7 @@ public class MessageService extends BasicService implements IMessageService
 					ret.setException(new RuntimeException("Receivers must not be empty: "+msg));
 					return;
 				}
-				
+				Date releasedate = null;
 				if(SReflect.isIterable(tmp))
 				{
 					for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
@@ -451,8 +490,20 @@ public class MessageService extends BasicService implements IMessageService
 							ret.setException(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
 							return;
 						}
+						Date prd = getReleaseDate(rec.getRoot());
+						if (prd != null && (releasedate== null || releasedate.after(prd)))
+						{
+							releasedate = prd;
+						}
 					}
 				}
+				
+				if (releasedate == null && tmp instanceof IComponentIdentifier)
+				{
+					releasedate = getReleaseDate((IComponentIdentifier) tmp);
+				}
+				
+				final Date freleasedate = releasedate;
 				
 				// External access of sender required for content encoding etc.
 //				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
@@ -468,7 +519,8 @@ public class MessageService extends BasicService implements IMessageService
 //								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
 								
 //								System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
-								doSendMessage(msg, type, exta, cl, ret, codecids);
+								IEncodingContext enccont = new EncodingContext(freleasedate);
+								doSendMessage(msg, type, exta, cl, ret, codecids, enccont);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
@@ -479,7 +531,7 @@ public class MessageService extends BasicService implements IMessageService
 //				});
 			}
 		});
-		
+
 		return ret;
 	}
 
@@ -487,7 +539,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Extracted method to be callable from listener.
 	 */
 	protected void doSendMessage(Map<String, Object> msg, MessageType type, IExternalAccess comp, 
-		ClassLoader cl, Future<Void> ret, byte[] codecids)
+		ClassLoader cl, Future<Void> ret, byte[] codecids, IEncodingContext enccontext)
 	{
 		Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
 
@@ -524,7 +576,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			if(codec!=null)
 			{
-				msgcopy.put(name, codec.encode(value, cl, getContentCodecInfo(comp.getComponentIdentifier())));
+				msgcopy.put(name, codec.encode(value, cl, getContentCodecInfo(comp.getComponentIdentifier()), enccontext));
 			}
 			else if(value!=null && !((value instanceof String) || (value instanceof byte[])) 
 				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())
@@ -550,7 +602,7 @@ public class MessageService extends BasicService implements IMessageService
 				
 				if(codec!=null)
 				{
-					msgcopy.put(name, codec.encode(value, cl, getContentCodecInfo(comp.getComponentIdentifier())));
+					msgcopy.put(name, codec.encode(value, cl, getContentCodecInfo(comp.getComponentIdentifier()), enccontext));
 				}
 				else if(!SFipa.JADEX_RAW.equals(msgcopy.get(SFipa.LANGUAGE)))
 				{
@@ -642,7 +694,7 @@ public class MessageService extends BasicService implements IMessageService
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
 			
-			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl);
+			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl, enccontext);
 			tm.addMessage(task).addResultListener(crl);
 //			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
@@ -1052,6 +1104,21 @@ public class MessageService extends BasicService implements IMessageService
 																		startStreamSendAliveBehavior();
 																		startStreamCheckAliveBehavior();
 																		ret.setResult(null);
+//																		SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//																		.addResultListener(new IResultListener<IAwarenessManagementService>()
+//																		{
+//																			public void resultAvailable(IAwarenessManagementService result)
+//																			{
+//																				ams = result;
+//																				ret.setResult(null);
+//																			};
+//																			
+//																			public void exceptionOccurred(
+//																					Exception exception)
+//																			{
+//																				ret.setResult(null);
+//																			}
+//																		});
 																	}
 																});
 															}
@@ -2605,6 +2672,35 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			mws.announceComponentIdentifier(cid);
 		}
+	}
+	
+	protected Date getReleaseDate(IComponentIdentifier platform)
+	{
+		Date ret = null;
+		if (!releasedatecache.containsKey(platform))
+		{
+			try
+			{
+				IAwarenessManagementService ams = SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+				DiscoveryInfo info = ams.getPlatformInfo(platform).get();
+				if (info != null)
+				{
+					Map<String, String> props = info != null? info.getProperties() : null;
+					String stringdate = props != null? props.get(AwarenessInfo.PROPERTY_JADEXDATE): null;
+					ret = stringdate != null? new Date(Long.parseLong(stringdate)) : null;
+					releasedatecache.put(platform, ret);
+				}
+			}
+			catch (ServiceNotFoundException e)
+			{
+				releasedatecache.put(platform, null);
+			}
+		}
+		else
+		{
+			ret = releasedatecache.get(platform);
+		}
+		return ret;
 	}
 }
 

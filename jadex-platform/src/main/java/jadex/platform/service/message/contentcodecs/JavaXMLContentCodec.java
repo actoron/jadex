@@ -1,6 +1,7 @@
 package jadex.platform.service.message.contentcodecs;
 
 import jadex.bridge.service.types.message.IContentCodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.beans.ExceptionListener;
 import jadex.commons.beans.XMLDecoder;
 import jadex.commons.beans.XMLEncoder;
@@ -37,7 +38,7 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public synchronized byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
+	public synchronized byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info, IEncodingContext context)
 	{
 		ByteArrayOutputStream bs = new ByteArrayOutputStream();
 		XMLEncoder e = new XMLEncoder(bs);

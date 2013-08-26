@@ -1080,7 +1080,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			Map props = introspector.getBeanProperties(object.getClass(), true, true);
 			Object prop = props.get(accessinfo instanceof String? accessinfo: xmlname.getLocalPart());
-			if(prop instanceof BeanProperty)
+			if(prop instanceof BeanProperty && ((BeanProperty) prop).isWritable())
 			{
 				BeanProperty	bprop	= (BeanProperty)prop;
 				Object arg = convertValue(val, bprop.getSetterType(), converter, context, id);
@@ -1275,17 +1275,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 
 				try
 				{
-					if(prop.getSetter()!=null)
-						prop.getSetter().invoke(object, new Object[]{arg});
+					if(prop.isWritable())
+					{
+						prop.setPropertyValue(object, arg);
+					}
 					else
 						prop.getField().set(object, arg);
 					set = true;
-				}
-				catch(InvocationTargetException e)
-				{
-					// Ignore -> try other way of setting attribute
-//					context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-//						"attribute error", context, context.getLocation());
 				}
 				catch(Exception e)
 				{

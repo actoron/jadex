@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.PlanPassed;
 import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.runtime.impl.ServiceCallPlan;
 import jadex.bridge.ClassInfo;
+import jadex.commons.MethodInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

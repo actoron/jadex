@@ -22,6 +22,7 @@ import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class WaitBDI
 	protected BDIAgent agent;
 	
 	@Belief
-	protected List<String> names;
+	protected List<String> names = new ArrayList<String>();
 	
 	protected TestReport[] tr = new TestReport[2];
 	

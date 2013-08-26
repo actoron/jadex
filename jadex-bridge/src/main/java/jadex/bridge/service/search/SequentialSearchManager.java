@@ -120,26 +120,26 @@ public class SequentialSearchManager implements ISearchManager
 			
 			public void finished() 
 			{
-				System.out.println("search end fin: "+ret.hashCode() + " "  + tried);
-				if (selector instanceof TypeResultSelector)
-				{
-					System.out.println(((TypeResultSelector) selector).getType());
-				}
+//				System.out.println("search end fin: "+ret.hashCode() + " "  + tried);
+//				if (selector instanceof TypeResultSelector)
+//				{
+//					System.out.println(((TypeResultSelector) selector).getType());
+//				}
 				opencalls.remove(ret);
 				super.finished();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("search end ex: "+ret.hashCode() + " "  + tried);
-				if (selector instanceof TypeResultSelector)
-				{
-					if (((TypeResultSelector) selector).getType().getName().indexOf("IClockService") != -1)
-					{
-						Thread.dumpStack();
-					}
-					System.out.println(((TypeResultSelector) selector).getType());
-				}
+//				System.out.println("search end ex: "+ret.hashCode() + " "  + tried);
+//				if (selector instanceof TypeResultSelector)
+//				{
+//					if (((TypeResultSelector) selector).getType().getName().indexOf("IClockService") != -1)
+//					{
+//						Thread.dumpStack();
+//					}
+//					System.out.println(((TypeResultSelector) selector).getType());
+//				}
 				opencalls.remove(ret);
 				// If the future was terminated it is changed to finished to avoid
 				// getting exceptions outside as termination is used also internally

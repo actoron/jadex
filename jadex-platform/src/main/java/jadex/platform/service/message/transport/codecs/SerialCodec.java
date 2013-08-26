@@ -1,6 +1,7 @@
 package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
+import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.ObjectInputStream;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
@@ -41,7 +42,7 @@ public class SerialCodec implements ICodec
 	 *  @return The encoded object.
 	 */
 //	public byte[] encode(Object object, ClassLoader classloader)
-	public Object encode(Object object, ClassLoader classloader)
+	public Object encode(Object object, ClassLoader classloader, IEncodingContext context)
 	{
 		byte[] ret = null;
 		try

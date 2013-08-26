@@ -6,10 +6,10 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MPlan;
-import jadex.bdiv3.model.MethodInfo;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.micro.IPojoMicroAgent;
 

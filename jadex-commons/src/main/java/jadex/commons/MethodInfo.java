@@ -2,6 +2,7 @@ package jadex.commons;
 
 
 import jadex.bridge.ClassInfo;
+import jadex.commons.transformation.annotations.Exclude;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -21,7 +22,15 @@ public class MethodInfo
 
 	// hack 
 //	protected Class<?>[] parametertypes2;
+	
+	/** Cached class. */
+	protected String classname;
+	
+	/** Cached method. */
+	protected Method method;
 
+	/** Cached classloader. */
+	protected ClassLoader classloader;
 	
 	//-------- constructors --------
 	
@@ -37,7 +46,9 @@ public class MethodInfo
 	 */
 	public MethodInfo(Method m)
 	{
-		this(m.getName(), m.getParameterTypes());
+		this.name = m.getName();
+		setParameterTypes(m.getParameterTypes());
+		this.classname = m.getDeclaringClass().getName();
 	}
 	
 	/**
@@ -85,7 +96,7 @@ public class MethodInfo
 	 *  and decoding purposes only, do not use.
 	 */
 	@Deprecated
-//	@Exclude
+	@Exclude
 	public Class<?>[] getParameterTypes()
 	{
 		// hack
@@ -129,7 +140,7 @@ public class MethodInfo
 		this.parametertypes = new ClassInfo[parametertypes.length];
 		for (int i = 0; i < parametertypes.length; ++i)
 		{
-			this.parametertypes[i] = new ClassInfo(parametertypes[i]);
+			this.parametertypes[i] = new ClassInfo(SReflect.getClassName(parametertypes[i]));
 		}
 	}
 
@@ -152,6 +163,47 @@ public class MethodInfo
 //		this.parametertypes = parametertypes.clone();
 		this.parametertypes = new ClassInfo[parametertypes.length];
 		System.arraycopy(parametertypes, 0, this.parametertypes, 0, parametertypes.length);
+	}
+	
+	/**
+	 *  Sets the class name for retrieving the method.
+	 * 
+	 * 	@param classname Name of the class.
+	 */
+	public void setClassName(String classname)
+	{
+		this.classname = classname;
+	}
+	
+	/**
+	 * 
+	 */
+	public Method getMethod(ClassLoader cl)
+	{
+		try
+		{
+			if(method==null || classloader != cl)
+			{
+				Class<?>[] types = new Class[parametertypes.length];
+				for(int i=0; i<types.length; i++)
+				{
+					types[i] = parametertypes[i].getType(cl);
+				}
+				Class<?> cla = SReflect.findClass(classname, null, cl);
+				System.out.println(cla);
+				method = cla.getDeclaredMethod(name, types);
+				this.classloader = cl;
+			}
+			return method;
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
