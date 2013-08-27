@@ -60,9 +60,9 @@ public class BeanCodec extends AbstractCodec
 			}
 			if (clazz != null)
 			{
-				Constructor	c	= clazz.getDeclaredConstructors()[0];
+				Constructor<?>	c	= clazz.getDeclaredConstructors()[0];
 				c.setAccessible(true);
-				Class[] paramtypes = c.getParameterTypes();
+				Class<?>[] paramtypes = c.getParameterTypes();
 				Object[] paramvalues = new Object[paramtypes.length];
 				for(int i=0; i<paramtypes.length; i++)
 				{

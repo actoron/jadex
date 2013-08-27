@@ -156,7 +156,7 @@ public class BeanProperty
 	 */
 	public boolean isWritable()
 	{
-		return readable;
+		return writable;
 	}
 	
 	/**
@@ -166,7 +166,7 @@ public class BeanProperty
 	 */
 	public boolean isReadable()
 	{
-		return writable;
+		return readable;
 	}
 
 	/**
