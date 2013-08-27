@@ -12,7 +12,32 @@ import jadex.commons.future.IFuture;
 public abstract class MemoryProperty extends NFRootProperty<Long, MemoryProperty.MemoryUnit>
 {
 	/** The allowed units. */
-	public static enum MemoryUnit{B, KB, MB, GB, TB}
+	public static enum MemoryUnit{B, KB, MB, GB, TB;
+		
+		public long convert(long bytes)
+		{
+			long ret = bytes;
+			
+			if(MemoryUnit.KB.equals(this))
+			{
+				ret = Math.round(ret/1024d);
+			}
+			else if(MemoryUnit.MB.equals(this))
+			{
+				ret = Math.round(ret/1024d/1024);
+			}
+			else if(MemoryUnit.GB.equals(this))
+			{
+				ret = Math.round(ret/1024d/1024/1024);
+			}
+			else if(MemoryUnit.TB.equals(this))
+			{
+				ret = Math.round(ret/1024d/1024/1024/1024); //1024*1024*1024*1024; -> 0 :-(
+			}
+			return ret;
+		}
+	
+	}
 	
 	/**
 	 *  Create a new property.
@@ -31,22 +56,7 @@ public abstract class MemoryProperty extends NFRootProperty<Long, MemoryProperty
 		long ret = value;
 		if(unit!=null)
 		{
-			if(MemoryUnit.KB.equals(unit))
-			{
-				ret = Math.round(ret/1024d);
-			}
-			else if(MemoryUnit.MB.equals(unit))
-			{
-				ret = Math.round(ret/1024d/1024);
-			}
-			else if(MemoryUnit.GB.equals(unit))
-			{
-				ret = Math.round(ret/1024d/1024/1024);
-			}
-			else if(MemoryUnit.TB.equals(unit))
-			{
-				ret = Math.round(ret/1024d/1024/1024/1024); //1024*1024*1024*1024; -> 0 :-(
-			}
+			ret = unit.convert(ret);
 		}
 		
 		return new Future<Long>(ret);
