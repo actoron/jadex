@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -64,13 +65,18 @@ public class BasicService implements IInternalService
 	protected Map<String, INFProperty<?, ?>> nfproperties;
 	
 	/** Non-functional properties of methods. */
-	protected Map<Method, Map<String, INFProperty<?, ?>>> methodnfproperties;
+	protected Map<MethodInfo, Map<String, INFProperty<?, ?>>> methodnfproperties;
 	
 	/** The service properties. */
 	protected Map<String, Object> properties;
 	
 	/** The provider id. */
 	protected IComponentIdentifier providerid;
+	
+	
+	protected Class<?> type;
+	
+	protected Class<?> impltype;
 	
 	//-------- constructors --------
 
@@ -80,12 +86,24 @@ public class BasicService implements IInternalService
 	// todo: remove type!!!
 	public BasicService(IComponentIdentifier providerid, Class<?> type, Map<String, Object> properties)
 	{
+		this(providerid, type, null, properties);
+	}
+	
+	/**
+	 *  Create a new service.
+	 */
+	// todo: remove type!!!
+	public BasicService(IComponentIdentifier providerid, Class<?> type, Class<?> impltype, Map<String, Object> properties)
+	{
 //		if(!SReflect.isSupertype(type, getClass()))
 //			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
 		this.providerid = providerid;
 //		this.type = type;
 //		this.implclazz = implclazz;
 		this.properties	= properties;
+		
+		this.type = type;
+		this.impltype = impltype;
 		
 		// todo: move to be able to use the constant
 		// jadex.base.gui.componentviewer.IAbstractViewerPanel.PROPERTY_VIEWERCLASS
@@ -122,115 +140,100 @@ public class BasicService implements IInternalService
 			this.properties.put("componentviewer.viewerclass", guiClasses);
 		}
 		
-		if(type.isAnnotationPresent(NFProperties.class))
-		{
-			if(nfproperties==null)
-				nfproperties = new HashMap<String, INFProperty<?,?>>();
-			addNFProperties(type.getAnnotation(NFProperties.class), nfproperties);
-		}
-		
-		Method[] methods = type.getMethods();
-		for (Method m : methods)
-		{
-			if(m.isAnnotationPresent(NFProperties.class))
-			{
-				if(methodnfproperties==null)
-					methodnfproperties = new HashMap<Method, Map<String,INFProperty<?,?>>>();
-				Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(m);
-				if (nfmap == null)
-				{
-					nfmap = new HashMap<String, INFProperty<?,?>>();
-					methodnfproperties.put(m, nfmap);
-				}
-				addNFProperties(m.getAnnotation(NFProperties.class), nfmap);
-			}
-		}
+//		if(type.isAnnotationPresent(NFProperties.class))
+//		{
+//			if(nfproperties==null)
+//				nfproperties = new HashMap<String, INFProperty<?,?>>();
+//			addNFProperties(type.getAnnotation(NFProperties.class), nfproperties, null);
+//		}
+//		
+//		Method[] methods = type.getMethods();
+//		for(Method m : methods)
+//		{
+//			if(m.isAnnotationPresent(NFProperties.class))
+//			{
+//				if(methodnfproperties==null)
+//					methodnfproperties = new HashMap<Method, Map<String,INFProperty<?,?>>>();
+//				Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(m);
+//				if (nfmap == null)
+//				{
+//					nfmap = new HashMap<String, INFProperty<?,?>>();
+//					methodnfproperties.put(m, nfmap);
+//				}
+//				addNFProperties(m.getAnnotation(NFProperties.class), nfmap, new MethodInfo(m));
+//			}
+//		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void initNFProperties()
+	{
+		IService ser = internalaccess.getServiceContainer().getProvidedService(type);
 		
 		List<Class<?>> classes = new ArrayList<Class<?>>();
-		Class<?> superclazz = this.getClass();
-		while (superclazz != null)
+		Class<?> superclazz = type;
+		while(superclazz != null && !Object.class.equals(superclazz))
+		{
+			classes.add(superclazz);
+			superclazz = superclazz.getSuperclass();
+		}
+		superclazz = impltype!=null? impltype: this.getClass();
+		while(superclazz != null && !BasicService.class.equals(superclazz) && !Object.class.equals(superclazz))
 		{
 			classes.add(superclazz);
 			superclazz = superclazz.getSuperclass();
 		}
 		Collections.reverse(classes);
 		
-		for (Class<?> sclazz : classes)
+		for(Class<?> sclazz: classes)
 		{
 			if(sclazz.isAnnotationPresent(NFProperties.class))
 			{
 				if(nfproperties==null)
 					nfproperties = new HashMap<String, INFProperty<?,?>>();
-				addNFProperties(this.getClass().getAnnotation(NFProperties.class), nfproperties);
+				addNFProperties(this.getClass().getAnnotation(NFProperties.class), nfproperties, ser, null);
 			}
 			
-			methods = sclazz.getMethods();
-			for (Method m : methods)
+			Method[] methods = sclazz.getMethods();
+			for(Method m : methods)
 			{
 				if(m.isAnnotationPresent(NFProperties.class))
 				{
-					try
-					{
-						Method tm = type.getMethod(m.getName(), m.getParameterTypes());
+					if(methodnfproperties==null)
+						methodnfproperties = new HashMap<MethodInfo, Map<String,INFProperty<?,?>>>();
 					
-						if(methodnfproperties==null)
-							methodnfproperties = new HashMap<Method, Map<String,INFProperty<?,?>>>();
-						Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(m);
-						if (nfmap == null)
-						{
-							nfmap = new HashMap<String, INFProperty<?,?>>();
-							methodnfproperties.put(m, nfmap);
-						}
-						addNFProperties(m.getAnnotation(NFProperties.class), nfmap);
-						
-						nfmap = methodnfproperties.get(tm);
-						if (nfmap == null)
-						{
-							nfmap = new HashMap<String, INFProperty<?,?>>();
-							methodnfproperties.put(tm, nfmap);
-						}
-						addNFProperties(m.getAnnotation(NFProperties.class), nfmap);
-					}
-					catch (NoSuchMethodException e)
+					Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(new MethodInfo(m));
+					if(nfmap == null)
 					{
-						throw new RuntimeException(e);
+						nfmap = new HashMap<String, INFProperty<?,?>>();
+						methodnfproperties.put(new MethodInfo(m), nfmap);
 					}
-					catch (SecurityException e)
-					{
-						throw new RuntimeException(e);
-					}
-					
-					
 				}
 			}
-			
-			sclazz = sclazz.getSuperclass();
+		}
+		
+		if(methodnfproperties!=null)
+		{
+			for(MethodInfo key: methodnfproperties.keySet())
+			{
+				Map<String,INFProperty<?,?>> nfmap = methodnfproperties.get(key);
+				addNFProperties(key.getMethod(internalaccess.getClassLoader()).getAnnotation(NFProperties.class), nfmap, ser, key);
+			}
 		}
 	}
 	
 	/**
 	 *  Add nf properties from a type.
 	 */
-	public void addNFProperties(NFProperties nfprops, Map<String, INFProperty<?, ?>> nfps)
+	public void addNFProperties(NFProperties nfprops, Map<String, INFProperty<?, ?>> nfps, IService ser, MethodInfo mi)
 	{
 		for(NFProperty nfprop : nfprops.value())
 		{
 			Class<?> clazz = nfprop.type();
-			
-			AbstractNFProperty.createProperty(clazz, internalaccess);
-//			try
-//			{
-//				Constructor<?> con = clazz.getConstructor(String.class);
-//				INFProperty<?, ?> prop = (INFProperty<?, ?>)con.newInstance(nfprop.name());
-//				
-//				if(nfps == null)
-//					nfps = new HashMap<String, INFProperty<?,?>>();
-//				nfps.put(nfprop.name(), prop);
-//			}
-//			catch(Exception e)
-//			{
-//				throw new RuntimeException(e);
-//			}
+			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, internalaccess, ser, mi);
+			nfps.put(prop.getName(), prop);
 		}
 	}
 	
@@ -410,11 +413,35 @@ public class BasicService implements IInternalService
 	}
 	
 	/**
+	 *  Returns meta information about a non-functional properties of all methods.
+	 *  @return The meta information about a non-functional properties.
+	 */
+	public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>  getNFPropertyMetaInfos()
+	{
+		Map<MethodInfo, Map<String, INFPropertyMetaInfo>> ret = new HashMap<MethodInfo, Map<String,INFPropertyMetaInfo>>();
+		if(methodnfproperties!=null)
+		{
+			for(MethodInfo mi: methodnfproperties.keySet())
+			{
+				Map<String, INFPropertyMetaInfo> res = new HashMap<String, INFPropertyMetaInfo>();
+				ret.put(mi, res);
+				Map<String, INFProperty<?, ?>> tmp = methodnfproperties.get(mi);
+				for(String name: tmp.keySet())
+				{
+					INFProperty<?, ?> prop = tmp.get(name);
+					res.put(name, prop.getMetaInfo());
+				}
+			}
+		}
+		return new Future<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>(ret);
+	}
+	
+	/**
 	 *  Returns the names of all non-functional properties of the specified method.
 	 *  @param method The method targeted by this operation.
 	 *  @return The names of the non-functional properties of the specified method.
 	 */
-	public IFuture<String[]> getNFPropertyNames(Method method)
+	public IFuture<String[]> getNFPropertyNames(MethodInfo method)
 	{
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		return new Future<String[]>(nfmap != null? nfmap.keySet().toArray(new String[nfproperties.size()]) : new String[0]);
@@ -426,7 +453,7 @@ public class BasicService implements IInternalService
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of the specified method.
 	 */
-	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(Method method, String name)
+	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(MethodInfo method, String name)
 	{
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		INFProperty<?, ?> prop = nfmap != null? nfmap.get(name) : null;
@@ -441,7 +468,7 @@ public class BasicService implements IInternalService
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of the specified method.
 	 */
-	public <T> IFuture<T> getNFPropertyValue(Method method, String name)
+	public <T> IFuture<T> getNFPropertyValue(MethodInfo method, String name)
 	{
 		Future<T> ret = new Future<T>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
@@ -473,7 +500,7 @@ public class BasicService implements IInternalService
 	 *  @return The current value of a non-functional property of the specified method.
 	 */
 //	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, Class<U> unit)
-	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, U unit)
+	public <T, U> IFuture<T> getNFPropertyValue(MethodInfo method, String name, U unit)
 	{
 		Future<T> ret = new Future<T>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
@@ -501,10 +528,10 @@ public class BasicService implements IInternalService
 	 *  @param method The method targeted by this operation.
 	 *  @param nfprop The property.
 	 */
-	public IFuture<Void> addNFProperty(Method method, INFProperty<?, ?> nfprop)
+	public IFuture<Void> addNFProperty(MethodInfo method, INFProperty<?, ?> nfprop)
 	{
 		if(methodnfproperties==null)
-			methodnfproperties = new HashMap<Method, Map<String,INFProperty<?,?>>>();
+			methodnfproperties = new HashMap<MethodInfo, Map<String,INFProperty<?,?>>>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		if (nfmap == null)
 		{
@@ -520,7 +547,7 @@ public class BasicService implements IInternalService
 	 *  @param method The method targeted by this operation.
 	 *  @param The name.
 	 */
-	public IFuture<Void> removeNFProperty(Method method, String name)
+	public IFuture<Void> removeNFProperty(MethodInfo method, String name)
 	{
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		if (nfmap != null)
@@ -530,13 +557,15 @@ public class BasicService implements IInternalService
 	
 	/**
 	 *  Sets the access for the component.
-	 *  
 	 *  @param access Component access.
-	 * @return 
 	 */
 	public IFuture<Void> setComponentAccess(IInternalAccess access)
 	{
 		internalaccess = access;
+		
+		// init properties when access is available
+		initNFProperties();
+		
 		return IFuture.DONE;
 	}
 
@@ -627,8 +656,8 @@ public class BasicService implements IInternalService
 		{
 			public void customResultAvailable(Boolean result)
 			{
-				if(sid.getProviderId().getParent()==null && getClass().getName().indexOf("ContextSer")!=-1)
-					System.out.println("shutdowned service: "+getServiceIdentifier());
+//				if(sid.getProviderId().getParent()==null && getClass().getName().indexOf("ContextSer")!=-1)
+//					System.out.println("shutdowned service: "+getServiceIdentifier());
 				
 				if(!result.booleanValue())
 				{

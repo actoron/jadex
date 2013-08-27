@@ -6,9 +6,10 @@ package jadex.base.gui.componenttree;
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.commons.MethodInfo;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 
@@ -18,7 +19,7 @@ import javax.swing.JTree;
 import javax.swing.UIDefaults;
 
 /**
- *
+ * Node for a non functional property.
  */
 public class NFPropertyNode extends AbstractSwingTreeNode
 {
@@ -46,19 +47,26 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	/** The external access of the nfproperty provider. */
 	protected IExternalAccess provider;
 	
+	/** The service identifier. */
+	protected IServiceIdentifier sid;
+	
+	/** The method info. */
+	protected MethodInfo mi;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
 	public NFPropertyNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, 
-		INFPropertyMetaInfo propmi, IExternalAccess provider)
+		INFPropertyMetaInfo propmi, IExternalAccess provider, IServiceIdentifier sid, MethodInfo mi)
 	{
 		super(parent, model, tree);
 //		this.ea = ea;
 		this.provider = provider;
 		this.propmi = propmi;
-		this.provider = provider;
+		this.sid = sid;
+		this.mi = mi;
 		model.registerNode(this);
 	}
 	
@@ -146,7 +154,7 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 		{
 			propcomp	= new NFPropertyProperties();
 		}
-		propcomp.setProperty(propmi, provider);
+		propcomp.setProperty(propmi, provider, sid, mi);
 		
 		return propcomp;
 	}
@@ -166,7 +174,6 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	 */
 	protected static String	getId(ISwingTreeNode parent, String name)
 	{
-		IComponentIdentifier provider = (IComponentIdentifier)parent.getParent().getId();
-		return ""+provider+":nfproperty:"+name;
+		return parent.getId()+":nfproperty:"+name;
 	}
 }

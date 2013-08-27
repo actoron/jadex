@@ -1015,14 +1015,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		// Init nf props
+		// Init nf component props
 		List<NFPropertyInfo> nfprops = model.getNFProperties();
 		if(nfprops!=null)
 		{
 			for(NFPropertyInfo nfprop: nfprops)
 			{
 				Class<?> clazz = nfprop.getClazz().getType(getClassLoader());
-				INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess());
+				INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), null, null);
 				addNFProperty(nfp);
 			}
 		}

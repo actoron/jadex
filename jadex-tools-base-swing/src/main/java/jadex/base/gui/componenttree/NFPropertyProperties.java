@@ -2,6 +2,10 @@ package jadex.base.gui.componenttree;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
@@ -29,6 +33,8 @@ public class NFPropertyProperties extends PropertiesPanel
 	protected JTextField tfval;
 	protected IExternalAccess provider;
 	protected INFPropertyMetaInfo propmi;
+	protected IServiceIdentifier sid;
+	protected MethodInfo mi;
 	
 	//-------- constructors --------
 	
@@ -60,9 +66,7 @@ public class NFPropertyProperties extends PropertiesPanel
 			{
 				if(provider!=null && propmi!=null)
 				{
-					Object u = counits.getSelectedItem();
-					IFuture<Object> fut = provider.getNFPropertyValue(propmi.getName(), u);
-					fut.addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
+					final IResultListener<Object> lis = new SwingResultListener<Object>(new IResultListener<Object>()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -72,7 +76,37 @@ public class NFPropertyProperties extends PropertiesPanel
 						public void exceptionOccurred(Exception exception)
 						{
 						}
-					}));
+					});
+					
+					final Object u = counits.getSelectedItem();
+					
+					if(sid!=null)
+					{
+						IFuture<IService> fut = SServiceProvider.getService(provider.getServiceProvider(), sid);
+						fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
+						{
+							public void resultAvailable(IService ser) 
+							{
+								if(mi!=null)
+								{
+									ser.getNFPropertyValue(mi, propmi.getName(), u).addResultListener(lis);
+								}
+								else
+								{
+									ser.getNFPropertyValue(propmi.getName(), u).addResultListener(lis);
+								}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+						}));
+					}
+					else
+					{
+						IFuture<Object> fut = provider.getNFPropertyValue(propmi.getName(), u);
+						fut.addResultListener(lis);
+					}
 				}
 			}
 		});
@@ -83,10 +117,13 @@ public class NFPropertyProperties extends PropertiesPanel
 	/**
 	 *  Set the nf prop.
 	 */
-	public void	setProperty(final INFPropertyMetaInfo propmi, IExternalAccess provider)
+	public void	setProperty(final INFPropertyMetaInfo propmi, IExternalAccess provider, 
+		IServiceIdentifier sid, MethodInfo mi)
 	{
 		this.provider = provider;
 		this.propmi = propmi;
+		this.sid = sid;
+		this.mi = mi;
 			
 		getTextField("Name").setText(propmi.getName());
 		getTextField("Type").setText(propmi.getType().getName());

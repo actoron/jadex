@@ -17,7 +17,7 @@ public @interface NFProperty
 	/**
 	 *  The name of the property.
 	 */
-	public String name();
+	public String name() default "";
 	
 	/**
 	 *  The type of the property.

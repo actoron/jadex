@@ -5,10 +5,28 @@ import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -110,7 +128,121 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 	 */
 	protected void	searchChildren()
 	{
-		// no children
+		IFuture<IService> fut = SServiceProvider.getService(ea.getServiceProvider(), sid);
+		fut.addResultListener(new IResultListener<IService>()
+		{
+			public void resultAvailable(IService ser)
+			{
+				ser.getNFPropertyMetaInfos()
+					.addResultListener(new SwingResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>(new IResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>()
+				{
+					public void resultAvailable(Map<MethodInfo,Map<String,INFPropertyMetaInfo>> result)
+					{
+						List<NFPropertyContainerNode> childs = new ArrayList<NFPropertyContainerNode>();
+						if(result!=null && result.size()>0)
+						{
+							Set<String> doublenames = new HashSet<String>();
+							Set<String> tmp = new HashSet<String>();
+							for(MethodInfo mi: result.keySet())
+							{
+								if(tmp.contains(mi.getName()))
+								{
+									doublenames.add(mi.getName());
+								}
+								else
+								{
+									tmp.add(mi.getName());
+								}
+							}
+							
+							for(MethodInfo mi: result.keySet())
+							{
+								String name = doublenames.contains(mi.getName())? mi.getNameWithParameters(): mi.getName();
+								NFPropertyContainerNode cn = new NFPropertyContainerNode(name, ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree);
+								
+								Map<String,INFPropertyMetaInfo> props = result.get(mi);
+								List<NFPropertyNode> subchilds = new ArrayList<NFPropertyNode>();
+								for(INFPropertyMetaInfo p: props.values())
+								{
+									NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), p, ea, sid, mi);
+									subchilds.add(nfpn);
+								}
+								
+								Collections.sort(subchilds, new java.util.Comparator<ISwingTreeNode>()
+								{
+									public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+									{
+										String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
+										String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
+										return si1.compareTo(si2);
+									}
+								});
+								
+								cn.setChildren(subchilds);
+								childs.add(cn);
+							}
+						}
+						
+						Collections.sort(childs, new java.util.Comparator<ISwingTreeNode>()
+						{
+							public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+							{
+								String si1 = t1.toString();
+								String si2 = t2.toString();
+								return si1.compareTo(si2);
+							}
+						});
+						
+						setChildren(childs);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				}));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Class<?>> getServiceType()
+	{
+		final Future<Class<?>> ret = new Future<Class<?>>();
+		
+		if(service.getType().getType(null)==null)
+		{
+			SServiceProvider.getService(ea.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
+			{
+				public void customResultAvailable(ILibraryService ls)
+				{
+					ls.getClassLoader(sid.getResourceIdentifier())
+						.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+					{
+						public void customResultAvailable(ClassLoader cl)
+						{
+							Class type = service.getType().getType(cl);
+	//						System.out.println("Found: "+service.getType().getTypeName()+" "+cl+" "+type);
+							ret.setResult(type);
+						}
+					});
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(service.getType().getType(null));
+		}
+		
+		return ret;
 	}
 	
 	/**

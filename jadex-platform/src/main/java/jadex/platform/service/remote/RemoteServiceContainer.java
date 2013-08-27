@@ -9,20 +9,15 @@ import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.TypeResultSelector;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.remote.IProxyAgentService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.util.Collection;
@@ -153,12 +148,12 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 
 //							ret.setResult(selector.getResult(results));
 //							ret.setResult(results);
-							ret.setFinished();
+							ret.setFinishedIfUndone();
 						}
 						
 						public void finished() 
 						{
-							ret.setFinished();
+							ret.setFinishedIfUndone();
 						}
 						
 						public void exceptionOccurred(Exception exception) 
@@ -169,7 +164,7 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 //							}
 //							ret.setFinished();
 							// todo: notify exception?
-							ret.setException(exception);
+							ret.setExceptionIfUndone(exception);
 						}
 					});
 				}
@@ -181,7 +176,7 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 //				{
 //					System.out.println("remote search failed locally: "+componentid+", "+exception);
 //				}
-				ret.setException(exception);
+				ret.setExceptionIfUndone(exception);
 			}
 		});
 			

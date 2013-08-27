@@ -2,13 +2,17 @@ package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.nonfunctional.IMethodNFPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -20,6 +24,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -54,19 +59,28 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("createServiceIdentifier", new Class[]{String.class, Class.class, IResourceIdentifier.class, Class.class}));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyNames", new Class[0]));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("addNFProperty", new Class[]{INFProperty.class}));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyMetaInfo", new Class[]{String.class}));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyValue", new Class[]{String.class}));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("getNFPropertyValue", new Class[]{String.class, Object.class}));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("setComponentAccess", new Class[]{IInternalAccess.class}));
+			
+			Method[] ms = INFPropertyProvider.class.getDeclaredMethods();
+			for(Method m: ms)
+			{
+//				System.out.println("m: "+m.getName());
+				SERVICEMETHODS.add(m);
+			}
+			
+			ms = IMethodNFPropertyProvider.class.getDeclaredMethods();
+			for(Method m: ms)
+			{
+//				System.out.println("m: "+m.getName());
+				SERVICEMETHODS.add(m);
+			}
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.

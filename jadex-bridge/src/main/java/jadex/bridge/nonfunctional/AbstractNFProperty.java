@@ -3,6 +3,8 @@ package jadex.bridge.nonfunctional;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
+import jadex.bridge.service.IService;
+import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Constructor;
@@ -62,7 +64,7 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 	/**
 	 *  Create nf properties form a class with nf annotations.
 	 */
-	public static List<INFProperty<?, ?>> readNFProperties(Class<?> type, IInternalAccess comp)
+	public static List<INFProperty<?, ?>> readNFProperties(Class<?> type, IInternalAccess comp, IService ser, MethodInfo mi)
 	{
 		List<INFProperty<?, ?>> ret = null;
 		
@@ -76,7 +78,7 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 			for(NFProperty nfprop : nfprops)
 			{
 				Class<?> clazz = nfprop.type();
-				INFProperty<?, ?> prop = createProperty(clazz, comp);
+				INFProperty<?, ?> prop = createProperty(clazz, comp, ser, mi);
 				
 				if(ret==null)
 					ret = new ArrayList<INFProperty<?,?>>();
@@ -90,7 +92,7 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 	/**
 	 *  Create a property instance from its type.
 	 */
-	public static INFProperty<?, ?> createProperty(Class<?> clazz, IInternalAccess comp)
+	public static INFProperty<?, ?> createProperty(Class<?> clazz, IInternalAccess comp, IService service, MethodInfo mi)
 	{
 		INFProperty<?, ?> prop = null;
 		try
@@ -102,11 +104,20 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 		{
 			try
 			{
-				Constructor<?> con = clazz.getConstructor(IInternalAccess.class);
+				Constructor<?> con = clazz.getConstructor(new Class[]{IInternalAccess.class});
 				prop = (INFProperty<?, ?>)con.newInstance(comp);
 			}
 			catch(Exception ex)
 			{
+				try
+				{
+					Constructor<?> con = clazz.getConstructor(new Class[]{IInternalAccess.class, IService.class, MethodInfo.class});
+					prop = (INFProperty<?, ?>)con.newInstance(comp, service, mi);
+				}
+				catch(Exception ex2)
+				{
+					ex2.printStackTrace();
+				}
 			}
 		}
 		

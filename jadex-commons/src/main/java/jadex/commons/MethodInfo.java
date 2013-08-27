@@ -5,6 +5,7 @@ import jadex.bridge.ClassInfo;
 import jadex.commons.transformation.annotations.Exclude;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 
 /**
@@ -20,8 +21,10 @@ public class MethodInfo
 	/** The parameter classes. */
 	protected ClassInfo[] parametertypes;
 
-	// hack 
-//	protected Class<?>[] parametertypes2;
+	// cached values
+	
+	/** Cached return type. */
+	protected ClassInfo returntype;
 	
 	/** Cached class. */
 	protected String classname;
@@ -47,8 +50,14 @@ public class MethodInfo
 	public MethodInfo(Method m)
 	{
 		this.name = m.getName();
-		setParameterTypes(m.getParameterTypes());
+		Type[] pts = m.getGenericParameterTypes();
+		this.parametertypes = new ClassInfo[pts.length];
+		for(int i = 0; i < parametertypes.length; ++i)
+		{
+			this.parametertypes[i] = new ClassInfo(pts[i]);
+		}
 		this.classname = m.getDeclaringClass().getName();
+		this.returntype = new ClassInfo(m.getGenericReturnType());
 	}
 	
 	/**
@@ -57,9 +66,14 @@ public class MethodInfo
 	public MethodInfo(String name, Class<?>[] parametertypes)
 	{
 		this.name = name;
-		setParameterTypes(parametertypes);
-		// hack 
-//		parametertypes2 = parametertypes;
+		if(parametertypes!=null)
+		{
+			this.parametertypes = new ClassInfo[parametertypes.length];
+			for(int i = 0; i < parametertypes.length; ++i)
+			{
+				this.parametertypes[i] = new ClassInfo(parametertypes[i]);
+			}
+		}
 	}
 	
 	/**
@@ -131,18 +145,18 @@ public class MethodInfo
 		return typeclasses;
 	}
 	
-	/**
-	 *  Get the parametertypes as classes.
-	 *  @return the parametertypes.
-	 */
-	public void setParameterTypes(Class<?>[] parametertypes)
-	{
-		this.parametertypes = new ClassInfo[parametertypes.length];
-		for (int i = 0; i < parametertypes.length; ++i)
-		{
-			this.parametertypes[i] = new ClassInfo(SReflect.getClassName(parametertypes[i]));
-		}
-	}
+//	/**
+//	 *  Get the parametertypes as classes.
+//	 *  @return the parametertypes.
+//	 */
+//	public void setParameterTypes(Class<?>[] parametertypes)
+//	{
+//		this.parametertypes = new ClassInfo[parametertypes.length];
+//		for(int i = 0; i < parametertypes.length; ++i)
+//		{
+//			this.parametertypes[i] = new ClassInfo(SReflect.getClassName(parametertypes[i]));
+//		}
+//	}
 
 	/**
 	 *  Get the parametertypes.
@@ -272,4 +286,57 @@ public class MethodInfo
 		
 		return ret;
 	}*/
+	
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		
+		// possibly add return type?
+		if(returntype!=null)
+		{
+			buf.append(SReflect.getUnqualifiedTypeName(returntype.toString())).append(" ");
+		}
+		
+		buf.append(getName());
+		if(parametertypes!=null && parametertypes.length>0)
+		{
+			buf.append("(");
+			for(int i=0; i<parametertypes.length; i++)
+			{
+				ClassInfo ci = parametertypes[i];
+				buf.append(SReflect.getUnqualifiedTypeName(ci.toString()));
+				if(i+1<parametertypes.length)
+					buf.append(", ");
+			}
+			buf.append(")");
+		}
+		
+		return buf.toString();
+	}
+	
+	/**
+	 *  Get the name with parameters, e.g. method1(String, int)
+	 *  but without return type.
+	 */
+	public String getNameWithParameters()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append(getName());
+		if(parametertypes!=null && parametertypes.length>0)
+		{
+			buf.append("(");
+			for(int i=0; i<parametertypes.length; i++)
+			{
+				ClassInfo ci = parametertypes[i];
+				buf.append(SReflect.getUnqualifiedTypeName(ci.toString()));
+				if(i+1<parametertypes.length)
+					buf.append(", ");
+			}
+			buf.append(")");
+		}
+		return buf.toString();
+	}
 }

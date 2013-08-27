@@ -29,15 +29,18 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 		"service-container", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/nonfunc.png"),
 	});
 	
+	/** The name. */
+	protected String name;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public NFPropertyContainerNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree)
+	public NFPropertyContainerNode(String name, ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree)
 	{
 		super(parent, model, tree);
+		this.name = name;
 		model.registerNode(this);
 	}
 	
@@ -48,7 +51,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	 */
 	public Object getId()
 	{
-		return getParent().getId()+NAME;
+		return getParent().getId()+NAME+(name==null? "": name);
 	}
 	
 	/**
@@ -91,7 +94,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	 */
 	public String toString()
 	{
-		return NAME;
+		return name!=null? name: NAME;
 	}
 	
 	/**

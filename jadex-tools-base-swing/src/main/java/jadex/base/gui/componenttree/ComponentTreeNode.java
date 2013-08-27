@@ -385,7 +385,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 										{
 											NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
 											if(cn==null)
-												cn = new NFPropertyContainerNode(ComponentTreeNode.this, getModel(), getTree());
+												cn = new NFPropertyContainerNode(null, ComponentTreeNode.this, getModel(), getTree());
 											children.add(0, cn);
 											final NFPropertyContainerNode node = cn;
 											
@@ -587,7 +587,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 					public void resultAvailable(INFPropertyMetaInfo pmi) 
 					{
 //						NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), pmi, rootea);
-						NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), pmi, provider);
+						NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), pmi, provider, null, null);
 						results.add(nfpn);
 						createNFPropertyNodes(names, results, provider, rootea, cn).addResultListener(new DelegationResultListener<Void>(ret));
 					}

@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
@@ -30,6 +31,7 @@ import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.IResultCommand;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -45,10 +47,12 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 /**
@@ -93,6 +97,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/** The root cause that was given at creation time. */
 	protected Cause cause;
 	
+	/** The registered non-functional property hooks. */
+	protected Map<MethodInfo, List<IMethodInvocationListener>> methodlisteners;
+	
+	/** The call id. */
+	protected AtomicLong callid;
+	
 	//-------- constructors --------
 	
 	/**
@@ -104,6 +114,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.logger	= logger;
 		this.realtime	= realtime;
 		this.cause = cause;
+		this.callid = new AtomicLong();
 	}
 	
 	/**
@@ -116,6 +127,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.logger	= logger;
 		this.realtime	= realtime;
 		this.cause = cause;
+		this.callid = new AtomicLong();
 	}
 	
 	/**
@@ -128,6 +140,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.logger	= logger;
 		this.realtime	= realtime;
 		this.cause = cause;
+		this.callid = new AtomicLong();
 	}
 	
 	//-------- methods --------
@@ -135,9 +148,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  A proxy method has been invoked.
 	 */
-	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
+	public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
 	{
 		Object ret = null;
+		
+//		if(method.getName().indexOf("methodA")!=-1)
+//			System.out.println("goto");
+		
+		final long callid = this.callid.getAndIncrement();
+		notifyMethodListeners(true, proxy, method, args, callid);
 		
 //		if(method.getName().indexOf("getExternalAccess")!=-1)
 //			System.out.println("call method ex");
@@ -238,6 +257,22 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 					}
 				}
 			}
+		}
+		
+		if(ret instanceof IFuture)
+		{
+			((IFuture<Object>)ret).addResultListener(new IResultListener<Object>()
+			{
+				public void resultAvailable(Object result)
+				{
+					notifyMethodListeners(false, proxy, method, args, callid);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					notifyMethodListeners(false, proxy, method, args, callid);
+				}
+			});
 		}
 		
 		return ret;
@@ -455,11 +490,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 					type = types[0];
 				}
 			}
-			
-			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
+			Class<?> serclass = service.getClass();
+
+			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, serclass, null);
 			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type);
 						
-			Class<?> serclass = service.getClass();
 			// Do not try to call isAnnotationPresent for Proxy on Android
 			// see http://code.google.com/p/android/issues/detail?id=24846
 			if (!(SReflect.isAndroid() && (service instanceof Proxy))) 
@@ -672,6 +707,62 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		synchronized(BasicServiceInvocationHandler.class)
 		{
 			return (IService)pojoproxies.get(pojo);
+		}
+	}
+	
+	/**
+	 *  Add a method listener.
+	 */
+	public void addMethodListener(MethodInfo m, IMethodInvocationListener listener)
+	{
+		if(methodlisteners==null)
+			methodlisteners = new HashMap<MethodInfo, List<IMethodInvocationListener>>();
+		List<IMethodInvocationListener> lis = methodlisteners.get(m);
+		if(lis==null)
+		{
+			lis = new ArrayList<IMethodInvocationListener>();
+			methodlisteners.put(m, lis);
+		}
+		lis.add(listener);
+	}
+	
+	/**
+	 *  Add a method listener.
+	 */
+	public void removeMethodListener(MethodInfo m, IMethodInvocationListener listener)
+	{
+		if(methodlisteners!=null)
+		{
+			List<IMethodInvocationListener> lis = methodlisteners.get(m);
+			if(lis!=null)
+			{
+				lis.remove(listener);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void notifyMethodListeners(boolean start, Object proxy, final Method method, final Object[] args, long callid)
+	{
+		if(methodlisteners!=null)
+		{
+			List<IMethodInvocationListener> lis = methodlisteners.get(new MethodInfo(method));
+			if(lis!=null)
+			{
+				for(IMethodInvocationListener ml: lis)
+				{
+					if(start)
+					{
+						ml.methodCallStarted(proxy, args, callid);
+					}
+					else
+					{
+						ml.methodCallFinished(proxy, args, callid);
+					}
+				}
+			}
 		}
 	}
 	
