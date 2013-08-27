@@ -5,6 +5,7 @@ import jadex.commons.IFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -45,15 +46,15 @@ public class MultiServiceSearchConstraints implements IServiceSearchConstraints
 	/**
 	 *  Is starting to compare allowed.
 	 */
-	public boolean isCompareStart()
+	public boolean isCompareStart(Collection<IService> services)
 	{
-		return constraints.get(0).isCompareStart();
+		return constraints.get(0).isCompareStart(services);
 	}
 	
 	/**
 	 *  Test if finished.
 	 */
-	public boolean isFinished()
+	public boolean isFinished(Collection<IService> services)
 	{
 		return true;
 	}

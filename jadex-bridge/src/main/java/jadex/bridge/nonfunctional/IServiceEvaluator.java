@@ -1,6 +1,7 @@
 package jadex.bridge.nonfunctional;
 
 import jadex.bridge.service.IService;
+import jadex.commons.future.IFuture;
 
 public interface IServiceEvaluator
 {
@@ -15,5 +16,5 @@ public interface IServiceEvaluator
 	 *  @return An evaluation of the service in a
 	 *  		 range between 0 and 1 (inclusive).
 	 */
-	public double evaluateService(IService service);
+	public IFuture<Double> evaluate(IService service);
 }

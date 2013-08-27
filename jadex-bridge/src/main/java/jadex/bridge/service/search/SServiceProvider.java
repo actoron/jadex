@@ -487,34 +487,34 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, 
-		String scope, IServiceSearchConstraints constraints)
-	{
+//	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, 
+//		String scope, IServiceSearchConstraints constraints)
+//	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final TerminableIntermediateDelegationFuture ret = new TerminableIntermediateDelegationFuture();
+//		final TerminableIntermediateDelegationFuture ret = new TerminableIntermediateDelegationFuture();
 		
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
 //		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
 		
-		try
-		{
-			ITerminableIntermediateFuture fut = provider.getServices(getSearchManager(true, scope), 
-				getVisitDecider(false, scope),
-				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), constraints.getFilter()));
-			ret.addResultListener(new ServiceSearchIntermediateResultListener(ret, fut, constraints));
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
-		
-		return ret;
-	}
+//		try
+//		{
+//			ITerminableIntermediateFuture fut = provider.getServices(getSearchManager(true, scope), 
+//				getVisitDecider(false, scope),
+//				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope), constraints.getFilter()));
+//			ret.addResultListener(new ServiceSearchIntermediateResultListener(ret, fut, constraints));
+//		}
+//		catch(Exception e)
+//		{
+//			ret.setException(e);
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Get one service of a type and only search upwards (parents).

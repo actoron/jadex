@@ -3,6 +3,7 @@ package jadex.bridge.nonfunctional;
 import jadex.bridge.service.IService;
 import jadex.commons.IFilter;
 
+import java.util.Collection;
 import java.util.Comparator;
 
 /**
@@ -24,10 +25,10 @@ public interface IServiceSearchConstraints //extends IIntermediateResultListener
 	/**
 	 *  Is starting to compare allowed.
 	 */
-	public boolean isCompareStart();
+	public boolean isCompareStart(Collection<IService> services);
 	
 	/**
 	 *  Test if finished.
 	 */
-	public boolean isFinished();
+	public boolean isFinished(Collection<IService> services);
 }

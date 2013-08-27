@@ -1,12 +1,12 @@
 package jadex.bridge.nonfunctional;
 
 import jadex.bridge.service.IService;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -17,19 +17,24 @@ public class ServiceSearchIntermediateResultListener extends TerminableIntermedi
 	/** The saved results. */
 	protected List<IService> results;
 	
-	/** The constraints. */
-	protected IServiceSearchConstraints constraints;
-	
 	/** The listener state. */
 	protected boolean finished;
+	
+	/** The ranker. */
+	protected IServiceRanker ranker;
+	
+	/** The termination decider. */
+	protected IRankingSearchTerminationDecider decider;
 	
 	/**
 	 *  Create a new listener.
 	 */
 	public ServiceSearchIntermediateResultListener(TerminableIntermediateDelegationFuture<IService> future, 
-		ITerminableIntermediateFuture<IService> src, IServiceSearchConstraints constraints)
+		ITerminableIntermediateFuture<IService> src, IServiceRanker ranker, IRankingSearchTerminationDecider decider)
 	{
 		super(future, src);
+		this.ranker = ranker;
+		this.decider = decider;
 	}
 	
 	/**
@@ -84,31 +89,22 @@ public class ServiceSearchIntermediateResultListener extends TerminableIntermedi
 		// Ignore out-filtered results (those do not satisfy hard constraints)
 		
 		// todo: omit filter as it is propagated to the selector?!
+		// genau
 		
-		if(constraints.getFilter()==null || constraints.getFilter().filter(result))
+		
+		if(!isFinished())
 		{
-			// If no soft constraints just delegate result
-			if(constraints.getComparator()==null)
-			{
-				super.customIntermediateResultAvailable(result);
-			}
-			else
-			{
-				if(!isFinished())
-				{
-					if(results!=null)
-						results.add(result);
-					results.add(result);
-				}
-				else 
-				{
-					// ignore result
-					System.out.println("Ignoring late result: "+result);
-				}
-				
-				checkNotifyResults();
-			}
+			if(results!=null)
+				results.add(result);
+			results.add(result);
 		}
+		else 
+		{
+			// ignore result
+			System.out.println("Ignoring late result: "+result);
+		}
+		
+		checkNotifyResults();
 	}
 	
 	/**
@@ -117,28 +113,39 @@ public class ServiceSearchIntermediateResultListener extends TerminableIntermedi
 	 */
 	protected void checkNotifyResults()
 	{
-		// Check if we have soft constraints
-		if(constraints.getComparator()!=null)
+		if(!isFinished())
 		{
-			if(!isFinished())
+			IServiceEvaluator evaluator = ranker instanceof IServiceEvaluator? (IServiceEvaluator) ranker : null;
+			decider.isStartRanking(results, evaluator).addResultListener(new IResultListener<Boolean>()
 			{
-				if(constraints.isCompareStart() || constraints.isFinished())
+				
+				public void resultAvailable(Boolean result)
 				{
-					finished = true;
-					
-					if(results!=null)
+					if (!finished)
 					{
-						Collections.sort(results, constraints.getComparator());
-						
-						for(IService res: results)
+						finished = true;
+						List<IService> unrankedresults = results;
+						ranker.rank(unrankedresults).addResultListener(new IResultListener<List<IService>>()
 						{
-							super.customIntermediateResultAvailable(res);
-						}
+							public void resultAvailable(List<IService> result)
+							{
+								future.setResult(result);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								future.setException(exception);
+							}
+						});
 					}
-					
-					super.finished();
 				}
-			}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					future.setException(exception);
+				}
+			});
+			
 		}
 	}
 }
