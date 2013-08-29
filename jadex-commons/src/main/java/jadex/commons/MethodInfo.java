@@ -56,19 +56,7 @@ public class MethodInfo
 		String[] str = new String[pts.length];
 		for(int i=0; i<pts.length; i++)
 		{
-			if(pts[i] instanceof Class)
-			{
-				str[i] = ((Class)pts[i]).getName();
-			}
-			else if(pts[i] instanceof ParameterizedType)
-			{
-				ParameterizedType pt = (ParameterizedType)pts[i];
-				str[i] = pts[i].toString();
-			}
-			else 
-			{
-				str[i] = raw[i].getName();
-			}
+			str[i] = getGenericClassName(pts[i], raw[i]);
 		}
 		this.parametertypes = new ClassInfo[pts.length];
 		for(int i = 0; i < parametertypes.length; ++i)
@@ -76,7 +64,7 @@ public class MethodInfo
 			this.parametertypes[i] = new ClassInfo(str[i]);
 		}
 		this.classname = m.getDeclaringClass().getName();
-		this.returntype = new ClassInfo(m.getGenericReturnType());
+		this.returntype = new ClassInfo(getGenericClassName(m.getGenericReturnType(), m.getReturnType()));
 	}
 	
 	/**
@@ -356,5 +344,35 @@ public class MethodInfo
 			buf.append(")");
 		}
 		return buf.toString();
+	}
+	
+	/**
+	 *  Returns generic type name.
+	 *  
+	 *  @param t The type.
+	 *  @param c The class, optional.
+	 *  @return The name of the type.
+	 */
+	protected String getGenericClassName(Type t, Class c)
+	{
+		String ret = null;
+		if(t instanceof Class)
+		{
+			ret = ((Class)t).getName();
+		}
+		else if(t instanceof ParameterizedType)
+		{
+			ParameterizedType pt = (ParameterizedType)t;
+			ret = t.toString();
+		}
+		else if (c != null)
+		{
+			ret = c.getName();
+		}
+		else
+		{
+			throw new RuntimeException("Unknown type: " + t);
+		}
+		return ret;
 	}
 }
