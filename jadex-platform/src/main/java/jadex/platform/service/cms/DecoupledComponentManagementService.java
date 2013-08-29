@@ -614,6 +614,9 @@ public class DecoupledComponentManagementService implements IComponentManagement
 //																								if(resultlistener!=null)
 //																									resultlisteners.put(cid, resultlistener);
 																					
+																					if(modelname.indexOf("jadex.platform.service.message.transport.ssltcpmtp.ProviderAgent")!=-1)
+																						System.out.println("inited, return: "+cid);//+" "+info!=null? info.getResourceIdentifier(): "norid");
+																					
 																					inited.setResult(cid);
 																					
 																					Future<Map<String, Object>>	killfut;
