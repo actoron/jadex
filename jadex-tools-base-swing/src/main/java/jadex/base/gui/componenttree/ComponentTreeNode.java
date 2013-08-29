@@ -383,51 +383,52 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 										{
 											NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
 											if(cn==null)
-												cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree());
+												cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree(), ea, null, null);
 											children.add(0, cn);
-											final NFPropertyContainerNode node = cn;
+											cont(ea);
+//											final NFPropertyContainerNode node = cn;
+//											
+//											final List<ISwingTreeNode>	results	= new ArrayList<ISwingTreeNode>();
+//											Iterator<String> it = SReflect.getIterator(names);
 											
-											final List<ISwingTreeNode>	results	= new ArrayList<ISwingTreeNode>();
-											Iterator<String> it = SReflect.getIterator(names);
-											
-											createNFPropertyNodes(it, results, ea, rootea, cn).addResultListener(new IResultListener<Void>()
-											{
-												public void resultAvailable(Void result)
-												{
-													Collections.sort(results, new java.util.Comparator<ISwingTreeNode>()
-													{
-														public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
-														{
-															String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
-															String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
-															return si1.compareTo(si2);
-														}
-													});
-													
-													node.setChildren(results);
-													cont(ea, node, results);
-												}
-												
-												public void exceptionOccurred(Exception exception)
-												{
-													cont(ea, null, null);
-												}
-											});
+//											createNFPropertyNodes(it, results, ea, rootea, cn).addResultListener(new IResultListener<Void>()
+//											{
+//												public void resultAvailable(Void result)
+//												{
+//													Collections.sort(results, new java.util.Comparator<ISwingTreeNode>()
+//													{
+//														public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+//														{
+//															String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
+//															String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
+//															return si1.compareTo(si2);
+//														}
+//													});
+//													
+//													node.setChildren(results);
+//													cont(ea, node, results);
+//												}
+//												
+//												public void exceptionOccurred(Exception exception)
+//												{
+//													cont(ea, null, null);
+//												}
+//											});
 										}
 										else
 										{
-											cont(ea, null, null);
+											cont(ea);
 										}
 									}
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										cont(ea, null, null);
+										cont(ea);
 									}
 								}));
 							}
 							
-							public void cont(final IExternalAccess ea, final NFPropertyContainerNode pcnode, final List<ISwingTreeNode> pcchilds)
+							public void cont(final IExternalAccess ea)
 							{
 								SRemoteGui.getServiceInfos(ea)
 									.addResultListener(new SwingResultListener<Object[]>(new IResultListener<Object[]>()
@@ -505,8 +506,8 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 												public void resultAvailable(List<ITreeNode> result)
 												{
 													node.setChildren(subchildren);
-													if(pcnode!=null)
-														pcnode.setChildren(pcchilds);
+//													if(pcnode!=null)
+//														pcnode.setChildren(pcchilds);
 												}
 												public void exceptionOccurred(Exception exception)
 												{

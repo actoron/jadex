@@ -555,8 +555,9 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							public void customResultAvailable(Void pass)
 							{
-								JOptionPane.showMessageDialog(SGUI.getWindowParent(ComponentTreePanel.this), 
-									"Deleted property: "+pnode.getPropertyMetaInfo().getName());
+								((NFPropertyContainerNode)pnode.getParent()).removeChild(pnode);
+//								JOptionPane.showMessageDialog(SGUI.getWindowParent(ComponentTreePanel.this), 
+//									"Deleted property: "+pnode.getPropertyMetaInfo().getName());
 							}
 						});
 					}

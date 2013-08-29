@@ -12,7 +12,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 /**
- * 
+ *
  */
 @Agent
 @Service
@@ -21,9 +21,13 @@ import jadex.micro.annotation.RequiredServices;
 @ComponentTypes(@ComponentType(name="provider", filename="jadex.micro.testcases.nfmethodprop.ProviderAgent.class"))
 public class UserAgent
 {
+	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
 	
+	/**
+	 *  The agent body. 
+	 */
 	@AgentBody
 	public void body()
 	{

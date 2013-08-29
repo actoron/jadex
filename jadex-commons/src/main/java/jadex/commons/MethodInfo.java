@@ -161,7 +161,8 @@ public class MethodInfo
 		this.parametertypes = new ClassInfo[parametertypes.length];
 		for(int i = 0; i < parametertypes.length; ++i)
 		{
-			this.parametertypes[i] = new ClassInfo(parametertypes[i].getName());
+//			this.parametertypes[i] = new ClassInfo(parametertypes[i].getName());
+			this.parametertypes[i] = new ClassInfo(SReflect.getClassName(parametertypes[i]));
 		}
 	}
 
@@ -358,7 +359,7 @@ public class MethodInfo
 		String ret = null;
 		if(t instanceof Class)
 		{
-			ret = ((Class)t).getName();
+			ret = SReflect.getClassName(((Class)t));
 		}
 		else if(t instanceof ParameterizedType)
 		{
@@ -366,7 +367,7 @@ public class MethodInfo
 		}
 		else if (c != null)
 		{
-			ret = c.getName();
+			ret = SReflect.getClassName(c);
 		}
 		else
 		{

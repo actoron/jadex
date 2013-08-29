@@ -68,8 +68,8 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public NFPropertyContainerNode(String name, String tooltip, ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree)//,
-//		IExternalAccess provider, IServiceIdentifier sid, MethodInfo mi)
+	public NFPropertyContainerNode(String name, String tooltip, ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree,
+		IExternalAccess provider, IServiceIdentifier sid, MethodInfo mi)
 	{
 		super(parent, model, tree);
 		this.name = name;
@@ -87,7 +87,19 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	 */
 	public Object getId()
 	{
-		return getParent().getId()+NAME+(name==null? "": name);
+		return getId(getParent().getId(), name);
+//		return getParent().getId()+NAME+(name==null? "": name);
+	}
+	
+	/**
+	 * 
+	 * @param parentid
+	 * @param name
+	 * @return
+	 */
+	public static String getId(Object parentid, String name)
+	{
+		return parentid.toString()+NAME+(name==null? "": name);
 	}
 	
 	/**
@@ -114,26 +126,42 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	 */
 	protected void	searchChildren()
 	{
-//		Map<String,INFPropertyMetaInfo> props = result.get(mi);
-//		List<NFPropertyNode> subchilds = new ArrayList<NFPropertyNode>();
-//		for(INFPropertyMetaInfo p: props.values())
-//		{
-//			NFPropertyNode nfpn	= new NFPropertyNode(this, getModel(), getTree(), p, ea, sid, mi);
-//			subchilds.add(nfpn);
-//		}
-//		
-//		Collections.sort(subchilds, new java.util.Comparator<ISwingTreeNode>()
-//		{
-//			public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
-//			{
-//				String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
-//				String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
-//				return si1.compareTo(si2);
-//			}
-//		});
-//		
-//		cn.setChildren(subchilds);
-//		childs.add(cn);
+//		System.out.println("start search childs: "+getId());
+		getNFPropertyInfos().addResultListener(new SwingResultListener<Collection<INFPropertyMetaInfo>>(
+			new IResultListener<Collection<INFPropertyMetaInfo>>()
+		{
+			public void resultAvailable(Collection<INFPropertyMetaInfo> result)
+			{
+//				System.out.println("found childs: "+getId()+" "+result.size());
+				List<NFPropertyNode> children = new ArrayList<NFPropertyNode>();
+				for(INFPropertyMetaInfo p: result)
+				{
+					NFPropertyNode nfpn = (NFPropertyNode)model.getNode(NFPropertyNode.getId(NFPropertyContainerNode.this, p.getName()));
+					if(nfpn==null)
+					{
+						nfpn = new NFPropertyNode(NFPropertyContainerNode.this, 
+							getModel(), getTree(), p, provider, sid, mi);
+					}
+					children.add(nfpn);
+				}
+				
+				Collections.sort(children, new java.util.Comparator<ISwingTreeNode>()
+				{
+					public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+					{
+						String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
+						String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
+						return si1.compareTo(si2);
+					}
+				});
+				
+				setChildren(children);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		}));
 	}
 	
 	/**
@@ -143,67 +171,65 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	{
 		final IntermediateFuture<INFPropertyMetaInfo> ret = new IntermediateFuture<INFPropertyMetaInfo>();
 		
-		if(provider!=null)
+		if(sid!=null)
 		{
-			if(sid!=null)
+			IFuture<IService> fut = SServiceProvider.getService(provider.getServiceProvider(), sid);
+			fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
 			{
-				IFuture<IService> fut = SServiceProvider.getService(provider.getServiceProvider(), sid);
-				fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
+				public void resultAvailable(IService ser) 
 				{
-					public void resultAvailable(IService ser) 
+					if(mi!=null)
 					{
-						if(mi!=null)
+						ser.getMethodNFPropertyMetaInfos(mi).addResultListener(
+							new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 						{
-							ser.getMethodNFPropertyMetaInfos(mi).addResultListener(
-								new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
+							public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
 							{
-								public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
+								for(INFPropertyMetaInfo mi: mis.values())
 								{
-									for(INFPropertyMetaInfo mi: mis.values())
-									{
-										ret.addIntermediateResult(mi);
-									}
-									ret.setFinished();
+									ret.addIntermediateResult(mi);
 								}
-							});
-						}
-						else
-						{
-							ser.getNFPropertyMetaInfos().addResultListener(
-								new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
-							{
-								public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
-								{
-									for(INFPropertyMetaInfo mi: mis.values())
-									{
-										ret.addIntermediateResult(mi);
-									}
-									ret.setFinished();
-								}
-							});
-						}
+								ret.setFinished();
+							}
+						});
 					}
-					
-					public void exceptionOccurred(Exception exception)
+					else
 					{
+						ser.getNFPropertyMetaInfos().addResultListener(
+							new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
+						{
+							public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
+							{
+								for(INFPropertyMetaInfo mi: mis.values())
+								{
+									ret.addIntermediateResult(mi);
+								}
+								ret.setFinished();
+							}
+						});
 					}
-				}));
-			}
-			else
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+				}
+			}));
+		}
+		else if(provider!=null)
+		{
+			provider.getNFPropertyMetaInfos().addResultListener(
+				new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 			{
-				provider.getNFPropertyMetaInfos().addResultListener(
-					new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
+				public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
 				{
-					public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
+					for(INFPropertyMetaInfo mi: mis.values())
 					{
-						for(INFPropertyMetaInfo mi: mis.values())
-						{
-							ret.addIntermediateResult(mi);
-						}
-						ret.setFinished();
+						ret.addIntermediateResult(mi);
 					}
-				});
-			}
+					ret.setFinished();
+				}
+			});
 		}
 		else
 		{
