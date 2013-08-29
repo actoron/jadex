@@ -152,18 +152,18 @@ public class MethodInfo
 		return typeclasses;
 	}
 	
-//	/**
-//	 *  Get the parametertypes as classes.
-//	 *  @return the parametertypes.
-//	 */
-//	public void setParameterTypes(Class<?>[] parametertypes)
-//	{
-//		this.parametertypes = new ClassInfo[parametertypes.length];
-//		for(int i = 0; i < parametertypes.length; ++i)
-//		{
-//			this.parametertypes[i] = new ClassInfo(SReflect.getClassName(parametertypes[i]));
-//		}
-//	}
+	/**
+	 *  Get the parametertypes as classes.
+	 *  @return the parametertypes.
+	 */
+	public void setParameterTypes(Class<?>[] parametertypes)
+	{
+		this.parametertypes = new ClassInfo[parametertypes.length];
+		for(int i = 0; i < parametertypes.length; ++i)
+		{
+			this.parametertypes[i] = new ClassInfo(parametertypes[i].getName());
+		}
+	}
 
 	/**
 	 *  Get the parametertypes.
@@ -362,7 +362,6 @@ public class MethodInfo
 		}
 		else if(t instanceof ParameterizedType)
 		{
-			ParameterizedType pt = (ParameterizedType)t;
 			ret = t.toString();
 		}
 		else if (c != null)
