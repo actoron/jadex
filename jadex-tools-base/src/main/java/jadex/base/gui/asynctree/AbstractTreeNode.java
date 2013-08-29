@@ -132,7 +132,7 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public void refresh(boolean recurse)
 	{
-		System.out.println("ATN refresh: "+getId());
+//		System.out.println("ATN refresh: "+getId());
 
 		if(!searching)
 		{
