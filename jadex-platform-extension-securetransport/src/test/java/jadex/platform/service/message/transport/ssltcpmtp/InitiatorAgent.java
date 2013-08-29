@@ -18,6 +18,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  *  Test if the @SecureTransmission annotation works.
@@ -79,15 +80,15 @@ public class InitiatorAgent extends TestAgent
 				{
 					public void customResultAvailable(final TestReport result)
 					{
-						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
+						platform.killComponent()
+							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+						{
+							public void customResultAvailable(Map<String, Object> v)
+							{
+								ret.setResult(result);
+							}
+						});
+//						ret.setResult(result);
 					}
 				}));
 			}
