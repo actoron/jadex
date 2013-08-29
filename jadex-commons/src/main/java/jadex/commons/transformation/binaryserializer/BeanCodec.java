@@ -281,7 +281,7 @@ public class BeanCodec extends AbstractCodec
 		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
 		{
 			BeanProperty prop = (BeanProperty)props.get(it.next());
-			if (prop.isReadable())
+			if(prop!=null && prop.isReadable())
 			{
 				Object val = prop.getPropertyValue(object);
 				if(val != null)
@@ -319,11 +319,11 @@ public class BeanCodec extends AbstractCodec
 				try
 				{
 					BeanProperty	prop	= (BeanProperty)props.get(name);
-					if (prop.isWritable())
+					if(prop!=null && prop.isWritable())
 					{
 						prop.setPropertyValue(object, val);
 					}
-					else
+					else if(prop!=null)
 					{
 						throw new RuntimeException("Property is write-protected: " + prop.getName());
 					}

@@ -89,8 +89,8 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		Object[] parametervalues, String callid, IComponentIdentifier caller, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
-//		if(method.getName().equals("secMethod"))
-//		System.out.println("caller: "+caller);
+		if(method.getName().equals("secMethod"))
+			System.out.println("caller: "+caller);
 		
 		this.rr = rr;
 		this.method = method;
@@ -225,6 +225,9 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 //			System.out.println("dglkysfi");
 //			Thread.dumpStack();
 //		}
+		
+		if(method.getName().equals("secMethod"))
+			System.out.println("caller: "+caller);
 		
 		// RMS acts as representative of remote caller.
 		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();
