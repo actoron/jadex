@@ -359,8 +359,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
 		final Cause curcause = sc==null? agent.getComponentDescription().getCause(): sc.getCause();
 		
-//		if(modelname.indexOf("Hello")!=-1)
-//			System.out.println("create: "+modelname);//+" "+info!=null? info.getResourceIdentifier(): "norid");
+		if(modelname.indexOf("jadex.platform.service.message.transport.ssltcpmtp.ProviderAgent")!=-1)
+			System.out.println("create: "+modelname);//+" "+info!=null? info.getResourceIdentifier(): "norid");
 		
 //		final DebugException	de	= new DebugException();
 	
