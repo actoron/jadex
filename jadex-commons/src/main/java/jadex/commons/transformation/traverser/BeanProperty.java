@@ -228,7 +228,6 @@ public class BeanProperty
 				throw new RuntimeException(e);
 			}
 		}
-		
 		else if (getter != null)
 		{
 			try
@@ -245,7 +244,7 @@ public class BeanProperty
 			try
 			{
 				Field field = getField();
-				if (!field.isAccessible())
+				if(!field.isAccessible())
 					field.setAccessible(true);
 				ret = field.get(object);
 			}

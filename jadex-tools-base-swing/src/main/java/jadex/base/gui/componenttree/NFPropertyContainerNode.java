@@ -68,8 +68,8 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public NFPropertyContainerNode(String name, String tooltip, ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree,
-		IExternalAccess provider, IServiceIdentifier sid, MethodInfo mi)
+	public NFPropertyContainerNode(String name, String tooltip, ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree)//,
+//		IExternalAccess provider, IServiceIdentifier sid, MethodInfo mi)
 	{
 		super(parent, model, tree);
 		this.name = name;

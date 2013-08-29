@@ -1,16 +1,10 @@
 package jadex.micro.testcases.nfproperties;
 
-import jadex.bridge.nonfunctional.ComposedEvaluator;
-import jadex.bridge.nonfunctional.IServiceEvaluator;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
-import jadex.bridge.service.IService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
