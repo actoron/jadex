@@ -6,6 +6,9 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -152,14 +155,25 @@ public class InitiatorAgent extends TestAgent
 		});
 		
 		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
-		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
-		
-		createComponent(ProviderAgent.class.getName()+".class", root, reslis)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+		final IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
+		SServiceProvider.getService(agent.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener<IAwarenessManagementService>()
 		{
-			public void customResultAvailable(final IComponentIdentifier cid) 
+			public void resultAvailable(IAwarenessManagementService result)
 			{
-				callService(cid, hassectrans, testno).addResultListener(new DelegationResultListener<TestReport>(ret));
+				result.addAwarenessInfo(new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, 20000, null, null, null, "empty"));
+				createComponent(ProviderAgent.class.getName()+".class", root, reslis)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+				{
+					public void customResultAvailable(final IComponentIdentifier cid) 
+					{
+						callService(cid, hassectrans, testno).addResultListener(new DelegationResultListener<TestReport>(ret));
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
 			}
 		});
 		
