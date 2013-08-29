@@ -53,17 +53,27 @@ public class MethodInfo
 		this.name = m.getName();
 		Type[] pts = m.getGenericParameterTypes();
 		Class<?>[] raw = m.getParameterTypes();
+		String[] str = new String[pts.length];
 		for(int i=0; i<pts.length; i++)
 		{
-			if(!(pts[i] instanceof Class) && !(pts[i] instanceof ParameterizedType))
+			if(pts[i] instanceof Class)
 			{
-				pts[i] = raw[i];
+				str[i] = ((Class)pts[i]).getName();
+			}
+			else if(pts[i] instanceof ParameterizedType)
+			{
+				ParameterizedType pt = (ParameterizedType)pts[i];
+				str[i] = pts[i].toString();
+			}
+			else 
+			{
+				str[i] = raw[i].getName();
 			}
 		}
 		this.parametertypes = new ClassInfo[pts.length];
 		for(int i = 0; i < parametertypes.length; ++i)
 		{
-			this.parametertypes[i] = new ClassInfo(pts[i]);
+			this.parametertypes[i] = new ClassInfo(str[i]);
 		}
 		this.classname = m.getDeclaringClass().getName();
 		this.returntype = new ClassInfo(m.getGenericReturnType());
@@ -80,7 +90,7 @@ public class MethodInfo
 			this.parametertypes = new ClassInfo[parametertypes.length];
 			for(int i = 0; i < parametertypes.length; ++i)
 			{
-				this.parametertypes[i] = new ClassInfo(parametertypes[i]);
+				this.parametertypes[i] = new ClassInfo(parametertypes[i].getName());
 			}
 		}
 	}
@@ -213,7 +223,6 @@ public class MethodInfo
 					types[i] = parametertypes[i].getType(cl);
 				}
 				Class<?> cla = SReflect.findClass(classname, null, cl);
-				System.out.println(cla);
 				method = cla.getDeclaredMethod(name, types);
 				this.classloader = cl;
 			}
