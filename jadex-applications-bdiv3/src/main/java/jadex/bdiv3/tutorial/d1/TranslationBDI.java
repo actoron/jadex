@@ -23,7 +23,6 @@ import java.util.Map;
  */
 @Description("Translation agent d1. <br>  This translation agent uses a subgoal.")
 @Agent
-@Service
 public class TranslationBDI
 {
 	/** The agent. */
@@ -32,7 +31,7 @@ public class TranslationBDI
 	
 	/** The current time. */
 	@Belief
-	protected Map<String, String> wordtable = new HashMap<String, String>();
+	protected Map<String, String> wordtable;// = new HashMap<String, String>();
 
 	/**
 	 *  The translation goal.
@@ -87,6 +86,7 @@ public class TranslationBDI
 	@AgentCreated
 	public void init()
 	{
+		this.wordtable = new HashMap<String, String>();
 		wordtable.put("coffee", "Kaffee");
 		wordtable.put("milk", "Milch");
 		wordtable.put("cow", "Kuh");

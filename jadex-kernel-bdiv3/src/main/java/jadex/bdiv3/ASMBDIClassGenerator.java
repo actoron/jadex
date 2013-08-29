@@ -487,9 +487,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	 */
 	protected void enhanceSetter(String iclname, IMethodNode mn, String belname)
 	{
-		System.out.println("method acc: "+mn.getName()+" "+mn.getAccess());
+//		System.out.println("method acc: "+mn.getName()+" "+mn.getAccess());
 		
-		Type arg = Type.getArgumentTypes(mn.getDesc())[0];
+		Type[] args = Type.getArgumentTypes(mn.getDesc());
 		
 		IInsnList l = mn.getInstructions();
 		
@@ -506,7 +506,14 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		
 		nl = new InsnList();
 //		nl.add(new VarInsnNode(Opcodes.ALOAD, 1)); // loads the argument (=parameter0) does not work for other types than object
-		makeObject(nl, arg);
+		if(args.length>0)
+		{
+			makeObject(nl, args[0]);
+		}
+		else
+		{
+			nl.add(new InsnNode(Opcodes.ACONST_NULL));
+		}
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
 		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
 		nl.add(new LdcInsnNode(belname));

@@ -3,20 +3,16 @@ package jadex.bdiv3.tutorial.c2;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  Belief with update rate.
+ *  Dynamic belief.
  */
 @Description("The clock agent C2. <br>  This translation agent uses a belief with update rate.")
 @Agent

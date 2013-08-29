@@ -5,6 +5,9 @@ import jadex.bridge.IInternalAccess;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 
+/**
+ * 
+ */
 public class MaxPermGenMemoryProperty extends MemoryProperty
 {
 	/** The name of the property. */

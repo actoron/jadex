@@ -21,7 +21,6 @@ import java.util.Map;
  */
 @Description("The translation agent C1. <br>  This translation agent allows for adding word pairs to extend its dictionary.")
 @Agent
-@Service
 public class TranslationBDI
 {
 	//-------- attributes --------

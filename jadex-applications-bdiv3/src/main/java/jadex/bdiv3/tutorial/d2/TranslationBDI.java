@@ -23,7 +23,6 @@ import java.util.Map;
  */
 @Description("Translation agent D2. <br>  This translation agent uses a subgoal.")
 @Agent
-@Service
 public class TranslationBDI
 {
 	/** The agent. */
