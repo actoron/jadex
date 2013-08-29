@@ -4,6 +4,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.MethodInfo;
+import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -17,17 +18,27 @@ public class MethodWaitingTimeProperty extends TimedProperty
 	/** The name of the property. */
 	public static final String WAITINGTIME = "waiting time";
 	
+	/** The handler. */
+	protected BasicServiceInvocationHandler handler;
+	
+	/** The listener. */
+	protected IMethodInvocationListener listener;
+	
+	/** The method info. */
+	protected MethodInfo method;
+	
 	/**
 	 *  Create a new property.
 	 */
 	public  MethodWaitingTimeProperty(IInternalAccess comp, IService service, MethodInfo method)
 	{
 		super(WAITINGTIME, comp, -1);
+		this.method = method;
 		
 		if(Proxy.isProxyClass(service.getClass()))
 		{
-			BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
-			handler.addMethodListener(method, new IMethodInvocationListener()
+			handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
+			listener = new IMethodInvocationListener()
 			{
 				Map<Long, Long> times = new HashMap<Long, Long>();
 				
@@ -42,7 +53,8 @@ public class MethodWaitingTimeProperty extends TimedProperty
 					long dur = System.currentTimeMillis() - start.longValue();
 					setValue(dur);
 				}
-			});
+			};
+			handler.addMethodListener(method, listener);
 		}
 		else
 		{
@@ -77,5 +89,15 @@ public class MethodWaitingTimeProperty extends TimedProperty
 			System.out.println("Setting value: "+value);
 			super.setValue((long)value);
 		}
+	}
+	
+	/**
+	 *  Property was removed and should be disposed.
+	 */
+	public IFuture<Void> dispose()
+	{
+		if(handler!=null)
+			handler.removeMethodListener(method, listener);
+		return IFuture.DONE;
 	}
 }

@@ -754,6 +754,48 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		return ret;
 	}
 	
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos()
+	{
+		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(getInterpreter().getNFPropertyMetaInfos());
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(getInterpreter().getAgentAdapter().getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setResult(getInterpreter().getNFPropertyMetaInfos());
+//						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setResult(getInterpreter().getNFPropertyMetaInfos());
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 *  Returns the meta information about a non-functional property of this service.
 	 *  @param name Name of the property.

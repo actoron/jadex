@@ -32,6 +32,7 @@ import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
@@ -787,6 +788,47 @@ public class ExternalAccess implements IExternalAccess
 		else
 		{
 			ret.setResult(interpreter.getResults());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos()
+	{
+		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(interpreter.getNFPropertyMetaInfos());
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+//						ret.setResult(interpreter.getNFPropertyNames());
+						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setResult(interpreter.getNFPropertyMetaInfos());
 		}
 		
 		return ret;

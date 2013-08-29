@@ -1,6 +1,8 @@
 package jadex.bridge.nonfunctional;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.sensor.unit.IConvertableUnit;
+import jadex.bridge.sensor.unit.MemoryUnit;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -51,9 +53,11 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 	 *  Get the value.
 	 */
 	public IFuture<T> getValue(U unit)
-//	public IFuture<T> getValue(Class<U> unit)
 	{
-		return new Future<T>(value);
+		T ret = value;
+		if(unit instanceof IConvertableUnit)
+			ret = ((IConvertableUnit<T>)unit).convert(ret);
+		return new Future<T>(ret);
 	}
 	
 	/**

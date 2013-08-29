@@ -133,7 +133,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		{
 			public void resultAvailable(IService ser)
 			{
-				ser.getNFPropertyMetaInfos()
+				ser.getMethodNFPropertyMetaInfos()
 					.addResultListener(new SwingResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>(new IResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>()
 				{
 					public void resultAvailable(Map<MethodInfo,Map<String,INFPropertyMetaInfo>> result)
@@ -158,7 +158,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 							for(MethodInfo mi: result.keySet())
 							{
 								String name = doublenames.contains(mi.getName())? mi.getNameWithParameters(): mi.getName();
-								NFPropertyContainerNode cn = new NFPropertyContainerNode(name, ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree);
+								NFPropertyContainerNode cn = new NFPropertyContainerNode(name, mi.toString(), ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree);
 								
 								Map<String,INFPropertyMetaInfo> props = result.get(mi);
 								List<NFPropertyNode> subchilds = new ArrayList<NFPropertyNode>();

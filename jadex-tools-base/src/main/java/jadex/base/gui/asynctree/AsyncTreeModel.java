@@ -330,7 +330,7 @@ public class AsyncTreeModel
 	{
 		synchronized (nodes)
 		{
-			if (nodes.containsKey(node.getId()))
+			if(nodes.containsKey(node.getId()))
 				throw new RuntimeException("Node id already contained: " + node + ", " + node.getId());
 
 			nodes.put(node.getId(), node);

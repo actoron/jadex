@@ -39,4 +39,8 @@ public interface INFProperty<T extends Object, U extends Object>
 //	public IFuture<T> getValue(Class<U> unit);
 	public IFuture<T> getValue(U unit);
 	
+	/**
+	 *  Property was removed and should be disposed.
+	 */
+	public IFuture<Void> dispose();
 }

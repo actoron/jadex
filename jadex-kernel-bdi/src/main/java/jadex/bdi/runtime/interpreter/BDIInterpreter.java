@@ -2413,7 +2413,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  Add a new nf property.
 	 *  @param nfprop The nf property.
 	 */
-	public void addNFProperty(INFProperty<?, ?> nfprop)
+	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop)
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -2422,7 +2422,17 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  Add a new nf property.
 	 *  @param nfprop The nf property.
 	 */
-	public void removeNFProperty(String name)
+	public IFuture<Void> removeNFProperty(String name)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public Map<String, INFPropertyMetaInfo> getNFPropertyMetaInfos()
 	{
 		throw new UnsupportedOperationException();
 	}

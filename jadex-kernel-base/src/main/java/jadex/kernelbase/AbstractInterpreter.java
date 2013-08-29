@@ -617,6 +617,24 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	//-------- nf properties --------
 	
 	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public Map<String, INFPropertyMetaInfo> getNFPropertyMetaInfos()
+	{
+		Map<String, INFPropertyMetaInfo> ret = new HashMap<String, INFPropertyMetaInfo>();
+		if(nfproperties!=null)
+		{
+			for(String key: nfproperties.keySet())
+			{
+				ret.put(key, nfproperties.get(key).getMetaInfo());
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Returns the names of all non-functional properties of this service.
 	 *  @return The names of the non-functional properties of this service.
 	 */
@@ -683,21 +701,38 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Add a new nf property.
 	 *  @param nfprop The nf property.
 	 */
-	public void addNFProperty(INFProperty<?, ?> nfprop)
+	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop)
 	{
 		if(nfproperties == null)
 			nfproperties = new HashMap<String, INFProperty<?,?>>();
 		nfproperties.put(nfprop.getName(), nfprop);
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Add a new nf property.
 	 *  @param nfprop The nf property.
 	 */
-	public void removeNFProperty(String name)
+	public IFuture<Void> removeNFProperty(String name)
 	{
-		if(nfproperties != null)
-			nfproperties.remove(name);
+		Future<Void> ret = new Future<Void>();
+		if(nfproperties!=null)
+		{
+			INFProperty<?, ?> prop = nfproperties.remove(name);
+			if(prop!=null)
+			{
+				prop.dispose().addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
 	}
 	
 	/**

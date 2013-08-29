@@ -3,10 +3,11 @@ package jadex.base.gui.componenttree;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ObjectInspectorPanel;
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
-import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.ISwingNodeHandler;
 import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
@@ -24,15 +25,16 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.base.gui.asynctree.ITreeNode;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -136,6 +138,9 @@ public class ComponentTreePanel extends JSplitPane
 
 	/** The set password action constant. */
 	public static final String SET_PASSWD_ACTION = "Set/change remote platform password";
+
+	/** The remove nf property constant. */
+	public static final String REMOVENFPROPERTY_ACTION = "Remove property";
 
 	
 	//-------- attributes --------
@@ -534,6 +539,32 @@ public class ComponentTreePanel extends JSplitPane
 		};
 		actions.put(setpasswd.getValue(Action.NAME), setpasswd);
 		
+		final Action remnfprop = new AbstractAction(REMOVENFPROPERTY_ACTION, icons.getIcon("overlay_kill"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TreePath path = tree.getSelectionPath();
+				if(path!=null)
+				{
+					final ISwingTreeNode node = (ISwingTreeNode)path.getLastPathComponent();
+					if(node instanceof NFPropertyNode)
+					{
+						final NFPropertyNode pnode = (NFPropertyNode)node;
+						pnode.removeProperty()
+							.addResultListener(new SwingDefaultResultListener<Void>(ComponentTreePanel.this)
+						{
+							public void customResultAvailable(Void pass)
+							{
+								JOptionPane.showMessageDialog(SGUI.getWindowParent(ComponentTreePanel.this), 
+									"Deleted property: "+pnode.getPropertyMetaInfo().getName());
+							}
+						});
+					}
+				}
+			}
+		};
+		actions.put(showobject.getValue(Action.NAME), showobject);
+		
 		
 //		final Action showview = new AbstractAction(SHOWVIEW_ACTION, icons.getIcon("show_details"))
 //		{
@@ -582,7 +613,6 @@ public class ComponentTreePanel extends JSplitPane
 		// Default overlays and popups.
 		model.addNodeHandler(new ISwingNodeHandler()
 		{
-			@Override
 			public byte[] getOverlay(ITreeNode node)
 			{
 				return null;
@@ -649,6 +679,18 @@ public class ComponentTreePanel extends JSplitPane
 							}
 						};
 						ret.add(psetpasswd);
+					}
+					
+					if(nodes[0] instanceof NFPropertyNode)
+					{
+						Action psetpasswd = new AbstractAction((String)remnfprop.getValue(Action.NAME), base)
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								remnfprop.actionPerformed(e);
+							}
+						};
+						ret.add(remnfprop);
 					}
 				}
 				

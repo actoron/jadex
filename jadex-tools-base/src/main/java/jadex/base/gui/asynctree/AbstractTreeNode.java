@@ -132,16 +132,16 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public void refresh(boolean recurse)
 	{
+		System.out.println("ATN refresh: "+getId());
 
-		// System.out.println("ATN refresh: "+getId());
-
-		if (!searching)
+		if(!searching)
 		{
 			searching = true;
 			this.recurse = recurse;
 			// System.out.println("searchChildren: "+getId());
 			searchChildren();
-		} else
+		}
+		else
 		{
 			// If search in progress upgrade to recursive, but do not downgrade.
 			this.recurse = this.recurse || recurse;

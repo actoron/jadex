@@ -126,4 +126,12 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 		
 		return prop;
 	}
+	
+	/**
+	 *  Property was removed and should be disposed.
+	 */
+	public IFuture<Void> dispose()
+	{
+		return IFuture.DONE;
+	}
 }

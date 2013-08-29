@@ -6,6 +6,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
@@ -89,7 +90,7 @@ public class NFPropertyProperties extends PropertiesPanel
 							{
 								if(mi!=null)
 								{
-									ser.getNFPropertyValue(mi, propmi.getName(), u).addResultListener(lis);
+									ser.getMethodNFPropertyValue(mi, propmi.getName(), u).addResultListener(lis);
 								}
 								else
 								{
@@ -126,10 +127,10 @@ public class NFPropertyProperties extends PropertiesPanel
 		this.mi = mi;
 			
 		getTextField("Name").setText(propmi.getName());
-		getTextField("Type").setText(propmi.getType().getName());
+		getTextField("Type").setText(SReflect.getUnqualifiedTypeName(propmi.getType().getName()));
 		if(propmi.getUnit()!=null)
 		{
-			getTextField("Unit").setText(propmi.getUnit().toString());
+			getTextField("Unit").setText(SReflect.getUnqualifiedTypeName(propmi.getUnit().getName()));
 			Class<?> ucl = propmi.getUnit();
 			if(Enum.class.isAssignableFrom(ucl))
 			{

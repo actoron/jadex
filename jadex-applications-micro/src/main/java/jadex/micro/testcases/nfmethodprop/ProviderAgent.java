@@ -12,8 +12,6 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
-import java.util.List;
-
 /**
  * 
  */
@@ -40,18 +38,27 @@ public class ProviderAgent implements ITestService
 		}, wait);
 	}
 	
+//	/**
+//	 * 
+//	 */
+//	@NFProperties(@NFProperty(type=MethodWaitingTimeProperty.class))
+//	public IFuture<Void> methodB(String[] str, List<List<String>> tmp)
+//	{
+//		return agent.scheduleStep(new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				return IFuture.DONE;
+//			}
+//		}, 1000);
+//	}
+	
 	/**
 	 * 
 	 */
 	@NFProperties(@NFProperty(type=MethodWaitingTimeProperty.class))
-	public IFuture<Void> methodB(String[] str, List<List<String>> tmp)
+	public IFuture<Void> methodB(String[] str)
 	{
-		return agent.scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				return IFuture.DONE;
-			}
-		}, 1000);
+		return IFuture.DONE;
 	}
 }

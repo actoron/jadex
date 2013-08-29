@@ -2,7 +2,7 @@ package jadex.bridge.sensor.service;
 
 
 /**
- * 
+ *  Interface 
  */
 public interface IMethodInvocationListener
 {

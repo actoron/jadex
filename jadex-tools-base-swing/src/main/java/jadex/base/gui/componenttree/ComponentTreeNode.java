@@ -9,7 +9,6 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
-import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -228,7 +227,6 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		ISwingTreeNode	node	= getModel().getNode(desc.getName());
 		if(node==null)
 		{
-			
 			boolean proxy = "jadex.platform.service.remote.Proxy".equals(desc.getModelName())
 				// Only create proxy nodes for local proxy components to avoid infinite nesting.
 				&& ((IActiveComponentTreeNode)getModel().getRoot()).getComponentIdentifier().getName().equals(desc.getName().getPlatformName());
@@ -385,7 +383,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 										{
 											NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
 											if(cn==null)
-												cn = new NFPropertyContainerNode(null, ComponentTreeNode.this, getModel(), getTree());
+												cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree());
 											children.add(0, cn);
 											final NFPropertyContainerNode node = cn;
 											

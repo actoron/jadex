@@ -1,9 +1,8 @@
-/**
- * 
- */
 package jadex.bridge.nonfunctional;
 
 import jadex.commons.future.IFuture;
+
+import java.util.Map;
 
 /**
  *  Interface for non-functional property providers such
@@ -16,6 +15,13 @@ public interface INFPropertyProvider
 	 *  @return The names of the non-functional properties of this service.
 	 */
 	public IFuture<String[]> getNFPropertyNames();
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos();
 	
 	/**
 	 *  Returns the meta information about a non-functional property of this service.

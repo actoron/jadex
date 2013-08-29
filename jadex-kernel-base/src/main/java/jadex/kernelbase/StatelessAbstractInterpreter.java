@@ -2244,6 +2244,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	}
 	
 	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
+	public abstract Map<String, INFPropertyMetaInfo> getNFPropertyMetaInfos();
+	
+	/**
 	 *  Returns the names of all non-functional properties of this service.
 	 *  @return The names of the non-functional properties of this service.
 	 */
@@ -2278,12 +2285,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Add a new nf property.
 	 *  @param nfprop The nf property.
 	 */
-	public abstract void addNFProperty(INFProperty<?, ?> nfprop);
+	public abstract IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop);
 	
 	/**
 	 *  Add a new nf property.
 	 *  @param nfprop The nf property.
 	 */
-	public abstract void removeNFProperty(String name);
+	public abstract IFuture<Void> removeNFProperty(String name);
 
 }

@@ -304,6 +304,29 @@ public class BasicService implements IInternalService
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.
 	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getNFPropertyMetaInfos()
+	{
+		Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String,INFPropertyMetaInfo>>();
+		
+		Map<String, INFPropertyMetaInfo> res = new HashMap<String, INFPropertyMetaInfo>();
+		if(nfproperties!=null)
+		{
+			for(String key: nfproperties.keySet())
+			{
+				res.put(key, nfproperties.get(key).getMetaInfo());
+			}
+			ret.setResult(res);
+		}
+		
+		return ret;
+	}
+
+	
+	/**
+	 *  Returns the meta information about a non-functional property of this service.
+	 *  @param name Name of the property.
+	 *  @return The meta information about a non-functional property of this service.
+	 */
 	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(String name)
 	{
 		Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
@@ -407,16 +430,31 @@ public class BasicService implements IInternalService
 	 */
 	public IFuture<Void> removeNFProperty(String name)
 	{
+		Future<Void> ret = new Future<Void>();
 		if(nfproperties!=null)
-			nfproperties.remove(name);
-		return IFuture.DONE;
+		{
+			INFProperty<?, ?> prop = nfproperties.remove(name);
+			if(prop!=null)
+			{
+				prop.dispose().addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Returns meta information about a non-functional properties of all methods.
 	 *  @return The meta information about a non-functional properties.
 	 */
-	public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>  getNFPropertyMetaInfos()
+	public IFuture<Map<MethodInfo, Map<String, INFPropertyMetaInfo>>>  getMethodNFPropertyMetaInfos()
 	{
 		Map<MethodInfo, Map<String, INFPropertyMetaInfo>> ret = new HashMap<MethodInfo, Map<String,INFPropertyMetaInfo>>();
 		if(methodnfproperties!=null)
@@ -437,11 +475,33 @@ public class BasicService implements IInternalService
 	}
 	
 	/**
+	 *  Returns meta information about a non-functional properties of a method.
+	 *  @return The meta information about a non-functional properties.
+	 */
+	public IFuture<Map<String, INFPropertyMetaInfo>> getMethodNFPropertyMetaInfos(MethodInfo method)
+	{
+		Map<String, INFPropertyMetaInfo> ret = new HashMap<String, INFPropertyMetaInfo>();
+		
+		if(methodnfproperties!=null)
+		{
+			Map<String, INFProperty<?, ?>> tmp = methodnfproperties.get(method);
+			for(String name: tmp.keySet())
+			{
+				INFProperty<?, ?> prop = tmp.get(name);
+				ret.put(name, prop.getMetaInfo());
+			}
+		}
+		
+		return new Future<Map<String,INFPropertyMetaInfo>>(ret);
+	}
+
+	
+	/**
 	 *  Returns the names of all non-functional properties of the specified method.
 	 *  @param method The method targeted by this operation.
 	 *  @return The names of the non-functional properties of the specified method.
 	 */
-	public IFuture<String[]> getNFPropertyNames(MethodInfo method)
+	public IFuture<String[]> getMethodNFPropertyNames(MethodInfo method)
 	{
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		return new Future<String[]>(nfmap != null? nfmap.keySet().toArray(new String[nfproperties.size()]) : new String[0]);
@@ -453,7 +513,7 @@ public class BasicService implements IInternalService
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of the specified method.
 	 */
-	public IFuture<INFPropertyMetaInfo> getNFPropertyMetaInfo(MethodInfo method, String name)
+	public IFuture<INFPropertyMetaInfo> getMethodNFPropertyMetaInfo(MethodInfo method, String name)
 	{
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		INFProperty<?, ?> prop = nfmap != null? nfmap.get(name) : null;
@@ -468,7 +528,7 @@ public class BasicService implements IInternalService
 	 *  @param type Type of the property value.
 	 *  @return The current value of a non-functional property of the specified method.
 	 */
-	public <T> IFuture<T> getNFPropertyValue(MethodInfo method, String name)
+	public <T> IFuture<T> getMethodNFPropertyValue(MethodInfo method, String name)
 	{
 		Future<T> ret = new Future<T>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
@@ -500,7 +560,7 @@ public class BasicService implements IInternalService
 	 *  @return The current value of a non-functional property of the specified method.
 	 */
 //	public <T, U> IFuture<T> getNFPropertyValue(Method method, String name, Class<U> unit)
-	public <T, U> IFuture<T> getNFPropertyValue(MethodInfo method, String name, U unit)
+	public <T, U> IFuture<T> getMethodNFPropertyValue(MethodInfo method, String name, U unit)
 	{
 		Future<T> ret = new Future<T>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
@@ -528,7 +588,7 @@ public class BasicService implements IInternalService
 	 *  @param method The method targeted by this operation.
 	 *  @param nfprop The property.
 	 */
-	public IFuture<Void> addNFProperty(MethodInfo method, INFProperty<?, ?> nfprop)
+	public IFuture<Void> addMethodNFProperty(MethodInfo method, INFProperty<?, ?> nfprop)
 	{
 		if(methodnfproperties==null)
 			methodnfproperties = new HashMap<MethodInfo, Map<String,INFProperty<?,?>>>();
@@ -547,12 +607,27 @@ public class BasicService implements IInternalService
 	 *  @param method The method targeted by this operation.
 	 *  @param The name.
 	 */
-	public IFuture<Void> removeNFProperty(MethodInfo method, String name)
+	public IFuture<Void> removeMethodNFProperty(MethodInfo method, String name)
 	{
+		Future<Void> ret = new Future<Void>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
-		if (nfmap != null)
-			nfmap.remove(name);
-		return IFuture.DONE;
+		if(nfmap != null)
+		{
+			INFProperty<?, ?> prop = nfmap.remove(name);
+			if(prop!=null)
+			{
+				prop.dispose().addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
 	}
 	
 	/**

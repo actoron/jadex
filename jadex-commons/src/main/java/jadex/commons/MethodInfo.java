@@ -5,6 +5,7 @@ import jadex.bridge.ClassInfo;
 import jadex.commons.transformation.annotations.Exclude;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 
@@ -51,6 +52,14 @@ public class MethodInfo
 	{
 		this.name = m.getName();
 		Type[] pts = m.getGenericParameterTypes();
+		Class<?>[] raw = m.getParameterTypes();
+		for(int i=0; i<pts.length; i++)
+		{
+			if(!(pts[i] instanceof Class) && !(pts[i] instanceof ParameterizedType))
+			{
+				pts[i] = raw[i];
+			}
+		}
 		this.parametertypes = new ClassInfo[pts.length];
 		for(int i = 0; i < parametertypes.length; ++i)
 		{
