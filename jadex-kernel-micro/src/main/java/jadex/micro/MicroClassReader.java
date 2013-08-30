@@ -354,7 +354,7 @@ public class MicroClassReader
 				
 				for(NFProperty prop: val.value())
 				{
-					nfps.add(new NFPropertyInfo(prop.name(), new ClassInfo(prop.type().getName())));
+					nfps.add(new NFPropertyInfo(prop.name(), new ClassInfo(prop.value().getName())));
 				}
 				
 				// todo!

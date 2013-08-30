@@ -55,8 +55,6 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 	 */
 	public IFuture<T> getValue(U unit)
 	{
-		if(this instanceof WaitqueueProperty)
-			System.out.println("get prop val: "+value+" "+hashCode());
 		T ret = value;
 		if(unit instanceof IConvertableUnit)
 			ret = ((IConvertableUnit<T>)unit).convert(ret);
@@ -69,8 +67,6 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 	 */
 	public void setValue(T value)
 	{
-		if(this instanceof WaitqueueProperty && value==null)
-			System.out.println("set prop val: "+value+" "+hashCode());
 		this.value = value;
 	}
 	

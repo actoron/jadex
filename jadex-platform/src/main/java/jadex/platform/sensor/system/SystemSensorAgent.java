@@ -17,13 +17,13 @@ import jadex.micro.annotation.Agent;
 @Agent
 @NFProperties(
 {
-	@NFProperty(type=CPULoadProperty.class),//, target=Target.Root))
-	@NFProperty(type=CoreNumberProperty.class),
-	@NFProperty(type=MaxMemoryProperty.class),
-	@NFProperty(type=UsedMemoryProperty.class),
-	@NFProperty(type=MaxPermGenMemoryProperty.class),
-	@NFProperty(type=UsedPermGenMemoryProperty.class),
-	@NFProperty(type=LoadedClassesProperty.class)
+	@NFProperty(value=CPULoadProperty.class),//, target=Target.Root))
+	@NFProperty(value=CoreNumberProperty.class),
+	@NFProperty(value=MaxMemoryProperty.class),
+	@NFProperty(value=UsedMemoryProperty.class),
+	@NFProperty(value=MaxPermGenMemoryProperty.class),
+	@NFProperty(value=UsedPermGenMemoryProperty.class),
+	@NFProperty(value=LoadedClassesProperty.class)
 })
 public class SystemSensorAgent
 {

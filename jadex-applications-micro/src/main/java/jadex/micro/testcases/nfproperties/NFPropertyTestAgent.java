@@ -14,7 +14,7 @@ import jadex.micro.annotation.ProvidedServices;
 
 @Agent
 @ProvidedServices(@ProvidedService(type=ICoreDependentService.class, implementation=@Implementation(NFPropertyTestService.class)))
-@NFProperties(@NFProperty(name="componentcores", type=CoreNumberProperty2.class))
+@NFProperties(@NFProperty(name="componentcores", value=CoreNumberProperty2.class))
 public class NFPropertyTestAgent
 {
 	@Agent

@@ -43,7 +43,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	//-------- constants --------
 	
 	/** The static map of subinterceptors (method -> interceptor). */
-	public static Set SERVICEMETHODS;
+	public static Set<Method> SERVICEMETHODS;
 	protected static Method START_METHOD;
 	protected static Method SHUTDOWN_METHOD;
 	protected static Method CREATESID_METHOD;
@@ -54,7 +54,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			START_METHOD = IInternalService.class.getMethod("startService", new Class[0]);
 			SHUTDOWN_METHOD = IInternalService.class.getMethod("shutdownService", new Class[0]);
-			SERVICEMETHODS = new HashSet();
+			SERVICEMETHODS = new HashSet<Method>();
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));

@@ -8,6 +8,7 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 
@@ -39,24 +40,24 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 		if(Proxy.isProxyClass(service.getClass()))
 		{
 			handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
-			listener = new IMethodInvocationListener()
+			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 			{
 				int cnt = 0;
 				
-				public void methodCallStarted(Object proxy, MethodInfo mi, Object[] args, long callid)
+				public void methodCallStarted(Object proxy, Method method, Object[] args, long callid)
 				{
-					System.out.println("started: "+mi+" "+cnt);
+//					System.out.println("started: "+method+" "+cnt);
 					setValue(new Integer(++cnt));
 				}
 				
-				public void methodCallFinished(Object proxy, MethodInfo mi, Object[] args, long callid)
+				public void methodCallFinished(Object proxy, Method method, Object[] args, long callid)
 				{
-					System.out.println("ended: "+mi+" "+cnt);
+//					System.out.println("ended: "+method+" "+cnt);
 					if(cnt>0)
 						--cnt;
 					setValue(new Integer(cnt));
 				}
-			};
+			});
 			handler.addMethodListener(method, listener);
 		}
 		else

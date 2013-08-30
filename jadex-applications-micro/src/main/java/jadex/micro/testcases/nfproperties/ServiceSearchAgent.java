@@ -13,10 +13,10 @@ import jadex.micro.annotation.ProvidedServices;
 
 @Service
 @ProvidedServices(@ProvidedService(type=ICoreDependentService.class, implementation=@Implementation(NFPropertyTestService.class)))
-@NFProperties({@NFProperty(type=FakeCpuLoadProperty.class),
-			   @NFProperty(type=FakeFreeMemoryProperty.class),
-			   @NFProperty(type=FakeNetworkBandwidthProperty.class),
-			   @NFProperty(type=FakeReliabilityProperty.class)})
+@NFProperties({@NFProperty(value=FakeCpuLoadProperty.class),
+			   @NFProperty(value=FakeFreeMemoryProperty.class),
+			   @NFProperty(value=FakeNetworkBandwidthProperty.class),
+			   @NFProperty(value=FakeReliabilityProperty.class)})
 public class ServiceSearchAgent
 {
 	@Agent

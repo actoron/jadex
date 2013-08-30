@@ -77,7 +77,7 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 			
 			for(NFProperty nfprop : nfprops)
 			{
-				Class<?> clazz = nfprop.type();
+				Class<?> clazz = nfprop.value();
 				INFProperty<?, ?> prop = createProperty(clazz, comp, ser, mi);
 				
 				if(ret==null)

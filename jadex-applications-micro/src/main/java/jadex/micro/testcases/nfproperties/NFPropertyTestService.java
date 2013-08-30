@@ -16,7 +16,7 @@ public class NFPropertyTestService implements ICoreDependentService
 		return IFuture.DONE;
 	}
 
-	@NFProperties(@NFProperty(name="methodspeed", type=MethodSpeedProperty.class))
+	@NFProperties(@NFProperty(name="methodspeed", value=MethodSpeedProperty.class))
 	public IFuture<Void> testMethod()
 	{
 		return IFuture.DONE;

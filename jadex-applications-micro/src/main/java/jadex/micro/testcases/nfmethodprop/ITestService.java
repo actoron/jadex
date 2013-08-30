@@ -11,26 +11,20 @@ import jadex.commons.future.IFuture;
  */
 @NFProperties(
 {	
-	@NFProperty(type=WaitingTimeProperty.class),
-	@NFProperty(type=WaitqueueProperty.class)
+	@NFProperty(WaitingTimeProperty.class),
+	@NFProperty(WaitqueueProperty.class)
 })
 public interface ITestService
 {
 	/**
 	 * 
 	 */
-	@NFProperties(@NFProperty(type=WaitingTimeProperty.class))
+	@NFProperties({@NFProperty(WaitqueueProperty.class), @NFProperty(WaitingTimeProperty.class)})
 	public IFuture<Void> methodA(long wait);
-	
-//	/**
-//	 * 
-//	 */
-//	@NFProperties(@NFProperty(type=MethodWaitingTimeProperty.class))
-//	public IFuture<Void> methodB(String[] str, List<List<String>> tmp);
 	
 	/**
 	 * 
 	 */
-	@NFProperties(@NFProperty(type=WaitingTimeProperty.class))
+	@NFProperties({@NFProperty(WaitingTimeProperty.class), @NFProperty(WaitqueueProperty.class)})
 	public IFuture<Void> methodB(long wait);
 }

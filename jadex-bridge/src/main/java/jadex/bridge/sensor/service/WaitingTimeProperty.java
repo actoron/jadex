@@ -6,6 +6,7 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,16 +39,16 @@ public class WaitingTimeProperty extends TimedProperty
 		if(Proxy.isProxyClass(service.getClass()))
 		{
 			handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
-			listener = new IMethodInvocationListener()
+			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 			{
 				Map<Long, Long> times = new HashMap<Long, Long>();
 				
-				public void methodCallStarted(Object proxy, MethodInfo mi, Object[] args, long callid)
+				public void methodCallStarted(Object proxy, Method method, Object[] args, long callid)
 				{
 					times.put(new Long(callid), new Long(System.currentTimeMillis()));
 				}
 				
-				public void methodCallFinished(Object proxy, MethodInfo mi, Object[] args, long callid)
+				public void methodCallFinished(Object proxy, Method method, Object[] args, long callid)
 				{
 					Long start = times.remove(new Long(callid));
 					// May happen that property is added during ongoing call
@@ -57,7 +58,7 @@ public class WaitingTimeProperty extends TimedProperty
 						setValue(dur);
 					}
 				}
-			};
+			});
 			handler.addMethodListener(method, listener);
 		}
 		else
@@ -90,7 +91,7 @@ public class WaitingTimeProperty extends TimedProperty
 		
 		if(value!=null)
 		{
-			System.out.println("Setting value: "+value);
+//			System.out.println("Setting value: "+value);
 			super.setValue((long)value);
 		}
 	}

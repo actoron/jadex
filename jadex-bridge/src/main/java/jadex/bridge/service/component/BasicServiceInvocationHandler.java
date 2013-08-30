@@ -768,11 +768,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			{
 				if(start)
 				{
-					ml.methodCallStarted(proxy, new MethodInfo(method), args, callid);
+					ml.methodCallStarted(proxy, method, args, callid);
 				}
 				else
 				{
-					ml.methodCallFinished(proxy, new MethodInfo(method), args, callid);
+					ml.methodCallFinished(proxy, method, args, callid);
 				}
 			}
 		}

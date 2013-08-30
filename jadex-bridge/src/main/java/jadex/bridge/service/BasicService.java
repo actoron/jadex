@@ -231,7 +231,7 @@ public class BasicService implements IInternalService
 	{
 		for(NFProperty nfprop : nfprops.value())
 		{
-			Class<?> clazz = nfprop.type();
+			Class<?> clazz = nfprop.value();
 			INFProperty<?, ?> prop = AbstractNFProperty.createProperty(clazz, internalaccess, ser, mi);
 			nfps.put(prop.getName(), prop);
 		}
