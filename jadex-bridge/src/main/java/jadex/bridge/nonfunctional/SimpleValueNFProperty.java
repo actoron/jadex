@@ -1,6 +1,7 @@
 package jadex.bridge.nonfunctional;
 
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.sensor.service.WaitqueueProperty;
 import jadex.bridge.sensor.unit.IConvertableUnit;
 import jadex.bridge.sensor.unit.MemoryUnit;
 import jadex.commons.future.Future;
@@ -26,7 +27,7 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 		super(mi);
 		this.comp = comp;
 		
-		if(mi.isDynamic())
+		if(mi.isDynamic() && mi.getUpdateRate()>0)
 		{
 			IResultListener<Void> res = new IResultListener<Void>()
 			{
@@ -54,6 +55,8 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 	 */
 	public IFuture<T> getValue(U unit)
 	{
+		if(this instanceof WaitqueueProperty)
+			System.out.println("get prop val: "+value+" "+hashCode());
 		T ret = value;
 		if(unit instanceof IConvertableUnit)
 			ret = ((IConvertableUnit<T>)unit).convert(ret);
@@ -66,6 +69,8 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 	 */
 	public void setValue(T value)
 	{
+		if(this instanceof WaitqueueProperty && value==null)
+			System.out.println("set prop val: "+value+" "+hashCode());
 		this.value = value;
 	}
 	

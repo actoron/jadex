@@ -131,71 +131,97 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 		IFuture<IService> fut = SServiceProvider.getService(ea.getServiceProvider(), sid);
 		fut.addResultListener(new IResultListener<IService>()
 		{
-			public void resultAvailable(IService ser)
+			public void resultAvailable(final IService ser)
 			{
-				ser.getMethodNFPropertyMetaInfos()
-					.addResultListener(new SwingResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>(new IResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>()
+				ser.getNFPropertyMetaInfos()
+					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 				{
-					public void resultAvailable(Map<MethodInfo,Map<String,INFPropertyMetaInfo>> result)
+					public void resultAvailable(Map<String,INFPropertyMetaInfo> result)
 					{
-						List<NFPropertyContainerNode> childs = new ArrayList<NFPropertyContainerNode>();
+						NFPropertyContainerNode cn = null;
 						if(result!=null && result.size()>0)
 						{
-							Set<String> doublenames = new HashSet<String>();
-							Set<String> tmp = new HashSet<String>();
-							for(MethodInfo mi: result.keySet())
-							{
-								if(tmp.contains(mi.getName()))
-								{
-									doublenames.add(mi.getName());
-								}
-								else
-								{
-									tmp.add(mi.getName());
-								}
-							}
-							
-							for(MethodInfo mi: result.keySet())
-							{
-								String name = doublenames.contains(mi.getName())? mi.getNameWithParameters(): mi.getName();
-								NFPropertyContainerNode cn = (NFPropertyContainerNode)model.getNode(NFPropertyContainerNode.getId(getId(), name));
-								if(cn==null)
-									cn = new NFPropertyContainerNode(name, mi.toString(), ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree, ea, sid, mi);
-								
-//								Map<String,INFPropertyMetaInfo> props = result.get(mi);
-//								List<NFPropertyNode> subchilds = new ArrayList<NFPropertyNode>();
-//								for(INFPropertyMetaInfo p: props.values())
-//								{
-//									NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), p, ea, sid, mi);
-//									subchilds.add(nfpn);
-//								}
-//								
-//								Collections.sort(subchilds, new java.util.Comparator<ISwingTreeNode>()
-//								{
-//									public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
-//									{
-//										String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
-//										String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
-//										return si1.compareTo(si2);
-//									}
-//								});
-//								
-//								cn.setChildren(subchilds);
-								childs.add(cn);
-							}
+							String name = "Service properties";
+							cn = (NFPropertyContainerNode)model.getNode(NFPropertyContainerNode.getId(getId(), name));
+							if(cn==null)
+								cn = new NFPropertyContainerNode(null, name, ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree, ea, sid, null);
 						}
 						
-						Collections.sort(childs, new java.util.Comparator<ISwingTreeNode>()
-						{
-							public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
-							{
-								String si1 = t1.toString();
-								String si2 = t2.toString();
-								return si1.compareTo(si2);
-							}
-						});
+						final NFPropertyContainerNode sercon = cn;
 						
-						setChildren(childs);
+						ser.getMethodNFPropertyMetaInfos()
+							.addResultListener(new SwingResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>(new IResultListener<Map<MethodInfo,Map<String,INFPropertyMetaInfo>>>()
+						{
+							public void resultAvailable(Map<MethodInfo,Map<String,INFPropertyMetaInfo>> result)
+							{
+								List<NFPropertyContainerNode> childs = new ArrayList<NFPropertyContainerNode>();
+								if(result!=null && result.size()>0)
+								{
+									Set<String> doublenames = new HashSet<String>();
+									Set<String> tmp = new HashSet<String>();
+									for(MethodInfo mi: result.keySet())
+									{
+										if(tmp.contains(mi.getName()))
+										{
+											doublenames.add(mi.getName());
+										}
+										else
+										{
+											tmp.add(mi.getName());
+										}
+									}
+									
+									for(MethodInfo mi: result.keySet())
+									{
+										String name = doublenames.contains(mi.getName())? mi.getNameWithParameters(): mi.getName();
+										NFPropertyContainerNode cn = (NFPropertyContainerNode)model.getNode(NFPropertyContainerNode.getId(getId(), name));
+										if(cn==null)
+											cn = new NFPropertyContainerNode(name, mi.toString(), ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree, ea, sid, mi);
+										
+		//								Map<String,INFPropertyMetaInfo> props = result.get(mi);
+		//								List<NFPropertyNode> subchilds = new ArrayList<NFPropertyNode>();
+		//								for(INFPropertyMetaInfo p: props.values())
+		//								{
+		//									NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), p, ea, sid, mi);
+		//									subchilds.add(nfpn);
+		//								}
+		//								
+		//								Collections.sort(subchilds, new java.util.Comparator<ISwingTreeNode>()
+		//								{
+		//									public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+		//									{
+		//										String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
+		//										String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
+		//										return si1.compareTo(si2);
+		//									}
+		//								});
+		//								
+		//								cn.setChildren(subchilds);
+										childs.add(cn);
+									}
+								}
+								
+								Collections.sort(childs, new java.util.Comparator<ISwingTreeNode>()
+								{
+									public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
+									{
+										String si1 = t1.toString();
+										String si2 = t2.toString();
+										return si1.compareTo(si2);
+									}
+								});
+								
+								if(sercon!=null)
+									childs.add(0, sercon);
+								
+								setChildren(childs);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								exception.printStackTrace();
+							}
+						}));
 					}
 					
 					public void exceptionOccurred(Exception exception)

@@ -18,4 +18,13 @@ public abstract class TimedProperty extends SimpleValueNFProperty<Long, TimeUnit
 		super(comp, new NFPropertyMetaInfo(name, long.class, TimeUnit.class, 
 			updaterate>0? true: false, updaterate, null));
 	}
+	
+	/**
+	 *  Create a new property.
+	 */
+	public TimedProperty(String name, final IInternalAccess comp, boolean dynamic)
+	{
+		super(comp, new NFPropertyMetaInfo(name, long.class, TimeUnit.class, 
+			dynamic, -1, null));
+	}
 }

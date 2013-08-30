@@ -193,7 +193,7 @@ public class BasicService implements IInternalService
 			{
 				if(nfproperties==null)
 					nfproperties = new HashMap<String, INFProperty<?,?>>();
-				addNFProperties(this.getClass().getAnnotation(NFProperties.class), nfproperties, ser, null);
+				addNFProperties(sclazz.getAnnotation(NFProperties.class), nfproperties, ser, null);
 			}
 			
 			Method[] methods = sclazz.getMethods();
@@ -333,7 +333,7 @@ public class BasicService implements IInternalService
 		
 		INFPropertyMetaInfo mi = nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
 		
-		if (mi == null)
+		if(mi == null)
 		{
 			internalaccess.getExternalAccess().getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 		}

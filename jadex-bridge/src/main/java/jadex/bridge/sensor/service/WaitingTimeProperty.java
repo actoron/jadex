@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  Property for the waiting time of a method.
+ *  Property for the waiting time of a method or a service as a whole.
  */
-public class MethodWaitingTimeProperty extends TimedProperty
+public class WaitingTimeProperty extends TimedProperty
 {
 	/** The name of the property. */
 	public static final String WAITINGTIME = "waiting time";
@@ -30,9 +30,9 @@ public class MethodWaitingTimeProperty extends TimedProperty
 	/**
 	 *  Create a new property.
 	 */
-	public  MethodWaitingTimeProperty(IInternalAccess comp, IService service, MethodInfo method)
+	public WaitingTimeProperty(IInternalAccess comp, IService service, MethodInfo method)
 	{
-		super(WAITINGTIME, comp, -1);
+		super(WAITINGTIME, comp, true);
 		this.method = method;
 		
 		if(Proxy.isProxyClass(service.getClass()))
@@ -42,23 +42,27 @@ public class MethodWaitingTimeProperty extends TimedProperty
 			{
 				Map<Long, Long> times = new HashMap<Long, Long>();
 				
-				public void methodCallStarted(Object proxy, Object[] args, long callid)
+				public void methodCallStarted(Object proxy, MethodInfo mi, Object[] args, long callid)
 				{
 					times.put(new Long(callid), new Long(System.currentTimeMillis()));
 				}
 				
-				public void methodCallFinished(Object proxy, Object[] args, long callid)
+				public void methodCallFinished(Object proxy, MethodInfo mi, Object[] args, long callid)
 				{
 					Long start = times.remove(new Long(callid));
-					long dur = System.currentTimeMillis() - start.longValue();
-					setValue(dur);
+					// May happen that property is added during ongoing call
+					if(start!=null)
+					{
+						long dur = System.currentTimeMillis() - start.longValue();
+						setValue(dur);
+					}
 				}
 			};
 			handler.addMethodListener(method, listener);
 		}
 		else
 		{
-			System.out.println("Warning, cannot install property callback on service: "+getName());
+			throw new RuntimeException("Cannot install waiting time listener hook.");
 		}
 	}
 	

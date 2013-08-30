@@ -76,6 +76,7 @@ public class NFPropertyProperties extends PropertiesPanel
 						
 						public void exceptionOccurred(Exception exception)
 						{
+							exception.printStackTrace();
 						}
 					});
 					

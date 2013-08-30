@@ -13,25 +13,31 @@ public enum TimeUnit implements IConvertableUnit<Long>
 	 */
 	public Long convert(Long value)
 	{
-		long ret = value;
-		
-		if(TimeUnit.SECS.equals(this))
+		if(value!=null)
 		{
-			ret = Math.round(ret/1000d);
+			long ret = value;
+			
+			if(TimeUnit.SECS.equals(this))
+			{
+				ret = Math.round(ret/1000d);
+			}
+			else if(TimeUnit.MINS.equals(this))
+			{
+				ret = Math.round(ret/1000d/60);
+			}
+			else if(TimeUnit.HOURS.equals(this))
+			{
+				ret = Math.round(ret/1000d/60/60);
+			}
+			else if(TimeUnit.DAYS.equals(this))
+			{
+				ret = Math.round(ret/1000d/60/24);
+			}
+			return new Long(ret);
 		}
-		else if(TimeUnit.MINS.equals(this))
+		else
 		{
-			ret = Math.round(ret/1000d/60);
+			return null;
 		}
-		else if(TimeUnit.HOURS.equals(this))
-		{
-			ret = Math.round(ret/1000d/60/60);
-		}
-		else if(TimeUnit.DAYS.equals(this))
-		{
-			ret = Math.round(ret/1000d/60/24);
-		}
-		
-		return new Long(ret);
 	}
 }

@@ -35,7 +35,9 @@ public class UserAgent
 		
 		for(int i=0; i<100; i++)
 		{
-			ser.methodA(i*500).get();
+			ser.methodA(500).get();
+			
+			ser.methodB(1000).get();
 		}
 	}
 }

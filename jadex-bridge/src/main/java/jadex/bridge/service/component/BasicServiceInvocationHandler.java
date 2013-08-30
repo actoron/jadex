@@ -274,6 +274,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				}
 			});
 		}
+		else
+		{
+			notifyMethodListeners(false, proxy, method, args, callid);
+		}
 		
 		return ret;
 	}
@@ -742,25 +746,33 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	}
 	
 	/**
-	 * 
+	 *  Notify registered listeners in case a method is called.
 	 */
 	protected void notifyMethodListeners(boolean start, Object proxy, final Method method, final Object[] args, long callid)
 	{
 		if(methodlisteners!=null)
 		{
-			List<IMethodInvocationListener> lis = methodlisteners.get(new MethodInfo(method));
-			if(lis!=null)
+			doNotifyListeners(start, proxy, method, args, callid, methodlisteners.get(null));
+			doNotifyListeners(start, proxy, method, args, callid, methodlisteners.get((new MethodInfo(method))));
+		}
+	}
+	
+	/**
+	 *  Do notify the listeners.
+	 */
+	protected void doNotifyListeners(boolean start, Object proxy, final Method method, final Object[] args, long callid, List<IMethodInvocationListener> lis)
+	{
+		if(lis!=null)
+		{
+			for(IMethodInvocationListener ml: lis)
 			{
-				for(IMethodInvocationListener ml: lis)
+				if(start)
 				{
-					if(start)
-					{
-						ml.methodCallStarted(proxy, args, callid);
-					}
-					else
-					{
-						ml.methodCallFinished(proxy, args, callid);
-					}
+					ml.methodCallStarted(proxy, new MethodInfo(method), args, callid);
+				}
+				else
+				{
+					ml.methodCallFinished(proxy, new MethodInfo(method), args, callid);
 				}
 			}
 		}
