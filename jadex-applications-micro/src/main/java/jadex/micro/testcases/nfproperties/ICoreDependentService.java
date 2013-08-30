@@ -7,8 +7,12 @@ import jadex.commons.future.IFuture;
 /**
  *  Empty Test Service for non-functional properties.
  */
-@NFProperties(@NFProperty(name="cores", value=CoreNumberProperty.class))
+@NFProperties(@NFProperty(CoreNumberProperty.class))
 public interface ICoreDependentService
 {
+	/**
+	 *  Service method for test purposes.
+	 *  
+	 */
 	public IFuture<Void> testMethod();
 }

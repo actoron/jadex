@@ -3,7 +3,6 @@ package jadex.bridge.service.search;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.IServiceSearchConstraints;
-import jadex.bridge.nonfunctional.ServiceSearchIntermediateResultListener;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;

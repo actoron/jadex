@@ -29,6 +29,7 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 		
 		if(mi.isDynamic() && mi.getUpdateRate()>0)
 		{
+			setValue(measureValue());
 			IResultListener<Void> res = new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)

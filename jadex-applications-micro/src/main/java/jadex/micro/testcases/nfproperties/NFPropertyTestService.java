@@ -12,7 +12,7 @@ public class NFPropertyTestService implements ICoreDependentService
 	@ServiceStart
 	public IFuture<Void> x()
 	{
-		System.out.println("SSTASD");
+//		System.out.println("SSTASD");
 		return IFuture.DONE;
 	}
 

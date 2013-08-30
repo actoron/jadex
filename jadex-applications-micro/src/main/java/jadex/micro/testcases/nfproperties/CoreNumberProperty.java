@@ -7,10 +7,18 @@ import jadex.commons.future.IFuture;
 
 import java.util.Properties;
 
+/**
+ *  Non-functional property reporting the CPU core count.
+ *
+ */
 public class CoreNumberProperty extends AbstractNFProperty<Integer, Void>
 {
+	/** CPU core count. */
 	protected int cores;
 	
+	/**
+	 *  Create the property.
+	 */
 	public CoreNumberProperty()
 	{
 		super(new NFPropertyMetaInfo("cores", int.class, null, false, -1, null));
@@ -24,6 +32,9 @@ public class CoreNumberProperty extends AbstractNFProperty<Integer, Void>
 	}
 
 //	public IFuture<Integer> getValue(Class<Void> unit)
+	/**
+	 *  Returns the value.
+	 */
 	public IFuture<Integer> getValue(Void unit)
 	{
 		return new Future<Integer>(cores);

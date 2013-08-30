@@ -6,18 +6,26 @@ import jadex.bridge.sensor.unit.MemoryUnit;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+/**
+ *  Property simulating a random amount of free memory.
+ *
+ */
 public class FakeFreeMemoryProperty extends AbstractNFProperty<Long, MemoryUnit>
 {
-	long fakemem = (long) Math.round(Math.random() * 17179869184.0);
-	
+	/**
+	 * Creates the property.
+	 */
 	public FakeFreeMemoryProperty()
 	{
-		super(new NFPropertyMetaInfo("fakecpu", Long.class, MemoryUnit.class, false, -1, null));
+		super(new NFPropertyMetaInfo("fakefreemem", Long.class, MemoryUnit.class, true, 3000, null));
 	}
 	
+	/**
+	 *  Returns the property value.
+	 */
 	public IFuture<Long> getValue(MemoryUnit unit)
 	{
-		long ret = fakemem;
+		long ret = (long) Math.round(Math.random() * 17179869184.0);
 		if(unit!=null)
 		{
 			ret = unit.convert(ret);
