@@ -226,14 +226,16 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
+						System.out.println("ex on: "+getId());
+//						exception.printStackTrace();
 					}
 				}));
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				exception.printStackTrace();
+				System.out.println("ex on: "+getId());
+//				exception.printStackTrace();
 			}
 		});
 	}
