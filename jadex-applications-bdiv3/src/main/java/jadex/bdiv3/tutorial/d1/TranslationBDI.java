@@ -5,12 +5,9 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 
 import java.util.HashMap;
@@ -21,7 +18,7 @@ import java.util.Map;
  *  
  *  Using a translation goal.
  */
-@Description("Translation agent d1. <br>  This translation agent uses a subgoal.")
+@Description("Translation agent d1. <br>  This translation agent uses a top level goal.")
 @Agent
 public class TranslationBDI
 {
