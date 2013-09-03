@@ -152,7 +152,7 @@ public class ComposedEvaluator<S> implements IServiceEvaluator, IServiceRanker<S
 				{
 					public int compare(S s1, S s2)
 					{
-						return (int) -Math.signum(evalmap.get(s1) - evalmap.get(s2));
+						return (int)-Math.signum(evalmap.get(s1) - evalmap.get(s2));
 					}
 				});
 				ret.setResult(unrankedservices);
@@ -164,7 +164,65 @@ public class ComposedEvaluator<S> implements IServiceEvaluator, IServiceRanker<S
 			}
 		});
 		
-		for (int i = 0; i < unrankedservices.size(); ++i)
+		for(int i = 0; i < unrankedservices.size(); ++i)
+		{
+			final IService service = (IService) unrankedservices.get(i);
+			
+			evaluate(service).addResultListener(new IResultListener<Double>()
+			{
+				public void resultAvailable(Double result)
+				{
+					evalmap.put(service, result);
+					crl.resultAvailable(null);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					crl.exceptionOccurred(exception);
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Ranks services according to non-functional criteria.
+	 *  
+	 *  @param unrankedservices Unranked list of services.
+	 *  @return Ranked list of services and scores.
+	 */
+	public IFuture<List<Tuple2<S, Double>>> rankWithScores(final List<S> unrankedservices)
+	{
+		final Future<List<Tuple2<S, Double>>> ret = new Future<List<Tuple2<S, Double>>>();
+		final Map<IService, Double> evalmap = Collections.synchronizedMap(new HashMap<IService, Double>());
+		
+		final CounterResultListener<Void> crl = new CounterResultListener<Void>(unrankedservices.size(), new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				Collections.sort(unrankedservices, new Comparator<S>()
+				{
+					public int compare(S s1, S s2)
+					{
+						return (int)-Math.signum(evalmap.get(s1) - evalmap.get(s2));
+					}
+				});
+				List<Tuple2<S, Double>> evas = new ArrayList<Tuple2<S, Double>>();
+				for(S ser: unrankedservices)
+				{
+					evas.add(new Tuple2<S, Double>(ser, evalmap.get(ser)));
+				}
+				ret.setResult(evas);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		for(int i = 0; i < unrankedservices.size(); ++i)
 		{
 			final IService service = (IService) unrankedservices.get(i);
 			

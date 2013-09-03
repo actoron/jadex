@@ -61,15 +61,15 @@ public class TranslationBDI
 	@Goal(excludemode=ExcludeMode.Never)
 	public class MaintainStorageGoal
 	{
-		@GoalMaintainCondition
-		protected boolean maintain(@Event("egwords") Object event)
+		@GoalMaintainCondition(events="egwords")
+		protected boolean maintain()
 		{
 //			System.out.println("check maintain: "+egwords.size()+" "+(egwords.size()<=maxstorage));
 			return egwords.size()<=4;//maxstorage;
 		}
 		
-		@GoalTargetCondition
-		protected boolean target(@Event("egwords") Object event)
+		@GoalTargetCondition(events="egwords")
+		protected boolean target()
 		{
 //			System.out.println("check target: "+egwords.size()+" "+event);
 			return egwords.size()<3;
@@ -138,7 +138,7 @@ public class TranslationBDI
 	 *  Removal plan that remove one entry.
 	 */
 	@Plan(trigger=@Trigger(goals=MaintainStorageGoal.class))
-	protected void removeEntry(ChangeEvent event, RPlan rplan)
+	protected void removeEntry()
 	{
 		String key = egwords.keySet().iterator().next();
 		String val = egwords.remove(key);

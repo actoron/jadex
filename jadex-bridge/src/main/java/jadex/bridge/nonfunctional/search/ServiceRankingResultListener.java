@@ -1,12 +1,17 @@
 package jadex.bridge.nonfunctional.search;
 
+import jadex.commons.Tuple2;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public abstract class ServiceRankingResultListener<S> implements IIntermediateResultListener<S>
+/**
+ *  Listener that ranks results.
+ */
+public class ServiceRankingResultListener<S> implements IIntermediateResultListener<S>
 {
 	/** The saved results. */
 	protected List<S> results = new ArrayList<S>();
@@ -20,10 +25,31 @@ public abstract class ServiceRankingResultListener<S> implements IIntermediateRe
 	/** The termination decider. */
 	protected IRankingSearchTerminationDecider<S> decider;
 	
-	public ServiceRankingResultListener(IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider)
+	/** The delegate listener. */
+	protected IResultListener<Collection<S>> listener;
+	
+	/** The delegate listener. */
+	protected IResultListener<Collection<Tuple2<S, Double>>> scorelistener;
+
+	
+	/**
+	 *  Create a new ranker.
+	 */
+	public ServiceRankingResultListener(IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider, IResultListener<Collection<S>> listener)
 	{
 		this.ranker = ranker;
 		this.decider = decider;
+		this.listener = listener;
+	}
+	
+	/**
+	 *  Create a new ranker.
+	 */
+	public ServiceRankingResultListener(IResultListener<Collection<Tuple2<S, Double>>> scorelistener, IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider)
+	{
+		this.ranker = ranker;
+		this.decider = decider;
+		this.scorelistener = scorelistener;
 	}
 	
 	/**
@@ -31,47 +57,58 @@ public abstract class ServiceRankingResultListener<S> implements IIntermediateRe
 	 */
 	public void intermediateResultAvailable(S result)
 	{
-		if (!finished)
+		if(!finished)
 		{
 			results.add(result);
 			decider.isStartRanking(results, ranker instanceof IServiceEvaluator? (IServiceEvaluator) ranker : null).addResultListener(new IResultListener<Boolean>()
 			{
-				
 				public void resultAvailable(Boolean result)
 				{
-					if (!isFinished() && result)
+					if(!isFinished() && result)
 					{
-						finished = true;
 						rankResults();
 					}
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					finished = true;
-					ServiceRankingResultListener.this.exceptionOccurred(exception);
+					notifyException(exception);
 				}
 			});
 		}
-		
-		customIntermediateResultAvailable(result);
+		else
+		{
+			System.out.println("Ignoring late result: "+result);
+		}
+//		customIntermediateResultAvailable(result);
 	}
 	
 	/**
-	 *  Called when an intermediate result is available.
-	 * @param result The result.
+	 *  Called when result is available.
 	 */
-	public void customIntermediateResultAvailable(S result)
+	public void resultAvailable(Collection<S> result)
 	{
+		for(S res: result)
+		{
+			intermediateResultAvailable(res);
+		}
+		finished();
 	}
-
+	
+	/**
+	 *  Called when exception occurs.
+	 */
+	public void exceptionOccurred(Exception exception)
+	{
+		notifyException(exception);
+	}
+	
+	/**
+	 * 
+	 */
 	public void finished()
 	{
-		if (!isFinished())
-		{
-			finished = true;
-			rankResults();
-		}
+		rankResults();
 	}
 	
 	/**
@@ -83,19 +120,80 @@ public abstract class ServiceRankingResultListener<S> implements IIntermediateRe
 		return finished;
 	}
 	
+	/**
+	 *  Rank the results and announce them
+	 */
 	protected void rankResults()
 	{
-		ranker.rank(results).addResultListener(new IResultListener<List<S>>()
+		if(!isFinished())
 		{
-			public void resultAvailable(List<S> result)
+			ranker.rankWithScores(results).addResultListener(new IResultListener<List<Tuple2<S, Double>>>()
 			{
-				ServiceRankingResultListener.this.resultAvailable(result);
-			}
+				public void resultAvailable(List<Tuple2<S, Double>> result)
+				{
+					notifyResults(result);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					notifyException(exception);
+				}
+			});
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void notifyResults(List<Tuple2<S, Double>> results)
+	{
+		if(!isFinished())
+		{
+			finished = true;
 			
-			public void exceptionOccurred(Exception exception)
+			if(listener instanceof IIntermediateResultListener)
 			{
-				ServiceRankingResultListener.this.exceptionOccurred(exception);
+				IIntermediateResultListener<S> lis = (IIntermediateResultListener<S>)listener;
+				for(Tuple2<S, Double> res: results)
+				{
+					lis.intermediateResultAvailable(res.getFirstEntity());
+				}
+				lis.finished();
 			}
-		});
+			else if(listener!=null)
+			{
+				List<S> res = new ArrayList<S>();
+				for(Tuple2<S, Double> ser: results)
+				{
+					res.add(ser.getFirstEntity());
+				}
+				listener.resultAvailable(res);
+			}
+			else if(scorelistener instanceof IIntermediateResultListener)
+			{
+				IIntermediateResultListener<Tuple2<S, Double>> lis = (IIntermediateResultListener<Tuple2<S, Double>>)scorelistener;
+				for(int i=0; i<results.size(); i++)
+				{
+					lis.intermediateResultAvailable(results.get(i));
+				}
+				lis.finished();
+			}
+			else if(scorelistener!=null)
+			{
+				scorelistener.resultAvailable(results);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void notifyException(Exception exception)
+	{
+		if(!isFinished())
+		{
+			finished = true;
+			listener.exceptionOccurred(exception);
+		}
 	}
 }

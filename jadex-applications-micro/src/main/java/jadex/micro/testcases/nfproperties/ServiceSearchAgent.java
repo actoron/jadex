@@ -12,8 +12,10 @@ import jadex.bridge.sensor.unit.MemoryUnit;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -91,20 +93,36 @@ public class ServiceSearchAgent
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final IComponentStep<Void> step = this;
+//				SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(new ServiceRankingResultListener<ICoreDependentService>(ce, new CountThresholdSearchTerminationDecider<ICoreDependentService>(10), 
+//					new IResultListener<Collection<ICoreDependentService>>()
+//				{
+//					public void resultAvailable(Collection<ICoreDependentService> result)
+//					{
+//						System.out.println(Arrays.toString(((List<ICoreDependentService>) result).toArray()));
+//						agent.scheduleStep(step, SEARCH_DELAY);
+//					}
+//
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						exception.printStackTrace();
+//					}
+//				}));
+				
 				SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ServiceRankingResultListener<ICoreDependentService>(ce, new CountThresholdSearchTerminationDecider<ICoreDependentService>(10))
+					.addResultListener(new ServiceRankingResultListener<ICoreDependentService>(new IResultListener<Collection<Tuple2<ICoreDependentService, Double>>>()
 				{
-					public void resultAvailable(Collection<ICoreDependentService> result)
+					public void resultAvailable(Collection<Tuple2<ICoreDependentService, Double>> result)
 					{
-						System.out.println(Arrays.toString(((List<ICoreDependentService>) result).toArray()));
+						System.out.println(Arrays.toString(((List<Tuple2<ICoreDependentService, Double>>)result).toArray()));
 						agent.scheduleStep(step, SEARCH_DELAY);
 					}
-
+	
 					public void exceptionOccurred(Exception exception)
 					{
 						exception.printStackTrace();
 					}
-				});
+				}, ce, new CountThresholdSearchTerminationDecider<ICoreDependentService>(10))); 
 				
 				
 				return IFuture.DONE;
