@@ -126,7 +126,7 @@
 						<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
 						<sdk>
 							<path>${env.ANDROID_HOME}</path>
-							<platform>2.2</platform>
+							<platform>8</platform>
 						</sdk>
 						<undeployBeforeDeploy>true</undeployBeforeDeploy>
 						<generateApk>true</generateApk>
