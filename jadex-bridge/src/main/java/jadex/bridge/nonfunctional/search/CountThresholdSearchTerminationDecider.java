@@ -14,7 +14,6 @@ public class CountThresholdSearchTerminationDecider<S> implements IRankingSearch
 	
 	/**
 	 *  Creates the decider.
-	 *  
 	 *  @param threshold The threshold of found services after which the ranking starts.
 	 */
 	public CountThresholdSearchTerminationDecider(int threshold)
@@ -25,8 +24,7 @@ public class CountThresholdSearchTerminationDecider<S> implements IRankingSearch
 	/**
 	 *  Decides if the search should start ranking.
 	 */
-	public Future<Boolean> isStartRanking(Collection<S> currentresults,
-			IServiceEvaluator evaluator)
+	public Future<Boolean> isStartRanking(Collection<S> currentresults, IServiceEvaluator evaluator)
 	{
 		return new Future<Boolean>(currentresults.size() >= threshold);
 	}

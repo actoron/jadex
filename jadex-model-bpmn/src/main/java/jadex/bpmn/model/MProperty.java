@@ -112,13 +112,13 @@ public class MProperty extends MAnnotationElement
 	 */
 	public void setInitialValue(String initialval)
 	{
-		if (initialval == null)
+		if(initialval == null)
 		{
 			this.initialval.setValue(null);
 		}
 		else
 		{
-			if (this.initialval == null)
+			if(this.initialval == null)
 			{
 				this.initialval = new UnparsedExpression(name, clazz.getTypeName(), null, null);
 			}

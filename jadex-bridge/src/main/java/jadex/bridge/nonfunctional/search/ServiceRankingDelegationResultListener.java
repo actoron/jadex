@@ -46,24 +46,27 @@ public class ServiceRankingDelegationResultListener<S> extends TerminableInterme
 		if(!isFinished() && !isFinishing())
 		{			
 			results.add(result);
-			decider.isStartRanking(results, ranker instanceof IServiceEvaluator? (IServiceEvaluator) ranker : null).addResultListener(new IResultListener<Boolean>()
+			if(decider!=null)
 			{
-				public void resultAvailable(Boolean result)
+				decider.isStartRanking(results, ranker instanceof IServiceEvaluator? (IServiceEvaluator) ranker : null).addResultListener(new IResultListener<Boolean>()
 				{
-					if(!isFinished() && result)
+					public void resultAvailable(Boolean result)
 					{
-						if(Boolean.FALSE.equals(finished))
-							finished = null; // set finishing
-						
-						rankResults();
+						if(!isFinished() && result)
+						{
+							if(Boolean.FALSE.equals(finished))
+								finished = null; // set finishing
+							
+							rankResults();
+						}
 					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					notifyException(exception);
-				}
-			});
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						notifyException(exception);
+					}
+				});
+			}
 		}
 		else
 		{

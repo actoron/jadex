@@ -315,8 +315,8 @@ public class BasicService implements IInternalService
 			{
 				res.put(key, nfproperties.get(key).getMetaInfo());
 			}
-			ret.setResult(res);
 		}
+		ret.setResult(res);
 		
 		return ret;
 	}

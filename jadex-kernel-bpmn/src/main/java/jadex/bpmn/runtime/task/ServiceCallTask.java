@@ -18,7 +18,6 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.nonfunctional.search.IServiceEvaluator;
-import jadex.bridge.nonfunctional.search.IServiceRanker;
 import jadex.bridge.nonfunctional.search.ServiceRankingResultListener;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
@@ -65,7 +64,8 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  */
 @Task(description="The print task can be used for calling a component service.", properties={
 	@TaskProperty(name="service", clazz=String.class, description="The required service name."),
-	@TaskProperty(name="method", clazz=String.class, description="The required method name.")},
+	@TaskProperty(name="method", clazz=String.class, description="The required method name."),
+	@TaskProperty(name="ranking", clazz=String.class, description="The ranking class.")},
 	gui=@TaskPropertyGui(ServiceCallTaskGui.class)
 //	@TaskProperty(name="rebind", clazz=boolean.class, description="The rebind flag (forces a frsh search).")
 )
@@ -527,11 +527,6 @@ public class ServiceCallTask implements ITask
 			this.cl = cl;
 			PropertiesPanel pp = new PropertiesPanel();
 			
-			cbranking = new AutoCompleteCombo(null, cl);
-			final FixedClassInfoComboModel mo = new FixedClassInfoComboModel(cbranking, -1, new ArrayList<ClassInfo>(container.getAllClasses()));
-			cbranking.setModel(mo);
-			pp.addComponent("Ranking", cbranking);
-			
 			cbsername = pp.createComboBox("Required service name:", null);
 			cbmethodname = pp.createComboBox("Method name", null);
 			cbmethodname.setRenderer(new BasicComboBoxRenderer()
@@ -546,6 +541,11 @@ public class ServiceCallTask implements ITask
 					return super.getListCellRendererComponent(list, txt, index, isSelected, cellHasFocus);
 				}
 			});
+			
+			cbranking = new AutoCompleteCombo(null, cl);
+			final FixedClassInfoComboModel mo = new FixedClassInfoComboModel(cbranking, -1, new ArrayList<ClassInfo>(container.getAllClasses()));
+			cbranking.setModel(mo);
+			pp.addComponent("Ranking", cbranking);
 			
 			cbsername.addActionListener(new ActionListener()
 			{
@@ -596,6 +596,22 @@ public class ServiceCallTask implements ITask
 					UnparsedExpression uexp = new UnparsedExpression(null, 
 						String.class, method!=null? "\""+method.toString()+"\"": "null", null);
 					mprop.setInitialValue(uexp);
+				}
+			});
+			
+			cbranking.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ClassInfo ci = (ClassInfo)cbranking.getSelectedItem();
+					if(ci!=null)
+					{
+	//					System.out.println("setting: "+method);
+						MProperty mprop = task.getProperties().get(PROPERTY_RANKING);
+						UnparsedExpression uexp = new UnparsedExpression(null, 
+							String.class, ci!=null? "\""+ci.toString()+"\"": "null", null);
+						mprop.setInitialValue(uexp);
+					}
 				}
 			});
 			
@@ -661,9 +677,13 @@ public class ServiceCallTask implements ITask
 				}
 			}
 			
-//			cbranking.removeAllItems();
-//			final FixedClassInfoComboModel model = new FixedClassInfoComboModel(cbranking, -1, new ArrayList<ClassInfo>(container.getAllClasses()));
-//			cbranking.setModel(model);
+			mprop = task.getProperties().get(PROPERTY_RANKING);
+			if(mprop.getInitialValue()!=null)
+			{
+				String rankclname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
+				ClassInfo ci = new ClassInfo(rankclname);
+				cbranking.setSelectedItem(ci);
+			}
 		}
 		
 		/**

@@ -29,8 +29,6 @@ public class AService implements IAService
 		this.test = test;
 	}
 
-
-
 	/**
 	 *  Test method.
 	 */

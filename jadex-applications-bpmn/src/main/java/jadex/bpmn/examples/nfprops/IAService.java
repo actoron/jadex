@@ -1,4 +1,4 @@
-package jadex.bpmn.testcases;
+package jadex.bpmn.examples.nfprops;
 
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
@@ -13,5 +13,6 @@ public interface IAService
 	/**
 	 *  Test method.
 	 */
+	@NFProperties(@NFProperty(ExecutionTimeProperty.class))
 	public IFuture<String> test();
 }

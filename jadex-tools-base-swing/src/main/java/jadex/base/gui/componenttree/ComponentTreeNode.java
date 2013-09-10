@@ -689,7 +689,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 									for(int i=0; i<parentnode.getChildCount() && !ins; i++)
 									{
 										ISwingTreeNode child = parentnode.getChild(i);
-										if(child instanceof ServiceContainerNode)
+										if(child instanceof ServiceContainerNode || child instanceof NFPropertyContainerNode)
 											continue;
 										if(child.toString().toLowerCase().compareTo(node.toString().toLowerCase())>=0)
 										{

@@ -24,6 +24,11 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 		this(propertyname, null, unit);
 	}
 	
+	public BasicEvaluator(String propertyname, MethodInfo mi)
+	{
+		this(propertyname, mi, null);
+	}
+	
 	public BasicEvaluator(String propertyname, MethodInfo methodinfo, Object unit)
 	{
 		this.propertyname = propertyname;

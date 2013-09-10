@@ -60,21 +60,24 @@ public class ServiceRankingResultListener<S> implements IIntermediateResultListe
 		if(!finished)
 		{
 			results.add(result);
-			decider.isStartRanking(results, ranker instanceof IServiceEvaluator? (IServiceEvaluator) ranker : null).addResultListener(new IResultListener<Boolean>()
+			if(decider!=null)
 			{
-				public void resultAvailable(Boolean result)
+				decider.isStartRanking(results, ranker instanceof IServiceEvaluator? (IServiceEvaluator) ranker : null).addResultListener(new IResultListener<Boolean>()
 				{
-					if(!isFinished() && result)
+					public void resultAvailable(Boolean result)
 					{
-						rankResults();
+						if(!isFinished() && result)
+						{
+							rankResults();
+						}
 					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					notifyException(exception);
-				}
-			});
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						notifyException(exception);
+					}
+				});
+			}
 		}
 		else
 		{

@@ -1175,7 +1175,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //	}
 	
 	protected int cnt;
-	
 	/**
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.
@@ -1185,6 +1184,20 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public  <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
 		final Future<T> ret = new Future<T>();
+//		System.out.println("start: "+cnt);
+//		ret.addResultListener(new IResultListener<T>()
+//		{
+//			int mycnt = cnt;
+//			public void resultAvailable(T result)
+//			{
+//				System.out.println("ra: "+mycnt);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+mycnt);
+//			}
+//		});
 		// todo:
 		//final Future ret = createStepFuture(step);
 		// todo: use FutureFunctionality.connectDelegationFuture(future, res); 
