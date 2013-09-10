@@ -200,7 +200,7 @@ import java.util.logging.Level;
 		@NameValue(name="platformname", value="null")
 	}, components={
 		@Component(name="mon", type="monitor", daemon=true, number="$args.monitoringcomp? 1 : 0"),
-		@Component(name="extensions", type="extensions", daemon=true, number="$args.extensions!=null ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),
+		@Component(name="extensions", type="extensions", daemon=true, number="($args.extensions!=null && !jadex.commons.SReflect.isAndroid()) ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),
 		@Component(name="kernels", type="kernel_multi", daemon=true, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=true, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_component", type="kernel_component", daemon=true, number="$args.get(\"kernels\").indexOf(\"component\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
