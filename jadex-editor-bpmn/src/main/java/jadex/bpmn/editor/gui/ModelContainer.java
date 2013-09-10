@@ -978,7 +978,7 @@ public class ModelContainer implements IModelContainer
 //			allclasses = settings.getGlobalAllClasses();
 //		}
 		
-		if (model != null &&
+		if(model != null &&
 			model.getClassLoader() != null &&
 			model.getClassLoader() != settings.getLibraryClassLoader() &&
 			model.getClassLoader() != Settings.class.getClassLoader() &&

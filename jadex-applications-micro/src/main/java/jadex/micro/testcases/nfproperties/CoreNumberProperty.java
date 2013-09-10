@@ -24,11 +24,11 @@ public class CoreNumberProperty extends AbstractNFProperty<Integer, Void>
 		super(new NFPropertyMetaInfo("cores", int.class, null, false, -1, null));
 		cores = Runtime.getRuntime().availableProcessors();
 		
-		Properties props = System.getProperties();
-		for (Object key : props.keySet())
-		{
-			System.out.println(System.getProperty((String) key));
-		}
+//		Properties props = System.getProperties();
+//		for (Object key : props.keySet())
+//		{
+//			System.out.println(System.getProperty((String) key));
+//		}
 	}
 
 //	public IFuture<Integer> getValue(Class<Void> unit)

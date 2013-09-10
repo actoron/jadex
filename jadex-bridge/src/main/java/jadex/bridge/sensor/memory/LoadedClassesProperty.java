@@ -13,14 +13,14 @@ import java.lang.management.ManagementFactory;
 public class LoadedClassesProperty extends NFRootProperty<Integer, MemoryUnit>
 {
 	/** The name of the property. */
-	public static final String LOADEDCLASSES = "loaded classes";
+	public static final String NAME = "loaded classes";
 	
 	/**
 	 *  Create a new property.
 	 */
 	public  LoadedClassesProperty(final IInternalAccess comp)
 	{
-		super(comp, new NFPropertyMetaInfo(LOADEDCLASSES, int.class, null, 
+		super(comp, new NFPropertyMetaInfo(NAME, int.class, null, 
 			true, 5000, Target.Root));
 	}
 	

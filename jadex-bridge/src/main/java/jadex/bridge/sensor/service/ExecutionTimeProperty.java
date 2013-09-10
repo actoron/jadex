@@ -1,8 +1,6 @@
 package jadex.bridge.sensor.service;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
-import jadex.bridge.nonfunctional.SimpleValueNFProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.MethodInfo;
@@ -10,15 +8,16 @@ import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- *  Property for the waitqueue length (in calls) of a method or a service.
+ *  Property for the overall execution time of a method or a service.
  */
-public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
+public class ExecutionTimeProperty extends TimedProperty
 {
 	/** The name of the property. */
-	public static final String NAME = "wait queue length";
+	public static final String NAME = "waiting time";
 	
 	/** The handler. */
 	protected BasicServiceInvocationHandler handler;
@@ -32,9 +31,9 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	/**
 	 *  Create a new property.
 	 */
-	public WaitqueueProperty(IInternalAccess comp, IService service, MethodInfo method)
+	public ExecutionTimeProperty(IInternalAccess comp, IService service, MethodInfo method)
 	{
-		super(comp, new NFPropertyMetaInfo(NAME, int.class, Void.class, true, -1, null));
+		super(NAME, comp, true);
 		this.method = method;
 		
 		if(Proxy.isProxyClass(service.getClass()))
@@ -42,37 +41,59 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 			handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 			{
-				int cnt = 0;
+				Map<Long, Long> times = new HashMap<Long, Long>();
 				
 				public void methodCallStarted(Object proxy, Method method, Object[] args, long callid)
 				{
-//					System.out.println("started: "+method+" "+cnt);
-					setValue(new Integer(++cnt));
+					times.put(new Long(callid), new Long(System.currentTimeMillis()));
 				}
 				
 				public void methodCallFinished(Object proxy, Method method, Object[] args, long callid)
 				{
-//					System.out.println("ended: "+method+" "+cnt);
-					if(cnt>0)
-						--cnt;
-					setValue(new Integer(cnt));
+					Long start = times.remove(new Long(callid));
+					// May happen that property is added during ongoing call
+					if(start!=null)
+					{
+						long dur = System.currentTimeMillis() - start.longValue();
+						setValue(dur);
+					}
 				}
 			});
 			handler.addMethodListener(method, listener);
 		}
 		else
 		{
-			throw new RuntimeException("Cannot install wait queue listener hook.");
+			throw new RuntimeException("Cannot install waiting time listener hook.");
 		}
 	}
 	
 	/**
 	 *  Measure the value.
 	 */
-	public Integer measureValue()
+	public Long measureValue()
 	{
 		return null;
 //		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Set the value.
+	 */
+	public void setValue(Long value) 
+	{
+		// ema calculatio: EMAt = EMAt-1 +(SF*(Ct-EMAt-1)) SF=2/(n+1)
+		if(this.value!=null && value!=null)
+		{
+			double sf = 2d/(10d+1); // 10 periods per default
+			double delta = value-this.value;
+			value = new Long((long)(this.value+sf*delta));
+		}
+		
+		if(value!=null)
+		{
+//			System.out.println("Setting value: "+value);
+			super.setValue((long)value);
+		}
 	}
 	
 	/**

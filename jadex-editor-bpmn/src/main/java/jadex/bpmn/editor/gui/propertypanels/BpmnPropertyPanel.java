@@ -81,7 +81,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	protected String[] PROVIDED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Proxytype", "Implementation Class", "Implementation Expression" };
 	
 	/** The column names for the required services table. */
-	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Multiplex", "Scope" };
+	protected String[] REQUIRED_SERVICES_COLUMN_NAMES = { "Name", "Interface", "Multiple", "Scope" };
 	
 	/** The proxy types. */
 	protected String[] PROXY_TYPES = { BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,

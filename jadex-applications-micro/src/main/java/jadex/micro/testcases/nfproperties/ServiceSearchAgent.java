@@ -7,7 +7,6 @@ import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.nonfunctional.search.BasicEvaluator;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.nonfunctional.search.CountThresholdSearchTerminationDecider;
-import jadex.bridge.nonfunctional.search.ServiceRankingResultListener;
 import jadex.bridge.sensor.unit.MemoryUnit;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -16,6 +15,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -34,7 +34,8 @@ import java.util.List;
 @NFProperties({@NFProperty(FakeCpuLoadProperty.class),
 			   @NFProperty(FakeFreeMemoryProperty.class),
 			   @NFProperty(FakeNetworkBandwidthProperty.class),
-			   @NFProperty(FakeReliabilityProperty.class)})
+			   @NFProperty(FakeReliabilityProperty.class)
+})
 public class ServiceSearchAgent
 {
 	protected static final int SEARCH_DELAY = 1000;
@@ -109,8 +110,40 @@ public class ServiceSearchAgent
 //					}
 //				}));
 				
-				SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ServiceRankingResultListener<ICoreDependentService>(new IResultListener<Collection<Tuple2<ICoreDependentService, Double>>>()
+//				SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(new ServiceRankingResultListener<ICoreDependentService>(new IResultListener<Collection<Tuple2<ICoreDependentService, Double>>>()
+//				{
+//					public void resultAvailable(Collection<Tuple2<ICoreDependentService, Double>> result)
+//					{
+//						System.out.println(Arrays.toString(((List<Tuple2<ICoreDependentService, Double>>)result).toArray()));
+//						agent.scheduleStep(step, SEARCH_DELAY);
+//					}
+//	
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						exception.printStackTrace();
+//					}
+//				}, ce, new CountThresholdSearchTerminationDecider<ICoreDependentService>(10))); 
+				
+//				ITerminableIntermediateFuture<ICoreDependentService> fut = SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//				ITerminableIntermediateFuture<ICoreDependentService> res = SServiceProvider.rankServices(fut, ce, new CountThresholdSearchTerminationDecider<ICoreDependentService>(10));
+//				res.addResultListener(new IResultListener<Collection<ICoreDependentService>>()
+//				{
+//					public void resultAvailable(Collection<ICoreDependentService> result)
+//					{
+//						System.out.println(Arrays.toString(((List<ICoreDependentService>)result).toArray()));
+//						agent.scheduleStep(step, SEARCH_DELAY);
+//					}
+//	
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						exception.printStackTrace();
+//					}
+//				}); 
+				
+				ITerminableIntermediateFuture<ICoreDependentService> fut = SServiceProvider.getServices(agent.getServiceProvider(), ICoreDependentService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+				ITerminableIntermediateFuture<Tuple2<ICoreDependentService, Double>> res = SServiceProvider.rankServicesWithScores(fut, ce, new CountThresholdSearchTerminationDecider<ICoreDependentService>(10));
+				res.addResultListener(new IResultListener<Collection<Tuple2<ICoreDependentService, Double>>>()
 				{
 					public void resultAvailable(Collection<Tuple2<ICoreDependentService, Double>> result)
 					{
@@ -122,8 +155,7 @@ public class ServiceSearchAgent
 					{
 						exception.printStackTrace();
 					}
-				}, ce, new CountThresholdSearchTerminationDecider<ICoreDependentService>(10))); 
-				
+				});
 				
 				return IFuture.DONE;
 			}

@@ -553,7 +553,7 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				boolean	finished;
 				int cnt;
-				public void intermediateResultAvailable(final IChatService chat)
+				public void customIntermediateResultAvailable(final IChatService chat)
 				{
 					cnt++;
 					chat.message(nick, text, false).addResultListener(new IResultListener<Void>()
@@ -700,7 +700,7 @@ public class ChatService implements IChatService, IChatGuiService
 			{
 				boolean	finished;
 				int cnt	= 0;
-				public void intermediateResultAvailable(final IChatService chat)
+				public void customIntermediateResultAvailable(final IChatService chat)
 				{
 					cnt++;
 					chat.status(nick, status, image).addResultListener(new IResultListener<Void>()

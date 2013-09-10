@@ -34,9 +34,9 @@ public class AService implements IAService
 	/**
 	 *  Test method.
 	 */
-	public IFuture test()
+	public IFuture<String> test()
 	{
 		System.out.println("val: "+test);
-		return new Future(test);
+		return new Future<String>(test);
 	}
 }

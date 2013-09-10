@@ -11,14 +11,14 @@ import java.lang.management.MemoryPoolMXBean;
 public class UsedPermGenMemoryProperty extends MemoryProperty
 {
 	/** The name of the property. */
-	public static final String PERMGEN = "used permgen memory";
+	public static final String NAME = "used permgen memory";
 	
 	/**
 	 *  Create a new property.
 	 */
 	public UsedPermGenMemoryProperty(final IInternalAccess comp)
 	{
-		super(PERMGEN, comp, 5000);
+		super(NAME, comp, 5000);
 	}
 	
 	/**

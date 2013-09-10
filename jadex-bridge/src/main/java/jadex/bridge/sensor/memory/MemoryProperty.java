@@ -4,11 +4,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.NFRootProperty;
 import jadex.bridge.sensor.unit.MemoryUnit;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Abstract base memory property.
  */
 public abstract class MemoryProperty extends NFRootProperty<Long, MemoryUnit>
 {

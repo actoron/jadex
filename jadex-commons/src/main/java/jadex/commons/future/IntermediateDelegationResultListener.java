@@ -63,7 +63,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 *  Called when an intermediate result is available.
 	 *  @param result The result.
 	 */
-	public void intermediateResultAvailable(E result)
+	public final void intermediateResultAvailable(E result)
 	{
 		try
 		{

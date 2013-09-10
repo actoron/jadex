@@ -191,6 +191,12 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 							else
 							{
 								fut.setException(new RuntimeException("No relay addresses found."));
+//								{
+//									public void printStackTrace()
+//									{
+//										super.printStackTrace();
+//									}
+//								});
 							}
 						}
 					});
@@ -209,7 +215,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 					sending	= false;
 					if(!(exception instanceof ComponentTerminatedException))
 					{
-						exception.printStackTrace();
+//						exception.printStackTrace();
 						agent.getLogger().info("Sending awareness info to server...failed: "+exception);
 					}
 				}

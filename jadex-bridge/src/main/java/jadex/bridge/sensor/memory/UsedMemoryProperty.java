@@ -9,14 +9,14 @@ import jadex.commons.OperatingSystemMXBeanFacade;
 public class UsedMemoryProperty extends MemoryProperty
 {
 	/** The name of the property. */
-	public static final String USEDMEMORY = "used memory";
+	public static final String NAME = "used memory";
 	
 	/**
 	 *  Create a new property.
 	 */
 	public UsedMemoryProperty(final IInternalAccess comp)
 	{
-		super(USEDMEMORY, comp, 5000);
+		super(NAME, comp, 5000);
 	}
 	
 	/**

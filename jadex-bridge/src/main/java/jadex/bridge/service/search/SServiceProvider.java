@@ -2,7 +2,10 @@ package jadex.bridge.service.search;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.nonfunctional.IServiceSearchConstraints;
+import jadex.bridge.nonfunctional.search.IRankingSearchTerminationDecider;
+import jadex.bridge.nonfunctional.search.IServiceRanker;
+import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener;
+import jadex.bridge.nonfunctional.search.ServiceRankingDelegationResultListener2;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
@@ -10,6 +13,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IFilter;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -714,6 +718,28 @@ public class SServiceProvider
 //		
 //		return ret;
 //	}
+	
+	/**
+	 *  Rank the services of a search with a specific ranker.
+	 */
+	public static <S> ITerminableIntermediateFuture<S> rankServices(ITerminableIntermediateFuture<S> searchfut, 
+		IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider)
+	{
+		TerminableIntermediateDelegationFuture<S> ret = new TerminableIntermediateDelegationFuture<S>();
+		searchfut.addResultListener(new ServiceRankingDelegationResultListener<S>(ret, searchfut, ranker, decider));
+		return ret;
+	}
+	
+	/**
+	 *  Rank the services of a search with a specific ranker and emit the scores.
+	 */
+	public static <S> ITerminableIntermediateFuture<Tuple2<S, Double>> rankServicesWithScores(ITerminableIntermediateFuture<S> searchfut, 
+		IServiceRanker<S> ranker, IRankingSearchTerminationDecider<S> decider)
+	{
+		TerminableIntermediateDelegationFuture<Tuple2<S, Double>> ret = new TerminableIntermediateDelegationFuture<Tuple2<S, Double>>();
+		searchfut.addResultListener(new ServiceRankingDelegationResultListener2<S>(ret, searchfut, ranker, decider));
+		return ret;
+	}
 	
 	/**
 	 *  Get the fitting visit decider.

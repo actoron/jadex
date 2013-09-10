@@ -10,5 +10,5 @@ public interface IAService
 	/**
 	 *  Test method.
 	 */
-	public IFuture test();
+	public IFuture<String> test();
 }

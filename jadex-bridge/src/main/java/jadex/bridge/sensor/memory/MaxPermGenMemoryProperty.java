@@ -11,14 +11,14 @@ import java.lang.management.MemoryPoolMXBean;
 public class MaxPermGenMemoryProperty extends MemoryProperty
 {
 	/** The name of the property. */
-	public static final String MAXPERMGEN = "max permgen memory";
+	public static final String NAME = "max permgen memory";
 	
 	/**
 	 *  Create a new property.
 	 */
 	public MaxPermGenMemoryProperty(final IInternalAccess comp)
 	{
-		super(MAXPERMGEN, comp, -1);
+		super(NAME, comp, -1);
 	}
 	
 	/**

@@ -31,6 +31,12 @@ public interface IModelContainer
 	public List<ClassInfo> getInterfaces();
 	
 	/**
+	 *  Get all classes.
+	 *  @return all classes.
+	 */
+	public List<ClassInfo> getAllClasses();
+	
+	/**
 	 *  Returns the BPMN model.
 	 *  @return BPMN model.
 	 */

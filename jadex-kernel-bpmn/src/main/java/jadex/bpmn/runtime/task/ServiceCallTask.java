@@ -16,13 +16,20 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.search.ComposedEvaluator;
+import jadex.bridge.nonfunctional.search.IServiceEvaluator;
+import jadex.bridge.nonfunctional.search.IServiceRanker;
+import jadex.bridge.nonfunctional.search.ServiceRankingResultListener;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.gui.autocombo.AutoCompleteCombo;
+import jadex.commons.gui.autocombo.FixedClassInfoComboModel;
 import jadex.javaparser.SJavaParser;
 
 import java.awt.Component;
@@ -34,10 +41,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.ServiceNotFoundException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -70,6 +79,9 @@ public class ServiceCallTask implements ITask
 	/** Property for method name. */
 	public static final String PROPERTY_METHOD	= "method"; 
 	
+	/** Property for ranking class name. */
+	public static final String PROPERTY_RANKING	= "ranking"; 
+	
 	//-------- ITask interface --------
 	
 
@@ -84,6 +96,7 @@ public class ServiceCallTask implements ITask
 		final Future<Void>	ret	= new Future<Void>();
 		String	service	= (String)context.getPropertyValue(PROPERTY_SERVICE);
 		String	method	= (String)context.getPropertyValue(PROPERTY_METHOD);
+		String	rank	= (String)context.getPropertyValue(PROPERTY_RANKING);
 		String	resultparam	= null;
 		
 		// Collect arguments and settings.
@@ -150,69 +163,118 @@ public class ServiceCallTask implements ITask
 		final String	fservice	= service;
 		final String	fmethod	= method;
 		final String	fresultparam	= resultparam;
-		process.getServiceContainer().getRequiredService(service)
-			.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		
+		if(rank!=null) //|| multiple)
 		{
-			public void customResultAvailable(Object result)
+			try
 			{
-				Class<?> servicetype = process.getServiceContainer().getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader());
-				Method[] methods = servicetype.getMethods();
-				Method m = null;
-				for (Method method : methods)
+				Class<?> evacl = SReflect.findClass(rank, process.getModel().getAllImports(), process.getClassLoader());
+				IServiceEvaluator eval = (IServiceEvaluator)evacl.newInstance();
+				ComposedEvaluator<Object> ranker = new ComposedEvaluator<Object>();
+				ranker.addEvaluator(eval);
+				
+				process.getServiceContainer().getRequiredServices(service)
+					.addResultListener(new ServiceRankingResultListener<Object>(ranker, null, 
+					new ExceptionDelegationResultListener<Collection<Object>, Void>(ret)
 				{
-					if (method.toString().equals(fmethod))
+					public void customResultAvailable(Collection<Object> results)
 					{
-						m = method;
-						break;
-					}
-				}
-//				SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
-				if(m==null)
-				{
-					throw new RuntimeException("SCT: "+ String.valueOf(process.getModel().getFilename()) + " Method "+fmethod+argtypes+" not found for service "+fservice+": "+context);
-				}
-				try
-				{
-					Object	val	= m.invoke(result, args.toArray());
-					if(val instanceof IFuture)
-					{
-						((IFuture<Object>)val).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+						if(results.isEmpty())
 						{
-							public void customResultAvailable(Object result)
-							{
-								if(fresultparam!=null)
-									context.setParameterValue(fresultparam, result);
-								ret.setResult(null);
-							}
-						});
+							ret.setException(new ServiceNotFoundException(fservice));
+						}
+						else
+						{
+							invokeService(process, fmethod, fservice, fresultparam, args, context, results.iterator().next())
+								.addResultListener(new DelegationResultListener<Void>(ret));
+						}
 					}
-					else
+				}));
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			process.getServiceContainer().getRequiredService(service)
+				.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					invokeService(process, fmethod, fservice, fresultparam, args, context, result).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> invokeService(final IInternalAccess process, String fmethod, String fservice, final String fresultparam, 
+		List<Object> args, final ITaskContext context, Object service)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		Class<?> servicetype = process.getServiceContainer().getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader());
+		Method[] methods = servicetype.getMethods();
+		Method m = null;
+		for(Method method : methods)
+		{
+			if(method.toString().equals(fmethod))
+			{
+				m = method;
+				break;
+			}
+		}
+//				SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
+		if(m==null)
+		{
+			throw new RuntimeException("SCT: "+ String.valueOf(process.getModel().getFilename()) + " Method "+fmethod+" not found for service "+fservice+": "+context);
+		}
+		try
+		{
+			Object	val	= m.invoke(service, args.toArray());
+			if(val instanceof IFuture)
+			{
+				((IFuture<Object>)val).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+				{
+					public void customResultAvailable(Object result)
 					{
 						if(fresultparam!=null)
-							context.setParameterValue(fresultparam, val);
+							context.setParameterValue(fresultparam, result);
 						ret.setResult(null);
 					}
-				}
-				catch(InvocationTargetException ite)
-				{
-					ret.setException((Exception)ite.getTargetException());
-				}
-				catch(IllegalArgumentException e)
-				{
-					Class<?>[] types = new Class<?>[args.size()];
-					for (int i = 0; i < args.size(); ++i)
-					{
-						types[i] = args.get(i) != null? args.get(i).getClass() : null;
-					}
-					System.err.println("Argument mismatch: " + fmethod + "\n input=" + Arrays.toString(types));
-					ret.setException(e);
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);					
-				}
+				});
 			}
-		});
+			else
+			{
+				if(fresultparam!=null)
+					context.setParameterValue(fresultparam, val);
+				ret.setResult(null);
+			}
+		}
+		catch(InvocationTargetException ite)
+		{
+			ret.setException((Exception)ite.getTargetException());
+		}
+		catch(IllegalArgumentException e)
+		{
+			Class<?>[] types = new Class<?>[args.size()];
+			for (int i = 0; i < args.size(); ++i)
+			{
+				types[i] = args.get(i) != null? args.get(i).getClass() : null;
+			}
+			System.err.println("Argument mismatch: " + fmethod + "\n input=" + Arrays.toString(types));
+			ret.setException(e);
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);					
+		}
 		
 		return ret;
 	}
@@ -448,15 +510,27 @@ public class ServiceCallTask implements ITask
 		/** The combo box for the method name. */
 		protected JComboBox cbmethodname;
 		
+		/** The combo box for the ranking. */
+		protected AutoCompleteCombo cbranking;
+		
+		/** The container. */
+		protected IModelContainer container;
+		
 		/**
 		 *  Once called to init the component.
 		 */
 		public void init(final IModelContainer container, final MActivity task, final ClassLoader cl)
 		{
+			this.container = container;
 			this.model = container.getBpmnModel().getModelInfo();
 			this.task = task;
 			this.cl = cl;
 			PropertiesPanel pp = new PropertiesPanel();
+			
+			cbranking = new AutoCompleteCombo(null, cl);
+			final FixedClassInfoComboModel mo = new FixedClassInfoComboModel(cbranking, -1, new ArrayList<ClassInfo>(container.getAllClasses()));
+			cbranking.setModel(mo);
+			pp.addComponent("Ranking", cbranking);
 			
 			cbsername = pp.createComboBox("Required service name:", null);
 			cbmethodname = pp.createComboBox("Method name", null);
@@ -586,6 +660,10 @@ public class ServiceCallTask implements ITask
 					}
 				}
 			}
+			
+//			cbranking.removeAllItems();
+//			final FixedClassInfoComboModel model = new FixedClassInfoComboModel(cbranking, -1, new ArrayList<ClassInfo>(container.getAllClasses()));
+//			cbranking.setModel(model);
 		}
 		
 		/**

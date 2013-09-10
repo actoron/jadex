@@ -11,14 +11,14 @@ import jadex.commons.OperatingSystemMXBeanFacade;
 public class CPULoadProperty extends NFRootProperty<Double, Void>
 {
 	/** The name of the property. */
-	public static final String CPULOAD = "cpu load";
+	public static final String NAME = "cpu load";
 	
 	/**
 	 *  Create a new property.
 	 */
 	public CPULoadProperty(final IInternalAccess comp)
 	{
-		super(comp, new NFPropertyMetaInfo(CPULOAD, double.class, null, true, 10000, Target.Root));
+		super(comp, new NFPropertyMetaInfo(NAME, double.class, null, true, 10000, Target.Root));
 	}
 	
 	/**

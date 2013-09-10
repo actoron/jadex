@@ -1,4 +1,4 @@
-package jadex.micro.testcases.nfmethodprop;
+package jadex.platform.service.nfmethodprops;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;

@@ -17,7 +17,7 @@ import java.util.Map;
 public class WaitingTimeProperty extends TimedProperty
 {
 	/** The name of the property. */
-	public static final String WAITINGTIME = "waiting time";
+	public static final String NAME = "waiting time";
 	
 	/** The handler. */
 	protected BasicServiceInvocationHandler handler;
@@ -33,7 +33,7 @@ public class WaitingTimeProperty extends TimedProperty
 	 */
 	public WaitingTimeProperty(IInternalAccess comp, IService service, MethodInfo method)
 	{
-		super(WAITINGTIME, comp, true);
+		super(NAME, comp, true);
 		this.method = method;
 		
 		if(Proxy.isProxyClass(service.getClass()))

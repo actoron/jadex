@@ -1,11 +1,17 @@
-package jadex.micro.testcases.nfmethodprop;
+package jadex.platform.service.nfmethodprops;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.sensor.service.ExecutionTimeProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.MethodInfo;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -17,6 +23,7 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.platform.service.servicepool.IServicePoolService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -27,9 +34,15 @@ import java.util.List;
  */
 @Agent
 @Service
-@RequiredServices(@RequiredService(name="testser", type=ITestService.class, 
-	binding=@Binding(create=true, creationinfo=@CreationInfo(type="provider"))))
-@ComponentTypes(@ComponentType(name="provider", filename="jadex.micro.testcases.nfmethodprop.ProviderAgent.class"))
+@RequiredServices(
+{
+	@RequiredService(name="poolser", type=IServicePoolService.class, binding=@Binding(
+		scope=RequiredServiceInfo.SCOPE_COMPONENT, create=true, 
+		creationinfo=@CreationInfo(type="spa"))),
+	@RequiredService(name="testser", type=ITestService.class, 
+		binding=@Binding(create=true, creationinfo=@CreationInfo(type="provider")))
+})
+@ComponentTypes(@ComponentType(name="spa", filename="jadex.platform.service.servicepool.ServicePoolAgent.class"))
 @Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
 public class UserAgent
 {
@@ -37,12 +50,32 @@ public class UserAgent
 	@Agent
 	protected MicroAgent agent;
 	
+//	/**
+//	 *  The agent body. 
+//	 */
+//	@AgentBody
+//	public void body()
+//	{
+//		registerServices().get();
+//		
+//		ITestService ser = (ITestService)agent.getServiceContainer().getRequiredService("testser").get();
+//		
+//		for(int i=0; i<100; i++)
+//		{
+//			ser.methodA(500).get();
+//			
+//			ser.methodB(1000).get();
+//		}
+//	}
+	
 	/**
 	 *  The agent body. 
 	 */
 	@AgentBody
 	public void body()
 	{
+		registerServices().get();
+		
 		ITestService ser = (ITestService)agent.getServiceContainer().getRequiredService("testser").get();
 		
 		final List<TestReport> results = new ArrayList<TestReport>();
@@ -107,6 +140,25 @@ public class UserAgent
 		agent.setResultValue("testresults", new Testcase(results.size(), 
 			(TestReport[])results.toArray(new TestReport[results.size()])));
 		agent.killAgent();
+	}
+	
+	/**
+	 *  Register services at the service pool service.
+	 */
+	public IFuture<Void> registerServices()
+	{
+		final Future<Void> ret = new Future<Void>();
+		IFuture<IServicePoolService> fut = agent.getRequiredService("poolser");
+		fut.addResultListener(new ExceptionDelegationResultListener<IServicePoolService, Void>(ret)
+		{
+			public void customResultAvailable(final IServicePoolService sps)
+			{
+				sps.addServiceType(ITestService.class, new DefaultPoolStrategy(5, 35000, 10), ProviderAgent.class.getName()+".class")
+					.addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+			
+		return ret;
 	}
 }
 

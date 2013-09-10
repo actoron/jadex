@@ -9,14 +9,14 @@ import jadex.commons.OperatingSystemMXBeanFacade;
 public class MaxMemoryProperty extends MemoryProperty
 {
 	/** The name of the property. */
-	public static final String MAXMEMORY = "max memory";
+	public static final String NAME = "max memory";
 	
 	/**
 	 *  Create a new property.
 	 */
 	public MaxMemoryProperty(final IInternalAccess comp)
 	{
-		super(MAXMEMORY, comp, -1);
+		super(NAME, comp, -1);
 	}
 	
 	/**
