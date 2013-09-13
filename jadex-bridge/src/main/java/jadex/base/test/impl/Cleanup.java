@@ -1,18 +1,19 @@
 package jadex.base.test.impl;
 
 
-import java.util.TimerTask;
-
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.ThreadSuspendable;
-import junit.framework.Test;
+
+import java.util.TimerTask;
+
+import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 /**
  *  This test kills the platform.
  *  Used as last test in the component test suite for cleanup.
  */
-public class Cleanup implements	Test
+public class Cleanup extends TestCase
 {
 	//-------- attributes --------
 	
@@ -29,6 +30,7 @@ public class Cleanup implements	Test
 	 */
 	public Cleanup(IExternalAccess platform, TimerTask timer)
 	{
+		super("Cleanup");
 		this.platform	= platform;
 		this.timer	= timer;
 	}

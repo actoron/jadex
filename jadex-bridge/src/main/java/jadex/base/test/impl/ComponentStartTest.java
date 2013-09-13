@@ -8,15 +8,13 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ThreadSuspendable;
-
-
-import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 /**
  *  Test if a component can be started.
  */
-public class ComponentStartTest implements	Test
+public class ComponentStartTest extends	TestCase
 {
 	//-------- attributes --------
 	

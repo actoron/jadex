@@ -3674,6 +3674,14 @@ public class SUtil
 		 * @throws MalformedURLException
 		 */
 		URL urlFromApkPath(String defaultAppPath) throws MalformedURLException;
+
+		/**
+		 * Get all Classes in a dex file as Enumeration.
+		 * @param dexFile the dex file
+		 * @return Enumeration of full-qualified classnames
+		 * @throws IOException
+		 */
+		Enumeration<String> getDexEntries(File dexFile) throws IOException;
 	}
 	
 	/**

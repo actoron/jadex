@@ -1,12 +1,16 @@
 package jadex.android.commons;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import dalvik.system.DexClassLoader;
+import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
 import jadex.bridge.service.types.library.ISimpleDelegationClassLoader;
 import jadex.commons.SUtil.AndroidUtils;
@@ -151,5 +155,13 @@ public class AndroidUtilsImpl implements AndroidUtils
 	{
 		return new URL("file", "localhost,", apkPath);
 	}
+
+	@Override
+	public Enumeration<String> getDexEntries(File dexFile) throws IOException
+	{
+		return new DexFile(dexFile).entries();
+	}
+	
+	
 
 }

@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="3" android:versionName="2.2" package="jadex.android.exampleproject.test">
-	<uses-sdk android:minSdkVersion="8"/>
-	<uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-	
-	<uses-permission android:name="android.permission.RUN_INSTRUMENTATION"/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="jadex.android.test"
+    android:versionCode="3"
+    android:versionName="2.2" >
+
+    <uses-sdk android:minSdkVersion="8" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <instrumentation
+        android:name="jadex.android.test.JadexInstrumentor"
+        android:targetPackage="jadex.android.test"
+         />
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="jadex.android.exampleproject" />
+        android:targetPackage="jadex.android.testlauncher" />
 
-    	<application>
-		<uses-library android:name="android.test.runner" />
-	</application>
-	
-	
+    <application>
+        <uses-library android:name="android.test.runner" />
+    </application>
+
 </manifest>

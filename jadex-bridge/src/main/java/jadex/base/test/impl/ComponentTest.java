@@ -15,13 +15,13 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import junit.framework.AssertionFailedError;
-import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 /**
  *  Test a component.
  */
-public class ComponentTest implements	Test
+public class ComponentTest extends TestCase
 {
 	//-------- attributes --------
 	

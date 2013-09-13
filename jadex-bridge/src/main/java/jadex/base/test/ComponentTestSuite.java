@@ -16,12 +16,16 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +108,17 @@ public class ComponentTestSuite extends TestSuite
 	{
 		super(path.toString());
 		
+		if (SReflect.isAndroid()) {
+			String[] newargs = new String[args.length+2];
+			for (int i = 0; i < args.length; i++)
+			{
+				newargs[i] = args[i];
+			}
+			newargs[args.length] = "-kernels";
+			newargs[args.length] = "micro,component";
+			args = newargs;
+		}
+		
 		final Thread	runner	= Thread.currentThread();
 		
 		TimerTask	timer	= null;
@@ -115,7 +130,12 @@ public class ComponentTestSuite extends TestSuite
 				{
 					aborted	= true;
 //					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
-					runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
+					if (!SReflect.isAndroid()) {
+						runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
+					} else {
+						System.err.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
+						System.exit(1);
+					}
 				}
 			};
 			new Timer(true).schedule(timer, timeout);
@@ -145,99 +165,169 @@ public class ComponentTestSuite extends TestSuite
 		}
 		
 		// Scan for test cases.
+		List<String> scanForTestCases = scanForTestCases(root, path, excludes);
+		for (String abspath : scanForTestCases)
+		{	
+			String testName = new File(abspath).getName();
+			if (SReflect.isAndroid()) {
+				abspath = abspath.replaceAll("\\.", "/") + ".class";
+			}
+			if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, rid).get(ts)).booleanValue())
+			{
+				if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, rid).get(ts)).booleanValue())
+				{
+					System.out.println("Building TestCase: " + abspath);
+					try
+					{
+						IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, rid).get(ts);
+						boolean istest = false;
+						if(model!=null && model.getReport()==null)
+						{
+							IArgument[]	results	= model.getResults();
+							for(int i=0; !istest && i<results.length; i++)
+							{
+								if(results[i].getName().equals("testresults") && Testcase.class.equals(
+									results[i].getClazz().getType(libsrv.getClassLoader(rid).get(ts), model.getAllImports())))
+								{
+									istest	= true;
+								}
+							}
+						}
+						
+						if(istest)
+						{
+							ComponentTest test = new ComponentTest(cms, model, this);
+							test.setName(testName);
+							addTest(test);
+						}
+						else if(model.getReport()!=null)
+						{
+							if(broken)
+							{
+								BrokenComponentTest test = new BrokenComponentTest(abspath, model.getReport());
+								test.setName(testName);
+								addTest(test);
+							}
+						}
+						else
+						{
+							if(start)
+							{
+								ComponentStartTest test = new ComponentStartTest(cms, model, this);
+								test.setName(testName);
+								addTest(test);
+							}
+						}
+					}
+					catch(final RuntimeException e)
+					{
+						BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
+						{
+							public String getErrorText()
+							{
+								return "Error loading model: "+e;
+							}
+							
+							public String getErrorHTML()
+							{
+								return getErrorText();
+							}
+							
+							public Map<String, String> getDocuments()
+							{
+								return null;
+							}
+						});
+						test.setName(testName);
+						addTest(test);							
+					}
+				} else {
+//					System.out.println("Not startable : " + abspath);
+				}
+			} else {
+//				System.out.println("Not loadable : " + abspath);
+			}
+		}
+		
+		// Hack!!! Isn't there some tearDown for the test suite?
+		addTest(new Cleanup(rootcomp, timer));
+		System.out.println("Finished Building Suite for " + root);
+		try
+		{
+			Thread.sleep(5000);
+		}
+		catch (InterruptedException e1)
+		{
+			e1.printStackTrace();
+		}
+	}
+
+	private List<String> scanForTestCases(File root, File path, String[] excludes)
+	{
+		List<String> result = new ArrayList<String>();
+		
 		List<File>	todo	= new LinkedList<File>();
 		todo.add(path);
 //		System.out.println("Path: "+path);
-		while(!todo.isEmpty())
+		
+		if (SReflect.isAndroid())
 		{
-			File	file	= (File)todo.remove(0);
-			final String	abspath	= file.getAbsolutePath();
-//			System.out.println("todo: "+abspath);
-			boolean	exclude	= false;
-			
-//			exclude	= !file.isDirectory() && (abspath.indexOf("threading")==-1 || abspath.indexOf("Initiator")==-1);
-			
-			for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
+			try
 			{
-				exclude	= abspath.indexOf(excludes[i])!=-1;
-			}
-			
-			if(!exclude)
-			{
-				if(file.isDirectory())
-				{
-					File[]	subs	= file.listFiles();
-					todo.addAll(Arrays.asList(subs));
-				}
-				else
-				{
-					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, rid).get(ts)).booleanValue())
-					{
-						if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, rid).get(ts)).booleanValue())
+				Enumeration<String> dexEntries = SUtil.androidUtils().getDexEntries(root);
+				String nextElement;
+				while (dexEntries.hasMoreElements()) {
+					nextElement = dexEntries.nextElement();
+					if (nextElement.toLowerCase().startsWith(path.toString().toLowerCase())) {
+						boolean	exclude	= false;
+						for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
 						{
-							try
-							{
-								IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, rid).get(ts);
-								boolean istest = false;
-								if(model!=null && model.getReport()==null)
-								{
-									IArgument[]	results	= model.getResults();
-									for(int i=0; !istest && i<results.length; i++)
-									{
-										if(results[i].getName().equals("testresults") && Testcase.class.equals(
-											results[i].getClazz().getType(libsrv.getClassLoader(rid).get(ts), model.getAllImports())))
-										{
-											istest	= true;
-										}
-									}
-								}
-								
-								if(istest)
-								{
-									addTest(new ComponentTest(cms, model, this));
-								}
-								else if(model.getReport()!=null)
-								{
-									if(broken)
-									{
-										addTest(new BrokenComponentTest(abspath, model.getReport()));
-									}
-								}
-								else
-								{
-									if(start)
-									{
-										addTest(new ComponentStartTest(cms, model, this));
-									}
-								}
-							}
-							catch(final RuntimeException e)
-							{
-								addTest(new BrokenComponentTest(abspath, new IErrorReport()
-								{
-									public String getErrorText()
-									{
-										return "Error loading model: "+e;
-									}
-									
-									public String getErrorHTML()
-									{
-										return getErrorText();
-									}
-									
-									public Map<String, String> getDocuments()
-									{
-										return null;
-									}
-								}));							
-							}
+							exclude	= nextElement.indexOf(excludes[i])!=-1;
 						}
+						if (!exclude) {
+							result.add(nextElement);
+							System.out.println("Found Testcase: " + nextElement);
+						}
+					}
+				}
+				
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		} else {
+		
+			while(!todo.isEmpty())
+			{
+				File	file	= (File)todo.remove(0);
+				final String	abspath	= file.getAbsolutePath();
+	//			System.out.println("todo: "+abspath);
+				boolean	exclude	= false;
+				
+	//			exclude	= !file.isDirectory() && (abspath.indexOf("threading")==-1 || abspath.indexOf("Initiator")==-1);
+				
+				for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
+				{
+					exclude	= abspath.indexOf(excludes[i])!=-1;
+				}
+				
+				if(!exclude)
+				{
+					if(file.isDirectory())
+					{
+						File[]	subs	= file.listFiles();
+						todo.addAll(Arrays.asList(subs));
+					}
+					else
+					{
+						result.add(abspath);
 					}
 				}
 			}
 		}
-		// Hack!!! Isn't there some tearDown for the test suite?
-		addTest(new Cleanup(rootcomp, timer));
+		return result;
+		
 	}
 
 	/**

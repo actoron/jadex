@@ -3,13 +3,13 @@ package jadex.base.test.impl;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.modelinfo.IModelInfo;
-import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 /**
  *  Test a component.
  */
-public class BrokenComponentTest implements	Test
+public class BrokenComponentTest extends	TestCase
 {
 	//-------- attributes --------
 	

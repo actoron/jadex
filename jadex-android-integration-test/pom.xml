@@ -6,18 +6,25 @@
 	<packaging>apk</packaging>
 	<name>jadex-android-integration-test</name>
 
+	<description>
+	Provides an entry point for unit tests on android.
+	Example project MUST be installed for this to work. 
+	(see http://code.google.com/p/maven-android-plugin/issues/detail?id=142)
+	</description>
+
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
 		<version> 2.4-SNAPSHOT </version>
 		<relativePath>../jadex-android-parent/</relativePath>
 	</parent>
-	
+
 	<properties>
 		<emulator.timeout>100000</emulator.timeout>
 	</properties>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android-test</artifactId>
@@ -31,62 +38,15 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.12.1.GA</version>
-			<scope>provided</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
+<!-- 			<artifactId>jadex-android-commons</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 			<scope>provided</scope> -->
+<!-- 		</dependency> -->
 
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-platform-android</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-commons</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
 
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-runtimetools-android</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
 
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-xmlpull</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-antlr</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-example-project-maven</artifactId>
-			<version>${project.version}</version>
-			<type>apk</type>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-example-project-maven</artifactId>
-			<version>${project.version}</version>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>com.jayway.android.robotium</groupId>
@@ -94,34 +54,75 @@
 			<version>3.3</version>
 			<type>jar</type>
 		</dependency>
+
+
+		<!-- <dependency> -->
+		<!-- <groupId>net.sourceforge.jadex</groupId> -->
+		<!-- <artifactId>jadex-android-testlauncher</artifactId> -->
+		<!-- <version>${project.version}</version> -->
+		<!-- <type>apk</type> -->
+		<!-- <scope>provided</scope> -->
+		<!-- </dependency> -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>net.sourceforge.jadex</groupId> -->
+		<!-- <artifactId>jadex-android-testlauncher</artifactId> -->
+		<!-- <version>${project.version}</version> -->
+		<!-- <type>jar</type> -->
+		<!-- <scope>provided</scope> -->
+		<!-- </dependency> -->
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-platformapp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-micro</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
 		<plugins>
+
 			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
 				<configuration>
 					<emulator>
 						<!-- name of the avd to deploy to and run the instrumentation on -->
-						<avd>22</avd>
+						<avd>23</avd>
 						<!-- wait time for the emulator to start -->
 						<wait>${emulator.timeout}</wait>
 						<!-- additional options to run the emulator with -->
-						<options>-partition-size 128 -wipe-data</options>
+						<!-- <options>-partition-size 128 -wipe-data</options> -->
 					</emulator>
 					<undeployBeforeDeploy>true</undeployBeforeDeploy>
 					<sdk>
 						<path>${env.ANDROID_HOME}</path>
-						<platform>2.2</platform>
+						<platform>10</platform>
 					</sdk>
 					<extensions>true</extensions>
 					<test>
-						<instrumentationPackage>jadex.android.exampleproject.test
-						</instrumentationPackage>
-						<instrumentationRunner>android.test.InstrumentationTestRunner
-						</instrumentationRunner>
-						<debug>false</debug>
+						<!-- <instrumentationPackage>jadex.android.test -->
+						<!-- </instrumentationPackage> -->
+						<!-- <instrumentationRunner>JadexTestRunner -->
+						<!-- </instrumentationRunner> -->
+						<debug>true</debug>
 					</test>
 					<manifest>
 						<versionName></versionName>
@@ -153,18 +154,18 @@
 						</goals>
 					</execution>
 
-					<execution>
+					<!-- <execution> -->
 					<!-- android plugin execution that stops the emulator. -->
-					    <id>stopemulator</id>
-					    <!-- bound to the 'install' phase -->
-					    <phase>install</phase>
-					    <goals>
-					        <goal>emulator-stop</goal>
-					    </goals>
-					</execution>
+					<!-- <id>stopemulator</id> -->
+					<!-- bound to the 'install' phase -->
+					<!-- <phase>install</phase> -->
+					<!-- <goals> -->
+					<!-- <goal>emulator-stop</goal> -->
+					<!-- </goals> -->
+					<!-- </execution> -->
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
