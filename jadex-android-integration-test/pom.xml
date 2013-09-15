@@ -38,12 +38,12 @@
 			<scope>provided</scope>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-android-commons</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>net.sourceforge.jadex</groupId> -->
+		<!-- <artifactId>jadex-android-commons</artifactId> -->
+		<!-- <version>${project.version}</version> -->
+		<!-- <scope>provided</scope> -->
+		<!-- </dependency> -->
 
 
 
@@ -82,12 +82,148 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applications-micro</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-base-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform-standalone-launch</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-base-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-nuggets</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-runtimetools-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-agr</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport-opengl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport-jmonkey</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-comanalyzer</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-bdi</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-bdibpmn</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-bpmn</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-rules-tools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-platform-extension-webservice-desktop</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-platform-extension-maven</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<build>
+
 		<plugins>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<source>
+								println "Copying tests ...";
+								def dir = "${project.basedir}";
+								def ln = System.getProperty('line.separator')
+
+								def path = dir + "/../jadex-platform-standalone-launch/src/test/java/"
+								def f = new File(path);
+								print "checking " + path + "... ";
+
+								def target = new File(dir + "/target/generated-sources/tests/");
+								if (!target.exists()) {
+									target.mkdirs()
+								}
+								<![CDATA[
+ 								if (f.exists() && f.isDirectory()) { 
+ 									new AntBuilder().copy(todir: target.path) {
+ 									    fileset(dir: f.path) {
+ 									    	exclude(name:"**/JCCTest.java")
+ 									    }
+									}
+									println "done.";
+ 								} else {
+									println "no directory";
+ 								}
+								]]>
+							</source>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>target/generated-sources/tests</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -122,7 +258,7 @@
 						<!-- </instrumentationPackage> -->
 						<!-- <instrumentationRunner>JadexTestRunner -->
 						<!-- </instrumentationRunner> -->
-						<debug>true</debug>
+						<debug>false</debug>
 					</test>
 					<manifest>
 						<versionName></versionName>

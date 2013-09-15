@@ -2,6 +2,7 @@ package jadex.android.test;
 
 import jadex.android.AndroidContextManager;
 import jadex.commons.SReflect;
+import jadex.launch.test.MicroTest;
 import junit.framework.TestSuite;
 import android.content.Context;
 import android.os.Bundle;
@@ -90,18 +91,18 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	@Override
 	public TestSuite getTestSuite()
 	{
-		Log.i(LOG_TAG, "getTestSuite sleep");
-		
-		try
-		{
-			Thread.sleep(5000);
-		}
-		catch (InterruptedException e1)
-		{
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		Log.i(LOG_TAG, "getTestSuite sleep end");
+//		Log.i(LOG_TAG, "getTestSuite sleep");
+//		
+//		try
+//		{
+//			Thread.sleep(5000);
+//		}
+//		catch (InterruptedException e1)
+//		{
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		Log.i(LOG_TAG, "getTestSuite sleep end");
 		
 		Context targetContext = getTargetContext();
 		
@@ -112,6 +113,11 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		
 		try
 		{
+//			suite.addTest(new MicroTest("jadex.micro.testcases.intermediate.InvokerAgent", getContext().getApplicationInfo().sourceDir));
+//			suite.addTest(new MicroTest("jadex.micro.testcases.longcall.InitiatorAgent", getContext().getApplicationInfo().sourceDir));
+//			suite.addTest(new MicroTest("jadex.micro.testcases.pull.InvokerAgent", getContext().getApplicationInfo().sourceDir));
+//			suite.addTest(new MicroTest("jadex.micro.testcases.stream.InitiatorAgent", getContext().getApplicationInfo().sourceDir));
+			
 			suite.addTest(new MicroTest("jadex.micro.testcases", getContext().getApplicationInfo().sourceDir));
 		}
 		catch (Exception e)
