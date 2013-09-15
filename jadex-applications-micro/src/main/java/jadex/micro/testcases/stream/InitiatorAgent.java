@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -43,14 +44,20 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
-				{
-					public void customResultAvailable(TestReport result)
+				if (SReflect.isAndroid()) {
+					tc.setTestCount(1);
+					ret.setResult(null);
+				} else {
+					testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 					{
-						tc.addReport(result);
-						ret.setResult(null);
-					}
-				}));
+						public void customResultAvailable(TestReport result)
+						{
+							tc.addReport(result);
+							ret.setResult(null);
+						}
+					}));
+				}
+				
 			}
 		}));
 		

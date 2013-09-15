@@ -278,7 +278,7 @@ public class ComponentTestSuite extends TestSuite
 					nextElement = dexEntries.nextElement();
 					if (nextElement.toLowerCase().startsWith(path.toString().toLowerCase())) {
 //							&& nextElement.toLowerCase().split("\\.").length  (path.toString().split("\\.").length +1)) {
-						if (!nextElement.matches("\\.*$\\.*")) {
+						if (!nextElement.matches(".*\\$.*")) {
 							result.add(nextElement);
 							System.out.println("Found potential Testcase: " + nextElement);
 						}

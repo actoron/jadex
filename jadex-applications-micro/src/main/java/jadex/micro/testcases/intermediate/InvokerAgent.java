@@ -13,6 +13,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -53,7 +54,12 @@ public class InvokerAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		tc.setTestCount(2);
+		if (SReflect.isAndroid()) {
+			tc.setTestCount(1);
+		} else {
+			tc.setTestCount(2);	
+		}
+		
 		
 		final Future<TestReport> ret = new Future<TestReport>();
 		ret.addResultListener(agent.createResultListener(new IResultListener<TestReport>()
@@ -96,14 +102,20 @@ public class InvokerAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				testRemote(2, 100, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+				if (SReflect.isAndroid()) {
+					ret.setResult(null);
+				}
+				else
 				{
-					public void customResultAvailable(TestReport result)
+					testRemote(2, 100, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 					{
-						tc.addReport(result);
-						ret.setResult(null);
-					}
-				}));
+						public void customResultAvailable(TestReport result)
+						{
+							tc.addReport(result);
+							ret.setResult(null);
+						}
+					}));
+				}
 			}
 		}));
 	}

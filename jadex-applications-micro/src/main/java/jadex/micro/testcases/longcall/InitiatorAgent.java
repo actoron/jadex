@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -49,6 +50,9 @@ public class InitiatorAgent extends TestAgent
 	 */
 	protected IFuture<Void> performTests(final Testcase tc)
 	{
+		if (SReflect.isAndroid()) {
+			tc.setTestCount(6);
+		}
 		final Future<Void> ret = new Future<Void>();
 		
 		testLocal(1).addResultListener(agent.createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
@@ -72,25 +76,30 @@ public class InitiatorAgent extends TestAgent
 			
 			public void proceed()
 			{
-				testRemote(3).addResultListener(agent.createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
-				{
-					public void customResultAvailable(Collection<TestReport> result)
-					{
-						for(TestReport tr: result)
-							tc.addReport(tr);
-						ret.setResult(null);
-					}
-					
-					public void finished()
-					{
-						ret.setResult(null);
-					}
-					
-					public void intermediateResultAvailable(TestReport result)
-					{
-						tc.addReport(result);
-					}
-				}));
+				if (SReflect.isAndroid()) {
+					// skip remote tests
+					ret.setResult(null);
+				} else {
+					testRemote(3).addResultListener(agent.createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+							{
+								public void customResultAvailable(Collection<TestReport> result)
+								{
+									for(TestReport tr: result)
+										tc.addReport(tr);
+									ret.setResult(null);
+								}
+								
+								public void finished()
+								{
+									ret.setResult(null);
+								}
+								
+								public void intermediateResultAvailable(TestReport result)
+								{
+									tc.addReport(result);
+								}
+							}));
+				}
 			}
 		}));
 		

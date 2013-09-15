@@ -29,64 +29,16 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	@Override
 	public void onCreate(Bundle arguments)
 	{
-		Log.i(LOG_TAG, "onCreate");
+//		Log.i(LOG_TAG, "onCreate");
+//		
+//		Log.i(LOG_TAG, "isAndroid: " + SReflect.isAndroid());
 		
-		Log.i(LOG_TAG, "isAndroid: " + SReflect.isAndroid());
-		
-		Context context = getContext();
 		AndroidContextManager androidContext = AndroidContextManager.getInstance();
 		androidContext.setAndroidContext(getContext());
 		
-//		ClassLoader classLoader = getTargetContext().getClassLoader();
-//		try
-//		{
-//			Class<?> clazz = classLoader.loadClass("jadex.android.AndroidContextManager");
-//			clazz.
-//		}
-//		catch (ClassNotFoundException e)
-//		{
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-//		if (arguments != null)
-//		{
-//			// Test class name passed as an argument should override any
-//			// meta-data declaration.
-//			String testClassesArg = arguments.getString(ARGUMENT_TEST_CLASS);
-//			boolean mDebug = getBooleanArgument(arguments, "debug");
-//			boolean mJustCount = getBooleanArgument(arguments, "count");
-//			boolean mSuiteAssignmentMode = getBooleanArgument(arguments, "suiteAssignment");
-//			String mPackageOfTests = arguments.getString(ARGUMENT_TEST_PACKAGE);
-//
-//			boolean includePerformance = getBooleanArgument(arguments, ARGUMENT_INCLUDE_PERF);
-//			boolean logOnly = getBooleanArgument(arguments, ARGUMENT_LOG_ONLY);
-//			boolean mCoverage = getBooleanArgument(arguments, "coverage");
-//			String mCoverageFilePath = arguments.getString("coverageFile");
-//
-//			
-//			Log.i(LOG_TAG, "debug: " + mDebug);
-//			Log.i(LOG_TAG, "mJustCount: " + mJustCount);
-//			Log.i(LOG_TAG, "mSuiteAssignmentMode: " + mSuiteAssignmentMode);
-//			Log.i(LOG_TAG, "mPackageOfTests: " + mPackageOfTests);
-//		}
 		super.onCreate(arguments);
 	}
 
-	@Override
-	public void onStart()
-	{
-		Log.i(LOG_TAG, " onStart");
-
-		super.onStart();
-	}
-
-	@Override
-	public TestSuite getAllTests()
-	{
-		Log.i(LOG_TAG, " getAllTests");
-		return super.getAllTests();
-	}
 
 	@Override
 	public TestSuite getTestSuite()
@@ -113,9 +65,8 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		
 		try
 		{
-//			suite.addTest(new MicroTest("jadex.micro.testcases.intermediate.InvokerAgent", getContext().getApplicationInfo().sourceDir));
-//			suite.addTest(new MicroTest("jadex.micro.testcases.longcall.InitiatorAgent", getContext().getApplicationInfo().sourceDir));
-//			suite.addTest(new MicroTest("jadex.micro.testcases.pull.InvokerAgent", getContext().getApplicationInfo().sourceDir));
+			
+			// Not working on android right now:
 //			suite.addTest(new MicroTest("jadex.micro.testcases.stream.InitiatorAgent", getContext().getApplicationInfo().sourceDir));
 			
 			suite.addTest(new MicroTest("jadex.micro.testcases", getContext().getApplicationInfo().sourceDir));
@@ -125,90 +76,6 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-//		suite.addTest(new TestSuite() {
-//
-//			@Override
-//			public void run(TestResult result)
-//			{
-//				try
-//				{
-//					MicroTest.suite().run(result);
-//				}
-//				catch (Exception e)
-//				{
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//
-//			@Override
-//			public void addTest(Test test)
-//			{
-//				// TODO Auto-generated method stub
-//				super.addTest(test);
-//			}
-//
-//			@Override
-//			public void addTestSuite(Class testClass)
-//			{
-//				// TODO Auto-generated method stub
-//				super.addTestSuite(testClass);
-//			}
-//
-//			@Override
-//			public int countTestCases()
-//			{
-//				Log.i(LOG_TAG, "countTestCases");
-//				return super.countTestCases();
-//			}
-//
-//			@Override
-//			public String getName()
-//			{
-//				// TODO Auto-generated method stub
-//				return super.getName();
-//			}
-//
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				// TODO Auto-generated method stub
-//				super.runTest(test, result);
-//			}
-//
-//			@Override
-//			public void setName(String name)
-//			{
-//				// TODO Auto-generated method stub
-//				super.setName(name);
-//			}
-//
-//			@Override
-//			public Test testAt(int index)
-//			{
-//				// TODO Auto-generated method stub
-//				Log.i(LOG_TAG, "testAt");
-//				return super.testAt(index);
-//			}
-//
-//			@Override
-//			public int testCount()
-//			{
-//				// TODO Auto-generated method stub
-//				Log.i(LOG_TAG, "testCount()");
-//				return super.testCount();
-//			}
-//
-//			@Override
-//			public Enumeration tests()
-//			{
-//				// TODO Auto-generated method stub
-//				Log.i(LOG_TAG, "tests()");
-//				return super.tests();
-//			}
-//
-//		});
 		
 		return suite;
 	}
@@ -232,29 +99,4 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		AndroidTestRunner jadexTestRunner = new JadexTestRunner();
 		return jadexTestRunner;
 	}
-
-	// @Override
-	// public TestSuite getAllTests()
-	// {
-	// TestSuite suite = new TestSuite();
-	// // MicroCreationTest test = new MicroCreationTest();
-	// // suite.addTest(test);
-	// return suite;
-	//
-	// }
-	//
-	// @Override
-	// protected AndroidTestRunner getAndroidTestRunner()
-	// {
-	// return super.getAndroidTestRunner();
-	// }
-	
-	private boolean getBooleanArgument(Bundle arguments, String tag) {
-        String tagString = arguments.getString(tag);
-        return tagString != null && Boolean.parseBoolean(tagString);
-    }
-	
-
-
-
 }

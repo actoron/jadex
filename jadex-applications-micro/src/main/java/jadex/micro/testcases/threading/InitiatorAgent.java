@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -30,6 +31,9 @@ import java.util.Collection;
 })
 public class InitiatorAgent extends TestAgent
 {
+	
+	private int maxLocal = 10000;
+	private int maxRemote = 1000;
 	/**
 	 *  Perform the tests.
 	 */
@@ -37,12 +41,17 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		testLocal(1, 10000).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		if (SReflect.isAndroid()) {
+			// reduce number of threads for android
+			maxLocal /=10;
+			maxRemote /=10;
+		}
+		testLocal(1, maxLocal).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				testRemote(2, 1000).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				testRemote(2, maxRemote).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
