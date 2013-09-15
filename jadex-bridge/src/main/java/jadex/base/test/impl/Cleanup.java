@@ -74,6 +74,11 @@ public class Cleanup extends TestCase
 		result.endTest(this);
 	}
 	
+	public String getName()
+	{
+		return this.toString();
+	}
+	
 	/**
 	 *  Get a string representation of this test.
 	 */

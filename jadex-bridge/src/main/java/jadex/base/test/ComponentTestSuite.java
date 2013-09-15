@@ -171,8 +171,6 @@ public class ComponentTestSuite extends TestSuite
 			
 			if(!exclude)
 			{
-//				String testName = new File(abspath).getName();
-				
 				if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, rid).get(ts)).booleanValue())
 				{
 					if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, rid).get(ts)).booleanValue())
