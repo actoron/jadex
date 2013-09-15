@@ -15,6 +15,7 @@ import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
@@ -76,11 +77,13 @@ public class MicroCreationTest extends TestCase
 			{
 				try
 				{
-					FileWriter	fw	= new FileWriter(new File("../"+tup.getFirstEntity()+".properties"));
+//					FileWriter	fw	= new FileWriter(new File("../"+tup.getFirstEntity()+".properties"));
+					File file = new File("../"+tup.getFirstEntity()+".properties");
+					FileOutputStream fileout = new FileOutputStream(file);
 					Properties	props	=	new Properties();
 					props.setProperty("YVALUE", ""+((Tuple)tup.getSecondEntity()).get(0));
-					props.store(fw, null);
-					fw.close();
+					props.store(fileout, null);
+					fileout.close();
 				}
 				catch(IOException e)
 				{

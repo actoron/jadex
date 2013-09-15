@@ -108,17 +108,6 @@ public class ComponentTestSuite extends TestSuite
 	{
 		super(path.toString());
 		
-		if (SReflect.isAndroid()) {
-			String[] newargs = new String[args.length+2];
-			for (int i = 0; i < args.length; i++)
-			{
-				newargs[i] = args[i];
-			}
-			newargs[args.length] = "-kernels";
-			newargs[args.length] = "micro,component";
-			args = newargs;
-		}
-		
 		final Thread	runner	= Thread.currentThread();
 		
 		TimerTask	timer	= null;
@@ -165,87 +154,96 @@ public class ComponentTestSuite extends TestSuite
 		}
 		
 		// Scan for test cases.
-		List<String> scanForTestCases = scanForTestCases(root, path, excludes);
+		List<String> scanForTestCases = scanForTestCases(root, path);
 		for (String abspath : scanForTestCases)
 		{	
-			String testName = new File(abspath).getName();
 			if (SReflect.isAndroid()) {
+				// path-style identifier needed for Factories, but android doesn't use a
+				// classical classpath
 				abspath = abspath.replaceAll("\\.", "/") + ".class";
 			}
-			if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, rid).get(ts)).booleanValue())
+			boolean	exclude	= false;
+						
+			for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
 			{
-				if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, rid).get(ts)).booleanValue())
+				exclude	= abspath.indexOf(excludes[i])!=-1;
+			}
+			
+			if(!exclude)
+			{
+//				String testName = new File(abspath).getName();
+				
+				if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, rid).get(ts)).booleanValue())
 				{
-					System.out.println("Building TestCase: " + abspath);
-					try
+					if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, rid).get(ts)).booleanValue())
 					{
-						IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, rid).get(ts);
-						boolean istest = false;
-						if(model!=null && model.getReport()==null)
+						System.out.println("Building TestCase: " + abspath);
+						try
 						{
-							IArgument[]	results	= model.getResults();
-							for(int i=0; !istest && i<results.length; i++)
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, rid).get(ts);
+							boolean istest = false;
+							if(model!=null && model.getReport()==null)
 							{
-								if(results[i].getName().equals("testresults") && Testcase.class.equals(
-									results[i].getClazz().getType(libsrv.getClassLoader(rid).get(ts), model.getAllImports())))
+								IArgument[]	results	= model.getResults();
+								for(int i=0; !istest && i<results.length; i++)
 								{
-									istest	= true;
+									if(results[i].getName().equals("testresults") && Testcase.class.equals(
+										results[i].getClazz().getType(libsrv.getClassLoader(rid).get(ts), model.getAllImports())))
+									{
+										istest	= true;
+									}
+								}
+							}
+							
+							if(istest)
+							{
+								ComponentTest test = new ComponentTest(cms, model, this);
+								test.setName(abspath);
+								addTest(test);
+							}
+							else if(model.getReport()!=null)
+							{
+								if(broken)
+								{
+									BrokenComponentTest test = new BrokenComponentTest(abspath, model.getReport());
+									test.setName(abspath);
+									addTest(test);
+								}
+							}
+							else
+							{
+								if(start)
+								{
+									ComponentStartTest test = new ComponentStartTest(cms, model, this);
+									test.setName(abspath);
+									addTest(test);
 								}
 							}
 						}
-						
-						if(istest)
+						catch(final RuntimeException e)
 						{
-							ComponentTest test = new ComponentTest(cms, model, this);
-							test.setName(testName);
-							addTest(test);
-						}
-						else if(model.getReport()!=null)
-						{
-							if(broken)
+							BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
 							{
-								BrokenComponentTest test = new BrokenComponentTest(abspath, model.getReport());
-								test.setName(testName);
-								addTest(test);
-							}
-						}
-						else
-						{
-							if(start)
-							{
-								ComponentStartTest test = new ComponentStartTest(cms, model, this);
-								test.setName(testName);
-								addTest(test);
-							}
+								public String getErrorText()
+								{
+									return "Error loading model: "+e;
+								}
+								
+								public String getErrorHTML()
+								{
+									return getErrorText();
+								}
+								
+								public Map<String, String> getDocuments()
+								{
+									return null;
+								}
+							});
+							test.setName(abspath);
+							addTest(test);							
 						}
 					}
-					catch(final RuntimeException e)
-					{
-						BrokenComponentTest test = new BrokenComponentTest(abspath, new IErrorReport()
-						{
-							public String getErrorText()
-							{
-								return "Error loading model: "+e;
-							}
-							
-							public String getErrorHTML()
-							{
-								return getErrorText();
-							}
-							
-							public Map<String, String> getDocuments()
-							{
-								return null;
-							}
-						});
-						test.setName(testName);
-						addTest(test);							
-					}
-				} else {
-//					System.out.println("Not startable : " + abspath);
 				}
-			} else {
-//				System.out.println("Not loadable : " + abspath);
 			}
 		}
 		
@@ -262,7 +260,7 @@ public class ComponentTestSuite extends TestSuite
 		}
 	}
 
-	private List<String> scanForTestCases(File root, File path, String[] excludes)
+	private List<String> scanForTestCases(File root, File path)
 	{
 		List<String> result = new ArrayList<String>();
 		
@@ -279,14 +277,10 @@ public class ComponentTestSuite extends TestSuite
 				while (dexEntries.hasMoreElements()) {
 					nextElement = dexEntries.nextElement();
 					if (nextElement.toLowerCase().startsWith(path.toString().toLowerCase())) {
-						boolean	exclude	= false;
-						for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
-						{
-							exclude	= nextElement.indexOf(excludes[i])!=-1;
-						}
-						if (!exclude) {
+//							&& nextElement.toLowerCase().split("\\.").length  (path.toString().split("\\.").length +1)) {
+						if (!nextElement.matches("\\.*$\\.*")) {
 							result.add(nextElement);
-							System.out.println("Found Testcase: " + nextElement);
+							System.out.println("Found potential Testcase: " + nextElement);
 						}
 					}
 				}
@@ -303,26 +297,15 @@ public class ComponentTestSuite extends TestSuite
 				File	file	= (File)todo.remove(0);
 				final String	abspath	= file.getAbsolutePath();
 	//			System.out.println("todo: "+abspath);
-				boolean	exclude	= false;
 				
-	//			exclude	= !file.isDirectory() && (abspath.indexOf("threading")==-1 || abspath.indexOf("Initiator")==-1);
-				
-				for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
+				if(file.isDirectory())
 				{
-					exclude	= abspath.indexOf(excludes[i])!=-1;
+					File[]	subs	= file.listFiles();
+					todo.addAll(Arrays.asList(subs));
 				}
-				
-				if(!exclude)
+				else
 				{
-					if(file.isDirectory())
-					{
-						File[]	subs	= file.listFiles();
-						todo.addAll(Arrays.asList(subs));
-					}
-					else
-					{
-						result.add(abspath);
-					}
+					result.add(abspath);
 				}
 			}
 		}

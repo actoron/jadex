@@ -7,6 +7,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
@@ -78,7 +79,7 @@ public class ComponentTest extends TestCase
 		// Evaluate the results.
 		try
 		{
-			cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), trl).get(new ThreadSuspendable(), 300000);
+			cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), trl).get(new ThreadSuspendable(), SReflect.isAndroid() ? 600000 : 300000);
 			Testcase	tc	= trl.waitForResult();
 			TestReport[]	reports	= tc.getReports();
 			if(tc.getTestCount()!=reports.length)
