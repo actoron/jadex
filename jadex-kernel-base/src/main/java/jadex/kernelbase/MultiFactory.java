@@ -29,6 +29,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
@@ -60,6 +61,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jadex.commons.gui.SGUI;
 
 
@@ -111,6 +115,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	
 	/** Kernel blacklist */
 	protected Set kernelblacklist;
+	
+	/** Package Separator */
+	protected char packageseparator;
 	
 	/** Unloadable kernel locations that may become loadable later. */
 	protected Set potentialkernellocations;
@@ -177,6 +184,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		this.extensionblacklist = new HashSet(baseextensionblacklist);
 		this.potentialkernellocations = new HashSet();
 		this.listeners = new ArrayList();
+		this.packageseparator = SReflect.isAndroid() ? '.' : '/';
 		started = false;
 	}
 	
@@ -1112,7 +1120,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //					System.out.println(loc.substring(loc.lastIndexOf('/') + 1).toLowerCase().startsWith("kernel"));
 //				}
 				// For jar entries, strip directory part.
-				return loc.substring(loc.lastIndexOf('/') + 1).toLowerCase().startsWith("kernel");
+				return loc.substring(loc.lastIndexOf(packageseparator) + 1).toLowerCase().startsWith("kernel");
 			}
 		}, rid);
 	}
@@ -1138,8 +1146,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					if (prefilter.filter(obj) &&
 					    !baseextensionblacklist.contains(getModelExtension(loc)) &&
 					    //((String) obj).endsWith("component.xml") &&
-					    !kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1)))
-						return true;
+					    !kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1))) 
+					{
+//							System.out.println("Found kernel: " + loc);
+							return true;
+					}
 				}
 				//System.out.println("Decided it's not a kernel: " + obj);
 				return false;
@@ -1250,6 +1261,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				return searchDirectory(file, filter, false);
 			else if (file.getName().endsWith(".jar"))
 				return searchJar(file, filter);
+			else if (file.getName().endsWith(".apk"))
+				return searchApk(file, filter);
 		}
 		catch (Exception e)
 		{
@@ -1338,20 +1351,57 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	}
 	
 	/**
+	 *  Searches a .apk for files matching a filter.
+	 *  
+	 *  @param jar The .jar-file.
+	 *  @param filter The filter.
+	 * @return List of files matching the filter.
+	 */
+	protected List searchApk(File apk, IFilter filter)
+	{
+//		System.out.println("Searching apk: " + apk.getAbsolutePath());
+		List ret = new ArrayList();
+		try
+		{
+			Enumeration<String> dexEntries = SUtil.androidUtils().getDexEntries(apk);
+			
+			for (Enumeration<String> entries = dexEntries; entries
+					.hasMoreElements();)
+			{
+				String entry = entries.nextElement();
+				if (filter.filter(entry)) {
+					if (!entry.endsWith("xml")) {
+						entry = entry + ".class";
+					}
+					ret.add(entry);
+				}
+					
+			}
+		}
+		catch (IOException e)
+		{
+			System.out.println("Warning: File not found: " + apk.getAbsolutePath());
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	
+	/**
 	 *  Helper method for generating the file extension of a model.
 	 *  
 	 *  @param model The model.
 	 *  @return The file extension, special case for .class files.
 	 */
-	protected static String getModelExtension(String model)
+	protected String getModelExtension(String model)
 	{
-		int firstpoint = Math.max(Math.max(0, model.lastIndexOf(File.separatorChar)), model.lastIndexOf('/'));
-		firstpoint = model.indexOf('.', firstpoint);
+		int lastpoint = Math.max(Math.max(0, model.lastIndexOf(File.separatorChar)), model.lastIndexOf(this.packageseparator));
+		lastpoint = model.indexOf('.', lastpoint);
 		
-		if (firstpoint < 0 || firstpoint == (model.length() - 1))
+		if (lastpoint < 0 || lastpoint == (model.length() - 1))
 			return null;
 		
-		String ext = model.substring(firstpoint + 1);
+		String ext = model.substring(lastpoint + 1);
 		
 		// Hack! todo: fix me
 		if(ext.equals("class"))
@@ -1363,6 +1413,20 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			else if(model.endsWith("BDI.class"))
 			{
 				ext = "BDI.class";
+			}
+			else
+			{
+				return null;
+			}
+		}
+		
+		if (ext.equals("xml")) {
+			if(model.endsWith("component.xml")) 
+			{
+				ext = "component.xml";
+			}
+			else if(model.endsWith("application.xml")) {
+				ext = "application.xml";
 			}
 			else
 			{
