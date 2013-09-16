@@ -279,7 +279,7 @@
 					</manifest>
 				</configuration>
 
-				<executions>
+<!-- 				<executions> -->
 <!-- 					<execution> -->
 <!-- 						<id>startemulator</id> -->
 <!-- 						bound to the 'initialize' phase -->
