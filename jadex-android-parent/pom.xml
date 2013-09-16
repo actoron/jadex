@@ -27,6 +27,11 @@
 			<id>jadex-android</id>
 			<url>http://jadex.julakali.org/nexus/content/groups/public/</url>
 		</repository>
+		<repository>
+			<id>jadex-public-snapshots</id>
+			<name>Jadex Snapshot Repository</name>
+			<url>http://localhost/nexus/content/repositories/snapshots/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -68,6 +73,14 @@
 			<version>3.12.1.GA</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.14.0-GA</version>
+			<scope>provided</scope>
+		</dependency>
+		
 
 		<dependency>
 			<groupId>javax.mail</groupId>

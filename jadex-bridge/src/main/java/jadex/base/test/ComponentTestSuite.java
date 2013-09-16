@@ -247,7 +247,7 @@ public class ComponentTestSuite extends TestSuite
 		
 		// Hack!!! Isn't there some tearDown for the test suite?
 		addTest(new Cleanup(rootcomp, timer));
-		System.out.println("Finished Building Suite for " + root);
+		System.out.println("Finished Building Suite for " + path);
 		try
 		{
 			Thread.sleep(5000);

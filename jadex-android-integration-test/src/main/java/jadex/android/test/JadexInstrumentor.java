@@ -1,8 +1,11 @@
 package jadex.android.test;
 
-import jadex.android.AndroidContextManager;
-import jadex.commons.SReflect;
+import jadex.launch.test.BDITest;
 import jadex.launch.test.MicroTest;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import junit.framework.TestSuite;
 import android.content.Context;
 import android.os.Bundle;
@@ -29,12 +32,51 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	@Override
 	public void onCreate(Bundle arguments)
 	{
-//		Log.i(LOG_TAG, "onCreate");
-//		
-//		Log.i(LOG_TAG, "isAndroid: " + SReflect.isAndroid());
+		ClassLoader classLoader = getTargetContext().getClassLoader();
+		Class<?> loadClass;
+		try
+		{
+			loadClass = classLoader.loadClass("jadex.android.AndroidContextManager");
+			Method getInstance = loadClass.getMethod("getInstance");
+			Method setAndroidContext = loadClass.getMethod("setAndroidContext", Context.class);
+			
+			Object contextManager = getInstance.invoke(null);
+			setAndroidContext.invoke(contextManager, getTargetContext());
+		}
+
+		catch (ClassNotFoundException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IllegalArgumentException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IllegalAccessException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (InvocationTargetException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (SecurityException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (NoSuchMethodException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		AndroidContextManager androidContext = AndroidContextManager.getInstance();
-		androidContext.setAndroidContext(getContext());
+//		AndroidContextManager androidContext = AndroidContextManager.getInstance();
+//		androidContext.setAndroidContext(getContext());
 		
 		super.onCreate(arguments);
 	}
@@ -58,6 +100,8 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		
 		Context targetContext = getTargetContext();
 		
+		String sourceDir = targetContext.getApplicationInfo().sourceDir;
+		
 		TestSuiteBuilder testSuiteBuilder = new TestSuiteBuilder(getClass().getName(), targetContext.getClassLoader());
 //		testSuiteBuilder.includePackages("jadex.android.test");
 		
@@ -67,9 +111,11 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		{
 			
 			// Not working on android right now:
-//			suite.addTest(new MicroTest("jadex.micro.testcases.stream.InitiatorAgent", getContext().getApplicationInfo().sourceDir));
+//			suite.addTest(new MicroTest("jadex.micro.testcases.stream.InitiatorAgent", sourceDir));
+//			suite.addTest(new MicroTest("jadex.micro.testcases.nfmethodprop", sourceDir));
 			
-			suite.addTest(new MicroTest("jadex.micro.testcases", getContext().getApplicationInfo().sourceDir));
+			suite.addTest(new MicroTest("jadex.micro.testcases", sourceDir));
+//			suite.addTest(new BDITest("jadex.bdi.testcases", sourceDir));
 		}
 		catch (Exception e)
 		{

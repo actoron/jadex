@@ -43,8 +43,8 @@ public class InitiatorAgent extends TestAgent
 		
 		if (SReflect.isAndroid()) {
 			// reduce number of threads for android
-			maxLocal /=10;
-			maxRemote /=10;
+			maxLocal /=100;
+			maxRemote /=100;
 		}
 		testLocal(1, maxLocal).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{

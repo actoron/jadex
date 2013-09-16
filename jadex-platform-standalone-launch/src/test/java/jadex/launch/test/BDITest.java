@@ -14,11 +14,21 @@ public class BDITest	extends	ComponentTestSuite
 	/**
 	 *  Constructor called by Maven JUnit runner.
 	 */
-	public BDITest()	throws Exception
+	public BDITest() throws Exception {
+		this("../jadex-applications-bdi/target/classes/","../jadex-applications-bdi/target/classes");
+	}
+
+	/**
+	 * Constructor
+	 * @param path
+	 * @param root
+	 * @throws Exception
+	 */
+	public BDITest(String path, String root)	throws Exception
 	{
 		// Use BDI classes directory as classpath root,
-		super(new File("../jadex-applications-bdi/target/classes/"),
-			new File("../jadex-applications-bdi/target/classes"),
+		super(new File(path),
+			new File(root),
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{

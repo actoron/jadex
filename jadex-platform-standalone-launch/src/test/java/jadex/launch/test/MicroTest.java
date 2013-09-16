@@ -20,7 +20,12 @@ public class MicroTest	extends ComponentTestSuite
 		this("../jadex-applications-micro/target/classes/", "../jadex-applications-micro/target/classes");
 	}
 	
-
+	/**
+	 * Constructor
+	 * @param path
+	 * @param root
+	 * @throws Exception
+	 */
 	public MicroTest(String path, String root)	throws Exception
 	{
 		// Use micro application classes directory as classpath root,

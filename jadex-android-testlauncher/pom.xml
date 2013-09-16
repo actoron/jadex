@@ -29,6 +29,40 @@
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-applications-micro</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-base-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applications-bdi</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-tools-base-swing</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-envsupport</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-kernel-extension-agr</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.toedter</groupId>
+					<artifactId>jcalendar</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

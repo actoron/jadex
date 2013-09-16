@@ -23,7 +23,6 @@ public class JadexTestRunner extends AndroidTestRunner
 	@Override
 	public void setTest(Test test)
 	{
-		System.out.println("JadexTestRunner: setTest");
 		super.setTest(test);
 	}
 
