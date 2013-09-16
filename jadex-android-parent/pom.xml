@@ -27,11 +27,11 @@
 			<id>jadex-android</id>
 			<url>http://jadex.julakali.org/nexus/content/groups/public/</url>
 		</repository>
-		<repository>
-			<id>jadex-public-snapshots</id>
-			<name>Jadex Snapshot Repository</name>
-			<url>http://localhost/nexus/content/repositories/snapshots/</url>
-		</repository>
+<!-- 		<repository> -->
+<!-- 			<id>jadex-public-snapshots</id> -->
+<!-- 			<name>Jadex Snapshot Repository</name> -->
+<!-- 			<url>http://localhost/nexus/content/repositories/snapshots/</url> -->
+<!-- 		</repository> -->
 	</repositories>
 
 	<dependencies>
