@@ -175,8 +175,9 @@
 						</goals>
 						<configuration>
 							<source>
-								println "Copying tests ...";
-								def dir = "${project.basedir}";
+								<![CDATA[
+								println "Copying tests ..."
+								def dir = "${project.basedir}"
 								def ln = System.getProperty('line.separator')
 
 								def path = dir + "/../jadex-platform-standalone-launch/src/test/java/"
@@ -187,7 +188,6 @@
 								if (!target.exists()) {
 									target.mkdirs()
 								}
-								<![CDATA[
  								if (f.exists() && f.isDirectory()) { 
  									new AntBuilder().copy(todir: target.path) {
  									    fileset(dir: f.path) {
@@ -280,26 +280,24 @@
 				</configuration>
 
 				<executions>
-					<!-- android plugin execution that starts the emulator. -->
-					<execution>
-						<id>startemulator</id>
-						<!-- bound to the 'initialize' phase -->
-						<phase>initialize</phase>
-						<goals>
-							<goal>emulator-start</goal>
-						</goals>
-					</execution>
+<!-- 					<execution> -->
+<!-- 						<id>startemulator</id> -->
+<!-- 						bound to the 'initialize' phase -->
+<!-- 						<phase>initialize</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>emulator-start</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
 
-					<!-- <execution> -->
-					<!-- android plugin execution that stops the emulator. -->
-					<!-- <id>stopemulator</id> -->
-					<!-- bound to the 'install' phase -->
-					<!-- <phase>install</phase> -->
-					<!-- <goals> -->
-					<!-- <goal>emulator-stop</goal> -->
-					<!-- </goals> -->
-					<!-- </execution> -->
-				</executions>
+<!-- 					<execution> -->
+<!-- 						<id>stopemulator</id> -->
+<!-- 						bound to the 'install' phase -->
+<!-- 						<phase>install</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>emulator-stop</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
 			</plugin>
 
 			<plugin>

@@ -243,17 +243,17 @@
 		
 		<!-- ======== integration test ======== -->
 		
-<!-- 		<profile> -->
-<!-- 			<id>integration-test</id> -->
+		<profile>
+			<id>integration-test</id>
 <!-- 			<activation> -->
 <!-- 				<file><exists>jadex-android-integration-test</exists></file> -->
 <!-- 			</activation> -->
-<!-- 			<modules> -->
+			<modules>
 <!-- 				Modules required for integration test -->
-<!-- 				<module>jadex-android-integration-test</module> -->
-<!-- 				<module>docs/android/jadex-android-example-project-maven</module> -->
-<!-- 			</modules> -->
-<!-- 		</profile> -->
+				<module>jadex-android-integration-test</module>
+				<module>jadex-android-testlauncher</module>
+			</modules>
+		</profile>
 		
 	</profiles>
 </project>

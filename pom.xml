@@ -613,6 +613,7 @@
 				<module>jadex-platform-extension-webservice-android</module>
 				<module>jadex-applications-android-demos</module>
 				<module>jadex-android-integration-test</module>
+				<module>jadex-android-testlauncher</module>
 				<module>jadex-applications-android/jadex-applications-android-chat</module>
 				<module>jadex-applications-android/jadex-applications-android-puzzle</module>
 				<module>docs/android/jadex-android-example-project-maven</module>

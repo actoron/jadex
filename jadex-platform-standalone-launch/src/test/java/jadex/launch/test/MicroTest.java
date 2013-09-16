@@ -1,6 +1,7 @@
 package jadex.launch.test;
 
 import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SReflect;
 
 import java.io.File;
 
@@ -65,7 +66,9 @@ public class MicroTest	extends ComponentTestSuite
 			// Non-tests that sometimes don't stop until finished (why?)
 			"AgentCreationAgent",	
 			"PojoAgentCreationAgent",
-			"MegaParallelStarter"
+			"MegaParallelStarter",
+			SReflect.isAndroid() ? "authenticate/InitiatorAgent" : "__noexclude__",
+			SReflect.isAndroid() ? "stream/InitiatorAgent" : "__noexclude__",
 		});
 //		}, 600000, true, false);
 	}
