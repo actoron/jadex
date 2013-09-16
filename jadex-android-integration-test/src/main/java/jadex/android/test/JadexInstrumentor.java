@@ -1,11 +1,19 @@
 package jadex.android.test;
 
-import jadex.launch.test.BDITest;
+import jadex.android.AndroidContextManager;
+import jadex.android.commons.JadexDexClassLoader;
+import jadex.bdiv3.AsmDexBdiClassGenerator;
+import jadex.commons.SUtil;
 import jadex.launch.test.MicroTest;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Collection;
 
+import junit.framework.Test;
 import junit.framework.TestSuite;
 import android.content.Context;
 import android.os.Bundle;
@@ -13,6 +21,7 @@ import android.test.AndroidTestRunner;
 import android.test.InstrumentationTestRunner;
 import android.test.suitebuilder.TestSuiteBuilder;
 import android.util.Log;
+import dalvik.system.PathClassLoader;
 
 public class JadexInstrumentor extends InstrumentationTestRunner
 {
@@ -29,49 +38,48 @@ public class JadexInstrumentor extends InstrumentationTestRunner
     static final String ARGUMENT_ANNOTATION = "annotation";
     static final String ARGUMENT_NOT_ANNOTATION = "notAnnotation";
 
+	private ClassLoader jadexCl;
+
+	private String targetAppDir;
+
+	private File optimizePath;
+
 	@Override
 	public void onCreate(Bundle arguments)
 	{
-		ClassLoader classLoader = getTargetContext().getClassLoader();
-		Class<?> loadClass;
+//		Log.i(LOG_TAG, "getTestSuite sleep");
+//		try
+//		{
+//			Thread.sleep(5000);
+//		}
+//		catch (InterruptedException e1)
+//		{
+//			e1.printStackTrace();
+//		}
+//		Log.i(LOG_TAG, "getTestSuite sleep end");
+		
+		Context targetContext = getTargetContext();
+		targetAppDir = targetContext.getApplicationInfo().sourceDir;
+		optimizePath = targetContext.getDir("outdex", Context.MODE_PRIVATE);
+		jadexCl = createJadexClassLoader(targetContext);
+		
 		try
 		{
-			loadClass = classLoader.loadClass("jadex.android.AndroidContextManager");
-			Method getInstance = loadClass.getMethod("getInstance");
-			Method setAndroidContext = loadClass.getMethod("setAndroidContext", Context.class);
-			
+			// Set Context:
+			Class<?> contextMgrClazz =
+//			jadexCl.loadClass("jadex.android.AndroidContextManager");
+			jadexCl.loadClass(AndroidContextManager.class.getCanonicalName());
+			Method getInstance = contextMgrClazz.getMethod("getInstance");
+			Method setAndroidContext = contextMgrClazz.getMethod("setAndroidContext", Context.class);
 			Object contextManager = getInstance.invoke(null);
-			setAndroidContext.invoke(contextManager, getTargetContext());
+			setAndroidContext.invoke(contextManager, targetContext);
+			
+			Class<?> classGeneratorClazz= jadexCl.loadClass(AsmDexBdiClassGenerator.class.getCanonicalName());
+			Field outField = classGeneratorClazz.getDeclaredField("OUTPATH");
+			outField.set(null, optimizePath);
 		}
-
-		catch (ClassNotFoundException e)
+		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IllegalArgumentException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (InvocationTargetException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (SecurityException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (NoSuchMethodException e)
-		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -82,40 +90,68 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	}
 
 
+	private ClassLoader createJadexClassLoader(Context targetContext)
+	{
+//		ClassLoader targetClassLoader = targetContext.getClassLoader();
+
+		Context myContext = getContext();
+		ClassLoader myCl = myContext.getClassLoader();
+		ClassLoader systemCl = myCl.getParent();
+		
+		Collection<? extends URL> collectDexPathUrls = SUtil.androidUtils().collectDexPathUrls(myCl);
+
+		// The original classpath contains /system/framework/android.test.runner.jar.
+		// we need to extract that for our own classloader, because it contains classes
+		// needed for unit testing.
+		String testlib = null;
+		for (URL url : collectDexPathUrls)
+		{
+			if (!url.toString().contains(".apk")) {
+				testlib = url.getPath();
+			}
+		}
+		
+		PathClassLoader testlibsloader = new PathClassLoader(testlib, systemCl);
+		PathClassLoader integrationLoader = new PathClassLoader(myContext.getApplicationInfo().sourceDir, testlibsloader);
+		
+		
+//		try
+//		{
+//			integrationLoader.loadClass("jadex.android.commons.JadexDexClassLoader");
+//			System.out.println("JadexDexClassLoader loaded");
+//		}
+//		catch (ClassNotFoundException e)
+//		{
+//			e.printStackTrace();
+//		}
+		
+		JadexDexClassLoader jadexCl = new JadexDexClassLoader(targetAppDir, optimizePath.getAbsolutePath(), null, integrationLoader);
+		jadexCl.defineClass("jadex.android.commons.JadexDexClassLoader", JadexDexClassLoader.class);
+		return jadexCl;
+	}
+
+
 	@Override
 	public TestSuite getTestSuite()
 	{
-//		Log.i(LOG_TAG, "getTestSuite sleep");
-//		
-//		try
-//		{
-//			Thread.sleep(5000);
-//		}
-//		catch (InterruptedException e1)
-//		{
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		Log.i(LOG_TAG, "getTestSuite sleep end");
-		
-		Context targetContext = getTargetContext();
-		
-		String sourceDir = targetContext.getApplicationInfo().sourceDir;
-		
-		TestSuiteBuilder testSuiteBuilder = new TestSuiteBuilder(getClass().getName(), targetContext.getClassLoader());
-//		testSuiteBuilder.includePackages("jadex.android.test");
-		
+		TestSuiteBuilder testSuiteBuilder = new TestSuiteBuilder(getClass().getName(), jadexCl);
 		TestSuite suite = testSuiteBuilder.build();
 		
 		try
 		{
-			
 			// Not working on android right now:
-//			suite.addTest(new MicroTest("jadex.micro.testcases.stream.InitiatorAgent", sourceDir));
-//			suite.addTest(new MicroTest("jadex.micro.testcases.nfmethodprop", sourceDir));
+//			suite.addTest(new MicroTest("jadex.micro.testcases.stream.InitiatorAgent", targetAppDir));
+//			suite.addTest(new MicroTest("jadex.micro.testcases.nfmethodprop", targetAppDir));
 			
-			suite.addTest(new MicroTest("jadex.micro.testcases", sourceDir));
-//			suite.addTest(new BDITest("jadex.bdi.testcases", sourceDir));
+//			Class<?> test = jadexCl.loadClass("jadex.launch.test.MicroTest");
+//			Constructor<?> constructor = test.getConstructor(String.class, String.class);
+//			Object testCase = constructor.newInstance("jadex.micro.testcases", targetAppDir);
+//			suite.addTest((Test) testCase);
+			
+			Class<?> test = jadexCl.loadClass("jadex.launch.test.BDIV3Test");
+			Constructor<?> constructor = test.getConstructor(String.class, String.class);
+			Object bdiTest = constructor.newInstance("jadex.bdiv3.testcases", targetAppDir);
+			suite.addTest((Test) bdiTest);
 		}
 		catch (Exception e)
 		{

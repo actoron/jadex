@@ -2,6 +2,7 @@ package jadex.android.commons;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -104,10 +105,10 @@ public class AndroidUtilsImpl implements AndroidUtils
 
 	private void collectDexPathUrls(ClassLoader classloader, Set<URL> ret)
 	{
-		if (classloader instanceof JadexDexClassLoader) {
+		String dexPathFromJadexLoader = getDexPathFromJadexLoader(classloader);
+		if (dexPathFromJadexLoader != null) {
 			// JadexDexClassLoader provides dex Path directly, add this
-			JadexDexClassLoader dexCl = (JadexDexClassLoader) classloader;
-			URL url = urlFromApkPath0(dexCl.getDexPath());
+			URL url = urlFromApkPath0(dexPathFromJadexLoader);
 			ret.add(url);
 		} else if (classloader instanceof ISimpleDelegationClassLoader) {
 			// check the delegate
@@ -116,18 +117,22 @@ public class AndroidUtilsImpl implements AndroidUtils
 			{
 				collectDexPathUrls(delegate, ret);
 			}
-		}
-		
-		if ((classloader instanceof DexClassLoader && !(classloader instanceof JadexDexClassLoader))
-				|| classloader instanceof PathClassLoader)
-		{
-			// we have the main application classloader now
-			String string = classloader.toString();
-			int begin = string.indexOf('[');
-			int end = string.indexOf(']');
-			String dexPath = string.substring(begin+1, end);
-			URL url = urlFromApkPath0(dexPath);
-			ret.add(url);
+		} else {
+			if ((classloader instanceof DexClassLoader)
+					|| classloader instanceof PathClassLoader)
+			{
+				// we have the main application classloader now
+				String string = classloader.toString();
+				int begin = string.indexOf('[');
+				int end = string.indexOf(']');
+				String[] urls = string.substring(begin+1, end).split(":");
+				for (int i = 0; i < urls.length; i++)
+				{
+					String dexPath = urls[i];
+					URL url = urlFromApkPath0(dexPath);
+					ret.add(url);
+				}
+			}
 		}
 		
 		// and always go up the hierarchy
@@ -136,6 +141,29 @@ public class AndroidUtilsImpl implements AndroidUtils
 		{
 			collectDexPathUrls(parent, ret);
 		}
+	}
+
+	private String getDexPathFromJadexLoader(ClassLoader classloader)
+	{
+		String result = null;
+		if (classloader instanceof DexClassLoader) {
+			if (classloader instanceof JadexDexClassLoader) {
+				result = ((JadexDexClassLoader) classloader).getDexPath();
+//			} else {
+//				try
+//				{
+//					Method method = classloader.getClass().getMethod("getDexPath");
+//					Object path = method.invoke(classloader);
+//					result = (String) path;
+//					System.out.println("Found JadexDexClassLoader with reflection");
+//				}
+//				catch (Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+			}
+		}
+		return result;
 	}
 
 	public URL urlFromApkPath0(String apkPath)

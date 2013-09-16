@@ -43,7 +43,7 @@
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applications-bdi</artifactId>
+			<artifactId>jadex-applications-bdiv3</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
@@ -61,6 +61,10 @@
 				<exclusion>
 					<groupId>com.toedter</groupId>
 					<artifactId>jcalendar</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.kohsuke</groupId>
+					<artifactId>asm4</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -89,6 +93,69 @@
 		</resources>
 
 		<plugins>
+		
+		<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<source>
+								<![CDATA[
+								println "Copying tests ..."
+								def dir = "${project.basedir}"
+								def ln = System.getProperty('line.separator')
+
+								def path = dir + "/../jadex-platform-standalone-launch/src/test/java/"
+								def f = new File(path);
+								print "checking " + path + "... ";
+
+								def target = new File(dir + "/target/generated-sources/tests/");
+								if (!target.exists()) {
+									target.mkdirs()
+								}
+ 								if (f.exists() && f.isDirectory()) { 
+ 									new AntBuilder().copy(todir: target.path) {
+ 									    fileset(dir: f.path) {
+ 									    	exclude(name:"**/JCCTest.java")
+ 									    }
+									}
+									println "done.";
+ 								} else {
+									println "no directory";
+ 								}
+								]]>
+							</source>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+<!-- 				<version>1.8</version> -->
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>target/generated-sources/tests</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
