@@ -11,6 +11,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.RemoteException;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -54,7 +55,12 @@ public class InvokerAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		tc.setTestCount(4);
+		if (SReflect.isAndroid()) {
+			tc.setTestCount(2);
+		} else {
+			tc.setTestCount(4);	
+		}
+		
 		
 		final Future<Void> ret = new Future<Void>();
 		ret.addResultListener(agent.createResultListener(new IResultListener<Void>()
@@ -83,18 +89,22 @@ public class InvokerAgent
 					tc.addReport(rep);
 				}
 				
-				testRemote(3, 1000).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
-				{
-					public void customResultAvailable(Collection<TestReport> result)
-					{
-						for(TestReport rep: result)
+				if (SReflect.isAndroid()) {
+					ret.setResult(null);
+				} else {
+					testRemote(3, 1000).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
+							{
+						public void customResultAvailable(Collection<TestReport> result)
 						{
-							tc.addReport(rep);
+							for(TestReport rep: result)
+							{
+								tc.addReport(rep);
+							}
+							
+							ret.setResult(null);
 						}
-						
-						ret.setResult(null);
-					}
-				});
+							});
+				}
 			}
 		});
 	}
