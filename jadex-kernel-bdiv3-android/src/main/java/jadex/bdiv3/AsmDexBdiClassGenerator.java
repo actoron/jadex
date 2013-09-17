@@ -25,8 +25,10 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -61,6 +63,8 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 	protected static Method methoddc1;
 	protected static Method methoddc2;
 	public static File OUTPATH;
+	
+	private static String LOG_TAG = "AsmDex";
 
 	static
 	{
@@ -85,6 +89,8 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 		}
 	}
 
+	private static Map<String,ApplicationReader> arCache = new HashMap<String, ApplicationReader>();
+
 	@Override
 	public Class<?> generateBDIClass(String classname, BDIModel micromodel, ClassLoader cl)
 	{
@@ -97,6 +103,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 	 */
 	public Class<?> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl, final Set<String> done)
 	{
+		Log.i(LOG_TAG, "Generating " + clname);
 		Class<?> ret = null;
 
 		final List<String> todo = new ArrayList<String>();
@@ -114,8 +121,14 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 			JadexDexClassLoader androidCl = (JadexDexClassLoader) SUtil.androidUtils().findJadexDexClassLoader(cl.getParent());
 			// is = SUtil.getResource(APP_PATH, cl);
 			String appPath = ((JadexDexClassLoader) androidCl).getDexPath();
-			is = getFileInputStream(new File(appPath));
-			ApplicationReader ar = new ApplicationReader(api, is);
+			ApplicationReader ar = arCache.get(appPath);
+			if (ar == null) {
+				is = getFileInputStream(new File(appPath));
+				ar = new ApplicationReader(api, is);
+				arCache.put(appPath, ar);
+			} else {
+				Log.i(LOG_TAG, "Got ApplicationReader from cache");
+			}
 			ApplicationWriter aw = new ApplicationWriter();
 			ApplicationNode an = new ApplicationNode(api);
 			
@@ -129,7 +142,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 				{
 					if (classPattern.matcher(name).matches())
 					{
-						System.out.println("visit class: " + name);
+						Log.d(LOG_TAG, "visit class: " + name);
 						final ClassNode cn = new ClassNode(api, access, name, signature, superName, interfaces);
 						classes.add(cn);
 						final ClassVisitor superVisitor = super.visitClass(access, iname, signature, superName, interfaces);
@@ -261,7 +274,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 				transformClassNode(ClassNodeWrapper.wrap(classNode), iclname, model);
 				String[] signature = classNode.signature == null? null : classNode.signature.toArray(new String[classNode.signature.size()]);
 				String[] interfaces = classNode.interfaces == null ? null :classNode.interfaces.toArray(new String[classNode.interfaces.size()]);
-				System.out.println("write class: " + classNode.name);
+				Log.i(LOG_TAG, "write class: " + classNode.name);
 				ClassVisitor visitClass = aw.visitClass(classNode.access, classNode.name, signature, classNode.superName, interfaces);
 				classNode.accept(visitClass);
 			}
