@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-applib-bdi"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-applications-bdi"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-applications-bdibpmn"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-applications-bdiv3"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-applications-bpmn"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-applications-gpmn"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-applications-micro"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-applications-web"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-applications-webservice"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-bridge"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-commons"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-distribution-minimal"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-distribution-pro"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-distribution-standard"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-javaparser"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-application"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-bdi"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-bdibpmn"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-bdiv3"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-bpmn"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-component"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-extension-agr"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-extension-envsupport"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-extension-envsupport-jmonkey"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-extension-envsupport-opengl"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-gpmn"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-kernel-micro"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-model-bpmn"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-nuggets"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform-extension-management"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform-extension-maven"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform-extension-relay"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform-extension-relay-standalone"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform-extension-securetransport"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform-extension-webservice"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform-extension-webservice-desktop"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform-relay-web"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-platform-standalone-launch"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-rules"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-rules-applications"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-rules-eca"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-rules-tools"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-runtimetools-swing"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-tools-base"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-tools-base-swing"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-tools-bdi"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-tools-bpmn"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-tools-comanalyzer"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jadex-xml"/>
+	<classpathentry kind="lib" path="C:/db-derby-10.9.1.0-bin/lib/derby.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
