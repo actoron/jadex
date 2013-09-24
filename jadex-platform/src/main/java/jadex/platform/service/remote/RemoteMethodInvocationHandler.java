@@ -18,6 +18,7 @@ import jadex.commons.future.IPullSubscriptionIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.ITuple2Future;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.PullIntermediateDelegationFuture;
 import jadex.commons.future.PullSubscriptionIntermediateDelegationFuture;
@@ -25,6 +26,7 @@ import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.future.Tuple2Future;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.platform.service.remote.commands.RemoteFuturePullCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
@@ -351,6 +353,10 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 					super.setExceptionIfUndone(exception);
 				}
 			};
+		}
+		else if(SReflect.isSupertype(ITuple2Future.class, type))
+		{
+			future = new Tuple2Future();
 		}
 		else if(SReflect.isSupertype(IIntermediateFuture.class, type))
 		{

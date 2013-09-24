@@ -12,7 +12,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITestService.class))
+@ProvidedServices({@ProvidedService(type=ITestService.class)})
 public class ProviderAgent implements ITestService
 {
 	/**
@@ -27,6 +27,14 @@ public class ProviderAgent implements ITestService
 //		System.out.println("called method getSomeResults()");
 		return ret;
 	}
+	
+//	/**
+//	 *  Example implementation of the method.
+//	 */
+//	public ITuple2Future<String, Integer> getSomeResults2()
+//	{
+//		return getSomeResults();
+//	}
 	
 //	/**
 //	 * 

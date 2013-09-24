@@ -412,6 +412,23 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public E getNextIntermediateResult()
     {
+    	return getNextIntermediateResult(null);
+    }
+    
+    /**
+     *  Iterate over the intermediate results in a blocking fashion.
+     *  Manages results independently for different callers, i.e. when called
+     *  from different threads, each thread receives all intermediate results.
+     *  
+     *  The operation is guaranteed to be non-blocking, if hasNextIntermediateResult()
+     *  has returned true before for the same caller. Otherwise the caller is blocked
+     *  until a result is available or the future is finished.
+     *  
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getNextIntermediateResult(ISuspendable sus)
+    {
     	Integer	index;
     	synchronized(this)
     	{
@@ -424,18 +441,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 			}
 			indices.put(Thread.currentThread(), index);
     	}
-		return doGetNextIntermediateResult(index.intValue()-1);
+		return doGetNextIntermediateResult(index.intValue()-1, sus);
     }
     
     /**
      *  Perform the get without increasing the index.
      */
-    protected E doGetNextIntermediateResult(int index)
+    protected E doGetNextIntermediateResult(int index, ISuspendable sus)
     {
        	E	ret	= null;
     	boolean	suspend	= false;
     	
-		ISuspendable	caller	= null;
+		ISuspendable	caller	= sus;
     	synchronized(this)
     	{
     		if(results!=null && results.size()>index)
@@ -454,7 +471,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		else
     		{
     			suspend	= true;
-    	    	caller	= ISuspendable.SUSPENDABLE.get();
+    			if(caller==null)
+    				caller	= ISuspendable.SUSPENDABLE.get();
     	    	if(caller==null)
     	    	{
     		   		throw new RuntimeException("No suspendable element.");
@@ -481,7 +499,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			}
     			// else already resumed.
     		}
-	    	ret	= doGetNextIntermediateResult(index);
+	    	ret	= doGetNextIntermediateResult(index, sus);
     	}
     	
     	return ret;

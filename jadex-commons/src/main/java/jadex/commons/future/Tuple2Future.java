@@ -47,7 +47,17 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
      */
     public E getFirstResult()
     {
-    	return (E)getXResult(0);
+    	return getFirstResult(null);
+    }
+    
+    /**
+     *  Get the first result.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getFirstResult(ISuspendable caller)
+    {
+    	return (E)getXResult(0, caller);
     }
     
     /**
@@ -57,7 +67,17 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
      */
     public F getSecondResult()
     {
-    	return (F)getXResult(1);
+    	return getSecondResult(null);
+    }
+    
+    /**
+     *  Get the second result.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public F getSecondResult(ISuspendable caller)
+    {
+    	return (F)getXResult(1, caller);
     }
     
 	/**
@@ -95,7 +115,7 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
 	 *  @return	The next intermediate result.
 	 *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
 	 */
-    protected Object getXResult(int idx)
+    protected Object getXResult(int idx, ISuspendable sus)
     {
     	TupleResult res = null;
     	for(int i=0; i<getMax() && res==null; i++)
@@ -103,7 +123,7 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
     		res = findResult(idx);
     		if(res==null)
     		{
-    			res = getNextIntermediateResult();
+    			res = getNextIntermediateResult(sus);
     			if(res.getNum()!=idx)
     				res = null;
     		}

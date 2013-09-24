@@ -512,6 +512,10 @@ public class SBpmnModelWriter
 						out.print("\" scope=\"");
 						out.print(escapeString(scope));
 					}
+					
+					boolean dyn = rs.getDefaultBinding().isDynamic();
+					out.print("\" dynamic=\"");
+					out.print(dyn);
 				}
 				
 				out.println("\"/>");

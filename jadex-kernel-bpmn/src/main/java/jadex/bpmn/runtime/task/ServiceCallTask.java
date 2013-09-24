@@ -21,6 +21,7 @@ import jadex.bridge.nonfunctional.search.IServiceEvaluator;
 import jadex.bridge.nonfunctional.search.ServiceRankingResultListener;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -173,23 +174,43 @@ public class ServiceCallTask implements ITask
 				ComposedEvaluator<Object> ranker = new ComposedEvaluator<Object>();
 				ranker.addEvaluator(eval);
 				
+//				process.getServiceContainer().getRequiredServices(service)
+//					.addResultListener(new ServiceRankingResultListener<Object>(ranker, null, 
+//					new ExceptionDelegationResultListener<Collection<Object>, Void>(ret)
+//				{
+//					public void customResultAvailable(Collection<Object> results)
+//					{
+//						System.out.println("services: "+results);
+//						if(results.isEmpty())
+//						{
+//							ret.setException(new ServiceNotFoundException(fservice));
+//						}
+//						else
+//						{
+//							invokeService(process, fmethod, fservice, fresultparam, args, context, results.iterator().next())
+//								.addResultListener(new DelegationResultListener<Void>(ret));
+//						}
+//					}
+//				}));
+				
 				process.getServiceContainer().getRequiredServices(service)
-					.addResultListener(new ServiceRankingResultListener<Object>(ranker, null, 
-					new ExceptionDelegationResultListener<Collection<Object>, Void>(ret)
+					.addResultListener(new ServiceRankingResultListener<Object>(new ExceptionDelegationResultListener<Collection<Tuple2<Object, Double>>, Void>(ret)
 				{
-					public void customResultAvailable(Collection<Object> results)
+					public void customResultAvailable(Collection<Tuple2<Object, Double>> results)
 					{
+						System.out.println("services: "+results);
 						if(results.isEmpty())
 						{
 							ret.setException(new ServiceNotFoundException(fservice));
 						}
 						else
 						{
-							invokeService(process, fmethod, fservice, fresultparam, args, context, results.iterator().next())
+							invokeService(process, fmethod, fservice, fresultparam, args, context, results.iterator().next().getFirstEntity())
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}
-				}));
+				}, ranker, null));
+					
 			}
 			catch(Exception e)
 			{

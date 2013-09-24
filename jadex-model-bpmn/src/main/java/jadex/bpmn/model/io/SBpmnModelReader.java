@@ -879,17 +879,20 @@ public class SBpmnModelReader
 				ClassInfo itrface = attrs.get("interface") != null? new ClassInfo(attrs.get("interface")) : null;
 				Boolean multi = attrs.get("multi") != null? Boolean.parseBoolean(attrs.get("multi")) : null;
 				String scope = attrs.get("scope");
+				String dyn = attrs.get("dynamic");
 				
 				RequiredServiceInfo rs = new RequiredServiceInfo();
 				rs.setName(name);
 				rs.setType(itrface);
-				if (multi != null)
+				if(multi != null)
 				{
 					rs.setMultiple(multi.booleanValue());
 				}
 				rs.setDefaultBinding(new RequiredServiceBinding());
 				rs.getDefaultBinding().setScope(scope);
-				((ModelInfo) model.getModelInfo()).addRequiredService(rs);
+				if(dyn!=null)
+					rs.getDefaultBinding().setDynamic(Boolean.parseBoolean(dyn));
+				((ModelInfo)model.getModelInfo()).addRequiredService(rs);
 			}
 			else if ("requiredserviceconfiguration".equals(tag.getLocalPart()))
 			{

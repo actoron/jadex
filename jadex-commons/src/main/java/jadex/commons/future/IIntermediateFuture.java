@@ -49,4 +49,18 @@ public interface IIntermediateFuture<E> extends IFuture<Collection <E>>
      *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
      */
     public E getNextIntermediateResult();
+    
+//    /**
+//     *  Iterate over the intermediate results in a blocking fashion.
+//     *  Manages results independently for different callers, i.e. when called
+//     *  from different threads, each thread receives all intermediate results.
+//     *  
+//     *  The operation is guaranteed to be non-blocking, if hasNextIntermediateResult()
+//     *  has returned true before for the same caller. Otherwise the caller is blocked
+//     *  until a result is available or the future is finished.
+//     *  
+//     *  @return	The next intermediate result.
+//     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+//     */
+//    public E getNextIntermediateResult(ISuspendable sus);
 }

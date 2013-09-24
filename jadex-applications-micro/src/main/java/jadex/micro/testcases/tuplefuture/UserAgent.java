@@ -2,6 +2,7 @@ package jadex.micro.testcases.tuplefuture;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.MicroAgent;
@@ -20,9 +21,15 @@ import jadex.micro.annotation.Results;
  * 
  */
 @Agent
-@ComponentTypes(@ComponentType(name="ta", filename="jadex.micro.testcases.tuplefuture.ProviderAgent.class"))
-@RequiredServices(@RequiredService(name="ts", type=ITestService.class, 
-	binding=@Binding(create=true, creationinfo=@CreationInfo(type="ta"))))
+@ComponentTypes({
+	@ComponentType(name="ta", filename="jadex.micro.testcases.tuplefuture.ProviderAgent.class"),
+	@ComponentType(name="ta2", filename="jadex.micro.testcases.tuplefuture.Provider2Agent.class")
+})
+@RequiredServices(
+{
+	@RequiredService(name="ts", type=ITestService.class, 
+		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, create=true, creationinfo=@CreationInfo(type="ta"))),
+})
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UserAgent
 {

@@ -175,13 +175,13 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     /**
      *  Perform the get without increasing the index.
      */
-    protected E doGetNextIntermediateResult(int index)
+    protected E doGetNextIntermediateResult(int index, ISuspendable sus)
     {
        	E	ret	= null;
     	boolean	suspend	= false;
     	
     	List<E>	ownres;
-		ISuspendable	caller	= null;
+		ISuspendable	caller	= sus;
     	synchronized(this)
     	{
     		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
@@ -205,7 +205,8 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     		else
     		{
     			suspend	= true;
-    	    	caller	= ISuspendable.SUSPENDABLE.get();
+    			if(caller==null)
+    				caller	= ISuspendable.SUSPENDABLE.get();
     	    	if(caller==null)
     	    	{
     		   		throw new RuntimeException("No suspendable element.");
@@ -242,7 +243,7 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
     	    	   	icallers.put(caller, CALLER_SUSPENDED);
     				caller.suspend(this, -1);
     	    	   	icallers.remove(caller);
-    		    	ret	= doGetNextIntermediateResult(index);
+    		    	ret	= doGetNextIntermediateResult(index, sus);
     			}
     			// else already resumed.
     		}

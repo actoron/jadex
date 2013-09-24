@@ -17,10 +17,24 @@ public interface ITuple2Future<E, F> extends IIntermediateFuture<TupleResult>
      */
     public E getFirstResult();
     
+	/**
+     *  Get the first result.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public E getFirstResult(ISuspendable caller);
+    
     /**
      *  Get the second result.
      *  @return	The next intermediate result.
      *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
      */
     public F getSecondResult();
+    
+    /**
+     *  Get the second result.
+     *  @return	The next intermediate result.
+     *  @throws NoSuchElementException, when there are no more intermediate results and the future is finished. 
+     */
+    public F getSecondResult(ISuspendable caller);
 }
