@@ -13,8 +13,14 @@
       <jadex:providedservice name="aser" interface="jadex.bpmn.examples.nfprops.IAService" class="jadex.bpmn.examples.nfprops.AService" proxytype="decoupled"/>
     </jadex:providedservices>
     <jadex:requiredservices>
-      <jadex:requiredservice name="aser" interface="jadex.bpmn.examples.nfprops.IAService" multi="true" scope="platform"/>
+      <jadex:requiredservice name="aser" interface="jadex.bpmn.examples.nfprops.IAService" multi="true" scope="platform" dynamic="true"/>
     </jadex:requiredservices>
+    <jadex:configurations>
+      <jadex:configuration name="default">
+      </jadex:configuration>
+      <jadex:configuration name="only service user">
+      </jadex:configuration>
+    </jadex:configurations>
   </semantic:extension>
   <semantic:process name="Pool" id="qem4RVqaTvHARCR2">
     <semantic:startEvent id="zait5KWxNKxr6m2U">
@@ -27,7 +33,7 @@
         <semantic:timeDuration>1000</semantic:timeDuration>
       </semantic:timerEventDefinition>
     </semantic:intermediateCatchEvent>
-    <semantic:task name="Invoke best \nService" id="0Iqn/r/XXotuw4WK">
+    <semantic:task name="Invoke fastest\nService" id="0Iqn/r/XXotuw4WK">
       <semantic:incoming>KmJy/PwMDTQOJSmG</semantic:incoming>
       <semantic:incoming>HahXfefD1HgdKs55</semantic:incoming>
       <semantic:outgoing>EZtVjFUlhql3UeS+</semantic:outgoing>

@@ -731,7 +731,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param name The services name.
 	 *  @return The service.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(String name)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name)
 	{
 		return getRequiredServices(name, false);
 	}
@@ -810,7 +810,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
 	{
 		return getRequiredServices(name, rebind, null);
 	}
@@ -819,15 +819,15 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IFilter<T> filter)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IFilter<T> filter)
 	{
 		if(shutdowned)
-			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
+			return new TerminableIntermediateFuture<T>(new ComponentTerminatedException(id));
 
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
 		if(info==null)
 		{
-			IntermediateFuture<T> ret = new IntermediateFuture<T>();
+			TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 			ret.setException(new ServiceNotFoundException(name));
 			return ret;
 		}
@@ -859,11 +859,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
 	{
 		if(info==null)
 		{
-			IntermediateFuture<T> ret = new IntermediateFuture<T>();
+			TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}

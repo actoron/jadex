@@ -152,7 +152,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param name The services name.
 	 *  @return The service.
 	 */
-	public IIntermediateFuture getRequiredServices(String name)
+	public ITerminableIntermediateFuture getRequiredServices(String name)
 	{
 		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name);
 	}
@@ -170,7 +170,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
+	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind);
 	}
@@ -188,7 +188,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
+	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
 	{
 		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind, filter);
 	}

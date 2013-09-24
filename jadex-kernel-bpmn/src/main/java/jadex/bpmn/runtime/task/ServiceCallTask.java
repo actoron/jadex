@@ -20,6 +20,7 @@ import jadex.bridge.nonfunctional.search.ComposedEvaluator;
 import jadex.bridge.nonfunctional.search.IServiceEvaluator;
 import jadex.bridge.nonfunctional.search.ServiceRankingResultListener;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
@@ -35,6 +36,7 @@ import jadex.javaparser.SJavaParser;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -153,11 +155,13 @@ public class ServiceCallTask implements ITask
 		
 		if(service==null)
 		{
-			throw new RuntimeException("No 'service' specified for ServiceCallTask: "+context);
+			ret.setException(new RuntimeException("No 'service' specified for ServiceCallTask: "+context));
+			return ret;
 		}
 		if(method==null)
 		{
-			throw new RuntimeException("No 'method' specified for ServiceCallTask: "+context);
+			ret.setException(new RuntimeException("No 'method' specified for ServiceCallTask: "+context));
+			return ret;
 		}
 		
 		// Fetch service and call method.
@@ -165,12 +169,49 @@ public class ServiceCallTask implements ITask
 		final String	fmethod	= method;
 		final String	fresultparam	= resultparam;
 		
+		Class<?> servicetype = process.getServiceContainer().getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader());
+		Method[] methods = servicetype.getMethods();
+		Method met = null;
+		for(Method meth : methods)
+		{
+			if(meth.toString().equals(fmethod))
+			{
+				met = meth;
+				break;
+			}
+		}
+		if(met==null)
+		{
+			ret.setException(new RuntimeException("SCT: "+ String.valueOf(process.getModel().getFilename()) + " Method "+fmethod+" not found for service "+fservice+": "+context));
+			return ret;
+		}
+		final Method m = met;
+		
 		if(rank!=null) //|| multiple)
 		{
+			IServiceEvaluator eval = null;
 			try
 			{
 				Class<?> evacl = SReflect.findClass(rank, process.getModel().getAllImports(), process.getClassLoader());
-				IServiceEvaluator eval = (IServiceEvaluator)evacl.newInstance();
+				try
+				{
+					Constructor con = evacl.getConstructor(new Class[]{MethodInfo.class});
+					eval = (IServiceEvaluator)con.newInstance(new Object[]{new MethodInfo(m)});
+				}
+				catch(Exception e)
+				{
+					try
+					{
+						Constructor con = evacl.getConstructor(new Class[0]);
+						eval = (IServiceEvaluator)con.newInstance(new Object[0]);
+					}
+					catch(Exception ex)
+					{
+						ret.setException(ex);
+						return ret;
+					}
+				}
+				
 				ComposedEvaluator<Object> ranker = new ComposedEvaluator<Object>();
 				ranker.addEvaluator(eval);
 				
@@ -205,7 +246,7 @@ public class ServiceCallTask implements ITask
 						}
 						else
 						{
-							invokeService(process, fmethod, fservice, fresultparam, args, context, results.iterator().next().getFirstEntity())
+							invokeService(process, fmethod, fservice, fresultparam, args, context, results.iterator().next().getFirstEntity(), m)
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}
@@ -224,7 +265,7 @@ public class ServiceCallTask implements ITask
 			{
 				public void customResultAvailable(Object result)
 				{
-					invokeService(process, fmethod, fservice, fresultparam, args, context, result).addResultListener(new DelegationResultListener<Void>(ret));
+					invokeService(process, fmethod, fservice, fresultparam, args, context, result, m).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -236,26 +277,10 @@ public class ServiceCallTask implements ITask
 	 * 
 	 */
 	protected IFuture<Void> invokeService(final IInternalAccess process, String fmethod, String fservice, final String fresultparam, 
-		List<Object> args, final ITaskContext context, Object service)
+		List<Object> args, final ITaskContext context, Object service, Method m)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		Class<?> servicetype = process.getServiceContainer().getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader());
-		Method[] methods = servicetype.getMethods();
-		Method m = null;
-		for(Method method : methods)
-		{
-			if(method.toString().equals(fmethod))
-			{
-				m = method;
-				break;
-			}
-		}
-//				SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
-		if(m==null)
-		{
-			throw new RuntimeException("SCT: "+ String.valueOf(process.getModel().getFilename()) + " Method "+fmethod+" not found for service "+fservice+": "+context);
-		}
 		try
 		{
 			Object	val	= m.invoke(service, args.toArray());

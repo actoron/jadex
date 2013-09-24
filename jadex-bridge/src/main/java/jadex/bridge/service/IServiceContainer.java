@@ -7,6 +7,7 @@ import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
  *  Internal interface for a service container. Allows
@@ -115,7 +116,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param name The services name.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(String name);
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name);
 	
 	/**
 	 *  Get a required service.
@@ -127,7 +128,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  Get a required services.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind);
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind);
 	
 	/**
 	 *  Get a required service.
@@ -139,7 +140,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  Get a required services.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IFilter<T> filter);
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IFilter<T> filter);
 	
 	/**
 	 *  Add a service interceptor.

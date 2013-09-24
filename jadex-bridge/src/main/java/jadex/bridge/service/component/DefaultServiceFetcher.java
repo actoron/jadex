@@ -29,8 +29,10 @@ import jadex.commons.future.FutureFinishChecker;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 
 import java.util.ArrayList;
@@ -197,15 +199,17 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required multi service.
 	 *  
+	 *  todo: implement termination!!!!
+	 *  
 	 *  todo: should also create component(s) when no service could be found
 	 */
-	public <T> IIntermediateFuture<T> getServices(final RequiredServiceInfo info, 
+	public <T> ITerminableIntermediateFuture<T> getServices(final RequiredServiceInfo info, 
 		final RequiredServiceBinding bd, boolean rebind, final IFilter<T> filter)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader());
 		
-		final IntermediateFuture<T> ret = new IntermediateFuture<T>();
+		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
 		
 		if(rebind)

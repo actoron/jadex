@@ -25,7 +25,6 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
-import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -34,8 +33,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.lang.reflect.Proxy;
 import java.util.Collection;
@@ -161,17 +162,16 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
 	{
 		if(shutdowned)
 		{
-			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
+			return new TerminableIntermediateFuture<T>(new ComponentTerminatedException(id));
 		}
 
-
-		IIntermediateFuture<T>	fut	= super.getRequiredServices(info, binding, rebind, filter);
+		ITerminableIntermediateFuture<T>	fut	= super.getRequiredServices(info, binding, rebind, filter);
 		
-		return (IIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
+		return (ITerminableIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 	
 //	/**

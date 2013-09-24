@@ -438,7 +438,7 @@ public class CacheServiceContainer	implements IServiceContainer
 		throw new UnsupportedOperationException();
 	}
 
-	public IIntermediateFuture getRequiredServices(String name)
+	public ITerminableIntermediateFuture getRequiredServices(String name)
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -448,7 +448,7 @@ public class CacheServiceContainer	implements IServiceContainer
 		throw new UnsupportedOperationException();
 	}
 
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
+	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -458,7 +458,7 @@ public class CacheServiceContainer	implements IServiceContainer
 		throw new UnsupportedOperationException();
 	}
 
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
+	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
 	{
 		throw new UnsupportedOperationException();
 	}

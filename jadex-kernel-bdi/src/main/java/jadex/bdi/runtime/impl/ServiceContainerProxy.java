@@ -155,7 +155,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param name The services name.
 	 *  @return The service.
 	 */
-	public IIntermediateFuture getRequiredServices(String name)
+	public ITerminableIntermediateFuture getRequiredServices(String name)
 	{
 		String prefix = interpreter.findServicePrefix(scope);
 		return interpreter.getServiceContainer().getRequiredServices(prefix+name);
@@ -175,7 +175,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
+	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		String prefix = interpreter.findServicePrefix(scope);
 		return interpreter.getServiceContainer().getRequiredServices(prefix+name, rebind);
@@ -195,7 +195,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
+	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
 	{
 		String prefix = interpreter.findServicePrefix(scope);
 		return interpreter.getServiceContainer().getRequiredServices(prefix+name, rebind, filter);

@@ -6,6 +6,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+/**
+ *  Basic evaluator implementation for service and methods.
+ */
 public abstract class BasicEvaluator<T> implements IServiceEvaluator
 {
 	protected String propertyname;
@@ -14,21 +17,39 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	
 	protected Object unit;
 	
+	/**
+	 *  Create a new evaluator.
+	 *  @param propertyname The property name.
+	 */
 	public BasicEvaluator(String propertyname)
 	{
 		this(propertyname, null, null);
 	}
 	
+	/**
+	 *  Create a new evaluator.
+	 *  @param propertyname The property name.
+	 */
 	public BasicEvaluator(String propertyname, Object unit)
 	{
 		this(propertyname, null, unit);
 	}
 	
+	/**
+	 *  Create a new evaluator.
+	 *  @param propertyname The property name.
+	 */
 	public BasicEvaluator(String propertyname, MethodInfo mi)
 	{
 		this(propertyname, mi, null);
 	}
 	
+	/**
+	 *  Create a new evaluator.
+	 *  @param propertyname The property name.
+	 *  @param methodinfo The method.
+	 *  @param unit The unit.
+	 */
 	public BasicEvaluator(String propertyname, MethodInfo methodinfo, Object unit)
 	{
 		this.propertyname = propertyname;
@@ -36,8 +57,16 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 		this.unit = unit;
 	}
 	
+	/**
+	 * 
+	 * @param propertyvalue
+	 * @return
+	 */
 	public abstract double calculateEvaluation(T propertyvalue);
 	
+	/**
+	 *  Evaluate the service of method.
+	 */
 	public IFuture<Double> evaluate(IService service)
 	{
 		final Future<Double> ret = new Future<Double>();
@@ -45,7 +74,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 		{
 			public void resultAvailable(Object result)
 			{
-				ret.setResult(calculateEvaluation((T) result));
+				ret.setResult(calculateEvaluation((T)result));
 			}
 
 			public void exceptionOccurred(Exception exception)
@@ -53,9 +82,9 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 				ret.setException(exception);
 			}
 		};
-		if (methodinfo != null)
+		if(methodinfo != null)
 		{
-			if (unit != null)
+			if(unit != null)
 			{
 				service.getMethodNFPropertyValue(methodinfo, propertyname, unit).addResultListener(listener);
 			}

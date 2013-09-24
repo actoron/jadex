@@ -28,17 +28,15 @@ import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
-import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
-import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -772,7 +770,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param name The services name.
 	 *  @return The service.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(String name)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name)
 	{
 		return getServiceContainer().getRequiredServices(name);
 	}
