@@ -920,8 +920,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			if(cnt==num)
 			{
-				if(!(future instanceof IntermediateFuture))
-					System.out.println("sarsdgaf");
 				IntermediateFuture ifut = (IntermediateFuture)future;
 				cnt++;
 				if(fini)

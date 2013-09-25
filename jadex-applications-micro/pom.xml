@@ -17,6 +17,13 @@
 		testcases using micro agents.
 	</description>
 
+	<repositories>
+	    <repository>
+			<id>xuggle repo</id>
+			<url>http://xuggle.googlecode.com/svn/trunk/repo/share/java/</url>
+		</repository>
+	</repositories>
+	
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -80,6 +87,24 @@
 			<version>1.9.3</version>
 		</dependency>
 		-->
+		
+		<dependency>
+		    <groupId>com.github.sarxos</groupId>
+		    <artifactId>webcam-capture</artifactId>
+		    <version>0.3.9</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.jcodec</groupId>
+		    <artifactId>jcodec</artifactId>
+		    <version>0.1.5</version>
+		</dependency>
+	
+		<!--  <dependency>
+			<groupId>xuggle</groupId>
+			<artifactId>xuggle-xuggler</artifactId>
+			<version>5.2</version>
+		</dependency>-->
 		
 	</dependencies>
 </project>
