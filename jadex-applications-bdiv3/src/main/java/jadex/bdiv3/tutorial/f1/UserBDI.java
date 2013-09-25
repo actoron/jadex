@@ -3,8 +3,8 @@ package jadex.bdiv3.tutorial.f1;
 import jadex.bdiv3.BDIAgent;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
@@ -15,7 +15,6 @@ import jadex.micro.annotation.Description;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -54,13 +53,18 @@ public class UserBDI
 				final JTextField tfg = pp.createTextField("German Word");
 				JButton bt = pp.createButton("Initiate", "Translate");
 				
+				f.add(pp, BorderLayout.CENTER);
+				f.pack();
+				f.setLocation(SGUI.calculateMiddlePosition(f));
+				f.setVisible(true);
+				
 				bt.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
 						// Search a translation service
 						SServiceProvider.getServices(agent.getServiceProvider(), ITranslationService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new IIntermediateResultListener<ITranslationService>()
+							.addResultListener(new IntermediateDefaultResultListener<ITranslationService>()
 						{
 							public void intermediateResultAvailable(ITranslationService ts)
 							{
@@ -80,27 +84,9 @@ public class UserBDI
 									}
 								}));
 							}
-
-							public void exceptionOccurred(Exception exception)
-							{
-							}
-							
-							public void finished()
-							{
-							}
-							
-							public void resultAvailable(Collection<ITranslationService> result)
-							{
-							}
 						});
 					}
 				});
-				
-				f.add(pp, BorderLayout.CENTER);
-				
-				f.pack();
-				f.setLocation(SGUI.calculateMiddlePosition(f));
-				f.setVisible(true);
 			}
 		});
 	}

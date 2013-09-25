@@ -1,6 +1,5 @@
 package jadex.bdiv3.tutorial.f2;
 
-import jadex.bridge.service.annotation.ParameterInfo;
 import jadex.commons.future.IFuture;
 
 /**
@@ -13,5 +12,6 @@ public interface ITranslationService
 	 *  @param eword The english word.
 	 *  @return The german translation.
 	 */
-	public IFuture<String> translateEnglishGerman(@ParameterInfo("eword") String eword);
+//	public IFuture<String> translateEnglishGerman(@ParameterInfo("eword") String eword);
+	public IFuture<String> translateEnglishGerman(String eword);
 }

@@ -55,9 +55,15 @@ public class TranslationBDI
 	 *  @param tg The translation goal.
 	 */
 	@Plan(trigger=@Trigger(goals=TranslationGoal.class))
-	public void translatePlan(TranslationGoal tg)
+	public String translatePlan(String eword)
 	{
-		String eword = wordtable.get(tg.getEWord());
-		tg.setGWord(eword);
+		return  wordtable.get(eword);
 	}
+	
+//	@Plan(trigger=@Trigger(goals=TranslationGoal.class))
+//	public void translatePlan(TranslationGoal tg)
+//	{
+//		String eword = wordtable.get(tg.getEWord());
+//		tg.setGWord(eword);
+//	}
 }
