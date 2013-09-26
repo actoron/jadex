@@ -124,6 +124,8 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
     		if(res==null)
     		{
     			res = getNextIntermediateResult(sus);
+    			if(res==null)
+    				System.out.println("sdfsdffsd");
     			if(res.getNum()!=idx)
     				res = null;
     		}

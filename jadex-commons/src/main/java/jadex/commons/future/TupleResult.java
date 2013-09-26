@@ -14,6 +14,13 @@ public class TupleResult
 	protected Object result;
 
 	/**
+	 *  Create a new TupleResult. 
+	 */
+	public TupleResult()
+	{
+	}
+
+	/**
 	 *  Create a new SequenceResult. 
 	 */
 	public TupleResult(int num, Object result)
