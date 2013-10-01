@@ -3581,7 +3581,7 @@ public class SUtil
 	}
 	
 	/** Cached for speed. */
-	public static String mac;
+	public static String[] macs;
 
 	/**
 	 *  Get the mac address.
@@ -3589,15 +3589,32 @@ public class SUtil
 	 */
 	public static String getMacAddress()
 	{
-		if(mac==null)
+		if(macs==null)
 		{
 			if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
 			{
-				mac	= SNonAndroid.getMacAddress();
+				macs	= SNonAndroid.getMacAddresses();
 			}
 		}
 		
-		return SUtil.NULL.equals(mac)? null: mac;
+		return macs.length==0? null: macs[0];
+	}
+	
+	/**
+	 *  Get the mac address.
+	 *  @return The mac address.
+	 */
+	public static String[] getMacAddresses()
+	{
+		if(macs==null)
+		{
+			if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
+			{
+				macs	= SNonAndroid.getMacAddresses();
+			}
+		}
+		
+		return macs;
 	}
 	
 	/**

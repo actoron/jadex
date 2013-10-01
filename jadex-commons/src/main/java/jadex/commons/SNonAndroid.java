@@ -231,6 +231,16 @@ public class SNonAndroid
 	 */
 	public static String getMacAddress()
 	{
+		String[] ret = getMacAddresses();
+		return ret.length>0? ret[0]: null;
+	}
+	
+	/**
+	 *  Get the mac address.
+	 *  @return The mac address.
+	 */
+	public static String[] getMacAddresses()
+	{
 		TreeSet<String> res = new TreeSet<String>(new Comparator<String>()
 		{
 			public int compare(String o1, String o2)
@@ -260,6 +270,6 @@ public class SNonAndroid
 //			e.printStackTrace();
 		}
 			
-		return res.isEmpty()? SUtil.NULL: res.first();
+		return res.isEmpty()? new String[0]: (String[])res.toArray(new String[res.size()]);
 	}
 }

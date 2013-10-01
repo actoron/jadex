@@ -4,6 +4,7 @@ import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.sensor.cpu.CPULoadProperty;
 import jadex.bridge.sensor.cpu.CoreNumberProperty;
+import jadex.bridge.sensor.mac.MacAddressProperty;
 import jadex.bridge.sensor.memory.LoadedClassesProperty;
 import jadex.bridge.sensor.memory.MaxMemoryProperty;
 import jadex.bridge.sensor.memory.MaxPermGenMemoryProperty;
@@ -18,6 +19,7 @@ import jadex.micro.annotation.Agent;
 @Agent
 @NFProperties(
 {
+	@NFProperty(MacAddressProperty.class),
 	@NFProperty(CPULoadProperty.class),
 	@NFProperty(CoreNumberProperty.class),
 	@NFProperty(MaxMemoryProperty.class),

@@ -27,12 +27,6 @@ public class ProviderAndUserAgent extends UserAgent implements IAService
 	/** The invocation counter. */
 	protected int cnt;
 	
-//	@AgentCreated
-//	public void init()
-//	{
-//		JFrame f = new JFrame
-//	}
-	
 	/**
 	 *  Test method.
 	 */

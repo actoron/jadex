@@ -31,6 +31,7 @@ import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -482,7 +483,11 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		try
 		{
 			storeCurrentPanelSettings();
-			final IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
+//			final IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
+//			System.out.println(SUtil.arrayToString(clazz.getConstructors()));
+			Constructor<?> con = clazz.getDeclaredConstructor(new Class[0]);
+			con.setAccessible(true);
+			final IComponentViewerPanel panel = (IComponentViewerPanel)con.newInstance(new Object[0]);
 			panel.init(getJCC(), exta).addResultListener(new SwingDefaultResultListener<Void>(comptree)
 			{
 				public void customResultAvailable(Void result)

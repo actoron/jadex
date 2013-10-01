@@ -367,7 +367,7 @@ public class MicroClassReader
 			if(isAnnotationPresent(cma, GuiClass.class, cl))
 			{
 				GuiClass gui = (GuiClass)getAnnotation(cma, GuiClass.class, cl);
-				Class gclazz = gui.value();
+				Class<?> gclazz = gui.value();
 				
 				Map props = (Map)toset.get("properties");
 				if(props==null)
@@ -378,7 +378,7 @@ public class MicroClassReader
 				
 				if(!props.containsKey("componentviewer.viewerclass"))
 				{
-					props.put("componentviewer.viewerclass", gclazz);
+					props.put("componentviewer.viewerclass", gclazz.getName());
 				}
 			}
 			else if(isAnnotationPresent(cma, GuiClassName.class, cl))
