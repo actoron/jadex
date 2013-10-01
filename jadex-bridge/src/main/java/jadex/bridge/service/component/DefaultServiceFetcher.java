@@ -7,9 +7,14 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
+import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.AbstractNFProperty;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -19,6 +24,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.MethodInfo;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -809,7 +815,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 //	}
 	
 	/**
-	 *  Create a proxy.
+	 *  Create a required service proxy.
 	 */
 	public <T> IFuture<T> createProxy(final IService service, final RequiredServiceInfo info, final RequiredServiceBinding binding)
 	{
@@ -844,8 +850,36 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							public IFuture<T> execute(IInternalAccess ia)
 							{
 //								System.out.println("createProxy 2:"+service);
-								return new Future<T>((T)BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ia.getExternalAccess(), 
-									(IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding, realtime));
+								
+								T ret = (T)BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ia.getExternalAccess(), 
+									(IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding, realtime);
+								
+								IServiceIdentifier sid = service.getServiceIdentifier();
+								if(!ia.hasRequiredServicePropertyProvider(sid))
+								{
+									INFMixedPropertyProvider nfpp = ia.getRequiredServicePropertyProvider(service.getServiceIdentifier());
+									
+									List<NFRPropertyInfo> nfprops = info.getNFRProperties();
+									if(nfprops!=null)
+									{
+										for(NFRPropertyInfo nfprop: nfprops)
+										{
+											Class<?> clazz = nfprop.getClazz().getType(ia.getClassLoader());
+											INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, ia, (IService)ret, nfprop.getMethodInfo());
+											MethodInfo mi = nfprop.getMethodInfo();
+											if(mi==null)
+											{
+												nfpp.addNFProperty(nfp);
+											}
+											else
+											{
+												nfpp.addMethodNFProperty(mi, nfp);
+											}
+										}
+									}
+								}
+								
+								return new Future<T>(ret);
 							}
 						});
 						fut.addResultListener(new DelegationResultListener<T>(ret));

@@ -1,6 +1,7 @@
 package jadex.bridge.service;
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
 
@@ -59,6 +60,11 @@ public class RequiredServiceInfo
 	/** The list of interceptors. */
 	protected List<UnparsedExpression> interceptors;
 	
+	// nf props for required service
+	
+	/** The nf props. */
+	protected List<NFRPropertyInfo> nfproperties;
+	
 	//-------- constructors --------
 	
 	/**
@@ -93,32 +99,33 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class<?> type, String scope, Class<?> multiplextype)
 	{
-		this(name, type, false, multiplextype, new RequiredServiceBinding(name, scope));
+		this(name, type, false, multiplextype, new RequiredServiceBinding(name, scope), null);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
 	public RequiredServiceInfo(String name, Class<?> type, boolean multiple, 
-		Class<?> multiplextype, RequiredServiceBinding binding)
+		Class<?> multiplextype, RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops)
 	{
 		this(name, type!=null ? new ClassInfo(SReflect.getClassName(type)) : null,
 			multiple,
 			multiplextype!=null ? new ClassInfo(SReflect.getClassName(multiplextype)) : null,
-			binding);
+			binding, nfprops);
 	}
 
 	/**
 	 *  Create a new service info.
 	 */
 	public RequiredServiceInfo(String name, ClassInfo type, boolean multiple, 
-		ClassInfo multiplextype, RequiredServiceBinding binding)
+		ClassInfo multiplextype, RequiredServiceBinding binding, List<NFRPropertyInfo> nfprops)
 	{
 		this.name = name;
 		this.type	= type;
 		this.multiple = multiple;
 		this.multiplextype	= multiplextype;
 		this.binding = binding;
+		this.nfproperties = nfprops;
 	}
 
 	//-------- methods --------
@@ -241,5 +248,23 @@ public class RequiredServiceInfo
 	{
 		return interceptors==null? new UnparsedExpression[0]: 
 			interceptors.toArray(new UnparsedExpression[interceptors.size()]);
+	}
+	
+	/**
+	 *  Get the nfproperties.
+	 *  @return The nfproperties.
+	 */
+	public List<NFRPropertyInfo> getNFRProperties()
+	{
+		return nfproperties;
+	}
+
+	/**
+	 *  Set the nfproperties.
+	 *  @param nfproperties The nfproperties to set.
+	 */
+	public void setNFRProperties(List<NFRPropertyInfo> nfproperties)
+	{
+		this.nfproperties = nfproperties;
 	}
 }

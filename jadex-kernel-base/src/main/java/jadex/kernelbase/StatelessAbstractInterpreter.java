@@ -22,6 +22,8 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.nonfunctional.INFPropertyProvider;
+import jadex.bridge.nonfunctional.NFPropertyProvider;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
@@ -84,7 +86,7 @@ import java.util.logging.Logger;
  *  Implements the IComponentInstance interface and is responsible
  *  for realizing the outer structure of active components.
  */
-public abstract class StatelessAbstractInterpreter implements IComponentInstance
+public abstract class StatelessAbstractInterpreter extends NFPropertyProvider implements IComponentInstance
 {
 	/** Constant for step event. */
 	public static final String TYPE_COMPONENT = "component";
@@ -843,7 +845,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		for(int i=0; i<ms.length; i++)
 		{
 			ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType().getType(getClassLoader()), ms[i].isMultiple(), 
-				ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), ms[i].getDefaultBinding());
+				ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), ms[i].getDefaultBinding(), ms[i].getNFRProperties());
 			sermap.put(ms[i].getName(), ms[i]);
 		}
 
@@ -855,7 +857,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			{
 				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getServicePrefix()+cs[i].getName());
 				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-					ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(cs[i].getDefaultBinding()));
+					ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(cs[i].getDefaultBinding()), ms[i].getNFRProperties());
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
@@ -865,7 +867,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			{
 				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getBindings()[i].getName());
 				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(getBindings()[i]));
+					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(getBindings()[i]), ms[i].getNFRProperties());
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
@@ -2243,54 +2245,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		return ret;
 	}
 	
+	// Overrides getParent() of nfproperty provider super class
 	/**
-	 *  Returns the meta information about a non-functional property of this service.
-	 *  @param name Name of the property.
-	 *  @return The meta information about a non-functional property of this service.
+	 *  Get the parent.
+	 *  return The parent.
 	 */
-	public abstract Map<String, INFPropertyMetaInfo> getNFPropertyMetaInfos();
-	
-	/**
-	 *  Returns the names of all non-functional properties of this service.
-	 *  @return The names of the non-functional properties of this service.
-	 */
-	public abstract String[] getNFPropertyNames();
-	
-	/**
-	 *  Returns the meta information about a non-functional property of this service.
-	 *  @param name Name of the property.
-	 *  @return The meta information about a non-functional property of this service.
-	 */
-	public abstract INFPropertyMetaInfo getNFPropertyMetaInfo(String name);
-	
-	/**
-	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-	 *  @param name Name of the property.
-	 *  @param type Type of the property value.
-	 *  @return The current value of a non-functional property of this service.
-	 */
-	public abstract <T> IFuture<T> getNFPropertyValue(String name);
-	
-	/**
-	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-	 *  @param name Name of the property.
-	 *  @param type Type of the property value.
-	 *  @param unit Unit of the property value.
-	 *  @return The current value of a non-functional property of this service.
-	 */
-//	public abstract <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit);
-	public abstract <T, U> IFuture<T> getNFPropertyValue(String name, U unit);
-	
-	/**
-	 *  Add a new nf property.
-	 *  @param nfprop The nf property.
-	 */
-	public abstract IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop);
-	
-	/**
-	 *  Add a new nf property.
-	 *  @param nfprop The nf property.
-	 */
-	public abstract IFuture<Void> removeNFProperty(String name);
-
+	public INFPropertyProvider getParent()
+	{
+		return getComponentAdapter().getParent();
+	}
 }

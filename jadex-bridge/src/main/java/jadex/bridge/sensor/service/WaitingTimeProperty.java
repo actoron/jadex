@@ -41,16 +41,16 @@ public class WaitingTimeProperty extends TimedProperty
 			handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 			{
-				Map<Long, Long> times = new HashMap<Long, Long>();
+				Map<Object, Long> times = new HashMap<Object, Long>();
 				
-				public void methodCallStarted(Object proxy, Method method, Object[] args, long callid)
+				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid)
 				{
-					times.put(new Long(callid), new Long(System.currentTimeMillis()));
+					times.put(callid, new Long(System.currentTimeMillis()));
 				}
 				
-				public void methodCallFinished(Object proxy, Method method, Object[] args, long callid)
+				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid)
 				{
-					Long start = times.remove(new Long(callid));
+					Long start = times.remove(callid);
 					// May happen that property is added during ongoing call
 					if(start!=null)
 					{

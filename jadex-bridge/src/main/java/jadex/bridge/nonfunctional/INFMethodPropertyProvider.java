@@ -12,7 +12,7 @@ import java.util.Map;
  *  Interface for method-based non-functional property providers such
  *  as services.
  */
-public interface IMethodNFPropertyProvider
+public interface INFMethodPropertyProvider
 {
 	/**
 	 *  Returns meta information about a non-functional properties of all methods.

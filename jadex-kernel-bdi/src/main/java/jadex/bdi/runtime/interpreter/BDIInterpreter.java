@@ -31,9 +31,11 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.nonfunctional.INFProperty;
-import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
@@ -212,6 +214,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		stacacheelems.add(IBelief.class);
 		stacacheelems.add(IBeliefSet.class);
 	}
+	
+	/** The nf property providers for required services. */
+	protected Map<IServiceIdentifier, INFMixedPropertyProvider> reqserprops;
 	
 	//-------- refactor --------
 	
@@ -2358,83 +2363,108 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		}
 	}
 	
-	//-------- nf properties --------
-	
 	/**
-	 *  Returns the names of all non-functional properties of this service.
-	 *  @return The names of the non-functional properties of this service.
+	 *  Get the required service property provider for a service.
 	 */
-	public String[] getNFPropertyNames()
+	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
 	{
-		throw new UnsupportedOperationException();
-//		return nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
+		INFMixedPropertyProvider ret = null;
+		if(reqserprops==null)
+			reqserprops = new HashMap<IServiceIdentifier, INFMixedPropertyProvider>(); // use LRU?
+		ret = reqserprops.get(sid);
+		if(ret==null)
+		{
+			ret = new NFMethodPropertyProvider(null); // parent of required service property?
+			reqserprops.put(sid, ret);
+		}
+		return ret;
 	}
 	
 	/**
-	 *  Returns the meta information about a non-functional property of this service.
-	 *  @param name Name of the property.
-	 *  @return The meta information about a non-functional property of this service.
+	 *  Has the service a property provider.
 	 */
-	public INFPropertyMetaInfo getNFPropertyMetaInfo(String name)
+	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
 	{
-		throw new UnsupportedOperationException();
-//		return nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
+		return reqserprops!=null? reqserprops.get(sid)!=null: false;
 	}
 	
-	/**
-	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-	 *  @param name Name of the property.
-	 *  @param type Type of the property value.
-	 *  @return The current value of a non-functional property of this service.
-	 */
-	public <T> IFuture<T> getNFPropertyValue(String name)
-	{
-		return new Future(new UnsupportedOperationException());
-//		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
-//		return prop != null? prop.getValue(type) : null;
-	}
-	
-	/**
-	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-	 *  @param name Name of the property.
-	 *  @param type Type of the property value.
-	 *  @param unit Unit of the property value.
-	 *  @return The current value of a non-functional property of this service.
-	 */
-//	public <T, U> IFuture<T> getNFPropertyValue(String name,  Class<U> unit)
-	public <T, U> IFuture<T> getNFPropertyValue(String name,  U unit)
-	{
-		return new Future(new UnsupportedOperationException());
-//		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
-//		return prop != null? prop.getValue(type, unit) : null;
-	}
-	
-	/**
-	 *  Add a new nf property.
-	 *  @param nfprop The nf property.
-	 */
-	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 *  Add a new nf property.
-	 *  @param nfprop The nf property.
-	 */
-	public IFuture<Void> removeNFProperty(String name)
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 *  Returns the meta information about a non-functional property of this service.
-	 *  @param name Name of the property.
-	 *  @return The meta information about a non-functional property of this service.
-	 */
-	public Map<String, INFPropertyMetaInfo> getNFPropertyMetaInfos()
-	{
-		throw new UnsupportedOperationException();
-	}
+//	//-------- nf properties --------
+//	
+//	/**
+//	 *  Returns the names of all non-functional properties of this service.
+//	 *  @return The names of the non-functional properties of this service.
+//	 */
+//	public String[] getNFPropertyNames()
+//	{
+//		throw new UnsupportedOperationException();
+////		return nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
+//	}
+//	
+//	/**
+//	 *  Returns the meta information about a non-functional property of this service.
+//	 *  @param name Name of the property.
+//	 *  @return The meta information about a non-functional property of this service.
+//	 */
+//	public INFPropertyMetaInfo getNFPropertyMetaInfo(String name)
+//	{
+//		throw new UnsupportedOperationException();
+////		return nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
+//	}
+//	
+//	/**
+//	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+//	 *  @param name Name of the property.
+//	 *  @param type Type of the property value.
+//	 *  @return The current value of a non-functional property of this service.
+//	 */
+//	public <T> IFuture<T> getNFPropertyValue(String name)
+//	{
+//		return new Future(new UnsupportedOperationException());
+////		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
+////		return prop != null? prop.getValue(type) : null;
+//	}
+//	
+//	/**
+//	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
+//	 *  @param name Name of the property.
+//	 *  @param type Type of the property value.
+//	 *  @param unit Unit of the property value.
+//	 *  @return The current value of a non-functional property of this service.
+//	 */
+////	public <T, U> IFuture<T> getNFPropertyValue(String name,  Class<U> unit)
+//	public <T, U> IFuture<T> getNFPropertyValue(String name,  U unit)
+//	{
+//		return new Future(new UnsupportedOperationException());
+////		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
+////		return prop != null? prop.getValue(type, unit) : null;
+//	}
+//	
+//	/**
+//	 *  Add a new nf property.
+//	 *  @param nfprop The nf property.
+//	 */
+//	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop)
+//	{
+//		throw new UnsupportedOperationException();
+//	}
+//	
+//	/**
+//	 *  Add a new nf property.
+//	 *  @param nfprop The nf property.
+//	 */
+//	public IFuture<Void> removeNFProperty(String name)
+//	{
+//		throw new UnsupportedOperationException();
+//	}
+//	
+//	/**
+//	 *  Returns the meta information about a non-functional property of this service.
+//	 *  @param name Name of the property.
+//	 *  @return The meta information about a non-functional property of this service.
+//	 */
+//	public Map<String, INFPropertyMetaInfo> getNFPropertyMetaInfos()
+//	{
+//		throw new UnsupportedOperationException();
+//	}
 
 }

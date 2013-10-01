@@ -2,7 +2,7 @@ package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.nonfunctional.IMethodNFPropertyProvider;
+import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
@@ -68,7 +68,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 				SERVICEMETHODS.add(m);
 			}
 			
-			ms = IMethodNFPropertyProvider.class.getDeclaredMethods();
+			ms = INFMethodPropertyProvider.class.getDeclaredMethods();
 			for(Method m: ms)
 			{
 //				System.out.println("m: "+m.getName());

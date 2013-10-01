@@ -730,7 +730,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run() 
 					{
-						ret.setResult(getInterpreter().getNFPropertyNames());
+						getInterpreter().getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 					}
 				});
 			}
@@ -740,7 +740,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run()
 					{
-						ret.setResult(getInterpreter().getNFPropertyNames());
+						getInterpreter().getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 //						ret.setException(e);
 					}
 				});
@@ -748,7 +748,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		}
 		else
 		{
-			ret.setResult(getInterpreter().getNFPropertyNames());
+			getInterpreter().getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 		}
 		
 		return ret;
@@ -772,7 +772,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run() 
 					{
-						ret.setResult(getInterpreter().getNFPropertyMetaInfos());
+						getInterpreter().getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
 					}
 				});
 			}
@@ -782,7 +782,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run()
 					{
-						ret.setResult(getInterpreter().getNFPropertyMetaInfos());
+						getInterpreter().getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
 //						ret.setException(e);
 					}
 				});
@@ -790,7 +790,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		}
 		else
 		{
-			ret.setResult(getInterpreter().getNFPropertyMetaInfos());
+			getInterpreter().getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
 		}
 		
 		return ret;
@@ -813,7 +813,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run() 
 					{
-						ret.setResult(getInterpreter().getNFPropertyMetaInfo(name));
+						getInterpreter().getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 					}
 				});
 			}
@@ -823,7 +823,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 				{
 					public void run()
 					{
-						ret.setResult(getInterpreter().getNFPropertyMetaInfo(name));
+						getInterpreter().getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 //						ret.setException(e);
 					}
 				});
@@ -831,7 +831,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		}
 		else
 		{
-			ret.setResult(getInterpreter().getNFPropertyMetaInfo(name));
+			getInterpreter().getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 		}
 		
 		return ret;

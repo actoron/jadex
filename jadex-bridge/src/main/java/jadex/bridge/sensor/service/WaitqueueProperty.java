@@ -44,13 +44,13 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 			{
 				int cnt = 0;
 				
-				public void methodCallStarted(Object proxy, Method method, Object[] args, long callid)
+				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid)
 				{
 //					System.out.println("started: "+method+" "+cnt);
 					setValue(new Integer(++cnt));
 				}
 				
-				public void methodCallFinished(Object proxy, Method method, Object[] args, long callid)
+				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid)
 				{
 //					System.out.println("ended: "+method+" "+cnt);
 					if(cnt>0)

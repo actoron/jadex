@@ -61,7 +61,7 @@ import java.util.logging.Logger;
  *  Executes the list of interceptors one by one.
  *  In case no handler can be found a fallback handler is used.
  */
-public class BasicServiceInvocationHandler implements InvocationHandler
+public class BasicServiceInvocationHandler extends MethodListenerHandler implements InvocationHandler
 {
 	//-------- constants --------
 	
@@ -97,8 +97,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/** The root cause that was given at creation time. */
 	protected Cause cause;
 	
-	/** The registered non-functional property hooks. */
-	protected Map<MethodInfo, List<IMethodInvocationListener>> methodlisteners;
+//	/** The registered non-functional property hooks. */
+//	protected Map<MethodInfo, List<IMethodInvocationListener>> methodlisteners;
 	
 	/** The call id. */
 	protected AtomicLong callid;
@@ -714,69 +714,69 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		}
 	}
 	
-	/**
-	 *  Add a method listener.
-	 */
-	public void addMethodListener(MethodInfo m, IMethodInvocationListener listener)
-	{
-		if(methodlisteners==null)
-			methodlisteners = new HashMap<MethodInfo, List<IMethodInvocationListener>>();
-		List<IMethodInvocationListener> lis = methodlisteners.get(m);
-		if(lis==null)
-		{
-			lis = new ArrayList<IMethodInvocationListener>();
-			methodlisteners.put(m, lis);
-		}
-		lis.add(listener);
-	}
-	
-	/**
-	 *  Add a method listener.
-	 */
-	public void removeMethodListener(MethodInfo m, IMethodInvocationListener listener)
-	{
-		if(methodlisteners!=null)
-		{
-			List<IMethodInvocationListener> lis = methodlisteners.get(m);
-			if(lis!=null)
-			{
-				lis.remove(listener);
-			}
-		}
-	}
-	
-	/**
-	 *  Notify registered listeners in case a method is called.
-	 */
-	protected void notifyMethodListeners(boolean start, Object proxy, final Method method, final Object[] args, long callid)
-	{
-		if(methodlisteners!=null)
-		{
-			doNotifyListeners(start, proxy, method, args, callid, methodlisteners.get(null));
-			doNotifyListeners(start, proxy, method, args, callid, methodlisteners.get((new MethodInfo(method))));
-		}
-	}
-	
-	/**
-	 *  Do notify the listeners.
-	 */
-	protected void doNotifyListeners(boolean start, Object proxy, final Method method, final Object[] args, long callid, List<IMethodInvocationListener> lis)
-	{
-		if(lis!=null)
-		{
-			for(IMethodInvocationListener ml: lis)
-			{
-				if(start)
-				{
-					ml.methodCallStarted(proxy, method, args, callid);
-				}
-				else
-				{
-					ml.methodCallFinished(proxy, method, args, callid);
-				}
-			}
-		}
-	}
+//	/**
+//	 *  Add a method listener.
+//	 */
+//	public void addMethodListener(MethodInfo m, IMethodInvocationListener listener)
+//	{
+//		if(methodlisteners==null)
+//			methodlisteners = new HashMap<MethodInfo, List<IMethodInvocationListener>>();
+//		List<IMethodInvocationListener> lis = methodlisteners.get(m);
+//		if(lis==null)
+//		{
+//			lis = new ArrayList<IMethodInvocationListener>();
+//			methodlisteners.put(m, lis);
+//		}
+//		lis.add(listener);
+//	}
+//	
+//	/**
+//	 *  Add a method listener.
+//	 */
+//	public void removeMethodListener(MethodInfo m, IMethodInvocationListener listener)
+//	{
+//		if(methodlisteners!=null)
+//		{
+//			List<IMethodInvocationListener> lis = methodlisteners.get(m);
+//			if(lis!=null)
+//			{
+//				lis.remove(listener);
+//			}
+//		}
+//	}
+//	
+//	/**
+//	 *  Notify registered listeners in case a method is called.
+//	 */
+//	protected void notifyMethodListeners(boolean start, Object proxy, final Method method, final Object[] args, long callid)
+//	{
+//		if(methodlisteners!=null)
+//		{
+//			doNotifyListeners(start, proxy, method, args, callid, methodlisteners.get(null));
+//			doNotifyListeners(start, proxy, method, args, callid, methodlisteners.get((new MethodInfo(method))));
+//		}
+//	}
+//	
+//	/**
+//	 *  Do notify the listeners.
+//	 */
+//	protected void doNotifyListeners(boolean start, Object proxy, final Method method, final Object[] args, long callid, List<IMethodInvocationListener> lis)
+//	{
+//		if(lis!=null)
+//		{
+//			for(IMethodInvocationListener ml: lis)
+//			{
+//				if(start)
+//				{
+//					ml.methodCallStarted(proxy, method, args, callid);
+//				}
+//				else
+//				{
+//					ml.methodCallFinished(proxy, method, args, callid);
+//				}
+//			}
+//		}
+//	}
 	
 //	/**
 //	 * 

@@ -18,6 +18,13 @@ public class NFPropertyInfo
 
 	/**
 	 *  Create a new property.
+	 */
+	public NFPropertyInfo()
+	{
+	}
+	
+	/**
+	 *  Create a new property.
 	 *  @param name The name.
 	 *  @param clazz The clazz.
 	 */

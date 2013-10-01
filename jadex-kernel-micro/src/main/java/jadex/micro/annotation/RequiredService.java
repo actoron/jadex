@@ -1,5 +1,7 @@
 package jadex.micro.annotation;
 
+import jadex.bridge.nonfunctional.annotation.NFRProperty;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -37,4 +39,8 @@ public @interface RequiredService
 	 */
 	public Class<?> multiplextype() default Object.class;
 
+	/**
+	 *  The required service non functional properties.
+	 */
+	public NFRProperty[] nfprops() default {};
 }

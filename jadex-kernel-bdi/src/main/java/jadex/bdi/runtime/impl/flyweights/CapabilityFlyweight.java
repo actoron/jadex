@@ -21,7 +21,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Timeout;
@@ -1055,6 +1057,19 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		{
 			return (String)getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.capability_has_configuration);
 		}
+	}
+	
+	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
+	{
+		return getInterpreter().getRequiredServicePropertyProvider(sid);
+	}
+	
+	/**
+	 *  Has the service a property provider.
+	 */
+	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
+	{
+		return getInterpreter().hasRequiredServicePropertyProvider(sid);
 	}
 	
 	/**

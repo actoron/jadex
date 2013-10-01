@@ -24,7 +24,7 @@ public class UserMethodInvocationListener implements IMethodInvocationListener
 	/**
 	 *  Called when a method call started.
 	 */
-	public void methodCallStarted(Object proxy, Method method, final Object[] args, long callid)
+	public void methodCallStarted(Object proxy, Method method, final Object[] args, Object callid)
 	{
 		if(ResolveInterceptor.SERVICEMETHODS.contains(method))
 		{
@@ -39,7 +39,7 @@ public class UserMethodInvocationListener implements IMethodInvocationListener
 	/**
 	 *  Called when the method call is finished.
 	 */
-	public void methodCallFinished(Object proxy, Method method, final Object[] args, long callid)
+	public void methodCallFinished(Object proxy, Method method, final Object[] args, Object callid)
 	{
 		if(ResolveInterceptor.SERVICEMETHODS.contains(method))
 		{

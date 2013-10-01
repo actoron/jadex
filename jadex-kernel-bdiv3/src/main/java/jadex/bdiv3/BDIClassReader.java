@@ -49,6 +49,7 @@ import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -182,7 +183,7 @@ public class BDIClassReader extends MicroClassReader
 		
 //		System.out.println("todo: read bdi");
 		
-//		List<Field> beliefs = new ArrayList<Field>();
+//		List<Field> s = new ArrayList<Field>();
 //		final Set<String> beliefnames = new HashSet<String>();
 //		List<Class> goals = new ArrayList<Class>();
 //		List<Method> plans = new ArrayList<Method>();
@@ -261,7 +262,7 @@ public class BDIClassReader extends MicroClassReader
 			}
 			for(RequiredServiceInfo	rsi: capa.getModelInfo().getRequiredServices())
 			{
-				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding());
+				RequiredServiceInfo	rsi2	= new RequiredServiceInfo(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+rsi.getName(), rsi.getType(), rsi.isMultiple(), rsi.getMultiplexType(), rsi.getDefaultBinding(), rsi.getNFRProperties());
 				((ModelInfo)bdimodel.getModelInfo()).addRequiredService(rsi2);
 			}
 			
@@ -500,8 +501,9 @@ public class BDIClassReader extends MicroClassReader
 						for(int j=0; j<reqs.length; j++)
 						{
 							RequiredServiceBinding binding = createBinding(reqs[j].binding());
+							List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
 							rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
-								Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding);
+								Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops);
 							configinfo.setRequiredServices(rsis);
 						}
 						

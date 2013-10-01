@@ -4,9 +4,11 @@ import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.nonfunctional.INFProperty;
-import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
@@ -20,15 +22,12 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
-import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -58,9 +57,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The properties. */
 	protected Map<String, Object> properties;
 	
-	/** Non-functional properties. */
-	protected Map<String, INFProperty<?, ?>> nfproperties;
-	
 	/** The parent component. */
 	protected IExternalAccess parent;
 
@@ -83,16 +79,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected Map<String, IExtensionInstance> extensions;	
 
 	
-	/** The parameter copy allowed flag. */
-	protected boolean copy;
-
-	/** The flag if local timeouts should be realtime. */
-	protected boolean realtime;
-	
-	
-//	/** The component listeners. */
-//	protected List<IComponentListener> componentlisteners;
-	
 	/** The subscriptions (subscription future -> subscription info). */
 	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>> subscriptions;
 
@@ -102,6 +88,16 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The monitoring service getter. */
 	protected ServiceGetter<IMonitoringService> getter;
 	
+	
+	/** The nf property providers for required services. */
+	protected Map<IServiceIdentifier, INFMixedPropertyProvider> reqserprops;
+	
+	
+	/** The parameter copy allowed flag. */
+	protected boolean copy;
+
+	/** The flag if local timeouts should be realtime. */
+	protected boolean realtime;
 	//-------- constructors --------
 	
 	/**
@@ -614,134 +610,28 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		subscriptions.remove(fut);
 	}
 	
-	//-------- nf properties --------
-	
 	/**
-	 *  Returns the meta information about a non-functional property of this service.
-	 *  @param name Name of the property.
-	 *  @return The meta information about a non-functional property of this service.
+	 *  Get the required service property provider for a service.
 	 */
-	public Map<String, INFPropertyMetaInfo> getNFPropertyMetaInfos()
+	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
 	{
-		Map<String, INFPropertyMetaInfo> ret = new HashMap<String, INFPropertyMetaInfo>();
-		if(nfproperties!=null)
+		INFMixedPropertyProvider ret = null;
+		if(reqserprops==null)
+			reqserprops = new HashMap<IServiceIdentifier, INFMixedPropertyProvider>(); // use LRU?
+		ret = reqserprops.get(sid);
+		if(ret==null)
 		{
-			for(String key: nfproperties.keySet())
-			{
-				ret.put(key, nfproperties.get(key).getMetaInfo());
-			}
+			ret = new NFMethodPropertyProvider(null); // parent of required service property?
+			reqserprops.put(sid, ret);
 		}
 		return ret;
 	}
 	
 	/**
-	 *  Returns the names of all non-functional properties of this service.
-	 *  @return The names of the non-functional properties of this service.
+	 *  Has the service a property provider.
 	 */
-	public String[] getNFPropertyNames()
+	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
 	{
-		return nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
-	}
-	
-	/**
-	 *  Returns the meta information about a non-functional property of this service.
-	 *  @param name Name of the property.
-	 *  @return The meta information about a non-functional property of this service.
-	 */
-	public INFPropertyMetaInfo getNFPropertyMetaInfo(String name)
-	{
-		return nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
-	}
-	
-	/**
-	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-	 *  @param name Name of the property.
-	 *  @param type Type of the property value.
-	 *  @return The current value of a non-functional property of this service.
-	 */
-	public <T> IFuture<T> getNFPropertyValue(String name)
-	{
-		Future<T> ret = new Future<T>();
-		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
-		if(prop != null)
-		{
-			prop.getValue().addResultListener(new DelegationResultListener<T>(ret));
-		}
-		else
-		{
-			ret.setException(new RuntimeException("Unknown property: "+name));
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-	 *  @param name Name of the property.
-	 *  @param type Type of the property value.
-	 *  @param unit Unit of the property value.
-	 *  @return The current value of a non-functional property of this service.
-	 */
-//	public <T, U> IFuture<T> getNFPropertyValue(String name, Class<U> unit)
-	public <T, U> IFuture<T> getNFPropertyValue(String name, U unit)
-	{
-		Future<T> ret = new Future<T>();
-		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
-		if(prop != null)
-		{
-			prop.getValue(unit).addResultListener(new DelegationResultListener<T>(ret));
-		}
-		else
-		{
-			ret.setException(new RuntimeException("Unknown property: "+name));
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Add a new nf property.
-	 *  @param nfprop The nf property.
-	 */
-	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop)
-	{
-		if(nfproperties == null)
-			nfproperties = new HashMap<String, INFProperty<?,?>>();
-		nfproperties.put(nfprop.getName(), nfprop);
-		return IFuture.DONE;
-	}
-	
-	/**
-	 *  Add a new nf property.
-	 *  @param nfprop The nf property.
-	 */
-	public IFuture<Void> removeNFProperty(String name)
-	{
-		Future<Void> ret = new Future<Void>();
-		if(nfproperties!=null)
-		{
-			INFProperty<?, ?> prop = nfproperties.remove(name);
-			if(prop!=null)
-			{
-				prop.dispose().addResultListener(new DelegationResultListener<Void>(ret));
-			}
-			else
-			{
-				ret.setResult(null);
-			}
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Get the nf property.
-	 *  @param name Name of the property.
-	 *  @return The property.
-	 */
-	public INFProperty<?, ?> getNfProperty(String name)
-	{
-		return nfproperties!=null? nfproperties.get(name): null;
+		return reqserprops!=null? reqserprops.get(sid)!=null: false;
 	}
 }

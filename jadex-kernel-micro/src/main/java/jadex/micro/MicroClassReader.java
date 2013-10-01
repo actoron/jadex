@@ -10,11 +10,12 @@ import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.NFPropertyInfo;
+import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
-import jadex.bridge.service.BasicService;
+import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
@@ -437,8 +438,16 @@ public class MicroClassReader
 				for(int i=0; i<vals.length; i++)
 				{
 					RequiredServiceBinding binding = createBinding(vals[i].binding());
+					List<NFRPropertyInfo> nfprops = createNFRProperties(vals[i].nfprops());
+					
+					for(NFRProperty prop: vals[i].nfprops())
+					{
+						nfprops.add(new NFRPropertyInfo(prop.name(), new ClassInfo(prop.value().getName()), 
+							new MethodInfo(prop.methodname(), prop.methodparametertypes())));
+					}
+					
 					RequiredServiceInfo rsis = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
-						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding);
+						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding, nfprops);
 					if(rsers.containsKey(vals[i].name()))
 					{
 						RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
@@ -651,8 +660,9 @@ public class MicroClassReader
 						for(int j=0; j<reqs.length; j++)
 						{
 							RequiredServiceBinding binding = createBinding(reqs[j].binding());
+							List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
 							rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
-								Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding);
+								Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops);
 							configinfo.setRequiredServices(rsis);
 						}
 						
@@ -1296,6 +1306,20 @@ public class MicroClassReader
 			bd.componentname().length()==0? null: bd.componentname(), bd.componenttype().length()==0? null: bd.componenttype(), 
 			bd.dynamic(), bd.scope(), bd.create(), bd.recover(), createUnparsedExpressions(bd.interceptors()),
 			bd.proxytype(), bd.creationinfo().type().length()>0? createComponentInstanceInfo(bd.creationinfo()): null);
+	}
+	
+	/**
+	 *  Create req service props.
+	 */
+	protected List<NFRPropertyInfo> createNFRProperties(NFRProperty[] nfrp)
+	{
+		List<NFRPropertyInfo> nfprops = new ArrayList<NFRPropertyInfo>();
+		for(NFRProperty prop: nfrp)
+		{
+			nfprops.add(new NFRPropertyInfo(prop.name(), new ClassInfo(prop.value().getName()), 
+				new MethodInfo(prop.methodname(), prop.methodparametertypes())));
+		}
+		return nfprops;
 	}
 	
 	/**

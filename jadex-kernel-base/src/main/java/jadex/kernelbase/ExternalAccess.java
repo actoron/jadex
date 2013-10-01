@@ -810,7 +810,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.getNFPropertyMetaInfos());
+						interpreter.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
 					}
 				});
 			}
@@ -828,7 +828,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.getNFPropertyMetaInfos());
+			interpreter.getNFPropertyMetaInfos().addResultListener(new DelegationResultListener<Map<String,INFPropertyMetaInfo>>(ret));
 		}
 		
 		return ret;
@@ -850,7 +850,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.getNFPropertyNames());
+						interpreter.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 					}
 				});
 			}
@@ -868,7 +868,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.getNFPropertyNames());
+			interpreter.getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 		}
 		
 		return ret;
@@ -891,23 +891,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						INFPropertyMetaInfo mi = interpreter.getNFPropertyMetaInfo(name);
-						if (mi == null)
-						{
-							IExternalAccess parent = adapter.getParent();
-							if (parent != null)
-							{
-								parent.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
-							}
-							else
-							{
-								ret.setResult(null);
-							}
-						}
-						else
-						{
-							ret.setResult(mi);
-						}
+						interpreter.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 					}
 				});
 			}
@@ -925,23 +909,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			INFPropertyMetaInfo mi = interpreter.getNFPropertyMetaInfo(name);
-			if (mi == null)
-			{
-				IExternalAccess parent = adapter.getParent();
-				if (parent != null)
-				{
-					parent.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
-				}
-				else
-				{
-					ret.setResult(null);
-				}
-			}
-			else
-			{
-				ret.setResult(mi);
-			}
+			interpreter.getNFPropertyMetaInfo(name).addResultListener(new DelegationResultListener<INFPropertyMetaInfo>(ret));
 		}
 		
 		return ret;

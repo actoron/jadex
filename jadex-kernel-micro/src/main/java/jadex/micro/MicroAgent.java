@@ -7,7 +7,7 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.nonfunctional.INFProperty;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
@@ -962,21 +962,21 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	
 	//-------- nf properties --------
 	
-	/**
-	 *  Get the nf property.
-	 *  @param name Name of the property.
-	 *  @return The property.
-	 */
-	public INFProperty<?, ?> getNfProperty(String name)
-	{
-		return interpreter.getNfProperty(name);
-	}
+//	/**
+//	 *  Get the nf property.
+//	 *  @param name Name of the property.
+//	 *  @return The property.
+//	 */
+//	public IFuture<INFProperty<?, ?>> getNfProperty(String name)
+//	{
+//		return interpreter.getNFProperty(name);
+//	}
 	
 	/**
 	 *  Returns the names of all non-functional properties of this service.
 	 *  @return The names of the non-functional properties of this service.
 	 */
-	public String[] getNonFunctionalPropertyNames()
+	public IFuture<String[]> getNonFunctionalPropertyNames()
 	{
 		return interpreter.getNFPropertyNames();
 	}
@@ -986,7 +986,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.
 	 */
-	public INFPropertyMetaInfo getNfPropertyMetaInfo(String name)
+	public IFuture<INFPropertyMetaInfo> getNfPropertyMetaInfo(String name)
 	{
 		return interpreter.getNFPropertyMetaInfo(name);
 	}
@@ -1012,5 +1012,21 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	public <T, U> IFuture<T> getNonFunctionalPropertyValue(String name, Class<U> unit)
 	{
 		return interpreter.getNFPropertyValue(name, unit);
+	}
+	
+	/**
+	 *  Get the required service property provider for a service.
+	 */
+	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
+	{
+		return interpreter.getRequiredServicePropertyProvider(sid);
+	}
+	
+	/**
+	 *  Has the service a property provider.
+	 */
+	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
+	{
+		return interpreter.hasRequiredServicePropertyProvider(sid);
 	}
 }

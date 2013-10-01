@@ -1710,7 +1710,7 @@ public class BpmnXMLReader
 								RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 								if(binding==null)
 									throw new RuntimeException("Unknown binding: "+bindingname);
-								rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding);
+								rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding, null);
 							}
 							else
 							{
@@ -1737,7 +1737,7 @@ public class BpmnXMLReader
 											RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 											if(binding==null)
 												throw new RuntimeException("Unknown binding: "+bindingname);
-											rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding);
+											rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding, null);
 										}
 										else
 										{

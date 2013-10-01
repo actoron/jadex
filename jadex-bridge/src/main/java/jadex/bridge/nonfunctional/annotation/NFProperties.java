@@ -6,7 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  The provided services annotation.
+ *  The annotation for non functional properties in
+ *  - components
+ *  - provided services
+ *  - provided service methods.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

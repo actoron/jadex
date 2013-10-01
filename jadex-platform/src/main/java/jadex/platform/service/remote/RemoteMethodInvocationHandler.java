@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.MethodListenerHandler;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -15,6 +16,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -41,7 +43,7 @@ import java.util.Map;
  *  Class that implements the Java proxy InvocationHandler, which
  *  is called when a method on a proxy is called.
  */
-public class RemoteMethodInvocationHandler implements InvocationHandler
+public class RemoteMethodInvocationHandler implements InvocationHandler //extends MethodListenerHandler
 {
 	protected static Method schedulestep;
 	
@@ -95,11 +97,13 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	/**
 	 *  Invoke a method.
 	 */
-	public Object invoke(Object proxy, final Method method, Object[] args) throws Throwable
+	public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
 	{
 		final IComponentIdentifier compid = rsms.getRMSComponentIdentifier();
 		final String callid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
 	
+//		notifyMethodListeners(true, proxy, method, args, callid);
+		
 		ProxyInfo pi = pr.getProxyInfo();
 		
 		// Get the current service invocation 
@@ -496,6 +500,26 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			}
 //			System.out.println("Resumed call: "+method.getName()+" "+ret);
 		}
+		
+//		if(ret instanceof IFuture)
+//		{
+//			((IFuture<Object>)ret).addResultListener(new IResultListener<Object>()
+//			{
+//				public void resultAvailable(Object result)
+//				{
+//					notifyMethodListeners(false, proxy, method, args, callid);
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					notifyMethodListeners(false, proxy, method, args, callid);
+//				}
+//			});
+//		}
+//		else
+//		{
+//			notifyMethodListeners(false, proxy, method, args, callid);
+//		}
 	
 		return ret;
 	}

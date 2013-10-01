@@ -53,22 +53,20 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			List<String> todoset = new ArrayList<String>();
 			List<String> todoget = new ArrayList<String>();
 			List<MBelief> mbels = model.getCapability().getBeliefs();
-			for (MBelief mbel : mbels)
+			for(MBelief mbel : mbels)
 			{
 				Collection<String> evs = mbel.getEvents();
-				if(evs != null && !evs.isEmpty() || mbel.isDynamic())
+				if(evs!=null && !evs.isEmpty() || mbel.isDynamic())
 				{
 					tododyn.add(mbel.getName());
 				}
 
 				if(!mbel.isFieldBelief())
 				{
-					todoset.add(mbel.getSetter().getName());
-				}
-
-				if(!mbel.isFieldBelief())
-				{
-					todoget.add(mbel.getGetter().getName());
+					if(mbel.getSetter()!=null)
+						todoset.add(mbel.getSetter().getName());
+					if(mbel.getGetter()!=null)
+						todoget.add(mbel.getGetter().getName());
 				}
 			}
 

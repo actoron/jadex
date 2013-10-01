@@ -1,7 +1,10 @@
 package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -166,4 +169,14 @@ public interface IInternalAccess
 //	 *  to the monitoring service of the platform (if any). 
 //	 */
 //	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event);
+	
+	/**
+	 *  Get the required service property provider for a service.
+	 */
+	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid);
+	
+	/**
+	 *  Has the service a property provider.
+	 */
+	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid);
 }
