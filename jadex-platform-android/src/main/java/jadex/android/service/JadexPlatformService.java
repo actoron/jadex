@@ -31,7 +31,7 @@ import android.os.IBinder;
 public class JadexPlatformService extends Service implements JadexPlatformOptions
 {
 
-	private JadexPlatformManager jadexPlatformManager;
+	protected JadexPlatformManager jadexPlatformManager;
 	
 	private String[] platformKernels;
 	private String platformOptions;
@@ -54,12 +54,12 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 
 			public IFuture<IComponentIdentifier> startMicroAgent(IComponentIdentifier platformId, String name, Class<?> clazz)
 			{
-				return startMicroAgent(platformId, name, clazz);
+				return JadexPlatformService.this.startMicroAgent(platformId, name, clazz);
 			}
 
 			public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, String name, String modelPath)
 			{
-				return startComponent(platformId, name, modelPath);
+				return JadexPlatformService.this.startComponent(platformId, name, modelPath);
 			}
 
 			public IFuture<IExternalAccess> startJadexPlatform()
@@ -79,12 +79,12 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 
 			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
 			{
-				return startJadexPlatform(kernels, platformId, options);
+				return JadexPlatformService.this.startJadexPlatform(kernels, platformId, options);
 			}
 
 			public IComponentIdentifier getPlatformId()
 			{
-				return getPlatformId();
+				return JadexPlatformService.this.getPlatformId();
 			}
 		};
 	}
@@ -186,6 +186,20 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	public String getPlatformName()
 	{
 		return platformName;
+	}
+	
+	/**
+	 * Retrieves the platformId of the last started Platform, if any.
+	 * @return {@link IComponentIdentifier} platformId or <code>null</code>.
+	 */
+	public IComponentIdentifier getPlatformId()
+	{
+		return platformId;
+	}
+
+	public void setPlatformId(IComponentIdentifier platformId)
+	{
+		this.platformId = platformId;
 	}
 
 	/**
@@ -356,6 +370,26 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	{
 		this.platformId = platform.getComponentIdentifier();
 	}
+	
+	/**
+	 * Checks whether a jadex platform is running.
+	 * @return true, when runnning, else false.
+	 */
+	protected boolean isPlatformRunning()
+	{
+		return isPlatformRunning(platformId);
+	}
+	
+	/**
+	 * Checks whether a jadex platform is running.
+	 * 
+	 * @param the IComponenntIdentifier of the platform to check.
+	 * @return true, when runnning, else false.
+	 */
+	protected boolean isPlatformRunning(IComponentIdentifier platformId)
+	{
+		return jadexPlatformManager.isPlatformRunning(platformId);
+	}
 
 	/**
 	 * Sends a FIPA Message to the specified receiver. The Sender is
@@ -415,7 +449,7 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
-//				super.exceptionOccurred(exception);
+				super.exceptionOccurred(exception);
 			}
 		});
 		return fut;
@@ -423,7 +457,7 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	
 	private void checkIfPlatformIsRunning(final IComponentIdentifier platformId, String caller)
 	{
-		if (!jadexPlatformManager.isPlatformRunning(platformId))
+		if (!isPlatformRunning(platformId))
 		{
 			throw new JadexAndroidPlatformNotStartedError(caller);
 		}

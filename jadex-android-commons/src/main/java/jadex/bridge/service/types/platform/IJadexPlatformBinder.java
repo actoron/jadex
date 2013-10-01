@@ -152,6 +152,8 @@ public interface IJadexPlatformBinder
 	 * @param clazz
 	 *            class of the agent to instantiate
 	 * @return ComponendIdentifier of the created agent.
+	 * 
+	 * @deprecated use stsartComponent() for all agent types
 	 */
 	public IFuture<IComponentIdentifier> startMicroAgent(final IComponentIdentifier platformId, final String name, final Class<?> clazz);
 
