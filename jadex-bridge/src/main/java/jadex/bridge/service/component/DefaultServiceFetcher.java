@@ -22,7 +22,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.CollectionResultListener;
@@ -100,7 +100,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required service.
 	 */
-	public <T> IFuture<T> getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind, final IFilter<T> filter)
+	public <T> IFuture<T> getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind, final IRemoteFilter<T> filter)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader());
@@ -210,7 +210,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 *  todo: should also create component(s) when no service could be found
 	 */
 	public <T> ITerminableIntermediateFuture<T> getServices(final RequiredServiceInfo info, 
-		final RequiredServiceBinding bd, boolean rebind, final IFilter<T> filter)
+		final RequiredServiceBinding bd, boolean rebind, final IRemoteFilter<T> filter)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader());

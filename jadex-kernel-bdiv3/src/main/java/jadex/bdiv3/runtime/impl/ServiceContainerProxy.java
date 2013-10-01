@@ -13,6 +13,7 @@ import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -179,7 +180,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(String name, boolean rebind, IFilter filter)
+	public IFuture getRequiredService(String name, boolean rebind, IRemoteFilter filter)
 	{
 		return interpreter.getServiceContainer().getRequiredService(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind, filter);
 	}
@@ -188,7 +189,7 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
+	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IRemoteFilter filter)
 	{
 		return interpreter.getServiceContainer().getRequiredServices(capa!=null ? capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name : name, rebind, filter);
 	}

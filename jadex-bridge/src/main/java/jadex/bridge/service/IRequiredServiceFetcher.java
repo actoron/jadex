@@ -1,6 +1,6 @@
 package jadex.bridge.service;
 
-import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
@@ -15,7 +15,7 @@ public interface IRequiredServiceFetcher
 	 *  @param provider The provider.
 	 *  @param rebind Flag if should be rebound.
 	 */
-	public <T> IFuture<T> getService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter);
+	public <T> IFuture<T> getService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter);
 	
 	/**
 	 *  Get a required multi service.
@@ -23,5 +23,5 @@ public interface IRequiredServiceFetcher
 	 *  @param provider The provider.
 	 *  @param rebind Flag if should be rebound.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter);
+	public <T> ITerminableIntermediateFuture<T> getServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter);
 }

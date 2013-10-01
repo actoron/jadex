@@ -4,6 +4,7 @@ package jadex.bridge.service;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -134,13 +135,13 @@ public interface IServiceContainer extends IServiceProvider
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IFilter<T> filter);
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind, IRemoteFilter<T> filter);
 	
 	/**
 	 *  Get a required services.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IFilter<T> filter);
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IRemoteFilter<T> filter);
 	
 	/**
 	 *  Add a service interceptor.

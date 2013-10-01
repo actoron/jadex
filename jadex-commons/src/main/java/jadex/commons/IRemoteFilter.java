@@ -6,7 +6,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Generic filter interface.
  */
-public interface IRemoteFilter
+public interface IRemoteFilter<T>
 {
 	//-------- constants --------
 	
@@ -40,5 +40,5 @@ public interface IRemoteFilter
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public IFuture<Boolean> filter(Object obj);
+	public IFuture<Boolean> filter(T obj);
 }

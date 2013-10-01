@@ -1,7 +1,6 @@
 package jadex.bridge.service.search;
 
 import jadex.bridge.service.IService;
-import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Tuple;
 
@@ -55,9 +54,9 @@ public class TypeResultSelector<T> extends BasicResultSelector<T>
 	/**
 	 *  Create a type result listener.
 	 */
-	public TypeResultSelector(Class<?> type, boolean oneresult, boolean remote, IFilter<T> filter)
+	public TypeResultSelector(Class<?> type, boolean oneresult, boolean remote, IRemoteFilter<?> filter)
 	{
-		super(IRemoteFilter.ALWAYS, oneresult, remote, filter);
+		super(filter, oneresult, remote);
 		this.type = type;
 	}
 	

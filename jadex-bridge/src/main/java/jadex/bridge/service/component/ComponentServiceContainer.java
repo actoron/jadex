@@ -25,6 +25,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -106,7 +107,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-		return getRequiredService(info, binding, false, null);
+		return getRequiredService(info, binding, false, (IRemoteFilter)null);
 	}
 	
 	/**
@@ -122,7 +123,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter)
 	{
 		if(shutdowned)
 		{
@@ -146,7 +147,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
-		return getRequiredServices(info, binding, false, null);
+		return getRequiredServices(info, binding, false, (IRemoteFilter)null);
 	}
 	
 	/**
@@ -162,7 +163,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IFilter<T> filter)
+	public <T> ITerminableIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter)
 	{
 		if(shutdowned)
 		{

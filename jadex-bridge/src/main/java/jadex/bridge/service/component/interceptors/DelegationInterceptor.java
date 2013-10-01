@@ -14,6 +14,7 @@ import jadex.bridge.service.component.DefaultServiceFetcher;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -94,11 +95,11 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				final Future<Void> ret = new Future<Void>();
-				IFuture<IService> fut = fetcher.getService(info, binding, false, new IFilter<IService>()
+				IFuture<IService> fut = fetcher.getService(info, binding, false, new IRemoteFilter<IService>()
 				{
-					public boolean filter(IService ser)
+					public IFuture<Boolean> filter(IService ser)
 					{
-						return !sid.equals(ser.getServiceIdentifier());
+						return new Future<Boolean>(!sid.equals(ser.getServiceIdentifier()));
 					}
 				});
 				

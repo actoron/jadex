@@ -30,6 +30,16 @@ public class ComposedFilter<T> implements IFilter<T>,	Serializable
 	protected int operator;
 
 	//-------- constructors --------
+	
+	/**
+	 *  Create a composed filter.
+	 *  @param filters The filters.
+	 *  @param operator The operator.
+	 */
+	public ComposedFilter()
+	{
+		this(new IFilter[0], AND);
+	}
 
 	/**
 	 *  Create a composed filter.

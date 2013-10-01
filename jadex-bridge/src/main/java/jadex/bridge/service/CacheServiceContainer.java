@@ -7,7 +7,7 @@ import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
-import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple;
 import jadex.commons.collection.Cache;
@@ -453,12 +453,12 @@ public class CacheServiceContainer	implements IServiceContainer
 		throw new UnsupportedOperationException();
 	}
 	
-	public IFuture getRequiredService(String name, boolean rebind, IFilter filter)
+	public IFuture getRequiredService(String name, boolean rebind, IRemoteFilter filter)
 	{
 		throw new UnsupportedOperationException();
 	}
 
-	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IFilter filter)
+	public ITerminableIntermediateFuture getRequiredServices(String name, boolean rebind, IRemoteFilter filter)
 	{
 		throw new UnsupportedOperationException();
 	}

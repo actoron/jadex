@@ -13,6 +13,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
@@ -203,7 +204,7 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope)
 	{
-		return getService(provider, type, scope, (IFilter<T>)null);
+		return getService(provider, type, scope, (IRemoteFilter<T>)null);
 	}
 	
 	/**
@@ -211,7 +212,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope, final IFilter<T> filter)
+	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope, final IRemoteFilter<T> filter)
 	{
 		final Future ret = new Future();
 
@@ -449,7 +450,7 @@ public class SServiceProvider
 	 */
 	public static <T> ITerminableIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope)
 	{
-		return getServices(provider, type, scope, (IFilter<T>)null);
+		return getServices(provider, type, scope, (IRemoteFilter<T>)null);
 	}
 	
 	/**
@@ -457,7 +458,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static <T> ITerminableIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope, IFilter<T> filter)
+	public static <T> ITerminableIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope, IRemoteFilter<T> filter)
 	{
 //		synchronized(profiling)
 //		{

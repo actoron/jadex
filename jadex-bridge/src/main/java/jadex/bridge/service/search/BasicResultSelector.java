@@ -64,25 +64,26 @@ public class BasicResultSelector<T> implements IResultSelector
 	/**
 	 *  Create a type result listener.
 	 */
-	public BasicResultSelector(IRemoteFilter filter, boolean oneresult, boolean remote)
-	{
-		this(filter, oneresult, false, null);
-	}
+//	public BasicResultSelector(IRemoteFilter filter, boolean oneresult, boolean remote)
+//	{
+//		this(filter, oneresult, false, null);
+//	}
 	
 	/**
 	 *  Create a type result listener.
 	 */
-	public BasicResultSelector(IRemoteFilter filter, boolean oneresult, boolean remote, final IFilter<T> sfilter)
+	public BasicResultSelector(IRemoteFilter filter, boolean oneresult, boolean remote)
 	{
 		this.oneresult = oneresult;
 		this.remote = remote;
-		this.filter = sfilter==null? filter: new ComposedRemoteFilter(new IRemoteFilter[]{new IRemoteFilter()
-		{
-			public jadex.commons.future.IFuture<Boolean> filter(Object obj) 
-			{
-				return new Future<Boolean>(sfilter.filter((T)obj)? Boolean.TRUE: Boolean.FALSE);
-			}
-		}, filter}, ComposedFilter.AND);
+		this.filter = filter == null? IRemoteFilter.ALWAYS : filter;
+//		this.filter = sfilter==null? filter: new ComposedRemoteFilter(new IRemoteFilter[]{new IRemoteFilter()
+//		{
+//			public jadex.commons.future.IFuture<Boolean> filter(Object obj) 
+//			{
+//				return new Future<Boolean>(sfilter.filter((T)obj)? Boolean.TRUE: Boolean.FALSE);
+//			}
+//		}, filter}, ComposedFilter.AND);
 	}
 	
 	//-------- methods --------
