@@ -56,5 +56,22 @@ public abstract class JadexPlatformBinder extends JadexEventBinder implements IJ
 	{
 		manager.shutdownJadexPlatform(platformID);
 	}
+
+	public <S> S getsService(IComponentIdentifier platformId, Class<S> serviceClazz)
+	{
+		return manager.getsService(platformId, serviceClazz);
+	}
+
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz)
+	{
+		return manager.getService(platformId, serviceClazz);
+	}
+
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz, String scope)
+	{
+		return manager.getService(platformId, serviceClazz, scope);
+	}
+	
+	
 	
 }

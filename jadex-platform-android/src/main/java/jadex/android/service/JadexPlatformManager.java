@@ -37,7 +37,9 @@ import android.util.Log;
  */
 public class JadexPlatformManager implements IJadexPlatformManager
 {
-	public static final String DEFAULT_OPTIONS = "-logging_level java.util.logging.Level.INFO" + " -extensions null" + " -awareness false"
+	public static final String DEFAULT_OPTIONS = "-logging_level java.util.logging.Level.INFO" 
+			+ " -extensions null" 
+			//+ " -awareness false"
 			+ " -wspublish false" + " -rspublish false" + " -android true" + " -binarymessages true"
 			+ " -conf jadex.platform.PlatformAgent" +
 			// " -tcptransport false" +
@@ -108,50 +110,84 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	}
 	
 	/**
-	 * Retrieves the CMS of the Platform with the given ID.
+	 * Looks up a service and returns it synchronously.
+	 * 
+	 * @param platformId Id of the platform to use for lookup
+	 * @param serviceClazz Class of the service (interface) to find
+	 * @return the service
 	 */
-	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
-	{
-		return getExternalPlatformAccess(platformID).scheduleStep(new IComponentStep<IComponentManagementService>()
+	public <S> S getsService(IComponentIdentifier platformId, final Class<S> serviceClazz) {
+		S s = getService(platformId, serviceClazz).get(new ThreadSuspendable());
+		return s;
+	}
+	
+	/**
+	 * Looks up a service using RequiredServiceInfo.SCOPE_PLATFORM as scope.
+	 * 
+	 * @see getsService
+	 * 
+	 * @param platformId Id of the platform to use for lookup
+	 * @param serviceClazz Class of the service (interface) to find
+	 * @return Future of the service.
+	 */
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz) {
+		return getService(platformId, serviceClazz, RequiredServiceInfo.SCOPE_PLATFORM);
+	}
+	
+	/**
+	 * Looks up a service.
+	 * 
+	 * @see getsService
+	 * 
+	 * @param platformId Id of the platform to use for lookup
+	 * @param serviceClazz Class of the service (interface) to find
+	 * @param scope Search scope. See {@link RequiredServiceInfo} constants.
+	 * @return Future of the service.
+	 */
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz, final String scope) {
+		return getExternalPlatformAccess(platformId).scheduleStep(new IComponentStep<S>()
 		{
 			@Classname("create-component")
-			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
+			public IFuture<S> execute(IInternalAccess ia)
 			{
-				Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
+				Future<S> ret = new Future<S>();
 				SServiceProvider
-						.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(ia.createResultListener(new DelegationResultListener<IComponentManagementService>(ret)));
+						.getService(ia.getServiceContainer(), serviceClazz, scope)
+						.addResultListener(ia.createResultListener(new DelegationResultListener<S>(ret)));
 
 				return ret;
 			}
 		});
+	}
+	
+	/**
+	 * Retrieves the CMS of the Platform with the given ID.
+	 * @param platformID Id of the platform
+	 * 
+	 * @deprecated use getService() or the synchronous getsService() instead. 
+	 */
+	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
+	{
+		return getService(platformID, IComponentManagementService.class);
 	}
 
 	/**
 	 * Retrieves the MS of the Platform with the given ID.
+	 * @param platformID Id of the platform
+	 * 
+	 * @deprecated use getService() or the synchronous getsService() instead. 
 	 */
 	public IFuture<IMessageService> getMS(IComponentIdentifier platformID)
 	{
-		return getExternalPlatformAccess(platformID).scheduleStep(new IComponentStep<IMessageService>()
-		{
-			@Classname("create-component")
-			public IFuture<IMessageService> execute(IInternalAccess ia)
-			{
-				Future<IMessageService> ret = new Future<IMessageService>();
-				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(ia.createResultListener(new DelegationResultListener<IMessageService>(ret)));
-
-				return ret;
-			}
-		});
+		return getService(platformID, IMessageService.class);
 	}
 
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options)
+	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformName, final String options)
 	{
-		return startJadexPlatform(kernels, platformId, options, true);
+		return startJadexPlatform(kernels, platformName, options, true);
 	}
 
-	public synchronized IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options,
+	public synchronized IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformName, final String options,
 			final boolean chat)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
@@ -170,7 +206,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 				kernelString.append("\"");
 
 				final String usedOptions = DEFAULT_OPTIONS + " -kernels " + kernelString.toString() + " -platformname "
-						+ (platformId != null ? platformId : getRandomPlatformID()) + (options == null ? "" : " " + options);
+						+ (platformName != null ? platformName : getRandomPlatformName()) + (options == null ? "" : " " + options);
 
 				IFuture<IExternalAccess> future = createPlatformWithClassloader((usedOptions).split("\\s+"), this.getClass().getClassLoader());
 
@@ -287,27 +323,13 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		Log.d("jadex-android", "Platform shutdown completed: " + platformID.toString());
 	}
 
-	public String getRandomPlatformID()
+	public String getRandomPlatformName()
 	{
 		StringBuilder sb = new StringBuilder(AndroidContextManager.getInstance().getUniqueDeviceName());
 		UUID randomUUID = UUID.randomUUID();
 		sb.append("_");
 		sb.append(randomUUID.toString().substring(0, 3));
 		return sb.toString();
-	}
-
-	public IComponentIdentifier getFirstRunningPlatformId()
-	{
-		Set<IComponentIdentifier> platformIds = runningPlatforms.keySet();
-		if (!platformIds.isEmpty())
-		{
-			IComponentIdentifier next = platformIds.iterator().next();
-			return next;
-		}
-		else
-		{
-			throw new JadexAndroidPlatformNotStartedError("getCMS()");
-		}
 	}
 
 }

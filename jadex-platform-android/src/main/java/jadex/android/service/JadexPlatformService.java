@@ -17,7 +17,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Service;
@@ -55,12 +54,12 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 
 			public IFuture<IComponentIdentifier> startMicroAgent(IComponentIdentifier platformId, String name, Class<?> clazz)
 			{
-				return JadexPlatformService.this.startMicroAgent(platformId, name, clazz);
+				return startMicroAgent(platformId, name, clazz);
 			}
 
 			public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, String name, String modelPath)
 			{
-				return JadexPlatformService.this.startComponent(platformId, name, modelPath);
+				return startComponent(platformId, name, modelPath);
 			}
 
 			public IFuture<IExternalAccess> startJadexPlatform()
@@ -70,7 +69,7 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 
 			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
 			{
-				return startJadexPlatform(kernels, jadexPlatformManager.getRandomPlatformID());
+				return startJadexPlatform(kernels, jadexPlatformManager.getRandomPlatformName());
 			}
 
 			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
@@ -80,9 +79,13 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 
 			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
 			{
-				return JadexPlatformService.this.startJadexPlatform(kernels, platformId, options);
+				return startJadexPlatform(kernels, platformId, options);
 			}
-			
+
+			public IComponentIdentifier getPlatformId()
+			{
+				return getPlatformId();
+			}
 		};
 	}
 	
@@ -114,9 +117,21 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 		// jadexAndroidContext.removeContextChangeListener(this);
 	}
 	
+	
+	/**
+	 * Returns whether the Jadex Platform is or has been started automatically.
+	 * @return boolean
+	 */
+	protected boolean isPlatformAutostart()
+	{
+		return platformAutostart;
+	}
+
 	/**
 	 * Sets the autostart parameter for this jadex platform.
-	 * If true, the platform will be started during onCreate.
+	 * If true, the platform will be started during onCreate().
+	 * Should be set in constructor, as this is the only method called
+	 * before onCreate().
 	 * @param autostart
 	 */
 	protected void setPlatformAutostart(boolean autostart) {
@@ -127,15 +142,35 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 		}
 	}
 	
+	
+	/**
+	 * Gets the Kernels.
+	 * See {@link JadexPlatformManager} constants for available Kernels.
+	 * @return String[] of kernels.
+	 */
+	protected String[] getPlatformKernels()
+	{
+		return platformKernels;
+	}
+
 	/**
 	 * Sets the Kernels.
-	 * See {@link JadexPlatformManager} Constants for available Kernels.
+	 * See {@link JadexPlatformManager} constants for available Kernels.
 	 * @param kernels
 	 */
 	protected void setPlatformKernels(String ... kernels) {
 		this.platformKernels = kernels;
 	}
 	
+	/**
+	 * Returns the platform options of newly created platforms.
+	 * @return String[] of options
+	 */
+	protected String getPlatformOptions()
+	{
+		return platformOptions;
+	}
+
 	/**
 	 * Sets platform options.
 	 * @param options
@@ -144,6 +179,15 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 		this.platformOptions = options;
 	}
 	
+	/**
+	 * Returns the name which is used to create the next jadex platform.
+	 * @return {@link String} name
+	 */
+	public String getPlatformName()
+	{
+		return platformName;
+	}
+
 	/**
 	 * Sets the name of the platform that is started by this activity.
 	 * @param name
@@ -187,24 +231,12 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	 * @param clazz
 	 *            class of the agent to instantiate
 	 * @return ComponentIdentifier of the created agent.
+	 * 
+	 * @deprecated Use startComponent() instead for all agent types.
 	 */
 	public IFuture<IComponentIdentifier> startMicroAgent(final IComponentIdentifier platformId, final String name, final Class<?> clazz)
 	{
-		checkIfPlatformIsRunning(platformId, "startMicroAgent()");
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		jadexPlatformManager.getCMS(platformId)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService cms)
-			{
-				HashMap<String, Object> args = new HashMap<String, Object>();
-
-				cms.createComponent(name, clazz.getName().replaceAll("\\.", "/") + ".class", new CreationInfo(args), null).addResultListener(
-						new DelegationResultListener<IComponentIdentifier>(ret));
-			}
-		});
-
-		return ret;
+		return startComponent(platformId, name, clazz);
 	}
 	
 	/**
@@ -231,10 +263,10 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	 * @param platformId
 	 *            Identifier of the jadex platform
 	 * @param name
-	 *            name of the newly created agent
-	 * @param modelPath
-	 *            Path to the bpmn model file of the new agent
-	 *            	 * @param creationInfo
+	 *            name of the newly created component
+	 * @param clazz
+	 *            Class of the new component
+	 * @param creationInfo
 	 * 			  {@link CreationInfo} to pass to the started Component.
 	 * @return ComponentIdentifier of the created agent.
 	 */
@@ -252,9 +284,9 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	 * @param platformId
 	 *            Identifier of the jadex platform
 	 * @param name
-	 *            name of the newly created agent
+	 *            name of the newly created component
 	 * @param modelPath
-	 *            Path to the bpmn model file of the new agent
+	 *            Path to the model file of the new component
 	 * @return ComponendIdentifier of the created agent.
 	 */
 	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath)
@@ -268,9 +300,9 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	 * @param platformId
 	 *            Identifier of the jadex platform
 	 * @param name
-	 *            name of the newly created agent
+	 *            name of the newly created component
 	 * @param modelPath
-	 *            Path to the bpmn model file of the new agent
+	 *            Path to the model file of the new component
 	 * @param creationInfo
 	 * 			  {@link CreationInfo} to pass to the started Component.
 	 * @return ComponentIdentifier of the created agent.

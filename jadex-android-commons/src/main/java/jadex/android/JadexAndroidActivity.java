@@ -33,6 +33,10 @@ import android.view.Window;
  * This is an Android Activity Class which provides needed Functionality and
  * comfort Features for Jadex Android Activities. It uses the {@link JadexPlatformService}
  * internally, but takes care about service binding.
+ * <br>
+ * <b>IMPORTANT</b>: When creating real applications, you need to use your own Service (extend JadexPlatformService)!
+ * <br>
+ * <b>Don't use this Activity for real applications as the service will be killed when it's destroyed.</b>
  * 
  * @author Julian Kalinowski
  */

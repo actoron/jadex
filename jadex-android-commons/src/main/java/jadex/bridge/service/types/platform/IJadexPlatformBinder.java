@@ -4,6 +4,7 @@ import jadex.android.IEventReceiver;
 import jadex.android.exception.WrongEventClassException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.message.IMessageService;
@@ -30,13 +31,55 @@ public interface IJadexPlatformBinder
 
 	/**
 	 * Retrieves the CMS of the Platform with the given ID.
+	 * 
+ 	 * @deprecated use getService() or getsService() instead.
 	 */
 	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID);
 	
 	/**
 	 * Retrieves the MS of the Platform with the given ID.
+	 * 
+	 * @deprecated use getService() or getsService() instead.
 	 */
 	public IFuture<IMessageService> getMS(IComponentIdentifier platformID);
+	
+	/**
+	 * Looks up a service and returns it synchronously.
+	 * 
+	 * @param platformId Id of the platform to use for lookup
+	 * @param serviceClazz Class of the service (interface) to find
+	 * @return the service
+	 */
+	public <S> S getsService(IComponentIdentifier platformId, final Class<S> serviceClazz);
+	
+	/**
+	 * Looks up a service.
+	 * 
+	 * @see getsService
+	 * 
+	 * @param platformId Id of the platform to use for lookup
+	 * @param serviceClazz Class of the service (interface) to find
+	 * @return Future of the service.
+	 */
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz);
+	
+	/**
+	 * Looks up a service.
+	 * 
+	 * @see getsService
+	 * 
+	 * @param platformId Id of the platform to use for lookup
+	 * @param serviceClazz Class of the service (interface) to find
+	 * @param scope Search scope. See {@link RequiredServiceInfo} constants.
+	 * @return Future of the service.
+	 */
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz, final String scope);
+	
+	/**
+	 * Retrieves the platformId of the last started Platform, if any.
+	 * @return {@link IComponentIdentifier} platformId or <code>null</code>.
+	 */
+	public IComponentIdentifier getPlatformId();
 
 
 	// ---------- starting / stopping ----------
