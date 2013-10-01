@@ -1,8 +1,12 @@
-package jadex.android.exampleproject;
+package jadex.android.exampleproject.simple;
 
 import jadex.android.JadexAndroidActivity;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
+import jadex.android.exampleproject.R;
+import jadex.android.exampleproject.R.id;
+import jadex.android.exampleproject.R.layout;
+import jadex.android.exampleproject.R.string;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -147,9 +151,21 @@ public class HelloWorldActivity extends JadexAndroidActivity
 				if (isJadexPlatformRunning())
 				{
 					startPlatformButton.setEnabled(false);
-					stopPlatforms();
-					refreshButtons();
-					startPlatformButton.setEnabled(true);
+					Thread thread = new Thread() {
+						public void run() {
+							stopPlatforms();
+							runOnUiThread(new Runnable()
+							{
+								@Override
+								public void run()
+								{
+									refreshButtons();
+									startPlatformButton.setEnabled(true);
+								}
+							});
+						};
+					};
+					thread.start();
 				} else
 				{
 					startPlatformButton.setEnabled(false);

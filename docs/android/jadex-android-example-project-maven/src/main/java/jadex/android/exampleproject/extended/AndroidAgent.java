@@ -1,4 +1,4 @@
-package jadex.android.exampleproject;
+package jadex.android.exampleproject.extended;
 
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -9,11 +9,16 @@ import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 import java.util.Map;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 
@@ -24,6 +29,9 @@ import android.os.Message;
 @Description("Sample Android Agent.")
 @RequiredServices({
 		@RequiredService(name="androidcontext", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+})
+@ProvidedServices({
+	@ProvidedService(name="guiproxy", type=IAgentInterface.class, implementation=@Implementation(AgentInterface.class))
 })
 public class AndroidAgent extends MicroAgent
 {
@@ -49,16 +57,6 @@ public class AndroidAgent extends MicroAgent
 		return IFuture.DONE;
 	}
 
-	/**
-	 *  Called when the agent receives a message.
-	 */
-	public void messageArrived(Map<String, Object> msg, MessageType mt)
-	{
-		if (msg.get(SFipa.CONTENT).equals("ping")) {
-			showAndroidMessage(getAgentName() + ": pong");
-		}
-	}
-	
 	//-------- helper methods --------
 
 	/**
@@ -67,10 +65,9 @@ public class AndroidAgent extends MicroAgent
 	 */
 	protected void showAndroidMessage(String txt)
 	{
-		Message message = new Message();
-		Bundle bundle = new Bundle();
-		bundle.putString("message", txt);
-		message.setData(bundle);
-		HelloWorldActivity.uiHandler.sendMessage(message);
+		Intent intent = new Intent("agentMessage");
+		intent.putExtra("message", txt);
+		Context ctx = (Context) getArgument("androidContext");
+		ctx.sendBroadcast(intent);
 	}
 }
