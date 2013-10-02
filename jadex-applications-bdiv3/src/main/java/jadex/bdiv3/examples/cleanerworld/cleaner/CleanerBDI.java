@@ -57,7 +57,6 @@ import javax.swing.SwingUtilities;
 	@Plan(trigger=@Trigger(goals=CleanerBDI.AchievePickupWaste.class), body=@Body(PickUpWastePlan.class)),
 	@Plan(trigger=@Trigger(goals=CleanerBDI.AchieveDropWaste.class), body=@Body(DropWastePlan.class)),
 	@Plan(trigger=@Trigger(goals=CleanerBDI.MaintainBatteryLoaded.class), body=@Body(LoadBatteryPlan.class)),
-	// <CONTEXTCONDITION>$BELIEFBASE.MY_CHARGESTATE &GT; 0</CONTEXTCONDITION>
 	@Plan(trigger=@Trigger(goals=CleanerBDI.AchieveMoveTo.class), body=@Body(MoveToLocationPlan.class)),
 	@Plan(trigger=@Trigger(goals=CleanerBDI.PerformMemorizePositions.class), body=@Body(MemorizePositionsPlan.class)),
 	@Plan(trigger=@Trigger(goals=CleanerBDI.PickupWasteAction.class), priority=1, body=@Body(LocalPickUpWasteActionPlan.class)),

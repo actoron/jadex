@@ -25,7 +25,7 @@ public class ClockBDI
 	@AgentBody
 	public void body()
 	{
-		setTime();
+//		setTime();
 	}
 	
 	/**
@@ -41,19 +41,18 @@ public class ClockBDI
 	 *  Get the time.
 	 *  @return The time.
 	 */
-	@Belief//(updaterate=1000)
+	@Belief(updaterate=1000)
 	public long getTime()
 	{
 		return System.currentTimeMillis();
 	}
 
-	// todo: 
-	/**
-	 *  Set the time.
-	 *  @param time The time to set.
-	 */
-	@Belief
-	public void setTime()
-	{
-	}
+//	/**
+//	 *  Set the time.
+//	 *  @param time The time to set.
+//	 */
+//	@Belief
+//	public void setTime()
+//	{
+//	}
 }
