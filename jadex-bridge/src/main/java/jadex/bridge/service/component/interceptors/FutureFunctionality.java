@@ -320,41 +320,41 @@ public class FutureFunctionality
 	 */
 	public static void connectDelegationFuture(Future target, IFuture source)
 	{
-		if(source instanceof IPullSubscriptionIntermediateFuture)
+		if(target instanceof IPullSubscriptionIntermediateFuture)
 		{
 			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
 				(PullSubscriptionIntermediateDelegationFuture)target, (IPullSubscriptionIntermediateFuture)source);
 			source.addResultListener(lis);
 		}
-		else if(source instanceof IPullIntermediateFuture)
+		else if(target instanceof IPullIntermediateFuture)
 		{
 			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
 				(PullIntermediateDelegationFuture)target, (IPullIntermediateFuture)source);
 			source.addResultListener(lis);
 		}
-		else if(source instanceof ISubscriptionIntermediateFuture)
+		else if(target instanceof ISubscriptionIntermediateFuture)
 		{
 			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
 				(TerminableIntermediateDelegationFuture)target, (ISubscriptionIntermediateFuture)source);
 			source.addResultListener(lis);
 		}
-		else if(source instanceof ITerminableIntermediateFuture)
+		else if(target instanceof ITerminableIntermediateFuture)
 		{
 			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
 				(TerminableIntermediateDelegationFuture)target, (ITerminableIntermediateFuture)source);
 			source.addResultListener(lis);
 		}
-		else if(source instanceof ITerminableFuture)
+		else if(target instanceof ITerminableFuture)
 		{
 			TerminableDelegationResultListener lis = new TerminableDelegationResultListener(
 				(TerminableDelegationFuture)target, (ITerminableFuture)source);
 			source.addResultListener(lis);
 		}
-		else if(source instanceof IIntermediateFuture)
+		else if(target instanceof IIntermediateFuture)
 		{
 			source.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)target));
 		}
-		else if(source instanceof IFuture)
+		else if(target instanceof IFuture)
 		{
 			source.addResultListener(new DelegationResultListener((Future)target));
 		}
