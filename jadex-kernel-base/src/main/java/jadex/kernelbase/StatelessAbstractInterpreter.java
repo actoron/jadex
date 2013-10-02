@@ -1023,9 +1023,16 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		{
 			for(NFPropertyInfo nfprop: nfprops)
 			{
-				Class<?> clazz = nfprop.getClazz().getType(getClassLoader());
-				INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), null, null);
-				addNFProperty(nfp);
+				try
+				{
+					Class<?> clazz = nfprop.getClazz().getType(getClassLoader());
+					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), null, null);
+					addNFProperty(nfp);
+				}
+				catch(Exception e)
+				{
+					getLogger().warning("Property creation problem: "+e);
+				}
 			}
 		}
 		

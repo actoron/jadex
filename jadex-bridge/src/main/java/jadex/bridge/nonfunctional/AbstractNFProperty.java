@@ -8,6 +8,7 @@ import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -100,29 +101,42 @@ public abstract class AbstractNFProperty<T, U> implements INFProperty<T, U>
 			Constructor<?> con = clazz.getConstructor();
 			prop = (INFProperty<?, ?>)con.newInstance();
 		}
-		catch(Exception e)
+		catch(NoSuchMethodException e)
 		{
 			try
 			{
 				Constructor<?> con = clazz.getConstructor(new Class[]{IInternalAccess.class});
 				prop = (INFProperty<?, ?>)con.newInstance(comp);
 			}
-			catch(Exception ex)
+			catch(NoSuchMethodException ex)
 			{
 				try
 				{
 					Constructor<?> con = clazz.getConstructor(new Class[]{IInternalAccess.class, IService.class, MethodInfo.class});
 					prop = (INFProperty<?, ?>)con.newInstance(comp, service, mi);
 				}
-				catch(Exception ex2)
+				catch(NoSuchMethodException ex2)
 				{
-					ex2.printStackTrace();
+					throw new RuntimeException("No suitable constructor: "+clazz, e);
+				}
+				catch(Exception eee)
+				{
+					throw new RuntimeException("Property creation exception: "+clazz, eee);
 				}
 			}
+			catch(Exception ee)
+			{
+				throw new RuntimeException("Property creation exception: "+clazz, ee);
+			}
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException("Property creation exception: "+clazz, e);
 		}
 		
-		if(prop==null)
-			throw new RuntimeException("Property has no suitable constructor: "+clazz);
+//		if(prop==null)
+//			System.out.println("Property cannot be created: "+clazz);
+//			throw new RuntimeException("Property cannot be created: "+clazz);
 		
 		return prop;
 	}

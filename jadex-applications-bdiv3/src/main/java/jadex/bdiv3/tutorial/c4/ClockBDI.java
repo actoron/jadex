@@ -3,7 +3,6 @@ package jadex.bdiv3.tutorial.c4;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bridge.service.annotation.Service;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
@@ -42,12 +41,13 @@ public class ClockBDI
 	 *  Get the time.
 	 *  @return The time.
 	 */
-	@Belief
+	@Belief//(updaterate=1000)
 	public long getTime()
 	{
 		return System.currentTimeMillis();
 	}
 
+	// todo: 
 	/**
 	 *  Set the time.
 	 *  @param time The time to set.

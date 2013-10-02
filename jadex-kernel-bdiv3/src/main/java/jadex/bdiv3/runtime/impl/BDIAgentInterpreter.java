@@ -877,8 +877,18 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 										{
 											try
 											{
-												Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(name), new Class[0]);
-												um.invoke(capa, new Object[0]);
+												// Invoke dynamic update method if field belief
+												if(mbel.isFieldBelief())
+												{
+													Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(name), new Class[0]);
+													um.invoke(capa, new Object[0]);
+												}
+												// Otherwise just call getValue and throw event
+												else
+												{
+													Object value = mbel.getValue(capa, getClassLoader());
+													BDIAgent.createEvent(value, (BDIAgent)microagent, mbel.getName());
+												}
 											}
 											catch(Exception e)
 											{
