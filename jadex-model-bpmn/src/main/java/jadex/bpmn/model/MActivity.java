@@ -4,6 +4,7 @@ import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.hardconstraints.MHardConstraint;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
@@ -94,6 +95,9 @@ public class MActivity extends MAssociationTarget
 	
 	/** The class. */
 	protected ClassInfo clazz;
+	
+	/** Non-functional hard constraints for service searches. */
+	protected List<MHardConstraint> searchconstraints;
 	
 	//-------- methods --------
 	
@@ -748,6 +752,28 @@ public class MActivity extends MAssociationTarget
 		return properties;
 	}
 	
+	
+	
+	/**
+	 *  Gets the search constraints.
+	 *
+	 *  @return The search constraints.
+	 */
+	public List<MHardConstraint> getSearchConstraints()
+	{
+		return searchconstraints;
+	}
+
+	/**
+	 *  Sets the search constraints.
+	 *
+	 *  @param searchconstraints The search constraints to set.
+	 */
+	public void setSearchConstraints(List<MHardConstraint> searchconstraints)
+	{
+		this.searchconstraints = searchconstraints;
+	}
+
 	/**
 	 *  Test if a property exists.
 	 */
