@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ *  Default implementation for a method property provider.
  */
 public class NFMethodPropertyProvider extends NFPropertyProvider implements INFMixedPropertyProvider
 {

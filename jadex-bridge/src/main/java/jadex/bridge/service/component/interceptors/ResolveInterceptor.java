@@ -6,6 +6,7 @@ import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
+import jadex.bridge.nonfunctional.INFRPropertyProvider;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.ServiceShutdown;

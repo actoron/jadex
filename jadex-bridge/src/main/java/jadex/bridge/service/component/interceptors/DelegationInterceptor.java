@@ -13,23 +13,16 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.DefaultServiceFetcher;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.management.ServiceNotFoundException;
 
 /**
  *  Delegates a service call to another service provider.

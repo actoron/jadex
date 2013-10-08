@@ -19,6 +19,14 @@ public class ExecutionTimeEvaluator extends BasicEvaluator<Long>
 	}
 	
 	/**
+	 *  Create a new evaluator.
+	 */
+	public ExecutionTimeEvaluator(MethodInfo mi, boolean required) throws Exception
+	{
+		super(ExecutionTimeProperty.NAME, mi, null, required);
+	}
+	
+	/**
 	 *  Calculate the value with 1 best and 0 worst.
 	 *  Re-scales waiting times from [0,unlimited] to [1,0].
 	 */

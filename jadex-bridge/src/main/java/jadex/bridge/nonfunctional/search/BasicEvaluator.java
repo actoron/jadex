@@ -1,7 +1,10 @@
 package jadex.bridge.nonfunctional.search;
 
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.INFRPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.commons.MethodInfo;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -11,11 +14,17 @@ import jadex.commons.future.IResultListener;
  */
 public abstract class BasicEvaluator<T> implements IServiceEvaluator
 {
+	/** The property name. */
 	protected String propertyname;
 	
+	/** The method info. */
 	protected MethodInfo methodinfo;
 	
+	/** The unit. */
 	protected Object unit;
+	
+	/** The required flag. */
+	protected boolean required;
 	
 	/**
 	 *  Create a new evaluator.
@@ -23,7 +32,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	 */
 	public BasicEvaluator(String propertyname)
 	{
-		this(propertyname, null, null);
+		this(propertyname, null, null, false);
 	}
 	
 	/**
@@ -32,7 +41,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	 */
 	public BasicEvaluator(String propertyname, Object unit)
 	{
-		this(propertyname, null, unit);
+		this(propertyname, null, unit, false);
 	}
 	
 	/**
@@ -41,7 +50,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	 */
 	public BasicEvaluator(String propertyname, MethodInfo mi)
 	{
-		this(propertyname, mi, null);
+		this(propertyname, mi, null, false);
 	}
 	
 	/**
@@ -50,11 +59,12 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	 *  @param methodinfo The method.
 	 *  @param unit The unit.
 	 */
-	public BasicEvaluator(String propertyname, MethodInfo methodinfo, Object unit)
+	public BasicEvaluator(String propertyname, MethodInfo methodinfo, Object unit, boolean required)
 	{
 		this.propertyname = propertyname;
 		this.methodinfo = methodinfo;
 		this.unit = unit;
+		this.required = required;
 	}
 	
 	/**
@@ -70,40 +80,60 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	public IFuture<Double> evaluate(IService service)
 	{
 		final Future<Double> ret = new Future<Double>();
-		IResultListener<Object> listener = new IResultListener<Object>()
+		final IResultListener<T> listener = new ExceptionDelegationResultListener<T, Double>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(T result)
 			{
-				ret.setResult(calculateEvaluation((T)result));
-			}
-
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
+				ret.setResult(calculateEvaluation(result));
 			}
 		};
-		if(methodinfo != null)
+		
+		if(required)
 		{
-			if(unit != null)
+//			System.out.println("test: "+(service instanceof INFRPropertyProvider));
+			((INFRPropertyProvider)service).getRequiredServiceProertyProvider(service.getServiceIdentifier())
+				.addResultListener(new ExceptionDelegationResultListener<INFMixedPropertyProvider, Double>(ret)
 			{
-				service.getMethodNFPropertyValue(methodinfo, propertyname, unit).addResultListener(listener);
+				public void customResultAvailable(INFMixedPropertyProvider result)
+				{
+					getPropertyValue(result).addResultListener(listener);
+				}
+			});
+		}
+		else
+		{
+			getPropertyValue(service).addResultListener(listener);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<T> getPropertyValue(INFMixedPropertyProvider provider)
+	{
+		if(methodinfo!=null)
+		{
+			if(unit!=null)
+			{
+				return provider.getMethodNFPropertyValue(methodinfo, propertyname, unit);
 			}
 			else
 			{
-				service.getMethodNFPropertyValue(methodinfo, propertyname).addResultListener(listener);
+				return provider.getMethodNFPropertyValue(methodinfo, propertyname);
 			}
 		}
 		else
 		{
-			if (unit != null)
+			if(unit!=null)
 			{
-				service.getNFPropertyValue(propertyname, unit).addResultListener(listener);
+				return provider.getNFPropertyValue(propertyname, unit);
 			}
 			else
 			{
-				service.getNFPropertyValue(propertyname).addResultListener(listener);
+				return provider.getNFPropertyValue(propertyname);
 			}
 		}
-		return ret;
 	}
 }

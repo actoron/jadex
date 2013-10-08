@@ -6,6 +6,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.INFRPropertyProvider;
 import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
@@ -25,6 +26,7 @@ import jadex.bridge.service.component.interceptors.DelegationInterceptor;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.MonitoringInterceptor;
+import jadex.bridge.service.component.interceptors.NFRequiredServicePropertyProviderInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
@@ -644,6 +646,7 @@ public class BasicServiceInvocationHandler extends MethodListenerHandler impleme
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
+			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{
@@ -657,7 +660,7 @@ public class BasicServiceInvocationHandler extends MethodListenerHandler impleme
 			}
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 			// service.getServiceIdentifier().getServiceType()
-			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, info.getType().getType(ia.getClassLoader())}, handler); 
+			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader())}, handler); 
 		}
 		
 		return ret;
