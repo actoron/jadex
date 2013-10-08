@@ -42,6 +42,7 @@ public class UserAgent
 			while(true)
 			{
 				ComposedEvaluator<IAService> ranker = new ComposedEvaluator<IAService>();
+//				ranker.addEvaluator(new WaitqueueEvaluator(new MethodInfo(IAService.class.getMethod("test", new Class[0]))));
 				ranker.addEvaluator(new WaitqueueEvaluator(new MethodInfo(IAService.class.getMethod("test", new Class[0]))));
 				ITerminableIntermediateFuture<IAService> sfut = agent.getRequiredServices("aser");
 				Collection<Tuple2<IAService, Double>> res = SServiceProvider.rankServicesWithScores(sfut, ranker, null).get();

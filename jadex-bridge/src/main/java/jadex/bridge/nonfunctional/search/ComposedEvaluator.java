@@ -113,7 +113,7 @@ public class ComposedEvaluator<S> implements IServiceEvaluator, IServiceRanker<S
 			}
 		});
 			
-		for (Tuple2<IServiceEvaluator, Double> eval : evaluators)
+		for(Tuple2<IServiceEvaluator, Double> eval : evaluators)
 		{
 			final double weight = eval.getSecondEntity();
 			eval.getFirstEntity().evaluate(service).addResultListener(new IResultListener<Double>()
