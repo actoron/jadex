@@ -719,9 +719,6 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		
-		// todo
-		ret.setException(new UnsupportedOperationException());
-		
 		if(getInterpreter().getAgentAdapter().isExternalThread())
 		{
 			try
@@ -749,6 +746,46 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		else
 		{
 			getInterpreter().getNFPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNFAllPropertyNames()
+	{
+		final Future<String[]> ret = new Future<String[]>();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						getInterpreter().getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(getInterpreter().getAgentAdapter().getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						getInterpreter().getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+//						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			getInterpreter().getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
 		}
 		
 		return ret;

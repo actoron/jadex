@@ -9,7 +9,7 @@ import jadex.commons.future.IFuture;
  *  the signature INFProperty(String name) to allow the service
  *  to initialize the property during creation.
  */
-public interface INFProperty<T extends Object, U extends Object>
+public interface INFProperty<T, U>
 {
 	public static enum Target{Self, Root} // todo: support COMPONENT, Parent
 	

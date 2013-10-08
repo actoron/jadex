@@ -201,26 +201,22 @@ public class ServiceInvocationContext
 			call.setProperty(ServiceCall.REALTIME, realtime ? Boolean.TRUE : Boolean.FALSE);
 		}
 		
-		if(method.getName().indexOf("get")==-1 && method.getDeclaringClass().getName().indexOf("IChatService")!=-1 && call.getCaller()==null)
-		{
-			System.out.println("ggggg: "+call);
-//			Thread.dumpStack();
-		}
-		
 		// Init the cause of the next call based on the last one
 		if(this.call.getCause()==null)
 		{
-			Cause cause = lastcall!=null? lastcall.getCause(): this.cause;
 //			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);
 			String target = sid.toString();
-			if(cause!=null)
+			if(lastcall!=null && lastcall.getCause()!=null)
 			{
-				this.call.setCause(new Cause(cause, target));
+				this.call.setCause(new Cause(lastcall.getCause(), target));
 //				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
 			}
 			else
 			{
-				this.call.setCause(new Cause((Cause)null, target));
+				// Create cause with novel chain id as origin is component itself
+				Cause newc = new Cause(cause);
+				newc.setChainId(newc.createUniqueId());
+				this.call.setCause(new Cause(newc, target));
 			}
 		}
 	}

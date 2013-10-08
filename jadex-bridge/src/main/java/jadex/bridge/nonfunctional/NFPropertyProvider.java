@@ -5,7 +5,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Base impl for nf property property provider.
@@ -40,6 +42,40 @@ public class NFPropertyProvider implements INFPropertyProvider
 	public IFuture<String[]> getNFPropertyNames()
 	{
 		return new Future<String[]>(nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0]);
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNFAllPropertyNames()
+	{
+		final Future<String[]> ret = new Future<String[]>();
+		final String[] myprops = nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
+		if(getParent()!=null)
+		{
+			getParent().getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
+			{
+				public void customResultAvailable(String[] result)
+				{
+					Set<String> tmp = new LinkedHashSet<String>();
+					for(String p: result)
+					{
+						tmp.add(p);
+					}
+					for(String p: myprops)
+					{
+						tmp.add(p);
+					}
+					ret.setResult((String[])tmp.toArray(new String[tmp.size()]));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(myprops);
+		}
+		return ret;
 	}
 	
 	/**

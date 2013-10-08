@@ -4,9 +4,13 @@
 package jadex.bridge.nonfunctional;
 
 import jadex.commons.MethodInfo;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Interface for method-based non-functional property providers such
@@ -26,6 +30,12 @@ public interface INFMethodPropertyProvider
 	 *  @return The names of the non-functional properties of the specified method.
 	 */
 	public IFuture<String[]> getMethodNFPropertyNames(MethodInfo method);
+	
+	/**
+	 *  Returns the names of all non-functional properties of this method.
+	 *  @return The names of the non-functional properties of this method.
+	 */
+	public IFuture<String[]> getMethodNFAllPropertyNames(MethodInfo method);
 	
 	/**
 	 *  Returns meta information about a non-functional properties of a method.

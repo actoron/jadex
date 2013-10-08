@@ -875,6 +875,46 @@ public class ExternalAccess implements IExternalAccess
 	}
 	
 	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNFAllPropertyNames()
+	{
+		final Future<String[]> ret = new Future<String[]>();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						interpreter.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+//						ret.setResult(interpreter.getNFPropertyNames());
+						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			interpreter.getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Returns the meta information about a non-functional property of this service.
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.

@@ -6,7 +6,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -79,6 +81,41 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 	{
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		return new Future<String[]>(nfmap != null? nfmap.keySet().toArray(new String[nfproperties.size()]) : new String[0]);
+	}
+	
+	/**
+	 *  Returns the names of all non-functional properties of this method.
+	 *  @return The names of the non-functional properties of this method.
+	 */
+	public IFuture<String[]> getMethodNFAllPropertyNames(MethodInfo method)
+	{
+		final Future<String[]> ret = new Future<String[]>();
+		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
+		final String[] myprops = nfmap != null? nfmap.keySet().toArray(new String[nfproperties.size()]) : new String[0];
+		if(getParent()!=null)
+		{
+			getParent().getNFAllPropertyNames().addResultListener(new DelegationResultListener<String[]>(ret)
+			{
+				public void customResultAvailable(String[] result)
+				{
+					Set<String> tmp = new LinkedHashSet<String>();
+					for(String p: result)
+					{
+						tmp.add(p);
+					}
+					for(String p: myprops)
+					{
+						tmp.add(p);
+					}
+					ret.setResult((String[])tmp.toArray(new String[tmp.size()]));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(myprops);
+		}
+		return ret;
 	}
 	
 	/**

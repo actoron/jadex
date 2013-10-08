@@ -17,6 +17,12 @@ public interface INFPropertyProvider
 	public IFuture<String[]> getNFPropertyNames();
 	
 	/**
+	 *  Returns the names of all non-functional properties of this service.
+	 *  @return The names of the non-functional properties of this service.
+	 */
+	public IFuture<String[]> getNFAllPropertyNames();
+	
+	/**
 	 *  Returns the meta information about a non-functional property of this service.
 	 *  @param name Name of the property.
 	 *  @return The meta information about a non-functional property of this service.
