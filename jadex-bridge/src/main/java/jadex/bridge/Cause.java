@@ -18,11 +18,11 @@ public class Cause
 	/** The target id. */
 	protected String targetid;
 	
-	/** The source name. */
-	protected String sourcename;
-	
-	/** The target name. */
-	protected String targetname;
+//	/** The source name. */
+//	protected String sourcename;
+//	
+//	/** The target name. */
+//	protected String targetname;
 
 	/**
 	 *  Create a new cause.
@@ -61,8 +61,8 @@ public class Cause
 		// This allows to check if an event is top-level
 //		this.chainid = chainid==null? this.sourceid: chainid;
 		
-		this.sourcename = sourcename;
-		this.targetname = targetname;
+//		this.sourcename = sourcename;
+//		this.targetname = targetname;
 	}
 	
 	/**
@@ -72,9 +72,9 @@ public class Cause
 	{
 		this.chainid = old!=null? old.getChainId(): createUniqueId();
 		this.sourceid = old!=null? old.getTargetId(): createUniqueId();
-		this.sourcename = old!=null? old.getTargetName(): null;
+//		this.sourcename = old!=null? old.getTargetName(): null;
 		this.targetid = createUniqueId();
-		this.targetname = targetname;
+//		this.targetname = targetname;
 	}
 	
 	/**
@@ -84,9 +84,9 @@ public class Cause
 	{
 		this.chainid = other.getChainId();
 		this.sourceid = other.getSourceId();
-		this.sourcename = other.getSourceName();
+//		this.sourcename = other.getSourceName();
 		this.targetid = other.getTargetId();
-		this.targetname = other.getTargetName();
+//		this.targetname = other.getTargetName();
 	}
 	
 //	/**
@@ -193,7 +193,8 @@ public class Cause
 	 */
 	public String getSourceName()
 	{
-		return sourcename;
+//		return sourcename;
+		return null;
 	}
 
 	/**
@@ -202,7 +203,7 @@ public class Cause
 	 */
 	public void setSourceName(String sourcename)
 	{
-		this.sourcename = sourcename;
+//		this.sourcename = sourcename;
 	}
 
 	/**
@@ -211,7 +212,8 @@ public class Cause
 	 */
 	public String getTargetName()
 	{
-		return targetname;
+//		return targetname;
+		return null;
 	}
 
 	/**
@@ -220,7 +222,7 @@ public class Cause
 	 */
 	public void setTargetName(String targetname)
 	{
-		this.targetname = targetname;
+//		this.targetname = targetname;
 	}
 
 	/**
@@ -229,7 +231,7 @@ public class Cause
 	public String toString()
 	{
 		return "Cause(chainid=" + chainid + ", sourceid=" + sourceid
-			+ ", targetid=" + targetid + ", sourcename=" + sourcename
-			+ ", targetname=" + targetname + ")";
+			+ ", targetid=" + targetid + ")";//, sourcename=" + sourcename
+			//+ ", targetname=" + targetname + ")";
 	}
 }

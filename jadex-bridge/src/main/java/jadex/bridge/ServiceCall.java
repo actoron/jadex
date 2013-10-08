@@ -37,7 +37,11 @@ public class ServiceCall
 	protected static ThreadLocal<ServiceCall> CALLS	= new ThreadLocal<ServiceCall>();
 	
 	/** The upcoming service invocations. */
-	protected static ThreadLocal<ServiceCall> INVOCATIONS = new ThreadLocal<ServiceCall>();
+	protected static ThreadLocal<ServiceCall> NEXT = new ThreadLocal<ServiceCall>();
+	
+//	/** The upcoming service invocations. */
+//	protected static ThreadLocal<ServiceCall> LAST = new ThreadLocal<ServiceCall>();
+
 	
 	//-------- attributes --------
 	
@@ -80,6 +84,16 @@ public class ServiceCall
 	
 	//-------- methods --------
 	
+//	/**
+//	 *  Get the last service call instance corresponding
+//	 *  to the current execution context.
+//	 *  @return The service call instance or null.
+//	 */
+//	public static ServiceCall	getLastInvocation()
+//	{
+//		return LAST.get();
+//	}
+	
 	/**
 	 *  Get the service call instance corresponding
 	 *  to the current execution context.
@@ -117,7 +131,7 @@ public class ServiceCall
 	 */
 	public static ServiceCall getInvocation0()
 	{
-		return INVOCATIONS.get();
+		return NEXT.get();
 	}
 	
 	/**
@@ -127,7 +141,7 @@ public class ServiceCall
 	 */
 	public static ServiceCall getInvocation(Map<String, Object> props)
 	{
-		ServiceCall ret = INVOCATIONS.get();
+		ServiceCall ret = NEXT.get();
 		if(ret==null)
 		{
 			ret = new ServiceCall(IComponentIdentifier.LOCAL.get(), props);
@@ -138,7 +152,7 @@ public class ServiceCall
 //				Thread.dumpStack();
 //			}
 
-			INVOCATIONS.set(ret);
+			NEXT.set(ret);
 			
 //			if(getCurrentInvocation()!=null)
 //			{

@@ -215,7 +215,8 @@ public class ServiceInvocationContext
 			{
 				// Create cause with novel chain id as origin is component itself
 				Cause newc = new Cause(cause);
-				newc.setChainId(newc.createUniqueId());
+//				newc.setChainId(newc.createUniqueId());
+				newc.setChainId(cause.getTargetId());
 				this.call.setCause(new Cause(newc, target));
 			}
 		}

@@ -47,6 +47,7 @@ public abstract class CallAccess	extends ServiceCall
 	 */
 	public static void	resetServiceCall()
 	{
+//		LAST.set(ServiceCall.CALLS.get());
 		ServiceCall.CALLS.set(null);
 	}
 	
@@ -55,7 +56,7 @@ public abstract class CallAccess	extends ServiceCall
 	 */
 	public static ServiceCall	getNextInvocation()
 	{
-		return INVOCATIONS.get();
+		return NEXT.get();
 	}
 	
 	/**
@@ -63,7 +64,7 @@ public abstract class CallAccess	extends ServiceCall
 	 */
 	public static void	setNextInvocation(ServiceCall call)
 	{
-		INVOCATIONS.set(call);
+		NEXT.set(call);
 	}
 
 	/**
@@ -71,6 +72,6 @@ public abstract class CallAccess	extends ServiceCall
 	 */
 	public static void	resetNextInvocation()
 	{
-		INVOCATIONS.set(null);
+		NEXT.set(null);
 	}
 }
