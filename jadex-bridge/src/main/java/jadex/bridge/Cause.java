@@ -77,6 +77,18 @@ public class Cause
 		this.targetname = targetname;
 	}
 	
+	/**
+	 *  Create a new cause as clone of the other.
+	 */
+	public Cause(Cause other)
+	{
+		this.chainid = other.getChainId();
+		this.sourceid = other.getSourceId();
+		this.sourcename = other.getSourceName();
+		this.targetid = other.getTargetId();
+		this.targetname = other.getTargetName();
+	}
+	
 //	/**
 //	 *  Create a new cause.
 //	 */
@@ -101,7 +113,7 @@ public class Cause
 	/**
 	 *  Create a unique id.
 	 */
-	protected String createUniqueId()
+	public String createUniqueId()
 	{
 //		return createUniqueId(5);
 		return createUniqueId(-1);
