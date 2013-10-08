@@ -213,12 +213,12 @@ public class PlatformProvidingClientAppFragment extends ClientAppFragment implem
 
 	protected void registerEventReceiver(String eventName, IEventReceiver<?> rec)
 	{
-		platformService.registerEventListener(eventName, rec);
+		platformService.registerEventReceiver(eventName, rec);
 	}
 
 	protected void unregisterEventReceiver(String eventName, IEventReceiver<?> rec)
 	{
-		platformService.unregisterEventListener(eventName, rec);
+		platformService.unregisterEventReceiver(eventName, rec);
 	}
 
 	/**

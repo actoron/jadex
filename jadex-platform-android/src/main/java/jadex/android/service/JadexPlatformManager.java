@@ -117,7 +117,9 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	 * @return the service
 	 */
 	public <S> S getsService(IComponentIdentifier platformId, final Class<S> serviceClazz) {
-		S s = getService(platformId, serviceClazz).get(new ThreadSuspendable());
+//		ThreadSuspendable caller = new ThreadSuspendable();
+		IFuture<S> fut = getService(platformId, serviceClazz);
+		S s = fut.get();
 		return s;
 	}
 	
@@ -160,27 +162,27 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		});
 	}
 	
-	/**
-	 * Retrieves the CMS of the Platform with the given ID.
-	 * @param platformID Id of the platform
-	 * 
-	 * @deprecated use getService() or the synchronous getsService() instead. 
-	 */
-	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
-	{
-		return getService(platformID, IComponentManagementService.class);
-	}
-
-	/**
-	 * Retrieves the MS of the Platform with the given ID.
-	 * @param platformID Id of the platform
-	 * 
-	 * @deprecated use getService() or the synchronous getsService() instead. 
-	 */
-	public IFuture<IMessageService> getMS(IComponentIdentifier platformID)
-	{
-		return getService(platformID, IMessageService.class);
-	}
+//	/**
+//	 * Retrieves the CMS of the Platform with the given ID.
+//	 * @param platformID Id of the platform
+//	 * 
+//	 * @deprecated use getService() or the synchronous getsService() instead. 
+//	 */
+//	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
+//	{
+//		return getService(platformID, IComponentManagementService.class);
+//	}
+//
+//	/**
+//	 * Retrieves the MS of the Platform with the given ID.
+//	 * @param platformID Id of the platform
+//	 * 
+//	 * @deprecated use getService() or the synchronous getsService() instead. 
+//	 */
+//	public IFuture<IMessageService> getMS(IComponentIdentifier platformID)
+//	{
+//		return getService(platformID, IMessageService.class);
+//	}
 
 	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformName, final String options)
 	{

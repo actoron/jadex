@@ -1,15 +1,22 @@
-package jadex.android.exampleproject.extended;
+package jadex.android.exampleproject.extended.agent;
 
+import jadex.android.AndroidContextManager;
+import jadex.android.exampleproject.extended.MyEvent;
+import jadex.android.exception.WrongEventClassException;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.context.IContextService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
@@ -31,18 +38,21 @@ import android.os.Message;
 		@RequiredService(name="androidcontext", type=IContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 })
 @ProvidedServices({
-	@ProvidedService(name="guiproxy", type=IAgentInterface.class, implementation=@Implementation(AgentInterface.class))
+	@ProvidedService(name="guiproxy", type=IAgentInterface.class)
 })
-public class AndroidAgent extends MicroAgent
+@Service
+public class AndroidAgent extends MicroAgent implements IAgentInterface
 {
-	//-------- methods --------
+	@AgentArgument
+	public Context androidContext;
 	
+	//-------- methods --------
 	/**
 	 *  Called when the agent is started.
 	 */
 	public IFuture<Void> executeBody()
 	{
-		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying hello!");
+//		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying hello!");
 		return new Future<Void>();
 	}
 	
@@ -67,7 +77,29 @@ public class AndroidAgent extends MicroAgent
 	{
 		Intent intent = new Intent("agentMessage");
 		intent.putExtra("message", txt);
-		Context ctx = (Context) getArgument("androidContext");
-		ctx.sendBroadcast(intent);
+		Object argument = getArgument("androidContext");
+		Map<String, Object> arguments = getArguments();
+		Context ctx = (Context) argument;
+//		ctx.sendBroadcast(intent);
+		MyEvent myEvent = new MyEvent();
+		myEvent.data = txt;
+		try
+		{
+			AndroidContextManager.getInstance().dispatchEvent(myEvent);
+		}
+		catch (WrongEventClassException e)
+		{
+			e.printStackTrace();
+		}
 	}
+
+
+
+	@Override
+	public void callAgent(String message)
+	{
+		System.out.println("callAgent()");
+		showAndroidMessage("I was called with: " + message);
+	}
+	
 }

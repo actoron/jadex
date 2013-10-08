@@ -1,5 +1,6 @@
 package jadex.android.exampleproject.extended;
 
+import jadex.android.IEventReceiver;
 import jadex.android.exampleproject.R;
 import jadex.android.exampleproject.extended.MyJadexService.MyPlatformListener;
 import jadex.android.exampleproject.extended.MyJadexService.MyServiceInterface;
@@ -87,6 +88,7 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 		
 		IntentFilter intentFilter = new IntentFilter("agentMessage");
 		registerReceiver(agentMessageReceiver, intentFilter);
+		
 	}
 
 	protected void onResume()

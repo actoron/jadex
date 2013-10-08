@@ -3,15 +3,15 @@ package jadex.android.service;
 import jadex.android.AndroidContextManager;
 import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
-import jadex.android.exception.JadexAndroidPlatformNotStartedError;
+import jadex.android.exception.WrongEventClassException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.future.DefaultResultListener;
+import jadex.bridge.service.types.platform.IJadexPlatformBinder;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -19,19 +19,16 @@ import jadex.commons.future.IFuture;
 
 import java.util.Map;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
 /**
- * Android Service to start/stop Jadex Platforms. Platforms are terminated on
- * destroy.
+ * Android Service to use a single jadex platform.
+ * The platform can be launched on creation and will be terminated in onDestroy().
  */
-public class JadexPlatformService extends Service implements JadexPlatformOptions
+public class JadexPlatformService extends JadexMultiPlatformService implements JadexPlatformOptions, IJadexPlatformBinder
 {
-
-	protected JadexPlatformManager jadexPlatformManager;
 	
 	private String[] platformKernels;
 	private String platformOptions;
@@ -49,44 +46,7 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 	@Override
 	public IBinder onBind(Intent intent)
 	{
-		return new JadexPlatformBinder(jadexPlatformManager)
-		{
-
-			public IFuture<IComponentIdentifier> startMicroAgent(IComponentIdentifier platformId, String name, Class<?> clazz)
-			{
-				return JadexPlatformService.this.startMicroAgent(platformId, name, clazz);
-			}
-
-			public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, String name, String modelPath)
-			{
-				return JadexPlatformService.this.startComponent(platformId, name, modelPath);
-			}
-
-			public IFuture<IExternalAccess> startJadexPlatform()
-			{
-				return startJadexPlatform(JadexPlatformManager.DEFAULT_KERNELS);
-			}
-
-			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
-			{
-				return startJadexPlatform(kernels, jadexPlatformManager.getRandomPlatformName());
-			}
-
-			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
-			{
-				return startJadexPlatform(kernels, platformId, "");
-			}
-
-			public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
-			{
-				return JadexPlatformService.this.startJadexPlatform(kernels, platformId, options);
-			}
-
-			public IComponentIdentifier getPlatformId()
-			{
-				return JadexPlatformService.this.getPlatformId();
-			}
-		};
+		return new JadexPlatformBinder(this);
 	}
 	
 	@Override
@@ -215,182 +175,83 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 		return startJadexPlatform(platformKernels, platformName, platformOptions);
 	}
 	
-	protected void stopPlatforms()
+	public IFuture<IMessageService> getMS()
 	{
-		jadexPlatformManager.shutdownJadexPlatforms();
-	}
-	
-	protected IExternalAccess getPlatformAccess(IComponentIdentifier platformId) {
-		checkIfPlatformIsRunning(platformId, "getPlatformAccess");
-		return jadexPlatformManager.getExternalPlatformAccess(platformId);
-	}
-	
-	protected IFuture<IMessageService> getMS()
-	{
-		return jadexPlatformManager.getMS(platformId);
+		return getMS(platformId);
 	}
 
-	protected IFuture<IComponentManagementService> getCMS()
+	public IFuture<IComponentManagementService> getCMS()
 	{
-		return jadexPlatformManager.getCMS(platformId);
+		return getCMS(platformId);
 	}
 	
-	/**
-	 * Start a new micro agent on a given platform.
-	 * 
-	 * @param platformId
-	 *            Identifier of the jadex platform
-	 * @param name
-	 *            name of the newly created agent
-	 * @param clazz
-	 *            class of the agent to instantiate
-	 * @return ComponentIdentifier of the created agent.
-	 * 
-	 * @deprecated Use startComponent() instead for all agent types.
-	 */
-	public IFuture<IComponentIdentifier> startMicroAgent(final IComponentIdentifier platformId, final String name, final Class<?> clazz)
+	public IExternalAccess getExternalPlatformAccess()
+	{
+		return getExternalPlatformAccess(platformId);
+	}
+
+	public <S> S getsService(Class<S> serviceClazz)
+	{
+		return getsService(platformId, serviceClazz);
+	}
+
+	public <S> IFuture<S> getService(Class<S> serviceClazz)
+	{
+		return getService(platformId, serviceClazz);
+	}
+
+	public <S> IFuture<S> getService(Class<S> serviceClazz, String scope)
+	{
+		return getService(platformId, serviceClazz, scope);
+	}
+
+	public void shutdownJadexPlatform()
+	{
+		shutdownJadexPlatform(platformId);
+	}
+
+	public IFuture<IComponentIdentifier> startComponent(String name, String modelPath)
+	{
+		return startComponent(platformId, name, modelPath);
+	}
+
+	public IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz)
 	{
 		return startComponent(platformId, name, clazz);
 	}
 	
-	/**
-	 * Start a new Component on a given platform with default {@link CreationInfo}.
-	 * If available, the belief "androidContext" will be set to <b>this</b>. 
-	 * 
-	 * @param platformId
-	 *            Identifier of the jadex platform
-	 * @param name
-	 *            name of the newly created agent
-	 * @param modelPath
-	 *            Path to the bpmn model file of the new agent
-	 * @return ComponentIdentifier of the created agent.
-	 */
-	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final Class<?> clazz)
-	{
-		return startComponent(platformId, name, clazz, new CreationInfo());
-	}
-	
-	/**
-	 * Start a new Component on a given platform.
-	 * If available, the belief "androidContext" will be set to <b>this</b>. 
-	 * 
-	 * @param platformId
-	 *            Identifier of the jadex platform
-	 * @param name
-	 *            name of the newly created component
-	 * @param clazz
-	 *            Class of the new component
-	 * @param creationInfo
-	 * 			  {@link CreationInfo} to pass to the started Component.
-	 * @return ComponentIdentifier of the created agent.
-	 */
-	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final Class<?> clazz, final CreationInfo creationInfo)
-	{
-		String modelPath = clazz.getName().replaceAll("\\.", "/") + ".class";
-		return startComponent(platformId, name, modelPath, creationInfo);
-	}
-	
-
-	/**
-	 * Start a new Component on a given platform with default {@link CreationInfo}.
-	 * If available, the belief "androidContext" will be set to <b>this</b>. 
-	 * 
-	 * @param platformId
-	 *            Identifier of the jadex platform
-	 * @param name
-	 *            name of the newly created component
-	 * @param modelPath
-	 *            Path to the model file of the new component
-	 * @return ComponendIdentifier of the created agent.
-	 */
-	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath)
-	{
-		return startComponent(platformId, name, modelPath, new CreationInfo());
-	}
-	
-	/**
-	 * Start a new Component on a given platform.
-	 * 
-	 * @param platformId
-	 *            Identifier of the jadex platform
-	 * @param name
-	 *            name of the newly created component
-	 * @param modelPath
-	 *            Path to the model file of the new component
-	 * @param creationInfo
-	 * 			  {@link CreationInfo} to pass to the started Component.
-	 * @return ComponentIdentifier of the created agent.
-	 */
-	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath, final CreationInfo creationInfo)
-	{
-		checkIfPlatformIsRunning(platformId, "startComponent()");
-		Map<String, Object> arguments = creationInfo.getArguments();
-		if (!arguments.containsKey("androidContext")) {
-			arguments.put("androidContext", this);
-		}
-		
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		jadexPlatformManager.getCMS(platformId)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService cms)
-			{
-				cms.createComponent(name, modelPath, creationInfo, null)
-					.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
-			}
-		});
-
-		return ret;
-	}
-
-	public void registerEventReceiver(String eventName, IEventReceiver<?> rec)
-	{
-		AndroidContextManager.getInstance().registerEventListener(eventName, rec);
-	}
-
-	public void unregisterEventReceiver(String eventName, IEventReceiver<?> rec)
-	{
-		AndroidContextManager.getInstance().unregisterEventListener(eventName, rec);
-	}
-
-	/**
-	 * Called right before the platform startup.
-	 */
-	protected void onPlatformStarting()
-	{
-	}
-
-	/**
-	 * Called right after the platform is started.
-	 * 
-	 * @param result
-	 *            The external access to the platform
-	 */
+	@Override
 	protected void onPlatformStarted(IExternalAccess platform)
 	{
 		this.platformId = platform.getComponentIdentifier();
 	}
 	
-	/**
-	 * Checks whether a jadex platform is running.
-	 * @return true, when runnning, else false.
-	 */
-	protected boolean isPlatformRunning()
+
+	public boolean isPlatformRunning()
 	{
 		return isPlatformRunning(platformId);
 	}
+
+	// --------------- event -----------------
 	
-	/**
-	 * Checks whether a jadex platform is running.
-	 * 
-	 * @param the IComponenntIdentifier of the platform to check.
-	 * @return true, when runnning, else false.
-	 */
-	protected boolean isPlatformRunning(IComponentIdentifier platformId)
+	public void registerEventReceiver(String eventName, IEventReceiver<?> rec)
 	{
-		return jadexPlatformManager.isPlatformRunning(platformId);
+		AndroidContextManager.getInstance().registerEventListener(eventName, rec);
 	}
 
+	public boolean unregisterEventReceiver(String eventName, IEventReceiver<?> rec)
+	{
+		return AndroidContextManager.getInstance().unregisterEventListener(eventName, rec);
+	}
+
+	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassException
+	{
+		return AndroidContextManager.getInstance().dispatchEvent(event);
+	}
+	
+	
+	//---------------- helper ----------------
+	
 	/**
 	 * Sends a FIPA Message to the specified receiver. The Sender is
 	 * automatically set to the Platform.
@@ -421,7 +282,7 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 
 		final Future<Void> ret = new Future<Void>();
 
-		jadexPlatformManager.getMS(platform).addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+		getMS(platform).addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
 			public void customResultAvailable(IMessageService ms)
 			{
@@ -432,40 +293,5 @@ public class JadexPlatformService extends Service implements JadexPlatformOption
 
 		return ret;
 	}
-	
-	//---------------- helper ----------------
-	
-	final private IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
-	{
-		onPlatformStarting();
-		IFuture<IExternalAccess> fut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
-		fut.addResultListener(new DefaultResultListener<IExternalAccess>()
-		{
-			public void resultAvailable(IExternalAccess result)
-			{
-				JadexPlatformService.this.onPlatformStarted(result);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-				super.exceptionOccurred(exception);
-			}
-		});
-		return fut;
-	}
-	
-	private void checkIfPlatformIsRunning(final IComponentIdentifier platformId, String caller)
-	{
-		if (!isPlatformRunning(platformId))
-		{
-			throw new JadexAndroidPlatformNotStartedError(caller);
-		}
-	}
 
-	@Override
-	public void attachBaseContext(Context baseContext)
-	{
-		super.attachBaseContext(baseContext);
-	}
 }

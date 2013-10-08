@@ -13,7 +13,7 @@ import jadex.commons.future.IFuture;
 /**
  * Interface for the platform binder object.
  */
-public interface IJadexPlatformBinder
+public interface IJadexPlatformBinder extends IJadexMultiPlatformBinder
 {
 	/**
 	 * Returns the Jadex External Platform Access object for a given platform Id
@@ -21,27 +21,27 @@ public interface IJadexPlatformBinder
 	 * @param platformID
 	 * @return IExternalAccess
 	 */
-	public IExternalAccess getExternalPlatformAccess(IComponentIdentifier platformID);
+	public IExternalAccess getExternalPlatformAccess();
 
 	/**
 	 * Returns true if given jadex platform is running.
 	 * 
 	 */
-	public boolean isPlatformRunning(IComponentIdentifier platformID);
+	public boolean isPlatformRunning();
 
 	/**
 	 * Retrieves the CMS of the Platform with the given ID.
 	 * 
  	 * @deprecated use getService() or getsService() instead.
 	 */
-	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID);
+	public IFuture<IComponentManagementService> getCMS();
 	
 	/**
 	 * Retrieves the MS of the Platform with the given ID.
 	 * 
 	 * @deprecated use getService() or getsService() instead.
 	 */
-	public IFuture<IMessageService> getMS(IComponentIdentifier platformID);
+	public IFuture<IMessageService> getMS();
 	
 	/**
 	 * Looks up a service and returns it synchronously.
@@ -50,7 +50,7 @@ public interface IJadexPlatformBinder
 	 * @param serviceClazz Class of the service (interface) to find
 	 * @return the service
 	 */
-	public <S> S getsService(IComponentIdentifier platformId, final Class<S> serviceClazz);
+	public <S> S getsService(final Class<S> serviceClazz);
 	
 	/**
 	 * Looks up a service.
@@ -61,7 +61,7 @@ public interface IJadexPlatformBinder
 	 * @param serviceClazz Class of the service (interface) to find
 	 * @return Future of the service.
 	 */
-	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz);
+	public <S> IFuture<S> getService(final Class<S> serviceClazz);
 	
 	/**
 	 * Looks up a service.
@@ -73,7 +73,7 @@ public interface IJadexPlatformBinder
 	 * @param scope Search scope. See {@link RequiredServiceInfo} constants.
 	 * @return Future of the service.
 	 */
-	public <S> IFuture<S> getService(IComponentIdentifier platformId, final Class<S> serviceClazz, final String scope);
+	public <S> IFuture<S> getService(final Class<S> serviceClazz, final String scope);
 	
 	/**
 	 * Retrieves the platformId of the last started Platform, if any.
@@ -85,60 +85,12 @@ public interface IJadexPlatformBinder
 	// ---------- starting / stopping ----------
 
 	/**
-	 * Starts a Jadex Platform with default settings.
-	 * 
-	 * @return IFuture<IExternalAccess> The external platform access
-	 */
-	public IFuture<IExternalAccess> startJadexPlatform();
-
-	/**
-	 * Starts a Jadex Platform.
-	 * 
-	 * @return IFuture<IExternalAccess> The external platform access
-	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels);
-
-	/**
-	 * Starts a Jadex Platform.
-	 * 
-	 * @param kernels
-	 *            String array of kernel Identifiers (see constants in
-	 *            {@link JadexPlatformManager}).
-	 * @param platformId
-	 *            Identifier of the new platform
-	 * @return IFuture<IExternalAccess> The external platform access
-	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId);
-
-	/**
-	 * Starts a Jadex Platform.
-	 * 
-	 * @param kernels
-	 *            String array of kernel Identifiers (see constants in
-	 *            {@link JadexPlatformManager}).
-	 * 
-	 * @param platformId
-	 *            Identifier of the new platform
-	 * @param options
-	 *            additional options that are passed directly to the platform
-	 *            starter.
-	 * 
-	 * @return IFuture<IExternalAccess> The external platform access
-	 */
-	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options);
-
-	/**
-	 * Terminates all running jadex platforms.
-	 */
-	public void shutdownJadexPlatforms();
-
-	/**
 	 * Terminates the running jadex platform with the given ID.
 	 * 
 	 * @param platformID
 	 *            Platform to terminate.
 	 */
-	public void shutdownJadexPlatform(IComponentIdentifier platformID);
+	public void shutdownJadexPlatform();
 
 	// ---------- agent creation ----------
 
@@ -151,11 +103,11 @@ public interface IJadexPlatformBinder
 	 *            name of the newly created agent
 	 * @param clazz
 	 *            class of the agent to instantiate
-	 * @return ComponendIdentifier of the created agent.
+	 * @return ComponentIdentifier of the created agent.
 	 * 
-	 * @deprecated use stsartComponent() for all agent types
+	 * @deprecated Use startComponent() instead for all agent types.
 	 */
-	public IFuture<IComponentIdentifier> startMicroAgent(final IComponentIdentifier platformId, final String name, final Class<?> clazz);
+	public IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz);
 
 
 	/**
@@ -169,15 +121,15 @@ public interface IJadexPlatformBinder
 	 *            Path to the bpmn model file of the new agent
 	 * @return ComponendIdentifier of the created agent.
 	 */
-	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, final String name, final String modelPath);
+	public IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath);
 
 	
 	// ---------- Event-stuff ----------
 
-	public void registerEventListener(String eventName, IEventReceiver<?> rec);
+	public void registerEventReceiver(String eventName, IEventReceiver<?> rec);
 
 	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassException;
 
-	public boolean unregisterEventListener(String eventName, IEventReceiver<?> rec);
+	public boolean unregisterEventReceiver(String eventName, IEventReceiver<?> rec);
 
 }

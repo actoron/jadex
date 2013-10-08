@@ -1,13 +1,20 @@
 package jadex.android.exampleproject.extended;
 
+import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
+import jadex.android.exampleproject.extended.agent.AndroidAgent;
+import jadex.android.exampleproject.extended.agent.IAgentInterface;
 import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.commons.future.DefaultResultListener;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.widget.Toast;
 
 public class MyJadexService extends JadexPlatformService
 {
@@ -44,7 +51,6 @@ public class MyJadexService extends JadexPlatformService
 
 		public void startHelloWorldAgent()
 		{
-			num++;
 			MyJadexService.this.startHelloWorldAgent();
 		}
 
@@ -63,11 +69,21 @@ public class MyJadexService extends JadexPlatformService
 	/** listener for the activity **/
 	public MyPlatformListener listener;
 
+	private Handler handler;
+
 	public MyJadexService()
 	{
 		setPlatformAutostart(false);
 		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
 	}
+	
+	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		this.handler = new Handler();
+	}
+	
 
 	@Override
 	public IBinder onBind(Intent intent)
@@ -97,6 +113,33 @@ public class MyJadexService extends JadexPlatformService
 
 	public void startHelloWorldAgent()
 	{
+		num++;
+		
+		registerEventReceiver("eventtype", new IEventReceiver<MyEvent>()
+		{
+
+			@Override
+			public void receiveEvent(final MyEvent event)
+			{
+				handler.post(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						Toast.makeText(MyJadexService.this, event.data, Toast.LENGTH_LONG).show();
+					}
+				});
+			}
+
+			@Override
+			public Class<MyEvent> getEventClass()
+			{
+				return MyEvent.class;
+			}
+
+		});
+		
 		startComponent(getPlatformId(), "HelloWorldAgent " + num, AndroidAgent.class).addResultListener(new DefaultResultListener<IComponentIdentifier>()
 		{
 
@@ -106,6 +149,25 @@ public class MyJadexService extends JadexPlatformService
 				if (listener != null) {
 					listener.onHelloWorldAgentStarted(result.toString());
 				}
+				
+				System.out.println("calling Agent");
+				
+//				getService(IComponentManagementService.class).addResultListener(new DefaultResultListener<IComponentManagementService>()
+//				{
+//
+//					@Override
+//					public void resultAvailable(IComponentManagementService result)
+//					{
+//						System.out.println("got CMS");
+//					}
+//				});
+				
+				IComponentManagementService getsService = getsService(IComponentManagementService.class);
+//				
+				IAgentInterface agent = getsService(IAgentInterface.class);
+//				
+				agent.callAgent("testMessage");
+				
 			}
 		});
 	}

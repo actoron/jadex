@@ -1,0 +1,123 @@
+package jadex.android.service;
+
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.platform.IJadexMultiPlatformBinder;
+import jadex.commons.future.IFuture;
+import android.os.Binder;
+
+/**
+ * Provides access to the Platform service.
+ */
+public class JadexMultiPlatformBinder extends Binder implements IJadexMultiPlatformBinder
+{
+	//-------- attributes --------
+	
+	/** The Jadex platform service Holder */
+	private IJadexMultiPlatformBinder service;
+
+	/**
+	 * Constructor
+	 * @param context
+	 */
+	public JadexMultiPlatformBinder(IJadexMultiPlatformBinder service)
+	{
+		this.service = service;
+	}
+	
+	public IExternalAccess getExternalPlatformAccess(IComponentIdentifier platformID)
+	{
+		return service.getExternalPlatformAccess(platformID);
+	}
+
+	public boolean isPlatformRunning(IComponentIdentifier platformID)
+	{
+		return service.isPlatformRunning(platformID);
+	}
+
+	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
+	{
+		return service.getCMS(platformID);
+	}
+	
+	
+	public IFuture<IMessageService> getMS(IComponentIdentifier platformID)
+	{
+		return service.getMS(platformID);
+	}
+
+	public void shutdownJadexPlatforms()
+	{
+		service.shutdownJadexPlatforms();
+	}
+
+	public void shutdownJadexPlatform(IComponentIdentifier platformID)
+	{
+		service.shutdownJadexPlatform(platformID);
+	}
+
+	public <S> S getsService(IComponentIdentifier platformId, Class<S> serviceClazz)
+	{
+		return service.getsService(platformId, serviceClazz);
+	}
+
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz)
+	{
+		return service.getService(platformId, serviceClazz);
+	}
+
+	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz, String scope)
+	{
+		return service.getService(platformId, serviceClazz, scope);
+	}
+	
+	
+	@Override
+	public IFuture<IComponentIdentifier> startComponent(IComponentIdentifier platformId, String name, String modelPath,
+			CreationInfo creationInfo)
+	{
+		return service.startComponent(platformId, name, modelPath, creationInfo);
+	}
+
+	@Override
+	public IFuture<IComponentIdentifier> startComponent(IComponentIdentifier platformId, String name, Class<?> clazz,
+			CreationInfo creationInfo)
+	{
+		return service.startComponent(platformId, name, clazz, creationInfo);
+	}
+
+	@Override
+	public IFuture<IComponentIdentifier> startComponent(IComponentIdentifier platformId, String name, Class<?> clazz)
+	{
+		return service.startComponent(platformId, name, clazz);
+	}
+
+	public IFuture<IComponentIdentifier> startComponent(final IComponentIdentifier platformId, String name, String modelPath)
+	{
+		return service.startComponent(platformId, name, modelPath);
+	}
+
+	public IFuture<IExternalAccess> startJadexPlatform()
+	{
+		return startJadexPlatform(JadexPlatformManager.DEFAULT_KERNELS);
+	}
+
+	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
+	{
+		return service.startJadexPlatform(kernels);
+	}
+
+	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
+	{
+		return startJadexPlatform(kernels, platformId, "");
+	}
+
+	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
+	{
+		return service.startJadexPlatform(kernels, platformId, options);
+	}
+
+}

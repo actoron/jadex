@@ -199,6 +199,7 @@
 				<module>jadex-rules-eca</module>
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-micro</module>
+				<module>jadex-kernel-micro-android</module>
 				<module>jadex-kernel-component</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-bdiv3</module>
