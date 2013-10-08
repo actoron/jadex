@@ -1,5 +1,6 @@
 package jadex.android.exampleproject.extended;
 
+import jadex.android.EventReceiver;
 import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.exampleproject.extended.agent.AndroidAgent;
@@ -82,6 +83,31 @@ public class MyJadexService extends JadexPlatformService
 	{
 		super.onCreate();
 		this.handler = new Handler();
+		
+		registerEventReceiver(new EventReceiver<MyEvent>(MyEvent.class)
+		{
+
+			@Override
+			public void receiveEvent(final MyEvent event)
+			{
+				handler.post(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						Toast.makeText(MyJadexService.this, event.data, Toast.LENGTH_LONG).show();
+					}
+				});
+			}
+
+			@Override
+			public Class<MyEvent> getEventClass()
+			{
+				return MyEvent.class;
+			}
+
+		});
 	}
 	
 
@@ -114,31 +140,6 @@ public class MyJadexService extends JadexPlatformService
 	public void startHelloWorldAgent()
 	{
 		num++;
-		
-		registerEventReceiver("eventtype", new IEventReceiver<MyEvent>()
-		{
-
-			@Override
-			public void receiveEvent(final MyEvent event)
-			{
-				handler.post(new Runnable()
-				{
-					
-					@Override
-					public void run()
-					{
-						Toast.makeText(MyJadexService.this, event.data, Toast.LENGTH_LONG).show();
-					}
-				});
-			}
-
-			@Override
-			public Class<MyEvent> getEventClass()
-			{
-				return MyEvent.class;
-			}
-
-		});
 		
 		startComponent(getPlatformId(), "HelloWorldAgent " + num, AndroidAgent.class).addResultListener(new DefaultResultListener<IComponentIdentifier>()
 		{

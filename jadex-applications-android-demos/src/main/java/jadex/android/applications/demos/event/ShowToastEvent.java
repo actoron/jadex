@@ -1,17 +1,11 @@
 package jadex.android.applications.demos.event;
 
-import jadex.bridge.service.types.context.IJadexAndroidEvent;
+import jadex.bridge.service.types.context.JadexAndroidEvent;
 
-public class ShowToastEvent implements IJadexAndroidEvent {
+public class ShowToastEvent extends JadexAndroidEvent {
 
 	private String message;
 	
-	public static final String TYPE = "showToast";
-	
-	public String getType() {
-		return TYPE;
-	}
-
 	public String getMessage() {
 		return message;
 	}

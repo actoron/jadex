@@ -4,7 +4,7 @@ import jadex.android.AndroidContextManager;
 import jadex.android.AndroidContextManager.AndroidContextChangeListener;
 import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidContextNotFoundError;
-import jadex.android.exception.WrongEventClassException;
+import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.context.IContextService;
@@ -145,7 +145,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 		{
 			result.setResult((androidContext.dispatchEvent(event)));
 		}
-		catch (WrongEventClassException e)
+		catch (WrongEventClassError e)
 		{
 			Log.e("AndroidContextService", e.getMessage());
 			result.setResult(false);

@@ -1,5 +1,6 @@
 package jadex.android.applications.demos.event;
 
+import jadex.android.EventReceiver;
 import jadex.android.IEventReceiver;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.applications.demos.R;
@@ -59,7 +60,7 @@ public class EventDemoActivity extends JadexAndroidActivity
 	{
 		super.onPlatformStarted(result);
 
-		registerEventReceiver(ShowToastEvent.TYPE, new IEventReceiver<ShowToastEvent>()
+		registerEventReceiver(new EventReceiver<ShowToastEvent>(ShowToastEvent.class)
 		{
 
 			public void receiveEvent(final ShowToastEvent event)

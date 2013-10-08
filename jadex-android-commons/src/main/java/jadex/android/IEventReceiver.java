@@ -8,8 +8,8 @@ import jadex.bridge.service.types.context.IJadexAndroidEvent;
  * @param <T>
  *            Type of the Event which is received through this receiver.
  */
-public interface IEventReceiver<T extends IJadexAndroidEvent> {
-
+public interface IEventReceiver<T extends IJadexAndroidEvent>
+{
 	/**
 	 * Receive an Event
 	 * 
@@ -18,9 +18,15 @@ public interface IEventReceiver<T extends IJadexAndroidEvent> {
 	void receiveEvent(T event);
 
 	/**
-	 * Return the Type of Event that can be received by this receiver.
+	 * Return the Class of Event that can be received by this receiver.
 	 * 
 	 * @return Class
 	 */
 	Class<T> getEventClass();
+
+	/**
+	 * Return the type = className of the event of interest.
+	 * @return String
+	 */
+	String getType();
 }

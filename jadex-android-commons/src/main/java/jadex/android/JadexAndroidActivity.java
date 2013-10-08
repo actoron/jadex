@@ -214,14 +214,14 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 		return ret;
 	}
 
-	protected void registerEventReceiver(String eventName, IEventReceiver<?> rec)
+	protected void registerEventReceiver(IEventReceiver<?> rec)
 	{
-		platformService.registerEventReceiver(eventName, rec);
+		platformService.registerEventReceiver(rec);
 	}
 
-	protected void unregisterEventReceiver(String eventName, IEventReceiver<?> rec)
+	protected void unregisterEventReceiver(IEventReceiver<?> rec)
 	{
-		platformService.unregisterEventReceiver(eventName, rec);
+		platformService.unregisterEventReceiver(rec);
 	}
 
 	/**

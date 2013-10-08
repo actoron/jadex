@@ -1,19 +1,8 @@
 package jadex.android.exampleproject.extended;
 
-import jadex.bridge.service.types.context.IJadexAndroidEvent;
+import jadex.bridge.service.types.context.JadexAndroidEvent;
 
-public class MyEvent implements IJadexAndroidEvent
+public class MyEvent extends JadexAndroidEvent
 {
-
 	public String data;
-	
-	@Override
-	public String getType()
-	{
-		return "eventtype";
-	}
-	
-	
-	
-
 }

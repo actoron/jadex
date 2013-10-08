@@ -1,7 +1,7 @@
 package jadex.android.service;
 
 import jadex.android.IEventReceiver;
-import jadex.android.exception.WrongEventClassException;
+import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -174,17 +174,17 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 		return service.getService(serviceClazz, scope);
 	}
 
-	public void registerEventReceiver(String eventName, IEventReceiver<?> rec)
+	public void registerEventReceiver(IEventReceiver<?> rec)
 	{
-		service.registerEventReceiver(eventName, rec);
+		service.registerEventReceiver(rec);
 	}
 
-	public boolean unregisterEventReceiver(String eventName, IEventReceiver<?> rec)
+	public boolean unregisterEventReceiver(IEventReceiver<?> rec)
 	{
-		return service.unregisterEventReceiver(eventName, rec);
+		return service.unregisterEventReceiver(rec);
 	}
 
-	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassException
+	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassError
 	{
 		return service.dispatchEvent(event);
 	}

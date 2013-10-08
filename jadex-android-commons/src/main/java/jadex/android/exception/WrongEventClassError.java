@@ -5,13 +5,13 @@ package jadex.android.exception;
  * and event type do not match.
  * 
  */
-public class WrongEventClassException extends JadexAndroidException {
+public class WrongEventClassError extends JadexAndroidError {
 	private static final long serialVersionUID = 7406711168427252765L;
 	private String message;
 	private Class<?> given;
 	private Class<?> expected;
 
-	public WrongEventClassException(Class<?> expected, Class<?> given,
+	public WrongEventClassError(Class<?> expected, Class<?> given,
 			String message) {
 		super();
 		this.expected = expected;

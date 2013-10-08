@@ -2,7 +2,7 @@ package jadex.android.exampleproject.extended.agent;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.exampleproject.extended.MyEvent;
-import jadex.android.exception.WrongEventClassException;
+import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -87,7 +87,7 @@ public class AndroidAgent extends MicroAgent implements IAgentInterface
 		{
 			AndroidContextManager.getInstance().dispatchEvent(myEvent);
 		}
-		catch (WrongEventClassException e)
+		catch (WrongEventClassError e)
 		{
 			e.printStackTrace();
 		}

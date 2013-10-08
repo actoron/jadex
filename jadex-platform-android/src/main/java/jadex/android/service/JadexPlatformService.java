@@ -3,7 +3,7 @@ package jadex.android.service;
 import jadex.android.AndroidContextManager;
 import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
-import jadex.android.exception.WrongEventClassException;
+import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -234,17 +234,17 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 
 	// --------------- event -----------------
 	
-	public void registerEventReceiver(String eventName, IEventReceiver<?> rec)
+	public void registerEventReceiver(IEventReceiver<?> rec)
 	{
-		AndroidContextManager.getInstance().registerEventListener(eventName, rec);
+		AndroidContextManager.getInstance().registerEventListener(rec);
 	}
 
-	public boolean unregisterEventReceiver(String eventName, IEventReceiver<?> rec)
+	public boolean unregisterEventReceiver(IEventReceiver<?> rec)
 	{
-		return AndroidContextManager.getInstance().unregisterEventListener(eventName, rec);
+		return AndroidContextManager.getInstance().unregisterEventListener(rec);
 	}
 
-	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassException
+	public boolean dispatchEvent(IJadexAndroidEvent event)
 	{
 		return AndroidContextManager.getInstance().dispatchEvent(event);
 	}

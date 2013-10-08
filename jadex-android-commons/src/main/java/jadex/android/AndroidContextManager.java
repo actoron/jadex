@@ -1,7 +1,7 @@
 package jadex.android;
 
 
-import jadex.android.exception.WrongEventClassException;
+import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 
 import java.lang.reflect.InvocationTargetException;
@@ -195,18 +195,18 @@ public class AndroidContextManager
 		}
 	}
 	
-	public void registerEventListener(String eventName, IEventReceiver<?> rec)
+	public void registerEventListener(IEventReceiver<?> rec)
 	{
-		List<IEventReceiver<?>> receivers = this.eventReceivers.get(eventName);
+		List<IEventReceiver<?>> receivers = this.eventReceivers.get(rec.getType());
 		if (receivers == null)
 		{
 			receivers = new ArrayList<IEventReceiver<?>>();
-			eventReceivers.put(eventName, receivers);
+			eventReceivers.put(rec.getType(), receivers);
 		}
 		receivers.add(rec);
 	}
 
-	public boolean dispatchEvent(IJadexAndroidEvent event) throws WrongEventClassException
+	public boolean dispatchEvent(IJadexAndroidEvent event)
 	{
 		boolean result = false;
 		List<IEventReceiver<?>> list = eventReceivers.get(event.getType());
@@ -240,17 +240,17 @@ public class AndroidContextManager
 					result = true;
 				} else
 				{
-					throw new WrongEventClassException(eventReceiver.getEventClass(), event.getClass(), "");
+					throw new WrongEventClassError(eventReceiver.getEventClass(), event.getClass(), "");
 				}
 			}
 		}
 		return result;
 	}
 
-	public boolean unregisterEventListener(String eventName, IEventReceiver<?> rec)
+	public boolean unregisterEventListener(IEventReceiver<?> rec)
 	{
 		boolean removed = false;
-		List<IEventReceiver<?>> list = eventReceivers.get(eventName);
+		List<IEventReceiver<?>> list = eventReceivers.get(rec.getType());
 		if (list != null)
 		{
 			removed = list.remove(rec);
