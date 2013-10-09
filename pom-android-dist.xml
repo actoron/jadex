@@ -249,6 +249,9 @@
 <!-- 			<activation> -->
 <!-- 				<file><exists>jadex-android-integration-test</exists></file> -->
 <!-- 			</activation> -->
+			<properties>
+				<assembly.skip>true</assembly.skip>
+			</properties>
 			<modules>
 <!-- 				Modules required for integration test -->
 				<module>jadex-android-integration-test</module>
