@@ -1,12 +1,11 @@
 package jadex.android.exampleproject.simple;
 
+import jadex.android.EventReceiver;
 import jadex.android.JadexAndroidActivity;
 import jadex.android.commons.JadexPlatformOptions;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
+import jadex.android.exampleproject.MyEvent;
 import jadex.android.exampleproject.R;
-import jadex.android.exampleproject.R.id;
-import jadex.android.exampleproject.R.layout;
-import jadex.android.exampleproject.R.string;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -14,8 +13,6 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,9 +34,6 @@ public class HelloWorldActivity extends JadexAndroidActivity
 	private Button startPlatformButton;
 	/** UI textView */
 	private TextView textView;
-
-	/** Handler to allow agents to create Toasts */
-	public static Handler uiHandler;
 
 	/**
 	 * Constructor to set jadex platform parameters. 
@@ -65,24 +59,18 @@ public class HelloWorldActivity extends JadexAndroidActivity
 		startPlatformButton.setOnClickListener(buttonListener);
 
 		textView = (TextView) findViewById(R.id.infoTextView);
-		
-		// create handler for agent ui output
-		uiHandler = new Handler()
-		{
-
-			@Override
-			public void handleMessage(Message msg)
-			{
-				Toast.makeText(HelloWorldActivity.this, msg.getData().getString("message"), Toast.LENGTH_SHORT).show();
-			}
-			
-		};
 	}
 
 	protected void onResume()
 	{
 		super.onResume();
 		refreshButtons();
+	}
+	
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
 	}
 
 	// BEGIN -------- show control center in menu ---------
@@ -176,7 +164,7 @@ public class HelloWorldActivity extends JadexAndroidActivity
 			{
 				startAgentButton.setEnabled(false);
 				num++;
-				startMicroAgent("HelloWorldAgent " + num, AndroidAgent.class).addResultListener(agentCreatedResultListener);
+				startMicroAgent("HelloWorldAgent " + num, MyAgent.class).addResultListener(agentCreatedResultListener);
 			}
 		}
 
@@ -204,6 +192,26 @@ public class HelloWorldActivity extends JadexAndroidActivity
 				refreshButtons();
 			}
 		});
+		
+		
+		// create handler for agent ui output
+		registerEventReceiver(new EventReceiver<MyEvent>(MyEvent.class)
+		{
+	
+			@Override
+			public void receiveEvent(final MyEvent event)
+			{
+				runOnUiThread(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						Toast.makeText(HelloWorldActivity.this, event.getMessage(), Toast.LENGTH_LONG).show();
+					}
+				});
+			}
+		});
 	}
 
 	private IResultListener<IComponentIdentifier> agentCreatedResultListener = new DefaultResultListener<IComponentIdentifier>()
@@ -218,7 +226,6 @@ public class HelloWorldActivity extends JadexAndroidActivity
 				{
 					textView.setText("Agent started: " + cid.toString());
 					startAgentButton.setEnabled(true);
-
 				}
 			});
 		}

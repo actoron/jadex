@@ -88,6 +88,24 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 	{
 		return service.startComponent(name, modelPath);
 	}
+	
+	@Override
+	public IFuture<IComponentIdentifier> startComponent(String name, String modelPath, CreationInfo creationInfo)
+	{
+		return service.startComponent(name, modelPath, creationInfo);
+	}
+
+	@Override
+	public IFuture<IComponentIdentifier> startComponent(String name, Class<?> clazz, CreationInfo creationInfo)
+	{
+		return service.startComponent(name, clazz, creationInfo);
+	}
+
+	@Override
+	public IFuture<IComponentIdentifier> startComponent(String name, Class<?> clazz)
+	{
+		return service.startComponent(name, clazz);
+	}
 
 	public IFuture<IComponentIdentifier> startMicroAgent(String name, Class<?> clazz)
 	{
@@ -188,5 +206,6 @@ public class JadexPlatformBinder extends JadexMultiPlatformBinder implements IJa
 	{
 		return service.dispatchEvent(event);
 	}
+
 
 }

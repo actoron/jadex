@@ -5,6 +5,7 @@ import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.message.IMessageService;
@@ -109,6 +110,19 @@ public interface IJadexPlatformBinder extends IJadexMultiPlatformBinder
 	 */
 	public IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz);
 
+	/**
+	 * Start a new Component on a given platform.
+	 * 
+	 * @param name
+	 *            name of the newly created component
+	 * @param modelPath
+	 *            Path to the model file of the new component
+	 * @param creationInfo
+	 * 			  {@link CreationInfo} to pass to the started Component.
+	 * @return ComponentIdentifier of the created agent.
+	 */
+	public IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath, final CreationInfo creationInfo);
+
 
 	/**
 	 * Start a new Component on a given platform.
@@ -122,6 +136,31 @@ public interface IJadexPlatformBinder extends IJadexMultiPlatformBinder
 	 * @return ComponendIdentifier of the created agent.
 	 */
 	public IFuture<IComponentIdentifier> startComponent(final String name, final String modelPath);
+	
+	/**
+		/**
+	 * Start a new Component on a given platform.
+	 * 
+	 * @param name
+	 *            name of the newly created component
+	 * @param clazz
+	 *            Class of the new component
+	 * @param creationInfo
+	 * 			  {@link CreationInfo} to pass to the started Component.
+	 * @return ComponentIdentifier of the created agent.
+	 */
+	public IFuture<IComponentIdentifier> startComponent(final String name, final Class<?> clazz, final CreationInfo creationInfo);
+
+	/**
+	 * Start a new Component on a given platform with default {@link CreationInfo}.
+	 * 
+	 * @param name
+	 *            name of the newly created agent
+	 * @param modelPath
+	 *            Path to the bpmn model file of the new agent
+	 * @return ComponentIdentifier of the created agent.
+	 */
+	public IFuture<IComponentIdentifier> startComponent(final String name, final Class<?> clazz);
 
 	
 	// ---------- Event-stuff ----------

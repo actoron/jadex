@@ -7,6 +7,7 @@ import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.bridge.service.types.message.IMessageService;
@@ -53,30 +54,11 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	public void onCreate()
 	{
 		super.onCreate();
-		Context base = this.getBaseContext();
-		if (base != null) {
-			// if base is null, this service was not started through android
-			AndroidContextManager.getInstance().setAndroidContext(base);
-		}
 		if (platformAutostart) {
 			startPlatform();
 		}
-		// jadexAndroidContext.addContextChangeListener(this);
 	}
 
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-		jadexPlatformManager.shutdownJadexPlatforms();
-		Context base = this.getBaseContext();
-		if (base != null) {
-			// if base is null, this service was not started through android
-			AndroidContextManager.getInstance().setAndroidContext(null);
-		}
-		// jadexAndroidContext.removeContextChangeListener(this);
-	}
-	
 	
 	/**
 	 * Returns whether the Jadex Platform is or has been started automatically.
@@ -209,10 +191,29 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	{
 		shutdownJadexPlatform(platformId);
 	}
+	
 
 	public IFuture<IComponentIdentifier> startComponent(String name, String modelPath)
 	{
 		return startComponent(platformId, name, modelPath);
+	}
+	
+	@Override
+	public IFuture<IComponentIdentifier> startComponent(String name, String modelPath, CreationInfo creationInfo)
+	{
+		return startComponent(platformId, name, modelPath, creationInfo);
+	}
+	
+	@Override
+	public IFuture<IComponentIdentifier> startComponent(String name, Class<?> clazz)
+	{
+		return startComponent(platformId, name, clazz);
+	}
+
+	@Override
+	public IFuture<IComponentIdentifier> startComponent(String name, Class<?> clazz, CreationInfo creationInfo)
+	{
+		return startComponent(platformId, name, clazz, creationInfo);
 	}
 
 	public IFuture<IComponentIdentifier> startMicroAgent(final String name, final Class<?> clazz)

@@ -216,11 +216,13 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 
 	protected void registerEventReceiver(IEventReceiver<?> rec)
 	{
+		checkIfJadexIsRunning("registerEventReceiver");
 		platformService.registerEventReceiver(rec);
 	}
 
 	protected void unregisterEventReceiver(IEventReceiver<?> rec)
 	{
+		checkIfJadexIsRunning("unregisterEventReceiver");
 		platformService.unregisterEventReceiver(rec);
 	}
 
@@ -266,7 +268,7 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 
 	private void checkIfJadexIsRunning(String caller)
 	{
-		if (!platformService.isPlatformRunning(platformId))
+		if (platformService == null || !platformService.isPlatformRunning(platformId))
 		{
 			throw new JadexAndroidPlatformNotStartedError(caller);
 		}
@@ -274,11 +276,13 @@ public class JadexAndroidActivity extends Activity implements ServiceConnection
 	
 	protected IFuture<IMessageService> getMS()
 	{
+		checkIfJadexIsRunning("getMS");
 		return platformService.getMS(platformId);
 	}
 	
 	protected IFuture<IComponentManagementService> getCMS()
 	{
+		checkIfJadexIsRunning("getCMS");
 		return platformService.getCMS(platformId);
 	}
 

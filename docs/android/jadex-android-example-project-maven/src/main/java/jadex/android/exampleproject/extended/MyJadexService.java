@@ -1,15 +1,14 @@
 package jadex.android.exampleproject.extended;
 
 import jadex.android.EventReceiver;
-import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
-import jadex.android.exampleproject.extended.agent.AndroidAgent;
+import jadex.android.exampleproject.MyEvent;
 import jadex.android.exampleproject.extended.agent.IAgentInterface;
+import jadex.android.exampleproject.extended.agent.MyAgent;
 import jadex.android.service.JadexPlatformService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.context.IJadexAndroidEvent;
 import jadex.commons.future.DefaultResultListener;
 import android.content.Intent;
 import android.os.Binder;
@@ -76,13 +75,14 @@ public class MyJadexService extends JadexPlatformService
 	{
 		setPlatformAutostart(false);
 		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO);
+		setPlatformName("JadexAndroidExample");
 	}
 	
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
-		this.handler = new Handler();
+		this.handler = new Handler(); // needed to make Toasts on UI Thread.
 		
 		registerEventReceiver(new EventReceiver<MyEvent>(MyEvent.class)
 		{
@@ -96,17 +96,10 @@ public class MyJadexService extends JadexPlatformService
 					@Override
 					public void run()
 					{
-						Toast.makeText(MyJadexService.this, event.data, Toast.LENGTH_LONG).show();
+						Toast.makeText(MyJadexService.this, event.getMessage(), Toast.LENGTH_LONG).show();
 					}
 				});
 			}
-
-			@Override
-			public Class<MyEvent> getEventClass()
-			{
-				return MyEvent.class;
-			}
-
 		});
 	}
 	
@@ -141,7 +134,7 @@ public class MyJadexService extends JadexPlatformService
 	{
 		num++;
 		
-		startComponent(getPlatformId(), "HelloWorldAgent " + num, AndroidAgent.class).addResultListener(new DefaultResultListener<IComponentIdentifier>()
+		startComponent("HelloWorldAgent " + num, MyAgent.class).addResultListener(new DefaultResultListener<IComponentIdentifier>()
 		{
 
 			@Override
@@ -153,21 +146,9 @@ public class MyJadexService extends JadexPlatformService
 				
 				System.out.println("calling Agent");
 				
-//				getService(IComponentManagementService.class).addResultListener(new DefaultResultListener<IComponentManagementService>()
-//				{
-//
-//					@Override
-//					public void resultAvailable(IComponentManagementService result)
-//					{
-//						System.out.println("got CMS");
-//					}
-//				});
-				
 				IComponentManagementService getsService = getsService(IComponentManagementService.class);
-//				
 				IAgentInterface agent = getsService(IAgentInterface.class);
-//				
-				agent.callAgent("testMessage");
+				agent.callAgent("Hello Agent!");
 				
 			}
 		});

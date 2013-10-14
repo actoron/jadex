@@ -1,6 +1,5 @@
 package jadex.android.exampleproject.extended;
 
-import jadex.android.IEventReceiver;
 import jadex.android.exampleproject.R;
 import jadex.android.exampleproject.extended.MyJadexService.MyPlatformListener;
 import jadex.android.exampleproject.extended.MyJadexService.MyServiceInterface;
@@ -8,9 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -20,7 +17,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Hello World Activity.
@@ -42,25 +38,6 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 	/** id of the platform **/
 	protected String platformId;
 
-	private BroadcastReceiver agentMessageReceiver = new BroadcastReceiver()
-	{
-		
-		@Override
-		public void onReceive(final Context context, final Intent intent)
-		{
-			runOnUiThread(new Runnable()
-			{
-				
-				@Override
-				public void run()
-				{
-					Toast.makeText(context, intent.getStringExtra("message"), Toast.LENGTH_LONG).show();					
-				}
-			});
-			
-		}
-	};
-	
 	/**
 	 * Constructor to set jadex platform parameters. 
 	 */
@@ -85,16 +62,13 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 		startPlatformButton.setOnClickListener(buttonListener);
 
 		textView = (TextView) findViewById(R.id.infoTextView);
-		
-		IntentFilter intentFilter = new IntentFilter("agentMessage");
-		registerReceiver(agentMessageReceiver, intentFilter);
-		
+		startService(serviceIntent); // this will cause the service to stay in background
 	}
 
 	protected void onResume()
 	{
 		super.onResume();
-		bindService(serviceIntent, this, BIND_AUTO_CREATE);
+		bindService(serviceIntent, this, 0);
 		refreshButtons();
 	}
 	
@@ -103,6 +77,12 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 	{
 		super.onPause();
 		unbindService(this); // This won't cause the platform to stop!
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
 	}
 	
 
@@ -179,10 +159,12 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 			textView.append(platformId.toString());
 			startAgentButton.setEnabled(true);
 			startPlatformButton.setText("Stop Platform");
+			startPlatformButton.setEnabled(true);
 		} else
 		{
 			startAgentButton.setEnabled(false);
 			startPlatformButton.setText("Start Platform");
+			startPlatformButton.setEnabled(true);
 			textView.setText(R.string.stopped);
 		}
 	}
@@ -233,15 +215,4 @@ public class HelloWorldActivity extends Activity implements ServiceConnection
 	{
 		return myService != null && myService.isJadexPlatformRunning();
 	}
-
-
-	private IResultListener<IComponentIdentifier> agentCreatedResultListener = new DefaultResultListener<IComponentIdentifier>()
-	{
-
-		public void resultAvailable(final IComponentIdentifier cid)
-		{
-		
-		}
-	};
-
 }

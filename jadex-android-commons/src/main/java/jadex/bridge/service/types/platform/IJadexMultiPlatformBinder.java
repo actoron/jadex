@@ -153,7 +153,6 @@ public interface IJadexMultiPlatformBinder
 
 	/**
 	 * Start a new Component on a given platform with default {@link CreationInfo}.
-	 * If available, the belief "androidContext" will be set to <b>this</b>. 
 	 * 
 	 * @param platformId
 	 *            Identifier of the jadex platform
@@ -167,7 +166,6 @@ public interface IJadexMultiPlatformBinder
 	
 	/**
 	 * Start a new Component on a given platform.
-	 * If available, the belief "androidContext" will be set to <b>this</b>. 
 	 * 
 	 * @param platformId
 	 *            Identifier of the jadex platform
@@ -183,7 +181,6 @@ public interface IJadexMultiPlatformBinder
 
 	/**
 	 * Start a new Component on a given platform with default {@link CreationInfo}.
-	 * If available, the belief "androidContext" will be set to <b>this</b>. 
 	 * 
 	 * @param platformId
 	 *            Identifier of the jadex platform

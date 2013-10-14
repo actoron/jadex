@@ -22,11 +22,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-kernel-component</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-micro-android</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 <!-- 		<dependency> -->
 <!-- 			<groupId>net.sourceforge.jadex</groupId> -->
