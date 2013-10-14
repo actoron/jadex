@@ -1,5 +1,7 @@
 package jadex.platform.service.message;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,9 +25,9 @@ public class TCPTest
 			else
 			{
 				Socket	sock	= new Socket(address, 12345);
-				OutputStream	os	= sock.getOutputStream();
-				InputStream	is	= new FileInputStream(f);
-				byte[]	buf	= new byte[8192];  
+				OutputStream	os	= new BufferedOutputStream(sock.getOutputStream());
+				InputStream	is	= new BufferedInputStream(new FileInputStream(f));
+				byte[]	buf	= new byte[8192];
 				int	len;
 				while((len=is.read(buf)) != -1)
 				{
@@ -48,8 +50,8 @@ public class TCPTest
 			{
 				ServerSocket	server	= new ServerSocket(12345);
 				Socket	sock	= server.accept();
-				InputStream	is	= sock.getInputStream();
-				OutputStream	os	= new FileOutputStream(f);
+				InputStream	is	= new BufferedInputStream(sock.getInputStream());
+				OutputStream	os	= new BufferedOutputStream(new FileOutputStream(f));
 				byte[]	buf	= new byte[8192];  
 				int	len;
 				while((len=is.read(buf)) != -1)
