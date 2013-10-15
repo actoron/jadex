@@ -192,15 +192,16 @@ public class DefaultStepHandler implements IStepHandler
 //				instance.notifyListeners(cce);
 //				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_REMOVED, (ProcessThread)it.next());
 				
-				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread));
+				if(instance.hasEventTargets(true))
+					instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread));
 
 			}
 //			ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 //				thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(thread));
 //			instance.notifyListeners(cce);
 //			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_CHANGED, thread);
-			instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread));
-
+			if(instance.hasEventTargets(true))
+				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread));
 		}
 
 		if(ex!=null && next==null)

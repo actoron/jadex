@@ -134,7 +134,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 			public void resultAvailable(final IService ser)
 			{
 				ser.getNFPropertyMetaInfos()
-					.addResultListener(new IResultListener<Map<String,INFPropertyMetaInfo>>()
+					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 //					.addResultListener(new SwingResultListener<Map<String,INFPropertyMetaInfo>>(new IResultListener<Map<String,INFPropertyMetaInfo>>()
 				{
 					public void resultAvailable(Map<String,INFPropertyMetaInfo> result)
@@ -230,7 +230,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 						System.out.println("ex on: "+getId());
 //						exception.printStackTrace();
 					}
-				});
+				}));
 			}
 			
 			public void exceptionOccurred(Exception exception)

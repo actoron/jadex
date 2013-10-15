@@ -251,7 +251,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //											thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
 //										instance.notifyListeners(cce);
 										
-										instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread));
+										if(instance.hasEventTargets(true))
+											instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread));
 									}
 								}
 							}

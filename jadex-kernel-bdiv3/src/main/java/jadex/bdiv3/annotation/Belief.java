@@ -30,5 +30,5 @@ public @interface Belief
 	/**
 	 *  An update rate causes the belief to be reevaluated periodically.
 	 */
-	public long	updaterate()	default 0;
+	public long	updaterate() default 0;
 }

@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 
 /**
@@ -453,4 +455,25 @@ public class DelegationURLClassLoader extends URLClassLoader
 //		return SReflect.getInnerClassName(getClass())+"("+rid+", "+SUtil.arrayToString(delegates)+")";
 		return SReflect.getInnerClassName(getClass())+"("+rid+", "+delegates.size()+", "+basecl+")";
 	}
+	
+//	/**
+//	 *  Get a string representation.
+//	 */
+//	public String toString()
+//	{
+//		int num = 0;
+//		try
+//		{
+//			Field f = ClassLoader.class.getDeclaredField("classes");
+//			f.setAccessible(true);
+//			Vector<Class> classes = (Vector<Class>)f.get(this);
+//			num = classes.size();
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//		return SReflect.getInnerClassName(getClass())+"("+rid+", loaded classes="+num;
+//	}
+		
 }

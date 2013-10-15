@@ -312,8 +312,9 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 		int seqno	= maxseqno;
 		while(seqno>lastack)
 		{
-			// Skip empty or acknowledged slots.
-			while(seqno>getSequenceNumber() && (!data.containsKey(new Integer(seqno)) || data.get(new Integer(seqno)).getSecondEntity().booleanValue()))
+			// Skip empty or acknowledged slots to find first unack slot from right.
+			while(seqno>getSequenceNumber() && (!data.containsKey(new Integer(seqno)) 
+				|| data.get(new Integer(seqno)).getSecondEntity().booleanValue()))
 			{
 				seqno--;
 			}
@@ -331,6 +332,8 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 				seqno--;
 			}
 			
+			// if reached back to current seq no then acks can be sent back to lastack because
+			// all messages before rseqno have been received in order
 			if(seqno==getSequenceNumber())	// acknowldege forwarded data, if block expands to current rseqno.
 			{
 				start	= lastack+1;

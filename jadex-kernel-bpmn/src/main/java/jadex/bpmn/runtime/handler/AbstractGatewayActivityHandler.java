@@ -46,7 +46,8 @@ public abstract class AbstractGatewayActivityHandler
 	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		// Notify listeners as gateways are not followed by step handler execution
-		instance.publishEvent(instance.createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity));
+		if(instance.hasEventTargets(true))
+			instance.publishEvent(instance.createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity));
 
 		List<MSequenceEdge>	incoming	= activity.getIncomingSequenceEdges();
 		List<MSequenceEdge>	outgoing	= activity.getOutgoingSequenceEdges();

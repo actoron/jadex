@@ -254,23 +254,30 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 													
 													protected void proceed(final Exception ex)
 													{
-														MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
-															IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis());
-														event.setProperty("details", getComponentDescription());
-														publishEvent(event).addResultListener(new DelegationResultListener<Void>(ret)
-														{
-															public void customResultAvailable(Void result)
+//														if(hasEventTargets(true))
+//														{
+															MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
+																IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis());
+															event.setProperty("details", getComponentDescription());
+															publishEvent(event).addResultListener(new DelegationResultListener<Void>(ret)
 															{
-																if(ex!=null)
-																	ret.setException(ex);
-																else
-																	ret.setResult(null);
-															}
-															public void exceptionOccurred(Exception exception)
-															{
-																ret.setException(exception);
-															}
-														});
+																public void customResultAvailable(Void result)
+																{
+																	if(ex!=null)
+																		ret.setException(ex);
+																	else
+																		ret.setResult(null);
+																}
+																public void exceptionOccurred(Exception exception)
+																{
+																	ret.setException(exception);
+																}
+															});
+//														}
+//														else
+//														{
+//															ret.setResult(null);
+//														}
 													}
 												};
 												// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
@@ -2167,6 +2174,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public abstract ServiceGetter<IMonitoringService> getMonitoringServiceGetter();
 
+		
 	/**
 	 *  Publish a monitoring event. This event is automatically send
 	 *  to the monitoring service of the platform (if any). 

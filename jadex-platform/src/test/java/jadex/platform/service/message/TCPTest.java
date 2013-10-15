@@ -27,7 +27,7 @@ public class TCPTest
 				Socket	sock	= new Socket(address, 12345);
 				OutputStream	os	= new BufferedOutputStream(sock.getOutputStream());
 				InputStream	is	= new BufferedInputStream(new FileInputStream(f));
-				byte[]	buf	= new byte[8192];
+				byte[]	buf	= new byte[8192*4];
 				int	len;
 				while((len=is.read(buf)) != -1)
 				{
@@ -42,17 +42,17 @@ public class TCPTest
 		else if(args.length==1)
 		{
 			File	f	= new File(args[0]);
-			if(f.exists())
-			{
-				System.out.println("Error: File already exists.");				
-			}
-			else
-			{
+//			if(f.exists())
+//			{
+//				System.out.println("Error: File already exists.");				
+//			}
+//			else
+//			{
 				ServerSocket	server	= new ServerSocket(12345);
 				Socket	sock	= server.accept();
 				InputStream	is	= new BufferedInputStream(sock.getInputStream());
 				OutputStream	os	= new BufferedOutputStream(new FileOutputStream(f));
-				byte[]	buf	= new byte[8192];  
+				byte[]	buf	= new byte[8192*4];  
 				int	len;
 				while((len=is.read(buf)) != -1)
 				{
@@ -63,7 +63,7 @@ public class TCPTest
 				is.close();
 				sock.close();
 				server.close();
-			}
+//			}
 		}
 		else
 		{

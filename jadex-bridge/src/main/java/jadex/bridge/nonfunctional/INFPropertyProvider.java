@@ -11,10 +11,16 @@ import java.util.Map;
 public interface INFPropertyProvider
 {
 	/**
-	 *  Returns the names of all non-functional properties of this service.
+	 *  Returns the declared names of all non-functional properties of this service.
 	 *  @return The names of the non-functional properties of this service.
 	 */
 	public IFuture<String[]> getNFPropertyNames();
+	
+//	/**
+//	 *  Returns names of all non-functional properties of this service and above entities.
+//	 *  @return The names of the non-functional properties of this service.
+//	 */
+//	public IFuture<String[]> getAllNFPropertyNames();
 	
 	/**
 	 *  Returns the names of all non-functional properties of this service.

@@ -487,6 +487,16 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 //	}
 	
 	/**
+	 *  Check if event targets exist.
+	 */
+	public boolean hasEventTargets(boolean tomonitor)
+	{
+		return (subscriptions!=null && !subscriptions.isEmpty()) 
+			||  (tomonitor && getComponentDescription().getMonitoring()!=null && getComponentDescription().getMonitoring().booleanValue());
+	}
+
+	
+	/**
 	 *  Get the monitoring service getter.
 	 *  @return The monitoring service getter.
 	 */
