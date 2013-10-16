@@ -258,12 +258,13 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.16</version>
 				<configuration>
-				    <fork>true</fork>
-				    <argLine>-Xms512m</argLine>
+				    <jvmFlags>-XX:MaxPermSize=512m</jvmFlags>
+				    <!-- <fork>true</fork>-->
+				    <!-- <argLine>-Xms512m</argLine>
 				    <argLine>-Xmx1024m</argLine>
 				    <argLine>-XX:MaxPermSize=512m</argLine>
 				    <argLine>-XX:+CMSPermGenSweepingEnabled</argLine>
-				    <argLine>-XX:+CMSClassUnloadingEnabled</argLine>
+				    <argLine>-XX:+CMSClassUnloadingEnabled</argLine> -->
 				</configuration>
 			</plugin>
 		</plugins>
