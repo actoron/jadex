@@ -150,7 +150,8 @@ public class RemovedServiceAgent
 											
 											public void exceptionOccurred(Exception exception)
 											{
-												if(exception instanceof ServiceNotFoundException)
+												if(exception instanceof ServiceNotFoundException
+													|| exception instanceof ComponentTerminatedException)	// decoupled (todo: should be same exception?)
 												{
 													tr2.setSucceeded(true);
 												}
