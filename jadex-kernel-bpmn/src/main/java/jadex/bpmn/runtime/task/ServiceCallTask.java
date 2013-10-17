@@ -689,46 +689,49 @@ public class ServiceCallTask implements ITask
 			for(ActionListener al: als)
 				cbsername.addActionListener(al);
 			
-			MProperty mprop = task.getProperties().get(PROPERTY_SERVICE);
-			if(mprop.getInitialValue()!=null)
+			if(task.getProperties()!=null)
 			{
-				String sername = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
-				cbsername.setSelectedItem(sername);
-//				System.out.println("sel item: "+sername);
-			
-				mprop = task.getProperties().get(PROPERTY_METHOD);
+			MProperty mprop = task.getProperties().get(PROPERTY_SERVICE);
 				if(mprop.getInitialValue()!=null)
 				{
-					String methodname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
-//					System.out.println(task.getName()+" "+mprop.getInitialValueString());
-					
-					RequiredServiceInfo reqser = model.getRequiredService(sername);
-					if(reqser!=null)
+					String sername = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
+					cbsername.setSelectedItem(sername);
+	//				System.out.println("sel item: "+sername);
+				
+					mprop = task.getProperties().get(PROPERTY_METHOD);
+					if(mprop.getInitialValue()!=null)
 					{
-						Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
+						String methodname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
+	//					System.out.println(task.getName()+" "+mprop.getInitialValueString());
 						
-						if(type!=null)
+						RequiredServiceInfo reqser = model.getRequiredService(sername);
+						if(reqser!=null)
 						{
-							Method[] ms = type.getMethods();
-							for(Method m: ms)
+							Class<?> type = reqser.getType().getType(cl==null? ServiceCallTask.class.getClassLoader(): cl);
+							
+							if(type!=null)
 							{
-								if(m.toString().equals(methodname))
+								Method[] ms = type.getMethods();
+								for(Method m: ms)
 								{
-									cbmethodname.setSelectedItem(m);
-	//								System.out.println("sel item2: "+methodname);
+									if(m.toString().equals(methodname))
+									{
+										cbmethodname.setSelectedItem(m);
+		//								System.out.println("sel item2: "+methodname);
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-			
-			mprop = task.getProperties().get(PROPERTY_RANKING);
-			if(mprop.getInitialValue()!=null)
-			{
-				String rankclname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
-				ClassInfo ci = new ClassInfo(rankclname);
-				cbranking.setSelectedItem(ci);
+				
+				mprop = task.getProperties().get(PROPERTY_RANKING);
+				if(mprop.getInitialValue()!=null)
+				{
+					String rankclname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
+					ClassInfo ci = new ClassInfo(rankclname);
+					cbranking.setSelectedItem(ci);
+				}
 			}
 		}
 		
