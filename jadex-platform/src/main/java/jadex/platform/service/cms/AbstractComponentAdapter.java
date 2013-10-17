@@ -982,13 +982,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			System.out.println("Adding to ext entries: "+cid);
 			if(ext_forbidden)
 			{
-				throw new ComponentTerminatedException(desc.getName());
-//				{
-//					public void printStackTrace()
-//					{
-//						Thread.dumpStack();
-//					}
-//				};
+				throw new ComponentTerminatedException(desc.getName())
+				{
+					public void printStackTrace()
+					{
+						Thread.dumpStack();
+					}
+				};
 			}
 			else
 			{

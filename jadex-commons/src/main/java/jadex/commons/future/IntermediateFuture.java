@@ -621,8 +621,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
             	}
         	}
         	
-        	try
-        	{
+//        	try
+//        	{
 	        	if(next!=null)
 	        	{
 	        		if(next instanceof IResultListener)
@@ -634,11 +634,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	        			notifyIntermediateResult((IIntermediateResultListener<E>)((Object[])next)[0], (E)((Object[])next)[1]);
 	        		}
 	        	}
-        	}
-        	catch(Exception e)
-        	{
-        		e.printStackTrace();
-        	}
+//        	}
+//        	catch(Exception e)
+//        	{
+//        		e.printStackTrace();
+//        	}
     	}
     }
 

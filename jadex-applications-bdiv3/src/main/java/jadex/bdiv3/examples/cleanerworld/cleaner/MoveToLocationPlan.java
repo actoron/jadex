@@ -121,13 +121,13 @@ public class MoveToLocationPlan
 		return ret;
 	}
 	
-	@PlanFailed
-	@PlanAborted
-	public void failedaborted()
-	{
-		System.out.println("failed+aborted: "+rplan.getId());
-//		rplan.getException().printStackTrace();
-	}
+//	@PlanFailed
+//	@PlanAborted
+//	public void failedaborted()
+//	{
+//		System.out.println("failed+aborted: "+rplan.getId());
+////		rplan.getException().printStackTrace();
+//	}
 	
 	
 	//-------- helper methods --------

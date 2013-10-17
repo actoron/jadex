@@ -86,11 +86,11 @@ public class PatrolPlan
 		return ret;
 	}
 	
-	@PlanPassed
-	@PlanFailed
-	@PlanAborted
-	public void end()
-	{
-		System.out.println("patrol end");
-	}
+//	@PlanPassed
+//	@PlanFailed
+//	@PlanAborted
+//	public void end()
+//	{
+//		System.out.println("patrol end");
+//	}
 }
