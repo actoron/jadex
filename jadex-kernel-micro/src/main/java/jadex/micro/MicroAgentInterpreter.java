@@ -907,6 +907,14 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						FutureFunctionality.connectDelegationFuture(future, res);
 					}
 				}
+				catch(ComponentTerminatedException e)
+				{
+					// Do not throw exception when component is trying to terminate
+					// Execution of a step could try to add a step which is refused due to termination procedure
+					// Then component cannot be terminated as last step is never executed
+					// Happened using ComponentStartTest with MessagePerformanceAgent
+					future.setExceptionIfUndone(e);
+				}
 				catch(RuntimeException e)
 				{
 					future.setExceptionIfUndone(e);
