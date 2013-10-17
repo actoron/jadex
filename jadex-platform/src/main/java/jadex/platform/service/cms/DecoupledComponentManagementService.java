@@ -1158,6 +1158,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		if(!contains)
 		{
 			cfs.put(cid, tmp);
+//			((CMSComponentDescription)getDescription(cid)).setState(IComponentDescription.STATE_TERMINATING);
 		}
 		
 		// Is the component locked?

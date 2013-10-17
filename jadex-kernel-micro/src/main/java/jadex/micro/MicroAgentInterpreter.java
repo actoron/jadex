@@ -69,6 +69,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/** Constant for step event. */
 	public static final String TYPE_STEP = "step";
 	
+	protected Field ext_forbidden;
+	
 	//-------- attributes --------
 	
 	/** The micro agent. */
@@ -907,18 +909,37 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						FutureFunctionality.connectDelegationFuture(future, res);
 					}
 				}
-				catch(ComponentTerminatedException e)
+				catch(RuntimeException e)
 				{
+					future.setExceptionIfUndone(e);
+			
 					// Do not throw exception when component is trying to terminate
 					// Execution of a step could try to add a step which is refused due to termination procedure
 					// Then component cannot be terminated as last step is never executed
 					// Happened using ComponentStartTest with MessagePerformanceAgent
-					future.setExceptionIfUndone(e);
-				}
-				catch(RuntimeException e)
-				{
-					future.setExceptionIfUndone(e);
-					throw e;
+					
+					// The micro interpreter must obey the following contract:
+					// It must not fail in termination with an execption to allow
+					// for execution of the LastStep that executes cleanup and notifies cms listeners
+					
+//					if(!IComponentDescription.STATE_TERMINATING.equals(getComponentDescription().getState()))
+					if(!(e instanceof  ComponentTerminatedException))
+					{
+						boolean terminating = false;
+						try
+						{
+							if(ext_forbidden==null)
+								ext_forbidden = SReflect.findClass("jadex.platform.service.cms.AbstractComponentAdapter", null, null).getDeclaredField("ext_forbidden");
+							ext_forbidden.setAccessible(true);
+							terminating = ((Boolean)ext_forbidden.get(getComponentAdapter())).booleanValue();
+						}
+						catch(Exception ex)
+						{
+							ex.printStackTrace();
+						}
+						if(!terminating)
+							throw e;
+					}
 				}
 
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,

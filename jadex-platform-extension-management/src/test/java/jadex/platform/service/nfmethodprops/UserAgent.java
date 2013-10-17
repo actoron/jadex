@@ -101,7 +101,7 @@ public class UserAgent
 			}
 			else
 			{
-				tr1.setReason("Value differs more than 15 percent: "+d);
+				tr1.setReason("Value differs more than 15 percent: "+d+" "+w+" "+wa);
 			}
 			
 			TestReport tr2 = new TestReport("#2", "Test if wait time of method b is ok");
@@ -115,7 +115,7 @@ public class UserAgent
 			}
 			else
 			{
-				tr2.setReason("Value differs more than 15 percent: "+d);
+				tr2.setReason("Value differs more than 15 percent: "+d+" "+w+" "+wb);
 			}
 			
 			TestReport tr3 = new TestReport("#3", "Test if wait time ofservice is ok");
