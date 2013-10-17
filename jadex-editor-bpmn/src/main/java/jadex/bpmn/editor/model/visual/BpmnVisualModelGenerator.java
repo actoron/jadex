@@ -89,10 +89,10 @@ public class BpmnVisualModelGenerator
 //							graph.getModel().endUpdate();
 //							vactivity.setBpmnElement(mactivity);
 //							elements.put(mactivity.getId(), vactivity);
-							if (mactivity.getOutgoingSequenceEdges() != null)
-							{
-								seqedges.addAll(mactivity.getOutgoingSequenceEdges());
-							}
+//							if (mactivity.getOutgoingSequenceEdges() != null)
+//							{
+//								seqedges.addAll(mactivity.getOutgoingSequenceEdges());
+//							}
 							elements.put(mactivity.getId(), generateActivity(graph, mactivity, vlane, elements, seqedges));
 						}
 					}
