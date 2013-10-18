@@ -764,9 +764,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	}
 	
 	/**
-	 * 
+	 * Transform byte Array into Class and define it in classloader.
 	 */
-	public static Class<?> toClass(String name, byte[] data, ClassLoader loader, ProtectionDomain domain)
+	public Class<?> toClass(String name, byte[] data, ClassLoader loader, ProtectionDomain domain)
 	{
 		Class<?> ret = null;
 		

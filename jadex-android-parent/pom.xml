@@ -13,6 +13,7 @@
 	</parent>
 
 	<properties>
+		<jadex-android-maven-plugin-version>1.0-SNAPSHOT</jadex-android-maven-plugin-version>
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
 		<android-maven-plugin-version>3.6.1</android-maven-plugin-version>
 		<android-api-version>2.2.1</android-api-version>
@@ -122,6 +123,12 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>net.sourceforge.jadex</groupId>
+					<artifactId>jadex-android-maven-plugin</artifactId>
+					<version>${jadex-android-maven-plugin-version}</version>
+				</plugin>
+				
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>

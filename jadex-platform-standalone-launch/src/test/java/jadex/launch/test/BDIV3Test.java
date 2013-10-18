@@ -1,5 +1,6 @@
 package jadex.launch.test;
 import jadex.base.test.ComponentTestSuite;
+import jadex.commons.SReflect;
 
 import java.io.File;
 
@@ -11,6 +12,8 @@ import junit.framework.Test;
  */
 public class BDIV3Test	extends	ComponentTestSuite
 {
+	private static final String NOEXCLUDE = "__noexclude__";
+	
 	/**
 	 *  Constructor called by Maven JUnit runner.
 	 */
@@ -37,7 +40,8 @@ public class BDIV3Test	extends	ComponentTestSuite
 				"Producer",	// sub agent
 				"Sentry",	// sub agent
 				"3d",	// OpenGL problems on termination?
-				"CreationBDI"	// should only be run as separate benchmark
+				"CreationBDI",	// should only be run as separate benchmark,
+				SReflect.isAndroid() ? "GuiBDI" : NOEXCLUDE
 			});
 	}
 	

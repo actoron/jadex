@@ -151,7 +151,6 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	@Override
 	public void startActivityForResult(Intent intent, int requestCode)
 	{
-		
 		super.startActivityForResult(intent, requestCode);
 	}
 	

@@ -59,7 +59,7 @@ public class SokratesLoaderActivity extends ClientAppFragment implements Service
 			@Override
 			public void onClick(View v)
 			{
-				Intent i = new Intent(getContext(),SokratesActivity.class);
+				Intent i = new Intent(getContext(), SokratesActivity.class);
 				startActivity(i);
  			}
 		});

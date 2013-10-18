@@ -12,6 +12,8 @@ import junit.framework.Test;
  */
 public class MicroTest	extends ComponentTestSuite
 {
+	private static final String NOEXCLUDE = "__noexclude__";
+
 	/**
 	 *  Constructor called by Maven JUnit runner.
 	 */
@@ -72,8 +74,8 @@ public class MicroTest	extends ComponentTestSuite
 			"AgentCreationAgent",	
 			"PojoAgentCreationAgent",
 			"MegaParallelStarter",
-			SReflect.isAndroid() ? "authenticate/InitiatorAgent" : "__noexclude__",
-			SReflect.isAndroid() ? "stream/InitiatorAgent" : "__noexclude__",
+			SReflect.isAndroid() ? "authenticate/InitiatorAgent" : NOEXCLUDE,
+			SReflect.isAndroid() ? "stream/InitiatorAgent" : NOEXCLUDE,
 		});
 //		}, 600000, true, false);
 	}

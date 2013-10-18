@@ -188,6 +188,18 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+				<groupId>net.sourceforge.jadex</groupId>
+				<artifactId>jadex-android-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generateBDI</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 		</plugins>
 		<pluginManagement>
@@ -213,6 +225,25 @@
 										</versionRange>
 										<goals>
 											<goal>execute</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											net.sourceforge.jadex
+										</groupId>
+										<artifactId>
+											jadex-android-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.0-SNAPSHOT,)
+										</versionRange>
+										<goals>
+											<goal>generateBDI</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

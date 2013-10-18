@@ -25,6 +25,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -94,7 +95,9 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 	@Override
 	public List<Class<?>> generateBDIClass(String classname, BDIModel micromodel, ClassLoader cl)
 	{
-		return generateBDIClass(classname, micromodel, cl, new HashSet<String>());
+//		return generateBDIClass(classname, micromodel, cl, new HashSet<String>());
+		Logger.i(classname + " requested, assuming it has been generated at compile time....");
+		return Collections.emptyList();
 	}
 
 	/**
