@@ -38,7 +38,6 @@ public class JadexBinaryCodec implements ICodec
 		// Current chain
 		List<ITraverseProcessor> encoders = new ArrayList<ITraverseProcessor>(BinarySerializer.ENCODER_HANDLERS);
 		Date since = new Date(1375912800000L);
-		System.out.println("Since " + since);
 		Tuple2<Date, List<ITraverseProcessor>> chain = new Tuple2<Date, List<ITraverseProcessor>>(since, encoders);
 		ENCODER_CHAINS.add(chain);
 		
