@@ -2674,16 +2674,19 @@ public class MessageService extends BasicService implements IMessageService
 		}
 	}
 	
+	/**
+	 *  Get the release date.
+	 */
 	protected Date getReleaseDate(IComponentIdentifier platform)
 	{
 		Date ret = null;
-		if (!releasedatecache.containsKey(platform))
+		if(!releasedatecache.containsKey(platform))
 		{
 			try
 			{
 				IAwarenessManagementService ams = SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 				DiscoveryInfo info = ams.getPlatformInfo(platform).get();
-				if (info != null)
+				if(info != null)
 				{
 					Map<String, String> props = info != null? info.getProperties() : null;
 					String stringdate = props != null? props.get(AwarenessInfo.PROPERTY_JADEXDATE): null;
@@ -2691,7 +2694,7 @@ public class MessageService extends BasicService implements IMessageService
 					releasedatecache.put(platform, ret);
 				}
 			}
-			catch (ServiceNotFoundException e)
+			catch(ServiceNotFoundException e)
 			{
 				releasedatecache.put(platform, null);
 			}

@@ -59,21 +59,18 @@ public class BpmnModelReader
 		AReader reader = XMLReaderFactory.getInstance().createReader(false, false, null);
 		Set types = getXMLMapping();
 		reader.read(new TypeInfoPathManager(types),
-				new BeanObjectReaderHandler(types)
+			new BeanObjectReaderHandler(types)
+			{
+				public void handleAttributeValue(Object object, QName xmlattrname,
+						List attrpath, String attrval, Object attrinfo,
+						AReadContext context) throws Exception
 				{
-					public void handleAttributeValue(Object object, QName xmlattrname,
-							List attrpath, String attrval, Object attrinfo,
-							AReadContext context) throws Exception
+					if (attrinfo != null)
 					{
-						if (attrinfo != null)
-						{
-							super.handleAttributeValue(object, xmlattrname, attrpath, attrval, attrinfo, context);
-						}
+						super.handleAttributeValue(object, xmlattrname, attrpath, attrval, attrinfo, context);
 					}
-				},
-				is,
-				BpmnModelReader.class.getClassLoader(),
-				new BpmnReadContext());
+				}
+			}, is, BpmnModelReader.class.getClassLoader(), new BpmnReadContext());
 	}
 	
 	protected static final Set getXMLMapping()

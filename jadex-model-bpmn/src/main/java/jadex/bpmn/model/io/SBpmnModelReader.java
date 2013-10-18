@@ -489,6 +489,10 @@ public class SBpmnModelReader
 			{
 				evttypes.add(new Tuple2("Cancel", null));
 			}
+			else if ("multipleEventDefinition".equals(tag.getLocalPart()))
+			{
+				evttypes.add(new Tuple2("Cancel", null));
+			}
 		}
 		else if("sequenceFlow".equals(tag.getLocalPart()))
 		{

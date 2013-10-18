@@ -941,8 +941,12 @@ public class SBpmnModelWriter
 	 */
 	protected static final void writeActivitySemantics(PrintStream out, List<MActivity> activities, String evthandlerref, int baseind, List<MSequenceEdge> seqedges, List<MMessagingEdge> medges, List<MDataEdge> dataedges)
 	{
-		for (MActivity activity : activities)
+		for(MActivity activity : activities)
 		{
+			// As activities are also contained in the pool in the old bpmn model
+			if(activity.isEventHandler() && evthandlerref==null)
+				continue; 
+			
 			if (activity.getOutgoingDataEdges() != null)
 			{
 				dataedges.addAll(activity.getOutgoingDataEdges());
@@ -962,10 +966,10 @@ public class SBpmnModelWriter
 			String mappedacttype = ACT_TYPE_MAPPING.get(activity.getActivityType());
 			
 			boolean event = false;
-			if (activity.getActivityType().startsWith("Event"))
+			if(activity.getActivityType().startsWith("Event"))
 			{
 				event = true;
-				if (activity.getActivityType().contains("Intermediate"))
+				if(activity.getActivityType().contains("Intermediate"))
 				{
 					if (activity.isEventHandler())
 					{
@@ -1007,7 +1011,7 @@ public class SBpmnModelWriter
 				}
 			}
 			
-			if (activity.isEventHandler())
+			if(activity.isEventHandler())
 			{
 				out.print("\" attachedToRef=\"");
 				out.print(escapeString(evthandlerref));
@@ -1087,6 +1091,11 @@ public class SBpmnModelWriter
 				{
 					out.print(getIndent(baseind + 1));
 					out.println("<semantic:cancelEventDefinition/>");
+				}
+				else if (activity.getActivityType().contains("Multipl"))
+				{
+					out.print(getIndent(baseind + 1));
+					out.println("<semantic:multipleEventDefinition/>");
 				}
 			}
 			
@@ -1370,6 +1379,8 @@ public class SBpmnModelWriter
 	 */
 	private static final String escapeString(String string)
 	{
+		if(string==null)
+			System.out.println("nullnull");
 		string = string.replace("&", "&amp;");
 		string = string.replace("\"", "&quot;");
 		string = string.replace("'", "&apos;");
