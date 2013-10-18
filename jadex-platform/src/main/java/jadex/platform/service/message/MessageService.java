@@ -490,12 +490,13 @@ public class MessageService extends BasicService implements IMessageService
 //						});
 				
 //				System.out.println("Getting final release date");
-				getReleaseDate(type, msg).addResultListener(new ExceptionDelegationResultListener<Date, Void>(ret)
-				{
-					public void customResultAvailable(Date result)
-					{
+//				getReleaseDate(type, msg).addResultListener(new ExceptionDelegationResultListener<Date, Void>(ret)
+//				{
+//					public void customResultAvailable(Date result)
+//					{
 //						System.out.println("Got final release date: " + String.valueOf(result));
-						final Date freleasedate = result;
+//						final Date freleasedate = result;
+						final Date freleasedate = null;
 						
 						// External access of sender required for content encoding etc.
 //						SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
@@ -521,8 +522,8 @@ public class MessageService extends BasicService implements IMessageService
 								});
 //							}
 //						});
-					}
-				});
+//					}
+//				});
 			}
 		});
 

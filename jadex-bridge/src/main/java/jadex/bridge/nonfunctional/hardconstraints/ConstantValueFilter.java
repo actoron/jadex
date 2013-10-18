@@ -1,10 +1,8 @@
 package jadex.bridge.nonfunctional.hardconstraints;
 
 import jadex.bridge.service.IService;
-import jadex.commons.IRemoteFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 public class ConstantValueFilter extends AbstractConstraintFilter
 {
@@ -28,22 +26,9 @@ public class ConstantValueFilter extends AbstractConstraintFilter
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public IFuture<Boolean> doFilter(IService service)
+	public IFuture<Boolean> doFilter(IService service, Object value)
 	{
-		final Future<Boolean> ret = new Future<Boolean>();
-		service.getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
-		{
-			public void resultAvailable(Object result)
-			{
-				ret.setResult(getValue().equals(result));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-		return ret;
+		return new Future<Boolean>(getValue().equals(value));
 	}
 	
 	/**

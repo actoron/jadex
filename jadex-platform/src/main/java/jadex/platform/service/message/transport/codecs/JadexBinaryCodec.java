@@ -42,7 +42,7 @@ public class JadexBinaryCodec implements ICodec
 		
 		// Oldest / Undeclared chain
 		encoders = new ArrayList<ITraverseProcessor>();
-		encoders.add(new LegacyMethodInfoEncoder());
+//		encoders.add(new LegacyMethodInfoEncoder());
 		encoders.addAll(BinarySerializer.ENCODER_HANDLERS);
 		since = null;
 		chain = new Tuple2<Date, List<ITraverseProcessor>>(since, encoders);

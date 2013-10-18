@@ -97,9 +97,9 @@ public class MHardConstraint
 	}
 
 	/**
-	 *  Gets the operand.
+	 *  Gets the operator.
 	 *
-	 *  @return The operand.
+	 *  @return The operator.
 	 */
 	public String getOperator()
 	{

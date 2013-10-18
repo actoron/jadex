@@ -2,8 +2,10 @@ package jadex.bridge.nonfunctional.hardconstraints;
 
 import jadex.bridge.service.IService;
 import jadex.commons.IRemoteFilter;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 public abstract class AbstractConstraintFilter implements IRemoteFilter<IService>
 {
@@ -33,24 +35,38 @@ public abstract class AbstractConstraintFilter implements IRemoteFilter<IService
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public final IFuture<Boolean> filter(IService service)
+	public final IFuture<Boolean> filter(final IService service)
 	{
 		if (getValue() == null)
 		{
 			return new Future<Boolean>(true);
 		}
-		return doFilter(service);
+		
+		final Future<Boolean> ret = new Future<Boolean>();
+		service.getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+		{
+			public void resultAvailable(Object result)
+			{
+				doFilter(service, result).addResultListener(new DelegationResultListener<Boolean>(ret));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		return ret;
 	}
 	
 	/**
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public abstract IFuture<Boolean> doFilter(IService service);
+	public abstract IFuture<Boolean> doFilter(IService service, Object value);
 
 	/**
 	 *  Gets the valuename.
-	 *
+	 *drag edge areadrag edge area
 	 *  @return The valuename.
 	 */
 	public String getValueName()
