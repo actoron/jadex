@@ -472,63 +472,57 @@ public class MessageService extends BasicService implements IMessageService
 					ret.setException(new RuntimeException("Receivers must not be empty: "+msg));
 					return;
 				}
-				Date releasedate = null;
-				if(SReflect.isIterable(tmp))
+//				cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+//						{
+//							public void customResultAvailable(IExternalAccess exta)
+//							{
+////								System.out.println("msgservice calling doSendMessage()");
+////								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+//								
+////								System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
+//								IEncodingContext enccont = new EncodingContext(new Date());
+//								doSendMessage(msg, type, exta, cl, ret, codecids, enccont);
+//							}
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								super.exceptionOccurred(exception);
+//							}
+//						});
+				
+//				System.out.println("Getting final release date");
+				getReleaseDate(type, msg).addResultListener(new ExceptionDelegationResultListener<Date, Void>(ret)
 				{
-					for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
+					public void customResultAvailable(Date result)
 					{
-						IComponentIdentifier rec = (IComponentIdentifier)it.next();
-						if(rec==null)
-						{
-							ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
-							return;
-						}
-						// Addresses may only null for local messages, i.e. intra platform communication
-						else if(rec.getAddresses()==null && 
-							!(rec.getPlatformName().equals(component.getComponentIdentifier().getPlatformName())))
-						{
-							ret.setException(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
-							return;
-						}
-						Date prd = getReleaseDate(rec.getRoot());
-						if (prd != null && (releasedate== null || releasedate.after(prd)))
-						{
-							releasedate = prd;
-						}
+//						System.out.println("Got final release date: " + String.valueOf(result));
+						final Date freleasedate = result;
+						
+						// External access of sender required for content encoding etc.
+//						SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+//							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+//						{
+//							public void customResultAvailable(IComponentManagementService cms)
+//							{
+								cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+								{
+									public void customResultAvailable(IExternalAccess exta)
+									{
+//										System.out.println("msgservice calling doSendMessage()");
+//										System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
+										
+//										System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
+										IEncodingContext enccont = new EncodingContext(freleasedate);
+										doSendMessage(msg, type, exta, cl, ret, codecids, enccont);
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										super.exceptionOccurred(exception);
+									}
+								});
+//							}
+//						});
 					}
-				}
-				
-				if (releasedate == null && tmp instanceof IComponentIdentifier)
-				{
-					releasedate = getReleaseDate((IComponentIdentifier) tmp);
-				}
-				
-				final Date freleasedate = releasedate;
-				
-				// External access of sender required for content encoding etc.
-//				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-//				{
-//					public void customResultAvailable(IComponentManagementService cms)
-//					{
-						cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
-						{
-							public void customResultAvailable(IExternalAccess exta)
-							{
-//								System.out.println("msgservice calling doSendMessage()");
-//								System.out.println("on2: "+IComponentIdentifier.CALLER.get()+" "+IComponentIdentifier.LOCAL.get());
-								
-//								System.err.println("send msg4: "+sender+" "+msg.get(SFipa.CONTENT));
-								IEncodingContext enccont = new EncodingContext(freleasedate);
-								doSendMessage(msg, type, exta, cl, ret, codecids, enccont);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								super.exceptionOccurred(exception);
-							}
-						});
-//					}
-//				});
+				});
 			}
 		});
 
@@ -2674,35 +2668,101 @@ public class MessageService extends BasicService implements IMessageService
 		}
 	}
 	
-	/**
-	 *  Get the release date.
-	 */
-	protected Date getReleaseDate(IComponentIdentifier platform)
+	protected IFuture<Date> getReleaseDate(MessageType type, final Map<String, Object> msg)
 	{
-		Date ret = null;
-		if(!releasedatecache.containsKey(platform))
+		final Future<Date> ret = new Future<Date>();
+		Object tmp = msg.get(type.getReceiverIdentifier());
+		
+		if (tmp instanceof IComponentIdentifier)
 		{
-			try
+			tmp = new IComponentIdentifier[] { (IComponentIdentifier) tmp };
+		}
+		
+		if(SReflect.isIterable(tmp))
+		{
+			int size = 0;
+			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
 			{
-				IAwarenessManagementService ams = SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-				DiscoveryInfo info = ams.getPlatformInfo(platform).get();
-				if(info != null)
+				++size;
+				it.next();
+			}
+			
+			final CollectionResultListener<Date> crl = new CollectionResultListener<Date>(size, false, new ExceptionDelegationResultListener<Collection<Date>, Date>(ret)
+			{
+				public void customResultAvailable(Collection<Date> result)
 				{
-					Map<String, String> props = info != null? info.getProperties() : null;
-					String stringdate = props != null? props.get(AwarenessInfo.PROPERTY_JADEXDATE): null;
-					ret = stringdate != null? new Date(Long.parseLong(stringdate)) : null;
-					releasedatecache.put(platform, ret);
+					Date releasedate = null;
+					for (Date date : result)
+					{
+						if (date != null && (releasedate == null || releasedate.after(date)))
+						{
+							releasedate = date;
+						}
+					}
+					
+					ret.setResult(releasedate);
+				}
+			});
+			
+			for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
+			{
+				final IComponentIdentifier rec = (IComponentIdentifier)it.next();
+				if(rec==null)
+				{
+					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
+				}
+				// Addresses may only null for local messages, i.e. intra platform communication
+				else if(rec.getAddresses()==null && 
+					!(rec.getPlatformName().equals(component.getComponentIdentifier().getPlatformName())))
+				{
+					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
+				}
+				
+				if (!releasedatecache.containsKey(rec.getRoot()))
+				{
+					SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener<IAwarenessManagementService>()
+					{
+						public void resultAvailable(IAwarenessManagementService ams)
+						{
+							ams.getPlatformInfo(rec.getRoot()).addResultListener(new IResultListener<DiscoveryInfo>()
+							{
+								public void resultAvailable(DiscoveryInfo info)
+								{
+									if (info != null)
+									{
+										Map<String, String> props = info != null? info.getProperties() : null;
+										String stringdate = props != null? props.get(AwarenessInfo.PROPERTY_JADEXDATE): null;
+										Date date = stringdate != null? new Date(Long.parseLong(stringdate)) : null;
+										releasedatecache.put(rec.getRoot(), date);
+										crl.resultAvailable(date);
+									}
+								}
+								
+								public void exceptionOccurred(
+										Exception exception)
+								{
+									releasedatecache.put(rec.getRoot(), null);
+									crl.resultAvailable(null);
+								}
+								
+							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							releasedatecache.put(rec.getRoot(), null);
+							crl.resultAvailable(null);
+						}
+					});
+				}
+				else
+				{
+					Date date = releasedatecache.get(rec.getRoot());
+					crl.resultAvailable(date);
 				}
 			}
-			catch(ServiceNotFoundException e)
-			{
-				releasedatecache.put(platform, null);
-			}
 		}
-		else
-		{
-			ret = releasedatecache.get(platform);
-		}
+		
 		return ret;
 	}
 }
