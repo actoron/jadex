@@ -88,7 +88,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 *  Generate class.
 	 */
-	public Class<?> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl)
+	public List<Class<?>> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl)
 	{
 		return generateBDIClass(clname, model, cl, new HashSet<String>());
 	}
@@ -96,10 +96,10 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 *  Generate class.
 	 */
-	public Class<?> generateBDIClass(final String clname, final BDIModel model, 
+	public List<Class<?>> generateBDIClass(final String clname, final BDIModel model, 
 		final ClassLoader cl, final Set<String> done)
 	{
-		Class<?> ret = null;
+		List<Class<?>> ret = new ArrayList<Class<?>>();
 		
 //		System.out.println("Generating with cl: "+cl+" "+clname);
 		
@@ -272,7 +272,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				}
 				
 //				System.out.println("toClass: "+clname+" "+found);
-				ret = toClass(clname, data, found, null);
+				ret.add(toClass(clname, data, found, null));
 				
 //				if(ret.getName().indexOf("$")!=-1)
 //				{
@@ -305,7 +305,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			
 			for(String icl: todo)
 			{
-				generateBDIClass(icl, model, cl, done);
+				List<Class<?>> classes = generateBDIClass(icl, model, cl, done);
+				ret.addAll(classes);
 			}
 		}
 		catch(Throwable e)

@@ -22,7 +22,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	
 	protected NodeHelper nodehelper = NodeHelper.getInstance();
 	
-	public abstract Class<?> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl);
+	public abstract List<Class<?>> generateBDIClass(String clname, BDIModel micromodel, ClassLoader cl);
 
 	/**
 	 * 

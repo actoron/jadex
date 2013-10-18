@@ -92,7 +92,7 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 	private static Map<String,ApplicationReader> arCache = new HashMap<String, ApplicationReader>();
 
 	@Override
-	public Class<?> generateBDIClass(String classname, BDIModel micromodel, ClassLoader cl)
+	public List<Class<?>> generateBDIClass(String classname, BDIModel micromodel, ClassLoader cl)
 	{
 		return generateBDIClass(classname, micromodel, cl, new HashSet<String>());
 	}
@@ -101,10 +101,10 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 	 * Generate class. Generated class should be available in the given
 	 * classLoader at the end of this method.
 	 */
-	public Class<?> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl, final Set<String> done)
+	public List<Class<?>> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl, final Set<String> done)
 	{
 		Log.i(LOG_TAG, "Generating " + clname);
-		Class<?> ret = null;
+		List<Class<?>> ret = new ArrayList<Class<?>>();
 
 		final List<String> todo = new ArrayList<String>();
 		done.add(clname);
@@ -291,10 +291,11 @@ public class AsmDexBdiClassGenerator extends AbstractAsmBdiClassGenerator
 				String className = Type.getType(classNode.name).getClassName();
 				Class<?> clazz = newCl.loadClass(className);
 				androidCl.defineClass(className, clazz);
+				ret.add(clazz);
 			}
 			
 			Class<?> generatedClass = newCl.loadClass(clname);
-			ret = generatedClass;
+			ret.add(generatedClass);
 
 		}
 		catch (IOException e)
