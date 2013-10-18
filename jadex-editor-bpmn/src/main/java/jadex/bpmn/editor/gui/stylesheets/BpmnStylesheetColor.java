@@ -191,6 +191,8 @@ public class BpmnStylesheetColor extends mxStylesheet
 		//mxGraphics2DCanvas.putShape(VPool.class.getSimpleName(), new PoolLaneShape(true));
 		//mxGraphics2DCanvas.putShape(VLane.class.getSimpleName(), new PoolLaneShape(false));
 		mxConstants.RECTANGLE_ROUNDING_FACTOR = 0.05;
+		mxConstants.CONNECT_HANDLE_ENABLED = true;
+		mxConstants.CONNECT_HANDLE_SIZE = 6;
 		mxGraphics2DCanvas.putShape(mxConstants.SHAPE_SWIMLANE, new mxSwimlaneShape()
 		{
 			/**
