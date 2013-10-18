@@ -18,15 +18,21 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.artifact.AttachedArtifact;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
 /**
  * @goal generateBDI
@@ -71,14 +77,20 @@ public class GenerateBDIMojo extends AbstractMojo
 	 * @parameter default-value="${project.build.outputDirectory}"
 	 * @readonly
 	 */
-	protected File outputDirectory;
+	protected File inputDirectory;
+	
+	/**
+	 * @parameter default-value="${project.build.directory}"
+	 * @readonly
+	 */
+	protected File buildDirectory;
 
 	/**
 	 * The android resources directory.
 	 * 
-	 * @parameter default-value="${project.basedir}/res"
+	 * @parameter default-value="${project.basedir}"
 	 */
-	protected File resourceDirectory;
+	protected File baseDirectory;
 
 	/**
 	 * Maven ProjectHelper.
@@ -93,8 +105,33 @@ public class GenerateBDIMojo extends AbstractMojo
 	{
 		try
 		{
-			generateBDI();
+			File outputDirectory = new File(buildDirectory, "bdi-generated");
+			generateBDI(inputDirectory, inputDirectory);
 			getLog().info("Generated BDI V3 Agents successfully!");
+//			String generatedClassesRelPath = ResourceUtils.getRelativePath(outputDirectory.getPath(), baseDirectory.getPath(), File.separator) + File.separator;
+//			getLog().info("adding resource path: " + generatedClassesRelPath);
+			
+//			 modify maven-android-plugin config
+//			Plugin plugin = project.getPlugin("com.jayway.maven.plugins.android.generation2:android-maven-plugin");
+//			if (plugin != null) {
+//				Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
+//				Xpp3Dom child = configuration.getChild("sourceDirectories");
+//				if (child == null){
+//					child = new Xpp3Dom("sourceDirectories");
+//					configuration.addChild(child);
+//				}
+//				Xpp3Dom source = new Xpp3Dom("file");
+//				source.setValue(generatedClassesPath);
+//				child.addChild(source);
+//				System.out.println(configuration);
+//				plugin.setConfiguration(configuration);
+//			} else {
+//				throw new MojoExecutionException("Android plugin has to be included in this build!!"); 
+//			}
+
+//			project.getBuild().setOutputDirectory(outputDirectory.getPath());
+			
+			
 		}
 		catch (Exception e)
 		{
@@ -103,33 +140,23 @@ public class GenerateBDIMojo extends AbstractMojo
 		}
 			
 	}
-	private void generateBDI() throws Exception
+	private void generateBDI(File inputDirectory, File outputDirectory) throws Exception
 	{
 		BDIModelLoader modelLoader = new BDIModelLoader();
-		BDIClassReader reader = new BDIClassReader(modelLoader);
 		
 		ByteKeepingASMBDIClassGenerator gen = new ByteKeepingASMBDIClassGenerator();
 				
-		Collection<File> allBDIFiles = getAllBDIFiles(outputDirectory);
+		Collection<File> allBDIFiles = getAllBDIFiles(inputDirectory);
 		String[] imports = getImportPath(allBDIFiles);
 		ResourceIdentifier rid = new ResourceIdentifier();
 
 		getLog().debug("Found BDI Files: " + allBDIFiles);
-		URLClassLoader classLoader;
-		URL outputUrl;
-		outputUrl = outputDirectory.toURI().toURL();
-		ClassLoader originalCl = getClass().getClassLoader();
-//		URL[] urls = SUtil.collectClasspathURLs(originalCl).toArray(new URL[1]);
-//		
-//		ClassLoader baseCl = new ClassLoader() {};
-//		DelegationURLClassLoader otherCl = new DelegationURLClassLoader(baseCl, new DelegationURLClassLoader[]{
-//			new DelegationURLClassLoader(originalCl, null)
-//		});
+		URL inputUrl =	inputDirectory.toURI().toURL();
+		getLog().debug("Generating to: " + outputDirectory);
 		
-		URLClassLoader inputCl = new URLClassLoader(new URL[]{outputUrl}, originalCl) {
-			
-		};
-		URLClassLoader outputCl = new URLClassLoader(new URL[]{outputUrl}, originalCl);
+		ClassLoader originalCl = getClass().getClassLoader();
+		URLClassLoader inputCl = new URLClassLoader(new URL[]{inputUrl}, originalCl);
+		URLClassLoader outputCl = new URLClassLoader(new URL[]{inputUrl}, originalCl);
 		
 		getLog().info("Generating BDI V3 Agent classes...");
 
@@ -137,7 +164,7 @@ public class GenerateBDIMojo extends AbstractMojo
 		{
 			List<Class<?>> classes = null;
 			BDIModel model = null;
-			String relativePath = ResourceUtils.getRelativePath(bdiFile.getAbsolutePath(), outputDirectory.getAbsolutePath(),
+			String relativePath = ResourceUtils.getRelativePath(bdiFile.getAbsolutePath(), inputDirectory.getAbsolutePath(),
 					File.separator);
 			String className = relativePath.replaceAll(File.separator, ".").replace(".class", "");
 
@@ -160,12 +187,19 @@ public class GenerateBDIMojo extends AbstractMojo
 //				FileWriter writer = null;
 				try
 				{
+					// write enhanced class 
 					getLog().info("    ... " + clazz.getName());
-					DataOutputStream dos = new DataOutputStream(new FileOutputStream(new File(outputDirectory, path)));
+					File enhancedFile = new File(outputDirectory, path);
+					enhancedFile.getParentFile().mkdirs();
+					DataOutputStream dos = new DataOutputStream(new FileOutputStream(enhancedFile));
 					dos.write(classBytes);
 					dos.close();
-//					IOUtils.copy(inputStream , writer);
-//					writer.close();
+
+					if (!inputDirectory.equals(outputDirectory)) {
+						// delete non-enhanced to allow repeatable execution of this plugin
+						File oldFile = new File(inputDirectory, path);
+						oldFile.delete();
+					}
 				}
 				catch (FileNotFoundException e)
 				{
@@ -184,7 +218,7 @@ public class GenerateBDIMojo extends AbstractMojo
 	{
 		getLog().debug("Building imports Path...");
 		List<String> result = new ArrayList<String>();
-		String absoluteOutput = outputDirectory.getAbsolutePath();
+		String absoluteOutput = inputDirectory.getAbsolutePath();
 
 		for (File bdiFile : allBDIFiles)
 		{
