@@ -715,13 +715,13 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					public void resultAvailable(Void result)
 					{
 						// result?!
-//						System.out.println("Killing (res): "+getComponentIdentifier().getName());
+						System.out.println("Killing (res): "+getComponentIdentifier().getName());
 						microagent.killComponent();
 					}
 					public void exceptionOccurred(Exception exception)
 					{
 						// result?!
-//						System.out.println("Killing (ex): "+getComponentIdentifier().getName());
+						System.out.println("Killing (ex): "+getComponentIdentifier().getName());
 						if(exception instanceof RuntimeException)
 						{
 							throw (RuntimeException)exception;
@@ -860,6 +860,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public boolean executeStep()
 	{
+		if(getComponentIdentifier().getName().indexOf("MessageP")!=-1)
+			System.out.println("steps: "+getComponentIdentifier()+" "+steps);
+		
 		try
 		{
 			if(steps!=null && !steps.isEmpty())
@@ -948,7 +951,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
 					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, step.getCause(), System.currentTimeMillis()));
 			}
-	
+			
 			return steps!=null && !steps.isEmpty();
 		}
 		catch(ComponentTerminatedException ate)
@@ -1428,6 +1431,19 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public IComponentAdapter getAgentAdapter()
 	{
 		return getComponentAdapter();
+	}
+	
+	/**
+	 *  Get the pojo agent (or null if it has none).
+	 *  @return The pojo agent object.
+	 */
+	public Object getPojoAgent()
+	{
+		Object ret = null;
+		MicroAgent ma = getAgent();
+		if(ma instanceof IPojoMicroAgent)
+			ret = ((IPojoMicroAgent)ma).getPojoAgent();
+		return ret;
 	}
 
 //	/**

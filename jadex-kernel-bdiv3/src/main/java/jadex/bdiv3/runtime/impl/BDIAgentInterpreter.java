@@ -26,6 +26,7 @@ import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
+import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -42,7 +43,10 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.FieldInfo;
+import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
@@ -56,6 +60,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.IPojoMicroAgent;
@@ -655,13 +662,44 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 	}
 
-	
 	/**
 	 *  Start the component behavior.
 	 */
 	public void startBehavior()
 	{
 		super.startBehavior();
+
+		Rule<?> toolrule = new Rule<Void>("bditool_events", 
+			new ICondition()
+			{
+				public Tuple2<Boolean, Object> evaluate(IEvent event)
+				{
+					System.out.println("hetag: "+hasEventTargets(true));
+					return new Tuple2<Boolean, Object>(hasEventTargets(true)? Boolean.TRUE: Boolean.FALSE, null);
+				}
+			}, new IAction<Void>()
+		{
+			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+			{
+				System.out.println("event: "+event.getType());
+				
+				return IFuture.DONE;
+			}
+		});
+		List<EventType> myevents = new ArrayList<EventType>();
+		myevents.add(new EventType(ChangeEvent.BELIEFCHANGED));
+		myevents.add(new EventType(ChangeEvent.FACTADDED));
+		myevents.add(new EventType(ChangeEvent.FACTREMOVED)); 
+		myevents.add(new EventType(ChangeEvent.FACTCHANGED)); 
+		myevents.add(new EventType(ChangeEvent.GOALADOPTED));
+		myevents.add(new EventType(ChangeEvent.GOALDROPPED));
+		myevents.add(new EventType(ChangeEvent.GOALACTIVE));
+		myevents.add(new EventType(ChangeEvent.GOALOPTION));
+		myevents.add(new EventType(ChangeEvent.GOALSUSPENDED));
+		myevents.add(new EventType(ChangeEvent.GOALINPROCESS));
+		myevents.add(new EventType(ChangeEvent.GOALNOTINPROCESS));
+		toolrule.setEvents(myevents);
+		getRuleSystem().getRulebase().addRule(toolrule);
 		
 //		try
 //		{
@@ -2276,6 +2314,60 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		{
 			return !capa.getPlans(mplan).isEmpty()? ICondition.TRUE: ICondition.FALSE;
 		}
+	}
+	
+	/**
+	 *  Get the current state as events.
+	 */
+	public List<IMonitoringEvent> getCurrentStateEvents()
+	{
+		List<IMonitoringEvent> ret = new ArrayList<IMonitoringEvent>();
+		
+		// Already gets merged beliefs (including subcapas).
+		List<MBelief> mbels = getBDIModel().getCapability().getBeliefs();
+		
+		if(mbels!=null)
+		{
+			for(MBelief mbel: mbels)
+			{
+				Object ag = getPojoAgent()!=null? getPojoAgent(): getAgent();
+				BeliefInfo	info = BeliefInfo.createBeliefInfo(mbel, ag, getClassLoader());
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis());
+				ev.setSourceDescription(mbel.toString());
+				ev.setProperty("details", info);
+				ret.add(ev);
+			}
+		}
+		
+		// Goals of this capability.
+		Collection<RGoal> goals = getCapability().getGoals();
+		if(goals!=null)
+		{
+			for(RGoal goal: goals)
+			{
+				GoalInfo	info = GoalInfo.createGoalInfo(goal);
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis());
+				ev.setSourceDescription(goal.toString());
+				ev.setProperty("details", info);
+				ret.add(ev);
+			}
+		}
+		
+		// Plans of this capability.
+		Collection<RPlan> plans	= getCapability().getPlans();
+		if(plans!=null)
+		{
+			for(RPlan plan: plans)
+			{
+				PlanInfo info = PlanInfo.createPlanInfo(plan);
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis());
+				ev.setSourceDescription(plan.toString());
+				ev.setProperty("details", info);
+				ret.add(ev);
+			}
+		}
+		
+		return ret;
 	}
 }
 
