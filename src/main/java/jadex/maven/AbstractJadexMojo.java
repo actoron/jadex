@@ -36,7 +36,7 @@ public abstract class AbstractJadexMojo extends AbstractMojo
 	 */
 	protected Set<Artifact> getRelevantCompileArtifacts()
 	{
-		final List<Artifact> allArtifacts = (List<Artifact>) project.getCompileArtifacts();
+		final Set<Artifact> allArtifacts = project.getArtifacts();
 		final Set<Artifact> results = filterOutIrrelevantArtifacts(allArtifacts);
 		return results;
 	}
