@@ -149,6 +149,7 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
+			
 		</plugins>
 
 		<pluginManagement>
@@ -175,6 +176,25 @@
 										</versionRange>
 										<goals>
 											<goal>emulator-start</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											net.sourceforge.jadex
+										</groupId>
+										<artifactId>
+											jadex-android-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.0-SNAPSHOT,)
+										</versionRange>
+										<goals>
+											<goal>generateBDI</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

@@ -143,15 +143,15 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 //			suite.addTest(new MicroTest("jadex.micro.testcases.stream.InitiatorAgent", targetAppDir));
 //			suite.addTest(new MicroTest("jadex.micro.testcases.nfmethodprop", targetAppDir));
 			
-			Class<?> test = jadexCl.loadClass("jadex.launch.test.MicroTest");
-			Constructor<?> constructor = test.getConstructor(String.class, String.class);
-			Object testCase = constructor.newInstance("jadex.micro.testcases", targetAppDir);
-			suite.addTest((Test) testCase);
-			
-//			Class<?> test = jadexCl.loadClass("jadex.launch.test.BDIV3Test");
+//			Class<?> test = jadexCl.loadClass("jadex.launch.test.MicroTest");
 //			Constructor<?> constructor = test.getConstructor(String.class, String.class);
-//			Object bdiTest = constructor.newInstance("jadex.bdiv3.testcases", targetAppDir);
-//			suite.addTest((Test) bdiTest);
+//			Object testCase = constructor.newInstance("jadex.micro.testcases", targetAppDir);
+//			suite.addTest((Test) testCase);
+			
+			Class<?> test = jadexCl.loadClass("jadex.launch.test.BDIV3Test");
+			Constructor<?> constructor = test.getConstructor(String.class, String.class);
+			Object bdiTest = constructor.newInstance("jadex.bdiv3.testcases", targetAppDir);
+			suite.addTest((Test) bdiTest);
 		}
 		catch (Exception e)
 		{

@@ -9,10 +9,9 @@ import jadex.micro.annotation.Properties;
 
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,13 +22,14 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -41,6 +41,7 @@ import org.apache.maven.project.MavenProjectHelper;
  * @phase compile
  * @requiresProject true
  * @requiresOnline false
+ * @requiresDependencyResolution runtime
  * @author Julian Kalinowski
  * 
  */
@@ -82,6 +83,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	 * The android resources directory.
 	 * 
 	 * @parameter default-value="${project.basedir}"
+	 * @readonly
 	 */
 	protected File baseDirectory;
 
@@ -92,6 +94,13 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	 * @readonly
 	 */
 	protected MavenProjectHelper projectHelper;
+
+	/**
+	 * Decides whether or not to enhance project runtime dependencies, too.
+	 * 
+	 * @parameter default-value="false"
+	 */
+	protected Boolean enhanceDependencies;
 
 	private IOFileFilter bdiFileFilter = new IOFileFilter()
 	{
@@ -123,19 +132,40 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	{
 		try
 		{
-
-			Set<Artifact> relevantCompileArtifacts = getRelevantCompileArtifacts();
-			for (Artifact artifact : relevantCompileArtifacts)
-			{
-				File jarFile = artifact.getFile();
-				// enhance the jar
-
-//				artifact.setFile(enhanceJar(jarFile));
-			}
-
 			File outputDirectory = new File(buildDirectory, "bdi-generated");
-			// outputDirectory = inputDirectory;
+			File tmpDirectory = new File(buildDirectory, "bdi-generated-deps");
+
+			if (enhanceDependencies)
+			{
+				Set<Artifact> relevantCompileArtifacts = getRelevantCompileArtifacts();
+				getLog().info("Found " + relevantCompileArtifacts.size() + " dependencies: " + relevantCompileArtifacts);
+
+				outputDirectory.mkdirs();
+				tmpDirectory.mkdirs();
+
+				for (Artifact artifact : relevantCompileArtifacts)
+				{
+					File jarFile = artifact.getFile();
+					// enhance the jar
+
+					File enhanceJar;
+					try
+					{
+						enhanceJar = enhanceJar(jarFile, new File(tmpDirectory, jarFile.getName()));
+						artifact.setFile(enhanceJar);
+					}
+					catch (IOException e)
+					{
+						getLog().error("Could not enhance jar: " + jarFile);
+						e.printStackTrace();
+					}
+				}
+
+				// outputDirectory = inputDirectory;
+				getLog().info("Now enhancing project-owned code...");
+			}
 			generateBDI(inputDirectory, outputDirectory);
+
 			getLog().info("Generated BDI V3 Agents successfully!");
 
 			project.getBuild().setOutputDirectory(outputDirectory.getPath());
@@ -148,66 +178,97 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		}
 
 	}
-	private File enhanceJar(File in)
-	{
-		String target = project.getBuild().getOutputDirectory();
-		File tmp = new File(target, "bdi-generated");
-		tmp.mkdirs();
-		File out = new File(tmp, in.getName());
 
-		if (out.exists())
+	private File enhanceJar(File in, File outputDir) throws IOException
+	{
+		unzipJar(in, outputDir);
+
+		getLog().info("enhancing " + in);
+		// now the whole jar has been extracted to generated-bdi/jar-name/
+		File outputFile = new File(outputDir.getParent(), in.getName().replace(".jar", ".generated.jar"));
+		getLog().debug("Zipping to: " + outputFile);
+		JarOutputStream jos = null;
+		try
 		{
-			return out;
+			// generate
+			generateBDI(outputDir, outputDir);
+			// and now re-zip the enhanced jar...
+
+			jos = new JarOutputStream(new FileOutputStream(outputFile));
+			// System.out.println(outputDir.list());
+			Collection<File> allFiles = FileUtils.listFiles(outputDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+			for (File file : allFiles)
+			{
+				String relativePath = ResourceUtils.getRelativePath(file.getPath(), outputDir.getPath(), File.separator);
+				FileInputStream is = new FileInputStream(file);
+				ZipEntry zipEntry = new ZipEntry(relativePath);
+				jos.putNextEntry(zipEntry);
+				copyStreamWithoutClosing(is, jos);
+				jos.closeEntry();
+				is.close();
+			}
 		}
-		else
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
 		{
 			try
 			{
-				out.createNewFile();
+				jos.close();
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
 			}
+		}
+
+		getLog().debug(in.getName() + " rewritten enhanced: " + outputFile.getName());
+		return outputFile;
+	}
+
+	private void unzipJar(File in, File outputDir) throws ZipException, IOException
+	{
+		if (!outputDir.exists())
+		{
+			outputDir.mkdir();
 		}
 
 		// Create a new Jar file
 		FileOutputStream fos = null;
-		ZipOutputStream jos = null;
-		try
-		{
-			fos = new FileOutputStream(out);
-			jos = new ZipOutputStream(fos);
-		}
-		catch (FileNotFoundException e1)
-		{
-			getLog().error("Cannot enhance jar: the output file " + out.getAbsolutePath() + " has not been found");
-			return null;
-		}
 
 		ZipFile inZip = null;
-		try
+		inZip = new ZipFile(in);
+		Enumeration<? extends ZipEntry> entries = inZip.entries();
+		while (entries.hasMoreElements())
 		{
-			inZip = new ZipFile(in);
-			Enumeration<? extends ZipEntry> entries = inZip.entries();
-			while (entries.hasMoreElements())
+			ZipEntry entry = entries.nextElement();
+			if (bdiFileFilter.accept(new File("/"), entry.getName()))
 			{
-				ZipEntry entry = entries.nextElement();
-				if (bdiFileFilter.accept(new File("/"), entry.getName())) {
-				} else {
-					// If the entry is not a duplicate, copy.
-					jos.putNextEntry(entry);
-					InputStream currIn = inZip.getInputStream(entry);
-					copyStreamWithoutClosing(currIn, jos);
+			}
+			else
+			{
+				// If the entry is not a duplicate, copy.
+				InputStream currIn = inZip.getInputStream(entry);
+				if (entry.isDirectory())
+				{
+					File dir = new File(outputDir, entry.getName());
+					dir.mkdir();
+				}
+				else
+				{
+					File outputFile = new File(outputDir, entry.getName());
+					File dir = outputFile.getParentFile();
+					if (!dir.exists())
+					{
+						dir.mkdirs();
+					}
+					fos = new FileOutputStream(outputFile);
+					copyStreamWithoutClosing(currIn, fos);
 					currIn.close();
-					jos.closeEntry();
+					fos.close();
 				}
 			}
-		}
-		catch (IOException e)
-		{
-			getLog().error("Cannot removing duplicates : " + e.getMessage());
-			return null;
 		}
 
 		try
@@ -216,17 +277,14 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			{
 				inZip.close();
 			}
-			jos.close();
 			fos.close();
-			jos = null;
 			fos = null;
 		}
 		catch (IOException e)
 		{
 			// ignore it.
 		}
-		getLog().info(in.getName() + " rewritten enhanced: " + out.getAbsolutePath());
-		return out;
+
 	}
 
 	private void generateBDI(File inputDirectory, File outputDirectory) throws Exception
@@ -235,11 +293,14 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 
 		ByteKeepingASMBDIClassGenerator gen = new ByteKeepingASMBDIClassGenerator();
 
-		Collection<File> allBDIFiles = getAllBDIFiles(inputDirectory);
+		Collection<File> allBDIFiles = FileUtils.listFiles(inputDirectory, bdiFileFilter, TrueFileFilter.INSTANCE);
 		String[] imports = getImportPath(allBDIFiles);
 		ResourceIdentifier rid = new ResourceIdentifier();
 
-		getLog().debug("Found BDI Files: " + allBDIFiles);
+		if (allBDIFiles.size() > 0)
+		{
+			getLog().info("Found " + allBDIFiles.size() + " BDI V3 Agent classes in " + inputDirectory);
+		}
 		URL inputUrl = inputDirectory.toURI().toURL();
 		getLog().debug("Generating to: " + outputDirectory);
 
@@ -248,9 +309,6 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		{inputUrl}, originalCl);
 		URLClassLoader outputCl = new URLClassLoader(new URL[]
 		{inputUrl}, originalCl);
-
-		getLog().info("Generating BDI V3 Agent classes...");
-
 		Collection<File> allClasses = FileUtils.listFiles(inputDirectory, new String[]
 		{"class"}, true);
 
@@ -295,7 +353,8 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 
 						if (!inputDirectory.equals(outputDirectory))
 						{
-							// delete non-enhanced to allow repeatable execution
+							// delete non-enhanced to allow repeatable
+							// execution
 							// of
 							// this plugin
 							File oldFile = new File(inputDirectory, path);
@@ -329,6 +388,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			}
 		}
 	}
+	
 	private String[] getImportPath(Collection<File> allBDIFiles)
 	{
 		getLog().debug("Building imports Path...");
@@ -343,28 +403,6 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		}
 
 		return result.toArray(new String[result.size()]);
-	}
-
-	private Collection<File> getAllBDIFiles(File dir)
-	{
-		final List<String> kernelTypes = getBDIKernelTypes();
-
-		IOFileFilter dirFilter = new IOFileFilter()
-		{
-
-			@Override
-			public boolean accept(File dir, String name)
-			{
-				return true;
-			}
-
-			@Override
-			public boolean accept(File file)
-			{
-				return true;
-			}
-		};
-		return FileUtils.listFiles(dir, bdiFileFilter, dirFilter);
 	}
 
 	private List<String> getBDIKernelTypes()
@@ -398,23 +436,27 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		getLog().info("KernelBDIV3 Types: " + kernelTypes);
 		return kernelTypes;
 	}
-	
-	   /**
-	* Copies an input stream into an output stream but does not close the streams.
-	*
-	* @param in the input stream
-	* @param out the output stream
-	* @throws IOException if the stream cannot be copied
-	*/
-	    private static void copyStreamWithoutClosing( InputStream in, OutputStream out ) throws IOException
-	    {
-	        final int bufferSize = 4096;
-	        byte[] b = new byte[ bufferSize ];
-	        int n;
-	        while ( ( n = in.read( b ) ) != - 1 )
-	        {
-	            out.write( b, 0, n );
-	        }
-	    }
+
+	/**
+	 * Copies an input stream into an output stream but does not close the
+	 * streams.
+	 * 
+	 * @param in
+	 *            the input stream
+	 * @param out
+	 *            the output stream
+	 * @throws IOException
+	 *             if the stream cannot be copied
+	 */
+	private static void copyStreamWithoutClosing(InputStream in, OutputStream out) throws IOException
+	{
+		final int bufferSize = 4096;
+		byte[] b = new byte[bufferSize];
+		int n;
+		while ((n = in.read(b)) != -1)
+		{
+			out.write(b, 0, n);
+		}
+	}
 
 }

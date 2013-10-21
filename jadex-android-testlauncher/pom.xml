@@ -192,6 +192,9 @@
 			<plugin>
 				<groupId>net.sourceforge.jadex</groupId>
 				<artifactId>jadex-android-maven-plugin</artifactId>
+				<configuration>
+					<enhanceDependencies>true</enhanceDependencies>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -200,7 +203,7 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
 		</plugins>
 		<pluginManagement>
 			<plugins>
