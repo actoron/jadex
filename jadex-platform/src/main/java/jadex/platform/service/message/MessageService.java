@@ -19,11 +19,9 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
-import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -489,14 +487,14 @@ public class MessageService extends BasicService implements IMessageService
 //							}
 //						});
 				
-//				System.out.println("Getting final release date");
-//				getReleaseDate(type, msg).addResultListener(new ExceptionDelegationResultListener<Date, Void>(ret)
-//				{
-//					public void customResultAvailable(Date result)
-//					{
+//				System.out.println("Getting final release date: " + msg);
+				getReleaseDate(type, msg).addResultListener(new ExceptionDelegationResultListener<Date, Void>(ret)
+				{
+					public void customResultAvailable(Date result)
+					{
 //						System.out.println("Got final release date: " + String.valueOf(result));
-//						final Date freleasedate = result;
-						final Date freleasedate = null;
+						final Date freleasedate = result;
+//						final Date freleasedate = null;
 						
 						// External access of sender required for content encoding etc.
 //						SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
@@ -522,8 +520,8 @@ public class MessageService extends BasicService implements IMessageService
 								});
 //							}
 //						});
-//					}
-//				});
+					}
+				});
 			}
 		});
 
@@ -2701,6 +2699,12 @@ public class MessageService extends BasicService implements IMessageService
 						}
 					}
 					
+					// Unknown platform date, assume oldest chain.
+					if (releasedate == null)
+					{
+						releasedate = new Date(1);
+					}
+					
 					ret.setResult(releasedate);
 				}
 			});
@@ -2736,6 +2740,11 @@ public class MessageService extends BasicService implements IMessageService
 										Date date = stringdate != null? new Date(Long.parseLong(stringdate)) : null;
 										releasedatecache.put(rec.getRoot(), date);
 										crl.resultAvailable(date);
+									}
+									else
+									{
+										releasedatecache.put(rec.getRoot(), null);
+										crl.resultAvailable(null);
 									}
 								}
 								

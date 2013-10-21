@@ -2,6 +2,7 @@ package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IEncodingContext;
+import jadex.commons.MethodInfo;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
@@ -10,6 +11,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -35,17 +37,21 @@ public class JadexBinaryCodec implements ICodec
 	static
 	{
 		// Current chain
-		List<ITraverseProcessor> encoders = new ArrayList<ITraverseProcessor>(BinarySerializer.ENCODER_HANDLERS);
+		List<ITraverseProcessor> currentencoders = new ArrayList<ITraverseProcessor>(BinarySerializer.ENCODER_HANDLERS);
 		Date since = new Date(1375912800000L);
-		Tuple2<Date, List<ITraverseProcessor>> chain = new Tuple2<Date, List<ITraverseProcessor>>(since, encoders);
+		Tuple2<Date, List<ITraverseProcessor>> chain = new Tuple2<Date, List<ITraverseProcessor>>(since, currentencoders);
 		ENCODER_CHAINS.add(chain);
 		
-		// Oldest / Undeclared chain
-		encoders = new ArrayList<ITraverseProcessor>();
-//		encoders.add(new LegacyMethodInfoEncoder());
+		// Oldest chain
+		List<ITraverseProcessor> encoders = new ArrayList<ITraverseProcessor>();
+		encoders.add(new LegacyMethodInfoEncoder());
 		encoders.addAll(BinarySerializer.ENCODER_HANDLERS);
-		since = null;
-		chain = new Tuple2<Date, List<ITraverseProcessor>>(since, encoders);
+		since = new Date(0);
+//		chain = new Tuple2<Date, List<ITraverseProcessor>>(since, encoders);
+		ENCODER_CHAINS.add(chain);
+		
+		// Undeclared chain
+		chain = new Tuple2<Date, List<ITraverseProcessor>>(null, currentencoders);
 		ENCODER_CHAINS.add(chain);
 		
 //		Collections.sort(ENCODER_CHAINS, new Comparator<Tuple2<Date, List<ITraverseProcessor>>>()
@@ -56,6 +62,27 @@ public class JadexBinaryCodec implements ICodec
 //				return o1.getFirstEntity().before(o2.getFirstEntity())? 1 : -1;
 //			}
 //		});
+	}
+	
+	public static void main(String[] args) throws NoSuchMethodException, SecurityException
+	{
+		List<ITraverseProcessor> newchain = new ArrayList<ITraverseProcessor>(BinarySerializer.ENCODER_HANDLERS);
+		
+		List<ITraverseProcessor> oldchain = new ArrayList<ITraverseProcessor>();
+		oldchain.add(new LegacyMethodInfoEncoder());
+		oldchain.addAll(BinarySerializer.ENCODER_HANDLERS);
+		
+		Method m = JadexBinaryCodec.class.getMethod("encode", Object.class, ClassLoader.class, IEncodingContext.class);
+		
+		MethodInfo mi = new MethodInfo(m);
+		
+		byte[] b = BinarySerializer.objectToByteArray(mi, null, oldchain, null, null);
+		
+		BinarySerializer.objectFromByteArray(b, null, null, null, null);
+		
+		b = BinarySerializer.objectToByteArray(mi, null, newchain, null, null);
+		
+		BinarySerializer.objectFromByteArray(b, null, null, null, null);
 	}
 	
 	/** Encoder chain cache. */
@@ -128,7 +155,8 @@ public class JadexBinaryCodec implements ICodec
 						{
 							for (Tuple2<Date, List<ITraverseProcessor>> chain : ENCODER_CHAINS)
 							{
-								if (context.getTargetReleaseDate() == null)
+//								System.out.println(context.getTargetReleaseDate());
+								if (context.getTargetReleaseDate() == null || chain.getFirstEntity() == null)
 								{
 									if (chain.getFirstEntity() == null)
 									{

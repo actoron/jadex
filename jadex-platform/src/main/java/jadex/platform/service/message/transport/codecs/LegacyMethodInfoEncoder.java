@@ -1,6 +1,7 @@
 package jadex.platform.service.message.transport.codecs;
 
 import jadex.commons.MethodInfo;
+import jadex.commons.transformation.STransformation;
 import jadex.commons.transformation.binaryserializer.EncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -35,8 +36,7 @@ public class LegacyMethodInfoEncoder implements ITraverseProcessor
 		EncodingContext ec = (EncodingContext) context;
 		
 		traversed.put(object, traversed.size());
-		
-		ec.writeClass(MethodInfo.class);
+		ec.writeBoolean(false);
 		
 		MethodInfo mi = (MethodInfo) object;
 		
