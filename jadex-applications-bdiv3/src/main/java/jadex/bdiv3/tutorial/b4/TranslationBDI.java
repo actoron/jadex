@@ -2,12 +2,10 @@ package jadex.bdiv3.tutorial.b4;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.annotation.PlanAPI;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
-import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;

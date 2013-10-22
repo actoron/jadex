@@ -162,7 +162,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>
 			}
 			rplan.setProcessingState(PlanProcessingState.WAITING);
 //			System.out.println("setting to null "+this+" "+Thread.currentThread());
-//			ExecutePlanStepAction.RPLANS.set(null);
+			ExecutePlanStepAction.RPLANS.set(null);
 		}
 		else
 		{

@@ -121,6 +121,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 				{
 					public void resultAvailable(Void result)
 					{
+						RPLANS.set(null);
 						ip.getCapability().removePlan(rplan);
 						Object reason = rplan.getReason();
 						if(reason instanceof RProcessableElement)
@@ -129,6 +130,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						RPLANS.set(null);
 						resultAvailable(null);
 					}
 				});

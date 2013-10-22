@@ -1827,7 +1827,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	}
 	
 	/**
-	 * 
+	 *  Check if plan is already aborted.
 	 */
 	protected void testBodyAborted(RPlan rplan)
 	{
