@@ -10,7 +10,7 @@ public interface IDecoderHandler
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz);
+	public boolean isApplicable(Class<?> clazz);
 	
 	/**
 	 *  Decodes an object.
@@ -18,5 +18,5 @@ public interface IDecoderHandler
 	 *  @param context The decoding context.
 	 *  @return The decoded object.
 	 */
-	public Object decode(Class clazz, DecodingContext context);
+	public Object decode(Class<?> clazz, DecodingContext context);
 }

@@ -1215,12 +1215,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// Proxy reference -> proxy object
 		IDecoderHandler rmipostproc = new IDecoderHandler()
 		{
-			public boolean isApplicable(Class clazz)
+			public boolean isApplicable(Class<?> clazz)
 			{
 				return ProxyReference.class.equals(clazz);
 			}
 			
-			public Object decode(Class clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, DecodingContext context)
 			{
 				try
 				{
@@ -1237,12 +1237,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		procs.add(new IDecoderHandler()
 		{
-			public boolean isApplicable(Class clazz)
+			public boolean isApplicable(Class<?> clazz)
 			{
 				return ServiceInputConnectionProxy.class.equals(clazz);
 			}
 			
-			public Object decode(Class clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, DecodingContext context)
 			{
 				try
 				{
@@ -1261,12 +1261,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				
 		procs.add(new IDecoderHandler()
 		{
-			public boolean isApplicable(Class clazz)
+			public boolean isApplicable(Class<?> clazz)
 			{
 				return ServiceOutputConnectionProxy.class.equals(clazz);
 			}
 			
-			public Object decode(Class clazz, DecodingContext context)
+			public Object decode(Class<?> clazz, DecodingContext context)
 			{
 				try
 				{

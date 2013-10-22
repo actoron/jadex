@@ -61,7 +61,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param ec The encoding context.
 	 *  @return True, if the codec allows referencing.
 	 */
-	public boolean canReference(Object object, Class clazz, EncodingContext ec)
+	public boolean canReference(Object object, Class<?> clazz, EncodingContext ec)
 	{
 		return true;
 	}
@@ -102,7 +102,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param context The decoding context.
 	 *  @return The decoded object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object decode(Class<?> clazz, DecodingContext context)
 	{
 		Object ret = createObject(clazz, context);
 		// Remap class in case there was a search for the correct inner class.
@@ -122,7 +122,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public abstract Object createObject(Class clazz, DecodingContext context);
+	public abstract Object createObject(Class<?> clazz, DecodingContext context);
 	
 	/**
 	 *  Record object as known during decoding, allows different behavior if needed.
@@ -140,7 +140,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param context The decoding context.
 	 *  @return The finished object.
 	 */
-	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
+	public Object decodeSubObjects(Object object, Class<?> clazz, DecodingContext context)
 	{
 		return object;
 	}

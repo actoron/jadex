@@ -17,7 +17,7 @@ public class StringCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return String.class.equals(clazz);
 	}
@@ -29,7 +29,7 @@ public class StringCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
 		String ret = context.readString();
 		return ret;
@@ -65,7 +65,7 @@ public class StringCodec extends AbstractCodec
 		return object;
 	}
 	
-	public boolean canReference(Object object, Class clazz, EncodingContext ec)
+	public boolean canReference(Object object, Class<?> clazz, EncodingContext ec)
 	{
 		return false;
 	}

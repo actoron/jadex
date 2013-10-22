@@ -20,7 +20,7 @@ public class DateCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return Date.class.equals(clazz);
 	}
@@ -32,7 +32,7 @@ public class DateCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
 		ByteBuffer buf = context.getByteBuffer(8);
 		buf.order(ByteOrder.BIG_ENDIAN);

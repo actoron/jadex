@@ -1,13 +1,16 @@
 package jadex.platform.service.message.transport.codecs;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IEncodingContext;
 import jadex.commons.MethodInfo;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
+import jadex.commons.future.Future;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.platform.service.remote.commands.RemoteIntermediateResultCommand;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -15,6 +18,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +51,7 @@ public class JadexBinaryCodec implements ICodec
 		encoders.add(new LegacyMethodInfoEncoder());
 		encoders.addAll(BinarySerializer.ENCODER_HANDLERS);
 		since = new Date(0);
-//		chain = new Tuple2<Date, List<ITraverseProcessor>>(since, encoders);
+		chain = new Tuple2<Date, List<ITraverseProcessor>>(since, encoders);
 		ENCODER_CHAINS.add(chain);
 		
 		// Undeclared chain
@@ -64,26 +68,32 @@ public class JadexBinaryCodec implements ICodec
 //		});
 	}
 	
-	public static void main(String[] args) throws NoSuchMethodException, SecurityException
-	{
-		List<ITraverseProcessor> newchain = new ArrayList<ITraverseProcessor>(BinarySerializer.ENCODER_HANDLERS);
-		
-		List<ITraverseProcessor> oldchain = new ArrayList<ITraverseProcessor>();
-		oldchain.add(new LegacyMethodInfoEncoder());
-		oldchain.addAll(BinarySerializer.ENCODER_HANDLERS);
-		
-		Method m = JadexBinaryCodec.class.getMethod("encode", Object.class, ClassLoader.class, IEncodingContext.class);
-		
-		MethodInfo mi = new MethodInfo(m);
-		
-		byte[] b = BinarySerializer.objectToByteArray(mi, null, oldchain, null, null);
-		
-		BinarySerializer.objectFromByteArray(b, null, null, null, null);
-		
-		b = BinarySerializer.objectToByteArray(mi, null, newchain, null, null);
-		
-		BinarySerializer.objectFromByteArray(b, null, null, null, null);
-	}
+//	public static void main(String[] args) throws NoSuchMethodException, SecurityException
+//	{
+//		System.out.println("Start");
+//		List<ITraverseProcessor> newchain = new ArrayList<ITraverseProcessor>(BinarySerializer.ENCODER_HANDLERS);
+//		
+//		List<ITraverseProcessor> oldchain = new ArrayList<ITraverseProcessor>();
+//		oldchain.add(new LegacyMethodInfoEncoder());
+//		oldchain.addAll(BinarySerializer.ENCODER_HANDLERS);
+//		
+//		Method m = JadexBinaryCodec.class.getMethod("encode", Object.class, ClassLoader.class, IEncodingContext.class);
+//		
+//		MethodInfo mi = new MethodInfo(m);
+//		
+//		byte[] b = BinarySerializer.objectToByteArray(mi, null, oldchain, null, null);
+//		
+//		BinarySerializer.objectFromByteArray(b, null, null, null, null);
+//		
+//		b = BinarySerializer.objectToByteArray(mi, null, newchain, null, null);
+//		
+//		BinarySerializer.objectFromByteArray(b, null, null, null, null);
+//		
+//		RemoteIntermediateResultCommand rirc = new RemoteIntermediateResultCommand(new ComponentIdentifier("blablabla"), new Object(), "callid", false, "getClass", true, new HashMap<String, Object>(), new Future(), 5);
+//		b = BinarySerializer.objectToByteArray(mi, null, oldchain, null, null);
+//		BinarySerializer.objectFromByteArray(b, null, null, null, null);
+//		System.out.println("End");
+//	}
 	
 	/** Encoder chain cache. */
 	protected static Map<Date, List<ITraverseProcessor>> ENCODER_CHAIN_CACHE = Collections.synchronizedMap(new LRU<Date, List<ITraverseProcessor>>(100));

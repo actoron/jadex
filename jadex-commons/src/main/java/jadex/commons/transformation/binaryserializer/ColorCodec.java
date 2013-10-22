@@ -17,7 +17,7 @@ public class ColorCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return Color.class.equals(clazz);
 	}
@@ -29,7 +29,7 @@ public class ColorCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
 		byte[] ccomps = context.read(4);
 		Color ret = new Color(ccomps[0] & 0xFF, ccomps[1] & 0xFF, ccomps[2] & 0xFF, ccomps[3] & 0xFF);

@@ -1,20 +1,19 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
-import jadex.commons.Tuple;
-import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
-import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 /**
- *  Codec for encoding and decoding URL objects.
+ *  Codec for encoding and decoding Date objects.
+ *
  */
-public class TupleCodec extends AbstractCodec
+public class MethodInfoCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -23,7 +22,7 @@ public class TupleCodec extends AbstractCodec
 	 */
 	public boolean isApplicable(Class<?> clazz)
 	{
-		return SReflect.isSupertype(Tuple.class, clazz);
+		return Date.class.equals(clazz);
 	}
 	
 	/**
@@ -35,44 +34,10 @@ public class TupleCodec extends AbstractCodec
 	 */
 	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
-		Tuple ret = null;
-		if(clazz.equals(Tuple3.class))
-		{
-			ret = new Tuple3(null, null, null);
-		}
-		else if (clazz.equals(Tuple2.class))
-		{
-			ret = new Tuple2(null, null);
-		}
-		else
-		{
-			ret =  new Tuple(null);
-		}
+		ByteBuffer buf = context.getByteBuffer(8);
+		buf.order(ByteOrder.BIG_ENDIAN);
+		Date ret = new Date(buf.getLong());
 		return ret;
-	}
-	
-	/**
-	 *  Decodes and adds sub-objects during decoding.
-	 *  
-	 *  @param object The instantiated object.
-	 *  @param clazz The class of the object.
-	 *  @param context The decoding context.
-	 *  @return The finished object.
-	 */
-	public Object decodeSubObjects(Object object, Class<?> clazz, DecodingContext context)
-	{
-		Object[] entities = (Object[])BinarySerializer.decodeObject(context);
-		try
-		{
-			Field fentities = SReflect.getField(object.getClass(), "entities");
-			fentities.setAccessible(true);
-			fentities.set(object, entities);
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-		return object;
 	}
 	
 	/**
@@ -93,8 +58,11 @@ public class TupleCodec extends AbstractCodec
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		Object[] entities = ((Tuple)object).getEntities();
-		traverser.traverse(entities, entities.getClass(), traversed, processors, clone, null, ec);
+		long time = ((Date)object).getTime();
+		ByteBuffer buf = ec.getByteBuffer(8);
+		buf.order(ByteOrder.BIG_ENDIAN);
+		buf.putLong(time);
+		
 		return object;
 	}
 }

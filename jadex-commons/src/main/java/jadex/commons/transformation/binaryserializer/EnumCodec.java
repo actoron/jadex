@@ -17,7 +17,7 @@ public class EnumCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return clazz != null && clazz.isEnum();
 	}
@@ -29,9 +29,10 @@ public class EnumCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	@SuppressWarnings("rawtypes")
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
-		Enum ret = Enum.valueOf(clazz, context.readString());
+		Enum ret = Enum.valueOf((Class<Enum>)clazz, context.readString());
 		return ret;
 	}
 	
@@ -50,6 +51,7 @@ public class EnumCodec extends AbstractCodec
 	/**
 	 *  Encode the object.
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{

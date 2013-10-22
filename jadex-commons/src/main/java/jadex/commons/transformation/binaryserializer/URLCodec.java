@@ -20,7 +20,7 @@ public class URLCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return SReflect.isSupertype(URL.class, clazz);
 	}
@@ -32,7 +32,7 @@ public class URLCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
 		URL ret = null;
 		try

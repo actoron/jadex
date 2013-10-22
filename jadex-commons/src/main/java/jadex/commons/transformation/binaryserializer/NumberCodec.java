@@ -48,7 +48,7 @@ public class NumberCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return TYPES.contains(clazz);
 	}
@@ -60,7 +60,7 @@ public class NumberCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
 		Object ret = null;
 		
@@ -196,7 +196,7 @@ public class NumberCodec extends AbstractCodec
 		//return super.encodeReference(object, clazz, ec);
 	}*/
 	
-	public boolean canReference(Object object, Class clazz, EncodingContext ec)
+	public boolean canReference(Object object, Class<?> clazz, EncodingContext ec)
 	{
 		return false;
 	}

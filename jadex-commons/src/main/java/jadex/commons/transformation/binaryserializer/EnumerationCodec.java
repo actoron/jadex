@@ -19,7 +19,7 @@ public class EnumerationCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return SReflect.isSupertype(Enumeration.class, clazz);
 	}
@@ -31,7 +31,7 @@ public class EnumerationCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
 		Vector vec = new Vector();
 		int length = (int) context.readVarInt();

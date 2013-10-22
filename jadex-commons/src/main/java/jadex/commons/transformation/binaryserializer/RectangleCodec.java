@@ -19,7 +19,7 @@ public class RectangleCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return Rectangle.class.equals(clazz);
 	}
@@ -31,7 +31,7 @@ public class RectangleCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
 		ByteBuffer buf = context.getByteBuffer(16);
 		buf.order(ByteOrder.BIG_ENDIAN);

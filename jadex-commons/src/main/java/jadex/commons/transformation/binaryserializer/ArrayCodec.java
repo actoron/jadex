@@ -20,7 +20,7 @@ public class ArrayCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return clazz != null && clazz.isArray();
 	}
@@ -32,7 +32,7 @@ public class ArrayCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
 		int length = (int) context.readVarInt();
 		
@@ -49,7 +49,7 @@ public class ArrayCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The finished object.
 	 */
-	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
+	public Object decodeSubObjects(Object object, Class<?> clazz, DecodingContext context)
 	{
 		Class compclass = clazz.getComponentType();
 		int length = getArrayLength(object, compclass);

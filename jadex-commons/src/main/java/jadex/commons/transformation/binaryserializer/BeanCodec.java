@@ -33,7 +33,7 @@ public class BeanCodec extends AbstractCodec
 	 *  @param clazz The class.
 	 *  @return True, if the decoder can decode this class.
 	 */
-	public boolean isApplicable(Class clazz)
+	public boolean isApplicable(Class<?> clazz)
 	{
 		return true;
 	}
@@ -45,7 +45,7 @@ public class BeanCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The created object.
 	 */
-	public Object createObject(Class clazz, DecodingContext context)
+	public Object createObject(Class<?> clazz, DecodingContext context)
 	{
 		Object bean = null;
 		boolean isanonclass = context.readBoolean();
@@ -123,7 +123,7 @@ public class BeanCodec extends AbstractCodec
 	 *  @param context The decoding context.
 	 *  @return The finished object.
 	 */
-	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
+	public Object decodeSubObjects(Object object, Class<?> clazz, DecodingContext context)
 	{
 		if(object != null)
 		{
