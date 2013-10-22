@@ -79,7 +79,7 @@ public class ExecutionTimeProperty extends TimedProperty
 						// May happen that property is added during ongoing call
 						if(start!=null)
 						{
-							long dur = System.currentTimeMillis() - start.longValue();
+							long dur = clock.getTime() - start.longValue();
 							setValue(dur);
 						}
 					}
@@ -107,6 +107,8 @@ public class ExecutionTimeProperty extends TimedProperty
 	 */
 	public void setValue(Long value) 
 	{
+		System.out.println("Setting org value: "+value);
+		
 		// ema calculatio: EMAt = EMAt-1 +(SF*(Ct-EMAt-1)) SF=2/(n+1)
 		if(this.value!=null && value!=null)
 		{
@@ -117,7 +119,7 @@ public class ExecutionTimeProperty extends TimedProperty
 		
 		if(value!=null)
 		{
-//			System.out.println("Setting value: "+value);
+			System.out.println("Setting exp value: "+value);
 			super.setValue((long)value);
 		}
 	}

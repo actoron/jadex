@@ -674,7 +674,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				public Tuple2<Boolean, Object> evaluate(IEvent event)
 				{
-					System.out.println("hetag: "+hasEventTargets(true));
+//					System.out.println("hetag: "+hasEventTargets(true));
 					return new Tuple2<Boolean, Object>(hasEventTargets(true)? Boolean.TRUE: Boolean.FALSE, null);
 				}
 			}, new IAction<Void>()
