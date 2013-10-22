@@ -105,9 +105,9 @@ public class Cause
 	 *  Create the next cause.
 	 *  @param targetname The new target name.
 	 */
-	public Cause createNext(String targetname)
+	public Cause createNext()//String targetname)
 	{
-		return new Cause(this, targetname);
+		return new Cause(this, null);//targetname);
 	}
 	
 	/**

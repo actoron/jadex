@@ -229,16 +229,6 @@ public class SNonAndroid
 	 *  Get the mac address.
 	 *  @return The mac address.
 	 */
-	public static String getMacAddress()
-	{
-		String[] ret = getMacAddresses();
-		return ret.length>0? ret[0]: null;
-	}
-	
-	/**
-	 *  Get the mac address.
-	 *  @return The mac address.
-	 */
 	public static String[] getMacAddresses()
 	{
 		TreeSet<String> res = new TreeSet<String>(new Comparator<String>()

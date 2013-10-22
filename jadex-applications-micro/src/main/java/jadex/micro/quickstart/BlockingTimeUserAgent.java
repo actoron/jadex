@@ -20,7 +20,7 @@ public class BlockingTimeUserAgent
 	/**
 	 *  The time services are searched and added at agent startup.
 	 */
-	@AgentService
+	@AgentService//(retrycnt=10, retrydelay=10000)
 	public void	addTimeService(ITimeService timeservice)
 	{
 		ISubscriptionIntermediateFuture<Date>	subscription	= timeservice.subscribe();

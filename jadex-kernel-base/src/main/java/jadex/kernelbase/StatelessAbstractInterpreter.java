@@ -2199,7 +2199,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			}
 			else if(getComponentDescription().getCause()!=null)
 			{
-				event.setCause(getComponentDescription().getCause().createNext(event.getSourceIdentifier().toString()));
+				event.setCause(getComponentDescription().getCause().createNext());//event.getSourceIdentifier().toString()));
 			}
 		}
 		

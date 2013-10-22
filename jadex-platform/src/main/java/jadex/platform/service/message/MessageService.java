@@ -1206,6 +1206,11 @@ public class MessageService extends BasicService implements IMessageService
 			((ITransport)transports.get(i)).shutdown().addResultListener(crl);
 		}
 		
+		if(timer!=null)
+		{
+			timer.cancel();
+		}
+		
 		return ret;
 	}
 

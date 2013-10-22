@@ -1,11 +1,5 @@
 package jadex.micro.tutorial;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.swing.SwingUtilities;
-
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
@@ -16,6 +10,20 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+
+import java.awt.BorderLayout;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 /**
  *  The chat service.
@@ -72,7 +80,7 @@ public class ChatServiceD5 implements IChatService
 		{
 			public void run()
 			{
-				gui.dispose();
+				gui.dispose();				
 			}
 		});
 //		return IFuture.DONE;

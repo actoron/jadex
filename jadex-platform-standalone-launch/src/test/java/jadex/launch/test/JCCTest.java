@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 /**
  *  Test if all JCC plugins can be activated.
  */
-public class JCCTest extends TestCase
+public class JCCTest //extends TestCase
 {
 	public void	testJCC()
 	{

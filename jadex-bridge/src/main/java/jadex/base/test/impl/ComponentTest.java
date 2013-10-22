@@ -100,7 +100,12 @@ public class ComponentTest extends TestCase
 		}
 
 		result.endTest(this);
-}
+
+		// Remove references to Jadex resources to aid GC cleanup.
+		cms	= null;
+		comp	= null;
+		suite	= null;
+	}
 	
 	public String getName()
 	{

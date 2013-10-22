@@ -363,7 +363,15 @@ public class MethodInfo
 		}
 		else if(t instanceof ParameterizedType)
 		{
-			ret = t.toString();
+			// Bug in Android 2.2. see http://code.google.com/p/android/issues/detail?id=6636
+			if(!SReflect.isAndroid() ||  SUtil.androidUtils().getAndroidVersion() > 8)
+			{
+				ret = t.toString();
+			}
+			else
+			{
+				ret	= "n/a";
+			}
 		}
 		else if (c != null)
 		{

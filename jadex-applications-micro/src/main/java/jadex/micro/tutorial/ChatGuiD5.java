@@ -32,14 +32,18 @@ public class ChatGuiD5 extends JFrame
 	/** The textfield with received messages. */
 	protected JTextArea received;
 	
+	/** The agent owning the gui. */
+	protected IExternalAccess agent;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create the user interface
 	 */
-	public ChatGuiD5(final IExternalAccess agent)
+	public ChatGuiD5(IExternalAccess agent)
 	{
 		super(agent.getComponentIdentifier().getName());
+		this.agent	= agent;
 		this.setLayout(new BorderLayout());
 		
 		received = new JTextArea(10, 20);
@@ -58,7 +62,7 @@ public class ChatGuiD5 extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				final String text = message.getText(); 
-				agent.scheduleStep(new IComponentStep<Void>()
+				ChatGuiD5.this.agent.scheduleStep(new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
@@ -72,7 +76,7 @@ public class ChatGuiD5 extends JFrame
 									IChatService cs = it.next();
 									try
 									{
-										cs.message(agent.getComponentIdentifier().getName(), text);
+										cs.message(ChatGuiD5.this.agent.getComponentIdentifier().getName(), text);
 									}
 									catch(Exception e)
 									{
@@ -84,7 +88,7 @@ public class ChatGuiD5 extends JFrame
 							public void intermediateResultAvailable(IChatService cs)
 							{
 								System.out.println("found: "+cs);
-								cs.message(agent.getComponentIdentifier().getName(), text);
+								cs.message(ChatGuiD5.this.agent.getComponentIdentifier().getName(), text);
 							}
 							
 							public void finished()
@@ -106,7 +110,8 @@ public class ChatGuiD5 extends JFrame
 		{
 			public void windowClosed(WindowEvent e)
 			{
-				agent.killComponent();
+				ChatGuiD5.this.agent.killComponent();
+				ChatGuiD5.this.agent	= null;
 			}
 		});
 
@@ -126,6 +131,6 @@ public class ChatGuiD5 extends JFrame
 			{
 				received.append(text+"\n");
 			}
-		})
-	;}
+		});
+	}
 }

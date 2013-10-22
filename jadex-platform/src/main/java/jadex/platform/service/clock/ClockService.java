@@ -332,6 +332,10 @@ public class ClockService extends BasicService implements IClockService, IProper
 	public IFuture<Void> shutdownService()
 	{
 		clock.dispose();
+		if(timer!=null)
+		{
+			timer.cancel();
+		}
 		listeners	= null;
 		threadpool	= null;
 		final Future<Void>	ret	= new Future<Void>();

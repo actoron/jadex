@@ -62,6 +62,10 @@ public class BrokenComponentTest extends	TestCase
 		result.addError(this, new RuntimeException(error.getErrorText()));			
 
 		result.endTest(this);
+		
+		// Remove references to Jadex resources to aid GC cleanup.
+		comp	= null;
+		error	= null;
 	}
 	
 	public String getName()

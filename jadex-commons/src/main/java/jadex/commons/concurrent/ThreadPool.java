@@ -116,7 +116,7 @@ public class ThreadPool implements IThreadPool
 	/** The maximum number of parked threads. */
 	protected int maxparked;
 
-	/** Rescur timer that checks if progress is made and tasks are scheduled. */
+	/** Rescue timer that checks if progress is made and tasks are scheduled. */
 	protected Timer timer; 
 	
 	/** The time a task should maximum wait. */
@@ -268,6 +268,10 @@ public class ThreadPool implements IThreadPool
 //				t.stop();
 //			}
 //		}
+		
+		// Aid cleanup
+		group	= null;
+		timer	= null;
 	}
 	
 	

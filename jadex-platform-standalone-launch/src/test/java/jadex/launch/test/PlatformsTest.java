@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 /**
  *  Test if the platforms can be started and terminate correctly.
  */
-public class PlatformsTest extends TestCase
+public class PlatformsTest //extends TestCase
 {
 	// Timeout for each platform.
 	long	TIMEOUT	= 120000;
@@ -166,126 +166,126 @@ public class PlatformsTest extends TestCase
 	 */
 	protected void compareModels(IModelInfo defmodel, IModelInfo model)
 	{
-		// Compare arguments.
-		IArgument[]	defargs	= defmodel.getArguments();
-		for(IArgument defarg: defargs)
-		{
-			IArgument	arg	= model.getArgument(defarg.getName());
-			assertNotNull("Argument not found: "+defarg.getName()+", "+model.getFilename(), arg);
-			if(arg!=null)
-			{
-				Class<?>	defclazz	= defarg.getClazz().getType(getClass().getClassLoader(), defmodel.getAllImports());
-				assertEquals("Argument types differ: "+defarg.getName()+", "+model.getFilename(), defclazz,
-					arg.getClazz().getType(getClass().getClassLoader(), model.getAllImports()));
-				
-				if(!EXCLUDEARGS.contains(defarg.getName()))
-				{
-					compareValues(defmodel, model, defarg.getDefaultValue(), arg.getDefaultValue(), defarg.getName(), "Argument");
-				}
-			}
-		}
-		
-		// Compare results.
-		IArgument[]	defress	= defmodel.getResults();
-		for(IArgument defres: defress)
-		{
-			IArgument	res	= model.getResult(defres.getName());
-			assertNotNull("Result not found: "+defres.getName()+", "+model.getFilename(), res);
-			if(res!=null)
-			{
-				Class<?>	defclazz	= defres.getClazz().getType(getClass().getClassLoader(), defmodel.getAllImports());
-				assertEquals("Result types differ: "+defres.getName()+", "+model.getFilename(), defclazz,
-					res.getClazz().getType(getClass().getClassLoader(), model.getAllImports()));
-				
-				if(!EXCLUDEARGS.contains(defres.getName()))
-				{
-					compareValues(defmodel, model, defres.getDefaultValue(), res.getDefaultValue(), defres.getName(), "Result");
-				}
-			}
-		}
-		
-		// Compare properties.
-		Map<String, Object>	defprops	= defmodel.getProperties();
-		for(String defprop: defprops.keySet())
-		{
-			assertTrue("Property not found: "+defprop+", "+model.getFilename(), model.getProperties().containsKey(defprop));
-			compareValues(defmodel, model, defmodel.getProperties().get(defprop), model.getProperties().get(defprop), defprop, "Property");
-		}
-		
-		// Compare provided services.
-		ProvidedServiceInfo[]	defpservs	= defmodel.getProvidedServices();
-		for(ProvidedServiceInfo defpserv: defpservs)
-		{
-			ProvidedServiceInfo	pserv	= null;
-			for(ProvidedServiceInfo psi: model.getProvidedServices())
-			{
-				if(defpserv.getName()!=null)
-				{
-					if(defpserv.getName().equals(psi.getName()))
-					{
-						pserv	= psi;
-						break;						
-					}
-				}
-				else if(psi.getType().getType(getClass().getClassLoader(), model.getAllImports()).equals(
-					defpserv.getType().getType(getClass().getClassLoader(), defmodel.getAllImports())))
-				{
-					pserv	= psi;
-					break;
-				}
-			}
-			assertNotNull("Service not found: "+defpserv.getType().getTypeName()+", "+model.getFilename(), pserv);
-			if(pserv!=null)
-			{
-				assertEquals("Service name differs: "+defpserv.getType().getTypeName()+", "+model.getFilename(), defpserv.getName(), pserv.getName());
-				
-				ProvidedServiceImplementation	defimpl	= defpserv.getImplementation();
-				ProvidedServiceImplementation	impl	= pserv.getImplementation();
-				compareValues(defmodel, model, defimpl, impl, defpserv.getType().getTypeName(), "Service implementation");
-				assertEquals("Service proxy type differs: "+defpserv.getType().getTypeName()+", "+model.getFilename(), defimpl.getProxytype(), impl.getProxytype());
-			}
-			
-//			defimpl.getBinding();
-//			defimpl.getInterceptors();
-		}
-
-		
-//		defmodel.getSubcomponentTypes();
-//		defmodel.getExtensionTypes();
+//		// Compare arguments.
+//		IArgument[]	defargs	= defmodel.getArguments();
+//		for(IArgument defarg: defargs)
+//		{
+//			IArgument	arg	= model.getArgument(defarg.getName());
+//			assertNotNull("Argument not found: "+defarg.getName()+", "+model.getFilename(), arg);
+//			if(arg!=null)
+//			{
+//				Class<?>	defclazz	= defarg.getClazz().getType(getClass().getClassLoader(), defmodel.getAllImports());
+//				assertEquals("Argument types differ: "+defarg.getName()+", "+model.getFilename(), defclazz,
+//					arg.getClazz().getType(getClass().getClassLoader(), model.getAllImports()));
+//				
+//				if(!EXCLUDEARGS.contains(defarg.getName()))
+//				{
+//					compareValues(defmodel, model, defarg.getDefaultValue(), arg.getDefaultValue(), defarg.getName(), "Argument");
+//				}
+//			}
+//		}
 //		
-//		defmodel.getRequiredServices();
+//		// Compare results.
+//		IArgument[]	defress	= defmodel.getResults();
+//		for(IArgument defres: defress)
+//		{
+//			IArgument	res	= model.getResult(defres.getName());
+//			assertNotNull("Result not found: "+defres.getName()+", "+model.getFilename(), res);
+//			if(res!=null)
+//			{
+//				Class<?>	defclazz	= defres.getClazz().getType(getClass().getClassLoader(), defmodel.getAllImports());
+//				assertEquals("Result types differ: "+defres.getName()+", "+model.getFilename(), defclazz,
+//					res.getClazz().getType(getClass().getClassLoader(), model.getAllImports()));
+//				
+//				if(!EXCLUDEARGS.contains(defres.getName()))
+//				{
+//					compareValues(defmodel, model, defres.getDefaultValue(), res.getDefaultValue(), defres.getName(), "Result");
+//				}
+//			}
+//		}
+//		
+//		// Compare properties.
+//		Map<String, Object>	defprops	= defmodel.getProperties();
+//		for(String defprop: defprops.keySet())
+//		{
+//			assertTrue("Property not found: "+defprop+", "+model.getFilename(), model.getProperties().containsKey(defprop));
+//			compareValues(defmodel, model, defmodel.getProperties().get(defprop), model.getProperties().get(defprop), defprop, "Property");
+//		}
+//		
+//		// Compare provided services.
+//		ProvidedServiceInfo[]	defpservs	= defmodel.getProvidedServices();
+//		for(ProvidedServiceInfo defpserv: defpservs)
+//		{
+//			ProvidedServiceInfo	pserv	= null;
+//			for(ProvidedServiceInfo psi: model.getProvidedServices())
+//			{
+//				if(defpserv.getName()!=null)
+//				{
+//					if(defpserv.getName().equals(psi.getName()))
+//					{
+//						pserv	= psi;
+//						break;						
+//					}
+//				}
+//				else if(psi.getType().getType(getClass().getClassLoader(), model.getAllImports()).equals(
+//					defpserv.getType().getType(getClass().getClassLoader(), defmodel.getAllImports())))
+//				{
+//					pserv	= psi;
+//					break;
+//				}
+//			}
+//			assertNotNull("Service not found: "+defpserv.getType().getTypeName()+", "+model.getFilename(), pserv);
+//			if(pserv!=null)
+//			{
+//				assertEquals("Service name differs: "+defpserv.getType().getTypeName()+", "+model.getFilename(), defpserv.getName(), pserv.getName());
+//				
+//				ProvidedServiceImplementation	defimpl	= defpserv.getImplementation();
+//				ProvidedServiceImplementation	impl	= pserv.getImplementation();
+//				compareValues(defmodel, model, defimpl, impl, defpserv.getType().getTypeName(), "Service implementation");
+//				assertEquals("Service proxy type differs: "+defpserv.getType().getTypeName()+", "+model.getFilename(), defimpl.getProxytype(), impl.getProxytype());
+//			}
+//			
+////			defimpl.getBinding();
+////			defimpl.getInterceptors();
+//		}
 //
-//		defmodel.getAutoShutdown(null);
-//		defmodel.getDaemon(null);
-//		defmodel.getSuspend(null);
-//		defmodel.getMaster(null);
-//
-//		ConfigurationInfo[]	defconfigs	= defmodel.getConfigurations();
-	}
-	
-	/**
-	 *  Compare two values that may be unparsed expressions, in which case the expressions are compared after parsing.
-	 */
-	protected void	compareValues(IModelInfo defmodel, IModelInfo model, Object defval, Object val, String name, String type)
-	{
-//		System.out.println(type+" '"+name+"' of: "+model.getFilename());
-		
-		if(defval!=null)
-		{
-			assertNotNull(type+" '"+name+"' has no default value: "+model.getFilename(), val);
-			if(defval instanceof UnparsedExpression)
-			{
-				assertTrue(type+" '"+name+"' should be expression (inconsistent model loaders?): "+model.getFilename(), val instanceof UnparsedExpression);
-				
-				defval	= SJavaParser.parseExpression((UnparsedExpression)defval, defmodel.getAllImports(), getClass().getClassLoader());
-				val	= SJavaParser.parseExpression((UnparsedExpression)val, model.getAllImports(), getClass().getClassLoader());
-			}
-			assertEquals(type+" '"+name+"' default value differs: "+model.getFilename(), defval, val);
-		}
-		else
-		{
-			assertNull(type+" '"+name+"' should have no default value: "+model.getFilename(), val);
-		}
+//		
+////		defmodel.getSubcomponentTypes();
+////		defmodel.getExtensionTypes();
+////		
+////		defmodel.getRequiredServices();
+////
+////		defmodel.getAutoShutdown(null);
+////		defmodel.getDaemon(null);
+////		defmodel.getSuspend(null);
+////		defmodel.getMaster(null);
+////
+////		ConfigurationInfo[]	defconfigs	= defmodel.getConfigurations();
+//	}
+//	
+//	/**
+//	 *  Compare two values that may be unparsed expressions, in which case the expressions are compared after parsing.
+//	 */
+//	protected void	compareValues(IModelInfo defmodel, IModelInfo model, Object defval, Object val, String name, String type)
+//	{
+////		System.out.println(type+" '"+name+"' of: "+model.getFilename());
+//		
+//		if(defval!=null)
+//		{
+//			assertNotNull(type+" '"+name+"' has no default value: "+model.getFilename(), val);
+//			if(defval instanceof UnparsedExpression)
+//			{
+//				assertTrue(type+" '"+name+"' should be expression (inconsistent model loaders?): "+model.getFilename(), val instanceof UnparsedExpression);
+//				
+//				defval	= SJavaParser.parseExpression((UnparsedExpression)defval, defmodel.getAllImports(), getClass().getClassLoader());
+//				val	= SJavaParser.parseExpression((UnparsedExpression)val, model.getAllImports(), getClass().getClassLoader());
+//			}
+//			assertEquals(type+" '"+name+"' default value differs: "+model.getFilename(), defval, val);
+//		}
+//		else
+//		{
+//			assertNull(type+" '"+name+"' should have no default value: "+model.getFilename(), val);
+//		}
 	}
 	
 	//-------- uncomment below to switch from test failure to print out --------

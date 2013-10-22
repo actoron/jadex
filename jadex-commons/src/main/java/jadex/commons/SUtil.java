@@ -3589,15 +3589,8 @@ public class SUtil
 	 */
 	public static String getMacAddress()
 	{
-		if(macs==null)
-		{
-			if(!SReflect.isAndroid() || androidUtils().getAndroidVersion() > 8)
-			{
-				macs	= SNonAndroid.getMacAddresses();
-			}
-		}
-		
-		return macs.length==0? null: macs[0];
+		String[] ret = getMacAddresses();
+		return ret!=null && ret.length>0 ? ret[0] : null;
 	}
 	
 	/**

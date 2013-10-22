@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 /**
  *  Test if the platform terminates itself.
  */
-public class MicroCreationTest extends TestCase
+public class MicroCreationTest// extends TestCase
 {
 	/**
 	 *  Test method.

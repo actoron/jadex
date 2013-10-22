@@ -5,6 +5,7 @@ import jadex.base.test.ComponentTestSuite;
 import java.io.File;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 
 /**
  *  Test suite for BDI BPMN agent tests.
@@ -36,4 +37,21 @@ public class BDIBPMNTest	extends ComponentTestSuite
 	{
 		return new BDIBPMNTest();
 	}
+	
+//	@Override
+//	public void run(TestResult result)
+//	{
+//		// TODO Auto-generated method stub
+//		super.run(result);
+//		
+//		try
+//		{
+//			Thread.sleep(300000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 }

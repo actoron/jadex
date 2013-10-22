@@ -175,7 +175,7 @@ public class ComponentTestSuite extends TestSuite
 				{
 					if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, rid).get(ts)).booleanValue())
 					{
-						System.out.println("Building TestCase: " + abspath);
+//						System.out.println("Building TestCase: " + abspath);
 						try
 						{
 							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, rid).get(ts);
@@ -247,7 +247,7 @@ public class ComponentTestSuite extends TestSuite
 		
 		// Hack!!! Isn't there some tearDown for the test suite?
 		addTest(new Cleanup(rootcomp, timer));
-		System.out.println("Finished Building Suite for " + path);
+//		System.out.println("Finished Building Suite for " + path);
 		try
 		{
 			Thread.sleep(5000);
@@ -263,6 +263,7 @@ public class ComponentTestSuite extends TestSuite
 		List<String> result = new ArrayList<String>();
 		
 		List<File>	todo	= new LinkedList<File>();
+//		if(path.toString().indexOf("micro")!=-1)
 		todo.add(path);
 //		System.out.println("Path: "+path);
 		

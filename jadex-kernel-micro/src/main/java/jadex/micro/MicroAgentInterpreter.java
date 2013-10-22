@@ -133,8 +133,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			};
 			
 			ServiceCall sc = ServiceCall.getCurrentInvocation();
-			Cause cause = sc!=null && sc.getCause()!=null? sc.getCause().createNext(st.toString()): 
-				desc.getCause()!=null? desc.getCause().createNext(st.toString()): null;
+			Cause cause = sc!=null && sc.getCause()!=null? sc.getCause().createNext()://st.toString()): 
+				desc.getCause()!=null? desc.getCause().createNext()/*st.toString())*/: null;
 			addStep(new StepInfo(st, new Future(), ServiceCall.getCurrentInvocation(), cause));
 		}
 		catch(Exception e)
@@ -533,7 +533,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 									if(!(e instanceof ServiceNotFoundException)
 										|| m.getAnnotation(AgentService.class).required())
 									{
-										getLogger().warning("Field injection failed: "+e);
+										getLogger().warning("Method injection failed: "+e);
 									}
 									else
 									{
@@ -860,8 +860,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public boolean executeStep()
 	{
-		if(getComponentIdentifier().getName().indexOf("MessageP")!=-1)
-			System.out.println("steps: "+getComponentIdentifier()+" "+steps);
+//		if(getComponentIdentifier().getName().indexOf("MessageP")!=-1)
+//			System.out.println("steps: "+getComponentIdentifier()+" "+steps);
 		
 		try
 		{
@@ -948,8 +948,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
 //				IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 
-				publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
-					+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, step.getCause(), System.currentTimeMillis()));
+				if(hasEventTargets(true))
+				{
+					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), step.getStep().toString(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
+						+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, step.getCause(), System.currentTimeMillis()));
+				}
 			}
 			
 			return steps!=null && !steps.isEmpty();
@@ -1209,7 +1212,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				{			
 					public void run()
 					{
-						addStep(new StepInfo(step, ret, null, getComponentDescription().getCause().createNext(step.toString())));
+						addStep(new StepInfo(step, ret, null, getComponentDescription().getCause().createNext()));//step.toString())));
 					}
 					
 					public String toString()
@@ -1232,8 +1235,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		else
 		{
 			ServiceCall sc = ServiceCall.getCurrentInvocation();
-			Cause cause = sc!=null && sc.getCause()!=null? sc.getCause().createNext(step.toString()): 
-				getComponentDescription().getCause()!=null? getComponentDescription().getCause().createNext(step.toString()): null;
+			Cause cause = sc!=null && sc.getCause()!=null? sc.getCause().createNext()/*step.toString())*/: 
+				getComponentDescription().getCause()!=null? getComponentDescription().getCause().createNext()/*step.toString())*/: null;
 			addStep(new StepInfo(step, ret, sc, cause));
 		}
 		return ret;

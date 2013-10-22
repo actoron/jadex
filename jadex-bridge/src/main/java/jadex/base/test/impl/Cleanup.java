@@ -4,7 +4,15 @@ package jadex.base.test.impl;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.ThreadSuspendable;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.TimerTask;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -72,8 +80,55 @@ public class Cleanup extends TestCase
 //		}
 		
 		result.endTest(this);
+		
+		// Remove references to Jadex resources to aid GC cleanup.
+		platform	= null;
+		timer	= null;
+		
+		// Java Bug not releasing the last focused window, see:
+		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
+		// http://bugs.sun.com/view_bug.do?bug_id=4726458
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+//				KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+				
+				final JFrame f	= new JFrame("dummy");
+				f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
+				f.setSize(100, 100);
+				f.setVisible(true);
+				
+				Timer	t	= new Timer(500, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						f.dispose();
+					}
+				});
+				t.setRepeats(false);
+				t.start();
+			}
+		});
+		
+//		// Another bug not releasing the last drawn window.
+//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
+//		
+//		try
+//		{
+//			Class<?> clazz	= Class.forName("sun.java2d.pipe.BufferedContext");
+//			Field	field	= clazz.getDeclaredField("currentContext");
+//			field.setAccessible(true);
+//			field.set(null, null);
+//		}
+//		catch(Throwable e)
+//		{
+//			e.printStackTrace();
+//		}
+
 	}
-	
+
 	public String getName()
 	{
 		return this.toString();
