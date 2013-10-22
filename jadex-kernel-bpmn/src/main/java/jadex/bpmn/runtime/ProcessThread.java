@@ -824,7 +824,7 @@ public class ProcessThread	implements ITaskContext
 				for(Iterator it=params.values().iterator(); it.hasNext(); )
 				{
 					MParameter param = (MParameter)it.next();
-					if (!initialized.contains(param.getName()))
+					if(!initialized.contains(param.getName()))
 					{
 						try
 						{
@@ -843,7 +843,9 @@ public class ProcessThread	implements ITaskContext
 			// Remove old data (all values that have not been renewed).
 			for(Iterator<String> it=before.iterator(); it.hasNext(); )
 			{
-				data.remove(it.next());
+				String name = it.next();
+				System.out.println("removing data: "+name);
+				data.remove(name);
 			}
 		}
 	}

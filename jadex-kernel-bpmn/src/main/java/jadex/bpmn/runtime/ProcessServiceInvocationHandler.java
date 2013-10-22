@@ -50,7 +50,7 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args)	throws Throwable
 	{
-		Future	ret	= new Future();
+		Future<Void> ret = new Future<Void>();
 		
 		MActivity	act	= (MActivity)events.get(method);
 		ThreadContext	tc	= instance.getThreadContext();

@@ -82,6 +82,10 @@ public class SPropertyPanelFactory
 			{
 				ret = new MessageEventPropertyPanel(container, (VActivity) velement);
 			}
+			else if(velement instanceof VActivity && ((MActivity)velement.getBpmnElement()).getActivityType().contains("Signal"))
+			{
+				ret = new SignalPropertyPanel(container, (VActivity)velement);
+			}
 //			else if (velement instanceof VExternalSubProcess)
 //			{
 //				ret = new ExternalSubProcessPropertyPanel(container, (VExternalSubProcess) velement);

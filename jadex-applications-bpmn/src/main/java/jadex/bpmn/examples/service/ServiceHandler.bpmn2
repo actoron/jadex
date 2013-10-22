@@ -94,7 +94,7 @@
       <semantic:outgoing>_7HPeEthzEeChMt_8FfXHzw</semantic:outgoing>
       <semantic:extensionElements>
         <jadex:class>jadex.bpmn.runtime.task.ServiceCallTask</jadex:class>
-        <jadex:parameter direction="in" name="a" type="int">result</jadex:parameter>
+        <jadex:parameter direction="in" name="a" type="int"/>
         <jadex:parameter direction="in" name="b" type="int">11</jadex:parameter>
         <jadex:parameter direction="out" name="value" type="int"/>
         <jadex:property name="service" type="java.lang.String">&quot;calc&quot;</jadex:property>
@@ -140,10 +140,17 @@
       <semantic:incoming>_VVt7MdVVEeCSPre9p8r1cA</semantic:incoming>
       <semantic:outgoing>_Ww6t4dVVEeCSPre9p8r1cA</semantic:outgoing>
       <semantic:signalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="a" type="int">null</jadex:property>
+        <jadex:property name="b" type="int">null</jadex:property>
+      </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:endEvent id="_Yl2PMdVVEeCSPre9p8r1cA">
       <semantic:incoming>_YmAAMdVVEeCSPre9p8r1cA</semantic:incoming>
       <semantic:signalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="service_result" type="int">result</jadex:property>
+      </semantic:extensionElements>
     </semantic:endEvent>
     <semantic:task name="Subtract Values" id="_Www84dVVEeCSPre9p8r1cA">
       <semantic:incoming>_Ww6t4dVVEeCSPre9p8r1cA</semantic:incoming>
@@ -158,6 +165,11 @@
       <semantic:incoming>_kz1rgdVUEeCSPre9p8r1cA</semantic:incoming>
       <semantic:outgoing>_ixtAOtVKEeC_1bBivy-cGg</semantic:outgoing>
       <semantic:signalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="a" type="int">null</jadex:property>
+        <jadex:property name="b" type="int">null</jadex:property>
+        <jadex:property name="c" type="int">null</jadex:property>
+      </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:endEvent id="_a-BhEdiCEeChMt_8FfXHzw">
       <semantic:incoming>_a-NuUdiCEeChMt_8FfXHzw</semantic:incoming>
@@ -170,11 +182,18 @@
       <semantic:incoming>_VNtvUdiCEeChMt_8FfXHzw</semantic:incoming>
       <semantic:outgoing>_a-NuUdiCEeChMt_8FfXHzw</semantic:outgoing>
       <semantic:signalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="a" type="int">null</jadex:property>
+      </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:intermediateCatchEvent name="addValues" id="_TA0V0dVUEeCSPre9p8r1cA">
       <semantic:incoming>_kcCPgdVUEeCSPre9p8r1cA</semantic:incoming>
       <semantic:outgoing>_XaS3gdVUEeCSPre9p8r1cA</semantic:outgoing>
       <semantic:signalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="a" type="int">null</jadex:property>
+        <jadex:property name="b" type="int">null</jadex:property>
+      </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:task name="Add Values" id="_TWvuE9VKEeC_1bBivy-cGg">
       <semantic:incoming>_ixtAOtVKEeC_1bBivy-cGg</semantic:incoming>
@@ -189,6 +208,9 @@
     <semantic:endEvent id="_25CoQdVSEeCSPre9p8r1cA">
       <semantic:incoming>_25fUMdVSEeCSPre9p8r1cA</semantic:incoming>
       <semantic:signalEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="service_result" type="int">result</jadex:property>
+      </semantic:extensionElements>
     </semantic:endEvent>
     <semantic:sequenceFlow sourceRef="_kN-CcdiCEeChMt_8FfXHzw" targetRef="_pAYokdiCEeChMt_8FfXHzw" id="_pAk10diCEeChMt_8FfXHzw">
     </semantic:sequenceFlow>
@@ -226,7 +248,7 @@
     </semantic:sequenceFlow>
     <semantic:extensionElements>
       <jadex:dataFlow id="B+AMq/fl777iHYql" sourceRef="_CrdbIOFAEeCaWpd5N4uTqA" sourceParam="sum" targetRef="_FKcmEeFAEeCaWpd5N4uTqA" targetParam="a"/>
-      <jadex:dataFlow id="1vc7R4bAFkJ59LRV" sourceRef="_FKcmEeFAEeCaWpd5N4uTqA" sourceParam="result" targetRef="_IMZUIOFAEeCaWpd5N4uTqA" targetParam="b"/>
+      <jadex:dataFlow id="PbYawrBSej06p8eh" sourceRef="_FKcmEeFAEeCaWpd5N4uTqA" sourceParam="result" targetRef="_IMZUIOFAEeCaWpd5N4uTqA" targetParam="a"/>
       <jadex:dataFlow id="yXUrWegSrBTW5q1Y" sourceRef="_IMZUIOFAEeCaWpd5N4uTqA" sourceParam="value" targetRef="_7HFtEdhzEeChMt_8FfXHzw" targetParam="text"/>
     </semantic:extensionElements>
   </semantic:process>
@@ -260,6 +282,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_IMZUIOFAEeCaWpd5N4uTqA">
         <dc:Bounds height="100.0" width="160.0" x="620.0" y="170.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>b</jadexvisual:internalParameter>
+        </di:extension>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="_7HFtEdhzEeChMt_8FfXHzw">
         <dc:Bounds height="100.0" width="160.0" x="830.0" y="170.0"/>
@@ -322,9 +347,9 @@
       </bpmndi:BPMNEdge>
       <di:Edge type="data" jadexElement="B+AMq/fl777iHYql">
       </di:Edge>
-      <di:Edge type="data" jadexElement="1vc7R4bAFkJ59LRV">
-      </di:Edge>
       <di:Edge type="data" jadexElement="yXUrWegSrBTW5q1Y">
+      </di:Edge>
+      <di:Edge type="data" jadexElement="PbYawrBSej06p8eh">
       </di:Edge>
       <bpmndi:BPMNEdge bpmnElement="_kOKPsdiCEeChMt_8FfXHzw">
       </bpmndi:BPMNEdge>

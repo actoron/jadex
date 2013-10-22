@@ -297,7 +297,7 @@ public class BasePropertyPanel extends JPanel
 	 */
 	protected static final String createFreeName(String name, IFilter<String> contains)
 	{
-		if (contains.filter(name))
+		if(contains.filter(name))
 		{
 			String basename = name;
 			int counter = 1;

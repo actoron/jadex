@@ -328,7 +328,7 @@ public class AutoCompleteCombo<T> extends JComboBox
 						}
 						else if(getSelectedItem()==null)
 						{
-							System.out.println("setting manually");
+//							System.out.println("setting manually");
 							T obj = getAutoModel().getModelValue(text);
 							if(obj!=null)
 								getAutoModel().setSelectedItem(obj);

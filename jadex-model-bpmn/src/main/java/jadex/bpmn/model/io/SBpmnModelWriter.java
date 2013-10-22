@@ -1139,7 +1139,7 @@ public class SBpmnModelWriter
 			boolean istask = MBpmnModel.TASK.equals(activity.getActivityType()) || issubproc;
 			boolean hasclass = activity.getClazz()!=null && activity.getClazz().getTypeName() != null && activity.getClazz().getTypeName().length() > 0;
 			boolean hastaskparams = istask && activity.getParameters()!=null && activity.getParameters().size()>0;
-			boolean hasprops = (istask || MBpmnModel.EVENT_END_ERROR.equals(activity.getActivityType())) && activity.getProperties()!=null && activity.getProperties().size()>0;
+			boolean hasprops = activity.getProperties()!=null && activity.getProperties().size()>0;
 			
 			if(hasclass || hastaskparams || hasprops || procref != null)
 			{

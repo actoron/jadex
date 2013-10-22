@@ -120,7 +120,7 @@ public class MProperty extends MAnnotationElement
 		{
 			if(this.initialval == null)
 			{
-				this.initialval = new UnparsedExpression(name, clazz.getTypeName(), null, null);
+				this.initialval = new UnparsedExpression(name, clazz==null? null: clazz.getTypeName(), null, null);
 			}
 			this.initialval.setValue(initialval);
 		}

@@ -290,6 +290,7 @@ public class ServiceCallTask implements ITask
 				{
 					public void customResultAvailable(Object result)
 					{
+						System.out.println("result is: "+result);
 						if(fresultparam!=null)
 							context.setParameterValue(fresultparam, result);
 						ret.setResult(null);
