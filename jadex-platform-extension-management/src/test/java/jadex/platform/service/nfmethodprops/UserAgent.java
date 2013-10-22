@@ -129,7 +129,7 @@ public class UserAgent
 			}
 			else
 			{
-				tr3.setReason("Value differs more than 15 percent: "+d);
+				tr3.setReason("Value differs more than 15 percent: "+d+" "+w+" "+wab);
 			}
 		}
 		catch(Exception e)

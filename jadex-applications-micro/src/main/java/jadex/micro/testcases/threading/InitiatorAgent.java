@@ -207,7 +207,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<Integer> ret = new Future<Integer>();
 		
-		System.out.println("Invoke: "+System.currentTimeMillis()+", "+agent.getModel().getFullName());
+//		System.out.println("Invoke: "+System.currentTimeMillis()+", "+agent.getModel().getFullName());
 
 		final IComponentIdentifier caller = IComponentIdentifier.LOCAL.get();
 		
@@ -223,7 +223,7 @@ public class InitiatorAgent extends TestAgent
 				}
 				else
 				{
-					System.out.println("ok: "+System.currentTimeMillis()+", "+i);
+//					System.out.println("ok: "+System.currentTimeMillis()+", "+i);
 				}
 				
 				if(i<max)

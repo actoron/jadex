@@ -2,9 +2,13 @@ package jadex.bridge.sensor.service;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -28,13 +32,31 @@ public class ExecutionTimeProperty extends TimedProperty
 	/** The method info. */
 	protected MethodInfo method;
 	
+	/** The clock. */
+	protected IClockService clock;
+	
 	/**
 	 *  Create a new property.
 	 */
-	public ExecutionTimeProperty(IInternalAccess comp, IService service, MethodInfo method)
+	public ExecutionTimeProperty(final IInternalAccess comp, IService service, MethodInfo method)
 	{
 		super(NAME, comp, true);
 		this.method = method;
+		
+		SServiceProvider.getService(comp.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<IClockService>()
+		{
+			public void resultAvailable(IClockService result)
+			{
+				ExecutionTimeProperty.this.clock = result;
+//				System.out.println("assigned clock");
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				comp.getLogger().warning("Could not fetch time service in property.");
+			}
+		});
 		
 		if(Proxy.isProxyClass(service.getClass()))
 		{
@@ -45,17 +67,21 @@ public class ExecutionTimeProperty extends TimedProperty
 				
 				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid)
 				{
-					times.put(callid, new Long(System.currentTimeMillis()));
+					if(clock!=null)
+						times.put(callid, new Long(clock.getTime()));
 				}
 				
 				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid)
 				{
-					Long start = times.remove(callid);
-					// May happen that property is added during ongoing call
-					if(start!=null)
+					if(clock!=null)
 					{
-						long dur = System.currentTimeMillis() - start.longValue();
-						setValue(dur);
+						Long start = times.remove(callid);
+						// May happen that property is added during ongoing call
+						if(start!=null)
+						{
+							long dur = System.currentTimeMillis() - start.longValue();
+							setValue(dur);
+						}
 					}
 				}
 			});
