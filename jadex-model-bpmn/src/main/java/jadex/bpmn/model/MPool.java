@@ -37,6 +37,26 @@ public class MPool extends MAssociationTarget
 	}
 	
 	/**
+	 *  Get an activity per id.
+	 */
+	public MActivity getActivity(String id)
+	{
+		MActivity ret = null;
+		if(activities!=null)
+		{
+			for(MActivity act: activities)
+			{
+				if(act.getId().equals(id))
+				{
+					ret = act;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Add an activity.
 	 *  @param activity The activity.
 	 */
@@ -44,13 +64,10 @@ public class MPool extends MAssociationTarget
 	{
 		if(activities==null)
 			activities = new ArrayList<MActivity>();
-		for (Object act : activities)
+		if(activities.contains(activity))
 		{
-			if (((MActivity) act).getId().equals(activity.getId()))
-			{
-				Thread.dumpStack();
-				System.out.println("Duplicate Item:" +act);
-			}
+			Thread.dumpStack();
+			System.out.println("Duplicate Item:" +activity);
 		}
 		activities.add(activity);		
 	}
@@ -99,7 +116,7 @@ public class MPool extends MAssociationTarget
 	 *  Get the lanes.
 	 *  @return The lanes.
 	 */
-	public List getLanes()
+	public List<MLane> getLanes()
 	{
 		return lanes;
 	}

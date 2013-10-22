@@ -733,13 +733,13 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	public List<MActivity> getStartActivities(String poolname, String lanename)
 	{
-		List ret	= null;
+		List<MActivity> ret	= null;
 		for(int i=0; pools!=null && i<pools.size(); i++)
 		{
 			MPool pool = (MPool)pools.get(i);
 			if(poolname==null || poolname.equals(pool.getName()))
 			{
-				List tmp = pool.getStartActivities();
+				List<MActivity> tmp = pool.getStartActivities();
 				if(tmp!=null)
 				{
 					if(lanename==null)
@@ -757,7 +757,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 					{
 						if(ret==null)
 						{
-							ret = new ArrayList();
+							ret = new ArrayList<MActivity>();
 						}
 						for(int j=0; j<tmp.size(); j++)
 						{
@@ -765,6 +765,26 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 							if(lanename.equals(act.getLane()))
 							{
 								ret.add(act);
+							}
+						}
+					}
+				}
+				List<MLane> lanes = pool.getLanes();
+				if(lanes!=null)
+				{
+					for(MLane lane: lanes)
+					{
+						if(lanename==null || lanename.equals(lane.getName()))
+						{
+							tmp = lane.getStartActivities();
+							
+							if(ret!=null)
+							{
+								ret.addAll(tmp);
+							}
+							else
+							{
+								ret	= tmp;
 							}
 						}
 					}

@@ -424,10 +424,10 @@ public class SBpmnModelReader
 				Tuple2<String, String> type = evttypes.get(0);
 				acttype += type.getFirstEntity();
 			}
-			else
-			{
-				//TODO: Multi
-			}
+//			else
+//			{
+//				//TODO: Multi
+//			}
 			
 			String dur = (String) buffer.remove("duration");
 			if (dur != null)
@@ -491,7 +491,7 @@ public class SBpmnModelReader
 			}
 			else if ("multipleEventDefinition".equals(tag.getLocalPart()))
 			{
-				evttypes.add(new Tuple2("Cancel", null));
+				evttypes.add(new Tuple2("Multiple", null));
 			}
 		}
 		else if("sequenceFlow".equals(tag.getLocalPart()))

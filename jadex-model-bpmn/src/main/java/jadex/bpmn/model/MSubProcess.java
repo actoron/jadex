@@ -54,6 +54,13 @@ public class MSubProcess extends MActivity
 	{
 		if(activities==null)
 			activities = new ArrayList<MActivity>();
+		
+		if(activities.contains(activity))
+		{
+			Thread.dumpStack();
+			System.out.println("Duplicate Item:" +activity);
+		}
+		
 		activities.add(activity);
 	}
 	
@@ -65,6 +72,26 @@ public class MSubProcess extends MActivity
 	{
 		if(activities!=null)
 			activities.remove(vertex);
+	}
+	
+	/**
+	 *  Get an activity per id.
+	 */
+	public MActivity getActivity(String id)
+	{
+		MActivity ret = null;
+		if(activities!=null)
+		{
+			for(MActivity act: activities)
+			{
+				if(act.getId().equals(id))
+				{
+					ret = act;
+					break;
+				}
+			}
+		}
+		return ret;
 	}
 	
 	/**

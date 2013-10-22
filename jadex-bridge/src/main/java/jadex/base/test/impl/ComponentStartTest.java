@@ -159,7 +159,7 @@ public class ComponentStartTest extends	TestCase
 	{
 		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(args).get(new ThreadSuspendable());
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
-//		dorun(cms, "jadex/micro/benchmarks/MessagePerformanceAgent.class");
-		dorun(cms, "jadex/micro/examples/ping/PingScenario.application.xml");
+		dorun(cms, "jadex/micro/benchmarks/MessagePerformanceAgent.class");
+//		dorun(cms, "jadex/micro/examples/ping/PingScenario.application.xml");
 	}
 }

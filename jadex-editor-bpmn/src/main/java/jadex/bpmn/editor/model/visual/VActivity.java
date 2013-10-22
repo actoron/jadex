@@ -145,26 +145,32 @@ public class VActivity extends VNamedNode
 				if (mactivity.isEventHandler())
 				{
 					MActivity mparent = (MActivity) ((VActivity) parent).getBpmnElement();
-					mparent.addEventHandler(mactivity);
+					if(!mparent.getEventHandlers().contains(mactivity))
+						mparent.addEventHandler(mactivity);
 					mactivity.setPool(mparent.getPool());
 					mactivity.setLane(mactivity.getLane());
 				}
 				else if (parent instanceof VLane)
 				{
-					((MLane) ((VLane) parent).getBpmnElement()).addActivity(mactivity);
+					MLane mlane = ((MLane) ((VLane) parent).getBpmnElement());
+					if(!mlane.getActivities().contains(mactivity))
+						mlane.addActivity(mactivity);
 					mactivity.setLane((MLane) ((VLane) parent).getBpmnElement());
 					mactivity.setPool((MPool) ((VLane) parent).getPool().getBpmnElement());
 				}
 				else if (parent instanceof VSubProcess)
 				{
 					MSubProcess msp = ((MSubProcess) ((VSubProcess) parent).getBpmnElement());
-					msp.addActivity(mactivity);
+					if(!msp.getActivities().contains(mactivity))
+						msp.addActivity(mactivity);
 					mactivity.setPool(msp.getPool());
 					mactivity.setLane(msp.getLane());
 				}
 				else
 				{
-					((MPool) ((VPool) parent).getBpmnElement()).addActivity(mactivity);
+					MPool mp = ((MPool) ((VPool) parent).getBpmnElement());
+					if(!mp.getActivities().contains(mactivity))
+						mp.addActivity(mactivity);
 					mactivity.setPool((MPool) ((VPool) parent).getBpmnElement());
 				}
 			}

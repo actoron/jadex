@@ -16,7 +16,7 @@ public class MLane extends MAssociationTarget
 	
 	
 	/** The activities. */
-	protected List activities;
+	protected List<MActivity> activities;
 	
 	/** The type. */
 	protected String type;
@@ -48,7 +48,7 @@ public class MLane extends MAssociationTarget
 	 *  Get the activities.
 	 *  @return The activities.
 	 */
-	public List getActivities()
+	public List<MActivity> getActivities()
 	{
 		return activities;
 	}
@@ -61,6 +61,13 @@ public class MLane extends MAssociationTarget
 	{
 		if(activities==null)
 			activities = new ArrayList();
+		
+		if(activities.contains(activity))
+		{
+			Thread.dumpStack();
+			System.out.println("Duplicate Item:" +activity);
+		}
+		
 		activities.add(activity);
 
 		// Todo: Use post processor!?
@@ -75,6 +82,26 @@ public class MLane extends MAssociationTarget
 	{
 		if(activities!=null)
 			activities.remove(activity);
+	}
+	
+	/**
+	 *  Get an activity per id.
+	 */
+	public MActivity getActivity(String id)
+	{
+		MActivity ret = null;
+		if(activities!=null)
+		{
+			for(MActivity act: activities)
+			{
+				if(act.getId().equals(id))
+				{
+					ret = act;
+					break;
+				}
+			}
+		}
+		return ret;
 	}
 
 	/**
@@ -120,5 +147,14 @@ public class MLane extends MAssociationTarget
 	public void setLane(MLane lane)
 	{
 		this.lane	= lane;
+	}
+	
+	/**
+	 *  Get all start activities of the pool.
+	 *  @return A non-empty List of start activities or null, if none.
+	 */
+	public List<MActivity> getStartActivities()
+	{
+		return MBpmnModel.getStartActivities(activities);
 	}
 }

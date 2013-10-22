@@ -691,18 +691,18 @@ public class ServiceCallTask implements ITask
 			
 			if(task.getProperties()!=null)
 			{
-			MProperty mprop = task.getProperties().get(PROPERTY_SERVICE);
+				MProperty mprop = task.getProperties().get(PROPERTY_SERVICE);
 				if(mprop.getInitialValue()!=null)
 				{
 					String sername = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
 					cbsername.setSelectedItem(sername);
-	//				System.out.println("sel item: "+sername);
+//					System.out.println("sel item: "+sername);
 				
 					mprop = task.getProperties().get(PROPERTY_METHOD);
 					if(mprop.getInitialValue()!=null)
 					{
 						String methodname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
-	//					System.out.println(task.getName()+" "+mprop.getInitialValueString());
+//						System.out.println(task.getName()+" "+mprop.getInitialValueString());
 						
 						RequiredServiceInfo reqser = model.getRequiredService(sername);
 						if(reqser!=null)
@@ -729,8 +729,11 @@ public class ServiceCallTask implements ITask
 				if(mprop.getInitialValue()!=null)
 				{
 					String rankclname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
-					ClassInfo ci = new ClassInfo(rankclname);
-					cbranking.setSelectedItem(ci);
+					if(rankclname!=null)
+					{ 
+						ClassInfo ci = new ClassInfo(rankclname);
+						cbranking.setSelectedItem(ci);
+					}
 				}
 			}
 		}

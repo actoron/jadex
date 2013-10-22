@@ -752,8 +752,6 @@ public class MActivity extends MAssociationTarget
 		return properties;
 	}
 	
-	
-	
 	/**
 	 *  Gets the search constraints.
 	 *

@@ -104,11 +104,11 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		int y = 0;
 		JPanel column = new JPanel(new GridBagLayout());
 		
-		if (!isSubprocess())
+		if(!isSubprocess())
 		{
 			tabpane.addTab("Task", column);
 		}
-		else if (task instanceof VExternalSubProcess)
+		else if(task instanceof VExternalSubProcess)
 		{
 			tabpane.addTab("External Sub-Process", createExternalSubprocessTab());
 		}
@@ -188,6 +188,27 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		if(getBpmnTask().getClazz()!=null)
 		{
 			cbox.setSelectedItem(getBpmnTask().getClazz());
+			
+			if(getBpmnTask().getProperties()==null || getBpmnTask().getProperties().size()==0)
+			{
+				TaskMetaInfo info = getTaskMetaInfo(getBpmnTask().getName());
+				if(info!=null)
+				{
+					List<PropertyMetaInfo> pmis = info.getPropertyInfos();
+					if(pmis!=null)
+					{
+						for(PropertyMetaInfo pmi: pmis)
+						{
+							UnparsedExpression uexp = new UnparsedExpression(null, 
+								pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), pmi.getInitialValue(), null);
+							MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
+							getBpmnTask().addProperty(mprop);
+						}
+					}
+				}
+			}
+//			initTaskProperties(getBpmnTask().getClazz());
+//			System.out.println("setting: "+getBpmnTask().getClazz());
 		}
 		
 //		JButton sel = new JButton("...");
@@ -312,12 +333,12 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		};
 		refresh.addActionListener(al);
 
-		cbox.addActionListener(new AbstractAction()
+		ActionListener alcbox = new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 //				String taskname = (String) ((JComboBox)e.getSource()).getSelectedItem();
-				ClassInfo taskcl = (ClassInfo)((JComboBox)e.getSource()).getSelectedItem();
+				ClassInfo taskcl = (ClassInfo)cbox.getSelectedItem();
 				if(taskcl==null)
 					return;
 				
@@ -327,6 +348,9 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				getBpmnTask().setClazz(taskcl);
 
 				// and renew properties
+//				TaskMetaInfo info = getTaskMetaInfo(taskname);
+//				initTaskProperties(taskcl);
+				
 				IndexMap<String, MProperty> props = getBpmnTask().getProperties();
 				if(props!=null)
 					props.clear();
@@ -351,9 +375,15 @@ public class TaskPropertyPanel extends BasePropertyPanel
 					defaultParameterButton.setEnabled(getTaskMetaInfo(taskname) != null);
 				}
 				
+//				if(info!=null)
+//				{
+//					processTaskInfos(taskname, descarea);
+//					defaultParameterButton.setEnabled(getTaskMetaInfo(taskname) != null);
+//				}
 				al.actionPerformed(null);
 			}
-		});
+		};
+		cbox.addActionListener(alcbox);
 		
 		//addVerticalFiller(column, y);
 		
@@ -399,7 +429,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 			}
 		};
-		if (!isSubprocess())
+		if(!isSubprocess())
 		{
 			Icon[] icons = modelcontainer.getSettings().getImageProvider().generateGenericFlatImageIconSet(buttonpanel.getIconSize(), ImageProvider.EMPTY_FRAME_TYPE, "page", buttonpanel.getIconColor());
 			defaultParameterButton.setAction(setDefaultParametersAction);
@@ -420,7 +450,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 0, 5, 5);
 		parameterpanel.add(buttonpanel, gc);
 		
-		if (isSubprocess())
+		if(isSubprocess())
 		{
 			tabpane.addTab("Parameters", parameterpanel);
 			tabpane.addTab("Properties", proppanel);
@@ -431,7 +461,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			tabpane.addTab("Parameters", parameterpanel);
 		}
 		
-		if (selectedparameter != null)
+		if(selectedparameter != null)
 		{
 			tabpane.setSelectedComponent(parameterpanel);
 			int row = getBpmnTask().getParameters().indexOf(selectedparameter);
@@ -448,8 +478,37 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			}
 		});
 		
+//		alcbox.actionPerformed(null);
 		al.actionPerformed(null);
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	protected void initTaskProperties(ClassInfo taskcl)
+//	{
+//		if(taskcl==null)
+//			return;
+//		IndexMap<String, MProperty> props = getBpmnTask().getProperties();
+//		if(props!=null)
+//			props.clear();
+//
+//		TaskMetaInfo info = getTaskMetaInfo(taskcl.getTypeName());
+//		if(info!=null)
+//		{
+//			List<PropertyMetaInfo> pmis = info.getPropertyInfos();
+//			if(pmis!=null)
+//			{
+//				for(PropertyMetaInfo pmi: pmis)
+//				{
+//					UnparsedExpression uexp = new UnparsedExpression(null, 
+//						pmi.getClazz().getType(modelcontainer.getProjectClassLoader()), pmi.getInitialValue(), null);
+//					MProperty mprop = new MProperty(pmi.getClazz(), pmi.getName(), uexp);
+//					getBpmnTask().addProperty(mprop);
+//				}
+//			}
+//		}
+//	}
 	
 	/**
 	 *  Gets the BPMN task.

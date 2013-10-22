@@ -834,8 +834,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		}
 		for(int i=0; entries!=null && i<entries.length; i++)
 		{
-			if(getComponentIdentifier().getName().indexOf("MessageP")!=-1 && entries.length>2)
-				System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
+//			if(getComponentIdentifier().getName().indexOf("MessageP")!=-1 && entries.length>2)
+//				System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
 			
 			if(entries[i] instanceof CheckedAction)
 			{

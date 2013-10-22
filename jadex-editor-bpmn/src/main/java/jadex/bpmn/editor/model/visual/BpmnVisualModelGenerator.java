@@ -131,6 +131,9 @@ public class BpmnVisualModelGenerator
 		}
 		else
 		{
+			if(mactivity.getOutgoingSequenceEdges() != null)
+				sseqedges.addAll(mactivity.getOutgoingSequenceEdges());
+			
 			VActivity vactivity = mactivity instanceof MSubProcess? mactivity.hasProperty("file") || mactivity.hasProperty("filename")? 
 				new VExternalSubProcess(graph): new VSubProcess(graph): new VActivity(graph);
 			vactivity.setBpmnElement(mactivity);
@@ -144,11 +147,6 @@ public class BpmnVisualModelGenerator
 			{
 				for(MActivity activity : activities)
 				{
-					if(activity.getOutgoingSequenceEdges() != null)
-					{
-						sseqedges.addAll(activity.getOutgoingSequenceEdges());
-					}
-					
 					genActivity(graph, activity, sseqedges, elements, elements.get(mactivity.getId()).getSecondEntity(), depth+1);
 				}
 			}

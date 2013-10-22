@@ -70,6 +70,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -210,6 +211,7 @@ public class BpmnXMLReader
 		user.put(CONTEXT_ENTRIES, report);
 		user.put(SEQUENCE_EDGES, new HashMap<String, MSequenceEdge>());
 		MBpmnModel ret = (MBpmnModel)reader.read(manager, handler, rinfo.getInputStream(), classloader, user);
+		cleanupModel(ret);
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
 //		ret.setClassloader(classloader);
@@ -304,8 +306,63 @@ public class BpmnXMLReader
         }.buildErrorReport();
     }
 
-	
-	
+	/**
+	 * 
+	 */
+    protected static void cleanupModel(MBpmnModel model)
+    {
+    	// Clean model from duplicate activities
+		Map acts = model.getAllActivities();
+		if(acts!=null)
+		{
+			for(MActivity act: (Collection<MActivity>)acts.values())
+			{
+				if(act instanceof MSubProcess)
+				{
+					MSubProcess subp = (MSubProcess)act;
+					List<MActivity> sacts = subp.getActivities();
+					if(sacts!=null)
+					{
+						for(MActivity sact: sacts)
+						{
+							if(sact.getPool()!=null)
+							{
+								sact.getPool().removeActivity(sact);
+								System.out.println("Removed act from pool: "+sact);
+							}
+							if(sact.getLane()!=null)
+							{
+								sact.getLane().removeActivity(sact);
+								System.out.println("Removed act from lane: "+sact);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		List<MPool> pools = model.getPools();
+		if(pools!=null)
+		{
+			for(MPool pool: pools)
+			{
+				List<MLane> lanes = pool.getLanes();
+				for(MLane lane: lanes)
+				{
+					List<MActivity> lacts = lane.getActivities();
+					if(lacts!=null)
+					{
+						for(MActivity lact: lacts)
+						{
+							lact.getPool().removeActivity(lact);
+							System.out.println("Removed act from pool: "+lact);
+						}
+					}
+				}				
+			}
+		}
+    }
+    
 	/**
 	 *  Get the XML mapping.
 	 */
