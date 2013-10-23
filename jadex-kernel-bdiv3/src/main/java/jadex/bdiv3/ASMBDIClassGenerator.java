@@ -272,7 +272,12 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				}
 				
 //				System.out.println("toClass: "+clname+" "+found);
-				ret.add(toClass(clname, data, found, null));
+				Class<?> loadedClass = toClass(clname, data, found, null);
+				if (loadedClass != null) {
+					// if it's null, we were not allowed to generate this class
+					// e.g. java.util.Map.Entry "subclasses" (in bdiv3.tutorial.c1.TranslationBDI)
+					ret.add(loadedClass);
+				}
 				
 //				if(ret.getName().indexOf("$")!=-1)
 //				{
@@ -765,6 +770,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	
 	/**
 	 * Transform byte Array into Class and define it in classloader.
+	 * @return the loaded Class or <code>null</code>, if the class is not valid, such as Map.entry "inner Classes".
 	 */
 	public Class<?> toClass(String name, byte[] data, ClassLoader loader, ProtectionDomain domain)
 	{

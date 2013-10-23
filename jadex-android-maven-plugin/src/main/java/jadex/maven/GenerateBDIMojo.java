@@ -1,7 +1,8 @@
 package jadex.maven;
 
-import jadex.bdiv3.BDIModelLoader;
+import jadex.bdiv3.ByteKeepingASMBDIClassGenerator;
 import jadex.bdiv3.KernelBDIV3Agent;
+import jadex.bdiv3.MavenBDIModelLoader;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bridge.ResourceIdentifier;
 import jadex.micro.annotation.NameValue;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -97,7 +99,9 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 
 	/**
 	 * Decides whether or not to enhance project runtime dependencies, too.
-	 * 
+	 * This is an experimental Goal.
+	 * The recommended way to use dependencies including BDIV3 classes is to include
+	 * this plugin in every of those dependency builds.
 	 * @parameter default-value="false"
 	 */
 	protected Boolean enhanceDependencies;
@@ -127,42 +131,71 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		}
 	};
 
+	private MavenBDIModelLoader modelLoader;
+	private ByteKeepingASMBDIClassGenerator gen;
+
 	@SuppressWarnings("resource")
 	public void execute() throws MojoExecutionException, MojoFailureException
 	{
+		modelLoader = new MavenBDIModelLoader();
+		gen = new ByteKeepingASMBDIClassGenerator();
+		modelLoader.setGenerator(gen);
+		
+		File outputDirectory = new File(buildDirectory, "bdi-generated");
+		File tmpDirectory = new File(buildDirectory, "bdi-generated-deps");
+		
+		
 		try
 		{
-			File outputDirectory = new File(buildDirectory, "bdi-generated");
-			File tmpDirectory = new File(buildDirectory, "bdi-generated-deps");
 
 			if (enhanceDependencies)
 			{
+				outputDirectory.mkdirs();
+				tmpDirectory.mkdirs();
+				File dummy = new File(tmpDirectory, "dummy.jar");
+				makeJar(new File[0], dummy);
+		
 				Set<Artifact> relevantCompileArtifacts = getRelevantCompileArtifacts();
 				getLog().info("Found " + relevantCompileArtifacts.size() + " dependencies: " + relevantCompileArtifacts);
 
-				outputDirectory.mkdirs();
-				tmpDirectory.mkdirs();
-
+				File outputDir = new File(tmpDirectory, "alldeps");
+				File allDepsFile = new File(tmpDirectory, "enhanced-dependencies.jar");
+				
 				for (Artifact artifact : relevantCompileArtifacts)
 				{
 					File jarFile = artifact.getFile();
+					
 					// enhance the jar
+					
+					unzipJar(jarFile, outputDir);
 
-					File enhanceJar;
-					try
-					{
-						enhanceJar = enhanceJar(jarFile, new File(tmpDirectory, jarFile.getName()));
-						artifact.setFile(enhanceJar);
-					}
-					catch (IOException e)
-					{
-						getLog().error("Could not enhance jar: " + jarFile);
-						e.printStackTrace();
-					}
+					artifact.setFile(dummy);
+
+//					File enhanceJar;
+//					try
+//					{
+//						enhanceJar = enhanceJar(jarFile, outputDir);
+//						artifact.setFile(enhanceJar);
+//					}
+//					catch (IOException e)
+//					{
+//						getLog().error("Could not enhance jar: " + jarFile);
+//						e.printStackTrace();
+//					}
 				}
-
+				// add real deps to random artifact
+				relevantCompileArtifacts.iterator().next().setFile(allDepsFile);
+				
+				File metaInf= new File(outputDir, "META-INF"); 
+				FileUtils.deleteDirectory(metaInf);
+				
+				generateBDI(outputDir, outputDir);
+				
+				File[] depDirs = tmpDirectory.listFiles();
+				makeJar(depDirs, allDepsFile);
+				
 				// outputDirectory = inputDirectory;
-				getLog().info("Now enhancing project-owned code...");
+				getLog().info("Enhancing project-own code...");
 			}
 			generateBDI(inputDirectory, outputDirectory);
 
@@ -179,22 +212,67 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 
 	}
 
+	private void makeJar(File[] depDirs, File outputFile)
+	{
+		getLog().info("Zipping to: " + outputFile);
+		JarOutputStream jos = null;
+		try
+		{
+			jos = new JarOutputStream(new FileOutputStream(outputFile));
+			
+			// System.out.println(outputDir.list());
+			for (File depDir : depDirs)
+			{
+				if (depDir.isDirectory()) {
+					Collection<File> allFiles = FileUtils.listFiles(depDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+					for (File file : allFiles)
+					{
+						String relativePath = ResourceUtils.getRelativePath(file.getPath(), depDir.getPath(), File.separator);
+						FileInputStream is = new FileInputStream(file);
+						ZipEntry zipEntry = new ZipEntry(relativePath);
+						jos.putNextEntry(zipEntry);
+						copyStreamWithoutClosing(is, jos);
+						jos.closeEntry();
+						is.close();
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				jos.close();
+			}
+			catch (IOException e)
+			{
+			}
+		}
+
+		getLog().debug("written enhanced: " + outputFile.getName());
+	}
+
 	private File enhanceJar(File in, File outputDir) throws IOException
 	{
 		unzipJar(in, outputDir);
 
-		getLog().info("enhancing " + in);
+		getLog().info("Enhancing Dependency: " + in.getName());
 		// now the whole jar has been extracted to generated-bdi/jar-name/
 		File outputFile = new File(outputDir.getParent(), in.getName().replace(".jar", ".generated.jar"));
-		getLog().debug("Zipping to: " + outputFile);
 		JarOutputStream jos = null;
 		try
 		{
+			jos = new JarOutputStream(new FileOutputStream(outputFile));
+			
 			// generate
 			generateBDI(outputDir, outputDir);
 			// and now re-zip the enhanced jar...
 
-			jos = new JarOutputStream(new FileOutputStream(outputFile));
+			getLog().debug("Zipping to: " + outputFile);
 			// System.out.println(outputDir.list());
 			Collection<File> allFiles = FileUtils.listFiles(outputDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 			for (File file : allFiles)
@@ -229,6 +307,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 
 	private void unzipJar(File in, File outputDir) throws ZipException, IOException
 	{
+		getLog().info("unzipping " + in.getName());
 		if (!outputDir.exists())
 		{
 			outputDir.mkdir();
@@ -243,31 +322,24 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		while (entries.hasMoreElements())
 		{
 			ZipEntry entry = entries.nextElement();
-			if (bdiFileFilter.accept(new File("/"), entry.getName()))
+			InputStream currIn = inZip.getInputStream(entry);
+			if (entry.isDirectory())
 			{
+				File dir = new File(outputDir, entry.getName());
+				dir.mkdir();
 			}
 			else
 			{
-				// If the entry is not a duplicate, copy.
-				InputStream currIn = inZip.getInputStream(entry);
-				if (entry.isDirectory())
+				File outputFile = new File(outputDir, entry.getName());
+				File dir = outputFile.getParentFile();
+				if (!dir.exists())
 				{
-					File dir = new File(outputDir, entry.getName());
-					dir.mkdir();
+					dir.mkdirs();
 				}
-				else
-				{
-					File outputFile = new File(outputDir, entry.getName());
-					File dir = outputFile.getParentFile();
-					if (!dir.exists())
-					{
-						dir.mkdirs();
-					}
-					fos = new FileOutputStream(outputFile);
-					copyStreamWithoutClosing(currIn, fos);
-					currIn.close();
-					fos.close();
-				}
+				fos = new FileOutputStream(outputFile);
+				copyStreamWithoutClosing(currIn, fos);
+				currIn.close();
+				fos.close();
 			}
 		}
 
@@ -289,10 +361,6 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 
 	private void generateBDI(File inputDirectory, File outputDirectory) throws Exception
 	{
-		BDIModelLoader modelLoader = new BDIModelLoader();
-
-		ByteKeepingASMBDIClassGenerator gen = new ByteKeepingASMBDIClassGenerator();
-
 		Collection<File> allBDIFiles = FileUtils.listFiles(inputDirectory, bdiFileFilter, TrueFileFilter.INSTANCE);
 		String[] imports = getImportPath(allBDIFiles);
 		ResourceIdentifier rid = new ResourceIdentifier();
@@ -314,6 +382,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 
 		for (File bdiFile : allClasses)
 		{
+			gen.clearRecentClassBytes();
 			List<Class<?>> classes = null;
 			BDIModel model = null;
 
@@ -321,30 +390,52 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 					.getRelativePath(bdiFile.getAbsolutePath(), inputDirectory.getAbsolutePath(), File.separator);
 			if (bdiFileFilter.accept(bdiFile))
 			{
-				String className = relativePath.replaceAll(File.separator, ".").replace(".class", "");
+				String agentClassName = relativePath.replaceAll(File.separator, ".").replace(".class", "");
 
 				getLog().debug("Loading Model: " + relativePath);
 
-				model = (BDIModel) modelLoader.loadModel(relativePath, imports, inputCl, new Object[]
-				{rid, null});
-				// className = model.getModelInfo().getPackage() +
-				// model.getModelInfo().getName();
-
-				getLog().info("Generating classes for: " + relativePath);
-				classes = gen.generateBDIClass(className, model, outputCl);
-				for (Class<?> clazz : classes)
+				try
 				{
-					String path = clazz.getName().replace('.', File.separatorChar) + ".class";
-					// String path = relativePath;
-					getLog().debug("path: " + path);
-					byte[] classBytes = gen.getClassBytes(clazz.getName());
-					// ByteArrayInputStream inputStream = new
-					// ByteArrayInputStream(classBytes);
-					// FileWriter writer = null;
+					model = (BDIModel) modelLoader.loadModel(relativePath, imports, inputCl, new Object[]
+					{rid, null});
+				}
+				catch (Throwable t)
+				{
+					// if error during model building, just dont enhance this file.
+					String message = t.getMessage();
+					if (message == null)  {
+						message = t.toString();
+					}
+					getLog().warn("Error loading model: " + agentClassName + ", message was: " + message);
+					// just copy file
+					if (!inputDirectory.equals(outputDirectory))
+					{
+						File newFile = new File(outputDirectory, relativePath);
+						if (!newFile.exists())
+						{
+							newFile.getParentFile().mkdirs();
+							FileUtils.copyFile(bdiFile, newFile);
+						}
+					}
+					continue;
+				}
+				
+				getLog().info("Generating classes for: " + relativePath);
+//				classes = gen.generateBDIClass(agentClassName, model, outputCl);
+				
+				Set<Entry<String,byte[]>> classEntrySet = gen.getRecentClassBytes().entrySet();
+				
+//				for (Class<?> clazz : classes)
+				for (Entry<String, byte[]> entry : classEntrySet)
+				{
+					String className = entry.getKey();
+					byte[] classBytes = entry.getValue();
+					getLog().debug("    ... " + className);
+					String path = className.replace('.', File.separatorChar) + ".class";
+//					byte[] classBytes = gen.getClassBytes(clazz.getName());
 					try
 					{
 						// write enhanced class
-						getLog().info("    ... " + clazz.getName());
 						File enhancedFile = new File(outputDirectory, path);
 						enhancedFile.getParentFile().mkdirs();
 						DataOutputStream dos = new DataOutputStream(new FileOutputStream(enhancedFile));
@@ -375,7 +466,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			}
 			else
 			{
-				// jsut copy file
+				// just copy file
 				if (!inputDirectory.equals(outputDirectory))
 				{
 					File newFile = new File(outputDirectory, relativePath);
