@@ -55,7 +55,18 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, SReflect.isAndroid() ? 2000000 :600000, true, true);
+		this(path, root, excludes, true);
+	}
+	
+	/**
+	 * Create a component test suite for components contained in a given path.
+	 * @param path	The path to look for test cases in.
+	 * @param root	The classpath root corresponding to the path.
+	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
+	 */
+	public ComponentTestSuite(File path, File root, String[] excludes, boolean addCleanup) throws Exception
+	{
+		this(path, root, excludes, addCleanup, SReflect.isAndroid() ? 2000000 :600000, true, true);
 	}
 	
 	/**
@@ -67,7 +78,7 @@ public class ComponentTestSuite extends TestSuite
 	 * @param broken	Include broken components.
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(File path, File root, String[] excludes, long timeout, boolean broken, boolean start) throws Exception
+	public ComponentTestSuite(File path, File root, String[] excludes, boolean addCleanup, long timeout, boolean broken, boolean start) throws Exception
 	{
 		this(new String[]
 		{
@@ -92,7 +103,7 @@ public class ComponentTestSuite extends TestSuite
 			"-printpass", "false",
 			// Hack!!! include ssl transport if available
 			"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
-		}, path, root, excludes, timeout, broken, start);
+		}, path, root, excludes, addCleanup, timeout, broken, start);
 	}
 	
 	/**
@@ -104,7 +115,7 @@ public class ComponentTestSuite extends TestSuite
 	 * @param broken	Include broken components.
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout, final boolean broken, final boolean start) throws Exception
+	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, boolean addCleanup, final long timeout, final boolean broken, final boolean start) throws Exception
 	{
 		super(path.toString());
 		
@@ -246,7 +257,9 @@ public class ComponentTestSuite extends TestSuite
 		}
 		
 		// Hack!!! Isn't there some tearDown for the test suite?
-		addTest(new Cleanup(rootcomp, timer));
+		if (addCleanup) {
+			addTest(new Cleanup(rootcomp, timer));
+		}
 //		System.out.println("Finished Building Suite for " + path);
 		try
 		{

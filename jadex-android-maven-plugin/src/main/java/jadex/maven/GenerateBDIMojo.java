@@ -11,8 +11,8 @@ import jadex.micro.annotation.Properties;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,6 +30,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.maven.artifact.Artifact;
@@ -49,15 +50,6 @@ import org.apache.maven.project.MavenProjectHelper;
  */
 public class GenerateBDIMojo extends AbstractJadexMojo
 {
-
-	/**
-	 * The maven session.
-	 * 
-	 * @parameter property=session
-	 * @required
-	 * @readonly
-	 */
-	protected MavenSession session;
 
 	/**
 	 * The java sources directory.
@@ -105,7 +97,14 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 	 * @parameter default-value="false"
 	 */
 	protected Boolean enhanceDependencies;
-
+	
+	/**
+	 * If set to true, this will remove all android-incompatible classes from Build,
+	 * e.g. Classes that use java.swing components.
+	 * @parameter default-value="false"
+	 */
+	protected Boolean removeAndroidIncompatible;
+	
 	private IOFileFilter bdiFileFilter = new IOFileFilter()
 	{
 		private List<String> kernelTypes = getBDIKernelTypes();
@@ -158,7 +157,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 				Set<Artifact> relevantCompileArtifacts = getRelevantCompileArtifacts();
 				getLog().info("Found " + relevantCompileArtifacts.size() + " dependencies: " + relevantCompileArtifacts);
 
-				File outputDir = new File(tmpDirectory, "alldeps");
+				File depOutputDir = new File(tmpDirectory, "alldeps");
 				File allDepsFile = new File(tmpDirectory, "enhanced-dependencies.jar");
 				
 				for (Artifact artifact : relevantCompileArtifacts)
@@ -167,7 +166,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 					
 					// enhance the jar
 					
-					unzipJar(jarFile, outputDir);
+					unzipJar(jarFile, depOutputDir);
 
 					artifact.setFile(dummy);
 
@@ -186,19 +185,25 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 				// add real deps to random artifact
 				relevantCompileArtifacts.iterator().next().setFile(allDepsFile);
 				
-				File metaInf= new File(outputDir, "META-INF"); 
+				File metaInf= new File(depOutputDir, "META-INF"); 
 				FileUtils.deleteDirectory(metaInf);
 				
-				generateBDI(outputDir, outputDir);
+				// strip incompatible
+				if (removeAndroidIncompatible) {
+					getLog().info("Removing incompatible code...");
+					removeAndroidIncompatible(depOutputDir);
+				}
+				
+				generateBDI(depOutputDir, depOutputDir);
 				
 				File[] depDirs = tmpDirectory.listFiles();
 				makeJar(depDirs, allDepsFile);
 				
 				// outputDirectory = inputDirectory;
-				getLog().info("Enhancing project-own code...");
 			}
+			getLog().info("Enhancing project-own classes...");
 			generateBDI(inputDirectory, outputDirectory);
-
+			
 			getLog().info("Generated BDI V3 Agents successfully!");
 
 			project.getBuild().setOutputDirectory(outputDirectory.getPath());
@@ -270,6 +275,12 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			
 			// generate
 			generateBDI(outputDir, outputDir);
+			
+			// strip incompatible
+			if (removeAndroidIncompatible) {
+				removeAndroidIncompatible(outputDir);
+			}
+			
 			// and now re-zip the enhanced jar...
 
 			getLog().debug("Zipping to: " + outputFile);
@@ -379,7 +390,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		{inputUrl}, originalCl);
 		Collection<File> allClasses = FileUtils.listFiles(inputDirectory, new String[]
 		{"class"}, true);
-
+		
 		for (File bdiFile : allClasses)
 		{
 			gen.clearRecentClassBytes();
@@ -388,6 +399,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 
 			String relativePath = ResourceUtils
 					.getRelativePath(bdiFile.getAbsolutePath(), inputDirectory.getAbsolutePath(), File.separator);
+			
 			if (bdiFileFilter.accept(bdiFile))
 			{
 				String agentClassName = relativePath.replaceAll(File.separator, ".").replace(".class", "");
@@ -452,14 +464,15 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 							oldFile.delete();
 						}
 					}
-					catch (FileNotFoundException e)
-					{
-						e.printStackTrace();
-						throw new MojoExecutionException(e.getMessage());
-					}
 					catch (IOException e)
 					{
 						e.printStackTrace();
+						if (inputCl != null) {
+							inputCl.close();
+						}
+						if (outputCl != null) {
+							outputCl.close();
+						}
 						throw new MojoExecutionException(e.getMessage());
 					}
 				}
@@ -478,8 +491,69 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 				}
 			}
 		}
+		inputCl.close();
+		outputCl.close();
 	}
 	
+	private void removeAndroidIncompatible(File path) throws IOException {
+		@SuppressWarnings("unchecked")
+		Collection<File> allFiles = FileUtils.listFiles(path, new FileFileFilter() {
+
+			@Override
+			public boolean accept(File file)
+			{
+				return file.getName().endsWith("class");
+			}
+			
+		}, TrueFileFilter.INSTANCE);
+		
+		for (File file : allFiles)
+		{
+			boolean compatible = isAndroidCompatible(file);
+			if (!compatible) {
+				getLog().debug("not compatible: " + file);
+				file.delete();
+			}
+		}
+		
+	}
+	
+	private boolean isAndroidCompatible(File bdiFile) throws IOException
+	{
+		boolean result = true;
+		FileInputStream fin = new FileInputStream(bdiFile);
+//		ClassReader cr = new ClassReader(fin);
+//		ClassNode cn = new ClassNode();
+//		cr.accept(cn, ClassReader.EXPAND_FRAMES);
+//		
+//		List<AnnotationNode> invisibleAnnotations = cn.invisibleAnnotations;
+//		
+//		if (invisibleAnnotations != null) {
+//			for (AnnotationNode ann : invisibleAnnotations)
+//			{
+//				if (REFLECTNAME.equals(ann.desc)) {
+//					List<Object> values = ann.values;
+//					boolean compatible = false;
+//					int minApi = 0;
+//					for (int i = 0; i < values.size(); i=i+2) {
+//						String name = (String) values.get(i);
+//						if (PARAMNAME_VALUE.equals(name)) {
+//							compatible = (Boolean) values.get(i+1);
+//						} else if (PARAMNAME_MINAPI.equals(name)) {
+//							minApi = (Integer) values.get(i+1);
+//						}
+//					}
+//					result = compatible;
+//				}
+//			}
+//		}
+		Set<Class<?>> classesUsedBy = Collector.getClassesUsedBy(fin, "javax.swing");
+		result = classesUsedBy.isEmpty();
+		
+		fin.close();
+		return result;
+	}
+
 	private String[] getImportPath(Collection<File> allBDIFiles)
 	{
 		getLog().debug("Building imports Path...");

@@ -30,6 +30,18 @@ public class MicroTest	extends ComponentTestSuite
 	 */
 	public MicroTest(String path, String root)	throws Exception
 	{
+		this(path, root, true);
+	}
+	
+	/**
+	 * Constructor
+	 * @param path
+	 * @param root
+	 * @param cleanup
+	 * @throws Exception
+	 */
+	public MicroTest(String path, String root, boolean cleanup)	throws Exception
+	{
 		// Use micro application classes directory as classpath root,
 		super(new File(path),
 //		super(new File("../jadex-applications-micro/target/classes/jadex/micro/testcases/intermediate/InvokerAgent.class"),
@@ -79,9 +91,12 @@ public class MicroTest	extends ComponentTestSuite
 			"AgentCreationAgent",	
 			"PojoAgentCreationAgent",
 			"MegaParallelStarter",
+			// android excludes
 			SReflect.isAndroid() ? "authenticate/InitiatorAgent" : NOEXCLUDE,
 			SReflect.isAndroid() ? "stream/InitiatorAgent" : NOEXCLUDE,
-		});
+			SReflect.isAndroid() ? "nfpropvis/ProviderAndUserAgent" : NOEXCLUDE,
+			SReflect.isAndroid() ? "nfpropvis/UserAgent" : NOEXCLUDE
+		}, cleanup);
 //		}, 600000, true, false);
 	}
 	

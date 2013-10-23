@@ -194,6 +194,7 @@
 				<artifactId>jadex-android-maven-plugin</artifactId>
 				<configuration>
 					<enhanceDependencies>true</enhanceDependencies>
+<!-- 					<removeAndroidIncompatible>true</removeAndroidIncompatible> -->
 				</configuration>
 				<executions>
 					<execution>

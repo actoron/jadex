@@ -29,6 +29,18 @@ public class BDIV3Test	extends	ComponentTestSuite
 	 */
 	public BDIV3Test(String path, String root)	throws Exception
 	{
+		this(path,root,true);
+	}
+	
+	/**
+	 * Constructor
+	 * @param path
+	 * @param root
+	 * @param addCleanup
+	 * @throws Exception
+	 */
+	public BDIV3Test(String path, String root, boolean addCleanup)	throws Exception
+	{
 		// Use BDI classes directory as classpath root,
 		super(new File(path),
 			new File(root),
@@ -42,9 +54,9 @@ public class BDIV3Test	extends	ComponentTestSuite
 				"3d",	// OpenGL problems on termination?
 				"CreationBDI",	// should only be run as separate benchmark,
 				SReflect.isAndroid() ? "GuiBDI" : NOEXCLUDE
-			});
+			}, addCleanup);
 	}
-	
+
 	/**
 	 *  Static method called by eclipse JUnit runner.
 	 */
