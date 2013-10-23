@@ -453,16 +453,6 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 						DataOutputStream dos = new DataOutputStream(new FileOutputStream(enhancedFile));
 						dos.write(classBytes);
 						dos.close();
-
-						if (!inputDirectory.equals(outputDirectory))
-						{
-							// delete non-enhanced to allow repeatable
-							// execution
-							// of
-							// this plugin
-							File oldFile = new File(inputDirectory, path);
-							oldFile.delete();
-						}
 					}
 					catch (IOException e)
 					{
@@ -578,7 +568,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		String types = null;
 		for (int i = 0; i < value.length; i++)
 		{
-			getLog().info("possible annotation: " + value[i]);
+			getLog().debug("possible annotation: " + value[i]);
 			if (value[i].name().equals("kernel.types"))
 			{
 				types = value[i].value();
@@ -598,7 +588,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 			begin = types.indexOf("\"", end + 1);
 		}
 
-		getLog().info("KernelBDIV3 Types: " + kernelTypes);
+		getLog().debug("KernelBDIV3 Types: " + kernelTypes);
 		return kernelTypes;
 	}
 
