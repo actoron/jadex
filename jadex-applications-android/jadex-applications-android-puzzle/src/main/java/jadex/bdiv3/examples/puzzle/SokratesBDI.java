@@ -41,12 +41,11 @@ import java.util.List;
 //})
 @BDIConfigurations(
 {
+	@BDIConfiguration(name=MoveComparator.STRATEGY_SAME_LONG),
 	@BDIConfiguration(name=MoveComparator.STRATEGY_DEFAULT),
 	@BDIConfiguration(name=MoveComparator.STRATEGY_LONG),
-	@BDIConfiguration(name=MoveComparator.STRATEGY_SAME_LONG),
 	@BDIConfiguration(name=MoveComparator.STRATEGY_ALTER_LONG)
 })
-
 public class SokratesBDI
 {
 	//-------- attributes --------
@@ -68,7 +67,8 @@ public class SokratesBDI
 	protected int	depth;
 	
 	/** The delay between two moves (in milliseconds). */
-	protected long	delay	= 500;
+	@AgentArgument
+	protected long	delay;
 	
 	/** The strategy (none=choose the first applicable, long=prefer jump moves,
 	 * same_long=prefer long moves of same color, alter_long=prefer long move of alternate color). */
@@ -93,7 +93,7 @@ public class SokratesBDI
 		strategy = agent.getConfiguration();
 		createGui(agent);
 		
-		System.out.println("Now puzzling:");
+		gui_proxy.showMessage("Now puzzling:");
 		final long	start	= System.currentTimeMillis();
 		IFuture<MoveGoal> fut = agent.dispatchTopLevelGoal(new MoveGoal());
 		fut.addResultListener(new IResultListener<MoveGoal>()
@@ -101,13 +101,13 @@ public class SokratesBDI
 			public void resultAvailable(MoveGoal movegoal)
 			{
 				long end = System.currentTimeMillis();
-				System.out.println("Needed: "+(end-start)+" millis.");
+				gui_proxy.showMessage("Needed: "+(end-start)+" millis for " + triescnt + "moves");
 				ret.setResult(null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("No solution found :-(");
+				gui_proxy.showMessage("No solution found :-(");
 				ret.setResult(null);
 			}
 		});
@@ -281,8 +281,11 @@ public class SokratesBDI
 	 */
 	protected void print(String text, int indent)
     {
+		StringBuilder sb = new StringBuilder();
         for(int x=0; x<indent; x++)
-            System.out.print(" ");
-        System.out.println(text);
+            sb.append(" ");
+        sb.append(text);
+        
+        gui_proxy.showMessage(sb.toString());
     }
 }

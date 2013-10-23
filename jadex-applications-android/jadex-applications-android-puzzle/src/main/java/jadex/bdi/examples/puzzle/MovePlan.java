@@ -37,7 +37,7 @@ public class MovePlan extends Plan
 	{
 		this.move = (Move)getParameter("move").getValue();
 		this.depth = ((Integer)getParameter("depth").getValue()).intValue();
-		this.delay = ((Long)getBeliefbase().getBelief("move_delay").getFact()).longValue();
+		this.delay = ((Long)getBeliefbase().getBelief("delay").getFact()).longValue();
 		this.board = (IBoard)getBeliefbase().getBelief("board").getFact();
 		this.proxy = (GuiProxy) getBeliefbase().getBelief("gui_proxy").getFact();
 		

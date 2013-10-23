@@ -20,6 +20,11 @@ import android.widget.TextView;
 
 public class SokratesActivity extends ClientAppFragment implements ServiceConnection
 {
+	protected static final String BDI = "BDI";
+	protected static final String BDIBenchmark = "BDIBenchmark";
+	protected static final String BDIV3 = "BDIV3";
+	protected static final String BDIV3Benchmark = "BDIV3Benchmark";
+	
 	private PlatformBinder service;
 	private TextView statusTextView;
 	private SokratesView sokratesView;
@@ -69,10 +74,19 @@ public class SokratesActivity extends ClientAppFragment implements ServiceConnec
 	{
 		this.service = (SokratesService.PlatformBinder) binder;
 		this.service.setSokratesListener(sokratesListener);
+		String mode = getIntent().getStringExtra("mode");
+		
 		if (!service.isSokratesRunning()) {
-			statusTextView.setText("starting Game...");
-			this.service.startSokratesV3();
-//			this.service.startSokrates();
+			statusTextView.setText("starting Game in mode: " + mode);
+			if (mode.equals(BDI)) {
+				this.service.startSokrates();
+			} else if (mode.equals(BDIBenchmark)) {
+				this.service.startSokratesBench();
+			} else if (mode.equals(BDIV3)) {
+				this.service.startSokratesV3();
+			} else if (mode.equals(BDIV3Benchmark)) {
+				this.service.startSokratesV3Bench();
+			}
 		}
 	}
 

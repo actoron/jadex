@@ -39,7 +39,7 @@ public class PlayGamePlan extends Plan
 		}
 		
 		long end = getTime();
-		proxy.showMessage("Needed: "+(end-start)+" millis.");
+		proxy.showMessage("Needed: "+(end-start)+" millis for " + getBeliefbase().getBelief("triescnt").getFact() + "moves");
 		if(getBeliefbase().containsBelief("endmem"))
 		{
 			Long	endmem	= (Long) getBeliefbase().getBelief("endmem").getFact();

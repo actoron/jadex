@@ -81,12 +81,22 @@ public class SokratesService extends JadexPlatformService
 
 		public IFuture<Void> startSokrates()
 		{
-			return createSokratesGame();
+			return createSokratesGame(false);
+		}
+		
+		public IFuture<Void> startSokratesBench()
+		{
+			return createSokratesGame(true);
 		}
 		
 		public IFuture<Void> startSokratesV3()
 		{
-			return createSokratesGameV3();
+			return createSokratesGameV3(false);
+		}
+		
+		public IFuture<Void> startSokratesV3Bench()
+		{
+			return createSokratesGameV3(true);
 		}
 
 		public void setPlatformListener(PlatformListener l)
@@ -152,13 +162,18 @@ public class SokratesService extends JadexPlatformService
 		handler.post(runnable);
 	}
 
-	private synchronized IFuture<Void> createSokratesGame()
+	private synchronized IFuture<Void> createSokratesGame(boolean benchmark)
 	{
 		if (!sokratesRunning)
 		{
 			CreationInfo ci = new CreationInfo();
 			HashMap<String, Object> args = new HashMap<String, Object>();
 			args.put("gui_listener", soListener);
+			long delay = 500;
+			if (benchmark) {
+				delay = 0;
+			}
+			args.put("delay", delay);
 			ci.setArguments(args);
 			IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
 					"jadex/bdi/examples/puzzle/Sokrates.agent.xml", ci);
@@ -185,13 +200,18 @@ public class SokratesService extends JadexPlatformService
 
 	}
 	
-	private synchronized IFuture<Void> createSokratesGameV3()
+	private synchronized IFuture<Void> createSokratesGameV3(boolean benchmark)
 	{
 		if (!sokratesRunning)
 		{
 			CreationInfo ci = new CreationInfo();
 			HashMap<String, Object> args = new HashMap<String, Object>();
 			args.put("gui_listener", soListener);
+			long delay = 500;
+			if (benchmark) {
+				delay = 0;
+			}
+			args.put("delay", delay);
 			ci.setArguments(args);
 			IFuture<IComponentIdentifier> future = SokratesService.this.startComponent(platformId, "Sokrates",
 					SokratesBDI.class, ci);

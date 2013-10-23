@@ -24,9 +24,13 @@ public class SokratesLoaderActivity extends ClientAppFragment implements Service
 
 	protected boolean platformRunning;
 
-	private Button startDemoButton;
+	private Intent serviceIntent;
 
-	private Intent serviceIntent; 
+	private Button startBDIV3Button;
+	private View startBDIV3BenchmarkButton;
+
+	private Button startBDIButton;
+	private View startBDIBenchmarkButton; 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -52,19 +56,60 @@ public class SokratesLoaderActivity extends ClientAppFragment implements Service
 		View view = getView();
 		statusTextView = (TextView) view.findViewById(R.id.statusTextView);
 		
-		startDemoButton = (Button) view.findViewById(R.id.startDemoButton);
-		startDemoButton.setOnClickListener(new OnClickListener()
+		final Intent i = new Intent(getContext(), SokratesActivity.class);
+		
+		startBDIButton = (Button) view.findViewById(R.id.startBDI);
+		startBDIButton.setOnClickListener(new OnClickListener()
 		{
 			
 			@Override
 			public void onClick(View v)
 			{
-				Intent i = new Intent(getContext(), SokratesActivity.class);
+				i.putExtra("mode", SokratesActivity.BDI);
 				startActivity(i);
  			}
 		});
 		
-		startDemoButton.setEnabled(false);
+		startBDIV3Button = (Button) view.findViewById(R.id.startBDIV3);
+		startBDIV3Button.setOnClickListener(new OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+				i.putExtra("mode", SokratesActivity.BDIV3);
+				startActivity(i);
+ 			}
+		});
+		
+		startBDIBenchmarkButton = (Button) view.findViewById(R.id.startBDIBenchmark);
+		startBDIBenchmarkButton.setOnClickListener(new OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+				i.putExtra("mode", SokratesActivity.BDIBenchmark);
+				startActivity(i);
+ 			}
+		});
+		
+		startBDIV3BenchmarkButton = (Button) view.findViewById(R.id.startBDIV3Benchmark);
+		startBDIV3BenchmarkButton.setOnClickListener(new OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+				i.putExtra("mode", SokratesActivity.BDIV3Benchmark);
+				startActivity(i);
+ 			}
+		});
+		
+		startBDIButton.setEnabled(false);
+		startBDIV3Button.setEnabled(false);
+		startBDIBenchmarkButton.setEnabled(false);
+		startBDIV3BenchmarkButton.setEnabled(false);
 		statusTextView.setText("Connecting to Service...");
 		bindService(serviceIntent, this, 0);
 	}
@@ -115,7 +160,10 @@ public class SokratesLoaderActivity extends ClientAppFragment implements Service
 			@Override
 			public void run()
 			{
-				startDemoButton.setEnabled(true);
+				startBDIButton.setEnabled(true);
+				startBDIBenchmarkButton.setEnabled(true);
+				startBDIV3BenchmarkButton.setEnabled(true);
+				startBDIV3Button.setEnabled(true);
 				statusTextView.setText("Platform started.");
 			}
 		});
