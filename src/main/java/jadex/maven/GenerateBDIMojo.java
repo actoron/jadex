@@ -388,8 +388,7 @@ public class GenerateBDIMojo extends AbstractJadexMojo
 		{inputUrl}, originalCl);
 		URLClassLoader outputCl = new URLClassLoader(new URL[]
 		{inputUrl}, originalCl);
-		Collection<File> allClasses = FileUtils.listFiles(inputDirectory, new String[]
-		{"class"}, true);
+		Collection<File> allClasses = FileUtils.listFiles(inputDirectory, null, true);
 		
 		for (File bdiFile : allClasses)
 		{
