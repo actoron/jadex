@@ -42,10 +42,6 @@ public class MicroTest	extends ComponentTestSuite
 //			"examples",
 //			"testcases",
 			
-			
-			// Todo: fix timing issues
-			"nfmethod",
-			
 			// Test-support agents
 			"BodyExceptionAgent",
 			"PojoBodyExceptionAgent",
