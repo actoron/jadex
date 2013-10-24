@@ -20,6 +20,7 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -88,6 +89,9 @@ public class CliAgent implements ICliService, IInternalCliService
 	/** The shells per session. */
 	protected Map<Tuple2<String, Integer>, Tuple2<ACliShell, Long>> shells;
 	
+	/** Flag if the agent is killed. */
+	protected boolean	aborted;
+	
 	//-------- methods --------
 	
 	/**
@@ -123,6 +127,15 @@ public class CliAgent implements ICliService, IInternalCliService
 			}
 		});
 		b.startBehavior();
+	}
+	
+	/**
+	 *  Called when the agent is killed.
+	 */
+	@AgentKilled
+	public void	killed()
+	{
+		aborted	= true;
 	}
 	
 	/**
@@ -216,73 +229,80 @@ public class CliAgent implements ICliService, IInternalCliService
 						
 						try
 						{
-							while(true)
+							while(!aborted)
 							{
 //								String tmp = sc.nextLine();
 //								System.out.println(tmp);
-								final String tmp = br.readLine();
-								if(tmp==null)	// null means end of stream.
+								if(br.ready())
 								{
-									break;
-								}
-								
-								final String cmd = tmp.endsWith(";")? tmp.substring(0, tmp.length()-1): tmp;
-								if("exit".equals(cmd) || "quit".equals(cmd))
-								{
-									break;
-								}
-								
-								agent.scheduleStep(new IComponentStep<Void>()
-								{
-									public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+									final String tmp = br.readLine();
+									if(tmp==null)	// null means end of stream.
 									{
-										final Future<Void> ret = new Future<Void>();
-										
-										if(cmd.length()>0)
-										{
-											executeCommand(cmd, consess).addResultListener(new IResultListener<String>()
-											{
-												public void resultAvailable(String result)
-												{
-													if(result!=null)
-														System.out.println(result);
-													printPrompt();
-												}
-												
-												public void exceptionOccurred(Exception exception)
-												{
-													System.out.println("Invocation error: "+exception.getMessage());
-													printPrompt();
-												}
-												
-												protected void printPrompt()
-												{
-													getShell(consess).getShellPrompt().addResultListener(new ExceptionDelegationResultListener<String, Void>(ret)
-													{
-														public void customResultAvailable(String result)
-														{
-															System.out.println(result);
-															ret.setResult(null);
-														}
-													});
-												}
-											});
-										}
-										else
-										{
-											getShell(consess).getShellPrompt().addResultListener(new ExceptionDelegationResultListener<String, Void>(ret)
-											{
-												public void customResultAvailable(String result)
-												{
-													System.out.println(result);
-													ret.setResult(null);
-												}
-											});
-										}
-										
-										return ret;
+										break;
 									}
-								}).get(new ThreadSuspendable());
+									
+									final String cmd = tmp.endsWith(";")? tmp.substring(0, tmp.length()-1): tmp;
+									if("exit".equals(cmd) || "quit".equals(cmd))
+									{
+										break;
+									}
+									
+									agent.scheduleStep(new IComponentStep<Void>()
+									{
+										public jadex.commons.future.IFuture<Void> execute(IInternalAccess ia) 
+										{
+											final Future<Void> ret = new Future<Void>();
+											
+											if(cmd.length()>0)
+											{
+												executeCommand(cmd, consess).addResultListener(new IResultListener<String>()
+												{
+													public void resultAvailable(String result)
+													{
+														if(result!=null)
+															System.out.println(result);
+														printPrompt();
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+														System.out.println("Invocation error: "+exception.getMessage());
+														printPrompt();
+													}
+													
+													protected void printPrompt()
+													{
+														getShell(consess).getShellPrompt().addResultListener(new ExceptionDelegationResultListener<String, Void>(ret)
+														{
+															public void customResultAvailable(String result)
+															{
+																System.out.println(result);
+																ret.setResult(null);
+															}
+														});
+													}
+												});
+											}
+											else
+											{
+												getShell(consess).getShellPrompt().addResultListener(new ExceptionDelegationResultListener<String, Void>(ret)
+												{
+													public void customResultAvailable(String result)
+													{
+														System.out.println(result);
+														ret.setResult(null);
+													}
+												});
+											}
+											
+											return ret;
+										}
+									}).get(new ThreadSuspendable());
+								}
+								else
+								{
+									Thread.sleep(500);
+								}
 							}
 						}
 						catch(Exception e)

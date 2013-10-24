@@ -2,7 +2,6 @@ package jadex.bridge.service.component;
 
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 
 /**

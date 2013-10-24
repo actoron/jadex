@@ -69,4 +69,12 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 	{
 		shutdownService();
 	}
+	
+	/**
+	 *  Test if the thread pool is running.
+	 */
+	public boolean	isRunning()
+	{
+		return threadpool.isRunning();
+	}
 }

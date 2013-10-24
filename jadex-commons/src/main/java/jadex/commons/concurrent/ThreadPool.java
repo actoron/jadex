@@ -9,9 +9,11 @@ import jadex.commons.collection.IBlockingQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -198,6 +200,14 @@ public class ThreadPool implements IThreadPool
 	//-------- methods --------
 
 	/**
+	 *  Test if the thread pool is running.
+	 */
+	public boolean	isRunning()
+	{
+		return running;
+	}
+	
+	/**
 	 *  Execute a task in its own thread.
 	 *  @param task The task to execute.
 	 */
@@ -230,6 +240,7 @@ public class ThreadPool implements IThreadPool
 	 */
 	public synchronized void dispose()
 	{
+//		System.out.println("dispose: "+this+", "+pool.size()+", "+parked.size());
 		this.running = false;
 		this.tasks.setClosed(true);
 
@@ -354,6 +365,8 @@ public class ThreadPool implements IThreadPool
 		return ret;
 	}
 
+	protected Set<ServiceThread>	THREADS	= Collections.synchronizedSet(new HashSet<ServiceThread>());
+
 	//-------- inner classes --------
 
 	/**
@@ -384,13 +397,18 @@ public class ThreadPool implements IThreadPool
 		}
 
 		//-------- methods --------
-
+		
 		/**
 		 *  Dequeue an element from the queue
 		 *  and execute it.
 		 */
 		public void run()
 		{
+			THREADS.add(this);
+			
+			try
+			{
+				
 			while(running && !terminated)
 			{
 				boolean exit = false;
@@ -494,6 +512,13 @@ public class ThreadPool implements IThreadPool
 			}
 			
 			remove();
+			
+			}
+			finally
+			{
+				THREADS.remove(this);
+//				System.out.println("Threads: "+ThreadPool.this.hashCode()+", "+THREADS.size());
+			}
 		}
 		
 		/**

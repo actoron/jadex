@@ -46,4 +46,13 @@ public class JavaThreadPool implements IThreadPool
 	{
 		executor.shutdown();
 	}
+	
+	
+	/**
+	 *  Test if the thread pool is running.
+	 */
+	public boolean	isRunning()
+	{
+		return !executor.isShutdown();
+	}
 }

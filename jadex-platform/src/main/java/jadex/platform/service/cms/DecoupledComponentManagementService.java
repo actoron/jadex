@@ -1,5 +1,6 @@
 package jadex.platform.service.cms;
 
+import jadex.base.Starter;
 import jadex.bridge.Cause;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
@@ -1880,8 +1881,14 @@ public class DecoupledComponentManagementService implements IComponentManagement
 			
 //			System.out.println("CleanupCommand end.");
 			
+			// Terminate rescue threads when platform is killed (hack, starter should use kill listener, but listener isn't registered in cms)
+			if(cid.getParent()==null)
+			{
+				Starter.shutdownRescueThread(cid);
+			}
+			
 			// Kill parent is autoshutdown or child was master.
-			if(pad!=null && killparent)
+			else if(pad!=null && killparent)
 			{
 //				System.out.println("killparent: "+pad.getComponentIdentifier());
 				destroyComponent(pad.getComponentIdentifier());

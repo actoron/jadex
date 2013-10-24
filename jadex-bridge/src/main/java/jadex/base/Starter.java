@@ -25,11 +25,13 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
+import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
 import jadex.javaparser.SJavaParser;
@@ -37,6 +39,7 @@ import jadex.javaparser.SJavaParser;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -456,6 +459,8 @@ public class Starter
 					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
 					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUrl()));
 					
+					initRescueThread(cid);
+					
 					cfac.getComponentType(configfile, null, model.getResourceIdentifier())
 						.addResultListener(new ExceptionDelegationResultListener<String, IExternalAccess>(ret)
 					{
@@ -779,26 +784,23 @@ public class Starter
 	protected static Map<IComponentIdentifier, Tuple2<BlockingQueue, Thread>> rescuethreads;
 	
 	/**
-	 *  Schedule a rescue step.
-	 *  @param cid The id of a component of the platform.
-	 *  @param run The runnable to execute.
+	 *  Init the rescue thread for a platform..
 	 */
-	public synchronized static void scheduleRescueStep(IComponentIdentifier cid, Runnable run)
+	public synchronized static void initRescueThread(IComponentIdentifier cid)
 	{
-		cid = cid.getRoot();
+		assert cid.getParent()==null;
 		if(rescuethreads==null)
 		{
 			rescuethreads = new HashMap<IComponentIdentifier, Tuple2<BlockingQueue, Thread>>();
 		}	
 		
-		Tuple2<BlockingQueue, Thread> tup = rescuethreads.get(cid);
-		if(tup==null)
+		final BlockingQueue bq = new BlockingQueue();
+		final IComponentIdentifier fcid = cid;
+		Thread rescuethread = new Thread(new Runnable()
 		{
-			final BlockingQueue bq = new BlockingQueue();
-			final IComponentIdentifier fcid = cid;
-			Thread rescuethread = new Thread(new Runnable()
+			public void run()
 			{
-				public void run()
+				try
 				{
 					while(true)
 					{
@@ -813,13 +815,34 @@ public class Starter
 						}
 					}
 				}
-			}, "rescue_thread_"+cid.getName());
-			tup = new Tuple2<BlockingQueue, Thread>(bq, rescuethread);
-			rescuethreads.put(cid, tup);
-			rescuethread.setDaemon(true);
-			rescuethread.start();
+				catch(IBlockingQueue.ClosedException bqce)
+				{
+				}
+			}
+		}, "rescue_thread_"+cid.getName());
+		Tuple2<BlockingQueue, Thread> tup = new Tuple2<BlockingQueue, Thread>(bq, rescuethread);
+		rescuethreads.put(cid, tup);
+		rescuethread.setDaemon(true);
+		rescuethread.start();
+	}
+	
+	/**
+	 *  Schedule a rescue step.
+	 *  @param cid The id of a component of the platform.
+	 *  @param run The runnable to execute.
+	 */
+	public synchronized static void scheduleRescueStep(IComponentIdentifier cid, Runnable run)
+	{
+		Tuple2<BlockingQueue, Thread> tup = rescuethreads!=null ? rescuethreads.get(cid.getRoot()) : null;
+		if(tup!=null)
+		{
+			tup.getFirstEntity().enqueue(run);
 		}
-		tup.getFirstEntity().enqueue(run);
+		else
+		{
+			// Rescue thread after platform shutdown -> just execute
+			run.run();
+		}
 	}
 	
 	/**
@@ -836,6 +859,30 @@ public class Starter
 			ret = Thread.currentThread().equals(tup.getSecondEntity());
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Shutdown the rescue thread of a platform. 
+	 */
+	public static synchronized void	shutdownRescueThread(IComponentIdentifier cid)
+	{
+		assert cid.getParent()==null : cid;
+		Tuple2<BlockingQueue, Thread> tup = rescuethreads==null? null: rescuethreads.remove(cid.getRoot());
+		if(tup!=null)
+		{
+			List<Runnable>	steps	= tup.getFirstEntity().setClosed(true);
+			for(Runnable next: steps)
+			{
+				try
+				{
+					next.run();
+				}
+				catch(Exception e)
+				{
+					Logger.getLogger(cid.getLocalName()).severe("Exception during step on rescue thread: "+e);
+				}
+			}
+		}
 	}
 }
 

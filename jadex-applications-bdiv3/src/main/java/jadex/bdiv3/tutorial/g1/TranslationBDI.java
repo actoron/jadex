@@ -99,6 +99,15 @@ public class TranslationBDI
 		
 		final int port = 9099;
 		
+		try
+		{
+			server	= new ServerSocket(port);
+		}
+		catch(IOException e)
+		{
+			throw new RuntimeException(e.getMessage());
+		}
+
 		Runnable run = new Runnable()
 		{			
 			/**
@@ -109,15 +118,6 @@ public class TranslationBDI
 			 */
 			public void	run()
 			{
-				try
-				{
-					server	= new ServerSocket(port);
-				}
-				catch(IOException e)
-				{
-					throw new RuntimeException(e.getMessage());
-				}
-				
 //				logger.info("Created: "+Thread.currentThread());
 
 				// Repeatedly listen for connections, until the server has been closed.

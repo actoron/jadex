@@ -16,4 +16,9 @@ public interface IThreadPool
 	 *  Shutdown the thread pool.
 	 */
 	public void dispose();
+	
+	/**
+	 *  Test if the thread pool is running.
+	 */
+	public boolean	isRunning();
 }

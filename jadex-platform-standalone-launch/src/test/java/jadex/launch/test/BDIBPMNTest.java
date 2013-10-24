@@ -38,20 +38,18 @@ public class BDIBPMNTest	extends ComponentTestSuite
 		return new BDIBPMNTest();
 	}
 	
-//	@Override
-//	public void run(TestResult result)
-//	{
-//		// TODO Auto-generated method stub
-//		super.run(result);
-//		
-//		try
-//		{
-//			Thread.sleep(300000);
-//		}
-//		catch(InterruptedException e)
-//		{
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
+	@Override
+	public void run(TestResult result)
+	{
+		// TODO Auto-generated method stub
+		super.run(result);
+		
+		try
+		{
+			Thread.sleep(3000000);
+		}
+		catch(InterruptedException e)
+		{
+		}
+	}
 }

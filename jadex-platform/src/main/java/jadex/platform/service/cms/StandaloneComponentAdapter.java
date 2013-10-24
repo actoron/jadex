@@ -225,6 +225,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 */
 	protected void	cleanup()
 	{
+		super.cleanup();
 		if(parenta!=null)
 		{
 			parenta.removeSubcomponent(this);

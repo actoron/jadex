@@ -33,6 +33,7 @@ import jadex.commons.future.ISuspendable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 	/** Flag for testing double execution. */
 	protected volatile boolean executing;
+	
+	/** The blocked threads (i.e. monitors) to be aborted on termination. */
+	protected Set<Object>	blocked;
 	
 	//-------- steppable attributes --------
 	
@@ -607,8 +611,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			IComponentIdentifier.LOCAL.set(getComponentIdentifier());
 			IComponentAdapter.LOCAL.set(this);
 			
-			ClassLoader	cl	= componentthread.getContextClassLoader();
-			componentthread.setContextClassLoader(component.getClassLoader());
+			ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(component.getClassLoader());
 	
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
@@ -624,6 +628,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			catch(Exception e)
 			{
 				fatalError(e);
+			}
+			catch(StepAborted sa)
+			{
 			}
 			catch(Throwable t)
 			{
@@ -670,6 +677,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					fatalError(e);
 				}
+				catch(StepAborted sa)
+				{
+				}
 				catch(Throwable t)
 				{
 					fatalError(new RuntimeException(t));
@@ -714,7 +724,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			// Must reset service call settings when thread retreats from components
 			CallAccess.resetServiceCall();
 			CallAccess.resetNextInvocation();
-			componentthread.setContextClassLoader(cl);
+			Thread.currentThread().setContextClassLoader(cl);
 			this.componentthread = null;
 			
 //			if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
@@ -772,7 +782,25 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			System.out.println("Blocking: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 //		}
 		
+		if(blocked==null)
+		{
+			blocked	= new HashSet<Object>();
+		}
+		blocked.add(monitor);
+		
 		exe.blockThread(monitor);
+		
+		blocked.remove(monitor);
+		if(blocked.isEmpty())
+		{
+			blocked	= null;
+		}
+		
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
+		{
+//			System.out.println("terminated: "+this);
+			throw new StepAborted();
+		}
 		
 //		if(getComponentIdentifier().toString().indexOf("GarbageCollector")!=-1)
 ////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
@@ -1065,5 +1093,15 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/**
 	 *  Clean up this component.
 	 */
-	protected abstract void	cleanup();
+	protected void	cleanup()
+	{
+		if(blocked!=null)
+		{
+//			System.out.println("blocked: "+this+", "+blocked.size());
+			for(Object monitor: blocked)
+			{
+				unblock(monitor);
+			}
+		}
+	}
 }

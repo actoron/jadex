@@ -39,6 +39,9 @@ class CombinedInputStream extends PipedInputStream
 	/** The output stream that is piped to the result input stream. */
 	protected PipedOutputStream out;
 	
+	/** The thread pool. */
+	protected IThreadPool	tp;
+	
 	/** The first thread. */
 	protected List<Thread> threads;
 	
@@ -57,6 +60,7 @@ class CombinedInputStream extends PipedInputStream
 	public CombinedInputStream(final InputStream in1, final PipedOutputStream outin, 
 		IThreadPool tp) throws IOException
 	{
+		this.tp	= tp;
 		this.threads = Collections.synchronizedList(new ArrayList<Thread>());
 		this.in1 = in1;
 		this.outin = outin;
@@ -108,6 +112,15 @@ class CombinedInputStream extends PipedInputStream
 	}
 
 	//-------- methods --------
+	
+	/**
+	 *  Get the original in.
+	 *  @return The in.
+	 */
+	public InputStream getIn()
+	{
+		return in1;
+	}
 	
 	/**
 	 *  Get the outin.
@@ -192,24 +205,31 @@ class CombinedInputStream extends PipedInputStream
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			try
 			{
-				while(!closed)
+				while(tp.isRunning() && !closed)
 				{
-					String	line	= br.readLine();
-					if(line==null)	// null means end of stream
+					if(br.ready())
 					{
-						break;
+						String	line	= br.readLine();
+						if(line==null)	// null means end of stream
+						{
+							break;
+						}
+						byte[] data = (line+SUtil.LF).getBytes();
+						synchronized(out)
+						{
+	//						System.out.println("wrote to comb is: "+new String(data));
+							out.write(data);	
+						}
 					}
-					byte[] data = (line+SUtil.LF).getBytes();
-					synchronized(out)
+					else
 					{
-//						System.out.println("wrote to comb is: "+new String(data));
-						out.write(data);	
+						Thread.sleep(500);
 					}
 				}
 			}
-			catch(IOException e)
+			catch(Exception e)
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 //			System.out.println("exit: "+in);
 		}

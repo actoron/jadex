@@ -50,9 +50,9 @@ public class MicroTest	extends ComponentTestSuite
 			new String[]
 		{
 			// Excluded for finding cause of memory leak
-//			"benchmarks",
-//			"examples",
-//			"testcases",
+			"benchmarks",
+			"examples",
+			"testcases",
 			
 			// Test-support agents
 			"BodyExceptionAgent",

@@ -293,7 +293,6 @@ public class Executor implements Runnable
 	 */
 	public void	switchThread(Object monitor)
 	{
-		
 		synchronized(this)
 		{
 			if(switchtos==null)

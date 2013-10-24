@@ -2507,17 +2507,17 @@ public class SUtil
 	{
 		OutputStream ret;
 		
-		if(System.in instanceof CombinedInputStream)
+		InputStream	in	= System.in; 
+		
+		if(in instanceof CombinedInputStream)
 		{
-			ret = ((CombinedInputStream)System.in).getOutin();
+			in	= ((CombinedInputStream)in).getIn();
 		}
-		else
-		{
-			PipedOutputStream pos = new PipedOutputStream();
-			CombinedInputStream cis = new CombinedInputStream(new ProtectedInputStream(System.in), pos, tp);
-			System.setIn(cis);
-			ret = pos;
-		}
+
+		PipedOutputStream pos = new PipedOutputStream();
+		CombinedInputStream cis = new CombinedInputStream(new ProtectedInputStream(in), pos, tp);
+		System.setIn(cis);
+		ret = pos;
 		
 		return ret;
 	}

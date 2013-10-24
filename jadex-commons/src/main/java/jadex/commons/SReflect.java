@@ -809,6 +809,8 @@ public class SReflect
 	{
 		clname = makeNiceArrayNotation(clname);
 		
+//		System.out.println("classcache: "+classcache.size());
+		
 		Class	clazz	= null;
 		Map	cache	= (Map)classcache.get(classloader);
 		if(cache==null)

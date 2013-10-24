@@ -134,7 +134,16 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 												listener.resultAvailable(null);
 											}
 										};
-										Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
+										
+										if(caller.getParent()==null)
+										{
+											// If destroy of platform, run directly as rescue thread already shut down.
+											run.run();
+										}
+										else
+										{
+											Starter.scheduleRescueStep(sic.getCallerAdapter().getComponentIdentifier(), run);
+										}
 									}
 									else
 									{
