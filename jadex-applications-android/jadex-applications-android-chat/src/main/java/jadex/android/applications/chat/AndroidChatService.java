@@ -105,7 +105,7 @@ public class AndroidChatService extends JadexPlatformService
 	public void onCreate()
 	{
 		super.onCreate();
-		notificationHelper = new NotificationHelper(this);
+		notificationHelper = new NotificationHelper(getBaseContext());
 	}
 
 	/**
@@ -244,6 +244,7 @@ public class AndroidChatService extends JadexPlatformService
 								{
 									public void intermediateResultAvailable(ChatEvent ce)
 									{
+										System.out.println("event: " + ce);
 										informChatEvent(ce);
 									}
 
@@ -295,6 +296,7 @@ public class AndroidChatService extends JadexPlatformService
 		boolean eventProcessed = false;
 		for (ChatEventListener l : listeners)
 		{
+			System.out.println("informing listener " + l + " about " + ce);
 			eventProcessed = l.eventReceived(ce) || eventProcessed;
 		}
 		processEvent(ce, eventProcessed);

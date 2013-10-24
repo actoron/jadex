@@ -1,5 +1,6 @@
 package jadex.android.standalone.clientservice;
 
+import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidError;
 import jadex.android.service.JadexPlatformManager;
 import jadex.android.service.JadexPlatformService;
@@ -55,7 +56,6 @@ public class UniversalClientService extends Service
 	public void onDestroy()
 	{
 		super.onDestroy();
-		// TODO: destroy all client services
 	}
 
 	private Service createClientService(String className)
@@ -66,6 +66,7 @@ public class UniversalClientService extends Service
 		Class<Service> clientServiceClass = SReflect.classForName0(className, cl);
 		try
 		{
+			Logger.d("Creating new Client Service: " + className);
 			result = clientServiceClass.newInstance();
 			Context baseContext = getBaseContext();
 			if (result instanceof JadexClientAppService) {
@@ -107,6 +108,7 @@ public class UniversalClientService extends Service
 			if (!serviceConnections.containsKey(conn))
 			{
 				Intent clientIntent = intent;
+				Logger.d("Binding existing Client Service: " + clientServiceClassName);
 				IBinder clientBinder = clientService.onBind(clientIntent);
 
 				clientIntents.put(conn, clientIntent);
@@ -128,10 +130,12 @@ public class UniversalClientService extends Service
 			if (service != null)
 			{
 				Intent clientIntent = clientIntents.get(conn);
+				ComponentName componentName = componentNames.get(conn);
+				Logger.d("Unbinding Client Service: " + componentName);
 				boolean onUnbind = service.onUnbind(clientIntent);
 				// onUnbind returns false by default, so don't respect it
 //				if (onUnbind) {
-					conn.onServiceDisconnected(componentNames.get(conn));
+					conn.onServiceDisconnected(componentName);
 					serviceConnections.remove(conn);
 					componentNames.remove(conn);
 					clientIntents.remove(conn);

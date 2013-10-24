@@ -1,6 +1,7 @@
 package jadex.android.applications.chat;
 
 import jadex.android.applications.chat.filetransfer.TransferActivity;
+import jadex.android.commons.Logger;
 import jadex.bridge.service.types.chat.TransferInfo;
 
 import java.util.HashMap;
@@ -47,6 +48,7 @@ public class NotificationHelper
 
 	public void createOrUpdateFileNotification(TransferInfo ti, String peerNick)
 	{
+		Logger.d("trying to create notification with context: " + context);
 		String id = ti.getId();
 		if (ti.getState().equals(TransferInfo.STATE_TRANSFERRING))
 		{
@@ -91,6 +93,7 @@ public class NotificationHelper
 			notificationBuilder.setTicker("Transfer aborted");
 			notificationBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
 		}
+		
 
 		// create or update notification
 		Integer notId = transferNotifications.get(id);
@@ -150,6 +153,7 @@ public class NotificationHelper
 
 	private PendingIntent createTransferActivityPendingIntent(TransferInfo ti, String nick)
 	{
+		// TODO convert transferactivity to clientfragment
 		Intent resultIntent = new Intent(context, TransferActivity.class);
 		if (ti != null && nick != null) {
 			resultIntent.putExtra(TransferActivity.EXTRA_KEY_TRANSFERINFO, ti);
@@ -162,7 +166,7 @@ public class NotificationHelper
 		}
 		
 		TaskStackBuilder stackBuilder = TaskStackBuilder.from(context);
-		stackBuilder.addParentStack(TransferActivity.class);
+//		stackBuilder.addParentStack(TransferActivity.class); // results in error because TransferActivity is not declared
 		stackBuilder.addNextIntent(resultIntent);
 		return stackBuilder.getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
