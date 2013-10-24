@@ -171,7 +171,7 @@ public class ServiceInvocationContext
 		this.calleradapter	= IComponentAdapter.LOCAL.get();
 		
 		this.lastcall = CallAccess.getCurrentInvocation();
-
+		
 		// Is next call defined by user?
 		this.call = CallAccess.getNextInvocation(); 
 		if(call==null)
@@ -202,6 +202,9 @@ public class ServiceInvocationContext
 		}
 		
 		// Init the cause of the next call based on the last one
+//		if(method.getName().indexOf("test")!=-1 && lastcall!=null)
+//			System.out.println("lastcall: "+lastcall.getCause());
+
 		if(this.call.getCause()==null)
 		{
 //			String target = SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3);
@@ -209,6 +212,8 @@ public class ServiceInvocationContext
 			if(lastcall!=null && lastcall.getCause()!=null)
 			{
 				this.call.setCause(new Cause(lastcall.getCause(), target));
+//				if(method.getName().indexOf("test")!=-1 && lastcall!=null)
+//					System.out.println("Creating new cause based on: "+lastcall.getCause());
 //				this.call.setCause(new Tuple2<String, String>(cause.getSecondEntity(), SUtil.createUniqueId(caller!=null? caller.getName(): "unknown", 3)));
 			}
 			else
@@ -216,8 +221,13 @@ public class ServiceInvocationContext
 				// Create cause with novel chain id as origin is component itself
 				Cause newc = new Cause(cause);
 //				newc.setChainId(newc.createUniqueId());
-				newc.setChainId(cause.getTargetId());
+//				newc.setOrigin(cause.getTargetId());
+				// This is on receiver side, i.e. must set the caller as origin
+				newc.setOrigin(caller!=null? caller.getName(): sid.getProviderId().getName());
 				this.call.setCause(new Cause(newc, target));
+				
+//				if(method.getName().indexOf("createCompo")!=-1)
+//					System.out.println("herer: "+cause);
 			}
 		}
 	}

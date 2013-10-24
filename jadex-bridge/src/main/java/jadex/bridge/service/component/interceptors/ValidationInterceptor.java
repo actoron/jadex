@@ -14,6 +14,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,15 +38,25 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 		try
 		{
 			ALWAYSOK = new HashSet();
+			
 			ALWAYSOK.add(Object.class.getMethod("toString", new Class[0]));
 			ALWAYSOK.add(Object.class.getMethod("equals", new Class[]{Object.class}));
 			ALWAYSOK.add(Object.class.getMethod("hashCode", new Class[0]));
-			ALWAYSOK.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
-			ALWAYSOK.add(IInternalService.class.getMethod("startService", new Class[0]));
-			ALWAYSOK.add(IInternalService.class.getMethod("shutdownService", new Class[0]));
-			ALWAYSOK.add(IInternalService.class.getMethod("setComponentAccess", new Class[] { IInternalAccess.class }));
-			ALWAYSOK.add(IInternalService.class.getMethod("setComponentAccess", new Class[] { IInternalAccess.class }));
-			ALWAYSOK.add(IService.class.getMethod("isValid", new Class[0]));
+			
+//			ALWAYSOK.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
+//			ALWAYSOK.add(IService.class.getMethod("isValid", new Class[0]));
+			
+			Method[] ms = IService.class.getDeclaredMethods();
+			for(Method m: ms)
+			{
+				ALWAYSOK.add(m);
+			}
+			
+			ms = IInternalService.class.getDeclaredMethods();
+			for(Method m: ms)
+			{
+				ALWAYSOK.add(m);
+			}
 		}
 		catch(Exception e)
 		{
@@ -83,9 +94,9 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 			{
 				System.out.println("null invocation: "+sic.getMethod());
 			}
-			Map<String, Object>	props	= new HashMap<String, Object>();
-			props.put("method1", sic.getMethod());
-			ServiceCall sc = CallAccess.getInvocation(props);
+//			Map<String, Object>	props	= new HashMap<String, Object>();
+//			props.put("method1", sic.getMethod());
+			ServiceCall sc = CallAccess.getInvocation(null);//props);
 			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
 			sc.setProperty(ServiceCall.INHERIT, true);
 //			CallAccess.setServiceCall(sc);

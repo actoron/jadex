@@ -32,8 +32,7 @@ public class BPMNTest	extends ComponentTestSuite
 				"StreamTest",	// ???
 				"CustomTask",	// Uses modal dialog that blocks execution.
 				"LoopingSubtask",	// Not yet implemented.
-				"ServiceCallTask",	// task properties implementation not yet finished
-				"ServiceHandler"	// service call task must be adapted to new version
+				"ServiceCallTask"	// task properties implementation not yet finished
 			});
 //			}, 600000, true, false);	// Uncomment for no starting of non-test agents.
 	}

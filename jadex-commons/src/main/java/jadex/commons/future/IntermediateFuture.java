@@ -466,7 +466,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		}
     		else if(isDone())
     		{
-    			throw new NoSuchElementException("No more intermediate results.");
+    			if(exception==null)
+    			{
+    				throw new NoSuchElementException("No more intermediate results.");
+    			}
+    			else if(exception instanceof RuntimeException)
+    			{
+    				throw (RuntimeException)exception;
+    			}
+    			else
+    			{
+    				throw new RuntimeException(exception);
+    			}
     		}
     		else
     		{

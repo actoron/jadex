@@ -2195,10 +2195,12 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			ServiceCall call = CallAccess.getCurrentInvocation();
 			if(call!=null)
 			{
+//				System.out.println("injecting call cause: "+call.getCause());
 				event.setCause(call.getCause());
 			}
 			else if(getComponentDescription().getCause()!=null)
 			{
+//				System.out.println("injecting root cause: "+call.getCause());
 				event.setCause(getComponentDescription().getCause().createNext());//event.getSourceIdentifier().toString()));
 			}
 		}

@@ -100,6 +100,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							if(ada==null || !ada.isExternalThread())
 //								|| !caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()) )
 							{
+//								if(sic.getMethod().getName().indexOf("test")!=-1)
+//									System.out.println("setting to: "+sic.getLastServiceCall());
 								CallAccess.setServiceCall(sic.getLastServiceCall());
 								listener.resultAvailable(null);
 							}
@@ -116,6 +118,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //											{
 //												System.out.println("resched: "+sic.getMethod().getName()+", "+System.currentTimeMillis());
 //											}
+//											if(sic.getMethod().getName().indexOf("test")!=-1)
+//												System.out.println("setting to d: "+sic.getLastServiceCall());
 											CallAccess.setServiceCall(sic.getLastServiceCall());
 											listener.resultAvailable(null);
 										}

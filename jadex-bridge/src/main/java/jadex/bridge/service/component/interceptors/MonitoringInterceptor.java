@@ -49,7 +49,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 	{
 		// Do not monitor calls to the monitoring service itself and no constant calls
 		
-		Boolean mon = (Boolean)context.getServiceCall().getProperty("monitoring");
+		Boolean mon = (Boolean)context.getServiceCall().getProperty(ServiceCall.MONITORING);
 		
 		boolean ret;
 		
@@ -92,7 +92,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 		final ServiceCall next = CallAccess.getNextInvocation();
 		
 		Map<String, Object>	props	= new HashMap<String, Object>();
-		props.put("method4", context.getMethod().getName());
+//		props.put("method4", context.getMethod().getName());
 		
 		ServiceCall sc = CallAccess.getInvocation(props);
 		sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
@@ -120,12 +120,15 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 				if(monser!=null)
 				{
 					// todo: clock?
+//					if(context.getMethod().getName().indexOf("test")!=-1)
+//						System.out.println("test call context: "+context.getServiceCall());
 					long start = System.currentTimeMillis();
 					ServiceCall sc = context.getServiceCall();
 					Cause cause = sc==null? null: sc.getCause();
+					String info = context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
+					info += context.getArguments();
 					MonitoringEvent ev = new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
-						context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName(), 
-						IMonitoringEvent.TYPE_SERVICECALL_START, cause, start);
+						info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start);
 					
 //					if(context.getMethod().getName().indexOf("method")!=-1)
 //						System.out.println("call method: "+ev.getCause().getChainId());

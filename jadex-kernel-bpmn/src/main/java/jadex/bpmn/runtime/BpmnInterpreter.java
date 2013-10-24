@@ -1436,7 +1436,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					{
 						if(methods.containsKey(meths[i]))
 						{
-							fut.setException(new RuntimeException("Ambiguous start events found for service method: "+meths[i]));
+							fut.setExceptionIfUndone(new RuntimeException("Ambiguous start events found for service method: "+meths[i]));
 						}
 						else
 						{
@@ -1447,21 +1447,24 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				
 				if(!methods.containsKey(meths[i]))
 				{
-					fut.setException(new RuntimeException("No start event found for service method: "+meths[i]));
+					fut.setExceptionIfUndone(new RuntimeException("No start event found for service method: "+meths[i]));
 				}
 			}
 
 //			System.out.println("Found mapping: "+methods);
 			// Todo: interceptors
-			addService(info.getName(), info.getType().getType(getClassLoader()), info.getImplementation().getProxytype(), null,
-				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType().getType(getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null, componentfetcher)
-				.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(fut)
+			if(!fut.isDone())
 			{
-				public void customResultAvailable(IInternalService result)
+				addService(info.getName(), info.getType().getType(getClassLoader()), info.getImplementation().getProxytype(), null,
+					Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType().getType(getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null, componentfetcher)
+					.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(fut)
 				{
-					fut.setResult(null);
-				}
-			});
+					public void customResultAvailable(IInternalService result)
+					{
+						fut.setResult(null);
+					}
+				});
+			}
 		}
 		
 		// External service implementation

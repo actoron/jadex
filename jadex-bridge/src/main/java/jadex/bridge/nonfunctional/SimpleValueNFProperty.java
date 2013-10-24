@@ -1,9 +1,7 @@
 package jadex.bridge.nonfunctional;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.sensor.service.WaitqueueProperty;
 import jadex.bridge.sensor.unit.IConvertableUnit;
-import jadex.bridge.sensor.unit.MemoryUnit;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

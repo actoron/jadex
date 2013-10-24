@@ -844,7 +844,7 @@ public class ProcessThread	implements ITaskContext
 			for(Iterator<String> it=before.iterator(); it.hasNext(); )
 			{
 				String name = it.next();
-				System.out.println("removing data: "+name);
+//				System.out.println("removing data: "+name);
 				data.remove(name);
 			}
 		}

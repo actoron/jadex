@@ -9,8 +9,11 @@ import java.util.UUID;
  */
 public class Cause
 {
+//	/** The id. Identical for all events of the same origin. */
+//	protected String chainid;
+	
 	/** The id. Identical for all events of the same origin. */
-	protected String chainid;
+	protected String origin;
 
 	/** The source id. */
 	protected String sourceid;
@@ -53,7 +56,7 @@ public class Cause
 	 */
 	public Cause(String chainid, String sourceid, String targetid, String sourcename, String targetname)
 	{
-		this.chainid = chainid==null? createUniqueId(): chainid;
+		this.origin = chainid==null? createUniqueId(): chainid;
 		this.sourceid = sourceid==null? createUniqueId(): sourceid;
 		this.targetid = targetid==null? createUniqueId(): targetid;
 		
@@ -66,11 +69,11 @@ public class Cause
 	}
 	
 	/**
-	 *  Create a new cause.
+	 *  Create a new cause rolling old one.
 	 */
 	public Cause(Cause old, String targetname)
 	{
-		this.chainid = old!=null? old.getChainId(): createUniqueId();
+		this.origin = old!=null? old.getOrigin(): createUniqueId();
 		this.sourceid = old!=null? old.getTargetId(): createUniqueId();
 //		this.sourcename = old!=null? old.getTargetName(): null;
 		this.targetid = createUniqueId();
@@ -82,7 +85,7 @@ public class Cause
 	 */
 	public Cause(Cause other)
 	{
-		this.chainid = other.getChainId();
+		this.origin = other.getOrigin();
 		this.sourceid = other.getSourceId();
 //		this.sourcename = other.getSourceName();
 		this.targetid = other.getTargetId();
@@ -115,8 +118,8 @@ public class Cause
 	 */
 	public String createUniqueId()
 	{
-//		return createUniqueId(5);
-		return createUniqueId(-1);
+		return createUniqueId(5);
+//		return createUniqueId(-1);
 	}
 	
 	/**
@@ -137,18 +140,18 @@ public class Cause
 	 *  Get the chain id.
 	 *  @return The chain id.
 	 */
-	public String getChainId()
+	public String getOrigin()
 	{
-		return chainid;
+		return origin;
 	}
 
 	/**
 	 *  Set the chain id.
-	 *  @param chainid The chainid to set.
+	 *  @param origin The chainid to set.
 	 */
-	public void setChainId(String callid)
+	public void setOrigin(String callid)
 	{
-		this.chainid = callid;
+		this.origin = callid;
 	}
 
 	/**
@@ -187,50 +190,50 @@ public class Cause
 		this.targetid = targetid;
 	}
 
-	/**
-	 *  Get the sourceName.
-	 *  @return The sourceName.
-	 */
-	public String getSourceName()
-	{
-//		return sourcename;
-		return null;
-	}
-
-	/**
-	 *  Set the sourceName.
-	 *  @param sourcename The sourceName to set.
-	 */
-	public void setSourceName(String sourcename)
-	{
-//		this.sourcename = sourcename;
-	}
-
-	/**
-	 *  Get the targetName.
-	 *  @return The targetName.
-	 */
-	public String getTargetName()
-	{
-//		return targetname;
-		return null;
-	}
-
-	/**
-	 *  Set the targetName.
-	 *  @param targetname The targetName to set.
-	 */
-	public void setTargetName(String targetname)
-	{
-//		this.targetname = targetname;
-	}
+//	/**
+//	 *  Get the sourceName.
+//	 *  @return The sourceName.
+//	 */
+//	public String getSourceName()
+//	{
+////		return sourcename;
+//		return null;
+//	}
+//
+//	/**
+//	 *  Set the sourceName.
+//	 *  @param sourcename The sourceName to set.
+//	 */
+//	public void setSourceName(String sourcename)
+//	{
+////		this.sourcename = sourcename;
+//	}
+//
+//	/**
+//	 *  Get the targetName.
+//	 *  @return The targetName.
+//	 */
+//	public String getTargetName()
+//	{
+////		return targetname;
+//		return null;
+//	}
+//
+//	/**
+//	 *  Set the targetName.
+//	 *  @param targetname The targetName to set.
+//	 */
+//	public void setTargetName(String targetname)
+//	{
+////		this.targetname = targetname;
+//	}
 
 	/**
 	 *  Get the string representation.
 	 */
 	public String toString()
 	{
-		return "Cause(chainid=" + chainid + ", sourceid=" + sourceid
+		return "Cause(origin=" + origin + ", sourceid=" + sourceid
 			+ ", targetid=" + targetid + ")";//, sourcename=" + sourcename
 			//+ ", targetname=" + targetname + ")";
 	}

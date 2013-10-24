@@ -721,7 +721,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					public void exceptionOccurred(Exception exception)
 					{
 						// result?!
-						System.out.println("Killing (ex): "+getComponentIdentifier().getName());
+//						System.out.println("Killing (ex): "+getComponentIdentifier().getName());
 						if(exception instanceof RuntimeException)
 						{
 							throw (RuntimeException)exception;

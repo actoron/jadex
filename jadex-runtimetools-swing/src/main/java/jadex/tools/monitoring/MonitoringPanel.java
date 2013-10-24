@@ -70,18 +70,22 @@ public class MonitoringPanel	implements IServiceViewerPanel
 		{
 			public void intermediateResultAvailable(IMonitoringEvent event)
 			{
-				String callid = event.getCause().getChainId();
+//				if(event.getType().indexOf(IMonitoringEvent.SOURCE_CATEGORY_SERVICE)==-1)
+//					return;
+				
+				String origin = event.getCause().getOrigin();
 				
 //				System.out.println("received callid: "+callid);
 				
-				IdTreeNode<List<IMonitoringEvent>> call = tm.getNode(callid);
-				String name = event.getCause().getSourceId().equals(callid)? event.getCause().getSourceName()+" ("+callid+")": callid;
+				IdTreeNode<List<IMonitoringEvent>> call = tm.getNode(origin);
+//				String name = event.getCause().getSourceId().equals(origin)? event.getCause().getSourceName()+" ("+origin+")": origin;
+				String name = event.getCause().getSourceId().equals(origin)? event.getCause().getSourceId()+" ("+origin+")": origin;
 				if(call==null)
 				{
-					call = new IdTreeNode<List<IMonitoringEvent>>(callid, name, tm, null, null, null, null);
+					call = new IdTreeNode<List<IMonitoringEvent>>(origin, name, tm, null, null, null, null);
 					root.add(call);
 				}
-				else if(callid.equals(call.getName()) && event.getCause().getSourceId().equals(callid))
+				else if(origin.equals(call.getName()) && event.getCause().getSourceId().equals(origin))
 				{
 					call.setName(name);
 				}
@@ -92,7 +96,7 @@ public class MonitoringPanel	implements IServiceViewerPanel
 				IdTreeNode<List<IMonitoringEvent>> parent = tm.getNode(srcid);
 				IdTreeNode<List<IMonitoringEvent>> child = tm.getNode(trgid);
 				
-//				System.out.println("event : "+event.getSource()+" "+srcid+" "+(parent!=null)+" "+trgid+" "+(child!=null));
+//				System.out.println("event : "+srcid+" "+(parent!=null)+" "+trgid+" "+(child!=null));
 				
 				// Create child
 				if(child==null)
@@ -117,8 +121,8 @@ public class MonitoringPanel	implements IServiceViewerPanel
 				if(parent==null)
 				{
 					// Parent not found, create parent and add parent on call level
-					String srcname = event.getCause().getSourceName()!=null? event.getCause().getSourceName(): "unknown";
-					parent = new MyIdTreeNode<List<IMonitoringEvent>>(srcid, srcname, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
+//					String srcname = event.getCause().getSourceName()!=null? event.getCause().getSourceName(): "unknown";
+					parent = new MyIdTreeNode<List<IMonitoringEvent>>(srcid, null, tm, null, null, null, new ArrayList<IMonitoringEvent>()); 
 					call.add(parent);
 				}
 
@@ -238,6 +242,7 @@ class MyIdTreeNode<T> extends IdTreeNode<T>
 		Icon icon, String tooltip, T object)
 	{
 		super(key, name, tm, leaf, icon, tooltip, object);
+//		System.out.println("created: "+getId());
 	}
 	
 	/**
@@ -261,8 +266,8 @@ class MyIdTreeNode<T> extends IdTreeNode<T>
 //					buf.append("chainid=").append(ev.getCause().getChainId()).append("<br>");
 //				}
 				
-				buf.append(ev.getSourceIdentifier()+" "+ev.getType());
-//				buf.append(ev.getSource()+" "+ev.getType()+" "+ev.getCause().getSourceId()+" "+ev.getCause().getTargetId());
+//				buf.append(ev.getSourceIdentifier()+" "+ev.getType());
+				buf.append(ev.getCause().getOrigin()+" "+ev.getSourceIdentifier()+" "+ev.getType()+" "+ev.getCause().getSourceId()+" "+ev.getCause().getTargetId());
 				buf.append("<br>");
 			}
 		}

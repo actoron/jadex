@@ -51,17 +51,23 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			
 			if(switchcall)
 			{
+//				if(sic.getMethod().getName().indexOf("test")!=-1)
+//					System.out.println("setting to a: "+sic.getServiceCall());
 				CallAccess.setServiceCall(sic.getServiceCall()); // next becomes current
 				CallAccess.resetNextInvocation();
 			}
 			else
 			{
+//				if(sic.getMethod().getName().indexOf("test")!=-1)
+//					System.out.println("setting to b: "+sic.getLastServiceCall());
 				CallAccess.setServiceCall(sic.getLastServiceCall());
 				CallAccess.setNextInvocation(sic.getServiceCall());
 			}
 			
 			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
 
+//			if(sic.getMethod().getName().indexOf("test")!=-1)
+//				System.out.println("setting to c: "+sic.getLastServiceCall());
 			CallAccess.setServiceCall(sic.getLastServiceCall()); 
 			CallAccess.resetNextInvocation();
 			
