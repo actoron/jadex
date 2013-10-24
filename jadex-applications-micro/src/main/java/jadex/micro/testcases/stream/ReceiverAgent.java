@@ -2,14 +2,20 @@ package jadex.micro.testcases.stream;
 
 import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.context.IContextService;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
+import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.AgentStreamArrived;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -19,6 +25,9 @@ import java.util.Collection;
 
 @Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"copy.copy\""))
 @Results(@Result(name="filesize", clazz=long.class))
+@RequiredServices({
+	@RequiredService(name="contextService", type=IContextService.class, binding=@Binding(scope=Binding.SCOPE_PLATFORM))
+})
 @Agent
 public class ReceiverAgent
 {
@@ -27,6 +36,9 @@ public class ReceiverAgent
 	
 	@AgentArgument
 	protected String filename;
+	
+	@AgentService
+	protected IContextService contextService;
 	
 	/**
 	 * 
@@ -49,7 +61,7 @@ public class ReceiverAgent
 		try
 		{
 			final long[] cnt = new long[1];
-			File f = new File(filename);
+			File f = contextService.getFile(filename).get();
 			final FileOutputStream fos = new FileOutputStream(f);
 			
 			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
@@ -107,7 +119,7 @@ public class ReceiverAgent
 		}
 		catch(Exception e)
 		{
-//			e.printStackTrace();
+			e.printStackTrace();
 			agent.killAgent();
 		}
 	}

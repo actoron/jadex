@@ -113,14 +113,17 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		
 		try
 		{
-			// Not working on android right now:
-//			suite.addTest(new MicroTest("jadex.micro.testcases.stream.InitiatorAgent", targetAppDir));
+			// To execute a single test:
+//			Test singleTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases.stream.InitiatorAgent", targetAppDir, true);
+//			suite.addTest(singleTest);
+			
 			
 			Test bdiTest = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", targetAppDir, false);
 			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", targetAppDir, true);
 
 			suite.addTest(bdiTest);
 			suite.addTest(microTest);
+			
 		}
 		catch (Exception e)
 		{
