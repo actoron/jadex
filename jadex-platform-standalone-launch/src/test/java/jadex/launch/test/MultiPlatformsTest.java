@@ -18,7 +18,7 @@ public class MultiPlatformsTest extends TestCase
 {
 	/**
 	 * 
-	 * /
+	 */
 	public static void main(String[] args) throws Exception
 	{
 		MultiPlatformsTest t = new MultiPlatformsTest();
@@ -28,7 +28,7 @@ public class MultiPlatformsTest extends TestCase
 	/**
 	 *  Perform the test.
 	 * @throws Exception 
-	 * /
+	 */
 	public void	testMultiplePlatforms() throws Exception
 	{
 //		for(int p=0; p<100; p++)
@@ -94,5 +94,5 @@ public class MultiPlatformsTest extends TestCase
 		}
 		
 //		Thread.sleep(300000);
-	}*/
+	}
 }
