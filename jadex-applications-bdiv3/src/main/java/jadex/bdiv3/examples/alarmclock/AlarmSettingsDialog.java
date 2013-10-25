@@ -9,6 +9,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.Dialog;
@@ -351,14 +352,19 @@ public class AlarmSettingsDialog extends JDialog
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					((BDIAgent)ia).getTime()
-						.addResultListener(new SwingDefaultResultListener<Long>(AlarmSettingsDialog.this)
+						.addResultListener(new SwingResultListener<Long>(new IResultListener<Long>()
 					{
-						public void customResultAvailable(Long time)
+						public void resultAvailable(Long time)
 						{
 							al.setTime(new Time(new Date(time.longValue())));
 							setAlarm(al);
 						}
-					});
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// Ignore when component already terminated.
+						}
+					}));
 					return IFuture.DONE;
 				}
 			});

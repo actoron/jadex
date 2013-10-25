@@ -5,7 +5,6 @@ import jadex.base.test.ComponentTestSuite;
 import java.io.File;
 
 import junit.framework.Test;
-import junit.framework.TestResult;
 
 /**
  *  Test suite for BDI BPMN agent tests.
@@ -23,6 +22,9 @@ public class BDIBPMNTest	extends ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
+//				// GUI problems: AWT not released.
+//				"examples",
+				
 				".bpmn",	// Only execute agents.
 				"Carry",
 				"Producer",
@@ -38,18 +40,17 @@ public class BDIBPMNTest	extends ComponentTestSuite
 		return new BDIBPMNTest();
 	}
 	
-	@Override
-	public void run(TestResult result)
-	{
-		// TODO Auto-generated method stub
-		super.run(result);
-		
-		try
-		{
-			Thread.sleep(3000000);
-		}
-		catch(InterruptedException e)
-		{
-		}
-	}
+//	public void run(TestResult result)
+//	{
+//		// TODO Auto-generated method stub
+//		super.run(result);
+//		
+//		try
+//		{
+//			Thread.sleep(3000000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
+//	}
 }

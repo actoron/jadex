@@ -7,12 +7,11 @@ import jadex.commons.future.ThreadSuspendable;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.TimerTask;
+import java.util.Timer;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -29,14 +28,14 @@ public class Cleanup extends TestCase
 	protected IExternalAccess	platform;
 	
 	/** The timer that stops test suite execution after timeout (needs to be cancelled on cleanup). */
-	protected	TimerTask	timer;
+	protected	Timer	timer;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a component test.
 	 */
-	public Cleanup(IExternalAccess platform, TimerTask timer)
+	public Cleanup(IExternalAccess platform, Timer timer)
 	{
 		super("Cleanup");
 		this.platform	= platform;
@@ -58,7 +57,10 @@ public class Cleanup extends TestCase
 	 */
 	public void run(TestResult result)
 	{
-		timer.cancel();
+		if(timer!=null)
+		{
+			timer.cancel();
+		}
 		
 		result.startTest(this);
 
@@ -100,7 +102,7 @@ public class Cleanup extends TestCase
 				f.setSize(100, 100);
 				f.setVisible(true);
 				
-				Timer	t	= new Timer(500, new ActionListener()
+				javax.swing.Timer	t	= new javax.swing.Timer(500, new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{

@@ -195,6 +195,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 	{
 		if(timer==null)
 		{
+//			System.out.println("create realtime timer: "+this);
 			timer = new java.util.Timer(true);
 		}
 		TimerTask tt = new TimerTask()
@@ -334,7 +335,9 @@ public class ClockService extends BasicService implements IClockService, IProper
 		clock.dispose();
 		if(timer!=null)
 		{
+//			System.out.println("cancel realtime timer: "+this);
 			timer.cancel();
+			timer	= null;
 		}
 		listeners	= null;
 		threadpool	= null;

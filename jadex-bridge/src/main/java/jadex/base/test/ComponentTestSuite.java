@@ -121,10 +121,11 @@ public class ComponentTestSuite extends TestSuite
 		
 		final Thread	runner	= Thread.currentThread();
 		
-		TimerTask	timer	= null;
+		Timer	timer	= null;
 		if(timeout>0)
 		{
-			timer	= new TimerTask()
+			timer	= new Timer(true);
+			timer.schedule(new TimerTask()
 			{
 				public void run()
 				{
@@ -137,8 +138,7 @@ public class ComponentTestSuite extends TestSuite
 						System.exit(1);
 					}
 				}
-			};
-			new Timer(true).schedule(timer, timeout);
+			}, timeout);
 		}
 		
 		// Tests must be available after constructor execution.

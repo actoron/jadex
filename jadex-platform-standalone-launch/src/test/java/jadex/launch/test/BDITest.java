@@ -32,6 +32,9 @@ public class BDITest	extends	ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
+//				// GUI problems: AWT not released.
+//				"examples",
+			
 				"BeliefSetChanges",
 				"BeliefSetContains",
 				"MultiplePlanTriggers",
@@ -69,4 +72,18 @@ public class BDITest	extends	ComponentTestSuite
 	{
 		return new BDITest();
 	}
+
+//	public void run(TestResult result)
+//	{
+//		// TODO Auto-generated method stub
+//		super.run(result);
+//		
+//		try
+//		{
+//			Thread.sleep(3000000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
+//	}
 }

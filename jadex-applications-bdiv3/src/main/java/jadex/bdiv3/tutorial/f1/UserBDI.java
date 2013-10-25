@@ -10,6 +10,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Description;
 
 import java.awt.BorderLayout;
@@ -34,6 +35,9 @@ public class UserBDI
 	@Agent
 	protected BDIAgent agent;
 	
+	/** The gui. */
+	protected JFrame	f;
+	
 	//-------- methods ---------
 	
 	/**
@@ -46,7 +50,7 @@ public class UserBDI
 		{
 			public void run()
 			{
-				JFrame f = new JFrame();
+				f = new JFrame();
 				
 				PropertiesPanel pp = new PropertiesPanel();
 				final JTextField tfe = pp.createTextField("English Word", "dog", true);
@@ -87,6 +91,24 @@ public class UserBDI
 						});
 					}
 				});
+			}
+		});
+	}
+	
+	/**
+	 *  Cleanup when agent is killed.
+	 */
+	@AgentKilled
+	public void	cleanup()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				if(f!=null)
+				{
+					f.dispose();
+				}
 			}
 		});
 	}

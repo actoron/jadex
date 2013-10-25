@@ -47,10 +47,16 @@ public class BDIV3Test	extends	ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
+//				// GUI problems: AWT not released.
+//				"examples\\garbagecollector",
+//				"examples\\marsworld",
+			
 				"ComponentPlanAgent",	// sub agent
 				"Carry",	// sub agent
 				"Producer",	// sub agent
 				"Sentry",	// sub agent
+				"BurnerBDI",	// sub agent
+				"CollectorBDI",	// sub agent
 				"3d",	// OpenGL problems on termination?
 				"CreationBDI",	// should only be run as separate benchmark,
 				SReflect.isAndroid() ? "GuiBDI" : NOEXCLUDE
@@ -64,4 +70,18 @@ public class BDIV3Test	extends	ComponentTestSuite
 	{
 		return new BDIV3Test();
 	}
+
+//	public void run(TestResult result)
+//	{
+//		// TODO Auto-generated method stub
+//		super.run(result);
+//		
+//		try
+//		{
+//			Thread.sleep(3000000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
+//	}
 }

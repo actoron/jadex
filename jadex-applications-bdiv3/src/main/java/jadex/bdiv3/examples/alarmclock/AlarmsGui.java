@@ -7,7 +7,8 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.IPojoMicroAgent;
@@ -87,9 +88,9 @@ public class AlarmsGui extends JFrame
 			{
 //				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
 				IFuture<IClockService>	fut	= ia.getServiceContainer().getRequiredService("clockservice");
-				fut.addResultListener(new SwingDefaultResultListener<IClockService>(AlarmsGui.this)
+				fut.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 				{
-					public void customResultAvailable(final IClockService cs)
+					public void resultAvailable(final IClockService cs)
 					{
 						alarms = new JTable(tadata)
 						{
@@ -226,7 +227,12 @@ public class AlarmsGui extends JFrame
 						getContentPane().add("Center", pan);
 						pack();
 					}
-				});
+
+					public void exceptionOccurred(Exception exception)
+					{
+						// Ignore when component already terminated.
+					}
+				}));
 				return IFuture.DONE;
 			}
 		});

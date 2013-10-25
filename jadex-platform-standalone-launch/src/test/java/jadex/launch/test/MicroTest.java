@@ -49,10 +49,10 @@ public class MicroTest	extends ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 		{
-			// Excluded for finding cause of memory leak
-			"benchmarks",
-			"examples",
-			"testcases",
+//			// Excluded for finding cause of memory leak
+//			"benchmarks",
+//			"examples",
+//			"testcases",
 			
 			// Test-support agents
 			"BodyExceptionAgent",
@@ -107,4 +107,17 @@ public class MicroTest	extends ComponentTestSuite
 		return new MicroTest();
 	}
 	
+//	public void run(TestResult result)
+//	{
+//		// TODO Auto-generated method stub
+//		super.run(result);
+//		
+//		try
+//		{
+//			Thread.sleep(3000000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
+//	}
 }

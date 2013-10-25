@@ -163,6 +163,12 @@ public class SelectorThread implements Runnable
 			}
 		}
 		
+		if(timer!=null)
+		{
+			timer.cancel();
+			timer	= null;
+		}
+		
 //		System.out.println("nio selector end");
 	}
 	

@@ -9,7 +9,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
@@ -380,9 +379,9 @@ public class ClockFrame extends JFrame
 					AlarmclockBDI agent = (AlarmclockBDI)((IPojoMicroAgent)ia).getPojoAgent();
 					final Settings sets = agent.getSettings();
 					IFuture<IClockService>	fut	= ia.getServiceContainer().getRequiredService("clockservice");
-					fut.addResultListener(new SwingDefaultResultListener<IClockService>(ClockFrame.this)
+					fut.addResultListener(new SwingResultListener<IClockService>(new IResultListener<IClockService>()
 					{
-						public void customResultAvailable(IClockService cs)
+						public void resultAvailable(IClockService cs)
 						{
 							if(!shutdown)
 							{
@@ -410,7 +409,12 @@ public class ClockFrame extends JFrame
 									ti.setToolTip(format.format(current));
 							}
 						}
-					});
+
+						public void exceptionOccurred(Exception exception)
+						{
+							// Ignore when component already terminated.
+						}
+					}));
 					return IFuture.DONE;
 				}
 			});

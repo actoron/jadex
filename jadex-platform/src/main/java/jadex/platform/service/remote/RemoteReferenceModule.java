@@ -653,6 +653,7 @@ public class RemoteReferenceModule
 		Future<Void>	ret	= new Future<Void>();
 		checkThread();
 		timer.cancel();
+		timer	= null;
 		
 		// todo: wait until all remote ref messages have been sent?!
 		

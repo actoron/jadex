@@ -32,7 +32,7 @@ public class MultiPlatformsTest extends TestCase
 	public void	testMultiplePlatforms() throws Exception
 	{
 //		for(int p=0; p<100; p++)
-		{
+//		{
 //			long	time	= System.currentTimeMillis();
 		int	number	= 25;	// larger numbers cause timeout on toaster.
 		long	timeout	= 180000;	// time required by toaster.
@@ -91,8 +91,11 @@ public class MultiPlatformsTest extends TestCase
 		
 //			time	= System.currentTimeMillis() - time;
 //			System.out.println("run "+p+" took "+time+" milliseconds.");
-		}
+//		}
 		
-//		Thread.sleep(300000);
+//		System.out.println("Killed all platforms");
+//		platforms	= null;
+//		futures	= null;
+//		Thread.sleep(3000000);
 	}
 }

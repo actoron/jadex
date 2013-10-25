@@ -1209,6 +1209,7 @@ public class MessageService extends BasicService implements IMessageService
 		if(timer!=null)
 		{
 			timer.cancel();
+			timer	= null;
 		}
 		
 		return ret;
