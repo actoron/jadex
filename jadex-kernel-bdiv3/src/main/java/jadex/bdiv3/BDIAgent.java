@@ -8,6 +8,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
@@ -16,6 +17,8 @@ import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -259,16 +262,19 @@ public class BDIAgent extends MicroAgent
 			
 			// unobserve old value for property changes
 			rs.unobserveObject(oldval);
-			
+
+			MBelief	mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
+		
 			if(!SUtil.equals(val, oldval))
 			{
+				publishToolBeliefEvent(ip, mbel);
 				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 
 			}
 			
 			// observe new value for property changes
-			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname);
+			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname, mbel);
 			
 			// initiate a step to reevaluate the conditions
 			scheduleStep(new IComponentStep()
@@ -375,7 +381,7 @@ public class BDIAgent extends MicroAgent
 			try
 			{
 				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, "__agent");
-				System.out.println("res: "+res);
+//				System.out.println("res: "+res);
 				agent = (BDIAgent)res.getFirstEntity().get(res.getSecondEntity());
 			}
 			catch(Exception e)
@@ -383,36 +389,25 @@ public class BDIAgent extends MicroAgent
 			}
 		}
 		
-		String	gn	= null;
-		try
-		{
-			Field	gnf	= obj.getClass().getField("__globalname");
-			gnf.setAccessible(true);
-			gn	= (String)gnf.get(obj);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		
-		String belname	= gn!=null ? gn + BDIAgentInterpreter.CAPABILITY_SEPARATOR + fieldname : fieldname;
+		String belname	= getBeliefName(obj, fieldname);
 
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+		MBelief mbel = ip.getBDIModel().getCapability().getBelief(belname);
 		
 		// Wrap collections of multi beliefs (if not already a wrapper)
-		if(ip.getBDIModel().getCapability().getBelief(belname).isMulti(ip.getClassLoader()))
+		if(mbel.isMulti(ip.getClassLoader()))
 		{
 			if(val instanceof List && !(val instanceof ListWrapper))
 			{
-				val = new ListWrapper((List<?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname);
+				val = new ListWrapper((List<?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname, mbel);
 			}
 			else if(val instanceof Set && !(val instanceof SetWrapper))
 			{
-				val = new SetWrapper((Set<?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname);
+				val = new SetWrapper((Set<?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname, mbel);
 			}
 			else if(val instanceof Map && !(val instanceof MapWrapper))
 			{
-				val = new MapWrapper((Map<?,?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname);
+				val = new MapWrapper((Map<?,?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname, mbel);
 			}
 		}
 		
@@ -467,11 +462,13 @@ public class BDIAgent extends MicroAgent
 				{
 //					System.out.println("initwrite: "+write[0]+" "+write[1]+" "+write[2]);
 //					agent.writeField(write[0], (String)write[1], write[2]);
-					RuleSystem rs = ((BDIAgentInterpreter)agent.getInterpreter()).getRuleSystem();
+					BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+					RuleSystem rs = ip.getRuleSystem();
 					final String belname = (String)write[1];
 					Object val = write[0];
 					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
-					observeValue(rs, val, (BDIAgentInterpreter)agent.getInterpreter(), ChangeEvent.FACTCHANGED+"."+belname);
+					MBelief	mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
+					observeValue(rs, val, (BDIAgentInterpreter)agent.getInterpreter(), ChangeEvent.FACTCHANGED+"."+belname, mbel);
 				}
 			}
 		}
@@ -503,12 +500,19 @@ public class BDIAgent extends MicroAgent
 				val = new Byte(((Integer)val).byteValue());
 			}
 			
+			// todo: fetch correct belname
+//			String belname	= getBeliefName(obj, fieldname);
+			String belname = fieldname; // Hack!!!
+			
 			Array.set(array, index, val);
-			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+fieldname);
+			MBelief	mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
+			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname, mbel);
 			
 			if(!SUtil.equals(val, oldval))
 			{
-				Event ev = new Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, fieldname}), val); // todo: index
+				publishToolBeliefEvent(ip, mbel);
+
+				Event ev = new Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}), val); // todo: index
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 
@@ -548,7 +552,7 @@ public class BDIAgent extends MicroAgent
 	/**
 	 * 
 	 */
-	public static void observeValue(RuleSystem rs, Object val, final BDIAgentInterpreter agent, final String etype)
+	public static void observeValue(RuleSystem rs, Object val, final BDIAgentInterpreter agent, final String etype, final MBelief mbel)
 	{
 		if(val!=null)
 		{
@@ -560,6 +564,8 @@ public class BDIAgent extends MicroAgent
 					{
 						public IFuture<IEvent> execute(IInternalAccess ia)
 						{
+							publishToolBeliefEvent(agent, mbel);
+							
 	//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
 	//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
 							Event ev = new Event(etype, event.getNewValue());
@@ -571,21 +577,6 @@ public class BDIAgent extends MicroAgent
 		}
 	}
 
-	/**
-	 *  Create a belief changed event.
-	 *  @param val The new value.
-	 *  @param agent The agent.
-	 *  @param belname The belief name.
-	 */
-	public static void createEvent(Object val, final BDIAgent agent, final String belname)
-	{
-//		System.out.println("createEv: "+val+" "+agent+" "+belname);
-		
-		RuleSystem rs = ((BDIAgentInterpreter)agent.getInterpreter()).getRuleSystem();
-		rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
-		observeValue(rs, val, (BDIAgentInterpreter)agent.getInterpreter(), ChangeEvent.FACTCHANGED+"."+belname);
-	}
-	
 	/**
 	 *  Get the value of an abstract belief.
 	 */
@@ -632,18 +623,82 @@ public class BDIAgent extends MicroAgent
 		{
 			throw new RuntimeException("No mapping for abstract belief: "+capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+name);
 		}
-		MBelief	bel	= bdimodel.getCapability().getBelief(belname);
+		MBelief	mbel = bdimodel.getCapability().getBelief(belname);
 
 		// Maybe unobserve old value
-		Object	old	= bel.getValue((BDIAgentInterpreter)getInterpreter());
+		Object	old	= mbel.getValue((BDIAgentInterpreter)getInterpreter());
 
-		boolean	field	= bel.setValue((BDIAgentInterpreter)getInterpreter(), value);
+		boolean	field = mbel.setValue((BDIAgentInterpreter)getInterpreter(), value);
 		
 		if(field)
 		{
-			RuleSystem rs = ((BDIAgentInterpreter)getInterpreter()).getRuleSystem();
+			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
+			RuleSystem rs = (ip).getRuleSystem();
 			rs.unobserveObject(old);	
-			createEvent(value, this, belname);
+			createChangeEvent(value, this, mbel);
+			observeValue(rs, value, ip, ChangeEvent.FACTCHANGED+"."+mbel.getName(), mbel);
 		}
+	}
+	
+	/**
+	 *  Create a belief changed event.
+	 *  @param val The new value.
+	 *  @param agent The agent.
+	 *  @param belname The belief name.
+	 */
+//	public static void createChangeEvent(Object val, final BDIAgent agent, final String belname)
+	public static void createChangeEvent(Object val, final BDIAgent agent, MBelief mbel)
+	{
+//		System.out.println("createEv: "+val+" "+agent+" "+belname);
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+		
+		RuleSystem rs = (ip).getRuleSystem();
+		rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+mbel.getName(), val));
+		
+		publishToolBeliefEvent(ip, mbel);
+	}
+	
+	/**
+	 * 
+	 */
+	public static void publishToolBeliefEvent(BDIAgentInterpreter ip, MBelief mbel)//, String evtype)
+	{
+		if(ip.hasEventTargets(false))
+		{
+			long time = System.currentTimeMillis();//getClockService().getTime();
+			MonitoringEvent mev = new MonitoringEvent();
+			mev.setSourceIdentifier(ip.getComponentIdentifier());
+			mev.setTime(time);
+			
+			BeliefInfo info = BeliefInfo.createBeliefInfo(ip, mbel, ip.getClassLoader());
+//			mev.setType(evtype+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT);
+			mev.setType(IMonitoringEvent.EVENT_TYPE_MODIFICATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT);
+//			mev.setProperty("sourcename", element.toString());
+			mev.setProperty("sourcetype", info.getType());
+			mev.setProperty("details", info);
+			
+			ip.publishEvent(mev);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected static String getBeliefName(Object obj, String fieldname)
+	{
+		String	gn	= null;
+		try
+		{
+			Field	gnf	= obj.getClass().getField("__globalname");
+			gnf.setAccessible(true);
+			gn	= (String)gnf.get(obj);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		String belname	= gn!=null ? gn + BDIAgentInterpreter.CAPABILITY_SEPARATOR + fieldname : fieldname;
+		return belname;
 	}
 }

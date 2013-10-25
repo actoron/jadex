@@ -1,5 +1,7 @@
 package jadex.bdiv3.runtime.wrappers;
 
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.RuleSystem;
@@ -17,9 +19,9 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 	 *  Create a new list wrapper.
 	 */
 	public ListWrapper(List<T> delegate, BDIAgentInterpreter interpreter, 
-		String addevent, String remevent, String changeevent)
+		String addevent, String remevent, String changeevent, MBelief mbel)
 	{
-		super(delegate, interpreter, addevent, remevent, changeevent);
+		super(delegate, interpreter, addevent, remevent, changeevent, mbel);
 	}
 
 	/**
@@ -56,6 +58,7 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 		unobserveValue(ret);
 		observeValue(element);
 		getRuleSystem().addEvent(new Event(changeevent, new Object[]{ret, element, new Integer(index)}));
+		publishToolBeliefEvent();
 		return ret;
 	}
 
@@ -67,6 +70,7 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 		getList().add(index, element);
 		observeValue(element);
 		getRuleSystem().addEvent(new Event(addevent, element));
+		publishToolBeliefEvent();
 	}
 
 	/**
@@ -77,6 +81,7 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 		T ret = getList().remove(index);
 		unobserveValue(ret);
 		getRuleSystem().addEvent(new Event(remevent, ret));
+		publishToolBeliefEvent();
 		return ret;
 	}
 

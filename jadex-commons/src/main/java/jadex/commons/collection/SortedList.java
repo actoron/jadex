@@ -11,7 +11,7 @@ import java.util.LinkedList;
  *  (unlike java.util.TreeSet).
  *  The list is kept sorted, while elements are being added.
  */
-public class SortedList	extends LinkedList
+public class SortedList<T>	extends LinkedList<T>
 {
 	//-------- attributes --------
 
@@ -19,7 +19,7 @@ public class SortedList	extends LinkedList
 	protected boolean ascending;
 
 	/** The comparator to use (if any). */
-	protected Comparator	comp;
+	protected Comparator<? super T>	comp;
 	
 	//-------- constrcutors --------
 
@@ -45,7 +45,7 @@ public class SortedList	extends LinkedList
 	 *  @param comp	A comparator to use for comparing elements.
 	 *  @param ascending	True, if the list shoudl sort ascending.
 	 */
-	public SortedList(Comparator comp, boolean ascending)
+	public SortedList(Comparator<? super T> comp, boolean ascending)
 	{
 		this.comp	= comp;
 		this.ascending	= ascending;
@@ -58,7 +58,7 @@ public class SortedList	extends LinkedList
 	 * 
 	 * @param o the element to be inserted at the beginning of this list.
 	 */
-	public void addFirst(Object o)
+	public void addFirst(T o)
 	{
 		insertElement(0, o);
 	}
@@ -69,7 +69,7 @@ public class SortedList	extends LinkedList
 	 * 
 	 * @param o the element to be inserted at the end of this list.
 	 */
-	public void addLast(Object o)
+	public void addLast(T o)
 	{
 		insertElement(size(), o);
 	}
@@ -81,7 +81,7 @@ public class SortedList	extends LinkedList
 	 * @return <tt>true</tt> (as per the general contract of
 	 * <tt>Collection.add</tt>).
 	 */
-	public boolean add(Object o)
+	public boolean add(T o)
 	{
 		addLast(o);
 	    return true;
@@ -99,9 +99,9 @@ public class SortedList	extends LinkedList
 	 * @return <tt>true</tt> if this list changed as a result of the call.
 	 * @throws NullPointerException if the specified collection is null.
 	 */
-	public boolean addAll(Collection c)
+	public boolean addAll(Collection<? extends T> c)
 	{
-		for(Iterator it=c.iterator(); it.hasNext(); )
+		for(Iterator<? extends T> it=c.iterator(); it.hasNext(); )
 		{
 			addLast(it.next());
 		}
@@ -120,9 +120,9 @@ public class SortedList	extends LinkedList
 	 *            range (<tt>index &lt; 0 || index &gt; size()</tt>).
 	 * @throws NullPointerException if the specified collection is null.
 	 */
-	public boolean addAll(int index, Collection c)
+	public boolean addAll(int index, Collection<? extends T> c)
 	{
-		for(Iterator it=c.iterator(); it.hasNext(); )
+		for(Iterator<? extends T> it=c.iterator(); it.hasNext(); )
 		{
 			int	idx	= insertElement(index, it.next());
 			if(idx<=index) index++;
@@ -141,7 +141,7 @@ public class SortedList	extends LinkedList
 	 * @throws IndexOutOfBoundsException if the specified index is out of
 	 *		  range (<tt>index &lt; 0 || index &gt; size()</tt>).
 	 */
-	public void add(int index, Object element)
+	public void add(int index, T element)
 	{
 		insertElement(index, element);
 	}
@@ -154,7 +154,7 @@ public class SortedList	extends LinkedList
 	 *  @param obj	The element to insert.
 	 *  @return The index where the element was actually inserted.
 	 */
-	public int	insertElement(int index, Object obj)
+	public int	insertElement(int index, T obj)
 	{
 		while(index>0 && compare(get(index-1), obj)>0)
 		{
@@ -171,7 +171,7 @@ public class SortedList	extends LinkedList
 	/**
 	 *  Compare two elements.
 	 */
-	protected int	compare(Object o1, Object o2)
+	protected int	compare(T o1, T o2)
 	{
 		int	cmp;
 

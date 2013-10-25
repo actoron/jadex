@@ -116,28 +116,28 @@ public class BeliefInfo	extends AbstractBDIInfo
 	/**
 	 *  Create an info object for a belief.
 	 */
-	public static BeliefInfo	createBeliefInfo(MBelief mbel, Object scope, ClassLoader cl)
+	public static BeliefInfo	createBeliefInfo(BDIAgentInterpreter agent, MBelief mbel, ClassLoader cl)
 	{
-		String id = mbel.toString();
+		String id = mbel.getName();
 //		String	id	= belief.toString();
-//		if(id.indexOf('@')!=-1)	// 'belief_<num>@stateid'
-//		{
-//			id	= id.substring(0, id.indexOf('@'));
-//		}
-//		if(id.startsWith("belief_"))	// 'belief_<num>@stateid'
-//		{
-//			id	= id.substring(5);
-//		}
-//		if(id.startsWith("beliefset_"))	// 'beliefset_<num>@stateid'
-//		{
-//			id	= id.substring(8);
-//		}
+		if(id.indexOf('@')!=-1)	// 'belief_<num>@stateid'
+		{
+			id	= id.substring(0, id.indexOf('@'));
+		}
+		if(id.startsWith("belief_"))	// 'belief_<num>@stateid'
+		{
+			id	= id.substring(5);
+		}
+		if(id.startsWith("beliefset_"))	// 'beliefset_<num>@stateid'
+		{
+			id	= id.substring(8);
+		}
 		
 //		Object	mbelief	= state.getAttributeValue(belief, OAVBDIRuntimeModel.element_has_model);
-		String	kind	= "belief"; 
-		String	type	= mbel.getName();
-		String	valuetype	= SReflect.getInnerClassName(mbel.getType(cl));
-		Object	value = mbel.getValue(scope, cl);
+		String kind	= "belief"; 
+		String type	= mbel.getName();
+		String valuetype	= SReflect.getInnerClassName(mbel.getType(cl));
+		Object value = mbel.getValue(agent);
 		
 		if(SReflect.isIterable(value))
 		{

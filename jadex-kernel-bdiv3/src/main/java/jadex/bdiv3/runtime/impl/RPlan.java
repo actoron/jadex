@@ -14,10 +14,13 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3.runtime.impl.RGoal.GoalLifecycleState;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.ITimer;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.TimeoutException;
@@ -128,11 +131,10 @@ public class RPlan extends RElement implements IPlan
 	 */
 	public static RPlan createRPlan(MPlan mplan, Object candidate, Object reason, IInternalAccess ia)
 	{
-		final RPlan rplan = new RPlan(mplan, candidate);
-		
+		final RPlan rplan = new RPlan(mplan, candidate, ia);
+//		rplan.setInternalAccess(ia);
 		rplan.setReason(reason);
 		rplan.setDispatchedElement(reason);
-		rplan.setInternalAccess(ia);
 		
 		MBody mbody = mplan.getBody();
 		
@@ -273,10 +275,11 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 *  Create a new plan.
 	 */
-	public RPlan(MPlan mplan, Object candidate)
+	public RPlan(MPlan mplan, Object candidate, IInternalAccess ia)
 	{
 		super(mplan);
 		this.candidate = candidate;
+		this.ia = ia;
 		setLifecycleState(PlanLifecycleState.NEW);
 	}
 
@@ -301,6 +304,8 @@ public class RPlan extends RElement implements IPlan
 //			Thread.dumpStack();
 //		}
 		this.processingstate = processingstate;
+		
+		publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
 	}
 
 	/**
@@ -319,6 +324,21 @@ public class RPlan extends RElement implements IPlan
 	public void setLifecycleState(PlanLifecycleState lifecyclestate)
 	{
 		this.lifecyclestate = lifecyclestate;
+		
+		if(PlanLifecycleState.NEW.equals(lifecyclestate))
+		{
+			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_CREATION);
+		}
+		else if(PlanLifecycleState.PASSED.equals(lifecyclestate) 
+			|| PlanLifecycleState.FAILED.equals(lifecyclestate) 
+			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
+		{
+			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL);
+		}
+		else
+		{
+			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
+		}
 		
 		// todo: where to notify listeners
 		if(listeners!=null && listeners.size()>0)
@@ -1326,6 +1346,36 @@ public class RPlan extends RElement implements IPlan
 	public void setResult(Object result)
 	{
 		this.result = result;
+	}
+	
+	/**
+	 * 
+	 */
+	public void publishToolPlanEvent(String evtype)
+	{
+		if(getInterpreter().hasEventTargets(false))
+		{
+			long time = System.currentTimeMillis();//getClockService().getTime();
+			MonitoringEvent mev = new MonitoringEvent();
+			mev.setSourceIdentifier(getInterpreter().getComponentIdentifier());
+			mev.setTime(time);
+			
+			PlanInfo info = PlanInfo.createPlanInfo(this);
+			mev.setType(evtype+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN);
+//			mev.setProperty("sourcename", element.toString());
+			mev.setProperty("sourcetype", info.getType());
+			mev.setProperty("details", info);
+			
+			getInterpreter().publishEvent(mev);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public BDIAgentInterpreter getInterpreter()
+	{
+		return (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 	}
 	
 //	/**

@@ -2,6 +2,8 @@ package jadex.bdiv3;
 
 import jadex.bridge.service.IServiceProvider;
 
+import java.util.Map;
+
 public class BDIClassGeneratorFactoryDesktop extends BDIClassGeneratorFactory
 {
 
@@ -18,9 +20,9 @@ public class BDIClassGeneratorFactoryDesktop extends BDIClassGeneratorFactory
 	}
 
 	@Override
-	public BDIAgentFactory createBDIAgentFactory(IServiceProvider provider)
+	public BDIAgentFactory createBDIAgentFactory(IServiceProvider provider, Map properties)
 	{
-		return new BDIAgentFactory(provider);
+		return new BDIAgentFactory(provider, properties);
 	}
 
 }

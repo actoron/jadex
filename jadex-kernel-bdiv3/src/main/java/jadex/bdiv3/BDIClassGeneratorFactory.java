@@ -3,6 +3,7 @@ package jadex.bdiv3;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.SReflect;
 
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,24 +27,28 @@ public abstract class BDIClassGeneratorFactory
 	 */
 	public static BDIClassGeneratorFactory getInstance()
 	{
-		if (INSTANCE == null)
+		if(INSTANCE == null)
 		{
-			if (SReflect.isAndroid())
+			if(SReflect.isAndroid())
 			{
 				Class<?> clz;
 				try
 				{
 					clz = SReflect.classForName("jadex.bdiv3.BDIClassGeneratorFactoryAndroid", null);
-					if (clz != null) {
-						INSTANCE = (BDIClassGeneratorFactory) clz.newInstance();
+					if(clz != null) 
+					{
+						INSTANCE = (BDIClassGeneratorFactory)clz.newInstance();
 					}
-				} catch (ClassNotFoundException e)
+				} 
+				catch (ClassNotFoundException e)
 				{
 					Logger.getLogger("jadex").log(Level.WARNING, "BDIClassGeneratorFactory not available.");
-				} catch (InstantiationException e)
+				} 
+				catch (InstantiationException e)
 				{
 					e.printStackTrace();
-				} catch (IllegalAccessException e)
+				} 
+				catch (IllegalAccessException e)
 				{
 					e.printStackTrace();
 				}
@@ -73,6 +78,6 @@ public abstract class BDIClassGeneratorFactory
 	 * Create a new, platform-specific BDIAgentFactory object.
 	 * @return {@link BDIAgentFactory}
 	 */
-	public abstract BDIAgentFactory createBDIAgentFactory(IServiceProvider provider);
+	public abstract BDIAgentFactory createBDIAgentFactory(IServiceProvider provider, Map properties);
 
 }

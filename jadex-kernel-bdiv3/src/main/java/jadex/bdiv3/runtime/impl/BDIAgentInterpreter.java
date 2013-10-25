@@ -26,7 +26,6 @@ import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
-import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -46,7 +45,6 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.FieldInfo;
-import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
@@ -60,9 +58,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminationCommand;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.IPojoMicroAgent;
@@ -598,17 +593,17 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				if(val instanceof List)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(this, new ListWrapper((List<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+					mbel.setValue(this, new ListWrapper((List<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 				else if(val instanceof Set)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(this, new SetWrapper((Set<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+					mbel.setValue(this, new SetWrapper((Set<?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 				else if(val instanceof Map)
 				{
 					String bname = mbel.getName();
-					mbel.setValue(this, new MapWrapper((Map<?,?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname));
+					mbel.setValue(this, new MapWrapper((Map<?,?>)val, this, ChangeEvent.FACTADDED+"."+bname, ChangeEvent.FACTREMOVED+"."+bname, ChangeEvent.FACTCHANGED+"."+bname, mbel));
 				}
 			}
 			catch(RuntimeException e)
@@ -669,37 +664,97 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		super.startBehavior();
 
-		Rule<?> toolrule = new Rule<Void>("bditool_events", 
-			new ICondition()
-			{
-				public Tuple2<Boolean, Object> evaluate(IEvent event)
-				{
-//					System.out.println("hetag: "+hasEventTargets(true));
-					return new Tuple2<Boolean, Object>(hasEventTargets(true)? Boolean.TRUE: Boolean.FALSE, null);
-				}
-			}, new IAction<Void>()
-		{
-			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-			{
-				System.out.println("event: "+event.getType());
-				
-				return IFuture.DONE;
-			}
-		});
-		List<EventType> myevents = new ArrayList<EventType>();
-		myevents.add(new EventType(ChangeEvent.BELIEFCHANGED));
-		myevents.add(new EventType(ChangeEvent.FACTADDED));
-		myevents.add(new EventType(ChangeEvent.FACTREMOVED)); 
-		myevents.add(new EventType(ChangeEvent.FACTCHANGED)); 
-		myevents.add(new EventType(ChangeEvent.GOALADOPTED));
-		myevents.add(new EventType(ChangeEvent.GOALDROPPED));
-		myevents.add(new EventType(ChangeEvent.GOALACTIVE));
-		myevents.add(new EventType(ChangeEvent.GOALOPTION));
-		myevents.add(new EventType(ChangeEvent.GOALSUSPENDED));
-		myevents.add(new EventType(ChangeEvent.GOALINPROCESS));
-		myevents.add(new EventType(ChangeEvent.GOALNOTINPROCESS));
-		toolrule.setEvents(myevents);
-		getRuleSystem().getRulebase().addRule(toolrule);
+//		Rule<?> toolrule = new Rule<Void>("bditool_events", 
+//			new ICondition()
+//			{
+//				public Tuple2<Boolean, Object> evaluate(IEvent event)
+//				{
+////					System.out.println("hetag: "+hasEventTargets(true));
+//					return new Tuple2<Boolean, Object>(hasEventTargets(true)? Boolean.TRUE: Boolean.FALSE, null);
+//				}
+//			}, new IAction<Void>()
+//		{
+//			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+//			{
+////				System.out.println("event: "+event.getType());
+//				
+//				long time = System.currentTimeMillis();//getClockService().getTime();
+//				MonitoringEvent mev = new MonitoringEvent();
+////				event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
+//				mev.setSourceIdentifier(getComponentIdentifier());
+////				if(scope == null)
+////					scope = bdiint.getAgent();
+//				mev.setTime(time);
+//				
+//				String type = event.getType().toString();
+//				
+//				if(ChangeEvent.FACTADDED.equals(type) || ChangeEvent.GOALADDED.equals(type) || ChangeEvent.PLANADDED.equals(type))
+//				{
+//					mev.setType(IMonitoringEvent.EVENT_TYPE_CREATION);
+//				}
+//				else if(ChangeEvent.AGENTTERMINATED ||
+//					 ChangeEvent.FACTREMOVED.equals(type) ||
+//					 ChangeEvent.GOALDROPPED.equals(type) ||
+//					 ChangeEvent.PLANREMOVED.equals(type))
+//				{
+//					mev.setType(IMonitoringEvent.EVENT_TYPE_DISPOSAL);
+//				}
+//				else if(ChangeEvent.FACTCHANGED.equals(type) ||
+//					ChangeEvent.GOALCHANGED.equals(type) ||
+//					ChangeEvent.PLANCHANGED.equals(type))
+//				{
+//					event.setType(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
+//				}
+//				else if(OAVBDIRuntimeModel.CHANGEEVENT_INTERNALEVENTOCCURRED.equals(type) ||
+//					OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(type) ||
+//					OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTSENT.equals(type) ||
+//					OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
+//				{		
+//					event.setType(IMonitoringEvent.EVENT_TYPE_OCCURRENCE);
+//				}
+//				
+//				if(event.getType().equals(ChangeEvent.BELIEFCHANGED) || event.getType().equals(ChangeEvent.FACTCHANGED) ||
+//					event.getType().equals(ChangeEvent.FACTADDED) || event.getType().equals(ChangeEvent.FACTREMOVED))
+//				{
+//					MBelief mbel = null;
+//					Object scope = null;
+//					BeliefInfo	info	= BeliefInfo.createBeliefInfo(mbel, scope, getClassLoader());
+//					mev.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT);
+////					mev.setProperty("sourcename", element.toString());
+//					mev.setProperty("sourcetype", info.getType());
+//					mev.setProperty("details", info);
+//					
+//					publishEvent(mev);
+//				}	
+//				else if(event.getType().equals(ChangeEvent.GOALADOPTED) || event.getType().equals(ChangeEvent.GOALDROPPED) 
+//					|| event.getType().equals(ChangeEvent.GOALACTIVE) || event.getType().equals(ChangeEvent.GOALOPTION)
+//					|| event.getType().equals(ChangeEvent.GOALSUSPENDED) || event.getType().equals(ChangeEvent.GOALINPROCESS)
+//					|| event.getType().equals(ChangeEvent.GOALNOTINPROCESS))
+//				{
+//					mev.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL);	
+//				}
+//				else 
+//				{
+//					mev.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN);	
+//				}
+//				
+//				return IFuture.DONE;
+//			}
+//		});
+//		List<EventType> myevents = new ArrayList<EventType>();
+//		myevents.add(new EventType(ChangeEvent.BELIEFCHANGED));
+//		myevents.add(new EventType(ChangeEvent.FACTADDED));
+//		myevents.add(new EventType(ChangeEvent.FACTREMOVED)); 
+//		myevents.add(new EventType(ChangeEvent.FACTCHANGED)); 
+//		myevents.add(new EventType(ChangeEvent.GOALADOPTED));
+//		myevents.add(new EventType(ChangeEvent.GOALDROPPED));
+//		myevents.add(new EventType(ChangeEvent.GOALACTIVE));
+//		myevents.add(new EventType(ChangeEvent.GOALOPTION));
+//		myevents.add(new EventType(ChangeEvent.GOALSUSPENDED));
+//		myevents.add(new EventType(ChangeEvent.GOALINPROCESS));
+//		myevents.add(new EventType(ChangeEvent.GOALNOTINPROCESS));
+//		toolrule.setEvents(myevents);
+//		getRuleSystem().getRulebase().addRule(toolrule);
 		
 //		try
 //		{
@@ -925,7 +980,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 												else
 												{
 													Object value = mbel.getValue(capa, getClassLoader());
-													BDIAgent.createEvent(value, (BDIAgent)microagent, mbel.getName());
+													BDIAgent.createChangeEvent(value, (BDIAgent)microagent, mbel);
 												}
 											}
 											catch(Exception e)
@@ -2330,8 +2385,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		{
 			for(MBelief mbel: mbels)
 			{
-				Object ag = getPojoAgent()!=null? getPojoAgent(): getAgent();
-				BeliefInfo	info = BeliefInfo.createBeliefInfo(mbel, ag, getClassLoader());
+				BeliefInfo info = BeliefInfo.createBeliefInfo(this, mbel, getClassLoader());
 				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis());
 				ev.setSourceDescription(mbel.toString());
 				ev.setProperty("details", info);
@@ -2345,7 +2399,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		{
 			for(RGoal goal: goals)
 			{
-				GoalInfo	info = GoalInfo.createGoalInfo(goal);
+				GoalInfo info = GoalInfo.createGoalInfo(goal);
 				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis());
 				ev.setSourceDescription(goal.toString());
 				ev.setProperty("details", info);
@@ -2368,6 +2422,52 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the capability part of a complex element name.
+	 */
+	public static String getCapabilityPart(String name)
+	{
+		String ret = null;
+		int	idx = name.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
+		if(idx!=-1)
+		{
+			ret = name.substring(0, idx);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the name part of a complex element name.
+	 */
+	public static String getNamePart(String name)
+	{
+		String ret = name;
+		int	idx = name.lastIndexOf("$");
+		if(idx==-1)
+		{
+			idx = name.lastIndexOf(".");
+		}
+		if(idx==-1)
+		{	
+			idx = name.lastIndexOf(BDIAgentInterpreter.CAPABILITY_SEPARATOR);
+		}
+		if(idx!=-1)
+		{	
+			ret = name.substring(idx+1);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get beautified element name.
+	 */
+	public static String getBeautifiedName(String name)
+	{
+		String capa = getCapabilityPart(name);
+		String pname = getNamePart(name);
+		return capa!=null? capa.replace(BDIAgentInterpreter.CAPABILITY_SEPARATOR, ".")+"."+pname: pname;
 	}
 }
 

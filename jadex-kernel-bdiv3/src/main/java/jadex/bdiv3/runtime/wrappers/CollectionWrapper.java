@@ -1,5 +1,8 @@
 package jadex.bdiv3.runtime.wrappers;
 
+import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -35,17 +38,21 @@ public class CollectionWrapper <T> implements Collection<T>
 	/** The change event name. */
 	protected String changeevent;
 	
+	/** The belief model. */
+	protected MBelief mbel;
+	
 	/**
 	 *  Create a new collection wrapper.
 	 */
 	public CollectionWrapper(Collection<T> delegate, BDIAgentInterpreter interpreter, 
-		String addevent, String remevent, String changeevent)
+		String addevent, String remevent, String changeevent, MBelief mbel)
 	{
 		this.delegate = delegate;
 		this.interpreter = interpreter;
 		this.addevent = addevent;
 		this.remevent = remevent;
 		this.changeevent = changeevent;
+		this.mbel = mbel;
 	}
 
 	/**
@@ -106,6 +113,7 @@ public class CollectionWrapper <T> implements Collection<T>
 		{
 			observeValue(e);
 			getRuleSystem().addEvent(new Event(addevent, e));
+			publishToolBeliefEvent();
 		}
 		return ret;
 	}
@@ -120,6 +128,7 @@ public class CollectionWrapper <T> implements Collection<T>
 		{
 			unobserveValue(o);
 			getRuleSystem().addEvent(new Event(remevent, o));
+			publishToolBeliefEvent();
 		}
 		return ret;
 	}
@@ -144,6 +153,7 @@ public class CollectionWrapper <T> implements Collection<T>
 			{
 				observeValue(t);
 				getRuleSystem().addEvent(new Event(addevent, t));
+				publishToolBeliefEvent();
 			}
 		}	
 		return ret;
@@ -161,6 +171,7 @@ public class CollectionWrapper <T> implements Collection<T>
 			{
 				unobserveValue(t);
 				getRuleSystem().addEvent(new Event(remevent, t));
+				publishToolBeliefEvent();
 			}
 		}	
 		return ret;
@@ -186,6 +197,7 @@ public class CollectionWrapper <T> implements Collection<T>
 		{
 			unobserveValue(t);
 			getRuleSystem().addEvent(new Event(addevent, t));
+			publishToolBeliefEvent();
 		}
 	}
 	
@@ -243,7 +255,7 @@ public class CollectionWrapper <T> implements Collection<T>
 	{
 		return interpreter.getRuleSystem();
 	}
-
+	
 	/**
 	 * 
 	 */
@@ -259,6 +271,7 @@ public class CollectionWrapper <T> implements Collection<T>
 					{
 						public IFuture<IEvent> execute(IInternalAccess ia)
 						{
+							publishToolBeliefEvent();
 							Event ev = new Event(changeevent, event.getNewValue());
 							return new Future<IEvent>(ev);
 						}
@@ -274,5 +287,13 @@ public class CollectionWrapper <T> implements Collection<T>
 	public void unobserveValue(Object val)
 	{
 		getRuleSystem().unobserveObject(val);
+	}
+	
+	/**
+	 * 
+	 */
+	public void publishToolBeliefEvent()//String evtype)
+	{
+		((BDIAgent)getInterpreter().getAgent()).publishToolBeliefEvent(getInterpreter(), mbel);//, evtype);
 	}
 }

@@ -9,12 +9,9 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanPassed;
-import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.impl.PlanAbortedException;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.IResultCommand;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -51,6 +48,7 @@ public class ListenerWaitBDI
 //		agent.createResultListener(listener)
 		
 		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
+//		agent.createResultListener(listener)
 		fut.addResultListener(new IResultListener<IComponentManagementService>()
 		{
 			public void resultAvailable(IComponentManagementService cms)

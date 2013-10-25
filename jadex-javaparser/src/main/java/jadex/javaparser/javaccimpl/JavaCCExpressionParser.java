@@ -63,17 +63,19 @@ public class JavaCCExpressionParser	implements IExpressionParser, Serializable
 		{
 //			e.printStackTrace();
 			String	msg	= e.getMessage();
-			if (msg != null) {
+			if(msg != null) 
+			{
 				int index = msg.indexOf("Was expecting one of");
-				if (index != -1) {
+				if(index != -1) 
+				{
 					msg = msg.substring(0, index);// + "Maybe missing import?";
 					msg = msg.replace("\n", " ");
 				}
 			}
-			else
-			{
+//			else
+//			{
 				msg = msg+", expr="+expression;
-			}
+//			}
 //			throw new RuntimeException("Error parsing: "+expression+": "+e.getClass().getName()+": "+msg);
 			throw new RuntimeException(e.getClass().getName()+": "+msg);
 		}

@@ -10,6 +10,8 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -118,6 +120,18 @@ public class RGoal extends RProcessableElement implements IGoal
 	public void setLifecycleState(GoalLifecycleState lifecyclestate)
 	{
 		this.lifecyclestate = lifecyclestate;
+		if(GoalLifecycleState.ADOPTED.equals(lifecyclestate))
+		{
+			publishToolGoalEvent(IMonitoringEvent.EVENT_TYPE_CREATION);
+		}
+		else if(GoalLifecycleState.DROPPED.equals(lifecyclestate))
+		{
+			publishToolGoalEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL);
+		}
+		else
+		{
+			publishToolGoalEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
+		}
 	}
 
 	/**
@@ -136,6 +150,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	public void setProcessingState(GoalProcessingState processingstate)
 	{
 		this.processingstate = processingstate;
+		publishToolGoalEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
 	}
 	
 	/**
@@ -232,6 +247,7 @@ public class RGoal extends RProcessableElement implements IGoal
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("activating: "+this);
 			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALINPROCESS, this));
+			publishToolGoalEvent(ChangeEvent.GOALINPROCESS);
 			setState(ia, RProcessableElement.State.UNPROCESSED);
 		}
 		else
@@ -976,6 +992,36 @@ public class RGoal extends RProcessableElement implements IGoal
 				ret = !ret;
 			return ret? ICondition.TRUE: ICondition.FALSE;
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void publishToolGoalEvent(String evtype)
+	{
+		if(getInterpreter().hasEventTargets(false))
+		{
+			long time = System.currentTimeMillis();//getClockService().getTime();
+			MonitoringEvent mev = new MonitoringEvent();
+			mev.setSourceIdentifier(getInterpreter().getComponentIdentifier());
+			mev.setTime(time);
+			
+			GoalInfo info = GoalInfo.createGoalInfo(this);
+			mev.setType(evtype+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL);
+//			mev.setProperty("sourcename", element.toString());
+			mev.setProperty("sourcetype", info.getType());
+			mev.setProperty("details", info);
+			
+			getInterpreter().publishEvent(mev);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public BDIAgentInterpreter getInterpreter()
+	{
+		return (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 	}
 	
 //	public static void main(String[] args)

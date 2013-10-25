@@ -16,7 +16,7 @@ public class ChangeEvent
 	/** Event type that a fact has changed (property change in case of bean). */
 	public static final String FACTCHANGED = "factchanged";
 
-	/** Event type that a belief value has changed. */
+	/** Event type that a belief value has changed (the whole value was changed). */
 	public static final String BELIEFCHANGED = "beliefchanged";
 
 	

@@ -68,7 +68,7 @@ public class DebuggerMainPanel extends JSplitPane
 	protected JButton	pause;
 	
 	/** The tabs. */
-	protected List debuggerpanels;
+	protected List<IDebuggerPanel> debuggerpanels;
 	
 	/** The cms listener. */
 	protected ICMSComponentListener listener;
@@ -85,7 +85,7 @@ public class DebuggerMainPanel extends JSplitPane
 		super(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel());
 		this.jcc	= jcc;
 		this.desc	= desc;
-		this.debuggerpanels = new ArrayList();
+		this.debuggerpanels = new ArrayList<IDebuggerPanel>();
 		this.setOneTouchExpandable(true);
 		setDividerLocation(0.3);
 				

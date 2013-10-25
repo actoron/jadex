@@ -21,7 +21,6 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.LazyResource;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -61,7 +60,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	protected IServiceProvider provider;
 	
 	/** The properties. */
-	protected Map properties;
+	protected Map<String, Object> properties;
 	
 	/** The library service. */
 	protected ILibraryService libservice;
@@ -76,10 +75,18 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public BDIAgentFactory(IServiceProvider provider)//, Map properties)
 	{
+		this(provider, null);
+	}
+	
+	/**
+	 *  Create a new agent factory.
+	 */
+	public BDIAgentFactory(IServiceProvider provider, Map<String, Object> properties)
+	{
 		super(provider.getId(), IComponentFactory.class, null);
 
 		this.provider = provider;
-//		this.properties = properties;
+		this.properties = properties;
 		this.loader = new BDIModelLoader();
 		
 		this.libservicelistener = new ILibraryServiceListener()
@@ -388,7 +395,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 *  @param type	The component type. 
 	 *  @return The properties or null, if the component type is not supported by this factory.
 	 */
-	public Map	getProperties(String type)
+	public Map<String, Object> getProperties(String type)
 	{
 		return FILETYPE_BDIAGENT.equals(type)? properties: null;
 	}
@@ -416,7 +423,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	// todo: make use of cache
 	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
 	{
-		Class ret = SReflect.findClass0(clname, imports, classloader);
+		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
 //		System.out.println("getMAC:"+clname+" "+SUtil.arrayToString(imports)+" "+ret);
 		int idx;
 		while(ret==null && (idx=clname.indexOf('.'))!=-1)

@@ -110,7 +110,7 @@ public class GoalInfo	extends AbstractBDIInfo
 	 */
 	public static GoalInfo	createGoalInfo(RGoal goal)
 	{
-		String	id	= goal.toString();
+		String	id	= ""+goal.hashCode();
 //		if(id.indexOf('@')!=-1)	// 'goal_<num>@stateid'
 //		{
 //			id	= id.substring(0, id.indexOf('@'));
@@ -124,7 +124,8 @@ public class GoalInfo	extends AbstractBDIInfo
 //		String	kind	= state.getType(mgoal).getName();
 //		kind	= kind.substring(1, kind.length()-4); // 'm<xyz>goal'
 		String kind = "unknown";
-		String type	= mgoal.getName();
+//		String type	= mgoal.getName();
+		String type	= BDIAgentInterpreter.getBeautifiedName(mgoal.getName());
 //		if(scope!=null)
 //		{
 //			BDIInterpreter interpreter	= BDIInterpreter.getInterpreter(state);

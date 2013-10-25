@@ -1,5 +1,8 @@
 package jadex.bdiv3.runtime.wrappers;
 
+import jadex.bdiv3.BDIAgent;
+import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -35,17 +38,21 @@ public class MapWrapper<T, E> implements Map<T, E>
 	/** The change event name. */
 	protected String changeevent;
 
+	/** The belief model. */
+	protected MBelief mbel;
+	
 	/**
 	 *  Create a new collection wrapper.
 	 */
 	public MapWrapper(Map<T, E> delegate, BDIAgentInterpreter interpreter, 
-		String addevent, String remevent, String changeevent)
+		String addevent, String remevent, String changeevent, MBelief mbel)
 	{
 		this.delegate = delegate;
 		this.interpreter = interpreter;
 		this.addevent = addevent;
 		this.remevent = remevent;
 		this.changeevent = changeevent;
+		this.mbel = mbel;
 	}
 	
 	/** 
@@ -100,11 +107,13 @@ public class MapWrapper<T, E> implements Map<T, E>
 		{
 			getRuleSystem().addEvent(new Event(addevent, new MapEntry<T, E>(key, value, ret)));
 //			getRuleSystem().addEvent(new Event(addevent, new Tuple3<T, E, E>(key, value, ret)));
+			publishToolBeliefEvent();
 		}
 		else
 		{
 //			getRuleSystem().addEvent(new Event(changeevent, new Tuple3<T, E, E>(key, value, ret)));
 			getRuleSystem().addEvent(new Event(changeevent, new MapEntry<T, E>(key, value, ret)));
+			publishToolBeliefEvent();
 		}
 		return ret;
 	}
@@ -118,6 +127,7 @@ public class MapWrapper<T, E> implements Map<T, E>
 		unobserveValue(ret);
 //		getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>((T)key, ret)));
 		getRuleSystem().addEvent(new Event(remevent, new MapEntry<T, E>((T)key, ret, null)));
+		publishToolBeliefEvent();
 		return ret;
 	}
 
@@ -145,6 +155,7 @@ public class MapWrapper<T, E> implements Map<T, E>
 			unobserveValue(e.getValue());
 //			getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>(e.getKey(), e.getValue())));
 			getRuleSystem().addEvent(new Event(remevent, new MapEntry<T, E>(e.getKey(), e.getValue(), null)));
+			publishToolBeliefEvent();
 		}
 	}
 
@@ -242,6 +253,7 @@ public class MapWrapper<T, E> implements Map<T, E>
 					{
 						public IFuture<IEvent> execute(IInternalAccess ia)
 						{
+							publishToolBeliefEvent();
 							Event ev = new Event(changeevent, event.getNewValue());
 							return new Future<IEvent>(ev);
 						}
@@ -259,6 +271,14 @@ public class MapWrapper<T, E> implements Map<T, E>
 		getRuleSystem().unobserveObject(val);
 	}
 
+	/**
+	 * 
+	 */
+	public void publishToolBeliefEvent()//String evtype)
+	{
+		((BDIAgent)getInterpreter().getAgent()).publishToolBeliefEvent(getInterpreter(), mbel);//, evtype);
+	}
+	
 	/**
 	 * 
 	 */

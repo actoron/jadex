@@ -69,7 +69,7 @@ public class PlanInfo	extends AbstractBDIInfo
 	 */
 	public static PlanInfo	createPlanInfo(RPlan plan)
 	{
-		String	id	= plan.toString();
+		String	id	= ""+plan.hashCode();
 //		if(id.indexOf('@')!=-1)	// 'plan_<num>@stateid'
 //		{
 //			id	= id.substring(0, id.indexOf('@'));
@@ -80,7 +80,8 @@ public class PlanInfo	extends AbstractBDIInfo
 //		}
 		
 		MPlan mplan	= (MPlan)plan.getModelElement();
-		String type	= mplan.getName();
+//		String type	= mplan.getName();
+		String type	= BDIAgentInterpreter.getBeautifiedName(mplan.getName());
 //		if(scope!=null)
 //		{
 //			BDIInterpreter interpreter	= BDIInterpreter.getInterpreter(state);

@@ -37,8 +37,8 @@ public class BDIComponentResultListener<E> implements IResultListener<E>
 		this.listener = listener;
 		this.interpreter = interpreter;
 		this.rplan = ExecutePlanStepAction.RPLANS.get();
-		if(rplan==null)
-			System.out.println("ash");
+//		if(rplan==null)
+//			System.out.println("ash");
 	}
 	
 	//-------- methods --------
