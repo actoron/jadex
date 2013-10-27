@@ -88,7 +88,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 *  Generate class.
 	 */
-	public List<Class<?>> generateBDIClass(final String clname, final BDIModel model, final ClassLoader cl)
+	public List<Class<?>> generateBDIClass(String clname, BDIModel model, ClassLoader cl)
 	{
 		return generateBDIClass(clname, model, cl, new HashSet<String>());
 	}
@@ -500,7 +500,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		IInsnList l = mn.getInstructions();
 		
 //		System.out.println("icl: "+iclname);
-		
+				
 		InsnList nl = new InsnList();
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
 		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
@@ -523,7 +523,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
 		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
 		nl.add(new LdcInsnNode(belname));
-		nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
+//		nl.add(new LdcInsnNode(mbel));
+		nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createChangeEvent", 
 			"(Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
 //			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
 //				"()V"));

@@ -94,7 +94,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 				}
 				else if(todoset.contains(mn.getName()))
 				{
-					String belname = mn.getName().substring(3);
+					String belname = mn.getName().substring(3); // property name = method name - get/set prefix
 					belname = belname.substring(0,1).toLowerCase()+belname.substring(1);
 					if(ophelper.isNative(mn.getAccess()))
 					{

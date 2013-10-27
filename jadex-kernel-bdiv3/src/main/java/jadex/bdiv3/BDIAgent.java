@@ -26,10 +26,8 @@ import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
-import jadex.micro.annotation.Implementation;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
@@ -635,7 +633,7 @@ public class BDIAgent extends MicroAgent
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = (ip).getRuleSystem();
 			rs.unobserveObject(old);	
-			createChangeEvent(value, this, mbel);
+			createChangeEvent(value, this, mbel.getName());
 			observeValue(rs, value, ip, ChangeEvent.FACTCHANGED+"."+mbel.getName(), mbel);
 		}
 	}
@@ -646,14 +644,16 @@ public class BDIAgent extends MicroAgent
 	 *  @param agent The agent.
 	 *  @param belname The belief name.
 	 */
-//	public static void createChangeEvent(Object val, final BDIAgent agent, final String belname)
-	public static void createChangeEvent(Object val, final BDIAgent agent, MBelief mbel)
+	public static void createChangeEvent(Object val, final BDIAgent agent, final String belname)
+//	public static void createChangeEvent(Object val, final BDIAgent agent, MBelief mbel)
 	{
 //		System.out.println("createEv: "+val+" "+agent+" "+belname);
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 		
+		MBelief mbel = ip.getBDIModel().getCapability().getBelief(belname);
+		
 		RuleSystem rs = (ip).getRuleSystem();
-		rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+mbel.getName(), val));
+		rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
 		
 		publishToolBeliefEvent(ip, mbel);
 	}

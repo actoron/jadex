@@ -980,7 +980,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 												else
 												{
 													Object value = mbel.getValue(capa, getClassLoader());
-													BDIAgent.createChangeEvent(value, (BDIAgent)microagent, mbel);
+													BDIAgent.createChangeEvent(value, (BDIAgent)microagent, mbel.getName());
 												}
 											}
 											catch(Exception e)
