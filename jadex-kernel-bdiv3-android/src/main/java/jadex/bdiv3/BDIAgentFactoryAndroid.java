@@ -1,5 +1,7 @@
 package jadex.bdiv3;
 
+import java.util.Map;
+
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -12,9 +14,9 @@ import jadex.commons.future.IFuture;
 public class BDIAgentFactoryAndroid extends BDIAgentFactory
 {
 
-	public BDIAgentFactoryAndroid(IServiceProvider provider)
+	public BDIAgentFactoryAndroid(IServiceProvider provider, Map<String,Object> properties)
 	{
-		super(provider);
+		super(provider, properties);
 	}
 
 	@Override
