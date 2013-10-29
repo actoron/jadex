@@ -200,6 +200,7 @@ import java.util.logging.Level;
 		@NameValue(name="platformname", value="null")
 	}, components={
 		@Component(name="mon", type="monitor", daemon=true, number="$args.monitoringcomp? 1 : 0"),
+		@Component(name="sensors", type="sensor", daemon=true, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="extensions", type="extensions", daemon=true, number="($args.extensions!=null && !jadex.commons.SReflect.isAndroid()) ? 1 : 0", arguments=@NameValue(name="extensions", value="$args.extensions")),
 		@Component(name="kernels", type="kernel_multi", daemon=true, number="$args.get(\"kernels\").indexOf(\"multi\")!=-1? 1 : 0"),
 		@Component(name="kernel_micro", type="kernel_micro", daemon=true, number="$args.get(\"kernels\").indexOf(\"micro\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
@@ -259,8 +260,7 @@ import java.util.logging.Level;
 		@Component(name="rspub", type="rspublish", daemon=true, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 		@Component(name="wspub", type="wspublish", daemon=true, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
 		@Component(name="cli", type="cli", daemon=true, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
-			arguments={@NameValue(name="console", value="$args.cliconsole")}),
-		@Component(name="sensors", type="sensor", daemon=true, number="Boolean.TRUE.equals($args.sensors)? 1: 0")
+			arguments={@NameValue(name="console", value="$args.cliconsole")})
 	})
 })
 public class PlatformAgent extends MicroAgent

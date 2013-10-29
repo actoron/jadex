@@ -385,6 +385,7 @@
 			</arguments>
 			
 			<components>
+			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>
@@ -424,13 +425,13 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
-				<component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 			</components>
 		</configuration>
 		
 		<!-- Fixed name and port.  Dynamically loads kernels as required.-->
 		<configuration name="fixed">
 			<components>
+			    <component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 				<component name="extensions" type="extensions" daemon="true" number="($args.extensions!=null &amp;&amp; !jadex.commons.SReflect.isAndroid()) ? 1 : 0">
 					<arguments>
 						<argument name="extensions">$args.extensions</argument>
@@ -467,7 +468,6 @@
 						<argument name="console">$args.cliconsole</argument>
 					</arguments>
 				</component>
-				<component name="sensors" type="sensor" daemon="true" number="Boolean.TRUE.equals($args.sensors)? 1: 0"/>
 			</components>
 		</configuration>
 		
