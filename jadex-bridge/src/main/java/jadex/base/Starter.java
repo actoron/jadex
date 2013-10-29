@@ -282,12 +282,12 @@ public class Starter
 		{
 			if(scn==null)
 			{
-				scn = CallAccess.getInvocation();
+				scn = CallAccess.getOrCreateNextInvocation();
 				scn.setCause(new Cause((String)null, "createPlatform"));
 			}
 			
 			if(scn!=null)
-				CallAccess.setServiceCall(scn);
+				CallAccess.setCurrentInvocation(scn);
 		}
 		
 		try

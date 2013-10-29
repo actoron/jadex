@@ -89,8 +89,8 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		Object[] parametervalues, String callid, IComponentIdentifier caller, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
-		if(method.getName().equals("secMethod"))
-			System.out.println("caller: "+caller);
+//		if(method.getName().equals("secMethod"))
+//			System.out.println("caller: "+caller);
 		
 		this.rr = rr;
 		this.method = method;
@@ -226,9 +226,6 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 //			Thread.dumpStack();
 //		}
 		
-		if(method.getName().equals("secMethod"))
-			System.out.println("caller: "+caller);
-		
 		// RMS acts as representative of remote caller.
 		IComponentAdapter	ada	= IComponentAdapter.LOCAL.get();
 		IComponentIdentifier.LOCAL.set(caller);
@@ -242,7 +239,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 //			System.out.println("lsdjgho");
 //		}
 		
-		ServiceCall.getInvocation(props);
+		ServiceCall.getOrCreateNextInvocation(props);
 		
 		invokeMethod(ret, rsms);
 		
@@ -277,10 +274,30 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			// Necessary due to Java inner class bug 4071957
 			if(target.getClass().isAnonymousClass())
 				method.setAccessible(true);
+
+//			if(method.getName().indexOf("method")!=-1)
+//			{
+//				System.out.println("hhh: "+ServiceCall.getCurrentInvocation());
+//				System.out.println("ggg: "+ServiceCall.getNextInvocation());
+//			}
 			
 			final Object res = method.invoke(target, parametervalues);
 			
-			handleResultFuture(terminable, rsms, callid, res, terminable, methodname, ridcom, ret, nonfunc);
+			if(method.getName().indexOf("method")!=-1)
+			{
+				System.out.println("iii: "+ServiceCall.getLastInvocation());
+				System.out.println("hhh: "+ServiceCall.getCurrentInvocation());
+				System.out.println("ggg: "+ServiceCall.getNextInvocation());
+			}
+			
+			Map<String, Object> nfunc = nonfunc;
+			ServiceCall sc = ServiceCall.getNextInvocation(); // hmm has not been switched during call to last
+			if(sc!=null)
+			{
+				nfunc = sc.getProperties();
+			}
+			
+			handleResultFuture(terminable, rsms, callid, res, terminable, methodname, ridcom, ret, nfunc);
 			
 //			// Remember invocation for termination invocation
 //			if(terminable) // or pullable

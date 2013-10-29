@@ -188,7 +188,7 @@ public class UserAgent
 //										System.out.println("called "+cnt4+" times ma1");
 										rep4.setSucceeded(true);
 										
-										ServiceCall call = CallAccess.getInvocation();
+										ServiceCall call = CallAccess.getOrCreateNextInvocation();
 										call.setTimeout(33000);
 										call.setProperty("myprop", "myval");
 										
@@ -221,7 +221,7 @@ public class UserAgent
 				});
 				for(int i=0; i<cnt2; i++)
 				{
-					ServiceCall call = CallAccess.getInvocation();
+					ServiceCall call = CallAccess.getOrCreateNextInvocation();
 					call.setTimeout(32000);
 					call.setProperty("myprop", "myval");
 
@@ -232,7 +232,7 @@ public class UserAgent
 		
 		for(int i=0; i<cnt1; i++)
 		{
-			ServiceCall call = CallAccess.getInvocation();
+			ServiceCall call = CallAccess.getOrCreateNextInvocation();
 			call.setTimeout(31000);
 			call.setProperty("myprop", "myval");
 

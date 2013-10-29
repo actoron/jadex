@@ -898,7 +898,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						ServiceCall sc = (ServiceCall)step.getCall();
 						if(sc!=null && ServiceCall.getCurrentInvocation()==null)
 						{
-							CallAccess.setServiceCall(sc);
+							CallAccess.setCurrentInvocation(sc);
 						}
 						
 //						if(getComponentIdentifier().getName().indexOf("rms")!=-1)

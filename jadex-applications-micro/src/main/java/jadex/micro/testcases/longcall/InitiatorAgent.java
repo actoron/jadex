@@ -236,12 +236,12 @@ public class InitiatorAgent extends TestAgent
 				if(to!=-1)
 				{
 //					ServiceCall.setInvocationProperties(to, true);
-					ServiceCall call = ServiceCall.getInvocation();
+					ServiceCall call = ServiceCall.getOrCreateNextInvocation();
 					call.setTimeout(to);
 					call.setRealtime(Boolean.TRUE);
 				}				
 				
-				System.out.println("calling method: "+ServiceCall.getInvocation());
+				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
 				
 				callMethod(ts, 1, ret).addResultListener(new IResultListener<Void>()
 				{

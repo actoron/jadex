@@ -102,7 +102,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							{
 //								if(sic.getMethod().getName().indexOf("test")!=-1)
 //									System.out.println("setting to: "+sic.getLastServiceCall());
-								CallAccess.setServiceCall(sic.getLastServiceCall());
+								CallAccess.setCurrentInvocation(sic.getLastServiceCall());
+								CallAccess.setLastInvocation(sic.getServiceCall());
 								listener.resultAvailable(null);
 							}
 							else
@@ -120,7 +121,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //											}
 //											if(sic.getMethod().getName().indexOf("test")!=-1)
 //												System.out.println("setting to d: "+sic.getLastServiceCall());
-											CallAccess.setServiceCall(sic.getLastServiceCall());
+											CallAccess.setCurrentInvocation(sic.getLastServiceCall());
+											CallAccess.setLastInvocation(sic.getServiceCall());
 											listener.resultAvailable(null);
 										}
 									});

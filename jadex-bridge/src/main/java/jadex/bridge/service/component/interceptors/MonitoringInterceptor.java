@@ -94,11 +94,11 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 		Map<String, Object>	props	= new HashMap<String, Object>();
 //		props.put("method4", context.getMethod().getName());
 		
-		ServiceCall sc = CallAccess.getInvocation(props);
+		ServiceCall sc = CallAccess.getOrCreateNextInvocation(props);
 		sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
 		sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
 		
-		CallAccess.setServiceCall(sc); 
+		CallAccess.setCurrentInvocation(sc); 
 		
 //		if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
 //			System.out.println("start shut in mon: "+context.getObject());
@@ -113,7 +113,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 //				if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
 //					System.out.println("end shut in mon: "+context.getObject());
 				
-				CallAccess.setServiceCall(cur); 
+				CallAccess.setCurrentInvocation(cur); 
 				CallAccess.setNextInvocation(next);
 				
 				// Publish event if monitoring service was found
@@ -126,7 +126,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 					ServiceCall sc = context.getServiceCall();
 					Cause cause = sc==null? null: sc.getCause();
 					String info = context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
-					info += context.getArguments();
+//					info += context.getArguments();
 					MonitoringEvent ev = new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
 						info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start);
 					
@@ -186,17 +186,17 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 			Map<String, Object>	props	= new HashMap<String, Object>();
 			props.put("method5", sic.getMethod().getName());
 			
-			ServiceCall sc = CallAccess.getInvocation();
+			ServiceCall sc = CallAccess.getOrCreateNextInvocation();
 			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
 			sc.setProperty(ServiceCall.INHERIT, Boolean.TRUE);
 			
-			CallAccess.setServiceCall(sc); 
+			CallAccess.setCurrentInvocation(sc); 
 
 			getter.getService().addResultListener(new IResultListener<IMonitoringService>()
 			{
 				public void resultAvailable(IMonitoringService monser)
 				{
-					CallAccess.setServiceCall(cur); 
+					CallAccess.setCurrentInvocation(cur); 
 					CallAccess.setNextInvocation(next);
 
 					if(monser!=null)
@@ -213,7 +213,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					CallAccess.setServiceCall(cur); 
+					CallAccess.setCurrentInvocation(cur); 
 					CallAccess.setNextInvocation(next);
 
 					// never happens

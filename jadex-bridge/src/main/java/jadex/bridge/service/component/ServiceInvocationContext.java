@@ -622,6 +622,15 @@ public class ServiceInvocationContext
 	{
 		return lastcall;
 	}
+
+	/**
+	 *  Set the lastcall. 
+	 *  @param lastcall The lastcall to set.
+	 */
+	public void setCurrentCall(ServiceCall call)
+	{
+		this.call = call;
+	}
 }
 
 

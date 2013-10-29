@@ -2,7 +2,9 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -67,7 +69,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 		boolean isref, String methodname, Map<String, Object> nonfunc)
 	{
 		super(nonfunc);
-//		if(methodname!=null && methodname.equals("getInputStream"))
+//		if(methodname!=null && methodname.equals("method"))
 //			System.out.println("callid of getResult result: "+callid+" "+result);
 		
 		this.result = result;
@@ -120,8 +122,8 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
 		
-//		if(methodname!=null && methodname.equals("getInputStream"))
-//			System.out.println("callid of getResult result: "+callid);
+		if(methodname!=null && methodname.equals("method"))
+			System.out.println("callid of getResult result: "+callid);
 		
 		WaitingCallInfo wci = rsms.getWaitingCall(callid);
 		
@@ -137,6 +139,13 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		else //if(!future.isDone())
 		if(wci!=null)
 		{
+			if(nonfunc!=null)
+			{
+//				CallAccess.setNextInvocation(CallAccess.createServiceCall(component.getComponentIdentifier(), nonfunc));
+//				CallAccess.setCurrentInvocation(CallAccess.createServiceCall(component.getComponentIdentifier(), nonfunc));
+				CallAccess.setLastInvocation(CallAccess.createServiceCall(component.getComponentIdentifier(), nonfunc));
+			}
+			
 			Future future = wci.getFuture();
 			if(exception!=null)
 			{

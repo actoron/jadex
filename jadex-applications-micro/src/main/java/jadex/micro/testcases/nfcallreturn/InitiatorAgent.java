@@ -1,4 +1,4 @@
-package jadex.micro.testcases.timeout;
+package jadex.micro.testcases.nfcallreturn;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -6,9 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.Tuple2;
-import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -161,7 +159,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		final TestReport tr = new TestReport("#"+testno, "Test if timeout works "+(to==-1? "without ": "with "+to)+" timeout.");
+		final TestReport tr = new TestReport("#"+testno, "Test if returning changed nf props works");
 		
 		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		
@@ -189,50 +187,31 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final ITestService ts)
 			{
-				// create a service call meta object and set the timeout
-				final long start = System.currentTimeMillis();
-				if(to!=-1)
-				{
-//					ServiceCall.setInvocationProperties(to, true);
-					ServiceCall call = ServiceCall.getOrCreateNextInvocation();
-					call.setTimeout(to);
-					call.setRealtime(Boolean.TRUE);
-					call.setProperty("extra", "somval");
-				}				
+				ServiceCall call = ServiceCall.getOrCreateNextInvocation();
+				call.setProperty("extra", "somval");
 				
-				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
+//				System.out.println("calling method: "+ServiceCall.getNextInvocation());
 				
 				ts.method("test1").addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
-						tr.setFailed("No timeout occurred");
+						ServiceCall sc = ServiceCall.getLastInvocation();
+						System.out.println("last invoc: "+sc);
+						if("new".equals(sc.getProperty("new")))
+						{
+							tr.setSucceeded(true);
+						}
+						else
+						{
+							tr.setFailed("Wrong service call properties: "+sc);
+						}
 						ret.setResult(tr);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ServiceCall	next	= CallAccess.getNextInvocation();
-						if(next!=null)
-						{
-							tr.setFailed("User invocation data still available: "+next);
-						}
-						else if(exception instanceof TimeoutException)
-						{
-							long diff = System.currentTimeMillis() - (start+to);
-							if(diff>=0 && diff<2000) // 2 secs max overdue delay?
-							{
-								tr.setSucceeded(true);
-							}
-							else
-							{
-								tr.setFailed("Timeout difference too high: "+diff);
-							}
-						}
-						else
-						{
-							tr.setFailed("No timeout occurred");
-						}
+						tr.setFailed("Failed with exception: "+exception);
 						ret.setResult(tr);
 					}
 				});

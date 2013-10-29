@@ -96,7 +96,7 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 			}
 //			Map<String, Object>	props	= new HashMap<String, Object>();
 //			props.put("method1", sic.getMethod());
-			ServiceCall sc = CallAccess.getInvocation(null);//props);
+			ServiceCall sc = CallAccess.getOrCreateNextInvocation(null);//props);
 			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
 			sc.setProperty(ServiceCall.INHERIT, true);
 //			CallAccess.setServiceCall(sc);

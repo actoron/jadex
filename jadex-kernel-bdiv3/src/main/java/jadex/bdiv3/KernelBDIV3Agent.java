@@ -17,7 +17,7 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices({
 	@ProvidedService(type=IComponentFactory.class, implementation=@Implementation(
 //	expression="new jadex.bdiv3.BDIAgentFactory($component.getServiceProvider())"))
-	expression="new jadex.bdiv3.BDIAgentFactory($component.getServiceProvider(), jadex.commons.SUtil.createHashMap(new String[]{\"debugger.panels\"},new Object[]{\"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel,jadex.tools.debugger.bdiv3.BDIAgentInspectorDebuggerPanel\"}))"))
+	expression="new jadex.bdiv3.BDIAgentFactory($component.getServiceProvider(), jadex.commons.SUtil.createHashMap(new String[]{\"debugger.panels\"},new Object[]{\"jadex.tools.debugger.bdiv3.BDIViewerDebuggerPanel\"}))"))
 })
 public class KernelBDIV3Agent extends MicroAgent
 {

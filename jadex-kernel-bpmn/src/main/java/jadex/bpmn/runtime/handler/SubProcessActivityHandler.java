@@ -48,7 +48,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		MSubProcess	proc	= (MSubProcess) activity;
 		List<MActivity> start = proc.getStartActivities();
 		String tmpfile = (String)thread.getPropertyValue("file");
-		if (tmpfile == null)
+		if(tmpfile == null)
 		{
 			tmpfile = (String)thread.getPropertyValue("filename");
 		}

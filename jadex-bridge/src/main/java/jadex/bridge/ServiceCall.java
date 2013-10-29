@@ -39,8 +39,8 @@ public class ServiceCall
 	/** The upcoming service invocations. */
 	protected static ThreadLocal<ServiceCall> NEXT = new ThreadLocal<ServiceCall>();
 	
-//	/** The upcoming service invocations. */
-//	protected static ThreadLocal<ServiceCall> LAST = new ThreadLocal<ServiceCall>();
+	/** The upcoming service invocations. */
+	protected static ThreadLocal<ServiceCall> LAST = new ThreadLocal<ServiceCall>();
 
 	
 	//-------- attributes --------
@@ -84,15 +84,13 @@ public class ServiceCall
 	
 	//-------- methods --------
 	
-//	/**
-//	 *  Get the last service call instance corresponding
-//	 *  to the current execution context.
-//	 *  @return The service call instance or null.
-//	 */
-//	public static ServiceCall	getLastInvocation()
-//	{
-//		return LAST.get();
-//	}
+	/**
+	 *  Get the invocation data for the next service call.
+	 */
+	public static ServiceCall	getNextInvocation()
+	{
+		return NEXT.get();
+	}
 	
 	/**
 	 *  Get the service call instance corresponding
@@ -102,6 +100,16 @@ public class ServiceCall
 	public static ServiceCall	getCurrentInvocation()
 	{
 		return CALLS.get();
+	}
+	
+	/**
+	 *  Get the last service call instance corresponding
+	 *  to the current execution context.
+	 *  @return The service call instance or null.
+	 */
+	public static ServiceCall	getLastInvocation()
+	{
+		return LAST.get();
 	}
 	
 //	/**
@@ -121,25 +129,25 @@ public class ServiceCall
 	 *  @param timeout The timeout.
 	 *  @param realtime The realtime flag.
 	 */
-	public static ServiceCall getInvocation()
+	public static ServiceCall getOrCreateNextInvocation()
 	{
-		return getInvocation(null);
+		return getOrCreateNextInvocation(null);
 	}
 	
-	/**
-	 *  Get the next invocation if any.
-	 */
-	public static ServiceCall getInvocation0()
-	{
-		return NEXT.get();
-	}
+//	/**
+//	 *  Get the next invocation if any.
+//	 */
+//	public static ServiceCall getInvocation0()
+//	{
+//		return NEXT.get();
+//	}
 	
 	/**
 	 *  Get or create the next servicecall for the next invocation. 
 	 *  @param timeout The timeout.
 	 *  @param realtime The realtime flag.
 	 */
-	public static ServiceCall getInvocation(Map<String, Object> props)
+	public static ServiceCall getOrCreateNextInvocation(Map<String, Object> props)
 	{
 		ServiceCall ret = NEXT.get();
 		if(ret==null)

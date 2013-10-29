@@ -293,7 +293,7 @@ public class ServiceHandler implements InvocationHandler
 		try
 		{
 			// Create new next invocation to preserve the non-func props
-			ServiceCall mcall = CallAccess.getInvocation();
+			ServiceCall mcall = CallAccess.getOrCreateNextInvocation();
 			if(call!=null)
 			{
 				for(String key: call.getProperties().keySet())

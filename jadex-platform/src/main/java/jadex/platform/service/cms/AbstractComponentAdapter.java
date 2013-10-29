@@ -722,7 +722,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			IComponentIdentifier.LOCAL.set(null);
 			IComponentAdapter.LOCAL.set(null);
 			// Must reset service call settings when thread retreats from components
-			CallAccess.resetServiceCall();
+			CallAccess.resetCurrentInvocation();
 			CallAccess.resetNextInvocation();
 			Thread.currentThread().setContextClassLoader(cl);
 			this.componentthread = null;

@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -49,27 +50,39 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 //				}
 //			}
 			
+			// Roll invocations meta infos before call
 			if(switchcall)
 			{
 //				if(sic.getMethod().getName().indexOf("test")!=-1)
 //					System.out.println("setting to a: "+sic.getServiceCall());
-				CallAccess.setServiceCall(sic.getServiceCall()); // next becomes current
-				CallAccess.resetNextInvocation();
+				CallAccess.setCurrentInvocation(sic.getServiceCall()); // next becomes current
+				CallAccess.resetNextInvocation(); // next is null
 			}
+			// No rolling if the method jumps from required to provided interceptor chain
 			else
 			{
 //				if(sic.getMethod().getName().indexOf("test")!=-1)
 //					System.out.println("setting to b: "+sic.getLastServiceCall());
-				CallAccess.setServiceCall(sic.getLastServiceCall());
+				CallAccess.setCurrentInvocation(sic.getLastServiceCall());
 				CallAccess.setNextInvocation(sic.getServiceCall());
 			}
+
+			if(sic.getMethod().getName().indexOf("method")!=-1)
+				System.out.println("setting to c: "+sic.getLastServiceCall()+" "+ServiceCall.getCurrentInvocation());
 			
 			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
 
-//			if(sic.getMethod().getName().indexOf("test")!=-1)
-//				System.out.println("setting to c: "+sic.getLastServiceCall());
-			CallAccess.setServiceCall(sic.getLastServiceCall()); 
-			CallAccess.resetNextInvocation();
+			// Restore after call
+//			if(sic.getMethod().getName().indexOf("method")!=-1)
+//				System.out.println("setting to c: "+sic.getLastServiceCall()+" "+ServiceCall.getCurrentInvocation());
+			if(switchcall)
+			{
+				CallAccess.setLastInvocation(ServiceCall.getCurrentInvocation());
+				CallAccess.setCurrentInvocation(sic.getLastServiceCall()); // current is last
+				CallAccess.resetNextInvocation(); // next is null
+				
+				sic.setCurrentCall(CallAccess.getLastInvocation()); // remember invocation made
+			}
 			
 			sic.setResult(res);
 		}

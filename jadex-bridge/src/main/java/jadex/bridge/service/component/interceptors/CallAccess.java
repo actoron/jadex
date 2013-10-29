@@ -28,7 +28,7 @@ public abstract class CallAccess	extends ServiceCall
 	 *  @param caller	The calling component. 
 	 *  @param props	The properties.
 	 */
-	public static ServiceCall	createServiceCall(IComponentIdentifier caller, Map<String, Object> props)
+	public static ServiceCall createServiceCall(IComponentIdentifier caller, Map<String, Object> props)
 	{
 		return ServiceCall.createServiceCall(caller, props);
 	}
@@ -37,7 +37,7 @@ public abstract class CallAccess	extends ServiceCall
 	 *  Set the current service call.
 	 *  @param call	The service call.
 	 */
-	public static void	setServiceCall(ServiceCall call)
+	public static void	setCurrentInvocation(ServiceCall call)
 	{
 		ServiceCall.CALLS.set(call);
 	}
@@ -45,18 +45,10 @@ public abstract class CallAccess	extends ServiceCall
 	/**
 	 *  Remove the current service call.
 	 */
-	public static void	resetServiceCall()
+	public static void	resetCurrentInvocation()
 	{
 //		LAST.set(ServiceCall.CALLS.get());
 		ServiceCall.CALLS.set(null);
-	}
-	
-	/**
-	 *  Get the invocation data for the next service call.
-	 */
-	public static ServiceCall	getNextInvocation()
-	{
-		return NEXT.get();
 	}
 	
 	/**
@@ -73,5 +65,21 @@ public abstract class CallAccess	extends ServiceCall
 	public static void	resetNextInvocation()
 	{
 		NEXT.set(null);
+	}
+	
+	/**
+	 *  Reset the invocation data for the last service call.
+	 */
+	public static void	setLastInvocation(ServiceCall call)
+	{
+		LAST.set(call);
+	}
+
+	/**
+	 *  Reset the invocation data for the last service call.
+	 */
+	public static void	resetLastInvocation()
+	{
+		LAST.set(null);
 	}
 }
