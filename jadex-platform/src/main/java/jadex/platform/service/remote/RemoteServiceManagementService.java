@@ -259,7 +259,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, e);
 							// Can be invoked directly, because internally redirects to agent thread.
 		//					System.out.println("sending terminate");
-							sendMessage(rrms, null, content, mycallid,  BasicService.DEFAULT_REMOTE, res, null);
+							sendMessage(rrms, null, content, mycallid,  BasicService.DEFAULT_REMOTE, res, null, null);
 						}
 						return IFuture.DONE;
 					}
@@ -310,7 +310,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							decider, selector, callid);
 						
 //						System.out.println("send to: "+rrms+" "+callid);
-						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null); // todo: non-func
+						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null, null); // todo: non-func
 //					}
 //				});
 				
@@ -427,7 +427,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
-						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null); // todo: non-func
+						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null, null); // todo: non-func
 //					}
 //				});
 				
@@ -493,10 +493,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @param future The future.
 	 */
-	public void putWaitingCall(String callid, Future<Object> future, TimeoutTimerTask tt)
+	public void putWaitingCall(String callid, Future<Object> future, TimeoutTimerTask tt, Object context)
 	{
 		getRemoteReferenceModule().checkThread();
-		waitingcalls.put(callid, new WaitingCallInfo(future, tt));
+		waitingcalls.put(callid, new WaitingCallInfo(future, tt, context));
 	}
 	
 	/**
@@ -613,9 +613,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Send the request message of a remote method invocation.
 	 *  (Can safely be called from any thread).
+	 *  The context parameter is stored during the call and is available when the result arrives.
 	 */
 	public void sendMessage(final IComponentIdentifier receiver, final IComponentIdentifier realrec, final Object content,
-		final String callid, final long to, final Future<Object> future, final Map<String, Object> nonfunc)
+		final String callid, final long to, final Future<Object> future, final Map<String, Object> nonfunc, final Object context)
 	{
 //		if(content instanceof RemoteMethodInvocationCommand && ((RemoteMethodInvocationCommand)content).getMethodName().equals("testThreading"))
 //		{
@@ -648,7 +649,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							
 							final TimeoutTimerTask tt = to>=0? new TimeoutTimerTask(to, future, callid, receiver, RemoteServiceManagementService.this): null;
 //							System.out.println("remote timeout is: "+to);
-							putWaitingCall(callid, future, tt);
+							putWaitingCall(callid, future, tt, context);
 							
 							// Remove waiting call when future is done
 							future.addResultListener(ia.createResultListener(new IFutureCommandResultListener<Object>()
@@ -850,14 +851,18 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		/** The results per cnt. */
 		protected Map<Integer, Object> results;
+		
+		/** The context. */
+		protected Object context;
 
 		/**
 		 *  Create a new info.
 		 */
-		public WaitingCallInfo(Future<Object> future, TimeoutTimerTask timertask)
+		public WaitingCallInfo(Future<Object> future, TimeoutTimerTask timertask, Object context)
 		{
 			this.future = future;
 			this.timertask = timertask;
+			this.context = context;
 		}
 
 		/**
@@ -913,7 +918,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			this.cnt = cnt;
 		}
-
+		
 		/**
 		 * 
 		 */
@@ -976,6 +981,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				timertask = new TimeoutTimerTask(timertask);
 				timertask.start();
 			}
+		}
+
+		/**
+		 *  Get the context.
+		 *  @return The context.
+		 */
+		public Object getContext()
+		{
+			return context;
 		}
 	}
 	

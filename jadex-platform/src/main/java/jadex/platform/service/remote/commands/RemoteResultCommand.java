@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Security;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -122,8 +123,8 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
 		
-		if(methodname!=null && methodname.equals("method"))
-			System.out.println("callid of getResult result: "+callid);
+//		if(methodname!=null && methodname.equals("method"))
+//			System.out.println("callid of getResult result: "+callid);
 		
 		WaitingCallInfo wci = rsms.getWaitingCall(callid);
 		
@@ -139,11 +140,13 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		else //if(!future.isDone())
 		if(wci!=null)
 		{
-			if(nonfunc!=null)
+			if(nonfunc!=null && wci.getContext()!=null)
 			{
-//				CallAccess.setNextInvocation(CallAccess.createServiceCall(component.getComponentIdentifier(), nonfunc));
-//				CallAccess.setCurrentInvocation(CallAccess.createServiceCall(component.getComponentIdentifier(), nonfunc));
-				CallAccess.setLastInvocation(CallAccess.createServiceCall(component.getComponentIdentifier(), nonfunc));
+				ServiceCall sc = ((ServiceInvocationContext)wci.getContext()).getServiceCall();
+				for(String name: nonfunc.keySet())
+				{
+					sc.setProperty(name, nonfunc.get(name));
+				}
 			}
 			
 			Future future = wci.getFuture();

@@ -27,8 +27,10 @@ import java.util.TimerTask;
  */
 public class ServiceInvocationContext
 {
-	//-------- profiling --------
+	public static ThreadLocal<ServiceInvocationContext> SICS = new ThreadLocal<ServiceInvocationContext>();
 	
+	//-------- profiling --------
+
 	/** Enable call profiling. */
 	public static final boolean	PROFILING	= false;
 	
@@ -92,6 +94,7 @@ public class ServiceInvocationContext
 			}, PRINT_DELAY);
 		}
 	}
+	
 	
 	//-------- attributes --------
 	

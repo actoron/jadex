@@ -1118,7 +1118,7 @@ public class RemoteReferenceModule
 				ret.setResult(null);
 			}
 		});
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, BasicService.DEFAULT_REMOTE, fut, null);
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, BasicService.DEFAULT_REMOTE, fut, null, null);
 		
 		return ret;
 	}
@@ -1158,7 +1158,7 @@ public class RemoteReferenceModule
 				ret.setResult(null);
 			}
 		});
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, BasicService.DEFAULT_REMOTE, fut, null);
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, BasicService.DEFAULT_REMOTE, fut, null, null);
 		return ret;
 	}
 	

@@ -292,6 +292,15 @@ public class ServiceCall
 	}
 	
 	/**
+	 *  Remove a property.
+	 *  @param name The property name.
+	 */
+	public void setProperty(String name)
+	{
+		this.properties.remove(name);
+	}
+	
+	/**
 	 *  Get a property.
 	 *  @param name The property name.
 	 *  @return The property.

@@ -283,13 +283,6 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			
 			final Object res = method.invoke(target, parametervalues);
 			
-			if(method.getName().indexOf("method")!=-1)
-			{
-				System.out.println("iii: "+ServiceCall.getLastInvocation());
-				System.out.println("hhh: "+ServiceCall.getCurrentInvocation());
-				System.out.println("ggg: "+ServiceCall.getNextInvocation());
-			}
-			
 			Map<String, Object> nfunc = nonfunc;
 			ServiceCall sc = ServiceCall.getNextInvocation(); // hmm has not been switched during call to last
 			if(sc!=null)

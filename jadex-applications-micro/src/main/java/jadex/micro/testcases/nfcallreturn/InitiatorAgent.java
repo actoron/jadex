@@ -21,7 +21,8 @@ import jadex.micro.testcases.TestAgent;
 import java.util.Collection;
 
 /**
- * 
+ *  Tests if non-functional properties can be changed and passed back
+ *  from the receiver to the sender side of a service invocation.
  */
 @Agent
 @RequiredServices(
@@ -197,7 +198,7 @@ public class InitiatorAgent extends TestAgent
 					public void resultAvailable(Void result)
 					{
 						ServiceCall sc = ServiceCall.getLastInvocation();
-						System.out.println("last invoc: "+sc);
+//						System.out.println("last invoc: "+sc);
 						if("new".equals(sc.getProperty("new")))
 						{
 							tr.setSucceeded(true);

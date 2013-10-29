@@ -715,7 +715,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					public void resultAvailable(Void result)
 					{
 						// result?!
-						System.out.println("Killing (res): "+getComponentIdentifier().getName());
+//						System.out.println("Killing (res): "+getComponentIdentifier().getName());
 						microagent.killComponent();
 					}
 					public void exceptionOccurred(Exception exception)

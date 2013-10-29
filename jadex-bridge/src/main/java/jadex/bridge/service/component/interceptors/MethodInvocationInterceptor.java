@@ -61,14 +61,17 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			// No rolling if the method jumps from required to provided interceptor chain
 			else
 			{
+				// Remember context for rmi command (extracts and stores it until return command arrives and non-func can be set)
+				ServiceInvocationContext.SICS.set(sic);
+				
 //				if(sic.getMethod().getName().indexOf("test")!=-1)
 //					System.out.println("setting to b: "+sic.getLastServiceCall());
 				CallAccess.setCurrentInvocation(sic.getLastServiceCall());
 				CallAccess.setNextInvocation(sic.getServiceCall());
 			}
 
-			if(sic.getMethod().getName().indexOf("method")!=-1)
-				System.out.println("setting to c: "+sic.getLastServiceCall()+" "+ServiceCall.getCurrentInvocation());
+//			if(sic.getMethod().getName().indexOf("method")!=-1)
+//				System.out.println("setting to c: "+sic.getLastServiceCall()+" "+ServiceCall.getCurrentInvocation());
 			
 			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
 
