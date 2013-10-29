@@ -1,13 +1,11 @@
 package jadex.commons;
 
 import jadex.commons.collection.SCollection;
+import jadex.commons.collection.WeakValueMap;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 import java.io.File;
@@ -35,8 +33,6 @@ import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javax.swing.text.html.InlineView;
-
 /**
  *  This class provides several useful static reflection methods.
  */
@@ -45,7 +41,9 @@ public class SReflect
 	//-------- attributes --------
 	
 	/** Class lookup cache (classloader(weak)->Map([name, import]->class)). */
-	protected static final Map classcache	= Collections.synchronizedMap(new WeakHashMap());
+//	protected static final Map classcache	= Collections.synchronizedMap(new WeakHashMap());
+	protected static final Map<Tuple2<String, Integer>, Class<?>> classcache	
+		= new WeakValueMap<Tuple2<String, Integer>, Class<?>>();
 
 	/** Inner class name lookup cache. */
 	protected static final Map innerclassnamecache	= Collections.synchronizedMap(new WeakHashMap());
@@ -248,7 +246,7 @@ public class SReflect
 	 *  @param name The class name.
 	 *  @return The class, or null if not found.
 	 */
-	public static Class	classForName0(String name, ClassLoader classloader)
+	public static Class<?>	classForName0(String name, ClassLoader classloader)
 	{
 		return classForName0(name, true, classloader);
 	}
@@ -262,7 +260,7 @@ public class SReflect
 	 *  @param name The class name.
 	 *  @return The class, or null if not found.
 	 */
-	public static Class	classForName0(String name, boolean initialize, ClassLoader classloader)
+	public static Class<?>	classForName0(String name, boolean initialize, ClassLoader classloader)
 	{
 		if(name==null)
 			throw new IllegalArgumentException("Class name must not be null.");
@@ -276,18 +274,13 @@ public class SReflect
 		{
 			if(classloader==null)
 				classloader = SReflect.class.getClassLoader();
+			Integer hash = new Integer(classloader.hashCode());
 
-			Map	cache	= (Map)classcache.get(classloader);
-			if(cache==null)
-			{
-				cache	= Collections.synchronizedMap(new HashMap());
-				classcache.put(classloader, cache);
-			}
-			ret	= cache.get(name);
+			ret = classcache.get(new Tuple2<String, Integer>(name, hash));
 			
 			if(ret==null)
 			{
-//					System.out.println("cFN0 cachemiss: "+name);
+//				System.out.println("cFN0 cachemiss: "+name);
 				
 				// For arrays get plain name and count occurrences of '['.
 				String	clname	= name;
@@ -299,7 +292,7 @@ public class SReflect
 						dimension++;
 					}
 					clname	= clname.substring(0, clname.indexOf('['));
-					Class	clazz	= classForName0(clname, initialize, classloader);
+					Class<?> clazz	= classForName0(clname, initialize, classloader);
 					if(clazz!=null)
 					{
 						// Create array class object. Hack!!! Is there a better way?
@@ -336,13 +329,13 @@ public class SReflect
 				}
 				
 				if(ret==null)
-					ret	= "notfound";
+					ret	= NotFound.class;
 				
-				cache.put(name, ret);
+				classcache.put(new Tuple2<String, Integer>(name, hash), (Class<?>)ret);
 			}
 		}
 		
-		return ret instanceof Class ? (Class)ret : null;
+		return ret instanceof Class && !NotFound.class.equals(ret)? (Class<?>)ret : null;
 	}
 	
 	/**
@@ -793,7 +786,7 @@ public class SReflect
 		{
 			throw new ClassNotFoundException("Class "+clname+" not found in imports"); //: "+SUtil.arrayToString(imports));
 		}
-
+		
 		return clazz;
 	}
 
@@ -809,59 +802,22 @@ public class SReflect
 	{
 		clname = makeNiceArrayNotation(clname);
 		
-//		System.out.println("classcache: "+classcache.size());
+		if(classloader==null)
+			classloader = SReflect.class.getClassLoader();
 		
-		Class	clazz	= null;
-		Map	cache	= (Map)classcache.get(classloader);
-		if(cache==null)
-		{
-			cache	= Collections.synchronizedMap(new HashMap());
-			classcache.put(classloader, cache);
-		}
+		Class<T> clazz = (Class<T>)classForName0(clname, classloader);
+//		Class<T> clazz = (Class<T>)classcache.get(new Tuple2<String, Integer>(clname, hash));
 
-		// Hack!!! Tuple should be immutable, but currently doesn't copy entries, so we can do this to reduce number of created tuples
-		Object[]	entities	= new Object[]{clname, null};
-		Tuple	tuple	= new Tuple(entities);
-
-		// Try to find fully qualified.
-		if(cache.containsKey(tuple))
-		{
-//			hit++;
-//			if(hit%1000==0)
-//				System.out.println("hits: "+hit+", misses: "+miss);
-			
-			clazz	= (Class)cache.get(tuple);
-		}
-		else
-		{
-//			miss++;
-//			if(miss%1000==0)
-//				System.out.println("hits: "+hit+", misses: "+miss);
-			
-			clazz	= classForName0(clname, classloader);
-			cache.put(new Tuple(clname, null), clazz);
-		}
-			
 		// Try to find in imports.
 		if(clazz==null && imports!=null)
 		{
+			Integer hash = classloader.hashCode();
 			for(int i=0; clazz==null && i<imports.length; i++)
 			{
-				entities[1]	= imports[i];	
-				if(cache.containsKey(tuple))
+				Tuple2<String, Integer> key = new Tuple2<String, Integer>(imports[i]+clname, hash);
+				clazz = (Class<T>)classcache.get(key);
+				if(clazz==null)	
 				{
-//					hit++;
-//					if(hit%1000==0)
-//						System.out.println("hits: "+hit+", misses: "+miss);
-					
-					clazz	= (Class)cache.get(tuple);
-				}
-				else
-				{
-//					miss++;
-//					if(miss%1000==0)
-//						System.out.println("hits: "+hit+", misses: "+miss);
-					
 					String	clwoa	=	clname;
 					String	brackets	= "";
 					while(clwoa.endsWith("[]"))
@@ -873,14 +829,14 @@ public class SReflect
 					// Package import
 					if(imports[i].endsWith(".*"))
 					{
-						clazz	= classForName0(imports[i].substring(0, imports[i].length()-1) + clname, classloader);
+						clazz	= (Class<T>)classForName0(imports[i].substring(0, imports[i].length()-1) + clname, classloader);
 					}
 					// Class import
 					else if(imports[i].endsWith(clwoa))
 					{
-						clazz	= classForName0(imports[i]+brackets, classloader);
+						clazz	= (Class<T>)classForName0(imports[i]+brackets, classloader);
 					}
-					cache.put(new Tuple(clname, imports[i]), clazz);
+					classcache.put(key, clazz);
 				}
 			}
 		}
@@ -888,23 +844,16 @@ public class SReflect
 		// Try java.lang (imported by default).
 		if(clazz==null)
 		{
-			entities[1]	= "java.lang.*";
-			if(cache.containsKey(tuple))
+			Integer hash = classloader.hashCode();
+			Tuple2<String, Integer> key = new Tuple2<String, Integer>("java.lang.*"+clname, hash);
+			clazz = (Class<T>)classcache.get(key);
+			if(clazz==null)
 			{
-//				hit++;
-//				if(hit%1000==0)
-//					System.out.println("hits: "+hit+", misses: "+miss);
-				
-				clazz	= (Class)cache.get(tuple);
-			}
-			else
-			{
-//				miss++;
-//				if(miss%1000==0)
-//					System.out.println("hits: "+hit+", misses: "+miss);
-				
-				clazz	= classForName0("java.lang." + clname, classloader);
-				cache.put(new Tuple(clname, "java.lang.*"), clazz);
+				clazz	= (Class<T>)classForName0("java.lang." + clname, classloader);
+				if(clazz!=null)
+				{
+					classcache.put(key, clazz);
+				}
 			}
 		}
 
@@ -912,6 +861,22 @@ public class SReflect
 //		{
 //			System.err.println("Class not found: "+clname+", "+SUtil.arrayToString(imports));
 //		}
+		
+//		System.out.println("classcache: "+classcache.size());//+" "+classcache.keySet());
+//		Map<Integer, Integer> res = new HashMap<Integer, Integer>();
+//		for(Tuple2<String, Integer> tup: classcache.keySet())
+//		{
+//			Integer cnt = res.get(tup.getSecondEntity());
+//			if(cnt==null)
+//			{
+//				res.put(tup.getSecondEntity(), new Integer(1));
+//			}
+//			else
+//			{
+//				res.put(tup.getSecondEntity(), new Integer(cnt.intValue()+1));
+//			}
+//		}
+//		System.out.println("found: "+res);
 		
 		return clazz;
 	}
@@ -1836,6 +1801,9 @@ public class SReflect
 		return isAndroid.booleanValue();
 	}
 	
+	private class NotFound
+	{
+	}
 }
 
 
