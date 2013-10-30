@@ -102,9 +102,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/** The root cause that was given at creation time. */
 	protected Cause cause;
 	
-//	/** The registered non-functional property hooks. */
-//	protected Map<MethodInfo, List<IMethodInvocationListener>> methodlisteners;
-	
 	/** The call id. */
 	protected AtomicLong callid;
 	
@@ -160,7 +157,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		Object ret = null;
 		
-//		if(method.getName().indexOf("methodA")!=-1)
+//		if(method.getName().indexOf("methodB")!=-1)
 //			System.out.println("goto");
 		
 		final long callid = this.callid.getAndIncrement();

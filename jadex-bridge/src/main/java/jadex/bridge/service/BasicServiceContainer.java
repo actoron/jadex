@@ -954,7 +954,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	{
 		if(servicelisteners==null)
 			servicelisteners = new HashMap<IServiceIdentifier, MethodListenerHandler>();
-		MethodListenerHandler handler = servicelisteners.get(mi);
+		MethodListenerHandler handler = servicelisteners.get(sid);
 		if(handler==null)
 		{
 			handler = new MethodListenerHandler();
