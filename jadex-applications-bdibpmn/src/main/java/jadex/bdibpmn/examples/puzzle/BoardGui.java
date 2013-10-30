@@ -110,6 +110,7 @@ public class BoardGui extends JFrame
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
+//						System.out.println("boardgui dispose");
 						BoardGui.this.dispose();
 					}
 				}));

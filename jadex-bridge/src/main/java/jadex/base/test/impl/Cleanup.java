@@ -2,6 +2,7 @@ package jadex.base.test.impl;
 
 
 import jadex.bridge.IExternalAccess;
+import jadex.commons.future.Future;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.awt.BorderLayout;
@@ -91,6 +92,8 @@ public class Cleanup extends TestCase
 		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
 		// http://bugs.sun.com/view_bug.do?bug_id=4726458
 		
+		final Future<Void>	disposed	= new Future<Void>();
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -106,13 +109,17 @@ public class Cleanup extends TestCase
 				{
 					public void actionPerformed(ActionEvent e)
 					{
+//						System.out.println("cleanup dispose");
 						f.dispose();
+						disposed.setResult(null);
 					}
 				});
 				t.setRepeats(false);
 				t.start();
 			}
 		});
+		
+		disposed.get(new ThreadSuspendable(), 30000);
 		
 //		// Another bug not releasing the last drawn window.
 //		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
