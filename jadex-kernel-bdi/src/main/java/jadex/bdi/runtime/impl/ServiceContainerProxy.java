@@ -407,4 +407,12 @@ public class ServiceContainerProxy implements IServiceContainer
 	{
 		interpreter.getServiceContainer().notifyMethodListeners(sid, start, proxy, method, args, callid, context);
 	}
+	
+	/**
+	 *  Test if service and method has listeners.
+	 */
+	public boolean hasMethodListeners(IServiceIdentifier sid, MethodInfo mi)
+	{
+		return interpreter.getServiceContainer().hasMethodListeners(sid, mi);
+	}
 }

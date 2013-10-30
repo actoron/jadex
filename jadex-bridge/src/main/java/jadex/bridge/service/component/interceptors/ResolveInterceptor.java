@@ -98,27 +98,27 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			if(START_METHOD.equals(sic.getMethod()))
 			{
 				// invoke 1) basic service start 2) domain service start
-				invokeDoubleMethod(sic, si, START_METHOD, ServiceStart.class, true).addResultListener(new DelegationResultListener(ret));
+				invokeDoubleMethod(sic, si, START_METHOD, ServiceStart.class, true).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else if(SHUTDOWN_METHOD.equals(sic.getMethod()))
 			{
 				// invoke 1) domain service shutdown 2) basic service shutdown
-				invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, false).addResultListener(new DelegationResultListener(ret));
+				invokeDoubleMethod(sic, si, SHUTDOWN_METHOD, ServiceShutdown.class, false).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else if(SERVICEMETHODS.contains(sic.getMethod()))
 			{
 				sic.setObject(si.getManagementService());
-				sic.invoke().addResultListener(new DelegationResultListener(ret));
+				sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			else
 			{
 				sic.setObject(si.getDomainService());
-				sic.invoke().addResultListener(new DelegationResultListener(ret));
+				sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		}
 		else
 		{
-			sic.invoke().addResultListener(new DelegationResultListener(ret));
+			sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;

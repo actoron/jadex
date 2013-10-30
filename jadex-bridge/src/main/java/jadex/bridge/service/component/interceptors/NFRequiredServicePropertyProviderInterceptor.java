@@ -11,7 +11,8 @@ import jadex.commons.future.IFuture;
 import java.lang.reflect.Method;
 
 /**
- *  Calls a methods on an object and returns the result.
+ *  Delegates 'getRequiredServicePropertyProvider()' calls
+ *  to the underlying component.
  */
 public class NFRequiredServicePropertyProviderInterceptor extends AbstractApplicableInterceptor
 {

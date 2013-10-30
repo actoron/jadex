@@ -87,6 +87,7 @@ public class ExecutionTimeProperty extends TimedProperty
 					}
 				}
 			});
+//			System.out.println("installing lis: "+comp.getComponentIdentifier().getName());
 			comp.getServiceContainer().addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
 		}
 		else
@@ -109,7 +110,7 @@ public class ExecutionTimeProperty extends TimedProperty
 	 */
 	public void setValue(Long value) 
 	{
-//		System.out.println("Setting org value: "+value);
+//		System.out.println("Set value: "+value);
 		
 		// ema calculatio: EMAt = EMAt-1 +(SF*(Ct-EMAt-1)) SF=2/(n+1)
 		if(this.value!=null && value!=null)

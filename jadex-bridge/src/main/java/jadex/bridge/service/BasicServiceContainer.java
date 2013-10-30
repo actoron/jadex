@@ -952,6 +952,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public void addMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener)
 	{
+//		System.out.println("added lis: "+sid+" "+mi+" "+hashCode());
+		
 		if(servicelisteners==null)
 			servicelisteners = new HashMap<IServiceIdentifier, MethodListenerHandler>();
 		MethodListenerHandler handler = servicelisteners.get(sid);
@@ -993,7 +995,24 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			}
 		}
 	}
-
+	
+	/**
+	 *  Test if service and method has listeners.
+	 */
+	public boolean hasMethodListeners(IServiceIdentifier sid, MethodInfo mi)
+	{
+		boolean ret = false;
+		if(servicelisteners!=null)
+		{
+			MethodListenerHandler handler = servicelisteners.get(sid);
+			if(handler!=null)
+			{
+				ret = handler.hasMethodListeners(sid, mi);
+			}
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 * 

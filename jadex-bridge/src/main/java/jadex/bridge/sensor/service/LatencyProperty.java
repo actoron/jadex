@@ -52,26 +52,28 @@ public class LatencyProperty extends TimedProperty
 				
 				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 				{
-					if(context instanceof ServiceInvocationContext)
-					{
-						ServiceInvocationContext sic = (ServiceInvocationContext)context;
-						if(sic.getServiceCall()!=null)
-						{
-							Long dur = (Long)sic.getServiceCall().getProperty("__duration");
-							System.out.println("dur is: "+dur);
-						}
-					}
-					else
-					{
-						System.out.println("no context");
-					}
-					
 					Long start = times.remove(callid);
 					// May happen that property is added during ongoing call
 					if(start!=null)
 					{
-						long dur = System.currentTimeMillis() - start.longValue();
-						setValue(dur);
+						if(context instanceof ServiceInvocationContext)
+						{
+							ServiceInvocationContext sic = (ServiceInvocationContext)context;
+							if(sic.getServiceCall()!=null)
+							{
+								Long exe = (Long)sic.getServiceCall().getProperty("__duration");
+								if(exe!=null)
+								{
+									long dur = System.currentTimeMillis() - start.longValue() - exe.longValue();
+//									System.out.println("dur is: "+dur);
+									setValue(dur);
+								}
+							}
+						}
+						else
+						{
+							System.out.println("no context");
+						}
 					}
 				}
 			});

@@ -200,6 +200,10 @@ public interface IServiceContainer extends IServiceProvider
 	 */
 	public void notifyMethodListeners(IServiceIdentifier sid, boolean start, Object proxy, final Method method, final Object[] args, Object callid, ServiceInvocationContext context);
 	
+	/**
+	 *  Test if service and method has listeners.
+	 */
+	public boolean hasMethodListeners(IServiceIdentifier sid, MethodInfo mi);
 	
 	/**
 	 *  Get one service of a type from a specific component.

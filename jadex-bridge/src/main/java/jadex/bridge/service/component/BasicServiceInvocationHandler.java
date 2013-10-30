@@ -7,7 +7,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.INFRPropertyProvider;
-import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
@@ -24,6 +23,7 @@ import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
+import jadex.bridge.service.component.interceptors.MethodCallListenerInterceptor;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.MonitoringInterceptor;
 import jadex.bridge.service.component.interceptors.NFRequiredServicePropertyProviderInterceptor;
@@ -33,7 +33,6 @@ import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 import jadex.bridge.service.component.interceptors.ValidationInterceptor;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.IResultCommand;
-import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -49,12 +48,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 /**
@@ -102,8 +99,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/** The root cause that was given at creation time. */
 	protected Cause cause;
 	
-	/** The call id. */
-	protected AtomicLong callid;
+//	/** The call id. */
+//	protected AtomicLong callid;
 	
 	//-------- constructors --------
 	
@@ -117,7 +114,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.logger	= logger;
 		this.realtime	= realtime;
 		this.cause = cause;
-		this.callid = new AtomicLong();
+//		this.callid = new AtomicLong();
 	}
 	
 	/**
@@ -131,7 +128,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.logger	= logger;
 		this.realtime	= realtime;
 		this.cause = cause;
-		this.callid = new AtomicLong();
+//		this.callid = new AtomicLong();
 	}
 	
 	/**
@@ -145,7 +142,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.logger	= logger;
 		this.realtime	= realtime;
 		this.cause = cause;
-		this.callid = new AtomicLong();
+//		this.callid = new AtomicLong();
 	}
 	
 	//-------- methods --------
@@ -160,8 +157,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 //		if(method.getName().indexOf("methodB")!=-1)
 //			System.out.println("goto");
 		
-		final long callid = this.callid.getAndIncrement();
-		comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), true, proxy, method, args, callid, null);
+//		final long callid = this.callid.getAndIncrement();
+//		comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), true, proxy, method, args, callid, null);
 		
 //		if(method.getName().indexOf("getExternalAccess")!=-1)
 //			System.out.println("call method ex");
@@ -267,26 +264,26 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			}
 		}
 		
-		final ServiceInvocationContext fsicon = sicon;
-		if(ret instanceof IFuture)
-		{
-			((IFuture<Object>)ret).addResultListener(new IResultListener<Object>()
-			{
-				public void resultAvailable(Object result)
-				{
-					comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), false, proxy, method, args, callid, fsicon);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), false, proxy, method, args, callid, fsicon);
-				}
-			});
-		}
-		else
-		{
-			comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), false, proxy, method, args, callid, fsicon);
-		}
+//		final ServiceInvocationContext fsicon = sicon;
+//		if(ret instanceof IFuture)
+//		{
+//			((IFuture<Object>)ret).addResultListener(new IResultListener<Object>()
+//			{
+//				public void resultAvailable(Object result)
+//				{
+//					comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), false, proxy, method, args, callid, fsicon);
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), false, proxy, method, args, callid, fsicon);
+//				}
+//			});
+//		}
+//		else
+//		{
+//			comp.getServiceContainer().notifyMethodListeners(getServiceIdentifier(), false, proxy, method, args, callid, fsicon);
+//		}
 		
 		return ret;
 	}
@@ -432,8 +429,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service, realtime, componentfetcher);
-			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy, monitoring);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
+			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy, monitoring, ret.getServiceIdentifier());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			if(!(service instanceof IService))
@@ -586,7 +583,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Add the standard and custom interceptors.
 	 */
 	protected static void addInterceptors(BasicServiceInvocationHandler handler, Object service, 
-		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, boolean copy, boolean monitoring)
+		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, boolean copy, 
+		boolean monitoring, IServiceIdentifier sid)
 	{
 //		System.out.println("addI:"+service);
 
@@ -602,6 +600,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			{
 				handler.addFirstServiceInterceptor(new ResolveInterceptor());
 			}
+			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
 			handler.addFirstServiceInterceptor(new ValidationInterceptor());
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 			{
@@ -653,6 +652,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
+			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, service.getServiceIdentifier()));
 			handler.addFirstServiceInterceptor(new NFRequiredServicePropertyProviderInterceptor(ia, service.getServiceIdentifier()));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)

@@ -1,6 +1,7 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.sensor.service.IMethodInvocationListener;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.commons.MethodInfo;
 
 import java.lang.reflect.Method;
@@ -58,6 +59,25 @@ public class MethodListenerHandler
 			doNotifyListeners(start, proxy, method, args, callid, context, methodlisteners.get(null));
 			doNotifyListeners(start, proxy, method, args, callid, context, methodlisteners.get((new MethodInfo(method))));
 		}
+	}
+	
+	/**
+	 *  Test if service and method has listeners.
+	 */
+	public boolean hasMethodListeners(IServiceIdentifier sid, MethodInfo mi)
+	{
+		boolean ret = false;
+		if(methodlisteners!=null)
+		{
+			List<IMethodInvocationListener> lis = methodlisteners.get(mi);
+			ret = lis!=null && lis.size()>0;
+			if(!ret)
+			{
+				lis = methodlisteners.get(null);
+				ret = lis!=null && lis.size()>0;
+			}
+		}
+		return ret;
 	}
 	
 	/**
