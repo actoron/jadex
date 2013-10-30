@@ -65,7 +65,11 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			else
 			{
 				// Remember context for rmi command (extracts and stores it until return command arrives and non-func can be set)
-				ServiceInvocationContext.SICS.set(sic);
+				if(Proxy.getInvocationHandler(sic.getObject()).getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1)
+				{
+					ServiceInvocationContext.SICS.set(sic);
+				}	
+				
 				
 //				if(sic.getMethod().getName().indexOf("test")!=-1)
 //					System.out.println("setting to b: "+sic.getLastServiceCall());

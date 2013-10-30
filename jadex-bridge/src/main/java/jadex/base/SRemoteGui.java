@@ -1185,31 +1185,13 @@ public class SRemoteGui
 			@Classname("redir")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				SServiceProvider.getService(ia.getServiceContainer(), IDaemonThreadPoolService.class)
-					.addResultListener(ia.createResultListener(new IResultListener<IDaemonThreadPoolService>()
+				try
 				{
-					public void resultAvailable(IDaemonThreadPoolService tp)
-					{
-						proceed(tp);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						proceed(null);
-					}
-					
-					protected void proceed(IThreadPool tp)
-					{
-						try
-						{
-							SUtil.getOutForSystemIn(tp).write(txt.getBytes());
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
-					}
-				}));
+					SUtil.getOutForSystemIn().write(txt.getBytes());
+				}
+				catch(IOException e)
+				{
+				}
 				return IFuture.DONE;
 			}
 		});		

@@ -284,6 +284,12 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	public IFuture<Void>	agentKilled()
 	{
 		final Future<Void>	ret	= new Future<Void>();
+		
+		if(timer!=null)
+		{
+			timer.cancel();
+		}
+		
 		IFuture<ISettingsService>	setfut	= getServiceContainer().getRequiredService("settings");
 		setfut.addResultListener(new IResultListener<ISettingsService>()
 		{

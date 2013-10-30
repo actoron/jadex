@@ -11,6 +11,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -2497,29 +2498,92 @@ public class SUtil
 		}
 	}
 	
+	protected static OutputStream	OUT_FOR_SYSTEM_IN;
+	
 	/**
 	 *  Get an output stream that is automatically fed into the new System.in,
 	 *  i.e. this method replaces System.in and delivers an output stream to
 	 *  which can be written.
-	 *  @param tp The thread pool.
+	 *  
+	 *  Note that writing to the output stream may block when no one reads from
+	 *  system in (default buffer size is 1024 characters).
 	 */
-	public static synchronized OutputStream getOutForSystemIn(IThreadPool tp) throws IOException
+	public static synchronized OutputStream getOutForSystemIn() throws IOException
 	{
-		OutputStream ret;
-		
-		InputStream	in	= System.in; 
-		
-		if(in instanceof CombinedInputStream)
+		if(OUT_FOR_SYSTEM_IN==null)
 		{
-			in	= ((CombinedInputStream)in).getIn();
+			final PipedInputStream	snk	= new PipedInputStream();
+			OUT_FOR_SYSTEM_IN	= new PipedOutputStream(snk);
+			
+			final InputStream	sysin	= System.in;
+			InputStream	in	= new InputStream()
+			{
+				public int available() throws IOException
+				{
+					return sysin.available() + snk.available();
+				}
+				
+				public int read() throws IOException
+				{
+					while(sysin.available()==0 && snk.available()==0)
+					{
+						try
+						{
+							Thread.sleep(500);
+						}
+						catch(InterruptedException e)
+						{
+						}
+					}
+					return snk.available()!=0 ? snk.read() : sysin.read();
+				}
+				
+			    public int read(byte b[], int off, int len) throws IOException
+			    {
+			        if(b==null)
+			        {
+			            throw new NullPointerException();
+			        }
+			        else if(off<0 || len<0 || len>b.length-off)
+			        {
+			            throw new IndexOutOfBoundsException();
+			        }
+			        else if(len==0)
+			        {
+			            return 0;
+			        }
+	
+			        int	c = read();
+			        if(c==-1)
+			        {
+			            return -1;
+			        }
+			        b[off]	= (byte)c;
+	
+			        int i = 1;
+			        try
+			        {
+			            for(; available()>0 && i<len; i++)
+			            {
+			                c	= read();
+			                if(c==-1)
+			                {
+			                    break;
+			                }
+			                b[off+i]	= (byte)c;
+			            }
+			        }
+			        catch (IOException ee)
+			        {
+			        }
+			        return i;
+			    }
+	
+			};
+			System.setIn(in);
 		}
-
-		PipedOutputStream pos = new PipedOutputStream();
-		CombinedInputStream cis = new CombinedInputStream(new ProtectedInputStream(in), pos, tp);
-		System.setIn(cis);
-		ret = pos;
 		
-		return ret;
+		return OUT_FOR_SYSTEM_IN;
 	}
 	
 	/**

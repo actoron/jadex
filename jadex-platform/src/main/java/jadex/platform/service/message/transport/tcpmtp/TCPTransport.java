@@ -265,6 +265,10 @@ public class TCPTransport implements ITransport
 //		System.out.println("shutdown: "+this);
 		try{this.serversocket.close();}catch(Exception e){}
 		connections = null; // Help gc
+		if(timer!=null)
+		{
+			timer.cancel();
+		}
 		return IFuture.DONE;
 	}
 	
@@ -743,6 +747,7 @@ public class TCPTransport implements ITransport
 		{
 			if(timer==null)
 			{
+//				System.out.println("create timer: "+TCPTransport.this);
 				timer	= new Timer(true);
 			}
 			

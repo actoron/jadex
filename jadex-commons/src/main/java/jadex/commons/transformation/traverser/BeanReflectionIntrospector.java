@@ -204,6 +204,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 					}
 				}
 	
+				// Todo: find a way to make lru keys and contents weak.
 				beaninfos.put(beaninfokey, ret);
 			}
 		}

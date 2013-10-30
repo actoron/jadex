@@ -222,7 +222,7 @@ public class CliAgent implements ICliService, IInternalCliService
 						System.out.println("Jadex shell (type 'h' for help)");
 						System.out.println(getShell(consess).getShellPrompt().get(sus));
 						// redirect System.in
-						try{SUtil.getOutForSystemIn(tp);}catch(Exception e){}
+						try{SUtil.getOutForSystemIn();}catch(Exception e){}
 //						System.out.println("sysin: "+System.in+" "+System.in.getClass());
 						BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 //						Scanner sc = new Scanner(System.in);

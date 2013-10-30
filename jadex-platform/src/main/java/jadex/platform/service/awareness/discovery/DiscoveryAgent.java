@@ -214,6 +214,11 @@ public abstract class DiscoveryAgent
 		final Future<Void> ret = new Future<Void>();
 		setKilled(true);
 		
+		if(timer!=null)
+		{
+			timer.cancel();
+		}
+		
 		if(sender!=null)
 		{
 			createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId())
@@ -325,24 +330,6 @@ public abstract class DiscoveryAgent
 	public void setKilled(boolean killed)
 	{
 		this.killed = killed;
-	}
-
-	/**
-	 *  Get the timer.
-	 *  @return the timer.
-	 */
-	public Timer getTimer()
-	{
-		return timer;
-	}
-
-	/**
-	 *  Set the timer.
-	 *  @param timer The timer to set.
-	 */
-	public void setTimer(Timer timer)
-	{
-		this.timer = timer;
 	}
 
 	/**

@@ -165,6 +165,7 @@ public class ComponentTestSuite extends TestSuite
 		}
 		
 		// Scan for test cases.
+		System.out.println("Scanning for testcases: "+path);
 		List<String> scanForTestCases = scanForTestCases(root, path);
 		for (String abspath : scanForTestCases)
 		{	
@@ -261,14 +262,6 @@ public class ComponentTestSuite extends TestSuite
 			addTest(new Cleanup(rootcomp, timer));
 		}
 //		System.out.println("Finished Building Suite for " + path);
-		try
-		{
-			Thread.sleep(5000);
-		}
-		catch (InterruptedException e1)
-		{
-			e1.printStackTrace();
-		}
 	}
 
 	private List<String> scanForTestCases(File root, File path)
@@ -278,7 +271,6 @@ public class ComponentTestSuite extends TestSuite
 		List<File>	todo	= new LinkedList<File>();
 //		if(path.toString().indexOf("micro")!=-1)
 		todo.add(path);
-//		System.out.println("Path: "+path);
 		
 		if (SReflect.isAndroid())
 		{
@@ -302,8 +294,9 @@ public class ComponentTestSuite extends TestSuite
 			{
 				e.printStackTrace();
 			}
-		} else {
-		
+		}
+		else
+		{
 			while(!todo.isEmpty())
 			{
 				File	file	= (File)todo.remove(0);
@@ -321,6 +314,7 @@ public class ComponentTestSuite extends TestSuite
 				}
 			}
 		}
+		
 		return result;
 		
 	}
