@@ -51,19 +51,19 @@ public class MethodListenerHandler
 	/**
 	 *  Notify registered listeners in case a method is called.
 	 */
-	protected void notifyMethodListeners(boolean start, Object proxy, final Method method, final Object[] args, Object callid)
+	public void notifyMethodListeners(boolean start, Object proxy, final Method method, final Object[] args, Object callid, ServiceInvocationContext context)
 	{
 		if(methodlisteners!=null)
 		{
-			doNotifyListeners(start, proxy, method, args, callid, methodlisteners.get(null));
-			doNotifyListeners(start, proxy, method, args, callid, methodlisteners.get((new MethodInfo(method))));
+			doNotifyListeners(start, proxy, method, args, callid, context, methodlisteners.get(null));
+			doNotifyListeners(start, proxy, method, args, callid, context, methodlisteners.get((new MethodInfo(method))));
 		}
 	}
 	
 	/**
 	 *  Do notify the listeners.
 	 */
-	protected void doNotifyListeners(boolean start, Object proxy, final Method method, final Object[] args, Object callid, List<IMethodInvocationListener> lis)
+	protected void doNotifyListeners(boolean start, Object proxy, final Method method, final Object[] args, Object callid, ServiceInvocationContext context, List<IMethodInvocationListener> lis)
 	{
 		if(lis!=null)
 		{
@@ -71,11 +71,11 @@ public class MethodListenerHandler
 			{
 				if(start)
 				{
-					ml.methodCallStarted(proxy, method, args, callid);
+					ml.methodCallStarted(proxy, method, args, callid, context);
 				}
 				else
 				{
-					ml.methodCallFinished(proxy, method, args, callid);
+					ml.methodCallFinished(proxy, method, args, callid, context);
 				}
 			}
 		}

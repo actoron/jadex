@@ -2,8 +2,10 @@ package jadex.bridge.sensor.service;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.MethodInfo;
@@ -23,8 +25,8 @@ public class WaitingTimeProperty extends TimedProperty
 	/** The name of the property. */
 	public static final String NAME = "waiting time";
 	
-	/** The handler. */
-	protected BasicServiceInvocationHandler handler;
+	/** The service identifier. */
+	protected IServiceIdentifier sid;
 	
 	/** The listener. */
 	protected IMethodInvocationListener listener;
@@ -42,6 +44,7 @@ public class WaitingTimeProperty extends TimedProperty
 	{
 		super(NAME, comp, true);
 		this.method = method;
+		this.sid = service.getServiceIdentifier();
 		
 		SServiceProvider.getService(comp.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<IClockService>()
@@ -60,18 +63,17 @@ public class WaitingTimeProperty extends TimedProperty
 		
 		if(Proxy.isProxyClass(service.getClass()))
 		{
-			handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 			{
 				Map<Object, Long> times = new HashMap<Object, Long>();
 				
-				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid)
+				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 				{
 					if(clock!=null)
 						times.put(callid, new Long(clock.getTime()));
 				}
 				
-				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid)
+				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 				{
 					if(clock!=null)
 					{
@@ -85,7 +87,7 @@ public class WaitingTimeProperty extends TimedProperty
 					}
 				}
 			});
-			handler.addMethodListener(method, listener);
+			comp.getServiceContainer().addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
 		}
 		else
 		{
@@ -127,8 +129,7 @@ public class WaitingTimeProperty extends TimedProperty
 	 */
 	public IFuture<Void> dispose()
 	{
-		if(handler!=null)
-			handler.removeMethodListener(method, listener);
+		comp.getServiceContainer().removeMethodInvocationListener(sid, method, listener);
 		return IFuture.DONE;
 	}
 }

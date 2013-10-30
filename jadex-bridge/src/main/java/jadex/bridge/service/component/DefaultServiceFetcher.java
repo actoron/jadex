@@ -855,9 +855,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 									(IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding, realtime);
 								
 								IServiceIdentifier sid = service.getServiceIdentifier();
-								if(!ia.hasRequiredServicePropertyProvider(sid))
+								if(!ia.getServiceContainer().hasRequiredServicePropertyProvider(sid))
 								{
-									INFMixedPropertyProvider nfpp = ia.getRequiredServicePropertyProvider(service.getServiceIdentifier());
+									INFMixedPropertyProvider nfpp = ia.getServiceContainer().getRequiredServicePropertyProvider(service.getServiceIdentifier());
 									
 									List<NFRPropertyInfo> nfprops = info.getNFRProperties();
 									if(nfprops!=null)

@@ -170,13 +170,13 @@ public interface IInternalAccess
 //	 */
 //	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event);
 	
-	/**
-	 *  Get the required service property provider for a service.
-	 */
-	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid);
-	
-	/**
-	 *  Has the service a property provider.
-	 */
-	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid);
+//	/**
+//	 *  Get the required service property provider for a service.
+//	 */
+//	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid);
+//	
+//	/**
+//	 *  Has the service a property provider.
+//	 */
+//	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid);
 }

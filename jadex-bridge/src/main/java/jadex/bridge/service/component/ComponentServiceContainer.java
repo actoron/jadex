@@ -4,6 +4,8 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
@@ -42,9 +44,11 @@ import jadex.commons.future.TerminableIntermediateFuture;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -69,6 +73,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	
 	/** The realtime flag for call timeouts. */
 	protected boolean	realtime;
+	
+	/** The nf property providers for required services. */
+	protected Map<IServiceIdentifier, INFMixedPropertyProvider> reqserprops;
 	
 	//-------- constructors --------
 
@@ -783,6 +790,31 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the required service property provider for a service.
+	 */
+	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
+	{
+		INFMixedPropertyProvider ret = null;
+		if(reqserprops==null)
+			reqserprops = new HashMap<IServiceIdentifier, INFMixedPropertyProvider>(); // use LRU?
+		ret = reqserprops.get(sid);
+		if(ret==null)
+		{
+			ret = new NFMethodPropertyProvider(null); // parent of required service property?
+			reqserprops.put(sid, ret);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Has the service a property provider.
+	 */
+	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
+	{
+		return reqserprops!=null? reqserprops.get(sid)!=null: false;
 	}
 	
 	/**

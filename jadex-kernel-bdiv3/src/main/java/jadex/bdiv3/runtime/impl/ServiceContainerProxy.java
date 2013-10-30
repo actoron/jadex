@@ -1,6 +1,8 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
@@ -9,16 +11,19 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 /**
@@ -355,4 +360,45 @@ public class ServiceContainerProxy implements IServiceContainer
 	{
 		return interpreter.getServiceContainer().searchServices(type, scope);
 	}
+	
+	/**
+	 *  Get the required service property provider for a service.
+	 */
+	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
+	{
+		return interpreter.getServiceContainer().getRequiredServicePropertyProvider(sid);
+	}
+	
+	/**
+	 *  Has the service a property provider.
+	 */
+	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
+	{
+		return interpreter.getServiceContainer().hasRequiredServicePropertyProvider(sid);
+	}
+	
+	/**
+	 *  Add a method invocation handler.
+	 */
+	public void addMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener)
+	{
+		interpreter.getServiceContainer().addMethodInvocationListener(sid, mi, listener);
+	}
+	
+	/**
+	 *  Remove a method invocation handler.
+	 */
+	public void removeMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener)
+	{
+		interpreter.getServiceContainer().removeMethodInvocationListener(sid, mi, listener);
+	}
+	
+	/**
+	 *  Notify listeners that a service method has been called.
+	 */
+	public void notifyMethodListeners(IServiceIdentifier sid, boolean start, Object proxy, final Method method, final Object[] args, Object callid, ServiceInvocationContext context)
+	{
+		interpreter.getServiceContainer().notifyMethodListeners(sid, start, proxy, method, args, callid, context);
+	}
+
 }

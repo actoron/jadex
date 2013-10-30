@@ -2,7 +2,9 @@ package jadex.bridge.sensor.service;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 
@@ -19,8 +21,8 @@ public class LatencyProperty extends TimedProperty
 	/** The name of the property. */
 	public static final String NAME = "latency";
 	
-	/** The handler. */
-	protected BasicServiceInvocationHandler handler;
+	/** The service identifier. */
+	protected IServiceIdentifier sid;
 	
 	/** The listener. */
 	protected IMethodInvocationListener listener;
@@ -35,21 +37,35 @@ public class LatencyProperty extends TimedProperty
 	{
 		super(NAME, comp, true);
 		this.method = method;
+		this.sid = service.getServiceIdentifier();
 		
 		if(Proxy.isProxyClass(service.getClass()))
 		{
-			handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 			{
 				Map<Object, Long> times = new HashMap<Object, Long>();
 				
-				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid)
+				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 				{
 					times.put(callid, new Long(System.currentTimeMillis()));
 				}
 				
-				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid)
+				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 				{
+					if(context instanceof ServiceInvocationContext)
+					{
+						ServiceInvocationContext sic = (ServiceInvocationContext)context;
+						if(sic.getServiceCall()!=null)
+						{
+							Long dur = (Long)sic.getServiceCall().getProperty("__duration");
+							System.out.println("dur is: "+dur);
+						}
+					}
+					else
+					{
+						System.out.println("no context");
+					}
+					
 					Long start = times.remove(callid);
 					// May happen that property is added during ongoing call
 					if(start!=null)
@@ -59,7 +75,7 @@ public class LatencyProperty extends TimedProperty
 					}
 				}
 			});
-			handler.addMethodListener(method, listener);
+			comp.getServiceContainer().addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
 		}
 		else
 		{
@@ -101,8 +117,7 @@ public class LatencyProperty extends TimedProperty
 	 */
 	public IFuture<Void> dispose()
 	{
-		if(handler!=null)
-			handler.removeMethodListener(method, listener);
+		comp.getServiceContainer().removeMethodInvocationListener(sid, method, listener);
 		return IFuture.DONE;
 	}
 }

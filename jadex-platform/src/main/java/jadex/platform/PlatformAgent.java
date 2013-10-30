@@ -227,8 +227,7 @@ import java.util.logging.Level;
 		@Component(name="rspub", type="rspublish", daemon=true, number="Boolean.TRUE.equals($args.rspublish)? 1: 0"),
 		@Component(name="wspub", type="wspublish", daemon=true, number="Boolean.TRUE.equals($args.wspublish)? 1: 0"),
 		@Component(name="cli", type="cli", daemon=true, number="jadex.commons.SReflect.classForName0(\"jadex.platform.service.cli.CliAgent\", jadex.platform.service.library.LibraryService.class.getClassLoader())!=null && Boolean.TRUE.equals($args.cli)? 1: 0",
-			arguments={@NameValue(name="console", value="$args.cliconsole")}),
-		@Component(name="sensors", type="sensor", daemon=true, number="Boolean.TRUE.equals($args.sensors)? 1: 0")
+			arguments={@NameValue(name="console", value="$args.cliconsole")})
 	}),
 	@Configuration(name="fixed", arguments={
 		@NameValue(name="tcpport", value="0"),
@@ -246,6 +245,7 @@ import java.util.logging.Level;
 		@Component(name="kernel_bdibpmn", type="kernel_bdibpmn", daemon=true, number="$args.get(\"kernels\").indexOf(\"bdibpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_bpmn", type="kernel_bpmn", daemon=true, number="$args.get(\"kernels\").indexOf(\"bpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
 		@Component(name="kernel_gpmn", type="kernel_gpmn", daemon=true, number="$args.get(\"kernels\").indexOf(\"gpmn\")!=-1 || $args.get(\"kernels\").indexOf(\"all\")!=-1? 1 : 0"),
+		@Component(name="sensors", type="sensor", daemon=true, number="Boolean.TRUE.equals($args.sensors)? 1: 0"),
 		@Component(name="rms", type="rms", daemon=true),
 		@Component(name="awa", type="awa", daemon=true, number="Boolean.TRUE.equals($args.get(\"awareness\")) ? 1 : 0",
 			arguments={

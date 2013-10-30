@@ -21,7 +21,7 @@ public class NFRequiredServicePropertyProviderInterceptor extends AbstractApplic
 	{
 		try
 		{
-			METHOD = INFRPropertyProvider.class.getMethod("getRequiredServiceProertyProvider", new Class[]{IServiceIdentifier.class});
+			METHOD = INFRPropertyProvider.class.getMethod("getRequiredServicePropertyProvider", new Class[0]);
 		}
 		catch(Exception e)
 		{
@@ -33,13 +33,17 @@ public class NFRequiredServicePropertyProviderInterceptor extends AbstractApplic
 
 	/** The component. */
 	protected IInternalAccess component;
+	
+	/** The service indentifier. */
+	protected IServiceIdentifier sid;
 
 	/**
 	 *  Create a new interceptor.
 	 */
-	public NFRequiredServicePropertyProviderInterceptor(IInternalAccess component)
+	public NFRequiredServicePropertyProviderInterceptor(IInternalAccess component, IServiceIdentifier sid)
 	{
 		this.component = component;
+		this.sid = sid;
 	}
 	
 	/**
@@ -57,7 +61,8 @@ public class NFRequiredServicePropertyProviderInterceptor extends AbstractApplic
 	 */
 	public IFuture<Void> execute(ServiceInvocationContext sic)
 	{
-		INFMixedPropertyProvider res = component.getRequiredServicePropertyProvider((IServiceIdentifier)sic.getArgumentArray()[0]);
+//		INFMixedPropertyProvider res = component.getRequiredServicePropertyProvider((IServiceIdentifier)sic.getArgumentArray()[0]);
+		INFMixedPropertyProvider res = component.getServiceContainer().getRequiredServicePropertyProvider(sid);
 		sic.setResult(new Future<INFMixedPropertyProvider>(res));
 		return IFuture.DONE;
 	}

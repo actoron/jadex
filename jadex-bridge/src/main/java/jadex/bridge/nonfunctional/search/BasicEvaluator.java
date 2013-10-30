@@ -91,7 +91,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 		if(required)
 		{
 //			System.out.println("test: "+(service instanceof INFRPropertyProvider));
-			((INFRPropertyProvider)service).getRequiredServiceProertyProvider(service.getServiceIdentifier())
+			((INFRPropertyProvider)service).getRequiredServicePropertyProvider()
 				.addResultListener(new ExceptionDelegationResultListener<INFMixedPropertyProvider, Double>(ret)
 			{
 				public void customResultAvailable(INFMixedPropertyProvider result)

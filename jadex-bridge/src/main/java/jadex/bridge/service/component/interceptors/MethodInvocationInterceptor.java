@@ -4,6 +4,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
@@ -51,10 +52,12 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 //			}
 			
 			// Roll invocations meta infos before call
+			long start = 0;
 			if(switchcall)
 			{
 //				if(sic.getMethod().getName().indexOf("test")!=-1)
 //					System.out.println("setting to a: "+sic.getServiceCall());
+				start = System.currentTimeMillis();
 				CallAccess.setCurrentInvocation(sic.getServiceCall()); // next becomes current
 				CallAccess.resetNextInvocation(); // next is null
 			}
@@ -80,6 +83,33 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 //				System.out.println("setting to c: "+sic.getLastServiceCall()+" "+ServiceCall.getCurrentInvocation());
 			if(switchcall)
 			{
+				if(ServiceCall.getCurrentInvocation()!=null)
+				{
+					final ServiceCall sc = ServiceCall.getCurrentInvocation();
+					if(res instanceof IFuture)
+					{
+						final long fstart = start;
+						((IFuture<Object>)res).addResultListener(new IResultListener<Object>()
+						{
+							public void resultAvailable(Object result)
+							{
+								long dur = System.currentTimeMillis()-fstart;
+								sc.setProperty("__duration", new Long(dur));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								// do nothing
+							}
+						});
+					}
+					else
+					{
+						long dur = System.currentTimeMillis()-start;
+						sc.setProperty("__duration", new Long(dur));
+					}
+				}
+				
 				CallAccess.setLastInvocation(ServiceCall.getCurrentInvocation());
 				CallAccess.setCurrentInvocation(sic.getLastServiceCall()); // current is last
 				CallAccess.resetNextInvocation(); // next is null

@@ -3,16 +3,19 @@ package jadex.bridge.service;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.MethodListenerHandler;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -58,6 +61,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	
 	/** True, if the container is shutdowned. */
 	protected boolean shutdowned;
+	
+	/** The map of provided service infos. (sid -> method listener) */
+	protected Map<IServiceIdentifier, MethodListenerHandler> servicelisteners;
 	
 	//-------- constructors --------
 
@@ -942,6 +948,54 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	}
 	
 	/**
+	 *  Add a method invocation handler.
+	 */
+	public void addMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener)
+	{
+		if(servicelisteners==null)
+			servicelisteners = new HashMap<IServiceIdentifier, MethodListenerHandler>();
+		MethodListenerHandler handler = servicelisteners.get(mi);
+		if(handler==null)
+		{
+			handler = new MethodListenerHandler();
+			servicelisteners.put(sid, handler);
+		}
+		handler.addMethodListener(mi, listener);
+	}
+	
+	/**
+	 *  Remove a method invocation handler.
+	 */
+	public void removeMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener)
+	{
+		if(servicelisteners!=null)
+		{
+			MethodListenerHandler handler = servicelisteners.get(sid);
+			if(handler!=null)
+			{
+				handler.removeMethodListener(mi, listener);
+			}
+		}
+	}
+	
+	/**
+	 *  Notify listeners that a service method has been called.
+	 */
+	public void notifyMethodListeners(IServiceIdentifier sid, boolean start, Object proxy, final Method method, final Object[] args, Object callid, ServiceInvocationContext context)
+	{
+		if(servicelisteners!=null)
+		{
+			MethodListenerHandler handler = servicelisteners.get(sid);
+			if(handler!=null)
+			{
+				MethodInfo mi = new MethodInfo(method);
+				handler.notifyMethodListeners(start, proxy, method, args, callid, context);
+			}
+		}
+	}
+
+	
+	/**
 	 * 
 	 */
 	public abstract IInternalAccess getComponent();
@@ -1029,4 +1083,5 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		
 		return ret==Timeout.UNSET? remote? BasicService.DEFAULT_REMOTE: BasicService.DEFAULT_LOCAL: ret;
 	}
+	
 }

@@ -1,5 +1,6 @@
 package jadex.bridge.sensor.service;
 
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.ResolveInterceptor;
 
 import java.lang.reflect.Method;
@@ -24,7 +25,7 @@ public class UserMethodInvocationListener implements IMethodInvocationListener
 	/**
 	 *  Called when a method call started.
 	 */
-	public void methodCallStarted(Object proxy, Method method, final Object[] args, Object callid)
+	public void methodCallStarted(Object proxy, Method method, final Object[] args, Object callid, ServiceInvocationContext context)
 	{
 		if(ResolveInterceptor.SERVICEMETHODS.contains(method))
 		{
@@ -32,14 +33,14 @@ public class UserMethodInvocationListener implements IMethodInvocationListener
 		}
 		else
 		{
-			listener.methodCallStarted(proxy, method, args, callid);
+			listener.methodCallStarted(proxy, method, args, callid, context);
 		}
 	}
 	
 	/**
 	 *  Called when the method call is finished.
 	 */
-	public void methodCallFinished(Object proxy, Method method, final Object[] args, Object callid)
+	public void methodCallFinished(Object proxy, Method method, final Object[] args, Object callid, ServiceInvocationContext context)
 	{
 		if(ResolveInterceptor.SERVICEMETHODS.contains(method))
 		{
@@ -47,7 +48,7 @@ public class UserMethodInvocationListener implements IMethodInvocationListener
 		}
 		else
 		{
-			listener.methodCallFinished(proxy, method, args, callid);
+			listener.methodCallFinished(proxy, method, args, callid, context);
 		}
 	}
 }

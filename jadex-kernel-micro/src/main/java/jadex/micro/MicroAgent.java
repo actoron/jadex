@@ -1019,7 +1019,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
 	{
-		return interpreter.getRequiredServicePropertyProvider(sid);
+		return interpreter.getServiceContainer().getRequiredServicePropertyProvider(sid);
 	}
 	
 	/**
@@ -1027,6 +1027,6 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
 	{
-		return interpreter.hasRequiredServicePropertyProvider(sid);
+		return interpreter.getServiceContainer().hasRequiredServicePropertyProvider(sid);
 	}
 }

@@ -1,11 +1,20 @@
 package jadex.bridge.service;
 
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
+import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.component.MethodListenerHandler;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -106,6 +115,17 @@ public interface IServiceContainer extends IServiceProvider
 	public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices);
 	
 	/**
+	 *  Get the required service property provider for a service.
+	 */
+	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid);
+	
+	/**
+	 *  Has the service a property provider.
+	 */
+	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid);
+	
+	
+	/**
 	 *  Get a required service of a given name.
 	 *  @param name The service name.
 	 *  @return The service.
@@ -166,6 +186,22 @@ public interface IServiceContainer extends IServiceProvider
 	public IServiceInvocationInterceptor[] getInterceptors(Object service);
 	
 	/**
+	 *  Add a method invocation handler.
+	 */
+	public void addMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener);
+	
+	/**
+	 *  Remove a method invocation handler.
+	 */
+	public void removeMethodInvocationListener(IServiceIdentifier sid, MethodInfo mi, IMethodInvocationListener listener);
+	
+	/**
+	 *  Notify listeners that a service method has been called.
+	 */
+	public void notifyMethodListeners(IServiceIdentifier sid, boolean start, Object proxy, final Method method, final Object[] args, Object callid, ServiceInvocationContext context);
+	
+	
+	/**
 	 *  Get one service of a type from a specific component.
 	 *  @param type The class.
 	 *  @param cid The component identifier of the target component.
@@ -208,4 +244,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
 	public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope);
+	
+	
+
 }

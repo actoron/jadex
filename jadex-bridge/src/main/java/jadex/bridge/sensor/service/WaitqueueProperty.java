@@ -4,7 +4,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.SimpleValueNFProperty;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 
@@ -20,8 +22,8 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	/** The name of the property. */
 	public static final String NAME = "wait queue length";
 	
-	/** The handler. */
-	protected BasicServiceInvocationHandler handler;
+	/** The service identifier. */
+	protected IServiceIdentifier sid;
 	
 	/** The listener. */
 	protected IMethodInvocationListener listener;
@@ -36,21 +38,21 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	{
 		super(comp, new NFPropertyMetaInfo(NAME, int.class, Void.class, true, -1, null));
 		this.method = method;
+		this.sid = service.getServiceIdentifier();
 		
 		if(Proxy.isProxyClass(service.getClass()))
 		{
-			handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 			{
 				int cnt = 0;
 				
-				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid)
+				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 				{
 //					System.out.println("started: "+method+" "+cnt);
 					setValue(new Integer(++cnt));
 				}
 				
-				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid)
+				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 				{
 //					System.out.println("ended: "+method+" "+cnt);
 					if(cnt>0)
@@ -58,7 +60,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 					setValue(new Integer(cnt));
 				}
 			});
-			handler.addMethodListener(method, listener);
+			comp.getServiceContainer().addMethodInvocationListener(sid, method, listener);
 		}
 		else
 		{
@@ -80,8 +82,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	 */
 	public IFuture<Void> dispose()
 	{
-		if(handler!=null)
-			handler.removeMethodListener(method, listener);
+		comp.getServiceContainer().removeMethodInvocationListener(sid, method, listener);
 		return IFuture.DONE;
 	}
 }

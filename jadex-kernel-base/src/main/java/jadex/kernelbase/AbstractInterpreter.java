@@ -89,8 +89,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected ServiceGetter<IMonitoringService> getter;
 	
 	
-	/** The nf property providers for required services. */
-	protected Map<IServiceIdentifier, INFMixedPropertyProvider> reqserprops;
+//	/** The nf property providers for required services. */
+//	protected Map<IServiceIdentifier, INFMixedPropertyProvider> reqserprops;
 	
 	
 	/** The parameter copy allowed flag. */
@@ -620,28 +620,5 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		subscriptions.remove(fut);
 	}
 	
-	/**
-	 *  Get the required service property provider for a service.
-	 */
-	public INFMixedPropertyProvider getRequiredServicePropertyProvider(IServiceIdentifier sid)
-	{
-		INFMixedPropertyProvider ret = null;
-		if(reqserprops==null)
-			reqserprops = new HashMap<IServiceIdentifier, INFMixedPropertyProvider>(); // use LRU?
-		ret = reqserprops.get(sid);
-		if(ret==null)
-		{
-			ret = new NFMethodPropertyProvider(null); // parent of required service property?
-			reqserprops.put(sid, ret);
-		}
-		return ret;
-	}
 	
-	/**
-	 *  Has the service a property provider.
-	 */
-	public boolean hasRequiredServicePropertyProvider(IServiceIdentifier sid)
-	{
-		return reqserprops!=null? reqserprops.get(sid)!=null: false;
-	}
 }
