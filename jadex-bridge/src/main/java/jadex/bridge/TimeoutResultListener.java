@@ -275,7 +275,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 	public void commandAvailable(Type command)
 	{
 		// reinit the timer
-		System.out.println("reinit of timer");
+//		System.out.println("reinit of timer");
 		initTimer();
 		
 		if(listener instanceof IFutureCommandListener)

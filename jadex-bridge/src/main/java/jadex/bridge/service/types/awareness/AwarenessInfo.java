@@ -79,9 +79,9 @@ public class AwarenessInfo
 //	/**
 //	 *  Create a new awareness info.
 //	 */
-//	public AwarenessInfo(IComponentIdentifier sender, String state, long delay)
+//	public AwarenessInfo(IComponentIdentifier sender, String state, long delay, String mechsrc)
 //	{
-//		this(sender, state, delay, null, null, false);
+//		this(sender, state, delay, null, null, null, mechsrc);
 //	}
 	
 	/**

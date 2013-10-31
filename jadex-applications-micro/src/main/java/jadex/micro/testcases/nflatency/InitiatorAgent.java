@@ -10,8 +10,12 @@ import jadex.bridge.nonfunctional.annotation.NFRProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.MethodInfo;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -19,7 +23,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
@@ -27,6 +30,7 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  *  Tests if non-functional properties can be changed and passed back
@@ -35,6 +39,7 @@ import java.util.Collection;
 @Agent
 @RequiredServices(
 {
+	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="ts", type=ITestService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)),
 	@RequiredService(name="aser", type=ITestService.class, multiple=true,
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true),
@@ -99,22 +104,45 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+				// Hack: announce platform immediately
+				IFuture<IComponentManagementService> fut = agent.getRequiredService("cms");
+				fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 				{
-					public void customResultAvailable(final TestReport result)
+					public void customResultAvailable(IComponentManagementService cms)
 					{
-						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
+						CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getComponentIdentifier().getRoot()}));
+						cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
+							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+						{
+							public void firstResultAvailable(IComponentIdentifier result)
+							{
+								performTest(platform.getComponentIdentifier(), testno, false)
+									.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+								{
+									public void customResultAvailable(final TestReport result)
+									{
+										platform.killComponent();
+	//										.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+	//									{
+	//										public void customResultAvailable(Map<String, Object> v)
+	//										{
+	//											ret.setResult(result);
+	//										}
+	//									});
+										ret.setResult(result);
+									}
+								}));
+							}
+							public void secondResultAvailable(Map<String,Object> result) 
+							{
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
 					}
-				}));
+				});
 			}
 		}));
 		
@@ -175,6 +203,12 @@ public class InitiatorAgent extends TestAgent
 		
 //		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		
+		// Add awarenessinfo for remote platform
+//		IAwarenessManagementService awa = SServiceProvider.getService(agent.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
+//		AwarenessInfo info = new AwarenessInfo(cid.getRoot(), AwarenessInfo.STATE_ONLINE, -1, 
+//			null, null, null, SReflect.getInnerClassName(this.getClass()));
+//		awa.addAwarenessInfo(info).get();
+		
 		IIntermediateFuture<ITestService> fut = agent.getRequiredServices("aser");
 		fut.addResultListener(new IIntermediateResultListener<ITestService>()
 		{
@@ -210,7 +244,7 @@ public class InitiatorAgent extends TestAgent
 			
 			protected void callService(final ITestService ts)
 			{
-				ts.methodA(1000).addResultListener(new IResultListener<Void>()
+				ts.methodA(100).addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
