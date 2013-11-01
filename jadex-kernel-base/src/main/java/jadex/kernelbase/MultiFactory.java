@@ -440,8 +440,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-//		if(model.endsWith("BDI.class"))
-//			System.out.println("isLoadable: "+model);
+		if(model.endsWith("BDI.class"))
+			System.out.println("isLoadable: "+model);
 
 		final Future<Boolean> ret = new Future<Boolean>();
 		findKernel(model, imports, rid).addResultListener(ia.createResultListener(new IResultListener()

@@ -879,6 +879,28 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	}
 	
 	/**
+	 *  Get the result of the last search.
+	 *  @param name The required service name.
+	 *  @return The last result.
+	 */
+	public <T> T getLastRequiredService(String name)
+	{
+		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(name);
+		return fetcher.getLastService();
+	}
+	
+	/**
+	 *  Get the result of the last search.
+	 *  @param name The required services name.
+	 *  @return The last result.
+	 */
+	public <T> Collection<T> getLastRequiredServices(String name)
+	{
+		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(name);
+		return fetcher.getLastServices();
+	}
+	
+	/**
 	 *  Get a required service fetcher.
 	 *  @param name The required service name.
 	 *  @return The service fetcher.

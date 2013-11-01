@@ -1,12 +1,18 @@
 package jadex.base.gui.componenttree;
 
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
@@ -17,7 +23,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -27,22 +35,22 @@ import javax.swing.JTextField;
 /**
  *  Panel for showing service properties.
  */
-public class NFPropertyProperties extends PropertiesPanel
+public class NFRPropertyProperties extends PropertiesPanel
 {
 	protected JButton bufetch;
 	protected JComboBox counits;
 	protected JTextField tfval;
 	protected IExternalAccess ea;
 	protected INFPropertyMetaInfo propmi;
-	protected IServiceIdentifier sid;
 	protected MethodInfo mi;
+	protected RequiredServiceInfo rinfo;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create new service properties panel.
 	 */
-	public NFPropertyProperties()
+	public NFRPropertyProperties()
 	{
 		super(" Non-functional Criterion Properties ");
 	}
@@ -53,17 +61,70 @@ public class NFPropertyProperties extends PropertiesPanel
 	 *  Set the nf prop.
 	 */
 	public void	setProperty(final INFPropertyMetaInfo propmi, final IExternalAccess ea, 
-		final IServiceIdentifier sid, final MethodInfo mi)
+		final MethodInfo mi, final RequiredServiceInfo rinfo)
 	{
 		this.ea = ea;
 		this.propmi = propmi;
-		this.sid = sid;
 		this.mi = mi;
+		this.rinfo = rinfo;
 		
+		final JComboBox serbox = new JComboBox();
+		final DefaultComboBoxModel serboxm = (DefaultComboBoxModel)serbox.getModel();
+		JButton ref = new JButton("Refresh");
+		JPanel pan = new JPanel(new GridBagLayout());
+		pan.add(serbox, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.EAST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
+		pan.add(ref, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.EAST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
+		
+		addComponent("Service", pan);
 		createTextField("Name");
 		createTextField("Type");
 		createTextField("Unit");
 		createTextField("Target");
+		
+		AbstractAction aa = new AbstractAction("Refresh")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				final boolean fmultiple = rinfo.isMultiple();
+				final String fname = rinfo.getName();
+				ea.scheduleStep(new IComponentStep<Object>()
+				{
+					public IFuture<Object> execute(IInternalAccess ia)
+					{
+						Object res = fmultiple? ia.getServiceContainer().getLastRequiredServices(fname): ia.getServiceContainer().getLastRequiredService(fname);
+						return new Future<Object>(res);
+					}
+				}).addResultListener(new SwingResultListener<Object>(new IResultListener<Object>()
+				{
+					public void resultAvailable(Object result)
+					{
+						if(result instanceof IService)
+						{
+							IService ser = (IService)result;
+							serboxm.removeAllElements();
+							serboxm.addElement(ser.getServiceIdentifier());
+						}
+						else if(result instanceof Collection)
+						{
+							Collection<IService> sers = (Collection<IService>)result;
+							serboxm.removeAllElements();
+							for(IService ser: sers)
+							{
+								serboxm.addElement(ser.getServiceIdentifier());
+							}
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("ex: "+exception);
+					}
+				}));
+			}
+		};
+		ref.setAction(aa);
+		aa.actionPerformed(null);
+		
 		
 		JPanel p = new JPanel(new GridBagLayout());
 		bufetch = new JButton("Fetch");
@@ -95,33 +156,28 @@ public class NFPropertyProperties extends PropertiesPanel
 					});
 					
 					final Object u = counits.getSelectedItem();
-					
+					final MethodInfo fmi = mi;
+					final String fname = propmi.getName();
+					final IServiceIdentifier sid = (IServiceIdentifier)serbox.getSelectedItem();
 					if(sid!=null)
 					{
-						IFuture<IService> fut = SServiceProvider.getService(ea.getServiceProvider(), sid);
-						fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
+						ea.scheduleStep(new IComponentStep<Object>()
 						{
-							public void resultAvailable(IService ser) 
+							public IFuture<Object> execute(IInternalAccess ia)
 							{
-								if(mi!=null)
+								Future<Object> ret = new Future<Object>();
+								INFMixedPropertyProvider pp = ia.getServiceContainer().getRequiredServicePropertyProvider(sid);
+								if(fmi!=null)
 								{
-									ser.getMethodNFPropertyValue(mi, propmi.getName(), u).addResultListener(lis);
+									pp.getMethodNFPropertyValue(fmi, fname, u).addResultListener(new DelegationResultListener<Object>(ret));
 								}
 								else
 								{
-									ser.getNFPropertyValue(propmi.getName(), u).addResultListener(lis);
+									pp.getNFPropertyValue(fname, u).addResultListener(new DelegationResultListener<Object>(ret));
 								}
+								return ret;
 							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-							}
-						}));
-					}
-					else
-					{
-						IFuture<Object> fut = ea.getNFPropertyValue(propmi.getName(), u);
-						fut.addResultListener(lis);
+						}).addResultListener(new SwingResultListener<Object>(lis));
 					}
 				}
 			}

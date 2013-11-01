@@ -4,6 +4,8 @@ import jadex.commons.IRemoteFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
+import java.util.Collection;
+
 /**
  *  Interface for fetching required services.
  */
@@ -24,4 +26,15 @@ public interface IRequiredServiceFetcher
 	 *  @param rebind Flag if should be rebound.
 	 */
 	public <T> ITerminableIntermediateFuture<T> getServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind, IRemoteFilter<T> filter);
+
+	/**
+	 *  Get the result of the last search.
+	 */
+	public <T> T getLastService();
+
+	/**
+	 *  Get the result of the last search.
+	 */
+	public <T> Collection<T> getLastServices();
+
 }

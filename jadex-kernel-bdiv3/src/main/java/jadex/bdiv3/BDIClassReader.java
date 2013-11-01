@@ -127,6 +127,9 @@ public class BDIClassReader extends MicroClassReader
 		return super.read(model, imports, cl, rid, root);
 	}
 
+	/**
+	 *  Create a throw away class loader.
+	 */
 	protected DummyClassLoader createDummyClassLoader(ClassLoader original, ClassLoader parent, List<URL> urls)
 	{
 		return new DummyClassLoader((URL[])urls.toArray(new URL[urls.size()]), parent, original);

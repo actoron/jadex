@@ -6,13 +6,19 @@ package jadex.base.gui.componenttree;
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
+import jadex.bridge.nonfunctional.INFRPropertyProvider;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -41,19 +47,15 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	
 	//-------- attributes --------
 	
-	/** The external access. */
-//	protected IExternalAccess ea;
-	
 	/** The property meta info. */
 	protected INFPropertyMetaInfo propmi;
 	
 	/** The properties panel. */
-	protected NFPropertyProperties propcomp;
+	protected JComponent propcomp;
 	
 	
-	// todo: support for services and methods
 	/** The external access of the nfproperty provider. */
-	protected IExternalAccess provider;
+	protected IExternalAccess ea;
 	
 	/** The service identifier. */
 	protected IServiceIdentifier sid;
@@ -61,20 +63,23 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	/** The method info. */
 	protected MethodInfo mi;
 	
+	/** The required service info. */
+	protected RequiredServiceInfo rinfo;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
 	public NFPropertyNode(ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree, 
-		INFPropertyMetaInfo propmi, IExternalAccess provider, IServiceIdentifier sid, MethodInfo mi)
+		INFPropertyMetaInfo propmi, IExternalAccess ea, IServiceIdentifier sid, MethodInfo mi, RequiredServiceInfo rinfo)
 	{
 		super(parent, model, tree);
-//		this.ea = ea;
-		this.provider = provider;
+		this.ea = ea;
 		this.propmi = propmi;
 		this.sid = sid;
 		this.mi = mi;
+		this.rinfo = rinfo;
 		model.registerNode(this);
 	}
 	
@@ -160,9 +165,17 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	{
 		if(propcomp==null)
 		{
-			propcomp	= new NFPropertyProperties();
+			if(rinfo==null)
+			{
+				propcomp = new NFPropertyProperties();
+				((NFPropertyProperties)propcomp).setProperty(propmi, ea, sid, mi);
+			}
+			else
+			{
+				propcomp = new NFRPropertyProperties();
+				((NFRPropertyProperties)propcomp).setProperty(propmi, ea, mi, rinfo);
+			}
 		}
-		propcomp.setProperty(propmi, provider, sid, mi);
 		
 		return propcomp;
 	}
@@ -192,33 +205,59 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(provider!=null && propmi!=null)
+		if(ea!=null && propmi!=null)
 		{
 			if(sid!=null)
 			{
-				IFuture<IService> fut = SServiceProvider.getService(provider.getServiceProvider(), sid);
-				fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
+				if(rinfo!=null)
 				{
-					public void resultAvailable(IService ser) 
+					final IServiceIdentifier fsid = sid;
+					final MethodInfo fmi = mi;
+					final String fname = propmi.getName();
+					ea.scheduleStep(new IComponentStep<Void>()
 					{
-						if(mi!=null)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							ser.removeMethodNFProperty(mi, propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
+							final Future<Void> ret = new Future<Void>();
+							INFMixedPropertyProvider pp = ia.getServiceContainer().getRequiredServicePropertyProvider(fsid);
+							if(fmi==null)
+							{
+								pp.removeNFProperty(fname).addResultListener(new DelegationResultListener<Void>(ret));
+							}
+							else
+							{
+								pp.removeMethodNFProperty(fmi, fname).addResultListener(new DelegationResultListener<Void>(ret));
+							}
+							return ret;
 						}
-						else
-						{
-							ser.removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
-						}
-					}
-					
-					public void exceptionOccurred(Exception exception)
+					});
+				}
+				else
+				{
+					IFuture<IService> fut = SServiceProvider.getService(ea.getServiceProvider(), sid);
+					fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
 					{
-					}
-				}));
+						public void resultAvailable(IService ser) 
+						{
+							if(mi!=null)
+							{
+								ser.removeMethodNFProperty(mi, propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
+							}
+							else
+							{
+								ser.removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+					}));
+				}
 			}
 			else
 			{
-				provider.removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
+				ea.removeNFProperty(propmi.getName()).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		}
 		else

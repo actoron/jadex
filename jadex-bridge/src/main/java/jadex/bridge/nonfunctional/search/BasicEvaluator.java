@@ -109,7 +109,7 @@ public abstract class BasicEvaluator<T> implements IServiceEvaluator
 	}
 	
 	/**
-	 * 
+	 *  Get the property value based on the provider.
 	 */
 	protected IFuture<T> getPropertyValue(INFMixedPropertyProvider provider)
 	{

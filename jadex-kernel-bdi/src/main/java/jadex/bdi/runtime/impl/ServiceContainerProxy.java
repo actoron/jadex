@@ -207,6 +207,26 @@ public class ServiceContainerProxy implements IServiceContainer
 	}
 	
 	/**
+	 *  Get the result of the last search.
+	 *  @param name The required service name.
+	 *  @return The last result.
+	 */
+	public <T> T getLastRequiredService(String name)
+	{
+		return interpreter.getServiceContainer().getLastRequiredService(name);
+	}
+	
+	/**
+	 *  Get the result of the last search.
+	 *  @param name The required services name.
+	 *  @return The last result.
+	 */
+	public <T> Collection<T> getLastRequiredServices(String name)
+	{
+		return interpreter.getServiceContainer().getLastRequiredServices(name);
+	}
+	
+	/**
 	 *  Add a service interceptor.
 	 *  @param interceptor The interceptor.
 	 *  @param service The service.

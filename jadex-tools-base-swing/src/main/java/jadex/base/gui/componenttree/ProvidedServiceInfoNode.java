@@ -145,7 +145,7 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 							String name = "Service properties";
 							cn = (NFPropertyContainerNode)model.getNode(NFPropertyContainerNode.getId(getId(), name));
 							if(cn==null)
-								cn = new NFPropertyContainerNode(null, name, ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree, ea, sid, null);
+								cn = new NFPropertyContainerNode(null, name, ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree, ea, sid, null, null);
 						}
 						
 						final NFPropertyContainerNode sercon = cn;
@@ -177,27 +177,8 @@ public class ProvidedServiceInfoNode	extends AbstractSwingTreeNode
 										String name = doublenames.contains(mi.getName())? mi.getNameWithParameters(): mi.getName();
 										NFPropertyContainerNode cn = (NFPropertyContainerNode)model.getNode(NFPropertyContainerNode.getId(getId(), name));
 										if(cn==null)
-											cn = new NFPropertyContainerNode(name, mi.toString(), ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree, ea, sid, mi);
+											cn = new NFPropertyContainerNode(name, mi.toString(), ProvidedServiceInfoNode.this, (AsyncSwingTreeModel)model, tree, ea, sid, mi, null);
 										
-		//								Map<String,INFPropertyMetaInfo> props = result.get(mi);
-		//								List<NFPropertyNode> subchilds = new ArrayList<NFPropertyNode>();
-		//								for(INFPropertyMetaInfo p: props.values())
-		//								{
-		//									NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), p, ea, sid, mi);
-		//									subchilds.add(nfpn);
-		//								}
-		//								
-		//								Collections.sort(subchilds, new java.util.Comparator<ISwingTreeNode>()
-		//								{
-		//									public int compare(ISwingTreeNode t1, ISwingTreeNode t2)
-		//									{
-		//										String si1 = ((NFPropertyNode)t1).getMetaInfo().getName();
-		//										String si2 = ((NFPropertyNode)t2).getMetaInfo().getName();
-		//										return si1.compareTo(si2);
-		//									}
-		//								});
-		//								
-		//								cn.setChildren(subchilds);
 										childs.add(cn);
 									}
 								}

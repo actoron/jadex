@@ -5,10 +5,14 @@ import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
@@ -53,9 +57,8 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	protected String tooltip;
 	
 	
-	// todo: support for services and methods
 	/** The external access of the nfproperty provider. */
-	protected IExternalAccess provider;
+	protected IExternalAccess ea;
 	
 	/** The service identifier. */
 	protected IServiceIdentifier sid;
@@ -63,20 +66,27 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	/** The method info. */
 	protected MethodInfo mi;
 	
+	/** The required service info. */
+	protected RequiredServiceInfo rinfo;
+	
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new service container node.
+	 *  Create a new nf property container node.
+	 *  - component (sid=null, mi=null)
+	 *  - service (sid!=null, mi=null)
+	 *  - method (sid!=null, mi!=null)
 	 */
 	public NFPropertyContainerNode(String name, String tooltip, ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree,
-		IExternalAccess provider, IServiceIdentifier sid, MethodInfo mi)
+		IExternalAccess provider, IServiceIdentifier sid, MethodInfo mi, RequiredServiceInfo rinfo)
 	{
 		super(parent, model, tree);
 		this.name = name;
 		this.tooltip = tooltip;
-		this.provider = provider;
+		this.ea = provider;
 		this.sid = sid;
 		this.mi = mi;
+		this.rinfo = rinfo;
 		model.registerNode(this);
 	}
 	
@@ -140,7 +150,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 					if(nfpn==null)
 					{
 						nfpn = new NFPropertyNode(NFPropertyContainerNode.this, 
-							getModel(), getTree(), p, provider, sid, mi);
+							getModel(), getTree(), p, ea, sid, mi, rinfo);
 					}
 					children.add(nfpn);
 				}
@@ -172,34 +182,41 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	{
 		final IntermediateFuture<INFPropertyMetaInfo> ret = new IntermediateFuture<INFPropertyMetaInfo>();
 		
-		if(sid!=null)
+		if(rinfo!=null)
 		{
-			IFuture<IService> fut = SServiceProvider.getService(provider.getServiceProvider(), sid);
-			fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
+			final MethodInfo fmi = mi;
+			ea.scheduleStep(new IComponentStep<Collection<INFPropertyMetaInfo>>()
 			{
-				public void resultAvailable(IService ser) 
+				public IFuture<Collection<INFPropertyMetaInfo>> execute(IInternalAccess ia)
 				{
-					if(mi!=null)
+					final IntermediateFuture<INFPropertyMetaInfo> ret = new IntermediateFuture<INFPropertyMetaInfo>();
+					if(fmi!=null)
 					{
-						ser.getMethodNFPropertyMetaInfos(mi).addResultListener(
+						INFMixedPropertyProvider pp = ia.getServiceContainer().getRequiredServicePropertyProvider(null);
+						pp.getMethodNFPropertyMetaInfos(fmi).addResultListener(
 							new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 						{
-							public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
+							public void customResultAvailable(Map<String,INFPropertyMetaInfo> mis)
 							{
 								for(INFPropertyMetaInfo mi: mis.values())
 								{
 									ret.addIntermediateResult(mi);
 								}
 								ret.setFinished();
+							}
+							public void exceptionOccurred(Exception e)
+							{
+								e.printStackTrace();
 							}
 						});
 					}
 					else
 					{
-						ser.getNFPropertyMetaInfos().addResultListener(
+						INFMixedPropertyProvider pp = ia.getServiceContainer().getRequiredServicePropertyProvider(null);
+						pp.getNFPropertyMetaInfos().addResultListener(
 							new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
 						{
-							public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
+							public void customResultAvailable(Map<String,INFPropertyMetaInfo> mis)
 							{
 								for(INFPropertyMetaInfo mi: mis.values())
 								{
@@ -207,36 +224,84 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 								}
 								ret.setFinished();
 							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+							}
 						});
 					}
+					return ret;
 				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					exception.printStackTrace();
-				}
-			}));
-		}
-		else if(provider!=null)
-		{
-			provider.getNFPropertyMetaInfos().addResultListener(
-				new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
-			{
-				public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
-				{
-					for(INFPropertyMetaInfo mi: mis.values())
-					{
-						ret.addIntermediateResult(mi);
-					}
-					ret.setFinished();
-				}
-			});
+			}).addResultListener(new DelegationResultListener<Collection<INFPropertyMetaInfo>>(ret));
 		}
 		else
 		{
-			ret.setException(new RuntimeException("Provider not set."));
+			if(sid!=null)
+			{
+				IFuture<IService> fut = SServiceProvider.getService(ea.getServiceProvider(), sid);
+				fut.addResultListener(new SwingResultListener<IService>(new IResultListener<IService>()
+				{
+					public void resultAvailable(IService ser) 
+					{
+						if(mi!=null)
+						{
+							ser.getMethodNFPropertyMetaInfos(mi).addResultListener(
+								new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
+							{
+								public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
+								{
+									for(INFPropertyMetaInfo mi: mis.values())
+									{
+										ret.addIntermediateResult(mi);
+									}
+									ret.setFinished();
+								}
+							});
+						}
+						else
+						{
+							ser.getNFPropertyMetaInfos().addResultListener(
+								new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
+							{
+								public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
+								{
+									for(INFPropertyMetaInfo mi: mis.values())
+									{
+										ret.addIntermediateResult(mi);
+									}
+									ret.setFinished();
+								}
+							});
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				}));
+			}
+			else if(ea!=null)
+			{
+				ea.getNFPropertyMetaInfos().addResultListener(
+					new ExceptionDelegationResultListener<Map<String, INFPropertyMetaInfo>, Collection<INFPropertyMetaInfo>>(ret)
+				{
+					public void customResultAvailable(Map<String, INFPropertyMetaInfo> mis)
+					{
+						for(INFPropertyMetaInfo mi: mis.values())
+						{
+							ret.addIntermediateResult(mi);
+						}
+						ret.setFinished();
+					}
+				});
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Provider not set."));
+			}
 		}
-		
 		return ret;
 	}
 	

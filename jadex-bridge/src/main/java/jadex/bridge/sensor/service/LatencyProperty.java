@@ -3,7 +3,6 @@ package jadex.bridge.sensor.service;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
@@ -37,51 +36,56 @@ public class LatencyProperty extends TimedProperty
 	{
 		super(NAME, comp, true);
 		this.method = method;
-		this.sid = service.getServiceIdentifier();
 		
-		if(Proxy.isProxyClass(service.getClass()))
+		// Necessary for unbound required service property to fetch meta info :-(
+		if(service!=null)
 		{
-			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
+			this.sid = service.getServiceIdentifier();
+		
+			if(Proxy.isProxyClass(service.getClass()))
 			{
-				Map<Object, Long> times = new HashMap<Object, Long>();
-				
-				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
+				listener = new UserMethodInvocationListener(new IMethodInvocationListener()
 				{
-					times.put(callid, new Long(System.currentTimeMillis()));
-				}
-				
-				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
-				{
-					Long start = times.remove(callid);
-					// May happen that property is added during ongoing call
-					if(start!=null)
+					Map<Object, Long> times = new HashMap<Object, Long>();
+					
+					public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 					{
-						if(context instanceof ServiceInvocationContext)
+						times.put(callid, new Long(System.currentTimeMillis()));
+					}
+					
+					public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
+					{
+						Long start = times.remove(callid);
+						// May happen that property is added during ongoing call
+						if(start!=null)
 						{
-							ServiceInvocationContext sic = (ServiceInvocationContext)context;
-							if(sic.getServiceCall()!=null)
+							if(context instanceof ServiceInvocationContext)
 							{
-								Long exe = (Long)sic.getServiceCall().getProperty("__duration");
-								if(exe!=null)
+								ServiceInvocationContext sic = (ServiceInvocationContext)context;
+								if(sic.getServiceCall()!=null)
 								{
-									long dur = System.currentTimeMillis() - start.longValue() - exe.longValue();
-//									System.out.println("dur is: "+dur);
-									setValue(dur);
+									Long exe = (Long)sic.getServiceCall().getProperty("__duration");
+									if(exe!=null)
+									{
+										long dur = System.currentTimeMillis() - start.longValue() - exe.longValue();
+//										System.out.println("latency is: "+dur);
+										setValue(dur);
+									}
 								}
 							}
-						}
-						else
-						{
-							System.out.println("no context");
+							else
+							{
+								System.out.println("no context");
+							}
 						}
 					}
-				}
-			});
-			comp.getServiceContainer().addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
-		}
-		else
-		{
-			throw new RuntimeException("Cannot install waiting time listener hook.");
+				});
+				comp.getServiceContainer().addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
+			}
+			else
+			{
+				throw new RuntimeException("Cannot install waiting time listener hook.");
+			}
 		}
 	}
 	

@@ -76,7 +76,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	protected IExternalAccess	access;
 
 	
-	/** The result. */
+	/** The cached result. */
 	protected Object result;
 	
 	/** The realtime flag for call timeouts. */
@@ -112,10 +112,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		final Future<T> ret = new Future<T>();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
 		
-		if(rebind)
-			result = null;
+//		if(rebind || binding.isDynamic())
+//			result = null;
 		
-		checkResult(result).addResultListener(new ExceptionDelegationResultListener<Object, T>(ret)
+		checkResult(result, rebind, bd).addResultListener(new ExceptionDelegationResultListener<Object, T>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -218,10 +218,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
 		
-		if(rebind)
-			result = null;
+//		if(rebind || binding.isDynamic())
+//			result = null;
 		
-		checkResults((List<T>)result).addResultListener(new IntermediateDelegationResultListener<T>(ret)
+		checkResults((List<T>)result, rebind, bd).addResultListener(new IntermediateDelegationResultListener<T>(ret)
 		{
 		    public void finished()
 		    {
@@ -261,15 +261,15 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 									{
 										public void resultAvailable(Void result)
 										{
-											if(!binding.isDynamic())
-												DefaultServiceFetcher.this.result = ret.getIntermediateResults();
+//											if(!binding.isDynamic())
+											DefaultServiceFetcher.this.result = ret.getIntermediateResults();
 											ret.setFinished();
 										}
 										
 										public void exceptionOccurred(Exception exception)
 										{
-											if(!binding.isDynamic())
-												DefaultServiceFetcher.this.result = ret.getIntermediateResults();
+//											if(!binding.isDynamic())
+											DefaultServiceFetcher.this.result = ret.getIntermediateResults();
 											ret.setFinished();
 										}
 									});
@@ -355,13 +355,29 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	}
 	
 	/**
+	 *  Get the result of the last search.
+	 */
+	public <T> T getLastService()
+	{
+		return (T)result;
+	}
+
+	/**
+	 *  Get the result of the last search.
+	 */
+	public <T> Collection<T> getLastServices()
+	{
+		return (Collection<T>)result;
+	}
+	
+	/**
 	 * 
 	 */
-	protected <T> IIntermediateFuture<T> checkResults(final List<T> results)
+	protected <T> IIntermediateFuture<T> checkResults(final List<T> results, boolean rebind, RequiredServiceBinding bd)
 	{
 		final IntermediateFuture<T> ret = new IntermediateFuture<T>();
 		
-		if(results==null || results.size()==0)
+		if(rebind || bd.isDynamic() || results==null || results.size()==0)
 		{
 			ret.setFinished();
 		}
@@ -392,7 +408,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 
 			for(int i=0; i<results.size(); i++)
 			{
-				checkResult(results.get(i)).addResultListener(lis);
+				checkResult(results.get(i), rebind, bd).addResultListener(lis);
 			}
 		}
 		
@@ -402,35 +418,43 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 * 
 	 */
-	protected <T> IFuture<T> checkResult(T result)
+	protected <T> IFuture<T> checkResult(T result, boolean rebind, RequiredServiceBinding bd)
 	{
 		final Future<T> ret = new Future<T>();
-		final T res = result;
 		
-		if(result instanceof IService)
+		if(rebind || bd.isDynamic())
 		{
-//			final String sname = ((IService)result).getServiceIdentifier().getServiceName();
-//			if(sname.indexOf("Add")!=-1)
-//				System.out.println("checkRes: "+((IService)result).getServiceIdentifier());
-			((IService)result).isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, T>(ret)
-			{
-				public void customResultAvailable(Boolean result)
-				{
-//					if(sname.indexOf("Add")!=-1)
-//						System.out.println("checkRes2: "+sname);
-					ret.setResult(result.booleanValue()? res: null);
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-//					System.out.println("kaputtt: "+exception);
-//					super.exceptionOccurred(exception);
-					ret.setResult(null);
-				}
-			});
+			ret.setResult(null);
 		}
 		else
 		{
-			ret.setResult(null);
+			final T res = result;
+			
+			if(result instanceof IService)
+			{
+	//			final String sname = ((IService)result).getServiceIdentifier().getServiceName();
+	//			if(sname.indexOf("Add")!=-1)
+	//				System.out.println("checkRes: "+((IService)result).getServiceIdentifier());
+				((IService)result).isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, T>(ret)
+				{
+					public void customResultAvailable(Boolean result)
+					{
+	//					if(sname.indexOf("Add")!=-1)
+	//						System.out.println("checkRes2: "+sname);
+						ret.setResult(result.booleanValue()? res: null);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+	//					System.out.println("kaputtt: "+exception);
+	//					super.exceptionOccurred(exception);
+						ret.setResult(null);
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		
 		return ret;
@@ -855,6 +879,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 									(IComponentAdapter)adapter, service, DefaultServiceFetcher.this, info, binding, realtime);
 								
 								IServiceIdentifier sid = service.getServiceIdentifier();
+								
+								// Check if no property provider has been created before and then create and init properties
 								if(!ia.getServiceContainer().hasRequiredServicePropertyProvider(sid))
 								{
 									INFMixedPropertyProvider nfpp = ia.getServiceContainer().getRequiredServicePropertyProvider(service.getServiceIdentifier());
@@ -864,9 +890,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 									{
 										for(NFRPropertyInfo nfprop: nfprops)
 										{
+											MethodInfo mi = nfprop.getMethodInfo();
 											Class<?> clazz = nfprop.getClazz().getType(ia.getClassLoader());
 											INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, ia, (IService)ret, nfprop.getMethodInfo());
-											MethodInfo mi = nfprop.getMethodInfo();
 											if(mi==null)
 											{
 												nfpp.addNFProperty(nfp);
@@ -934,8 +960,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 			{
 				public void customResultAvailable(T result)
 				{
-					if(!binding.isDynamic())
-						DefaultServiceFetcher.this.result = result;
+//					if(!binding.isDynamic())
+					DefaultServiceFetcher.this.result = result;
 					super.customResultAvailable(result);
 				}
 			});
@@ -1008,8 +1034,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					if(future.isDone())
 						return;
 					
-					if(!binding.isDynamic())
-						DefaultServiceFetcher.this.result = future.getIntermediateResults();
+//					if(!binding.isDynamic())
+					DefaultServiceFetcher.this.result = future.getIntermediateResults();
 					
 					if(future.getIntermediateResults().size()==0)
 					{

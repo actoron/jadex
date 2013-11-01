@@ -1,23 +1,20 @@
 package jadex.bridge.service;
 
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
-import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.sensor.service.IMethodInvocationListener;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
-import jadex.bridge.service.component.MethodListenerHandler;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
+
+import java.lang.reflect.Method;
+import java.util.Collection;
 
 /**
  *  Internal interface for a service container. Allows
@@ -162,6 +159,20 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
 	public <T> ITerminableIntermediateFuture<T> getRequiredServices(String name, boolean rebind, IRemoteFilter<T> filter);
+	
+	/**
+	 *  Get the result of the last search.
+	 *  @param name The required service name.
+	 *  @return The last result.
+	 */
+	public <T> T getLastRequiredService(String name);
+	
+	/**
+	 *  Get the result of the last search.
+	 *  @param name The required services name.
+	 *  @return The last result.
+	 */
+	public <T> Collection<T> getLastRequiredServices(String name);
 	
 	/**
 	 *  Add a service interceptor.

@@ -254,6 +254,8 @@ public class InitiatorAgent extends TestAgent
 							INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
 							Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
 							System.out.println("latency: "+lat);
+							// Test is ok if latency could be fetched.
+							// todo? Could also test if local latency is faster than remote
 							tr.setSucceeded(true);
 							ret.setResult(tr);
 						}

@@ -17,11 +17,12 @@ import jadex.bridge.modelinfo.IExtensionInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.NFPropertyInfo;
+import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.AbstractNFProperty;
+import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.INFProperty;
-import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.nonfunctional.NFPropertyProvider;
 import jadex.bridge.service.BasicService;
@@ -54,6 +55,7 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
@@ -878,8 +880,32 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
+		
+		// Create place holder required service properties
 		RequiredServiceInfo[]	rservices	= (RequiredServiceInfo[])sermap.values().toArray(new RequiredServiceInfo[sermap.size()]);
 		getServiceContainer().addRequiredServiceInfos(rservices);
+		for(RequiredServiceInfo rsi: rservices)
+		{
+			List<NFRPropertyInfo> nfprops = rsi.getNFRProperties();
+			{
+				INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(null); // null for unbound
+				
+				for(NFRPropertyInfo nfprop: nfprops)
+				{
+					MethodInfo mi = nfprop.getMethodInfo();
+					Class<?> clazz = nfprop.getClazz().getType(getClassLoader());
+					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), null, nfprop.getMethodInfo());
+					if(mi==null)
+					{
+						nfpp.addNFProperty(nfp);
+					}
+					else
+					{
+						nfpp.addMethodNFProperty(mi, nfp);
+					}
+				}
+			}
+		}
 					
 		return IFuture.DONE;
 	}

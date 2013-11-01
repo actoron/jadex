@@ -383,7 +383,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 										{
 											NFPropertyContainerNode cn = (NFPropertyContainerNode)getModel().getNode(getId()+NFPropertyContainerNode.NAME);
 											if(cn==null)
-												cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree(), ea, null, null);
+												cn = new NFPropertyContainerNode(null, null, ComponentTreeNode.this, getModel(), getTree(), ea, null, null, null);
 											children.add(0, cn);
 											cont(ea);
 //											final NFPropertyContainerNode node = cn;
@@ -458,7 +458,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 														String id	= ProvidedServiceInfoNode.getId(scn, pros[i]);
 														ProvidedServiceInfoNode	sn	= (ProvidedServiceInfoNode)getModel().getNode(id);
 														if(sn==null)
-															sn	= new ProvidedServiceInfoNode(scn, getModel(), getTree(), pros[i], sis[i], rootea);
+															sn	= new ProvidedServiceInfoNode(scn, getModel(), getTree(), pros[i], sis[i], ea);
 														subchildren.add(sn);
 													}
 													catch(Exception e)
@@ -495,7 +495,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 													String nid = ea.getServiceProvider().getId()+"."+reqs[i].getName();
 													RequiredServiceNode	sn = (RequiredServiceNode)getModel().getNode(nid);
 													if(sn==null)
-														sn	= new RequiredServiceNode(scn, getModel(), getTree(), reqs[i], nid);
+														sn	= new RequiredServiceNode(scn, getModel(), getTree(), reqs[i], nid, ea);
 													subchildren.add(sn);
 												}
 											}
@@ -586,7 +586,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 					public void resultAvailable(INFPropertyMetaInfo pmi) 
 					{
 //						NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), pmi, rootea);
-						NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), pmi, provider, null, null);
+						NFPropertyNode nfpn	= new NFPropertyNode(cn, getModel(), getTree(), pmi, provider, null, null, null);
 						results.add(nfpn);
 						createNFPropertyNodes(names, results, provider, rootea, cn).addResultListener(new DelegationResultListener<Void>(ret));
 					}
