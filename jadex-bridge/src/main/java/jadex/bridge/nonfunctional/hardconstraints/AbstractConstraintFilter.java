@@ -7,7 +7,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-public abstract class AbstractConstraintFilter implements IRemoteFilter<IService>
+public abstract class AbstractConstraintFilter<T> implements IRemoteFilter<T>
 {
 	/** Name of the property being kept constant. */
 	protected String propname;
@@ -35,7 +35,7 @@ public abstract class AbstractConstraintFilter implements IRemoteFilter<IService
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public final IFuture<Boolean> filter(final IService service)
+	public final IFuture<Boolean> filter(final T service)
 	{
 		if (getValue() == null)
 		{
@@ -43,11 +43,11 @@ public abstract class AbstractConstraintFilter implements IRemoteFilter<IService
 		}
 		
 		final Future<Boolean> ret = new Future<Boolean>();
-		service.getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
+		((IService) service).getNFPropertyValue(propname).addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
 			{
-				doFilter(service, result).addResultListener(new DelegationResultListener<Boolean>(ret));
+				doFilter((IService) service, result).addResultListener(new DelegationResultListener<Boolean>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)

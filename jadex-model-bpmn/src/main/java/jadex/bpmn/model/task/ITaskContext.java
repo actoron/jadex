@@ -1,6 +1,7 @@
 package jadex.bpmn.model.task;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
 
 /**
  *  The task context contains the data available to
@@ -54,6 +55,13 @@ public interface ITaskContext
 	 *  @param value The parameter value. 
 	 */
 	public void	setParameterValue(String name, Object key, Object value);
+	
+	/**
+	 *  Gets the hard constraints.
+	 *
+	 *  @return The hard constraints.
+	 */
+	public RHardConstraints getHardConstraints();
 	
 	/**
 	 *  Get the value of a property.

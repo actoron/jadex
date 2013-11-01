@@ -12,6 +12,7 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -537,6 +538,16 @@ public class ProcessThread	implements ITaskContext
 	public boolean	hasPropertyValue(String name)
 	{
 		return activity.hasPropertyValue(name);
+	}
+	
+	/**
+	 *  Gets the hard constraints.
+	 *
+	 *  @return The hard constraints.
+	 */
+	public RHardConstraints getHardConstraints()
+	{
+		return context.getHardConstraints();
 	}
 	
 //	/**

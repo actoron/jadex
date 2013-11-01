@@ -4,6 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.SReflect;
 
@@ -29,6 +30,9 @@ public class ThreadContext
 	
 	/** The currently running threads (thread -> context or null, if leaf thread). */
 	protected Map<ProcessThread, ThreadContext>	threads;
+	
+	/** Service search hard constraints */;
+	protected RHardConstraints hardconstraints;
 	
 	//-------- constructors --------
 	
@@ -83,6 +87,28 @@ public class ThreadContext
 		return initiator;
 	}
 	
+	
+	
+	/**
+	 *  Gets the hard constraints.
+	 *
+	 *  @return The hard constraints.
+	 */
+	public RHardConstraints getHardConstraints()
+	{
+		return hardconstraints;
+	}
+
+	/**
+	 *  Sets the hard constraints.
+	 *
+	 *  @param hardconstraints The hard constraints to set.
+	 */
+	public void setHardConstraints(RHardConstraints hardconstraints)
+	{
+		this.hardconstraints = hardconstraints;
+	}
+
 	/**
 	 *  Add a thread to this context.
 	 *  @param thread	The thread to be added.

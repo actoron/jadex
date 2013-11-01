@@ -1,20 +1,24 @@
 package jadex.bridge.nonfunctional.hardconstraints;
 
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.ComposedRemoteFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  Class defining runtime hard constraints.
@@ -22,14 +26,8 @@ import java.util.Map;
  */
 public class RHardConstraints
 {
-	protected static final Map<String, Class<?>> CONSTRAINT_OPERATOR_MAP = new HashMap<String, Class<?>>();
-	static
-	{
-		CONSTRAINT_OPERATOR_MAP.put(MHardConstraint.CONSTANT, ConstantValueFilter.class);
-	}
-	
 	/** The basic hard constraints filter */
-	protected List<IRemoteFilter<IService>> filters = new ArrayList<IRemoteFilter<IService>>();
+	protected List<IRemoteFilter<?>> filters = new ArrayList<IRemoteFilter<?>>();
 	
 	/** Unbound constant value filters */
 	protected List<ConstantValueFilter> unboundconstantfilters = new ArrayList<ConstantValueFilter>();
@@ -43,16 +41,29 @@ public class RHardConstraints
 	{
 		for (MHardConstraint hc : mhc)
 		{
-			Class<?> opclazz = CONSTRAINT_OPERATOR_MAP.get(hc.getOperator());
-			try
+			if (MHardConstraint.CONSTANT.equals(hc.getOperator()))
 			{
-				Constructor<IRemoteFilter<IService>> c = (Constructor<IRemoteFilter<IService>>) opclazz.getConstructor(String.class, Object.class);
-				IRemoteFilter<IService> filter = c.newInstance(hc.getPropertyName(), hc.getValue());
-				addFilter(filter);
+				addFilter(new ConstantValueFilter(hc.getPropertyName(), hc.getValue()));
 			}
-			catch(Exception e)
+			else if (MHardConstraint.GREATER.equals(hc.getOperator()))
 			{
-				throw new RuntimeException(e);
+				addFilter(new StrictInequalityFilter(false));
+			}
+			else if (MHardConstraint.LESS.equals(hc.getOperator()))
+			{
+				addFilter(new StrictInequalityFilter(true));
+			}
+			else if (MHardConstraint.GREATER_OR_EQUAL.equals(hc.getOperator()))
+			{
+				addFilter(new InequalityFilter(false));
+			}
+			else if (MHardConstraint.LESS_OR_EQUAL.equals(hc.getOperator()))
+			{
+				addFilter(new StrictInequalityFilter(true));
+			}
+			else
+			{
+				throw new RuntimeException("Unknown hard constraint type: " + hc.getOperator());
 			}
 		}
 	}
@@ -80,7 +91,7 @@ public class RHardConstraints
 	 * 
 	 *  @return Remotable filter.
 	 */
-	public IRemoteFilter<IService> getRemotableFilter()
+	public IRemoteFilter<?> getRemotableFilter()
 	{
 		IRemoteFilter<?> ret = null;
 		
@@ -93,7 +104,7 @@ public class RHardConstraints
 			ret = new ComposedRemoteFilter(filters.toArray(new IRemoteFilter[filters.size()]));
 		}
 		
-		return (IRemoteFilter<IService>) ret;
+		return (IRemoteFilter<?>) ret;
 	}
 	
 	/**
@@ -101,7 +112,7 @@ public class RHardConstraints
 	 *  
 	 *  @return Filter for local filtering.
 	 */
-	public IRemoteFilter<IService> getLocalFilter()
+	public IRemoteFilter<?> getLocalFilter()
 	{
 		return getLocalFilter(null);
 	}
@@ -205,5 +216,40 @@ public class RHardConstraints
 			}
 		}
 		unboundconstantfilters = newunboundconstantfilters;
+	}
+	
+	public static <T> ITerminableIntermediateFuture<T> getServices(final IServiceProvider provider, final Class<T> type, final String scope, final MethodInfo method, final RHardConstraints hardconstraints)
+	{
+		if (hardconstraints == null)
+		{
+			return SServiceProvider.getServices(provider, type, scope);
+		}
+		else
+		{
+			final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
+			SServiceProvider.getServices(provider, type, scope, (IRemoteFilter<T>) hardconstraints.getRemotableFilter()).addResultListener(new IResultListener<Collection<T>>()
+			{
+				public void resultAvailable(Collection<T> results)
+				{
+					List<T> filteredresults = new ArrayList<T>();
+					IRemoteFilter<T> filter = (IRemoteFilter<T>) hardconstraints.getLocalFilter();
+					
+//					CollectionResultListener<T> crl = new CollectionResultListener<T>(results.size(), true, new DelegationResultListener<T>(new IResultListener<T>()
+//					{
+//						
+//					}));
+					
+					for (T result : results)
+					{
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		return null;
 	}
 }

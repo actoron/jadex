@@ -108,6 +108,16 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
+	 *  Returns the hard constraints.
+	 *  
+	 *  @return The hard constraints.
+	 */
+	public List<MHardConstraint> getHardConstraints()
+	{
+		return hardconstraints;
+	}
+	
+	/**
 	 *  Get an activity per id.
 	 */
 	public MActivity getActivity(String id)

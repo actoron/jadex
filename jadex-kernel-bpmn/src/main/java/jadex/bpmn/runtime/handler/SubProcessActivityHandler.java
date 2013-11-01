@@ -11,6 +11,7 @@ import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -129,6 +130,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			else
 			{
 				ThreadContext subcontext = new ThreadContext(proc, thread);
+				subcontext.setHardConstraints(proc.getHardConstraints() != null? new RHardConstraints(proc.getHardConstraints()) : null);
 				thread.getThreadContext().addSubcontext(subcontext);
 				for(int i=0; i<start.size(); i++)
 				{
