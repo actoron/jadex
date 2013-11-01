@@ -63,11 +63,11 @@ public class UniversalClientService extends Service
 		Service result;
 		ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(null);
 		@SuppressWarnings("unchecked")
-		Class<Service> clientServiceClass = SReflect.classForName0(className, cl);
+		Class<?> clientServiceClass = SReflect.classForName0(className, cl);
 		try
 		{
 			Logger.d("Creating new Client Service: " + className);
-			result = clientServiceClass.newInstance();
+			result = (Service) clientServiceClass.newInstance();
 			Context baseContext = getBaseContext();
 			if (result instanceof JadexClientAppService) {
 				((JadexClientAppService) result).attachBaseContext(baseContext);
