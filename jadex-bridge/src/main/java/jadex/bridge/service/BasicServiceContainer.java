@@ -265,6 +265,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //							if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
 //								System.out.println("Terminating service: "+sid);
 							getLogger().info("Terminating service: "+sid);
+							
+							// Dispose nonfunc properties
+							service.shutdownNFPropertyProvider();
+							
 							final IInternalService fservice = service;
 							service.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 							{
@@ -394,6 +398,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //		Thread.dumpStack();
 //		System.out.println("shutdown called: "+getName());
 		final Future<Void> ret = new Future<Void>();
+		
 		
 		// Stop the services.
 		if(services!=null && services.size()>0)

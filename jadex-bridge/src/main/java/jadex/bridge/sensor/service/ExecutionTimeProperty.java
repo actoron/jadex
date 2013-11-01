@@ -44,55 +44,59 @@ public class ExecutionTimeProperty extends TimedProperty
 	{
 		super(NAME, comp, true);
 		this.method = method;
-		this.sid = service.getServiceIdentifier();
 		
-		SServiceProvider.getService(comp.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener<IClockService>()
+		if(service!=null)
 		{
-			public void resultAvailable(IClockService result)
-			{
-				ExecutionTimeProperty.this.clock = result;
-//				System.out.println("assigned clock");
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				comp.getLogger().warning("Could not fetch time service in property.");
-			}
-		});
+			this.sid = service.getServiceIdentifier();
 		
-		if(Proxy.isProxyClass(service.getClass()))
-		{
-			listener = new UserMethodInvocationListener(new IMethodInvocationListener()
+			SServiceProvider.getService(comp.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener<IClockService>()
 			{
-				Map<Object, Long> times = new HashMap<Object, Long>();
-				
-				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
+				public void resultAvailable(IClockService result)
 				{
-					if(clock!=null)
-						times.put(callid, new Long(clock.getTime()));
+					ExecutionTimeProperty.this.clock = result;
+	//				System.out.println("assigned clock");
 				}
 				
-				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
+				public void exceptionOccurred(Exception exception)
 				{
-					if(clock!=null)
-					{
-						Long start = times.remove(callid);
-						// May happen that property is added during ongoing call
-						if(start!=null)
-						{
-							long dur = clock.getTime() - start.longValue();
-							setValue(dur);
-						}
-					}
+					comp.getLogger().warning("Could not fetch time service in property.");
 				}
 			});
-//			System.out.println("installing lis: "+comp.getComponentIdentifier().getName());
-			comp.getServiceContainer().addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
-		}
-		else
-		{
-			throw new RuntimeException("Cannot install waiting time listener hook.");
+		
+			if(Proxy.isProxyClass(service.getClass()))
+			{
+				listener = new UserMethodInvocationListener(new IMethodInvocationListener()
+				{
+					Map<Object, Long> times = new HashMap<Object, Long>();
+					
+					public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
+					{
+						if(clock!=null)
+							times.put(callid, new Long(clock.getTime()));
+					}
+					
+					public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
+					{
+						if(clock!=null)
+						{
+							Long start = times.remove(callid);
+							// May happen that property is added during ongoing call
+							if(start!=null)
+							{
+								long dur = clock.getTime() - start.longValue();
+								setValue(dur);
+							}
+						}
+					}
+				});
+	//			System.out.println("installing lis: "+comp.getComponentIdentifier().getName());
+				comp.getServiceContainer().addMethodInvocationListener(service.getServiceIdentifier(), method, listener);
+			}
+			else
+			{
+				throw new RuntimeException("Cannot install waiting time listener hook.");
+			}
 		}
 	}
 	

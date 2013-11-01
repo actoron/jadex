@@ -73,4 +73,13 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 	 *  Measure the value.
 	 */
 	public abstract T measureValue();
+
+	/**
+	 *  Get the component.
+	 *  @return The component.
+	 */
+	public IInternalAccess getComponent()
+	{
+		return comp;
+	}
 }

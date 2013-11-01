@@ -84,4 +84,9 @@ public interface INFMethodPropertyProvider
 	 *  @param The name.
 	 */
 	public IFuture<Void> removeMethodNFProperty(MethodInfo method, String name);
+	
+	/**
+	 *  Shutdown the provider.
+	 */
+	public IFuture<Void> shutdownNFPropertyProvider();
 }

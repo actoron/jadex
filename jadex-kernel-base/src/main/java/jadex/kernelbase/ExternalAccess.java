@@ -1185,8 +1185,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.removeNFProperty(name);
-						ret.setResult(null);
+						interpreter.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}
@@ -1205,8 +1204,47 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.removeNFProperty(name);
-			ret.setResult(null);
+			interpreter.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Shutdown the provider.
+	 */
+	public IFuture<Void> shutdownNFPropertyProvider()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						interpreter.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+//						interpreter.removeNFProperty(name);
+//						ret.setResult(null);
+						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			interpreter.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;

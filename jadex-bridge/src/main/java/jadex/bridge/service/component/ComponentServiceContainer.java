@@ -26,10 +26,10 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
-import jadex.commons.IFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -571,7 +571,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture<Void> shutdown()
 	{
-		Future<Void>	ret	= new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
+		
 		super.shutdown().addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -579,7 +580,20 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				adapter	= null;
 				cms	= null;
 				instance	= null;
-				super.customResultAvailable(result);
+				
+				// Shudown the required service property providers
+				if(reqserprops!=null && reqserprops.size()>0)
+				{
+					CounterResultListener<Void> lis = new CounterResultListener<Void>(reqserprops.size(), new DelegationResultListener<Void>(ret));
+					for(INFMixedPropertyProvider pp: reqserprops.values())
+					{
+						pp.shutdownNFPropertyProvider().addResultListener(lis);
+					}
+				}
+				else
+				{
+					super.customResultAvailable(result);
+				}
 			}
 		});
 		return ret;

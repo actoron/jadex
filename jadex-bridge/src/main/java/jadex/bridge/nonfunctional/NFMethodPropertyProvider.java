@@ -1,6 +1,7 @@
 package jadex.bridge.nonfunctional;
 
 import jadex.commons.MethodInfo;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -238,6 +239,47 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 		{
 			ret.setResult(null);
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Shutdown the provider.
+	 */
+	public IFuture<Void> shutdownNFPropertyProvider()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		super.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				if(methodnfproperties!=null)
+				{
+					int cnt = 0;
+					for(Map<String, INFProperty<?, ?>> maps: methodnfproperties.values())
+					{
+						for(INFProperty<?, ?> prop: maps.values())
+						{
+							cnt++;
+						}
+					}
+					
+					CounterResultListener<Void> lis = new CounterResultListener<Void>(cnt, true, new DelegationResultListener<Void>(ret));
+					for(Map<String, INFProperty<?, ?>> maps: methodnfproperties.values())
+					{
+						for(INFProperty<?, ?> prop: maps.values())
+						{
+							prop.dispose().addResultListener(lis);
+						}
+					}
+				}
+				else
+				{
+					ret.setResult(null);
+				}
+			}
+		});
+		
 		return ret;
 	}
 }

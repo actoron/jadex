@@ -1,5 +1,6 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -259,4 +260,24 @@ public class NFPropertyProvider implements INFPropertyProvider
 		this.parent = parent;
 	}
 	
+	/**
+	 *  Shutdown the provider.
+	 */
+	public IFuture<Void> shutdownNFPropertyProvider()
+	{
+		Future<Void> ret = new Future<Void>();
+		if(nfproperties!=null)
+		{
+			CounterResultListener<Void> lis = new CounterResultListener<Void>(nfproperties.size(), true, new DelegationResultListener<Void>(ret));
+			for(INFProperty<?, ?> prop: nfproperties.values())
+			{
+				prop.dispose().addResultListener(lis);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}
 }

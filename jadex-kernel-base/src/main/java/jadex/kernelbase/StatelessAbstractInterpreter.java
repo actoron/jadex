@@ -226,67 +226,72 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 										{
 											public void customResultAvailable(Void result)
 											{
-//												final Collection<IComponentListener> lis = getInternalComponentListeners();
-												IResultListener<Void> reslis	= new IResultListener<Void>()
+												shutdownNFPropertyProvider().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 												{
-													public void resultAvailable(Void result)
+													public void customResultAvailable(Void result)
 													{
-														proceed(null);
-//														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), getModel(), lis, clock)
-//															.addResultListener(new DelegationResultListener<Void>(ret));
-//														ret.setResult(null);
-													}
-													public void exceptionOccurred(final Exception exception)
-													{
-														proceed(exception);
-//														ret.setException(exception);
-//														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), getModel(), lis, clock)
-//															.addResultListener(new DelegationResultListener<Void>(ret)
-//														{
-//															public void customResultAvailable(Void result)
-//															{
-//																ret.setException(exception);
-//															}
-//															public void exceptionOccurred(Exception exception)
-//															{
-//																ret.setException(exception);
-//															}
-//														});
-													}
-													
-													protected void proceed(final Exception ex)
-													{
-//														if(hasEventTargets(true))
-//														{
-															MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
-																IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis());
-															event.setProperty("details", getComponentDescription());
-															publishEvent(event).addResultListener(new DelegationResultListener<Void>(ret)
+														IResultListener<Void> reslis	= new IResultListener<Void>()
+														{
+															public void resultAvailable(Void result)
 															{
-																public void customResultAvailable(Void result)
-																{
-																	if(ex!=null)
-																		ret.setException(ex);
-																	else
-																		ret.setResult(null);
-																}
-																public void exceptionOccurred(Exception exception)
-																{
-																	ret.setException(exception);
-																}
-															});
-//														}
-//														else
-//														{
-//															ret.setResult(null);
-//														}
+																proceed(null);
+//																ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), getModel(), lis, clock)
+//																	.addResultListener(new DelegationResultListener<Void>(ret));
+//																ret.setResult(null);
+															}
+															public void exceptionOccurred(final Exception exception)
+															{
+																proceed(exception);
+//																ret.setException(exception);
+//																ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), getModel(), lis, clock)
+//																	.addResultListener(new DelegationResultListener<Void>(ret)
+//																{
+//																	public void customResultAvailable(Void result)
+//																	{
+//																		ret.setException(exception);
+//																	}
+//																	public void exceptionOccurred(Exception exception)
+//																	{
+//																		ret.setException(exception);
+//																	}
+//																});
+															}
+															
+															protected void proceed(final Exception ex)
+															{
+//																if(hasEventTargets(true))
+//																{
+																	MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
+																		IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis());
+																	event.setProperty("details", getComponentDescription());
+																	publishEvent(event).addResultListener(new DelegationResultListener<Void>(ret)
+																	{
+																		public void customResultAvailable(Void result)
+																		{
+																			if(ex!=null)
+																				ret.setException(ex);
+																			else
+																				ret.setResult(null);
+																		}
+																		public void exceptionOccurred(Exception exception)
+																		{
+																			ret.setException(exception);
+																		}
+																	});
+//																}
+//																else
+//																{
+//																	ret.setResult(null);
+//																}
+															}
+														};
+														// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
+														if(getComponentIdentifier().getParent()!=null)
+															reslis	= createResultListener(reslis);
+																									
+														terminateServiceContainer().addResultListener(reslis);
 													}
-												};
-												// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
-												if(getComponentIdentifier().getParent()!=null)
-													reslis	= createResultListener(reslis);
-												
-												terminateServiceContainer().addResultListener(reslis);
+												}));
 											}
 										}));
 									}
@@ -887,6 +892,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		for(RequiredServiceInfo rsi: rservices)
 		{
 			List<NFRPropertyInfo> nfprops = rsi.getNFRProperties();
+			if(nfprops!=null)
 			{
 				INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(null); // null for unbound
 				

@@ -71,4 +71,9 @@ public interface INFPropertyProvider
 	 *  @param The name.
 	 */
 	public IFuture<Void> removeNFProperty(String name);
+	
+	/**
+	 *  Shutdown the provider.
+	 */
+	public IFuture<Void> shutdownNFPropertyProvider();
 }

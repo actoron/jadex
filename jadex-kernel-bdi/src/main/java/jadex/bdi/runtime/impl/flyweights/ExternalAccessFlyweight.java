@@ -1047,4 +1047,44 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		
 		return ret;
 	}
+	
+	/**
+	 *  Shutdown the provider.
+	 */
+	public IFuture<Void> shutdownNFPropertyProvider()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(getInterpreter().getAgentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						getInterpreter().shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(getInterpreter().getAgentAdapter().getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+//						interpreter.removeNFProperty(name);
+//						ret.setResult(null);
+						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			getInterpreter().shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		
+		return ret;
+	}
 }

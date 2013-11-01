@@ -3,13 +3,15 @@ package jadex.platform.service.remote;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
+import jadex.bridge.nonfunctional.annotation.NFProperties;
+import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -32,10 +34,12 @@ import java.util.Map;
 @Description("This agent represents a proxy for a remote component.")
 @Arguments(@Argument(name="component", clazz=IComponentIdentifier.class, defaultvalue="null", description="The component id of the remote component/platform."))
 @ProvidedServices(@ProvidedService(type=IProxyAgentService.class, implementation=@Implementation(expression="$component")))
-//@RequiredServices(@RequiredService(name="aser", type=.class, multiple=true,
+@NFProperties(@NFProperty(ProxyLatencyProperty.class))
+@Service
+
+//@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, multiple=true,
 //	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL, dynamic=true),
 //	nfprops=@NFRProperty(value=LatencyProperty.class, methodname="getConnectionState")))
-@Service
 public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 {
 	//-------- attributes --------
@@ -52,8 +56,10 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	 *  The agent created method.
 	 */
 	public IFuture<Void> agentCreated()
+//	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();
+		
 		getServiceContainer().getService(IComponentManagementService.class, rcid.getRoot()).addResultListener(
 			new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
@@ -64,11 +70,32 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 				LatencyProperty lt = new LatencyProperty(getInterpreter().getInternalAccess(), (IService)rcms, null);
 				nfpp.addNFProperty(lt);
 				ret.setResult(null);
+//				System.out.println("created: "+getComponentIdentifier());
 			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("created: "+getComponentIdentifier()+" "+exception);
+////				exception.printStackTrace();
+//				super.exceptionOccurred(exception);
+//			}
 		});
 		
-		return ret;
+//		System.out.println("created1: "+getComponentIdentifier());
+		
+//		return new Future<Void>();
+		return IFuture.DONE;
 	}
+	
+//	/**
+//	 *  Called when agent is killed.
+//	 */
+//	public IFuture<Void> agentKilled()
+//	{
+//		Future<Void> ret = new Future<Void>();
+//			INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
+//			nfpp.removeNFProperty(LatencyProperty.NAME).addResultListener(new DelegationResultListener<Void>(ret));
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the service container.
@@ -158,5 +185,21 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 //		});
 		
 		return ret;
+	}
+
+	/**
+	 *  Get the current latency.
+	 */
+	public IFuture<Long> getCurrentLatency()
+	{
+		if(rcms!=null)
+		{
+			INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
+			return nfpp.getNFPropertyValue(LatencyProperty.NAME);
+		}
+		else
+		{
+			return new Future<Long>((Long)null);
+		}
 	}
 }

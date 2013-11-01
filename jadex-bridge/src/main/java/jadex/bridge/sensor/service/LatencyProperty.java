@@ -124,6 +124,6 @@ public class LatencyProperty extends TimedProperty
 	public IFuture<Void> dispose()
 	{
 		comp.getServiceContainer().removeMethodInvocationListener(sid, method, listener);
-		return IFuture.DONE;
+		return super.dispose();
 	}
 }
