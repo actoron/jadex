@@ -28,14 +28,10 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
-
-import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 
 /**
  *  External access for applications.

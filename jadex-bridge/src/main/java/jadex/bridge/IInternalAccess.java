@@ -168,7 +168,7 @@ public interface IInternalAccess
 //	 *  Publish a monitoring event. This event is automatically send
 //	 *  to the monitoring service of the platform (if any). 
 //	 */
-//	public IFuture<Void> publishMonitoringEvent(IMonitoringEvent event);
+//	public IFuture<Void> publishEvent(IMonitoringEvent event, boolean tomonitor);//, boolean force);
 	
 //	/**
 //	 *  Get the required service property provider for a service.

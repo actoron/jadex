@@ -15,6 +15,8 @@ import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -929,12 +931,14 @@ public class RGoal extends RProcessableElement implements IGoal
 		/**
 		 * 
 		 */
-		public Tuple2<Boolean, Object> evaluate(IEvent event)
+		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 		{
-			boolean ret = states.contains(getLifecycleState());
+			Future<Tuple2<Boolean, Object>> ret = new Future<Tuple2<Boolean, Object>>();
+			boolean res = states.contains(getLifecycleState());
 			if(!allowed)
-				ret = !ret;
-			return ret? ICondition.TRUE: ICondition.FALSE;
+				res = !res;
+			ret.setResultIfUndone(res? ICondition.TRUE: ICondition.FALSE);
+			return ret;
 		}
 	}
 	
@@ -982,15 +986,28 @@ public class RGoal extends RProcessableElement implements IGoal
 			this.allowed = allowed;
 		}
 		
+//		/**
+//		 * 
+//		 */
+//		public Tuple2<Boolean, Object> evaluate(IEvent event)
+//		{
+//			boolean ret = states.contains(getProcessingState());
+//			if(!allowed)
+//				ret = !ret;
+//			return ret? ICondition.TRUE: ICondition.FALSE;
+//		}
+		
 		/**
 		 * 
 		 */
-		public Tuple2<Boolean, Object> evaluate(IEvent event)
+		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 		{
-			boolean ret = states.contains(getProcessingState());
+			Future<Tuple2<Boolean, Object>> ret = new Future<Tuple2<Boolean, Object>>();
+			boolean res = states.contains(getProcessingState());
 			if(!allowed)
-				ret = !ret;
-			return ret? ICondition.TRUE: ICondition.FALSE;
+				res = !res;
+			ret.setResultIfUndone(res? ICondition.TRUE: ICondition.FALSE);
+			return ret;
 		}
 	}
 	

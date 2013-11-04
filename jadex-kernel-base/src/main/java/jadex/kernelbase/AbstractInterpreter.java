@@ -85,15 +85,12 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected ServiceGetter<IMonitoringService> getter;
 	
 	
-//	/** The nf property providers for required services. */
-//	protected Map<IServiceIdentifier, INFMixedPropertyProvider> reqserprops;
-	
-	
 	/** The parameter copy allowed flag. */
 	protected boolean copy;
 
 	/** The flag if local timeouts should be realtime. */
 	protected boolean realtime;
+	
 	//-------- constructors --------
 	
 	/**
@@ -490,7 +487,31 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		return (subscriptions!=null && !subscriptions.isEmpty()) 
 			||  (tomonitor && getComponentDescription().getMonitoring()!=null && getComponentDescription().getMonitoring().booleanValue());
 	}
-
+	
+	
+//	/**
+//	 *  Check if event targets exist.
+//	 */
+//	public boolean hasEventTargets(PublishType pt, PublishImportance pi)
+//	{
+//		boolean ret = false;
+//		PublishLevel pl = null;
+//		boolean dopub = pi.getImportance()>pl.getLevel();
+//		if(dopub)
+//		{
+//			if(PublishType.TOALL.equals(pt) || PublishType.TOSUBSCRIBERS.equals(pt))
+//			{
+//				ret = subscriptions!=null && !subscriptions.isEmpty();
+//			}
+//			else if(PublishType.TOALL.equals(pt) || PublishType.TOMONITORING.equals(pt))
+//			{
+//				ret = true;
+//			}
+//		}
+////		return (subscriptions!=null && !subscriptions.isEmpty()) 
+////			||  (tomonitor && getComponentDescription().getMonitoring()!=null && getComponentDescription().getMonitoring().booleanValue());
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the monitoring service getter.

@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IRuleService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IRuleService.class))
 public class RuleAgent implements IRuleService
 {
 	/** The agent. */

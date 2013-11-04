@@ -2,6 +2,9 @@ package jadex.rules.eca;
 
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Command version of the condition.
@@ -22,18 +25,44 @@ public class CommandCondition implements ICondition
 	/**
 	 * 
 	 */
-	public Tuple2<Boolean, Object> evaluate(IEvent event)
+	public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 	{
-		Tuple2<Boolean, Object> ret;
 		Object res = command.execute(event).booleanValue();
+		return evaluateResult(res);
+	}
+	
+	/**
+	 * 
+	 */
+	public static IFuture<Tuple2<Boolean, Object>> evaluateResult(Object res)
+	{
+		final Future<Tuple2<Boolean, Object>> ret = new Future<Tuple2<Boolean, Object>>();
 		if(res instanceof Tuple2)
 		{
-			ret = (Tuple2<Boolean, Object>)res;
+			ret.setResult((Tuple2<Boolean, Object>)res);
 		}
-		else
+		else if(res instanceof Boolean)
 		{
 			boolean bs = ((Boolean)res).booleanValue();
-			ret = bs? ICondition.TRUE: ICondition.FALSE;
+			ret.setResult(bs? ICondition.TRUE: ICondition.FALSE);
+		}
+		else if(res instanceof Future)
+		{
+			((Future<Object>)res).addResultListener(new ExceptionDelegationResultListener<Object, Tuple2<Boolean, Object>>(ret)
+			{
+				public void customResultAvailable(Object res)
+				{
+					if(res instanceof Tuple2)
+					{
+						ret.setResult((Tuple2<Boolean, Object>)res);
+					}
+					else //if(res instanceof Boolean)
+					{
+						boolean bs = ((Boolean)res).booleanValue();
+						ret.setResult(bs? ICondition.TRUE: ICondition.FALSE);
+					}
+				}
+			});
 		}
 		return ret;
 	}

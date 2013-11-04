@@ -451,30 +451,42 @@ public class RuleSystem
 		
 		if(i<rules.length)
 		{
-			Tuple2<Boolean, Object> cres = rules[i].getCondition()==null? ICondition.TRUE: rules[i].getCondition().evaluate(event);
-			if(cres.getFirstEntity().booleanValue())
+			if(rules[i].getCondition()!=null)
 			{
-				IFuture<Object> fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, cres.getSecondEntity());
-				
-				fut.addResultListener(new IResultListener<Object>()
+				rules[i].getCondition().evaluate(event).addResultListener(new IResultListener<Tuple2<Boolean,Object>>()
 				{
-					public void resultAvailable(Object result) 
+					public void resultAvailable(Tuple2<Boolean, Object> result)
 					{
-						RuleEvent ev = new RuleEvent(rules[i].getName(), result);
-						res.addIntermediateResult(ev);
-						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+						if(result.getFirstEntity().booleanValue())
+						{
+							IFuture<Object> fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, result.getSecondEntity());
+							
+							fut.addResultListener(new IResultListener<Object>()
+							{
+								public void resultAvailable(Object result) 
+								{
+									RuleEvent ev = new RuleEvent(rules[i].getName(), result);
+									res.addIntermediateResult(ev);
+									processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+									processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+								}
+							});
+						}
+						else
+						{
+							processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+						}
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
-						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
-			}
-			else
-			{
-				processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		}
 		else
@@ -484,6 +496,49 @@ public class RuleSystem
 		
 		return ret;
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	protected IFuture<Void> processRules(final IRule<?>[] rules, final int i, final IEvent event, final IntermediateFuture<RuleEvent> res)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		
+//		if(i<rules.length)
+//		{
+//			Tuple2<Boolean, Object> cres = rules[i].getCondition()==null? ICondition.TRUE: rules[i].getCondition().evaluate(event);
+//			if(cres.getFirstEntity().booleanValue())
+//			{
+//				IFuture<Object> fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, cres.getSecondEntity());
+//				
+//				fut.addResultListener(new IResultListener<Object>()
+//				{
+//					public void resultAvailable(Object result) 
+//					{
+//						RuleEvent ev = new RuleEvent(rules[i].getName(), result);
+//						res.addIntermediateResult(ev);
+//						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						exception.printStackTrace();
+//						processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+//					}
+//				});
+//			}
+//			else
+//			{
+//				processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+//			}
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Process events until the event queue is empty or max

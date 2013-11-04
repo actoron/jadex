@@ -135,6 +135,12 @@ public interface IComponentDescription
 	 */
 	public Boolean getMonitoring();
 	
+//	/**
+//	 *  Get the monitoring flag.
+//	 *  @return	The monitoring flag.
+//	 */
+//	public Boolean getMonitoringLevel();
+	
 	/**
 	 *  Get the synchronous flag.
 	 *  @return	The synchronous flag.

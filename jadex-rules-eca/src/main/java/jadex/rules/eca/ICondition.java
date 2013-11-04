@@ -1,6 +1,8 @@
 package jadex.rules.eca;
 
 import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 /**
  *  Interface for a condition part of a rule.
@@ -13,16 +15,23 @@ public interface ICondition
 	
 	public static ICondition TRUE_CONDITION = new ICondition()
 	{
-		public Tuple2<Boolean, Object> evaluate(IEvent event)
+		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 		{
-			return TRUE;
+			return new Future<Tuple2<Boolean, Object>>(TRUE);
 		}
 	};
+	
+//	/**
+//	 *  Evaluation the condition.
+//	 *  @param event The event.
+//	 *  @return True, if condition is met (plus additional user data).
+//	 */
+//	public Tuple2<Boolean, Object> evaluate(IEvent event);
 	
 	/**
 	 *  Evaluation the condition.
 	 *  @param event The event.
 	 *  @return True, if condition is met (plus additional user data).
 	 */
-	public Tuple2<Boolean, Object> evaluate(IEvent event);
+	public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event);
 }

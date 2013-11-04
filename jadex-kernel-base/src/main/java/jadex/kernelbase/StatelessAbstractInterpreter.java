@@ -93,6 +93,60 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	/** Constant for step event. */
 	public static final String TYPE_COMPONENT = "component";
 	
+	public static enum PublishType
+	{
+		TOALL,
+		TOMONITORING,
+		TOSUBSCRIBERS
+	}
+	
+	public static enum PublishLevel
+	{
+		ALL(0),
+		MOST(1),
+		SOME(2),
+		NONE(3);
+		
+		protected int level;
+		
+		private PublishLevel(int level)
+		{
+			this.level = level;
+		}
+
+		/**
+		 *  Get the level.
+		 *  return The level.
+		 */
+		public int getLevel()
+		{
+			return level;
+		}
+	}
+	
+	public static enum PublishImportance
+	{
+		HIGH(3),
+		MEDIUM(2),
+		LOW(1);
+		
+		protected int importance;
+		
+		private PublishImportance(int importance)
+		{
+			this.importance = importance;
+		}
+
+		/**
+		 *  Get the importance.
+		 *  return The importance.
+		 */
+		public int getImportance()
+		{
+			return importance;
+		}
+	}
+	
 	//-------- interface methods --------
 	
 	/**
@@ -375,6 +429,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 					MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime());
 				me.setProperty("details", desc);
 				// for extensions only
+//				publishEvent(me, false, false) 
 				publishEvent(me, false) 
 					.addResultListener(new DelegationResultListener<Void>(ret));
 				
@@ -407,6 +462,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 				MonitoringEvent event = new MonitoringEvent(desc.getName(), desc.getCreationTime(), IMonitoringEvent.TYPE_COMPONENT_DISPOSED, desc.getCause(), System.currentTimeMillis());
 				event.setProperty("details", getComponentDescription());
 				// for extensions only
+//				publishEvent(event, false, false).addResultListener(new IResultListener<Void>()
 				publishEvent(event, false).addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
@@ -2213,14 +2269,15 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public IFuture<Void> publishEvent(IMonitoringEvent event)
 	{
-		return publishEvent(event, true);
+		return publishEvent(event, true);//, false);
 	}
 	
 	/**
 	 *  Publish a monitoring event. This event is automatically send
 	 *  to the monitoring service of the platform (if any). 
+	 *  @param tomonitor Flag, if event should be sent to the monitoring service.
 	 */
-	public IFuture<Void> publishEvent(IMonitoringEvent event, boolean tomonitor)
+	public IFuture<Void> publishEvent(IMonitoringEvent event, boolean tomonitor)//, boolean force)
 	{
 		if(event.getCause()==null)
 		{
@@ -2241,7 +2298,9 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		publishLocalEvent(event);
 		
 		// Publish to monitoring service if monitoring is turned on
-		if(tomonitor && getComponentDescription().getMonitoring()!=null && getComponentDescription().getMonitoring().booleanValue())
+//		if(tomonitor && (force || getComponentDescription().getMonitoring()!=null 
+		if(tomonitor && getComponentDescription().getMonitoring()!=null 
+			&& getComponentDescription().getMonitoring().booleanValue())
 		{
 			return publishEvent(event, getMonitoringServiceGetter());
 		}

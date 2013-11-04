@@ -1668,7 +1668,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				rule = new Rule<Void>("goal_addinhibitor", 
 					new ICondition()
 					{
-						public Tuple2<Boolean, Object> evaluate(IEvent event)
+						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 						{
 	//						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
 	//							System.out.println("maintain");
@@ -1679,7 +1679,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							RGoal goal = (RGoal)event.getContent();
 							ret = ChangeEvent.GOALACTIVE.equals(type.getType(0)) && RGoal.GoalProcessingState.INPROCESS.equals(goal.getProcessingState())
 								|| (ChangeEvent.GOALINPROCESS.equals(type.getType(0)) && RGoal.GoalLifecycleState.ACTIVE.equals(goal.getLifecycleState()));
-							return ret? ICondition.TRUE: ICondition.FALSE;
+//							return ret? ICondition.TRUE: ICondition.FALSE;
+							return new Future<Tuple2<Boolean,Object>>(ret? ICondition.TRUE: ICondition.FALSE);
 						}
 					}, new IAction<Void>()
 				{
@@ -1717,7 +1718,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				rule = new Rule<Void>("goal_removeinhibitor", 
 					new ICondition()
 					{
-						public Tuple2<Boolean, Object> evaluate(IEvent event)
+						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 						{
 							// return true when other goal is active and inprocess
 							boolean ret = false;
@@ -1728,7 +1729,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								ret = ChangeEvent.GOALSUSPENDED.equals(type.getType(0)) || ChangeEvent.GOALOPTION.equals(type.getType(0))
 									|| !RGoal.GoalProcessingState.INPROCESS.equals(goal.getProcessingState());
 							}
-							return ret? ICondition.TRUE: ICondition.FALSE;
+//							return ret? ICondition.TRUE: ICondition.FALSE;
+							return new Future<Tuple2<Boolean,Object>>(ret? ICondition.TRUE: ICondition.FALSE);
 						}
 					}, new IAction<Void>()
 				{
@@ -1803,10 +1805,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					new LifecycleStateCondition(RGoal.GoalLifecycleState.OPTION),
 					new ICondition()
 					{
-						public Tuple2<Boolean, Object> evaluate(IEvent event)
+						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 						{
 							RGoal goal = (RGoal)event.getContent();
-							return !goal.isInhibited()? ICondition.TRUE: ICondition.FALSE;
+//							return !goal.isInhibited()? ICondition.TRUE: ICondition.FALSE;
+							return new Future<Tuple2<Boolean,Object>>(!goal.isInhibited()? ICondition.TRUE: ICondition.FALSE);
 						}
 					}
 				}), new IAction<Void>()
@@ -2312,13 +2315,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		/**
 		 *  Evaluate the condition.
 		 */
-		public Tuple2<Boolean, Object> evaluate(IEvent event)
+		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 		{
 			RGoal goal = (RGoal)event.getContent();
 			boolean ret = states.contains(goal.getLifecycleState());
 			if(!allowed)
 				ret = !ret;
-			return ret? ICondition.TRUE: ICondition.FALSE;
+//			return ret? ICondition.TRUE: ICondition.FALSE;
+			return new Future<Tuple2<Boolean,Object>>(ret? ICondition.TRUE: ICondition.FALSE);
 		}
 	}
 	
@@ -2340,10 +2344,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		/**
 		 * 
 		 */
-		public Tuple2<Boolean, Object> evaluate(IEvent event)
+		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 		{
 			boolean res = !capa.getGoals(mgoal).isEmpty();
-			return res? ICondition.TRUE: ICondition.FALSE;
+//			return res? ICondition.TRUE: ICondition.FALSE;
+			return new Future<Tuple2<Boolean,Object>>(res? ICondition.TRUE: ICondition.FALSE);
 		}
 	}
 	
@@ -2365,9 +2370,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		/**
 		 * 
 		 */
-		public Tuple2<Boolean, Object> evaluate(IEvent event)
+		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 		{
-			return !capa.getPlans(mplan).isEmpty()? ICondition.TRUE: ICondition.FALSE;
+			return new Future<Tuple2<Boolean,Object>>(!capa.getPlans(mplan).isEmpty()? ICondition.TRUE: ICondition.FALSE);
 		}
 	}
 	

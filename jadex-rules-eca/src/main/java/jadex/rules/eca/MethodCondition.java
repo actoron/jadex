@@ -4,6 +4,9 @@ import jadex.commons.IMethodParameterGuesser;
 import jadex.commons.SimpleMethodParameterGuesser;
 import jadex.commons.SimpleParameterGuesser;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -74,30 +77,35 @@ public class MethodCondition implements ICondition
 	/**
 	 *  Evaluate the condition.
 	 */
-	public Tuple2<Boolean, Object> evaluate(IEvent event)
+	public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 	{
-		Tuple2<Boolean, Object> ret = ICondition.FALSE;
+		Future<Tuple2<Boolean, Object>> fut = new Future<Tuple2<Boolean,Object>>();
 		try
 		{
-			ret	= prepareResult(invokeMethod(event));
-			
-			if(invert)
+			CommandCondition.evaluateResult(invokeMethod(event)).addResultListener(new DelegationResultListener<Tuple2<Boolean,Object>>(fut)
 			{
-				Boolean b = ret.getFirstEntity().booleanValue()? Boolean.FALSE: Boolean.TRUE;
-				ret = new Tuple2<Boolean, Object>(b, ret.getSecondEntity());
-			}
+				public void customResultAvailable(Tuple2<Boolean, Object> result)
+				{
+					if(invert)
+					{
+						Boolean b = result.getFirstEntity().booleanValue()? Boolean.FALSE: Boolean.TRUE;
+						result = new Tuple2<Boolean, Object>(b, result.getSecondEntity());
+					}
+				}
+			});
 		}
 		catch(Exception e)
 		{
-			throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+			fut.setException(e);			
+			//throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
 		}
-		return ret;
+		return fut;
 	}
 	
 	/**
 	 *  Do the method invocation.
 	 */
-	protected Object	invokeMethod(IEvent event)	throws Exception
+	protected Object invokeMethod(IEvent event)	throws Exception
 	{
 		method.setAccessible(true);
 		Object[] params = null;
@@ -121,21 +129,21 @@ public class MethodCondition implements ICondition
 		return method.invoke(object, params);
 	}
 	
-	/**
-	 * 
-	 */
-	public Tuple2<Boolean, Object> prepareResult(Object res)
-	{
-		Tuple2<Boolean, Object> ret;
-		if(res instanceof Tuple2)
-		{
-			ret = (Tuple2<Boolean, Object>)res;
-		}
-		else 
-		{
-			boolean bs = ((Boolean)res).booleanValue();
-			ret = bs? ICondition.TRUE: ICondition.FALSE;
-		}
-		return ret;
-	}
+//	/**
+//	 * 
+//	 */
+//	public Tuple2<Boolean, Object> prepareResult(Object res)
+//	{
+//		Tuple2<Boolean, Object> ret;
+//		if(res instanceof Tuple2)
+//		{
+//			ret = (Tuple2<Boolean, Object>)res;
+//		}
+//		else 
+//		{
+//			boolean bs = ((Boolean)res).booleanValue();
+//			ret = bs? ICondition.TRUE: ICondition.FALSE;
+//		}
+//		return ret;
+//	}
 }

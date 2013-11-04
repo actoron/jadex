@@ -16,10 +16,10 @@ import jadex.micro.annotation.AgentBody;
 //@RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class))
 public class CountBDI
 {
-	static
-	{
-		System.out.println("countbdi: "+CountBDI.class.getClassLoader());
-	}
+//	static
+//	{
+//		System.out.println("countbdi: "+CountBDI.class.getClassLoader());
+//	}
 	
 	/** The agent. */
 	@Agent

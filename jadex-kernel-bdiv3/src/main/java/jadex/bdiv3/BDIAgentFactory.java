@@ -224,7 +224,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		System.out.println("isLoadable: "+model);
+//		System.out.println("isLoadable: "+model);
 //		boolean ret = model.toLowerCase().endsWith("bdi.class");
 		boolean ret = model.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3);
 		
