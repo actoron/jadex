@@ -2,9 +2,10 @@ package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.ICommandFuture.Type;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
@@ -93,9 +94,9 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 					if(res instanceof IFuture)
 					{
 						final long fstart = start;
-						((IFuture<Object>)res).addResultListener(new IResultListener<Object>()
+						((IFuture<Object>)res).addResultListener(new DelegationResultListener<Object>(null)
 						{
-							public void resultAvailable(Object result)
+							public void customResultAvailable(Object result)
 							{
 								long dur = System.currentTimeMillis()-fstart;
 								sc.setProperty("__duration", new Long(dur));
@@ -104,6 +105,11 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 							public void exceptionOccurred(Exception exception)
 							{
 								// do nothing
+							}
+							
+							public void commandAvailable(Type command)
+							{
+								// do nothing and avoid printouts
 							}
 						});
 					}

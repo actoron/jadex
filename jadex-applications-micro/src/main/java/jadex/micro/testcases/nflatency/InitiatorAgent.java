@@ -19,10 +19,13 @@ import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.TupleResult;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
@@ -112,7 +115,8 @@ public class InitiatorAgent extends TestAgent
 					{
 						CreationInfo ci = new CreationInfo(SUtil.createHashMap(new String[]{"component"}, new Object[]{platform.getComponentIdentifier().getRoot()}));
 						cms.createComponent("jadex.platform.service.remote.ProxyAgent.class", ci).addResultListener(
-							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+							new Tuple2Listener<IComponentIdentifier, Map<String, Object>>()
+//							new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 						{
 							public void firstResultAvailable(IComponentIdentifier result)
 							{
@@ -244,7 +248,8 @@ public class InitiatorAgent extends TestAgent
 			
 			protected void callService(final ITestService ts)
 			{
-				ts.methodA(100).addResultListener(new IResultListener<Void>()
+				ts.methodA(100).addResultListener(new IFutureCommandResultListener<Void>()
+//				ts.methodA(100).addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -271,10 +276,25 @@ public class InitiatorAgent extends TestAgent
 						tr.setFailed("Failed with exception: "+exception);
 						ret.setResult(tr);
 					}
+					
+					public void commandAvailable(Type command)
+					{
+					}
 				});
 			}
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Hack class that avoids printouts of forward command
+	 */
+	abstract class Tuple2Listener<T, E> extends DefaultTuple2ResultListener<T, E> implements IFutureCommandResultListener<Collection<TupleResult>>
+	{
+		public void commandAvailable(Type command)
+		{
+			// nop, avoids printouts
+		}
 	}
 }
