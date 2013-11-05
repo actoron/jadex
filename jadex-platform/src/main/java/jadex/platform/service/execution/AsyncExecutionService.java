@@ -305,12 +305,16 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					if(keys.length>0)
 					{
 						// One listener counts until all executors have shutdowned.
-						IResultListener<Void> lis = new CounterResultListener<Void>(keys.length, new DelegationResultListener<Void>(ret));
+						final IResultListener<Void> lis = new CounterResultListener<Void>(keys.length, new DelegationResultListener<Void>(ret));
 						for(int i=0; i<keys.length; i++)
 						{
-							Executor exe = (Executor)executors.get(keys[i]);
+							final Executor exe = (Executor)executors.get(keys[i]);
 							if(exe!=null)
 							{
+//								if(exe.toString().indexOf("Tester@")!=-1)
+//								{
+//									System.out.println("shutdown 4b: "+AsyncExecutionService.this+", "+exe);
+//								}
 								exe.shutdown().addResultListener(lis);
 							}
 							else

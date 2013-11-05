@@ -663,6 +663,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	
 	private static final IViewport createViewport(IPerspective persp, ClassLoader cl, Color bgColor, boolean tryopengl)
 	{
+//		System.out.println("create viewport: "+Thread.currentThread());
 		final JFrame frame = new JFrame("");
 		frame.setLayout(new BorderLayout());
 		frame.setUndecorated(true);
@@ -687,7 +688,6 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 					System.err.println("OpenGL support insufficient, using Java2D fallback...");
 					tryopengl = false;
 				}
-				frame.dispose();
 			}
 			catch (ClassNotFoundException e)
 			{
@@ -721,6 +721,16 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 				System.err.println(e);
 				tryopengl = false;
 			}
+			finally
+			{
+//				System.out.println("dispose viewport frame: "+Thread.currentThread());
+				frame.dispose();
+			}
+		}
+		else
+		{
+//			System.out.println("dispose viewport frame2: "+Thread.currentThread());
+			frame.dispose();			
 		}
 		
 		IViewport viewport = null;

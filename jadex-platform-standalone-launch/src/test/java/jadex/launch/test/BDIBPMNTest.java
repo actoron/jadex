@@ -22,9 +22,6 @@ public class BDIBPMNTest	extends ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
-//				// GUI problems: AWT not released.
-//				"examples",
-				
 				".bpmn",	// Only execute agents.
 				"Carry",
 				"Producer",
@@ -42,7 +39,6 @@ public class BDIBPMNTest	extends ComponentTestSuite
 	
 //	public void run(TestResult result)
 //	{
-//		// TODO Auto-generated method stub
 //		super.run(result);
 //		
 //		try

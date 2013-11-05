@@ -8,7 +8,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

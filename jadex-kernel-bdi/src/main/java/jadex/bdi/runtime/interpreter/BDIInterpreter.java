@@ -31,7 +31,6 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
@@ -1178,14 +1177,14 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		{
 			// Todo: search agent properties for custom plan executors.
 
-			synchronized(gexecutors)
+//			synchronized(gexecutors)
 			{
 				// Initialize for each kernel one time.
-				Map	global	= (Map)gexecutors.get(getKernelProperties());
-				if(global==null)
-				{
-					global	= new HashMap();
-					gexecutors.put(getKernelProperties(), global);
+//				Map	global	= (Map)gexecutors.get(getKernelProperties());
+//				if(global==null)
+//				{
+//					global	= new HashMap();
+//					gexecutors.put(getKernelProperties(), global);
 					
 //					Property[] props = getKernelProperties().getProperties("planexecutor");
 
@@ -1201,7 +1200,11 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 						{
 							String tmp = key.substring(13);
 //							System.out.println("PE:"+tmp);
-							global.put(tmp, getKernelProperties().get(key));
+//							global.put(tmp, getKernelProperties().get(key));
+							if(tmp.equals(name))
+							{
+								ret	= (IPlanExecutor)getKernelProperties().get(key);
+							}
 						}
 					}
 					
@@ -1209,8 +1212,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					{
 						global.put(props[i].getName(), props[i].getJavaObject(fetcher));
 					}*/
-				}
-				ret	= (IPlanExecutor)global.get(name);
+//				}
+//				ret	= (IPlanExecutor)global.get(name);
 				if(ret!=null)
 					planexecutors.put(name, ret);
 				else
@@ -1220,9 +1223,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return ret;
 	}
 	
-	/** global plan executors, cached for speed. */
-	// hack!!!
-	protected static Map gexecutors	= new HashMap();
+//	/** global plan executors, cached for speed. */
+//	// hack!!!
+//	protected static Map gexecutors	= new HashMap();
 	
 	/**
 	 *  Get the adapter agent.

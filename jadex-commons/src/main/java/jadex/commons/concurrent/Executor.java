@@ -118,6 +118,11 @@ public class Executor implements Runnable
 			Object	switchto	= null;
 			synchronized(this)
 			{
+//				if(toString().indexOf("Tester@")!=-1)
+//				{
+//					System.out.println("run exe: ");
+//				}
+
 				if(switchtos!=null)
 				{
 					switchto	= switchtos.remove(0);
@@ -224,6 +229,11 @@ public class Executor implements Runnable
 	public IFuture<Void>	shutdown()
 	{
 		Future<Void>	ret	= new Future<Void>();
+		
+//		if(toString().indexOf("Tester@")!=-1)
+//		{
+//			System.out.println("shutdown exe: ");
+//		}
 		
 		boolean directnotify = false;
 		synchronized(this)

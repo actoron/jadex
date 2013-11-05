@@ -2,6 +2,7 @@ package jadex.launch.test;
 
 import jadex.base.Starter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
+import jadex.base.test.impl.Cleanup;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -27,11 +28,11 @@ import junit.framework.TestCase;
 /**
  *  Test if all JCC plugins can be activated.
  */
-public class JCCTest //extends TestCase
+public class JCCTest extends TestCase
 {
 	public void	testJCC()
 	{
-		System.err.println("starting platform");
+//		System.err.println("starting platform");
 		IFuture<IExternalAccess>	fut	= Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 //			"-logging", "true",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"});
@@ -39,7 +40,7 @@ public class JCCTest //extends TestCase
 		long timeout	= BasicService.DEFAULT_LOCAL;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
-		final IExternalAccess	platform	= fut.get(sus, timeout);
+		IExternalAccess	platform	= fut.get(sus, timeout);
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
 			.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
@@ -69,6 +70,21 @@ public class JCCTest //extends TestCase
 		}).get(sus, timeout*10);
 		
 		platform.killComponent().get(sus, timeout);
+		
+		fut	= null;
+		platform	= null;
+		jcc	= null;
+		cms	= null;
+		
+		Cleanup.clearAWT();
+		
+//		try
+//		{
+//			Thread.sleep(3000000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
 	}
 	
 	/**

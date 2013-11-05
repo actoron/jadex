@@ -287,7 +287,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		
 		if(timer!=null)
 		{
+//			System.out.println("cancel timer: "+this);
 			timer.cancel();
+			timer	= null;
 		}
 		
 		IFuture<ISettingsService>	setfut	= getServiceContainer().getRequiredService("settings");
@@ -1066,7 +1068,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 //		waitFor(delay, step);
 		
 		if(timer==null)
+		{
+//			System.out.println("new timer: "+this);
 			timer	= new Timer(true);
+		}
 		
 		timer.schedule(new TimerTask()
 		{

@@ -110,7 +110,7 @@ public class AsyncSwingTreeModel extends AsyncTreeModel implements TreeModel
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		super.removeTreeModelListener(TreeModelListenerWrapper.getWrapperFor(l));
-		TreeModelListenerWrapper.deleteWrapperFor(l);
+//		TreeModelListenerWrapper.deleteWrapperFor(l);
 	}
 	
 	//-------- helper methods --------

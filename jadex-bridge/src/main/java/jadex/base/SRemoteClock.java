@@ -804,6 +804,15 @@ public class SRemoteClock
 					elementChanged("timers", TimerEntries.getTimerEntries(cs));
 					return IFuture.DONE;
 				}
+			}).addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					dispose();
+				}
 			});
 		}
 

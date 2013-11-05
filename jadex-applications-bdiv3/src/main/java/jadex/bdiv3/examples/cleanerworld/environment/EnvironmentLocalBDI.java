@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.examples.cleanerworld.world.Environment;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 
 /**
  * 
@@ -30,6 +31,12 @@ public class EnvironmentLocalBDI
 //		System.out.println(EnvironmentLocalBDI.class.getClassLoader());
 //		System.out.println("body: "+getClass().getClassLoader()+" "+agent.getClassLoader());
 		EnvironmentGui envgui = new EnvironmentGui(agent.getExternalAccess());
+	}
+	
+	@AgentKilled
+	public void	killed()
+	{
+		Environment.clearInstance();
 	}
 	
 	/**

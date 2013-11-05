@@ -16,7 +16,6 @@ import jadex.commons.future.ThreadSuspendable;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +28,7 @@ import junit.framework.TestCase;
 /**
  *  Test if the platform terminates itself.
  */
-public class MicroCreationTest// extends TestCase
+public class MicroCreationTest extends TestCase
 {
 	/**
 	 *  Test method.
@@ -50,7 +49,7 @@ public class MicroCreationTest// extends TestCase
 			"-printpass", "false"}).get(sus, timeout);
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
 		
-		final Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
+		Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", new Integer(10000));
 //		cms.createComponent(null, "jadex/micro/benchmarks/ParallelAgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
@@ -100,5 +99,18 @@ public class MicroCreationTest// extends TestCase
 		{
 			// Platform autoshutdown already finished.			
 		}
+		
+		sus	= null;
+		platform	= null;
+		cms	= null;
+		fut	= null;
+		
+//		try
+//		{
+//			Thread.sleep(3000000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
 	}
 }

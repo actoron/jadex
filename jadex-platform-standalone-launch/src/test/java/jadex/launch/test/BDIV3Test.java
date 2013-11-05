@@ -47,10 +47,6 @@ public class BDIV3Test	extends	ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
-//				// GUI problems: AWT not released.
-//				"examples\\garbagecollector",
-//				"examples\\marsworld",
-			
 				"ComponentPlanAgent",	// sub agent
 				"Carry",	// sub agent
 				"Producer",	// sub agent

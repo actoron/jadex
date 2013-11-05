@@ -175,7 +175,10 @@ public abstract class RemoteChangeListenerHandler
 		{
 			final IExternalAccess	access	= instance.getExternalAccess();
 			if(timer==null)
+			{
+//				System.out.println("new timer: "+this);
 				timer	= new Timer(true);
+			}
 			
 			started	= true;
 			timer.schedule(new TimerTask()
@@ -329,6 +332,10 @@ public abstract class RemoteChangeListenerHandler
 	protected void	dispose()
 	{
 		if(timer!=null)
-			timer.cancel();		
+		{
+//			System.out.println("cancel timer: "+this);
+			timer.cancel();
+			timer	= null;
+		}
 	}
 }

@@ -6,6 +6,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.awt.BorderLayout;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Timer;
@@ -88,6 +89,35 @@ public class Cleanup extends TestCase
 		platform	= null;
 		timer	= null;
 		
+		clearAWT();
+		
+//		try
+//		{
+//			Thread.sleep(3000000);
+//		}
+//		catch(InterruptedException e)
+//		{
+//		}
+	}
+
+	public String getName()
+	{
+		return this.toString();
+	}
+	
+	/**
+	 *  Get a string representation of this test.
+	 */
+	public String toString()
+	{
+		return "Cleanup";
+	}
+	
+	/**
+	 *  Workaround for AWT/Swing memory leaks.
+	 */
+	public static void	clearAWT()
+	{
 		// Java Bug not releasing the last focused window, see:
 		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
 		// http://bugs.sun.com/view_bug.do?bug_id=4726458
@@ -98,20 +128,36 @@ public class Cleanup extends TestCase
 		{
 			public void run()
 			{
-//				KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
-				
-				final JFrame f	= new JFrame("dummy");
-				f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
-				f.setSize(100, 100);
-				f.setVisible(true);
-				
-				javax.swing.Timer	t	= new javax.swing.Timer(500, new ActionListener()
+				javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-//						System.out.println("cleanup dispose");
-						f.dispose();
-						disposed.setResult(null);
+						final JFrame f	= new JFrame("dummy");
+						f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
+						f.setSize(100, 100);
+						f.setVisible(true);
+						
+						javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								f.dispose();
+								javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+//										System.out.println("cleanup dispose");
+										KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+										disposed.setResult(null);
+									}
+								});
+								t.setRepeats(false);
+								t.start();
+
+							}
+						});
+						t.setRepeats(false);
+						t.start();
 					}
 				});
 				t.setRepeats(false);
@@ -136,18 +182,5 @@ public class Cleanup extends TestCase
 //			e.printStackTrace();
 //		}
 
-	}
-
-	public String getName()
-	{
-		return this.toString();
-	}
-	
-	/**
-	 *  Get a string representation of this test.
-	 */
-	public String toString()
-	{
-		return "Cleanup";
 	}
 }

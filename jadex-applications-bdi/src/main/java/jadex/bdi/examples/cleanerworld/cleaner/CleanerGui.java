@@ -1,11 +1,11 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
@@ -19,6 +19,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 
@@ -50,39 +51,7 @@ public class CleanerGui	extends JFrame
 			}
 		});		
 		
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("disp")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//				bia.addComponentListener(new TerminationAdapter()
-//				{
-//					public void componentTerminated()
-//					{
-//						SwingUtilities.invokeLater(new Runnable()
-//						{
-//							public void run()
-//							{
-//								dispose();
-//							}
-//						});
-//					}
-//				});
-				
-				bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
-					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
-				{
-					public void intermediateResultAvailable(IMonitoringEvent result)
-					{
-						dispose();
-					}
-				}));
-				return IFuture.DONE;
-			}
-		});
-		
-		Timer	timer	= new Timer(50, new ActionListener()
+		final Timer	timer	= new Timer(50, new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -91,5 +60,40 @@ public class CleanerGui	extends JFrame
 			}
 		});
 		timer.start();
+		
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("disp")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
+				{
+					public void intermediateResultAvailable(IMonitoringEvent result)
+					{
+						timer.stop();
+						dispose();
+					}
+				}));
+				return IFuture.DONE;
+			}
+		}).addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						timer.stop();
+						dispose();
+					}
+				});
+			}
+		});
 	}		
 }

@@ -1,6 +1,5 @@
 package jadex.bridge;
 
-import java.util.Date;
 
 /**
  *  Interface for component identifiers.

@@ -22,7 +22,7 @@ import java.util.TimerTask;
  *  
  *  Subclasses may override
  *  entryDeleted(DiscoveryEntry entry)
- *  to perform actions whenever an etry
+ *  to perform actions whenever an entry
  *  was deleted.
  */
 public class LeaseTimeHandler
@@ -179,7 +179,9 @@ public class LeaseTimeHandler
 //		waitFor(delay, step);
 		
 		if(timer==null)
+		{
 			timer	= new Timer(true);
+		}
 		
 		timer.schedule(new TimerTask()
 		{
@@ -211,5 +213,17 @@ public class LeaseTimeHandler
 	 */
 	public void entryDeleted(DiscoveryEntry entry)
 	{
+	}
+
+	/**
+	 *  Release all resources.
+	 */
+	public void dispose()
+	{
+		if(timer!=null)
+		{
+			timer.cancel();
+			timer	= null;
+		}
 	}
 }

@@ -32,9 +32,6 @@ public class BDITest	extends	ComponentTestSuite
 			// Exclude failing tests to allow maven build.
 			new String[]
 			{
-//				// GUI problems: AWT not released.
-//				"examples",
-			
 				"BeliefSetChanges",
 				"BeliefSetContains",
 				"MultiplePlanTriggers",
@@ -43,8 +40,8 @@ public class BDITest	extends	ComponentTestSuite
 				// Agents not to be started in isolation
 				"Worker",
 				"GarbageBurner",
-				"GarbageCollector",
-				"Cleaner",
+				"GarbageCollector.agent",
+				"Cleaner.agent",
 				"Truck",
 				"Ambulance",
 				"FireBrigade",
@@ -57,6 +54,7 @@ public class BDITest	extends	ComponentTestSuite
 				"RemoteObserver",
 				"Carry",
 				"Producer",
+				"Production",
 				"Sentry",
 				"ShutdownPlatform",
 //				"ServiceCallReasoning",

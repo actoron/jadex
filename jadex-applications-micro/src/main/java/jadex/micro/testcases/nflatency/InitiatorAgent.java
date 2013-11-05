@@ -142,7 +142,7 @@ public class InitiatorAgent extends TestAgent
 							}
 							public void exceptionOccurred(Exception exception)
 							{
-								ret.setException(exception);
+								ret.setExceptionIfUndone(exception);
 							}
 						});
 					}
@@ -176,8 +176,7 @@ public class InitiatorAgent extends TestAgent
 		
 		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
-		
-//		System.out.println("root: "+root+" "+SUtil.arrayToString(root.getAddresses()));
+
 		createComponent(ProviderAgent.class.getName()+".class", root, reslis)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 		{
@@ -256,6 +255,7 @@ public class InitiatorAgent extends TestAgent
 						try
 						{
 							MethodInfo mi = new MethodInfo(ITestService.class.getMethod("methodA", new Class[]{long.class}));
+							System.out.println("service: "+ts);
 							INFMixedPropertyProvider pp = ((INFRPropertyProvider)ts).getRequiredServicePropertyProvider().get();
 							Long lat = (Long)pp.getMethodNFPropertyValue(mi, LatencyProperty.NAME).get();
 							System.out.println("latency: "+lat);

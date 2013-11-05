@@ -16,6 +16,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -72,21 +73,13 @@ public abstract class TestAgent
 	public IFuture<Void>	cleanup()
 	{
 		final Future<Void>	ret	= new Future<Void>();
+		IResultListener<Map<String, Object>>	crl	= new CounterResultListener<Map<String, Object>>(platforms.size(), new DelegationResultListener<Void>(ret));
 		
 		for(IExternalAccess platform: platforms)
 		{
-			platform.killComponent();
+			platform.killComponent().addResultListener(crl);
 		}
-		
-		// Give platforms time to terminate.
-		agent.waitForDelay(100, new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				ret.setResult(null);
-				return IFuture.DONE;
-			}
-		});
+		platforms	= null;
 		
 		return ret;
 	}

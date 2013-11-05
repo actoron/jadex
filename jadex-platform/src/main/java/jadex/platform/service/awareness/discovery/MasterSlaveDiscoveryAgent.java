@@ -1,7 +1,11 @@
 package jadex.platform.service.awareness.discovery;
 
 
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.
@@ -88,7 +92,22 @@ public abstract class MasterSlaveDiscoveryAgent extends DiscoveryAgent
 	 *  Get the local master id.
 	 */
 	protected abstract String getMyMasterId();
-	
+
+	@AgentKilled
+	public IFuture<Void> agentKilled()
+	{
+		Future<Void>	ret	= new Future<Void>();
+		super.agentKilled().addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				locals.dispose();
+				remotes.dispose();
+				super.customResultAvailable(result);
+			}
+		});
+		return ret;
+	}
 }
 
 

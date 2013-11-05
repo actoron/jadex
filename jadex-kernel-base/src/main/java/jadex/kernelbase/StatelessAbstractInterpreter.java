@@ -2107,6 +2107,11 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 					{
 						scheduleStep(step).addResultListener(createResultListener(new DelegationResultListener<T>(ret)));
 					}
+					
+					public String toString()
+					{
+						return "waitForDelay[Step]("+getComponentIdentifier()+")";
+					}
 				});
 			}
 		}));
@@ -2138,6 +2143,11 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 								return IFuture.DONE;
 							}
 						});
+					}
+					
+					public String toString()
+					{
+						return "waitForDelay("+getComponentIdentifier()+")";
 					}
 				});
 			}

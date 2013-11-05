@@ -87,6 +87,14 @@ public class Environment
 		return instance;
 	}
 
+	/**
+	 *  Clear the singleton instance.
+	 */
+	public static void clearInstance()
+	{
+		instance = null;
+	}
+
 	//-------- methods --------
 
 	/**

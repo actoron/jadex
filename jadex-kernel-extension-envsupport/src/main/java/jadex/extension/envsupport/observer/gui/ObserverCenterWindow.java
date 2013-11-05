@@ -254,6 +254,7 @@ public class ObserverCenterWindow extends JFrame
 	 */
 	public void dispose()
 	{
+//		System.out.println("observer dispose");
 		disposed = true;
 		super.dispose();
 	}

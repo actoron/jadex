@@ -216,7 +216,9 @@ public abstract class DiscoveryAgent
 		
 		if(timer!=null)
 		{
+//			System.out.println("cancel timer: "+this);
 			timer.cancel();
+			timer	= null;
 		}
 		
 		if(sender!=null)
@@ -423,7 +425,10 @@ public abstract class DiscoveryAgent
 //		waitFor(delay, step);
 		
 		if(timer==null)
+		{
+//			System.out.println("new timer: "+this);
 			timer	= new Timer(true);
+		}
 		
 		timer.schedule(new TimerTask()
 		{

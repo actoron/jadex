@@ -3,7 +3,6 @@ package jadex.bridge;
 import jadex.commons.SUtil;
 
 import java.io.Serializable;
-import java.util.Date;
 
 
 /**

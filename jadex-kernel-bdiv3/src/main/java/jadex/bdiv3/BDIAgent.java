@@ -430,13 +430,13 @@ public class BDIAgent extends MicroAgent
 			}
 			synchronized(initwrites)
 			{
-				List<Object[]> inits = initwrites.get(obj);
+				List<Object[]> inits = initwrites.get(agent);
 				if(inits==null)
 				{
 					inits = new ArrayList<Object[]>();
-					initwrites.put(obj, inits);
+					initwrites.put(agent, inits);
 				}
-				inits.add(new Object[]{val, belname, obj});	
+				inits.add(new Object[]{val, belname});
 			}
 		}
 	}
@@ -447,13 +447,11 @@ public class BDIAgent extends MicroAgent
 	/**
 	 * 
 	 */
-	public static void performInitWrites(final BDIAgent agent)
+	public static void performInitWrites(BDIAgent agent)
 	{
-		Object pojo = ((IPojoMicroAgent)agent).getPojoAgent();
-
 		synchronized(initwrites)
 		{
-			List<Object[]> writes = initwrites.remove(pojo);
+			List<Object[]> writes = initwrites.remove(agent);
 			if(writes!=null)
 			{
 				for(Object[] write: writes)

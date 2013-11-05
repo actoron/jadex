@@ -1,5 +1,6 @@
-package jadex.bdi.examples.garbagecollector_classic;
+package jadex.bdi.examples.cleanerworld_classic.environment;
 
+import jadex.bdi.examples.cleanerworld_classic.Environment;
 import jadex.bdi.runtime.Plan;
 
 /**

@@ -18,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  *  The board gui.
@@ -77,7 +78,14 @@ public class BoardGui extends JFrame
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				BoardGui.this.dispose();
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+//						System.out.println("boardgui dispose2: "+Thread.currentThread());
+						BoardGui.this.dispose();
+					}
+				});
 			}
 			public void resultAvailable(Void result)
 			{

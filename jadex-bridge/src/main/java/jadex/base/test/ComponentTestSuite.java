@@ -165,7 +165,7 @@ public class ComponentTestSuite extends TestSuite
 		}
 		
 		// Scan for test cases.
-//		System.out.println("Scanning for testcases: "+path);
+		System.out.println("Scanning for testcases: "+path);
 		List<String> scanForTestCases = scanForTestCases(root, path);
 		for (String abspath : scanForTestCases)
 		{	

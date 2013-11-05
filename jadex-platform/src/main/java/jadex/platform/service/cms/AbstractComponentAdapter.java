@@ -21,6 +21,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
@@ -116,6 +117,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 
 	/** The cached clock service. */
 	protected IClockService clock;
+	
+	/** Retained listener notifications when switching threads due to blocking. */
+	List<Tuple2<Future<?>, IResultListener<?>>>	notifications;
 	
 	//-------- constructors --------
 
@@ -613,28 +617,58 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			
 			ClassLoader	cl	= Thread.currentThread().getContextClassLoader();
 			Thread.currentThread().setContextClassLoader(component.getClassLoader());
+			
+			// Process listener notifications from old component thread.
+			boolean notifexecuted	= false;
+			if(notifications!=null)
+			{
+				FutureHelper.addStackedListeners(notifications);
+//				System.out.println("readded stack size: "+notifications.size()+", "+getComponentIdentifier());
+				notifications	= null;
+				
+				try
+				{
+					FutureHelper.notifyStackedListeners();
+					notifexecuted	= true;
+				}
+				catch(Exception e)
+				{
+					fatalError(e);
+				}
+				catch(StepAborted sa)
+				{
+				}
+				catch(Throwable t)
+				{
+					fatalError(new RuntimeException(t));
+				}
+
+			}
 	
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
 			boolean extexecuted	= false;
-			try
+			if(!notifexecuted)
 			{
-//				if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
-//					System.out.println("Ext Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
-				extexecuted	= executeExternalEntries(false);
-//				if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
-//					System.out.println("Ext Not Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
-			}
-			catch(Exception e)
-			{
-				fatalError(e);
-			}
-			catch(StepAborted sa)
-			{
-			}
-			catch(Throwable t)
-			{
-				fatalError(new RuntimeException(t));
+				try
+				{
+	//				if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+	//					System.out.println("Ext Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
+					extexecuted	= executeExternalEntries(false);
+	//				if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
+	//					System.out.println("Ext Not Executing: "+getComponentIdentifier()+", "+Thread.currentThread());
+				}
+				catch(Exception e)
+				{
+					fatalError(e);
+				}
+				catch(StepAborted sa)
+				{
+				}
+				catch(Throwable t)
+				{
+					fatalError(new RuntimeException(t));
+				}
 			}
 				
 			// Suspend when breakpoint is triggered.
@@ -663,7 +697,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				}
 			}
 			boolean	again	= false;
-			if(!breakpoint_triggered && !extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
+			if(!breakpoint_triggered && !extexecuted  && !notifexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
 			{
 				try
 				{
@@ -730,7 +764,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			if(getComponentIdentifier()!=null && getComponentIdentifier().getParent()==null)
 //				System.out.println("Set to null: "+getComponentIdentifier()+", "+Thread.currentThread());
 			
-			ret	= (again && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState())) || extexecuted;
+			ret	= (again && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState())) || extexecuted || notifexecuted;
 		}
 		else
 		{
@@ -746,7 +780,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			System.out.println("Leave: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 //		}
 		
-//		System.out.println("Again: "+getComponentIdentifier()+", "+ret+", "+Thread.currentThread());
+//		if(getComponentIdentifier().getName()!=getComponentIdentifier().getPlatformName() && Future.STACK.get()!=null && Future.STACK.get()!=null)
+//		{
+//			System.out.println("Again: "+getComponentIdentifier()+", "+ret+", "+Thread.currentThread()+", "+Future.STACK.get());
+//		}
 		
 		return ret;
 	}
@@ -762,8 +799,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			throw new RuntimeException("Can only block current component thread: "+componentthread+", "+Thread.currentThread());
 		}
 		
-		// Notify remaining listeners on this thread.
-		FutureHelper.notifyStackedListeners();
+		// Retain listener notifications for new component thread.
+		assert notifications==null;
+		notifications	= FutureHelper.removeStackedListeners();
+//		System.out.println("removed stack size: "+notifications.size()+", "+getComponentIdentifier());
 		
 		Executor	exe	= Executor.EXECUTOR.get();
 		if(exe==null)
@@ -789,12 +828,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		blocked.add(monitor);
 		
 		exe.blockThread(monitor);
-		
-		blocked.remove(monitor);
-		if(blocked.isEmpty())
-		{
-			blocked	= null;
-		}
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
@@ -835,6 +868,12 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		if(exe==null)
 		{
 			throw new RuntimeException("Cannot unblock: no executor");
+		}
+		
+		blocked.remove(monitor);
+		if(blocked.isEmpty())
+		{
+			blocked	= null;
 		}
 		
 		exe.switchThread(monitor);
@@ -1095,6 +1134,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	protected void	cleanup()
 	{
+//		if(toString().indexOf("Tester@")!=-1)
+//		{
+//			System.err.println("cleanup: "+this+", "+(blocked!=null?blocked.size():0));
+//		}
 		if(blocked!=null)
 		{
 //			System.out.println("blocked: "+this+", "+blocked.size());

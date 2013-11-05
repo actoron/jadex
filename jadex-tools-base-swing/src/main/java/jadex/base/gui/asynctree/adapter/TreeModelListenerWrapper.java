@@ -1,9 +1,9 @@
 package jadex.base.gui.asynctree.adapter;
 
+import jadex.base.gui.asynctree.AsyncTreeModelEvent;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import jadex.base.gui.asynctree.AsyncTreeModelEvent;
 
 import javax.swing.event.TreeModelListener;
 
@@ -12,41 +12,53 @@ import javax.swing.event.TreeModelListener;
  */
 public class TreeModelListenerWrapper implements jadex.base.gui.asynctree.TreeModelListener
 {
-
-	private static Map<javax.swing.event.TreeModelListener, TreeModelListenerWrapper> adapters;
+//	private static Map<javax.swing.event.TreeModelListener, TreeModelListenerWrapper> adapters;
 	private javax.swing.event.TreeModelListener swingListener;
 
-	static {
-		adapters = new HashMap<TreeModelListener, TreeModelListenerWrapper>();
-	}
+//	static
+//	{
+//		adapters = new HashMap<TreeModelListener, TreeModelListenerWrapper>();
+//	}
 	
 	private TreeModelListenerWrapper(javax.swing.event.TreeModelListener swingListener)
 	{
 		this.swingListener = swingListener;
 	}
 
-	@Override
 	public void treeStructureChanged(AsyncTreeModelEvent treeModelEvent)
 	{
 		swingListener.treeStructureChanged(new TreeModelEventWrapper(treeModelEvent));
 	}
 
-	@Override
 	public void treeNodesChanged(AsyncTreeModelEvent treeModelEvent)
 	{
 		swingListener.treeNodesChanged(new TreeModelEventWrapper(treeModelEvent));
 	}
 
-	@Override
 	public void treeNodesRemoved(AsyncTreeModelEvent treeModelEvent)
 	{
 		swingListener.treeNodesRemoved(new TreeModelEventWrapper(treeModelEvent));
 	}
 
-	@Override
 	public void treeNodesInserted(AsyncTreeModelEvent treeModelEvent)
 	{
 		swingListener.treeNodesInserted(new TreeModelEventWrapper(treeModelEvent));
+	}
+	
+	/**
+	 *  Overridden such that a new wrapper for the same listener can be used to remove an old wrapper. 
+	 */
+	public int hashCode()
+	{
+		return 31 + swingListener.hashCode();
+	}
+	
+	/**
+	 *  Overridden such that a new wrapper for the same listener can be used to remove an old wrapper. 
+	 */
+	public boolean equals(Object o)
+	{
+		return o instanceof TreeModelListenerWrapper && ((TreeModelListenerWrapper)o).swingListener.equals(swingListener);
 	}
 
 	/**
@@ -58,22 +70,22 @@ public class TreeModelListenerWrapper implements jadex.base.gui.asynctree.TreeMo
 	 */
 	public static TreeModelListenerWrapper getWrapperFor(javax.swing.event.TreeModelListener swingListener)
 	{
-		TreeModelListenerWrapper result = adapters.get(swingListener);
-		if (result == null)
-		{
-			result = new TreeModelListenerWrapper(swingListener);
-			adapters.put(swingListener, result);
-		}
-		return result;
+		return  new TreeModelListenerWrapper(swingListener);
+//		TreeModelListenerWrapper result = adapters.get(swingListener);
+//		if (result == null)
+//		{
+//			result = new TreeModelListenerWrapper(swingListener);
+//			adapters.put(swingListener, result);
+//		}
+//		return result;
 	}
 
-	/**
-	 * Deletes a wrapped Object from cache.
-	 * @param swingListener
-	 */
-	public static void deleteWrapperFor(javax.swing.event.TreeModelListener swingListener)
-	{
-		adapters.remove(swingListener);
-	}
-
+//	/**
+//	 * Deletes a wrapped Object from cache.
+//	 * @param swingListener
+//	 */
+//	public static void deleteWrapperFor(javax.swing.event.TreeModelListener swingListener)
+//	{
+//		adapters.remove(swingListener);
+//	}
 }
