@@ -66,6 +66,9 @@ import java.util.jar.JarFile;
 
 /**
  *  Kernel that delegates calls to sub-kernels it finds using on-demand searches.
+ *  
+ *  NOTE: This is extremely complex code. Do not touch unless you really, REALLY
+ *        know what you are doing.
  */
 @Service
 public class MultiFactory implements IComponentFactory, IMultiKernelNotifierService
