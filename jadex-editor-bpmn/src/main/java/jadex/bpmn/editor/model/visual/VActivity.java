@@ -145,7 +145,7 @@ public class VActivity extends VNamedNode
 				if (mactivity.isEventHandler())
 				{
 					MActivity mparent = (MActivity) ((VActivity) parent).getBpmnElement();
-					if(!mparent.getEventHandlers().contains(mactivity))
+					if(mparent.getEventHandlers() == null || !mparent.getEventHandlers().contains(mactivity))
 						mparent.addEventHandler(mactivity);
 					mactivity.setPool(mparent.getPool());
 					mactivity.setLane(mactivity.getLane());
@@ -153,7 +153,7 @@ public class VActivity extends VNamedNode
 				else if (parent instanceof VLane)
 				{
 					MLane mlane = ((MLane) ((VLane) parent).getBpmnElement());
-					if(!mlane.getActivities().contains(mactivity))
+					if(mlane.getActivities() == null || !mlane.getActivities().contains(mactivity))
 						mlane.addActivity(mactivity);
 					mactivity.setLane((MLane) ((VLane) parent).getBpmnElement());
 					mactivity.setPool((MPool) ((VLane) parent).getPool().getBpmnElement());
@@ -161,7 +161,7 @@ public class VActivity extends VNamedNode
 				else if (parent instanceof VSubProcess)
 				{
 					MSubProcess msp = ((MSubProcess) ((VSubProcess) parent).getBpmnElement());
-					if(!msp.getActivities().contains(mactivity))
+					if(msp.getActivities() == null || !msp.getActivities().contains(mactivity))
 						msp.addActivity(mactivity);
 					mactivity.setPool(msp.getPool());
 					mactivity.setLane(msp.getLane());
@@ -169,7 +169,7 @@ public class VActivity extends VNamedNode
 				else
 				{
 					MPool mp = ((MPool) ((VPool) parent).getBpmnElement());
-					if(!mp.getActivities().contains(mactivity))
+					if(mp.getActivities() == null || !mp.getActivities().contains(mactivity))
 						mp.addActivity(mactivity);
 					mactivity.setPool((MPool) ((VPool) parent).getBpmnElement());
 				}
