@@ -43,6 +43,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.SGUI;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,10 +62,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import jadex.commons.gui.SGUI;
 
 
 /**
@@ -82,6 +79,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	
 	/** Kernel default locations */
 	protected Map kerneldefaultlocations;
+	
 	
 	/** Cache of known factories */
 	protected Map factorycache;
@@ -162,14 +160,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		this.baseextensionblacklist = new HashSet();
 		if (extensionblacklist != null)
 			Arrays.asList(extensionblacklist);
-		this.baseextensionblacklist.add(null);
+//		this.baseextensionblacklist.add(null);
 		
-		kerneldefaultlocations = new HashMap();
+		kerneldefaultlocations = new MultiCollection();
 		if(defaultLocations != null)
 		{
 			for (int i = 0; i < defaultLocations.length; ++i)
 			{
-				kerneldefaultlocations.put(defaultLocations[i], null);
+				kerneldefaultlocations.put(null, defaultLocations[i]);
 			}
 		}
 		
@@ -273,7 +271,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						else
 						{
 							// Initialize default locations
-							String[] dl = (String[])kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
+//							String[] dl = (String[])kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
+							String[] dl = kerneldefaultlocations.get(null) == null? new String[0] : (String[]) ((Collection) kerneldefaultlocations.get(null)).toArray(new String[kerneldefaultlocations.size()]);
 							kerneldefaultlocations.clear();
 							IResultListener loccounter = ia.createResultListener(new CounterResultListener(dl.length, ia.createResultListener(new DelegationResultListener(ret)
 							{
@@ -412,6 +411,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid, boolean isrecur)
 	{
+//		System.out.println("loadModel2: "+model);
+		
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
 		findKernel(model, imports, rid, isrecur).addResultListener(ia.createResultListener(ia.createResultListener(new IResultListener()
@@ -429,6 +430,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				ret.setException(exception);
 			}
 		})));
+		
 		return ret;
 	}
 
@@ -586,7 +588,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 //		System.out.println("createComponentInstance: "+model.getName());
 		
-		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
+//		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
+		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model.getFilename(), factorycache);
 		if(fac != null)
 			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, resultlistener, ret);
 		
@@ -677,14 +680,18 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findKernel(final String model, final String[] imports, final IResourceIdentifier rid, final boolean isrecur)
 	{
-		final String ext = getModelExtension(model);
-		if(extensionblacklist.contains(ext))
+//		final String ext = getModelExtension(model);
+//		System.out.println("EXT: " + ext);
+//		if(extensionblacklist.contains(ext))
+//			return IFuture.DONE;
+		if (isInExtensionBlacklist(model, extensionblacklist))
 			return IFuture.DONE;
 		
 //		if(model.toString().indexOf("agent")!=-1)
 //			System.out.println("findKernel: "+model);
 		
-		IComponentFactory fac = (IComponentFactory)factorycache.get(ext);
+//		IComponentFactory fac = (IComponentFactory)factorycache.get(ext);
+		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model, factorycache);
 		if(fac != null)
 			return new Future(fac);
 		
@@ -711,8 +718,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 								ret.setResult(result);
 							else
 							{
-								if (!isrecur)
-									extensionblacklist.add(ext);
+								// FIXME: Blacklist? What if a new factory model is added later?
+//								if (!isrecur)
+//									extensionblacklist.add(ext);
 								ret.setResult(null);
 							}
 						}
@@ -723,8 +731,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			public void exceptionOccurred(Exception exception)
 			{
 				// Give warning?
-				if(!isrecur)
-					extensionblacklist.add(ext);
+				// FIXME: Blacklist? What if a new factory model is added later?
+//				if(!isrecur)
+//					extensionblacklist.add(ext);
 				resultAvailable(null);
 			}
 		}));
@@ -770,6 +779,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				for (Iterator it = factories.iterator(); it.hasNext(); )
 				{
 					final IComponentFactory factory = (IComponentFactory)it.next();
+//					System.out.println("Trying isloadable :" + factory + " for " + model);
 					factory.isLoadable(model, imports, rid).addResultListener(ia.createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
@@ -806,7 +816,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //			System.out.println("findLoadableKernel: "+model);
 		
 		IFuture	ret;
-		String dl = (String) kerneldefaultlocations.get(getModelExtension(model));
+//		String dl = (String) kerneldefaultlocations.get(getModelExtension(model));
+		String dl = (String) getCacheResultForModel(model, kerneldefaultlocations);
 		if (dl != null)
 			ret	= startLoadableKernel(model, imports, rid, dl);
 		else
@@ -830,9 +841,12 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //			System.out.println("findKernelInCache0: "+model);
 		final Future ret = new Future();
 		
-		Collection kernels = kernellocationcache.getCollection(getModelExtension(model));
+//		Collection kernels = kernellocationcache.getCollection(getModelExtension(model));
+		Tuple2<Object, Object> cachedkernels = getCacheKeyValueForModel(model, kernellocationcache);
+		final Object kernelsext = cachedkernels != null? cachedkernels.getFirstEntity(): null;
+		Collection kernels = cachedkernels != null? (Collection) cachedkernels.getSecondEntity() : null;
 		String cachedresult = null;
-		if(!kernels.isEmpty())
+		if(kernels != null && !kernels.isEmpty())
 			cachedresult = (String) kernels.iterator().next();
 		
 		if(cachedresult != null)
@@ -845,7 +859,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					kernellocationcache.remove(getModelExtension(model), kernelmodel);
+					kernellocationcache.remove(kernelsext, kernelmodel);
 					findKernelInCache(model, imports, rid, isrecur)
 						.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 				}
@@ -1143,16 +1157,37 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				if (obj instanceof String)
 				{
 					String loc = (String) obj;
-					if (prefilter.filter(obj) &&
-					    !baseextensionblacklist.contains(getModelExtension(loc)) &&
-					    //((String) obj).endsWith("component.xml") &&
-					    !kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1))) 
+
+					for (Object oblstr : baseextensionblacklist)
+					{
+						String blstr = (String) oblstr;
+						
+						if (loc.endsWith(blstr))
+						{
+							return false;
+						}
+					}
+					
+					for (Object oblstr : kernelblacklist)
+					{
+						//!kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1))
+						String blstr = (String) oblstr;
+						
+						if (loc.endsWith(blstr))
+						{
+							return false;
+						}
+					}
+					
+					if (!isInExtensionBlacklist(obj, baseextensionblacklist) &&
+						!kernelblacklist.contains(loc.substring(loc.lastIndexOf(File.separatorChar) + 1)) &&
+						prefilter.filter(obj)) 
 					{
 //							System.out.println("Found kernel: " + loc);
 							return true;
 					}
 				}
-				//System.out.println("Decided it's not a kernel: " + obj);
+//				System.out.println("Decided it's not a kernel: " + obj);
 				return false;
 			}
 		});
@@ -1238,6 +1273,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				
 				public void exceptionOccurred(Exception exception)
 				{
+//					System.out.println("Tried to load model for kernel: " + kernelloc + " but failed. ");
 					resultAvailable(null);
 				}
 			}));
@@ -1393,48 +1429,116 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  @param model The model.
 	 *  @return The file extension, special case for .class files.
 	 */
-	protected String getModelExtension(String model)
+//	protected String getModelExtension(String model)
+//	{
+////		int lastpoint = Math.max(Math.max(0, model.lastIndexOf(File.separatorChar)), model.lastIndexOf(this.packageseparator));
+////		lastpoint = model.indexOf('.', lastpoint);
+//		int lastpoint = model.lastIndexOf('.');
+//		
+//		if (lastpoint < 0 || lastpoint == (model.length() - 1))
+//			return null;
+//		
+//		String ext = model.substring(lastpoint + 1);
+//		
+//		// Hack! todo: fix me
+//		if(ext.equals("class"))
+//		{
+//			if(model.endsWith("Agent.class"))
+//			{
+//				ext = "Agent.class";
+//			}
+//			else if(model.endsWith("BDI.class"))
+//			{
+//				ext = "BDI.class";
+//			}
+//			else
+//			{
+//				return null;
+//			}
+//		}
+//		
+//		if (ext.equals("xml")) {
+//			if(model.endsWith("component.xml")) 
+//			{
+//				ext = "component.xml";
+//			}
+//			else if(model.endsWith("application.xml")) {
+//				ext = "application.xml";
+//			}
+//			else
+//			{
+//				return null;
+//			}
+//		}
+//		
+//		return ext;
+//	}
+	
+	/**
+	 *  Checks if a model matches an extension blacklist.
+	 */
+	protected boolean isInExtensionBlacklist(Object model, Set blacklist)
 	{
-		int lastpoint = Math.max(Math.max(0, model.lastIndexOf(File.separatorChar)), model.lastIndexOf(this.packageseparator));
-		lastpoint = model.indexOf('.', lastpoint);
-		
-		if (lastpoint < 0 || lastpoint == (model.length() - 1))
-			return null;
-		
-		String ext = model.substring(lastpoint + 1);
-		
-		// Hack! todo: fix me
-		if(ext.equals("class"))
+//		if (model instanceof String)
+//		{
+//			if (((String) model).indexOf('.') == -1)
+//			{
+//				return true;
+//			}
+//			
+//			for (Object oblstr : blacklist)
+//			{
+//				String blstr = (String) oblstr;
+//				
+//				if (((String) model).endsWith(blstr))
+//				{
+//					return true;
+//				}
+//			}
+//		}
+		return false;
+	}
+	
+	/**
+	 *  Gets result for a cached object based on model name.
+	 *  
+	 *  @param model The model.
+	 *  @param map The cache.
+	 *  @return A cache hit or null.
+	 */
+	protected Object getCacheResultForModel(String model, Map map)
+	{
+		Tuple2<Object, Object> ret = getCacheKeyValueForModel(model, map);
+		return ret != null? ret.getSecondEntity() : null;
+	}
+	
+	/**
+	 *  Gets key/value for a cached object based on model name.
+	 *  
+	 *  @param model The model.
+	 *  @param map The cache.
+	 *  @return A cache hit or null.
+	 */
+	protected Tuple2<Object, Object> getCacheKeyValueForModel(String model, Map map)
+	{
+		Tuple2<Object, Object> ret = null;
+
+		if (model != null && map != null)
 		{
-			if(model.endsWith("Agent.class"))
+			for (Object oentry : map.entrySet())
 			{
-				ext = "Agent.class";
-			}
-			else if(model.endsWith("BDI.class"))
-			{
-				ext = "BDI.class";
-			}
-			else
-			{
-				return null;
+				Map.Entry entry = (Map.Entry) oentry;
+				String ext = (String) entry.getKey();
+				if (model.endsWith(ext))
+				{
+					ret = new Tuple2<Object, Object>(entry.getKey(), entry.getValue());
+					
+					break;
+				}
 			}
 		}
 		
-		if (ext.equals("xml")) {
-			if(model.endsWith("component.xml")) 
-			{
-				ext = "component.xml";
-			}
-			else if(model.endsWith("application.xml")) {
-				ext = "application.xml";
-			}
-			else
-			{
-				return null;
-			}
-		}
-		
-		return ext;
+		return ret;
 	}
 	
 	public int hashCode()
