@@ -1138,13 +1138,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		{
 //			System.err.println("cleanup: "+this+", "+(blocked!=null?blocked.size():0));
 //		}
-		if(blocked!=null)
+		while(blocked!=null && !blocked.isEmpty())
 		{
-//			System.out.println("blocked: "+this+", "+blocked.size());
-			for(Object monitor: blocked)
-			{
-				unblock(monitor);
-			}
+			unblock(blocked.iterator().next());
 		}
 	}
 }

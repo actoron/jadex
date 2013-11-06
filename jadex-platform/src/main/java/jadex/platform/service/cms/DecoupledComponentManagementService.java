@@ -379,7 +379,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		{
 			// Check if parent is killing itself -> no new child component, exception
 			if(cfs.containsKey(cinfo.getParent()))
-				return new Future<IComponentIdentifier>(new ComponentTerminatedException("Parent is killing itself. Child component creation no allowed."));
+				return new Future<IComponentIdentifier>(new ComponentTerminatedException(cinfo.getParent() ,"Parent is killing itself. Child component creation no allowed."));
 			
 			// Lock the parent while creating
 			final String lockkey = SUtil.createUniqueId("lock");
