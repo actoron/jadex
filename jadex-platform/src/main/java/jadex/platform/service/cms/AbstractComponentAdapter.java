@@ -1028,7 +1028,23 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 		}
 
-		wakeup();
+		try
+		{
+			wakeup();
+		}
+		catch(ComponentTerminatedException cte)
+		{
+			// If wakeup doesn't work -> remove action as it gets executed on rescue thread.
+			synchronized(this)
+			{
+				if(ext_entries!=null)
+				{
+					ext_entries.remove(action);
+				}
+			}
+			
+			throw cte;
+		}
 	}
 	
 	//-------- test methods --------

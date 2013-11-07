@@ -30,9 +30,7 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 	 */
 	public DefaultResultListener()
 	{
-		this.logger = Logger.getLogger("default-result-listener");
-		if(Future.DEBUG)
-			exception = new DebugException();
+		this(null);
 	}
 	
 	/**
@@ -45,6 +43,10 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 		if(logger==null)
 		{
 			this.logger = Logger.getLogger("default-result-listener");
+		}
+		if(Future.DEBUG)
+		{
+			exception = new DebugException();
 		}
 	}
 	

@@ -259,6 +259,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 					
 					if(service!=null)
 					{
+						final IInternalService fservice = service;
 						// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
 	//					if(!terminated)
 	//					{
@@ -267,21 +268,29 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 							getLogger().info("Terminating service: "+sid);
 							
 							// Dispose nonfunc properties
-							service.shutdownNFPropertyProvider();
-							
-							final IInternalService fservice = service;
-							
-							if(service.getServiceIdentifier().toString().indexOf("ContextSer")!=-1)
-								System.out.println("hierda");
-							
-							service.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
+							service.shutdownNFPropertyProvider().addResultListener(new DelegationResultListener<Void>(ret)
 							{
 								public void customResultAvailable(Void result)
 								{
-//									if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
-//										System.out.println("Terminated service: "+sid);
-									getLogger().info("Terminated service: "+sid);
-									serviceShutdowned(fservice).addResultListener(new DelegationResultListener<Void>(ret));
+									if(fservice.getServiceIdentifier().toString().indexOf("ContextSer")!=-1)
+										System.out.println("hierda");
+									
+									fservice.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
+									{
+										public void customResultAvailable(Void result)
+										{
+//											if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
+//												System.out.println("Terminated service: "+sid);
+											getLogger().info("Terminated service: "+sid);
+											serviceShutdowned(fservice).addResultListener(new DelegationResultListener<Void>(ret));
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											exception.printStackTrace();
+											super.exceptionOccurred(exception);
+										}
+									});
 								}
 								
 								public void exceptionOccurred(Exception exception)
@@ -289,7 +298,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 									exception.printStackTrace();
 									super.exceptionOccurred(exception);
 								}
-							});
+							});							
 	//					}
 	//					else
 	//					{

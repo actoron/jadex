@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -81,6 +82,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/** The external access. */
 	protected IExternalAccess ea;	
 		
+	/** The internal access. */
+	protected IInternalAccess ia;	
+		
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
@@ -98,9 +102,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DecouplingInterceptor(IExternalAccess ea, IComponentAdapter adapter, boolean copy)
+	public DecouplingInterceptor(IInternalAccess ia, IComponentAdapter adapter, boolean copy)
 	{
-		this.ea = ea;
+		this.ia = ia;
+		this.ea	= ia.getExternalAccess();
 		this.adapter = adapter;
 		this.copy = copy;
 //		System.out.println("copy: "+copy);
@@ -250,8 +255,22 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //				System.out.println("decouple: "+Thread.currentThread());
 //			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get(), to, rt))
 //				.addResultListener(new CopyReturnValueResultListener(ret, sic, to, rt));
-			ea.scheduleStep(new InvokeMethodStep(sic))
-				.addResultListener(new CopyReturnValueResultListener(ret, sic));
+			try
+			{
+				ea.scheduleStep(new InvokeMethodStep(sic))
+					.addResultListener(new CopyReturnValueResultListener(ret, sic));
+			}
+			catch(ComponentTerminatedException cte)
+			{
+				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						new InvokeMethodStep(sic).execute(ia)
+							.addResultListener(new CopyReturnValueResultListener(ret, sic));
+					}
+				});
+			}
 		}
 		
 		return ret;

@@ -604,7 +604,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			handler.addFirstServiceInterceptor(new ValidationInterceptor());
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 			{
-				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter, copy));
+				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, copy));
 			}
 			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
 		}
