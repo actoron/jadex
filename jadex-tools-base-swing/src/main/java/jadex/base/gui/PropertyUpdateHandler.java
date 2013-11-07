@@ -26,7 +26,7 @@ public class PropertyUpdateHandler
 {
 	//-------- attributes --------
 
-	/** The local external access. */
+	/** The local external access. ggg */
 	protected IExternalAccess access;
 	
 	/** The local listeners (cid+":"+propname->commands). */
