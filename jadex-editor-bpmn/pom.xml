@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-editor-bpmn</artifactId>
 	<packaging>jar</packaging>
-	<version> 2.4-SNAPSHOT </version>
+	<version> 2.4 </version>
 	<name>jadex-editor-bpmn</name>
 	<url>http://jadex.sourceforge.net</url>
 
