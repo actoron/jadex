@@ -227,7 +227,7 @@ public class CreateComponentTask implements ITask
 				
 				// todo: rid
 				// todo: monitoring
-				PublishEventLevel elm = monitoring? PublishEventLevel.COARSE: PublishEventLevel.OFF;
+				PublishEventLevel elm = monitoring!=null && monitoring.booleanValue() ? PublishEventLevel.COARSE: PublishEventLevel.OFF;
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub? instance.getComponentIdentifier() : null, 
 						suspend, master, daemon, autoshutdown, elm, synchronous, 

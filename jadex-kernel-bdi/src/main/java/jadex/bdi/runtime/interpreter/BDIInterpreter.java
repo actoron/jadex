@@ -290,6 +290,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.realtime = realtime;
 		this.resultlistener = resultlistener;
 		this.inited = inited;
+		this.emitlevelsub	= PublishEventLevel.OFF;
 				
 		// Hack! todo:
 		interpreters.put(state, this);
