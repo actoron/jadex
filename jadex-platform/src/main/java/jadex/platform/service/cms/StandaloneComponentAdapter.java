@@ -141,7 +141,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 					}
 					catch(RuntimeException e)
 					{
-						e.printStackTrace();
+//						e.printStackTrace();
 						throw new ComponentTerminatedException(getComponentIdentifier());
 						// Happens, when execution service shutdown() is called and timer should be registered for result future, but service already terminated
 					}
@@ -156,7 +156,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 			}
 			catch(RuntimeException e)
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
 				throw new ComponentTerminatedException(getComponentIdentifier());
 				// Happens, when execution service shutdown() is called and timer should be registered for result future, but service already terminated
 			}

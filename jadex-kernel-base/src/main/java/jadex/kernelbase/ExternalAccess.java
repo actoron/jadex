@@ -13,6 +13,7 @@ import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -23,16 +24,13 @@ import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
-import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *  External access for applications.
@@ -355,81 +353,59 @@ public class ExternalAccess implements IExternalAccess
 			throw new NullPointerException("No step. Maybe decoding error?");
 		}
 		
-		boolean im = false;
+		Class<?>	type	= null;
 		try
 		{
-			Method m = step.getClass().getMethod("execute", new Class[]{IInternalAccess.class});
-			im = IIntermediateFuture.class.isAssignableFrom(m.getReturnType());
+			type	= step.getClass().getMethod("execute", new Class[]{IInternalAccess.class}).getReturnType();
 		}
-		catch(Exception e)
+		catch(NoSuchMethodException nsme)
 		{
-			e.printStackTrace();
+			nsme.printStackTrace();
 		}
 		
-		if(im)
+		final Future<T>	ret = type!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(type, new FutureFunctionality((Logger)null)) : new Future<T>();
+		
+		if(adapter.isExternalThread())
 		{
-			final IntermediateFuture ret = new IntermediateFuture();
-			if(adapter.isExternalThread())
+			try
 			{
-				try
+				adapter.invokeLater(new Runnable() 
 				{
-					adapter.invokeLater(new Runnable() 
+					public void run() 
 					{
-						public void run() 
-						{
-							interpreter.scheduleStep(step).addResultListener(new IntermediateDelegationResultListener(ret));
-						}
-					});
-				}
-				catch(final Exception e)
+						IFuture<T>	fut	= interpreter.scheduleStep(step);
+						FutureFunctionality.connectDelegationFuture(ret, fut);
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				// Allow executing steps on platform during (and after?) shutdown.
+				if(adapter.getComponentIdentifier().getParent()==null)
 				{
 					Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
 					{
 						public void run()
 						{
-							ret.setException(e);
+							IFuture<T>	fut	= step.execute(interpreter.getInternalAccess());
+							FutureFunctionality.connectDelegationFuture(ret, fut);
 						}
-					});
+					});					
+				}
+				
+				else
+				{
+					ret.setException(e);
 				}
 			}
-			else
-			{
-				interpreter.scheduleStep(step).addResultListener(new IntermediateDelegationResultListener(ret));
-			}
-			return ret;
 		}
 		else
 		{
-			final Future<T> ret = new Future<T>();
-			if(adapter.isExternalThread())
-			{
-				try
-				{
-					adapter.invokeLater(new Runnable() 
-					{
-						public void run() 
-						{
-							interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
-						}
-					});
-				}
-				catch(final Exception e)
-				{
-					Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
-					{
-						public void run()
-						{
-							ret.setException(e);
-						}
-					});
-				}
-			}
-			else
-			{
-				interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
-			}
-			return ret;
+			IFuture<T>	fut	= interpreter.scheduleStep(step);
+			FutureFunctionality.connectDelegationFuture(ret, fut);
 		}
+		
+		return ret;
 	}
 	
 	/**

@@ -34,4 +34,10 @@ public class DebugException extends RuntimeException
 		super(msg);
 		fillInStackTrace();
 	}
+	
+//	public void printStackTrace()
+//	{
+//		Thread.dumpStack();
+//		super.printStackTrace();
+//	}
 }

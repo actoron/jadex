@@ -263,8 +263,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
 	//					if(!terminated)
 	//					{
-							if(sid.toString().indexOf("Context")!=-1)
-								System.out.println("Terminating service: "+sid);
+//							if(sid.toString().indexOf("Context")!=-1)
+//								System.out.println("Terminating service: "+sid);
 							getLogger().info("Terminating service: "+sid);
 							
 							// Dispose nonfunc properties
@@ -272,8 +272,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(fservice.getServiceIdentifier().toString().indexOf("ContextSer")!=-1)
-										System.out.println("hierda");
+//									if(fservice.getServiceIdentifier().toString().indexOf("ContextSer")!=-1)
+//										System.out.println("hierda");
 									
 									fservice.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 									{

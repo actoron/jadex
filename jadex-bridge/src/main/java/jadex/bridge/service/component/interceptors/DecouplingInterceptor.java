@@ -255,22 +255,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //				System.out.println("decouple: "+Thread.currentThread());
 //			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get(), to, rt))
 //				.addResultListener(new CopyReturnValueResultListener(ret, sic, to, rt));
-			try
-			{
-				ea.scheduleStep(new InvokeMethodStep(sic))
-					.addResultListener(new CopyReturnValueResultListener(ret, sic));
-			}
-			catch(ComponentTerminatedException cte)
-			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
-				{
-					public void run()
-					{
-						new InvokeMethodStep(sic).execute(ia)
-							.addResultListener(new CopyReturnValueResultListener(ret, sic));
-					}
-				});
-			}
+			ea.scheduleStep(new InvokeMethodStep(sic))
+				.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		
 		return ret;
