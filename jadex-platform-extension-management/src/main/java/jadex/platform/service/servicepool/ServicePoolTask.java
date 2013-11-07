@@ -17,6 +17,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -100,7 +101,7 @@ public class ServicePoolTask implements ITask
 								String[] oldmaps = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_OLD_MAPPINGS);
 								String[] classinfos = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_CLASS_INFOS);
 								String[] fileinfos = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_FILE_INFOS);
-								Boolean[] monitorings = (Boolean[])context.getActivity().getParsedPropertyValue(PROPERTY_MONITORINGS);
+								String[] monitorings = (String[])context.getActivity().getParsedPropertyValue(PROPERTY_MONITORINGS);
 								List<MappingEntry> mappingentries = getMappingEntries(oldmaps, classinfos, fileinfos, monitorings);
 								
 								if(mappingentries.size() > 0)
@@ -109,7 +110,7 @@ public class ServicePoolTask implements ITask
 									for(MappingEntry mentry : mappingentries)
 									{
 										CreationInfo cinfo = new CreationInfo();
-										cinfo.setMonitoring(mentry.isMonitoring());
+										cinfo.setMonitoring(mentry.getMonitoring());
 										sps.addServiceType(mentry.getClassinfo().getType(process.getClassLoader(), process.getModel().getAllImports()), mentry.getFileinfo()).addResultListener(lis);
 									}
 								}
@@ -163,7 +164,7 @@ public class ServicePoolTask implements ITask
 						ent = entry.getFileinfo();
 						break;
 					case 2:
-						ent = entry.isMonitoring();
+						ent = entry.getMonitoring();
 						break;
 				}
 				if (colnum == 2)
@@ -195,7 +196,7 @@ public class ServicePoolTask implements ITask
 	/**
 	 *  Retrieve mapping entries.
 	 */
-	public static final List<MappingEntry> getMappingEntries(String[] oldmaps, String[] classinfos, String[] fileinfos, Boolean[] monitorings)
+	public static final List<MappingEntry> getMappingEntries(String[] oldmaps, String[] classinfos, String[] fileinfos, String[] monitorings)
 	{
 		List<MappingEntry> mappingentries = new ArrayList<ServicePoolTask.MappingEntry>();
 		
@@ -219,10 +220,10 @@ public class ServicePoolTask implements ITask
 				{
 					fi = fileinfos[i];
 				}
-				Boolean mon = null;
-				if (monitorings != null && monitorings.length > i && monitorings[i] != null)
+				PublishEventLevel mon = null;
+				if(monitorings != null && monitorings.length > i && monitorings[i] != null)
 				{
-					mon = monitorings[i];
+					mon = PublishEventLevel.valueOf(monitorings[i]);
 				}
 				mappingentries.add(new MappingEntry(ci, fi, mon));
 			}
@@ -287,7 +288,7 @@ public class ServicePoolTask implements ITask
 				mprop = task.getProperties().removeKey(PROPERTY_FILE_INFOS);
 				String[] fileinfos = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
 				mprop = task.getProperties().removeKey(PROPERTY_MONITORINGS);
-				Boolean[] monitorings = mprop == null ? null : mprop.getInitialValue()!=null ? (Boolean[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
+				String[] monitorings = mprop == null ? null : mprop.getInitialValue()!=null ? (String[])SJavaParser.parseExpression(mprop.getInitialValue(), null, cl).getValue(null) : null;
 				
 				List<MappingEntry> mappingentries = getMappingEntries(oldmaps, classinfos, fileinfos, monitorings);
 				if(mappingentries.size() > 0)
@@ -454,7 +455,7 @@ public class ServicePoolTask implements ITask
 					}
 					case 2:
 					{
-						ret = entries.get(rowIndex).isMonitoring();
+						ret = entries.get(rowIndex).getMonitoring();
 						break;
 					}
 				}
@@ -521,9 +522,9 @@ public class ServicePoolTask implements ITask
 					}
 					case 2:
 					{
-						if (value != null)
+						if(value != null)
 						{
-							val.setMonitoring((Boolean) value);
+							val.setMonitoring(PublishEventLevel.valueOf((String)value));
 						}
 						else
 						{
@@ -599,17 +600,26 @@ public class ServicePoolTask implements ITask
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	protected static class MappingEntry
 	{
 		protected ClassInfo classinfo;
 		protected String fileinfo;
-		protected Boolean monitoring;
+		protected PublishEventLevel monitoring;
 		
+		/**
+		 *  Create a new MappingEntry.
+		 */
 		public MappingEntry()
 		{
 		}
 		
-		public MappingEntry(ClassInfo classinfo, String fileinfo, Boolean monitoring)
+		/**
+		 *  Create a new MappingEntry.
+		 */
+		public MappingEntry(ClassInfo classinfo, String fileinfo, PublishEventLevel monitoring)
 		{
 			this.classinfo = classinfo;
 			this.fileinfo = fileinfo;
@@ -636,12 +646,12 @@ public class ServicePoolTask implements ITask
 			this.fileinfo = fileinfo;
 		}
 
-		public void setMonitoring(Boolean monitoring)
+		public void setMonitoring(PublishEventLevel monitoring)
 		{
 			this.monitoring = monitoring;
 		}
 
-		public Boolean isMonitoring()
+		public PublishEventLevel getMonitoring()
 		{
 			return monitoring;
 		}

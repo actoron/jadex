@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -12,12 +13,12 @@ import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -669,10 +670,11 @@ public class ExternalAccess implements IExternalAccess
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
 	 */
-	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(final IFilter<IMonitoringEvent> filter, final boolean initial)
+//	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(final IFilter<IMonitoringEvent> filter, final boolean initial, final PublishEventLevel elm)
 	{
-		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
+//		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
+		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = (SubscriptionIntermediateDelegationFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, interpreter.getInternalAccess());
 		
 		if(adapter.isExternalThread())
 		{
@@ -682,7 +684,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = interpreter.subscribeToEvents(filter, initial);
+						ISubscriptionIntermediateFuture<IMonitoringEvent> fut = interpreter.subscribeToEvents(filter, initial, elm);
 						TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 						fut.addResultListener(lis);
 					}
@@ -701,7 +703,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = interpreter.subscribeToEvents(filter, initial);
+			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = interpreter.subscribeToEvents(filter, initial, elm);
 			TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
 			fut.addResultListener(lis);
 		}

@@ -817,7 +817,13 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		ret = reqserprops.get(sid);
 		if(ret==null)
 		{
-			ret = new NFMethodPropertyProvider(null); // parent of required service property?
+			ret = new NFMethodPropertyProvider(null) // parent of required service property?
+			{
+				public IInternalAccess getInternalAccess() 
+				{
+					return instance;
+				}
+			}; 
 			reqserprops.put(sid, ret);
 		}
 		return ret;

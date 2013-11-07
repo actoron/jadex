@@ -13,6 +13,7 @@ import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
@@ -25,7 +26,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.extension.envsupport.IObjectCreator;
 import jadex.extension.envsupport.MEnvSpaceInstance;
@@ -2906,7 +2906,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						return obj.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_COMPONENT)
 							|| obj.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START);
 					}
-				}, false);
+				}, false, PublishEventLevel.FINE);
 				
 				sub.addResultListener(new IIntermediateResultListener<IMonitoringEvent>()
 				{

@@ -5,6 +5,7 @@ import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -200,7 +201,7 @@ public class ProcessViewPanel extends JPanel
 			{
 				return true;	
 			}
-		}, true);
+		}, true, PublishEventLevel.COARSE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent event)

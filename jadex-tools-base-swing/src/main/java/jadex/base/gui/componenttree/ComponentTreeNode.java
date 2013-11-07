@@ -577,7 +577,7 @@ public class ComponentTreeNode	extends AbstractSwingTreeNode implements IActiveC
 		if(names.hasNext())
 		{
 			final String name = names.next();
-			String id = NFPropertyNode.getId(cn, name);
+			String id = NFPropertyNode.getId(cn.getId(), name);
 			NFPropertyNode nfpn	= (NFPropertyNode)getModel().getNode(id);
 			if(nfpn==null)
 			{

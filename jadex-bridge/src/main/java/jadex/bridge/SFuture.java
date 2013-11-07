@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.ICommandFuture;
 import jadex.commons.future.IFuture;
@@ -20,7 +21,7 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IInternalAccess ia)
 	{
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
-		long to = sc.getTimeout();
+		long to = sc!=null? sc.getTimeout(): BasicService.DEFAULT_LOCAL; // Hack!!! find out in which cases service call can null
 	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
 	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
 	//	to = 5000;

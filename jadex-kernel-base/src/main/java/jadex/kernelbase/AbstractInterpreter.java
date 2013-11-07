@@ -2,6 +2,7 @@ package jadex.kernelbase;
 
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
@@ -14,6 +15,8 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
@@ -76,13 +79,19 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 
 	
 	/** The subscriptions (subscription future -> subscription info). */
-	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>> subscriptions;
+	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>> subscriptions;
 
 	/** The result listener. */
 	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
 
 	/** The monitoring service getter. */
 	protected ServiceGetter<IMonitoringService> getter;
+	
+//	/** The event emit level for monitoring. */
+//	protected PublishEmitLevel emitlevelmon;
+	
+	/** The event emit level for subscriptions. */
+	protected PublishEventLevel emitlevelsub;
 	
 	
 	/** The parameter copy allowed flag. */
@@ -108,6 +117,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.bindings = bindings;
 		this.copy = copy;
 		this.realtime = realtime;
+		this.emitlevelsub = desc.getMonitoring();
+//		this.emitlevelmon = desc.getMonitoring();
 		this.resultlistener = resultlistener;
 		if(factory != null)
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
@@ -479,39 +490,54 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 //		return componentlisteners;	
 //	}
 	
-	/**
-	 *  Check if event targets exist.
-	 */
-	public boolean hasEventTargets(boolean tomonitor)
-	{
-		return (subscriptions!=null && !subscriptions.isEmpty()) 
-			||  (tomonitor && getComponentDescription().getMonitoring()!=null && getComponentDescription().getMonitoring().booleanValue());
-	}
-	
-	
 //	/**
 //	 *  Check if event targets exist.
 //	 */
-//	public boolean hasEventTargets(PublishType pt, PublishImportance pi)
+//	public boolean hasEventTargets(boolean tomonitor)
 //	{
-//		boolean ret = false;
-//		PublishLevel pl = null;
-//		boolean dopub = pi.getImportance()>pl.getLevel();
-//		if(dopub)
-//		{
-//			if(PublishType.TOALL.equals(pt) || PublishType.TOSUBSCRIBERS.equals(pt))
-//			{
-//				ret = subscriptions!=null && !subscriptions.isEmpty();
-//			}
-//			else if(PublishType.TOALL.equals(pt) || PublishType.TOMONITORING.equals(pt))
-//			{
-//				ret = true;
-//			}
-//		}
-////		return (subscriptions!=null && !subscriptions.isEmpty()) 
-////			||  (tomonitor && getComponentDescription().getMonitoring()!=null && getComponentDescription().getMonitoring().booleanValue());
-//		return ret;
+//		return (subscriptions!=null && !subscriptions.isEmpty()) 
+//			||  (tomonitor && getComponentDescription().getMonitoring()!=null && getComponentDescription().getMonitoring().booleanValue());
 //	}
+	
+	
+	/**
+	 *  Check if event targets exist.
+	 */
+	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi)
+	{
+		boolean ret = false;
+		
+		if(pi.getLevel()<=getPublishEmitLevelSubscriptions().getLevel() 
+			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOSUBSCRIBERS.equals(pt)))
+		{
+			ret = subscriptions!=null && !subscriptions.isEmpty();
+		}
+		if(!ret && pi.getLevel()<=getPublishEmitLevelMonitoring().getLevel()
+			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt)))
+		{
+			ret = true;
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the monitoring event emit level.
+	 */
+	public PublishEventLevel getPublishEmitLevelMonitoring()
+	{
+		return getComponentDescription().getMonitoring();
+//		return emitlevelmon;
+	}
+	
+	/**
+	 *  Get the monitoring event emit level for subscriptions.
+	 *  Is the maximum level of all subscriptions (cached for speed).
+	 */
+	public PublishEventLevel getPublishEmitLevelSubscriptions()
+	{
+		return emitlevelsub;
+	}
 	
 	/**
 	 *  Get the monitoring service getter.
@@ -543,15 +569,20 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	protected void publishLocalEvent(IMonitoringEvent event, SubscriptionIntermediateFuture<IMonitoringEvent> sub)
 	{
-		IFilter<IMonitoringEvent> fil = subscriptions.get(sub);
+		Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel> tup = subscriptions.get(sub);
 		try
 		{
-			if(fil==null || fil.filter(event))
+			PublishEventLevel el = tup.getSecondEntity();
+			if(event.getLevel().getLevel()>=el.getLevel())
 			{
-//				System.out.println("forward to: "+event+" "+sub);
-				if(!sub.addIntermediateResultIfUndone(event))
+				IFilter<IMonitoringEvent> fil = tup.getFirstEntity();
+				if(fil==null || fil.filter(event))
 				{
-					subscriptions.remove(fil);
+	//				System.out.println("forward to: "+event+" "+sub);
+					if(!sub.addIntermediateResultIfUndone(event))
+					{
+						subscriptions.remove(fil);
+					}
 				}
 			}
 		}
@@ -566,10 +597,11 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Subscribe to monitoring events.
 	 *  @param filter An optional filter.
 	 */
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel emitlevel)
 	{
-		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
-		
+//		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
+		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
+			
 		ITerminationCommand tcom = new ITerminationCommand()
 		{
 			public void terminated(Exception reason)
@@ -584,12 +616,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		};
 		ret.setTerminationCommand(tcom);
 		
-		// signal that subscription has been done
-		MonitoringEvent	subscribed	= new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis());
-		boolean	post	= false;
+		// Signal that subscription has been done
+		MonitoringEvent	subscribed	= new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), 
+			IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(), PublishEventLevel.COARSE);
+		boolean	post = false;
 		try
 		{
-			post	= filter==null || filter.filter(subscribed);
+			post = filter==null || filter.filter(subscribed);
 		}
 		catch(Exception e)
 		{
@@ -599,7 +632,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			ret.addIntermediateResult(subscribed);
 		}
 
-		addSubscription(ret, filter);
+		addSubscription(ret, filter, emitlevel);
 		
 		if(initial)
 		{
@@ -619,11 +652,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  @param future The subscription future.
 	 *  @param si The subscription info.
 	 */
-	protected void addSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> future, IFilter<IMonitoringEvent> filter)
+	protected void addSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> future, IFilter<IMonitoringEvent> filter, PublishEventLevel emitlevel)
 	{
 		if(subscriptions==null)
-			subscriptions = new LinkedHashMap<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>>();
-		subscriptions.put(future, filter);
+			subscriptions = new LinkedHashMap<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>>();
+		if(emitlevel.getLevel()>emitlevelsub.getLevel())
+			emitlevelsub = emitlevel;
+		subscriptions.put(future, new Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>(filter, emitlevel));
 	}
 	
 	/**
@@ -635,6 +670,14 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		if(subscriptions==null || !subscriptions.containsKey(fut))
 			throw new RuntimeException("Subscriber not known: "+fut);
 		subscriptions.remove(fut);
+		emitlevelsub = PublishEventLevel.OFF;
+		for(Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel> tup: subscriptions.values())
+		{
+			if(tup.getSecondEntity().getLevel()>emitlevelsub.getLevel())
+				emitlevelsub = tup.getSecondEntity();
+			if(PublishEventLevel.COARSE.equals(emitlevelsub))
+				break;
+		}
 	}
 	
 	

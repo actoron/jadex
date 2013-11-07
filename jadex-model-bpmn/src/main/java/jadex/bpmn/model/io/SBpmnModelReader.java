@@ -21,6 +21,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.Tuple2;
 import jadex.javaparser.SJavaParser;
 
@@ -782,7 +783,8 @@ public class SBpmnModelReader
 				}
 				if (attrs.containsKey("monitoring"))
 				{
-					((ModelInfo) model.getModelInfo()).setMonitoring(Boolean.parseBoolean(attrs.get("monitoring")));
+//					((ModelInfo) model.getModelInfo()).setMonitoring(Boolean.parseBoolean(attrs.get("monitoring")));
+					((ModelInfo) model.getModelInfo()).setMonitoring(PublishEventLevel.valueOf(attrs.get("monitoring")));
 				}
 				if (attrs.containsKey("synchronous"))
 				{

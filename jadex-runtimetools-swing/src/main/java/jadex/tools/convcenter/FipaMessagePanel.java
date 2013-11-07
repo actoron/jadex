@@ -300,7 +300,7 @@ public class FipaMessagePanel extends JPanel
 
 
 		// Actions for agent selection.
-		final ComponentSelectorDialog	agentselector	= new ComponentSelectorDialog(this, access, cmshandler, iconcache);
+		final ComponentSelectorDialog	agentselector	= new ComponentSelectorDialog(this, access, cmshandler, null, iconcache);
 		setsender.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

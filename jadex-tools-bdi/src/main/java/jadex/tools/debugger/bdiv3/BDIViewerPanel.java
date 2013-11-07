@@ -7,6 +7,7 @@ import jadex.bdiv3.runtime.impl.PlanInfo;
 import jadex.bridge.BulkMonitoringEvent;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SortedList;
@@ -552,7 +553,7 @@ public class BDIViewerPanel extends JPanel
 					|| ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_GOAL)
 					|| ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_PLAN);
 			}
-		}, true);
+		}, true, PublishEventLevel.COARSE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent event)

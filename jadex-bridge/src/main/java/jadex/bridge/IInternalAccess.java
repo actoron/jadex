@@ -1,13 +1,11 @@
 package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
-import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
-import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.IFuture;
@@ -161,14 +159,20 @@ public interface IInternalAccess
 	 *  @param filter An optional filter.
 	 *  @param initial True, for receiving the current state.
 	 */
-	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial);
+//	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm);
 
-//	/**
-//	 *  Publish a monitoring event. This event is automatically send
-//	 *  to the monitoring service of the platform (if any). 
-//	 */
-//	public IFuture<Void> publishEvent(IMonitoringEvent event, boolean tomonitor);//, boolean force);
+	/**
+	 *  Publish a monitoring event. This event is automatically send
+	 *  to the monitoring service of the platform (if any). 
+	 */
+	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt);
+	
+	/**
+	 *  Check if event targets exist.
+	 */
+	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi);
+
 	
 //	/**
 //	 *  Get the required service property provider for a service.

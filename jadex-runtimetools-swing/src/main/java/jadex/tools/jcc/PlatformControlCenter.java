@@ -1,6 +1,7 @@
 package jadex.tools.jcc;
 
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.PropertyUpdateHandler;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
@@ -953,6 +954,14 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	public CMSUpdateHandler getCMSHandler()
 	{
 		return controlcenter.getCMSHandler();
+	}
+	
+	/**
+	 *  Get the property update handler shared by all tools.
+	 */
+	public PropertyUpdateHandler getPropertyHandler()
+	{
+		return controlcenter.getPropertyHandler();
 	}
 
 	/**

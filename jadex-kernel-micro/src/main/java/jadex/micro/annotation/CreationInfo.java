@@ -1,5 +1,6 @@
 package jadex.micro.annotation;
 
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.Boolean3;
 
 import java.lang.annotation.ElementType;
@@ -40,7 +41,7 @@ public @interface CreationInfo
 	/**
 	 *  The monitoring flag.
 	 */
-	public Boolean3 monitoring() default Boolean3.NULL;
+	public PublishEventLevel monitoring() default PublishEventLevel.OFF;
 
 	/**
 	 *  The synchronous flag.

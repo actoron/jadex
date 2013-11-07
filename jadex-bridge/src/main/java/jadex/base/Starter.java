@@ -22,6 +22,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.BlockingQueue;
@@ -473,7 +474,20 @@ public class Starter
 								Cause cause = sc==null? null: sc.getCause();
 								
 								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
-								Boolean moni = (Boolean)getArgumentValue(MONITORING, model, cmdargs, compargs);
+								Object tmpmoni = getArgumentValue(MONITORING, model, cmdargs, compargs);
+								PublishEventLevel moni = PublishEventLevel.OFF;
+								if(tmpmoni instanceof Boolean)
+								{
+									moni = ((Boolean)tmpmoni).booleanValue()? PublishEventLevel.FINE: PublishEventLevel.OFF;
+								}
+								else if(tmpmoni instanceof String)
+								{
+									moni = PublishEventLevel.valueOf((String)tmpmoni);
+								}
+								else if(tmpmoni instanceof PublishEventLevel)
+								{
+									moni = (PublishEventLevel)tmpmoni;
+								}
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, 
 									autosd, moni, null, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
 								

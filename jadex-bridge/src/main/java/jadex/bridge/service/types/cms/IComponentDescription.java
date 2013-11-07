@@ -3,7 +3,7 @@ package jadex.bridge.service.types.cms;
 import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
-import jadex.commons.Tuple2;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 
 
 /**
@@ -133,7 +133,7 @@ public interface IComponentDescription
 	 *  Get the monitoring flag.
 	 *  @return	The monitoring flag.
 	 */
-	public Boolean getMonitoring();
+	public PublishEventLevel getMonitoring();
 	
 //	/**
 //	 *  Get the monitoring flag.

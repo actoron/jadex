@@ -11,6 +11,8 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -181,13 +183,11 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			if(step!=null)
 			{
 				Future future = (Future)step[1];
-//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-//					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 				
-				if(hasEventTargets(true))
+				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{
 					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."
-							+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+							+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 				}
 				
 				try
@@ -201,12 +201,10 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 					future.setExceptionIfUndone(e);
 					throw e;
 				}
-//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-//					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
-				if(hasEventTargets(true))
+				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{
 					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."
-						+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+						+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 				}
 			}
 			

@@ -1,7 +1,7 @@
 package jadex.commons;
 
 /**
- *  A three valued boolean to be used in annotations.
+ *  A three valued boolean to be used in annotations as they do not allow null values.
  */
 public enum Boolean3
 {

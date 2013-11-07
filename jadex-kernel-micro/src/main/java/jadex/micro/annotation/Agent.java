@@ -1,5 +1,6 @@
 package jadex.micro.annotation;
 
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.Boolean3;
 
 import java.lang.annotation.ElementType;
@@ -45,7 +46,7 @@ public @interface Agent
 	/**
 	 *  Specify if monitoring should be enabled on the component.
 	 */
-	public Boolean3 monitoring() default Boolean3.NULL;
+	public PublishEventLevel monitoring() default PublishEventLevel.NULL;
 	
 	/**
 	 *  Specify if the subcomponent should run synchronously on its parent's thread.

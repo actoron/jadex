@@ -18,6 +18,8 @@ import jadex.bdiv3.runtime.wrappers.SetWrapper;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
@@ -661,7 +663,7 @@ public class BDIAgent extends MicroAgent
 	 */
 	public static void publishToolBeliefEvent(BDIAgentInterpreter ip, MBelief mbel)//, String evtype)
 	{
-		if(ip.hasEventTargets(false))
+		if(ip.hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.COARSE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
@@ -675,7 +677,7 @@ public class BDIAgent extends MicroAgent
 			mev.setProperty("sourcetype", info.getType());
 			mev.setProperty("details", info);
 			
-			ip.publishEvent(mev);
+			ip.publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	

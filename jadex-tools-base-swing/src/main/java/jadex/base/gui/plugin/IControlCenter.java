@@ -1,6 +1,7 @@
 package jadex.base.gui.plugin;
 
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.PropertyUpdateHandler;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -36,6 +37,13 @@ public interface IControlCenter
 	// Only one per JCC as many plugins listen to many remote platforms, too.
 	// So its not useful to have separate handlers for each administered remote platform.
 	public CMSUpdateHandler getCMSHandler();
+	
+	/**
+	 *  Get the cms update handler shared by all tools.
+	 */
+	// Only one per JCC as many plugins listen to many remote platforms, too.
+	// So its not useful to have separate handlers for each administered remote platform.
+	public PropertyUpdateHandler getPropertyHandler();
 	
 	/**
 	 *  Get the component icon cache shared by all tools.

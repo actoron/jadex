@@ -43,6 +43,7 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.FieldInfo;
 import jadex.commons.IResultCommand;
@@ -127,7 +128,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final BDIModel model, Class<?> agentclass, final Map<String, Object> args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, 
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
 		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, listener, inited);
@@ -2067,7 +2068,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		assert isComponentThread();
 		
 		// Evaluate condition before executing step.
-		boolean aborted = false;
+//		boolean aborted = false;
 //		if(rulesystem!=null)
 //			aborted = rulesystem.processAllEvents(15);
 //		if(aborted)
@@ -2076,10 +2077,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		if(inited && rulesystem!=null)
 			rulesystem.processAllEvents();
 		
-//		if(steps!=null && steps.size()>0)
-//		{
-//			System.out.println("steps: "+steps.size()+" "+((Object[])steps.get(0))[0]);
-//		}
+		if(steps!=null && steps.size()>0)
+		{
+			System.out.println("steps: "+steps.size()+" "+steps.get(0).getStep().getClass());
+		}
 		boolean ret = super.executeStep();
 
 		return ret || (inited && rulesystem!=null && rulesystem.isEventAvailable());
@@ -2391,7 +2392,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			for(MBelief mbel: mbels)
 			{
 				BeliefInfo info = BeliefInfo.createBeliefInfo(this, mbel, getClassLoader());
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis());
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(mbel.toString());
 				ev.setProperty("details", info);
 				ret.add(ev);
@@ -2405,7 +2406,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			for(RGoal goal: goals)
 			{
 				GoalInfo info = GoalInfo.createGoalInfo(goal);
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis());
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(goal.toString());
 				ev.setProperty("details", info);
 				ret.add(ev);
@@ -2419,7 +2420,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			for(RPlan plan: plans)
 			{
 				PlanInfo info = PlanInfo.createPlanInfo(plan);
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis());
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(plan.toString());
 				ev.setProperty("details", info);
 				ret.add(ev);

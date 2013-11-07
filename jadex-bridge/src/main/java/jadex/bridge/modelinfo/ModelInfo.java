@@ -2,9 +2,9 @@ package jadex.bridge.modelinfo;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 
@@ -784,14 +784,30 @@ public class ModelInfo extends Startable implements IModelInfo
 //		return suspend==null? null: (Boolean)suspend.getValue(configname);
 	}
 	
+//	/**
+//	 *  Get the monitoring flag.
+//	 *  @param configname The configname.
+//	 *  @return The monitoring flag value.
+//	 */
+//	public Boolean getMonitoring(String configname)
+//	{
+//		Boolean ret = null;
+//		ConfigurationInfo config = getConfiguration(configname);
+//		if(config!=null)
+//			ret = config.getMonitoring();
+//		if(ret==null)
+//			ret = super.getMonitoring();
+//		return ret;
+//	}
+	
 	/**
 	 *  Get the monitoring flag.
 	 *  @param configname The configname.
 	 *  @return The monitoring flag value.
 	 */
-	public Boolean getMonitoring(String configname)
+	public PublishEventLevel getMonitoring(String configname)
 	{
-		Boolean ret = null;
+		PublishEventLevel ret = null;
 		ConfigurationInfo config = getConfiguration(configname);
 		if(config!=null)
 			ret = config.getMonitoring();

@@ -1,5 +1,7 @@
 package jadex.bridge.modelinfo;
 
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+
 /**
  *  Base class for startable elements.
  */
@@ -23,7 +25,7 @@ public class Startable
 	private Boolean autoshutdown;
 
 	/** The monitoring flag. */
-	private Boolean monitoring;
+	private PublishEventLevel monitoring;
 	
 	/** The synchronous flag. */
 	private Boolean synchronous;
@@ -124,7 +126,7 @@ public class Startable
 	 *  Get the monitoring.
 	 *  @return The monitoring.
 	 */
-	public Boolean getMonitoring()
+	public PublishEventLevel getMonitoring()
 	{
 		return monitoring;
 	}
@@ -133,7 +135,7 @@ public class Startable
 	 *  Set the monitoring.
 	 *  @param monitoring The monitoring to set.
 	 */
-	public void setMonitoring(Boolean monitoring)
+	public void setMonitoring(PublishEventLevel monitoring)
 	{
 		this.monitoring = monitoring;
 	}

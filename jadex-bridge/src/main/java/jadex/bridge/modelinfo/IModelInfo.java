@@ -2,10 +2,10 @@ package jadex.bridge.modelinfo;
 
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.nonfunctional.INFProperty;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 
 import java.util.List;
 import java.util.Map;
@@ -211,7 +211,7 @@ public interface IModelInfo
 	 *  @param monitoring The monitoring.
 	 *  @return The monitoring flag value.
 	 */
-	public Boolean getMonitoring(String configname);
+	public PublishEventLevel getMonitoring(String configname);
 	
 	/**
 	 *  Get the synchronous flag.

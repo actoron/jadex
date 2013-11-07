@@ -456,8 +456,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					public void run()
 					{
-						try
-						{
+//						if(desc.getName().getLocalName().startsWith("Initiator"))
+//							System.out.println("killComponent last step: "+getComponentIdentifier());
 						component.cleanupComponent()
 							.addResultListener(new IResultListener<Void>()
 						{
@@ -467,6 +467,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 								{
 									// Do final cleanup step as (last) ext_entry
 									// for allowing previously added entries still be executed.
+//									if(desc.getName().getLocalName().startsWith("Initiator"))
+//										System.out.println("killComponent last step: "+getComponentIdentifier());
+
 									Runnable laststep = new LastStep();
 //									Runnable	laststep	= new Runnable()
 //									{								
@@ -521,12 +524,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 								killfuture.setException(exception);
 							}
 						});
-						
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
 					}
 				});
 			}
@@ -584,8 +581,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
-//		if(getComponentIdentifier().toString().indexOf("GarbageCollector")!=-1)
-////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
+//		if(getComponentIdentifier().toString().startsWith("Initiator"))
 //		{
 //			System.out.println("Enter: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 //		}
@@ -901,7 +897,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		}
 		for(int i=0; entries!=null && i<entries.length; i++)
 		{
-//			if(getComponentIdentifier().getName().indexOf("MessageP")!=-1 && entries.length>2)
+//			if(getComponentIdentifier().getName().indexOf("Initiator")!=-1)
 //				System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
 			
 			if(entries[i] instanceof CheckedAction)
@@ -948,6 +944,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //					{
 //						System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
 //					}
+//					if(getComponentIdentifier().getName().indexOf("Initiator")!=-1)
+//						System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
 					entries[i].run();
 				}
 				catch(Exception e)
@@ -1106,8 +1104,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		public void run()
 		{
-//			if(desc.getName().getLocalName().indexOf("AutoTerminate")!=-1)
-//				System.out.println("killComponent last: "+getComponentIdentifier());
+			if(desc.getName().getLocalName().indexOf("Initiator")!=-1)
+				System.out.println("killComponent last: "+getComponentIdentifier());
 
 			cleanup();
 			clock	= null;
@@ -1123,7 +1121,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 
 		}
 	}
-	
+
 	/**
 	 *  Wake up this component.
 	 */

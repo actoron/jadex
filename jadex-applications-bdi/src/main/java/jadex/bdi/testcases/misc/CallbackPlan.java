@@ -15,6 +15,7 @@ import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.IntermediateDefaultResultListener;
 
 import java.util.logging.Logger;
@@ -392,7 +393,7 @@ public class CallbackPlan extends Plan
 //		});
 		
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr16);
-		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+		getScope().subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 			.addResultListener(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)

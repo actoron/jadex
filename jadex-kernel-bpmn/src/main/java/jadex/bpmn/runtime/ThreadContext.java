@@ -6,6 +6,8 @@ import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.SReflect;
 
 import java.util.HashSet;
@@ -119,8 +121,10 @@ public class ThreadContext
 			threads	= new LinkedHashMap<ProcessThread, ThreadContext>();
 		
 		threads.put(thread, null);
-		
-		thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread));
+		if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		{	
+			thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+		}
 //		System.out.println("add: "+thread);
 	}
 	
@@ -137,7 +141,10 @@ public class ThreadContext
 		if(oldthreads!=null)
 			threads.putAll(oldthreads);
 		
-		thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread));
+		if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		{	
+			thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+		}
 //		System.out.println("add: "+thread);
 	}
 	
@@ -168,7 +175,10 @@ public class ThreadContext
 			{
 //				System.out.println("remove1: "+thread);
 				BpmnInterpreter in = thread.getInstance();
-				in.publishEvent(in.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread));
+				if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+				{	
+					in.publishEvent(in.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
+				}
 			}
 		}
 		

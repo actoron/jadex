@@ -35,7 +35,6 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInfo;
@@ -51,6 +50,8 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
@@ -92,60 +93,6 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 {
 	/** Constant for step event. */
 	public static final String TYPE_COMPONENT = "component";
-	
-	public static enum PublishType
-	{
-		TOALL,
-		TOMONITORING,
-		TOSUBSCRIBERS
-	}
-	
-	public static enum PublishLevel
-	{
-		ALL(0),
-		MOST(1),
-		SOME(2),
-		NONE(3);
-		
-		protected int level;
-		
-		private PublishLevel(int level)
-		{
-			this.level = level;
-		}
-
-		/**
-		 *  Get the level.
-		 *  return The level.
-		 */
-		public int getLevel()
-		{
-			return level;
-		}
-	}
-	
-	public static enum PublishImportance
-	{
-		HIGH(3),
-		MEDIUM(2),
-		LOW(1);
-		
-		protected int importance;
-		
-		private PublishImportance(int importance)
-		{
-			this.importance = importance;
-		}
-
-		/**
-		 *  Get the importance.
-		 *  return The importance.
-		 */
-		public int getImportance()
-		{
-			return importance;
-		}
-	}
 	
 	//-------- interface methods --------
 	
@@ -253,6 +200,9 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 //		System.out.println("cleanup: "+getComponentIdentifier());
 		assert !getComponentAdapter().isExternalThread();
 		
+		if(getComponentDescription().getName().getLocalName().startsWith("Initiator"))
+			System.out.println("ini1: "+getComponentIdentifier());
+		
 		final Future<Void> ret = new Future<Void>();
 		
 		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
@@ -260,6 +210,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		{
 			public void customResultAvailable(final IClockService clock)
 			{
+//				if(getComponentDescription().getName().getLocalName().startsWith("Initiator"))
+//					System.out.println("ini1: "+getComponentIdentifier());
 //				MonitoringEvent me = new MonitoringEvent(getComponentIdentifier().toString(), 
 //					MonitoringEvent.TYPE_COMPONENT_DISPOSED, clock.getTime());
 //				me.setProperty("details", getComponentDescription());
@@ -276,14 +228,20 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 								{
 									public void customResultAvailable(Void result)
 									{
+//										if(getComponentDescription().getName().getLocalName().startsWith("Initiator"))
+//											System.out.println("ini1: "+getComponentIdentifier());
 										terminateExtensions().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 										{
 											public void customResultAvailable(Void result)
 											{
+//												if(getComponentDescription().getName().getLocalName().startsWith("Initiator"))
+//													System.out.println("ini1: "+getComponentIdentifier());
 												shutdownNFPropertyProvider().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 												{
 													public void customResultAvailable(Void result)
 													{
+//														if(getComponentDescription().getName().getLocalName().startsWith("Initiator"))
+//															System.out.println("ini1: "+getComponentIdentifier());
 														IResultListener<Void> reslis	= new IResultListener<Void>()
 														{
 															public void resultAvailable(Void result)
@@ -313,12 +271,12 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 															
 															protected void proceed(final Exception ex)
 															{
-//																if(hasEventTargets(true))
-//																{
+																if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+																{
 																	MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
-																		IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis());
+																		IMonitoringEvent.TYPE_COMPONENT_DISPOSED, getComponentDescription().getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
 																	event.setProperty("details", getComponentDescription());
-																	publishEvent(event).addResultListener(new DelegationResultListener<Void>(ret)
+																	publishEvent(event, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret)
 																	{
 																		public void customResultAvailable(Void result)
 																		{
@@ -332,11 +290,11 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 																			ret.setException(exception);
 																		}
 																	});
-//																}
-//																else
-//																{
-//																	ret.setResult(null);
-//																}
+																}
+																else
+																{
+																	ret.setResult(null);
+																}
 															}
 														};
 														// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
@@ -424,15 +382,18 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 //				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), 
 //					desc.getName().getName(), getComponentIdentifier(), desc.getCreationTime(), desc);
 //				notifyListeners(event);
-				
-				MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
-					MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime());
-				me.setProperty("details", desc);
-				// for extensions only
-//				publishEvent(me, false, false) 
-				publishEvent(me, false) 
-					.addResultListener(new DelegationResultListener<Void>(ret));
-				
+				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+				{
+					MonitoringEvent me = new MonitoringEvent(desc.getName(), desc.getCreationTime(), 
+						MonitoringEvent.TYPE_COMPONENT_CREATED, desc.getCause(), desc.getCreationTime(), PublishEventLevel.COARSE);
+					me.setProperty("details", desc);
+					// for extensions only
+					publishEvent(me, PublishTarget.TOALL) .addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				else
+				{
+					ret.setResult(null);
+				}
 				return IFuture.DONE;
 			}
 		});
@@ -458,22 +419,29 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 //				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_COMPONENT, desc.getModelName(), desc.getName().getName(), getComponentIdentifier(), getComponentDescription().getCreationTime(), desc);
 //				notifyListeners(event);
 				
-				// todo: clock time? , creation time
-				MonitoringEvent event = new MonitoringEvent(desc.getName(), desc.getCreationTime(), IMonitoringEvent.TYPE_COMPONENT_DISPOSED, desc.getCause(), System.currentTimeMillis());
-				event.setProperty("details", getComponentDescription());
-				// for extensions only
-//				publishEvent(event, false, false).addResultListener(new IResultListener<Void>()
-				publishEvent(event, false).addResultListener(new IResultListener<Void>()
+				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 				{
-					public void resultAvailable(Void result)
+					// todo: clock time? , creation time
+					MonitoringEvent event = new MonitoringEvent(desc.getName(), desc.getCreationTime(), IMonitoringEvent.TYPE_COMPONENT_DISPOSED, desc.getCause(), System.currentTimeMillis(), PublishEventLevel.COARSE);
+					event.setProperty("details", getComponentDescription());
+					// for extensions only
+	//				publishEvent(event, false, false).addResultListener(new IResultListener<Void>()
+					publishEvent(event, PublishTarget.TOALL).addResultListener(new IResultListener<Void>()
 					{
-						ret.setResult(null);
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setResult(null);
-					}
-				});
+						public void resultAvailable(Void result)
+						{
+							ret.setResult(null);
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setResult(null);
+						}
+					});
+				}
+				else
+				{
+					ret.setResult(null);
+				}
 				
 				return ret;
 //				return IFuture.DONE;
@@ -639,8 +607,11 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public IInternalService	createInternalService(Object service, Class<?> type)
 	{
-		boolean moni = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring().booleanValue(): false;
-
+//		boolean moni = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring().booleanValue(): false;
+		PublishEventLevel elm = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring(): null;
+		// todo: remove this? currently the level cannot be turned on due to missing interceptor
+		boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
+		
 		IInternalService	is	= BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), getComponentAdapter(), service, null,
 			type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED,
@@ -728,6 +699,16 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public abstract boolean isRealtime();
 	
+	/**
+	 *  Check if event targets exist.
+	 */
+	public abstract boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi);
+	
+	/**
+	 *  Get the monitoring event emit level.
+	 */
+	public abstract PublishEventLevel getPublishEmitLevelMonitoring();
+	
 	//-------- methods --------
 	
 	/**
@@ -786,12 +767,14 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 //																getComponentDescription().getName().getName(), getComponentIdentifier(), getComponentDescription().getCreationTime(), getComponentDescription());
 //															notifyListeners(event);
 															
-															MonitoringEvent me = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
-																MonitoringEvent.TYPE_COMPONENT_CREATED, getComponentDescription().getCause(), getComponentDescription().getCreationTime());
-															me.setProperty("details", getComponentDescription());
-															publishEvent(me);
-//																.addResultListener(new DelegationResultListener<Void>(ret));
-
+															if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+															{
+																MonitoringEvent me = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
+																	MonitoringEvent.TYPE_COMPONENT_CREATED, getComponentDescription().getCause(), getComponentDescription().getCreationTime(), PublishEventLevel.COARSE);
+																me.setProperty("details", getComponentDescription());
+																publishEvent(me, PublishTarget.TOALL);
+//																	.addResultListener(new DelegationResultListener<Void>(ret));
+															}
 															super.customResultAvailable(result);
 														}
 													}));
@@ -1409,7 +1392,9 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		assert !getComponentAdapter().isExternalThread();
 		final Future<IInternalService> ret = new Future<IInternalService>();
 		
-		boolean moni = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring().booleanValue(): false;
+		PublishEventLevel elm = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring(): null;
+		// todo: remove this? currently the level cannot be turned on due to missing interceptor
+		boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier(), moni, componentfetcher);
 		getServiceContainer().addService(proxy, info, componentfetcher).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
@@ -1753,7 +1738,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 					Boolean	master = components[i].getMaster()!=null ? components[i].getMaster() : type.getMaster();
 					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();
 					Boolean	autoshutdown = components[i].getAutoShutdown()!=null ? components[i].getAutoShutdown() : type.getAutoShutdown();
-					Boolean	monitoring = components[i].getMonitoring()!=null ? components[i].getMonitoring() : type.getMonitoring();
+					PublishEventLevel monitoring = components[i].getMonitoring()!=null ? components[i].getMonitoring() : type.getMonitoring();
 					Boolean	synchronous = components[i].getSynchronous()!=null ? components[i].getSynchronous() : type.getSynchronous();
 					RequiredServiceBinding[] bindings = components[i].getBindings();
 					// todo: rid
@@ -2250,8 +2235,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 *  Subscribe to monitoring events.
 	 *  @param filter An optional filter.
 	 */
-	@Timeout(Timeout.NONE)
-	public abstract ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial);
+//	@Timeout(Timeout.NONE)
+	public abstract ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel els);
 	
 	/**
 	 *  Get the current state as events.
@@ -2273,21 +2258,21 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	public abstract ServiceGetter<IMonitoringService> getMonitoringServiceGetter();
 
 		
-	/**
-	 *  Publish a monitoring event. This event is automatically send
-	 *  to the monitoring service of the platform (if any). 
-	 */
-	public IFuture<Void> publishEvent(IMonitoringEvent event)
-	{
-		return publishEvent(event, true);//, false);
-	}
+//	/**
+//	 *  Publish a monitoring event. This event is automatically send
+//	 *  to the monitoring service of the platform (if any). 
+//	 */
+//	public IFuture<Void> publishEvent(IMonitoringEvent event)
+//	{
+//		return publishEvent(event, PublishTarget.TOALL);
+//	}
 	
 	/**
 	 *  Publish a monitoring event. This event is automatically send
 	 *  to the monitoring service of the platform (if any). 
 	 *  @param tomonitor Flag, if event should be sent to the monitoring service.
 	 */
-	public IFuture<Void> publishEvent(IMonitoringEvent event, boolean tomonitor)//, boolean force)
+	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt)
 	{
 		if(event.getCause()==null)
 		{
@@ -2309,8 +2294,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		
 		// Publish to monitoring service if monitoring is turned on
 //		if(tomonitor && (force || getComponentDescription().getMonitoring()!=null 
-		if(tomonitor && getComponentDescription().getMonitoring()!=null 
-			&& getComponentDescription().getMonitoring().booleanValue())
+		if((PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt) 
+			&& event.getLevel().getLevel()>getPublishEmitLevelMonitoring().getLevel()))
 		{
 			return publishEvent(event, getMonitoringServiceGetter());
 		}
@@ -2371,5 +2356,57 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	public INFPropertyProvider getParent()
 	{
 		return getComponentAdapter().getParent();
+	}
+	
+	/**
+	 *  Overridden to throw property added events.
+	 */
+	public IFuture<Void> addNFProperty(final INFProperty<?,?> nfprop)
+	{
+		final Future<Void> ret = new Future<Void>();
+		super.addNFProperty(nfprop).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+				{
+					MonitoringEvent me = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), 
+						MonitoringEvent.TYPE_PROPERTY_ADDED, System.currentTimeMillis(), PublishEventLevel.COARSE);
+					me.setProperty("propname", nfprop.getName());
+					publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				else
+				{
+					ret.setResult(null);
+				}
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Overridden to throw property added events.
+	 */
+	public IFuture<Void> removeNFProperty(final String name)
+	{
+		final Future<Void> ret = new Future<Void>();
+		super.removeNFProperty(name).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+				{
+					MonitoringEvent me = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), 
+						MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
+					me.setProperty("propname", name);
+					publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				else
+				{
+					ret.setResult(null);
+				}
+			}
+		});
+		return ret;
 	}
 }

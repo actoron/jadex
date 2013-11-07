@@ -3,6 +3,7 @@ package jadex.bridge;
 import java.util.Map;
 
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 
 /**
  * 
@@ -107,6 +108,14 @@ public class BulkMonitoringEvent implements IMonitoringEvent
 	 *  @return The property.
 	 */
 	public Map<String, Object> getProperties()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get the event importance.
+	 */
+	public PublishEventLevel getLevel()
 	{
 		throw new UnsupportedOperationException();
 	}

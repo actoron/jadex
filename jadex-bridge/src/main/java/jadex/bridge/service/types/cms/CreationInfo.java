@@ -3,6 +3,7 @@ package jadex.bridge.service.types.cms;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 
 import java.util.Map;
 
@@ -40,8 +41,9 @@ public class CreationInfo
 	/** The auto shutdown flag (default: false). */
 	protected Boolean autoshutdown;
 
-	/** The monitoring flag (default: false). */
-	protected Boolean monitoring;
+//	/** The monitoring flag (default: false). */
+//	protected Boolean monitoring;
+	protected PublishEventLevel monitoring;
 	
 	/** The synchronous flag (default: false). */
 	protected Boolean synchronous;
@@ -82,7 +84,7 @@ public class CreationInfo
 			this.master = info.getMaster();
 			this.daemon = info.getDaemon();
 			this.autoshutdown = info.getAutoShutdown();
-			this.monitoring = info.getMonitoring();
+//			this.monitoring = info.getMonitoring();
 			this.synchronous = info.getSynchronous();
 			this.imports	= info.getImports();
 			this.bindings = info.getRequiredServiceBindings();
@@ -231,7 +233,7 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, 
-		Boolean master, Boolean daemon, Boolean autoshutdown, Boolean monitoring, Boolean synchronous)
+		Boolean master, Boolean daemon, Boolean autoshutdown, PublishEventLevel monitoring, Boolean synchronous)
 	{
 		this(config, args, parent, suspend, master, daemon, autoshutdown, monitoring, synchronous, null, null, null);
 	}
@@ -246,7 +248,7 @@ public class CreationInfo
 	 *  @param imports	The imports.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, 
-		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, Boolean monitoring, Boolean synchronous,
+		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, PublishEventLevel monitoring, Boolean synchronous,
 		String[] imports, RequiredServiceBinding[] bindings, IResourceIdentifier rid)
 	{
 		this.config	= config;
@@ -472,11 +474,29 @@ public class CreationInfo
 		this.localtype = localtype;
 	}
 
+//	/**
+//	 *  Get the monitoring.
+//	 *  @return The monitoring.
+//	 */
+//	public Boolean getMonitoring()
+//	{
+//		return monitoring;
+//	}
+//
+//	/**
+//	 *  Set the monitoring.
+//	 *  @param monitoring The monitoring to set.
+//	 */
+//	public void setMonitoring(Boolean monitoring)
+//	{
+//		this.monitoring = monitoring;
+//	}
+
 	/**
 	 *  Get the monitoring.
 	 *  @return The monitoring.
 	 */
-	public Boolean getMonitoring()
+	public PublishEventLevel getMonitoring()
 	{
 		return monitoring;
 	}
@@ -485,11 +505,11 @@ public class CreationInfo
 	 *  Set the monitoring.
 	 *  @param monitoring The monitoring to set.
 	 */
-	public void setMonitoring(Boolean monitoring)
+	public void setMonitoring(PublishEventLevel monitoring)
 	{
 		this.monitoring = monitoring;
 	}
-
+	
 	/**
 	 *  Get the synchronous.
 	 *  @return The synchronous.

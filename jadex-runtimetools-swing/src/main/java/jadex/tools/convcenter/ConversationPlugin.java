@@ -140,7 +140,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler(), getJCC().getIconCache());
+		comptree = new ComponentTreePanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler(), getJCC().getPropertyHandler(), getJCC().getIconCache());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 		convcenter = new ConversationPanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler(), getJCC().getIconCache(), comptree, SFipa.FIPA_MESSAGE_TYPE);

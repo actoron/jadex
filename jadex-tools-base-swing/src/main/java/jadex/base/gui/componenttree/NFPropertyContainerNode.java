@@ -1,6 +1,7 @@
 package jadex.base.gui.componenttree;
 
 
+import jadex.base.gui.PropertyUpdateHandler;
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
@@ -14,6 +15,9 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -78,16 +82,29 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 	 *  - method (sid!=null, mi!=null)
 	 */
 	public NFPropertyContainerNode(String name, String tooltip, ISwingTreeNode parent, AsyncSwingTreeModel model, JTree tree,
-		IExternalAccess provider, IServiceIdentifier sid, MethodInfo mi, RequiredServiceInfo rinfo)
+		IExternalAccess ea, IServiceIdentifier sid, MethodInfo mi, RequiredServiceInfo rinfo)
 	{
 		super(parent, model, tree);
 		this.name = name;
 		this.tooltip = tooltip;
-		this.ea = provider;
+		this.ea = ea;
 		this.sid = sid;
 		this.mi = mi;
 		this.rinfo = rinfo;
 		model.registerNode(this);
+		
+//		PropertyUpdateHandler puh = (PropertyUpdateHandler)tree.getClientProperty(PropertyUpdateHandler.class);
+//		if(puh!=null)
+//		{
+//			String id = sid+":"+mi+":"+name;
+//			puh.addPropertyCommand(ea.getComponentIdentifier(), id, new ICommand<IMonitoringEvent>()
+//			{
+//				public void execute(IMonitoringEvent ev)
+//				{
+//					System.out.println("received: "+ev);
+//				}
+//			});
+//		}
 	}
 	
 	//-------- methods --------
@@ -146,7 +163,7 @@ public class NFPropertyContainerNode	extends AbstractSwingTreeNode
 				List<NFPropertyNode> children = new ArrayList<NFPropertyNode>();
 				for(INFPropertyMetaInfo p: result)
 				{
-					NFPropertyNode nfpn = (NFPropertyNode)model.getNode(NFPropertyNode.getId(NFPropertyContainerNode.this, p.getName()));
+					NFPropertyNode nfpn = (NFPropertyNode)model.getNode(NFPropertyNode.getId(NFPropertyContainerNode.this.getId(), p.getName()));
 					if(nfpn==null)
 					{
 						nfpn = new NFPropertyNode(NFPropertyContainerNode.this, 

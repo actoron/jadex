@@ -40,6 +40,7 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
@@ -517,7 +518,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 																	Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 																	Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
-																	Boolean moni = cinfo.getMonitoring()!=null? cinfo.getMonitoring(): lmodel.getMonitoring(cinfo.getConfiguration());
+																	PublishEventLevel moni = cinfo.getMonitoring()!=null? cinfo.getMonitoring(): lmodel.getMonitoring(cinfo.getConfiguration());
 																	Boolean sync = cinfo.getSynchronous()!=null? cinfo.getSynchronous(): lmodel.getSynchronous(cinfo.getConfiguration());
 																	// Inherit monitoring from parent if null
 																	if(moni==null && cinfo.getParent()!=null)
@@ -1244,7 +1245,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 //						if(achildren.length>0)
 //							System.out.println("kill childs end: "+cid);
 						
-//						if(cid.toString().indexOf("Mandelbrot")!=-1)
+//						if(cid.toString().startsWith("Initiator"))
 //							System.out.println("Terminated component structure: "+cid.getName());
 						
 						logger.info("Terminated component structure: "+cid.getName());

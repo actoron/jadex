@@ -14,7 +14,6 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -26,6 +25,8 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
@@ -944,19 +945,19 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Publish a monitoring event. This event is automatically send
 	 *  to the monitoring service of the platform (if any). 
 	 */
-	public IFuture<Void> publishEvent(IMonitoringEvent event)
+	public IFuture<Void> publishEvent(IMonitoringEvent event, PublishTarget pt)
 	{
-		return interpreter.publishEvent(event);
+		return interpreter.publishEvent(event, pt);
 	}
 	
 	/**
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
 	 */
-	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial)
+//	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm)
 	{
-		return interpreter.subscribeToEvents(filter, initial);
+		return interpreter.subscribeToEvents(filter, initial, elm);
 	}
 
 	
@@ -1029,4 +1030,13 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		return interpreter.getServiceContainer().hasRequiredServicePropertyProvider(sid);
 	}
+	
+	/**
+	 *  Check if event targets exist.
+	 */
+	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi)
+	{
+		return interpreter.hasEventTargets(pt, pi);
+	}
+
 }

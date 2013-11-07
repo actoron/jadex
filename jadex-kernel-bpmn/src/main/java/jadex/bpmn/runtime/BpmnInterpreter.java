@@ -46,6 +46,8 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
@@ -362,17 +364,21 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		{
 			if(!isFinished(pool, lane) && isReady(pool, lane))
 			{
-//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
-//					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
-				if(hasEventTargets(true))
-					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+				{
+					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), 
+						IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
+						System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+				}
 				
 				executeStep(pool, lane);
 				
-//				notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-//					IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
-				if(hasEventTargets(true))
-					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+				{
+					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), 
+						IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, 
+						System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+				}
 			}
 			
 //			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
@@ -837,9 +843,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			MActivity act = thread.getActivity();
 			
 //			notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
-			if(hasEventTargets(true))
-				publishEvent(createActivityEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));
-
+			if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			{
+				publishEvent(createActivityEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()), PublishTarget.TOALL);
+			}
+			
 //			thread = handler.execute(act, this, thread);
 			handler.execute(act, this, thread);
 
@@ -883,9 +891,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				}
 			}
 			
-			if(thread.getThreadContext()!=null)
-				publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread));
-//				notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
+			if(thread.getThreadContext()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			{
+				publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+			}
+//			notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
 		}
 	}
 
@@ -929,8 +939,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //							System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
 							step(activity, BpmnInterpreter.this, thread, event);
 							thread.setNonWaiting();
-							if(thread.getThreadContext()!=null)
-								publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread));
+							if(thread.getThreadContext()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+							{
+								publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+							}
 						}
 						else
 						{
@@ -951,8 +963,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //				System.out.println("Notify2: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
 				step(activity, BpmnInterpreter.this, thread, event);
 				thread.setNonWaiting();
-				if(thread.getThreadContext()!=null && hasEventTargets(true))
-					publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread));
+				if(thread.getThreadContext()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+				{
+					publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
+				}
 			}
 			else
 			{
@@ -1024,8 +1038,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 //		System.out.println("step: "+activity.getName());
 //		notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread, activity));
-		if(hasEventTargets(true))
-			publishEvent(createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity));
+		if(thread.getThreadContext()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		{
+			publishEvent(createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
+		}
 		
 		IStepHandler ret = (IStepHandler)stephandlers.get(activity.getActivityType());
 		if(ret==null) 
@@ -1511,7 +1527,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public IMonitoringEvent createThreadEvent(String type, ProcessThread thread)
 	{
-		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), type+"."+TYPE_THREAD, System.currentTimeMillis());
+		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), type+"."+TYPE_THREAD, System.currentTimeMillis(), PublishEventLevel.FINE);
 		event.setProperty("thread_id", thread.getId());
 		if(!type.startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 			event.setProperty("details", createProcessThreadInfo(thread));
@@ -1530,7 +1546,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //		return new ComponentChangeEvent(type, TYPE_ACTIVITY, activity.getName(), 
 //			thread.getId(), getComponentIdentifier(), getComponentDescription().getCreationTime(), createProcessThreadInfo(thread));
 	
-		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis());
+		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), type+"."+TYPE_ACTIVITY, System.currentTimeMillis(), PublishEventLevel.FINE);
 		event.setProperty("thread_id", thread.getId());
 		event.setProperty("activity", activity.getName());
 		event.setProperty("details", createProcessThreadInfo(thread));

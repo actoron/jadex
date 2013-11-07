@@ -139,6 +139,7 @@ public class InitiatorAgent extends TestAgent
 							}
 							public void secondResultAvailable(Map<String,Object> result) 
 							{
+								System.out.println("sec");
 							}
 							public void exceptionOccurred(Exception exception)
 							{

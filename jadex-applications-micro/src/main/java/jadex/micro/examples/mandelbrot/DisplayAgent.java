@@ -7,6 +7,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -121,7 +122,7 @@ public class DisplayAgent extends MicroAgent
 //							}
 //						});
 						
-						ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+						ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 							.addResultListener(/*new SwingIntermediateResultListener<IMonitoringEvent>(*/new IntermediateDefaultResultListener<IMonitoringEvent>()
 						{
 							public void intermediateResultAvailable(IMonitoringEvent result)

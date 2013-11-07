@@ -314,7 +314,7 @@ public class AcquireCertificatePanel extends JPanel
 		
 		pp.addComponent(pi.getName(), p);
 
-		final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(AcquireCertificatePanel.this), ea, cmshandler, new ComponentIconCache(ea));
+		final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(AcquireCertificatePanel.this), ea, cmshandler, null, new ComponentIconCache(ea));
 		
 		bu.addActionListener(new ActionListener()
 		{

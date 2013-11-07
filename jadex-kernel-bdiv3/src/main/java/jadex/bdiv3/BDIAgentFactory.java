@@ -27,15 +27,15 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-/* $if !android $ */
 import jadex.kernelbase.IBootstrapFactory;
-/* $endif $ */
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+/* $if !android $ */
+/* $endif $ */
 
 
 /**

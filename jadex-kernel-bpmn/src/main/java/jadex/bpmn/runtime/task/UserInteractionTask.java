@@ -5,11 +5,10 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
-import jadex.bpmn.task.info.ParameterMetaInfo;
-import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.Future;
@@ -85,7 +84,7 @@ public class UserInteractionTask implements ITask
 //		};
 //		instance.addComponentListener(lis);
 
-		final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = instance.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false);
+		final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = instance.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.FINE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent result)

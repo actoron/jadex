@@ -28,6 +28,7 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.SFuture;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -49,6 +50,8 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
@@ -171,7 +174,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	protected IMessageService	msgservice;
 	
 	/** The subscriptions (subscription future -> subscription info). */
-	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>> subscriptions;
+	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>> subscriptions;
+	
+	/** The event emit level for subscriptions. */
+	protected PublishEventLevel emitlevelsub;
 	
 	//-------- null on init --------
 	
@@ -650,7 +656,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 //					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION,
 //						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
 					
-					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+					if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+					{
+						publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+					}
 					
 					rulesystem.getAgenda().fireRule();
 					act	= rulesystem.getAgenda().getLastActivation();
@@ -660,10 +669,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					state.notifyEventListeners();
 					state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 					
-//					notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-//						IComponentChangeEvent.SOURCE_CATEGORY_EXECUTION, null, null, getComponentIdentifier(), getComponentDescription().getCreationTime(), null));
-
-					publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis()));
+					if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+					{
+						publishEvent(new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_DISPOSAL+"."+IMonitoringEvent.SOURCE_CATEGORY_EXECUTION, System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
+					}
 				}
 	
 				return !rulesystem.getAgenda().isEmpty();
@@ -673,7 +682,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				// still in init
 				return false;
 			}
-			
 		}
 		catch(Throwable e)
 		{
@@ -2182,10 +2190,11 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  Subscribe to monitoring events.
 	 *  @param filter An optional filter.
 	 */
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel emitlevel)
 	{
-		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
-		
+//		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
+		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
+			
 		ITerminationCommand tcom = new ITerminationCommand()
 		{
 			public void terminated(Exception reason)
@@ -2200,6 +2209,24 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		};
 		ret.setTerminationCommand(tcom);
 		
+		// Signal that subscription has been done
+		MonitoringEvent	subscribed	= new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), 
+			IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(), PublishEventLevel.COARSE);
+		boolean	post = false;
+		try
+		{
+			post = filter==null || filter.filter(subscribed);
+		}
+		catch(Exception e)
+		{
+		}
+		if(post)
+		{
+			ret.addIntermediateResult(subscribed);
+		}
+
+		addSubscription(ret, filter, emitlevel);
+		
 		if(initial)
 		{
 			List<IMonitoringEvent> evs = getCurrentStateEvents();
@@ -2209,8 +2236,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				ret.addIntermediateResult(bme);
 			}
 		}
-		
-		addSubscription(ret, filter);
 		
 		return ret;
 	}
@@ -2234,15 +2259,20 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	protected void publishLocalEvent(IMonitoringEvent event, SubscriptionIntermediateFuture<IMonitoringEvent> sub)
 	{
-		IFilter<IMonitoringEvent> fil = subscriptions.get(sub);
+		Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel> tup = subscriptions.get(sub);
 		try
 		{
-			if(fil==null || fil.filter(event))
+			PublishEventLevel el = tup.getSecondEntity();
+			if(event.getLevel().getLevel()>=el.getLevel())
 			{
-//				System.out.println("forward to: "+sub);
-				if(!sub.addIntermediateResultIfUndone(event))
+				IFilter<IMonitoringEvent> fil = tup.getFirstEntity();
+				if(fil==null || fil.filter(event))
 				{
-					subscriptions.remove(fil);
+	//				System.out.println("forward to: "+event+" "+sub);
+					if(!sub.addIntermediateResultIfUndone(event))
+					{
+						subscriptions.remove(fil);
+					}
 				}
 			}
 		}
@@ -2258,11 +2288,13 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param future The subscription future.
 	 *  @param si The subscription info.
 	 */
-	protected void addSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> future, IFilter<IMonitoringEvent> filter)
+	protected void addSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> future, IFilter<IMonitoringEvent> filter, PublishEventLevel emitlevel)
 	{
 		if(subscriptions==null)
-			subscriptions = new LinkedHashMap<SubscriptionIntermediateFuture<IMonitoringEvent>, IFilter<IMonitoringEvent>>();
-		subscriptions.put(future, filter);
+			subscriptions = new LinkedHashMap<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>>();
+		if(emitlevel.getLevel()>emitlevelsub.getLevel())
+			emitlevelsub = emitlevel;
+		subscriptions.put(future, new Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>(filter, emitlevel));
 	}
 	
 	/**
@@ -2274,6 +2306,14 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		if(subscriptions==null || !subscriptions.containsKey(fut))
 			throw new RuntimeException("Subscriber not known: "+fut);
 		subscriptions.remove(fut);
+		emitlevelsub = PublishEventLevel.OFF;
+		for(Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel> tup: subscriptions.values())
+		{
+			if(tup.getSecondEntity().getLevel()>emitlevelsub.getLevel())
+				emitlevelsub = tup.getSecondEntity();
+			if(PublishEventLevel.FINE.equals(emitlevelsub))
+				break;
+		}
 	}
 	
 	/**
@@ -2300,7 +2340,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				Object	belief	= it.next();
 				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, belief, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), belief.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis());
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(belief.toString());
 				ev.setProperty("details", info);
 				events.add(ev);
@@ -2316,7 +2356,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				Object	beliefset	= it.next();
 				BeliefInfo	info = BeliefInfo.createBeliefInfo(state, beliefset, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_FACT, info.getType(), beliefset.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis());
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(beliefset.toString());
 				ev.setProperty("details", info);
 				events.add(ev);
@@ -2332,7 +2372,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				Object	goal	= it.next();
 				GoalInfo	info = GoalInfo.createGoalInfo(state, goal, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_GOAL, info.getType(), goal.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis());
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(goal.toString());
 				ev.setProperty("details", info);
 				events.add(ev);
@@ -2348,7 +2388,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				Object	plan	= it.next();
 				PlanInfo	info = PlanInfo.createPlanInfo(state, plan, capa);
 //				events.add(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, IComponentChangeEvent.SOURCE_CATEGORY_PLAN, info.getType(), plan.toString(), ia.getComponentIdentifier(), ia.getComponentDescription().getCreationTime(), info));
-				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis());
+				MonitoringEvent ev = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.EVENT_TYPE_CREATION+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN, System.currentTimeMillis(), PublishEventLevel.FINE);
 				ev.setSourceDescription(plan.toString());
 				ev.setProperty("details", info);
 				events.add(ev);
@@ -2377,7 +2417,13 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		ret = reqserprops.get(sid);
 		if(ret==null)
 		{
-			ret = new NFMethodPropertyProvider(null); // parent of required service property?
+			ret = new NFMethodPropertyProvider(null)
+			{
+				public IInternalAccess getInternalAccess() 
+				{
+					return BDIInterpreter.this.getInternalAccess();
+				}
+			}; // parent of required service property?
 			reqserprops.put(sid, ret);
 		}
 		return ret;
@@ -2391,83 +2437,42 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return reqserprops!=null? reqserprops.get(sid)!=null: false;
 	}
 	
-//	//-------- nf properties --------
-//	
-//	/**
-//	 *  Returns the names of all non-functional properties of this service.
-//	 *  @return The names of the non-functional properties of this service.
-//	 */
-//	public String[] getNFPropertyNames()
-//	{
-//		throw new UnsupportedOperationException();
-////		return nfproperties != null? nfproperties.keySet().toArray(new String[nfproperties.size()]) : new String[0];
-//	}
-//	
-//	/**
-//	 *  Returns the meta information about a non-functional property of this service.
-//	 *  @param name Name of the property.
-//	 *  @return The meta information about a non-functional property of this service.
-//	 */
-//	public INFPropertyMetaInfo getNFPropertyMetaInfo(String name)
-//	{
-//		throw new UnsupportedOperationException();
-////		return nfproperties != null? nfproperties.get(name) != null? nfproperties.get(name).getMetaInfo() : null : null;
-//	}
-//	
-//	/**
-//	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-//	 *  @param name Name of the property.
-//	 *  @param type Type of the property value.
-//	 *  @return The current value of a non-functional property of this service.
-//	 */
-//	public <T> IFuture<T> getNFPropertyValue(String name)
-//	{
-//		return new Future(new UnsupportedOperationException());
-////		INFProperty<T, ?> prop = (INFProperty<T, ?>)(nfproperties != null? nfproperties.get(name) : null);
-////		return prop != null? prop.getValue(type) : null;
-//	}
-//	
-//	/**
-//	 *  Returns the current value of a non-functional property of this service, performs unit conversion.
-//	 *  @param name Name of the property.
-//	 *  @param type Type of the property value.
-//	 *  @param unit Unit of the property value.
-//	 *  @return The current value of a non-functional property of this service.
-//	 */
-////	public <T, U> IFuture<T> getNFPropertyValue(String name,  Class<U> unit)
-//	public <T, U> IFuture<T> getNFPropertyValue(String name,  U unit)
-//	{
-//		return new Future(new UnsupportedOperationException());
-////		INFProperty<T, U> prop = (INFProperty<T, U>)(nfproperties != null? nfproperties.get(name) : null);
-////		return prop != null? prop.getValue(type, unit) : null;
-//	}
-//	
-//	/**
-//	 *  Add a new nf property.
-//	 *  @param nfprop The nf property.
-//	 */
-//	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop)
-//	{
-//		throw new UnsupportedOperationException();
-//	}
-//	
-//	/**
-//	 *  Add a new nf property.
-//	 *  @param nfprop The nf property.
-//	 */
-//	public IFuture<Void> removeNFProperty(String name)
-//	{
-//		throw new UnsupportedOperationException();
-//	}
-//	
-//	/**
-//	 *  Returns the meta information about a non-functional property of this service.
-//	 *  @param name Name of the property.
-//	 *  @return The meta information about a non-functional property of this service.
-//	 */
-//	public Map<String, INFPropertyMetaInfo> getNFPropertyMetaInfos()
-//	{
-//		throw new UnsupportedOperationException();
-//	}
-
+	/**
+	 *  Check if event targets exist.
+	 */
+	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi)
+	{
+		boolean ret = false;
+		
+		if(pi.getLevel()<=getPublishEmitLevelSubscriptions().getLevel() 
+			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOSUBSCRIBERS.equals(pt)))
+		{
+			ret = subscriptions!=null && !subscriptions.isEmpty();
+		}
+		if(!ret && pi.getLevel()<=getPublishEmitLevelMonitoring().getLevel()
+			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt)))
+		{
+			ret = true;
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the monitoring event emit level for subscriptions.
+	 *  Is the maximum level of all subscriptions (cached for speed).
+	 */
+	public PublishEventLevel getPublishEmitLevelSubscriptions()
+	{
+		return emitlevelsub;
+	}
+	
+	/**
+	 *  Get the monitoring event emit level.
+	 */
+	public PublishEventLevel getPublishEmitLevelMonitoring()
+	{
+		return getComponentDescription().getMonitoring();
+	}
+	
 }

@@ -5,6 +5,7 @@ import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
@@ -628,7 +629,7 @@ public class EventReificator implements IOAVStateListener
 			}
 			
 //			bdiint.notifyListeners(event);
-			bdiint.publishEvent(event);
+			bdiint.publishEvent(event, PublishTarget.TOALL);
 		}
 	}
 }

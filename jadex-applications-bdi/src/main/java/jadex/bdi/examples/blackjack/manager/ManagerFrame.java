@@ -17,6 +17,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -183,7 +184,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		
 		final	CMSUpdateHandler	cmsuh	= new CMSUpdateHandler(access);
 		
-		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access, cmsuh, new ComponentIconCache(access));
+		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access, cmsuh, null, new ComponentIconCache(access));
 		JButton	dealerbut	= new JButton("...");
 		dealerbut.addActionListener(new ActionListener()
 		{
@@ -303,7 +304,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //					}
 //				});
 				
-				bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+				bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

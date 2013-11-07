@@ -3,6 +3,7 @@
  */
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.PropertyUpdateHandler;
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.ISwingTreeNode;
@@ -16,6 +17,8 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.commons.ICommand;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -81,6 +84,18 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 		this.mi = mi;
 		this.rinfo = rinfo;
 		model.registerNode(this);
+		
+//		PropertyUpdateHandler puh = (PropertyUpdateHandler)tree.getClientProperty(PropertyUpdateHandler.class);
+//		if(puh!=null)
+//		{
+//			puh.addPropertyCommand(ea.getComponentIdentifier(), propmi.getName(), new ICommand<IMonitoringEvent>()
+//			{
+//				public void execute(IMonitoringEvent ev)
+//				{
+//					System.out.println("received: "+ev);
+//				}
+//			});
+//		}
 	}
 	
 	//-------- methods --------
@@ -92,7 +107,7 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	public Object	getId()
 	{
 //		return sid;
-		return getId(getParent(), propmi.getName());
+		return getId(getParent().getId(), propmi.getName());
 	}
 	
 	/**
@@ -193,9 +208,9 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 	/**
 	 *  Build the node id.
 	 */
-	protected static String	getId(ISwingTreeNode parent, String name)
+	protected static String	getId(Object parentid, String name)
 	{
-		return parent.getId()+":nfproperty:"+name;
+		return parentid+":nfproperty:"+name;
 	}
 	
 	/**

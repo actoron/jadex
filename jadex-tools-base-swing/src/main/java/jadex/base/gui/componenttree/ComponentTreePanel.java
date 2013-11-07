@@ -2,6 +2,7 @@ package jadex.base.gui.componenttree;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ObjectInspectorPanel;
+import jadex.base.gui.PropertyUpdateHandler;
 import jadex.base.gui.asynctree.AbstractSwingTreeNode;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
@@ -22,15 +23,15 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.ICommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
@@ -61,6 +62,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.event.ChangeEvent;
@@ -163,21 +165,25 @@ public class ComponentTreePanel extends JSplitPane
 	/** The properties panel. */
 	protected final JScrollPane	proppanel;
 	
+	/** The property update handler command. */
+	protected ICommand<IMonitoringEvent> propcmd;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ComponentTreePanel(IExternalAccess access, CMSUpdateHandler cmshandler, ComponentIconCache cic)
+	public ComponentTreePanel(IExternalAccess access, CMSUpdateHandler cmshandler, 
+		PropertyUpdateHandler prophandler, ComponentIconCache cic)
 	{
-		this(access, cmshandler, cic, VERTICAL_SPLIT);
+		this(access, cmshandler, prophandler, cic, VERTICAL_SPLIT);
 	}
 	
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ComponentTreePanel(final IExternalAccess access, CMSUpdateHandler cmshandler, final ComponentIconCache cic, int orientation)
+	public ComponentTreePanel(final IExternalAccess access, CMSUpdateHandler cmshandler, 
+		PropertyUpdateHandler prophandler, final ComponentIconCache cic, int orientation)
 	{
 		super(orientation);
 		this.setOneTouchExpandable(true);
@@ -191,6 +197,7 @@ public class ComponentTreePanel extends JSplitPane
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);
 		tree.putClientProperty(CMSUpdateHandler.class, cmshandler);
+		tree.putClientProperty(PropertyUpdateHandler.class, prophandler);
 		JScrollPane	scroll	= new JScrollPane(tree);
 		this.add(scroll);
 		// needed to show tooltips: http://info.michael-simons.eu/2008/08/12/enabling-tooltips-on-a-jtree/
@@ -201,8 +208,30 @@ public class ComponentTreePanel extends JSplitPane
 		proppanel.setPreferredSize(new Dimension(0, 0));
 		this.add(proppanel);
 		this.setResizeWeight(1.0);
+		
+		// Refresh dynamic property additions / removals
+		if(prophandler!=null)
+		{
+			propcmd = new ICommand<IMonitoringEvent>() {
 				
-
+				public void execute(final IMonitoringEvent ev) 
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							ISwingTreeNode node = model.getNode(ev.getSourceIdentifier());
+							if(node!=null)
+							{
+								node.refresh(true);
+							}
+						}
+					});
+				}
+			};
+			prophandler.addPropertyCommand(propcmd);
+		}
+				
 		final Action kill = new AbstractAction(KILL_ACTION, icons.getIcon("kill_component"))
 		{
 			public void actionPerformed(ActionEvent e)
@@ -967,6 +996,12 @@ public class ComponentTreePanel extends JSplitPane
 	 */
 	public void	dispose()
 	{
+		PropertyUpdateHandler prophandler = (PropertyUpdateHandler)tree.getClientProperty(PropertyUpdateHandler.class);
+		if(prophandler!=null)
+		{
+			prophandler.removePropertyCommand(propcmd);
+		}
+		
 		getModel().dispose();
 	}
 	

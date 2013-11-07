@@ -4,6 +4,7 @@ import jadex.bridge.Cause;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 
 import java.io.Serializable;
 import java.util.LinkedHashSet;
@@ -52,7 +53,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	protected Boolean autoshutdown;
 
 	/** The monitoring flag. */
-	protected Boolean monitoring;
+	protected PublishEventLevel monitoring;
 	
 	/** The synchronous flag. */
 	protected Boolean synchronous;
@@ -86,7 +87,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Create a new CESComponentDescription.
 	 */
 	public CMSComponentDescription(IComponentIdentifier cid, String type, Boolean master, 
-		Boolean daemon, Boolean autoshutdown, Boolean monitoring, Boolean synchronous, String modelname, String localtype, IResourceIdentifier rid,
+		Boolean daemon, Boolean autoshutdown, PublishEventLevel monitoring, Boolean synchronous, String modelname, String localtype, IResourceIdentifier rid,
 		long creationtime, IComponentIdentifier creator, Cause cause)
 	{
 //		System.out.println("created desc: "+cid+" "+hashCode());
@@ -98,7 +99,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setMaster(master);
 		setDaemon(daemon);
 		setAutoShutdown(autoshutdown);
-		setMonitoring(monitoring);
+		setMonitoring(monitoring!=null? monitoring: PublishEventLevel.OFF);
 		setSynchronous(synchronous);
 		setModelName(modelname);
 		setLocalType(localtype);
@@ -112,7 +113,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 
 	/**
 	 *  Get the state of this CESComponentDescription.
-	 * @return state
+	 *  @return state
 	 */
 	public String getState()
 	{
@@ -121,7 +122,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 
 	/**
 	 *  Set the state of this CESComponentDescription.
-	 * @param state the value to be set
+	 *  @param state the value to be set
 	 */
 	public void setState(String state)
 	{
@@ -426,7 +427,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Get the monitoring.
 	 *  @return The monitoring.
 	 */
-	public Boolean getMonitoring()
+	public PublishEventLevel getMonitoring()
 	{
 		return monitoring;
 	}
@@ -435,7 +436,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Set the monitoring.
 	 *  @param monitoring The monitoring to set.
 	 */
-	public void setMonitoring(Boolean monitoring)
+	public void setMonitoring(PublishEventLevel monitoring)
 	{
 		this.monitoring = monitoring;
 	}

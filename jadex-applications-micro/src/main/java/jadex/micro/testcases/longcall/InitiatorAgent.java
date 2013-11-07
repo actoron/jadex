@@ -50,9 +50,11 @@ public class InitiatorAgent extends TestAgent
 	 */
 	protected IFuture<Void> performTests(final Testcase tc)
 	{
-		if (SReflect.isAndroid()) {
+		if(SReflect.isAndroid()) 
+		{
 			tc.setTestCount(6);
 		}
+		
 		final Future<Void> ret = new Future<Void>();
 		
 		testLocal(1).addResultListener(agent.createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
@@ -76,29 +78,32 @@ public class InitiatorAgent extends TestAgent
 			
 			public void proceed()
 			{
-				if (SReflect.isAndroid()) {
+				if(SReflect.isAndroid()) 
+				{
 					// skip remote tests
 					ret.setResult(null);
-				} else {
+				} 
+				else 
+				{
 					testRemote(3).addResultListener(agent.createResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
-							{
-								public void customResultAvailable(Collection<TestReport> result)
-								{
-									for(TestReport tr: result)
-										tc.addReport(tr);
-									ret.setResult(null);
-								}
-								
-								public void finished()
-								{
-									ret.setResult(null);
-								}
-								
-								public void intermediateResultAvailable(TestReport result)
-								{
-									tc.addReport(result);
-								}
-							}));
+					{
+						public void customResultAvailable(Collection<TestReport> result)
+						{
+							for(TestReport tr: result)
+								tc.addReport(tr);
+							ret.setResult(null);
+						}
+						
+						public void finished()
+						{
+							ret.setResult(null);
+						}
+						
+						public void intermediateResultAvailable(TestReport result)
+						{
+							tc.addReport(result);
+						}
+					}));
 				}
 			}
 		}));
@@ -126,7 +131,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		createPlatform(null).addResultListener(agent.createResultListener(
+		createPlatform(new String[]{"-gui", "true", "-logging", "true"}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -136,7 +141,7 @@ public class InitiatorAgent extends TestAgent
 				{
 					public void customResultAvailable(final Collection<TestReport> result)
 					{
-						platform.killComponent();
+//						platform.killComponent();
 //							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
 //						{
 //							public void customResultAvailable(Map<String, Object> v)

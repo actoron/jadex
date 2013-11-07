@@ -6,14 +6,13 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
-import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -169,7 +168,7 @@ public class AGRSpace	implements IExtensionInstance
 							return obj.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_COMPONENT)
 								|| obj.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START);
 						}
-					}, false);
+					}, false, PublishEventLevel.FINE);
 					
 					sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
 					{

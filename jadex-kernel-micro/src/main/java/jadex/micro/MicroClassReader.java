@@ -24,6 +24,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Value;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.FieldInfo;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
@@ -258,7 +259,7 @@ public class MicroClassReader
 				Boolean	mast	= val.master().toBoolean();
 				Boolean	daem	= val.daemon().toBoolean();
 				Boolean	auto	= val.autoshutdown().toBoolean();
-				Boolean	moni	= val.monitoring().toBoolean();
+				PublishEventLevel moni = val.monitoring();
 				Boolean	sync	= val.synchronous().toBoolean();
 				if(susp!=null)
 				{
@@ -276,7 +277,7 @@ public class MicroClassReader
 				{
 					modelinfo.setAutoShutdown(auto);
 				}
-				if(moni!=null)
+				if(!PublishEventLevel.NULL.equals(moni))
 				{
 					modelinfo.setMonitoring(moni);
 				}
@@ -1375,7 +1376,7 @@ public class MicroClassReader
 		ret.setMaster(comp.master().toBoolean());
 		ret.setDaemon(comp.daemon().toBoolean());
 		ret.setAutoShutdown(comp.autoshutdown().toBoolean());
-		ret.setMonitoring(comp.monitoring().toBoolean());
+		ret.setMonitoring(comp.monitoring());
 		ret.setSynchronous(comp.synchronous().toBoolean());
 		
 		if(comp.name().length()>0)

@@ -1,6 +1,9 @@
 package jadex.platform.service.monitoring;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.IFilter;
@@ -22,6 +25,10 @@ import java.util.Map;
 @Service
 public class MonitoringService implements IMonitoringService
 {
+	/** The agent. */
+	@ServiceComponent
+	protected IInternalAccess agent;
+	
 	/** The list of events. */
 	protected List<IMonitoringEvent> events;
 	
@@ -92,7 +99,8 @@ public class MonitoringService implements IMonitoringService
 	 */
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter)
 	{
-		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
+//		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
+		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class,  agent);
 		
 		ITerminationCommand tcom = new ITerminationCommand()
 		{

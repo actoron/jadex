@@ -11,6 +11,7 @@ import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -128,7 +129,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 					String info = context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
 //					info += context.getArguments();
 					MonitoringEvent ev = new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
-						info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start);
+						info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start, PublishEventLevel.MEDIUM);
 					
 //					if(context.getMethod().getName().indexOf("method")!=-1)
 //						System.out.println("call method: "+ev.getCause().getChainId());
@@ -206,7 +207,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 						ServiceCall sc = sic.getServiceCall();
 						Cause cause = sc==null? null: sc.getCause();
 						monser.publishEvent(new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
-							sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end));
+							sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end, PublishEventLevel.MEDIUM));
 					}
 					ReturnValueResultListener.super.customResultAvailable(null);
 				}

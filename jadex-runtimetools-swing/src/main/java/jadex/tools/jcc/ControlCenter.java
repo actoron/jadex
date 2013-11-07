@@ -1,6 +1,7 @@
 package jadex.tools.jcc;
 
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.PropertyUpdateHandler;
 import jadex.base.gui.RememberOptionMessage;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.SJCC;
@@ -76,6 +77,9 @@ public class ControlCenter
 
 	/** The CMS update handler shared by all tools. */
 	protected CMSUpdateHandler	cmshandler;
+
+	/** The property handler. */
+	protected PropertyUpdateHandler prophandler;
 	
 	/** The component icon cache shared by all tools. */
 	protected ComponentIconCache	iconcache;
@@ -389,6 +393,9 @@ public class ControlCenter
 									handlerdisposed	= cmshandler.dispose();
 								else
 									handlerdisposed	= IFuture.DONE;
+								
+								if(prophandler!=null)
+									prophandler.dispose();
 
 								handlerdisposed.addResultListener(new SwingDelegationResultListener<Void>(ret)
 								{
@@ -459,6 +466,20 @@ public class ControlCenter
 			cmshandler	= new CMSUpdateHandler(jccaccess);
 		}
 		return cmshandler;
+	}
+	
+	/**
+	 *  Get the property update handler shared by all tools.
+	 */
+	public PropertyUpdateHandler getPropertyHandler()
+	{
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
+		
+		if(prophandler==null)
+		{
+			prophandler	= new PropertyUpdateHandler(jccaccess);
+		}
+		return prophandler;
 	}
 	
 	/**

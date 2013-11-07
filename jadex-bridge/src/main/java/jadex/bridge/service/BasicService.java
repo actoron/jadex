@@ -430,6 +430,14 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	}
 	
 	/**
+	 *  Get the internal access.
+	 */
+	public IInternalAccess getInternalAccess() 
+	{
+		return internalaccess;
+	}
+	
+	/**
 	 *  Check if the service is valid.
 	 * /
 	public IFuture checkValid()

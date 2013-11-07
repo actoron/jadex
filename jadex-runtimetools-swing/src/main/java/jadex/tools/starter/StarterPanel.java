@@ -17,6 +17,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -137,7 +138,7 @@ public class StarterPanel extends JLayeredPane
 	protected JCheckBox mastercb;
 	protected JCheckBox daemoncb;
 	protected JCheckBox autosdcb;
-	protected JCheckBox monicb;
+	protected JComboBox monicb;
 	protected JCheckBox synccb;
 
 //	/** The application name. */
@@ -340,7 +341,7 @@ public class StarterPanel extends JLayeredPane
 										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-										monicb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+										(PublishEventLevel)monicb.getSelectedItem(),
 										synccb.isSelected()? Boolean.TRUE: Boolean.FALSE,
 										killlistener, StarterPanel.this.parent, StarterPanel.this)
 									.addResultListener(new DelegationResultListener(fut));
@@ -355,7 +356,7 @@ public class StarterPanel extends JLayeredPane
 									mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-									monicb.isSelected()? Boolean.TRUE: Boolean.FALSE,
+									(PublishEventLevel)monicb.getSelectedItem(),
 									synccb.isSelected()? Boolean.TRUE: Boolean.FALSE,
 									killlistener, StarterPanel.this.parent, StarterPanel.this)
 								.addResultListener(new DelegationResultListener(fut));
@@ -411,7 +412,7 @@ public class StarterPanel extends JLayeredPane
 		chooseparent.setToolTipText("Choose parent");
 		componentpanel.add(chooseparent, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
-		final ComponentSelectorDialog	agentselector = new ComponentSelectorDialog(this, jcc.getPlatformAccess(), jcc.getCMSHandler(), jcc.getIconCache());
+		final ComponentSelectorDialog	agentselector = new ComponentSelectorDialog(this, jcc.getPlatformAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), jcc.getIconCache());
 		chooseparent.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -450,7 +451,7 @@ public class StarterPanel extends JLayeredPane
 		autosdcb.setToolTipText("Auto shutdown terminates a composite components when all (non daemon) components have terminated");
 //		autosdcb.setPreferredSize(pd);
 //		autosdcb.setMinimumSize(md);
-		monicb = new JCheckBox("Monitor");
+		monicb = new JComboBox(new Object[]{PublishEventLevel.OFF, PublishEventLevel.COARSE, PublishEventLevel.MEDIUM, PublishEventLevel.FINE});
 		monicb.setToolTipText("Monitor the component. If turned on it will push events to the IMonitoringService of the platform.");
 		synccb = new JCheckBox("Synchronous");
 		synccb.setToolTipText("Run the component synchronously on the thread of its parent.");
@@ -459,8 +460,10 @@ public class StarterPanel extends JLayeredPane
 		flags.add(mastercb);
 		flags.add(daemoncb);
 		flags.add(autosdcb);
-		flags.add(monicb);
 		flags.add(synccb);
+		flags.add(new JLabel("Monitor "));
+		flags.add(monicb);
+		
 		componentpanel.add(new JLabel("Flags"), new GridBagConstraints(0, 2, 1, 0, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(2, 2, 0, 2), 0, 0));
 		componentpanel.add(flags, new GridBagConstraints(1, 2, 4, 0, 0, 0, GridBagConstraints.WEST,
@@ -747,7 +750,7 @@ public class StarterPanel extends JLayeredPane
 			daemoncb.setSelected(false);
 			mastercb.setSelected(false);
 			autosdcb.setSelected(false);
-			monicb.setSelected(false);
+			monicb.setSelectedItem(PublishEventLevel.OFF);
 			synccb.setSelected(false);
 			genname.setSelected(false);
 			numcomponents.setValue(new Integer(1));
@@ -969,13 +972,13 @@ public class StarterPanel extends JLayeredPane
 			boolean m = model.getMaster(c)==null? mastercb.isSelected(): model.getMaster(c).booleanValue();
 			boolean d = model.getDaemon(c)==null? daemoncb.isSelected(): model.getDaemon(c).booleanValue();
 			boolean a = model.getAutoShutdown(c)==null? autosdcb.isSelected(): model.getAutoShutdown(c).booleanValue();
-			boolean mo = model.getMonitoring(c)==null? monicb.isSelected(): model.getMonitoring(c).booleanValue();
+			PublishEventLevel mo = model.getMonitoring(c)==null? (PublishEventLevel)monicb.getSelectedItem(): model.getMonitoring(c);
 			boolean sy = model.getSynchronous(c)==null? synccb.isSelected(): model.getSynchronous(c).booleanValue();
 			suspend.setSelected(s);
 			mastercb.setSelected(m);
 			daemoncb.setSelected(d);
 			autosdcb.setSelected(a); 
-			monicb.setSelected(mo); 
+			monicb.setSelectedItem(mo); 
 			synccb.setSelected(sy); 
 //			System.out.println("smda: "+s+" "+m+" "+d+" "+a);
 		}
@@ -1641,7 +1644,7 @@ public class StarterPanel extends JLayeredPane
 	 */
 	public static IFuture createComponent(final IControlCenter jcc, final IResourceIdentifier rid, final String type, final String name, 
 		final String configname, final Map arguments, final Boolean suspend, 
-		final Boolean master, final Boolean daemon, final Boolean autosd, final Boolean moni, final Boolean sync,
+		final Boolean master, final Boolean daemon, final Boolean autosd, final PublishEventLevel moni, final Boolean sync,
 		final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future ret = new Future(); 

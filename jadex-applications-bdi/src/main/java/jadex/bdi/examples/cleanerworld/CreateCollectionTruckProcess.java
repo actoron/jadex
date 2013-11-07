@@ -10,6 +10,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -125,7 +126,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 //													}
 //												});
 												
-												bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+												bia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 													.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 												{
 													public void intermediateResultAvailable(IMonitoringEvent result)

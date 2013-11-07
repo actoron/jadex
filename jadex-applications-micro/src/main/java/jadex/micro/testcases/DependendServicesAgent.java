@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -86,7 +87,7 @@ public class DependendServicesAgent extends MicroAgent
                 for(int i=0; i<childs.length; i++)
                 {
                     final IExternalAccess child = childs[i];
-                    child.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+                    child.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 						.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 					{
 						public void intermediateResultAvailable(IMonitoringEvent result)

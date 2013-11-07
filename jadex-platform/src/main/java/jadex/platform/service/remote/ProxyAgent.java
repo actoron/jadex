@@ -1,7 +1,9 @@
 package jadex.platform.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
@@ -137,25 +139,39 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	{
 		final Future<State> ret = new Future<State>();
 		
-		rcms.getExternalAccess(rcid).addResultListener(new IResultListener<IExternalAccess>()
+		if(rcms!=null)
 		{
-			public void resultAvailable(IExternalAccess result) 
+			rcms.getExternalAccess(rcid).addResultListener(new IResultListener<IExternalAccess>()
 			{
-				ret.setResult(State.CONNECTED);
-			}
-			
-			public void exceptionOccurred(Exception exception)
+				public void resultAvailable(IExternalAccess result) 
+				{
+					ret.setResult(State.CONNECTED);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					if(exception instanceof SecurityException)
+					{
+						ret.setResult(State.LOCKED);
+					}
+					else
+					{
+						ret.setResult(State.UNCONNECTED);
+					}
+				}
+			});
+		}
+		else
+		{
+			scheduleStep(new IComponentStep<Void>()
 			{
-				if(exception instanceof SecurityException)
+				public IFuture<Void> execute(IInternalAccess ia) 
 				{
-					ret.setResult(State.LOCKED);
+					getConnectionState().addResultListener(new DelegationResultListener<IProxyAgentService.State>(ret));
+					return IFuture.DONE;
 				}
-				else
-				{
-					ret.setResult(State.UNCONNECTED);
-				}
-			}
-		});
+			}, 10000);
+		}
 		
 //		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)

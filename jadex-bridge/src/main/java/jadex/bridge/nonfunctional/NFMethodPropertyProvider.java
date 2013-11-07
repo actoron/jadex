@@ -1,5 +1,8 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -14,7 +17,7 @@ import java.util.Set;
 /**
  *  Default implementation for a method property provider.
  */
-public class NFMethodPropertyProvider extends NFPropertyProvider implements INFMixedPropertyProvider
+public abstract class NFMethodPropertyProvider extends NFPropertyProvider implements INFMixedPropertyProvider
 {
 	/** Non-functional properties of methods. */
 	protected Map<MethodInfo, Map<String, INFProperty<?, ?>>> methodnfproperties;
@@ -202,6 +205,8 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 	 */
 	public IFuture<Void> addMethodNFProperty(MethodInfo method, INFProperty<?, ?> nfprop)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		if(methodnfproperties==null)
 			methodnfproperties = new HashMap<MethodInfo, Map<String,INFProperty<?,?>>>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
@@ -211,7 +216,20 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 			methodnfproperties.put(method, nfmap);
 		}
 		nfmap.put(nfprop.getName(), nfprop);
-		return IFuture.DONE;
+		
+		if(getInternalAccess().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+		{
+			MonitoringEvent me = new MonitoringEvent(getInternalAccess().getComponentIdentifier(), getInternalAccess().getComponentDescription().getCreationTime(), 
+				MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
+			me.setProperty("propname", nfprop.getName());
+			getInternalAccess().publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -219,16 +237,32 @@ public class NFMethodPropertyProvider extends NFPropertyProvider implements INFM
 	 *  @param method The method targeted by this operation.
 	 *  @param The name.
 	 */
-	public IFuture<Void> removeMethodNFProperty(MethodInfo method, String name)
+	public IFuture<Void> removeMethodNFProperty(MethodInfo method, final String name)
 	{
-		Future<Void> ret = new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
 		Map<String, INFProperty<?, ?>> nfmap = methodnfproperties != null? methodnfproperties.get(method) : null;
 		if(nfmap != null)
 		{
 			INFProperty<?, ?> prop = nfmap.remove(name);
 			if(prop!=null)
 			{
-				prop.dispose().addResultListener(new DelegationResultListener<Void>(ret));
+				prop.dispose().addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						if(getInternalAccess().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+						{
+							MonitoringEvent me = new MonitoringEvent(getInternalAccess().getComponentIdentifier(), getInternalAccess().getComponentDescription().getCreationTime(), 
+								MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
+							me.setProperty("propname", name);
+							getInternalAccess().publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+						else
+						{
+							ret.setResult(null);
+						}
+					}
+				});
 			}
 			else
 			{

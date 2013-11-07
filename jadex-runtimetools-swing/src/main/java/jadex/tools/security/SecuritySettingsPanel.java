@@ -413,7 +413,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 								public void actionPerformed(ActionEvent e)
 								{
 									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
-										jcc.getJCCAccess(), jcc.getCMSHandler(), new ComponentIconCache(jcc.getJCCAccess()));
+										jcc.getJCCAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), new ComponentIconCache(jcc.getJCCAccess()));
 									IComponentIdentifier cid = psd.selectAgent(null);
 									if(cid!=null)
 										tfentry.setText(cid.getPlatformPrefix());
@@ -497,7 +497,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 								public void actionPerformed(ActionEvent e)
 								{
 									final PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
-										jcc.getJCCAccess(), jcc.getCMSHandler(), new ComponentIconCache(jcc.getJCCAccess()));
+										jcc.getJCCAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), new ComponentIconCache(jcc.getJCCAccess()));
 									cid[0] = psd.selectAgent(null);
 									if(cid[0]!=null)
 									{
@@ -589,7 +589,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 								public void actionPerformed(ActionEvent e)
 								{
 									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
-										jcc.getJCCAccess(), jcc.getCMSHandler(), new ComponentIconCache(jcc.getJCCAccess()));
+										jcc.getJCCAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), new ComponentIconCache(jcc.getJCCAccess()));
 									IComponentIdentifier cid = psd.selectAgent(null);
 									if(cid!=null)
 //										tfentry.setText(cid.getName());
@@ -652,7 +652,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 								public void actionPerformed(ActionEvent e)
 								{
 									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
-										jcc.getJCCAccess(), jcc.getCMSHandler(), new ComponentIconCache(jcc.getJCCAccess()));
+										jcc.getJCCAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), new ComponentIconCache(jcc.getJCCAccess()));
 									IComponentIdentifier cid = psd.selectAgent(null);
 									if(cid!=null)
 //										tfentry.setText(cid.getName());

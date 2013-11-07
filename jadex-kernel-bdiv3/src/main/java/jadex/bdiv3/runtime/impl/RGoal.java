@@ -12,6 +12,8 @@ import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -1016,7 +1018,7 @@ public class RGoal extends RProcessableElement implements IGoal
 	 */
 	public void publishToolGoalEvent(String evtype)
 	{
-		if(getInterpreter().hasEventTargets(false))
+		if(getInterpreter().hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
@@ -1028,8 +1030,9 @@ public class RGoal extends RProcessableElement implements IGoal
 //			mev.setProperty("sourcename", element.toString());
 			mev.setProperty("sourcetype", info.getType());
 			mev.setProperty("details", info);
+			mev.setPublishEventImportance(PublishEventLevel.FINE);
 			
-			getInterpreter().publishEvent(mev);
+			getInterpreter().publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}
 	}
 	

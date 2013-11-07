@@ -15,6 +15,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.DelegationResultListener;
@@ -225,9 +226,11 @@ public class CreateComponentTask implements ITask
 				};
 				
 				// todo: rid
+				// todo: monitoring
+				PublishEventLevel elm = monitoring? PublishEventLevel.COARSE: PublishEventLevel.OFF;
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub? instance.getComponentIdentifier() : null, 
-						suspend, master, daemon, autoshutdown, monitoring, synchronous, 
+						suspend, master, daemon, autoshutdown, elm, synchronous, 
 						((BpmnInterpreter) instance).getModelElement().getModelInfo().getAllImports(), bindings,
 						instance.getModel().getResourceIdentifier()), lis)
 					.addResultListener(instance.createResultListener(new DelegationResultListener(creationfuture)));

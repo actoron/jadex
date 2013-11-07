@@ -74,6 +74,9 @@ public class ComponentSelectorDialog
 	/** The cms handler. */
 	protected CMSUpdateHandler cmshandler;
 	
+	/** The cms handler. */
+	protected PropertyUpdateHandler prophandler;
+	
 	/** The icon cache. */
 	protected ComponentIconCache iconcache;
 	
@@ -108,7 +111,7 @@ public class ComponentSelectorDialog
 	 *  Create a new AgentSelectorDialog.
 	 */
 	public ComponentSelectorDialog(Component parent, IExternalAccess access, 
-		CMSUpdateHandler cmshandler, ComponentIconCache iconcache)
+		CMSUpdateHandler cmshandler, PropertyUpdateHandler prophandler, ComponentIconCache iconcache)
 	{
 		this.parent	= parent;
 		this.access	= access;
@@ -458,7 +461,7 @@ public class ComponentSelectorDialog
 	 */
 	protected JComponent createTreeView()
 	{
-		final ComponentTreePanel comptree = new ComponentTreePanel(access, cmshandler, iconcache);
+		final ComponentTreePanel comptree = new ComponentTreePanel(access, cmshandler, prophandler, iconcache);
 		comptree.setPreferredSize(new Dimension(200, 100));
 		comptree.addNodeHandler(new ISwingNodeHandler()
 		{

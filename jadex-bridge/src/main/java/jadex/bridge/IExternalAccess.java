@@ -1,18 +1,18 @@
 package jadex.bridge;
 
-import java.util.Map;
-
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+
+import java.util.Map;
 
 /**
  *  The interface for accessing components from the outside.
@@ -125,8 +125,8 @@ public interface IExternalAccess extends INFPropertyProvider//extends IRemotable
 	 *  @param filter An optional filter.
 	 *  @param initial True, for receiving the current state.
 	 */
-	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial);
+//	@Timeout(Timeout.NONE)
+	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm);
 	
 	/**
 	 *  Get the component results.

@@ -3,6 +3,7 @@ package jadex.micro.examples.helpline;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -379,7 +380,7 @@ public class HelplinePanel extends JPanel
 //					}
 //				});
 				
-				ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false)
+				ia.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.COARSE)
 					.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent result)

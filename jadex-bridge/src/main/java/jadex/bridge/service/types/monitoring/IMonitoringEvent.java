@@ -2,6 +2,7 @@ package jadex.bridge.service.types.monitoring;
 
 import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 
 import java.util.Map;
@@ -45,6 +46,9 @@ public interface IMonitoringEvent
 	/** Events regarding a service. */
 	public static final String SOURCE_CATEGORY_SERVICE = "Service";
 
+	/** Events regarding a property. */
+	public static final String SOURCE_CATEGORY_PROPERTY = "Property";
+
 	
 	// BPMN
 	
@@ -78,6 +82,10 @@ public interface IMonitoringEvent
 	public static final String TYPE_COMPONENT_CREATED = EVENT_TYPE_CREATION+"."+SOURCE_CATEGORY_COMPONENT; //"component_created";
 	
 	public static final String TYPE_COMPONENT_DISPOSED = EVENT_TYPE_DISPOSAL+"."+SOURCE_CATEGORY_COMPONENT; //"component_created";
+
+	public static final String TYPE_PROPERTY_ADDED = EVENT_TYPE_CREATION+"."+SOURCE_CATEGORY_PROPERTY;
+	
+	public static final String TYPE_PROPERTY_REMOVED = EVENT_TYPE_DISPOSAL+"."+SOURCE_CATEGORY_PROPERTY;
 
 	
 	/**
@@ -123,7 +131,6 @@ public interface IMonitoringEvent
 	 */
 	public void setCause(Cause cause);
 
-	
 	/**
 	 *  Get a property.
 	 *  @param name The property name.
@@ -138,4 +145,8 @@ public interface IMonitoringEvent
 	 */
 	public Map<String, Object> getProperties();
 	
+	/**
+	 *  Get the event importance level.
+	 */
+	public PublishEventLevel getLevel();
 }

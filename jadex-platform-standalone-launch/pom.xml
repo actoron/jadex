@@ -52,11 +52,11 @@
 			<artifactId>jadex-javaparser</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-nuggets</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>

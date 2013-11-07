@@ -1,5 +1,9 @@
 package jadex.bridge.nonfunctional;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -13,7 +17,7 @@ import java.util.Set;
 /**
  *  Base impl for nf property property provider.
  */
-public class NFPropertyProvider implements INFPropertyProvider
+public abstract class NFPropertyProvider implements INFPropertyProvider
 {
 	/** The parent. */
 	protected INFPropertyProvider parent;
@@ -210,25 +214,54 @@ public class NFPropertyProvider implements INFPropertyProvider
 	 */
 	public IFuture<Void> addNFProperty(INFProperty<?, ?> nfprop)
 	{
+		final Future<Void> ret = new Future<Void>();
 		if(nfproperties==null)
 			nfproperties = new HashMap<String, INFProperty<?,?>>();
 		nfproperties.put(nfprop.getName(), nfprop);
-		return IFuture.DONE;
+		
+		if(getInternalAccess().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+		{
+			MonitoringEvent me = new MonitoringEvent(getInternalAccess().getComponentIdentifier(), getInternalAccess().getComponentDescription().getCreationTime(), 
+				MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
+			me.setProperty("propname", nfprop.getName());
+			getInternalAccess().publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
 	}
 	
 	/**
 	 *  Remove a non-functional property.
 	 *  @param The name.
 	 */
-	public IFuture<Void> removeNFProperty(String name)
+	public IFuture<Void> removeNFProperty(final String name)
 	{
-		Future<Void> ret = new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
 		if(nfproperties!=null)
 		{
 			INFProperty<?, ?> prop = nfproperties.remove(name);
 			if(prop!=null)
 			{
-				prop.dispose().addResultListener(new DelegationResultListener<Void>(ret));
+				prop.dispose().addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						if(getInternalAccess().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
+						{
+							MonitoringEvent me = new MonitoringEvent(getInternalAccess().getComponentIdentifier(), getInternalAccess().getComponentDescription().getCreationTime(), 
+								MonitoringEvent.TYPE_PROPERTY_REMOVED, System.currentTimeMillis(), PublishEventLevel.COARSE);
+							me.setProperty("propname", name);
+							getInternalAccess().publishEvent(me, PublishTarget.TOALL).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+						else
+						{
+							ret.setResult(null);
+						}
+					}
+				});
 			}
 			else
 			{
@@ -241,7 +274,7 @@ public class NFPropertyProvider implements INFPropertyProvider
 		}
 		return ret;
 	}
-
+	
 	/**
 	 *  Get the parent.
 	 *  return The parent.
@@ -280,4 +313,9 @@ public class NFPropertyProvider implements INFPropertyProvider
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get the internal access.
+	 */
+	public abstract IInternalAccess getInternalAccess();
 }

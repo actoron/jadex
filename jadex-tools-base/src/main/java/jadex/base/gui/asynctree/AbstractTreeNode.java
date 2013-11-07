@@ -376,9 +376,8 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public void removeChild(ITreeNode node)
 	{
-
 		int index = getIndexOfChild(node);
-		if (index != -1)
+		if(index != -1)
 		{
 			// boolean removed =
 			children.remove(node);
@@ -388,7 +387,8 @@ public abstract class AbstractTreeNode implements ITreeNode
 			model.fireNodeRemoved(this, node, index);
 			if (searching)
 				dirty = true;
-		} else
+		} 
+		else
 		{
 			getModel().addZombieNode(node.getId());
 		}
@@ -399,10 +399,10 @@ public abstract class AbstractTreeNode implements ITreeNode
 	 */
 	public void removeAllChildren()
 	{
-		if (children != null && children.size() > 0)
+		if(children != null && children.size() > 0)
 		{
 			int[] indices = new int[children.size()];
-			for (int i = 0; i < children.size(); i++)
+			for(int i = 0; i < children.size(); i++)
 			{
 				indices[i] = i;
 			}
