@@ -303,6 +303,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	if(listener==null)
     		throw new RuntimeException();
     	
+    	boolean	scheduled	= false;
+    	
     	synchronized(this)
     	{
     		// If results==null its a subscription future and first results are already collected.
@@ -313,12 +315,14 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    		for(int i=0; i<inter.length; i++)
 	    		{
 	    			scheduleNotification(lis, true, inter[i]);
+	    			scheduled	= true;
 	    		}
     		}
     		
 	    	if(resultavailable)
 	    	{
 	    		scheduleNotification(listener, false, null);
+    			scheduled	= true;
 	    	}
 	    	else
 	    	{
@@ -335,7 +339,10 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	    	}
     	}
 
-    	startScheduledNotifications();
+    	if(scheduled)
+    	{
+    		startScheduledNotifications();
+    	}
     }
     
 	

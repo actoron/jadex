@@ -28,7 +28,6 @@ import jadex.micro.testcases.TestAgent;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -209,8 +208,6 @@ public class InitiatorAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		final TestReport tr = new TestReport("#"+testno, "Test if long call works with normal timeout of: "+to+".");
-		
 		IFuture<ITestService> fut = agent.getServiceContainer().getService(ITestService.class, cid);
 		
 //		fut.addResultListener(new IResultListener()
@@ -276,12 +273,14 @@ public class InitiatorAgent extends TestAgent
 			final TestReport tr = new TestReport("#"+cnt, "Test if long call works with normal timeout.");
 
 			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
+			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
-			((IFuture<Void>)m.invoke(ts, new Object[0])).addResultListener(new IResultListener()
+			final long start	= System.currentTimeMillis();
+			((IFuture)m.invoke(ts, new Object[0])).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					System.out.println("rec result");
+					System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
 					tr.setSucceeded(true);
 					ret.addIntermediateResult(tr);
 					proceed();
@@ -289,6 +288,7 @@ public class InitiatorAgent extends TestAgent
 				
 				public void exceptionOccurred(Exception exception)
 				{
+					System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
 					tr.setFailed("Exception: "+exception);
 					ret.addIntermediateResult(tr);
 					proceed();

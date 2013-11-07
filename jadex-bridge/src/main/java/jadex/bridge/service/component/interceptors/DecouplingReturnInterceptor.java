@@ -79,7 +79,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 			{
 //				final boolean	destroy	= sic.getMethod().getName().toString().indexOf("destroyComponent")!=-1;
 				
-				Object	res	= sic.getResult();
+				final Object	res	= sic.getResult();
 				
 				if(res instanceof IFuture)
 				{
@@ -110,6 +110,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							{
 								try
 								{
+//									if(sic.getMethod().getName().indexOf("method3")!=-1)
+//										System.out.println("setting to d: "+sic.getLastServiceCall()+", "+res);
 									ada.invokeLater(new Runnable()
 									{
 										public void run()
@@ -119,8 +121,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //											{
 //												System.out.println("resched: "+sic.getMethod().getName()+", "+System.currentTimeMillis());
 //											}
-//											if(sic.getMethod().getName().indexOf("test")!=-1)
-//												System.out.println("setting to d: "+sic.getLastServiceCall());
+											if(sic.getMethod().getName().indexOf("method3")!=-1)
+												System.out.println("setting to d: "+sic.getLastServiceCall());
 											CallAccess.setCurrentInvocation(sic.getLastServiceCall());
 											CallAccess.setLastInvocation(sic.getServiceCall());
 											listener.resultAvailable(null);

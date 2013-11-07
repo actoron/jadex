@@ -11,9 +11,12 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.AlarmGoal;
 import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.NotifyGoal;
 import jadex.bdiv3.examples.alarmclock.AlarmclockBDI.PlaySongGoal;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
@@ -25,6 +28,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import javax.swing.SwingUtilities;
 
 /**
  *  Alarm clock that notifies on alarm.
@@ -177,9 +182,19 @@ public class AlarmclockBDI
 	 *  Start the agent
 	 */
 	@AgentCreated
-	public void	body(BDIAgent agent)
+	public IFuture<Void>	body(BDIAgent agent)
 	{
-		this.gui	= new ClockFrame(agent.getExternalAccess());
+		final Future<Void>	ret	= new Future<Void>();
+		final IExternalAccess	exta	= agent.getExternalAccess();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				AlarmclockBDI.this.gui	= new ClockFrame(exta);
+				ret.setResult(null);
+			}
+		});
+		return ret;
 	}
 	
 	/**

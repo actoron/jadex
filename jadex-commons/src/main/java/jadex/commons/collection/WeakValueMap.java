@@ -259,7 +259,7 @@ public class WeakValueMap<K, V>	implements Map<K, V>
 		WeakEntry<V> entry;
 		while((entry=(WeakEntry<V>)queue.poll())!=null)
 		{
-			System.out.println("removing: "+entry);
+//			System.out.println("removing: "+entry);
 			contents.remove(entry.getArgument());
 		}
 	}

@@ -32,6 +32,7 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 		String methodname, Map<String, Object> nonfunc)
 	{
 		super(realreceiver, cmd, null, callid, isref, methodname, nonfunc);
+		System.out.println("RFSC: "+realreceiver+", "+System.currentTimeMillis()); 
 	}
 	
 	/**
@@ -50,13 +51,17 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 			
 			if(wci!=null)
 			{
-				System.out.println("remote timer refresh");
+				System.out.println("remote timer refresh: "+System.currentTimeMillis());
 				wci.refresh();
 				IFuture<?> fut = wci.getFuture();
 				if(fut instanceof ICommandFuture)
 				{
 					((ICommandFuture)fut).sendCommand((Type)getResult());
 				}
+			}
+			else
+			{				
+				System.out.println("no waiting call to update timer: "+System.currentTimeMillis());
 			}
 		}
 		else

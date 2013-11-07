@@ -46,7 +46,7 @@ public class ProviderAgent implements ITestService
 	{
 //		final Future<Void> ret = new Future<Void>();
 		final Future<Void> ret = (Future<Void>)SFuture.getNoTimeoutFuture(agent);
-		System.out.println("Called method");
+		System.out.println("Called method1");
 		doCall(ret);
 		return ret;
 	}
@@ -58,7 +58,7 @@ public class ProviderAgent implements ITestService
 	public ITerminableFuture<Void> method2()
 	{
 		TerminableFuture<Void> ret = (TerminableFuture<Void>)SFuture.getNoTimeoutFuture(TerminableFuture.class, agent);
-		System.out.println("Called tmethod");
+		System.out.println("Called tmethod2");
 		doCall(ret);
 		return ret;
 	}
@@ -70,7 +70,7 @@ public class ProviderAgent implements ITestService
 	public IIntermediateFuture<Void> method3()
 	{
 		final IntermediateFuture<Void> ret = (IntermediateFuture<Void>)SFuture.getNoTimeoutFuture(IntermediateFuture.class, agent);
-		System.out.println("Called imethod");
+		System.out.println("Called imethod3");
 		doCall(ret);
 		return ret;
 	}
@@ -82,7 +82,7 @@ public class ProviderAgent implements ITestService
 	public ISubscriptionIntermediateFuture<Void> method4()
 	{
 		final SubscriptionIntermediateFuture<Void> ret = (SubscriptionIntermediateFuture<Void>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
-		System.out.println("Called smethod");
+		System.out.println("Called smethod4");
 		doCall(ret);
 		return ret;
 	}
@@ -95,7 +95,7 @@ public class ProviderAgent implements ITestService
 	{
 		final PullIntermediateFuture<Void> ret = new PullIntermediateFuture<Void>((ICommand<PullIntermediateFuture<Void>>)null);
 		SFuture.avoidCallTimeouts(ret, agent);
-		System.out.println("Called pmethod");
+		System.out.println("Called pmethod5");
 		doCall(ret);
 		return ret;
 	}
@@ -108,7 +108,7 @@ public class ProviderAgent implements ITestService
 	{
 		final PullSubscriptionIntermediateFuture<Void> ret = new PullSubscriptionIntermediateFuture<Void>((ICommand<PullSubscriptionIntermediateFuture<Void>>)null);
 		SFuture.avoidCallTimeouts(ret, agent);
-		System.out.println("Called psmethod");
+		System.out.println("Called psmethod6");
 		doCall(ret);
 		return ret;
 	}
@@ -124,11 +124,12 @@ public class ProviderAgent implements ITestService
 		long to = sc.getTimeout();
 	
 		long wait = to>0? to*3: 0;
-		System.out.println("waiting: "+wait);
+		System.out.println("waiting: "+wait+", "+System.currentTimeMillis());
 		agent.waitForDelay(wait, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				System.out.println("done waiting: "+System.currentTimeMillis());
 				ret.setResultIfUndone(null);
 				return IFuture.DONE;
 			}
