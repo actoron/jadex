@@ -262,8 +262,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
 	//					if(!terminated)
 	//					{
-//							if(id.getParent()==null)// && sid.toString().indexOf("Async")!=-1)
-//								System.out.println("Terminating service: "+sid);
+							if(sid.toString().indexOf("Context")!=-1)
+								System.out.println("Terminating service: "+sid);
 							getLogger().info("Terminating service: "+sid);
 							
 							// Dispose nonfunc properties

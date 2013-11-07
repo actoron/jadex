@@ -101,8 +101,8 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 		
 		CallAccess.setCurrentInvocation(sc); 
 		
-//		if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
-//			System.out.println("start shut in mon: "+context.getObject());
+		if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
+			System.out.println("start shut in mon: "+context.getObject());
 		
 //		if(context.getMethod().getName().indexOf("getExternalAccess")!=-1)
 //			System.out.println("getExt");

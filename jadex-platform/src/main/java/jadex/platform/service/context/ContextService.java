@@ -125,4 +125,9 @@ public class ContextService extends BasicService implements jadex.bridge.service
 		SNonAndroid.openFile(path);
 		return IFuture.DONE;
 	}
+	
+	public IFuture<Void> shutdownService()
+	{
+		return super.shutdownService();
+	}
 }

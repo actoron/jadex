@@ -895,66 +895,28 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				extexecuted	= true;
 			}
 		}
-		for(int i=0; entries!=null && i<entries.length; i++)
+		
+		try
 		{
-//			if(getComponentIdentifier().getName().indexOf("Initiator")!=-1)
-//				System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
-			
-			if(entries[i] instanceof CheckedAction)
+			for(int i=0; entries!=null && i<entries.length; i++)
 			{
-				if(((CheckedAction)entries[i]).isValid())
+				if(entries[i] instanceof CheckedAction)
 				{
-					try
+					if(((CheckedAction)entries[i]).isValid())
 					{
-//						if(getComponentIdentifier().getName().indexOf("MessageP")!=-1)
-////							getModel().getFullName().indexOf("testcases.threading")!=-1)
-//						{
-//							System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
-//						}
-						
 						entries[i].run();
 					}
-					catch(Exception e)
-					{
-//						if(!platform)
-							fatalError(e);
-					}
-				}
-				try
-				{
 					((CheckedAction)entries[i]).cleanup();
 				}
-				catch(Exception e)
+				else //if(entries[i] instanceof Runnable)
 				{
-					fatalError(e);
-				}
-			}
-			else //if(entries[i] instanceof Runnable)
-			{
-				try
-				{
-//					if(entries[i].toString().indexOf("calc")!=-1)
-//					{
-//						System.out.println("scheduleStep: "+getComponentIdentifier());
-//					}
-//					if(platform)
-//						System.out.println(entries[i]+" "+entries[i].getClass());
-//					if(getComponentIdentifier().getName().indexOf("rms")!=-1)
-////						getModel().getFullName().indexOf("testcases.threading")!=-1)
-//					{
-//						System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
-//					}
-//					if(getComponentIdentifier().getName().indexOf("Initiator")!=-1)
-//						System.out.println("Entry: "+entries[i]+", "+System.currentTimeMillis());
 					entries[i].run();
 				}
-				catch(Exception e)
-				{
-//					e.printStackTrace();
-//					if(!platform)
-						fatalError(e);
-				}
 			}
+		}
+		catch(Exception e)
+		{
+			fatalError(e);
 		}
 		
 		return extexecuted;
