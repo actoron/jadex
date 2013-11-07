@@ -477,33 +477,62 @@ public class BDIAgent extends MicroAgent
 	 *  is written as array access.
 	 */
 	// todo: allow init writes in constructor also for arrays
-	public static void writeArrayField(Object array, final int index , Object val, BDIAgent agent, String fieldname)
+	public static void writeArrayField(Object array, final int index, Object val, Object agentobj, String fieldname)
 	{
-		try
+		// This is the case in inner classes
+		BDIAgent agent = null;
+		if(agentobj instanceof BDIAgent)
 		{
-			final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-			RuleSystem rs = ip.getRuleSystem();
-//			System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
-			
-			Object oldval = Array.get(array, index);
+			agent = (BDIAgent)agentobj;
+		}
+		else
+		{
+			try
+			{
+				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, "__agent");
+//				System.out.println("res: "+res);
+				agent = (BDIAgent)res.getFirstEntity().get(res.getSecondEntity());
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+		final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+		
+		// Test if array store is really a belief store instruction by
+		// looking up the current belief value and comparing it with the
+		// array that is written
+		
+		String belname	= getBeliefName(agentobj, fieldname);
+		MBelief	mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
+		
+		Object curval = mbel.getValue(ip);
+		boolean isbeliefwrite = curval==array;
+		
+		RuleSystem rs = ip.getRuleSystem();
+//		System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
+		
+		Object oldval = null;
+		if(isbeliefwrite)
+		{
+			oldval = Array.get(array, index);
 			rs.unobserveObject(oldval);	
-			
-			Class<?> ct = array.getClass().getComponentType();
-			if(boolean.class.equals(ct))
-			{
-				val = ((Integer)val)==1? Boolean.TRUE: Boolean.FALSE;
-			}
-			else if(byte.class.equals(ct))
-			{
-				val = new Byte(((Integer)val).byteValue());
-			}
-			
-			// todo: fetch correct belname
-//			String belname	= getBeliefName(obj, fieldname);
-			String belname = fieldname; // Hack!!!
-			
-			Array.set(array, index, val);
-			MBelief	mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
+		}
+		
+		Class<?> ct = array.getClass().getComponentType();
+		if(boolean.class.equals(ct))
+		{
+			val = ((Integer)val)==1? Boolean.TRUE: Boolean.FALSE;
+		}
+		else if(byte.class.equals(ct))
+		{
+			val = new Byte(((Integer)val).byteValue());
+		}
+		Array.set(array, index, val);
+		
+		if(isbeliefwrite)
+		{
 			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname, mbel);
 			
 			if(!SUtil.equals(val, oldval))
@@ -515,10 +544,6 @@ public class BDIAgent extends MicroAgent
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 
 			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
 		}
 	}
 	

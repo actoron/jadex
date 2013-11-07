@@ -2437,6 +2437,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return reqserprops!=null? reqserprops.get(sid)!=null: false;
 	}
 	
+
 	/**
 	 *  Check if event targets exist.
 	 */

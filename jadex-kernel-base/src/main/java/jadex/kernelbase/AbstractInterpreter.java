@@ -117,7 +117,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.bindings = bindings;
 		this.copy = copy;
 		this.realtime = realtime;
-		this.emitlevelsub = desc.getMonitoring();
+		this.emitlevelsub = PublishEventLevel.OFF;
 //		this.emitlevelmon = desc.getMonitoring();
 		this.resultlistener = resultlistener;
 		if(factory != null)
@@ -526,10 +526,10 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public PublishEventLevel getPublishEmitLevelMonitoring()
 	{
-		return getComponentDescription().getMonitoring();
+		return getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring(): PublishEventLevel.OFF;
 //		return emitlevelmon;
 	}
-	
+
 	/**
 	 *  Get the monitoring event emit level for subscriptions.
 	 *  Is the maximum level of all subscriptions (cached for speed).

@@ -1,5 +1,6 @@
 package jadex.platform.service.cms;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -140,6 +141,8 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 					}
 					catch(RuntimeException e)
 					{
+						e.printStackTrace();
+						throw new ComponentTerminatedException(getComponentIdentifier());
 						// Happens, when execution service shutdown() is called and timer should be registered for result future, but service already terminated
 					}
 				}

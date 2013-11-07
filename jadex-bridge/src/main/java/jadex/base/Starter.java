@@ -474,6 +474,7 @@ public class Starter
 								Cause cause = sc==null? null: sc.getCause();
 								
 								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
+								
 								Object tmpmoni = getArgumentValue(MONITORING, model, cmdargs, compargs);
 								PublishEventLevel moni = PublishEventLevel.OFF;
 								if(tmpmoni instanceof Boolean)
@@ -488,6 +489,7 @@ public class Starter
 								{
 									moni = (PublishEventLevel)tmpmoni;
 								}
+
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, 
 									autosd, moni, null, model.getFullName(), null, model.getResourceIdentifier(), System.currentTimeMillis(), caller, cause);
 								

@@ -14,6 +14,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
@@ -263,17 +264,18 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		cbox.setText("Keep Alive");
 		column.add(cbox);
 		
-		cbox = new JCheckBox();
-		cbox.setSelected(convBool(getModelInfo().getMonitoring()));
-		cbox.setAction(new AbstractAction()
+		JComboBox cobox = new JComboBox(new Object[]{PublishEventLevel.OFF, PublishEventLevel.COARSE, PublishEventLevel.MEDIUM, PublishEventLevel.FINE});
+		cobox.setSelectedItem(getModelInfo().getMonitoring());
+		cobox.setAction(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				getModelInfo().setMonitoring(((JCheckBox) e.getSource()).isSelected());
+				getModelInfo().setMonitoring((PublishEventLevel)((JComboBox)e.getSource()).getSelectedItem());
 			}
 		});
-		cbox.setText("Monitoring");
-		column.add(cbox);
+//		cobox.setText("Monitoring");
+		column.add(new JLabel("Monitor"));
+		column.add(cobox);
 		
 		cbox = new JCheckBox();
 		cbox.setSelected(convBool(getModelInfo().getSynchronous()));

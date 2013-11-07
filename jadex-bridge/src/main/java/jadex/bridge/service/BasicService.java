@@ -376,7 +376,7 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	 */
 	public IFuture<Void>	shutdownService()
 	{
-//		if(sid.getProviderId().getParent()==null && getClass().getName().indexOf("ContextSer")!=-1)
+//		if(getClass().getName().indexOf("ContextSer")!=-1)
 //			System.out.println("shutdown service: "+getServiceIdentifier());
 
 		// Deregister pojo->sid mapping in shutdown.
@@ -387,7 +387,7 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 		{
 			public void customResultAvailable(Boolean result)
 			{
-//				if(sid.getProviderId().getParent()==null && getClass().getName().indexOf("ContextSer")!=-1)
+//				if(getClass().getName().indexOf("ContextSer")!=-1)
 //					System.out.println("shutdowned service: "+getServiceIdentifier());
 				
 				if(!result.booleanValue())

@@ -188,6 +188,15 @@ public class MethodInfo
 	}
 	
 	/**
+	 *  Get the return type.
+	 *  @return The return type.
+	 */
+	public ClassInfo getReturnTypeInfo()
+	{
+		return returntype;
+	}
+
+	/**
 	 *  Sets the class name for retrieving the method.
 	 * 
 	 * 	@param classname Name of the class.

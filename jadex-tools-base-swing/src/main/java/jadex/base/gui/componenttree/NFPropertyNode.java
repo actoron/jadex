@@ -84,7 +84,6 @@ public class NFPropertyNode extends AbstractSwingTreeNode
 		this.mi = mi;
 		this.rinfo = rinfo;
 		model.registerNode(this);
-		
 //		PropertyUpdateHandler puh = (PropertyUpdateHandler)tree.getClientProperty(PropertyUpdateHandler.class);
 //		if(puh!=null)
 //		{

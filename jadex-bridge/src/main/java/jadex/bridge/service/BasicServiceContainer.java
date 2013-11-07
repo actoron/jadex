@@ -270,6 +270,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 							service.shutdownNFPropertyProvider();
 							
 							final IInternalService fservice = service;
+							
+							if(service.getServiceIdentifier().toString().indexOf("ContextSer")!=-1)
+								System.out.println("hierda");
+							
 							service.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 							{
 								public void customResultAvailable(Void result)

@@ -412,4 +412,23 @@ public class MBelief extends MElement
 	{
 		return msetter;
 	}
+	
+	/**
+	 *  Test if belief is of array type.
+	 */
+	public boolean isArrayBelief()//ClassLoader cl)
+	{
+		boolean ret = false;
+		if(isFieldBelief() && ftarget.getClassName()!=null)
+		{
+//			ret = ftarget.getField(cl).getType().isArray();
+			ret = ftarget.getClassName().charAt(0)=='['; 
+		}
+		else if(mgetter!=null && mgetter.getReturnTypeInfo()!=null)
+		{
+//			ret = mgetter.getMethod(cl).getReturnType().isArray();
+			ret = mgetter.getReturnTypeInfo().getTypeName().charAt(0)=='['; 
+		}
+		return ret;
+	}
 }

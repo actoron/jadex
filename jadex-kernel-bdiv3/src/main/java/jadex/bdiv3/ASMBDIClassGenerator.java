@@ -683,7 +683,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	}
 
 	/**
-	 * 
+	 *  Transform array store instructions for beliefs.
 	 */
 	protected void transformArrayStores(IMethodNode mn, BDIModel model, String iclname)
 	{
@@ -702,7 +702,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			if(n.getOpcode()==Opcodes.GETFIELD)
 			{
 				String bn = ((IFieldInsnNode)n).getName();
-				if(model.getCapability().hasBelief(bn))
+				if(model.getCapability().hasBelief(bn) && model.getCapability().getBelief(bn).isArrayBelief())
 				{
 					belnames.add(bn);
 				}
@@ -754,10 +754,12 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 					String belname = belnames.get(0);
 					
 					newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
-					newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+//					newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
 					newins.add(new LdcInsnNode(belname));
+//					newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
+//						"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
 					newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
-						"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+						"(Ljava/lang/Object;ILjava/lang/Object;Ljava/lang/Object;Ljava/lang/String;)V"));
 					
 					ins.insert(n.getPrevious(), InsnListWrapper.wrap(newins));
 					ins.remove(n); // remove old Xastore

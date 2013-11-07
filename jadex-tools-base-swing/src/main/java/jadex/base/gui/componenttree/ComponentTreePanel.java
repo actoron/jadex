@@ -212,8 +212,8 @@ public class ComponentTreePanel extends JSplitPane
 		// Refresh dynamic property additions / removals
 		if(prophandler!=null)
 		{
-			propcmd = new ICommand<IMonitoringEvent>() {
-				
+			propcmd = new ICommand<IMonitoringEvent>() 
+			{
 				public void execute(final IMonitoringEvent ev) 
 				{
 					SwingUtilities.invokeLater(new Runnable()
