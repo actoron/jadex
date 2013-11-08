@@ -238,6 +238,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 */
 	public IFuture<Void> send(final byte[] dat)
 	{
+		// Todo: need to copy dat in case user uses array otherwise...
+		
 		final Future<Void> ret = new Future<Void>();
 //		ret.addResultListener(new IResultListener<Void>()
 //		{
