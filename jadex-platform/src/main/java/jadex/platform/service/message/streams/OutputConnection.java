@@ -103,17 +103,20 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 
 		component.scheduleStep(new IComponentStep<Void>()
 		{
+			byte[]	buf	= null;
+			
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				final IComponentStep<Void> self = this;
 				
 				waitForReady().addResultListener(ia.createResultListener(new IResultListener<Integer>()
-				{					
+				{
 					public void resultAvailable(Integer bytes)
 					{
 						// Stop transfer on cancel etc.
 						if(ret.isDone())
 						{
+							buf	= null;
 							close();
 							try
 							{
@@ -129,7 +132,10 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 							{
 								int size = Math.min(bytes.intValue(), is.available());
 								filesize[0] += size;
-								byte[] buf = new byte[size];
+								if(buf==null || buf.length!=size)
+								{
+									buf = new byte[size];
+								}
 								int read = 0;
 								// Hack!!! Should only read once, as subsequent reads might block, because available() only provides an estimate
 								while(read!=buf.length)
@@ -171,6 +177,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 								}
 								else
 								{
+									buf	= null;
 									close();
 									ret.setFinishedIfUndone();
 									is.close();
@@ -178,6 +185,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 							}
 							catch(Exception e)
 							{
+								buf	= null;
 								close();
 								ret.setExceptionIfUndone(e);
 								try
@@ -193,6 +201,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						buf	= null;
 						close();
 						ret.setExceptionIfUndone(exception);
 						try

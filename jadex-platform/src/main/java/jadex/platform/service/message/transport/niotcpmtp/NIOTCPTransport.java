@@ -277,7 +277,7 @@ public class NIOTCPTransport implements ITransport
 	}
 	
 	/**
-	 *  Get the adresses of this transport.
+	 *  Get the addresses of this transport.
 	 *  @return An array of strings representing the addresses 
 	 *  of this message transport mechanism.
 	 */

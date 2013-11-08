@@ -480,13 +480,21 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		
 		if(multipacket.size()>0)
 		{
-			byte[] target = new byte[mpsize];
-			int start = 0;
-			for(int i=0; i<multipacket.size(); i++)
+			byte[] target;
+			if(multipacket.size()==1)
 			{
-				byte[] tmp = multipacket.get(i);
-				System.arraycopy(tmp, 0, target, start, tmp.length);
-				start += tmp.length;
+				target	= multipacket.get(0);
+			}
+			else
+			{
+				target = new byte[mpsize];
+				int start = 0;
+				for(int i=0; i<multipacket.size(); i++)
+				{
+					byte[] tmp = multipacket.get(i);
+					System.arraycopy(tmp, 0, target, start, tmp.length);
+					start += tmp.length;
+				}
 			}
 			
 //			System.out.println("sending stream bytes: "+target.length);
