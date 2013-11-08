@@ -12,6 +12,7 @@ import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -120,28 +121,32 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 				// Publish event if monitoring service was found
 				if(monser!=null)
 				{
-					// todo: clock?
-//					if(context.getMethod().getName().indexOf("test")!=-1)
-//						System.out.println("test call context: "+context.getServiceCall());
-					long start = System.currentTimeMillis();
-					ServiceCall sc = context.getServiceCall();
-					Cause cause = sc==null? null: sc.getCause();
-					String info = context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
-//					info += context.getArguments();
-					MonitoringEvent ev = new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
-						info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start, PublishEventLevel.MEDIUM);
-					
-//					if(context.getMethod().getName().indexOf("method")!=-1)
-//						System.out.println("call method: "+ev.getCause().getChainId());
-					
-					monser.publishEvent(ev).addResultListener(new ExceptionResultListener<Void>()
+					if(component.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 					{
-						public void exceptionOccurred(Exception e)
+						// todo: clock?
+	//					if(context.getMethod().getName().indexOf("test")!=-1)
+	//						System.out.println("test call context: "+context.getServiceCall());
+						long start = System.currentTimeMillis();
+						ServiceCall sc = context.getServiceCall();
+						Cause cause = sc==null? null: sc.getCause();
+						String info = context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
+	//					info += context.getArguments();
+						MonitoringEvent ev = new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
+							info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start, PublishEventLevel.MEDIUM);
+						
+	//					if(context.getMethod().getName().indexOf("method")!=-1)
+	//						System.out.println("call method: "+ev.getCause().getChainId());
+						
+						
+						monser.publishEvent(ev).addResultListener(new ExceptionResultListener<Void>()
 						{
-							// Reset mon service if error on publish
-							getter.resetService();
-						}
-					});
+							public void exceptionOccurred(Exception e)
+							{
+								// Reset mon service if error on publish
+								getter.resetService();
+							}
+						});
+					}
 				}
 				
 				context.invoke().addResultListener(new ReturnValueResultListener(ret, context));
@@ -185,7 +190,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 			final ServiceCall next = CallAccess.getNextInvocation();
 			
 			Map<String, Object>	props	= new HashMap<String, Object>();
-			props.put("method5", sic.getMethod().getName());
+//			props.put("method5", sic.getMethod().getName());
 			
 			ServiceCall sc = CallAccess.getOrCreateNextInvocation();
 			sc.setProperty(ServiceCall.MONITORING, Boolean.FALSE);
@@ -202,12 +207,15 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 
 					if(monser!=null)
 					{
-						// todo: clock?
-						long end = System.currentTimeMillis();
-						ServiceCall sc = sic.getServiceCall();
-						Cause cause = sc==null? null: sc.getCause();
-						monser.publishEvent(new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
-							sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end, PublishEventLevel.MEDIUM));
+						if(component.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+						{
+							// todo: clock?
+							long end = System.currentTimeMillis();
+							ServiceCall sc = sic.getServiceCall();
+							Cause cause = sc==null? null: sc.getCause();
+							monser.publishEvent(new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
+								sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end, PublishEventLevel.MEDIUM));
+						}
 					}
 					ReturnValueResultListener.super.customResultAvailable(null);
 				}

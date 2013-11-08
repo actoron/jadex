@@ -1082,8 +1082,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		public void run()
 		{
-			if(desc.getName().getLocalName().indexOf("Initiator")!=-1)
-				System.out.println("killComponent last: "+getComponentIdentifier());
+//			if(desc.getName().getLocalName().indexOf("Initiator")!=-1)
+//				System.out.println("killComponent last: "+getComponentIdentifier());
 
 			cleanup();
 			clock	= null;

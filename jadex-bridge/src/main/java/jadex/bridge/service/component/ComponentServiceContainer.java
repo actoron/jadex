@@ -619,6 +619,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				}
 				public void exceptionOccurred(Exception exception)
 				{
+//					exception.printStackTrace();
 					instance.getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
 					ret.setResult(null);
 				}

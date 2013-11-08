@@ -14,7 +14,8 @@ public class BDITest	extends	ComponentTestSuite
 	/**
 	 *  Constructor called by Maven JUnit runner.
 	 */
-	public BDITest() throws Exception {
+	public BDITest() throws Exception 
+	{
 		this("../jadex-applications-bdi/target/classes/","../jadex-applications-bdi/target/classes");
 	}
 
