@@ -34,7 +34,7 @@ public class MonitoringEvent implements IMonitoringEvent
 	protected Cause cause;
 	
 	/** The event importance. */
-	protected PublishEventLevel importance;
+	protected PublishEventLevel level;
 	
 	/** The service call properties. */
 	protected Map<String, Object> properties;
@@ -84,7 +84,7 @@ public class MonitoringEvent implements IMonitoringEvent
 		this.type = type;
 		this.cause = cause;
 		this.time = time;
-		this.importance = importance;
+		this.level = importance;
 		this.properties = props;
 	}
 	
@@ -244,15 +244,15 @@ public class MonitoringEvent implements IMonitoringEvent
 	 */
 	public PublishEventLevel getLevel()
 	{
-		return importance;
+		return level;
 	}
 	
 	/**
 	 *  Set the importance.
 	 */
-	public void setPublishEventImportance(PublishEventLevel importance)
+	public void setLevel(PublishEventLevel importance)
 	{
-		this.importance = importance;
+		this.level = importance;
 	}
 
 	/**

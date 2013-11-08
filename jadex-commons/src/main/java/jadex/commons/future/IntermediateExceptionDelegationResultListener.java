@@ -3,6 +3,7 @@ package jadex.commons.future;
 import jadex.commons.future.ICommandFuture.Type;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -118,7 +119,8 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 		}
 		else
 		{
-			System.out.println("Cannot forward command: "+future+" "+command);
+//			System.out.println("Cannot forward command: "+future+" "+command);
+			Logger.getLogger("intermediate-exception-delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
 		}
 	}
 }

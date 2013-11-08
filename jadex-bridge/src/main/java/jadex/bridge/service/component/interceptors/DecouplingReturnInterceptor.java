@@ -121,8 +121,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //											{
 //												System.out.println("resched: "+sic.getMethod().getName()+", "+System.currentTimeMillis());
 //											}
-											if(sic.getMethod().getName().indexOf("method3")!=-1)
-												System.out.println("setting to d: "+sic.getLastServiceCall());
+//											if(sic.getMethod().getName().indexOf("method3")!=-1)
+//												System.out.println("setting to d: "+sic.getLastServiceCall());
 											CallAccess.setCurrentInvocation(sic.getLastServiceCall());
 											CallAccess.setLastInvocation(sic.getServiceCall());
 											listener.resultAvailable(null);

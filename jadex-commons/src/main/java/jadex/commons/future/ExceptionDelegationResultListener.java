@@ -1,5 +1,7 @@
 package jadex.commons.future;
 
+import java.util.logging.Logger;
+
 import jadex.commons.future.ICommandFuture.Type;
 
 
@@ -89,7 +91,8 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 		}
 		else
 		{
-			System.out.println("Cannot forward command: "+future+" "+command);
+//			System.out.println("Cannot forward command: "+future+" "+command);
+			Logger.getLogger("exception-delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
 		}
 	}
 }

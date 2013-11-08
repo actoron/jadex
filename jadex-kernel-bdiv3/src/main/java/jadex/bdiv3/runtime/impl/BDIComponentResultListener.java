@@ -1,5 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.util.logging.Logger;
+
 import jadex.base.Starter;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
@@ -128,7 +130,8 @@ public class BDIComponentResultListener<E> implements IResultListener<E>
 		}
 		else
 		{
-			System.out.println("Cannot forward command: "+listener+" "+command);
+//			System.out.println("Cannot forward command: "+listener+" "+command);
+			Logger.getLogger("bdi-component-result-listener").warning("Cannot forward command: "+listener+" "+command);
 		}
 	}
 	

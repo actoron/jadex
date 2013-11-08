@@ -100,7 +100,7 @@ public class ServiceGetter<T>
 						public void resultAvailable(T result)
 						{
 							service = result;
-	//							ret.setResult(service);
+	//						ret.setResult(service);
 							Future<T> fut = callfut;
 							callfut = null;
 							fut.setResult(service);
@@ -109,7 +109,7 @@ public class ServiceGetter<T>
 						public void exceptionOccurred(Exception exception)
 						{
 		//					exception.printStackTrace();
-	//							ret.setResult(null);
+	//						ret.setResult(null);
 							Future<T> fut = callfut;
 							callfut = null;
 							fut.setResult(null);

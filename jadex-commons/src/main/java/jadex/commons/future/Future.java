@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *  Future that includes mechanisms for callback notification.
@@ -557,7 +558,8 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 		}
 		else
 		{
-			System.out.println("Cannot forward command: "+listener+" "+command);
+//			System.out.println("Cannot forward command: "+listener+" "+command);
+			Logger.getLogger("future").warning("Cannot forward command: "+listener+" "+command);
 		}
 	}
 }

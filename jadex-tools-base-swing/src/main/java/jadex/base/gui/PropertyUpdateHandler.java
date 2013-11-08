@@ -1,6 +1,5 @@
 package jadex.base.gui;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -13,9 +12,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
@@ -92,6 +89,11 @@ public class PropertyUpdateHandler
 								}
 							}
 						}
+					}
+					
+					public void exceptionOccurred(Exception ex)
+					{
+						// ignore
 					}
 				});
 			}

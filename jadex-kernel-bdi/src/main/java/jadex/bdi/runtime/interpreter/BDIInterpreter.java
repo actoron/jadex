@@ -290,7 +290,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.realtime = realtime;
 		this.resultlistener = resultlistener;
 		this.inited = inited;
-		this.emitlevelsub	= PublishEventLevel.OFF;
+		this.emitlevelsub = PublishEventLevel.OFF;
 				
 		// Hack! todo:
 		interpreters.put(state, this);
@@ -834,7 +834,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public void cleanup()
 	{
-//		System.err.println("Cleanup: "+state);
+//		System.err.println("Cleanup: "+getComponentIdentifier());
 
 		BDIInterpreter.interpreters.remove(state);
 		

@@ -3,6 +3,7 @@ package jadex.commons.future;
 import jadex.commons.future.ICommandFuture.Type;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 
 
@@ -136,7 +137,8 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 		}
 		else
 		{
-			System.out.println("Cannot forward command: "+future+" "+command);
+//			System.out.println("Cannot forward command: "+future+" "+command);
+			Logger.getLogger("intermediate-delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
 		}
 	}
 }

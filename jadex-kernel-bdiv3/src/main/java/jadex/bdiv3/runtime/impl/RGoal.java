@@ -1030,7 +1030,7 @@ public class RGoal extends RProcessableElement implements IGoal
 //			mev.setProperty("sourcename", element.toString());
 			mev.setProperty("sourcetype", info.getType());
 			mev.setProperty("details", info);
-			mev.setPublishEventImportance(PublishEventLevel.FINE);
+			mev.setLevel(PublishEventLevel.FINE);
 			
 			getInterpreter().publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}

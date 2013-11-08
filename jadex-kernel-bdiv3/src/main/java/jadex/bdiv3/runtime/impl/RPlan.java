@@ -1367,7 +1367,7 @@ public class RPlan extends RElement implements IPlan
 //			mev.setProperty("sourcename", element.toString());
 			mev.setProperty("sourcetype", info.getType());
 			mev.setProperty("details", info);
-			mev.setPublishEventImportance(PublishEventLevel.FINE);
+			mev.setLevel(PublishEventLevel.FINE);
 			
 			getInterpreter().publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}

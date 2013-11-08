@@ -302,14 +302,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					object = BDIInterpreter.getInterpreter(getState()).getLogger(getScope());
+					object = BDIInterpreter.getInterpreter(getState())!=null? BDIInterpreter.getInterpreter(getState()).getLogger(getScope()): Logger.getAnonymousLogger();
 				}
 			};
 			return (Logger)invoc.object;
 		}
 		else
 		{
-			return BDIInterpreter.getInterpreter(getState()).getLogger(getScope());
+			return BDIInterpreter.getInterpreter(getState())!=null? BDIInterpreter.getInterpreter(getState()).getLogger(getScope()): Logger.getAnonymousLogger();
 		}
 	}
 

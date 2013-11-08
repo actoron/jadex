@@ -14,6 +14,7 @@ import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 
 /**
@@ -284,7 +285,8 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 		}
 		else
 		{
-			System.out.println("Cannot forward command: "+listener+" "+command);
+			Logger.getLogger("timeout-result-listener").warning("Cannot forward command: "+listener+" "+command);
+//			System.out.println("Cannot forward command: "+listener+" "+command);
 		}
 	}
 }

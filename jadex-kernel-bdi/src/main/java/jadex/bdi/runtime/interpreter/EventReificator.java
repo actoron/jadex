@@ -5,6 +5,7 @@ import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.rules.state.IOAVState;
@@ -474,6 +475,7 @@ public class EventReificator implements IOAVStateListener
 			long time = bdiint.getClockService().getTime();
 //			ComponentChangeEvent event = new ComponentChangeEvent();
 			MonitoringEvent event = new MonitoringEvent();
+			event.setLevel(PublishEventLevel.FINE);
 //			event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
 			event.setSourceIdentifier(bdiint.getAgentAdapter().getComponentIdentifier());
 			if(scope == null)

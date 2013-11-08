@@ -1,8 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceInvalidException;
@@ -16,9 +16,7 @@ import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -57,6 +55,8 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 			{
 				ALWAYSOK.add(m);
 			}
+			
+			ALWAYSOK.add(INFPropertyProvider.class.getMethod("shutdownNFPropertyProvider", new Class[0]));
 		}
 		catch(Exception e)
 		{
@@ -81,6 +81,9 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 		}
 		else
 		{
+			if(sic.getMethod().getName().indexOf("shutdownNFPropertyProvider")!=-1)
+				System.out.println("gggggio");
+			
 			// Call isValid() on proxy to execute full interceptor chain.
 //			IService ser = (IService)sic.getProxy();
 //			IFuture<Boolean>	valid	= ser.isValid();
