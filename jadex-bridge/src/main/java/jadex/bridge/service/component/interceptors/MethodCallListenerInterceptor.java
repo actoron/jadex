@@ -13,13 +13,10 @@ import jadex.commons.future.IResultListener;
 /**
  *  Calls a methods on an object and returns the result.
  */
-public class MethodCallListenerInterceptor extends AbstractApplicableInterceptor
+public class MethodCallListenerInterceptor extends ComponentThreadInterceptor
 {
 	//-------- methods --------
 
-	/** The component. */
-	protected IInternalAccess component;
-	
 	/** The service indentifier. */
 	protected IServiceIdentifier sid;
 	
@@ -31,7 +28,7 @@ public class MethodCallListenerInterceptor extends AbstractApplicableInterceptor
 	 */
 	public MethodCallListenerInterceptor(IInternalAccess component, IServiceIdentifier sid)
 	{
-		this.component = component;
+		super(component);
 		this.sid = sid;
 		this.container = component.getServiceContainer();
 	}
@@ -42,10 +39,11 @@ public class MethodCallListenerInterceptor extends AbstractApplicableInterceptor
 	 */
 	public boolean isApplicable(ServiceInvocationContext context)
 	{
+		// Interceptor is used in both chains, provided and required
 //		if(context.getMethod().getName().indexOf("methodA")!=-1)
 //			System.out.println("interceptor: "+component.getComponentIdentifier());
 //		boolean ret = component.getServiceContainer().hasMethodListeners(sid, new MethodInfo(context.getMethod()));
-		boolean ret = container.hasMethodListeners(sid, new MethodInfo(context.getMethod()));
+		boolean ret = super.isApplicable(context) && container.hasMethodListeners(sid, new MethodInfo(context.getMethod()));
 //		System.out.println("app: "+context.getMethod().getName()+" "+ret);
 		return ret;
 	}
@@ -71,18 +69,18 @@ public class MethodCallListenerInterceptor extends AbstractApplicableInterceptor
 					{
 						public void resultAvailable(Object result)
 						{
-							component.getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							component.getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+							getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 						}
 					});
 				}
 				else
 				{
-					component.getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
+					getComponent().getServiceContainer().notifyMethodListeners(sid, false, null, sic.getMethod(), sic.getArgumentArray(), sic.hashCode(), sic);
 				}
 				super.customResultAvailable(result);
 			}

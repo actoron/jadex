@@ -1,10 +1,12 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
@@ -24,7 +26,7 @@ import java.util.Set;
  *  
  *  Calls isValid() on IService to check if service call is allowed.
  */
-public class ValidationInterceptor extends AbstractApplicableInterceptor
+public class ValidationInterceptor extends ComponentThreadInterceptor
 {
 	//-------- constants --------
 	
@@ -65,6 +67,23 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 	}
 
 	/**
+	 *  Create a new interceptor.
+	 */
+	public ValidationInterceptor(IInternalAccess component)
+	{
+		super(component);
+	}
+	
+//	/**
+//	 *  Test if the interceptor is applicable.
+//	 *  @return True, if applicable.
+//	 */
+//	public boolean isApplicable(ServiceInvocationContext context)
+//	{
+//		return true;
+//	}
+	
+	/**
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
@@ -81,9 +100,6 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 		}
 		else
 		{
-			if(sic.getMethod().getName().indexOf("shutdownNFPropertyProvider")!=-1)
-				System.out.println("gggggio");
-			
 			// Call isValid() on proxy to execute full interceptor chain.
 //			IService ser = (IService)sic.getProxy();
 //			IFuture<Boolean>	valid	= ser.isValid();
@@ -93,10 +109,10 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 			Object	service	= handler.getService();
 			IFuture<Boolean>	valid;
 			
-			if(IComponentIdentifier.LOCAL.get()==null && sic.getMethod().getName().equals("status"))
-			{
-				System.out.println("null invocation: "+sic.getMethod());
-			}
+//			if(IComponentIdentifier.LOCAL.get()==null && sic.getMethod().getName().equals("status"))
+//			{
+//				System.out.println("null invocation: "+sic.getMethod());
+//			}
 //			Map<String, Object>	props	= new HashMap<String, Object>();
 //			props.put("method1", sic.getMethod());
 			ServiceCall sc = CallAccess.getOrCreateNextInvocation(null);//props);

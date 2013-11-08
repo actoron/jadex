@@ -16,4 +16,5 @@ public abstract class AbstractApplicableInterceptor implements IServiceInvocatio
 	{
 		return true;
 	}
+	
 }

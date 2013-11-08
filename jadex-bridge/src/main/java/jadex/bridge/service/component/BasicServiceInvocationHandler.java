@@ -594,14 +594,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 			if(monitoring)
 				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
-			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia.getExternalAccess(), false));
-			handler.addFirstServiceInterceptor(new PrePostConditionInterceptor());
+			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, false));
+			handler.addFirstServiceInterceptor(new PrePostConditionInterceptor(ia));
 			if(!(service instanceof IService))
 			{
 				handler.addFirstServiceInterceptor(new ResolveInterceptor());
 			}
 			handler.addFirstServiceInterceptor(new MethodCallListenerInterceptor(ia, sid));
-			handler.addFirstServiceInterceptor(new ValidationInterceptor());
+			handler.addFirstServiceInterceptor(new ValidationInterceptor(ia));
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 			{
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, copy));
@@ -639,7 +639,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public static IService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IService service, 
 		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, boolean realtime)
 	{
-//		System.out.println("cRSP:"+service.getServiceIdentifier());
+		System.out.println("cRSP:"+service.getServiceIdentifier());
 		IService ret = service;
 		
 		if(binding==null || !PROXYTYPE_RAW.equals(binding.getProxytype()))
@@ -647,7 +647,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
 			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(ia, service, adapter.getLogger(), realtime, ia.getComponentDescription().getCause());
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia.getExternalAccess(), true));
+			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, true));
 			if(binding!=null && binding.isRecover())
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
@@ -665,6 +665,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 					handler.addServiceInterceptor(interceptor);
 				}
 			}
+			// Decoupling interceptor on required chains ensures that wrong incoming calls e.g. from gui thread
+			// are automatically pushed to the req component thread
+			handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, false));
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 			// service.getServiceIdentifier().getServiceType()
 			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader())}, handler); 

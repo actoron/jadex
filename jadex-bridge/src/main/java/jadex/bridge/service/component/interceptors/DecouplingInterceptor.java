@@ -1,6 +1,5 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -243,6 +242,11 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		
 		if(!adapter.isExternalThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{
+			// Not possible to use if it complains this way
+			// E.g. you have prov service and need to reschedule on the component then first getProviderId(), getExtAccess(), scheduleStep
+//			if(!scheduleable && adapter.isExternalThread())
+//				throw new RuntimeException("Must be called on component thread: "+Thread.currentThread()+" "+sic.getMethod().getName());
+			
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());
 //			sic.invoke().addResultListener(new TimeoutResultListener<Void>(10000, ea, 

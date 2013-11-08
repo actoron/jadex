@@ -2,6 +2,7 @@ package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Authenticated;
@@ -28,9 +29,6 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 {
 	//-------- attributes --------
 	
-	/** The external access. */
-	protected IExternalAccess ea;
-	
 	/** The mode (send or receive). */
 	protected boolean send;
 	
@@ -39,9 +37,9 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 	/**
 	 *  Create a new AuthenticationInterceptor.
 	 */
-	public AuthenticationInterceptor(IExternalAccess ea, boolean send)
+	public AuthenticationInterceptor(IInternalAccess ia, boolean send)
 	{
-		this.ea = ea;
+		super(ia);
 		this.send = send;
 	}
 
@@ -125,7 +123,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		Object[] t = new Object[]{context.getCaller().getPlatformPrefix(), classname, methodname, args};
 		final byte[] content = BinarySerializer.objectToByteArray(t, null);
 		
-		SServiceProvider.getService(ea.getServiceProvider(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(getComponent().getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService sser)
@@ -201,7 +199,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 				{
 					// if not contained in direct names check virtual name mappings
 					final String[] virtuals = au.virtuals();
-					SServiceProvider.getService(ea.getServiceProvider(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					SServiceProvider.getService(ia.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 						.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 					{
 						public void customResultAvailable(ISecurityService sser)
@@ -247,7 +245,7 @@ public class AuthenticationInterceptor extends AbstractLRUApplicableInterceptor
 		Object[] t = new Object[]{callername, classname, methodname, args};
 		final byte[] content = BinarySerializer.objectToByteArray(t, null);
 		
-		SServiceProvider.getService(ea.getServiceProvider(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(ia.getServiceContainer(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ISecurityService, Void>(ret)
 		{
 			public void customResultAvailable(ISecurityService sser)

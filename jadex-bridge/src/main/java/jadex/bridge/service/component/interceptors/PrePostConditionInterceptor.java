@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.CheckIndex;
 import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.CheckState;
@@ -24,6 +25,14 @@ import java.util.Map;
  */
 public class PrePostConditionInterceptor extends AbstractLRUApplicableInterceptor
 {
+	/**
+	 *  Create a new AbstractLRUApplicableInterceptor. 
+	 */
+	public PrePostConditionInterceptor(IInternalAccess ia)
+	{
+		super(ia);
+	}
+	
 	/**
 	 *  Test if the interceptor is applicable.
 	 *  @return True, if applicable.

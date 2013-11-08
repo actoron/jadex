@@ -26,11 +26,8 @@ import jadex.commons.future.IResultListener;
  *  Interceptor that creates service call start / end events and sends
  *  them to the monitoring service.
  */
-public class MonitoringInterceptor implements IServiceInvocationInterceptor
+public class MonitoringInterceptor extends ComponentThreadInterceptor
 {
-	/** The component. */
-	protected IInternalAccess component;
-	
 	/** The service getter. */
 	protected ServiceGetter<IMonitoringService> getter;
 	
@@ -39,7 +36,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 	 */
 	public MonitoringInterceptor(IInternalAccess component)
 	{
-		this.component = component;
+		super(component);
 		this.getter = new ServiceGetter<IMonitoringService>(component, IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 	}
 	
@@ -49,33 +46,36 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 	 */
 	public boolean isApplicable(ServiceInvocationContext context)
 	{
-		// Do not monitor calls to the monitoring service itself and no constant calls
+		boolean ret = super.isApplicable(context);
 		
-		Boolean mon = (Boolean)context.getServiceCall().getProperty(ServiceCall.MONITORING);
-		
-		boolean ret;
-		
-		if(mon!=null)
+		if(ret)
 		{
-			ret = mon.booleanValue();
+			// Do not monitor calls to the monitoring service itself and no constant calls
+			
+			Boolean mon = (Boolean)context.getServiceCall().getProperty(ServiceCall.MONITORING);
+			
+			if(mon!=null)
+			{
+				ret = mon.booleanValue();
+			}
+			else
+			{
+				ret = !context.getMethod().getDeclaringClass().equals(IMonitoringService.class)
+					&& SReflect.isSupertype(IFuture.class, context.getMethod().getReturnType());
+				//&& context.getMethod().getName().indexOf("getChildren")==-1;
+			}
+			
+	//		System.out.println("isApp: "+context.getMethod()+" "+ret);
+	//
+	//		if(context.getMethod().getName().indexOf("getChildren")!=-1)
+	//			System.out.println("gggggg");
+			
+	//		if(ret)
+	//			System.out.println("ok: "+context.getMethod().getDeclaringClass()+"."+context.getMethod().getName());
+					
+	//		if(context.getMethod().getName().indexOf("getExternalAccess")!=-1)
+	//			System.out.println("getExt");
 		}
-		else
-		{
-			ret = !context.getMethod().getDeclaringClass().equals(IMonitoringService.class)
-				&& SReflect.isSupertype(IFuture.class, context.getMethod().getReturnType());
-			//&& context.getMethod().getName().indexOf("getChildren")==-1;
-		}
-		
-//		System.out.println("isApp: "+context.getMethod()+" "+ret);
-//
-//		if(context.getMethod().getName().indexOf("getChildren")!=-1)
-//			System.out.println("gggggg");
-		
-//		if(ret)
-//			System.out.println("ok: "+context.getMethod().getDeclaringClass()+"."+context.getMethod().getName());
-				
-//		if(context.getMethod().getName().indexOf("getExternalAccess")!=-1)
-//			System.out.println("getExt");
 		
 		return ret;
 	}
@@ -121,7 +121,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 				// Publish event if monitoring service was found
 				if(monser!=null)
 				{
-					if(component.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+					if(getComponent().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 					{
 						// todo: clock?
 	//					if(context.getMethod().getName().indexOf("test")!=-1)
@@ -131,7 +131,7 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 						Cause cause = sc==null? null: sc.getCause();
 						String info = context.getMethod().getDeclaringClass().getName()+"."+context.getMethod().getName();
 	//					info += context.getArguments();
-						MonitoringEvent ev = new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
+						MonitoringEvent ev = new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(),
 							info, IMonitoringEvent.TYPE_SERVICECALL_START, cause, start, PublishEventLevel.MEDIUM);
 						
 	//					if(context.getMethod().getName().indexOf("method")!=-1)
@@ -207,13 +207,13 @@ public class MonitoringInterceptor implements IServiceInvocationInterceptor
 
 					if(monser!=null)
 					{
-						if(component.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
+						if(getComponent().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.MEDIUM))
 						{
 							// todo: clock?
 							long end = System.currentTimeMillis();
 							ServiceCall sc = sic.getServiceCall();
 							Cause cause = sc==null? null: sc.getCause();
-							monser.publishEvent(new MonitoringEvent(component.getComponentIdentifier(), component.getComponentDescription().getCreationTime(),
+							monser.publishEvent(new MonitoringEvent(getComponent().getComponentIdentifier(), getComponent().getComponentDescription().getCreationTime(),
 								sic.getMethod().getDeclaringClass().getName()+"."+sic.getMethod().getName(), IMonitoringEvent.TYPE_SERVICECALL_END, cause, end, PublishEventLevel.MEDIUM));
 						}
 					}

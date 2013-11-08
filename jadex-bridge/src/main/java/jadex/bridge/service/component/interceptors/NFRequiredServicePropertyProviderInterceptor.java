@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
  *  Delegates 'getRequiredServicePropertyProvider()' calls
  *  to the underlying component.
  */
-public class NFRequiredServicePropertyProviderInterceptor extends AbstractApplicableInterceptor
+public class NFRequiredServicePropertyProviderInterceptor extends ComponentThreadInterceptor
 {
 	protected static Method METHOD;
 	
@@ -32,9 +32,6 @@ public class NFRequiredServicePropertyProviderInterceptor extends AbstractApplic
 	
 	//-------- methods --------
 
-	/** The component. */
-	protected IInternalAccess component;
-	
 	/** The service indentifier. */
 	protected IServiceIdentifier sid;
 
@@ -43,7 +40,7 @@ public class NFRequiredServicePropertyProviderInterceptor extends AbstractApplic
 	 */
 	public NFRequiredServicePropertyProviderInterceptor(IInternalAccess component, IServiceIdentifier sid)
 	{
-		this.component = component;
+		super(component);
 		this.sid = sid;
 	}
 	
@@ -53,7 +50,7 @@ public class NFRequiredServicePropertyProviderInterceptor extends AbstractApplic
 	 */
 	public boolean isApplicable(ServiceInvocationContext context)
 	{
-		return context.getMethod().equals(METHOD);
+		return super.isApplicable(context) && context.getMethod().equals(METHOD);
 	}
 	
 	/**
@@ -63,7 +60,7 @@ public class NFRequiredServicePropertyProviderInterceptor extends AbstractApplic
 	public IFuture<Void> execute(ServiceInvocationContext sic)
 	{
 //		INFMixedPropertyProvider res = component.getRequiredServicePropertyProvider((IServiceIdentifier)sic.getArgumentArray()[0]);
-		INFMixedPropertyProvider res = component.getServiceContainer().getRequiredServicePropertyProvider(sid);
+		INFMixedPropertyProvider res = getComponent().getServiceContainer().getRequiredServicePropertyProvider(sid);
 		sic.setResult(new Future<INFMixedPropertyProvider>(res));
 		return IFuture.DONE;
 	}
