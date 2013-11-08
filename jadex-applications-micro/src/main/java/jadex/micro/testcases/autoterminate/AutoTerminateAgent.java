@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -55,23 +56,28 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	{
 		ret	= new Future<Void>();
 		this.tc	= tc;
-		tc.setTestCount(3);
+		if (SReflect.isAndroid()) {
+			tc.setTestCount(1);
+		} else {
+			tc.setTestCount(3);
+		}
 		
 		setupLocalTest(SubscriberAgent.class.getName()+".class", null)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{
-				
-				setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
-				{
-					public void customResultAvailable(IComponentIdentifier result)
+				if (!SReflect.isAndroid()) {
+					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
-						setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null);
-						// keep future open -> is set in check finished.
-					}
-				});
+						public void customResultAvailable(IComponentIdentifier result)
+						{
+							setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null);
+							// keep future open -> is set in check finished.
+						}
+					});
+				}
 			}
 		});
 		
@@ -118,6 +124,8 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 				{
 					report.setSucceeded(true);
 					checkFinished();
+				} else {
+					report.setFailed(reason.getMessage());
 				}
 			}
 		});
@@ -142,10 +150,15 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	
 	protected void	checkFinished()
 	{
-		boolean	finished	= reports.size()==3
-			&& reports.get(0).isFinished()
-			&& reports.get(1).isFinished()
-			&& reports.get(2).isFinished();
+		boolean	finished = false;
+		if (SReflect.isAndroid()) {
+			finished = reports.size()==1 && reports.get(0).isFinished();
+		} else {
+			finished = reports.size()==3
+				&& reports.get(0).isFinished()
+				&& reports.get(1).isFinished()
+				&& reports.get(2).isFinished();
+		}
 
 //		System.out.println("test4: "+reports.size()+", "+finished);
 
