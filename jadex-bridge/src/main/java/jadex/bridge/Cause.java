@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import java.util.UUID;
+import jadex.commons.SUtil;
 
 /**
  *  A cause is used to link events. It has a source and a target id that
@@ -118,8 +118,8 @@ public class Cause
 	 */
 	public String createUniqueId()
 	{
-		return createUniqueId(5);
-//		return createUniqueId(-1);
+//		return createUniqueId(5);
+		return createUniqueId(-1);
 	}
 	
 	/**
@@ -127,8 +127,8 @@ public class Cause
 	 */
 	protected String createUniqueId(int len)
 	{
-		String ret = UUID.randomUUID().toString();
-//		String ret = SUtil.createUniqueId("cause");
+//		String ret = UUID.randomUUID().toString();
+		String ret = SUtil.createUniqueId(origin);
 		if(len>0)
 		{
 			ret = ret.substring(0, len);

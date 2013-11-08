@@ -2,8 +2,9 @@ package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.commons.MethodInfo;
 import jadex.commons.collection.LRU;
+
+import java.lang.reflect.Method;
 
 /**
  *  Abstract interceptor class that uses a LRU for caching applicable states of invocations
@@ -12,7 +13,7 @@ import jadex.commons.collection.LRU;
 public abstract class AbstractLRUApplicableInterceptor implements IServiceInvocationInterceptor
 {
 	/** The LRU. */
-	protected LRU<MethodInfo, Boolean> applicables = new LRU<MethodInfo, Boolean>(50);
+	protected LRU<Method, Boolean> applicables = new LRU<Method, Boolean>(50);
 	
 	/**
 	 *  Test if the interceptor is applicable.
@@ -21,7 +22,7 @@ public abstract class AbstractLRUApplicableInterceptor implements IServiceInvoca
 	public final boolean isApplicable(ServiceInvocationContext context)
 	{
 		boolean ret = false;
-		Boolean app = applicables.get(new MethodInfo(context.getMethod()));
+		Boolean app = applicables.get(context.getMethod());
 		if(app!=null)
 		{
 			ret = app.booleanValue();
@@ -29,7 +30,7 @@ public abstract class AbstractLRUApplicableInterceptor implements IServiceInvoca
 		else
 		{
 			ret = customIsApplicable(context);
-			applicables.put(new MethodInfo(context.getMethod()), ret? Boolean.TRUE: Boolean.FALSE);
+			applicables.put(context.getMethod(), ret? Boolean.TRUE: Boolean.FALSE);
 		}
 		return ret;
 	}
