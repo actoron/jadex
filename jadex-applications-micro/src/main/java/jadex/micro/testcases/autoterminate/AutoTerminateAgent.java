@@ -4,14 +4,18 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
@@ -22,6 +26,7 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.testcases.TestAgent;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -29,7 +34,7 @@ import java.util.List;
  */
 @Service
 @Agent
-@ProvidedServices(@ProvidedService(type=IAutoTerminateService.class, implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IAutoTerminateService.class))
 public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateService
 {
 	//-------- attributes --------
@@ -56,9 +61,12 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	{
 		ret	= new Future<Void>();
 		this.tc	= tc;
-		if (SReflect.isAndroid()) {
+		if(SReflect.isAndroid()) 
+		{
 			tc.setTestCount(1);
-		} else {
+		} 
+		else 
+		{
 			tc.setTestCount(3);
 		}
 		
@@ -67,13 +75,14 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{
-				if (!SReflect.isAndroid()) {
-					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null)
+				if(!SReflect.isAndroid()) 
+				{
+					setupRemoteTest(SubscriberAgent.class.getName()+".class", "self", null, false)
 						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier result)
 						{
-							setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null);
+							setupRemoteTest(SubscriberAgent.class.getName()+".class", "platform", null, true);
 							// keep future open -> is set in check finished.
 						}
 					});
@@ -82,7 +91,68 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Setup a remote test.
+	 */
+	protected IFuture<IComponentIdentifier>	setupRemoteTest(final String filename, final String config,
+		final IResultListener<Collection<Tuple2<String,Object>>> reslis, final boolean remove)
+	{
+		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		
+		createPlatform(null).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(final IExternalAccess exta)
+			{
+				if(remove)
+					platforms.remove(exta);
+//				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+//				{
+//					public void customResultAvailable(IComponentManagementService cms)
+//					{
+//						cms.addComponentListener(exta.getComponentIdentifier(), new ICMSComponentListener()
+//						{
+//							public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
+//							{
+//								platforms.remove(desc.getName());
+//								return IFuture.DONE;
+//							}
+//							
+//							public IFuture<Void> componentChanged(IComponentDescription desc)
+//							{
+//								return IFuture.DONE;
+//							}
+//							
+//							public IFuture<Void> componentAdded(IComponentDescription desc)
+//							{
+//								return IFuture.DONE;
+//							}
+//						});
+//					}
+//				});
+				
+				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
+					{
+						// inverse proxy from remote to local.
+						createProxy(exta.getComponentIdentifier(), agent.getComponentIdentifier().getRoot())
+							.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+						{
+							public void customResultAvailable(IComponentIdentifier result)
+							{
+								createComponent(filename, null, config, exta.getComponentIdentifier(), reslis)
+									.addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -124,7 +194,9 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 				{
 					report.setSucceeded(true);
 					checkFinished();
-				} else {
+				} 
+				else 
+				{
 					report.setFailed(reason.getMessage());
 				}
 			}
@@ -151,9 +223,12 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 	protected void	checkFinished()
 	{
 		boolean	finished = false;
-		if (SReflect.isAndroid()) {
+		if(SReflect.isAndroid()) 
+		{
 			finished = reports.size()==1 && reports.get(0).isFinished();
-		} else {
+		} 
+		else 
+		{
 			finished = reports.size()==3
 				&& reports.get(0).isFinished()
 				&& reports.get(1).isFinished()

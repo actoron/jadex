@@ -10,9 +10,12 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.ICMSComponentListener;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
@@ -77,6 +80,8 @@ public abstract class TestAgent
 		
 		for(IExternalAccess platform: platforms)
 		{
+//			platform.killComponent().addResultListener(crl);
+//			System.out.println("kill: "+platform.getComponentIdentifier());
 			platform.killComponent().addResultListener(crl);
 		}
 		platforms	= null;
@@ -273,6 +278,33 @@ public abstract class TestAgent
 		{
 			public void customResultAvailable(final IExternalAccess exta)
 			{
+				
+//				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+//				{
+//					public void customResultAvailable(IComponentManagementService cms)
+//					{
+//						cms.addComponentListener(exta.getComponentIdentifier(), new ICMSComponentListener()
+//						{
+//							public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
+//							{
+//								platforms.remove(desc.getName());
+//								return IFuture.DONE;
+//							}
+//							
+//							public IFuture<Void> componentChanged(IComponentDescription desc)
+//							{
+//								return IFuture.DONE;
+//							}
+//							
+//							public IFuture<Void> componentAdded(IComponentDescription desc)
+//							{
+//								return IFuture.DONE;
+//							}
+//						});
+//					}
+//				});
+				
 				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier result)
