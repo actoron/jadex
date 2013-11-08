@@ -2906,8 +2906,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						return obj.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_COMPONENT)
 							|| obj.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START);
 					}
-				}, false, PublishEventLevel.FINE);
+				}, false, PublishEventLevel.COARSE);
 				
+//				System.out.println("sub add: "+this);
 				sub.addResultListener(new IIntermediateResultListener<IMonitoringEvent>()
 				{
 					public void resultAvailable(Collection<IMonitoringEvent> result)
@@ -2922,7 +2923,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						}
 						else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
 						{
-//							System.out.println("add: "+result.getSource());
+//							System.out.println("add: "+result);
 							componentAdded((IComponentDescription)result.getProperty("details"));	
 						}
 						else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
