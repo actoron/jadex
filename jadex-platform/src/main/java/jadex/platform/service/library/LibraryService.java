@@ -493,6 +493,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<List<URL>> getAllURLs()
 	{
+//		final long	start	= System.currentTimeMillis();
+		
 		final Future<List<URL>> ret = new Future<List<URL>>();
 		getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, List<URL>>(ret)
 		{
@@ -508,6 +510,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				}
 				
 				res.addAll(getInternalNonManagedURLs());
+				
+//				System.out.println("getAllUrls: "+(System.currentTimeMillis()-start));
 				ret.setResult(res);
 			}
 		});

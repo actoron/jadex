@@ -270,6 +270,9 @@ public class InitiatorAgent extends TestAgent
 		
 		try
 		{
+			// Garbage collect before executing method to avoid interference causing timeouts on slow computers
+			System.gc();
+			
 			final TestReport tr = new TestReport("#"+cnt, "Test if long call works with normal timeout.");
 
 			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
