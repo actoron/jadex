@@ -28,8 +28,11 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.SReflect;
+import jadex.commons.collection.ILRUEntryCleaner;
+import jadex.commons.collection.LRU;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -44,11 +47,11 @@ import jadex.commons.future.TerminableIntermediateFuture;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -77,12 +80,23 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/** The nf property providers for required services. */
 	protected Map<IServiceIdentifier, INFMixedPropertyProvider> reqserprops;
 	
+	/** The max number of preserved req service providers. */
+	protected int maxreq;
+	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new service container.
 	 */
 	public ComponentServiceContainer(IComponentAdapter adapter, String type, IInternalAccess instance, boolean realtime)
+	{
+		this(adapter, type, instance, realtime, 50);
+	}
+	
+	/**
+	 *  Create a new service container.
+	 */
+	public ComponentServiceContainer(IComponentAdapter adapter, String type, IInternalAccess instance, boolean realtime, int maxreq)
 	{
 		super(adapter.getComponentIdentifier());
 		
@@ -93,6 +107,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		this.type	= type;
 		this.instance = instance;
 		this.realtime	= realtime;
+		this.maxreq = maxreq;
 	}
 	
 	//-------- interface methods --------
@@ -813,7 +828,18 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	{
 		INFMixedPropertyProvider ret = null;
 		if(reqserprops==null)
-			reqserprops = new HashMap<IServiceIdentifier, INFMixedPropertyProvider>(); // use LRU?
+			reqserprops = new LRU<IServiceIdentifier, INFMixedPropertyProvider>(maxreq, new ILRUEntryCleaner<IServiceIdentifier, INFMixedPropertyProvider>()
+		{
+			public void cleanupEldestEntry(Entry<IServiceIdentifier, INFMixedPropertyProvider> eldest)
+			{
+				eldest.getValue().shutdownNFPropertyProvider().addResultListener(new DefaultResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+					}
+				});
+			}
+		}); 
 		ret = reqserprops.get(sid);
 		if(ret==null)
 		{

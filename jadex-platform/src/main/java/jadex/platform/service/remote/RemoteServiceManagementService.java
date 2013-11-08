@@ -496,6 +496,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public void putWaitingCall(String callid, Future<Object> future, TimeoutTimerTask tt, Object context)
 	{
 		getRemoteReferenceModule().checkThread();
+		if(waitingcalls.containsKey(callid))
+			throw new RuntimeException("Call id collision: "+callid+" "+waitingcalls.size());
 		waitingcalls.put(callid, new WaitingCallInfo(future, tt, context));
 	}
 	
@@ -724,7 +726,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //																	}
 	//																System.out.println("sent: "+callid);
 																	// ok message could be sent.
-																	if(to>=0)
+																	if(to>=0 && timer!=null)
 																		timer.schedule(tt, to);
 																}
 															});
@@ -755,7 +757,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public IFuture<Void> shutdownService()
 	{
 		timer.cancel();
-		timer	= null;
+		timer = null;
 		return super.shutdownService();
 	}
 	

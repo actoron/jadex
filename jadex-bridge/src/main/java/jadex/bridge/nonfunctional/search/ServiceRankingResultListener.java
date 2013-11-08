@@ -196,7 +196,14 @@ public class ServiceRankingResultListener<S> implements IIntermediateResultListe
 		if(!isFinished())
 		{
 			finished = true;
-			listener.exceptionOccurred(exception);
+			if(listener!=null)
+			{
+				listener.exceptionOccurred(exception);
+			}
+			else
+			{
+				scorelistener.exceptionOccurred(exception);
+			}
 		}
 	}
 }

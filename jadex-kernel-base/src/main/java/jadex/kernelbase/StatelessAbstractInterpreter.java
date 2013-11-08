@@ -2292,17 +2292,16 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		// Publish to local subscribers
 		publishLocalEvent(event);
 		
-		// Publish to monitoring service if monitoring is turned on
-//		if(tomonitor && (force || getComponentDescription().getMonitoring()!=null 
-		if((PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt) 
-			&& event.getLevel().getLevel()>getPublishEmitLevelMonitoring().getLevel()))
-		{
+//		// Publish to monitoring service if monitoring is turned on
+//		if((PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt) 
+//			&& event.getLevel().getLevel()<=getPublishEmitLevelMonitoring().getLevel()))
+//		{
 			return publishEvent(event, getMonitoringServiceGetter());
-		}
-		else
-		{
-			return IFuture.DONE;
-		}
+//		}
+//		else
+//		{
+//			return IFuture.DONE;
+//		}
 	}
 	
 	/**

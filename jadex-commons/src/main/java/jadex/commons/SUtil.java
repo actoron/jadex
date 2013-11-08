@@ -1844,7 +1844,7 @@ public class SUtil
 	}
 
 	/** The counter for conversation ids. */
-	protected static int	convidcnt;
+	protected static long convidcnt;
 
 	/**
 	 * Create a globally unique conversation id.

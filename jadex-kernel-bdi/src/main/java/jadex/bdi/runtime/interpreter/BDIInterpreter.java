@@ -2264,7 +2264,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		try
 		{
 			PublishEventLevel el = tup.getSecondEntity();
-			if(event.getLevel().getLevel()>=el.getLevel())
+			if(event.getLevel().getLevel()<=el.getLevel())
 			{
 				IFilter<IMonitoringEvent> fil = tup.getFirstEntity();
 				if(fil==null || fil.filter(event))

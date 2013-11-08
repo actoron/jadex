@@ -573,7 +573,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		try
 		{
 			PublishEventLevel el = tup.getSecondEntity();
-			if(event.getLevel().getLevel()>=el.getLevel())
+//			System.out.println("rec ev: "+event);
+			if(event.getLevel().getLevel()<=el.getLevel())
 			{
 				IFilter<IMonitoringEvent> fil = tup.getFirstEntity();
 				if(fil==null || fil.filter(event))
