@@ -1233,12 +1233,21 @@ public class SReflect
 	 */
 	public static Class[] getSuperInterfaces(Class[] interfaces) 
 	{
-		List ret = new ArrayList();
-		for(int i = 0; i<interfaces.length; i++) 
+		List<Class<?>> ret = new ArrayList<Class<?>>();
+		for(int i=0; i<interfaces.length; i++) 
 		{
 			ret.add(interfaces[i]);
-			ret.addAll(Arrays.asList(getSuperInterfaces(interfaces[i].getInterfaces())));
 		}
+		
+		for(int i=0; i<ret.size(); i++)
+		{
+			Class<?>[]	ifs	= ret.get(i).getInterfaces();
+			for(int j=0; j<ifs.length; j++) 
+			{
+				ret.add(ifs[j]);
+			}
+		}
+			
 		return (Class[])ret.toArray(new Class[ret.size()]);
 	}
 	
