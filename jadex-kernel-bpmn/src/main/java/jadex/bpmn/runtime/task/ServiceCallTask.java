@@ -727,7 +727,7 @@ public class ServiceCallTask implements ITask
 				}
 				
 				mprop = task.getProperties().get(PROPERTY_RANKING);
-				if(mprop.getInitialValue()!=null)
+				if(mprop!=null && mprop.getInitialValue()!=null)
 				{
 					String rankclname = (String)SJavaParser.parseExpression(mprop.getInitialValue(), model.getAllImports(), cl).getValue(null);
 					if(rankclname!=null)
