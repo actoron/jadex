@@ -67,7 +67,7 @@ public class BlockingAgentCreationAgent
 	{
 		if(num==0)
 		{
-			IClockService	clock	= getClock();
+			IClockService	clock	= getClock(agent);
 			System.gc();
 			try
 			{
@@ -84,7 +84,7 @@ public class BlockingAgentCreationAgent
 		
 		if(num<max)
 		{
-			IComponentManagementService	cms	=  getCMS();
+			IComponentManagementService	cms	=  getCMS(agent);
 			Map<String, Object>	args	= new HashMap<String, Object>();
 			args.put("max", new Integer(max));
 			args.put("num", new Integer(num));
@@ -96,7 +96,7 @@ public class BlockingAgentCreationAgent
 		}
 		else
 		{
-			final IClockService	clock	= getClock();
+			final IClockService	clock	= getClock(agent);
 			long	end	= clock.getTime();
 			
 			System.gc();
@@ -116,7 +116,7 @@ public class BlockingAgentCreationAgent
 			System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 		
 			// Use initial component to kill others
-			IComponentManagementService cms	= getCMS();
+			IComponentManagementService cms	= getCMS(agent);
 			String	initial	= createPeerName(1, agent.getComponentIdentifier());
 			IComponentIdentifier	cid	= new ComponentIdentifier(initial, agent.getComponentIdentifier().getRoot());
 			IExternalAccess exta	= cms.getExternalAccess(cid).get();
@@ -126,7 +126,7 @@ public class BlockingAgentCreationAgent
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					long	killstarttime	= clock.getTime();
-					IComponentManagementService	cms	= getCMS();
+					IComponentManagementService	cms	= getCMS(ia);
 					for(int i=max; i>1; i--)
 					{
 						String name = createPeerName(i, ia.getComponentIdentifier());
@@ -183,14 +183,14 @@ public class BlockingAgentCreationAgent
 		return name;
 	}
 	
-	protected IComponentManagementService	getCMS()
+	protected static IComponentManagementService	getCMS(IInternalAccess ia)
 	{
-		return agent.getServiceContainer().searchServiceUpwards(IComponentManagementService.class).get();
+		return ia.getServiceContainer().searchServiceUpwards(IComponentManagementService.class).get();
 	}
 	
 	
-	protected IClockService getClock()
+	protected static IClockService getClock(IInternalAccess ia)
 	{
-		return agent.getServiceContainer().searchServiceUpwards(IClockService.class).get();
+		return ia.getServiceContainer().searchServiceUpwards(IClockService.class).get();
 	}
 }
