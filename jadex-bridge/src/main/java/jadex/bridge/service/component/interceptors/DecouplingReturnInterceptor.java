@@ -61,10 +61,10 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //			System.out.println("sdifzgio sd");
 //		}
 //		assert adapter==null || adapter.equals(sic.getCallerAdapter()): adapter+", "+sic.getCallerAdapter();
-//		if(ada!=null && caller!=null && !ada.getComponentIdentifier().equals(caller))
-//		{
-//			System.out.println("klsdj gkl: "+ada+", "+caller);
-//		}
+		if(ada!=null && caller!=null && !ada.getComponentIdentifier().equals(caller))
+		{
+			System.out.println("klsdj gkl: "+ada+", "+caller);
+		}
 		assert ada==null || caller==null || ada.getComponentIdentifier().equals(caller): ada+", "+caller+" "+sic.getMethod()+" "+sic.getMethod().getDeclaringClass();
 
 //		if(ada!=null && caller!=null && !caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))

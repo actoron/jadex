@@ -261,7 +261,7 @@
 				    <!-- <jvmFlags>
 				    	<jvmFlag>-XX:MaxPermSize=512m</jvmFlag>
 				    </jvmFlags>-->
-				    <argLine>-Xmx256m -XX:MaxPermSize=128m</argLine>  
+				    <argLine>-ea -Xmx256m -XX:MaxPermSize=128m</argLine>  
 				    <!-- <fork>true</fork>-->
 				    <!-- <argLine>-Xms512m</argLine>
 				    <argLine>-Xmx1024m</argLine>
