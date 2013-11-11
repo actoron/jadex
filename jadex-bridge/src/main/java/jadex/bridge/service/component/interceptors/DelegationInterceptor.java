@@ -3,6 +3,7 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.nonfunctional.INFPropertyProvider;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
@@ -20,9 +21,12 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Delegates a service call to another service provider.
@@ -35,6 +39,23 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 	
 	/** The static map of subinterceptors (method -> interceptor). */
 	protected static Map SUBINTERCEPTORS = getInterceptors();
+	
+	/** The static set of no delegation methods. */
+	protected static final Set<Method> NO_DELEGATION;
+
+	
+	static
+	{
+		NO_DELEGATION = new HashSet<Method>();
+		try
+		{
+			NO_DELEGATION.add(INFPropertyProvider.class.getMethod("shutdownNFPropertyProvider", new Class[0]));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 	
 	//-------- attributes --------
 	
@@ -82,80 +103,88 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 		// This works because context has not to be transferred remotely.
 		// Ea is the local component and the service is fetched maybe a proxy.
 		// The reult listener is executed locally to ea.
-		return ea.scheduleStep(new IComponentStep<Void>()
-		{
-//			@XMLClassname("invoc")
-			public IFuture<Void> execute(final IInternalAccess ia)
-			{
-				final Future<Void> ret = new Future<Void>();
-				IFuture<IService> fut = fetcher.getService(info, binding, false, new IRemoteFilter<IService>()
-				{
-					public IFuture<Boolean> filter(IService ser)
-					{
-						return new Future<Boolean>(!sid.equals(ser.getServiceIdentifier()));
-					}
-				});
-				
-				fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IService, Void>(ret)
-				{
-					public void customResultAvailable(IService result) 
-					{
-						// Note: this will not be executed remotely but on the component 
-						sic.setObject(result);
-						sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				}));
-				
-//				IIntermediateFuture<IService> fut = fetcher.getServices(info, binding, false);
-//				fut.addResultListener(ia.createResultListener(new IIntermediateResultListener<IService>()
-//				{
-//					boolean fin = false;
-//					public void resultAvailable(Collection<IService> result)
-//					{
-//						for(IService ser: result)
-//						{
-//							intermediateResultAvailable(ser);
-//						}
-//						finished();
-//					}
-//					
-//					public void intermediateResultAvailable(IService result) 
-//					{
-//						// Only set result if not found itself
-//						if(!fin && !sid.equals(result.getServiceIdentifier()))
-//						{
-//							fin = true;
-//							sic.setObject(result);
-//							sic.invoke().addResultListener(new DelegationResultListener(ret));
-//						}
-//					}	
-//					
-//					public void finished()
-//					{
-//						if(!fin)
-//						{
-//							ret.setException(new ServiceNotFoundException());
-//						}
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						ret.setException(exception);
-//					}
-//				}));
-//					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-//				{
-//					public void customResultAvailable(Object result) 
-//					{
-//						// Note: this will not be executed remotely but on the component 
-//						sic.setObject(result);
-//						sic.invoke().addResultListener(new DelegationResultListener(ret));
-//					}
-//				}));
-				return ret;
-			}
-		});
 		
+		if(NO_DELEGATION.contains(sic.getMethod()))
+		{
+			sic.setResult(IFuture.DONE);
+			return IFuture.DONE;
+		}
+		else
+		{
+			return ea.scheduleStep(new IComponentStep<Void>()
+			{
+	//			@XMLClassname("invoc")
+				public IFuture<Void> execute(final IInternalAccess ia)
+				{
+					final Future<Void> ret = new Future<Void>();
+					IFuture<IService> fut = fetcher.getService(info, binding, false, new IRemoteFilter<IService>()
+					{
+						public IFuture<Boolean> filter(IService ser)
+						{
+							return new Future<Boolean>(!sid.equals(ser.getServiceIdentifier()));
+						}
+					});
+					
+					fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IService, Void>(ret)
+					{
+						public void customResultAvailable(IService result) 
+						{
+							// Note: this will not be executed remotely but on the component 
+							sic.setObject(result);
+							sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					}));
+					
+	//				IIntermediateFuture<IService> fut = fetcher.getServices(info, binding, false);
+	//				fut.addResultListener(ia.createResultListener(new IIntermediateResultListener<IService>()
+	//				{
+	//					boolean fin = false;
+	//					public void resultAvailable(Collection<IService> result)
+	//					{
+	//						for(IService ser: result)
+	//						{
+	//							intermediateResultAvailable(ser);
+	//						}
+	//						finished();
+	//					}
+	//					
+	//					public void intermediateResultAvailable(IService result) 
+	//					{
+	//						// Only set result if not found itself
+	//						if(!fin && !sid.equals(result.getServiceIdentifier()))
+	//						{
+	//							fin = true;
+	//							sic.setObject(result);
+	//							sic.invoke().addResultListener(new DelegationResultListener(ret));
+	//						}
+	//					}	
+	//					
+	//					public void finished()
+	//					{
+	//						if(!fin)
+	//						{
+	//							ret.setException(new ServiceNotFoundException());
+	//						}
+	//					}
+	//					
+	//					public void exceptionOccurred(Exception exception)
+	//					{
+	//						ret.setException(exception);
+	//					}
+	//				}));
+	//					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+	//				{
+	//					public void customResultAvailable(Object result) 
+	//					{
+	//						// Note: this will not be executed remotely but on the component 
+	//						sic.setObject(result);
+	//						sic.invoke().addResultListener(new DelegationResultListener(ret));
+	//					}
+	//				}));
+					return ret;
+				}
+			});
+		}
 	}
 
 	/**

@@ -102,6 +102,8 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public <T> IFuture<T> getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind, final IRemoteFilter<T> filter)
 	{
+//		System.out.println("searching: "+info.getName());
+		
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
 		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader());
 		

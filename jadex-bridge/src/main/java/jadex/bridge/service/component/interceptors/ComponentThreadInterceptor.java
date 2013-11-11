@@ -25,8 +25,8 @@ public abstract class ComponentThreadInterceptor extends AbstractApplicableInter
 	 */
 	public boolean isApplicable(ServiceInvocationContext context)
 	{
-		if(!getComponent().isComponentThread())
-			System.out.println("not on comp: "+context.getMethod().toString());
+//		if(!getComponent().isComponentThread())
+//			System.out.println("not on comp: "+context.getMethod().toString());
 //			throw new RuntimeException("Must be called on component thread: "+Thread.currentThread());
 
 		return getComponent().isComponentThread();

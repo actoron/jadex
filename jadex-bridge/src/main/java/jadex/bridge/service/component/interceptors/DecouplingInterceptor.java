@@ -122,7 +122,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		final Future<Void> ret = new Future<Void>();
 		
 		// Fetch marshal service first time.
-		
+				
 		if(marshal==null)
 		{
 			SServiceProvider.getService(ea.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)

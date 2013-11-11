@@ -154,7 +154,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		Object ret = null;
 		
-//		if(method.getName().indexOf("methodB")!=-1)
+//		if(method.getName().indexOf("create")!=-1)
 //			System.out.println("goto");
 		
 //		final long callid = this.callid.getAndIncrement();
@@ -426,6 +426,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			((IInternalService)service).createServiceIdentifier(name, service.getClass(), rid, type);
 		}
 		
+//		if(type.getName().indexOf("IServiceCallService")!=-1)
+//			System.out.println("hijijij");
+		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service, realtime, componentfetcher);
@@ -639,7 +642,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public static IService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IService service, 
 		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, boolean realtime)
 	{
-		System.out.println("cRSP:"+service.getServiceIdentifier());
+//		if(service.getServiceIdentifier().getServiceType().getTypeName().indexOf("IServiceCallService")!=-1)
+//			System.out.println("hijijij");
+
+//		System.out.println("cRSP:"+service.getServiceIdentifier());
 		IService ret = service;
 		
 		if(binding==null || !PROXYTYPE_RAW.equals(binding.getProxytype()))
