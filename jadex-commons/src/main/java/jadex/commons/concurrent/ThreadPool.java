@@ -180,7 +180,7 @@ public class ThreadPool implements IThreadPool
 					{
 						Runnable	task	= tasks.peek();
 						Long start = enqueuetimes.get(task);
-						if(start!=null && start.longValue()+maxwait<System.currentTimeMillis())
+						if(start!=null && strategy.getCapacity()==0 && start.longValue()+maxwait<System.currentTimeMillis())
 						{
 							addThreads(5);
 							strategy.workersAdded(5);

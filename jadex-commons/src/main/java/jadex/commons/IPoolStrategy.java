@@ -47,4 +47,8 @@ public interface IPoolStrategy
 	 */
 	public int getWorkerCount();
 	
+	/**
+	 *  Get the number of free workers.
+	 */
+	public int	getCapacity();
 }

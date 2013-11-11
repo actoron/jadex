@@ -802,7 +802,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		 */
 		public void start()
 		{
-			rms.getTimer().schedule(this, timeout);
+			if(rms.getTimer()!=null)
+			{
+				rms.getTimer().schedule(this, timeout);
+			}
 		}
 
 		/**
