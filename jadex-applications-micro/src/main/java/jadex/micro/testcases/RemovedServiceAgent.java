@@ -65,7 +65,7 @@ public class RemovedServiceAgent
 		{
 			public void customResultAvailable(final Collection<TestReport> reports1)
 			{
-				performTests(DirectServiceAgent.class.getName()+".class", false).addResultListener(new DelegationResultListener<Collection<TestReport>>(reports)
+				performTests(DirectServiceAgent.class.getName()+".class", true).addResultListener(new DelegationResultListener<Collection<TestReport>>(reports)
 				{
 					public void customResultAvailable(final Collection<TestReport> reports2)
 					{
