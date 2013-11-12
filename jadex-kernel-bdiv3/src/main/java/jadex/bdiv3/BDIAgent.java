@@ -688,7 +688,7 @@ public class BDIAgent extends MicroAgent
 	 */
 	public static void publishToolBeliefEvent(BDIAgentInterpreter ip, MBelief mbel)//, String evtype)
 	{
-		if(ip.hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.COARSE))
+		if(ip.hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();

@@ -3,6 +3,7 @@ package jadex.platform.service.message.streams;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -71,7 +72,8 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	public AbstractConnectionHandler(MessageService ms, Map<String, Object> nonfunc)
 	{
-		this(ms, nonfunc, 3, 10000, 15000);
+		// Use timeouts relative to deftimeout
+		this(ms, nonfunc, 3, BasicService.DEFAULT_REMOTE/3, BasicService.DEFAULT_REMOTE/2);
 	}
 	
 	/**
@@ -194,7 +196,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	// Is already called from correct message service thread
 	public boolean isConnectionAlive()
 	{
-		boolean isalive = System.currentTimeMillis()<alivetime+getLeasetime()*2.5;
+		boolean isalive = getLeasetime()<0 || System.currentTimeMillis()<alivetime+getLeasetime()*2.5;
 //		System.out.println("alive: "+isalive+" "+alivetime+" "+System.currentTimeMillis());
 		return isalive;
 	}
