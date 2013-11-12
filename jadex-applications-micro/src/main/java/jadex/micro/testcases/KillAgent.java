@@ -10,6 +10,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -21,6 +22,7 @@ import jadex.micro.annotation.RequiredServices;
 /**
  * 
  */
+// Todo: what is this agent supposed to test!?
 @Agent
 @RequiredServices(@RequiredService(name="cms", type=IComponentManagementService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
@@ -40,12 +42,17 @@ public class KillAgent
 			public void customResultAvailable(IComponentManagementService cms)
 			{
 				cms.createComponent(null, "jadex.micro.MicroAgent.class", new CreationInfo(agent.getComponentIdentifier()), null)
-					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					.addResultListener(agent.createResultListener(new IResultListener<IComponentIdentifier>()
 				{
-					public void customResultAvailable(IComponentIdentifier result) 
+					public void resultAvailable(IComponentIdentifier result) 
 					{
 						System.out.println("Micro agent started: "+result);
-					};
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+//						exception.printStackTrace();
+					}
 				}));
 				
 				ret.setResult(null);
