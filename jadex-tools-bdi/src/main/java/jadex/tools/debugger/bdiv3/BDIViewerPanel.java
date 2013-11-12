@@ -553,7 +553,7 @@ public class BDIViewerPanel extends JPanel
 					|| ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_GOAL)
 					|| ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_PLAN);
 			}
-		}, true, PublishEventLevel.COARSE);
+		}, true, PublishEventLevel.FINE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent event)

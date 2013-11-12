@@ -323,7 +323,7 @@ public class MicroAgentViewPanel extends JPanel
 			{
 				return ev.getType().endsWith(MicroAgentInterpreter.TYPE_STEP);	
 			}
-		}, true, PublishEventLevel.COARSE);
+		}, true, PublishEventLevel.FINE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent event)

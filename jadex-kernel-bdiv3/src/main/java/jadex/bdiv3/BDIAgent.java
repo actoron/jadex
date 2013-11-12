@@ -701,6 +701,7 @@ public class BDIAgent extends MicroAgent
 //			mev.setProperty("sourcename", element.toString());
 			mev.setProperty("sourcetype", info.getType());
 			mev.setProperty("details", info);
+			mev.setLevel(PublishEventLevel.FINE);
 			
 			ip.publishEvent(mev, PublishTarget.TOSUBSCRIBERS);
 		}

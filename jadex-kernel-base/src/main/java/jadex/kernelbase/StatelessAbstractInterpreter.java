@@ -200,9 +200,6 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 //		System.out.println("cleanup: "+getComponentIdentifier());
 		assert !getComponentAdapter().isExternalThread();
 		
-		if(getComponentDescription().getName().getLocalName().startsWith("Initiator"))
-			System.out.println("ini1: "+getComponentIdentifier());
-		
 		final Future<Void> ret = new Future<Void>();
 		
 		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);

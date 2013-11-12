@@ -76,7 +76,7 @@ public class MonitoringEvent implements IMonitoringEvent
 	/**
 	 *  Create a new monitoring event.
 	 */
-	public MonitoringEvent(IComponentIdentifier source, long crtime, String sourcdesc, String type, Cause cause, long time, PublishEventLevel importance, Map<String, Object> props)
+	public MonitoringEvent(IComponentIdentifier source, long crtime, String sourcdesc, String type, Cause cause, long time, PublishEventLevel level, Map<String, Object> props)
 	{
 		this.source = source;
 		this.sourcedesc = sourcdesc;
@@ -84,7 +84,7 @@ public class MonitoringEvent implements IMonitoringEvent
 		this.type = type;
 		this.cause = cause;
 		this.time = time;
-		this.level = importance;
+		this.level = level!=null? level: PublishEventLevel.FINE;
 		this.properties = props;
 	}
 	
