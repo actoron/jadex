@@ -67,7 +67,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes, boolean addCleanup) throws Exception
 	{
-		this(path, root, excludes, addCleanup, SReflect.isAndroid() ? 2000000 : BasicService.DEFAULT_LOCAL*20, true, true);
+		this(path, root, excludes, addCleanup, SReflect.isAndroid() ? 2000000 : BasicService.DEFAULT_LOCAL*10, true, true);
 	}
 	
 	/**
