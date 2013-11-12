@@ -48,7 +48,7 @@ public class SokratesBDI
 	protected IBoard	board	= new JackBoard();
 	
 	/** The number of tried moves. */
-	@Belief
+	@Belief // needs not to be belief, just used here to test the BDIDebugger
 	protected int	triescnt;
 	
 	/** The depth of the current move. */

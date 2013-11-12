@@ -351,5 +351,12 @@ public class JackBoard implements IBoard, Serializable
 		pcs.removePropertyChangeListener(listener);
     }
 
+	/** 
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "JackBoard(moves=" + moves + ", the_hole=" + the_hole + ")";
+	}
 }
 
