@@ -1391,7 +1391,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!mypcons[i].isConnectionAlive())
 					{
-//						System.out.println("removed con: "+mypcons[i]);
+						System.out.println("removed con: "+component+", "+mypcons[i].getConnectionId());
 						mypcons[i].close();
 						pcons.remove(new Integer(mypcons[i].getConnectionId()));
 					}
@@ -1401,7 +1401,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!myicons[i].isConnectionAlive())
 					{
-//						System.out.println("removed con: "+myicons[i]);
+						System.out.println("removed con: "+component+", "+myicons[i].getConnectionId());
 						myicons[i].close();
 						icons.remove(new Integer(myicons[i].getConnectionId()));
 					}
