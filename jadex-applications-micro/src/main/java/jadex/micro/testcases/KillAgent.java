@@ -1,12 +1,16 @@
 package jadex.micro.testcases;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -49,5 +53,38 @@ public class KillAgent
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		ThreadSuspendable sus = new ThreadSuspendable();
+		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get(sus);
+		IComponentManagementService cms = SServiceProvider.getService(pl.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+		
+		for(int i=0; i<1000; i++)
+		{
+			IComponentIdentifier cid = cms.createComponent(KillAgent.class.getName()+".class", null).getFirstResult(sus);
+			try
+			{
+				cms.destroyComponent(cid).get(sus);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Ex: "+e.getMessage());
+			}
+		}
+		
+		try
+		{
+			Thread.currentThread().sleep(30000);
+		}
+		catch(Exception e)
+		{
+		}
+		
+		System.out.println("fini");
 	}
 }

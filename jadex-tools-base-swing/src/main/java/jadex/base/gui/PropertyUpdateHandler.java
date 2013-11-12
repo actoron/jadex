@@ -7,11 +7,13 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.ICommandFuture.Type;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -56,7 +58,7 @@ public class PropertyUpdateHandler
 					}
 				});
 				
-				subscription.addResultListener(new IntermediateDefaultResultListener<IMonitoringEvent>()
+				subscription.addResultListener(new IIntermediateFutureCommandResultListener<IMonitoringEvent>()
 				{
 					public void intermediateResultAvailable(IMonitoringEvent ev)
 					{
@@ -91,9 +93,21 @@ public class PropertyUpdateHandler
 						}
 					}
 					
+					public void resultAvailable(Collection<IMonitoringEvent> result)
+					{
+					}
+					
 					public void exceptionOccurred(Exception ex)
 					{
 						// ignore
+					}
+					
+					public void commandAvailable(Type command)
+					{
+					}
+					
+					public void finished()
+					{
 					}
 				});
 			}
