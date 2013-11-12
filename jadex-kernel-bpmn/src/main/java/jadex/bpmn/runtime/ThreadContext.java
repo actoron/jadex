@@ -162,7 +162,10 @@ public class ThreadContext
 			// Cancel activity (e.g. timer).
 			MActivity	act	= thread.getActivity();
 			if(act!=null && thread.isWaiting())
+			{
 				thread.getInstance().getActivityHandler(act).cancel(act, thread.getInstance(), thread);
+			}
+			thread.setActivity(null);
 			
 			boolean rem = threads.containsKey(thread);
 			threads.remove(thread);

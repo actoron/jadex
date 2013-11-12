@@ -53,6 +53,7 @@ import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
@@ -936,6 +937,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					{
 						if(isCurrentActivity(activity, thread))
 						{
+							if(thread.getThreadContext()==null)
+							{
+								System.out.println("gfeqhzydilgh");
+							}
+
 //							System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
 							step(activity, BpmnInterpreter.this, thread, event);
 							thread.setNonWaiting();
@@ -985,8 +991,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	protected boolean isCurrentActivity(final MActivity activity, final ProcessThread thread)
 	{
-		boolean ret = thread.getActivity().equals(activity);
-		if(!ret && MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(thread.getActivity().getActivityType()))
+		boolean ret = SUtil.equals(thread.getActivity(), activity);
+		if(!ret && thread.getActivity()!=null && MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(thread.getActivity().getActivityType()))
 		{
 			List<MSequenceEdge> outedges = thread.getActivity().getOutgoingSequenceEdges();
 			for(int i=0; i<outedges.size() && !ret; i++)
@@ -995,7 +1001,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				ret = edge.getTarget().equals(activity);
 			}
 		}
-		if(!ret && MBpmnModel.SUBPROCESS.equals(thread.getActivity().getActivityType()))
+		if(!ret && thread.getActivity()!=null && MBpmnModel.SUBPROCESS.equals(thread.getActivity().getActivityType()))
 		{
 			List<MActivity> handlers = thread.getActivity().getEventHandlers();
 			for(int i=0; !ret && handlers!=null && i<handlers.size(); i++)
