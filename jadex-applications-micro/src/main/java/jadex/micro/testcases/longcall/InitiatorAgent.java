@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
@@ -277,6 +278,8 @@ public class InitiatorAgent extends TestAgent
 
 			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
 			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
+			
+			ServiceCall.getOrCreateNextInvocation().setTimeout(BasicService.DEFAULT_LOCAL/15);
 			
 			final long start	= System.currentTimeMillis();
 			((IFuture)m.invoke(ts, new Object[0])).addResultListener(new IResultListener()

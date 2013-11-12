@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -66,7 +67,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes, boolean addCleanup) throws Exception
 	{
-		this(path, root, excludes, addCleanup, SReflect.isAndroid() ? 2000000 :600000, true, true);
+		this(path, root, excludes, addCleanup, SReflect.isAndroid() ? 2000000 : BasicService.DEFAULT_LOCAL*20, true, true);
 	}
 	
 	/**

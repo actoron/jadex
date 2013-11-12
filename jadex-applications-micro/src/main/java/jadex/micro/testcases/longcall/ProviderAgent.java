@@ -54,7 +54,6 @@ public class ProviderAgent implements ITestService
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
 	public ITerminableFuture<Void> method2()
 	{
 		TerminableFuture<Void> ret = (TerminableFuture<Void>)SFuture.getNoTimeoutFuture(TerminableFuture.class, agent);
@@ -66,7 +65,6 @@ public class ProviderAgent implements ITestService
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
 	public IIntermediateFuture<Void> method3()
 	{
 		final IntermediateFuture<Void> ret = (IntermediateFuture<Void>)SFuture.getNoTimeoutFuture(IntermediateFuture.class, agent);
@@ -78,7 +76,6 @@ public class ProviderAgent implements ITestService
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
 	public ISubscriptionIntermediateFuture<Void> method4()
 	{
 		final SubscriptionIntermediateFuture<Void> ret = (SubscriptionIntermediateFuture<Void>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
@@ -90,7 +87,6 @@ public class ProviderAgent implements ITestService
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
 	public IPullIntermediateFuture<Void> method5()
 	{
 		final PullIntermediateFuture<Void> ret = new PullIntermediateFuture<Void>((ICommand<PullIntermediateFuture<Void>>)null);
@@ -103,7 +99,6 @@ public class ProviderAgent implements ITestService
 	/**
 	 *  A test method.
 	 */
-	@Timeout(2000)
 	public IPullSubscriptionIntermediateFuture<Void> method6()
 	{
 		final PullSubscriptionIntermediateFuture<Void> ret = new PullSubscriptionIntermediateFuture<Void>((ICommand<PullSubscriptionIntermediateFuture<Void>>)null);
