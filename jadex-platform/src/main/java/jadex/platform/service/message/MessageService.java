@@ -296,6 +296,7 @@ public class MessageService extends BasicService implements IMessageService
 		OutputConnection con = new OutputConnection(internalUpdateComponentIdentifier(sender), 
 			internalUpdateComponentIdentifier(receiver), conid, true, och);
 		icons.put(conid, och);
+		System.out.println("created ocon: "+component+", "+System.currentTimeMillis()+", "+och.getConnectionId());
 		return con;
 	}
 	
@@ -318,6 +319,7 @@ public class MessageService extends BasicService implements IMessageService
 		InputConnection con = new InputConnection(internalUpdateComponentIdentifier(sender), 
 			internalUpdateComponentIdentifier(receiver), conid, true, ich);
 		icons.put(conid, ich);
+		System.out.println("created icon: "+component+", "+System.currentTimeMillis()+", "+ich.getConnectionId());
 		return con;
 	}
 	
@@ -1391,7 +1393,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!mypcons[i].isConnectionAlive())
 					{
-						System.out.println("removed con: "+component+", "+mypcons[i].getConnectionId());
+						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+mypcons[i].getConnectionId());
 						mypcons[i].close();
 						pcons.remove(new Integer(mypcons[i].getConnectionId()));
 					}
@@ -1401,7 +1403,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!myicons[i].isConnectionAlive())
 					{
-						System.out.println("removed con: "+component+", "+myicons[i].getConnectionId());
+						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+myicons[i].getConnectionId());
 						myicons[i].close();
 						icons.remove(new Integer(myicons[i].getConnectionId()));
 					}
@@ -1811,7 +1813,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found (ackinit): "+conid);
+						System.out.println("OutputStream not found (ackinit): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.DATA_OUTPUT_INITIATOR)
@@ -1837,7 +1839,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found (coi): "+conid);
+						System.out.println("InputStream not found (coi): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ACKCLOSE_OUTPUT_PARTICIPANT)
@@ -1850,7 +1852,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found (ackclose): "+conid);
+						System.out.println("OutputStream not found (ackclose): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.CLOSEREQ_OUTPUT_PARTICIPANT)
@@ -1863,7 +1865,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found (closereq): "+conid);
+						System.out.println("OutputStream not found (closereq): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ACKCLOSEREQ_OUTPUT_INITIATOR)
@@ -1877,7 +1879,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found (ackclosereq): "+conid);
+						System.out.println("OutputStream not found (ackclosereq): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ACKDATA_OUTPUT_PARTICIPANT)
@@ -1891,7 +1893,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found (ackdata): "+conid);
+						System.out.println("OutputStream not found (ackdata): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				
@@ -1909,7 +1911,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found (ackinit): "+conid);
+						System.out.println("InputStream not found (ackinit): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.DATA_INPUT_PARTICIPANT)
@@ -1934,7 +1936,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found (ackdata): "+conid);
+						System.out.println("OutputStream not found (ackdata): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.CLOSEREQ_INPUT_INITIATOR)
@@ -1958,7 +1960,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found (ackclosereq): "+conid);
+						System.out.println("InputStream not found (ackclosereq): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.CLOSE_INPUT_PARTICIPANT)
@@ -1970,7 +1972,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found (closeinput): "+conid);
+						System.out.println("OutputStream not found (closeinput): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ACKCLOSE_INPUT_INITIATOR)
@@ -1982,7 +1984,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found (ackclose): "+conid);
+						System.out.println("InputStream not found (ackclose): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				
@@ -1997,7 +1999,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("Stream not found (alive ini): "+conid);
+						System.out.println("Stream not found (alive ini): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ALIVE_PARTICIPANT)
@@ -2010,7 +2012,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("Stream not found (alive par): "+conid);
+						System.out.println("Stream not found (alive par): "+component+", "+System.currentTimeMillis()+", "+conid);
 					}
 				}
 	
