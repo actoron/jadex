@@ -8,7 +8,7 @@
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
 		<version> 2.4 </version>
-		<relativePath>../jadex-parent/pom.xml</relativePath>
+		<relativePath>../jadex-android-parent/pom.xml</relativePath>
 	</parent>
 
 	<description>
