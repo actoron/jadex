@@ -18,7 +18,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-android-maven-plugin</artifactId>
 	<name>jadex-android-maven-plugin</name>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<description>
@@ -28,7 +28,7 @@
 	<properties>
 		<!-- <maven-plugin-plugin.version>3.2</maven-plugin-plugin.version> -->
 		<maven.api.version>3.1.1</maven.api.version>
-		<jadex-version>2.4-SNAPSHOT</jadex-version>
+		<jadex-version>2.4</jadex-version>
 	</properties>
 
 	<dependencies>
