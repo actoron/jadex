@@ -18,6 +18,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -26,6 +27,8 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 import java.util.Map;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 
 
@@ -51,6 +54,9 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	/** The remote cms. */
 	protected IComponentManagementService rcms;
 	
+	/** The injected flag. */
+	protected boolean injected;
+	
 	//-------- methods --------
 	
 	/**
@@ -66,11 +72,39 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 			public void customResultAvailable(IComponentManagementService cms) 
 			{
 				rcms = cms;
-				INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)cms).getServiceIdentifier());
-				LatencyProperty lt = new LatencyProperty(getInterpreter().getInternalAccess(), (IService)rcms, null);
-				nfpp.addNFProperty(lt);
-				ret.setResult(null);
-//				System.out.println("created: "+getComponentIdentifier());
+				cms.getExternalAccess(getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				{
+					public void customResultAvailable(IExternalAccess pl)
+					{
+						pl.getArguments().addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+						{
+							public void customResultAvailable(Map<String, Object> args)
+							{
+								Boolean b = (Boolean)args.get("sensors");
+								if(b!=null && b.booleanValue())
+								{
+									INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
+									LatencyProperty lt = new LatencyProperty(getInterpreter().getInternalAccess(), (IService)rcms, null);
+									nfpp.addNFProperty(lt).addResultListener(new DelegationResultListener<Void>(ret)
+									{
+										public void customResultAvailable(Void result)
+										{
+											injected = true;
+											super.customResultAvailable(result);
+										}
+									});
+//									System.out.println("created: "+getComponentIdentifier());
+								}
+								else
+								{
+									ret.setResult(null);
+								}
+							}
+						});
+					}
+				});
+				
+			
 			}
 //			public void exceptionOccurred(Exception exception)
 //			{
@@ -206,7 +240,7 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	 */
 	public IFuture<Long> getCurrentLatency()
 	{
-		if(rcms!=null)
+		if(rcms!=null && injected)
 		{
 			INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
 			return nfpp.getNFPropertyValue(LatencyProperty.NAME);
