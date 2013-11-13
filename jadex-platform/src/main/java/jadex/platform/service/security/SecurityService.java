@@ -1451,7 +1451,7 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Subscribe to changes.
 	 */
-	public ISubscriptionIntermediateFuture<ChangeEvent<Object>> subcribeToEvents()
+	public ISubscriptionIntermediateFuture<ChangeEvent<Object>> subscribeToEvents()
 	{
 		final SubscriptionIntermediateFuture<ChangeEvent<Object>> ret = new SubscriptionIntermediateFuture<ChangeEvent<Object>>();
 		ret.setTerminationCommand(new TerminationCommand()
@@ -1477,6 +1477,8 @@ public class SecurityService implements ISecurityService
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, new Long(valdur)));
 
+		System.out.println("ret fut is: "+ret+" "+ret.hashCode());
+		
 		return ret;
 	}
 	

@@ -322,6 +322,6 @@ public interface ISecurityService
 	 */
 	@SecureTransmission // Sends configuration changes with passwords etc.
 	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<ChangeEvent<Object>> subcribeToEvents();
+	public ISubscriptionIntermediateFuture<ChangeEvent<Object>> subscribeToEvents();
 	
 }

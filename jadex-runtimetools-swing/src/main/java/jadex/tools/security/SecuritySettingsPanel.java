@@ -18,6 +18,7 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.JSplitPanel;
@@ -132,7 +133,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 	 */
 	public IFuture<Void> init(final IControlCenter jcc, IService service)
 	{
-		final Future<Void>	ret	= new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
 		
 		this.secservice	= (ISecurityService)service;
 //		this.inner	= new JPanel(new BorderLayout());
@@ -925,7 +926,8 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 //			}
 //		});
 		
-		secservice.subcribeToEvents().addResultListener(new IIntermediateResultListener<jadex.commons.ChangeEvent<Object>>()
+		IIntermediateFuture<jadex.commons.ChangeEvent<Object>> fut = secservice.subscribeToEvents();
+		fut.addResultListener(new IIntermediateResultListener<jadex.commons.ChangeEvent<Object>>()
 		{
 			public void intermediateResultAvailable(final jadex.commons.ChangeEvent<Object> event)
 			{

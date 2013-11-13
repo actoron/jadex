@@ -6,6 +6,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ICommandFuture.Type;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
@@ -91,7 +92,8 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 				if(ServiceCall.getCurrentInvocation()!=null)
 				{
 					final ServiceCall sc = ServiceCall.getCurrentInvocation();
-					if(res instanceof IFuture)
+					// Problem with subscription futures: if is first listener it will fetch the initial events :-(
+					if(res instanceof IFuture && !(res instanceof ISubscriptionIntermediateFuture))
 					{
 						final long fstart = start;
 						((IFuture<Object>)res).addResultListener(new DelegationResultListener<Object>(null)

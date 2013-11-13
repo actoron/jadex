@@ -86,9 +86,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 */
 	public void	addIntermediateResult(E result)
 	{
-//		if(result!=null && Object.class.equals(result.getClass()))
-//			System.out.println("ires: "+this+" "+result);
-		
 	   	synchronized(this)
 		{
         	if(resultavailable)
@@ -133,6 +130,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	 */
 	protected void addResult(E result)
 	{
+//		if(result!=null && result.getClass().getName().indexOf("ChangeEvent")!=-1)
+//			System.out.println("ires: "+this+" "+result);
       	intermediate = true;
 		if(results==null)
 			results	= new ArrayList<E>();

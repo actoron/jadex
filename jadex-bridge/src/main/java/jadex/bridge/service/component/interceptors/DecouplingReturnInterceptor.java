@@ -61,10 +61,6 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //			System.out.println("sdifzgio sd");
 //		}
 //		assert adapter==null || adapter.equals(sic.getCallerAdapter()): adapter+", "+sic.getCallerAdapter();
-		if(ada!=null && caller!=null && !ada.getComponentIdentifier().equals(caller))
-		{
-			System.out.println("klsdj gkl: "+ada+", "+caller);
-		}
 		assert ada==null || caller==null || ada.getComponentIdentifier().equals(caller): ada+", "+caller+" "+sic.getMethod()+" "+sic.getMethod().getDeclaringClass();
 
 //		if(ada!=null && caller!=null && !caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()))
@@ -73,6 +69,12 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //		}
 //		assert	ada==null || caller==null || caller.getPlatformName().equals(ea.getComponentIdentifier().getPlatformName()) : caller+", "+ea.getComponentIdentifier();  
 
+//		if(sic.getMethod().getName().indexOf("subscribeToEvents")!=-1)
+//			System.out.println("sjdjfhsdfhj");
+
+//		if(sic.getMethod().getName().indexOf("subscribeToEvents")!=-1)
+//			System.out.println("enter: "+sic.getMethod().getName()+" "+(ada!=null? ada.getComponentIdentifier(): "null"));
+		
 		sic.invoke().addResultListener(new DelegationResultListener<Void>(fut)
 		{
 			public void customResultAvailable(Void result)
@@ -80,6 +82,9 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //				final boolean	destroy	= sic.getMethod().getName().toString().indexOf("destroyComponent")!=-1;
 				
 				final Object	res	= sic.getResult();
+				
+//				if(sic.getMethod().getName().indexOf("subscribeToEvents")!=-1)
+//					System.out.println("sjdjfhsdfhj: "+sic.getResult()+" "+sic.getResult().hashCode());
 				
 				if(res instanceof IFuture)
 				{
@@ -93,8 +98,8 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 						
 						public void notifyListener(final IResultListener<Void> listener)
 						{
-//							if(sic.getMethod().getName().indexOf("method")!=-1)
-//								System.out.println("sjdjfhsdfhj");
+//							if(sic.getMethod().getName().indexOf("subscribeToEvents")!=-1)
+//								System.out.println("sjdjfhsdfhj: "+sic.getResult()+" "+sic.getResult().hashCode());
 							
 							// Don't reschedule if already on correct thread or called from remote.
 							if(ada==null || !ada.isExternalThread())
