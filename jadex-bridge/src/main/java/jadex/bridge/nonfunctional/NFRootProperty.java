@@ -7,6 +7,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -18,30 +19,65 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 	/** The root access. */
 	protected IExternalAccess root;
 	
+	/** The flag if the property has been injected to the root component. */
+	protected boolean injected;
+	
 	/**
 	 *  Create a new property.
 	 */
 	public NFRootProperty(final IInternalAccess comp, final NFPropertyMetaInfo mi)
 	{
+		this(comp, mi, true);
+	}
+	
+	/**
+	 *  Create a new property.
+	 */
+	public NFRootProperty(final IInternalAccess comp, final NFPropertyMetaInfo mi, boolean inject)
+	{
 		super(comp, mi);
-		
-		// Add property to root component
-		SServiceProvider.getService(comp.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DefaultResultListener<IComponentManagementService>()
+		if(inject)
 		{
-			public void resultAvailable(IComponentManagementService cms)
+			injectPropertyToRootComponent();
+		}
+	}
+	
+	/**
+	 *  Inject the property to the root component.
+	 */
+	protected IFuture<Void> injectPropertyToRootComponent()
+	{
+		final Future<Void> ret = new Future<Void>();
+
+		if(!injected)
+		{
+			this.injected = true;
+			
+			// Add property to root component
+			SServiceProvider.getService(comp.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
-				cms.getExternalAccess(comp.getComponentIdentifier().getRoot()).addResultListener(new DefaultResultListener<IExternalAccess>()
+				public void customResultAvailable(IComponentManagementService cms)
 				{
-					public void resultAvailable(IExternalAccess root)
+					cms.getExternalAccess(comp.getComponentIdentifier().getRoot()).addResultListener(new DefaultResultListener<IExternalAccess>()
 					{
-						NFRootProperty.this.root = root;
-						NFPropertyMetaInfo cmi = new NFPropertyMetaInfo(mi.getName(), mi.getType(), mi.getUnit(), mi.isDynamic(), mi.getUpdateRate(), Target.Root);
-						root.addNFProperty(new NFPropertyRef<T, U>(comp.getExternalAccess(), root, cmi));
-					}
-				});
-			}
-		});
+						public void resultAvailable(IExternalAccess root)
+						{
+							NFRootProperty.this.root = root;
+							INFPropertyMetaInfo mi = getMetaInfo();
+							NFPropertyMetaInfo cmi = new NFPropertyMetaInfo(mi.getName(), mi.getType(), mi.getUnit(), mi.isDynamic(), mi.getUpdateRate(), Target.Root);
+							root.addNFProperty(new NFPropertyRef<T, U>(comp.getExternalAccess(), root, cmi)).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					});
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -49,12 +85,20 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 	 */
 	public IFuture<Void> dispose()
 	{
-//		final Future<Void> ret = new Future<Void>();
-		if(root!=null)
+		if(root!=null && injected)
 		{
 			root.removeNFProperty(getName());//.addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		return super.dispose();
+	}
+
+	/**
+	 *  Get the injected.
+	 *  @return The injected.
+	 */
+	public boolean isInjected()
+	{
+		return injected;
 	}
 }
 

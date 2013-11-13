@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @Description("This agent represents a proxy for a remote component.")
 @Arguments(@Argument(name="component", clazz=IComponentIdentifier.class, defaultvalue="null", description="The component id of the remote component/platform."))
-@ProvidedServices(@ProvidedService(type=IProxyAgentService.class, implementation=@Implementation(expression="$component")))
+@ProvidedServices(@ProvidedService(type=IProxyAgentService.class))
 @NFProperties(@NFProperty(ProxyLatencyProperty.class))
 @Service
 
@@ -58,7 +58,6 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	 *  The agent created method.
 	 */
 	public IFuture<Void> agentCreated()
-//	public IFuture<Void> executeBody()
 	{
 		final Future<Void> ret = new Future<Void>();
 		
