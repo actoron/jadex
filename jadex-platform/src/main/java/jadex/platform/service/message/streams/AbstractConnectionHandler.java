@@ -208,7 +208,8 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	// Is already called from correct message service thread
 	public boolean isClosed()
 	{
-		return getConnection().isClosed();
+		// Hack!!! Closed before init
+		return getConnection()==null || getConnection().isClosed();
 	}
 	
 //	/**

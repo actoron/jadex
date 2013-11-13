@@ -293,10 +293,10 @@ public class MessageService extends BasicService implements IMessageService
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
 		OutputConnectionHandler och = new OutputConnectionHandler(this, nonfunc);
+		icons.put(conid, och);
 		OutputConnection con = new OutputConnection(internalUpdateComponentIdentifier(sender), 
 			internalUpdateComponentIdentifier(receiver), conid, true, och);
-		icons.put(conid, och);
-		System.out.println("created ocon: "+component+", "+System.currentTimeMillis()+", "+och.getConnectionId());
+//		System.out.println("created ocon: "+component+", "+System.currentTimeMillis()+", "+och.getConnectionId());
 		return con;
 	}
 	
@@ -316,10 +316,10 @@ public class MessageService extends BasicService implements IMessageService
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
 		InputConnectionHandler ich = new InputConnectionHandler(this, nonfunc);
+		icons.put(conid, ich);
 		InputConnection con = new InputConnection(internalUpdateComponentIdentifier(sender), 
 			internalUpdateComponentIdentifier(receiver), conid, true, ich);
-		icons.put(conid, ich);
-		System.out.println("created icon: "+component+", "+System.currentTimeMillis()+", "+ich.getConnectionId());
+//		System.out.println("created icon: "+component+", "+System.currentTimeMillis()+", "+ich.getConnectionId());
 		return con;
 	}
 	
@@ -1393,7 +1393,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!mypcons[i].isConnectionAlive())
 					{
-						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+mypcons[i].getConnectionId());
+//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+mypcons[i].getConnectionId());
 						mypcons[i].close();
 						pcons.remove(new Integer(mypcons[i].getConnectionId()));
 					}
@@ -1403,7 +1403,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!myicons[i].isConnectionAlive())
 					{
-						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+myicons[i].getConnectionId());
+//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+myicons[i].getConnectionId());
 						myicons[i].close();
 						icons.remove(new Integer(myicons[i].getConnectionId()));
 					}
