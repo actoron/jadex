@@ -1477,7 +1477,7 @@ public class SecurityService implements ISecurityService
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, new Long(valdur)));
 
-		System.out.println("ret fut is: "+ret+" "+ret.hashCode());
+//		System.out.println("ret fut is: "+ret+" "+ret.hashCode());
 		
 		return ret;
 	}
