@@ -735,7 +735,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 //		final URL url = rid.getLocalIdentifier().getSecondEntity();
 		final List<IResourceIdentifier> deps = alldeps.get(rid);
 
-		final DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, baseloader, null);
+		final DelegationURLClassLoader cl = createNewDelegationClassLoader(rid, baseloader, null);
 		classloaders.put(rid, cl);
 		// Add also local rid to ensure that classloader will be found for these searches as well
 		if(rid.getGlobalIdentifier()!=null && rid.getLocalIdentifier()!=null)
@@ -776,6 +776,19 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			getClassLoader(myrid, alldeps, rid, workspace).addResultListener(lis);
 		}
 		return ret;
+	}
+
+	/**
+	 * Handle instanciation here, so the DelegationURLClassLoader can be another
+	 * implementation.
+	 * @param rid
+	 * @param baseloader
+	 * @param delegates
+	 * @return {@link DelegationURLClassLoader} or subclass.
+	 */
+	protected DelegationURLClassLoader createNewDelegationClassLoader(final IResourceIdentifier rid, ClassLoader baseloader, DelegationURLClassLoader[] delegates)
+	{
+		return new DelegationURLClassLoader(rid, baseloader, delegates);
 	}
 	
 	/**
