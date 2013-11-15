@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -390,7 +391,7 @@ public class ClockFrame extends JFrame
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 					final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
-					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //					ia.getServiceContainer().getRequiredService("clockservice")
 						.addResultListener(new SwingDefaultResultListener(ClockFrame.this)
 					{

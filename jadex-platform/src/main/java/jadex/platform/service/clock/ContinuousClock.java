@@ -338,13 +338,17 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 						{
 							try
 							{
-//								System.out.println("timer waiting for "+diff+" millis");
+//								System.out.println("timer waiting for "+diff+" millis at "+System.currentTimeMillis());
 								ContinuousClock.this.wait(diff);
-//								System.out.println("timer awake");
+//								System.out.println("timer awake at "+System.currentTimeMillis());
 							}
 							catch(InterruptedException e)
 							{
-//								System.out.println("timer awake");								
+//								System.out.println("timer awake at "+System.currentTimeMillis());							
+							}
+							catch(Throwable t)
+							{
+								t.printStackTrace();
 							}
 						}
 					}
@@ -358,7 +362,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 					{
 						// It is important to remove the entry before calling the notifyDue() method,
 						// as from this method a new timing entry might be added,
-						// which will otherwise be removed aftwerwards.
+						// which will otherwise be removed afterwards.
 						removeTimer(next);
 					}
 //				}
@@ -373,6 +377,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 					
 					try
 					{
+//						System.out.println("notifying: "+next.getTimedObject());
 						next.getTimedObject().timeEventOccurred(currenttime);
 //						System.out.println("notified: "+next);
 					}

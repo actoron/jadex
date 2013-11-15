@@ -469,7 +469,7 @@ public class EventReificator implements IOAVStateListener
 		
 //		if(componentlisteners != null && !componentlisteners.isEmpty())
 		
-		if((bdiint.subscriptions!=null && !bdiint.subscriptions.isEmpty()) || bdiint.getter.getLastService()!=null)
+		if(bdiint.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
 //			BDIInterpreter bdiint = BDIInterpreter.getInterpreter(state);
 			long time = bdiint.getClockService().getTime();

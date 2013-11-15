@@ -129,6 +129,10 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 		
 		else if(exeservice==null)
 		{
+//			if(getComponentIdentifier().toString().indexOf("Environment")!=-1)
+//			{
+//				System.out.println("exe1");
+//			}
 			SServiceProvider.getService(getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DefaultResultListener<IExecutionService>()
 			{
@@ -141,7 +145,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 					}
 					catch(RuntimeException e)
 					{
-//						e.printStackTrace();
+						e.printStackTrace();
 						throw new ComponentTerminatedException(getComponentIdentifier());
 						// Happens, when execution service shutdown() is called and timer should be registered for result future, but service already terminated
 					}
@@ -150,13 +154,17 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 		}
 		else
 		{
+//			if(getComponentIdentifier().toString().indexOf("Environment")!=-1)
+//			{
+//				System.out.println("exe2");
+//			}
 			try
 			{
 				exeservice.execute(StandaloneComponentAdapter.this);
 			}
 			catch(RuntimeException e)
 			{
-//				e.printStackTrace();
+				e.printStackTrace();
 				throw new ComponentTerminatedException(getComponentIdentifier());
 				// Happens, when execution service shutdown() is called and timer should be registered for result future, but service already terminated
 			}

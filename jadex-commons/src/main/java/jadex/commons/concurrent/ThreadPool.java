@@ -9,11 +9,9 @@ import jadex.commons.collection.IBlockingQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -224,13 +222,19 @@ public class ThreadPool implements IThreadPool
 		}
 		
 		if(!running)
+		{
 			throw new RuntimeException("Thread pool not running: "+this);
+		}
 		
 		if(this.strategy.taskAdded())
+		{
 			addThreads(1);
+		}
 		
 		if(enqueuetimes.put(task, System.currentTimeMillis()) != null)
+		{
 			throw new RuntimeException("Task already scheduled: " + task);
+		}
 		
 		tasks.enqueue(task);
 	}
@@ -365,8 +369,6 @@ public class ThreadPool implements IThreadPool
 		return ret;
 	}
 
-	protected Set<ServiceThread>	THREADS	= Collections.synchronizedSet(new HashSet<ServiceThread>());
-
 	//-------- inner classes --------
 
 	/**
@@ -404,11 +406,6 @@ public class ThreadPool implements IThreadPool
 		 */
 		public void run()
 		{
-			THREADS.add(this);
-			
-			try
-			{
-				
 			while(running && !terminated)
 			{
 				boolean exit = false;
@@ -441,14 +438,12 @@ public class ThreadPool implements IThreadPool
 				}
 				catch(IBlockingQueue.ClosedException e)
 				{
-//					e.printStackTrace();
-					
-					task = null;
+					assert	task == null;
 					exit = true;
 				}
 				catch(TimeoutException e)
 				{
-					task = null;
+					assert	task == null;
 					exit = strategy.workerTimeoutOccurred();
 				}
 				catch(Exception e)
@@ -512,13 +507,6 @@ public class ThreadPool implements IThreadPool
 			}
 			
 			remove();
-			
-			}
-			finally
-			{
-				THREADS.remove(this);
-//				System.out.println("Threads: "+ThreadPool.this.hashCode()+", "+THREADS.size());
-			}
 		}
 		
 		/**
@@ -627,7 +615,7 @@ public class ThreadPool implements IThreadPool
 //			}
 //		}
 		
-		final ThreadPool tp	= new ThreadPool(new DefaultPoolStrategy(10, 100, 10000, 4));
+//		final ThreadPool tp	= new ThreadPool(new DefaultPoolStrategy(10, 100, 10000, 4));
 //		int max = 10000;
 //		todo = max;
 //		final long start = System.currentTimeMillis();

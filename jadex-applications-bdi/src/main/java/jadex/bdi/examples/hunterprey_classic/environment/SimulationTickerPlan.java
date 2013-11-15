@@ -28,14 +28,16 @@ public class SimulationTickerPlan extends Plan
 		Environment env = (Environment)getBeliefbase().getBelief("environment").getFact();
 		while(true)
 		{
+//			System.out.println("before wait");
 			waitFor(((Long)getBeliefbase().getBelief("roundtime").getFact()).longValue());
+//			System.out.println("after wait");
 		
 			env.executeStep();
-			//System.out.println("Actual tick cnt: "+getBeliefbase().getBelief("???").getFact("tickcnt"));
+//			System.out.println("Actual tick cnt: "+getBeliefbase().getBelief("???").getFact("tickcnt"));
 
 			// Dispatch new visions.
 			Creature[]	creatures	= env.getCreatures();
-			//System.out.println("Knows creatures: "+creatures.length);
+//			System.out.println("Knows creatures: "+creatures.length);
 			for(int i=0; i<creatures.length; i++)
 			{
 				//System.out.println("Sending to: "+creatures[i].getName()+" "+creatures[i].getAID());
@@ -57,6 +59,5 @@ public class SimulationTickerPlan extends Plan
 			// clear task list, so waiting plans can work
 			env.clearTaskList();
 		}
-			
 	}
 }

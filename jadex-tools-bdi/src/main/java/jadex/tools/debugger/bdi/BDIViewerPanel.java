@@ -11,6 +11,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SortedList;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -553,9 +554,18 @@ public class BDIViewerPanel extends JPanel
 					|| ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_GOAL)
 					|| ev.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_PLAN);
 			}
-		}, true, PublishEventLevel.COARSE);
+		}, true, PublishEventLevel.FINE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
+			public void exceptionOccurred(Exception exception)
+			{
+				// Ignore exception when monitored agent dies.
+				if(!(exception instanceof FutureTerminatedException))
+				{
+					super.exceptionOccurred(exception);
+				}					
+			}
+			
 			public void intermediateResultAvailable(IMonitoringEvent event)
 			{
 				// todo: hide decomposing bulk events

@@ -34,6 +34,24 @@ public class SFuture
 	 *  value is set in that timespan.
 	 *  The call periodically sends alive calls to the caller. 
 	 *  @param ret The future that is returned by the service call.
+	 *  @param ea The component handling the service call (on that component the periodic updates are scheduled).
+	 */
+	public static void avoidCallTimeouts(final Future<?> ret, IExternalAccess ea)
+	{
+		ServiceCall sc = ServiceCall.getCurrentInvocation();
+		long to = sc!=null? sc.getTimeout(): BasicService.DEFAULT_LOCAL; // Hack!!! find out in which cases service call can null
+	//	boolean local = sc.getCaller().getPlatformName().equals(agent.getComponentIdentifier().getPlatformName());
+	//	long to = sc.getTimeout()>0? sc.getTimeout(): (local? BasicService.DEFAULT_LOCAL: BasicService.DEFAULT_REMOTE);
+	//	to = 5000;
+		avoidCallTimeouts(ret, ea, to);
+	}
+	
+	/**
+	 *  Automatically update the timer of a long running service call future.
+	 *  Ensures that the caller does not timeout even if no result
+	 *  value is set in that timespan.
+	 *  The call periodically sends alive calls to the caller. 
+	 *  @param ret The future that is returned by the service call.
 	 *  @param ia The component handling the service call (on that component the periodic updates are scheduled).
 	 *  @param factor (default 0.8) Used to update the timer when factor*to has elapsed.
 	 */
@@ -56,6 +74,20 @@ public class SFuture
 	public static void avoidCallTimeouts(final Future<?> ret, IInternalAccess ia, long to)
 	{
 		avoidCallTimeouts(ret, ia, to, 0.8);
+	}
+	
+	/**
+	 *  Automatically update the timer of a long running service call future.
+	 *  Ensures that the caller does not timeout even if no result
+	 *  value is set in that timespan.
+	 *  The call periodically sends alive calls to the caller. 
+	 *  @param ret The future that is returned by the service call.
+	 *  @param ea The component handling the service call (on that component the periodic updates are scheduled).
+	 *  @param to The timeout.
+	 */
+	public static void avoidCallTimeouts(final Future<?> ret, IExternalAccess ea, long to)
+	{
+		avoidCallTimeouts(ret, ea, to, 0.8);
 	}
 	
 	/**
@@ -90,6 +122,31 @@ public class SFuture
 	}
 	
 	/**
+	 *  Automatically update the timer of a long running service call future.
+	 *  Ensures that the caller does not timeout even if no result
+	 *  value is set in that timespan.
+	 *  The call periodically sends alive calls to the caller. 
+	 *  @param ret The future that is returned by the service call.
+	 *  @param ea The component handling the service call (on that component the periodic updates are scheduled).
+	 *  @param to The timeout.
+	 *  @param factor (default 0.8) Used to update the timer when factor*to has elapsed.
+	 */
+	public static void avoidCallTimeouts(final Future<?> ret, IExternalAccess ea, final long to, final double factor)
+	{
+		if(to>0)
+		{
+			ea.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					avoidCallTimeouts(ret, ia, to, factor);
+					return IFuture.DONE;
+				}
+			});
+		}
+	}
+	
+	/**
 	 *  Convenience method for creating a future (possibly with timeout avoidance).
 	 *  @param timeouts (default is true) False, if no timeouts should be generated when service call timeout has elapsed.
 	 *  @param ea The external access.
@@ -102,11 +159,21 @@ public class SFuture
 	/**
 	 *  Convenience method for creating a future (possibly with timeout avoidance).
 	 *  @param timeouts (default is true) False, if no timeouts should be generated when service call timeout has elapsed.
-	 *  @param ea The external access.
+	 *  @param ia The internal access.
 	 */
 	public static <T> Future<?> getNoTimeoutFuture(Class<T> type, IInternalAccess ia)
 	{
 		return getFuture(type, false, ia);
+	}
+	
+	/**
+	 *  Convenience method for creating a future (possibly with timeout avoidance).
+	 *  @param timeouts (default is true) False, if no timeouts should be generated when service call timeout has elapsed.
+	 *  @param ea The external access.
+	 */
+	public static <T> Future<?> getNoTimeoutFuture(Class<T> type, IExternalAccess ea)
+	{
+		return getFuture(type, false, ea);
 	}
 	
 	/**
@@ -133,6 +200,29 @@ public class SFuture
 			
 			if(!timeouts)
 				avoidCallTimeouts(ret, ia);
+			
+			return ret;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Convenience method for creating a future (possibly with timeout avoidance).
+	 *  @param type The future implementation type.
+	 *  @param timeouts (default is true) False, if no timeouts should be generated when service call timeout has elapsed.
+	 *  @param ea The external access.
+	 */
+	public static <T> Future<?> getFuture(Class<T> type, boolean timeouts, IExternalAccess ea)
+	{
+		try
+		{
+			Future<?> ret = (Future<?>)type.newInstance();
+			
+			if(!timeouts)
+				avoidCallTimeouts(ret, ea);
 			
 			return ret;
 		}

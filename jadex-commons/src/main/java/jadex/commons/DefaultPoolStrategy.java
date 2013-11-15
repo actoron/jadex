@@ -27,8 +27,11 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	/** The maximum number of allowed workers. */
 	protected int maxcnt;
 
-	/** Defer the creation and deletion of threads according to their distance from desfree. */ 
-	protected boolean defer;
+	/** Defer the creation of threads according to their distance from desfree. */ 
+	protected boolean dodeferinc;
+	
+	/** Defer the deletion of threads according to their distance from desfree. */ 
+	protected boolean dodeferdec;
 	
 	/** The defer factor to slow down thread creation. */
 	protected int deferinc;
@@ -84,7 +87,25 @@ public class DefaultPoolStrategy implements IPoolStrategy
 		this.desfree = desfree;
 		this.maxwait = maxwait;
 		this.maxcnt = maxcnt;
-		this.defer = defer;
+		this.dodeferdec = defer;
+		this.waitings = new LinkedList<Double>();
+		
+		// Can't defer creation when threads are blocking as it might cause deadlocks
+		this.dodeferinc	= false;
+	}
+
+	/**
+	 *  Create a new default pool strategy.
+	 */
+	public DefaultPoolStrategy(int workercnt, int desfree, long maxwait, int maxcnt, boolean deferinc, boolean deferdec)
+	{
+		this.workercnt = workercnt;
+		this.capacity = workercnt;
+		this.desfree = desfree;
+		this.maxwait = maxwait;
+		this.maxcnt = maxcnt;
+		this.dodeferinc = deferinc;
+		this.dodeferdec = deferdec;
 		this.waitings = new LinkedList<Double>();
 	}
 
@@ -103,7 +124,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 		boolean ok = false;
 		if(capacity<=0 && (maxcnt<=0 || workercnt<maxcnt))
 		{
-			if(defer)
+			if(dodeferinc)
 			{
 				int dt = workercnt/desfree;
 				if(dt>2)
@@ -184,7 +205,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 		boolean ok = false;
 		if(capacity>=desfree)
 		{
-			if(defer)
+			if(dodeferdec)
 			{
 				int dt = workercnt/desfree;
 				if(dt>2)
@@ -272,7 +293,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 		boolean ok = false;
 		if(capacity>desfree)
 		{
-			if(defer)
+			if(dodeferdec)
 			{
 				int dt = workercnt/desfree;
 				if(dt>2)

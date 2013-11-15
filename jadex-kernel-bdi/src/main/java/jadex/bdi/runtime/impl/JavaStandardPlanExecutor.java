@@ -454,6 +454,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
      	if(task.getExecutionThread()==Thread.currentThread())
 		{
      		// Transfer execution to agent thread and wait until the plan is scheduled again.
+//     		System.out.println("GiveBackControl: "+interpreter.getComponentIdentifier()+", "+rplan);
 			task.giveBackControl(PlanExecutionTask.STATE_WAITING, OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING);
 
 			// When timout event occurred, throw as TimeoutException.
@@ -579,7 +580,11 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			// allow the scheduler (agent) thread to wakeup
 			// whenever the planstep execution time of the plan
 			// thread exceeds.
-						
+			synchronized(monitor)
+			{				
+			}
+//			System.out.println("start2: "+rplan);
+			
 			// Save the execution thread for this task.
 			this.thread = Thread.currentThread();
 			interpreter.setPlanThread(thread);

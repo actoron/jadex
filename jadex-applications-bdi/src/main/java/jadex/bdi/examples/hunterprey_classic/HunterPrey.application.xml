@@ -13,7 +13,7 @@
 	Preys (sheeps) are creatures that search for salads and gain one point
 	for eating a piece of salad. Hunters (wolfs) search for preys and
 	try to eat them. They gain five points if they manage to eat a
-	prey. Consequently preys should try to free from hunters if they
+	prey. Consequently preys should try to flee from hunters if they
 	see them. Every creature can see all objects and creatues in a
 	certain range around them.
 -->

@@ -554,7 +554,10 @@ public class PlanRules
 					
 					// todo: get plan executor for capability
 					// todo: can cause nullpointer when killAgent is called
+//		     		System.out.println("executePlanStep: "+ip.getComponentIdentifier()+", "+rplan+", "+
+//		     			state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 					interrupted = ip.getPlanExecutor(rplan).executePlanStep(ip, rcapa, rplan); // Hack
+//		     		System.out.println("executePlanStep finished: "+ip.getComponentIdentifier()+", "+rplan);
 				}
 				catch(Exception e)
 				{
@@ -2118,20 +2121,22 @@ public class PlanRules
 				// timer runs on other thread.
 				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
 				
+//				System.out.println("Create timer: "+timeout+", "+BDIInterpreter.getInterpreter(state).getName()+", "+System.currentTimeMillis());
 				ITimer timer = BDIInterpreter.getInterpreter(state).getClockService().createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), toa));
 				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
 				
-	//			System.out.println("Timer created: "+start);
+//				System.out.println("Timer created: "+BDIInterpreter.getInterpreter(state).getName()+", "+System.currentTimeMillis());
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, timer);
 			}
 			else if(timeout==TICK_TIMER)
 			{
 				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
 				
+//				System.out.println("Create tick timer: "+BDIInterpreter.getInterpreter(state).getName());
 				ITimer timer = BDIInterpreter.getInterpreter(state).getClockService().createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), toa));
 				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
 
-//				System.out.println("Tick timer created: "+timer);
+//				System.out.println("Tick timer created: "+BDIInterpreter.getInterpreter(state).getName());
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, timer);
 			}
 		}
