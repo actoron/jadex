@@ -1,5 +1,7 @@
 package jadex.commons;
 
+import jadex.commons.gui.SGUI;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -189,7 +191,7 @@ public class SNonAndroid
 	 */
 	public static boolean isGuiThread()
 	{
-		return SwingUtilities.isEventDispatchThread();
+		return SGUI.HAS_GUI && SwingUtilities.isEventDispatchThread();
 	}
 	
 	/**
@@ -199,7 +201,6 @@ public class SNonAndroid
 	{
 		return FileSystemView.getFileSystemView().getHomeDirectory();
 	}
-	
 	
 	/**
 	 *  Get the default directory.

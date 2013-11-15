@@ -11,7 +11,8 @@ public class RSJAXAnnotationHelper
 	
 	private static RSJAXAnnotationHelper INSTANCE = new RSJAXAnnotationHelper();
 	
-	private static Class<?>[] JAX_ANNOTATIONTYPES = new Class[] {
+	private static Class<?>[] JAX_ANNOTATIONTYPES = new Class[] 
+	{
 		javax.ws.rs.GET.class, javax.ws.rs.POST.class, javax.ws.rs.PUT.class, 
 		javax.ws.rs.DELETE.class, javax.ws.rs.HEAD.class, javax.ws.rs.OPTIONS.class
 	}; 
@@ -42,11 +43,13 @@ public class RSJAXAnnotationHelper
 	protected Annotation findDeclaredRestType(Method method)
 	{
 		java.lang.annotation.Annotation ret = null; //super.findDeclaredRestType(method);
-		if (ret == null) {
-			for (Class annotation : JAX_ANNOTATIONTYPES)
+		if(ret == null) 
+		{
+			for(Class annotation : JAX_ANNOTATIONTYPES)
 			{
 				ret = method.getAnnotation(annotation);
-				if (ret != null) {
+				if(ret != null) 
+				{
 //					ret = jaxToJadexMap.get(ret.annotationType());
 					break;
 				}

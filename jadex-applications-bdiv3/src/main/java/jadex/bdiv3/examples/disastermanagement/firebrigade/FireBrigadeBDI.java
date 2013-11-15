@@ -5,7 +5,9 @@ import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.annotation.GoalCreationCondition;
+import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
@@ -13,6 +15,7 @@ import jadex.bdiv3.annotation.Publish;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3.examples.disastermanagement.IExtinguishFireService;
+import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI;
 import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
 import jadex.bdiv3.examples.disastermanagement.movement.MoveToLocationPlan;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
@@ -104,12 +107,24 @@ public class FireBrigadeBDI
 		{
 			return home;
 		}
+		
+//		/**
+//		 *  Drop if there is another goal.
+//		 */
+//		@GoalDropCondition(rawevents={ChangeEvent.GOALADOPTED, ChangeEvent.GOALDROPPED})
+//		public boolean checkDrop(FireBrigadeBDI ag)
+//		{
+//			MovementCapa capa = ag.getMoveCapa();
+//			boolean ret = capa.getCapability().getAgent().getGoals().size()>1;
+//			System.out.println("dropping: "+this);
+//			return ret;
+//		}
 	}
 	
 	/**
 	 * 
 	 */
-	@Goal(deliberation=@Deliberation(cardinalityone=true), 
+	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true), 
 		publish=@Publish(type=IExtinguishFireService.class, method="extinguishFire"))
 	public static class ExtinguishFire
 	{
@@ -147,7 +162,7 @@ public class FireBrigadeBDI
 	/**
 	 * 
 	 */
-	@Goal(deliberation=@Deliberation(cardinalityone=true), 
+	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true), 
 		publish=@Publish(type=IClearChemicalsService.class, method="clearChemicals"))
 	public static class ClearChemicals
 	{

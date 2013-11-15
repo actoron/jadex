@@ -174,15 +174,15 @@
 			<extensions>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
-						<!-- 
-						<!- - Firestation with 3 brigades - ->
+						<!-- Firestation with 3 brigades -->
 						<env:object type="firestation">
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
-						<env:object type="firebrigade" number="3">
+						<env:object type="firebrigade" number="1">
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
 						
+						<!-- 
 						<!- - Firestation with 3 brigades - ->
 						<env:object type="firestation">
 							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
