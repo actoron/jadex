@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>WaitForTick</jadex:modelname>
+    <jadex:description>Test if waiting for a tick works.</jadex:description>
+    <jadex:package>jadex.bpmn.testcases</jadex:package>
+    <jadex:imports>
+      <jadex:import>jadex.base.test.*</jadex:import>
+      <jadex:import>jadex.bpmn.runtime.task.*</jadex:import>
+    </jadex:imports>
+    <jadex:results>
+      <jadex:result name="testresults" type="Testcase">
+        <jadex:description>The test results.</jadex:description>
+      </jadex:result>
+    </jadex:results>
+    <jadex:configurations>
+      <jadex:configuration name="Pool">
+      </jadex:configuration>
+    </jadex:configurations>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_JpPCgUMbEd-aDdXkLqEWvQ">
+    <semantic:task name="Success" id="_vg4kIUMbEd-aDdXkLqEWvQ">
+      <semantic:incoming>_NLD7wUMhEd-aDdXkLqEWvQ</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Wait for tick.&quot;, true, null)})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:task name="Fail" id="_QaMKMUMhEd-aDdXkLqEWvQ">
+      <semantic:incoming>_RDT_sUMhEd-aDdXkLqEWvQ</semantic:incoming>
+      <semantic:extensionElements>
+        <jadex:class>jadex.bpmn.runtime.task.WriteContextTask</jadex:class>
+        <jadex:parameter direction="in" name="name" type="String">&quot;testresults&quot;</jadex:parameter>
+        <jadex:parameter direction="in" name="value" type="Testcase">new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Wait for tick.&quot;, false,  &quot;needed: &quot;+(System.currentTimeMillis()-start))})</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:exclusiveGateway id="_LACOoUMhEd-aDdXkLqEWvQ" default="_RDT_sUMhEd-aDdXkLqEWvQ">
+      <semantic:incoming>_6IAsIUMhEd-aDdXkLqEWvQ</semantic:incoming>
+      <semantic:outgoing>_NLD7wUMhEd-aDdXkLqEWvQ</semantic:outgoing>
+      <semantic:outgoing>_RDT_sUMhEd-aDdXkLqEWvQ</semantic:outgoing>
+    </semantic:exclusiveGateway>
+    <semantic:intermediateCatchEvent name="second tick" id="_3hkOUUMhEd-aDdXkLqEWvQ">
+      <semantic:incoming>_50yOIUMhEd-aDdXkLqEWvQ</semantic:incoming>
+      <semantic:outgoing>_6IAsIUMhEd-aDdXkLqEWvQ</semantic:outgoing>
+      <semantic:timerEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="tick">true</jadex:property>
+      </semantic:extensionElements>
+    </semantic:intermediateCatchEvent>
+    <semantic:intermediateCatchEvent name="first tick" id="_ur1LcUMbEd-aDdXkLqEWvQ">
+      <semantic:incoming>_vHP8IUMbEd-aDdXkLqEWvQ</semantic:incoming>
+      <semantic:outgoing>_50yOIUMhEd-aDdXkLqEWvQ</semantic:outgoing>
+      <semantic:timerEventDefinition/>
+      <semantic:extensionElements>
+        <jadex:property name="tick">true</jadex:property>
+      </semantic:extensionElements>
+    </semantic:intermediateCatchEvent>
+    <semantic:task name="Before wait" id="_JpPCg0MbEd-aDdXkLqEWvQ">
+      <semantic:incoming>6lNf9kEA8WCoDU6Z</semantic:incoming>
+      <semantic:outgoing>_vHP8IUMbEd-aDdXkLqEWvQ</semantic:outgoing>
+      <semantic:extensionElements>
+        <jadex:parameter direction="inout" name="start" type="long">System.currentTimeMillis()</jadex:parameter>
+      </semantic:extensionElements>
+    </semantic:task>
+    <semantic:startEvent id="H4APILnzfhmGosPD">
+      <semantic:outgoing>6lNf9kEA8WCoDU6Z</semantic:outgoing>
+    </semantic:startEvent>
+    <semantic:sequenceFlow sourceRef="_LACOoUMhEd-aDdXkLqEWvQ" targetRef="_vg4kIUMbEd-aDdXkLqEWvQ" id="_NLD7wUMhEd-aDdXkLqEWvQ">
+      <semantic:conditionExpression>System.currentTimeMillis()-start&gt;=100</semantic:conditionExpression>
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_LACOoUMhEd-aDdXkLqEWvQ" targetRef="_QaMKMUMhEd-aDdXkLqEWvQ" id="_RDT_sUMhEd-aDdXkLqEWvQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_3hkOUUMhEd-aDdXkLqEWvQ" targetRef="_LACOoUMhEd-aDdXkLqEWvQ" id="_6IAsIUMhEd-aDdXkLqEWvQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_ur1LcUMbEd-aDdXkLqEWvQ" targetRef="_3hkOUUMhEd-aDdXkLqEWvQ" id="_50yOIUMhEd-aDdXkLqEWvQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="_JpPCg0MbEd-aDdXkLqEWvQ" targetRef="_ur1LcUMbEd-aDdXkLqEWvQ" id="_vHP8IUMbEd-aDdXkLqEWvQ">
+    </semantic:sequenceFlow>
+    <semantic:sequenceFlow sourceRef="H4APILnzfhmGosPD" targetRef="_JpPCg0MbEd-aDdXkLqEWvQ" id="6lNf9kEA8WCoDU6Z">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_JpPCgUMbEd-aDdXkLqEWvQ">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_vg4kIUMbEd-aDdXkLqEWvQ">
+        <dc:Bounds height="100.0" width="160.0" x="1260.0" y="300.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_QaMKMUMhEd-aDdXkLqEWvQ">
+        <dc:Bounds height="100.0" width="160.0" x="1260.0" y="80.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>name</jadexvisual:internalParameter>
+          <jadexvisual:internalParameter>value</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_LACOoUMhEd-aDdXkLqEWvQ">
+        <dc:Bounds height="60.0" width="60.0" x="1120.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_3hkOUUMhEd-aDdXkLqEWvQ">
+        <dc:Bounds height="40.0" width="40.0" x="970.0" y="210.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_ur1LcUMbEd-aDdXkLqEWvQ">
+        <dc:Bounds height="40.0" width="40.0" x="790.0" y="210.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_JpPCg0MbEd-aDdXkLqEWvQ">
+        <dc:Bounds height="100.0" width="160.0" x="520.0" y="180.0"/>
+        <di:extension>
+          <jadexvisual:internalParameter>start</jadexvisual:internalParameter>
+        </di:extension>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="H4APILnzfhmGosPD">
+        <dc:Bounds height="40.0" width="40.0" x="200.0" y="210.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_vHP8IUMbEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_vHP8IUMbEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_50yOIUMhEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_50yOIUMhEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_NLD7wUMhEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_RDT_sUMhEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_NLD7wUMhEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_RDT_sUMhEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_6IAsIUMhEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_6IAsIUMhEd-aDdXkLqEWvQ">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="6lNf9kEA8WCoDU6Z">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+
