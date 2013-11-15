@@ -55,7 +55,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxwZxBEeC3-cIdV9ycxw" key="uniqueColumnIndex" value="0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxwpxBEeC3-cIdV9ycxw" key="complexColumns" value="false:false:true:true:true"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxw5xBEeC3-cIdV9ycxw" key="0:0" value="result"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxxJxBEeC3-cIdV9ycxw" key="0:1" value="Result.bpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxxJxBEeC3-cIdV9ycxw" key="0:1" value="Result.bpmn2"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmmxxZxBEeC3-cIdV9ycxw" key="0:2" value="jadex_subcomponents_table_Instance-Name_dbadddcd-e93a-4709-9f0f-8d78d10b60f8_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmnY0pxBEeC3-cIdV9ycxw" key="0:3" value="jadex_subcomponents_table_Number_4afb5a1f-6612-4ddd-98fe-f5becd6ed0c5_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vmn_4ZxBEeC3-cIdV9ycxw" key="0:4" value="jadex_subcomponents_table_Arguments_e02a2e86-1391-40f6-a341-4d58a29be18a_complex"/>

@@ -82,9 +82,18 @@ public class SPropertyPanelFactory
 			{
 				ret = new MessageEventPropertyPanel(container, (VActivity) velement);
 			}
-			else if(velement instanceof VActivity && ((MActivity)velement.getBpmnElement()).getActivityType().contains("Signal"))
+			else if(velement instanceof VActivity &&
+					((MActivity)velement.getBpmnElement()).getActivityType().contains("Signal"))
 			{
-				ret = new SignalPropertyPanel(container, (VActivity)velement);
+				if (((MActivity)velement.getBpmnElement()).isEventHandler())
+				{
+					ret = new SignalEventHandlerPropertyPanel(container, (VActivity)velement);
+//					ret = new SignalPropertyPanel(container, (VActivity)velement);
+				}
+				else
+				{
+					ret = new SignalPropertyPanel(container, (VActivity)velement);
+				}
 			}
 //			else if (velement instanceof VExternalSubProcess)
 //			{

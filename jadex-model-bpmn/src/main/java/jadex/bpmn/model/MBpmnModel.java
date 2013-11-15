@@ -110,6 +110,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** Property name for error events. */
 	public static final String PROPERTY_EVENT_ERROR = "exception";
 	
+	/** The signal event handler trigger parameter name. Used to put the trigger in the signal event arguments. */
+	public static final String SIGNAL_EVENT_TRIGGER = "signal_trigger";
+	
 	/** The process trigger name. Used to put the trigger event in the process arguments. */
 	public static final String TRIGGER = "_process_trigger";
 	

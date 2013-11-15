@@ -2,6 +2,7 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
@@ -221,7 +222,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						info.setImports(imps);
 						
 //					System.out.println("parent is: "+parent.getAddresses());	
-						
+
 					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file, info, 
 						instance.createResultListener(new IIntermediateResultListener<Tuple2<String, Object>>()
 					{
@@ -242,7 +243,13 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								for(int i=0; i<handlers.size(); i++)
 								{
 									MActivity act = handlers.get(i);
-									if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL))
+									String trig = null;
+									if (act.hasProperty(MBpmnModel.SIGNAL_EVENT_TRIGGER))
+									{
+										trig = (String) thread.getPropertyValue(MBpmnModel.SIGNAL_EVENT_TRIGGER, act);
+									}
+									if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL) &&
+									   (trig == null || result.getFirstEntity().equals(trig)))
 									{
 										ProcessThread newthread	= thread.createCopy();
 										updateParameters(newthread);
@@ -337,6 +344,14 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 									else if(res!=null && res.containsKey(param.getName()))
 									{
 										thread.setParameterValue(param.getName(), res.get(param.getName()));
+									}
+								}
+								
+								if (activity.getOutgoingDataEdges() != null)	
+								{
+									for (MDataEdge de : activity.getOutgoingDataEdges())
+									{
+										thread.setDataEdgeValue(de.getId(), thread.getParameterValue(de.getSourceParameter()));
 									}
 								}
 							}

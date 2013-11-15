@@ -347,18 +347,21 @@ public class BpmnXMLReader
 			for(MPool pool: pools)
 			{
 				List<MLane> lanes = pool.getLanes();
-				for(MLane lane: lanes)
+				if (lanes != null)
 				{
-					List<MActivity> lacts = lane.getActivities();
-					if(lacts!=null)
+					for(MLane lane: lanes)
 					{
-						for(MActivity lact: lacts)
+						List<MActivity> lacts = lane.getActivities();
+						if(lacts!=null)
 						{
-							lact.getPool().removeActivity(lact);
-							System.out.println("Removed act from pool: "+lact);
+							for(MActivity lact: lacts)
+							{
+								lact.getPool().removeActivity(lact);
+								System.out.println("Removed act from pool: "+lact);
+							}
 						}
-					}
-				}				
+					}				
+				}
 			}
 		}
     }

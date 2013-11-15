@@ -790,7 +790,14 @@ public class ProcessThread	implements ITaskContext
 								}
 								else
 								{
-									throw new RuntimeException("Could not find data edge value for: "+de.getId());
+									String pname = de.getTargetParameter();
+									if (getActivity().getParameters() == null ||
+										getActivity().getParameters().get(pname) == null ||
+										getActivity().getParameters().get(pname).getInitialValueString() == null ||
+										getActivity().getParameters().get(pname).getInitialValueString().isEmpty())
+									{
+										throw new RuntimeException("Could not find data edge value for: "+de.getId());
+									}
 								}
 							}
 						}
