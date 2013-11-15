@@ -58,7 +58,7 @@ public class ProducerBDI extends BaseBDI implements IProduceService
 		/**
 		 * 
 		 */
-		@GoalDropCondition(events="movecapa.missionend")
+		@GoalDropCondition(beliefs="movecapa.missionend")
 		public boolean checkDrop()
 		{
 			return movecapa.isMissionend();

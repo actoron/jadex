@@ -19,6 +19,7 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
@@ -536,23 +537,23 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		return ret;
 	}
 	
-	/**
-	 *  Add extra init code after components.
-	 */
-	public IFuture<Void> initComponents(final IModelInfo model, String config)
-	{
-		final Future<Void>	ret	= new Future<Void>();
-		super.initComponents(model, config).addResultListener(new DelegationResultListener<Void>(ret)
-		{
-			public void customResultAvailable(Void result)
-			{
-				Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
-//				wrapCollections(bdimodel.getCapability(), agent);
-				ret.setResult(null);
-			}
-		});
-		return ret;
-	}
+//	/**
+//	 *  Add extra init code after components.
+//	 */
+//	public IFuture<Void> initComponents(final IModelInfo model, String config)
+//	{
+//		final Future<Void>	ret	= new Future<Void>();
+//		super.initComponents(model, config).addResultListener(new DelegationResultListener<Void>(ret)
+//		{
+//			public void customResultAvailable(Void result)
+//			{
+//				Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
+////				wrapCollections(bdimodel.getCapability(), agent);
+//				ret.setResult(null);
+//			}
+//		});
+//		return ret;
+//	}
 	
 	/**
 	 * 
@@ -665,101 +666,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		super.startBehavior();
 
-//		Rule<?> toolrule = new Rule<Void>("bditool_events", 
-//			new ICondition()
-//			{
-//				public Tuple2<Boolean, Object> evaluate(IEvent event)
-//				{
-////					System.out.println("hetag: "+hasEventTargets(true));
-//					return new Tuple2<Boolean, Object>(hasEventTargets(true)? Boolean.TRUE: Boolean.FALSE, null);
-//				}
-//			}, new IAction<Void>()
-//		{
-//			public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-//			{
-////				System.out.println("event: "+event.getType());
-//				
-//				long time = System.currentTimeMillis();//getClockService().getTime();
-//				MonitoringEvent mev = new MonitoringEvent();
-////				event.setComponent(bdiint.getAgentAdapter().getComponentIdentifier());
-//				mev.setSourceIdentifier(getComponentIdentifier());
-////				if(scope == null)
-////					scope = bdiint.getAgent();
-//				mev.setTime(time);
-//				
-//				String type = event.getType().toString();
-//				
-//				if(ChangeEvent.FACTADDED.equals(type) || ChangeEvent.GOALADDED.equals(type) || ChangeEvent.PLANADDED.equals(type))
-//				{
-//					mev.setType(IMonitoringEvent.EVENT_TYPE_CREATION);
-//				}
-//				else if(ChangeEvent.AGENTTERMINATED ||
-//					 ChangeEvent.FACTREMOVED.equals(type) ||
-//					 ChangeEvent.GOALDROPPED.equals(type) ||
-//					 ChangeEvent.PLANREMOVED.equals(type))
-//				{
-//					mev.setType(IMonitoringEvent.EVENT_TYPE_DISPOSAL);
-//				}
-//				else if(ChangeEvent.FACTCHANGED.equals(type) ||
-//					ChangeEvent.GOALCHANGED.equals(type) ||
-//					ChangeEvent.PLANCHANGED.equals(type))
-//				{
-//					event.setType(IMonitoringEvent.EVENT_TYPE_MODIFICATION);
-//				}
-//				else if(OAVBDIRuntimeModel.CHANGEEVENT_INTERNALEVENTOCCURRED.equals(type) ||
-//					OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(type) ||
-//					OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTSENT.equals(type) ||
-//					OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
-//				{		
-//					event.setType(IMonitoringEvent.EVENT_TYPE_OCCURRENCE);
-//				}
-//				
-//				if(event.getType().equals(ChangeEvent.BELIEFCHANGED) || event.getType().equals(ChangeEvent.FACTCHANGED) ||
-//					event.getType().equals(ChangeEvent.FACTADDED) || event.getType().equals(ChangeEvent.FACTREMOVED))
-//				{
-//					MBelief mbel = null;
-//					Object scope = null;
-//					BeliefInfo	info	= BeliefInfo.createBeliefInfo(mbel, scope, getClassLoader());
-//					mev.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_FACT);
-////					mev.setProperty("sourcename", element.toString());
-//					mev.setProperty("sourcetype", info.getType());
-//					mev.setProperty("details", info);
-//					
-//					publishEvent(mev);
-//				}	
-//				else if(event.getType().equals(ChangeEvent.GOALADOPTED) || event.getType().equals(ChangeEvent.GOALDROPPED) 
-//					|| event.getType().equals(ChangeEvent.GOALACTIVE) || event.getType().equals(ChangeEvent.GOALOPTION)
-//					|| event.getType().equals(ChangeEvent.GOALSUSPENDED) || event.getType().equals(ChangeEvent.GOALINPROCESS)
-//					|| event.getType().equals(ChangeEvent.GOALNOTINPROCESS))
-//				{
-//					mev.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_GOAL);	
-//				}
-//				else 
-//				{
-//					mev.setType(event.getType()+"."+IMonitoringEvent.SOURCE_CATEGORY_PLAN);	
-//				}
-//				
-//				return IFuture.DONE;
-//			}
-//		});
-//		List<EventType> myevents = new ArrayList<EventType>();
-//		myevents.add(new EventType(ChangeEvent.BELIEFCHANGED));
-//		myevents.add(new EventType(ChangeEvent.FACTADDED));
-//		myevents.add(new EventType(ChangeEvent.FACTREMOVED)); 
-//		myevents.add(new EventType(ChangeEvent.FACTCHANGED)); 
-//		myevents.add(new EventType(ChangeEvent.GOALADOPTED));
-//		myevents.add(new EventType(ChangeEvent.GOALDROPPED));
-//		myevents.add(new EventType(ChangeEvent.GOALACTIVE));
-//		myevents.add(new EventType(ChangeEvent.GOALOPTION));
-//		myevents.add(new EventType(ChangeEvent.GOALSUSPENDED));
-//		myevents.add(new EventType(ChangeEvent.GOALINPROCESS));
-//		myevents.add(new EventType(ChangeEvent.GOALNOTINPROCESS));
-//		toolrule.setEvents(myevents);
-//		getRuleSystem().getRulebase().addRule(toolrule);
-		
-//		try
-//		{
-		
 		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
 				
 		// Init bdi configuration
@@ -1584,11 +1490,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			if(mi!=null)
 			{
 				PlanContextCondition pcc = mi.getMethod(getClassLoader()).getAnnotation(PlanContextCondition.class);
-				String[] evs = pcc.events();
+				String[] evs = pcc.beliefs();
+				String[] rawevs = pcc.rawevents();
 				List<EventType> events = new ArrayList<EventType>();
 				for(String ev: evs)
 				{
 					addBeliefEvents(getInternalAccess(), events, ev);
+				}
+				for(String rawev: rawevs)
+				{
+					events.add(new EventType(rawev));
 				}
 				
 				IAction<Void> abortplans = new IAction<Void>()
@@ -1657,8 +1568,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							}
 						}
 						
-	//					if(goal.inhibitors!=null && goal.inhibitors.size()>0)
-	//						System.out.println("initial inhibitors of: "+goal+" "+goal.inhibitors);
+						if(getComponentIdentifier().getName().indexOf("Ambu")!=-1 && goal.inhibitors!=null && goal.inhibitors.size()>0)
+							System.out.println("initial inhibitors of: "+goal+" "+goal.inhibitors);
 						return IFuture.DONE;
 					}
 				});
@@ -1673,6 +1584,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 	//						if(((RGoal)event.getContent()).getId().indexOf("Battery")!=-1)
 	//							System.out.println("maintain");
+//							if(getComponentIdentifier().getName().indexOf("Ambu")!=-1)
+//								System.out.println("addin");
 							
 							// return true when other goal is active and inprocess
 							boolean ret = false;
@@ -1721,6 +1634,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					{
 						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 						{
+//							if(getComponentIdentifier().getName().indexOf("Ambu")!=-1)
+//								System.out.println("remin");
+							
 							// return true when other goal is active and inprocess
 							boolean ret = false;
 							EventType type = event.getType();

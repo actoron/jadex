@@ -76,7 +76,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 		 * 
 		 */
 		// todo: support directly factadded etc.
-		@GoalCreationCondition(events="movecapa.mytargets")
+		@GoalCreationCondition(beliefs="movecapa.mytargets")
 		public static AnalyzeTarget checkCreate(SentryBDI outer, ISpaceObject target, IEvent event)
 		{
 			if(target==null)// ||  outer.getMoveCapa().isMissionend())
@@ -129,7 +129,7 @@ public class SentryBDI extends BaseBDI implements ITargetAnnouncementService
 		/**
 		 * 
 		 */
-		@GoalDropCondition(events="movecapa.missionend")
+		@GoalDropCondition(beliefs="movecapa.missionend")
 		public boolean checkDrop()
 		{
 //			System.out.println("dropping: "+this+" "+outer.getMoveCapa().isMissionend());

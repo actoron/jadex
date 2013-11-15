@@ -89,7 +89,7 @@ public class AlarmclockBDI
 		/**
 		 *  Creation condition for creating a goal for every alarm.
 		 */
-		@GoalCreationCondition(events="alarms")
+		@GoalCreationCondition(beliefs="alarms")
 		public static AlarmGoal checkCreate(Alarm alarm)
 		{
 			return alarm!=null ? new AlarmGoal(alarm) : null;

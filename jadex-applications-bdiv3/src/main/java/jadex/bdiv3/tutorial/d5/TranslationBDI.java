@@ -64,7 +64,7 @@ public class TranslationBDI
 		/**
 		 *  Check if goal should be retried.
 		 */
-		@GoalRecurCondition(events="wordtable")
+		@GoalRecurCondition(beliefs="wordtable")
 		public boolean checkRecur()
 		{
 			return true;

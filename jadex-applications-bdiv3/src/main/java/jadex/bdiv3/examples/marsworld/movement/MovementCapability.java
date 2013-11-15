@@ -97,7 +97,7 @@ public class MovementCapability
 		 *  Drop condition.
 		 *  @return True if should be dropped.
 		 */
-		@GoalDropCondition(events="missionend")
+		@GoalDropCondition(beliefs="missionend")
 		public boolean checkDrop()
 		{
 			return missionend;
@@ -125,7 +125,7 @@ public class MovementCapability
 		/**
 		 *  Create a new Move. 
 		 */
-		@GoalCreationCondition(events="missionend")
+		@GoalCreationCondition(beliefs="missionend")
 		public static boolean checkCreate(MovementCapability capa)
 		{
 			return capa.missionend && !capa.myself.getProperty("position").equals(capa.getHomebasePosition());

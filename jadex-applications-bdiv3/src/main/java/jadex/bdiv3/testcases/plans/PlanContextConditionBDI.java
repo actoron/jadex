@@ -81,7 +81,7 @@ public class PlanContextConditionBDI
 	@Plan(trigger=@Trigger(goals=SomeGoal.class))
 	protected class PlanA
 	{
-		@PlanContextCondition(events="counter")
+		@PlanContextCondition(beliefs="counter")
 		protected boolean contextcondition()
 		{
 			return counter==0;

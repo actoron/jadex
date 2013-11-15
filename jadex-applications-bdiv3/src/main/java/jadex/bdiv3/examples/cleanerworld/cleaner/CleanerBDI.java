@@ -141,7 +141,7 @@ public class CleanerBDI
 		 *  When the chargestate is below 0.2
 		 *  the cleaner will activate this goal.
 		 */
-		@GoalMaintainCondition(events="my_chargestate")
+		@GoalMaintainCondition(beliefs="my_chargestate")
 		public boolean checkMaintain()
 		{
 			return my_chargestate>0.2;
@@ -151,7 +151,7 @@ public class CleanerBDI
 		 *  The target condition determines when
 		 *  the goal goes back to idle. 
 		 */
-		@GoalTargetCondition(events="my_chargestate")
+		@GoalTargetCondition(beliefs="my_chargestate")
 		public boolean checkTarget()
 		{
 			return my_chargestate>=1.0;
@@ -177,7 +177,7 @@ public class CleanerBDI
 		/**
 		 *  Create a new goal.
 		 */
-		@GoalCreationCondition(events="wastes")
+		@GoalCreationCondition(beliefs="wastes")
 		public AchieveCleanup(Waste waste)
 		{
 //			System.out.println("new achieve cleanup: "+waste);
@@ -194,7 +194,7 @@ public class CleanerBDI
 		/**
 		 *  Suspend the goal when night.
 		 */
-		@GoalContextCondition(events="daytime")
+		@GoalContextCondition(beliefs="daytime")
 		public boolean checkContext()
 		{
 			return isDaytime();
@@ -204,7 +204,7 @@ public class CleanerBDI
 		 *  Drop the goal when waste is not seen
 		 *  anymore and the agent agent does not carry it.
 		 */
-		@GoalDropCondition(events={"carriedwaste", "wastes"})
+		@GoalDropCondition(beliefs={"carriedwaste", "wastes"})
 		public boolean checkDrop()
 		{
 //			System.out.println("drop triggerd: "+getWaste());
@@ -332,7 +332,7 @@ public class CleanerBDI
 		/**
 		 *  Suspend the goal at night.
 		 */
-		@GoalContextCondition(events="daytime")
+		@GoalContextCondition(beliefs="daytime")
 		public boolean checkContext()
 		{
 			return daytime;
@@ -348,7 +348,7 @@ public class CleanerBDI
 		/**
 		 *  Suspend the goal when daytime.
 		 */
-		@GoalContextCondition(events="daytime")
+		@GoalContextCondition(beliefs="daytime")
 		public boolean checkContext()
 		{
 			return !daytime;
@@ -442,7 +442,7 @@ public class CleanerBDI
 		 *  The goal is achieved when the position
 		 *  of the cleaner is near to the target position.
 		 */
-		@GoalTargetCondition(events="my_location")
+		@GoalTargetCondition(beliefs="my_location")
 		public boolean checkTarget()
 		{
 			return my_location.isNear(location);
@@ -467,7 +467,7 @@ public class CleanerBDI
 		/** The wastebin. */
 		protected Wastebin wastebin;
 		
-		@GoalTargetCondition(events="wastebins")
+		@GoalTargetCondition(beliefs="wastebins")
 		public boolean checkTarget()
 		{
 			wastebin = getNearestNonFullWastebin();
@@ -514,7 +514,7 @@ public class CleanerBDI
 	{
 		protected Chargingstation station;
 		
-		@GoalTargetCondition(events="chargingstations")
+		@GoalTargetCondition(beliefs="chargingstations")
 		public boolean checkTarget()
 		{
 			station = getNearestChargingStation();

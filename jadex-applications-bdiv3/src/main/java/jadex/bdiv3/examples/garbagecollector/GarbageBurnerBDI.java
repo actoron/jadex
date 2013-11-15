@@ -57,7 +57,7 @@ public class GarbageBurnerBDI extends BaseAgentBDI
 		 * 
 		 */
 		// todo: support directly factadded etc.
-		@GoalCreationCondition(events="garbages")
+		@GoalCreationCondition(beliefs="garbages")
 		public static Burn checkCreate(GarbageBurnerBDI outer, ISpaceObject garbage, IEvent event)
 		{
 			return garbage==null? null: new Burn(outer, garbage);

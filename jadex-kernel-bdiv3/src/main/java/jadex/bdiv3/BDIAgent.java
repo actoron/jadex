@@ -6,6 +6,7 @@ import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.BeliefInfo;
@@ -65,8 +66,15 @@ public class BDIAgent extends MicroAgent
 		{
 			ret.add((T)rgoal.getPojoElement());
 		}
-		
 		return ret;
+	}
+	
+	/**
+	 *  Get the current goals.
+	 */
+	public Collection<IGoal> getGoals()
+	{
+		return (Collection)((BDIAgentInterpreter)getInterpreter()).getCapability().getGoals();
 	}
 
 	/**

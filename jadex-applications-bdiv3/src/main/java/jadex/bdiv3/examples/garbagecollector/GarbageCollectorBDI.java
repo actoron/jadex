@@ -50,7 +50,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 		 * 
 		 */
 		// todo: support directly factadded etc.
-		@GoalCreationCondition(events="garbages")
+		@GoalCreationCondition(beliefs="garbages")
 		public static boolean checkCreate(GarbageCollectorBDI outer, ISpaceObject garbage, IEvent event)
 		{
 			boolean ret = outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.getPosition(), "burner")==null;
@@ -120,7 +120,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 		/**
 		 * 
 		 */
-		@GoalDropCondition(events="garbages")
+		@GoalDropCondition(beliefs="garbages")
 		public boolean checkDrop()
 		{
 			boolean ret = !isDirty() && !hasGarbage();

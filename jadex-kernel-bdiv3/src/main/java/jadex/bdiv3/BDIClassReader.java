@@ -863,7 +863,7 @@ public class BDIClassReader extends MicroClassReader
 	 */
 	protected MPlan createMPlan(BDIModel bdimodel, Plan p, MethodInfo mi, String name,
 		ClassInfo ci, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
-	{
+	{		
 		Body body = p.body();
 		ServicePlan sp = body.service();
 		
@@ -924,6 +924,8 @@ public class BDIClassReader extends MicroClassReader
 	protected MGoal createMGoal(BDIModel model, Goal goal, Class<?> gcl, ClassLoader cl, Map<ClassInfo, List<Tuple2<MGoal, String>>> pubs)
 	{
 		assert model.getCapability().getGoal(gcl.getName())==null;
+		
+//		System.out.println("name: "+gcl.getName());
 		
 		Map<String, MethodInfo> spmappings = new HashMap<String, MethodInfo>();
 		Map<String, MethodInfo> srmappings = new HashMap<String, MethodInfo>();
@@ -1018,11 +1020,17 @@ public class BDIClassReader extends MicroClassReader
 		{
 			if(isAnnotationPresent(c, GoalCreationCondition.class, cl))
 			{
-				String[] evs = getAnnotation(c, GoalCreationCondition.class, cl).events();
+				GoalCreationCondition gc = getAnnotation(c, GoalCreationCondition.class, cl);
+				String[] evs = gc.beliefs();
+				String[] rawevs = gc.rawevents();
 				List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(c, cl), cl);
 				for(String ev: evs)
 				{
 					addBeliefEvents(model.getCapability(), events, ev, cl);
+				}
+				for(String rawev: rawevs)
+				{
+					events.add(new EventType(rawev)); 
 				}
 				MCondition cond = new MCondition("creation_"+c.toString(), events);
 				cond.setConstructorTarget(new ConstructorInfo(c));
@@ -1035,33 +1043,39 @@ public class BDIClassReader extends MicroClassReader
 		{
 			if(isAnnotationPresent(m, GoalCreationCondition.class, cl))
 			{
-				addMethodCondition(mgoal, MGoal.CONDITION_CREATION, getAnnotation(m, 
-					GoalCreationCondition.class, cl).events(), model, m, cl);
+				GoalCreationCondition c = getAnnotation(m, GoalCreationCondition.class, cl);
+				addMethodCondition(mgoal, MGoal.CONDITION_CREATION, 
+					c.beliefs(), c.rawevents(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalDropCondition.class, cl))
 			{
-				addMethodCondition(mgoal, MGoal.CONDITION_DROP, getAnnotation(m, 
-					GoalDropCondition.class, cl).events(), model, m, cl);
+				GoalDropCondition c = getAnnotation(m, GoalDropCondition.class, cl);
+				addMethodCondition(mgoal, MGoal.CONDITION_DROP, 
+					c.beliefs(), c.rawevents(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalMaintainCondition.class, cl))
 			{
-				addMethodCondition(mgoal, MGoal.CONDITION_MAINTAIN, getAnnotation(m, 
-					GoalMaintainCondition.class, cl).events(), model, m, cl);
+				GoalMaintainCondition c = getAnnotation(m, GoalMaintainCondition.class, cl);
+				addMethodCondition(mgoal, MGoal.CONDITION_MAINTAIN, 
+					c.beliefs(), c.rawevents(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalTargetCondition.class, cl))
 			{
-				addMethodCondition(mgoal, MGoal.CONDITION_TARGET, getAnnotation(m, 
-					GoalTargetCondition.class, cl).events(), model, m, cl);
+				GoalTargetCondition c = getAnnotation(m, GoalTargetCondition.class, cl);
+				addMethodCondition(mgoal, MGoal.CONDITION_TARGET, 
+					c.beliefs(), c.rawevents(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalContextCondition.class, cl))
 			{
-				addMethodCondition(mgoal, MGoal.CONDITION_CONTEXT, getAnnotation(m, 
-					GoalContextCondition.class, cl).events(), model, m, cl);
+				GoalContextCondition c = getAnnotation(m, GoalContextCondition.class, cl);
+				addMethodCondition(mgoal, MGoal.CONDITION_CONTEXT, 
+					c.beliefs(), c.rawevents(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalRecurCondition.class, cl))
 			{
-				addMethodCondition(mgoal, MGoal.CONDITION_RECUR, getAnnotation(m, 
-					GoalRecurCondition.class, cl).events(), model, m, cl);
+				GoalRecurCondition c = getAnnotation(m, GoalRecurCondition.class, cl);
+				addMethodCondition(mgoal, MGoal.CONDITION_RECUR, 
+					c.beliefs(), c.rawevents(), model, m, cl);
 			}
 		}
 		
@@ -1071,12 +1085,16 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected void addMethodCondition(MGoal mgoal, String condtype, String[] evs, BDIModel model, Method m, ClassLoader cl)
+	protected void addMethodCondition(MGoal mgoal, String condtype, String[] evs, String[] rawevs, BDIModel model, Method m, ClassLoader cl)
 	{
 		List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(m, cl), cl);
 		for(String ev: evs)
 		{
 			addBeliefEvents(model.getCapability(), events, ev, cl);
+		}
+		for(String rawev: rawevs)
+		{
+			events.add(new EventType(rawev)); 
 		}
 		MCondition cond = new MCondition(condtype+"_"+m.toString(), events);
 		cond.setMethodTarget(new MethodInfo(m));

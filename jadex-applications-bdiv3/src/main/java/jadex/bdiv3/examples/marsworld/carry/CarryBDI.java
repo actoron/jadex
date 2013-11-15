@@ -54,7 +54,7 @@ public class CarryBDI extends BaseBDI implements ICarryService
 		/**
 		 * 
 		 */
-		@GoalDropCondition(events="movecapa.missionend")
+		@GoalDropCondition(beliefs="movecapa.missionend")
 		public boolean checkDrop()
 		{
 			return movecapa.isMissionend();

@@ -47,14 +47,14 @@ public class TranslationBDI
 	@Goal(excludemode=ExcludeMode.Never)
 	public class MaintainStorageGoal
 	{
-		@GoalMaintainCondition(events="egwords")
+		@GoalMaintainCondition(beliefs="egwords")
 		protected boolean maintain()
 		{
 //			System.out.println("check maintain: "+egwords.size()+" "+(egwords.size()<=maxstorage));
 			return egwords.size()<=4;//maxstorage;
 		}
 		
-		@GoalTargetCondition(events="egwords")
+		@GoalTargetCondition(beliefs="egwords")
 		protected boolean target()
 		{
 //			System.out.println("check target: "+egwords.size()+" "+event);

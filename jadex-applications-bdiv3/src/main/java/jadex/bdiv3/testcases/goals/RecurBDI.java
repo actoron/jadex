@@ -81,7 +81,7 @@ public class RecurBDI
 			this.num = num;
 		}
 		
-		@GoalTargetCondition(events="items")
+		@GoalTargetCondition(beliefs="items")
 		protected boolean checkTarget()//@Event("items") Object ev)
 		{
 			return items.size()>=num;

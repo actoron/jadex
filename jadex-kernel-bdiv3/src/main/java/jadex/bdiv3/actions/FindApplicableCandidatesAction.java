@@ -53,15 +53,17 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-//		if(element.toString().indexOf("")!=-1)
+//		if(element!=null && element.toString().indexOf("Move")!=-1)
 //			System.out.println("find applicable candidates: "+element);
 		final Future<Void> ret = new Future<Void>();
 		
+//		System.out.println("find applicable candidates 1: "+element);
 		final APL apl = element.getApplicablePlanList();
 		apl.build(ia).addResultListener(ia.createResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
+//				System.out.println("find applicable candidates 2: "+element+" "+apl);
 				if(apl.isEmpty())
 				{
 					element.setState(RProcessableElement.State.NOCANDIDATES);

@@ -56,7 +56,7 @@ public class TranslationBDI
 		/**
 		 *  Create a new translate goal. 
 		 */
-		@GoalCreationCondition(events="eword")
+		@GoalCreationCondition(beliefs="eword")
 		public Translate(String eword)
 		{
 			this.eword = eword;

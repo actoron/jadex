@@ -100,7 +100,7 @@ public class TranslationBDI
 		/**
 		 *  The context condition.
 		 */
-		@PlanContextCondition(events="context")
+		@PlanContextCondition(beliefs="context")
 		public boolean checkCondition()
 		{
 			return context;

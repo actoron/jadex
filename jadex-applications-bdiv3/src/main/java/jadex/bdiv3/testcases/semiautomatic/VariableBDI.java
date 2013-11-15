@@ -26,7 +26,7 @@ public class VariableBDI
 		/**
 		 *  Create a new AGoal.
 		 */
-		@GoalCreationCondition(events="str")
+		@GoalCreationCondition(beliefs="str")
 		public AGoal(String str)
 		{
 			System.out.println("Created goal: "+str);

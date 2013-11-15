@@ -1,8 +1,11 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.util.Collection;
+
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.ICapability;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bridge.service.IServiceContainer;
 
 /**
@@ -68,7 +71,7 @@ public class CapabilityWrapper implements ICapability
 	 */
 	public IServiceContainer	getServiceContainer()
 	{
-		return new ServiceContainerProxy((BDIAgentInterpreter)agent.getInterpreter(), capa);
+		return new ServiceContainerProxy(getInterpreter(), capa);
 		
 	}
 
@@ -80,4 +83,20 @@ public class CapabilityWrapper implements ICapability
 		return pojo;
 	}
 
+//	/**
+//	 *  Get the goals.
+//	 *  @return The goals.
+//	 */
+//	public Collection<IGoal> getGoals()
+//	{
+//		return (Collection<IGoal>)getInterpreter().getCapability().getGoals();
+//	}
+	
+	/**
+	 *  Get the interpreter.
+	 */
+	protected BDIAgentInterpreter getInterpreter()
+	{
+		return (BDIAgentInterpreter)agent.getInterpreter();
+	}
 }

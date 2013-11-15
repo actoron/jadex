@@ -65,7 +65,7 @@ public class ComponentPlanBDI
 	@Goal
 	public class AchieveSuccess
 	{
-		@GoalTargetCondition(events="success")
+		@GoalTargetCondition(beliefs="success")
 		public boolean	achieved()
 		{
 			return success;

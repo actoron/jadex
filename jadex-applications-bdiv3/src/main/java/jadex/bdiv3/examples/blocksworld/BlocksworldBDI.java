@@ -93,7 +93,7 @@ public class BlocksworldBDI
 		 * 
 		 * @return True, if clear.
 		 */
-		@GoalTargetCondition(events="blocks")
+		@GoalTargetCondition(beliefs="blocks")
 		public boolean checkClear()
 		{
 //			System.out.println("clear target condition for: "+block+" "+block.isClear());
@@ -137,7 +137,7 @@ public class BlocksworldBDI
 			this.target = target;
 		}
 
-		@GoalTargetCondition(events="blocks")
+		@GoalTargetCondition(beliefs="blocks")
 		public boolean checkOn()
 		{
 //			System.out.println("stack target condition for: "+block+" "+target+" "+block.getLower().equals(target));
@@ -181,7 +181,7 @@ public class BlocksworldBDI
 			this.blocks = blocks;
 		}
 
-		@GoalTargetCondition(events="blocks")
+		@GoalTargetCondition(beliefs="blocks")
 		public boolean checkConfiguration()
 		{
 //			System.out.println("check configure goal: "+table.configurationEquals(configuration));

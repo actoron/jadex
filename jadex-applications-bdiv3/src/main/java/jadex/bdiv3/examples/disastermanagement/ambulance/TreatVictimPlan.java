@@ -1,0 +1,96 @@
+package jadex.bdiv3.examples.disastermanagement.ambulance;
+
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanBody;
+import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanReason;
+import jadex.bdiv3.examples.disastermanagement.DeliverPatientTask;
+import jadex.bdiv3.examples.disastermanagement.DisasterType;
+import jadex.bdiv3.examples.disastermanagement.TreatVictimTask;
+import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.TreatVictims;
+import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
+import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa.Move;
+import jadex.bdiv3.runtime.IPlan;
+import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.extension.envsupport.environment.AbstractTask;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.micro.IPojoMicroAgent;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ *  Move to victim and treat her.
+ */
+@Plan
+public class TreatVictimPlan
+{
+	//-------- attributes --------
+
+	@PlanCapability
+	protected AmbulanceBDI capa;
+	
+	@PlanAPI
+	protected IPlan rplan;
+	
+	@PlanReason
+	protected TreatVictims goal;
+	
+	/**
+	 *  The plan body.
+	 */
+	@PlanBody
+	public void body()
+	{
+		Space2D	space	= (Space2D)capa.getMoveCapa().getEnvironment();
+		ISpaceObject myself	= capa.getMoveCapa().getMyself();
+		IVector2 home = capa.getMoveCapa().getHomePosition();
+		ISpaceObject disaster = (ISpaceObject)goal.getDisaster();
+		
+		// Move to disaster location
+		myself.setProperty("state", "moving_to_disaster");
+		IVector2	targetpos	= DisasterType.getVictimLocation(disaster);
+		Move move = capa.getMoveCapa().new Move(targetpos);
+		capa.getAgent().dispatchTopLevelGoal(move).get();
+		
+		// Treat victim.
+		myself.setProperty("state", "treating_victim");
+		Map props = new HashMap();
+		props.put(TreatVictimTask.PROPERTY_DISASTER, disaster);
+		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
+		Object taskid = space.createObjectTask(TreatVictimTask.PROPERTY_TYPENAME, props, myself.getId());
+		Future<Void> fut = new Future<Void>();
+		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
+		space.addTaskListener(taskid, myself.getId(), lis);
+		fut.get();
+		
+		// Move to hospital
+		myself.setProperty("state", "moving_to_hospital");
+		move = capa.getMoveCapa().new Move(home);
+		capa.getAgent().dispatchTopLevelGoal(move).get();
+		
+		//  Deliver patient.
+		myself.setProperty("state", "delivering_patient");
+		props = new HashMap();
+		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
+		taskid = space.createObjectTask(DeliverPatientTask.PROPERTY_TYPENAME, props, myself.getId());
+		fut = new Future<Void>();
+		lis = new DelegationResultListener<Void>(fut, true);
+		space.addTaskListener(taskid, myself.getId(), lis);
+		fut.get();
+	}
+	
+//	/**
+//	 *  Called when a plan fails.
+//	 */
+//	public void failed()
+//	{
+//		System.err.println("Plan failed: "+this);
+//		getException().printStackTrace();
+//	}
+}

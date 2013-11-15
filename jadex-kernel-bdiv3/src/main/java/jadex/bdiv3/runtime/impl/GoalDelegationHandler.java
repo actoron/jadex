@@ -4,6 +4,7 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.model.MCapability;
 import jadex.bdiv3.model.MGoal;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.micro.IPojoMicroAgent;
@@ -12,6 +13,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *  Handler used for service-goal delegation.
@@ -57,8 +59,8 @@ public class GoalDelegationHandler  implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
-		final Future<Object> ret = new Future<Object>();
-		
+		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
+				
 		String goalname = goalnames.get(method.getName());
 		
 		if(goalname==null)
@@ -98,6 +100,10 @@ public class GoalDelegationHandler  implements InvocationHandler
 			public void customResultAvailable(Object result)
 			{
 				ret.setResult(RGoal.getGoalResult(fgoal, mgoal, agent.getClassLoader()));
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setExceptionIfUndone(exception);
 			}
 		});
 	
