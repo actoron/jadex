@@ -168,7 +168,7 @@ public class AGRSpace	implements IExtensionInstance
 							return obj.getType().endsWith(IMonitoringEvent.SOURCE_CATEGORY_COMPONENT)
 								|| obj.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START);
 						}
-					}, false, PublishEventLevel.FINE);
+					}, false, PublishEventLevel.COARSE);
 					
 					sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
 					{
