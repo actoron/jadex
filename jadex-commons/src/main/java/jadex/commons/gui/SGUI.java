@@ -431,7 +431,12 @@ public class SGUI
 			JPanel	but	= new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			but.add(details);
 			JTextArea	msg	= new JTextArea(message.toString());
-			msg.setEditable(false);  
+			msg.setEditable(false);
+			
+			// Java Bug #7100524 Workaround:
+			// This is needed to avoid throwing an obscure exception later 
+			msg.setDropTarget(null);
+			
 			msg.setCursor(null);  
 			msg.setOpaque(false);  
 //					msg.setFocusable(false);
