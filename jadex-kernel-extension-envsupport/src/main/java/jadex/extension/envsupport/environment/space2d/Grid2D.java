@@ -7,7 +7,6 @@ import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.extension.envsupport.math.Vector1Int;
-import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 
 import java.util.ArrayList;
@@ -106,7 +105,7 @@ public class Grid2D extends Space2D
 	/**
 	 * Get all SimObjects from a specific type at a specific grid position
 	 */
-	public Collection getSpaceObjectsByGridPosition(IVector2 position, Object type)
+	public Collection<ISpaceObject> getSpaceObjectsByGridPosition(IVector2 position, Object type)
 	{
 		Collection ret = null;
 		synchronized(monitor)

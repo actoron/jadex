@@ -48,7 +48,7 @@ public class BurnPlanEnv
 		
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
-		Map params = new HashMap();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(ISpaceAction.ACTOR_ID, burner.getAgent().getComponentDescription());
 		env.performSpaceAction("burn", params, lis);
 		fut.get();

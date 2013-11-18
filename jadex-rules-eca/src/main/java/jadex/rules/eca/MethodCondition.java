@@ -91,6 +91,8 @@ public class MethodCondition implements ICondition
 						Boolean b = result.getFirstEntity().booleanValue()? Boolean.FALSE: Boolean.TRUE;
 						result = new Tuple2<Boolean, Object>(b, result.getSecondEntity());
 					}
+					
+					super.customResultAvailable(result);
 				}
 			});
 		}

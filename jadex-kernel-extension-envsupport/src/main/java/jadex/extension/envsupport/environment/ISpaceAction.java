@@ -26,5 +26,5 @@ public interface ISpaceAction extends IPropertyObject
 	 * @param parameters parameters for the action
 	 * @param space the environment space
 	 */
-	public Object perform(Map parameters, IEnvironmentSpace space);
+	public Object perform(Map<String, Object> parameters, IEnvironmentSpace space);
 }

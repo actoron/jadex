@@ -3,13 +3,12 @@ package jadex.bdiv3.examples.garbagecollector;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Deliberation;
 import jadex.bdiv3.annotation.Goal;
+import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.annotation.Goal.ExcludeMode;
-import jadex.bdiv3.model.MProcessableElement;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
@@ -55,7 +54,7 @@ public class GarbageCollectorBDI extends BaseAgentBDI
 		{
 			boolean ret = outer.isDirty() && outer.getEnvironment().getSpaceObjectsByGridPosition(outer.getPosition(), "burner")==null;
 //			if(ret)
-//				System.out.println("collector creating new take goal");
+//				System.out.println("collector creating new take goal: "+ret);
 			return ret;
 		}
 		

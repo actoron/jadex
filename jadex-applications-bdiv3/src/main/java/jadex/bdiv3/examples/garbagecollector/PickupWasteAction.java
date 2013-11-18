@@ -22,7 +22,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 	 * @param space the environment space
 	 * @return action return value
 	 */
-	public Object perform(Map parameters, IEnvironmentSpace space)
+	public Object perform(Map<String, Object> parameters, IEnvironmentSpace space)
 	{	
 		boolean ret = false;
 				
@@ -37,7 +37,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 		}
 		else
 		{
-			Collection wastes = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "garbage");
+			Collection<ISpaceObject> wastes = grid.getSpaceObjectsByGridPosition((IVector2)so.getProperty(Grid2D.PROPERTY_POSITION), "garbage");
 			ISpaceObject waste = (ISpaceObject)(wastes!=null? wastes.iterator().next(): null);
 	//		System.out.println("pickup waste action: "+so+" "+so.getProperty(Grid2D.POSITION)+" "+waste);
 			if(wastes!=null)

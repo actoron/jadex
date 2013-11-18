@@ -2,10 +2,8 @@ package jadex.bdiv3.examples.garbagecollector;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
-import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
-import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Go;
 import jadex.bdiv3.examples.garbagecollector.GarbageCollectorBDI.Pick;
@@ -64,7 +62,7 @@ public class TakePlanEnv
 //		System.out.println("Calling drop: "+collector.getAgent().getAgentName());
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
-		Map params = new HashMap();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(ISpaceAction.ACTOR_ID, collector.getAgent().getComponentDescription());
 		grid.performSpaceAction("drop", params, lis);
 		fut.get();

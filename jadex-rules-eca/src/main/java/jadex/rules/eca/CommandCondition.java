@@ -2,6 +2,7 @@ package jadex.rules.eca;
 
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -37,7 +38,11 @@ public class CommandCondition implements ICondition
 	public static IFuture<Tuple2<Boolean, Object>> evaluateResult(Object res)
 	{
 		final Future<Tuple2<Boolean, Object>> ret = new Future<Tuple2<Boolean, Object>>();
-		if(res instanceof Tuple2)
+		if(res==null)
+		{
+			ret.setResult(new Tuple2<Boolean, Object>(Boolean.FALSE, res));
+		}
+		else if(res instanceof Tuple2)
 		{
 			ret.setResult((Tuple2<Boolean, Object>)res);
 		}
@@ -52,17 +57,13 @@ public class CommandCondition implements ICondition
 			{
 				public void customResultAvailable(Object res)
 				{
-					if(res instanceof Tuple2)
-					{
-						ret.setResult((Tuple2<Boolean, Object>)res);
-					}
-					else //if(res instanceof Boolean)
-					{
-						boolean bs = ((Boolean)res).booleanValue();
-						ret.setResult(bs? ICondition.TRUE: ICondition.FALSE);
-					}
+					evaluateResult(res).addResultListener(new DelegationResultListener<Tuple2<Boolean,Object>>(ret));
 				}
 			});
+		}
+		else
+		{
+			ret.setResult(new Tuple2<Boolean, Object>(Boolean.TRUE, res));
 		}
 		return ret;
 	}

@@ -68,7 +68,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	//-------- attributes --------
 	
 	/** The percepttypes infos. */
-	protected Map percepttypes;
+	protected Map<String, String[][]> percepttypes;
 	
 	//-------- methods --------
 	
@@ -234,7 +234,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 												IVector1 vision	= getRange(avatar);
 												Space2D	space2d	= (Space2D)space;
 												IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
-												Set	seen = space2d.getNearObjects(mypos, vision);
+												Set<ISpaceObject>	seen = space2d.getNearObjects(mypos, vision);
 												for(Iterator<?> it=facts.iterator(); it.hasNext(); )
 												{
 													Object	known	= it.next();
@@ -280,7 +280,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	{
 		if(percepttypes==null)
 		{
-			this.percepttypes = new HashMap();
+			this.percepttypes = new HashMap<String, String[][]>();
 			Object[] percepttypes = getPerceptTypes();
 			for(int i=0; i<percepttypes.length; i++)
 			{

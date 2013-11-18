@@ -386,7 +386,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param distance
 	 * @return The near objects. 
 	 */
-	public Set getNearObjects(IVector2 position, IVector1 maxdist)
+	public Set<ISpaceObject> getNearObjects(IVector2 position, IVector1 maxdist)
 	{
 		return getNearObjects(position, maxdist, (IFilter)null);
 	}

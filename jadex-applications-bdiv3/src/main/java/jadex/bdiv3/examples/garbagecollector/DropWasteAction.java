@@ -21,7 +21,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 	 * @param space the environment space
 	 * @return action return value
 	 */
-	public Object perform(Map parameters, IEnvironmentSpace space)
+	public Object perform(Map<String, Object> parameters, IEnvironmentSpace space)
 	{
 //		System.out.println("drop waste action: "+parameters);
 		
