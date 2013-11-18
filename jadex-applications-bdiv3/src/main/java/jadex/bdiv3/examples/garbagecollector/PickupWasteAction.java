@@ -58,10 +58,10 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 	//				System.out.println("Agent picked up failed: "+name+" "+getPosition(name));
 	//			}
 			}
-			else
-			{
-				System.out.println("Agent picked up failed: no waste on position");
-			}
+//			else
+//			{
+//				System.out.println("Agent picked up failed: no waste on position");
+//			}
 		}
 
 //		System.out.println("pickup waste action "+parameters);

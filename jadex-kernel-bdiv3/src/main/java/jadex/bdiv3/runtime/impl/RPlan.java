@@ -14,7 +14,6 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
-import jadex.bdiv3.runtime.impl.RGoal.GoalLifecycleState;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -28,7 +27,6 @@ import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -635,7 +633,7 @@ public class RPlan extends RElement implements IPlan
 					}
 				});
 			}
-			else
+			else if(!PlanLifecycleState.NEW.equals(getLifecycleState()))
 			{
 				System.out.println("Cannot abort plan: "+getId()+" "+getProcessingState());
 			}
