@@ -28,12 +28,14 @@ public class TreatVictimsPlan
 	@PlanBody
 	public void	body(SendRescueForce goal)
 	{
-		ISpaceObject disaster = (ISpaceObject)goal.getDisaster();
-		ITreatVictimsService force = (ITreatVictimsService)goal.getRescueForce();
 		try
 		{
-			tv	= force.treatVictims(disaster);
-			tv.get();
+		ISpaceObject disaster = (ISpaceObject)goal.getDisaster();
+		System.out.println("treat victims for: "+disaster);
+		ITreatVictimsService force = (ITreatVictimsService)goal.getRescueForce();
+		tv	= force.treatVictims(disaster);
+		tv.get();
+		System.out.println("treat victims end for: "+disaster);
 		}
 		catch(Exception e)
 		{

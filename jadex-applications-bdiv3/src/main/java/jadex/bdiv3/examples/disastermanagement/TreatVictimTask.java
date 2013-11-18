@@ -75,5 +75,9 @@ public class TreatVictimTask extends AbstractTask
 				obj.setProperty(PROPERTY_TREATED, new Double(treated));			
 			}
 		}
+		else
+		{
+			throw new RuntimeException("Still chemicals at disaster: "+obj);
+		}
 	}
 }

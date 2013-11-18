@@ -2,14 +2,15 @@ package jadex.bdiv3.examples.disastermanagement.ambulance;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdiv3.examples.disastermanagement.DisasterType;
 import jadex.bdiv3.examples.disastermanagement.TreatVictimTask;
 import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.TreatVictims;
-import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa.Move;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
@@ -19,7 +20,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.micro.IPojoMicroAgent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class TreatVictimPlan
 		myself.setProperty("state", "moving_to_disaster");
 		IVector2	targetpos	= DisasterType.getVictimLocation(disaster);
 		Move move = capa.getMoveCapa().new Move(targetpos);
-		capa.getAgent().dispatchTopLevelGoal(move).get();
+		rplan.dispatchSubgoal(move).get();
 		
 		// Treat victim.
 		myself.setProperty("state", "treating_victim");
@@ -72,7 +72,7 @@ public class TreatVictimPlan
 		// Move to hospital
 		myself.setProperty("state", "moving_to_hospital");
 		move = capa.getMoveCapa().new Move(home);
-		capa.getAgent().dispatchTopLevelGoal(move).get();
+		rplan.dispatchSubgoal(move).get();
 		
 		//  Deliver patient.
 		myself.setProperty("state", "delivering_patient");
@@ -85,12 +85,14 @@ public class TreatVictimPlan
 		fut.get();
 	}
 	
-//	/**
-//	 *  Called when a plan fails.
-//	 */
-//	public void failed()
-//	{
-//		System.err.println("Plan failed: "+this);
-//		getException().printStackTrace();
-//	}
+	/**
+	 *  Called when a plan fails.
+	 */
+	@PlanFailed
+	@PlanAborted
+	public void failed(Exception e)
+	{
+		System.err.println("Plan failed: "+this);
+//		e.printStackTrace();
+	}
 }

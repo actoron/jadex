@@ -2,15 +2,15 @@ package jadex.bdiv3.examples.disastermanagement.commander;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.SendRescueForce;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.IService;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector2;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -87,5 +87,13 @@ public abstract class HandleForcesPlan
 //			waitForFactRemoved("busy_entities");
 			rplan.waitFor(1000).get();
 		}
+	}
+	
+	@PlanAborted
+	@PlanFailed
+	public void failure(Exception e)
+	{
+		System.out.println("aborted: "+this);
+//		e.printStackTrace();
 	}
 }

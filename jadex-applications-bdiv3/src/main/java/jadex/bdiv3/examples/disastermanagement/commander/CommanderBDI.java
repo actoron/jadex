@@ -12,6 +12,7 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
+import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveCleanup;
 import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3.examples.disastermanagement.IExtinguishFireService;
 import jadex.bdiv3.examples.disastermanagement.ITreatVictimsService;
@@ -179,7 +180,7 @@ public class CommanderBDI
 		}
 	}
 
-	@Goal(unique=true, deliberation=@Deliberation(inhibits={TreatVictims.class}))
+	@Goal(unique=true , deliberation=@Deliberation(inhibits={TreatVictims.class}))
 	public class ClearChemicals implements IForcesGoal
 	{
 		/** The disaster. */
@@ -223,6 +224,16 @@ public class CommanderBDI
 		public boolean checkTarget()
 		{
 			return ((Integer)getDisaster().getProperty("chemicals"))==0;
+		}
+		
+		/**
+		 *  Inhibit other achieve cleanup goals that 
+		 *  are farer away from the cleaner.
+		 */
+		@GoalInhibit(TreatVictims.class)
+		protected boolean inhibitAchieveCleanUp(TreatVictims other)
+		{
+			return other.getDisaster().equals(disaster);
 		}
 	}
 	

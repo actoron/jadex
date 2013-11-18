@@ -33,8 +33,6 @@ public class HandleDisasterPlan
 	@PlanBody
 	public void	body(HandleDisaster goal)
 	{		
-		try
-		{
 		ISpaceObject disaster = (ISpaceObject)goal.getDisaster();
 		System.out.println("handle: "+disaster);
 	
@@ -50,11 +48,6 @@ public class HandleDisasterPlan
 		ccfut.get();
 		effut.get();
 		tvfut.get();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
 	}
 	
 //	public void aborted()

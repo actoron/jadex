@@ -36,6 +36,8 @@ public class TreatVictimsService implements ITreatVictimsService
 	 */
 	public ITerminableFuture<Void> treatVictims(final ISpaceObject disaster)
 	{
+		System.out.println("received treat victims task: "+ia.getComponentIdentifier());
+		
 //		final IGoal tv = (IGoal)agent.getGoalbase().createGoal("treat_victims");
 		
 		final TreatVictims tv = new TreatVictims(disaster);

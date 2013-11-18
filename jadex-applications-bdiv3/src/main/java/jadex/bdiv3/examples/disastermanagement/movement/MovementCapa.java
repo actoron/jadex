@@ -38,6 +38,9 @@ public class MovementCapa
 	/** The environment. */
 	protected ISpaceObject myself = env.getAvatar(capa.getAgent().getComponentDescription(), capa.getAgent().getModel().getFullName());
 
+	/** The home position (=first position). */
+	protected IVector2 homepos = myself!=null? (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION): null;
+	
 	/**
 	 *  The move goal.
 	 *  Move to a certain location.
@@ -79,7 +82,8 @@ public class MovementCapa
 	 */
 	public IVector2 getHomePosition()
 	{
-		return (IVector2)getMyself().getProperty(Space2D.PROPERTY_POSITION);
+		return homepos;
+//		return (IVector2)getMyself().getProperty(Space2D.PROPERTY_POSITION);
 	}
 	
 
