@@ -30,8 +30,15 @@ public class TreatVictimsPlan
 	{
 		ISpaceObject disaster = (ISpaceObject)goal.getDisaster();
 		ITreatVictimsService force = (ITreatVictimsService)goal.getRescueForce();
-		tv	= force.treatVictims(disaster);
-		tv.get();
+		try
+		{
+			tv	= force.treatVictims(disaster);
+			tv.get();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**

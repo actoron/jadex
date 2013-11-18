@@ -10,12 +10,16 @@ import java.util.logging.Logger;
 /**
  *  Intermediate version of the delegation result listener.
  */
-public class IntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>, IFutureCommandListener
+public class IntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>, 
+	IFutureCommandListener, IUndoneIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	
 	/** The future to which calls are delegated. */
 	protected IntermediateFuture<E> future;
+	
+	/** Flag if undone methods should be used. */
+	protected boolean undone;
 	
 	//-------- constructors --------
 	
@@ -25,6 +29,15 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	public IntermediateDelegationResultListener(IntermediateFuture<E> future)
 	{
 		this.future = future;
+	}
+	
+	/**
+	 *  Create a new listener.
+	 */
+	public IntermediateDelegationResultListener(IntermediateFuture<E> future, boolean undone)
+	{
+		this.future = future;
+		this.undone = undone;
 	}
 	
 	//-------- methods --------
@@ -96,7 +109,14 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
      */
     public void finished()
     {
-    	future.setFinished();
+    	if(undone)
+		{
+			future.setFinishedIfUndone();
+		}
+		else
+		{
+			future.setFinished();
+		}
     }
 	
 	/**
@@ -105,7 +125,14 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customResultAvailable(Collection<E> result)
 	{
-		future.setResult(result);
+		if(undone)
+		{
+			future.setResultIfUndone(result);
+		}
+		else
+		{
+			future.setResult(result);
+		}
 	}
 
 	/**
@@ -114,7 +141,14 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void exceptionOccurred(Exception exception)
 	{
-		future.setException(exception);
+		if(undone)
+		{
+			future.setExceptionIfUndone(exception);
+		}
+		else
+		{
+			future.setException(exception);
+		}
 	}
 	
 	/**
@@ -123,7 +157,14 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	 */
 	public void customIntermediateResultAvailable(E result)
 	{
-		future.addIntermediateResult(result);
+		if(undone)
+		{
+			future.addIntermediateResultIfUndone(result);
+		}
+		else
+		{
+			future.addIntermediateResult(result);
+		}
 	}
 	
 	/**
@@ -141,4 +182,47 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 			Logger.getLogger("intermediate-delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
 		}
 	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(Collection<E> result)
+	{
+		undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		undone = true;
+		exceptionOccurred(exception);
+	}
+	
+	/**
+	 *  Called when an intermediate result is available.
+	 *  @param result The result.
+	 */
+	public void intermediateResultAvailableIfUndone(E result)
+	{
+		undone = true;
+		intermediateResultAvailable(result);
+	}
+	
+	/**
+     *  Declare that the future is finished.
+	 *  This method is only called for intermediate futures,
+	 *  i.e. when this method is called it is guaranteed that the
+	 *  intermediateResultAvailable method was called for all
+	 *  intermediate results before.
+     */
+    public void finishedIfUndone()
+    {
+    	undone = true;
+    	finished();
+    }
 }

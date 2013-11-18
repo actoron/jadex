@@ -8,7 +8,7 @@ import jadex.commons.future.ICommandFuture.Type;
 /**
  *  Result listener that delegates calls to a future.
  */
-public class DelegationResultListener<E> implements IResultListener<E>, IFutureCommandListener
+public class DelegationResultListener<E> implements IResultListener<E>, IFutureCommandListener, IUndoneResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -121,4 +121,25 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 			Logger.getLogger("delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
 		}
 	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(E result)
+	{
+		undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		undone = true;
+		exceptionOccurred(exception);
+	}
+
 }
