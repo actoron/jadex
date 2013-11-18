@@ -61,7 +61,14 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 			}
 			else
 			{
-				future.setExceptionIfUndone(e);				
+				if(undone)
+				{
+					future.setExceptionIfUndone(e);
+				}
+				else
+				{
+					future.setException(e);
+				}	
 			}
 		}
 		catch(Exception e)
@@ -69,7 +76,14 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 //			e.printStackTrace();
 			// Could happen that overridden customResultAvailable method
 			// first sets result and then throws exception (listener ex are catched).
-			future.setExceptionIfUndone(e);
+			if(undone)
+			{
+				future.setExceptionIfUndone(e);
+			}
+			else
+			{
+				future.setException(e);
+			}
 		}
 	}
 	
@@ -142,4 +156,12 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 		exceptionOccurred(exception);
 	}
 
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
+	}
 }

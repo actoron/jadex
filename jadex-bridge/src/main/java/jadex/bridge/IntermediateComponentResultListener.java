@@ -3,13 +3,15 @@ package jadex.bridge;
 import jadex.base.Starter;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IUndoneIntermediateResultListener;
 
 import java.util.Collection;
 
 /**
  *  Intermediate listener that invokes listeners on component thread.
  */
-public class IntermediateComponentResultListener<E> extends ComponentResultListener<Collection<E>> implements IIntermediateResultListener<E>
+public class IntermediateComponentResultListener<E> extends ComponentResultListener<Collection<E>> 
+	implements IIntermediateResultListener<E>, IUndoneIntermediateResultListener<E>
 {
 	//-------- constructors --------
 	
@@ -39,7 +41,14 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 				{
 					public void run()
 					{
-						((IIntermediateResultListener<E>)listener).intermediateResultAvailable(result);
+						if(undone && listener instanceof IUndoneIntermediateResultListener)
+						{
+							((IUndoneIntermediateResultListener<E>)listener).intermediateResultAvailableIfUndone(result);
+						}
+						else
+						{
+							((IIntermediateResultListener<E>)listener).intermediateResultAvailable(result);
+						}
 					}
 					
 					public String toString()
@@ -57,7 +66,14 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 		}
 		else
 		{
-			((IIntermediateResultListener<E>)listener).intermediateResultAvailable(result);
+			if(undone && listener instanceof IUndoneIntermediateResultListener)
+			{
+				((IUndoneIntermediateResultListener<E>)listener).intermediateResultAvailableIfUndone(result);
+			}
+			else
+			{
+				((IIntermediateResultListener<E>)listener).intermediateResultAvailable(result);
+			}
 		}
 	}
 	
@@ -74,7 +90,14 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 				{
 					public void run()
 					{
-						((IIntermediateResultListener<E>)listener).finished();
+						if(undone && listener instanceof IUndoneIntermediateResultListener)
+						{
+							((IUndoneIntermediateResultListener<E>)listener).finishedIfUndone();
+						}
+						else
+						{
+							((IIntermediateResultListener<E>)listener).finished();
+						}
 					}
 					
 					public String toString()
@@ -98,5 +121,28 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 		{
 			((IIntermediateResultListener<E>)listener).finished();
 		}
+    }
+    
+    /**
+	 *  Called when an intermediate result is available.
+	 *  @param result The result.
+	 */
+	public void intermediateResultAvailableIfUndone(E result)
+	{
+		this.undone = true;
+		intermediateResultAvailable(result);
+	}
+	
+	/**
+     *  Declare that the future is finished.
+	 *  This method is only called for intermediate futures,
+	 *  i.e. when this method is called it is guaranteed that the
+	 *  intermediateResultAvailable method was called for all
+	 *  intermediate results before.
+     */
+    public void finishedIfUndone()
+    {
+    	this.undone = true;
+    	finished();
     }
 }

@@ -6,9 +6,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.DuplicateResultException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IUndoneResultListener;
 
 /**
  *  The decoupling return interceptor ensures that the result
@@ -109,7 +111,14 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //									System.out.println("setting to: "+sic.getLastServiceCall());
 								CallAccess.setCurrentInvocation(sic.getLastServiceCall());
 								CallAccess.setLastInvocation(sic.getServiceCall());
-								listener.resultAvailable(null);
+								if(isUndone() && listener instanceof IUndoneResultListener)
+								{
+									((IUndoneResultListener)listener).resultAvailableIfUndone(null);
+								}
+								else
+								{
+									listener.resultAvailable(null);
+								}
 							}
 							else
 							{
@@ -117,6 +126,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 								{
 //									if(sic.getMethod().getName().indexOf("method3")!=-1)
 //										System.out.println("setting to d: "+sic.getLastServiceCall()+", "+res);
+									final Exception ex = new Exception();
 									ada.invokeLater(new Runnable()
 									{
 										public void run()
@@ -130,7 +140,17 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 //												System.out.println("setting to d: "+sic.getLastServiceCall());
 											CallAccess.setCurrentInvocation(sic.getLastServiceCall());
 											CallAccess.setLastInvocation(sic.getServiceCall());
-											listener.resultAvailable(null);
+											if(isUndone() && listener instanceof IUndoneResultListener)
+											{
+												((IUndoneResultListener)listener).resultAvailableIfUndone(null);
+											}
+											else
+											{
+												boolean a = true;
+												if(!a)
+													ex.printStackTrace();
+												listener.resultAvailable(null);
+											}
 										}
 									});
 								}
@@ -144,7 +164,14 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 										{
 											public void run() 
 											{
-												listener.resultAvailable(null);
+												if(isUndone() && listener instanceof IUndoneResultListener)
+												{
+													((IUndoneResultListener)listener).resultAvailableIfUndone(null);
+												}
+												else
+												{
+													listener.resultAvailable(null);
+												}
 											}
 										};
 										

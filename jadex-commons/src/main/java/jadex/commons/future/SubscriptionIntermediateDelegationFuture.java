@@ -29,7 +29,6 @@ public class SubscriptionIntermediateDelegationFuture<E> extends TerminableInter
 	 */
 	public SubscriptionIntermediateDelegationFuture()
 	{
-		super();
 		storeforfirst = true;
 	}
 	

@@ -8,11 +8,12 @@ import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IUndoneResultListener;
 
 /**
  *  The result listener for executing listener invocations as a component step.
  */
-public class ComponentResultListener<E> implements IResultListener<E>, IFutureCommandListener
+public class ComponentResultListener<E> implements IResultListener<E>, IFutureCommandListener, IUndoneResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -24,6 +25,9 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	
 	/** The external acess. */
 	protected IExternalAccess access;
+	
+	/** The undone flag. */
+	protected boolean undone;
 	
 	//-------- constructors --------
 	
@@ -70,7 +74,14 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 				{
 					try
 					{
-						listener.resultAvailable(result);
+						if(undone && listener instanceof IUndoneResultListener)
+						{
+							((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+						}
+						else
+						{
+							listener.resultAvailable(result);
+						}
 					}
 					catch(Exception e)
 					{
@@ -90,7 +101,14 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					{
 						public void run()
 						{
-							listener.exceptionOccurred(exception);
+							if(undone && listener instanceof IUndoneResultListener)
+							{
+								((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+							}
+							else
+							{
+								listener.exceptionOccurred(exception);
+							}
 						}
 					});
 				}
@@ -106,7 +124,14 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					{
 						public void run()
 						{
-							listener.resultAvailable(result);
+							if(undone && listener instanceof IUndoneResultListener)
+							{
+								((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+							}
+							else
+							{
+								listener.resultAvailable(result);
+							}
 						}
 						
 						public String toString()
@@ -121,14 +146,28 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 					{
 						public void run()
 						{
-							listener.exceptionOccurred(e);
+							if(undone && listener instanceof IUndoneResultListener)
+							{
+								((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(e);
+							}
+							else
+							{
+								listener.exceptionOccurred(e);
+							}
 						}
 					});
 				}
 			}
 			else
 			{
-				listener.resultAvailable(result);
+				if(undone && listener instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+				}
+				else
+				{
+					listener.resultAvailable(result);
+				}
 			}	
 		}
 	}
@@ -148,7 +187,14 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 				{
 					try
 					{
-						listener.exceptionOccurred(exception);
+						if(undone && listener instanceof IUndoneResultListener)
+						{
+							((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+						}
+						else
+						{
+							listener.exceptionOccurred(exception);
+						}
 					}
 					catch(Exception e)
 					{
@@ -163,7 +209,14 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					listener.exceptionOccurred(exception);
+					if(undone && listener instanceof IUndoneResultListener)
+					{
+						((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+					}
+					else
+					{
+						listener.exceptionOccurred(exception);
+					}
 				}
 			});
 		}
@@ -179,7 +232,14 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 						{
 //							try
 //							{
-								listener.exceptionOccurred(exception);
+								if(undone && listener instanceof IUndoneResultListener)
+								{
+									((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+								}
+								else
+								{
+									listener.exceptionOccurred(exception);
+								}
 //							}
 //							catch(Exception e) 
 //							{
@@ -196,14 +256,48 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 				}
 				catch(Exception e)
 				{
-					listener.exceptionOccurred(e);
+					if(undone && listener instanceof IUndoneResultListener)
+					{
+						((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+					}
+					else
+					{
+						listener.exceptionOccurred(exception);
+					}
 				}
 			}
 			else
 			{
-				listener.exceptionOccurred(exception);
+				if(undone && listener instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+				}
+				else
+				{
+					listener.exceptionOccurred(exception);
+				}
 			}
 		}
+	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(E result)
+	{
+		this.undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		this.undone = true;
+		exceptionOccurred(exception);
 	}
 	
 	/**

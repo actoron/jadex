@@ -1,5 +1,6 @@
 package jadex.bdiv3.runtime.impl;
 
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import jadex.base.Starter;
@@ -10,11 +11,12 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IUndoneResultListener;
 
 /**
  * 
  */
-public class BDIComponentResultListener<E> implements IResultListener<E>
+public class BDIComponentResultListener<E> implements IResultListener<E>, IUndoneResultListener<E>
 {
 	/** The result listener. */
 	protected IResultListener<E> listener;
@@ -24,6 +26,9 @@ public class BDIComponentResultListener<E> implements IResultListener<E>
 	
 	/** The plan. */
 	protected RPlan rplan;
+	
+	/** The undone flag. */
+	protected boolean undone;
 	
 	//-------- constructors --------
 	
@@ -74,7 +79,14 @@ public class BDIComponentResultListener<E> implements IResultListener<E>
 				{
 					public void run()
 					{
-						listener.exceptionOccurred(e);
+						if(undone && listener instanceof IUndoneResultListener)
+						{
+							((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(e);
+						}
+						else
+						{
+							listener.exceptionOccurred(e);
+						}
 					}
 				});
 			}
@@ -110,7 +122,14 @@ public class BDIComponentResultListener<E> implements IResultListener<E>
 			}
 			catch(Exception e)
 			{
-				listener.exceptionOccurred(e);
+				if(undone && listener instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(e);
+				}
+				else
+				{
+					listener.exceptionOccurred(e);
+				}
 			}
 		}
 		else
@@ -157,11 +176,25 @@ public class BDIComponentResultListener<E> implements IResultListener<E>
 				ex = new PlanAbortedException();
 			if(ex!=null)
 			{
-				listener.exceptionOccurred(ex);
+				if(undone && listener instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(ex);
+				}
+				else
+				{
+					listener.exceptionOccurred(ex);
+				}
 			}
 			else
 			{
-				listener.resultAvailable(result);
+				if(undone && listener instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+				}
+				else
+				{
+					listener.resultAvailable(result);
+				}
 			}
 			rplan.setProcessingState(PlanProcessingState.WAITING);
 //			System.out.println("setting to null "+this+" "+Thread.currentThread());
@@ -171,12 +204,56 @@ public class BDIComponentResultListener<E> implements IResultListener<E>
 		{
 			if(ex!=null)
 			{
-				listener.exceptionOccurred(ex);
+				if(undone && listener instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(ex);
+				}
+				else
+				{
+					listener.exceptionOccurred(ex);
+				}
 			}
 			else
 			{
-				listener.resultAvailable(result);
+				if(undone && listener instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+				}
+				else
+				{
+					listener.resultAvailable(result);
+				}
 			}
 		}
 	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(E result)
+	{
+		undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		undone = true;
+		exceptionOccurred(exception);
+	}
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
+	}
+	
 }

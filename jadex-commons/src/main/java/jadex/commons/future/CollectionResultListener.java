@@ -8,7 +8,7 @@ import java.util.Collection;
 /**
  *  Collection result listener collects a number of results and return a collection.
  */
-public class CollectionResultListener<E>	implements IResultListener<E>
+public class CollectionResultListener<E> implements IResultListener<E>, IUndoneResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -22,11 +22,13 @@ public class CollectionResultListener<E>	implements IResultListener<E>
 	protected IResultListener<Collection<E>>delegate;
 	
 	/** Flag to indicate that the delegate already has been notified. */
-	protected boolean	notified;
+	protected boolean notified;
 
 	/** Flag to indicate that failures should be ignored and only valid results returned. */
-	protected boolean	ignorefailures;
+	protected boolean ignorefailures;
 
+	/** The undone flag. */
+	protected boolean undone;
 	
 	//-------- constructors --------
 	
@@ -49,7 +51,7 @@ public class CollectionResultListener<E>	implements IResultListener<E>
 		{
 			this.notified	= true;
 //			System.out.println("collecting finished: "+this+", "+this.sresults.size());
-			delegate.resultAvailable(results);
+			delegate.resultAvailable(results); // todo: undone???
 		}
 	}
 	
@@ -76,7 +78,14 @@ public class CollectionResultListener<E>	implements IResultListener<E>
 		if(notify)
 		{
 //			System.out.println("collecting finished: "+this+", "+this.sresults.size());
-			delegate.resultAvailable(results);
+			if(undone && delegate instanceof IUndoneIntermediateResultListener)
+			{
+				((IUndoneIntermediateResultListener<E>)delegate).resultAvailableIfUndone(results);
+			}
+			else
+			{
+				delegate.resultAvailable(results);
+			}
 		}
 	}
 	
@@ -108,12 +117,55 @@ public class CollectionResultListener<E>	implements IResultListener<E>
 //			
 			if(ignorefailures)
 			{
-				delegate.resultAvailable(results);
+				if(undone && delegate instanceof IUndoneIntermediateResultListener)
+				{
+					((IUndoneIntermediateResultListener<E>)delegate).resultAvailableIfUndone(results);
+				}
+				else
+				{
+					delegate.resultAvailable(results);
+				}
 			}
 			else
 			{
-				delegate.exceptionOccurred(exception);
+				if(undone && delegate instanceof IUndoneIntermediateResultListener)
+				{
+					((IUndoneIntermediateResultListener<E>)delegate).exceptionOccurredIfUndone(exception);
+				}
+				else
+				{
+					delegate.exceptionOccurred(exception);
+				}
 			}
 		}
+	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(E result)
+	{
+		undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		undone = true;
+		exceptionOccurred(exception);
+	}
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
 	}
 }

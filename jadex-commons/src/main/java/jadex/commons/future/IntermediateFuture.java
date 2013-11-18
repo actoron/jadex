@@ -34,6 +34,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     
 	/** The index of the next result for a thread. */
     protected Map<Thread, Integer>	indices;
+    
+    /** The undone flag. */
+    protected boolean undone;
            
 	//-------- constructors--------
 	
@@ -154,6 +157,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
         	}
         	else
         	{
+        		undone = true;
         		addResult(result);
     			
     			if(listeners!=null)
@@ -220,6 +224,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	boolean ex = false;
     	synchronized(this)
 		{
+    		undone = true;
     		ex = intermediate;
 //    		if(results!=null)
 //    			ex = true;
@@ -277,6 +282,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
         	}
         	else
         	{
+        		undone = true;
         		res	= getIntermediateResults();
     			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
         		// because getIntermediateResults() returns empty list when results==null.
@@ -528,7 +534,14 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     protected void notifyIntermediateResult(IIntermediateResultListener<E> listener, E result)
     {
-    	listener.intermediateResultAvailable(result);
+    	if(undone && listener instanceof IUndoneIntermediateResultListener)
+    	{
+    		((IUndoneIntermediateResultListener<E>)listener).intermediateResultAvailableIfUndone(result);
+    	}
+    	else
+    	{
+    		listener.intermediateResultAvailable(result);
+    	}
     }
 
     /**
@@ -551,7 +564,14 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 //    	{
 			if(exception!=null)
 			{
-				listener.exceptionOccurred(exception);
+				if(undone && listener instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+				}
+				else
+				{
+					listener.exceptionOccurred(exception);
+				}
 			}
 			else
 			{
@@ -573,11 +593,25 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 			    			notifyIntermediateResult(lis, (E)inter[i]);
 			    		}
 			    	}
-					lis.finished();
+					if(undone && listener instanceof IUndoneIntermediateResultListener)
+					{
+						((IUndoneIntermediateResultListener<E>)listener).finishedIfUndone();
+					}
+					else
+					{
+						lis.finished();
+					}
 				}
 				else
 				{
-					listener.resultAvailable(results); 
+					if(undone && listener instanceof IUndoneResultListener)
+					{
+						((IUndoneResultListener)listener).resultAvailableIfUndone(results);
+					}
+					else
+					{
+						listener.resultAvailable(results); 
+					}
 				}
 			}
 //    	}

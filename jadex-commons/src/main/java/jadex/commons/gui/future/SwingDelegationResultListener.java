@@ -18,6 +18,9 @@ public class SwingDelegationResultListener<E> implements IResultListener<E>
 	/** The future to which calls are delegated. */
 	protected Future<E> future;
 	
+	/** Flag if undone methods should be used. */
+	protected boolean undone;
+	
 	//-------- constructors --------
 	
 	/**
@@ -50,6 +53,14 @@ public class SwingDelegationResultListener<E> implements IResultListener<E>
 				// Could happen that overridden customResultAvailable method
 				// first sets result and then throws exception (listener ex are catched).
 				future.setExceptionIfUndone(e);
+//				if(undone)
+//				{
+//					future.setExceptionIfUndone(e);
+//				}
+//				else
+//				{
+//					future.setException(e);
+//				}
 			}
 		}
 		else
@@ -67,6 +78,14 @@ public class SwingDelegationResultListener<E> implements IResultListener<E>
 						// Could happen that overridden customResultAvailable method
 						// first sets result and then throws exception (listener ex are catched).
 						future.setExceptionIfUndone(e);
+//						if(undone)
+//						{
+//							future.setExceptionIfUndone(e);
+//						}
+//						else
+//						{
+//							future.setException(e);
+//						}
 					}
 				}
 			});
@@ -105,7 +124,14 @@ public class SwingDelegationResultListener<E> implements IResultListener<E>
 	 */
 	public void customResultAvailable(E result)
 	{
-		future.setResult(result);
+		if(undone)
+		{
+			future.setResultIfUndone(result);
+		}
+		else
+		{
+			future.setResult(result);
+		}
 	}
 	
 	/**
@@ -115,6 +141,42 @@ public class SwingDelegationResultListener<E> implements IResultListener<E>
 	public void customExceptionOccurred(Exception exception)
 	{
 //		System.err.println("Problem: "+exception);
-		future.setException(exception);
+		if(undone)
+		{
+			future.setExceptionIfUndone(exception);
+		}
+		else
+		{
+			future.setException(exception);
+		}
+	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(E result)
+	{
+		undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		undone = true;
+		exceptionOccurred(exception);
+	}
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
 	}
 }

@@ -4,6 +4,7 @@
 package jadex.commons.gui.future;
 
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IUndoneIntermediateResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.util.Collection;
@@ -13,12 +14,15 @@ import javax.swing.SwingUtilities;
 /**
  *
  */
-public class SwingIntermediateResultListener<E> implements IIntermediateResultListener<E>
+public class SwingIntermediateResultListener<E> implements IIntermediateResultListener<E>, IUndoneIntermediateResultListener<E>
 {
 	//-------- attributes --------
 
 	/** The delegation listener. */
 	protected IIntermediateResultListener<E> listener;
+	
+	/** The undone flag. */
+	protected boolean undone;
 	
 	//-------- constructors --------
 
@@ -145,7 +149,14 @@ public class SwingIntermediateResultListener<E> implements IIntermediateResultLi
      */
     public void customFinished()
     {
-    	listener.finished();
+    	if(undone && listener instanceof IUndoneIntermediateResultListener)
+    	{
+    		((IUndoneIntermediateResultListener<E>)listener).finishedIfUndone();
+    	}
+    	else
+    	{
+    		listener.finished();
+    	}
     }
 	
 	/**
@@ -154,7 +165,14 @@ public class SwingIntermediateResultListener<E> implements IIntermediateResultLi
 	 */
 	public void customResultAvailable(Collection<E> result)
 	{
-		listener.resultAvailable(result);
+		if(undone && listener instanceof IUndoneIntermediateResultListener)
+    	{
+    		((IUndoneIntermediateResultListener<E>)listener).resultAvailableIfUndone(result);
+    	}
+    	else
+    	{
+    		listener.resultAvailable(result);
+    	}
 	}
 
 	/**
@@ -163,7 +181,14 @@ public class SwingIntermediateResultListener<E> implements IIntermediateResultLi
 	 */
 	public void customExceptionOccurred(Exception exception)
 	{
-		listener.exceptionOccurred(exception);
+		if(undone && listener instanceof IUndoneIntermediateResultListener)
+    	{
+    		((IUndoneIntermediateResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+    	}
+    	else
+    	{
+    		listener.exceptionOccurred(exception);
+    	}
 	}
 	
 	/**
@@ -172,6 +197,65 @@ public class SwingIntermediateResultListener<E> implements IIntermediateResultLi
 	 */
 	public void customIntermediateResultAvailable(E result)
 	{
-		listener.intermediateResultAvailable(result);
+		if(undone && listener instanceof IUndoneIntermediateResultListener)
+    	{
+    		((IUndoneIntermediateResultListener<E>)listener).intermediateResultAvailableIfUndone(result);
+    	}
+    	else
+    	{
+    		listener.intermediateResultAvailable(result);
+    	}
+	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(Collection<E> result)
+	{
+		this.undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		this.undone = true;
+		exceptionOccurred(exception);
+	}
+	
+	/**
+	 *  Called when an intermediate result is available.
+	 *  @param result The result.
+	 */
+	public void intermediateResultAvailableIfUndone(E result)
+	{
+		this.undone = true;
+		intermediateResultAvailable(result);
+	}
+	
+	/**
+     *  Declare that the future is finished.
+	 *  This method is only called for intermediate futures,
+	 *  i.e. when this method is called it is guaranteed that the
+	 *  intermediateResultAvailable method was called for all
+	 *  intermediate results before.
+     */
+    public void finishedIfUndone()
+    {
+    	this.undone = true;
+    	finished();
+    }
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
 	}
 }

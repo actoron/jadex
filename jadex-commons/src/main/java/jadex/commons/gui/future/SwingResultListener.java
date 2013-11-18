@@ -1,6 +1,7 @@
 package jadex.commons.gui.future;
 
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IUndoneResultListener;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.SwingUtilities;
@@ -16,6 +17,9 @@ public class SwingResultListener<E> implements IResultListener<E>
 	
 	/** The delegation listener. */
 	protected IResultListener<E> listener;
+	
+	/** Flag if undone methods should be used. */
+	protected boolean undone;
 	
 	//-------- constructors --------
 
@@ -87,7 +91,14 @@ public class SwingResultListener<E> implements IResultListener<E>
 	 */
 	public void	customResultAvailable(E result)
 	{
-		listener.resultAvailable(result);
+		if(undone && listener instanceof IUndoneResultListener)
+		{
+			((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+		}
+		else
+		{
+			listener.resultAvailable(result);
+		}
 	}
 	
 	/**
@@ -96,6 +107,42 @@ public class SwingResultListener<E> implements IResultListener<E>
 	 */
 	public void	customExceptionOccurred(Exception exception)
 	{
-		listener.exceptionOccurred(exception);
+		if(undone && listener instanceof IUndoneResultListener)
+		{
+			((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+		}
+		else
+		{
+			listener.exceptionOccurred(exception);
+		}
+	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(E result)
+	{
+		undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		undone = true;
+		exceptionOccurred(exception);
+	}
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
 	}
 }

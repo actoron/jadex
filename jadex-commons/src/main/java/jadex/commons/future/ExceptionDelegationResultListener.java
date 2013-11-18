@@ -15,6 +15,9 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	/** The future to which calls are delegated. */
 	protected Future<T> future;
 	
+	/** Flag if undone methods should be used. */
+	protected boolean undone;
+	
 //	protected DebugException	ex;
 	
 	//-------- constructors --------
@@ -49,7 +52,14 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 			}
 			else
 			{
-				future.setExceptionIfUndone(e);				
+//				if(undone)
+//				{
+					future.setExceptionIfUndone(e);
+//				}
+//				else
+//				{
+//					future.setException(e);
+//				}	
 			}
 		}
 		catch(Exception e)
@@ -57,7 +67,14 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 //			e.printStackTrace();
 			// Could happen that overridden customResultAvailable method
 			// first sets result and then throws exception (listener ex are catched).
-			future.setExceptionIfUndone(e);
+//			if(undone)
+//			{
+				future.setExceptionIfUndone(e);
+//			}
+//			else
+//			{
+//				future.setException(e);
+//			}
 		}
 	}
 	
@@ -78,6 +95,35 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	{
 //		System.err.println("Problem: "+exception);
 		future.setException(exception);
+	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(E result)
+	{
+		undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		undone = true;
+		exceptionOccurred(exception);
+	}
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
 	}
 	
 	/**

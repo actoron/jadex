@@ -3,12 +3,16 @@ package jadex.bridge;
 import java.util.Collection;
 
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IUndoneIntermediateResultListener;
 
 /**
  * 
  */
-public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<Collection<E>> implements IIntermediateResultListener<E>
+public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<Collection<E>> implements IIntermediateResultListener<E>, IUndoneIntermediateResultListener<E>
 {
+	/** The undone flag. */
+	protected boolean undone;
+	
 	/**
 	 *  Create a new listener.
 	 */
@@ -52,7 +56,16 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 			}
 		}
 		if(notify)
-			getIntermediateResultListener().intermediateResultAvailable(result);
+		{
+			if(undone && listener instanceof IUndoneIntermediateResultListener)
+			{
+				((IUndoneIntermediateResultListener<E>)listener).intermediateResultAvailableIfUndone(result);
+			}
+			else
+			{
+				getIntermediateResultListener().intermediateResultAvailable(result);
+			}
+		}
 	}
 	
 	/**
@@ -75,6 +88,67 @@ public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<
 			}
 		}
 		if(notify)
-			getIntermediateResultListener().finished();
+		{
+			if(undone && listener instanceof IUndoneIntermediateResultListener)
+			{
+				((IUndoneIntermediateResultListener<E>)listener).finishedIfUndone();
+			}
+			else
+			{
+				getIntermediateResultListener().finished();
+			}
+		}
+	}
+    
+    /**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(Collection<E> result)
+	{
+		this.undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		this.undone = true;
+		exceptionOccurred(exception);
+	}
+	
+	/**
+	 *  Called when an intermediate result is available.
+	 *  @param result The result.
+	 */
+	public void intermediateResultAvailableIfUndone(E result)
+	{
+		this.undone = true;
+		intermediateResultAvailable(result);
+	}
+	
+	/**
+     *  Declare that the future is finished.
+	 *  This method is only called for intermediate futures,
+	 *  i.e. when this method is called it is guaranteed that the
+	 *  intermediateResultAvailable method was called for all
+	 *  intermediate results before.
+     */
+    public void finishedIfUndone()
+    {
+    	this.undone = true;
+    	finished();
     }
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
+	}
 }

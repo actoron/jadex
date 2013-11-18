@@ -4,7 +4,7 @@ package jadex.commons.future;
 /**
  *  Counter result listener for counting a specified number of resultAvailable calls.
  */
-public class CounterResultListener<E> implements IResultListener<E>
+public class CounterResultListener<E> implements IResultListener<E>, IUndoneResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -22,6 +22,9 @@ public class CounterResultListener<E> implements IResultListener<E>
 	
 	/** The ignore failure flag. */
 	protected boolean ignorefailures;
+	
+	/** The undone flag. */
+	protected boolean undone;
 	
 	//-------- constructors --------
 	
@@ -47,7 +50,7 @@ public class CounterResultListener<E> implements IResultListener<E>
 		if(num==0)
 		{
 			this.notified = true;
-			delegate.resultAvailable(null);
+			delegate.resultAvailable(null); // todo: undone??
 		}
 	}
 	
@@ -75,7 +78,14 @@ public class CounterResultListener<E> implements IResultListener<E>
 		{
 //			System.out.println("!!!");
 			intermediateResultAvailable(result);
-			delegate.resultAvailable(null);
+			if(undone && delegate instanceof IUndoneResultListener)
+			{
+				((IUndoneResultListener<E>)delegate).resultAvailableIfUndone(result);
+			}
+			else
+			{
+				delegate.resultAvailable(null);
+			}
 		}
 		else if(!notified)
 		{
@@ -121,11 +131,25 @@ public class CounterResultListener<E> implements IResultListener<E>
 //				System.out.println("!!!");
 				// todo: what about aggregated result?
 //				listener.resultAvailable(source, result);
-				delegate.resultAvailable(null);
+				if(undone && delegate instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)delegate).resultAvailableIfUndone(null);
+				}
+				else
+				{
+					delegate.resultAvailable(null);
+				}
 			}
 			else
 			{
-				delegate.exceptionOccurred(exception);
+				if(undone && delegate instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener<E>)delegate).exceptionOccurredIfUndone(exception);
+				}
+				else
+				{
+					delegate.exceptionOccurred(exception);
+				}
 			}
 		}
 	}
@@ -164,5 +188,34 @@ public class CounterResultListener<E> implements IResultListener<E>
 	public int getCnt()
 	{
 		return cnt;
+	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(E result)
+	{
+		undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		undone = true;
+		exceptionOccurred(exception);
+	}
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
 	}
 }

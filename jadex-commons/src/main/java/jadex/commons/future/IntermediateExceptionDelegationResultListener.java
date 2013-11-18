@@ -8,12 +8,16 @@ import java.util.logging.Logger;
 /**
  * 
  */
-public abstract class IntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>, IFutureCommandListener
+public abstract class IntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>, 
+	IFutureCommandListener, IUndoneIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	
 	/** The future to which calls are delegated. */
 	protected Future<T> future;
+	
+	/** The undone flag. */
+	protected boolean undone;
 	
 //	protected DebugException	ex;
 	
@@ -52,7 +56,14 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 			}
 			else
 			{
-				future.setExceptionIfUndone(e);				
+				if(undone)
+				{
+					future.setExceptionIfUndone(e);
+				}
+				else
+				{
+					future.setExceptionIfUndone(e);				
+				}
 			}
 		}
 		catch(Exception e)
@@ -60,7 +71,14 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 	//		e.printStackTrace();
 			// Could happen that overridden customResultAvailable method
 			// first sets result and then throws exception (listener ex are catched).
-			future.setExceptionIfUndone(e);
+			if(undone)
+			{
+				future.setExceptionIfUndone(e);
+			}
+			else
+			{
+				future.setExceptionIfUndone(e);				
+			}
 		}
 	}
 	
@@ -105,8 +123,58 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 	public void exceptionOccurred(Exception exception)
 	{
 //		System.err.println("Problem: "+exception);
-		future.setException(exception);
+		if(undone)
+		{
+			future.setExceptionIfUndone(exception);
+		}
+		else
+		{
+			future.setException(exception);
+		}
 	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(Collection<E> result)
+	{
+		this.undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		this.undone = true;
+		exceptionOccurred(exception);
+	}
+	
+	/**
+	 *  Called when an intermediate result is available.
+	 *  @param result The result.
+	 */
+	public void intermediateResultAvailableIfUndone(E result)
+	{
+		this.undone = true;
+		intermediateResultAvailable(result);
+	}
+	
+	/**
+     *  Declare that the future is finished.
+	 *  This method is only called for intermediate futures,
+	 *  i.e. when this method is called it is guaranteed that the
+	 *  intermediateResultAvailable method was called for all
+	 *  intermediate results before.
+     */
+    public void finishedIfUndone()
+    {
+    	this.undone = true;
+    	finished();
+    }
 	
 	/**
 	 *  Called when a command is available.
@@ -122,5 +190,14 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 //			System.out.println("Cannot forward command: "+future+" "+command);
 			Logger.getLogger("intermediate-exception-delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
 		}
+	}
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
 	}
 }

@@ -36,6 +36,7 @@ public class FutureFunctionality
 	/** The logger used for notification failure warnings (if any). */
 	protected Logger	logger;
 	protected IResultCommand<Logger, Void> loggerfetcher;
+	protected boolean undone;
 	
 	/**
 	 * 
@@ -74,6 +75,15 @@ public class FutureFunctionality
 	}
 	
 	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
+	}
+
+	/**
 	 * 
 	 */
 	public Object addIntermediateResult(Object result)
@@ -86,6 +96,7 @@ public class FutureFunctionality
 	 */
 	public Object addIntermediateResultIfUndone(Object result)
 	{
+		undone = true;
 		return result;
 	}
 	
@@ -109,6 +120,7 @@ public class FutureFunctionality
 	 */
 	public void setFinishedIfUndone(Collection<Object> results)
 	{
+		undone = true;
 	}
 	
 	/**
@@ -124,6 +136,7 @@ public class FutureFunctionality
 	 */
 	public Object setResultIfUndone(Object result)
 	{
+		undone = true;
 		return result;
 	}
 	
@@ -140,6 +153,7 @@ public class FutureFunctionality
 	 */
 	public Exception setExceptionIfUndone(Exception exception)
 	{
+		undone = true;
 		return exception;
 	}
 	

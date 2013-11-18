@@ -1,6 +1,7 @@
 package jadex.commons.gui.future;
 
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IUndoneIntermediateResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.SGUI;
 
@@ -11,12 +12,15 @@ import javax.swing.SwingUtilities;
 /**
  *  Exception delegation listener for intermediate results called back on swing thread.
  */
-public class SwingIntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>
+public class SwingIntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>, IUndoneIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	
 	/** The future to which calls are delegated. */
 	protected IntermediateFuture<E> future;
+	
+	/** The undone flag. */
+	protected boolean undone;
 	
 	//-------- constructors --------
 	
@@ -140,7 +144,14 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
      */
     public void customFinished()
     {
-    	future.setFinished();
+    	if(undone)
+		{
+    		future.setFinishedIfUndone();
+		}
+    	else
+    	{
+    		future.setFinished();
+    	}
     }
 	
 	/**
@@ -149,7 +160,14 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 	 */
 	public void customResultAvailable(Collection<E> result)
 	{
-		future.setResult(result);
+		if(undone)
+		{
+			future.setResultIfUndone(result);
+		}
+		else
+		{
+			future.setResult(result);
+		}
 	}
 
 	/**
@@ -158,15 +176,82 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 	 */
 	public void customExceptionOccurred(Exception exception)
 	{
-		future.setException(exception);
+		if(undone)
+		{
+			future.setExceptionIfUndone(exception);
+		}
+		else
+		{
+			future.setException(exception);
+		}
 	}
 	
 	/**
 	 *  Called when an intermediate result is available.
-	 * @param result The result.
+	 *  @param result The result.
 	 */
 	public void customIntermediateResultAvailable(E result)
 	{
-		future.addIntermediateResult(result);
+		if(undone)
+		{
+			future.addIntermediateResultIfUndone(result);
+		}
+		else
+		{
+			future.addIntermediateResult(result);
+		}
 	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param result The result.
+	 */
+	public void resultAvailableIfUndone(Collection<E> result)
+	{
+		this.undone = true;
+		resultAvailable(result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurredIfUndone(Exception exception)
+	{
+		this.undone = true;
+		exceptionOccurred(exception);
+	}
+	
+	/**
+	 *  Called when an intermediate result is available.
+	 *  @param result The result.
+	 */
+	public void intermediateResultAvailableIfUndone(E result)
+	{
+		this.undone = true;
+		intermediateResultAvailable(result);
+	}
+	
+	/**
+     *  Declare that the future is finished.
+	 *  This method is only called for intermediate futures,
+	 *  i.e. when this method is called it is guaranteed that the
+	 *  intermediateResultAvailable method was called for all
+	 *  intermediate results before.
+     */
+    public void finishedIfUndone()
+    {
+    	this.undone = true;
+    	finished();
+    }
+
+	/**
+	 *  Get the undone.
+	 *  @return The undone.
+	 */
+	public boolean isUndone()
+	{
+		return undone;
+	}
+    
 }

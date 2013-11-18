@@ -86,6 +86,9 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	// Only for debugging;
 	protected Exception first;
 	
+	/** The undone flag. */
+	protected boolean undone;
+	
 	//-------- constructors --------
 	
 	/**
@@ -289,6 +292,7 @@ public class Future<E> implements IFuture<E>, ICommandFuture
     		throw new IllegalArgumentException();
     	synchronized(this)
 		{
+    		undone = true;
     		// Return if is done. Should implement same logic as setResultIfUndone().
         	if(isDone())
         	{
@@ -303,7 +307,6 @@ public class Future<E> implements IFuture<E>, ICommandFuture
         	{
         		this.exception = exception;
 //	        	System.out.println(this+" setResult: "+result);
-            	
         		resultavailable = true;
             	if(DEBUG)
             	{
@@ -369,6 +372,7 @@ public class Future<E> implements IFuture<E>, ICommandFuture
     {
     	synchronized(this)
 		{
+    		undone = true;
         	if(isDone())
         	{
         		return false;
@@ -492,24 +496,53 @@ public class Future<E> implements IFuture<E>, ICommandFuture
     		{
 	    		if(exception!=null)
 	    		{
-	    			listener.exceptionOccurred(exception);
+	    			if(undone && listener instanceof IUndoneResultListener)
+					{
+						((IUndoneResultListener)listener).exceptionOccurredIfUndone(exception);
+					}
+					else
+					{
+						listener.exceptionOccurred(exception);
+					}
 	    		}
 	    		else
 	    		{
-	    			listener.resultAvailable(result); 
+	    			if(undone && listener instanceof IUndoneResultListener)
+					{
+						((IUndoneResultListener)listener).resultAvailableIfUndone(result);
+					}
+					else
+					{
+						listener.resultAvailable(result);
+					}
 	    		}
 				while(!list.isEmpty())
 				{
 					Tuple2<Future<?>, IResultListener<?>>	tup	= list.remove(0);
 					Future<?> fut	= tup.getFirstEntity();
+					IResultListener<Object> lis = (IResultListener<Object>)tup.getSecondEntity();
 					if(fut.exception!=null)
 					{
-						tup.getSecondEntity().exceptionOccurred(fut.exception);
+						if(fut.undone && lis instanceof IUndoneResultListener)
+						{
+							((IUndoneResultListener)lis).exceptionOccurredIfUndone(fut.exception);
+						}
+						else
+						{
+							lis.exceptionOccurred(fut.exception);
+						}
 					}
 					else
 					{
 //						int	len	= list.size();
-						((IResultListener)tup.getSecondEntity()).resultAvailable(fut.result);
+						if(fut.undone && lis instanceof IUndoneResultListener)
+						{
+							((IUndoneResultListener)lis).resultAvailableIfUndone(fut.result);
+						}
+						else
+						{
+							lis.resultAvailable(fut.result);
+						}
 //						System.out.println(this+": "+tup+ (list.size()>=len ? " -> "+list.subList(len, list.size()) : ""));
 					}
 				}

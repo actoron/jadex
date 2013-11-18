@@ -12,6 +12,7 @@ import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IUndoneResultListener;
 
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -45,6 +46,9 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 	
 	/** The timeout message. */
 	protected String message;
+	
+	/** Flag if undone methods should be used. */
+	protected boolean undone;
 	
 	//-------- constructors --------
 
@@ -94,7 +98,16 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 			}
 		}
 		if(notify)
-			listener.resultAvailable(result);
+		{
+			if(undone && listener instanceof IUndoneResultListener)
+			{
+				((IUndoneResultListener<E>)listener).resultAvailableIfUndone(result);
+			}
+			else
+			{
+				listener.resultAvailable(result);
+			}
+		}
 	}
 	
 	/**
@@ -115,7 +128,16 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 			}
 		}
 		if(notify)
-			listener.exceptionOccurred(exception);
+		{
+			if(undone && listener instanceof IUndoneResultListener)
+			{
+				((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
+			}
+			else
+			{
+				listener.exceptionOccurred(exception);
+			}
+		}
 	}
 	
 	/**
@@ -185,6 +207,14 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 												{
 													public IFuture<Void> execute(IInternalAccess ia)
 													{
+														if(undone && listener instanceof IUndoneResultListener)
+														{
+															((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(new TimeoutException("Timeout was: "+timeout+" "+message));
+														}
+														else
+														{
+															listener.exceptionOccurred(new TimeoutException("Timeout was: "+timeout+" "+message));
+														}
 														listener.exceptionOccurred(/*ex!=null ? ex :*/ new TimeoutException("Timeout was: "+timeout+" "+message));
 														return IFuture.DONE;
 													}
