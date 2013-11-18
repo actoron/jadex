@@ -1,18 +1,25 @@
 package jadex.micro.examples.eliza;
 
+import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.micro.testcases.KillAgent;
 
 
 /**
@@ -74,5 +81,41 @@ public class EchoChatAgent
 				// ignore... (e.g. FutureTerminationException on exit)
 			}
 		});		
+	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		ThreadSuspendable sus = new ThreadSuspendable();
+		IExternalAccess pl = Starter.createPlatform(new String[]{"-gui", "false", "-autoshutdown", "false"}).get(sus);
+		IComponentManagementService cms = SServiceProvider.getService(pl.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus);
+		
+		for(int i=0; i<10000; i++)
+		{
+			System.out.print(".");
+			if(i%100==0)
+				System.out.println("\n "+i+": ");
+			IComponentIdentifier cid = cms.createComponent(EchoChatAgent.class.getName()+".class", null).getFirstResult(sus);
+			try
+			{
+				cms.destroyComponent(cid).get(sus);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Ex: "+e.getMessage());
+			}
+		}
+		
+//		try
+//		{
+//			Thread.currentThread().sleep(30000);
+//		}
+//		catch(Exception e)
+//		{
+//		}
+		
+		System.out.println("fini");
 	}
 }
