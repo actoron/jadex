@@ -169,7 +169,7 @@ public class UserInteractionTask implements ITask
 											catch(Exception ex)
 											{
 												// Hack!!! Fallback: if no expression entered for string, use value directly.
-												if(param.getClazz().equals(String.class))
+												if(param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()).equals(String.class))
 												{
 													context.setParameterValue(param.getName(), text);
 												}
@@ -236,13 +236,11 @@ public class UserInteractionTask implements ITask
 			                {
 								Exception	e	= new RuntimeException("Task not completed");
 								e.fillInStackTrace();
-//								listener.exceptionOccurred(UserInteractionTask.this, e);		                	
-								ret.setException(e);
+								ret.setExceptionIfUndone(e);
 			                }
 			                else
 			                {
-			                	ret.setResult(null);
-//								listener.resultAvailable(UserInteractionTask.this, null);
+			                	ret.setResultIfUndone(null);
 			                }
 		            	}
 		            }

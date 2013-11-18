@@ -70,48 +70,58 @@ public class MavenWorkspaceReader implements WorkspaceReader
 					if(pfile.exists())
 					{
 						parent = service.loadPom(new FileModelSource(pfile));
+						ret = findModuleInParent(artifact, parent);
 					}
 				}
-				else
-				{
-					// Todo: load parent from repository!?
-				}
+				// Todo: load parent from repository!?
 			}
-			else
+
+			if(ret==null)
 			{
 				// Parent not specified: search in upper directories.
 				File pdir = MavenDependencyResolverService.findBasedir(model.getProjectDirectory().getParentFile());
 				if(pdir!=null)
 				{
 					parent = service.loadPom(new FileModelSource(new File(pdir,	"pom.xml")));
+					ret = findModuleInParent(artifact, parent);
 				}
 			}
 
-			// Find dependency in available modules.
-			if(parent!=null && parent.getModules() != null)
-			{
-				String path = null;
-				for(Iterator<String> it = parent.getModules().iterator(); path==null && it.hasNext();)
-				{
-					String module = it.next();
-					if(module.endsWith(artifact.getArtifactId()))
-					{
-						path = module;
-					}
-				}
+			// Not found: returns null and causes search in local or global
+			// repository.
+		}
+		return ret;
+	}
 
-				if(path!=null)
+	/**
+	 *  Find the artifact as a module in a parent.
+	 */
+	protected File findModuleInParent(Artifact artifact, Model parent)
+	{
+		File ret	= null;
+		
+		// Find dependency in available modules.
+		if(parent!=null && parent.getModules() != null)
+		{
+			String path = null;
+			for(Iterator<String> it = parent.getModules().iterator(); path==null && it.hasNext();)
+			{
+				String module = it.next();
+				if(module.endsWith(artifact.getArtifactId()))
 				{
-					File mpom = new File(new File(parent.getProjectDirectory(), path), "pom.xml");
-					if(mpom.exists())
-					{
-						Model mmodel = service.loadPom(new FileModelSource(mpom));
-						String output = mmodel.getBuild().getOutputDirectory();
-						ret = new File(output);
-					}
+					path = module;
 				}
-				// Not found: returns null and causes search in local or global
-				// repository. else
+			}
+
+			if(path!=null)
+			{
+				File mpom = new File(new File(parent.getProjectDirectory(), path), "pom.xml");
+				if(mpom.exists())
+				{
+					Model mmodel = service.loadPom(new FileModelSource(mpom));
+					String output = mmodel.getBuild().getOutputDirectory();
+					ret = new File(output);
+				}
 			}
 		}
 		return ret;

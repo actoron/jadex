@@ -327,7 +327,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 						}
 						catch(Exception e)
 						{
-	//						logger.warning("Unable to resolve artifact for Dependency: "+model+", "+deps.get(i));
+							logger.warning("Unable to resolve artifact for Dependency: "+model+", "+deps.get(i));
 						}
 						finally
 						{
