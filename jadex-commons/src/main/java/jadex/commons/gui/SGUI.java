@@ -655,7 +655,7 @@ public class SGUI
 		if(!writerIterator.hasNext())
 		{
 			throw new RuntimeException(new IOException("No registered service provider can encode "
-					+ " an image to " + mimeType));
+				+ " an image to " + mimeType));
 		}
 		if(image instanceof RenderedImage)
 		{

@@ -6,8 +6,8 @@ import jadex.bdiv3.examples.disastermanagement.firebrigade.FireBrigadeBDI.Exting
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
@@ -37,6 +37,8 @@ public class ClearChemicalsService implements IClearChemicalsService
 	 */
 	public ITerminableFuture<Void> clearChemicals(final ISpaceObject disaster)
 	{
+		System.out.println("received clear chemicals task: "+ia.getComponentIdentifier());
+
 		final FireBrigadeBDI agent = (FireBrigadeBDI)((IPojoMicroAgent)ia).getPojoAgent();
 		
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
@@ -71,11 +73,16 @@ public class ClearChemicalsService implements IClearChemicalsService
 			{
 				ClearChemicals cc = new ClearChemicals(disaster);
 				IFuture<ClearChemicals> fut = agent.getAgent().dispatchTopLevelGoal(cc);
-				fut.addResultListener(new ExceptionDelegationResultListener<ClearChemicals, Void>(ret)
+				fut.addResultListener(new IResultListener<ClearChemicals>()
 				{
-					public void customResultAvailable(ClearChemicals result)
+					public void resultAvailable(ClearChemicals result)
 					{
-						ret.setResult(null);
+						ret.setResultIfUndone(null);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setExceptionIfUndone(exception);
 					}
 				});
 			}

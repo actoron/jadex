@@ -16,6 +16,7 @@ import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3.examples.disastermanagement.IExtinguishFireService;
 import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI;
+import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.GoHome;
 import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
 import jadex.bdiv3.examples.disastermanagement.movement.MoveToLocationPlan;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
@@ -84,6 +85,9 @@ public class FireBrigadeBDI
 			this.home = home;
 		}
 		
+		/**
+		 *  Create a new Move. 
+		 */
 		@GoalCreationCondition(rawevents={ChangeEvent.GOALADOPTED, ChangeEvent.GOALDROPPED})
 		public static GoHome checkCreate(FireBrigadeBDI ag)
 		{
@@ -100,6 +104,18 @@ public class FireBrigadeBDI
 		}
 		
 		/**
+		 *  Drop if there is another goal.
+		 */
+		@GoalDropCondition(rawevents={ChangeEvent.GOALADOPTED, ChangeEvent.GOALDROPPED})
+		public boolean checkDrop(FireBrigadeBDI ag)
+		{
+			MovementCapa capa = ag.getMoveCapa();
+			boolean ret = capa.getCapability().getAgent().getGoals().size()>1;
+			System.out.println("dropping: "+this);
+			return ret;
+		}
+		
+		/**
 		 *  Get the destination.
 		 *  @return The destination.
 		 */
@@ -107,24 +123,12 @@ public class FireBrigadeBDI
 		{
 			return home;
 		}
-		
-//		/**
-//		 *  Drop if there is another goal.
-//		 */
-//		@GoalDropCondition(rawevents={ChangeEvent.GOALADOPTED, ChangeEvent.GOALDROPPED})
-//		public boolean checkDrop(FireBrigadeBDI ag)
-//		{
-//			MovementCapa capa = ag.getMoveCapa();
-//			boolean ret = capa.getCapability().getAgent().getGoals().size()>1;
-//			System.out.println("dropping: "+this);
-//			return ret;
-//		}
 	}
 	
 	/**
 	 * 
 	 */
-	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true), 
+	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true, inhibits=ExtinguishFire.class), 
 		publish=@Publish(type=IExtinguishFireService.class, method="extinguishFire"))
 	public static class ExtinguishFire
 	{
@@ -162,7 +166,7 @@ public class FireBrigadeBDI
 	/**
 	 * 
 	 */
-	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true), 
+	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true, inhibits=ClearChemicals.class), 
 		publish=@Publish(type=IClearChemicalsService.class, method="clearChemicals"))
 	public static class ClearChemicals
 	{

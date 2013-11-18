@@ -9,6 +9,7 @@ import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminationCommand;
@@ -37,6 +38,8 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 */
 	public ITerminableFuture<Void> extinguishFire(final ISpaceObject disaster)
 	{
+		System.out.println("received ext fire task: "+ia.getComponentIdentifier());
+
 		final FireBrigadeBDI agent = (FireBrigadeBDI)((IPojoMicroAgent)ia).getPojoAgent();
 		
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
@@ -73,11 +76,16 @@ public class ExtinguishFireService implements IExtinguishFireService
 			{
 				ExtinguishFire exfire = new ExtinguishFire(disaster);
 				IFuture<ExtinguishFire> fut = agent.getAgent().dispatchTopLevelGoal(exfire);
-				fut.addResultListener(new ExceptionDelegationResultListener<ExtinguishFire, Void>(ret)
+				fut.addResultListener(new IResultListener<ExtinguishFire>()
 				{
-					public void customResultAvailable(ExtinguishFire result)
+					public void resultAvailable(ExtinguishFire result)
 					{
-						ret.setResult(null);
+						ret.setResultIfUndone(null);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setExceptionIfUndone(exception);
 					}
 				});
 			}

@@ -2,8 +2,10 @@ package jadex.bdiv3.examples.disastermanagement.firebrigade;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.disastermanagement.ClearChemicalsTask;
 import jadex.bdiv3.examples.disastermanagement.DisasterType;
@@ -68,12 +70,14 @@ public class ClearChemicalsPlan
 		fut.get();
 	}
 
-//	/**
-//	 *  Called when a plan fails.
-//	 */
-//	public void failed()
-//	{
-//		System.err.println("Plan failed: "+this);
-//		getException().printStackTrace();
-//	}
+	/**
+	 *  Called when a plan fails.
+	 */
+	@PlanFailed
+	@PlanAborted
+	public void failed(Exception e)
+	{
+		System.err.println("Plan failed: "+this);
+		e.printStackTrace();
+	}
 }
