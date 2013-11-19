@@ -2,6 +2,8 @@ package jadex.commons.gui.future;
 
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFutureCommandResultListener;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Component;
@@ -12,7 +14,7 @@ import javax.swing.SwingUtilities;
 /**
  *  Result listener that redirects callbacks on the swing thread.
  */
-public abstract class SwingDefaultResultListener<E> extends DefaultResultListener<E>
+public abstract class SwingDefaultResultListener<E> extends DefaultResultListener<E>	implements IFutureCommandResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -125,5 +127,38 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 		{
 			super.exceptionOccurred(exception);
 		}
+	}
+
+	/**
+	 *  Called when a command is available.
+	 */
+	final public void commandAvailable(final Type command)
+	{
+		// Hack!!! When triggered from shutdown hook, swing might be terminated
+		// and invokeLater has no effect (grrr).
+		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+//		if(SwingUtilities.isEventDispatchThread())
+		{
+			customCommandAvailable(command);			
+		}
+		else
+		{
+//			Thread.dumpStack();
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					customCommandAvailable(command);
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void	customCommandAvailable(Type command)
+	{
+		Logger.getLogger("swing-result-listener").warning("Cannot forward command: "+this+" "+command);
 	}
 }

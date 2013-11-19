@@ -31,6 +31,9 @@ public class MultiPlatformsTest extends TestCase
 	 */
 	public void	testMultiplePlatforms() throws Exception
 	{
+//		Thread.sleep(3000000);
+
+		
 //		for(int p=0; p<100; p++)
 //		{
 //			long	time	= System.currentTimeMillis();

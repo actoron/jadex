@@ -2,7 +2,9 @@ package jadex.commons.gui.future;
 
 
 import jadex.commons.future.Future;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.ICommandFuture.Type;
+import jadex.commons.future.IFutureCommandResultListener;
+import jadex.commons.future.IUndoneResultListener;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.SwingUtilities;
@@ -11,7 +13,7 @@ import javax.swing.SwingUtilities;
  *  Delegation result listener that calls customResultAvailable and
  *  customExceptionOccurred on swing thread.
  */
-public class SwingDelegationResultListener<E> implements IResultListener<E>
+public class SwingDelegationResultListener<E> implements IUndoneResultListener<E>, IFutureCommandResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -150,7 +152,40 @@ public class SwingDelegationResultListener<E> implements IResultListener<E>
 			future.setException(exception);
 		}
 	}
+
+	/**
+	 *  Called when a command is available.
+	 */
+	final public void commandAvailable(final Type command)
+	{
+		// Hack!!! When triggered from shutdown hook, swing might be terminated
+		// and invokeLater has no effect (grrr).
+		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+//		if(SwingUtilities.isEventDispatchThread())
+		{
+			customCommandAvailable(command);			
+		}
+		else
+		{
+//			Thread.dumpStack();
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					customCommandAvailable(command);
+				}
+			});
+		}
+	}
 	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void	customCommandAvailable(Type command)
+	{
+		future.sendCommand(command);
+	}
+
 	/**
 	 *  Called when the result is available.
 	 *  @param result The result.

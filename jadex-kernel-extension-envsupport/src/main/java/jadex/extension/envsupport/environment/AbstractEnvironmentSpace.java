@@ -23,9 +23,11 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.extension.envsupport.IObjectCreator;
 import jadex.extension.envsupport.MEnvSpaceInstance;
@@ -2909,7 +2911,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				}, false, PublishEventLevel.COARSE);
 				
 //				System.out.println("sub add: "+this);
-				sub.addResultListener(new IIntermediateResultListener<IMonitoringEvent>()
+				sub.addResultListener(new IIntermediateFutureCommandResultListener<IMonitoringEvent>()
 				{
 					public void resultAvailable(Collection<IMonitoringEvent> result)
 					{
@@ -2939,6 +2941,11 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				    public void exceptionOccurred(Exception e)
 				    {
 				    	e.printStackTrace();
+				    }
+				    
+				    public void commandAvailable(Type command)
+				    {
+				    	// ignore timer updates
 				    }
 				});
 			}

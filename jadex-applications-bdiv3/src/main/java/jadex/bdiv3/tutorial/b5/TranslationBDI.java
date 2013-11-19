@@ -63,17 +63,10 @@ public class TranslationBDI
 	@AgentBody
 	public void body()
 	{
-		try
-		{
-			agent.adoptPlan(new TranslatePlan("dog"));
-			agent.waitForDelay(1000).get();
-			context = false;
-			System.out.println("context set to false");
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		agent.adoptPlan(new TranslatePlan("dog"));
+		agent.waitForDelay(1000).get();
+		context = false;
+		System.out.println("context set to false");
 	}
 	
 	/**

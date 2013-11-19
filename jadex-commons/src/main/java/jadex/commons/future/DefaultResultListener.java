@@ -2,6 +2,7 @@ package jadex.commons.future;
 
 
 import jadex.commons.DebugException;
+import jadex.commons.future.ICommandFuture.Type;
 
 import java.util.logging.Logger;
 
@@ -9,7 +10,7 @@ import java.util.logging.Logger;
  *  The default listener for just printing out result information.
  *  Is used as fallback when no other listener is available.
  */
-public abstract class DefaultResultListener<E> implements IResultListener<E>
+public abstract class DefaultResultListener<E> implements IFutureCommandResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -92,5 +93,14 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 			exception.printStackTrace();
 		}
 		logger.severe("Exception occurred: "+this+", "+exception);
+	}
+
+	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void commandAvailable(Type command)
+	{
+		logger.warning("Cannot forward command: "+this+" "+command);
 	}
 }

@@ -1,17 +1,21 @@
 package jadex.commons.gui.future;
 
+import java.util.logging.Logger;
+
+import jadex.commons.future.IFutureCommandListener;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.SwingUtilities;
 
 
 /**
- *  Listener that allows to automatically trigger a timeout when
- *  no result (or exception) was received after some timeout interval.
+ *  Listener that performs notifications on swing thread..
  */
-public class SwingResultListener<E> implements IResultListener<E>
+public class SwingResultListener<E> implements IUndoneResultListener<E>, IFutureCommandResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -107,13 +111,53 @@ public class SwingResultListener<E> implements IResultListener<E>
 	 */
 	public void	customExceptionOccurred(Exception exception)
 	{
-		if(undone && listener instanceof IUndoneResultListener)
+		if(undone && listener instanceof IUndoneResultListener<?>)
 		{
 			((IUndoneResultListener<E>)listener).exceptionOccurredIfUndone(exception);
 		}
 		else
 		{
 			listener.exceptionOccurred(exception);
+		}
+	}
+	
+	/**
+	 *  Called when a command is available.
+	 */
+	final public void commandAvailable(final Type command)
+	{
+		// Hack!!! When triggered from shutdown hook, swing might be terminated
+		// and invokeLater has no effect (grrr).
+		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+//		if(SwingUtilities.isEventDispatchThread())
+		{
+			customCommandAvailable(command);			
+		}
+		else
+		{
+//			Thread.dumpStack();
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					customCommandAvailable(command);
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void	customCommandAvailable(Type command)
+	{
+		if(listener instanceof IFutureCommandListener)
+		{
+			((IFutureCommandListener)listener).commandAvailable(command);
+		}
+		else
+		{
+			Logger.getLogger("swing-result-listener").warning("Cannot forward command: "+listener+" "+command);
 		}
 	}
 	

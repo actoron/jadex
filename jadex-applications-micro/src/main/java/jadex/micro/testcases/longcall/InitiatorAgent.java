@@ -13,11 +13,13 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -131,27 +133,13 @@ public class InitiatorAgent extends TestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-		createPlatform(new String[]{"-gui", "true", "-logging", "true"}).addResultListener(agent.createResultListener(
+		createPlatform(null/*new String[]{"-gui", "true", "-logging", "true"}*/).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				performTests(platform.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)
-				{
-					public void customResultAvailable(final Collection<TestReport> result)
-					{
-//						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
-					}
-				}));
+					.addResultListener(agent.createResultListener(new IntermediateDelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		
@@ -244,7 +232,7 @@ public class InitiatorAgent extends TestAgent
 					call.setRealtime(Boolean.TRUE);
 				}				
 				
-				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
+//				System.out.println("calling method: "+ServiceCall.getOrCreateNextInvocation());
 				
 				callMethod(ts, 1, ret).addResultListener(new IResultListener<Void>()
 				{
@@ -277,16 +265,16 @@ public class InitiatorAgent extends TestAgent
 			final TestReport tr = new TestReport("#"+cnt, "Test if long call works with normal timeout.");
 
 			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
-			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
+//			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
 			ServiceCall.getOrCreateNextInvocation().setTimeout(BasicService.DEFAULT_LOCAL/15);
 			
 			final long start	= System.currentTimeMillis();
-			((IFuture)m.invoke(ts, new Object[0])).addResultListener(new IResultListener()
+			((IFuture<Object>)m.invoke(ts, new Object[0])).addResultListener(new IFutureCommandResultListener<Object>()
 			{
 				public void resultAvailable(Object result)
 				{
-					System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+//					System.out.println("rec result "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
 					tr.setSucceeded(true);
 					ret.addIntermediateResult(tr);
 					proceed();
@@ -294,10 +282,15 @@ public class InitiatorAgent extends TestAgent
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
+//					System.out.println("rec exception "+cnt+": "+(System.currentTimeMillis()-start)+", "+System.currentTimeMillis());
 					tr.setFailed("Exception: "+exception);
 					ret.addIntermediateResult(tr);
 					proceed();
+				}
+				
+				public void commandAvailable(Type command)
+				{
+					// ignore timer updates
 				}
 				
 				public void proceed()

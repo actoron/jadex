@@ -1,6 +1,7 @@
 package jadex.commons.gui.future;
 
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ICommandFuture.Type;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.SGUI;
@@ -12,7 +13,7 @@ import javax.swing.SwingUtilities;
 /**
  *  Exception delegation listener for intermediate results called back on swing thread.
  */
-public class SwingIntermediateDelegationResultListener<E> implements IIntermediateResultListener<E>, IUndoneIntermediateResultListener<E>
+public class SwingIntermediateDelegationResultListener<E> implements IIntermediateFutureCommandResultListener<E>, IUndoneIntermediateResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -201,7 +202,39 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 			future.addIntermediateResult(result);
 		}
 	}
+	/**
+	 *  Called when a command is available.
+	 */
+	final public void commandAvailable(final Type command)
+	{
+		// Hack!!! When triggered from shutdown hook, swing might be terminated
+		// and invokeLater has no effect (grrr).
+		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+//		if(SwingUtilities.isEventDispatchThread())
+		{
+			customCommandAvailable(command);			
+		}
+		else
+		{
+//			Thread.dumpStack();
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					customCommandAvailable(command);
+				}
+			});
+		}
+	}
 	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void	customCommandAvailable(Type command)
+	{
+		future.sendCommand(command);
+	}
+
 	/**
 	 *  Called when the result is available.
 	 *  @param result The result.

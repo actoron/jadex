@@ -10,8 +10,9 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.commons.IFilter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.util.Collection;
@@ -170,7 +171,7 @@ public class AGRSpace	implements IExtensionInstance
 						}
 					}, false, PublishEventLevel.COARSE);
 					
-					sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateResultListener<IMonitoringEvent>()
+					sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateFutureCommandResultListener<IMonitoringEvent>()
 					{
 						public void resultAvailable(Collection<IMonitoringEvent> result)
 						{
@@ -200,6 +201,11 @@ public class AGRSpace	implements IExtensionInstance
 					    public void exceptionOccurred(Exception e)
 					    {
 					    	e.printStackTrace();
+					    }
+					    
+					    public void commandAvailable(Type command)
+					    {
+					    	// ignore timer updates
 					    }
 					}));
 					

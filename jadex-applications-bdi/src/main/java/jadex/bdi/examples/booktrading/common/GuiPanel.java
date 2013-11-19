@@ -771,8 +771,8 @@ public class GuiPanel extends JPanel
 		{
 			super(getFrame(), addorderlabel, true);
 
-			// Add some default entry for easy testing of the gui.
-			// This order are not added to the agent (see manager.agent.xml).
+			// Add some default entries for easy testing of the gui.
+			// These orders are not added to the agent (see manager.agent.xml).
 			agent.scheduleStep(new IComponentStep<Void>()
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
@@ -782,19 +782,26 @@ public class GuiPanel extends JPanel
 					{
 						public void resultAvailable(IClockService clock)
 						{
-							if(buy)
+							try
 							{
-								orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));
-								orders.addItem(new Order("All about web services", null, 40, 60, buy, clock));
-								orders.addItem(new Order("Harry Potter", null, 5, 10, buy, clock));
-								orders.addItem(new Order("Agents in the real world", null, 30, 65, buy, clock));
+								if(buy)
+								{
+									orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));
+									orders.addItem(new Order("All about web services", null, 40, 60, buy, clock));
+									orders.addItem(new Order("Harry Potter", null, 5, 10, buy, clock));
+									orders.addItem(new Order("Agents in the real world", null, 30, 65, buy, clock));
+								}
+								else
+								{
+									orders.addItem(new Order("All about agents", null, 130, 110, buy, clock));
+									orders.addItem(new Order("All about web services", null, 50, 30, buy, clock));
+									orders.addItem(new Order("Harry Potter", null, 15, 9, buy, clock));
+									orders.addItem(new Order("Agents in the real world", null, 100, 60, buy, clock));
+								}
 							}
-							else
+							catch(Exception e)
 							{
-								orders.addItem(new Order("All about agents", null, 130, 110, buy, clock));
-								orders.addItem(new Order("All about web services", null, 50, 30, buy, clock));
-								orders.addItem(new Order("Harry Potter", null, 15, 9, buy, clock));
-								orders.addItem(new Order("Agents in the real world", null, 100, 60, buy, clock));
+								// happens when killed during startup
 							}
 							
 							JPanel center = new JPanel(new GridBagLayout());

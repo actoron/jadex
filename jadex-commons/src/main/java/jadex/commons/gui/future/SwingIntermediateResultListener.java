@@ -3,18 +3,23 @@
  */
 package jadex.commons.gui.future;
 
+import jadex.commons.future.ICommandFuture.Type;
+import jadex.commons.future.IFutureCommandListener;
+import jadex.commons.future.IFutureCommandResultListener;
+import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
 /**
  *
  */
-public class SwingIntermediateResultListener<E> implements IIntermediateResultListener<E>, IUndoneIntermediateResultListener<E>
+public class SwingIntermediateResultListener<E> implements IIntermediateFutureCommandResultListener<E>, IUndoneIntermediateResultListener<E>
 {
 	//-------- attributes --------
 
@@ -206,7 +211,47 @@ public class SwingIntermediateResultListener<E> implements IIntermediateResultLi
     		listener.intermediateResultAvailable(result);
     	}
 	}
+
+	/**
+	 *  Called when a command is available.
+	 */
+	final public void commandAvailable(final Type command)
+	{
+		// Hack!!! When triggered from shutdown hook, swing might be terminated
+		// and invokeLater has no effect (grrr).
+		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread())// || Starter.isShutdown())
+//		if(SwingUtilities.isEventDispatchThread())
+		{
+			customCommandAvailable(command);			
+		}
+		else
+		{
+//			Thread.dumpStack();
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					customCommandAvailable(command);
+				}
+			});
+		}
+	}
 	
+	/**
+	 *  Called when a command is available.
+	 */
+	public void	customCommandAvailable(Type command)
+	{
+		if(listener instanceof IFutureCommandListener)
+		{
+			((IFutureCommandListener)listener).commandAvailable(command);
+		}
+		else
+		{
+			Logger.getLogger("swing-result-listener").warning("Cannot forward command: "+listener+" "+command);
+		}
+	}
+
 	/**
 	 *  Called when the result is available.
 	 *  @param result The result.

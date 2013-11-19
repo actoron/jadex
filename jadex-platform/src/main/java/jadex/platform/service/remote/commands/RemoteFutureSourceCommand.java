@@ -2,11 +2,10 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.ICommandFuture;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
@@ -32,7 +31,7 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 		String methodname, Map<String, Object> nonfunc)
 	{
 		super(realreceiver, cmd, null, callid, isref, methodname, nonfunc);
-		System.out.println("RFSC: "+realreceiver+", "+System.currentTimeMillis()); 
+//		System.out.println("RFSC: "+realreceiver+", "+System.currentTimeMillis()); 
 	}
 	
 	/**
@@ -51,7 +50,7 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 			
 			if(wci!=null)
 			{
-				System.out.println("remote timer refresh: "+System.currentTimeMillis());
+//				System.out.println("remote timer refresh: "+System.currentTimeMillis());
 				wci.refresh();
 				IFuture<?> fut = wci.getFuture();
 				if(fut instanceof ICommandFuture)

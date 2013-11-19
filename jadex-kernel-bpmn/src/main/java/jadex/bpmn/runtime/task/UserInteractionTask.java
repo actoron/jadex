@@ -12,6 +12,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.Future;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -94,7 +95,14 @@ public class UserInteractionTask implements ITask
 					dialog.setVisible(false);
 				}
 			}
+			
+			public void	commandAvailable(Type command)
+			{
+				// ignore timer updates
+			}
 		}));
+		
+		final MActivity	task	= context.getModelElement();
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -102,23 +110,22 @@ public class UserInteractionTask implements ITask
 			{
 				final JOptionPane	pane;
 				JComponent	message;
-				MActivity	task	= context.getModelElement();
 				IndexMap<String, MParameter>	parameters	= task.getParameters();
 				
 				if(parameters!=null && !parameters.isEmpty())
 				{
 					Insets	insets	= new Insets(2,2,2,2);
 					message	= new JPanel(new GridBagLayout());
-					message.add(new JLabel("Please enter values for task "+context.getModelElement().getName()),
+					message.add(new JLabel("Please enter values for task "+task.getName()),
 						new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 					
 					pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
 					pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 
 					int i=0;
-					for(Iterator it=parameters.values().iterator(); it.hasNext(); i++)
+					for(Iterator<MParameter> it=parameters.values().iterator(); it.hasNext(); i++)
 					{
-						final MParameter param = (MParameter)it.next();
+						final MParameter param = it.next();
 						Object	value	= context.getParameterValue(param.getName());
 						JComponent	comp;
 						if(SReflect.getWrappedType(param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports())).equals(Boolean.class))
@@ -137,6 +144,7 @@ public class UserInteractionTask implements ITask
 						            {
 						            	if(pane.getValue()!=JOptionPane.UNINITIALIZED_VALUE)
 						            	{
+						    				// Todo: context should not be accessed from swing thread!
 						            		context.setParameterValue(param.getName(), new Boolean(cb.isSelected()));
 						            	}
 						            }
@@ -192,12 +200,12 @@ public class UserInteractionTask implements ITask
 				}
 				else
 				{
-					message = new JLabel("Please perform task "+context.getModelElement().getName());
+					message = new JLabel("Please perform task "+task.getName());
 					pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
 					pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 				}
 				
-				dialog = new JDialog((JFrame)null, context.getModelElement().getName());
+				dialog = new JDialog((JFrame)null, task.getName());
 				dialog.getContentPane().setLayout(new BorderLayout());
 				dialog.getContentPane().add(pane, BorderLayout.CENTER);
 

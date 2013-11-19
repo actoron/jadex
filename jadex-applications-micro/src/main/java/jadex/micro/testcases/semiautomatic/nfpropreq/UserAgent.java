@@ -52,7 +52,7 @@ public class UserAgent
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			System.out.println("User agent problem: "+e);
 		}
 	}
 	
