@@ -74,13 +74,13 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 //		System.out.println("callid: "+callid);
 //		System.out.println("terminatecallid: "+terminatecallid);
 		Object tfut = rsms.getProcessingCall(terminatecallid);
-		if(tfut!=null)
+		if(tfut instanceof ITerminableFuture)
 		{
 			// directly invoke terminate when call has already been received
 //			System.out.println("terminating remote future: "+tfut.hashCode());
 			((ITerminableFuture<?>)tfut).terminate(exception);
 		}
-		else
+		else if(tfut==null)
 		{
 //			System.out.println("remote future not found");
 			// store as command if not already received
@@ -96,6 +96,10 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 					}
 				}
 			});
+		}
+		else
+		{
+			throw new RuntimeException("Cannot terminate incompatible future: "+tfut+", "+callid+", "+terminatecallid+", "+exception);
 		}
 		
 		ret.addIntermediateResult(new RemoteResultCommand(null, null, null, callid, 
