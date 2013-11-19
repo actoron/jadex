@@ -188,7 +188,7 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 		else
 		{
 //			System.out.println("Cannot forward command: "+future+" "+command);
-			Logger.getLogger("intermediate-exception-delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
+			Logger.getLogger("intermediate-exception-delegation-result-listener").fine("Cannot forward command: "+future+" "+command);
 		}
 	}
 

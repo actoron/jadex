@@ -592,7 +592,7 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 		else
 		{
 //			System.out.println("Cannot forward command: "+listener+" "+command);
-			Logger.getLogger("future").warning("Cannot forward command: "+listener+" "+command);
+			Logger.getLogger("future").fine("Cannot forward command: "+listener+" "+command);
 		}
 	}
 }

@@ -150,7 +150,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 		else
 		{
 //			System.out.println("Cannot forward command: "+listener+" "+command);
-			Logger.getLogger("bdi-component-result-listener").warning("Cannot forward command: "+listener+" "+command);
+			Logger.getLogger("bdi-component-result-listener").fine("Cannot forward command: "+listener+" "+command);
 		}
 	}
 	

@@ -132,7 +132,7 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 		else
 		{
 //			System.out.println("Cannot forward command: "+future+" "+command);
-			Logger.getLogger("delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
+			Logger.getLogger("delegation-result-listener").fine("Cannot forward command: "+future+" "+command);
 		}
 	}
 	

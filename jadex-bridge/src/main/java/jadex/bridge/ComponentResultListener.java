@@ -311,7 +311,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 		}
 		else
 		{
-			Logger.getLogger("component-result-listener").warning("Cannot forward command: "+listener+" "+command);
+			Logger.getLogger("component-result-listener").fine("Cannot forward command: "+listener+" "+command);
 //			System.out.println("Cannot forward command: "+listener+" "+command);
 		}
 	}

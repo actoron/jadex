@@ -315,7 +315,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 		}
 		else
 		{
-			Logger.getLogger("timeout-result-listener").warning("Cannot forward command: "+listener+" "+command);
+			Logger.getLogger("timeout-result-listener").fine("Cannot forward command: "+listener+" "+command);
 //			System.out.println("Cannot forward command: "+listener+" "+command);
 		}
 	}

@@ -179,7 +179,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 		else
 		{
 //			System.out.println("Cannot forward command: "+future+" "+command);
-			Logger.getLogger("intermediate-delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
+			Logger.getLogger("intermediate-delegation-result-listener").fine("Cannot forward command: "+future+" "+command);
 		}
 	}
 	

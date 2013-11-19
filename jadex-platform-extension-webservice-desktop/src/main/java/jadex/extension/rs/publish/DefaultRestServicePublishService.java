@@ -532,6 +532,8 @@ public class DefaultRestServicePublishService implements IPublishService
 	}
 	
 	/**
+	 *  Method that is invoked when rest service is called.
+	 * 
 	 *  Functionality blueprint for all service methods.
 	 *  @param params The parameters.
 	 *  @return The result.

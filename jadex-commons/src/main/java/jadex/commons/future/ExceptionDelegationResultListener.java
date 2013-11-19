@@ -138,7 +138,7 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 		else
 		{
 //			System.out.println("Cannot forward command: "+future+" "+command);
-			Logger.getLogger("exception-delegation-result-listener").warning("Cannot forward command: "+future+" "+command);
+			Logger.getLogger("exception-delegation-result-listener").fine("Cannot forward command: "+future+" "+command);
 		}
 	}
 }
