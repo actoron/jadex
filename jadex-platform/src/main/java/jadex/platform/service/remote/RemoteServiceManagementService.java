@@ -225,7 +225,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
 		final IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
-		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
+		final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".0.getServiceProxies");
 		
 		final TerminableIntermediateDelegationFuture<IService> future = new TerminableIntermediateDelegationFuture<IService>()
 		{
@@ -255,7 +255,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		//							System.out.println("received exception: "+exception);
 		//						}
 		//					});
-							final String mycallid = SUtil.createUniqueId("getServiceProxies");
+							final String mycallid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".ret.getServiceProxies");
 							RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, e);
 							// Can be invoked directly, because internally redirects to agent thread.
 		//					System.out.println("sending terminate");

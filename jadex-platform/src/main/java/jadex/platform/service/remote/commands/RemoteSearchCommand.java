@@ -17,7 +17,10 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.commons.transformation.annotations.Alias;
 import jadex.micro.IMicroExternalAccess;
 import jadex.platform.service.remote.IRemoteCommand;
@@ -138,7 +141,13 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 */
 	public IIntermediateFuture<IRemoteCommand> execute(final IMicroExternalAccess component, final RemoteServiceManagementService rsms)
 	{
-		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
+		final TerminableIntermediateFuture<IRemoteCommand> ret = new TerminableIntermediateFuture<IRemoteCommand>(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				// Todo: terminate ongoing search.
+			}
+		});
 		
 //		System.out.println("start rem search: "+callid);
 		
@@ -190,16 +199,16 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 							public void intermediateResultAvailable(IService result)
 							{
 //								System.out.println("result command of search: "+callid+" "+result);
-								ret.addIntermediateResult(new RemoteIntermediateResultCommand(null, result, callid, 
+								ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, result, callid, 
 									false, null, false, getNonFunctionalProperties(), ret, cnt++));
 							}
 							
 							public void finished()
 							{
 //								System.out.println("result command of search fini: "+callid);
-								ret.addIntermediateResult(new RemoteIntermediateResultCommand(null, null, callid, 
+								ret.addIntermediateResultIfUndone(new RemoteIntermediateResultCommand(null, null, callid, 
 									false, null, true, getNonFunctionalProperties(), ret, cnt++));
-								ret.setFinished();
+								ret.setFinishedIfUndone();
 							}
 							
 							public void resultAvailable(Collection<IService> result)
@@ -229,17 +238,17 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 //								}
 								
 //								ret.setResult(new RemoteResultCommand(content, null , callid, false));
-								ret.addIntermediateResult(new RemoteResultCommand(null, content, null, callid, 
+								ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, content, null, callid, 
 									false, null, getNonFunctionalProperties()));
-								ret.setFinished();
+								ret.setFinishedIfUndone();
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
 //								ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-								ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, 
+								ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, null, exception, callid, 
 									false, null, getNonFunctionalProperties()));
-								ret.setFinished();
+								ret.setFinishedIfUndone();
 							}
 						});
 					}
@@ -247,9 +256,9 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 					public void exceptionOccurred(Exception exception)
 					{
 //						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-						ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, 
+						ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, null, exception, callid, 
 							false, null, getNonFunctionalProperties()));
-						ret.setFinished();
+						ret.setFinishedIfUndone();
 					}
 				});
 			}
@@ -257,9 +266,9 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 			public void exceptionOccurred(Exception exception)
 			{
 //				ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-				ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, 
+				ret.addIntermediateResultIfUndone(new RemoteResultCommand(null, null, exception, callid, 
 					false, null, getNonFunctionalProperties()));
-				ret.setFinished();
+				ret.setFinishedIfUndone();
 			}
 		});
 		
