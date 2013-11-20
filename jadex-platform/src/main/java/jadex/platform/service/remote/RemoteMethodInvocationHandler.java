@@ -175,7 +175,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 	//							System.out.println("received exception: "+exception);
 	//						}
 	//					});
-						final String mycallid = SUtil.createUniqueId(compid.getName()+"."+method.toString());
+						final String mycallid = SUtil.createUniqueId(compid.getName()+".pullsub."+method.toString());
 						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
@@ -226,7 +226,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 	//							System.out.println("received exception: "+exception);
 	//						}
 	//					});
-						final String mycallid = SUtil.createUniqueId(compid.getName()+"."+method.toString());
+						final String mycallid = SUtil.createUniqueId(compid.getName()+".pull."+method.toString());
 						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
@@ -266,7 +266,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 	//							System.out.println("received exception: "+exception);
 	//						}
 	//					});
-						final String mycallid = SUtil.createUniqueId(compid.getName()+"."+method.toString());
+						final String mycallid = SUtil.createUniqueId(compid.getName()+".sub."+method.toString());
 						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
@@ -306,7 +306,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 	//							System.out.println("received exception: "+exception);
 	//						}
 	//					});
-						final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+						final String mycallid = SUtil.createUniqueId(compid.getName()+".interm."+method.toString());
 						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, e);
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
@@ -346,7 +346,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 	//							System.out.println("received exception: "+exception);
 	//						}
 	//					});
-						final String mycallid = SUtil.createUniqueId(compid.getName()+"."+method.toString());
+						final String mycallid = SUtil.createUniqueId(compid.getName()+".term."+method.toString());
 						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
