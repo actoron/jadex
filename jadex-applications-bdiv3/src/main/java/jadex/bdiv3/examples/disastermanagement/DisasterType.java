@@ -149,6 +149,9 @@ public class DisasterType
 		ret.put("size", new Integer(size));
 		
 		// Use random +/- 25% for victims/fire/chemicals value
+//		ret.put("victims", 0);
+//		ret.put("fire", 1);
+//		ret.put("chemicals", 0);
 		ret.put("victims", new Integer(DISASTER_TYPES[index].getVictims()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getVictims()*size): 0));
 		ret.put("fire", new Integer(DISASTER_TYPES[index].getFire()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getFire()*size): 0));
 		ret.put("chemicals", new Integer(DISASTER_TYPES[index].getChemicals()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getChemicals()*size): 0));

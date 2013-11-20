@@ -11,9 +11,9 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
-import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
+import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -35,11 +35,6 @@ import java.util.Set;
  */
 public class RGoal extends RProcessableElement implements IGoal
 {
-	static
-	{
-		System.out.println("RGoal loaded with: "+RGoal.class.getClassLoader());
-	}
-	
 	/** The lifecycle state. */
 	protected GoalLifecycleState lifecyclestate;
 
@@ -342,7 +337,7 @@ public class RGoal extends RProcessableElement implements IGoal
 			
 //			System.out.println("dropping: "+getId());
 			
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
+//			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
 			// goal is dropping (no more plan executions)
 //			setProcessingState(ia, GOALPROCESSINGSTATE_IDLE);
 			abortPlans();
@@ -350,6 +345,8 @@ public class RGoal extends RProcessableElement implements IGoal
 		}
 		else if(GoalLifecycleState.DROPPED.equals(lifecyclestate))
 		{
+			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
+
 			if(getListeners()!=null)
 			{
 				if(!isFinished())

@@ -217,10 +217,18 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 				public void visitInnerClass(String name, String outerName, String innerName, int access)
 				{
-//					System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
-					String icln = name.replace("/", ".");
-					if(!done.contains(icln))
-						todo.add(icln);
+					// Exclude non-relevant inner classes (that do not belong to the application code)
+					if(iclname!=null && outerName!=null && iclname.startsWith(outerName))
+					{
+//						System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
+						String icln = name.replace("/", ".");
+						if(!done.contains(icln))
+							todo.add(icln);
+					}
+//					else
+//					{
+//						System.out.println("skipping class enhancement of: "+innerName);
+//					}
 					super.visitInnerClass(name, outerName, innerName, access);//Opcodes.ACC_PUBLIC); does not work
 				}
 				
@@ -794,6 +802,9 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				args = new Object[]{name, data, new Integer(0), new Integer(data.length), domain};
 			}
 
+			if(name.indexOf("GoalLifecycleState")!=-1)
+				System.out.println("define: "+name);
+			
 			method.setAccessible(true);
 			try
 			{

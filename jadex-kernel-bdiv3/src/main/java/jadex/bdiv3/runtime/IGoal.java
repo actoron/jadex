@@ -1,6 +1,5 @@
 package jadex.bdiv3.runtime;
 
-
 /**
  *  Interface for a bdi goal.
  */

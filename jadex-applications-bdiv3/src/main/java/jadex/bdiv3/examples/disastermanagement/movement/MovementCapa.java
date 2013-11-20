@@ -24,7 +24,7 @@ import jadex.micro.annotation.RequiredServices;
 @Capability
 @Plans(@Plan(trigger=@Trigger(goals={MovementCapa.Move.class}), body=@Body(MoveToLocationPlan.class)))
 @RequiredServices(@RequiredService(name="clockser", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
-public class MovementCapa
+public class MovementCapa implements IEnvAccess
 {
 	//-------- attributes --------
 
@@ -74,7 +74,7 @@ public class MovementCapa
 	 */
 	public IVector2 getPosition()
 	{
-		return (IVector2)getMyself().getProperty("location");
+		return (IVector2)getMyself().getProperty("position");
 	}
 
 	/**

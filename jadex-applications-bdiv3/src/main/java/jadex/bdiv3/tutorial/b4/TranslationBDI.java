@@ -92,7 +92,13 @@ public class TranslationBDI
 		@PlanBody
 		public String translateEnglishGerman()
 		{
-			throw new PlanFailureException();
+			throw new PlanFailureException()
+			{
+				public void printStackTrace()
+				{
+					super.printStackTrace();
+				}
+			};
 //			return wordtable.get(gword);
 		}
 		

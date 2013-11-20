@@ -8,7 +8,7 @@ package jadex.bdi.runtime;
 public interface IGoal	extends IProcessableElement
 {
 	//-------- BDI flags --------
-
+	
 	/**
 	 *  Get the retry flag.
 	 */

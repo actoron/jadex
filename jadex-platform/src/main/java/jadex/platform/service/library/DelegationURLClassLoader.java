@@ -258,6 +258,12 @@ public class DelegationURLClassLoader extends URLClassLoader
 			ret.add(getResourceIdentifier());
 		return ret;
 	}
+
+//	protected Class<?> findClass(String name) throws ClassNotFoundException
+//	{
+//		System.out.println("find: "+name);
+//		return super.findClass(name);
+//	}
 	
 	/**
 	 *  Load a class directly, without delegation to dependencies or base class loader
@@ -274,6 +280,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	protected Class<?>	loadClass(String name, boolean resolve)	throws ClassNotFoundException
 	{	
+//		System.out.println("loadClass: "+name);
 		Class<?> ret = null;
 		
 		if(basecl!=null)

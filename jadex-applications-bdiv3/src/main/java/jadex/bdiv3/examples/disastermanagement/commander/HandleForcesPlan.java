@@ -93,7 +93,7 @@ public abstract class HandleForcesPlan
 	@PlanFailed
 	public void failure(Exception e)
 	{
-		System.out.println("aborted: "+this+" "+goal.getDisaster());
+//		System.out.println("aborted: "+this+" "+goal.getDisaster());
 //		e.printStackTrace();
 	}
 }

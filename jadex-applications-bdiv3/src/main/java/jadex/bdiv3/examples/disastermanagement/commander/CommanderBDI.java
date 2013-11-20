@@ -69,6 +69,7 @@ public class CommanderBDI
 	protected Set<ISpaceObject> disasters = new HashSet<ISpaceObject>();
 	
 	/** The busy entities. */
+	@Belief // to watch in debugger
 	protected List<Object> busyentities = new ArrayList<Object>();
 	
 	/**

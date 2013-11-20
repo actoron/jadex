@@ -17,12 +17,17 @@ import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3.examples.disastermanagement.IExtinguishFireService;
 import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI;
 import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.GoHome;
+import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.TreatVictims;
 import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
+import jadex.bdiv3.examples.disastermanagement.movement.IEnvAccess;
 import jadex.bdiv3.examples.disastermanagement.movement.MoveToLocationPlan;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bridge.service.annotation.Service;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -46,7 +51,7 @@ import jadex.micro.annotation.Configurations;
 	@Plan(trigger=@Trigger(goals=FireBrigadeBDI.GoHome.class), body=@Body(MoveToLocationPlan.class))
 })
 @Configurations({@Configuration(name="do_nothing"), @Configuration(name="default")})
-public class FireBrigadeBDI
+public class FireBrigadeBDI implements IEnvAccess
 {
 	/** The capa. */
 	@Capability
@@ -88,7 +93,7 @@ public class FireBrigadeBDI
 		/**
 		 *  Create a new Move. 
 		 */
-		@GoalCreationCondition(rawevents={ChangeEvent.GOALADOPTED, ChangeEvent.GOALDROPPED})
+		@GoalCreationCondition(rawevents={ChangeEvent.GOALDROPPED})
 		public static GoHome checkCreate(FireBrigadeBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
@@ -111,7 +116,7 @@ public class FireBrigadeBDI
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = capa.getCapability().getAgent().getGoals().size()>1;
-			System.out.println("dropping: "+this);
+//			System.out.println("check drop fire brigade: "+this+" "+capa.getCapability().getAgent().getGoals());
 			return ret;
 		}
 		
@@ -154,6 +159,20 @@ public class FireBrigadeBDI
 		}
 
 		/**
+		 *  Drop if this goal is only option and there are others.
+		 */
+		@GoalDropCondition(rawevents={ChangeEvent.GOALOPTION, ChangeEvent.GOALADOPTED})
+		public boolean checkDrop(FireBrigadeBDI ag, IGoal goal)
+		{
+			MovementCapa capa = ag.getMoveCapa();
+			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
+				capa.getCapability().getAgent().getGoals(TreatVictims.class).size()>1;
+//			if(ret)
+//				System.out.println("dropping ext fire: "+disaster);
+			return ret;
+		}
+		
+		/**
 		 *  Get the disaster.
 		 *  @return The disaster.
 		 */
@@ -190,6 +209,20 @@ public class FireBrigadeBDI
 			Integer fires = (Integer)getDisaster().getProperty("chemicals");
 			return fires!=null && fires.intValue()==0;
 		}
+		
+		/**
+		 *  Drop if this goal is only option and there are others.
+		 */
+		@GoalDropCondition(rawevents={ChangeEvent.GOALOPTION, ChangeEvent.GOALADOPTED})
+		public boolean checkDrop(FireBrigadeBDI ag, IGoal goal)
+		{
+			MovementCapa capa = ag.getMoveCapa();
+			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
+				capa.getCapability().getAgent().getGoals(TreatVictims.class).size()>1;
+//			if(ret)
+//				System.out.println("dropping clear chemicals: "+disaster);
+			return ret;
+		}
 
 		/**
 		 *  Get the disaster.
@@ -217,6 +250,24 @@ public class FireBrigadeBDI
 	public BDIAgent getAgent()
 	{
 		return agent;
+	}
+	
+	/**
+	 *  Get the env.
+	 *  @return The env.
+	 */
+	public ContinuousSpace2D getEnvironment()
+	{
+		return getMoveCapa().getEnvironment();
+	}
+
+	/**
+	 *  Get the myself.
+	 *  @return The myself.
+	 */
+	public ISpaceObject getMyself()
+	{
+		return getMoveCapa().getMyself();
 	}
 }
 

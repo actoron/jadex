@@ -53,7 +53,7 @@ public class FindApplicableCandidatesAction implements IConditionalComponentStep
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-//		if(element!=null && element.toString().indexOf("Move")!=-1)
+//		if(element!=null && element.toString().indexOf("GoH")!=-1)
 //			System.out.println("find applicable candidates: "+element);
 		final Future<Void> ret = new Future<Void>();
 		

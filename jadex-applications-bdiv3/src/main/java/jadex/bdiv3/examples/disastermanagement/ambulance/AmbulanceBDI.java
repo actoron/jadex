@@ -12,13 +12,15 @@ import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
+import jadex.bdiv3.examples.disastermanagement.movement.IEnvAccess;
 import jadex.bdiv3.examples.disastermanagement.movement.MoveToLocationPlan;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
-import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.service.annotation.Service;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -40,7 +42,7 @@ import jadex.micro.annotation.ProvidedServices;
 	@Plan(trigger=@Trigger(goals=AmbulanceBDI.GoHome.class), body=@Body(MoveToLocationPlan.class))
 })
 @Configurations({@Configuration(name="do_nothing"), @Configuration(name="default")})
-public class AmbulanceBDI
+public class AmbulanceBDI implements IEnvAccess
 {
 	/** The capa. */
 	@Capability
@@ -105,7 +107,7 @@ public class AmbulanceBDI
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = capa.getCapability().getAgent().getGoals().size()>1;
-			System.out.println("dropping: "+this);
+//			System.out.println("dropping: "+this);
 			return ret;
 		}
 		
@@ -148,14 +150,14 @@ public class AmbulanceBDI
 		/**
 		 *  Drop if this goal is only option and there are others.
 		 */
-		@GoalDropCondition
-		public boolean checkDrop(AmbulanceBDI ag, RGoal goal)
+		@GoalDropCondition(rawevents={ChangeEvent.GOALOPTION, ChangeEvent.GOALADOPTED})
+		public boolean checkDrop(AmbulanceBDI ag, IGoal goal)
 		{
-			System.out.println(GoalLifecycleState.OPTION.getClass().getClassLoader());
-			System.out.println(GoalLifecycleState.OPTION.getClass().getClassLoader());
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
 				capa.getCapability().getAgent().getGoals(TreatVictims.class).size()>1;
+//			if(ret)
+//				System.out.println("dropping treat victim: "+disaster);
 			return ret;
 		}
 	}
@@ -176,6 +178,24 @@ public class AmbulanceBDI
 	public BDIAgent getAgent()
 	{
 		return agent;
+	}
+	
+	/**
+	 *  Get the env.
+	 *  @return The env.
+	 */
+	public ContinuousSpace2D getEnvironment()
+	{
+		return getMoveCapa().getEnvironment();
+	}
+
+	/**
+	 *  Get the myself.
+	 *  @return The myself.
+	 */
+	public ISpaceObject getMyself()
+	{
+		return getMoveCapa().getMyself();
 	}
 }
 

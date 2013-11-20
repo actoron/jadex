@@ -6,7 +6,6 @@ import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.disastermanagement.MoveTask;
-import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa.Move;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.PlanFinishedTaskCondition;
 import jadex.commons.future.DelegationResultListener;
@@ -29,13 +28,13 @@ public class MoveToLocationPlan
 	//-------- attributes --------
 
 	@PlanCapability
-	protected MovementCapa capa;
+	protected IEnvAccess capa;
 	
 	@PlanAPI
 	protected IPlan rplan;
 	
 	@PlanReason
-	protected Move goal;
+	protected IDestinationGoal goal;
 	
 	/**
 	 *  The plan body.
@@ -45,6 +44,8 @@ public class MoveToLocationPlan
 	{
 		ISpaceObject myself	= capa.getMyself();
 		IVector2 dest = goal.getDestination();
+		
+//		System.out.println("move plan: "+goal.getDestination());
 		
 //		if(!((String)myself.getProperty("state")).equals("moving_to_hospital") && dest.equals(home))
 //			myself.setProperty("state", "moving_home");
