@@ -45,8 +45,6 @@ public class ExtinguishFirePlan
 	@PlanBody
 	public void body()
 	{
-		try
-		{
 		Space2D	space	= (Space2D)capa.getMoveCapa().getEnvironment();
 		ISpaceObject myself	= capa.getMoveCapa().getMyself();
 		ISpaceObject disaster = (ISpaceObject)goal.getDisaster();
@@ -67,11 +65,6 @@ public class ExtinguishFirePlan
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 		space.addTaskListener(taskid, myself.getId(), lis);
 		fut.get();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
 	}
 	
 //	/**

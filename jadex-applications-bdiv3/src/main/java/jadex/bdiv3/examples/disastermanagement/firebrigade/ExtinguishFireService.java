@@ -47,13 +47,11 @@ public class ExtinguishFireService implements IExtinguishFireService
 			public void terminated(Exception reason)
 			{
 				Collection<ExtinguishFire> goals = agent.getAgent().getGoals(ExtinguishFire.class);
-//				IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
 				if(goals!=null)
 				{
 					for(ExtinguishFire g: goals)
 					{
-//						System.out.println("Dropping: "+goals[i]);
-//						goals[i].drop();
+						System.out.println("Dropping ext after terminate: "+g.getDisaster());
 						agent.getAgent().dropGoal(g);
 					}
 				}

@@ -50,7 +50,7 @@ public class ClearChemicalsService implements IClearChemicalsService
 				{
 					for(ClearChemicals g: goals)
 					{
-//						System.out.println("Dropping: "+goals[i]);
+						System.out.println("Dropping after terminate: "+g.getDisaster());
 						agent.getAgent().dropGoal(g);
 					}
 				}
