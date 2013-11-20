@@ -802,9 +802,6 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				args = new Object[]{name, data, new Integer(0), new Integer(data.length), domain};
 			}
 
-			if(name.indexOf("GoalLifecycleState")!=-1)
-				System.out.println("define: "+name);
-			
 			method.setAccessible(true);
 			try
 			{
