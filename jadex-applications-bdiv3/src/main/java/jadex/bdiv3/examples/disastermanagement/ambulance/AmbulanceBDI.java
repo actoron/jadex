@@ -151,6 +151,8 @@ public class AmbulanceBDI
 		@GoalDropCondition
 		public boolean checkDrop(AmbulanceBDI ag, RGoal goal)
 		{
+			System.out.println(GoalLifecycleState.OPTION.getClass().getClassLoader());
+			System.out.println(GoalLifecycleState.OPTION.getClass().getClassLoader());
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
 				capa.getCapability().getAgent().getGoals(TreatVictims.class).size()>1;
