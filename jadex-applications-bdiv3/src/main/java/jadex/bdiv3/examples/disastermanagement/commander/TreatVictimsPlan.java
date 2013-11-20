@@ -33,7 +33,7 @@ public class TreatVictimsPlan
 		ITreatVictimsService force = (ITreatVictimsService)goal.getRescueForce();
 		tv	= force.treatVictims(disaster);
 		tv.get();
-		System.out.println("treat victims end for: "+disaster);
+//		System.out.println("treat victims end for: "+disaster);
 	}
 	
 	/**

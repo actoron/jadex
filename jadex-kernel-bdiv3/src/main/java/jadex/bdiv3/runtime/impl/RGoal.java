@@ -35,27 +35,10 @@ import java.util.Set;
  */
 public class RGoal extends RProcessableElement implements IGoal
 {
-	//-------- goal lifecycle states --------
-	
-	public static enum GoalLifecycleState
+	static
 	{
-		NEW, 
-		ADOPTED,
-		OPTION,
-		ACTIVE,
-		SUSPENDED,
-		DROPPING,
-		DROPPED
-	};
-	
-	public static enum GoalProcessingState
-	{
-		IDLE, 
-		INPROCESS,
-		PAUSED,
-		SUCCEEDED,
-		FAILED,
-	};
+		System.out.println("RGoal loaded with: "+RGoal.class.getClassLoader());
+	}
 	
 	/** The lifecycle state. */
 	protected GoalLifecycleState lifecyclestate;

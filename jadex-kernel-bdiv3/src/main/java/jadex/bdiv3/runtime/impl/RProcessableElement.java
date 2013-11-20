@@ -2,7 +2,6 @@ package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.actions.FindApplicableCandidatesAction;
 import jadex.bdiv3.model.MProcessableElement;
-import jadex.bdiv3.runtime.impl.RGoal.GoalProcessingState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IResultListener;
 

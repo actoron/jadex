@@ -35,9 +35,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
 	/** The index of the next result for a thread. */
     protected Map<Thread, Integer>	indices;
     
-    /** The undone flag. */
-    protected boolean undone;
-           
 	//-------- constructors--------
 	
 	/**

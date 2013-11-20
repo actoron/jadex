@@ -22,13 +22,28 @@ public abstract class FutureHelper
 			notified	= true;
 			Tuple2<Future<?>, IResultListener<?>>	tup	= Future.STACK.get().remove(0);
 			Future<?> fut	= tup.getFirstEntity();
+			IResultListener lis = tup.getSecondEntity();
 			if(fut.exception!=null)
 			{
-				tup.getSecondEntity().exceptionOccurred(fut.exception);
+				if(fut.undone && lis instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener)lis).exceptionOccurredIfUndone(fut.exception);
+				}
+				else
+				{
+					lis.exceptionOccurred(fut.exception);
+				}
 			}
 			else
 			{
-				((IResultListener)tup.getSecondEntity()).resultAvailable(fut.result); 
+				if(fut.undone && lis instanceof IUndoneResultListener)
+				{
+					((IUndoneResultListener)lis).resultAvailableIfUndone(fut.result);
+				}
+				else
+				{
+					lis.resultAvailable(fut.result); 
+				}
 			}
 		}
 		Future.STACK.remove();

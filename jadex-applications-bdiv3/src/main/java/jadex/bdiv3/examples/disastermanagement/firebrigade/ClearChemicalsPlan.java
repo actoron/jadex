@@ -63,7 +63,7 @@ public class ClearChemicalsPlan
 		Map props = new HashMap();
 		props.put(ClearChemicalsTask.PROPERTY_DISASTER, disaster);
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(rplan));
-		Object taskid = space.createObjectTask(ExtinguishFireTask.PROPERTY_TYPENAME, props, myself.getId());
+		Object taskid = space.createObjectTask(ClearChemicalsTask.PROPERTY_TYPENAME, props, myself.getId());
 		Future<Void> fut = new Future<Void>();
 		DelegationResultListener<Void> lis = new DelegationResultListener<Void>(fut, true);
 		space.addTaskListener(taskid, myself.getId(), lis);
@@ -78,6 +78,6 @@ public class ClearChemicalsPlan
 	public void failed(Exception e)
 	{
 		System.err.println("Plan failed: "+this);
-		e.printStackTrace();
+//		e.printStackTrace();
 	}
 }

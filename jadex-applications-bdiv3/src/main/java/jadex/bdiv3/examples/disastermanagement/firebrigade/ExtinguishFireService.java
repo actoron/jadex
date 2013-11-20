@@ -63,14 +63,14 @@ public class ExtinguishFireService implements IExtinguishFireService
 		Collection<ExtinguishFire> exgoals = agent.getAgent().getGoals(ExtinguishFire.class);
 		if(exgoals.size()>0)
 		{
-			ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
+			ret.setExceptionIfUndone(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
 		}
 		else
 		{
 			Collection<ClearChemicals> ccgoals = agent.getAgent().getGoals(ClearChemicals.class);
 			if(ccgoals.size()>0)
 			{
-				ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
+				ret.setExceptionIfUndone(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
 			}
 			else
 			{

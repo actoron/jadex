@@ -15,6 +15,8 @@ import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
 import jadex.bdiv3.examples.disastermanagement.movement.MoveToLocationPlan;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
+import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bridge.service.annotation.Service;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.IVector2;
@@ -141,6 +143,18 @@ public class AmbulanceBDI
 		public ISpaceObject getDisaster()
 		{
 			return disaster;
+		}
+
+		/**
+		 *  Drop if this goal is only option and there are others.
+		 */
+		@GoalDropCondition
+		public boolean checkDrop(AmbulanceBDI ag, RGoal goal)
+		{
+			MovementCapa capa = ag.getMoveCapa();
+			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
+				capa.getCapability().getAgent().getGoals(TreatVictims.class).size()>1;
+			return ret;
 		}
 	}
 

@@ -20,7 +20,7 @@ import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.impl.RGoal.GoalLifecycleState;
+import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
