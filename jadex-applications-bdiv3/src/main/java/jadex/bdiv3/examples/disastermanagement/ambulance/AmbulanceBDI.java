@@ -122,7 +122,7 @@ public class AmbulanceBDI implements IEnvAccess
 	/**
 	 * 
 	 */
-	@Goal(deliberation=@Deliberation(inhibits=TreatVictims.class, cardinalityone=true),
+	@Goal(deliberation=@Deliberation(cardinalityone=true),
 		publish=@Publish(type=ITreatVictimsService.class, method="treatVictims"))
 	public static class TreatVictims
 	{

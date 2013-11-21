@@ -942,6 +942,19 @@ public class BDIClassReader extends MicroClassReader
 			}
 		}
 		boolean cardinalityone = del.cardinalityone();
+		// If cardinality is one ensure that its own goal type is also inhibited
+		if(cardinalityone)
+		{
+			if(inhnames==null)
+			{
+				inhnames = new HashSet<String>();
+			}
+			if(!inhnames.contains(gcl.getName()))
+			{
+//				System.out.println("Added own goal type to inhibitions due to cardinalityone: "+gcl.getName());
+				inhnames.add(gcl.getName());
+			}
+		}
 		MDeliberation mdel = null;
 		if(inhnames!=null || cardinalityone)
 		{
