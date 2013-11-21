@@ -1753,7 +1753,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		inited	= true;
 //		if(getComponentIdentifier().getName().indexOf("Cleaner")!=-1)// && getComponentIdentifier().getName().indexOf("Burner")==-1)
 //			getCapability().dumpPlansPeriodically(getInternalAccess());
-//		if(getComponentIdentifier().getName().indexOf("Ambulance")!=-1)
+//		if(getComponentIdentifier().getName().indexOf("Commander")!=-1)
 //		{
 //			getCapability().dumpGoalsPeriodically(getInternalAccess());
 //			getCapability().dumpPlansPeriodically(getInternalAccess());

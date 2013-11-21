@@ -1,12 +1,11 @@
 package jadex.bdiv3.examples.disastermanagement.commander;
 
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanPrecondition;
-import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3.examples.disastermanagement.IExtinguishFireService;
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.SendRescueForce;
-import jadex.bdiv3.examples.disastermanagement.firebrigade.FireBrigadeBDI.ExtinguishFire;
 import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -34,6 +33,7 @@ public class ExtinguishFirePlan
 	/**
 	 *  Called when the plan is aborted.
 	 */
+	@PlanAborted
 	public void aborted()
 	{
 		if(ef!=null)

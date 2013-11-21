@@ -1,6 +1,7 @@
 package jadex.bdiv3.examples.disastermanagement.commander;
 
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanPrecondition;
 import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
@@ -32,6 +33,7 @@ public class ClearChemicalsPlan
 	/**
 	 *  Called when the plan is aborted.
 	 */
+	@PlanAborted
 	public void aborted()
 	{
 		if(cc!=null)

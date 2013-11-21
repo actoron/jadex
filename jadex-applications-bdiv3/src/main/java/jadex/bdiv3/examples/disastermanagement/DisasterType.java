@@ -130,6 +130,7 @@ public class DisasterType
 	/**
 	 *  Generate properties for a random disaster.
 	 */
+	static int cnt = 0;
 	public static Map	generateDisaster()
 	{
 		// Select disaster based on occurrence probability.
@@ -148,10 +149,12 @@ public class DisasterType
 		int	size	= range[0]+random.nextInt(range[1]-range[0]);
 		ret.put("size", new Integer(size));
 		
-		// Use random +/- 25% for victims/fire/chemicals value
-//		ret.put("victims", 0);
-//		ret.put("fire", 1);
+//		ret.put("severe", cnt==1); 
+//		ret.put("victims", 2);
+//		ret.put("fire", 3);
 //		ret.put("chemicals", 0);
+//		cnt++;
+		// Use random +/- 25% for victims/fire/chemicals value
 		ret.put("victims", new Integer(DISASTER_TYPES[index].getVictims()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getVictims()*size): 0));
 		ret.put("fire", new Integer(DISASTER_TYPES[index].getFire()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getFire()*size): 0));
 		ret.put("chemicals", new Integer(DISASTER_TYPES[index].getChemicals()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getChemicals()*size): 0));

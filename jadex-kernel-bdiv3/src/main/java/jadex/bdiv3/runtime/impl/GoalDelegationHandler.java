@@ -7,6 +7,8 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.TerminableFuture;
 import jadex.micro.IPojoMicroAgent;
 
 import java.lang.reflect.Constructor;
@@ -59,14 +61,12 @@ public class GoalDelegationHandler  implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
-		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
-				
 		String goalname = goalnames.get(method.getName());
 		
 		if(goalname==null)
 			throw new RuntimeException("No method-goal mapping found: "+method.getName()+" "+goalnames);
 		
-		BDIAgentInterpreter	ip	= (BDIAgentInterpreter)agent.getInterpreter();
+		final BDIAgentInterpreter	ip	= (BDIAgentInterpreter)agent.getInterpreter();
 		MCapability mcapa = (MCapability)ip.getCapability().getModelElement();
 		final MGoal mgoal = mcapa.getGoal(goalname);
 		
@@ -93,8 +93,19 @@ public class GoalDelegationHandler  implements InvocationHandler
 			args2[0] = pojo;
 			goal = c.newInstance(args2);
 		}
-		
 		final Object fgoal = goal;
+		
+		// Drop goal when future is terminated from service caller
+		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null)
+		{
+			public void terminate(Exception reason, IResultListener<Void> terminate)
+			{
+//				System.out.println("terminated call: "+fgoal);
+				ip.dropGoal(fgoal);
+				super.terminate(reason, terminate);
+			}
+		});
+		
 		ip.dispatchTopLevelGoal(fgoal).addResultListener(new ExceptionDelegationResultListener<Object, Object>(ret)
 		{
 			public void customResultAvailable(Object result)

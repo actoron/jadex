@@ -92,7 +92,7 @@ public class TreatVictimPlan
 	@PlanAborted
 	public void failed(Exception e)
 	{
-		System.out.println("Plan failed: "+this);
+//		System.out.println("Plan failed: "+this);
 //		e.printStackTrace();
 	}
 }

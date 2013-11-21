@@ -51,6 +51,13 @@ public class ChangeEvent
 
 	/** Event type that a goal has been added. */
 	public static final String GOALNOTINHIBITED = "goalnotinhibited";
+	
+	
+	/** Event type that a plan has been added. */
+	public static final String PLANADOPTED = "planadopted";
+	
+	/** Event type that a plan has been finished. */
+	public static final String PLANFINISHED = "planfinished";
 
 	
 	/** The event type. */

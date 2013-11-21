@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.GoalCreationCondition;
 import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.annotation.Publish;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
@@ -26,16 +27,13 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 
 /**
  * 
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=ITreatVictimsService.class, implementation=@Implementation(TreatVictimsService.class)))
+//@ProvidedServices(@ProvidedService(type=ITreatVictimsService.class, implementation=@Implementation(TreatVictimsService.class)))
 @Plans(
 {
 	@Plan(trigger=@Trigger(goals=AmbulanceBDI.TreatVictims.class), body=@Body(TreatVictimPlan.class)),
@@ -124,7 +122,8 @@ public class AmbulanceBDI implements IEnvAccess
 	/**
 	 * 
 	 */
-	@Goal(deliberation=@Deliberation(inhibits=TreatVictims.class, cardinalityone=true))
+	@Goal(deliberation=@Deliberation(inhibits=TreatVictims.class, cardinalityone=true),
+		publish=@Publish(type=ITreatVictimsService.class, method="treatVictims"))
 	public static class TreatVictims
 	{
 		/** The disaster. */

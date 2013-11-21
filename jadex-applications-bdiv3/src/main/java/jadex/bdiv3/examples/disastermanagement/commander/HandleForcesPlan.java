@@ -9,6 +9,7 @@ import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.SendRescueForce;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.service.IService;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -43,14 +44,15 @@ public abstract class HandleForcesPlan
 		while(true)
 		{
 			final ISpaceObject disaster = goal.getDisaster();
-			Collection forces = (Collection)capa.getAgent().getRequiredServices(servicename).get();
+			IIntermediateFuture<IService> fut = capa.getAgent().getRequiredServices(servicename);
+			Collection<IService> forces = (Collection<IService>)fut.get();
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
 			
 //			int as = 0;
 			if(forces.size()>0)
 			{
-				List fs = new ArrayList(forces);
-				Iterator it = fs.iterator();
+				List<IService> fs = new ArrayList<IService>(forces);
+				Iterator<IService> it = fs.iterator();
 				
 //				List goals = new ArrayList();
 				while(number>goal.getUnits().size() && it.hasNext())

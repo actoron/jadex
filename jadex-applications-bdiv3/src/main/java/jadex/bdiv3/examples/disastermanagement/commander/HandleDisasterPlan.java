@@ -56,7 +56,8 @@ public class HandleDisasterPlan
 	@PlanFailed
 	public void aborted(Exception e)
 	{
-		System.out.println("aborted: "+e+" "+this);
+//		System.out.println("aborted: "+e+" "+this);
+//		e.printStackTrace();
 	}
 //	
 //	public void failed()

@@ -72,7 +72,7 @@ public class ExtinguishFirePlan
 //	 */
 //	public void failed()
 //	{
-//		System.err.println("Plan failed: "+this);
+//		System.out.println("Plan failed: "+this);
 //		getException().printStackTrace();
 //	}
 }

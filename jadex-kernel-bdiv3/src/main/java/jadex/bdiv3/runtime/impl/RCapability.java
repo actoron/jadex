@@ -342,7 +342,7 @@ public class RCapability extends RElement
 			{
 				dumpGoals();
 			}
-		}, 500, 500);
+		}, 3000, 3000);
 		
 //		IComponentStep<Void> step = new IComponentStep<Void>()
 //		{
@@ -392,7 +392,7 @@ public class RCapability extends RElement
 			System.out.println("--------");
 			for(RGoal goal: goals)
 			{
-				System.out.println(goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState()+" "+goal.getParentPlan());
+				System.out.println("goal: "+goal+" "+goal.getLifecycleState()+" "+goal.getProcessingState()+" "+goal.getParentPlan());
 //				if(goal.getInhibitors()!=null)
 //				{
 //					for(RGoal g: goal.getInhibitors())
@@ -401,7 +401,7 @@ public class RCapability extends RElement
 //					}
 //					System.out.println();
 //				}
-				System.out.println(goal.getInhibitors());
+				System.out.println("inhibitors: "+goal.getInhibitors());
 				System.out.println("--------");
 			}
 		}

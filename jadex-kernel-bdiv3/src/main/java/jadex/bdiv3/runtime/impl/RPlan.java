@@ -31,6 +31,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
@@ -325,14 +326,16 @@ public class RPlan extends RElement implements IPlan
 	{
 		this.lifecyclestate = lifecyclestate;
 		
-		if(PlanLifecycleState.NEW.equals(lifecyclestate))
+		if(PlanLifecycleState.BODY.equals(lifecyclestate))
 		{
+			getInterpreter().getRuleSystem().addEvent(new Event(ChangeEvent.PLANADOPTED, this));
 			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_CREATION);
 		}
 		else if(PlanLifecycleState.PASSED.equals(lifecyclestate) 
 			|| PlanLifecycleState.FAILED.equals(lifecyclestate) 
 			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
 		{
+			getInterpreter().getRuleSystem().addEvent(new Event(ChangeEvent.PLANFINISHED, this));
 			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL);
 		}
 		else

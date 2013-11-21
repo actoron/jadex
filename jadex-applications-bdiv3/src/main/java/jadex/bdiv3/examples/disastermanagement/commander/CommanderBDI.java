@@ -12,7 +12,6 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.examples.cleanerworld.cleaner.CleanerBDI.AchieveCleanup;
 import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3.examples.disastermanagement.IExtinguishFireService;
 import jadex.bdiv3.examples.disastermanagement.ITreatVictimsService;
@@ -110,9 +109,12 @@ public class CommanderBDI
 		/**
 		 * 
 		 */
-		@GoalTargetCondition
+		// Current limitation: As the target condition is checked only when plan finished the 
+		// completion of a disaster is not immediately noticed.
+		@GoalTargetCondition(rawevents=ChangeEvent.PLANFINISHED) // Hack! todo: allow for detecting goal parameter changes
 		public boolean checkTarget()
 		{
+//			System.out.println("check target of: "+this);
 			Integer fires = (Integer)disaster.getProperty("fire");
 			Integer chems = (Integer)disaster.getProperty("chemicals");
 			Integer vics = (Integer)disaster.getProperty("victims");
@@ -221,7 +223,7 @@ public class CommanderBDI
 		/**
 		 * 
 		 */
-		@GoalTargetCondition
+		@GoalTargetCondition(rawevents=ChangeEvent.PLANFINISHED) // Hack! todo: allow for detecting goal parameter changes
 		public boolean checkTarget()
 		{
 			return ((Integer)getDisaster().getProperty("chemicals"))==0;
@@ -278,7 +280,7 @@ public class CommanderBDI
 		/**
 		 * 
 		 */
-		@GoalTargetCondition
+		@GoalTargetCondition(rawevents=ChangeEvent.PLANFINISHED) // Hack! todo: allow for detecting goal parameter changes
 		public boolean checkTarget()
 		{
 			return ((Integer)getDisaster().getProperty("fire"))==0;
@@ -325,7 +327,7 @@ public class CommanderBDI
 		/**
 		 * 
 		 */
-		@GoalTargetCondition
+		@GoalTargetCondition(rawevents=ChangeEvent.PLANFINISHED) // Hack! todo: allow for detecting goal parameter changes
 		public boolean checkTarget()
 		{
 			return ((Integer)getDisaster().getProperty("victims"))==0;
