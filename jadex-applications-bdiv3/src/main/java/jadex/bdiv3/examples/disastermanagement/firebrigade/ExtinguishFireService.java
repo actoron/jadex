@@ -42,7 +42,7 @@ public class ExtinguishFireService implements IExtinguishFireService
 
 		final FireBrigadeBDI agent = (FireBrigadeBDI)((IPojoMicroAgent)ia).getPojoAgent();
 		
-		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
+		final TerminableFuture<Void> ret = new TerminableFuture<Void>(new TerminationCommand()
 		{
 			public void terminated(Exception reason)
 			{

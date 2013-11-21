@@ -2,8 +2,10 @@ package jadex.bdiv3.examples.disastermanagement.commander;
 
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanAPI;
+import jadex.bdiv3.annotation.PlanAborted;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanCapability;
+import jadex.bdiv3.annotation.PlanFailed;
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.ClearChemicals;
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.ExtinguishFires;
 import jadex.bdiv3.examples.disastermanagement.commander.CommanderBDI.HandleDisaster;
@@ -50,13 +52,12 @@ public class HandleDisasterPlan
 		tvfut.get();
 	}
 	
-//	public void aborted()
-//	{
-//		if(getException()!=null)
-//		{
-//			System.out.println("aborted: "+getException()+" "+this);
-//		}
-//	}
+	@PlanAborted
+	@PlanFailed
+	public void aborted(Exception e)
+	{
+		System.out.println("aborted: "+e+" "+this);
+	}
 //	
 //	public void failed()
 //	{
