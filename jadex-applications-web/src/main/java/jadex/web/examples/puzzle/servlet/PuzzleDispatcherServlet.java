@@ -44,7 +44,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 	 */
 	public void init() throws ServletException
 	{
-		// Force AWT thread on system class loader instead of web app clas loader
+		// Force AWT thread on system class loader instead of web app class loader
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
 		Toolkit.getDefaultToolkit();
@@ -52,7 +52,8 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		
 		String[]	args	= new String[]
 		{
-//			"-logging_level", "java.util.logging.Level.INFO",
+			"-kernels", "\"micro, component, bdi\"",
+			"-logging", "true",
 			"-awareness", "false",
 			"-gui", "false",
 			"-extensions", "null",
