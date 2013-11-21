@@ -37,8 +37,7 @@ public class MultiPlatformsTest extends TestCase
 //		for(int p=0; p<100; p++)
 //		{
 //			long	time	= System.currentTimeMillis();
-		int	number	= 25;	// larger numbers cause timeout on toaster.
-		long	timeout	= 180000;	// time required by toaster.
+		int	number	= 15;	// larger numbers cause timeout on toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)
@@ -49,7 +48,6 @@ public class MultiPlatformsTest extends TestCase
 			}
 			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_"+i+"*",
 				"-gui", "false", "-printpass", "false", "-cli", "false",
-				"-deftimeout", ""+timeout,
 //				"-logging", "true",
 //				"-awareness", "false",
 //				"-componentfactory", "jadex.micro.MicroAgentFactory",
@@ -71,7 +69,7 @@ public class MultiPlatformsTest extends TestCase
 			}
 			try
 			{
-				platforms[i]	= futures.get(i).get(sus, timeout);
+				platforms[i]	= futures.get(i).get(sus);
 			}
 			catch(RuntimeException e)
 			{
@@ -88,7 +86,7 @@ public class MultiPlatformsTest extends TestCase
 			{
 				System.out.println("Killing platform "+i);
 			}
-			platforms[i].killComponent().get(sus, timeout);
+			platforms[i].killComponent().get(sus);
 		}
 		
 		
