@@ -103,21 +103,7 @@ public class InitiatorAgent extends TestAgent
 				System.out.println("Test remote1: "+agent.getModel().getFullName());
 				
 				performTest(platform.getComponentIdentifier(), testno, max, false)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-				{
-					public void customResultAvailable(final TestReport result)
-					{
-						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
-					}
-				}));
+					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		

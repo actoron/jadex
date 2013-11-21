@@ -20,7 +20,6 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.testcases.TestAgent;
@@ -107,31 +106,6 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 			{
 				if(remove)
 					platforms.remove(exta);
-//				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-//				{
-//					public void customResultAvailable(IComponentManagementService cms)
-//					{
-//						cms.addComponentListener(exta.getComponentIdentifier(), new ICMSComponentListener()
-//						{
-//							public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
-//							{
-//								platforms.remove(desc.getName());
-//								return IFuture.DONE;
-//							}
-//							
-//							public IFuture<Void> componentChanged(IComponentDescription desc)
-//							{
-//								return IFuture.DONE;
-//							}
-//							
-//							public IFuture<Void> componentAdded(IComponentDescription desc)
-//							{
-//								return IFuture.DONE;
-//							}
-//						});
-//					}
-//				});
 				
 				createProxy(agent.getComponentIdentifier().getRoot(), exta.getComponentIdentifier()).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 				{

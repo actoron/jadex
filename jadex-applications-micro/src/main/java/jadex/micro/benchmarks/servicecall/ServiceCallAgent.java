@@ -87,7 +87,6 @@ public class ServiceCallAgent	extends TestAgent
 													public void customResultAvailable(TestReport result)
 													{
 														tc.addReport(result);
-														exta.killComponent();
 														ret.setResult(null);
 													}
 												});

@@ -2,11 +2,9 @@ package jadex.micro.testcases.tracing;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.Cause;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.Tuple2;
@@ -92,21 +90,7 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				performTest(platform.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-				{
-					public void customResultAvailable(final TestReport result)
-					{
-						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
-					}
-				}));
+					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		

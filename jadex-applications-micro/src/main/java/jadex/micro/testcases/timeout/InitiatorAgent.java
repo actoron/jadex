@@ -90,21 +90,7 @@ public class InitiatorAgent extends TestAgent
 			public void customResultAvailable(final IExternalAccess platform)
 			{
 				performTest(platform.getComponentIdentifier(), testno, false)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-				{
-					public void customResultAvailable(final TestReport result)
-					{
-						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
-					}
-				}));
+					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		
