@@ -215,7 +215,6 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 														{
 															listener.exceptionOccurred(new TimeoutException("Timeout was: "+timeout+" "+message));
 														}
-														listener.exceptionOccurred(/*ex!=null ? ex :*/ new TimeoutException("Timeout was: "+timeout+" "+message));
 														return IFuture.DONE;
 													}
 												});
