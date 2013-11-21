@@ -1,5 +1,6 @@
 package jadex.base;
 
+import jadex.base.test.Testcase;
 import jadex.bridge.GlobalResourceIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -855,7 +856,7 @@ public class SRemoteGui
 		return access.scheduleImmediate(new IComponentStep<Boolean>()
 		{
 			@Classname("isTestcase")
-			public IFuture<Boolean> execute(IInternalAccess ia)
+			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future<Boolean>	ret	= new Future<Boolean>();
 				try
@@ -882,18 +883,36 @@ public class SRemoteGui
 												{
 													if(model!=null && model.getReport()==null)
 													{
-														IArgument[]	results	= model.getResults();
-														boolean	istest	= false;
-														for(int i=0; !istest && i<results.length; i++)
+														SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+															.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Boolean>(ret)
 														{
-															if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
-																&& "jadex.base.test.Testcase".equals(results[i].getClazz().getTypeName()))
-				//												&& Testcase.class.equals(results[i].getClazz(ls.getClassLoader(model.getResourceIdentifier()), model.getAllImports())))
-															{	
-																istest	= true;
+															public void customResultAvailable(ILibraryService ls)
+															{
+																ls.getClassLoader(model.getResourceIdentifier())
+																	.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
+																{
+																	public void customResultAvailable(ClassLoader cl)
+																	{
+																		IArgument[]	results	= model.getResults();
+																		boolean	istest	= false;
+																		for(int i=0; !istest && i<results.length; i++)
+																		{
+//																			if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
+//																				&& "jadex.base.test.Testcase".equals(results[i].getClazz().getTypeName()))
+//																			{	
+//																				istest	= true;
+//																			}
+																			if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
+																				&& Testcase.class.equals(results[i].getClazz().getType(cl, model.getAllImports())))
+																			{
+																				istest	= true;
+																			}
+																		}
+																		ret.setResult(istest? Boolean.TRUE: Boolean.FALSE);
+																	}
+																});
 															}
-														}
-														ret.setResult(istest? Boolean.TRUE: Boolean.FALSE);
+														});
 													}
 													else
 													{
