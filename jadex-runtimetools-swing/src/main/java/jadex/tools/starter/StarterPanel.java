@@ -1226,7 +1226,7 @@ public class StarterPanel extends JLayeredPane
 		if(sel>0)
 		{
 			List rs = (List)resultsets.get(model.getFullName());
-			Object[] r = rs!=null && sel<rs.size() ? (Object[])rs.get(sel-1) : null;
+			Object[] r = rs!=null && (sel-1)<rs.size() ? (Object[])rs.get(sel-1) : null;
 			mres = r!=null ? (Map)r[1] : null;
 		}
 		
