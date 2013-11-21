@@ -510,7 +510,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 						
 			// Do not try to call isAnnotationPresent for Proxy on Android
 			// see http://code.google.com/p/android/issues/detail?id=24846
-			if (!(SReflect.isAndroid() && (service instanceof Proxy))) 
+			if(!(SReflect.isAndroid() && (service instanceof Proxy))) 
 			{
 				while(!Object.class.equals(serclass))
 				{

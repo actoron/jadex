@@ -185,8 +185,8 @@ public class StarterPanel extends JLayeredPane
 	/** The loading indicator. */
 	protected JComponent loading;
 	
-//	/** The application specific panel. */
-//	protected JPanel apppanel;
+	/** The application specific panel. */
+	protected JPanel apppanel;
 	
 	/** The jcc. */
 	protected IControlCenter jcc;
