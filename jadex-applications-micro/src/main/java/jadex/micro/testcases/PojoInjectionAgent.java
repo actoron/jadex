@@ -1,0 +1,58 @@
+package jadex.micro.testcases;
+
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.commons.future.IFuture;
+import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
+
+/**
+ *  Test if a pojo can be injected into a service.
+ */
+@Agent
+@ProvidedServices(@ProvidedService(type=IAService.class))
+@Service
+@Description("Test if a pojo agent can be injected into a service as servicecomponent.")
+@Results(@Result(name="testresults", clazz=Testcase.class))
+public class PojoInjectionAgent implements IAService
+{
+	/** The agent. */
+	@Agent
+	protected MicroAgent agent;
+
+	/** The service component. */
+	@ServiceComponent
+	protected PojoInjectionAgent pojo;
+	
+	@AgentBody(keepalive=false)
+	public void body()
+	{
+//		System.out.println("pojo is: "+pojo);
+		TestReport	tr	= new TestReport("#1", "Test if a pojo agent can be injected into a service as servicecomponent.");
+		if(pojo!=null)
+		{
+			tr.setSucceeded(true);
+		}
+		else
+		{
+			tr.setFailed("Service component not set: "+pojo);
+		}
+		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+	}
+	
+	/**
+	 *  Dummy test method.
+	 */
+	public IFuture<Void> test()
+	{
+		return IFuture.DONE;
+	}
+}
