@@ -14,6 +14,7 @@ import jadex.bdiv3.asm.instructions.IMethodInsnNode;
 import jadex.bdiv3.asm.instructions.LabelNodeWrapper;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.bdiv3.model.MGoal;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
@@ -52,7 +53,6 @@ import org.kohsuke.asm4.tree.MethodNode;
 import org.kohsuke.asm4.tree.TypeInsnNode;
 import org.kohsuke.asm4.tree.VarInsnNode;
 import org.kohsuke.asm4.util.ASMifier;
-import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 
@@ -121,6 +121,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			ClassVisitor cv = new ClassVisitor(Opcodes.ASM4, cn)
 			{
 				boolean isagentorcapa = false;
+				boolean isgoal = false;
+				boolean isplan = false;
 //				Set<String> fields = new HashSet<String>();
 				
 	//			public void visit(int version, int access, String name,
@@ -138,9 +140,20 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 			    public AnnotationVisitor visitAnnotation(String desc, boolean visible) 
 			    {
-			    	if(visible && isAgentOrCapa(desc))
+			    	if(visible)
 			    	{
-			    		isagentorcapa = true;
+			    		if(isAgentOrCapa(desc))
+			    		{
+			    			isagentorcapa = true;
+			    		}
+			    		else if(isGoal(desc))
+			    		{
+			    			isgoal = true;
+			    		}
+			    		else if(isPlan(desc))
+			    		{
+			    			isplan = true;
+			    		}
 			    	}
 			    	return super.visitAnnotation(desc, visible);
 			    }
@@ -154,45 +167,80 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 					{
 						public void visitFieldInsn(int opcode, String owner, String name, String desc)
 						{
-							// if is a putfield and is belief and not is in init (__agent field is not available)
-							if(ophelper.isPutField(opcode) && model.getCapability().hasBelief(name) 
-								&& model.getCapability().getBelief(name).isFieldBelief()
-								&& (isagentorcapa || !owner.equals(iclname))) // either is itself agent/capa or is not field of non-agent
+							boolean enh = false;
+							if(ophelper.isPutField(opcode))
 							{
-								// possibly transform basic value
-								if(SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))
-									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
-								
-								visitInsn(Opcodes.SWAP);
-								
-								// fetch bdi agent value from field
-
-								// this pop aload is necessary in inner classes!
-								if(isagentorcapa)
+								// if is a putfield and is belief and not is in init (__agent field is not available)
+								// either is itself agent/capa or is not field of non-agent
+								if(model.getCapability().hasBelief(name) 
+									&& model.getCapability().getBelief(name).isFieldBelief()
+									&& (isagentorcapa || !owner.equals(iclname)))
 								{
-									visitInsn(Opcodes.POP);
+									// possibly transform basic value
+									if(SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))
+										visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
+									
+									visitInsn(Opcodes.SWAP);
+									
+									// fetch bdi agent value from field
+	
+									// this pop aload is necessary in inner classes!
+									if(isagentorcapa)
+									{
+										visitInsn(Opcodes.POP);
+										visitVarInsn(Opcodes.ALOAD, 0);
+										super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
+									}
+									else
+									{
+										visitInsn(Opcodes.POP);
+										visitInsn(Opcodes.ACONST_NULL);
+									}
+									
+									// add field name	
+									visitLdcInsn(name);
+									visitInsn(Opcodes.SWAP);
+									// add this
 									visitVarInsn(Opcodes.ALOAD, 0);
-									super.visitFieldInsn(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class));
+									visitInsn(Opcodes.SWAP);
+									
+									visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
+									enh = true;
 								}
-								else
+								else if(isgoal)
 								{
-									visitInsn(Opcodes.POP);
-									visitInsn(Opcodes.ACONST_NULL);
+									MGoal mgoal = model.getCapability().getGoal(clname);
+									if(mgoal!=null && mgoal.hasParameter(name))
+									{
+										// possibly transform basic value
+										if(SReflect.isBasicType(SReflect.findClass0(Type.getType(desc).getClassName(), null, cl)))
+											visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/commons/SReflect", "wrapValue", "("+desc+")Ljava/lang/Object;");
+										
+										visitInsn(Opcodes.SWAP);
+										
+										// fetch bdi agent value from field
+										visitInsn(Opcodes.POP);
+										visitInsn(Opcodes.ACONST_NULL);
+										
+										// add field name	
+										visitLdcInsn(name);
+										visitInsn(Opcodes.SWAP);
+										// add this
+										visitVarInsn(Opcodes.ALOAD, 0);
+										visitInsn(Opcodes.SWAP);
+										
+										visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeParameterField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
+										enh = true;
+									}
 								}
-								
-								// add field name	
-								visitLdcInsn(name);
-								visitInsn(Opcodes.SWAP);
-								// add this
-								visitVarInsn(Opcodes.ALOAD, 0);
-								visitInsn(Opcodes.SWAP);
-								
-								visitMethodInsn(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeField", "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;)V");
+//								else if(isplan)
+//								{
+//									// todo? currently have no parameter support
+//								}
 							}
-							else
-							{
+							
+							if(!enh)
 								super.visitFieldInsn(opcode, owner, name, desc);
-							}
 						}
 						
 //						public void visitInsn(int opcode)

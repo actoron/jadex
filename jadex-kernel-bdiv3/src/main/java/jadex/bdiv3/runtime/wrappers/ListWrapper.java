@@ -4,6 +4,7 @@ import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.rules.eca.Event;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.RuleSystem;
 
 import java.util.Collection;
@@ -20,6 +21,15 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 	 */
 	public ListWrapper(List<T> delegate, BDIAgentInterpreter interpreter, 
 		String addevent, String remevent, String changeevent, MBelief mbel)
+	{
+		super(delegate, interpreter, addevent, remevent, changeevent, mbel);
+	}
+	
+	/**
+	 *  Create a new list wrapper.
+	 */
+	public ListWrapper(List<T> delegate, BDIAgentInterpreter interpreter, 
+		EventType addevent, EventType remevent, EventType changeevent, MBelief mbel)
 	{
 		super(delegate, interpreter, addevent, remevent, changeevent, mbel);
 	}

@@ -17,6 +17,7 @@ import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -30,6 +31,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
 import jadex.micro.annotation.Agent;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
@@ -55,8 +57,8 @@ public class RPlan extends RElement implements IPlan
 		READY, 
 		RUNNING,
 		WAITING,
-		GOALCLEANUP,
-		FINISHED,
+//		GOALCLEANUP,
+//		FINISHED,
 	};
 	
 	public static enum PlanLifecycleState
@@ -282,6 +284,7 @@ public class RPlan extends RElement implements IPlan
 		this.candidate = candidate;
 		this.ia = ia;
 		setLifecycleState(PlanLifecycleState.NEW);
+		setProcessingState(PlanProcessingState.READY);
 	}
 
 	/**
@@ -588,6 +591,7 @@ public class RPlan extends RElement implements IPlan
 	}
 	
 	public boolean aborted;
+	public Runnable abortcmd;
 	
 	/**
 	 * 
@@ -595,7 +599,7 @@ public class RPlan extends RElement implements IPlan
 	public void abort()
 	{
 //		if(getReason() instanceof RGoal && ((RGoal)getReason()).getId().indexOf("Go")!=-1)
-//		System.out.println("abort move plan: "+getId());
+//		System.out.println("abort plan: "+getId());
 		
 		if(!isFinished())
 		{
@@ -636,10 +640,16 @@ public class RPlan extends RElement implements IPlan
 					}
 				});
 			}
-			else if(!PlanLifecycleState.NEW.equals(getLifecycleState()))
-			{
-				System.out.println("Cannot abort plan: "+getId()+" "+getProcessingState());
-			}
+//			// Can be currently executing and being abort due to e.g. goal condition triggering
+//			else if(PlanProcessingState.RUNNING.equals(getProcessingState()))
+//			{
+				// it will detect the abort in beforeBlock() when next future.get() is
+				// called and will avoid the next wait
+//			}
+//			else if(!PlanLifecycleState.NEW.equals(getLifecycleState()))
+//			{
+//				System.out.println("Cannot abort plan: "+getId()+" "+getProcessingState()+" "+getLifecycleState());
+//			}
 		}
 	}
 	
@@ -1219,6 +1229,7 @@ public class RPlan extends RElement implements IPlan
 	 */
 	class ResumeCommand<T> implements ICommand<Boolean>
 	{
+		protected ComponentSuspendable sus;
 		protected Future<T> waitfuture;
 		protected String rulename;
 		protected ITimer timer;
@@ -1234,6 +1245,13 @@ public class RPlan extends RElement implements IPlan
 //			System.out.println("created: "+this+" "+RPlan.this.getId());
 			this.waitfuture = waitfuture;
 			this.rulename = rulename;
+			this.isvoid = isvoid;
+		}
+		
+		public ResumeCommand(ComponentSuspendable sus, boolean isvoid)
+		{
+			this.sus = sus;
+			this.waitfuture = (Future<T>)sus.getFuture();
 			this.isvoid = isvoid;
 		}
 		
@@ -1273,13 +1291,27 @@ public class RPlan extends RElement implements IPlan
 				
 				if(notify)
 				{
-					if(getException()!=null)
+					if(sus==null)
 					{
-						waitfuture.setExceptionIfUndone(getException());
+						if(getException()!=null)
+						{
+							if(waitfuture instanceof ITerminableFuture)
+							{
+								((ITerminableFuture<?>)waitfuture).terminate();
+							}
+							else
+							{
+								waitfuture.setExceptionIfUndone(getException());
+							}
+						}
+						else
+						{
+							waitfuture.setResultIfUndone(isvoid? null: (T)getDispatchedElement());
+						}
 					}
 					else
 					{
-						waitfuture.setResultIfUndone(isvoid? null: (T)getDispatchedElement());
+						waitfuture.abortGet(sus);
 					}
 				}
 			}

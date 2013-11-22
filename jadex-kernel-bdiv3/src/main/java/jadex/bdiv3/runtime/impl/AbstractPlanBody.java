@@ -1,15 +1,11 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  *  Abstract base class for plan body implementations.
@@ -189,6 +185,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 		
 		try
 		{			
+			rplan.setProcessingState(RPlan.PlanProcessingState.RUNNING);
 			Object res = null;
 			if(part==0) 
 			{

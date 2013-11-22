@@ -1025,9 +1025,6 @@ public class BDIClassReader extends MicroClassReader
 			tmp.add(new Tuple2<MGoal, String>(mgoal, method));
 		}
 		
-//		boolean declarative = false;
-//		boolean maintain = false;
-		
 		Constructor<?>[] cons = gcl.getConstructors();
 		for(final Constructor<?> c: cons)
 		{
@@ -1036,6 +1033,7 @@ public class BDIClassReader extends MicroClassReader
 				GoalCreationCondition gc = getAnnotation(c, GoalCreationCondition.class, cl);
 				String[] evs = gc.beliefs();
 				String[] rawevs = gc.rawevents();
+				String[] paramevs = gc.parameters();
 				List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(c, cl), cl);
 				for(String ev: evs)
 				{
@@ -1044,6 +1042,10 @@ public class BDIClassReader extends MicroClassReader
 				for(String rawev: rawevs)
 				{
 					events.add(new EventType(rawev)); 
+				}
+				for(String pev: paramevs)
+				{
+					addParameterEvents(mgoal, model.getCapability(), events, pev, gcl.getName(), cl);
 				}
 				MCondition cond = new MCondition("creation_"+c.toString(), events);
 				cond.setConstructorTarget(new ConstructorInfo(c));
@@ -1058,37 +1060,37 @@ public class BDIClassReader extends MicroClassReader
 			{
 				GoalCreationCondition c = getAnnotation(m, GoalCreationCondition.class, cl);
 				addMethodCondition(mgoal, MGoal.CONDITION_CREATION, 
-					c.beliefs(), c.rawevents(), model, m, cl);
+					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalDropCondition.class, cl))
 			{
 				GoalDropCondition c = getAnnotation(m, GoalDropCondition.class, cl);
 				addMethodCondition(mgoal, MGoal.CONDITION_DROP, 
-					c.beliefs(), c.rawevents(), model, m, cl);
+					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalMaintainCondition.class, cl))
 			{
 				GoalMaintainCondition c = getAnnotation(m, GoalMaintainCondition.class, cl);
 				addMethodCondition(mgoal, MGoal.CONDITION_MAINTAIN, 
-					c.beliefs(), c.rawevents(), model, m, cl);
+					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalTargetCondition.class, cl))
 			{
 				GoalTargetCondition c = getAnnotation(m, GoalTargetCondition.class, cl);
 				addMethodCondition(mgoal, MGoal.CONDITION_TARGET, 
-					c.beliefs(), c.rawevents(), model, m, cl);
+					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalContextCondition.class, cl))
 			{
 				GoalContextCondition c = getAnnotation(m, GoalContextCondition.class, cl);
 				addMethodCondition(mgoal, MGoal.CONDITION_CONTEXT, 
-					c.beliefs(), c.rawevents(), model, m, cl);
+					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
 			}
 			else if(isAnnotationPresent(m, GoalRecurCondition.class, cl))
 			{
 				GoalRecurCondition c = getAnnotation(m, GoalRecurCondition.class, cl);
 				addMethodCondition(mgoal, MGoal.CONDITION_RECUR, 
-					c.beliefs(), c.rawevents(), model, m, cl);
+					c.beliefs(), c.rawevents(), c.parameters(), model, m, cl);
 			}
 		}
 		
@@ -1098,7 +1100,8 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected void addMethodCondition(MGoal mgoal, String condtype, String[] evs, String[] rawevs, BDIModel model, Method m, ClassLoader cl)
+	protected void addMethodCondition(MGoal mgoal, String condtype, String[] evs, String[] rawevs, String[] paramevs, 
+		BDIModel model, Method m, ClassLoader cl)
 	{
 		List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(m, cl), cl);
 		for(String ev: evs)
@@ -1108,6 +1111,10 @@ public class BDIClassReader extends MicroClassReader
 		for(String rawev: rawevs)
 		{
 			events.add(new EventType(rawev)); 
+		}
+		for(String pev: paramevs)
+		{
+			addParameterEvents(mgoal, model.getCapability(), events, pev, mgoal.getName(), cl);
 		}
 		MCondition cond = new MCondition(condtype+"_"+m.toString(), events);
 		cond.setMethodTarget(new MethodInfo(m));
@@ -1170,6 +1177,28 @@ public class BDIClassReader extends MicroClassReader
 		{
 			events.add(new EventType(new String[]{ChangeEvent.FACTADDED, belname}));
 			events.add(new EventType(new String[]{ChangeEvent.FACTREMOVED, belname}));
+		}
+	}
+	
+	/**
+	 *  Create parameter events from a belief name.
+	 */
+	public static void addParameterEvents(MGoal mgoal, MCapability mcapa, List<EventType> events, String paramname, String elemname, ClassLoader cl)
+	{
+		MParameter mparam = mgoal.getParameter(paramname);
+		
+		if(mparam==null)
+		{
+			throw new RuntimeException("No such parameter "+paramname+" in "+elemname);
+		}
+		
+		events.add(new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, paramname})); // the whole value was changed
+		events.add(new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, paramname})); // property change of a value
+		
+		if(mparam.isMulti(cl))
+		{
+			events.add(new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, paramname}));
+			events.add(new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, paramname}));
 		}
 	}
 	

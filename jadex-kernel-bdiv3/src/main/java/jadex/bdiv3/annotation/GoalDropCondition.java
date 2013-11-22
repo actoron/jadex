@@ -18,6 +18,11 @@ public @interface GoalDropCondition
 	public String[] beliefs() default {};
 	
 	/**
+	 *  The parameters this condition should react to.
+	 */
+	public String[] parameters() default {};
+	
+	/**
 	 *  The events this condition should react to.
 	 */
 	public String[] rawevents() default {};

@@ -242,7 +242,6 @@ public class MBelief extends MElement
 			{
 				Field f = ftarget.getField(cl);
 				ftype = f.getType();
-				
 			}
 			else 
 			{

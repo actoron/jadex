@@ -70,6 +70,7 @@ public class ComponentSuspendable implements ISuspendable
 	public void resume(final Future<?> future)
 	{
 //		System.out.println("ComponentSuspendable.resume "+Thread.currentThread());
+//		Thread.dumpStack();
 		if(adapter.isExternalThread())
 		{
 			adapter.invokeLater(new Runnable()

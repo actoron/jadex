@@ -2,7 +2,6 @@ package jadex.bdiv3.runtime.wrappers;
 
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -11,6 +10,7 @@ import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.Event;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.RuleSystem;
 
@@ -30,13 +30,13 @@ public class CollectionWrapper <T> implements Collection<T>
 	protected BDIAgentInterpreter interpreter;
 	
 	/** The add event name. */
-	protected String addevent;
+	protected EventType addevent;
 	
 	/** The remove event name. */
-	protected String remevent;
+	protected EventType remevent;
 	
 	/** The change event name. */
-	protected String changeevent;
+	protected EventType changeevent;
 	
 	/** The belief model. */
 	protected MBelief mbel;
@@ -46,6 +46,15 @@ public class CollectionWrapper <T> implements Collection<T>
 	 */
 	public CollectionWrapper(Collection<T> delegate, BDIAgentInterpreter interpreter, 
 		String addevent, String remevent, String changeevent, MBelief mbel)
+	{
+		this(delegate, interpreter, new EventType(addevent), new EventType(remevent), new EventType(changeevent), mbel);
+	}
+	
+	/**
+	 *  Create a new collection wrapper.
+	 */
+	public CollectionWrapper(Collection<T> delegate, BDIAgentInterpreter interpreter, 
+		EventType addevent, EventType remevent, EventType changeevent, MBelief mbel)
 	{
 		this.delegate = delegate;
 		this.interpreter = interpreter;

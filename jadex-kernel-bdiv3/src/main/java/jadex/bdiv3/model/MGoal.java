@@ -369,6 +369,34 @@ public class MGoal extends MClassBasedElement
 	{
 		return parameters;
 	}
+	
+	/**
+	 *  Get a parameter by name.
+	 */
+	public MParameter getParameter(String name)
+	{
+		MParameter ret = null;
+		if(parameters!=null && name!=null)
+		{
+			for(MParameter param: parameters)
+			{
+				if(param.getName().equals(name))
+				{
+					ret = param;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Test if goal has a parameter.
+	 */
+	public boolean hasParameter(String name)
+	{
+		return getParameter(name)!=null;
+	}
 
 	/**
 	 *  Set the parameters.

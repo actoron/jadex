@@ -3,6 +3,8 @@ package jadex.bdiv3;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
+import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.model.MParameter;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IBeliefListener;
@@ -256,6 +258,15 @@ public class BDIAgent extends MicroAgent
 	 */
 	protected void writeField(Object val, String belname, String fieldname, Object obj)
 	{
+		writeField(val, belname, fieldname, obj, new EventType(ChangeEvent.BELIEFCHANGED+"."+belname), new EventType(ChangeEvent.FACTCHANGED+"."+belname));
+	}
+	
+	/**
+	 *  Method that is called automatically when a belief 
+	 *  is written as field access.
+	 */
+	protected void writeField(Object val, String belname, String fieldname, Object obj, EventType ev1, EventType ev2)
+	{
 		assert isComponentThread();
 		
 		// todo: support for belief sets (un/observe values? insert mappers when setting value etc.
@@ -276,13 +287,15 @@ public class BDIAgent extends MicroAgent
 			if(!SUtil.equals(val, oldval))
 			{
 				publishToolBeliefEvent(ip, mbel);
-				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
+//				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
+				rs.addEvent(new Event(ev1, val));
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 
 			}
 			
 			// observe new value for property changes
-			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname, mbel);
+//			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname, mbel);
+			observeValue(rs, val, ip, ev2, mbel);
 			
 			// initiate a step to reevaluate the conditions
 			scheduleStep(new IComponentStep()
@@ -405,17 +418,20 @@ public class BDIAgent extends MicroAgent
 		// Wrap collections of multi beliefs (if not already a wrapper)
 		if(mbel.isMulti(ip.getClassLoader()))
 		{
+			String addev = ChangeEvent.FACTADDED+"."+belname;
+			String remev = ChangeEvent.FACTREMOVED+"."+belname;
+			String chev = ChangeEvent.FACTCHANGED+"."+belname;
 			if(val instanceof List && !(val instanceof ListWrapper))
 			{
-				val = new ListWrapper((List<?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname, mbel);
+				val = new ListWrapper((List<?>)val, ip, addev, remev, chev, mbel);
 			}
 			else if(val instanceof Set && !(val instanceof SetWrapper))
 			{
-				val = new SetWrapper((Set<?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname, mbel);
+				val = new SetWrapper((Set<?>)val, ip, addev, remev, chev, mbel);
 			}
 			else if(val instanceof Map && !(val instanceof MapWrapper))
 			{
-				val = new MapWrapper((Map<?,?>)val, ip, ChangeEvent.FACTADDED+"."+belname, ChangeEvent.FACTREMOVED+"."+belname, ChangeEvent.FACTCHANGED+"."+belname, mbel);
+				val = new MapWrapper((Map<?,?>)val, ip, addev, remev, chev, mbel);
 			}
 		}
 		
@@ -585,6 +601,14 @@ public class BDIAgent extends MicroAgent
 	 */
 	public static void observeValue(RuleSystem rs, Object val, final BDIAgentInterpreter agent, final String etype, final MBelief mbel)
 	{
+		observeValue(rs, val, agent, new EventType(etype), mbel);
+	}
+	
+	/**
+	 * 
+	 */
+	public static void observeValue(RuleSystem rs, Object val, final BDIAgentInterpreter agent, final EventType etype, final MBelief mbel)
+	{
 		if(val!=null)
 		{
 			rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
@@ -696,7 +720,7 @@ public class BDIAgent extends MicroAgent
 	 */
 	public static void publishToolBeliefEvent(BDIAgentInterpreter ip, MBelief mbel)//, String evtype)
 	{
-		if(ip.hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
+		if(mbel!=null && ip.hasEventTargets(PublishTarget.TOSUBSCRIBERS, PublishEventLevel.FINE))
 		{
 			long time = System.currentTimeMillis();//getClockService().getTime();
 			MonitoringEvent mev = new MonitoringEvent();
@@ -734,5 +758,97 @@ public class BDIAgent extends MicroAgent
 		
 		String belname	= gn!=null ? gn + BDIAgentInterpreter.CAPABILITY_SEPARATOR + fieldname : fieldname;
 		return belname;
+	}
+	
+	//-------- methods for goal/plan parameter rewrites --------
+	
+	/**
+	 *  Method that is called automatically when a parameter 
+	 *  is written as field access.
+	 */
+	public static void writeParameterField(Object val, String fieldname, Object obj, BDIAgent agent)
+	{
+//		System.out.println("write: "+val+" "+fieldname+" "+obj+" "+agent);
+		
+		// This is the case in inner classes
+		if(agent==null)
+		{
+			try
+			{
+				Tuple2<Field, Object> res = findFieldWithOuterClass(obj, "__agent");
+//					System.out.println("res: "+res);
+				agent = (BDIAgent)res.getFirstEntity().get(res.getSecondEntity());
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+
+		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+		String elemname = obj.getClass().getName();
+		MGoal mgoal = ip.getBDIModel().getCapability().getGoal(elemname);
+		
+//		String paramname = elemname+"."+fieldname; // ?
+
+		if(mgoal!=null)
+		{
+			MParameter mparam = mgoal.getParameter(fieldname);
+			if(mparam!=null)
+			{
+				// Wrap collections of multi beliefs (if not already a wrapper)
+				if(mparam.isMulti(ip.getClassLoader()))
+				{
+					EventType addev = new EventType(new String[]{ChangeEvent.VALUEADDED, elemname, fieldname});
+					EventType remev = new EventType(new String[]{ChangeEvent.VALUEREMOVED, elemname, fieldname});
+					EventType chev = new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, fieldname});
+					if(val instanceof List && !(val instanceof ListWrapper))
+					{
+						val = new ListWrapper((List<?>)val, ip, addev, remev, chev, null);
+					}
+					else if(val instanceof Set && !(val instanceof SetWrapper))
+					{
+						val = new SetWrapper((Set<?>)val, ip, addev, remev, chev, null);
+					}
+					else if(val instanceof Map && !(val instanceof MapWrapper))
+					{
+						val = new MapWrapper((Map<?,?>)val, ip, addev, remev, chev, null);
+					}
+				}
+			}
+		}
+		
+		// agent is not null any more due to deferred exe of init expressions but rules are
+		// available only after startBehavior
+		if(ip.isInited())
+		{
+			EventType chev1 = new EventType(new String[]{ChangeEvent.PARAMETERCHANGED, elemname, fieldname});
+			EventType chev2 = new EventType(new String[]{ChangeEvent.VALUECHANGED, elemname, fieldname});
+			agent.writeField(val, null, fieldname, obj, chev1, chev2);
+		}
+//			else
+//			{
+//				// In init set field immediately but throw events later, when agent is available.
+//				
+//				try
+//				{
+//					setFieldValue(obj, fieldname, val);
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//					throw new RuntimeException(e);
+//				}
+//				synchronized(initwrites)
+//				{
+//					List<Object[]> inits = initwrites.get(agent);
+//					if(inits==null)
+//					{
+//						inits = new ArrayList<Object[]>();
+//						initwrites.put(agent, inits);
+//					}
+//					inits.add(new Object[]{val, belname});
+//				}
+//			}
 	}
 }

@@ -1776,8 +1776,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		ComponentSuspendable sus = ComponentSuspendable.COMSUPS.get();
 		if(rplan!=null && sus!=null && !RPlan.PlanProcessingState.WAITING.equals(rplan.getProcessingState()))
 		{
-			Future fut = sus.getFuture();
-			final ResumeCommand<Void> rescom = rplan.new ResumeCommand<Void>(fut, false);
+			final ResumeCommand<Void> rescom = rplan.new ResumeCommand<Void>(sus, false);
 			rplan.setProcessingState(PlanProcessingState.WAITING);
 			rplan.resumecommand = rescom;
 		}
@@ -1795,6 +1794,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			rplan.setProcessingState(PlanProcessingState.RUNNING);
 			if(rplan.resumecommand!=null)
 			{
+				// performs only cleanup without setting future
 				rplan.resumecommand.execute(Boolean.FALSE);
 				rplan.resumecommand = null;
 			}

@@ -3,10 +3,14 @@ package jadex.bdiv3.model;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
+import jadex.commons.SReflect;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -20,6 +24,9 @@ public class MParameter extends MElement
 	/** The method targets. */
 	protected MethodInfo mgetter;
 	protected MethodInfo msetter;
+	
+	/** Flag if is multi. */
+	protected Boolean multi;
 	
 	/**
 	 *  Create a new parameter.
@@ -207,5 +214,37 @@ public class MParameter extends MElement
 	public MethodInfo getSetter()
 	{
 		return msetter;
+	}
+	
+	/**
+	 *  Get the multi.
+	 *  @return The multi.
+	 */
+	public boolean isMulti(ClassLoader cl)
+	{
+		if(multi==null)
+		{
+			Class<?> ftype = null;
+			if(ftarget!=null)
+			{
+				Field f = ftarget.getField(cl);
+				ftype = f.getType();
+			}
+			else 
+			{
+				ftype = mgetter.getMethod(cl).getReturnType();
+			}
+			if(ftype.isArray() || SReflect.isSupertype(List.class, ftype) 
+				|| SReflect.isSupertype(Set.class, ftype)
+				|| SReflect.isSupertype(Map.class, ftype))
+			{
+				multi = Boolean.TRUE;
+			}
+			else
+			{
+				multi = Boolean.FALSE;
+			}
+		}
+		return multi;
 	}
 }

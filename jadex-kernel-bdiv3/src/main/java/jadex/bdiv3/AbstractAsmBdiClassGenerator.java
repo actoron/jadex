@@ -213,6 +213,26 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	}
 	
 	/**
+	 * Check whether a given Annotation marks a goal.
+	 * @param annotationDescription description of the annotation
+	 * @return true, if the given annotationDescription marks a goal.
+	 */
+	protected boolean isGoal(String annotationDescription)
+	{
+		return annotationDescription.indexOf("Ljadex/bdiv3/annotation/Goal;")!=-1;
+	}
+	
+	/**
+	 * Check whether a given Annotation marks a plan.
+	 * @param annotationDescription description of the annotation
+	 * @return true, if the given annotationDescription marks a plan.
+	 */
+	protected boolean isPlan(String annotationDescription)
+	{
+		return annotationDescription.indexOf("Ljadex/bdiv3/annotation/Plan;")!=-1;
+	}
+	
+	/**
 	 * 
 	 * @param classNode
 	 * @return

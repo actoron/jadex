@@ -432,7 +432,31 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	    	}
 		}
 	}
-    
+	
+	/**
+	 *  Abort a blocking get call.
+	 */
+	public void abortGet(ISuspendable caller)
+	{
+		synchronized(this)
+		{
+    	   	if(callers!=null && callers.containsKey(caller))
+    	   	{
+	    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+	    		synchronized(mon)
+				{
+	    			String	state	= callers.get(caller);
+	    			if(CALLER_SUSPENDED.equals(state))
+	    			{
+	    				// Only reactivate thread when previously suspended.
+	    				caller.resume(this);
+	    			}
+	    			callers.put(caller, CALLER_RESUMED);
+				}
+			}
+		}
+	}
+	
     /**
      *  Add a result listener.
      *  @param listsner The listener.
