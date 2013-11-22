@@ -11,6 +11,7 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -25,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 /**
  *  Agent that lets a user interact with the web service offering a user interface. 
@@ -39,11 +41,8 @@ public class UserAgent
 	@Agent
 	protected MicroAgent agent;
 	
-	/** The text field for the symbol. */
-	protected JTextField tfsymbol;
-	
-	/** The text field for the result. */
-	protected JTextField tfresult;
+	/** The gui. */
+	protected JFrame	f;
 
 	//-------- methods --------
 	
@@ -51,66 +50,98 @@ public class UserAgent
 	 *  Called when agent is born.
 	 */
 	@AgentCreated
-	public void agentCreated()
+	public IFuture<Void> agentCreated()
 	{
-		JFrame f = new JFrame();
-		f.setLayout(new BorderLayout());
-		JPanel p = new JPanel(new GridBagLayout());
-		tfsymbol = new JTextField(10);
-		tfsymbol.setText("Google");
-		JButton b = new JButton("get");
-		tfresult = new JTextField(10);
-		p.add(tfsymbol, new GridBagConstraints(0, 0, 1, 1, 1, 0, GridBagConstraints.WEST, 
-			GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0), 0, 0));
-		p.add(b, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.WEST, 
-			GridBagConstraints.NONE, new Insets(0,0,0,0), 0, 0));
-		p.add(tfresult, new GridBagConstraints(0, 1, 2, 1, 0, 0, GridBagConstraints.WEST, 
-			GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0), 0, 0));
-		f.add(p, BorderLayout.CENTER);
-		f.pack();
-		f.setLocation(SGUI.calculateMiddlePosition(f));
-		f.setVisible(true);
-
-		final IExternalAccess exta = agent.getExternalAccess();
+		final Future<Void>	cret	= new Future<Void>();
 		
-		b.addActionListener(new ActionListener()
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			public void actionPerformed(ActionEvent e)
+			public void run()
 			{
-				final String stock = tfsymbol.getText();
-//				System.out.println("stock is: "+stock);
+				f = new JFrame();
+				f.setLayout(new BorderLayout());
+				JPanel p = new JPanel(new GridBagLayout());
+				final JTextField	tfsymbol = new JTextField(10);
+				tfsymbol.setText("Google");
+				JButton b = new JButton("get");
+				final JTextField	tfresult = new JTextField(10);
+				p.add(tfsymbol, new GridBagConstraints(0, 0, 1, 1, 1, 0, GridBagConstraints.WEST, 
+					GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0), 0, 0));
+				p.add(b, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.WEST, 
+					GridBagConstraints.NONE, new Insets(0,0,0,0), 0, 0));
+				p.add(tfresult, new GridBagConstraints(0, 1, 2, 1, 0, 0, GridBagConstraints.WEST, 
+					GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0), 0, 0));
+				f.add(p, BorderLayout.CENTER);
+				f.pack();
+				f.setLocation(SGUI.calculateMiddlePosition(f));
+				f.setVisible(true);
+
+				final IExternalAccess exta = agent.getExternalAccess();
 				
-				exta.scheduleStep(new IComponentStep<Object>()
+				b.addActionListener(new ActionListener()
 				{
-					public IFuture<Object> execute(IInternalAccess ia)
+					public void actionPerformed(ActionEvent e)
 					{
-						final Future<Object> ret = new Future<Object>();
-						IFuture<IQuoteService> fut = ia.getServiceContainer().getRequiredService("quoteservice");
-						fut.addResultListener(new ExceptionDelegationResultListener<IQuoteService, Object>(ret)
+						final String stock = tfsymbol.getText();
+//						System.out.println("stock is: "+stock);
+						
+						exta.scheduleStep(new IComponentStep<Object>()
 						{
-							public void customResultAvailable(IQuoteService qs)
+							public IFuture<Object> execute(IInternalAccess ia)
 							{
-								qs.getQuote(stock)
-									.addResultListener(new ExceptionDelegationResultListener<String, Object>(ret)
+								final Future<Object> ret = new Future<Object>();
+								IFuture<IQuoteService> fut = ia.getServiceContainer().getRequiredService("quoteservice");
+								fut.addResultListener(new ExceptionDelegationResultListener<IQuoteService, Object>(ret)
 								{
-									public void customResultAvailable(String result) 
+									public void customResultAvailable(IQuoteService qs)
 									{
-										ret.setResult(result);
-//										System.out.println("quote: "+result);
-									};
+										qs.getQuote(stock)
+											.addResultListener(new ExceptionDelegationResultListener<String, Object>(ret)
+										{
+											public void customResultAvailable(String result) 
+											{
+												ret.setResult(result);
+//												System.out.println("quote: "+result);
+											};
+										});
+									}
 								});
+								return ret;
+							}
+						}).addResultListener(new SwingDefaultResultListener<Object>()
+						{
+							public void customResultAvailable(Object result)
+							{
+								tfresult.setText(""+result);
 							}
 						});
-						return ret;
-					}
-				}).addResultListener(new SwingDefaultResultListener<Object>()
-				{
-					public void customResultAvailable(Object result)
-					{
-						tfresult.setText(""+result);
 					}
 				});
+				cret.setResult(null);
 			}
 		});
+		
+		return cret;
+	}
+	
+	
+	/**
+	 *  Called when the agent is killed.
+	 */
+	@AgentKilled
+	public IFuture<Void>	cleanup()
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				f.dispose();
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
 }

@@ -1,9 +1,12 @@
 package jadex.webservice.examples.rs.chart;
 
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.RestServiceAgent;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
@@ -26,19 +29,23 @@ public class ChartUserAgent extends RestServiceAgent
 	@Agent
 	protected MicroAgent agent;
 	
+	protected JFrame	f; 
+	
 	//-------- emthods --------
 
 	/**
-	 *  The agent body.
+	 *  The agent init.
 	 */
-	@AgentBody
-	public void executeBody()
+	@AgentCreated
+	public IFuture<Void> init()
 	{
+		final Future<Void>	ret	= new Future<Void>();
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				final JFrame f = ChartPanel.createChartFrame(agent.getExternalAccess());
+				f = ChartPanel.createChartFrame(agent.getExternalAccess());
 				f.addWindowListener(new WindowAdapter()
 				{
 					public void windowClosing(WindowEvent e)
@@ -46,8 +53,31 @@ public class ChartUserAgent extends RestServiceAgent
 						agent.killAgent();
 					}
 				});
+				ret.setResult(null);
 			}
 		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Called when the agent is killed.
+	 */
+	@AgentKilled
+	public IFuture<Void>	cleanup()
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				f.dispose();
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
 }
 
