@@ -7,6 +7,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -19,7 +21,7 @@ public class NIOTCPInputConnection	implements Closeable
 	/** 10 kB as message buffer */
 	static final int BUFFER_SIZE	= 1024 * 10;
 
-	// -------- attributes ---------
+	//-------- attributes ---------
 
 	/** The socket channel for receiving messages. */
 	protected SocketChannel	sc;
@@ -39,8 +41,10 @@ public class NIOTCPInputConnection	implements Closeable
 	/** The msg pos. */
 	protected int msg_pos;
 
-	// -------- constrcutors --------
+	//-------- constrcutors --------
 
+	static Map<SocketChannel, NIOTCPInputConnection> icons = new HashMap<SocketChannel, NIOTCPInputConnection>();
+	
 	/**
 	 * Constructor for InputConnection.
 	 * 
@@ -50,11 +54,17 @@ public class NIOTCPInputConnection	implements Closeable
 	 */
 	public NIOTCPInputConnection(SocketChannel sc)
 	{
-		// System.out.println("Creating input con: "+sc);
+//		System.out.println("Creating input con: "+sc);
 		this.sc = sc;
 		this.wb = ByteBuffer.allocateDirect(BUFFER_SIZE);
 		this.rb = wb.asReadOnlyBuffer();
 		msg_len = -1; // No message available.
+//		
+//		synchronized(NIOTCPInputConnection.class)
+//		{
+//			icons.put(sc, this);
+//			System.out.println("icons create: "+icons.size());
+//		}
 	}
 
 	// -------- methods --------
@@ -144,14 +154,25 @@ public class NIOTCPInputConnection	implements Closeable
 	 */
 	public void close()
 	{
+//		synchronized(NIOTCPInputConnection.class)
+//		{
+//			Object old = icons.remove(sc);
+//			System.out.println("icons rem: "+icons.size());
+//			if(old==null)
+//				System.out.println("!!!!!!!!!!!");
+//		}
+		
 		try
 		{
-//			System.out.println("closed: "+this);
+//			System.out.println("Closing icon: "+sc);
+			sc.socket().close();
 			sc.close();
+			sc = null;
+//			sc.socket().close();
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{
-			// e.printStackTrace();
+//			e.printStackTrace();
 		}
 	}
 

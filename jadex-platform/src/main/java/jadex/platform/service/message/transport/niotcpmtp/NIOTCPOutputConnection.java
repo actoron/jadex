@@ -6,6 +6,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Struct for holding information about an output connection.
@@ -25,6 +27,8 @@ public class NIOTCPOutputConnection	implements Closeable
 	
 	//-------- constructors --------
 	
+	static Map<SocketChannel, NIOTCPOutputConnection> ocons = new HashMap<SocketChannel, NIOTCPOutputConnection>();
+	
 	/**
 	 *  Create a new output connection.
 	 */
@@ -33,6 +37,12 @@ public class NIOTCPOutputConnection	implements Closeable
 		this.sc	= sc;
 		this.address	= address;
 		this.cleaner	= cleaner;
+		
+//		synchronized(NIOTCPInputConnection.class)
+//		{
+//			ocons.put(sc, this);
+//			System.out.println("ocons create: "+ocons.size());
+//		}
 	}
 	
 	//-------- methods --------
@@ -67,9 +77,28 @@ public class NIOTCPOutputConnection	implements Closeable
 	 */
 	public void close() throws IOException
 	{
+//		synchronized(NIOTCPInputConnection.class)
+//		{
+//			Object old = ocons.remove(sc);
+//			System.out.println("ocons rem: "+ocons.size());
+//			if(old==null)
+//				System.out.println("!!!!!!!!!!!");
+//		}
+		
 //		System.out.println("Shutdown: "+sc.socket());
-		sc.close();
-		sc.socket().shutdownOutput();
+		try
+		{
+			sc.socket().close();
+			sc.close();
+			sc = null;
+//			sc.socket().close();
+//			sc.socket().shutdownInput();
+//			sc.socket().shutdownOutput();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		cleaner.remove();
 	}
 }

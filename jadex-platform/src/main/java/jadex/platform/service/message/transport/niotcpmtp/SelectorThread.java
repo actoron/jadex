@@ -104,6 +104,8 @@ public class SelectorThread implements Runnable
 				// Wait for an event one of the registered channels
 //				System.out.println("NIO selector idle");
 				this.selector.select();
+				
+//				System.out.println("cons: "+cnt);
 
 				// Iterate over the set of keys for which events are available
 				Iterator<SelectionKey> selectedKeys = this.selector.selectedKeys().iterator();
@@ -556,6 +558,7 @@ public class SelectorThread implements Runnable
 			{
 				// Connection lost, try to reconnect before marking as dead connection.
 				connections.remove(con.getAddress());
+				try{con.close();}catch(Exception ex){}
 				cnt--;
 			}
 			
@@ -740,6 +743,7 @@ public class SelectorThread implements Runnable
 							con	= null;
 						}
 					}
+					
 					if(con instanceof NIOTCPOutputConnection)
 					{
 						synchronized(connections)
@@ -749,7 +753,8 @@ public class SelectorThread implements Runnable
 						
 						try
 						{
-							((NIOTCPOutputConnection)con).getSocketChannel().close();
+//							((NIOTCPOutputConnection)con).getSocketChannel().close();
+							((NIOTCPOutputConnection)con).close();
 						}
 						catch(Exception e)
 						{
