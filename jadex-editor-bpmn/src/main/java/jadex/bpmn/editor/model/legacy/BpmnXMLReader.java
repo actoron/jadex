@@ -30,7 +30,6 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -227,8 +226,8 @@ public class BpmnXMLReader
 		}
 		ret.setResourceIdentifier(rid);
 		
-		ret.initModelInfo();
-		((ModelInfo) ret.getModelInfo()).getProperties().remove("debugger.breakpoints");
+//		ret.initModelInfo();
+//		((ModelInfo) ret.getModelInfo()).getProperties().remove("debugger.breakpoints");
 		rinfo.getInputStream().close();
 		
 		if(!((ModelInfo)ret.getModelInfo()).checkName())
@@ -668,9 +667,10 @@ public class BpmnXMLReader
 						String paramdir = stok2.nextToken();
 						String paramclazzname = stok2.nextToken();
 						
-						Class paramclazz = SReflect.findClass0(paramclazzname, dia.getModelInfo().getAllImports(), context.getClassLoader());
-						if(paramclazz==null)
-							throw new RuntimeException("Parameter class not found in imports: "+dia+", "+act+", "+paramclazzname);//+", "+SUtil.arrayToString(dia.getAllImports()));
+						ClassInfo paramclazz = new ClassInfo(paramclazzname);
+//						Class paramclazz = SReflect.findClass0(paramclazzname, dia.getModelInfo().getAllImports(), context.getClassLoader());
+//						if(paramclazz==null)
+//							throw new RuntimeException("Parameter class not found in imports: "+dia+", "+act+", "+paramclazzname);//+", "+SUtil.arrayToString(dia.getAllImports()));
 						
 						String paramname = stok2.nextToken();
 						
@@ -680,11 +680,11 @@ public class BpmnXMLReader
 						{
 							String proptext = prop.substring(idx+1).trim();
 //							paramexp = parser.parseExpression(proptext, dia.getModelInfo().getAllImports(), null, context.getClassLoader());
-							paramexp = new UnparsedExpression(paramname, paramclazz, proptext, null);
+							paramexp = new UnparsedExpression(paramname, paramclazzname, proptext, null);
 							SJavaParser.parseExpression(paramexp, dia.getModelInfo().getAllImports(), context.getClassLoader());
 						}
 						
-						MParameter param = new MParameter(paramdir, new ClassInfo(paramclazz), paramname, paramexp);
+						MParameter param = new MParameter(paramdir, paramclazz, paramname, paramexp);
 						act.addParameter(param);
 					}
 					else if(idx!=-1)
@@ -855,25 +855,25 @@ public class BpmnXMLReader
 											String val = stok2.hasMoreTokens() ? stok2.nextToken() : null;
 											
 											
-											try
-											{
-												Class clazz = SReflect.findClass(clazzname, dia.getModelInfo().getAllImports(),
-													context.getClassLoader());
+//											try
+//											{
+//												Class clazz = SReflect.findClass(clazzname, dia.getModelInfo().getAllImports(),
+//													context.getClassLoader());
 												UnparsedExpression exp = null;
 												if(val != null && val.length() > 0)
 												{
 //													exp = parser.parseExpression(val, dia.getModelInfo().getAllImports(),
 //														null, context.getClassLoader());
-													exp = new UnparsedExpression(name, clazz, val, null);
+													exp = new UnparsedExpression(name, clazzname, val, null);
 												}
-												MParameter param = new MParameter(dir, new ClassInfo(clazz), name, exp);
+												MParameter param = new MParameter(dir, new ClassInfo(clazzname), name, exp);
 												act.addParameter(param);
 												// System.out.println("Parameter: "+param);
-											}
-											catch (ClassNotFoundException cnfe)
-											{
-												throw new RuntimeException(cnfe);
-											}
+//											}
+//											catch (ClassNotFoundException cnfe)
+//											{
+//												throw new RuntimeException(cnfe);
+//											}
 										}
 
 										// Parameters of event handlers have 2 elements = are treated as properties?!
@@ -1679,34 +1679,36 @@ public class BpmnXMLReader
 							if("".equals(implname))
 								implname	= null;
 
-							Class impltype = implname!=null ? SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader()) : null;
-							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
-							if(type==null)
-							{
-								try
-								{
-									((AReadContext)context).getReporter().report("Type not found: "+typename, null, null, null);
-								}
-								catch(Exception e)
-								{
-									throw new RuntimeException(e);
-								}
-							}
+//							Class impltype = implname!=null ? SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader()) : null;
+//							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
+							ClassInfo type = new ClassInfo(typename);
+//							if(type==null)
+//							{
+//								try
+//								{
+//									((AReadContext)context).getReporter().report("Type not found: "+typename, null, null, null);
+//								}
+//								catch(Exception e)
+//								{
+//									throw new RuntimeException(e);
+//								}
+//							}
 							RequiredServiceBinding binding = implname!=null ? (RequiredServiceBinding)bindings.get(implname) : null;
-							ProvidedServiceImplementation psim	= null;
-							if(binding!=null)
-							{
-								// todo: interceptors
-								psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
-							}
-							else
-							{
-								// todo: interceptors
-								psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
-							}
+//							ProvidedServiceImplementation psim	= null;
+//							if(binding!=null)
+//							{
+//								// todo: interceptors
+//								psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
+//							}
+//							else
+//							{
+//								// todo: interceptors
+//								psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
+//							}
 							
 							// todo: support publish
-							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null);
+//							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null);
+							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, null, null);
 							mi.addProvidedService(psi);
 							
 							if(table.getRowSize()>4)
@@ -1722,20 +1724,21 @@ public class BpmnXMLReader
 									ConfigurationInfo ci = (ConfigurationInfo)configurations.get(configid);
 									if(ci!=null)
 									{
-										impltype = implname!=null ? SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader()) : null;
+//										impltype = implname!=null ? SReflect.findClass0(implname, mi.getAllImports(), context.getClassLoader()) : null;
 										binding = implname!=null ? (RequiredServiceBinding)bindings.get(implname) : null;
-										if(binding!=null)
-										{
-											// todo: interceptors
-											psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
-										}
-										else
-										{
-											// todo: interceptors
-											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
-										}
+//										if(binding!=null)
+//										{
+//											// todo: interceptors
+//											psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
+//										}
+//										else
+//										{
+//											// todo: interceptors
+//											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
+//										}
 										// todo: support publish
-										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null));
+//										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null));
+										ci.addProvidedService(new ProvidedServiceInfo(name, type, null, null));
 									}
 								}
 							}
@@ -1754,8 +1757,8 @@ public class BpmnXMLReader
 							String mtypename = null;//table.getCellValue(row, 4);
 							if("".equals(bindingname))
 								bindingname	= null;
-							Class<?> type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
-							Class<?> mtype = mtypename==null? null: SReflect.findClass0(mtypename, mi.getAllImports(), context.getClassLoader());
+//							Class<?> type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
+//							Class<?> mtype = mtypename==null? null: SReflect.findClass0(mtypename, mi.getAllImports(), context.getClassLoader());
 							boolean multiple = new Boolean(multi).booleanValue();
 							
 							RequiredServiceInfo rsi;
@@ -1764,11 +1767,12 @@ public class BpmnXMLReader
 								RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 								if(binding==null)
 									throw new RuntimeException("Unknown binding: "+bindingname);
-								rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding, null);
+								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), multiple, new ClassInfo(mtypename), binding, null);
 							}
 							else
 							{
-								rsi = new RequiredServiceInfo(name, type);
+//								rsi = new RequiredServiceInfo(name, type);
+								rsi = new RequiredServiceInfo(name, new ClassInfo(typename), false, new ClassInfo(mtypename), new RequiredServiceBinding(name, RequiredServiceInfo.SCOPE_APPLICATION), null);
 								rsi.setMultiple(multiple);
 							}
 							mi.addRequiredService(rsi);
@@ -1791,11 +1795,12 @@ public class BpmnXMLReader
 											RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 											if(binding==null)
 												throw new RuntimeException("Unknown binding: "+bindingname);
-											rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding, null);
+											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), multiple, new ClassInfo(mtypename), binding, null);
 										}
 										else
 										{
-											rsi = new RequiredServiceInfo(name, type);
+//											rsi = new RequiredServiceInfo(name, new ClassInfo(typename));
+											rsi = new RequiredServiceInfo(name, new ClassInfo(typename), false, new ClassInfo(mtypename), new RequiredServiceBinding(name, RequiredServiceInfo.SCOPE_APPLICATION), null);
 											rsi.setMultiple(multiple);
 										}
 										ci.addRequiredService(rsi);
@@ -2066,14 +2071,14 @@ public class BpmnXMLReader
 						if(stok2.countTokens()==2)
 						{
 							String clazzname = stok2.nextToken();
-							Class clazz = SReflect.findClass0(clazzname, mi.getAllImports(), context.getClassLoader());
-							if(clazz!=null)
-							{
+//							Class clazz = SReflect.findClass0(clazzname, mi.getAllImports(), context.getClassLoader());
+//							if(clazz!=null)
+//							{
 								String name = stok2.nextToken();
 								//UnparsedExpression exp = null;
 								MContextVariable cv = new MContextVariable();
 								cv.setName(name);
-								cv.setClazz(new ClassInfo(clazz));
+								cv.setClazz(new ClassInfo(clazzname));
 								if(init!=null)
 								{
 //									exp = parser.parseExpression(init, mi.getAllImports(), null, context.getClassLoader());
@@ -2083,7 +2088,7 @@ public class BpmnXMLReader
 								
 								//model.addContextVariable(name, new ClassInfo(clazz), exp, null);
 								model.addContextVariable(cv);
-							}
+//							}
 						}
 					}
 				}

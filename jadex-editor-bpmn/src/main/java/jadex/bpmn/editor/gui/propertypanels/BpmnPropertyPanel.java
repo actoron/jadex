@@ -778,7 +778,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				ps.setImplementation(psimpl);
 				
 //				String confname = (String)confmodel.getSelectedItem();
-				int row;
+				// Row derived from length must be determined BEFORE item is added.
+				int row = getModelInfo().getProvidedServices().length;
 //				if(confname!=null)
 //				{
 //					getModelInfo().getConfiguration(confname).addProvidedService(ps);
@@ -787,7 +788,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 //				else
 //				{
 					getModelInfo().addProvidedService(ps);
-					row = getModelInfo().getProvidedServices().length;
+//					row = getModelInfo().getProvidedServices().length;
 //				}
 				
 				modelcontainer.setDirty(true);
@@ -902,7 +903,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				rs.setName(name);
 				
 //				String confname = (String)confmodel.getSelectedItem();
-				int row;
+				// Row derived from length must be determined BEFORE item is added.
+				int row = getModelInfo().getProvidedServices().length;
 //				if(confname!=null)
 //				{
 //					getModelInfo().getConfiguration(confname).addRequiredService(rs);
@@ -911,7 +913,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 //				else
 //				{
 					getModelInfo().addRequiredService(rs);
-					row = getModelInfo().getRequiredServices().length;
+//					row = getModelInfo().getRequiredServices().length;
 //				}
 				
 				modelcontainer.setDirty(true);
@@ -1805,7 +1807,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 						for (ConfigurationInfo itconf : confs)
 						{
 							ProvidedServiceInfo itcs = getProvService(ps.getName(), itconf);
-							itcs.setName(newname);
+							if (itcs != null)
+								itcs.setName(newname);
 						}
 						ps.setName(newname);
 					}
