@@ -4,7 +4,6 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -16,14 +15,13 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.STransformation;
@@ -151,7 +149,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 */
 	public void messageArrived(final Map<String, Object> msg, final MessageType mt)
 	{
-		String	tmp	= (""+msg.get(SFipa.CONTENT)).replace("\n", " ").replace("\r", " ");
+//		String	tmp	= (""+msg.get(SFipa.CONTENT)).replace("\n", " ").replace("\r", " ");
 //		System.out.println("RMS "+getComponentIdentifier()+" received message from "+msg.get(SFipa.SENDER)
 //			+": "+tmp.substring(0, Math.min(tmp.length(), 400)));
 		
@@ -179,7 +177,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
 			getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DefaultResultListener<ILibraryService>()
+				.addResultListener(new IResultListener<ILibraryService>()
 			{
 				public void resultAvailable(final ILibraryService ls)
 				{
@@ -247,7 +245,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							public void resultAvailable(Void result)
 							{
 								RemoteServiceManagementService.getResourceIdentifier(getServiceProvider(), ((AbstractRemoteCommand)com).getRealReceiver())
-									.addResultListener(createResultListener(new DefaultResultListener<IResourceIdentifier>()
+									.addResultListener(createResultListener(new IResultListener<IResourceIdentifier>()
 								{
 									public void resultAvailable(final IResourceIdentifier srid) 
 									{
@@ -266,6 +264,16 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										
 										com.execute((IMicroExternalAccess)getExternalAccess(), rms)
 											.addResultListener(createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
+									}
+									
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										// Terminated, when rms killed in mean time
+										if(!(exception instanceof ComponentTerminatedException))
+										{
+											getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
+										}
 									}
 								}));
 							}
@@ -305,7 +313,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					}
 
 					// Send reply.
-					reply.addResultListener(createResultListener(new IntermediateDefaultResultListener<IRemoteCommand>()
+					reply.addResultListener(createResultListener(new IIntermediateResultListener<IRemoteCommand>()
 					{
 						public void intermediateResultAvailable(IRemoteCommand result)
 						{
@@ -337,7 +345,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									pre.setResult(null);
 								}
 								
-								pre.addResultListener(new DefaultResultListener<Void>()
+								pre.addResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void v)
 									{
@@ -377,14 +385,18 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										// Ignore when terminated in mean time.
+										// Terminated, when rms killed in mean time
 										if(!(exception instanceof ComponentTerminatedException))
 										{
-											super.exceptionOccurred(exception);
+											getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
 										}
 									}
 								});
 							}
+						}
+						
+						public void finished()
+						{
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -392,7 +404,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							// Terminated, when rms killed in mean time
 							if(!(exception instanceof ComponentTerminatedException))
 							{
-								super.exceptionOccurred(exception);
+								getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
 							}
 						}
 					}));
@@ -403,7 +415,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					// Terminated, when rms killed in mean time
 					if(!(exception instanceof ComponentTerminatedException))
 					{
-						super.exceptionOccurred(exception);
+						getLogger().warning("Exception while sending reply to "+msg.get(SFipa.SENDER)+": "+exception);
 					}
 				}
 			});

@@ -582,68 +582,90 @@ public class HttpRelayTransport implements ITransport
 		
 		if(startworker)
 		{
-			threadpool.execute(new Runnable()
-			{
-				public void run()
-				{
-//					System.out.println("starting worker");
-					boolean	again	= true;
-					
-					while(again)
-					{
-						ISendTask	task	= null;
-						Future<Void>	ret	= null;
-						synchronized(workers)
-						{
-							List<Tuple2<ISendTask, Future<Void>>>	queue	= sendqueue.get(address);
-							if(queue!=null)
-							{
-								Tuple2<ISendTask, Future<Void>>	tup	= queue.remove(0);
-								task	= tup.getFirstEntity();
-								ret	= tup.getSecondEntity();
-								if(queue.isEmpty())
-								{
-									sendqueue.remove(address);
-								}
-							}
-							else
-							{
-								again	= false;
-								Integer	cnt	= workers.get(address);
-								if(cnt.intValue()>1)
-								{
-									workers.put(address, new Integer(cnt.intValue()-1));
-								}
-								else
-								{
-									workers.remove(address);
-								}
-							}
-						}
-						
-						if(task!=null)
-						{
-							try
-							{
-								// Message service only calls transport.sendMessage() with receivers on same destination
-								// so just use first to fetch platform id.
-								IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
-								byte[][]	data	= new byte[][]{task.getProlog(), task.getData()};
-								conman.postMessage(address, targetid, data);
-								addresses.put(address, new Long(System.currentTimeMillis()));
-								ret.setResult(null);
-//								System.out.println("Sent with HTTP Relay: "+System.currentTimeMillis()+", "+address);
-							}
-							catch(Exception e)
-							{
-								ret.setException(e);
-							}
-						}
-					}
-//					System.out.println("stopping worker");
-				}
-			});
+			threadpool.execute(new Worker(address));
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Worker for sending messages.
+	 */
+	public class Worker implements Runnable
+	{
+		private final String	address;
+
+		public Worker(String address)
+		{
+			this.address = address;
+		}
+
+		public void run()
+		{
+//			System.out.println("starting worker");
+			boolean	again	= true;
+			
+			while(again)
+			{
+				ISendTask	task	= null;
+				Future<Void>	ret	= null;
+				synchronized(workers)
+				{
+					List<Tuple2<ISendTask, Future<Void>>>	queue	= sendqueue.get(address);
+					if(queue!=null)
+					{
+						Tuple2<ISendTask, Future<Void>>	tup	= queue.remove(0);
+						task	= tup.getFirstEntity();
+						ret	= tup.getSecondEntity();
+						if(queue.isEmpty())
+						{
+							sendqueue.remove(address);
+						}
+						// help gc when connection is aborted.
+						tup	= null;
+						queue	= null;
+					}
+					else
+					{
+						again	= false;
+						Integer	cnt	= workers.get(address);
+						if(cnt.intValue()>1)
+						{
+							workers.put(address, new Integer(cnt.intValue()-1));
+						}
+						else
+						{
+							workers.remove(address);
+						}
+					}
+				}
+				
+				if(task!=null)
+				{
+					try
+					{
+						// Message service only calls transport.sendMessage() with receivers on same destination
+						// so just use first to fetch platform id.
+						IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
+						byte[][]	data	= new byte[][]{task.getProlog(), task.getData()};
+						task	= null; // help gc when connection is aborted.
+						conman.postMessage(address, targetid, data);
+						addresses.put(address, new Long(System.currentTimeMillis()));
+						ret.setResult(null);
+//						System.out.println("Sent with HTTP Relay: "+System.currentTimeMillis()+", "+address);
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+					finally
+					{
+						// help gc when connection is aborted.
+						ret	= null;
+					}
+				}
+			}
+//			System.out.println("stopping worker");
+		}
+	}
+
 }

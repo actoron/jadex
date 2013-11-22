@@ -18,6 +18,7 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -68,6 +69,7 @@ import jadex.platform.service.message.streams.StreamSendTask;
 import jadex.platform.service.message.transport.ITransport;
 import jadex.platform.service.message.transport.MessageEnvelope;
 import jadex.platform.service.message.transport.codecs.CodecFactory;
+import jadex.platform.service.remote.RemoteMethodInvocationHandler;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -75,6 +77,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Proxy;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -554,6 +557,24 @@ public class MessageService extends BasicService implements IMessageService
 			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
 				return object instanceof IComponentIdentifier;
+			}
+		});
+		
+		// Ignore service proxies.
+		procs.add(1, new ITraverseProcessor()
+		{
+			public Object process(Object object, Class<?> clazz,
+				List<ITraverseProcessor> processors, Traverser traverser,
+				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				return object;
+			}
+			
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				return Proxy.isProxyClass(clazz) &&
+					(Proxy.getInvocationHandler(object) instanceof BasicServiceInvocationHandler
+						|| Proxy.getInvocationHandler(object) instanceof RemoteMethodInvocationHandler);
 			}
 		});
 		

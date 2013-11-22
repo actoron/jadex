@@ -689,6 +689,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static void addPojoServiceProxy(Object pojo, IService proxy)
 	{
+//		System.out.println("add pojoproxy: "+proxy.getServiceIdentifier());
+		
 		synchronized(BasicServiceInvocationHandler.class)
 		{
 			if(pojoproxies==null)
@@ -697,7 +699,6 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			}
 			pojoproxies.put(pojo, proxy);
 		}
-//		System.out.println("add: "+pojosids.size());
 	}
 	
 	/**
@@ -706,6 +707,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static void removePojoServiceProxy(IServiceIdentifier sid)
 	{
+//		System.out.println("remove pojoproxy: "+sid);
+
 		synchronized(BasicServiceInvocationHandler.class)
 		{
 			for(Iterator<IService> it=pojoproxies.values().iterator(); it.hasNext(); )

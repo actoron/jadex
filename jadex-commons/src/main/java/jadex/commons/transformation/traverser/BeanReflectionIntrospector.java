@@ -10,6 +10,7 @@ import jadex.commons.transformation.annotations.IncludeFields;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -58,6 +59,11 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	 */
 	public Map getBeanProperties(Class clazz, boolean includemethods, boolean includefields)
 	{
+		if(Proxy.isProxyClass(clazz))
+		{
+			System.out.println("sdfkljgosdkj");
+		}
+		
 		// includefields component of key is call based to avoid reflection calls during cache hits.
 		Tuple3<Class, Boolean, Boolean> beaninfokey = new Tuple3<Class, Boolean, Boolean>(clazz, includemethods, includefields);
 		Map ret = null;

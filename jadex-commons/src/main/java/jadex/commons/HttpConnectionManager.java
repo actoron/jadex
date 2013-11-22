@@ -83,42 +83,42 @@ public class HttpConnectionManager
 	{
 		// Use sun.net.www.http.HttpClient.closeServer()
 		// as con.disconnect() just blocks for sun default implementation :-(
-		if(con.getClass().getName().equals("sun.net.www.protocol.http.HttpURLConnection"))
-		{
-			try
-			{
-				Field	f	= con.getClass().getDeclaredField("http");
-				f.setAccessible(true);
-				Object	client	= f.get(con);
-				if(client!=null)
-				{
-					client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
-				}
-				else
-				{
-					con.disconnect();	// Connection not open?			
-				}
-			}
-			catch(Exception e)
-			{
-				con.disconnect();	// Hangs until next ping :-(
-			}
-		}
-		// Special treatment for android impl not needed, because disconnect() works fine. 
-//		else if()
+//		if(con.getClass().getName().equals("sun.net.www.protocol.http.HttpURLConnection"))
 //		{
-//			// org.apache.harmony.luni.internal.net.www.protocol.http.HttpURLConnectionImpl	con;
-//			// org.apache.harmony.luni.internal.net.www.protocol.http.HttpConnection	connection = con.connection;
-//			// Socket socket	= connection.socket;
-//			Field	f	= con.getClass().getDeclaredField("connection");
-//			f.setAccessible(true);
-//			Object	connection	= f.get(con);
-//			f	= connection.getClass().getDeclaredField("socket");
-//			f.setAccessible(true);
-//			Socket	socket	= (Socket)f.get(connection);
-//			socket.close();				
+//			try
+//			{
+//				Field	f	= con.getClass().getDeclaredField("http");
+//				f.setAccessible(true);
+//				Object	client	= f.get(con);
+//				if(client!=null)
+//				{
+//					client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
+//				}
+//				else
+//				{
+//					con.disconnect();	// Connection not open?			
+//				}
+//			}
+//			catch(Exception e)
+//			{
+//				con.disconnect();	// Hangs until next ping :-(
+//			}
 //		}
-		else
+//		// Special treatment for android impl not needed, because disconnect() works fine. 
+////		else if()
+////		{
+////			// org.apache.harmony.luni.internal.net.www.protocol.http.HttpURLConnectionImpl	con;
+////			// org.apache.harmony.luni.internal.net.www.protocol.http.HttpConnection	connection = con.connection;
+////			// Socket socket	= connection.socket;
+////			Field	f	= con.getClass().getDeclaredField("connection");
+////			f.setAccessible(true);
+////			Object	connection	= f.get(con);
+////			f	= connection.getClass().getDeclaredField("socket");
+////			f.setAccessible(true);
+////			Socket	socket	= (Socket)f.get(connection);
+////			socket.close();				
+////		}
+//		else
 		{
 			con.disconnect();
 		}			
