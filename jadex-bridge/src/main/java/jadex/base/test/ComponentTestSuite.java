@@ -2,7 +2,6 @@ package jadex.base.test;
 
 import jadex.base.Starter;
 import jadex.base.test.impl.BrokenComponentTest;
-import jadex.base.test.impl.Cleanup;
 import jadex.base.test.impl.ComponentStartTest;
 import jadex.base.test.impl.ComponentTest;
 import jadex.bridge.IErrorReport;
@@ -18,9 +17,14 @@ import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
+import java.awt.BorderLayout;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -33,6 +37,11 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 
@@ -46,6 +55,15 @@ public class ComponentTestSuite extends TestSuite
 	/** Indicate when the suite is aborted due to excessibe run time. */
 	public boolean	aborted;
 	
+	/** The platform. */
+	protected IExternalAccess	platform;
+	
+	/** The timeout timer (if any). */
+	protected Timer	timer;
+	
+	/** The print memory timer (if any). */
+	protected Timer	memtimer;
+	
 	//-------- constructors --------
 
 	/**
@@ -56,18 +74,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, true);
-	}
-	
-	/**
-	 * Create a component test suite for components contained in a given path.
-	 * @param path	The path to look for test cases in.
-	 * @param root	The classpath root corresponding to the path.
-	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
-	 */
-	public ComponentTestSuite(File path, File root, String[] excludes, boolean addCleanup) throws Exception
-	{
-		this(path, root, excludes, addCleanup, SReflect.isAndroid() ? 2000000 : BasicService.DEFAULT_LOCAL*10, true, true);
+		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.DEFAULT_LOCAL*10, true, true);
 	}
 	
 	/**
@@ -79,7 +86,7 @@ public class ComponentTestSuite extends TestSuite
 	 * @param broken	Include broken components.
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(File path, File root, String[] excludes, boolean addCleanup, long timeout, boolean broken, boolean start) throws Exception
+	public ComponentTestSuite(File path, File root, String[] excludes, long timeout, boolean broken, boolean start) throws Exception
 	{
 		this(new String[]
 		{
@@ -104,7 +111,7 @@ public class ComponentTestSuite extends TestSuite
 			"-printpass", "false",
 			// Hack!!! include ssl transport if available
 			"-ssltcptransport", (SReflect.findClass0("jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport", null, ComponentTestSuite.class.getClassLoader())!=null ? "true" : "false"),  
-		}, path, root, excludes, addCleanup, timeout, broken, start);
+		}, path, root, excludes, timeout, broken, start);
 	}
 	
 	/**
@@ -116,13 +123,12 @@ public class ComponentTestSuite extends TestSuite
 	 * @param broken	Include broken components.
 	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, boolean addCleanup, final long timeout, final boolean broken, final boolean start) throws Exception
+	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout, final boolean broken, final boolean start) throws Exception
 	{
 		super(path.toString());
 		
 		final Thread	runner	= Thread.currentThread();
 		
-		Timer	timer	= null;
 		if(timeout>0)
 		{
 			timer	= new Timer(true);
@@ -147,10 +153,10 @@ public class ComponentTestSuite extends TestSuite
 		ISuspendable	ts	= new ThreadSuspendable();
 		
 //		System.out.println("start platform");
-		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(args).get(ts);
+		platform	= (IExternalAccess)Starter.createPlatform(args).get(ts);
 //		System.out.println("end platform");
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).get(ts);
-		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(ts);
+		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(platform.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
 		
 		// Only works with x-rid hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
 //		final IResourceIdentifier	rid	= null;
@@ -184,14 +190,14 @@ public class ComponentTestSuite extends TestSuite
 			
 			if(!exclude)
 			{
-				if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, rid).get(ts)).booleanValue())
+				if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get(ts)).booleanValue())
 				{
-					if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, rid).get(ts)).booleanValue())
+					if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get(ts)).booleanValue())
 					{
 //						System.out.println("Building TestCase: " + abspath);
 						try
 						{
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, rid).get(ts);
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(platform, abspath, rid).get(ts);
 							boolean istest = false;
 							if(model!=null && model.getReport()==null)
 							{
@@ -258,10 +264,6 @@ public class ComponentTestSuite extends TestSuite
 			}
 		}
 		
-		// Hack!!! Isn't there some tearDown for the test suite?
-		if (addCleanup) {
-			addTest(new Cleanup(rootcomp, timer));
-		}
 //		System.out.println("Finished Building Suite for " + path);
 	}
 
@@ -321,10 +323,131 @@ public class ComponentTestSuite extends TestSuite
 	}
 
 	/**
-	 *  Indicate when the suite is aborted due to excessibe run time.
+	 *  Indicate when the suite is aborted due to excessive run time.
 	 */
 	public boolean isAborted()
 	{
 		return aborted;
+	}
+	
+	/**
+	 *  Overridden for pre and post code.
+	 */
+	public void run(TestResult result)
+	{		
+		this.memtimer	= new Timer(true);
+		memtimer.scheduleAtFixedRate(new TimerTask()
+		{
+			public void run()
+			{
+				System.out.println("Memory: free="+SUtil.bytesToString(Runtime.getRuntime().freeMemory())
+					+", max="+SUtil.bytesToString(Runtime.getRuntime().maxMemory())
+					+", total="+SUtil.bytesToString(Runtime.getRuntime().totalMemory()));
+			}
+		}, 0, 30000);
+
+		super.run(result);
+		cleanup(result);
+	}
+	
+	/**
+	 *  Called after test suite is finished.
+	 */
+	protected void	cleanup(TestResult result)
+	{
+		if(timer!=null)
+		{
+			timer.cancel();
+			timer	= null;
+		}
+		
+		if(memtimer!=null)
+		{
+			memtimer.cancel();
+			memtimer	= null;
+		}
+		
+		try
+		{
+			platform.killComponent().get(new ThreadSuspendable());
+		}
+		catch(Exception e)
+		{
+			result.addError(this, e);
+		}
+		platform	= null;
+		
+		clearAWT();
+	}
+	
+	/**
+	 *  Workaround for AWT/Swing memory leaks.
+	 */
+	public static void	clearAWT()
+	{
+		// Java Bug not releasing the last focused window, see:
+		// http://www.lucamasini.net/Home/java-in-general-/the-weakness-of-swing-s-memory-model
+		// http://bugs.sun.com/view_bug.do?bug_id=4726458
+		
+		final Future<Void>	disposed	= new Future<Void>();
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						final JFrame f	= new JFrame("dummy");
+						f.getContentPane().add(new JButton("Dummy"), BorderLayout.CENTER);
+						f.setSize(100, 100);
+						f.setVisible(true);
+						
+						javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								f.dispose();
+								javax.swing.Timer	t	= new javax.swing.Timer(100, new ActionListener()
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+//										System.out.println("cleanup dispose");
+										KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+										disposed.setResult(null);
+									}
+								});
+								t.setRepeats(false);
+								t.start();
+
+							}
+						});
+						t.setRepeats(false);
+						t.start();
+					}
+				});
+				t.setRepeats(false);
+				t.start();
+			}
+		});
+		
+		disposed.get(new ThreadSuspendable(), 30000);
+		
+//		// Another bug not releasing the last drawn window.
+//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
+//		
+//		try
+//		{
+//			Class<?> clazz	= Class.forName("sun.java2d.pipe.BufferedContext");
+//			Field	field	= clazz.getDeclaredField("currentContext");
+//			field.setAccessible(true);
+//			field.set(null, null);
+//		}
+//		catch(Throwable e)
+//		{
+//			e.printStackTrace();
+//		}
+
 	}
 }

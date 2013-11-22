@@ -2,7 +2,7 @@ package jadex.launch.test;
 
 import jadex.base.Starter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
-import jadex.base.test.impl.Cleanup;
+import jadex.base.test.ComponentTestSuite;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -76,7 +76,7 @@ public class JCCTest extends TestCase
 		jcc	= null;
 		cms	= null;
 		
-		Cleanup.clearAWT();
+		ComponentTestSuite.clearAWT();
 		
 //		try
 //		{
