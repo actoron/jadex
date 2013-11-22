@@ -2,12 +2,15 @@ package jadex.launch.test;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import junit.framework.TestCase;
 
@@ -31,13 +34,25 @@ public class MultiPlatformsTest extends TestCase
 	 */
 	public void	testMultiplePlatforms() throws Exception
 	{
+		
+		Timer	memtimer	= new Timer(true);
+		memtimer.scheduleAtFixedRate(new TimerTask()
+		{
+			public void run()
+			{
+				System.out.println("Memory: free="+SUtil.bytesToString(Runtime.getRuntime().freeMemory())
+					+", max="+SUtil.bytesToString(Runtime.getRuntime().maxMemory())
+					+", total="+SUtil.bytesToString(Runtime.getRuntime().totalMemory()));
+			}
+		}, 0, 30000);
+
 //		Thread.sleep(3000000);
 
 		
 //		for(int p=0; p<100; p++)
 //		{
 //			long	time	= System.currentTimeMillis();
-		int	number	= 15;	// larger numbers cause timeout on toaster.
+		int	number	= 25;	// larger numbers cause timeout on toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)
@@ -98,5 +113,11 @@ public class MultiPlatformsTest extends TestCase
 //		platforms	= null;
 //		futures	= null;
 //		Thread.sleep(3000000);
+		
+		if(memtimer!=null)
+		{
+			memtimer.cancel();
+			memtimer	= null;
+		}
 	}
 }
