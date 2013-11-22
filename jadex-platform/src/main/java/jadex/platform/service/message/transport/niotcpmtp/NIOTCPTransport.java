@@ -42,7 +42,7 @@ public class NIOTCPTransport implements ITransport
 	public static final String[] SCHEMAS = new String[]{"tcp-mtp://"};
 	
 	/** How long to keep connections alive (5 min). */
-	protected static final int	MAX_KEEPALIVE	= 30000;
+	protected static final int	MAX_KEEPALIVE	= 300000;
 
 	/** The time span for which a failed connection is not retried. */
 	public static long DEADSPAN = 60000;
