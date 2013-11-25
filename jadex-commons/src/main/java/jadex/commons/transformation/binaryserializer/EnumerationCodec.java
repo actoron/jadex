@@ -43,9 +43,13 @@ public class EnumerationCodec extends AbstractCodec
 		{
 			int index = (int) context.readVarInt();
 			while (count < index)
+			{
 				vec.add(null);
+				++count;
+			}
 			Object element = BinarySerializer.decodeObject(context);
 			vec.add(element);
+			++count;
 		}
 		return vec.elements();
 	}
