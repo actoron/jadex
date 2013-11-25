@@ -97,7 +97,8 @@ public class MicroCreationTest extends TestCase
 		}
 		catch(Exception e)
 		{
-			// Platform autoshutdown already finished.			
+			// Platform autoshutdown already finished.
+			e.printStackTrace();
 		}
 		
 		sus	= null;

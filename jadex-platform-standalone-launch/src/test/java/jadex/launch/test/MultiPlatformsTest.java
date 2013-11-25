@@ -50,9 +50,9 @@ public class MultiPlatformsTest extends TestCase
 
 		
 //		for(int p=0; p<1000; p++)
-		{
-			long	time	= System.currentTimeMillis();
-		int	number	= 15;	// 25; larger numbers cause timeout on toaster.
+//		{
+//			long	time	= System.currentTimeMillis();
+		int	number	= 15;	// 15; larger numbers cause timeout on toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
 		for(int i=0; i<number; i++)
@@ -71,7 +71,7 @@ public class MultiPlatformsTest extends TestCase
 //				"-awamechanisms", "\"Broadcast\"", // broadcast 3 times as slow!?
 //				"-awamechanisms", "\"Multicast\"", 
 				"-awamechanisms", "\"Relay, Multicast, Message\"", 
-				"-deftimeout", "60000",
+//				"-deftimeout", "60000",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
@@ -106,9 +106,9 @@ public class MultiPlatformsTest extends TestCase
 		}
 		
 		
-			time	= System.currentTimeMillis() - time;
+//			time	= System.currentTimeMillis() - time;
 //			System.out.println("run "+p+" took "+time+" milliseconds.");
-		}
+//		}
 		
 		if(memtimer!=null)
 		{
