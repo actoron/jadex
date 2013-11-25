@@ -741,11 +741,13 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 	/**
 	 *  Transform array store instructions for beliefs.
 	 */
-	protected void transformArrayStores(IMethodNode mn, BDIModel model, String iclname)
+	protected void transformArrayStores(IMethodNode mn, BDIModel model, String iclname)//, MGoal mgoal)
 	{
 		IInsnList ins = mn.getInstructions();
 		LabelNode lab = null;
 		List<String> belnames = new ArrayList<String>();
+		List<String> paramnames = new ArrayList<String>();
+		MGoal mgoal = model.getCapability().getGoal(iclname.replaceAll("/", "."));
 		
 		for(IAbstractInsnNode n: ins)
 		{
@@ -753,18 +755,23 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			{
 				lab = (LabelNode)n;
 				belnames.clear();
+				paramnames.clear();
 			}
 			
 			if(n.getOpcode()==Opcodes.GETFIELD)
 			{
-				String bn = ((IFieldInsnNode)n).getName();
-				if(model.getCapability().hasBelief(bn) && model.getCapability().getBelief(bn).isArrayBelief())
+				String fn = ((IFieldInsnNode)n).getName();
+				if(model.getCapability().hasBelief(fn) && model.getCapability().getBelief(fn).isArrayBelief())
 				{
-					belnames.add(bn);
+					belnames.add(fn);
+				}
+				else if(mgoal!=null && mgoal.hasParameter(fn) && mgoal.getParameter(fn).isArray())
+				{
+					paramnames.add(fn);
 				}
 			}
 			
-			if(!belnames.isEmpty())
+			if(!belnames.isEmpty() || !paramnames.isEmpty())
 			{
 				InsnList newins = null;
 				
@@ -806,22 +813,39 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				if(newins!=null)
 				{
 //					// on stack: arrayref, index, value 
-//					System.out.println("found: "+belnames);
-					String belname = belnames.get(0);
+//					System.out.println("found: "+belnames+" "+paramnames);
 					
-					newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
-//					newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
-					newins.add(new LdcInsnNode(belname));
-//					newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
-//						"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
-					newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
-						"(Ljava/lang/Object;ILjava/lang/Object;Ljava/lang/Object;Ljava/lang/String;)V"));
-					
-					ins.insert(n.getPrevious(), InsnListWrapper.wrap(newins));
-					ins.remove(n); // remove old Xastore
+					if(!belnames.isEmpty())
+					{
+						String belname = belnames.get(0);
+						
+						newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
+	//					newins.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+						newins.add(new LdcInsnNode(belname));
+	//					newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
+	//						"(Ljava/lang/Object;ILjava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayField", 
+							"(Ljava/lang/Object;ILjava/lang/Object;Ljava/lang/Object;Ljava/lang/String;)V"));
+						
+						ins.insert(n.getPrevious(), InsnListWrapper.wrap(newins));
+						ins.remove(n); // remove old Xastore
+					}
+					else if(!paramnames.isEmpty())
+					{
+						String paramname = paramnames.get(0);
+						
+						newins.add(new VarInsnNode(Opcodes.ALOAD, 0));
+						newins.add(new LdcInsnNode(paramname));
+						newins.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "writeArrayParameterField", 
+							"(Ljava/lang/Object;ILjava/lang/Object;Ljava/lang/Object;Ljava/lang/String;)V"));
+						
+						ins.insert(n.getPrevious(), InsnListWrapper.wrap(newins));
+						ins.remove(n); // remove old Xastore
+					}
 					
 					lab = null;
 					belnames.clear();
+					paramnames.clear();
 				}
 			}
 		}

@@ -11,12 +11,15 @@ public class FieldInfo
 	/** The field name. */
 	protected String name;
 	
-	/** The class name. */
+	/** The declaring class name. */
 	protected String classname;
+	
+	/** The typename. */
+	protected String typename;
 	
 	/** The field (cached). */
 	protected Field field;
-
+	
 	/**
 	 *  Create a new FieldInfo. 
 	 */
@@ -31,6 +34,7 @@ public class FieldInfo
 	{
 		this.name = field.getName();
 		this.classname = field.getDeclaringClass().getName();
+		this.typename = field.getType().getName();
 	}
 	
 	/**
@@ -111,5 +115,23 @@ public class FieldInfo
 	public void setClassName(String classname)
 	{
 		this.classname = classname;
+	}
+
+	/**
+	 *  Get the typename.
+	 *  @return The typename.
+	 */
+	public String getTypeName()
+	{
+		return typename;
+	}
+
+	/**
+	 *  Set the typename.
+	 *  @param typename The typename to set.
+	 */
+	public void setTypeName(String typename)
+	{
+		this.typename = typename;
 	}
 }

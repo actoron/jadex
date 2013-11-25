@@ -557,7 +557,7 @@ public class BDIAgent extends MicroAgent
 		
 		if(isbeliefwrite)
 		{
-			observeValue(rs, val, ip, ChangeEvent.FACTCHANGED+"."+belname, mbel);
+			observeValue(rs, val, ip, new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}), mbel);
 			
 			if(!SUtil.equals(val, oldval))
 			{
@@ -850,5 +850,84 @@ public class BDIAgent extends MicroAgent
 //					inits.add(new Object[]{val, belname});
 //				}
 //			}
+	}
+	
+	/**
+	 *  Method that is called automatically when a belief 
+	 *  is written as array access.
+	 */
+	// todo: allow init writes in constructor also for arrays
+	public static void writeArrayParameterField(Object array, final int index, Object val, Object agentobj, String fieldname)
+	{
+		// This is the case in inner classes
+		BDIAgent agent = null;
+		if(agentobj instanceof BDIAgent)
+		{
+			agent = (BDIAgent)agentobj;
+		}
+		else
+		{
+			try
+			{
+				Tuple2<Field, Object> res = findFieldWithOuterClass(agentobj, "__agent");
+//				System.out.println("res: "+res);
+				agent = (BDIAgent)res.getFirstEntity().get(res.getSecondEntity());
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+		final BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
+		
+		// Test if array store is really a belief store instruction by
+		// looking up the current belief value and comparing it with the
+		// array that is written
+		
+		boolean isparamwrite = false;
+		
+		MGoal mgoal = ((MCapability)ip.getCapability().getModelElement()).getGoal(agentobj.getClass().getName());
+		if(mgoal!=null)
+		{
+			MParameter mparam = mgoal.getParameter(fieldname);
+			if(mparam!=null)
+			{
+				Object curval = mparam.getValue(agentobj, ip.getClassLoader());
+				isparamwrite = curval==array;
+			}
+		}
+		RuleSystem rs = ip.getRuleSystem();
+//		System.out.println("write array index: "+val+" "+index+" "+array+" "+agent+" "+fieldname);
+		
+		Object oldval = null;
+		if(isparamwrite)
+		{
+			oldval = Array.get(array, index);
+			rs.unobserveObject(oldval);	
+		}
+		
+		Class<?> ct = array.getClass().getComponentType();
+		if(boolean.class.equals(ct))
+		{
+			val = ((Integer)val)==1? Boolean.TRUE: Boolean.FALSE;
+		}
+		else if(byte.class.equals(ct))
+		{
+			val = new Byte(((Integer)val).byteValue());
+		}
+		Array.set(array, index, val);
+		
+		if(isparamwrite)
+		{
+			observeValue(rs, val, ip, new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname}), null);
+			
+			if(!SUtil.equals(val, oldval))
+			{
+				Event ev = new Event(new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname}), val); // todo: index
+				rs.addEvent(ev);
+				// execute rulesystem immediately to ensure that variable values are not changed afterwards
+				rs.processAllEvents(); 
+			}
+		}
 	}
 }

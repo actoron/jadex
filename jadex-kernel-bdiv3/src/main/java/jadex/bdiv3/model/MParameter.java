@@ -60,7 +60,7 @@ public class MParameter extends MElement
 	 *  Test if this belief refers to a field.
 	 *  @return True if is a field belief.
 	 */
-	public boolean isFieldBelief()
+	public boolean isFieldParameter()
 	{
 		return ftarget!=null;
 	}
@@ -246,5 +246,24 @@ public class MParameter extends MElement
 			}
 		}
 		return multi;
+	}
+	
+	/**
+	 *  Test if parameter is of array type.
+	 */
+	public boolean isArray()
+	{
+		boolean ret = false;
+		if(isFieldParameter() && ftarget.getClassName()!=null)
+		{
+//			ret = ftarget.getField(cl).getType().isArray();
+			ret = ftarget.getTypeName().charAt(0)=='['; 
+		}
+		else if(mgetter!=null && mgetter.getReturnTypeInfo()!=null)
+		{
+//			ret = mgetter.getMethod(cl).getReturnType().isArray();
+			ret = mgetter.getReturnTypeInfo().getTypeName().charAt(0)=='['; 
+		}
+		return ret;
 	}
 }

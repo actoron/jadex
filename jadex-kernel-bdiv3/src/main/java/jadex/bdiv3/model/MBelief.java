@@ -421,7 +421,7 @@ public class MBelief extends MElement
 		if(isFieldBelief() && ftarget.getClassName()!=null)
 		{
 //			ret = ftarget.getField(cl).getType().isArray();
-			ret = ftarget.getClassName().charAt(0)=='['; 
+			ret = ftarget.getTypeName().charAt(0)=='['; 
 		}
 		else if(mgetter!=null && mgetter.getReturnTypeInfo()!=null)
 		{
