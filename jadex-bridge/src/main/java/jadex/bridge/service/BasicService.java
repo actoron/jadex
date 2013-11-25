@@ -30,19 +30,59 @@ import java.util.Map;
  *  that returns true after start service and false afterwards.
  */
 public class BasicService extends NFMethodPropertyProvider implements IInternalService
-{	
+{
 	//-------- constants --------
 	
-	/** Default service timeout. */
-	// Hack!!! field to be set by starter and read by Timeout annotation
-//	public static long	DEFTIMEOUT	= 30000;
-	
 	/** Constant for remote default timeout. */
-	public static long DEFAULT_REMOTE = 30000;//BasicService.DEFTIMEOUT;
+	private static long DEFAULT_REMOTE = 30000;
 
 	/** Constant for local default timeout. */
-	public static long DEFAULT_LOCAL = 30000;//BasicService.DEFTIMEOUT;
+	private static long DEFAULT_LOCAL = 30000;
 	
+	static
+	{
+		// Set deftimeout from environment, if set.
+		String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
+		if(dtoprop!=null)
+		{
+			DEFAULT_LOCAL = Long.parseLong(dtoprop);
+			DEFAULT_REMOTE = Long.parseLong(dtoprop);
+			System.out.println("Setting jadex.deftimeout: "+dtoprop);
+		}
+	}
+	
+	/**
+	 *  Get the remote default timeout.
+	 */
+	public static long	getRemoteDefaultTimeout()
+	{
+		return DEFAULT_REMOTE;
+	}
+
+	/**
+	 *  Get the local default timeout.
+	 */
+	public static long	getLocalDefaultTimeout()
+	{
+		return DEFAULT_LOCAL;
+	}
+
+	/**
+	 *  Set the remote default timeout.
+	 */
+	public static void	setRemoteDefaultTimeout(long timeout)
+	{
+		DEFAULT_REMOTE	= timeout;
+	}
+
+	/**
+	 *  Set the local default timeout.
+	 */
+	public static void	setLocalDefaultTimeout(long timeout)
+	{
+		DEFAULT_LOCAL	= timeout;
+	}
+
 	//-------- attributes --------
 
 	/** The id counter. */

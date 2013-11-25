@@ -142,7 +142,7 @@ public class AutoTerminateAgent	extends	TestAgent	implements IAutoTerminateServi
 		
 //		System.out.println("test: "+report.getDescription()+", "+BasicService.DEFAULT_LOCAL);
 		
-		waitForRealtimeDelay(BasicService.DEFAULT_LOCAL,
+		waitForRealtimeDelay(BasicService.getLocalDefaultTimeout(),
 			new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)

@@ -32,7 +32,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
 import jadex.javaparser.SJavaParser;
@@ -40,7 +39,6 @@ import jadex.javaparser.SJavaParser;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -296,7 +294,6 @@ public class Starter
 			// Absolute start time (for testing and benchmarking).
 			final long starttime = System.currentTimeMillis();
 		
-			boolean	deftimeout	= false;	// True if deftimeout is supplied as arg.
 			final Map<String, Object> cmdargs = new HashMap<String, Object>();	// Starter arguments (required for instantiation of root component)
 			final Map<String, Object> compargs = new HashMap<String, Object>();	// Arguments of root component (platform)
 			final List<String> components = new ArrayList<String>();	// Additional components to start
@@ -329,9 +326,8 @@ public class Starter
 					val = SJavaParser.evaluateExpression(args[i+1], null);
 //					BasicService.DEFTIMEOUT	= ((Number)val).longValue();
 					long to	= ((Number)val).longValue();
-					BasicService.DEFAULT_LOCAL = to;
-					BasicService.DEFAULT_REMOTE = to;
-					deftimeout	= true;
+					BasicService.setRemoteDefaultTimeout(to);
+					BasicService.setLocalDefaultTimeout(to);
 //					System.out.println("timeout: "+BasicService.DEFAULT_LOCAL);
 				}
 				else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
@@ -349,18 +345,6 @@ public class Starter
 				else
 				{
 					cmdargs.put(key, val);
-				}
-			}
-			
-			// Set deftimeout from environment, if set.
-			if(!deftimeout)
-			{
-				String	dtoprop	= System.getProperty("jadex.deftimeout", System.getenv("jadex.deftimeout"));
-				if(dtoprop!=null)
-				{
-					BasicService.DEFAULT_LOCAL = Long.parseLong(dtoprop);
-					BasicService.DEFAULT_REMOTE = Long.parseLong(dtoprop);
-					System.out.println("Setting jadex.deftimeout: "+dtoprop);
 				}
 			}
 			

@@ -61,7 +61,7 @@ public class ServiceCall
 		this.caller	= caller;
 		this.properties = props!=null? props: new HashMap<String, Object>();
 		if(!properties.containsKey(TIMEOUT))
-			properties.put(DEFTIMEOUT, BasicService.DEFAULT_LOCAL); // todo: refactor that
+			properties.put(DEFTIMEOUT, BasicService.getLocalDefaultTimeout()); // todo: refactor that
 				
 //		if(props!=null)
 //			properties.putAll(props);

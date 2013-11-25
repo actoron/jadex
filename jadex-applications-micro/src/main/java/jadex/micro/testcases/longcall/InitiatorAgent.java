@@ -267,7 +267,7 @@ public class InitiatorAgent extends TestAgent
 			Method m = ITestService.class.getMethod("method"+cnt, new Class[0]);
 //			System.out.println("calling method "+cnt+": "+System.currentTimeMillis());
 			
-			ServiceCall.getOrCreateNextInvocation().setTimeout(BasicService.DEFAULT_LOCAL/15);
+			ServiceCall.getOrCreateNextInvocation().setTimeout(BasicService.getLocalDefaultTimeout()/15);
 			
 			final long start	= System.currentTimeMillis();
 			((IFuture<Object>)m.invoke(ts, new Object[0])).addResultListener(new IFutureCommandResultListener<Object>()

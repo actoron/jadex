@@ -74,7 +74,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.DEFAULT_LOCAL*10, true, true);
+		this(path, root, excludes, SReflect.isAndroid() ? 2000000 : BasicService.getLocalDefaultTimeout()*10, true, true);
 	}
 	
 	/**

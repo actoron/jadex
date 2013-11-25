@@ -73,7 +73,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	public AbstractConnectionHandler(MessageService ms, Map<String, Object> nonfunc)
 	{
 		// Use timeouts relative to deftimeout
-		this(ms, nonfunc, 3, BasicService.DEFAULT_REMOTE/3, BasicService.DEFAULT_REMOTE/2);
+		this(ms, nonfunc, 3, BasicService.getRemoteDefaultTimeout()/3, BasicService.getRemoteDefaultTimeout()/2);
 	}
 	
 	/**

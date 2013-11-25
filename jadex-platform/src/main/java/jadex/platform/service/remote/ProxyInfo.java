@@ -110,7 +110,7 @@ public class ProxyInfo
 	 */
 	public long	getMethodTimeout(Method method)
 	{
-		long	ret	= BasicService.DEFAULT_REMOTE;
+		long	ret	= BasicService.getRemoteDefaultTimeout();
 		MethodInfo	key	= new MethodInfo(method);
 		if(timeouts!=null && timeouts.containsKey(key))
 		{

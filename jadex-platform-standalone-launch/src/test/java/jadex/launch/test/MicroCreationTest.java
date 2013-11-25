@@ -1,6 +1,7 @@
 package jadex.launch.test;
 
 import jadex.base.Starter;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
@@ -98,7 +99,10 @@ public class MicroCreationTest extends TestCase
 		catch(Exception e)
 		{
 			// Platform autoshutdown already finished.
-			e.printStackTrace();
+			if(!(e instanceof ComponentTerminatedException))
+			{
+				e.printStackTrace();
+			}
 		}
 		
 		sus	= null;

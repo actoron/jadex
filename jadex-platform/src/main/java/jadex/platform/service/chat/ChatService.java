@@ -27,7 +27,6 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -46,7 +45,6 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.rules.eca.RuleEvent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -1038,7 +1036,7 @@ public class ChatService implements IChatService, IChatGuiService
 				
 				// Call chat service of receiver (alternative interface)
 				final TransferInfo fi = new TransferInfo(false, null, file.getName(), filepath, cid, file.length(), System.currentTimeMillis() + // Hack!!! assume real time timeout.
-					(cid.getRoot().equals(agent.getComponentIdentifier().getRoot()) ? BasicService.DEFAULT_LOCAL : BasicService.DEFAULT_REMOTE));	// Todo: actual timeout of method!?
+					(cid.getRoot().equals(agent.getComponentIdentifier().getRoot()) ? BasicService.getLocalDefaultTimeout() : BasicService.getRemoteDefaultTimeout()));	// Todo: actual timeout of method!?
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, file.getName(), size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));

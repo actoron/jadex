@@ -37,7 +37,7 @@ public class JCCTest extends TestCase
 //			"-logging", "true",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"});
 		
-		long timeout	= BasicService.DEFAULT_LOCAL;
+		long timeout	= BasicService.getLocalDefaultTimeout();
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		IExternalAccess	platform	= fut.get(sus, timeout);

@@ -43,7 +43,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
@@ -259,7 +258,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, e);
 							// Can be invoked directly, because internally redirects to agent thread.
 		//					System.out.println("sending terminate");
-							sendMessage(rrms, null, content, mycallid,  BasicService.DEFAULT_REMOTE, res, null, null);
+							sendMessage(rrms, null, content, mycallid,  BasicService.getRemoteDefaultTimeout(), res, null, null);
 						}
 						return IFuture.DONE;
 					}
@@ -310,7 +309,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							decider, selector, callid);
 						
 //						System.out.println("send to: "+rrms+" "+callid);
-						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null, null); // todo: non-func
+						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func
 //					}
 //				});
 				
@@ -427,7 +426,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
-						sendMessage(rrms, cid, content, callid, BasicService.DEFAULT_REMOTE, fut, null, null); // todo: non-func
+						sendMessage(rrms, cid, content, callid, BasicService.getRemoteDefaultTimeout(), fut, null, null); // todo: non-func
 //					}
 //				});
 				
