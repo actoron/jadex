@@ -73,14 +73,14 @@ public class ChartMultiplePiePlot extends MultiplePiePlot
 
 	// -------- constructors --------
 
-	/**
-	 * Creates a new plot with no data.
-	 */
-	public ChartMultiplePiePlot(PaintMaps paintMaps)
-	{
-		this(null, paintMaps);
-
-	}
+//	/**
+//	 * Creates a new plot with no data.
+//	 */
+//	public ChartMultiplePiePlot(PaintMaps paintMaps)
+//	{
+//		this(null, paintMaps);
+//
+//	}
 
 	/**
 	 * Creates a new plot with a given dataset and paint maps.

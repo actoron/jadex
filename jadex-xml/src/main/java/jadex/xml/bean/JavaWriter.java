@@ -12,8 +12,6 @@ import jadex.commons.transformation.IObjectStringConverter;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
-import jadex.xml.IContext;
-import jadex.xml.IPostProcessor;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
@@ -47,10 +45,10 @@ public class JavaWriter
 	//-------- attributes --------
 	
 	/** The static writer instance. */
-	protected static AWriter writer;
+	protected static volatile AWriter writer;
 	
 	/** The object handler. */
-	protected static IObjectWriterHandler handler;
+	protected static volatile IObjectWriterHandler handler;
 	
 	
 	//-------- constructors --------

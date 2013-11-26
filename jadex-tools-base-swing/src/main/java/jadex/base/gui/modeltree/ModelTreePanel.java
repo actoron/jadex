@@ -5,6 +5,7 @@ import jadex.base.SRemoteGui;
 import jadex.base.gui.RememberOptionMessage;
 import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.DefaultNodeFactory;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
@@ -201,7 +202,7 @@ public class ModelTreePanel extends FileTreePanel
 		setIconCache(ic);
 		DefaultNodeHandler dnh = new DefaultNodeHandler(getTree())
 		{
-			public Icon getOverlay(ISwingTreeNode node)
+			public Icon getSwingOverlay(ISwingTreeNode node)
 			{
 				Icon	overlay	= null;
 				if(getModel().getRoot().equals(node.getParent()) && node instanceof IFileNode)
@@ -223,7 +224,7 @@ public class ModelTreePanel extends FileTreePanel
 		
 		tree.setCellRenderer(new AsyncTreeCellRenderer()
 		{
-			protected String getLabel(ISwingTreeNode node)
+			protected String getLabel(ITreeNode node)
 			{
 				String	ret	= null;
 				if(getModel().getRoot().equals(node.getParent()) && node instanceof IFileNode)

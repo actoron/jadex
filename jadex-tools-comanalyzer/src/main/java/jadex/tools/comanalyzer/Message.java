@@ -396,7 +396,7 @@ public class Message extends ParameterElement
 	public boolean equals(Object obj)
 	{
 		final Message other = (Message)obj;
-		return this.uniqueId == other.uniqueId;
+		return obj!=null && this.uniqueId == other.uniqueId;
 	}
 
 	/** 

@@ -7,7 +7,7 @@ import jadex.xml.bean.JavaWriter;
 /**
  * Testcases for writer and reader.
  */
-public class Test extends jadex.commons.transformation.Test
+public class XMLTest extends jadex.commons.transformation.Test
 {
 
 	// -------- methods --------
@@ -33,7 +33,7 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public static void main(String[] args)
 	{
-		Test t = new Test();
+		XMLTest t = new XMLTest();
 		t.performTests();
 	}
 }

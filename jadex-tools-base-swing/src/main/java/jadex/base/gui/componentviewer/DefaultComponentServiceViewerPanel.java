@@ -87,7 +87,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 				final List<Object[]> panels = new ArrayList<Object[]>();
 				
 				final CounterResultListener<Void> lis = new CounterResultListener<Void>(
-					services.size()+1, true, new DelegationResultListener<Void>(ret)
+					services!=null ? services.size()+1 : 1, true, new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result) 
 					{

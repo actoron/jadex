@@ -60,13 +60,13 @@ public class JavaReader
 	//-------- attributes --------
 	
 	/** The reader. */
-	protected static AReader reader;
+	protected static volatile AReader reader;
 	
 	/** The path manager. */
-	protected static TypeInfoPathManager pathmanager;
+	protected static volatile TypeInfoPathManager pathmanager;
 
 	/** The type manager. */
-	protected static IObjectReaderHandler handler;
+	protected static volatile IObjectReaderHandler handler;
 
 	/**
 	 *  Join sets of typeinfos.

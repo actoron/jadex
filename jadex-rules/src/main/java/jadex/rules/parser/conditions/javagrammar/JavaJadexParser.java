@@ -1564,8 +1564,10 @@ public class JavaJadexParser extends Parser {
             			Class	clazz	= ((OAVJavaType)otype).getClazz();
             			Field	f	= clazz.getField(field.getText());
             			exp = new LiteralExpression(f.get(null));
-            			if((f.getModifiers()&Modifier.FINAL)==0)
+            			if(!Modifier.isFinal(f.getModifiers()))
+            			{
             				System.out.println("Warning: static field should be final: "+clazz+", "+field.getText());
+            			}
             		}
             		catch(Exception e)
             		{

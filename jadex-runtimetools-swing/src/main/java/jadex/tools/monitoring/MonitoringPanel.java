@@ -52,8 +52,6 @@ public class MonitoringPanel	implements IServiceViewerPanel
 	 */
 	public IFuture<Void> init(final IControlCenter jcc, IService service)
 	{
-		final Future<Void>	ret	= new Future<Void>();
-		
 		this.monservice	= (IMonitoringService)service;
 		this.inner	= new JPanel(new BorderLayout());
 

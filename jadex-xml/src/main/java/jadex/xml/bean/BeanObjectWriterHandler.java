@@ -26,6 +26,7 @@ import jadex.xml.writer.AWriteContext;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -344,8 +345,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				{
 					try
 					{
-						if((field.getModifiers()&Field.PUBLIC)==0)
+						if(!Modifier.isPublic(field.getModifiers()))
+						{
 							field.setAccessible(true);
+						}
 						value = field.get(object);
 					}
 					catch(Exception e)
@@ -446,8 +449,6 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	protected Collection getProperties(Object object, IContext context, boolean includemethods, boolean includefields)
 	{
-		Object o = introspector.getBeanProperties(object.getClass(), includemethods, includefields);
-		
 		return object==null? Collections.EMPTY_LIST: introspector.getBeanProperties(object.getClass(), includemethods, includefields).values();
 	}
 

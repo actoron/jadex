@@ -140,7 +140,7 @@ public class MicroAgentViewPanel extends JPanel
 //						if(laststep!=null)
 //							step.removeJavaRootObject(laststep);
 						step.setText(cce.getProperty("details").toString());
-						laststep = step;
+						laststep = cce;
 					}
 				}
 				else if(laststep!=null && steps.contains(laststep))
@@ -181,7 +181,7 @@ public class MicroAgentViewPanel extends JPanel
 //						if(laststep!=null)
 //							step.removeJavaRootObject(laststep);
 						step.setText(cce.getProperty("details").toString());
-						laststep = step;
+						laststep = cce;
 					}
 				}
 				else if(laststep!=null && history.contains(laststep))

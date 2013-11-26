@@ -75,7 +75,7 @@ class FieldProcessor implements ITraverseProcessor
 			Field[] fields = clazz.getDeclaredFields();
 			for(int i=0; i<fields.length; i++) 
 			{
-				if((fields[i].getModifiers() & Modifier.STATIC) != Modifier.STATIC) 
+				if(!Modifier.isStatic(fields[i].getModifiers())) 
 				{
 					fields[i].setAccessible(true);
 					Object val = null;

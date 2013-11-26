@@ -36,13 +36,13 @@ public class PropertiesXMLHelper
 //	public static Reader reader;
 	
 	/** The path manager. */
-	protected static TypeInfoPathManager pathmanager;
+	protected static volatile TypeInfoPathManager pathmanager;
 
 	/** The reader handler. */
-	protected static IObjectReaderHandler readerhandler;
+	protected static volatile IObjectReaderHandler readerhandler;
 
 	/** The writer handler. */
-	protected static IObjectWriterHandler writerhandler;
+	protected static volatile IObjectWriterHandler writerhandler;
 
 	
 	//-------- static initializer --------

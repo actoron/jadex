@@ -2,10 +2,11 @@ package jadex.base.gui.filetree;
 
 import jadex.base.DefaultFileFilter;
 import jadex.base.SRemoteGui;
-import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.AsyncSwingTreeModel;
+import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.ISwingNodeHandler;
 import jadex.base.gui.asynctree.ISwingTreeNode;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
@@ -117,7 +118,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		
 		tree.setCellRenderer(new AsyncTreeCellRenderer()
 		{
-			protected String getLabel(ISwingTreeNode node)
+			protected String getLabel(ITreeNode node)
 			{
 				String ret = super.getLabel(node);
 				if(node instanceof IFileNode)

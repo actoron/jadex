@@ -136,7 +136,7 @@ public class FileNode	extends AbstractSwingTreeNode	implements IFileNode
 			if(lastsiblings==null || !lastsiblings.equals(siblings))
 			{
 //				System.out.println("check: "+file.getAbsolutePath());
-				lastsiblings = new ArrayList(siblings);
+				lastsiblings = siblings!=null ? new ArrayList(siblings) : new ArrayList();
 				
 				for(int i=0; siblings!=null && i<siblings.size(); i++)
 				{

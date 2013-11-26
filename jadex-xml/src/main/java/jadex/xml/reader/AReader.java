@@ -23,7 +23,7 @@ public abstract class AReader
 	public static boolean DEBUG = false;
 	
 	/** The string marker object. */
-	public static final Object STRING_MARKER = new String();
+	public static final Object STRING_MARKER = new Object();
 
 	/** This thread local variable provides access to the read context,
 	 *  e.g. from the XML reporter, if required. */

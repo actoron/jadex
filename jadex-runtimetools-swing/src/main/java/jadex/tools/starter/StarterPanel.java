@@ -1444,7 +1444,6 @@ public class StarterPanel extends JLayeredPane
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		results.add(valt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		y++;
 	}
 	
 	/**

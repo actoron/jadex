@@ -600,7 +600,7 @@ public class Reader extends AReader
 									Object check = postprocs[fi].postProcess(readcontext, ftopse.getObject());
 									if(check!=null)
 									{
-										readcontext.getReporter().report("Object replacement only possible in first pass.", "postprocessor error", ftopse, ftopse!=null ? ftopse.getLocation() : (readcontext.getLocation()));																				
+										readcontext.getReporter().report("Object replacement only possible in first pass.", "postprocessor error", ftopse, ftopse.getLocation());																				
 									}
 								}
 								catch(Exception e)

@@ -784,8 +784,10 @@ public class ObjectTreeModel implements TreeModel
 						for (int i = 0; i < f.length; i++)
 						{
 							// get only nonstatic fields
-							if ((f[i].getModifiers() & Modifier.STATIC) == 0)
+							if(Modifier.isStatic(f[i].getModifiers()))
+							{
 								fields.add(f[i]);
+							}
 							// TO-DO: Filter other fields as well?
 						}
 					}
@@ -908,7 +910,7 @@ public class ObjectTreeModel implements TreeModel
 			boolean ret = obj instanceof ObjectInspectorNode
 				&& ((ObjectInspectorNode)obj).parent==parent
 				&& ((ObjectInspectorNode)obj).type==type
-				&& ((ObjectInspectorNode)obj).name==name
+				&& SUtil.equals(((ObjectInspectorNode)obj).name, name)
 				&& (fields != null && fields.equals(((ObjectInspectorNode)obj).fields))
 				&& (nodeObject != null && nodeObject.equals(((ObjectInspectorNode) obj).nodeObject));
 			
@@ -1149,7 +1151,7 @@ public class ObjectTreeModel implements TreeModel
 		}
 
 		/**
-		 * This method can be used to do a sematically equals check.
+		 * This method can be used to do a semantical equals check.
 		 * E.g. check only the fields, not the unique identifier.
 		 * @param obj Object to test for equals
 		 * @param checkUUID flag to check the unique Identifier for the node. <br><code>true</code>=do a compete equals check<br><code>false</code>=do a sematically equals check
@@ -1157,10 +1159,9 @@ public class ObjectTreeModel implements TreeModel
 		protected boolean equals(Object obj, boolean checkUUID)
 		{
 			boolean ret = obj instanceof ObjectInspectorAttributeNode
-						&& ((ObjectInspectorAttributeNode) obj).parent == parent
-						&& ((ObjectInspectorAttributeNode) obj).field == field
-						&& ((ObjectInspectorAttributeNode) obj).name == name
-						;
+						&& ((ObjectInspectorAttributeNode)obj).parent == parent
+						&& ((ObjectInspectorAttributeNode)obj).field == field
+						&& SUtil.equals(((ObjectInspectorAttributeNode)obj).name, name);
 
 			if (ret) 
 			{

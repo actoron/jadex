@@ -1570,8 +1570,10 @@ public class OAVTreeModel implements TreeModel
 						for (int i = 0; i < f.length; i++)
 						{
 							// get only nonstatic fields
-							if ((f[i].getModifiers() & Modifier.STATIC) == 0)
+							if(!Modifier.isStatic(f[i].getModifiers()))
+							{
 								fields.add(f[i]);
+							}
 							// TO-DO: Filter other fields as well?
 						}
 					}

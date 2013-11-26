@@ -327,12 +327,14 @@ public class TypeInfo	extends AbstractInfo
 				QName[] tmp = si.getXMLPathElementsWithoutElement();
 				boolean ok = (si.getFilter()==null || si.getFilter().filter(rawattributes)) && 
 					(tmp==null || tmp.length<=fullpath.length);
-				for(int i=1; i<=tmp.length && ok; i++)
+				for(int i=1; ok && tmp!=null && i<=tmp.length; i++)
 				{
 					ok = tmp[tmp.length-i].equals(fullpath[fullpath.length-i-1]);
 				}
 				if(ok)
+				{
 					ret = si;
+				}
 //				if(fullpath.endsWith(tmp.getXMLPathWithoutElement())) // && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
 			}
 		}

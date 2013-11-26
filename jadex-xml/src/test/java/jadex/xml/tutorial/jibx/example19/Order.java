@@ -14,6 +14,6 @@ public class Order {
     }
     public void preget() {
         System.out.println("Order.preget called");
-        total = items.size() * 1.5;
+        total = items!=null ? items.size() * 1.5 : 0;
     }
 }

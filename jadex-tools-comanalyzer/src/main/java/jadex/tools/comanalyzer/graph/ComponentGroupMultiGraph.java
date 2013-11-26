@@ -105,7 +105,7 @@ public class ComponentGroupMultiGraph implements Graph
 		this.edge_elemets = new HashMap();
 		this.vertex_elemets = new HashMap();
 
-		delegate = new MultidirectedMultiGraph();
+//		delegate = new MultidirectedMultiGraph();
 
 		this.edge_weights = new GenericSortedList(new Comparator() {
 
