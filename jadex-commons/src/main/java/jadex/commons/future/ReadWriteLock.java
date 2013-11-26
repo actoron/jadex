@@ -3,7 +3,6 @@ package jadex.commons.future;
 import jadex.commons.IResultCommand;
 
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *  Locking class implementing RX-style operation:
