@@ -58,11 +58,11 @@ public class ComponentTestSuite extends TestSuite
 	/** The platform. */
 	protected IExternalAccess	platform;
 	
+	/** The timeout (if any). */
+	protected long	timeout;
+	
 	/** The timeout timer (if any). */
 	protected Timer	timer;
-	
-	/** The print memory timer (if any). */
-	protected Timer	memtimer;
 	
 	//-------- constructors --------
 
@@ -126,27 +126,8 @@ public class ComponentTestSuite extends TestSuite
 	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout, final boolean broken, final boolean start) throws Exception
 	{
 		super(path.toString());
-		
-		final Thread	runner	= Thread.currentThread();
-		
-		if(timeout>0)
-		{
-			timer	= new Timer(true);
-			timer.schedule(new TimerTask()
-			{
-				public void run()
-				{
-					aborted	= true;
-//					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
-					if (!SReflect.isAndroid()) {
-						runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
-					} else {
-						System.err.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
-						System.exit(1);
-					}
-				}
-			}, timeout);
-		}
+		this.timeout	= timeout;				
+		startTimer();
 		
 		// Tests must be available after constructor execution.
 		// Todo: get rid of thread suspendable!?
@@ -264,7 +245,42 @@ public class ComponentTestSuite extends TestSuite
 			}
 		}
 		
+		stopTimer();
+		
 //		System.out.println("Finished Building Suite for " + path);
+	}
+
+	protected void startTimer()
+	{
+		final Thread	runner	= Thread.currentThread();
+		
+		if(timeout>0)
+		{
+			timer	= new Timer(true);
+			timer.schedule(new TimerTask()
+			{
+				public void run()
+				{
+					aborted	= true;
+//					System.out.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
+					if (!SReflect.isAndroid()) {
+						runner.stop(new RuntimeException("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms)."));
+					} else {
+						System.err.println("Aborting test suite "+getName()+" due to excessive run time (>"+timeout+" ms).");
+						System.exit(1);
+					}
+				}
+			}, timeout);
+		}
+	}
+	
+	protected void	stopTimer()
+	{
+		if(timer!=null)
+		{
+			timer.cancel();
+			timer	= null;
+		}
 	}
 
 	private List<String> scanForTestCases(File root, File path)
@@ -334,9 +350,13 @@ public class ComponentTestSuite extends TestSuite
 	 *  Overridden for pre and post code.
 	 */
 	public void run(TestResult result)
-	{		
-		this.memtimer	= new Timer(true);
-		memtimer.scheduleAtFixedRate(new TimerTask()
+	{
+		startTimer();
+		if(timer==null)
+		{
+			this.timer	= new Timer(true);
+		}
+		timer.scheduleAtFixedRate(new TimerTask()
 		{
 			public void run()
 			{
@@ -347,6 +367,7 @@ public class ComponentTestSuite extends TestSuite
 		}, 0, 30000);
 
 		super.run(result);
+		
 		cleanup(result);
 	}
 	
@@ -355,18 +376,6 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	protected void	cleanup(TestResult result)
 	{
-		if(timer!=null)
-		{
-			timer.cancel();
-			timer	= null;
-		}
-		
-		if(memtimer!=null)
-		{
-			memtimer.cancel();
-			memtimer	= null;
-		}
-		
 		try
 		{
 			platform.killComponent().get(new ThreadSuspendable());
@@ -378,6 +387,8 @@ public class ComponentTestSuite extends TestSuite
 		platform	= null;
 		
 		clearAWT();
+		
+		stopTimer();
 	}
 	
 	/**
@@ -432,7 +443,7 @@ public class ComponentTestSuite extends TestSuite
 			}
 		});
 		
-		disposed.get(new ThreadSuspendable(), 30000);
+		disposed.get(new ThreadSuspendable(), BasicService.getLocalDefaultTimeout());
 		
 //		// Another bug not releasing the last drawn window.
 //		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6857676
