@@ -471,7 +471,7 @@ public class HttpReceiver
 												}
 												catch(Exception e)
 												{
-													log(Level.WARNING, "Relay transport exception when delivering message: "+e+", "+rawmsg);
+													log(Level.WARNING, "Relay transport exception when delivering message: "+e+", "+new String(rawmsg));
 												}
 											}
 										}

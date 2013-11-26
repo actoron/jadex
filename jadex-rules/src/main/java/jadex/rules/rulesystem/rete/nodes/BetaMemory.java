@@ -8,6 +8,7 @@ import jadex.rules.state.IOAVState;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -151,7 +152,7 @@ public class BetaMemory
 	protected IndexedConstraintMemory getIndexedMemory(ConstraintIndexer ci)
 	{
 		if(xmems==null)
-			xmems	= new HashMap();
+			xmems	= new IdentityHashMap();
 		if(xmems.get(ci)==null)
 			xmems.put(ci, new IndexedConstraintMemory(state));			
 		return (IndexedConstraintMemory)xmems.get(ci);

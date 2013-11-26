@@ -202,7 +202,7 @@ public class MonitoringService implements IMonitoringService
 //				System.out.println("forward to: "+sub);
 				if(!sub.addIntermediateResultIfUndone(event))
 				{
-					subscriptions.remove(fil);
+					subscriptions.remove(sub);
 				}
 			}
 		}

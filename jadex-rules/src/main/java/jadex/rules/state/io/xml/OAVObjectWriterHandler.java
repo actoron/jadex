@@ -256,7 +256,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 		if(value!=null)
 		{
 			OAVAttributeType attr = (OAVAttributeType)property;
-			ret = value.getClass().equals(attr.getType());
+			ret = value.getClass().equals(((OAVJavaType)attr.getType()).getClazz());
 		}
 		return ret;
 	}
