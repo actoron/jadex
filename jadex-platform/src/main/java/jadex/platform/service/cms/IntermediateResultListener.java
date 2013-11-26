@@ -20,7 +20,7 @@ public class IntermediateResultListener implements IIntermediateResultListener<T
 	//-------- attributes --------
 	
 	/** The listeners. */
-	protected List<IResultListener<Collection<Tuple2<String, Object>>>> listeners;
+	protected volatile List<IResultListener<Collection<Tuple2<String, Object>>>> listeners;
 	
 	/** The results map. */
 	protected Map<String, Object> results;

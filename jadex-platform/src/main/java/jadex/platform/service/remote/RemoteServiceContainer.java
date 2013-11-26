@@ -34,9 +34,6 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 	/** The remote component id. */
 	protected IComponentIdentifier componentid;
 	
-	/** The component adapter. */
-	protected IComponentAdapter adapter;
-	
 	/** The local rms service. */
 	protected IRemoteServiceManagementService rms;
 	
@@ -48,7 +45,6 @@ public class RemoteServiceContainer extends ComponentServiceContainer
 	public RemoteServiceContainer(IComponentIdentifier remotecid, IComponentAdapter adapter, IInternalAccess instance)
 	{
 		super(adapter, "remote", instance, true);
-		this.adapter = adapter;
 		this.componentid = remotecid;
 	}
 	

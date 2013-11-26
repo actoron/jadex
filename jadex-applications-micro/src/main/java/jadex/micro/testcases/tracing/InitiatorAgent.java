@@ -19,6 +19,8 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 
 /**
@@ -112,8 +114,10 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				TestReport tr = new TestReport("#"+testno, "Tests if timeout works.");
-				tr.setReason(exception.getMessage());
+				TestReport tr = new TestReport("#"+testno, "Tests if tracing works.");
+				StringWriter	sw	= new StringWriter();
+				exception.printStackTrace(new PrintWriter(sw));
+				tr.setReason(sw.toString());
 				super.resultAvailable(tr);
 			}
 		});

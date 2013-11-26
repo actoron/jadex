@@ -2752,7 +2752,7 @@ public class MessageService extends BasicService implements IMessageService
 					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
 				}
 				
-				if (!releasedatecache.containsKey(rec.getRoot()))
+				if(rec!=null && !releasedatecache.containsKey(rec.getRoot()))
 				{
 					SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener<IAwarenessManagementService>()
 					{
