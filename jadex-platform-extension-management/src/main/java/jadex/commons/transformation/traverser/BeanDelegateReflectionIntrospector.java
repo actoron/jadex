@@ -220,9 +220,13 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 				}
 				ret = delegateclazz!=null ? (IBeanAccessorDelegate)delegateclazz.newInstance() : null;
 			}
+			catch(RuntimeException e)
+			{
+//				throw e;
+			}
 			catch(Exception e)
 			{
-//				throw new RuntimeException(e);
+//				throw new RuntimeException(e);				
 			}
 			delegates.put(clazz, ret);
 		}

@@ -70,13 +70,13 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 * Map of vertices to adjacency maps of vertices to {incoming, outgoing,
 	 * incident} edges
 	 */
-	protected Map vertex_maps;
+	protected Map mvertex_maps;
 
 	/** Map of directed edges to incident vertex sets */
-	protected Map directed_edges; //
+	protected Map mdirected_edges;
 
 	/** Map of undirected edges to incident vertex sets */
-	protected Map undirected_edges;
+	protected Map mundirected_edges;
 
 	//-------- constructor --------
 
@@ -85,9 +85,9 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	public MultidirectedMultiGraph()
 	{
-		vertex_maps = new HashMap();
-		directed_edges = new HashMap();
-		undirected_edges = new HashMap();
+		mvertex_maps = new HashMap();
+		mdirected_edges = new HashMap();
+		mundirected_edges = new HashMap();
 	}
 
 	//-------- Graph interface --------
@@ -134,13 +134,13 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 		{
 			getOutgoing_internal(v1).add(edge);
 			getIncoming_internal(v2).add(edge);
-			directed_edges.put(edge, new_endpoints);
+			mdirected_edges.put(edge, new_endpoints);
 		}
 		else
 		{
 			getIncident_internal(v1).add(edge);
 			getIncident_internal(v2).add(edge);
-			undirected_edges.put(edge, new_endpoints);
+			mundirected_edges.put(edge, new_endpoints);
 		}
 
 		return true;
@@ -300,9 +300,9 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	public Collection getEdges(EdgeType edgeType)
 	{
 		if(edgeType == EdgeType.DIRECTED)
-			return Collections.unmodifiableCollection(directed_edges.keySet());
+			return Collections.unmodifiableCollection(mdirected_edges.keySet());
 		else if(edgeType == EdgeType.UNDIRECTED)
-			return Collections.unmodifiableCollection(undirected_edges.keySet());
+			return Collections.unmodifiableCollection(mundirected_edges.keySet());
 		else
 			return null;
 		// return Collections.unmodifiableCollection(new ArrayList<E>(0));
@@ -316,9 +316,9 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	public Pair getEndpoints(Object edge)
 	{
 		Pair endpoints;
-		endpoints = (Pair)directed_edges.get(edge);
+		endpoints = (Pair)mdirected_edges.get(edge);
 		if(endpoints == null)
-			return (Pair)undirected_edges.get(edge);
+			return (Pair)mundirected_edges.get(edge);
 		else
 			return endpoints;
 	}
@@ -330,9 +330,9 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	public EdgeType getEdgeType(Object edge)
 	{
-		if(directed_edges.containsKey(edge))
+		if(mdirected_edges.containsKey(edge))
 			return EdgeType.DIRECTED;
-		else if(undirected_edges.containsKey(edge))
+		else if(mundirected_edges.containsKey(edge))
 			return EdgeType.UNDIRECTED;
 		else
 			return null;
@@ -346,7 +346,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	public Object getSource(Object directed_edge)
 	{
 		if(getEdgeType(directed_edge) == EdgeType.DIRECTED)
-			return ((Pair)directed_edges.get(directed_edge)).getFirst();
+			return ((Pair)mdirected_edges.get(directed_edge)).getFirst();
 		else
 			return null;
 	}
@@ -359,7 +359,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	public Object getDest(Object directed_edge)
 	{
 		if(getEdgeType(directed_edge) == EdgeType.DIRECTED)
-			return ((Pair)directed_edges.get(directed_edge)).getSecond();
+			return ((Pair)mdirected_edges.get(directed_edge)).getSecond();
 		else
 			return null;
 	}
@@ -407,8 +407,8 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	public Collection getEdges()
 	{
 		Collection edges = new ArrayList();
-		edges.addAll(directed_edges.keySet());
-		edges.addAll(undirected_edges.keySet());
+		edges.addAll(mdirected_edges.keySet());
+		edges.addAll(mundirected_edges.keySet());
 		
 		return Collections.unmodifiableCollection(edges);
 	}
@@ -419,7 +419,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	public Collection getVertices()
 	{
-		return Collections.unmodifiableCollection(vertex_maps.keySet());
+		return Collections.unmodifiableCollection(mvertex_maps.keySet());
 	}
 
 	/**
@@ -429,7 +429,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	public boolean containsVertex(Object vertex)
 	{
-		return vertex_maps.containsKey(vertex);
+		return mvertex_maps.containsKey(vertex);
 	}
 
 	/**
@@ -439,7 +439,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	public boolean containsEdge(Object edge)
 	{
-		return directed_edges.containsKey(edge) || undirected_edges.containsKey(edge);
+		return mdirected_edges.containsKey(edge) || mundirected_edges.containsKey(edge);
 	}
 
 	/**
@@ -447,7 +447,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	public int getEdgeCount()
 	{
-		return directed_edges.size() + undirected_edges.size();
+		return mdirected_edges.size() + mundirected_edges.size();
 	}
 
 	/**
@@ -455,7 +455,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	public int getVertexCount()
 	{
-		return vertex_maps.size();
+		return mvertex_maps.size();
 	}
 
 	/**
@@ -538,7 +538,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 		}
 		if(!containsVertex(vertex))
 		{
-			vertex_maps.put(vertex, new HashSet[]{new HashSet(), new HashSet(), new HashSet()});
+			mvertex_maps.put(vertex, new HashSet[]{new HashSet(), new HashSet(), new HashSet()});
 			return true;
 		}
 		else
@@ -568,7 +568,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 		for(int i = 0; i < incident.size(); i++)
 			removeEdge(incident.get(i));
 
-		vertex_maps.remove(vertex);
+		mvertex_maps.remove(vertex);
 
 		return true;
 	}
@@ -592,13 +592,13 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 		{
 			getOutgoing_internal(v1).remove(edge);
 			getIncoming_internal(v2).remove(edge);
-			directed_edges.remove(edge);
+			mdirected_edges.remove(edge);
 		}
 		else
 		{
 			getIncident_internal(v1).remove(edge);
 			getIncident_internal(v2).remove(edge);
-			undirected_edges.remove(edge);
+			mundirected_edges.remove(edge);
 		}
 		return true;
 	}
@@ -612,7 +612,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	protected Collection getIncoming_internal(Object vertex)
 	{
-		return (Collection)((Object[])vertex_maps.get(vertex))[INCOMING];
+		return (Collection)((Object[])mvertex_maps.get(vertex))[INCOMING];
 	}
 
 	/**
@@ -622,7 +622,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	protected Collection getIncident_internal(Object vertex)
 	{
-		return (Collection)((Object[])vertex_maps.get(vertex))[INCIDENT];
+		return (Collection)((Object[])mvertex_maps.get(vertex))[INCIDENT];
 	}
 
 	/**
@@ -632,7 +632,7 @@ public class MultidirectedMultiGraph extends SparseGraph implements Graph, Seria
 	 */
 	protected Collection getOutgoing_internal(Object vertex)
 	{
-		return (Collection)((Object[])vertex_maps.get(vertex))[OUTGOING];
+		return (Collection)((Object[])mvertex_maps.get(vertex))[OUTGOING];
 	}
 
 }

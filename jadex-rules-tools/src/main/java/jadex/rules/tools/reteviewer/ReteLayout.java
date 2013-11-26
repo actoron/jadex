@@ -23,7 +23,7 @@ public class ReteLayout extends AbstractLayout implements Layout
 	/** The size. */
 	// Managed directly, because jung's abstractlayout introduces
 	// it's own (incompatible) offsets. 
-	protected Dimension	size;
+	protected Dimension	rsize;
 	
 	/** The nodes, sorted in layers. */
 	protected List	layers;
@@ -93,7 +93,7 @@ public class ReteLayout extends AbstractLayout implements Layout
 	public void setSize(Dimension size)
 	{
 		positions	= false;
-		this.size	= size;
+		this.rsize	= size;
 	}
 	
 	/**
@@ -101,7 +101,7 @@ public class ReteLayout extends AbstractLayout implements Layout
 	 */
 	public Dimension	getSize()
 	{
-		return this.size;
+		return this.rsize;
 	}
 	
 	/**

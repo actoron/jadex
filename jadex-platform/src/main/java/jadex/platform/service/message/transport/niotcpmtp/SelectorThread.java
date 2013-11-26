@@ -421,7 +421,14 @@ public class SelectorThread implements Runnable
 		else
 		{
 			SocketChannel	sc	= (SocketChannel)key.channel();
-			try{sc.socket().setSendBufferSize(sc.socket().getSendBufferSize()<<1);}catch(Exception e){}
+			try
+			{
+				sc.socket().setSendBufferSize(sc.socket().getSendBufferSize()<<1);
+			}
+			catch(Exception e)
+			{
+				logger.warning("Cannot set send buffer size: "+e);
+			}
 			Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>	tuple	= (Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>)key.attachment();
 			InetSocketAddress	address	= tuple.getFirstEntity();
 			Future<NIOTCPOutputConnection>	ret	= tuple.getSecondEntity();

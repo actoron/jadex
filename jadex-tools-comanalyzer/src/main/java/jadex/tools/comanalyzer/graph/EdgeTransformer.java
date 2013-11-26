@@ -354,8 +354,8 @@ public class EdgeTransformer
 		/** The gradient level */
 		protected int gradientLevel;
 
-		/** The self loop predicate */
-		protected Predicate selfLoop = new SelfLoopEdgePredicate();
+//		/** The self loop predicate */
+//		protected Predicate selfLoop = new SelfLoopEdgePredicate();
 
 		//-------- constructor --------
 

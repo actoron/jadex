@@ -263,7 +263,14 @@ public class TCPTransport implements ITransport
 	public IFuture<Void> shutdown()
 	{
 //		System.out.println("shutdown: "+this);
-		try{this.serversocket.close();}catch(Exception e){}
+		try
+		{
+			this.serversocket.close();
+		}
+		catch(Exception e)
+		{
+			logger.warning("Exception during shutdown: "+e);
+		}
 		connections = null; // Help gc
 		if(timer!=null)
 		{

@@ -40,6 +40,9 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	
 	/** The security service of the ttp. */
 	protected ISecurityService ttpsecser;
+	
+	/** The random generator. */
+	protected Random	rnd;
 
 	//-------- constructors --------
 
@@ -58,6 +61,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 	{
 		this.ttpcid = ttpname==null? null: new ComponentIdentifier(ttpname);
 		this.verify = true;
+		this.rnd	= new Random();
 //		setTTPCid(new ComponentIdentifier(ttpname));
 //		setverify(true);
 	}
@@ -142,6 +146,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 						{
 							public void customResultAvailable(Void result)
 							{
+								ttpsecser	= ss;
 								ret.setResult(ss);
 							}
 						});
@@ -219,7 +224,7 @@ public class TTPAcquisitionMechanism extends AAcquisitionMechanism
 				else
 				{
 					final byte[] content = new byte[20];
-					new Random().nextBytes(content);
+					rnd.nextBytes(content);
 				
 					// Let ttp sign some data
 					ss.signCall(content).addResultListener(new ExceptionDelegationResultListener<byte[], Void>(ret)

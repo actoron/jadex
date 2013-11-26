@@ -14,6 +14,8 @@ import java.util.Set;
  */
 public class NIOBehavior
 {
+	protected static Random	rnd	= new Random();
+	
 	public static void main(String[] args) throws Exception
 	{
 		Selector	selector	= Selector.open();
@@ -23,7 +25,7 @@ public class NIOBehavior
 //		sc.connect(new InetSocketAddress("google.de", 80));
 		sc.connect(new InetSocketAddress("192.168.1.144", 8080));
 		byte[]	bytes	= new byte[12345];
-		new Random().nextBytes(bytes);
+		rnd.nextBytes(bytes);
 		ByteBuffer	buf	= ByteBuffer.wrap(bytes);
 		while(selector.isOpen())
 		{

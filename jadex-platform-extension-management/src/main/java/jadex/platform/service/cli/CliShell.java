@@ -234,7 +234,7 @@ public class CliShell extends ACliShell
 						
 		// Split the command line to parts
 		String[] parts = SUtil.splitCommandline(line);
-		for(int i=0; i<parts.length; i++)
+		for(int i=0; parts!=null && i<parts.length; i++)
 		{
 			parts[i] = parts[i].trim();
 		}

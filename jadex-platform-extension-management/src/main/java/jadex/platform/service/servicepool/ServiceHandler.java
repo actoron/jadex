@@ -27,6 +27,7 @@ import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -141,7 +142,7 @@ public class ServiceHandler implements InvocationHandler
 								
 								public void exceptionOccurred(Exception exception)
 								{
-									System.out.println("method: "+method+" "+args+" "+sc);
+									System.out.println("method: "+method+" "+Arrays.toString(args)+" "+sc);
 									super.exceptionOccurred(exception);
 								}
 							}));

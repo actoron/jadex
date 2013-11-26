@@ -58,7 +58,15 @@ public class XMLCodec implements ICodec
 		});
 	    enc.writeObject(val);
 	    enc.close();
-	    try{baos.close();} catch(Exception e) {}
+	    try
+	    {
+	    	baos.close();
+	    }
+	    catch(Exception e)
+	    {
+			System.out.println("XML encoding ERROR: ");
+			e.printStackTrace();	    	
+	    }
 	    return baos.toByteArray();
 	}
 
@@ -68,7 +76,7 @@ public class XMLCodec implements ICodec
 	 *  @throws IOException
 	 */
 //	public Object decode(byte[] bytes, ClassLoader classloader)
-	public Object decode(Object bytes, ClassLoader classloader, IErrorReporter rep)
+	public Object decode(Object bytes, ClassLoader classloader, final IErrorReporter rep)
 	{
 		final InputStream bais = bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (InputStream)bytes;
 		
@@ -76,14 +84,22 @@ public class XMLCodec implements ICodec
 		{
 			public void exceptionThrown(Exception e)
 			{
-				System.out.println("XML decoding ERROR: "+bais);
-				e.printStackTrace();
+				rep.exceptionOccurred(e);
+//				System.out.println("XML decoding ERROR: "+bais);
+//				e.printStackTrace();
 			}
 		}, classloader);
 		
 		Object ret = dec.readObject();
 		dec.close();
-		try{bais.close();} catch(Exception e) {}
+		try
+		{
+			bais.close();
+		}
+		catch(Exception e)
+		{
+			rep.exceptionOccurred(e);
+		}
 		return ret;
 	}
 }

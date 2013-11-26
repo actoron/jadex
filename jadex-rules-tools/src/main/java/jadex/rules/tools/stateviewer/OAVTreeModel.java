@@ -1048,10 +1048,12 @@ public class OAVTreeModel implements TreeModel
 	 * Add a timer to the static refresh timer list 
 	 * @param t
 	 */
-	protected static void addRefreshTimer(Timer t)
+	protected synchronized static void addRefreshTimer(Timer t)
 	{
-		if (timerList == null)
+		if(timerList==null)
+		{
 			timerList = new ArrayList();
+		}
 		
 		timerList.add(t);
 	}
@@ -1062,11 +1064,13 @@ public class OAVTreeModel implements TreeModel
 	 */
 	protected static void removeRefreshTimer(Timer t)
 	{
-		if (t != null)
+		if(t!=null)
 		{
 			t.stop();
-			if (timerList == null)
+			if(timerList!=null)
+			{
 				timerList.remove(t);
+			}
 		}
 	}
 
@@ -1392,7 +1396,14 @@ public class OAVTreeModel implements TreeModel
 				// Hack!!! configure name slot?
 				OAVObjectType	type	= copy.getType(object);
 				OAVAttributeType name = null;
-				try{name = type.getAttributeType("element_has_name");} catch(Exception e){}
+				try
+				{
+					name = type.getAttributeType("element_has_name");
+				}
+				catch(Exception e)
+				{
+					name	= null;
+				}
 				if(name!=null)
 				{
 					Object val	= copy.getAttributeValue(object, name);
@@ -1717,7 +1728,7 @@ public class OAVTreeModel implements TreeModel
 			boolean ret = obj instanceof ObjectInspectorNode
 				&& ((ObjectInspectorNode)obj).parent==parent
 				&& ((ObjectInspectorNode)obj).type==type
-				&& ((ObjectInspectorNode)obj).name==name
+				&& SUtil.equals(((ObjectInspectorNode)obj).name, name)
 				&& (fields != null && fields.equals(((ObjectInspectorNode)obj).fields))
 				&& (nodeObject != null && nodeObject.equals(((ObjectInspectorNode) obj).nodeObject));
 			
@@ -1993,8 +2004,7 @@ public class OAVTreeModel implements TreeModel
 			boolean ret = obj instanceof ObjectInspectorAttributeNode
 						&& ((ObjectInspectorAttributeNode) obj).parent == parent
 						&& ((ObjectInspectorAttributeNode) obj).field == field
-						&& ((ObjectInspectorAttributeNode) obj).name == name
-						;
+						&& SUtil.equals(((ObjectInspectorAttributeNode)obj).name, name);
 
 			if (ret) 
 			{
