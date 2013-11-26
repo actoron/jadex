@@ -46,7 +46,7 @@ public class MultiPlatformsTest extends TestCase
 			}
 		}, 0, 30000);
 
-		Thread.sleep(3000000);
+//		Thread.sleep(3000000);
 
 		
 //		for(int p=0; p<1000; p++)
