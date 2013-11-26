@@ -21,6 +21,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -29,6 +30,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -353,17 +355,8 @@ public class ExternalAccess implements IExternalAccess
 			throw new NullPointerException("No step. Maybe decoding error?");
 		}
 		
-		Class<?>	type	= null;
-		try
-		{
-			type	= step.getClass().getMethod("execute", new Class[]{IInternalAccess.class}).getReturnType();
-		}
-		catch(NoSuchMethodException nsme)
-		{
-			nsme.printStackTrace();
-		}
-		
-		final Future<T>	ret = type!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(type, new FutureFunctionality((Logger)null)) : new Future<T>();
+		Method	m	= SReflect.getMethod(step.getClass(), "execute", new Class[]{IInternalAccess.class});
+		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(m.getReturnType(), new FutureFunctionality((Logger)null)) : new Future<T>();
 		
 		if(adapter.isExternalThread())
 		{

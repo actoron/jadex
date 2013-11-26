@@ -51,7 +51,10 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 	 */
 	public void terminate()
 	{
-		terminate(new FutureTerminatedException());
+		if(!isDone())
+		{
+			terminate(new FutureTerminatedException());
+		}
 	}
 	
 	/**
@@ -59,7 +62,8 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 	 */
 	public void terminate(Exception reason)
 	{
-		boolean	term = terminate==null || terminate.checkTermination(reason);
+		
+		boolean	term = !isDone() && (terminate==null || terminate.checkTermination(reason));
 		
 		if(term && setExceptionIfUndone(reason))
 		{
