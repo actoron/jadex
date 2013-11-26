@@ -3,6 +3,7 @@ package jadex.commons.future;
 import jadex.commons.IResultCommand;
 
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *  Locking class implementing RX-style operation:
@@ -26,6 +27,14 @@ public class ReadWriteLock
 	/** Backlog of write requests */
 	protected LinkedList<IResultCommand<IFuture<Void>, Void>> writebacklog = new LinkedList<IResultCommand<IFuture<Void>, Void>>();
 	
+	/** Future for notifying finished condition. */
+	protected Future<Void> finishedfuture = null;
+	
+	/**
+	 *  Schedules a read operation.
+	 * 
+	 *  @param readcommand The read command.
+	 */
 	public void scheduleRead(IResultCommand<IFuture<Void>, Void> readcommand)
 	{
 		if (write || !writebacklog.isEmpty())
@@ -57,6 +66,30 @@ public class ReadWriteLock
 		}
 	}
 	
+	/**
+	 *  Returns a future notifying if/when the operations queue is currently empty.
+	 *  
+	 *  @return Future being notified.
+	 */
+	public IFuture<Void> notifyWhenFinished()
+	{
+		if (!write && reads == 0 && readbacklog.isEmpty() && writebacklog.isEmpty())
+		{
+			return IFuture.DONE;
+		}
+		
+		if (finishedfuture == null)
+		{
+			finishedfuture = new Future<Void>();
+		}
+		
+		return finishedfuture;
+	}
+	
+	/**
+	 *  Listener performing post-action operations.
+	 *
+	 */
 	protected class ActionPerformedListener implements IResultListener<Void>
 	{
 		/** Flag indicating a read operation. */
@@ -100,6 +133,12 @@ public class ReadWriteLock
 					++reads;
 					readbacklog.remove().execute(null).addResultListener(this);
 				}
+			}
+			else if (finishedfuture != null &&!write && reads == 0 && readbacklog.isEmpty() && writebacklog.isEmpty())
+			{
+				Future<Void> finished = finishedfuture;
+				finishedfuture = null;
+				finished.setResult(null);
 			}
 		}
 		
