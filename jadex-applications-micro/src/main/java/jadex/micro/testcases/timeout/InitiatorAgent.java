@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.Tuple2;
@@ -131,7 +132,7 @@ public class InitiatorAgent extends TestAgent
 		{
 			public void customResultAvailable(final IComponentIdentifier cid) 
 			{
-				callService(cid, testno, 5000).addResultListener(new DelegationResultListener<TestReport>(ret));
+				callService(cid, testno, BasicService.getLocalDefaultTimeout()/6).addResultListener(new DelegationResultListener<TestReport>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -210,7 +211,7 @@ public class InitiatorAgent extends TestAgent
 						else if(exception instanceof TimeoutException)
 						{
 							long diff = System.currentTimeMillis() - (start+to);
-							if(diff>=0 && diff<2000) // 2 secs max overdue delay?
+							if(diff>=0 && diff<BasicService.getLocalDefaultTimeout()/15) // 2 secs max overdue delay?
 							{
 								tr.setSucceeded(true);
 							}
