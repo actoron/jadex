@@ -47,7 +47,7 @@ public class JadexBinaryContentCodec implements IContentCodec, Serializable
 		List<ITraverseProcessor> preprocessors = (List<ITraverseProcessor>)(infos!=null? infos[1]: null);
 		byte[] ret = BinarySerializer.objectToByteArray(val, preprocessors, JadexBinaryCodec.getEncoderChain(context), null, classloader);
 		if(DEBUG)
-			System.out.println("encode content: "+ret);
+			System.out.println("encode content: "+new String(ret));
 		return ret;
 	}
 

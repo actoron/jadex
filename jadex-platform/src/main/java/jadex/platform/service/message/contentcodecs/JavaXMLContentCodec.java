@@ -77,7 +77,7 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 				}
 				else
 				{
-					System.err.println("XML decoding ERROR: "+val);
+					System.err.println("XML decoding ERROR: "+new String(val));
 					e.printStackTrace();
 				}
 			}

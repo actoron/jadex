@@ -19,7 +19,15 @@ public class BrowserLauncher2
 	//---------- static fields ----------
 	
 	/** The applet (has to be set from the outside). */
-	public static Applet	applet;
+	protected static Applet	applet;
+	
+	/**
+	 *  Set the current applet.
+	 */
+	public static void	setApplet(Applet applet)
+	{
+		BrowserLauncher2.applet	= applet;
+	}
 	
 	//---------- methods ----------
 	

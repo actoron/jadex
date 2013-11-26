@@ -506,16 +506,17 @@ public class AsyncTreeModel
 	 */
 	public void removeZombieNode(ITreeNode node)
 	{
-		synchronized (nodes)
+		synchronized(nodes)
 		{
 			Integer num = zombies.get(node.getId());
-			if (num.intValue() > 1)
+			if(num.intValue()>1)
 			{
-				num = new Integer(num != null ? num.intValue() - 1 : 1);
+				num = new Integer(num.intValue()-1);
 				zombies.put(node.getId(), num);
 				// if(node.getId().toString().startsWith("ANDTest@"))
 				// System.out.println("Zombie node count decreased: "+node+", "+num);
-			} else
+			}
+			else
 			{
 				// if(node.getId().toString().startsWith("ANDTest@"))
 				// System.out.println("Zombie node removed: "+node+", "+num);

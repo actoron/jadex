@@ -32,7 +32,7 @@ public class CodecFactory
 	protected byte[] default_ids; 
 	
 	/** The default codecs. */
-	protected ICodec[] default_codecs; 
+	protected volatile ICodec[] default_codecs; 
 	
 	/** The codec names, array index equals CODEC_ID. */
 	public static String[] CODEC_NAMES = {"No Codec","SerialCodec","NuggetsCodec", "XMLCodec", "JadexXMLCodec", "GZIPCodec", "JadexBinaryCodec"};

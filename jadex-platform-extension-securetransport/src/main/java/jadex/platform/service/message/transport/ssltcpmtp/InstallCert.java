@@ -133,7 +133,12 @@ public class InstallCert
 		}
 
 		System.out.println("Enter certificate to add to trusted keystore or 'q' to quit: [1]");
-		String line = reader.readLine().trim();
+		String line = reader.readLine();
+		if(line==null)
+		{
+			throw new RuntimeException("Console closed?");
+		}
+		line	= line.trim();
 		int k;
 		try
 		{

@@ -13,7 +13,7 @@ public class PlatformApplet extends Applet
 	public void init()
 	{
 		// Initialize browser launcher.
-		BrowserLauncher2.applet	= this;
+		BrowserLauncher2.setApplet(this);
 		
 		// Start platform.
 		String[]	args;

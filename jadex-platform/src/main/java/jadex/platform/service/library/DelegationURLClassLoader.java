@@ -40,7 +40,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 	
 	/** The flattened transitive dependencies without duplicates
 	    (created lazy from delegates list). */
-	protected Set<DelegationURLClassLoader>	dependencies;
+	protected volatile Set<DelegationURLClassLoader>	dependencies;
 	
 	//-------- constructors --------
 	

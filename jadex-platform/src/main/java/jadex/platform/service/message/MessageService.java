@@ -2397,7 +2397,7 @@ public class MessageService extends BasicService implements IMessageService
 	}
 	
 	/** The (real) system clock timer. */
-	protected Timer	timer;
+	protected volatile Timer	timer;
 	
 	/**
 	 *  Wait for a time delay on the (real) system clock.
@@ -2751,8 +2751,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					crl.exceptionOccurred(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
 				}
-				
-				if(rec!=null && !releasedatecache.containsKey(rec.getRoot()))
+				else if(!releasedatecache.containsKey(rec.getRoot()))
 				{
 					SServiceProvider.getService(component.getServiceProvider(), IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener<IAwarenessManagementService>()
 					{

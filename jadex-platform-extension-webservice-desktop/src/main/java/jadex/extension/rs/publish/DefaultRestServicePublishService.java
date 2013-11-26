@@ -575,6 +575,10 @@ public class DefaultRestServicePublishService implements IPublishService
 			{
 				method = methods[0];
 			}
+			else
+			{
+				throw new RuntimeException("No method '"+name+"' on class: "+getClass());
+			}
 //			System.out.println("call: "+this+" "+method+" "+SUtil.arrayToString(params)+" "+name);
 			
 			// check if mappers are there

@@ -29,10 +29,10 @@ public abstract class AbstractSendTask implements ISendTask
 	//-------- attributes --------
 	
 	/** The encoded message envelope. */
-	protected byte[] data;
+	protected volatile byte[] data;
 
 	/** The message prolog. */
-	protected byte[] prolog;
+	protected volatile byte[] prolog;
 
 	
 	/** The codecids. */

@@ -87,7 +87,7 @@ public class MethodWrapper
 //			ret = ((MethodWrapper)obj).getName().equals(getName());
 			Method m2 = ((MethodWrapper)obj).getMethod();
 			ret = method.getName().equals(m2.getName());
-			if(method.getName().equals(m2))
+			if(ret)
 			{
 				Class[] paramtypes = method.getParameterTypes();
 				Class[] pt2 = m2.getParameterTypes();
