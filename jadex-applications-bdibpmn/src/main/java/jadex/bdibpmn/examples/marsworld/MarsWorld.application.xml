@@ -106,7 +106,7 @@
 			</env:avatarmappings>
 
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D">
+				<env:perspective name="icons" class="Perspective2D" opengl="false">
 				
 					<!-- Target -->
 					<env:drawable objecttype="target" width="0.1" height="0.1">
