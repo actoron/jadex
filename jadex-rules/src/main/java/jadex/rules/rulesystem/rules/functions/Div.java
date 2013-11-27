@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
@@ -18,7 +19,7 @@ public class Div implements IFunction
 	{
 		double ret = 0;
 		if(paramvalues==null || paramvalues.length!=2)
-			throw new IllegalArgumentException("Function needs two parameters: "+paramvalues);
+			throw new IllegalArgumentException("Function needs two parameters: "+SUtil.arrayToString(paramvalues));
 		
 		Object val1 = paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]; 
 		Object val2 = paramvalues[1] instanceof ILazyValue? ((ILazyValue)paramvalues[1]).getValue(): paramvalues[1]; 

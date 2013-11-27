@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.state.IOAVState;
@@ -35,7 +36,7 @@ public class OperatorFunction implements IFunction
 	public Object invoke(Object[] paramvalues, IOAVState state)
 	{
 		if(paramvalues==null || paramvalues.length!=2)
-			throw new IllegalArgumentException("Operator function needs two parameters: "+paramvalues);
+			throw new IllegalArgumentException("Operator function needs two parameters: "+SUtil.arrayToString(paramvalues));
 
 		return new Boolean(operator.evaluate(state, paramvalues[0], paramvalues[1]));
 	}
@@ -84,5 +85,13 @@ public class OperatorFunction implements IFunction
 	{
 		return (obj instanceof OperatorFunction) 
 			&& ((OperatorFunction)obj).getOperator().equals(obj);
+	}
+	
+	/**
+	 *  Get the hash code.
+	 */
+	public int hashCode()
+	{
+		return 31 + operator.hashCode();
 	}
 }

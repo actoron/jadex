@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -723,7 +724,7 @@ public class OAVWeakState	implements IOAVState
 		if(ret==null && !theobject.containsKey(attribute))
 			ret = attribute.getDefaultValue();
 		
-		return ((Map)ret).keySet();
+		return ret!=null ? ((Map)ret).keySet(): Collections.emptySet();
 	}
 
 	

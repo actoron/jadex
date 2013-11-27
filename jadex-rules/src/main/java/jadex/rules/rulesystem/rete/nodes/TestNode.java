@@ -29,10 +29,10 @@ public class TestNode extends AbstractNode implements ITupleConsumerNode, ITuple
 	final protected IConstraintEvaluator evaluator;
 	
 	/** The set of relevant attributes. */
-	protected AttributeSet relevants;
+	protected volatile AttributeSet relevants;
 	
 	/** The set of indirect attributes. */
-	protected AttributeSet indirects;
+	protected volatile AttributeSet indirects;
 	
 	//-------- constructors --------
 	

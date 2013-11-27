@@ -179,6 +179,14 @@ public class Block
 			&& ((Block)o).number==number
 			&& ((Block)o).getColor().equals(getColor());
 	}
+	
+	/**
+	 *  Get the hash code.
+	 */
+	public int hashCode()
+	{
+		return 31 + number + 31 * getColor().hashCode();
+	}
 
 	//-------- property methods --------
 

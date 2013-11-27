@@ -1,6 +1,7 @@
 package jadex.rules.rulesystem.rules.functions;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
@@ -21,7 +22,7 @@ public class Mult implements IFunction
 	{
 		double ret = 0;
 		if(paramvalues==null || paramvalues.length==0)
-			throw new IllegalArgumentException("Function needs one parameter: "+paramvalues);
+			throw new IllegalArgumentException("Function needs one parameter: "+SUtil.arrayToString(paramvalues));
 			
 		if(paramvalues.length==1)
 		{

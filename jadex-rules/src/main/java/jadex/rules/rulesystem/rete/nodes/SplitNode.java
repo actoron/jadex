@@ -43,10 +43,10 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	protected IObjectConsumerNode[]	oconsumers;
 
 	/** The set of relevant attributes. */
-	protected AttributeSet relevants;
+	protected volatile AttributeSet relevants;
 	
 	/** The set of indirect attributes. */
-	protected AttributeSet indirects;
+	protected volatile AttributeSet indirects;
 
 	/** The values extractor. */
 	// Needed as long as multifield extractor is based on attribute
@@ -486,7 +486,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 		}
 		else
 		{
-			if(splitpattern[cur]!=SINGLE)
+			if(!splitpattern[cur].equals(SINGLE))
 			{
 				for(int i=0; i<=weight-min_values; i++)
 				{

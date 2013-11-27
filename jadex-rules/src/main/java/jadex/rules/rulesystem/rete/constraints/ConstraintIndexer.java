@@ -214,5 +214,13 @@ public class ConstraintIndexer
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get the hash code.
+	 */
+	public int hashCode()
+	{
+		return 31 + extractor1.hashCode() + 31 * extractor2.hashCode();
+	}
 }
 

@@ -36,7 +36,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	protected Map typenodesets;
 	
 	/** Indirectly affected nodes for an attribute type (cached for speed). */
-	protected Map indirectnodesets;
+	protected volatile Map indirectnodesets;
 	
 	/** The initial fact node (if any). */
 	protected InitialFactNode	initialfact;
@@ -48,7 +48,7 @@ public class ReteNode extends AbstractNode implements IObjectSourceNode
 	protected ReteBuilder builder;
 	
 	/** The set of relevant attributes. */
-	protected AttributeSet relevants;
+	protected volatile AttributeSet relevants;
 	
 	/** Do a consistency check after each state change (requires asserts). */
 	protected boolean	check;

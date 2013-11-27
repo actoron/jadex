@@ -24,7 +24,7 @@ public class LeftInputAdapterNode extends AbstractNode implements IObjectConsume
 	protected IObjectSourceNode osource;
 	
 	/** The set of relevant attributes. */
-	protected AttributeSet	relevants;
+	protected volatile AttributeSet	relevants;
 
 	//-------- object consumer node --------
 	

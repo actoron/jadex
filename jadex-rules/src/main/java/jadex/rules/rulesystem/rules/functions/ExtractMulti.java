@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules.functions;
 
+import jadex.commons.SUtil;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
@@ -44,7 +45,7 @@ public class ExtractMulti implements IFunction
 	public Object invoke(Object[] paramvalues, IOAVState state)
 	{
 		if(paramvalues==null || paramvalues.length!=1)
-			throw new IllegalArgumentException("Function needs one parameter: "+paramvalues);
+			throw new IllegalArgumentException("Function needs one parameter: "+SUtil.arrayToString(paramvalues));
 			
 		Object val1 = paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]; 
 

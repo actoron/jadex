@@ -39,10 +39,10 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	protected IConstraintEvaluator[] evaluators;
 	
 	/** The set of relevant attributes. */
-	protected AttributeSet relevants;
+	protected volatile AttributeSet relevants;
 	
 	/** The set of indirect attributes. */
-	protected AttributeSet indirects;
+	protected volatile AttributeSet indirects;
 	
 	/** The tuple index to collect. */
 	protected int tupleindex;

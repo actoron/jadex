@@ -22,7 +22,7 @@ public class RightInputAdapterNode extends AbstractNode implements ITupleConsume
 	protected ITupleSourceNode tsource;
 	
 	/** The set of relevant attributes. */
-	protected AttributeSet	relevants;
+	protected volatile AttributeSet	relevants;
 
 	//-------- ITupleConsumer interface --------
 

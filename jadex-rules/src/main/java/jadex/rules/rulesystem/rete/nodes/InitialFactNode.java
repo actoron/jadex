@@ -29,7 +29,7 @@ public class InitialFactNode extends AbstractNode implements ITupleSourceNode, I
 	protected IObjectSourceNode osource;
 
 	/** The set of relevant attributes. */
-	protected AttributeSet	relevants;
+	protected volatile AttributeSet	relevants;
 
 	/** The initial fact tuple. */
 	protected Tuple	initial_fact_tuple;

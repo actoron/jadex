@@ -38,10 +38,10 @@ public class TerminalNode extends AbstractNode implements ITupleConsumerNode
 	protected IRule	rule;
 
 	/** The set of relevant attributes. */
-	protected AttributeSet relevants;
+	protected volatile AttributeSet relevants;
 
 	/** The set of indirect attributes. */
-	protected AttributeSet indirects;
+	protected volatile AttributeSet indirects;
 
 	//-------- constructors --------
 	
