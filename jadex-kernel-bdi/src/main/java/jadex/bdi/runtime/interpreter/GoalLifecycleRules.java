@@ -333,8 +333,8 @@ public class GoalLifecycleRules
 				{
 					String	pname	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
 					IParsedExpression	pexp	= (IParsedExpression)state.getAttributeValue(state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_value), OAVBDIMetaModel.expression_has_parsed);	// Todo: value-variable attribute???
-					if(pexp==null)
-						System.out.println("hier");
+//					if(pexp==null)
+//						System.out.println("hier");
 					Class	clazz	= (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
 					
 					Variable	parvar	= new Variable("?para_"+parcons.size(), OAVBDIRuntimeModel.parameter_type);

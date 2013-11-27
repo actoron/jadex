@@ -482,102 +482,105 @@ public class Starter
 								{
 									ret.setException(new RuntimeException("No adapterfactory found."));
 								}
-								Class<?> afclass = af instanceof Class ? (Class<?>)af : SReflect.classForName(af.toString(), cl);
-								final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
-								
-								final Future<IComponentInstance>	instancefut	= new Future<IComponentInstance>();
-								Future<Void> future = new Future<Void>();
-								future.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+								else
 								{
-									public void customResultAvailable(Void result)
+									Class<?> afclass = af instanceof Class ? (Class<?>)af : SReflect.classForName(af.toString(), cl);
+									final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
+									
+									final Future<IComponentInstance>	instancefut	= new Future<IComponentInstance>();
+									Future<Void> future = new Future<Void>();
+									future.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 									{
-										instancefut.addResultListener(new ExceptionDelegationResultListener<IComponentInstance, IExternalAccess>(ret)
+										public void customResultAvailable(Void result)
 										{
-											public void customResultAvailable(final IComponentInstance instance)
+											instancefut.addResultListener(new ExceptionDelegationResultListener<IComponentInstance, IExternalAccess>(ret)
 											{
-												startComponents(0, components, instance)
-													.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+												public void customResultAvailable(final IComponentInstance instance)
 												{
-													public void customResultAvailable(Void result)
+													startComponents(0, components, instance)
+														.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 													{
-														if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
+														public void customResultAvailable(Void result)
 														{
-															long startup = System.currentTimeMillis() - starttime;
-															// platform.logger.info("Platform startup time: " + startup + " ms.");
-															System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+															if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
+															{
+																long startup = System.currentTimeMillis() - starttime;
+																// platform.logger.info("Platform startup time: " + startup + " ms.");
+																System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+															}
+															ret.setResult(instance.getExternalAccess());
 														}
-														ret.setResult(instance.getExternalAccess());
-													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-														// On exception in init: kill platform.
-														instance.getExternalAccess().killComponent();
-														super.exceptionOccurred(exception);
-													}
-												});
-											}
-										});
-									}
-								});
-								
-								boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
-								boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
-								// what about platform result listener?!
-								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, realtime, null, future)
-									.addResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, IExternalAccess>(ret)
-								{
-									public void customResultAvailable(Tuple2<IComponentInstance, IComponentAdapter> root)
+														
+														public void exceptionOccurred(Exception exception)
+														{
+															// On exception in init: kill platform.
+															instance.getExternalAccess().killComponent();
+															super.exceptionOccurred(exception);
+														}
+													});
+												}
+											});
+										}
+									});
+									
+									boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
+									boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
+									// what about platform result listener?!
+									cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, realtime, null, future)
+										.addResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, IExternalAccess>(ret)
 									{
-										instancefut.setResult(root.getFirstEntity());
-										IComponentAdapter adapter = root.getSecondEntity();
-										
-										// Execute init steps of root component on main thread (i.e. platform)
-										// until platform is ready to run by itself.
-										boolean again = true;
-										// Remember suspandable as it gets overwritten by adapter.executeStep()
-										ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
-										while(again && !ret.isDone())
+										public void customResultAvailable(Tuple2<IComponentInstance, IComponentAdapter> root)
 										{
-											again = afac.executeStep(adapter);
+											instancefut.setResult(root.getFirstEntity());
+											IComponentAdapter adapter = root.getSecondEntity();
 											
-											// When adapter not running, process open future notifications as if on platform thread.
-											if(!again)
+											// Execute init steps of root component on main thread (i.e. platform)
+											// until platform is ready to run by itself.
+											boolean again = true;
+											// Remember suspandable as it gets overwritten by adapter.executeStep()
+											ISuspendable	sus	= ISuspendable.SUSPENDABLE.get();
+											while(again && !ret.isDone())
 											{
-												IComponentAdapter.LOCAL.set(adapter);
-												IComponentIdentifier.LOCAL.set(cid);
-												again	= FutureHelper.notifyStackedListeners();
-												IComponentIdentifier.LOCAL.set(null);
-												IComponentAdapter.LOCAL.set(null);
+												again = afac.executeStep(adapter);
+												
+												// When adapter not running, process open future notifications as if on platform thread.
+												if(!again)
+												{
+													IComponentAdapter.LOCAL.set(adapter);
+													IComponentIdentifier.LOCAL.set(cid);
+													again	= FutureHelper.notifyStackedListeners();
+													IComponentIdentifier.LOCAL.set(null);
+													IComponentAdapter.LOCAL.set(null);
+												}
+											}
+											ISuspendable.SUSPENDABLE.set(sus);
+											
+											// Start normal execution of root component (i.e. platform) unless an error occurred during init.
+											boolean	wakeup	= false;
+											try
+											{
+												wakeup	= !ret.isDone() || ret.get(null)!=null;
+											}
+											catch(Exception e)
+											{
+											}
+											
+											if(wakeup)
+											{
+	//											try
+	//											{
+	//												Thread.sleep(300000);
+	//											}
+	//											catch(InterruptedException e)
+	//											{
+	//												// TODO Auto-generated catch block
+	//												e.printStackTrace();
+	//											}
+												afac.initialWakeup(adapter);
 											}
 										}
-										ISuspendable.SUSPENDABLE.set(sus);
-										
-										// Start normal execution of root component (i.e. platform) unless an error occurred during init.
-										boolean	wakeup	= false;
-										try
-										{
-											wakeup	= !ret.isDone() || ret.get(null)!=null;
-										}
-										catch(Exception e)
-										{
-										}
-										
-										if(wakeup)
-										{
-//											try
-//											{
-//												Thread.sleep(300000);
-//											}
-//											catch(InterruptedException e)
-//											{
-//												// TODO Auto-generated catch block
-//												e.printStackTrace();
-//											}
-											afac.initialWakeup(adapter);
-										}
-									}
-								});
+									});
+								}
 							}
 							catch(Exception e)
 							{

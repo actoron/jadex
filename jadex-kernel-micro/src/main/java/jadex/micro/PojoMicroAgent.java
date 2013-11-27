@@ -77,7 +77,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 			public void customResultAvailable(Tuple2<Method, Object> res)
 			{
 				// Only end body if future or void and kill is true 
-				Boolean found = null;
+				boolean kill = false;
 				
 				Method method = res!=null? res.getFirstEntity(): null;
 				
@@ -85,22 +85,24 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 				{
 					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 					{
-						found = Boolean.TRUE;
+						kill = true;
 					}
 					else if(void.class.equals(method.getReturnType()))
 					{
 						AgentBody ab = method.getAnnotation(AgentBody.class);
-						found = ab.keepalive()? Boolean.FALSE: Boolean.TRUE;
+						kill = !ab.keepalive();
 					}
 				}
 				else
 				{
 					Agent ag = agent.getClass().getAnnotation(Agent.class);
-					found = ag.keepalive()? Boolean.FALSE: Boolean.TRUE;
+					kill = ag.keepalive();
 				}
 				
-				if(found.booleanValue())
+				if(kill)
+				{
 					ret.setResult(null);
+				}
 			}
 		}));
 		

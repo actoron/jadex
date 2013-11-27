@@ -19,13 +19,13 @@ public class VersionInfo
 	protected static VersionInfo	instance	= new VersionInfo();
 	
 	/** The text date format (e.g. January 13, 2012). */
-	public static final DateFormat	DATE_FORMAT_TEXT	= new SimpleDateFormat("MMMM d, yyyy");
+	public DateFormat	DATE_FORMAT_TEXT	= new SimpleDateFormat("MMMM d, yyyy");
 	
 	/** The short date format (e.g. 2012/01/13). */
-	public static final DateFormat	DATE_FORMAT_NUMBER	= new SimpleDateFormat("yyyy/MM/dd");
+	public DateFormat	DATE_FORMAT_NUMBER	= new SimpleDateFormat("yyyy/MM/dd");
 
 	/** The short date format (e.g. 2012/01/13). */
-	public static final DateFormat	DATE_FORMAT_TIMESTAMP	= new SimpleDateFormat("yyyyMMdd.HHmmss");
+	public DateFormat	DATE_FORMAT_TIMESTAMP	= new SimpleDateFormat("yyyyMMdd.HHmmss");
 
 	//-------- attributes --------
 	

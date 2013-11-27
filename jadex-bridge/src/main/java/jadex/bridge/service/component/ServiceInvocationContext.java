@@ -577,7 +577,7 @@ public class ServiceInvocationContext
 		Object ret = getObject();
 		if(ret instanceof ServiceInfo)
 		{
-			ret = ((ServiceInfo)object).getDomainService();
+			ret = ((ServiceInfo)ret).getDomainService();
 		}
 		return ret;
 	}

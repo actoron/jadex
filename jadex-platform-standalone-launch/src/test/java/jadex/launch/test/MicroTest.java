@@ -46,6 +46,7 @@ public class MicroTest	extends ComponentTestSuite
 			"CompositeCalculatorAgent",
 			"blocking/Step",
 			"blocking\\Step",
+			"CallAllServicesAgent",
 			
 			// Manual tests requiring interaction
 			"ExternalAccessInvokerAgent",

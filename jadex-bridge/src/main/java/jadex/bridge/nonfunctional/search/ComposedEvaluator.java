@@ -63,7 +63,7 @@ public class ComposedEvaluator<S> implements IServiceEvaluator, IServiceRanker<S
 	{
 		for (int i = 0; i < evaluators.size(); ++i)
 		{
-			if (evaluators.get(i).equals(evaluator))
+			if (evaluators.get(i).getFirstEntity().equals(evaluator))
 			{
 				evaluators.remove(i);
 				break;

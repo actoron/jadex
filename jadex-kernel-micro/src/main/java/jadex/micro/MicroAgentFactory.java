@@ -58,7 +58,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	protected IServiceProvider provider;
 	
 	/** The properties. */
-	protected Map<String, Object> properties;
+	protected Map<String, Object> fproperties;
 	
 	/** The library service. */
 	protected ILibraryService libservice;
@@ -76,7 +76,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		super(provider.getId(), IComponentFactory.class, null);
 
 		this.provider = provider;
-		this.properties = properties;
+		this.fproperties = properties;
 		this.loader = new MicroModelLoader();
 		
 		this.libservicelistener = new ILibraryServiceListener()
@@ -465,7 +465,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public Map<String, Object>	getProperties(String type)
 	{
 		return FILETYPE_MICROAGENT.equals(type)
-		? properties: null;
+		? fproperties: null;
 	}
 	
 	/**

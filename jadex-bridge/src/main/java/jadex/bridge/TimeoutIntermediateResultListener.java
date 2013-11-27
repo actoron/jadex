@@ -10,9 +10,6 @@ import jadex.commons.future.IUndoneIntermediateResultListener;
  */
 public class TimeoutIntermediateResultListener<E> extends TimeoutResultListener<Collection<E>> implements IIntermediateResultListener<E>, IUndoneIntermediateResultListener<E>
 {
-	/** The undone flag. */
-	protected boolean undone;
-	
 	/**
 	 *  Create a new listener.
 	 */

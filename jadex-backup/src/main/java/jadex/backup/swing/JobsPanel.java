@@ -440,12 +440,12 @@ public class JobsPanel extends JPanel
 		return f;
 	}
 	
-	/**
-	 * 
-	 */
-	public static void main(String[] args)
-	{
-		createFrame(null);
-	}
+//	/**
+//	 * 
+//	 */
+//	public static void main(String[] args)
+//	{
+//		createFrame(null);
+//	}
 }
 

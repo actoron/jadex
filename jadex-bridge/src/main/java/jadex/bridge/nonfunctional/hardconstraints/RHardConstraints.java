@@ -144,14 +144,18 @@ public class RHardConstraints
 					{
 						public void resultAvailable(Collection<Boolean> result)
 						{
-							Boolean[] results = result.toArray(new Boolean[result.size()]);
-							boolean filterresult = true;
-							for (int i = 0; i < results.length && filterresult; ++i)
+							boolean filterresult = false;
+							if(result!=null)
 							{
-								filterresult &= results[i];
+								Boolean[] results = result.toArray(new Boolean[result.size()]);
+								filterresult = true;
+								for (int i = 0; i < results.length && filterresult; ++i)
+								{
+									filterresult &= results[i];
+								}
 							}
 							
-							if (!filterresult)
+							if(!filterresult)
 							{
 								for (ConstantValueFilter bfil : boundconstantfilters)
 								{

@@ -70,7 +70,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	protected ILibraryService libservice;
 	
 	/** The properties. */
-	protected Map properties;
+	protected Map fproperties;
 	
 	//-------- constructors --------
 	
@@ -93,7 +93,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	{
 		super(access.getServiceContainer().getId(), IComponentFactory.class, properties);
 		
-		this.properties	= properties;
+		this.fproperties	= properties;
 		this.ia = access;
 		this.loader = new GpmnModelLoader();
 		this.converter = new GpmnBDIConverter(access.getComponentIdentifier().getRoot());
@@ -358,6 +358,6 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	public Map	getProperties(String type)
 	{
 		return FILETYPE_GPMNPROCESS.equals(type)
-		? properties : null;
+		? fproperties : null;
 	}
 }

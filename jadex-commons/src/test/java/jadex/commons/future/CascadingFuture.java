@@ -1,13 +1,11 @@
 package jadex.commons.future;
 
-import java.util.LinkedList;
-import java.util.List;
 
 public class CascadingFuture<E> extends Future<E>
 {
 	protected int stacksize;
-	protected List<IResultListener<E>>	listeners	= new LinkedList<IResultListener<E>>();
-	protected E	result;
+//	protected List<IResultListener<E>>	listeners	= new LinkedList<IResultListener<E>>();
+//	protected E	result;
 	protected boolean	hasresult;
 	
 	public void	setCascadingResult(E result)

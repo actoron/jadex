@@ -64,7 +64,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	protected ILibraryServiceListener libservicelistener;
 	
 	/** The properties. */
-	protected Map<String, Object> properties;
+	protected Map<String, Object> fproperties;
 	
 	//-------- constructors --------
 	
@@ -88,7 +88,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 
 		this.provider = provider;
 		this.loader = new BpmnModelLoader();
-		this.properties	= properties;
+		this.fproperties	= properties;
 		
 		this.libservicelistener = new ILibraryServiceListener()
 		{
@@ -348,6 +348,6 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	public Map<String, Object>	getProperties(String type)
 	{
 		return FILETYPE_BPMNPROCESS.equals(type)
-		? properties : null;
+		? fproperties : null;
 	}
 }
