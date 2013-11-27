@@ -866,132 +866,132 @@ public class RGoal extends RProcessableElement implements IGoal
 		return ret;
 	}
 	
-	/**
-	 * 
-	 */
-	class LifecycleStateCondition implements ICondition
-	{
-		/** The allowed states. */
-		protected Set<String> states;
-		
-		/** The flag if state is allowed or disallowed. */
-		protected boolean allowed;
-		
-		/**
-		 * 
-		 */
-		public LifecycleStateCondition(String state)
-		{
-			this(SUtil.createHashSet(new String[]{state}));
-		}
-		
-		/**
-		 * 
-		 */
-		public LifecycleStateCondition(Set<String> states)
-		{
-			this(states, true);
-		}
-		
-		/**
-		 * 
-		 */
-		public LifecycleStateCondition(String state, boolean allowed)
-		{
-			this(SUtil.createHashSet(new String[]{state}), allowed);
-		}
-		
-		/**
-		 * 
-		 */
-		public LifecycleStateCondition(Set<String> states, boolean allowed)
-		{
-			this.states = states;
-			this.allowed = allowed;
-		}
-		
-		/**
-		 * 
-		 */
-		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-		{
-			Future<Tuple2<Boolean, Object>> ret = new Future<Tuple2<Boolean, Object>>();
-			boolean res = states.contains(getLifecycleState());
-			if(!allowed)
-				res = !res;
-			ret.setResultIfUndone(res? ICondition.TRUE: ICondition.FALSE);
-			return ret;
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	class ProcessingStateCondition implements ICondition
-	{
-		/** The allowed states. */
-		protected Set<String> states;
-		
-		/** The flag if state is allowed or disallowed. */
-		protected boolean allowed;
-		
-		/**
-		 * 
-		 */
-		public ProcessingStateCondition(String state)
-		{
-			this(SUtil.createHashSet(new String[]{state}));
-		}
-		
-		/**
-		 * 
-		 */
-		public ProcessingStateCondition(Set<String> states)
-		{
-			this(states, true);
-		}
-		
-		/**
-		 * 
-		 */
-		public ProcessingStateCondition(String state, boolean allowed)
-		{
-			this(SUtil.createHashSet(new String[]{state}), allowed);
-		}
-		
-		/**
-		 * 
-		 */
-		public ProcessingStateCondition(Set<String> states, boolean allowed)
-		{
-			this.states = states;
-			this.allowed = allowed;
-		}
-		
+//	/**
+//	 * 
+//	 */
+//	class LifecycleStateCondition implements ICondition
+//	{
+//		/** The allowed states. */
+//		protected Set<GoalLifecycleState> states;
+//		
+//		/** The flag if state is allowed or disallowed. */
+//		protected boolean allowed;
+//		
 //		/**
 //		 * 
 //		 */
-//		public Tuple2<Boolean, Object> evaluate(IEvent event)
+//		public LifecycleStateCondition(GoalLifecycleState state)
 //		{
-//			boolean ret = states.contains(getProcessingState());
-//			if(!allowed)
-//				ret = !ret;
-//			return ret? ICondition.TRUE: ICondition.FALSE;
+//			this(SUtil.createHashSet(new GoalLifecycleState[]{state}));
 //		}
-		
-		/**
-		 * 
-		 */
-		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-		{
-			Future<Tuple2<Boolean, Object>> ret = new Future<Tuple2<Boolean, Object>>();
-			boolean res = states.contains(getProcessingState());
-			if(!allowed)
-				res = !res;
-			ret.setResultIfUndone(res? ICondition.TRUE: ICondition.FALSE);
-			return ret;
-		}
-	}
+//		
+//		/**
+//		 * 
+//		 */
+//		public LifecycleStateCondition(Set<GoalLifecycleState> states)
+//		{
+//			this(states, true);
+//		}
+//		
+//		/**
+//		 * 
+//		 */
+//		public LifecycleStateCondition(GoalLifecycleState state, boolean allowed)
+//		{
+//			this(SUtil.createHashSet(new GoalLifecycleState[]{state}), allowed);
+//		}
+//		
+//		/**
+//		 * 
+//		 */
+//		public LifecycleStateCondition(Set<GoalLifecycleState> states, boolean allowed)
+//		{
+//			this.states = states;
+//			this.allowed = allowed;
+//		}
+//		
+//		/**
+//		 * 
+//		 */
+//		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+//		{
+//			Future<Tuple2<Boolean, Object>> ret = new Future<Tuple2<Boolean, Object>>();
+//			boolean res = states.contains(getLifecycleState());
+//			if(!allowed)
+//				res = !res;
+//			ret.setResultIfUndone(res? ICondition.TRUE: ICondition.FALSE);
+//			return ret;
+//		}
+//	}
+	
+//	/**
+//	 * 
+//	 */
+//	class ProcessingStateCondition implements ICondition
+//	{
+//		/** The allowed states. */
+//		protected Set<String> states;
+//		
+//		/** The flag if state is allowed or disallowed. */
+//		protected boolean allowed;
+//		
+//		/**
+//		 * 
+//		 */
+//		public ProcessingStateCondition(String state)
+//		{
+//			this(SUtil.createHashSet(new String[]{state}));
+//		}
+//		
+//		/**
+//		 * 
+//		 */
+//		public ProcessingStateCondition(Set<String> states)
+//		{
+//			this(states, true);
+//		}
+//		
+//		/**
+//		 * 
+//		 */
+//		public ProcessingStateCondition(String state, boolean allowed)
+//		{
+//			this(SUtil.createHashSet(new String[]{state}), allowed);
+//		}
+//		
+//		/**
+//		 * 
+//		 */
+//		public ProcessingStateCondition(Set<String> states, boolean allowed)
+//		{
+//			this.states = states;
+//			this.allowed = allowed;
+//		}
+//		
+////		/**
+////		 * 
+////		 */
+////		public Tuple2<Boolean, Object> evaluate(IEvent event)
+////		{
+////			boolean ret = states.contains(getProcessingState());
+////			if(!allowed)
+////				ret = !ret;
+////			return ret? ICondition.TRUE: ICondition.FALSE;
+////		}
+//		
+//		/**
+//		 * 
+//		 */
+//		public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+//		{
+//			Future<Tuple2<Boolean, Object>> ret = new Future<Tuple2<Boolean, Object>>();
+//			boolean res = states.contains(getProcessingState());
+//			if(!allowed)
+//				res = !res;
+//			ret.setResultIfUndone(res? ICondition.TRUE: ICondition.FALSE);
+//			return ret;
+//		}
+//	}
 	
 	/**
 	 * 

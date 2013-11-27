@@ -607,7 +607,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 //		boolean moni = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring().booleanValue(): false;
 		PublishEventLevel elm = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring(): null;
 		// todo: remove this? currently the level cannot be turned on due to missing interceptor
-		boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
+		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		
 		IInternalService	is	= BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), getComponentAdapter(), service, null,
@@ -820,10 +820,10 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		// Call add default argument also for passed arguments.
 		if(arguments!=null)
 		{
-			for(Iterator<String> it=arguments.keySet().iterator(); it.hasNext(); )
+			for(Iterator<Map.Entry<String, Object>> it=arguments.entrySet().iterator(); it.hasNext(); )
 			{
-				String key = (String)it.next();
-				addArgument(key, arguments.get(key));
+				Map.Entry<String, Object> entry = it.next();
+				addArgument(entry.getKey(), entry.getValue());
 			}
 		}
 		
@@ -1118,10 +1118,11 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		final Map<String, Object>	props	= model.getProperties();
 		if(props!=null)
 		{
-			for(Iterator<String> it=props.keySet().iterator(); it.hasNext(); )
+			for(Iterator<Map.Entry<String, Object>> it=props.entrySet().iterator(); it.hasNext(); )
 			{
-				final String name = it.next();
-				final Object value = props.get(name);
+				final Map.Entry<String, Object> entry = it.next();
+				final String name = entry.getKey();
+				final Object value = entry.getValue();
 				if(value instanceof UnparsedExpression)
 				{
 					try
@@ -1391,7 +1392,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		
 		PublishEventLevel elm = getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring(): null;
 		// todo: remove this? currently the level cannot be turned on due to missing interceptor
-		boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
+//		boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
+		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier(), moni, componentfetcher);
 		getServiceContainer().addService(proxy, info, componentfetcher).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
@@ -1850,7 +1852,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		if(ret!=null)
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
-			fetcher.setValue("$n", new Integer(cnt));
+			fetcher.setValue("$n", Integer.valueOf(cnt));
 			try
 			{
 				ret = (String)SJavaParser.evaluateExpression(component.getName(), model.getAllImports(), fetcher, getClassLoader());

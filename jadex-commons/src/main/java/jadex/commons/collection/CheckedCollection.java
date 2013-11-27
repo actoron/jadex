@@ -101,7 +101,9 @@ public class CheckedCollection implements Collection, Set
     			}
     			catch(RuntimeException e)
     			{
-    				(lastmod==null && parent!=null ? parent.lastmod : lastmod).printStackTrace();
+    				Exception ex = lastmod==null && parent!=null ? parent.lastmod : lastmod;
+    				if(ex!=null)
+    					ex.printStackTrace();
     				throw e;
     			}
     		}
@@ -114,7 +116,9 @@ public class CheckedCollection implements Collection, Set
     			}
     			catch(RuntimeException e)
     			{
-    				(lastmod==null && parent!=null ? parent.lastmod : lastmod).printStackTrace();
+    				Exception ex = lastmod==null && parent!=null ? parent.lastmod : lastmod;
+    				if(ex!=null)
+    					ex.printStackTrace();
     				throw e;
     			}
     		}
@@ -135,7 +139,9 @@ public class CheckedCollection implements Collection, Set
     			}
     			catch(RuntimeException e)
     			{
-    				(lastmod==null && parent!=null ? parent.lastmod : lastmod).printStackTrace();
+    				Exception ex = lastmod==null && parent!=null ? parent.lastmod : lastmod;
+    				if(ex!=null)
+    					ex.printStackTrace();
     				throw e;
     			}
     		}

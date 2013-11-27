@@ -70,7 +70,7 @@ public class FixedClassInfoComboModel extends AbstractFixedAutoComboModel<ClassI
 		boolean	suffix = val.indexOf(".")==-1;
 		for(ClassInfo item : entries)
 		{
-			if(item.equals(val) || (suffix && item.getTypeName().endsWith(val)))
+			if(item.getTypeName().equals(val) || item.getGenericTypeName().equals(val) || (suffix && item.getTypeName().endsWith(val)))
 			{
 				ret = item;
 				break;

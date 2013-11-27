@@ -234,7 +234,8 @@ public class FeatureDescriptor {
     }
     
     void merge(FeatureDescriptor feature){
-        assert(name.equals(feature.name));
+//        assert(name.equals(feature.name));
+        
         expert |= feature.expert;
         hidden |= feature.hidden;
         preferred |= feature.preferred;

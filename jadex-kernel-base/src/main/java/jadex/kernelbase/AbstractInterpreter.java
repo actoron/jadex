@@ -582,7 +582,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	//				System.out.println("forward to: "+event+" "+sub);
 					if(!sub.addIntermediateResultIfUndone(event))
 					{
-						subscriptions.remove(fil);
+						subscriptions.remove(sub);
 					}
 				}
 			}

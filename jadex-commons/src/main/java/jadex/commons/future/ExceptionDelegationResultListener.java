@@ -133,7 +133,7 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	{
 		if(future instanceof ICommandFuture)
 		{
-			((ICommandFuture)future).equals(command);
+			((ICommandFuture)future).sendCommand(command);
 		}
 		else
 		{
