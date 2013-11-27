@@ -703,9 +703,11 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	{
 		Properties	props	= new Properties();
 		if(currentperspective!=null)
+		{
 			props.addProperty(new Property("perspective", currentperspective.getName()));
+			consoleheights.put(currentperspective.getName()+".console.height", new Double(getConsoleHeight()));
+		}
 		props.addProperty(new Property("consoleenabled", consoleenabled ? "true" : "false"));
-		consoleheights.put(currentperspective.getName()+".console.height", new Double(getConsoleHeight()));
 		props.addProperty(new Property("consoleheights", JavaWriter.objectToXML(consoleheights, getClass().getClassLoader())));
 		return new Future<Properties>(props);
 	}

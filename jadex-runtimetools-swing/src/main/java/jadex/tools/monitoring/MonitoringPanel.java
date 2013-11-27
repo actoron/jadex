@@ -126,8 +126,8 @@ public class MonitoringPanel	implements IServiceViewerPanel
 
 				// Add event on child
 				List<IMonitoringEvent> evs = child.getObject();
-				if(evs==null)
-					System.out.println("huch");
+//				if(evs==null)
+//					System.out.println("huch");
 				evs.add(event);
 				
 				// Add child on parent

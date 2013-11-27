@@ -96,7 +96,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 				else
 				{
 					Agent ag = agent.getClass().getAnnotation(Agent.class);
-					kill = ag.keepalive();
+					kill = !ag.keepalive();
 				}
 				
 				if(kill)
