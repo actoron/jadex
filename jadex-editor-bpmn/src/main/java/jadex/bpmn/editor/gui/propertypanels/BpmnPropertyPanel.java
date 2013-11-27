@@ -2373,6 +2373,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		
 		if (s.getImplementation().getClazz().getTypeName() == null || cs.getImplementation().getClazz().getTypeName() == null)
 		{
+			// FINDBUG: Correct, this is a clever sort of xor which opts out when both initial terms are null. 
 			return s.getImplementation().getClazz().getTypeName() == cs.getImplementation().getClazz().getTypeName();
 		}
 		

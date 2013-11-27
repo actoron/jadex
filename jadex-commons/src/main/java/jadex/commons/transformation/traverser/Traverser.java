@@ -25,7 +25,7 @@ import java.util.Map;
 public class Traverser
 {
 	/** The default cloner. */
-	protected static Traverser instance;
+	protected static volatile Traverser instance;
 	
 	/** The default traversal processors with no special actions. */
 	protected static List<ITraverseProcessor> processors;

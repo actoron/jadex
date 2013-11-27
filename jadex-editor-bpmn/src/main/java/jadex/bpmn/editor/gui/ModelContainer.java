@@ -824,7 +824,6 @@ public class ModelContainer implements IModelContainer
 	        switch(result)
 	        {
 	            case JOptionPane.NO_OPTION:
-	                ret = false;
 	            case JOptionPane.CLOSED_OPTION:
 	                ret = false;
 	            case JOptionPane.YES_OPTION:

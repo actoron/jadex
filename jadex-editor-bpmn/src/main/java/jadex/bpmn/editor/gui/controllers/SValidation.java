@@ -224,9 +224,13 @@ public class SValidation
 					tp = tp.getParent();
 				}
 			}
-			if (!tp.equals(sp))
+			if (tp != null && !tp.equals(sp))
 			{
 				error = "No data edges allowed between pools.";
+			}
+			else if (tp == null)
+			{
+				error = "Unknown target pool for data edge.";
 			}
 		}
 		

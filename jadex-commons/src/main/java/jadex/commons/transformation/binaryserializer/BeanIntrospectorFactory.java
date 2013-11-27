@@ -18,7 +18,7 @@ public class BeanIntrospectorFactory
 	protected static final String DELEGATE_INTRO_CLASS = "jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector";
 	
 	/** The factor instance */
-	protected static BeanIntrospectorFactory instance;
+	protected static volatile BeanIntrospectorFactory instance;
 	
 	/**
 	 *  Private constructor.
@@ -34,8 +34,7 @@ public class BeanIntrospectorFactory
 	 */
 	public static BeanIntrospectorFactory getInstance() 
 	{
-		BeanIntrospectorFactory ret = instance;
-		if (ret == null)
+		if (instance == null)
 		{
 			synchronized (BeanIntrospectorFactory.class)
 			{
@@ -43,10 +42,9 @@ public class BeanIntrospectorFactory
 				{
 					instance = new BeanIntrospectorFactory();
 				}
-				ret = instance;
 			}
 		}
-		return ret;
+		return instance;
 	}
 	
 	/**
