@@ -380,8 +380,8 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 			
 			JTree tree = (JTree)c;
 			TreePath path = tree.getSelectionPath();
-			Object o = path.getLastPathComponent();
-			if(path != null && o instanceof IFileNode && ((ITreeNode)o).isLeaf() || !isRealDirectory((IFileNode)o))
+			Object o = path!=null ? path.getLastPathComponent() : null;
+			if(o instanceof IFileNode && (((ITreeNode)o).isLeaf() || !isRealDirectory((IFileNode)o)))
 			{
 				ret = new NodesTransferable(new TransferInfo(DeploymentServiceViewerPanel.this));
 			}

@@ -116,6 +116,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 		// Wake up timer thread, if currently waiting.
 		synchronized(this)
 		{
+			timers.clear();	// Todo: should still send notifications?
 			this.notify();
 		}
 //		notificator.shutdown(null);
@@ -258,6 +259,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	{
 		super.addTimer(timer);
 		
+		// naked notify due to notifications in addTimer() must not be synchronized.
 		synchronized(this)
 		{
 			this.notify();	
@@ -273,6 +275,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	{
 		super.removeTimer(timer);
 		
+		// naked notify due to notifications in removeTimer() must not be synchronized.
 		synchronized(this)
 		{
 			this.notify();	
@@ -306,7 +309,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 			public boolean execute()
 			{
 				Timer	next = null;
-				long	diff = 1;
+				long	diff;
 				long	currenttime = getTime();
 	
 				// Getting entry and waiting has to be synchronized
@@ -321,59 +324,55 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	
 					//System.out.println("timer: "+timetable);
 	
-					// Must check diff>0 as wait(0) performs endless wait()
+					// Exit thread when timetable is empty.
+					if(timers.isEmpty() || STATE_SUSPENDED.equals(state))
+						return false;
+					
+					// Get next entry from timetable.
+					next = (Timer)timers.first();
+					diff = (long)((next.time - currenttime)/getDilation());
+//						System.out.println("diff: "+diff+" "+next.time+" "+getTime()+" "+next);
+
+					// Wait until next entry is due
+					// (must check diff>0 as wait(0) performs endless wait())
 					if(diff>0)
 					{
-						// Exit thread when timetable is empty.
-						if(timers.isEmpty() || STATE_SUSPENDED.equals(state))
-							return false;
-						
-						// Get next entry from timetable.
-						next = (Timer)timers.first();
-						diff = (long)((next.time - currenttime)/getDilation());
-//						System.out.println("diff: "+diff+" "+next.time+" "+getTime()+" "+next);
-	
-						// Wait until next entry is due.
-						if(diff>0)
+						try
 						{
-							try
-							{
-//								System.out.println("timer waiting for "+diff+" millis at "+System.currentTimeMillis());
-								ContinuousClock.this.wait(diff);
-//								System.out.println("timer awake at "+System.currentTimeMillis());
-							}
-							catch(InterruptedException e)
-							{
-//								System.out.println("timer awake at "+System.currentTimeMillis());							
-							}
-							catch(Throwable t)
-							{
-								t.printStackTrace();
-							}
+//							System.out.println("timer waiting for "+diff+" millis at "+System.currentTimeMillis());
+							ContinuousClock.this.wait(diff);
+//							System.out.println("timer awake at "+System.currentTimeMillis());
+						}
+						catch(InterruptedException e)
+						{
+//							System.out.println("timer awake at "+System.currentTimeMillis());							
+						}
+						catch(Throwable t)
+						{
+							t.printStackTrace();
 						}
 					}
 				}
 	
-					// Handle due entry (must not be synchronized to avoid
-					// deadlock when timed object concurrently accesses timetable).
-					// Problem: Timed object may concurrently remove/change its entry
-					// (timed object is notified anyways, and too much notifications don't hurt?)
-					if(diff<=0)
-					{
-						// It is important to remove the entry before calling the notifyDue() method,
-						// as from this method a new timing entry might be added,
-						// which will otherwise be removed afterwards.
-						removeTimer(next);
-					}
-//				}
+				// Handle due entry (must not be synchronized to avoid
+				// deadlock when timed object concurrently accesses timetable).
+				// Problem: Timed object may concurrently remove/change its entry
+				// (timed object is notified anyways, and too much notifications don't hurt?)
+				if(diff<=0)
+				{
+					// It is important to remove the entry before calling the notifyDue() method,
+					// as from this method a new timing entry might be added,
+					// which will otherwise be removed afterwards.
+					removeTimer(next);
+				}
 				
 				if(diff<=0)
 				{
 					// Now notify the agent.
-					if(next==null)
-						throw new RuntimeException("next is null");
-					else if(next.getTimedObject()==null)
-						throw new RuntimeException("next.to is null");
+//					if(next==null)
+//						throw new RuntimeException("next is null");
+//					else if(next.getTimedObject()==null)
+//						throw new RuntimeException("next.to is null");
 					
 					try
 					{

@@ -155,7 +155,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public static final String lf = (String)System.getProperty("line.separator");
 	
 	/** The time format. */
-	public static final DateFormat	df	= new SimpleDateFormat("HH:mm:ss");
+	public final DateFormat	df	= new SimpleDateFormat("HH:mm:ss");
 	
 	/** The notification sound for a newly online user. */
 	public static final String	NOTIFICATION_NEW_USER	= "new user";

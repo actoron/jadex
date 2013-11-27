@@ -256,11 +256,11 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 				}
 				else if(column==5)
 				{
-					ret = SUtil.SDF2.format(new Date(obj.getFrom())) +" - "+ SUtil.SDF2.format(new Date(obj.getTo()));
+					ret = SUtil.SDF2.get().format(new Date(obj.getFrom())) +" - "+ SUtil.SDF2.get().format(new Date(obj.getTo()));
 				}
 				else if(column==6)
 				{
-					ret = SUtil.SDF.format(new Date(obj.getDate()));
+					ret = SUtil.SDF.get().format(new Date(obj.getDate()));
 				}
 				return ret;
 			}

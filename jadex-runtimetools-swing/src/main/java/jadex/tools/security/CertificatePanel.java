@@ -67,7 +67,7 @@ public class CertificatePanel extends JPanel
 					pp.createTextField("Subject", ""+xcert.getSubjectDN());
 					pp.createTextField("Issuer", ""+xcert.getIssuerDN());
 					pp.createTextField("Serial number", ""+SUtil.hex(xcert.getSerialNumber().toByteArray(), " ", 2));
-					pp.createTextField("Validity duration", SUtil.SDF.format(xcert.getNotBefore())+" - "+SUtil.SDF.format(xcert.getNotAfter()));
+					pp.createTextField("Validity duration", SUtil.SDF.get().format(xcert.getNotBefore())+" - "+SUtil.SDF.get().format(xcert.getNotAfter()));
 					pp.createTextField("Public key", key);
 					pp.createTextField("Signature algoritm", xcert.getSigAlgName());
 					pp.createTextField("Fingerprint SHA-1", SSecurity.getHexMessageDigest(xcert.getEncoded(), "SHA1"));

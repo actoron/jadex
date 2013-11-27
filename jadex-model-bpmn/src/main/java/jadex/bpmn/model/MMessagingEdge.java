@@ -26,9 +26,6 @@ public class MMessagingEdge extends MAssociationTarget
 	/** The type. */
 	protected String type;
 	
-	/** The associations. */
-	protected List associations;
-	
 	//-------- methods --------
 
 	/**

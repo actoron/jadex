@@ -118,9 +118,9 @@ public class JadexRelayExample
 										throw new IOException("Stream closed");
 									count += bytes_read;
 								}
+								
+								deliverMessage(rawmsg);
 							}
-	
-							deliverMessage(rawmsg);
 						}
 					}
 				}

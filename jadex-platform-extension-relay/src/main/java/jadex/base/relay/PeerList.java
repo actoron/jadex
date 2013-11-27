@@ -52,7 +52,7 @@ public class PeerList
 	protected Map<String, PeerEntry>	peers;
 	
 	/** Timer for polling relay peers. */
-	protected Timer	timer;
+	protected volatile Timer	timer;
 	
 	/** The connection manager. */
 	protected RelayConnectionManager	conman;

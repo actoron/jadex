@@ -10,7 +10,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 class LeaseTimeRenderer extends DefaultTableCellRenderer
 {
-	final static DateFormat date_format = new SimpleDateFormat("HH:mm:ss, dd-MM-yyyy");
+	final DateFormat date_format = new SimpleDateFormat("HH:mm:ss, dd-MM-yyyy");
 
 	/**
 	 * @param table

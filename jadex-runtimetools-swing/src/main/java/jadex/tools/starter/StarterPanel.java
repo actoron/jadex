@@ -1624,7 +1624,7 @@ public class StarterPanel extends JLayeredPane
 			{
 				String tmp = (String)model.getFullName();
 				resultsets.put(tmp, new Object[]{cid, res});
-				if(model!=null && fullname.equals(model.getFullName()))
+				if(fullname.equals(model.getFullName()))
 				{
 					selectavail.addItem(cid);
 					refreshResults();

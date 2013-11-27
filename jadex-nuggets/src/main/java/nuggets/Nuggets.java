@@ -108,7 +108,7 @@ public class Nuggets
 	}
 
 	/** The nuggets codec. */
-	protected static Nuggets	nuggets;
+	protected static volatile Nuggets	nuggets;
 
 	/**
 	 * Encode data with the codec.

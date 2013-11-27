@@ -28,7 +28,7 @@ public class DDate extends ADelegate
 //   static protected final String CLASS_NAME=DDate.class.getName();
    
    /** formats date in ISO 8601 */
-   protected static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+   protected  final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
    /** 
     * @param clazz
@@ -58,7 +58,7 @@ public class DDate extends ADelegate
     * @param date
     * @return a format in ISO 8601
     */
-   public static String format(Date date) {
+   public String format(Date date) {
       return df.format(date);
    }
    
@@ -67,7 +67,7 @@ public class DDate extends ADelegate
     * @return a date from the parsed expression in ISO 8601 format
     * @throws Exception
     */
-   public static Date parse(Object exp) throws Exception {
+   public Date parse(Object exp) throws Exception {
       return df.parse(String.valueOf(exp));
    }
    

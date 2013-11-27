@@ -306,7 +306,7 @@ public class SBpmnModelWriter
 			
 			for (int i = 0; i < args.length; ++i)
 			{
-				if (args != null && args[i].getName() != null && args[i].getName().length() > 0)
+				if(args[i].getName() != null && args[i].getName().length() > 0)
 				{
 					IArgument arg = args[i];
 					
@@ -1382,8 +1382,8 @@ public class SBpmnModelWriter
 	 */
 	private static final String escapeString(String string)
 	{
-		if(string==null)
-			System.out.println("nullnull");
+//		if(string==null)
+//			System.out.println("nullnull");
 		string = string.replace("&", "&amp;");
 		string = string.replace("\"", "&quot;");
 		string = string.replace("'", "&apos;");

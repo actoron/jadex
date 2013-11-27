@@ -79,9 +79,12 @@ public class TaskMetaInfo
 			this.parameterinfos.add(pmi);
 		}
 		this.propertyinfos = new ArrayList<PropertyMetaInfo>();
-		for(PropertyMetaInfo pmi: propertyinfos)
+		if(propertyinfos!=null)
 		{
-			this.propertyinfos.add(pmi);
+			for(PropertyMetaInfo pmi: propertyinfos)
+			{
+				this.propertyinfos.add(pmi);
+			}
 		}
 	}
 	

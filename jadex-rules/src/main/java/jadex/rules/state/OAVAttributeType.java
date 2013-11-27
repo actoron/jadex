@@ -219,7 +219,7 @@ public class OAVAttributeType
 	{
 		boolean ret = this==obj;
 		
-		if(!ret && obj instanceof OAVAttributeType)
+		if(!ret && obj!=null && obj.getClass().equals(OAVAttributeType.class))
 		{
 			OAVAttributeType attr = (OAVAttributeType)obj;
 			if(SUtil.equals(name, attr.getName()) 

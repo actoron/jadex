@@ -50,7 +50,7 @@ public class TimePatternTest extends TestCase
 			for(int i=0; i<10; i++)
 			{
 				cur = tp.getNextTimepoint(cur, end);
-				System.out.println(i+": "+SUtil.SDF.format(cur));
+				System.out.println(i+": "+SUtil.SDF.get().format(cur));
 				cur+=60000;
 			}
 		}

@@ -34,36 +34,35 @@ public interface INugget
 	void _set(String attribute, Object value);
 	
 	
-	/** Helper 
-	 * @author walczak
-	 * @since  Jan 19, 2006
-	 */
-	public static class Helper {
-		
-		/** 
-		 * @param date
-		 * @return this date to string
-		 */
-		public static String toString(java.util.Date date) {
-			return DDate.format(date);
-		}
-		
-		/** 
-		 * @param string
-		 * @return the date from representation
-		 */
-		public static java.util.Date parseDate(Object string) {
-			try
-			{	if (string==null) return null;
-				return DDate.parse(string);
-			}
-			catch(Exception e)
-			{
-				throw new PersistenceException(e);
-			}
-		}
-		
-	}
+//	/** Helper 
+//	 * @author walczak
+//	 * @since  Jan 19, 2006
+//	 */
+//	public static class Helper {
+//		
+//		/** 
+//		 * @param date
+//		 * @return this date to string
+//		 */
+//		public static String toString(java.util.Date date) {
+//			return DDate.format(date);
+//		}
+//		
+//		/** 
+//		 * @param string
+//		 * @return the date from representation
+//		 */
+//		public static java.util.Date parseDate(Object string) {
+//			try
+//			{	if (string==null) return null;
+//				return DDate.parse(string);
+//			}
+//			catch(Exception e)
+//			{
+//				throw new PersistenceException(e);
+//			}
+//		}	
+//	}
 }
 
 

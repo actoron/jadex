@@ -1,6 +1,8 @@
 package jadex.tools.comanalyzer;
 
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.ThreadSuspendable;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -8,6 +10,8 @@ import java.awt.event.InvocationEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
+
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -143,44 +147,25 @@ public class RefreshTask extends TimerTask
 		// start measuring time
 		long start = System.currentTimeMillis();
 
-		// create thread (runnable) to be invoked on awt-thread
-		Thread updatethread = new Thread()
+		// update on awt thread
+		final Future<Void>	updated	= new Future<Void>();
+		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				plugin.getMessageList().fireMessagesAdded(msg_array);
+				try
+				{
+					plugin.getMessageList().fireMessagesAdded(msg_array);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				updated.setResult(null);
 			}
-		};
-		// Thread thisthread =Thread.currentThread();
-
-		// invoke updatethread on awt-thread with notifier for return call
-		Object notifier = new Object();
-		EventQueue eventqueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
-		InvocationEvent event = new InvocationEvent(Toolkit.getDefaultToolkit(), updatethread, notifier, true);
-
-		// wait for notifier to be notified about the return of the
-		// updatethreads run method
-		synchronized(notifier)
-		{
-			eventqueue.postEvent(event);
-			try
-			{
-				notifier.wait();
-			}
-			catch(InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		// ceck for InvocationTargetException
-		Throwable eventThrowable = event.getThrowable();
-		if(eventThrowable != null)
-		{
-			eventThrowable.printStackTrace();
-			// throw new InvocationTargetException(eventThrowable);
-		}
+		});
+		
+		updated.get(new ThreadSuspendable());
 
 		// end measuring time, add duration to durationlist
 		addExecutionDuration(System.currentTimeMillis() - start);

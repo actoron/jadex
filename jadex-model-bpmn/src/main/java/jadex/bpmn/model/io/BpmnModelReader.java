@@ -195,13 +195,13 @@ public class BpmnModelReader
 		return types;
 	}
 	
-	public static void main(String[] args) throws Exception
-	{
-		
-		BpmnModelReader mr = new BpmnModelReader();
-		mr.read(new File("/home/jander/readersample.bpmn2"));
-		
-	}
+//	public static void main(String[] args) throws Exception
+//	{
+//		
+//		BpmnModelReader mr = new BpmnModelReader();
+//		mr.read(new File("/home/jander/readersample.bpmn2"));
+//		
+//	}
 	
 	protected static final TypeInfo createTypeInfo(Class<?> clazz,
 			   String uri, String localpart,

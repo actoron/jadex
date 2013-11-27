@@ -776,7 +776,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				for(String key: tds.keySet())
 				{
 					long[] vals = tds.get(key);
-					buf.append(key).append("=[").append(SUtil.SDF3.format(vals[0])).append(" ").append(vals[1]).append("], ");
+					buf.append(key).append("=[").append(SUtil.SDF3.get().format(vals[0])).append(" ").append(vals[1]).append("], ");
 				}
 				value = buf.toString();
 				

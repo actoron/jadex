@@ -62,7 +62,7 @@ public class OAVJavaAttributeType extends OAVAttributeType
 	{
 		boolean ret = this==obj;
 		
-		if(!ret && obj instanceof OAVJavaAttributeType)
+		if(!ret && obj!=null && obj.getClass().equals(OAVJavaAttributeType.class))
 		{
 			OAVJavaAttributeType attr = (OAVJavaAttributeType)obj;
 			if(SUtil.equals(name, attr.getName()))

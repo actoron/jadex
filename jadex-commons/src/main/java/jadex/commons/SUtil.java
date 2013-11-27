@@ -31,6 +31,7 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -93,10 +94,31 @@ public class SUtil
 	/** A Null value. */
 	public static final String		NULL					= "NULL";
 
+	// Thread local gives best multithread performance for date format access:
+	// http://www.javacodegeeks.com/2010/07/java-best-practices-dateformat-in.html
+	
 	/** Simple date format. */
-	public static final SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-	public static final SimpleDateFormat SDF2 = new SimpleDateFormat("dd.MM.yyyy");
-	public static final SimpleDateFormat SDF3 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+	public static final ThreadLocal<DateFormat>	SDF	= new ThreadLocal<DateFormat>()
+	{
+		protected DateFormat initialValue()
+		{
+			return new SimpleDateFormat("dd.MM.yyyy HH:mm");
+		}
+	};
+	public static final ThreadLocal<DateFormat>	SDF2	= new ThreadLocal<DateFormat>()
+	{
+		protected DateFormat initialValue()
+		{
+			return new SimpleDateFormat("dd.MM.yyyy");
+		}
+	};
+	public static final ThreadLocal<DateFormat>	SDF3	= new ThreadLocal<DateFormat>()
+	{
+		protected DateFormat initialValue()
+		{
+			return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+		}
+	};
 	
 	/**
 	 * Mapping from single characters to encoded version for displaying on

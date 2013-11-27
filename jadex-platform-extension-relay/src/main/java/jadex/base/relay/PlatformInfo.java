@@ -22,15 +22,30 @@ import java.util.Map;
  *  Data object to collect information about
  *  connected platforms.
  */
-public class PlatformInfo
+public final class PlatformInfo
 {
 	//-------- constants --------
 	
+	// Thread local gives best multithread performance for date format access:
+	// http://www.javacodegeeks.com/2010/07/java-best-practices-dateformat-in.html
+	
 	/** The short time format (only time). */
-	public static final DateFormat	TIME_FORMAT_SHORT	= new SimpleDateFormat("k:mm:ss z");
+	public static final ThreadLocal<DateFormat>	TIME_FORMAT_SHORT	= new ThreadLocal<DateFormat>()
+	{
+		protected DateFormat initialValue()
+		{
+			return new SimpleDateFormat("k:mm:ss z");			
+		}
+	};
 	
 	/** The long time format (time and date). */
-	public static final DateFormat	TIME_FORMAT_LONG	= new SimpleDateFormat("k:mm:ss z, EEE, MMM d, yyyy");
+	public static final ThreadLocal<DateFormat>	TIME_FORMAT_LONG	= new ThreadLocal<DateFormat>()
+	{
+		protected DateFormat initialValue()
+		{
+			return new SimpleDateFormat("k:mm:ss z, EEE, MMM d, yyyy");			
+		}
+	};
 	
 	//-------- attributes --------
 	
@@ -121,7 +136,7 @@ public class PlatformInfo
 
 		// Resolve hostname, when only IP is supplied
 		// Prefetch the hostname in background as blocking getCanonicalHostName() can be slow due to network timeouts.
-		if(hostname.equals(hostip))
+		if(hostname==null || hostname.equals(hostip))
 		{
 			final Future<String>	fut	= new Future<String>();
 			new Thread(new Runnable()
@@ -146,7 +161,6 @@ public class PlatformInfo
 			}).start();
 			hostnamefut	= fut;
 		}
-
 	}
 	
 	//-------- methods --------
@@ -202,7 +216,8 @@ public class PlatformInfo
 			DateFormat	df	= (con.get(Calendar.YEAR)!=cal.get(Calendar.YEAR)
 				|| con.get(Calendar.MONTH)!=cal.get(Calendar.MONTH)
 				|| con.get(Calendar.DAY_OF_MONTH)!=cal.get(Calendar.DAY_OF_MONTH))
-				? TIME_FORMAT_LONG : TIME_FORMAT_SHORT;
+				? TIME_FORMAT_LONG.get() : TIME_FORMAT_SHORT.get();
+			
 			
 			return df.format(connect_time);
 		}
@@ -226,7 +241,7 @@ public class PlatformInfo
 			DateFormat	df	= (con.get(Calendar.YEAR)!=cal.get(Calendar.YEAR)
 				|| con.get(Calendar.MONTH)!=cal.get(Calendar.MONTH)
 				|| con.get(Calendar.DAY_OF_MONTH)!=cal.get(Calendar.DAY_OF_MONTH))
-				? TIME_FORMAT_LONG : TIME_FORMAT_SHORT;
+				? TIME_FORMAT_LONG.get() : TIME_FORMAT_SHORT.get();
 			
 			return df.format(disconnect_time);
 		}
