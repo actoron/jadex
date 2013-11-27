@@ -10,6 +10,7 @@ import jadex.bpmn.task.info.ParameterMetaInfo;
 import jadex.bpmn.task.info.TaskMetaInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -175,7 +176,7 @@ public class CreateComponentTask implements ITask
 					{
 						if(result!=null)
 						{
-							Map results = (Map)result;
+							Map<String, Object> results = Argument.convertArguments(result);
 							for(int i=0; i<resultmapping.length/2; i++)
 							{
 								Object value = results.get(resultmapping[i]);

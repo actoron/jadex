@@ -41,18 +41,18 @@ import jadex.xml.stax.QName;
  */
 public class GpmnXMLReader
 {
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args) throws Exception
-	{
-		File file = new File("/home/jander/test.gpmn");
-		InputStream is = new FileInputStream(file);
-		ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), is, 0);
-		MGpmnModel model = read(rinfo, Thread.currentThread().getContextClassLoader(), null); // rid null??
-		System.out.println(SUtil.arrayToString(model.getActivationEdges().toArray()));
-		System.out.println(((MActivationPlan)model.getActivationPlans().values().toArray()[0]).getMode());
-	}
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args) throws Exception
+//	{
+//		File file = new File("/home/jander/test.gpmn");
+//		InputStream is = new FileInputStream(file);
+//		ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), is, 0);
+//		MGpmnModel model = read(rinfo, Thread.currentThread().getContextClassLoader(), null); // rid null??
+//		System.out.println(SUtil.arrayToString(model.getActivationEdges().toArray()));
+//		System.out.println(((MActivationPlan)model.getActivationPlans().values().toArray()[0]).getMode());
+//	}
 	
 	//-------- attributes --------
 	

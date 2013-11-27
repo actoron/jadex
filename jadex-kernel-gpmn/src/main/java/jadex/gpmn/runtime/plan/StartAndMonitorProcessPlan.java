@@ -7,6 +7,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -93,17 +94,17 @@ public class StartAndMonitorProcessPlan extends Plan
 	
 	public void passed()
 	{
-		System.out.println("Passed: "+this+" "+SUtil.arrayToString(getParameterSet("achieve_goals").getValues()
-			+SUtil.arrayToString(getParameterSet("maintain_goals").getValues())));
+		System.out.println("Passed: "+this+" "+Arrays.toString(getParameterSet("achieve_goals").getValues())
+			+Arrays.toString(getParameterSet("maintain_goals").getValues()));
 	}
 	public void failed()
 	{
-		System.out.println("Failed: "+this+" "+SUtil.arrayToString(getParameterSet("achieve_goals").getValues())
-			+SUtil.arrayToString(getParameterSet("maintain_goals").getValues())+", "+getException());
+		System.out.println("Failed: "+this+" "+Arrays.toString(getParameterSet("achieve_goals").getValues())
+			+Arrays.toString(getParameterSet("maintain_goals").getValues())+", "+getException());
 	}
 	public void aborted()
 	{
-		System.out.println("Aborted: "+this+" "+SUtil.arrayToString(getParameterSet("achieve_goals").getValues()
-			+SUtil.arrayToString(getParameterSet("maintain_goals").getValues())));
+		System.out.println("Aborted: "+this+" "+Arrays.toString(getParameterSet("achieve_goals").getValues())
+			+Arrays.toString(getParameterSet("maintain_goals").getValues()));
 	}
 }

@@ -138,6 +138,14 @@ public class Location implements Cloneable
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return (int)(x*21+y);
+	}
 
 	/**
 	 *  Clone the object.

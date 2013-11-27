@@ -173,7 +173,7 @@ public class SortedList<T>	extends LinkedList<T>
 	 */
 	protected int	compare(T o1, T o2)
 	{
-		int	cmp;
+		int	cmp = 0;
 
 		if(comp==null)
 		{
@@ -183,8 +183,10 @@ public class SortedList<T>	extends LinkedList<T>
 				cmp	= -1;
 			else if(o1==null && o2!=null)
 				cmp	= 1;
-			else
+			else if(o1!=null)
 				cmp	= ((Comparable)o1).compareTo(o2);
+			else if(o2!=null)
+				cmp	= ((Comparable)o2).compareTo(o1);
 		}
 		else
 		{

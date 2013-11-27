@@ -694,7 +694,7 @@ public class BpmnXMLReader
 								String dir = (String) table.get(row).getColumnValueAt(0); 		// direction
 								String name = (String) table.get(row).getColumnValueAt(1);		// name
 								String clazzname = (String) table.get(row).getColumnValueAt(2);	// class
-								String val = (String) table.get(row).getColumnValueAt(3) != "" ? (String) table.get(row).getColumnValueAt(3) : null;		// value
+								String val = !"".equals(table.get(row).getColumnValueAt(3))? (String) table.get(row).getColumnValueAt(3) : null;		// value
 								
 								UnparsedExpression exp = null;
 								if(val!=null && val.length()>0)
@@ -712,7 +712,7 @@ public class BpmnXMLReader
 							else if (table.get(row).size() == 2)
 							{
 								String name =  (String) table.get(row).getColumnValueAt(0);
-								String val = (String) table.get(row).getColumnValueAt(1) != "" ? (String) table.get(row).getColumnValueAt(1) : null;
+								String val = !"".equals(table.get(row).getColumnValueAt(1))? (String)table.get(row).getColumnValueAt(1) : null;
 								
 								// context variable
 								IParsedExpression exp = null;
@@ -744,8 +744,8 @@ public class BpmnXMLReader
 							// normal property has 2 values
 //							assert table.get(row).size() == 2;
 			
-							String name =  (String) table.get(row).getColumnValueAt(0);
-							String val = (String) table.get(row).getColumnValueAt(1) != "" ? (String) table.get(row).getColumnValueAt(1) : null;
+							String name = (String)table.get(row).getColumnValueAt(0);
+							String val = !"".equals(table.get(row).getColumnValueAt(1))? (String)table.get(row).getColumnValueAt(1): null;
 							
 							// context variable
 							IParsedExpression exp = null;

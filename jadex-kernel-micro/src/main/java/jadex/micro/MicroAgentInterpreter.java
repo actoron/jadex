@@ -85,7 +85,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	protected boolean nosteps;
 	
 	/** The list of message handlers. */
-	protected List messagehandlers;
+	protected List<IMessageHandler> messagehandlers;
 	
 	/** The classloader (hack? should be in model). */
 	protected ClassLoader classloader;
@@ -1475,7 +1475,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			
 		if(messagehandlers==null)
 		{
-			messagehandlers = new ArrayList();
+			messagehandlers = new ArrayList<IMessageHandler>();
 		}
 		if(handler.getTimeout()>0)
 		{

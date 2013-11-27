@@ -2785,7 +2785,7 @@ public class SUtil
 	}
 
 	/** The cached network interfaces. */
-	protected static List<NetworkInterface>	NIS;
+	protected static volatile List<NetworkInterface>	NIS;
 	
 	/** The time of the last caching of network interfaces. */
 	protected static long	NISTIME;
@@ -3667,7 +3667,7 @@ public class SUtil
 	}
 	
 	/** Cached for speed. */
-	public static String[] macs;
+	public static volatile String[] macs;
 
 	/**
 	 *  Get the mac address.
@@ -3706,29 +3706,31 @@ public class SUtil
 	}
 	
 	/** Cached AndroidUtils */
-	protected static AndroidUtils androidUtils;
+	protected static volatile AndroidUtils androidutils;
 	
 	/**
 	 * Get the AndroidUtils, if available.
 	 * @return AndroidUtils
 	 */
-	public static AndroidUtils androidUtils() {
-		if (androidUtils == null && SReflect.isAndroid()) {
+	public static AndroidUtils androidUtils() 
+	{
+		if(androidutils == null && SReflect.isAndroid()) 
+		{
 			Class<?> clazz = SReflect.classForName0("jadex.android.commons.AndroidUtilsImpl", SReflect.class.getClassLoader());
 			try
 			{
-				androidUtils = (AndroidUtils) clazz.newInstance();
+				androidutils = (AndroidUtils) clazz.newInstance();
 			}
-			catch (InstantiationException e)
+			catch(InstantiationException e)
 			{
 				e.printStackTrace();
 			}
-			catch (IllegalAccessException e)
+			catch(IllegalAccessException e)
 			{
 				e.printStackTrace();
 			}
 		}
-		return androidUtils;
+		return androidutils;
 	}
 	
 	public interface AndroidUtils {

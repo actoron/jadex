@@ -87,9 +87,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The monitoring service getter. */
 	protected ServiceGetter<IMonitoringService> getter;
 	
-//	/** The event emit level for monitoring. */
-//	protected PublishEmitLevel emitlevelmon;
-	
 	/** The event emit level for subscriptions. */
 	protected PublishEventLevel emitlevelsub;
 	
