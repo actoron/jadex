@@ -405,8 +405,13 @@ public class BDIAgent extends MicroAgent
 //				System.out.println("res: "+res);
 				agent = (BDIAgent)res.getFirstEntity().get(res.getSecondEntity());
 			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
 			catch(Exception e)
 			{
+				throw new RuntimeException(e);
 			}
 		}
 		
@@ -517,8 +522,13 @@ public class BDIAgent extends MicroAgent
 //				System.out.println("res: "+res);
 				agent = (BDIAgent)res.getFirstEntity().get(res.getSecondEntity());
 			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
 			catch(Exception e)
 			{
+				throw new RuntimeException(e);
 			}
 		}
 		
@@ -779,11 +789,15 @@ public class BDIAgent extends MicroAgent
 //					System.out.println("res: "+res);
 				agent = (BDIAgent)res.getFirstEntity().get(res.getSecondEntity());
 			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
 			catch(Exception e)
 			{
+				throw new RuntimeException(e);
 			}
 		}
-		
 
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
 		String elemname = obj.getClass().getName();
@@ -873,8 +887,13 @@ public class BDIAgent extends MicroAgent
 //				System.out.println("res: "+res);
 				agent = (BDIAgent)res.getFirstEntity().get(res.getSecondEntity());
 			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
 			catch(Exception e)
 			{
+				throw new RuntimeException(e);
 			}
 		}
 		

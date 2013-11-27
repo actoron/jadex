@@ -35,8 +35,6 @@ parameters={@TaskParameter(name="type", clazz=String.class, direction=TaskParame
 )
 public class DispatchGoalTask	implements ITask
 {
-	/** Future to indicate creation completion. */
-	protected Future creationFuture;
 	
 	/** The goal. */
 	protected IGoal	goal;
@@ -44,9 +42,9 @@ public class DispatchGoalTask	implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture execute(final ITaskContext context, IInternalAccess instance)
+	public IFuture<Void> execute(final ITaskContext context, IInternalAccess instance)
 	{
-		creationFuture = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		try
 		{
@@ -85,14 +83,14 @@ public class DispatchGoalTask	implements ITask
 						goal.removeGoalListener(this);
 						if(goal.isSucceeded())
 						{
-							creationFuture.setResult(null);
+							ret.setResult(null);
 //							listener.resultAvailable(DispatchGoalTask.this, null);
 						}
 						else
 						{
 							Exception	e	= new GoalFailureException();
 							e.fillInStackTrace();
-							creationFuture.setException(e);
+							ret.setException(e);
 //							listener.exceptionOccurred(DispatchGoalTask.this, e);
 						}
 					}
@@ -104,44 +102,40 @@ public class DispatchGoalTask	implements ITask
 			}
 			
 			if(subgoal)
+			{
 				plan.dispatchSubgoal(goal);
+			}
 			else
+			{
 				plan.dispatchTopLevelGoal(goal);
+			}
 			
 			if(!wait)
-				creationFuture.setResult(null);
+			{
+				ret.setResult(null);
+			}
 //				listener.resultAvailable(this, null);
 		}
 		catch(Exception e)
 		{
-			creationFuture.setException(e);
+			ret.setException(e);
 //			listener.exceptionOccurred(this, e);
 		}
 		
-		return creationFuture;
+		return ret;
 	}
 	
 	/**
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final IInternalAccess instance)
+	public IFuture<Void> cancel(final IInternalAccess instance)
 	{
-		final Future ret = new Future();
-		creationFuture.addResultListener(instance.createResultListener(new IResultListener()
+		if(goal!=null && !goal.isFinished())
 		{
-			public void resultAvailable(Object result)
-			{
-				goal.drop();
-				ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setResult(null);
-			}
-		}));
-		return ret;
+			goal.drop();
+		}
+		return IFuture.DONE;
 	}
 	
 	//-------- static methods --------

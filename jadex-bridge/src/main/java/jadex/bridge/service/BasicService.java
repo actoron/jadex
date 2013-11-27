@@ -101,7 +101,7 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	protected IServiceIdentifier sid;
 	
 	/** The service properties. */
-	protected Map<String, Object> properties;
+	private Map<String, Object> properties;
 	
 	/** The provider id. */
 	protected IComponentIdentifier providerid;

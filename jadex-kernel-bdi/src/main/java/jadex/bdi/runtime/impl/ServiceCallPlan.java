@@ -44,7 +44,7 @@ public class ServiceCallPlan extends Plan
 //		String	service	= (String)getParameter("service").getValue();
 //		String	method	= (String)getParameter("method").getValue();
 //		Object[]	args	= (Object[])getParameter("args").getValue();
-		Object[] args = new Object[0];
+//		Object[] args = new Object[0];
 		
 		IIntermediateFuture<?>	services	= getServiceContainer().getRequiredServices(service);
 		// Todo: implement suspendable intermediate futures.

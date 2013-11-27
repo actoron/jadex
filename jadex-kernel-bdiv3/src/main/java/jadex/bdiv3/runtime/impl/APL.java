@@ -297,6 +297,7 @@ public class APL
 		{
 			public void resultAvailable(Collection<MPlan> result) 
 			{
+				// not a nice cast but ok as impl is list
 				ret.setResult((List)result);
 			}
 			

@@ -965,9 +965,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 									
 									pojogoal = c.newInstance(pvals);
 								}
+								catch(RuntimeException e)
+								{
+									throw e;
+								}
 								catch(Exception e)
 								{
-									e.printStackTrace();
+									throw new RuntimeException(e);
 								}
 								
 								if(!getCapability().containsGoal(pojogoal))
@@ -1012,23 +1016,23 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 									mgoal, new ChangeEvent(event), null, null));
 							}
 														
-							public Tuple2<Boolean, Object> prepareResult(Object res)
-							{
-								Tuple2<Boolean, Object> ret = null;
-								if(res instanceof Boolean)
-								{
-									ret = new Tuple2<Boolean, Object>((Boolean)res, null);
-								}
-								else if(res!=null)
-								{
-									ret = new Tuple2<Boolean, Object>(Boolean.TRUE, res);
-								}
-								else
-								{
-									ret = new Tuple2<Boolean, Object>(Boolean.FALSE, null);
-								}
-								return ret;
-							}
+//							public Tuple2<Boolean, Object> prepareResult(Object res)
+//							{
+//								Tuple2<Boolean, Object> ret = null;
+//								if(res instanceof Boolean)
+//								{
+//									ret = new Tuple2<Boolean, Object>((Boolean)res, null);
+//								}
+//								else if(res!=null)
+//								{
+//									ret = new Tuple2<Boolean, Object>(Boolean.TRUE, res);
+//								}
+//								else
+//								{
+//									ret = new Tuple2<Boolean, Object>(Boolean.FALSE, null);
+//								}
+//								return ret;
+//							}
 						}, new IAction<Void>()
 						{
 							public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)

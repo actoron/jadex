@@ -101,7 +101,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		this.state = interpreter.getState();
 		this.access	= new ExternalAccessFlyweight(state, rcapa);
 		
-		if(interpreter==null || rplan==null || rcapa==null)
+		if(rplan==null || rcapa==null)
 			throw new RuntimeException("Plan could not be inited: "+myadr+" - "+interpreter+" "+rplan);
 	}
 

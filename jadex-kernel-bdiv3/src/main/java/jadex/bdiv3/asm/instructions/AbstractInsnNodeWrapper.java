@@ -12,10 +12,11 @@ import org.kohsuke.asm4.tree.LdcInsnNode;
 import org.kohsuke.asm4.tree.LineNumberNode;
 import org.kohsuke.asm4.tree.MethodInsnNode;
 
-
+/**
+ * 
+ */
 public class AbstractInsnNodeWrapper implements IAbstractInsnNode
 {
-
 	public AbstractInsnNode insnNode;
 
 	public AbstractInsnNodeWrapper(AbstractInsnNode insnNode)
@@ -23,20 +24,17 @@ public class AbstractInsnNodeWrapper implements IAbstractInsnNode
 		this.insnNode = insnNode;
 	}
 	
-	@Override
 	public int getOpcode()
 	{
 		return insnNode.getOpcode();
 	}
 
-	@Override
 	public IAbstractInsnNode getPrevious()
 	{
 		AbstractInsnNode previous = insnNode.getPrevious();
 		return previous == null ? null : AbstractInsnNodeWrapper.wrap(previous);
 	}
 	
-	@Override
 	public IAbstractInsnNode getNext()
 	{
 		return AbstractInsnNodeWrapper.wrap(insnNode.getNext());
@@ -85,7 +83,6 @@ public class AbstractInsnNodeWrapper implements IAbstractInsnNode
 		return result;
 	}
 
-	@Override
 	public IAbstractInsnNode clone(Map<ILabelNode, ILabelNode> labels)
 	{
 		Map<LabelNode, LabelNode> nativeMap = new HashMap<LabelNode, LabelNode>();
@@ -101,17 +98,19 @@ public class AbstractInsnNodeWrapper implements IAbstractInsnNode
 		return AbstractInsnNodeWrapper.wrap(clone);
 	}
 
-	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof AbstractInsnNodeWrapper) {
-			return insnNode.equals(((AbstractInsnNodeWrapper) obj).insnNode);
-		} else {
+		// todo: find bugs reports assymmetric equals
+		if(obj instanceof AbstractInsnNodeWrapper) 
+		{
+			return insnNode.equals(((AbstractInsnNodeWrapper)obj).insnNode);
+		} 
+		else 
+		{
 			return insnNode.equals(obj);
 		}
 	}
 
-	@Override
 	public int hashCode()
 	{
 		return insnNode.hashCode();

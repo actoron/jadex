@@ -314,10 +314,14 @@ public class EventReificator implements IOAVStateListener
 	{
 		Integer	cnt	= (Integer)observed.get(element);
 		if(cnt==null)
+		{
 			cnt	= new Integer(1);
+		}
 		else
+		{
 			cnt	= new Integer(cnt.intValue()+1);
-		observed.put(element, cnt);
+		}
+		observed.put(element, Integer.valueOf(cnt));
 	}
 	
 	/**
@@ -327,9 +331,14 @@ public class EventReificator implements IOAVStateListener
 	{
 		Integer	cnt	= (Integer)observed.get(element);
 		if(cnt.intValue()>1)
+		{
 			cnt	= new Integer(cnt.intValue()-1);
+			observed.put(element, Integer.valueOf(cnt));
+		}
 		else
+		{
 			observed.remove(element);
+		}
 	}
 	
 //	protected void fireComponentChangeEvent(IOAVState state, Object element, Object scope, String type, Object value)

@@ -13,10 +13,13 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITuple2Future;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +41,7 @@ parameters={@TaskParameter(name="processref", clazz=String.class, direction=Task
 public class DispatchSubprocessTask	implements ITask
 {
 	/** Future to indicate creation completion. */
-	protected Future creationfut;
+	protected ITuple2Future<IComponentIdentifier, Map<String, Object>> creationfut;
 	
 	/**
 	 *  Execute the task.
@@ -55,33 +58,52 @@ public class DispatchSubprocessTask	implements ITask
 				throw new RuntimeException("Parameter 'processref' for subprocess not specified: "+instance);
 			Map params = context.hasParameterValue("parameters")
 				? (Map)context.getParameterValue("parameters") : null;
-			boolean	wait	= context.hasParameterValue("wait")
+			final boolean	wait	= context.hasParameterValue("wait")
 				? ((Boolean)context.getParameterValue("wait")).booleanValue() : true;
 			
 			IComponentManagementService cms = plan.getInterpreter().getCMS();
 //			IComponentManagementService cms = (IComponentManagementService) plan.getScope().getServiceProvider().getService(IComponentManagementService.class);
 //			final Object	goal	= new Object() ;
-			ResultFuture rf = new ResultFuture();
-			if (params == null)
+			if(params == null)
 				params = new HashMap();
-			cms.createComponent(null, processref, new CreationInfo(params), rf).addResultListener(instance.createResultListener(new DelegationResultListener(creationfut)));
+//			cms.createComponent(null, processref, new CreationInfo(params), rf).addResultListener(instance.createResultListener(new DelegationResultListener(creationfut)));
+			creationfut = cms.createComponent(null, processref, new CreationInfo(params));
+			final Future<Map<String, Object>> rf = new Future<Map<String,Object>>();
+			
+			creationfut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+			{
+				public void firstResultAvailable(IComponentIdentifier result)
+				{
+				}
+				
+				public void secondResultAvailable(Map<String, Object> result)
+				{
+					if(wait)
+					{
+						ret.setResult(null);
+					}
+					rf.setResult(result);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					if(wait)
+					{
+						ret.setException(exception);
+					}
+					rf.setException(exception);
+				}
+			});
+			
 			
 			if(context.getModelElement().hasParameter("resultfuture"))
 				context.setParameterValue("resultfuture", rf);
 			
-			if(wait)
+			if(!wait)
 			{
-				Object result = rf.getResults();
-				if(result instanceof Exception)
-					ret.setException((Exception)result);
-//					listener.exceptionOccurred(DispatchSubprocessTask.this, (Exception)result);
-				else
-					ret.setResult(null);
-//					listener.resultAvailable(DispatchSubprocessTask.this, null);
-			}
-			else
 				ret.setResult(null);
 //				listener.resultAvailable(this, null);
+			}
 		}
 		catch(Exception e)
 		{
@@ -96,71 +118,91 @@ public class DispatchSubprocessTask	implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture cancel(final IInternalAccess instance)
+	public IFuture<Void> cancel(final IInternalAccess instance)
 	{
-		final Future ret = new Future();
-		creationfut.addResultListener(instance.createResultListener(new IResultListener()
+		final Future<Void> ret = new Future<Void>();
+		if(creationfut!=null)
 		{
-			public void resultAvailable(Object result)
+			creationfut.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
 			{
-				final IComponentIdentifier id = ((IComponentIdentifier) result);
-				SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener()
+				public void firstResultAvailable(final IComponentIdentifier cid)
 				{
-					public void resultAvailable(Object result)
+					SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(instance.createResultListener(new IResultListener<IComponentManagementService>()
 					{
-						IComponentManagementService	cms	= (IComponentManagementService)result;
-						cms.destroyComponent(id).addResultListener(new DelegationResultListener(ret));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-						ret.setResult(null);
-					}
-					
-				}));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setResult(null);
-			}
-		}));
+						public void resultAvailable(IComponentManagementService cms)
+						{
+							cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+							{
+								public void customResultAvailable(Map<String, Object> result)
+								{
+									ret.setResult(null);
+								}
+							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							exception.printStackTrace();
+							ret.setResult(null);
+						}
+					}));
+				}
+				
+				public void secondResultAvailable(Map<String, Object> result)
+				{
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setResult(null);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		return ret;
 	}
 	
-	private static class ResultFuture implements IResultFuture, IResultListener
-	{
-		private boolean unfinished = true;
-		private Object result;
-		
-		public synchronized void resultAvailable(Object result)
-		{
-			this.result = result;
-			unfinished = false;
-			notifyAll();
-		}
-		
-		public synchronized void exceptionOccurred(Exception exception)
-		{
-			result = exception;
-			unfinished = false;
-			notifyAll();
-		}
-		
-		public synchronized Object getResults()
-		{
-			while (unfinished)
-				try
-				{
-					wait();
-				}
-				catch (InterruptedException e)
-				{
-				}
-			return result;
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	private static class ResultFuture implements IResultFuture, IResultListener
+//	{
+//		private boolean unfinished = true;
+//		private Object result;
+//		
+//		public synchronized void resultAvailable(Object result)
+//		{
+//			this.result = result;
+//			unfinished = false;
+//			notifyAll();
+//		}
+//		
+//		public synchronized void exceptionOccurred(Exception exception)
+//		{
+//			result = exception;
+//			unfinished = false;
+//			notifyAll();
+//		}
+//		
+//		public synchronized Object getResults()
+//		{
+//			while(unfinished)
+//			{
+//				try
+//				{
+//					wait();
+//				}
+//				catch (InterruptedException e)
+//				{
+//				}
+//			}
+//			return result;
+//		}
+//	}
 	
 	//-------- static methods --------
 	

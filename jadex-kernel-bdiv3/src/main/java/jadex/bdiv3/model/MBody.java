@@ -38,24 +38,26 @@ public class MBody
 	/** The body as component type. */
 	protected String component;
 	
+	// double check locking requires volatile 
+	// http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html 
 	
 	/** The body method cached for speed. */
-	protected MethodInfo bodymethod;
+	protected volatile MethodInfo bodymethod;
 
 	/** The passed method cached for speed. */
-	protected MethodInfo passedmethod;
+	protected volatile MethodInfo passedmethod;
 
 	/** The failed method cached for speed. */
-	protected MethodInfo failedmethod;
+	protected volatile MethodInfo failedmethod;
 
 	/** The aborted method cached for speed. */
-	protected MethodInfo abortedmethod;
+	protected volatile MethodInfo abortedmethod;
 	
 	/** The precondition method cached for speed. */
-	protected MethodInfo preconditionmethod;
+	protected volatile MethodInfo preconditionmethod;
 
 	/** The precondition method cached for speed. */
-	protected MethodInfo contextconditionmethod;
+	protected volatile MethodInfo contextconditionmethod;
 
 	
 	/**

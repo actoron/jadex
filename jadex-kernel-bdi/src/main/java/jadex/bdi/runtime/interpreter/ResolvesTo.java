@@ -7,6 +7,8 @@ import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
 
+import java.util.Arrays;
+
 /**
  *  Test if a reference string resolves to a given element.
  *  E.g. dfcap.register resolves to any register goal in a dfcap subcapability.
@@ -32,7 +34,7 @@ public class ResolvesTo implements IFunction
 	public Object invoke(Object[] paramvalues, IOAVState state)
 	{
 		if(paramvalues==null || paramvalues.length!=4)
-			throw new IllegalArgumentException("Function needs four parameters: "+paramvalues);
+			throw new IllegalArgumentException("Function needs four parameters: "+Arrays.toString(paramvalues));
 			
 		Object rstartcapa	= paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0];
 		String ref	 = (String)(paramvalues[1] instanceof ILazyValue? ((ILazyValue)paramvalues[1]).getValue(): paramvalues[1]);

@@ -104,7 +104,7 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 					found = ag.keepalive()? Boolean.FALSE: Boolean.TRUE;
 				}
 				
-				if(found.booleanValue())
+				if(found!=null && found.booleanValue())
 					ret.setResult(null);
 			}
 		}));

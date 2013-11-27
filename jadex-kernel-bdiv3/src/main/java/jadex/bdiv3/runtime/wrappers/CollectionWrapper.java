@@ -231,7 +231,7 @@ public class CollectionWrapper <T> implements Collection<T>
 		{
 			ret = delegate.equals(((CollectionWrapper)obj).delegate);
 		}
-		else if(obj instanceof Map)
+		else if(obj instanceof Collection)
 		{
 			ret = delegate.equals(obj);
 		}

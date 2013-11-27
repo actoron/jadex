@@ -59,8 +59,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	/** The platform. */
 	protected IServiceProvider provider;
 	
-	/** The properties. */
-	protected Map<String, Object> properties;
+//	/** The properties. */
+//	protected Map<String, Object> properties;
 	
 	/** The library service. */
 	protected ILibraryService libservice;
@@ -83,10 +83,10 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public BDIAgentFactory(IServiceProvider provider, Map<String, Object> properties)
 	{
-		super(provider.getId(), IComponentFactory.class, null);
+		super(provider.getId(), IComponentFactory.class, properties);
 
 		this.provider = provider;
-		this.properties = properties;
+//		this.properties = properties;
 		this.loader = new BDIModelLoader();
 		
 		this.libservicelistener = new ILibraryServiceListener()
@@ -398,7 +398,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory, 
 	 */
 	public Map<String, Object> getProperties(String type)
 	{
-		return FILETYPE_BDIAGENT.equals(type)? properties: null;
+		return FILETYPE_BDIAGENT.equals(type)? super.getPropertyMap(): null;
 	}
 	
 	/**

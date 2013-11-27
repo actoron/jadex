@@ -13,7 +13,6 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
 
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +21,7 @@ import java.util.Set;
  *  A plan executor for plans modeled in BPMN. These plan steps 
  *  are executed on the agent thread.
  */
-public class BpmnPlanExecutor implements IPlanExecutor, Serializable
+public class BpmnPlanExecutor implements IPlanExecutor //, Serializable
 {
 	//-------- attributes --------
 	
