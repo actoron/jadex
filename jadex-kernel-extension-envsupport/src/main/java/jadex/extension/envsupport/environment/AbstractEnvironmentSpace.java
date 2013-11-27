@@ -209,6 +209,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
+		if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+			System.out.println("Initing space: "+this);
+
 		try
 		{
 			this.classloader	= ia.getClassLoader();
@@ -601,6 +604,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				}
 			}
 			
+			if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+				System.out.println("Initing space observers: "+this);
+
 			Future<Void>	ocsdone	= new Future<Void>();
 			List observers = config.getPropertyList("observers");
 			if(observers!=null)
@@ -639,6 +645,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						tmpoc = (IObserverCenter)classloader.loadClass(classname).newInstance();
 					}
 					
+					if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+						System.out.println("starting observer: "+this+", "+tmpoc);
 					final IObserverCenter oc = tmpoc;
 					oc.startObserver(title, AbstractEnvironmentSpace.this,
 							ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
@@ -714,6 +722,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			{
 				public void customResultAvailable(Void result)
 				{
+					if(ia.getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+						System.out.println("Inited observers: "+this);
+					
 					Map mse = (Map)MEnvSpaceType.getProperty(mspacetype.getProperties(), "spaceexecutor");
 					if(mse!=null)
 					{
