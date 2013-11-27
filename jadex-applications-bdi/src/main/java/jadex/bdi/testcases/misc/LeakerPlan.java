@@ -144,7 +144,7 @@ public class LeakerPlan extends Plan
 	protected void testGoalCreation(int num, boolean dispatch)
 	{
 		getLogger().info("\n-------- Start of goal creation test --------");
-		for(int i=num; i>0 || num==0; i--)
+		for(int i=num; i>0 && num!=0; i--)
 		{
 			// create goals, thereby resources will be aquired
 			// test if resources are released again when the goal is not used.
@@ -199,7 +199,7 @@ public class LeakerPlan extends Plan
 	protected void testInternalEventCreation(int num, boolean dispatch)
 	{
 		getLogger().info("\n-------- Start of internal event creation test --------");
-		for(int i=num; i>0 || num==0; i--)
+		for(int i=num; i>0 && num!=0; i--)
 		{
 			IInternalEvent event = createInternalEvent("testevent");
 			//getLogger().info("Internal event created: "+i);
@@ -225,7 +225,7 @@ public class LeakerPlan extends Plan
 	protected void testMessageCreation(int num, boolean send)
 	{
 		getLogger().info("\n-------- Start of message event creation and sending test --------");
-		for(int i=num; i>0 || num==0; i--)
+		for(int i=num; i>0 && num!=0; i--)
 		{
 			IMessageEvent me = createMessageEvent("testmsg");
 			if(send)

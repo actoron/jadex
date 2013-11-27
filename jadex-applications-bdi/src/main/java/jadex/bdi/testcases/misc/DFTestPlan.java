@@ -73,7 +73,7 @@ public class DFTestPlan extends Plan
 		catch(GoalFailureException gfe)
 		{
 			getLogger().info(" search failed. "+search.getParameterSet("result").getValues());
-			tr.setReason("Search failed. "+search.getParameterSet("result").getValues());
+			tr.setReason("Search failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 
@@ -159,7 +159,7 @@ public class DFTestPlan extends Plan
 			if(search.getParameterSet("result").getValues().length>0)
 			{
 				getLogger().info(" lease time test failed. "+search.getParameterSet("result").getValues());
-				tr.setReason("Lease time test failed. "+search.getParameterSet("result").getValues());
+				tr.setReason("Lease time test failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
 			}
 			else
 			{
@@ -212,8 +212,8 @@ public class DFTestPlan extends Plan
 		catch(GoalFailureException gfe)
 		{
 			//getLogger().info(" search failed. "+search.getResult());
-			getLogger().info(" search failed. "+search.getParameterSet("result").getValues());
-			tr.setReason("Search failed. "+search.getParameterSet("result").getValues());
+			getLogger().info(" search failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
+			tr.setReason("Search failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		//waitFor(2000);

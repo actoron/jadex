@@ -277,7 +277,7 @@ public class ConfigurationInfo extends Startable
 	{
 		if(requiredservices!=null)
 		{
-			requiredservices.remove(requiredservice.getName());
+			requiredservices.remove(requiredservice);
 		}
 	}
 	

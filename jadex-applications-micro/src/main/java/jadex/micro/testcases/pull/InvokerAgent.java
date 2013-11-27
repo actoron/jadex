@@ -30,6 +30,8 @@ import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -214,8 +216,7 @@ public class InvokerAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-				tr.setReason(""+exception);
-//				exception.printStackTrace();
+				tr.setReason(exception);
 				super.resultAvailable(tr);
 			}
 		});
@@ -287,7 +288,7 @@ public class InvokerAgent
 											{
 												System.out.println("exceptionOccurred: "+exception);
 												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-												tr.setReason("Exception occurred: "+exception);
+												tr.setReason(exception);
 												ret.setResult(tr);
 											}
 										}));
@@ -324,8 +325,7 @@ public class InvokerAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-				tr.setReason(""+exception);
-//				exception.printStackTrace();
+				tr.setReason(exception);
 				super.resultAvailable(tr);
 			}
 		});

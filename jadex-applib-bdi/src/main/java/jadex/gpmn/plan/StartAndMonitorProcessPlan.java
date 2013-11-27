@@ -93,8 +93,8 @@ public class StartAndMonitorProcessPlan extends Plan
 	
 	public void passed()
 	{
-		System.out.println("Passed: "+this+" "+SUtil.arrayToString(getParameterSet("achieve_goals").getValues()
-			+SUtil.arrayToString(getParameterSet("maintain_goals").getValues())));
+		System.out.println("Passed: "+this+" "+SUtil.arrayToString(getParameterSet("achieve_goals").getValues())
+			+SUtil.arrayToString(getParameterSet("maintain_goals").getValues()));
 	}
 	public void failed()
 	{
@@ -103,7 +103,7 @@ public class StartAndMonitorProcessPlan extends Plan
 	}
 	public void aborted()
 	{
-		System.out.println("Aborted: "+this+" "+SUtil.arrayToString(getParameterSet("achieve_goals").getValues()
-			+SUtil.arrayToString(getParameterSet("maintain_goals").getValues())));
+		System.out.println("Aborted: "+this+" "+SUtil.arrayToString(getParameterSet("achieve_goals").getValues())
+			+SUtil.arrayToString(getParameterSet("maintain_goals").getValues()));
 	}
 }

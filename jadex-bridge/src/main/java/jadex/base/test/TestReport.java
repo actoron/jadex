@@ -1,5 +1,8 @@
 package jadex.base.test;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  *  A test report captures the description and results of a test.
  */
@@ -128,6 +131,17 @@ public class TestReport
 	public void setReason(String reason)
 	{
 		this.reason = reason;
+	}
+
+	/**
+	 *  Set the failure reason.
+	 *  @param reason The failure reason.
+	 */
+	public void setReason(Exception reason)
+	{
+		StringWriter	sw	= new StringWriter();
+		reason.printStackTrace(new PrintWriter(sw));
+		setReason(sw.toString());
 	}
 
 	/**

@@ -87,7 +87,7 @@ public abstract class AbstractStrategy implements IStrategy
 	 */
 	public boolean equals(Object o)
 	{
-		return o instanceof IStrategy && o.getClass().equals(getName());
+		return o instanceof IStrategy && ((IStrategy)o).getName().equals(getName());
 	}
 
 	static

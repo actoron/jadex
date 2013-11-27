@@ -114,9 +114,7 @@ public class InitiatorAgent extends TestAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if nfcallreturn works.");
-				StringWriter	sw	= new StringWriter();
-				exception.printStackTrace(new PrintWriter(sw));
-				tr.setReason(sw.toString());
+				tr.setReason(exception);
 				super.resultAvailable(tr);
 			}
 		});

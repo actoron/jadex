@@ -28,6 +28,8 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -162,7 +164,7 @@ public class InitiatorAgent extends TestAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if a long running call works.");
-				tr.setReason(exception.getMessage());
+				tr.setReason(exception);
 				List<TestReport> li = new ArrayList<TestReport>();
 				super.resultAvailable(li);
 			}

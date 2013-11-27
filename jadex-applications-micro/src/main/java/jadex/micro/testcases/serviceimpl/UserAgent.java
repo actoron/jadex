@@ -62,7 +62,7 @@ public class UserAgent
 		}
 		catch(Exception e)
 		{
-			tr.setReason("Exception occurred: "+e.getMessage());
+			tr.setReason(e);
 		}
 		return tr;
 	}

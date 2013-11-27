@@ -145,13 +145,22 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		}
 		
 		// Capability panels.
-		if(subcapnames!=null)
+		for(int i=0; i<subcapnames.length; i++)
 		{
-			for(int i=0; i<subcapnames.length; i++)
+			ICapability subcap = (ICapability)scope.getSubcapability(subcapnames[i]);
+			Object clid = subcap.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+			Class<?> clazz	= null;
+			if(clid instanceof Class)
 			{
-				ICapability subcap = (ICapability)scope.getSubcapability(subcapnames[i]);
-				Object clid = subcap.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-				Class<?> clazz = clid instanceof Class? (Class<?>)clid: clid instanceof String? SReflect.classForName0((String)clid, subcap.getClassLoader()): null;
+				clazz	= (Class<?>)clid;
+			}
+			else if(clid instanceof String)
+			{
+				clazz	= SReflect.classForName0((String)clid, subcap.getClassLoader());
+			}
+			
+			if(clazz!=null)
+			{
 				try
 				{
 					IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
@@ -162,6 +171,14 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 				{
 					lis.exceptionOccurred(e);
 				}
+			}
+			else if(clid!=null)
+			{
+				lis.exceptionOccurred(new RuntimeException("Cannot create panel: "+clid));
+			}
+			else
+			{
+				lis.resultAvailable(null);
 			}
 		}
 	}

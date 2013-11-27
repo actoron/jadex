@@ -765,7 +765,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 						for(int j=0; j<tmp.size(); j++)
 						{
 							MActivity act = (MActivity)tmp.get(j);
-							if(lanename.equals(act.getLane()))
+							if(act.getLane()!=null && lanename.equals(act.getLane().getName()))
 							{
 								ret.add(act);
 							}

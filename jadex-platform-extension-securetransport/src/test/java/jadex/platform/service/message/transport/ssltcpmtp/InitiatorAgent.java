@@ -147,7 +147,7 @@ public class InitiatorAgent extends TestAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if secure transport works.");
-				tr.setReason(exception.getMessage());
+				tr.setReason(exception);
 				super.resultAvailable(tr);
 			}
 		});

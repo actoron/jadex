@@ -7,6 +7,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.fipa.SFipa;
+import jadex.commons.SUtil;
 
 import java.util.Arrays;
 
@@ -80,7 +81,7 @@ public class WaitForPlan extends Plan	//implements Runnable
 			if(!Arrays.equals(oldfacts, newfacts))
 				report.setSucceeded(true);
 			else
-				report.setReason("No addition in beliefset detected: "+oldfacts+" "+newfacts);
+				report.setReason("No addition in beliefset detected: "+SUtil.arrayToString(oldfacts)+" "+SUtil.arrayToString(newfacts));
 		}
 		catch(TimeoutException e)
 		{
@@ -97,7 +98,7 @@ public class WaitForPlan extends Plan	//implements Runnable
 			if(!Arrays.equals(oldfacts, newfacts))
 				report.setSucceeded(true);
 			else
-				report.setReason("No removal in beliefset detected: "+oldfacts+" "+newfacts);
+				report.setReason("No removal in beliefset detected: "+SUtil.arrayToString(oldfacts)+" "+SUtil.arrayToString(newfacts));
 		}
 		catch(TimeoutException e)
 		{

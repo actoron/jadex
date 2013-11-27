@@ -209,11 +209,11 @@ public class SBpmnModelWriter
 		boolean master = Boolean.TRUE.equals(mmodel.getModelInfo().getMaster(null));
 		boolean daemon = Boolean.TRUE.equals(mmodel.getModelInfo().getDaemon(null));
 		boolean autoshutdown = Boolean.TRUE.equals(mmodel.getModelInfo().getAutoShutdown(null));
-		boolean monitoring = Boolean.TRUE.equals(mmodel.getModelInfo().getMonitoring(null));
+		String monitoring = mmodel.getModelInfo().getMonitoring(null)!=null ? mmodel.getModelInfo().getMonitoring(null).toString() : null;
 		boolean synchronous = Boolean.TRUE.equals(mmodel.getModelInfo().getSynchronous(null));
 		boolean keepalive = Boolean.TRUE.equals(mmodel.isKeepAlive());
 		
-		if (suspend || master || daemon || autoshutdown || monitoring || synchronous || keepalive)
+		if (suspend || master || daemon || autoshutdown || monitoring!=null || synchronous || keepalive)
 		{
 			out.print(getIndent(ind));
 			out.print("<jadex:componentflags suspend=\"");
@@ -224,8 +224,11 @@ public class SBpmnModelWriter
 			out.print(escapeString(String.valueOf(daemon)));
 			out.print("\" autoshutdown=\"");
 			out.print(escapeString(String.valueOf(autoshutdown)));
-			out.print("\" monitoring=\"");
-			out.print(escapeString(String.valueOf(monitoring)));
+			if(monitoring!=null)
+			{
+				out.print("\" monitoring=\"");
+				out.print(escapeString(String.valueOf(monitoring)));
+			}
 			out.print("\" synchronous=\"");
 			out.print(escapeString(String.valueOf(synchronous)));
 			out.print("\" keepalive=\"");

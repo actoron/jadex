@@ -66,11 +66,12 @@ public class EnglishGermanTranslationPlanC1 extends Plan
 	{
 		if(dictionary==null)
 		{
-			dictionary = new HashMap();
-			dictionary.put("milk", "Milch");
-			dictionary.put("cow", "Kuh");
-			dictionary.put("cat", "Katze");
-			dictionary.put("dog", "Hund");
+			Map	m = new HashMap();
+			m.put("milk", "Milch");
+			m.put("cow", "Kuh");
+			m.put("cat", "Katze");
+			m.put("dog", "Hund");
+			dictionary	= m;
 		}
 		return dictionary;
 	}

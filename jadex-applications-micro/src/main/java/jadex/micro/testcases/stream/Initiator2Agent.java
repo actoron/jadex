@@ -110,7 +110,7 @@ public class Initiator2Agent extends TestAgent
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if streams work");
-				tr.setReason(exception.getMessage());
+				tr.setReason(exception);
 				super.resultAvailable(tr);
 			}
 		});

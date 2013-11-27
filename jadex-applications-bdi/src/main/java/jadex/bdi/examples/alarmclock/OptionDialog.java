@@ -351,14 +351,14 @@ public class OptionDialog extends JDialog
 			((ClockFrame)getParent()).refresh(false);
 	}
 
-	/**
-	 *  Main for testing.
-	 *  @param args The arguments.
-	 */
-	public static void main(String[] args)
-	{
-		Dialog dia = new OptionDialog(new ClockFrame(null), null);
-		dia.pack();
-		dia.setVisible(true);
-	}
+//	/**
+//	 *  Main for testing.
+//	 *  @param args The arguments.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		Dialog dia = new OptionDialog(new ClockFrame(null), null);
+//		dia.pack();
+//		dia.setVisible(true);
+//	}
 }

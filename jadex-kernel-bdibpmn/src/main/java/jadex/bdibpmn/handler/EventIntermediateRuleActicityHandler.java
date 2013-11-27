@@ -24,10 +24,10 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 		// Just set thread to waiting.
-		String type	= (String)thread.getPropertyValue("type", activity);
+		final String wtype	= (String)thread.getPropertyValue("type", activity);
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_RULE);
 		thread.setWaiting(true);
-		thread.setWaitInfo(type);
+		thread.setWaitInfo(wtype);
 //		System.out.println("Waiting for rule: "+type);
 		
 		// Does currently only match message type name.
@@ -43,7 +43,7 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 				if(OAVBDIMetaModel.condition_type.equals(state.getType(event)))
 				{
 					String type = (String)state.getAttributeValue(event, OAVBDIMetaModel.modelelement_has_name);
-					ret = type.equals(type);
+					ret = type.equals(wtype);
 				}
 				
 				return ret;

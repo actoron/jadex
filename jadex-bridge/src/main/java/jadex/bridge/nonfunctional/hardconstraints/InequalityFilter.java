@@ -30,7 +30,7 @@ public class InequalityFilter extends StrictInequalityFilter
 		final Future<Boolean> ret = new Future<Boolean>();
 		if (value instanceof Comparable<?>)
 		{
-			int val = (int) Math.signum(((Comparable<Object>) value).compareTo(value));
+			int val = (int) Math.signum(((Comparable<Object>) value).compareTo(this.value));
 			ret.setResult((val == comparevalue) || (val == 0));
 		}
 		else

@@ -61,14 +61,7 @@ public class ChooseMovePlan extends Plan
 			for(int i=0; i<apps.length; i++)
 			{
 				Move tmpmove = null;
-				try
-				{
-					tmpmove = (Move)apps[i].getPlan().getParameter("move").getValue();
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
+				tmpmove = (Move)apps[i].getPlan().getParameter("move").getValue();
 				if(matchColor(board, tmpmove, same))
 				{
 					sel_col.add(apps[i]);

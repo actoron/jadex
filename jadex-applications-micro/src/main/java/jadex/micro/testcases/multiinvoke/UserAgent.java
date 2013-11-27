@@ -23,6 +23,8 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -175,7 +177,7 @@ public class UserAgent
 		
 		public void exceptionOccurred(Exception exception)
 		{
-			tr.setReason("Exception: "+exception);
+			tr.setReason(exception);
 			endlis.resultAvailable(null);
 		}
 	}
@@ -215,7 +217,7 @@ public class UserAgent
 		
 		public void exceptionOccurred(Exception exception)
 		{
-			tr.setReason("Exception: "+exception);
+			tr.setReason(exception);
 			endlis.resultAvailable(null);
 		}
 	}

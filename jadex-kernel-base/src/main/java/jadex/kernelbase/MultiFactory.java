@@ -626,7 +626,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture removeKernelListener(IMultiKernelListener listener)
 	{
-		listeners.remove(listeners);
+		listeners.remove(listener);
 		return IFuture.DONE;
 	}
 	
