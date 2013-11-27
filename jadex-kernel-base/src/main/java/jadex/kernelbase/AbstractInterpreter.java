@@ -69,7 +69,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected IServiceContainer container;
 		
 	/** The external access (cached). */
-	protected IExternalAccess access;
+	protected volatile IExternalAccess access;
 	
 	/** The required service binding information. */
 	protected RequiredServiceBinding[] bindings;

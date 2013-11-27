@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * External access interface.
  */
-public class ExternalAccess extends jadex.kernelbase.ExternalAccess implements IMicroExternalAccess 
+public class MicroExternalAccess extends jadex.kernelbase.ExternalAccess implements IMicroExternalAccess 
 {
 	//-------- attributes --------
 
@@ -24,7 +24,7 @@ public class ExternalAccess extends jadex.kernelbase.ExternalAccess implements I
 	/**
 	 *	Create an external access.
 	 */
-	public ExternalAccess(MicroAgent agent, MicroAgentInterpreter interpreter)
+	public MicroExternalAccess(MicroAgent agent, MicroAgentInterpreter interpreter)
 	{
 		super(interpreter);
 		this.agent = agent;

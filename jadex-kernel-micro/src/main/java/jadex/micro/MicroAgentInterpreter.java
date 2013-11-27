@@ -1562,7 +1562,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				if(access==null)
 				{
-					access	= new ExternalAccess(microagent, this);
+					access	= new MicroExternalAccess(microagent, this);
 				}
 			}
 		}

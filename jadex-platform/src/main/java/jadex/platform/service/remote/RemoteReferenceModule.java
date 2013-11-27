@@ -32,7 +32,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.SJavaParser;
-import jadex.micro.ExternalAccess;
+import jadex.micro.MicroExternalAccess;
 import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
@@ -1274,7 +1274,7 @@ public class RemoteReferenceModule
 		if(DEBUG)
 		{
 			// Hack!
-			if(((ExternalAccess)rsms.getComponent()).getInterpreter().getComponentAdapter().isExternalThread())
+			if(((MicroExternalAccess)rsms.getComponent()).getInterpreter().getComponentAdapter().isExternalThread())
 			{
 				System.out.println("wrong thread: "+Thread.currentThread());
 				Thread.dumpStack();
