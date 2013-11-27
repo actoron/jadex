@@ -991,10 +991,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 										}
 									});
 								}
-								else
-								{
-									System.out.println("new goal not adopted, already contained: "+pojogoal);
-								}
+//								else
+//								{
+//									System.out.println("new goal not adopted, already contained: "+pojogoal);
+//								}
 								
 								return IFuture.DONE;
 							}

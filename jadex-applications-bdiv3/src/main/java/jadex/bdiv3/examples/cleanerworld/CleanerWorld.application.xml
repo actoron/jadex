@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>The cleaner world application descriptor</H3>
+
+	It can be started to launch a cleaner world scenario.
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-application-2.4.xsd"
+	name="CleanerWorld" package="jadex.bdiv3.examples.cleanerworld">
+	
+	<componenttypes>
+		<componenttype name="EnvironmentLocal" filename="jadex/bdiv3/examples/cleanerworld/environment/EnvironmentLocalBDI.class"/>
+		<componenttype name="CleanerLocal" filename="jadex/bdiv3/examples/cleanerworld/cleaner/CleanerBDI.class"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Two cleaners local">
+			<components>
+				<component type="EnvironmentLocal" master="true"/>
+				<component type="CleanerLocal" number="2"/>
+			</components>
+		</configuration>
+		<configuration name="One cleaner local">
+			<components>
+				<component type="EnvironmentLocal" master="true"/>
+				<component type="CleanerLocal"/>
+			</components>
+		</configuration>
+		<configuration name="Ten cleaners local">
+			<components>
+				<component type="EnvironmentLocal" master="true"/>
+				<component type="CleanerLocal" number="10"/>
+			</components>
+		</configuration>
+	</configurations>
+
+</applicationtype>

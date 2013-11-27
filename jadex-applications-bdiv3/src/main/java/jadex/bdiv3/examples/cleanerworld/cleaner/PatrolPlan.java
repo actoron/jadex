@@ -40,7 +40,7 @@ public class PatrolPlan
 	public PatrolPlan()
 	{
 //		getLogger().info("Created: "+this);
-		System.out.println("created: "+this);
+//		System.out.println("created: "+this);
 	}
 
 	//-------- methods --------
