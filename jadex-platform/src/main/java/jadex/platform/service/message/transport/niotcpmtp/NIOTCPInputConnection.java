@@ -43,7 +43,7 @@ public class NIOTCPInputConnection	implements Closeable
 
 	//-------- constrcutors --------
 
-	static Map<SocketChannel, NIOTCPInputConnection> icons = new HashMap<SocketChannel, NIOTCPInputConnection>();
+//	static Map<SocketChannel, NIOTCPInputConnection> icons = new HashMap<SocketChannel, NIOTCPInputConnection>();
 	
 	/**
 	 * Constructor for InputConnection.
@@ -156,16 +156,14 @@ public class NIOTCPInputConnection	implements Closeable
 	{
 //		synchronized(NIOTCPInputConnection.class)
 //		{
-//			Object old = icons.remove(sc);
+////			Object old = icons.remove(sc);
 //			System.out.println("icons rem: "+icons.size());
-//			if(old==null)
-//				System.out.println("!!!!!!!!!!!");
 //		}
 		
 		try
 		{
 //			System.out.println("Closing icon: "+sc);
-			sc.socket().close();
+//			sc.socket().close();
 			sc.close();
 			sc = null;
 //			sc.socket().close();

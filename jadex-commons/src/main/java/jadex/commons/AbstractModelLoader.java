@@ -293,6 +293,10 @@ public abstract class AbstractModelLoader
 				info.cleanup();
 			}
 		}
+		else if(info!=null)
+		{
+			info.cleanup();
+		}
 
 		return cached;
 	}

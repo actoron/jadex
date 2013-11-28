@@ -27,7 +27,7 @@ public class NIOTCPOutputConnection	implements Closeable
 	
 	//-------- constructors --------
 	
-	static Map<SocketChannel, NIOTCPOutputConnection> ocons = new HashMap<SocketChannel, NIOTCPOutputConnection>();
+//	static Map<SocketChannel, NIOTCPOutputConnection> ocons = new HashMap<SocketChannel, NIOTCPOutputConnection>();
 	
 	/**
 	 *  Create a new output connection.
@@ -88,7 +88,7 @@ public class NIOTCPOutputConnection	implements Closeable
 //		System.out.println("Shutdown: "+sc.socket());
 		try
 		{
-			sc.socket().close();
+//			sc.socket().close();
 			sc.close();
 			sc = null;
 //			sc.socket().close();

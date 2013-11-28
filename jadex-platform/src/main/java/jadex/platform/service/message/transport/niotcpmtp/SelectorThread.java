@@ -53,7 +53,9 @@ public class SelectorThread implements Runnable
 	protected List<Runnable>	tasks;
 
 	/** The pool of output connections (address -> Future|NIOTCPOutputConnection|DeadConnection). */
-	protected Map<InetSocketAddress, Object>	connections;
+	private Map<InetSocketAddress, Future<NIOTCPOutputConnection>> futconnections;
+	private Map<InetSocketAddress, Object> aliveconnections;
+	private Map<InetSocketAddress, NIOTCPDeadConnection> deadconnections;
 	
 	/** The write tasks of data waiting to be written to a connection. */
 	protected Map<SocketChannel, List<Tuple2<List<ByteBuffer>, Future<Void>>>>	writetasks;
@@ -74,7 +76,9 @@ public class SelectorThread implements Runnable
 		this.logger	= logger;
 		this.provider	= provider;
 		this.tasks	= new ArrayList<Runnable>();
-		this.connections	= new LinkedHashMap<InetSocketAddress, Object>();
+		this.futconnections	= new LinkedHashMap<InetSocketAddress, Future<NIOTCPOutputConnection>>();
+		this.aliveconnections = new LinkedHashMap<InetSocketAddress, Object>();
+		this.deadconnections = new LinkedHashMap<InetSocketAddress, NIOTCPDeadConnection>();
 		this.writetasks	= new LinkedHashMap<SocketChannel, List<Tuple2<List<ByteBuffer>, Future<Void>>>>();
 	}
 
@@ -151,18 +155,7 @@ public class SelectorThread implements Runnable
 		
 		for(SelectionKey key: selector.keys())
 		{
-			Object	con	= key.attachment();
-			if(con instanceof Closeable)
-			{
-				try
-				{
-					((Closeable)con).close();
-//					System.out.println("closed: "+con);
-				}
-				catch(IOException e)
-				{
-				}
-			}
+			closeKeyAttachment(key);
 		}
 		
 		if(timer!=null)
@@ -172,6 +165,25 @@ public class SelectorThread implements Runnable
 		}
 		
 //		System.out.println("nio selector end");
+	}
+	
+	/**
+	 * 
+	 */
+	protected void closeKeyAttachment(SelectionKey key)
+	{
+		Object	con	= key.attachment();
+		if(con instanceof Closeable)
+		{
+			try
+			{
+				((Closeable)con).close();
+//				System.out.println("closed: "+con);
+			}
+			catch(IOException e)
+			{
+			}
+		}
 	}
 	
 	//-------- methods to be called from external --------
@@ -185,8 +197,6 @@ public class SelectorThread implements Runnable
 		selector.wakeup();
 	}
 	
-	public static int cnt	= 0;
-	
 	/**
 	 *  Get a connection to one of the given addresses.
 	 *  Tries all addresses in parallel and returns the first
@@ -199,10 +209,10 @@ public class SelectorThread implements Runnable
 	{
 		Future<NIOTCPOutputConnection>	ret;
 		
-		synchronized(connections)
+		synchronized(aliveconnections)
 		{
 			// Try to find existing connection.
-			Object	val	= connections.get(address); 
+			Object	val	= internalGetConnection(address); 
 			if(val instanceof NIOTCPOutputConnection)
 			{
 				ret	= new Future<NIOTCPOutputConnection>((NIOTCPOutputConnection)val);
@@ -221,20 +231,16 @@ public class SelectorThread implements Runnable
 				{
 					final Future<NIOTCPOutputConnection>	fut	= new Future<NIOTCPOutputConnection>();
 					ret	= fut;
-					connections.put(address, fut);
+					internalPutConnection(address, fut);
 					Runnable	task	= new Runnable()
 					{
 						public void run()
 						{
 							boolean	connected	= false;
+							SocketChannel sc = null;
 							try
 							{
-								synchronized(connections)
-								{
-									cnt++;
-								}
-								
-								SocketChannel	sc	= SocketChannel.open();
+								sc = SocketChannel.open();
 //								sc.socket().setSoTimeout(10);
 								sc.configureBlocking(false);
 								sc.connect(address);
@@ -247,24 +253,23 @@ public class SelectorThread implements Runnable
 							}
 							catch(Exception e)
 							{
+								if(sc!=null)
+								{
+									try{sc.close();}catch(Exception ex){}
+								}
 								if(connected)
 								{
 									e.printStackTrace();
 								}
 								
-								synchronized(connections)
-								{
-									cnt--;
-								}
-								
-								logger.info("Failed connection to: "+address+": "+cnt);
+								logger.info("Failed connection to: "+address);//+": "+cnt);
 								fut.setException(e);
 								Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.DEADSPAN);
-								synchronized(connections)
+								synchronized(aliveconnections)
 								{
-									if(connections.get(address)==fut)
+									if(internalGetConnection(address)==fut)
 									{
-										connections.put(address, new NIOTCPDeadConnection(cleaner));
+										internalPutConnection(address, new NIOTCPDeadConnection(cleaner));
 									}
 								}
 							}
@@ -304,9 +309,10 @@ public class SelectorThread implements Runnable
 		{
 			public void run()
 			{
+				SelectionKey key = null;
 				try
 				{
-					SelectionKey	key	= con.getSocketChannel().keyFor(selector);
+					key = con.getSocketChannel().keyFor(selector);
 					if(key!=null && key.isValid())
 					{
 						// Convert message into buffers.
@@ -339,6 +345,11 @@ public class SelectorThread implements Runnable
 				}
 				catch(RuntimeException e)
 				{
+					if(key!=null)
+					{
+						closeKeyAttachment(key);
+					}
+					
 //					System.err.println("writetasks4: "+writetasks.get(con.getSocketChannel())+", "+e);
 //					e.printStackTrace();
 					
@@ -367,10 +378,11 @@ public class SelectorThread implements Runnable
 	{
 		// For an accept to be pending the channel must be a server socket channel.
 		ServerSocketChannel ssc = (ServerSocketChannel)key.channel();
+		SocketChannel sc = null;
 		try
 		{
 			// Accept the connection and make it non-blocking
-			SocketChannel sc = ssc.accept();
+			sc = ssc.accept();
 			sc.configureBlocking(false);
 			
 			// Write one byte for handshake (always works due to local network buffers).
@@ -385,6 +397,8 @@ public class SelectorThread implements Runnable
 		}
 		catch(Exception e)
 		{
+			if(sc!=null)
+				try{sc.close();}catch(Exception ex){}
 			this.logger.info("Failed connection attempt: "+ssc+", "+e);
 //			e.printStackTrace();
 			key.cancel();
@@ -398,7 +412,7 @@ public class SelectorThread implements Runnable
 	{
 		if(key.attachment() instanceof NIOTCPInputConnection)
 		{
-			NIOTCPInputConnection	con	= (NIOTCPInputConnection)key.attachment();
+			NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
 			try
 			{
 				// Read as much messages as available (if any).
@@ -420,7 +434,7 @@ public class SelectorThread implements Runnable
 		// Handle output handshake (read one byte to make sure that channel is working before sending).
 		else
 		{
-			SocketChannel	sc	= (SocketChannel)key.channel();
+			SocketChannel sc = (SocketChannel)key.channel();
 			try
 			{
 				sc.socket().setSendBufferSize(sc.socket().getSendBufferSize()<<1);
@@ -429,19 +443,20 @@ public class SelectorThread implements Runnable
 			{
 				logger.warning("Cannot set send buffer size: "+e);
 			}
-			Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>	tuple	= (Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>)key.attachment();
+			Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>> tuple = (Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>)key.attachment();
 			InetSocketAddress	address	= tuple.getFirstEntity();
 			Future<NIOTCPOutputConnection>	ret	= tuple.getSecondEntity();
+			NIOTCPOutputConnection con = null;
 			try
 			{
 				if(sc.read(ByteBuffer.wrap(new byte[1]))!=1)
 					throw new IOException("Error receiving handshake byte.");
 				
 				Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.MAX_KEEPALIVE);
-				NIOTCPOutputConnection	con	= new NIOTCPOutputConnection(sc, address, cleaner);
-				synchronized(connections)
+				con	= new NIOTCPOutputConnection(sc, address, cleaner);
+				synchronized(aliveconnections)
 				{
-					connections.put(address, con);
+					internalPutConnection(address, con);
 				}
 				cleaner.refresh();
 				// Keep channel on hold until we are ready to write.
@@ -451,10 +466,18 @@ public class SelectorThread implements Runnable
 			}
 			catch(Exception e)
 			{
-				Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.DEADSPAN);
-				synchronized(connections)
+				if(con!=null)
 				{
-					connections.put(address, new NIOTCPDeadConnection(cleaner));
+					try{con.close();}catch(Exception ex){}
+				}
+				if(sc!=null)
+				{
+					try{sc.close();}catch(Exception ex){}
+				}
+				Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.DEADSPAN);
+				synchronized(aliveconnections)
+				{
+					internalPutConnection(address, new NIOTCPDeadConnection(cleaner));
 				}
 				cleaner.refresh();
 				ret.setException(e);
@@ -470,13 +493,13 @@ public class SelectorThread implements Runnable
 	 */
 	protected void	handleConnect(SelectionKey key)
 	{
-		SocketChannel	sc	= (SocketChannel)key.channel();
-		Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>	tuple	= (Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>)key.attachment();
+		SocketChannel sc = (SocketChannel)key.channel();
+		Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>> tuple = (Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>)key.attachment();
 		InetSocketAddress	address	= tuple.getFirstEntity();
 		Future<NIOTCPOutputConnection>	ret	= tuple.getSecondEntity();
 		try
 		{
-			boolean	finished	= sc.finishConnect();
+			boolean	finished = sc.finishConnect();
 			assert finished;
 			// Before connection can be used, make sure that it works by waiting for handshake byte.
 			key.interestOps(SelectionKey.OP_READ);
@@ -485,11 +508,14 @@ public class SelectorThread implements Runnable
 		}
 		catch(Exception e)
 		{
-			Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.DEADSPAN);
-			synchronized(connections)
+			if(sc!=null)
 			{
-				connections.put(address, new NIOTCPDeadConnection(cleaner));
-				cnt--;
+				try{sc.close();}catch(Exception ex){}
+			}
+			Cleaner	cleaner	= new Cleaner(address, NIOTCPTransport.DEADSPAN);
+			synchronized(aliveconnections)
+			{
+				internalPutConnection(address, new NIOTCPDeadConnection(cleaner));
 			}
 			cleaner.refresh();
 			ret.setException(e);
@@ -507,7 +533,7 @@ public class SelectorThread implements Runnable
 	 */
 	protected void handleWrite(SelectionKey key)
 	{
-		SocketChannel	sc	= (SocketChannel)key.channel();
+		SocketChannel sc = (SocketChannel)key.channel();
 		
 //		System.out.println("write: "+sc.socket().isInputShutdown()+", "+sc.socket().isOutputShutdown());
 		
@@ -560,13 +586,14 @@ public class SelectorThread implements Runnable
 		}
 		catch(Exception e)
 		{
+			try{con.close();}catch(Exception ex){}
 			con.getCleaner().remove();
-			synchronized(connections)
+			try{sc.close();}catch(Exception ex){}
+			synchronized(aliveconnections)
 			{
 				// Connection lost, try to reconnect before marking as dead connection.
-				connections.remove(con.getAddress());
-				try{con.close();}catch(Exception ex){}
-				cnt--;
+				internalRemoveConnection(con.getAddress());
+				System.out.println("cons (alive, dead, future): "+aliveconnections.size()+" "+deadconnections.size()+" "+futconnections.size());
 			}
 			
 			// Connection failure: notify all open tasks.
@@ -718,9 +745,9 @@ public class SelectorThread implements Runnable
 		{
 			if(con==null)
 			{
-				synchronized(connections)
+				synchronized(aliveconnections)
 				{
-					con	= connections.get(address);
+					con	= internalGetConnection(address);
 				}
 			}
 			
@@ -738,11 +765,11 @@ public class SelectorThread implements Runnable
 				public void run()
 				{
 					logger.info("Timeout reached for: "+address+", "+delay);
-					synchronized(connections)
+					synchronized(aliveconnections)
 					{
-						if(con.equals(connections.get(address)))
+						if(con.equals(internalGetConnection(address)))
 						{
-							connections.remove(address);
+							internalRemoveConnection(address);
 						}
 						else
 						{
@@ -753,9 +780,9 @@ public class SelectorThread implements Runnable
 					
 					if(con instanceof NIOTCPOutputConnection)
 					{
-						synchronized(connections)
+						synchronized(aliveconnections)
 						{
-							cnt--;
+							System.out.println("cons (alive, dead, future): "+aliveconnections.size()+" "+deadconnections.size()+" "+futconnections.size());
 						}
 						
 						try
@@ -766,7 +793,7 @@ public class SelectorThread implements Runnable
 						catch(Exception e)
 						{
 						}
-						logger.info("Removed connection to : "+address+", "+cnt);
+						logger.info("Removed connection to : "+address);
 					}
 				}
 			};
@@ -783,5 +810,59 @@ public class SelectorThread implements Runnable
 				timertask.cancel();
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void internalPutConnection(InetSocketAddress address, Object con)
+	{
+//		Object ret = null;
+		if(con instanceof Future)
+		{
+			futconnections.put(address, (Future)con);
+			aliveconnections.remove(address);
+			deadconnections.remove(address);
+		}
+		else if(con instanceof NIOTCPOutputConnection)
+		{
+			aliveconnections.put(address, (NIOTCPOutputConnection)con);
+			futconnections.remove(address);
+			deadconnections.remove(address);
+		}
+		else if(con instanceof NIOTCPDeadConnection)
+		{
+			deadconnections.put(address, (NIOTCPDeadConnection)con);
+			futconnections.remove(address);
+			aliveconnections.remove(address);
+		}
+//		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected Object internalGetConnection(InetSocketAddress address)
+	{
+		Object ret = futconnections.get(address);
+		if(ret==null)
+		{
+			ret = aliveconnections.get(address);
+			if(ret==null)
+			{
+				ret = deadconnections.get(address);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void internalRemoveConnection(InetSocketAddress address)
+	{
+		futconnections.remove(address);
+		aliveconnections.remove(address);
+		deadconnections.remove(address);
 	}
 }

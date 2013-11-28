@@ -48,10 +48,11 @@ public class LazyResource
 		}
 		else if(data==null)
 		{
+			InputStream	is = null;
 			try
 			{
 				ByteArrayOutputStream	bos	= new ByteArrayOutputStream();
-				InputStream	is	= clazz.getResourceAsStream(path);
+				is	= clazz.getResourceAsStream(path);
 				byte[]	buf	= new byte[8192];
 				int read;
 				while((read=is.read(buf))!=-1)
@@ -64,6 +65,17 @@ public class LazyResource
 			{
 				exception	= e;
 				throw e;
+			}
+			finally
+			{
+				try
+				{
+					if(is!=null)
+						is.close();
+				}
+				catch(Exception e)
+				{
+				}
 			}
 		}
 		return data;

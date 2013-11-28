@@ -1914,7 +1914,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								url = f.toURI().toURL();
 						}
 						// Cannot use stream due to jar starter bug.
-						AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
+						final AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
 						AudioFormat	format	= ais.getFormat();
 						DataLine.Info	info	= new DataLine.Info(Clip.class, format);
 						Clip	clip	= (Clip)AudioSystem.getLine(info);
@@ -1928,6 +1928,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								{
 									// Close the clip after it finished playing.
 									event.getLine().close();
+									try
+									{
+										ais.close();
+									}
+									catch(Exception e)
+									{
+									}
 									SwingUtilities.invokeLater(new Runnable()
 									{
 										public void run()
