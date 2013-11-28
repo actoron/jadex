@@ -254,8 +254,6 @@ public class Vector2Double implements IVector2, Cloneable
 
 	public IVector1 getDistance(IVector2 vector)
 	{
-		if(vector==null)
-			System.out.println("test");
 		double dx = x_ - vector.getXAsDouble();
 		double dy = y_ - vector.getYAsDouble();
 		return new Vector1Double(Math.sqrt((dx * dx) + (dy * dy)));
@@ -370,7 +368,8 @@ public class Vector2Double implements IVector2, Cloneable
 	public boolean equals(IVector2 vector)
 	{
 		// Perform null check, to respect equals(Object) contract
-		return vector!=null && (x_ == vector.getXAsDouble() && y_ == vector.getYAsDouble());
+		return (Double.doubleToLongBits(x_) == Double.doubleToLongBits(vector.getXAsDouble())) &&
+			   (Double.doubleToLongBits(y_) == Double.doubleToLongBits(vector.getYAsDouble()));
 	}
 	
 	/** 

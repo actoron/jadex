@@ -1610,7 +1610,7 @@ public class MEnvSpaceType
 							continuosly = false;
 						}		
 						Boolean positional = (Boolean)getProperty(args, "positional");
-						if(loop==null)
+						if(positional==null)
 						{
 							positional = false;
 						}	

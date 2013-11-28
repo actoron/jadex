@@ -149,8 +149,9 @@ public abstract class AbstractViewport implements IViewport
 	 */
 	public void setPreLayers(Layer[] layers)
 	{
-		synchronized(preLayers_)
-		{
+		// Synchronization necessary?
+//		synchronized(preLayers_)
+//		{
 			if(layers != null)
 			{
 				preLayers_ = layers.clone();
@@ -159,7 +160,7 @@ public abstract class AbstractViewport implements IViewport
 			{
 				preLayers_ = new Layer[0];
 			}
-		}
+//		}
 	}
 
 	/**
@@ -169,8 +170,8 @@ public abstract class AbstractViewport implements IViewport
 	 */
 	public void setPostLayers(Layer[] layers)
 	{
-		synchronized(postLayers_)
-		{
+//		synchronized(postLayers_)
+//		{
 			if(layers != null)
 			{
 				postLayers_ = layers.clone();
@@ -179,7 +180,7 @@ public abstract class AbstractViewport implements IViewport
 			{
 				postLayers_ = new Layer[0];
 			}
-		}
+//		}
 	}
 	
 	/**

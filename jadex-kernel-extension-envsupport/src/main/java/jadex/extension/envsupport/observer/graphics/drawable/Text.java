@@ -111,7 +111,7 @@ public final class Text extends Primitive
 			}
 			else
 			{
-				if(tokens[i] == "")
+				if("".equals(tokens[i]))
 				{
 					sb.append("$");
 				}

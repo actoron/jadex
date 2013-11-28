@@ -319,7 +319,7 @@ public class Grid2D extends Space2D
 	
 			int x = position.getXAsInteger();
 			int y = position.getYAsInteger();
-			IVector2 pos = new Vector2Int(x, y);
+//			IVector2 pos = new Vector2Int(x, y);
 			
 			
 			int minx = x - range >= 0 || getBorderMode().equals(BORDER_TORUS) ? x - range : 0;

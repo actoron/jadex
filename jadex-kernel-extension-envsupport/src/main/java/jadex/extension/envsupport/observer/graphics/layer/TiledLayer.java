@@ -63,21 +63,43 @@ public class TiledLayer extends Layer
 		//texture_ = 0;
 	}
 	
+	/**
+	 *  The tile size.
+	 */
 	public IVector2 getTileSize()
 	{
 		return tileSize_;
 	}
 	
+	/**
+	 *  Get the inverted tile size.
+	 */
 	public IVector2 getInvTileSize()
 	{
 		return invTileSize_;
 	}
 	
+	/**
+	 *  Get the texture path.
+	 *  
+	 *  @return The texture path.
+	 */
 	public String getTexturePath()
 	{
 		return texturePath_;
 	}
-
+	
+	/**
+	 *  Get the hash code.
+	 */
+	public int hashCode()
+	{
+		return tileSize_.hashCode() * 31 + texturePath_.hashCode();
+	}
+	
+	/**
+	 *  Compares the layers.
+	 */
 	public boolean equals(Object obj)
 	{
 		if(obj instanceof TiledLayer)

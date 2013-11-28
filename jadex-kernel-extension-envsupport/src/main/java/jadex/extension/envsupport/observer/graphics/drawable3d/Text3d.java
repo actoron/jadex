@@ -76,7 +76,7 @@ public class Text3d extends Primitive3d
 			}
 			else
 			{
-				if(tokens[i] == "")
+				if("".equals(tokens[i]))
 				{
 					sb.append("$");
 				}

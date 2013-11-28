@@ -70,7 +70,7 @@ public class TexturedRectangleGLRenderer extends AbstractGLRenderer
 		
 		gl.glColor4fv(currentColor.getComponents(null), 0);
 		
-		if(setupMatrix(dc, primitive, obj, gl, vp));
+		if(setupMatrix(dc, primitive, obj, gl, vp))
 			gl.glCallList(dList);
 		gl.glDisable(GL.GL_TEXTURE_2D);
 	}

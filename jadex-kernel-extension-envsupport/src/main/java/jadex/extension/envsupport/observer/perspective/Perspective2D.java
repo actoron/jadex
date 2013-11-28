@@ -747,7 +747,8 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 			{
 			}
 		}
-		else
+		
+		if (viewport == null)
 		{
 			viewport = new ViewportJ2D(persp, cl);
 		}

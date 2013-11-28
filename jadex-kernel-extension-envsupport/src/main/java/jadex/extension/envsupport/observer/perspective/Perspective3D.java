@@ -286,7 +286,10 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 				IVector3 tmp3dsize = ((Space3D)space).getAreaSize();
 				viewport3d = createViewport(this, cl, tmp3dsize, isGrid, shader, camera, guiCreatorPath, gridcontrol);
 			}
-
+			else
+			{
+				throw new RuntimeException("Space type incompatible with Perspective3D: " + space);
+			}
 		}
 		return viewport3d.getCanvas();
 	}

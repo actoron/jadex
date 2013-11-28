@@ -467,33 +467,39 @@ public class ObserverCenter implements IObserverCenter
 	{
 		if(SwingUtilities.isEventDispatchThread())
 		{
+			IPerspective selp = null;
 			synchronized(perspectives)
 			{
-
-				IPerspective selp = getSelectedPerspective();
-
-				if(selp!=null)
-					{
-					
-						if(selp instanceof Perspective3D)
-						{
-							((Perspective3D) selp).getViewport().pauseApp();
-					        try {
-					            Thread.sleep(1000);
-					        } catch (InterruptedException ex) {
-					        }
-						}
-					}
-					
+				selp = getSelectedPerspective();
+			}
 			
-				IPerspective perspective = (IPerspective)perspectives.get(name);
-				perspective.setObserverCenter(this);
-				selectedperspective = perspective;
-				mainwindow.setPerspectiveView(perspective.getView());
-				perspective.setSelectedObject(null);
+			if(selp!=null)
+			{
+			
+				if(selp instanceof Perspective3D)
+				{
+					((Perspective3D) selp).getViewport().pauseApp();
+			        try {
+			        	// Hack??
+			            Thread.sleep(1000);
+			        } catch (InterruptedException ex) {
+			        }
+				}
+			}
+				
+		
+			IPerspective perspective = (IPerspective)perspectives.get(name);
+			if (perspective instanceof Perspective2D)
+			{
+				((Perspective2D) perspective).flushRenderInfo();
+			}
+			perspective.setObserverCenter(this);
+			selectedperspective = perspective;
+			mainwindow.setPerspectiveView(perspective.getView());
+			perspective.setSelectedObject(null);
 				
 			
-			}
+			
 			
 		}
 		else

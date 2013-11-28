@@ -416,6 +416,14 @@ public class SynchronizedVector2Wrapper implements IVector2
 		return copy();
 	}
 	
+	/**
+	 *  Get the hash code.
+	 */
+	public int hashCode()
+	{
+		return vector_.hashCode();
+	}
+	
 	/** Compares the vector to an object
 	 * 
 	 * @param obj the object

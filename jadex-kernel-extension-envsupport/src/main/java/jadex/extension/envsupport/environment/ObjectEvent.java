@@ -94,13 +94,28 @@ public class ObjectEvent implements Serializable
 	 */
 	public static class PrimitiveEventType
 	{
+		/** Event ID. */
 		private int id_;
 		
+		/**
+		 *  Creates the type.
+		 */
 		protected PrimitiveEventType(int id)
 		{
 			id_ = id;
 		}
 		
+		/**
+		 *  Get the hash code.
+		 */
+		public int hashCode()
+		{
+			return id_;
+		}
+		
+		/**
+		 *  Compares the type.
+		 */
 		public boolean equals(Object obj)
 		{
 			return ((obj instanceof PrimitiveEventType) &&

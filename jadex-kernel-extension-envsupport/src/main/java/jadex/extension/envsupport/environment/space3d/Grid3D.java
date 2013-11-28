@@ -301,30 +301,30 @@ public class Grid3D extends Space3D
 			{
 				for(int j = miny; j <= maxy; j++)
 				{
-					for(int k = minz; k <= maxz; j++)
+					for(int k = minz; k <= maxz; k++)
 					{
-					Vector3Int testpos = new Vector3Int((i + sizex) % sizex, (j + sizey) % sizey, (k + sizez) % sizez);
-					if(!getDistance(testpos, pos).greater(distance))
-					{
-						Collection tmp = objectsygridpos.getCollection(testpos);
-						if(tmp != null)
+						Vector3Int testpos = new Vector3Int((i + sizex) % sizex, (j + sizey) % sizey, (k + sizez) % sizez);
+						if(!getDistance(testpos, pos).greater(distance))
 						{
-							if(type==null)
+							Collection tmp = objectsygridpos.getCollection(testpos);
+							if(tmp != null)
 							{
-								ret.addAll(tmp);
-							}
-							else
-							{
-								for(Iterator it=tmp.iterator(); it.hasNext(); )
+								if(type==null)
 								{
-									ISpaceObject obj = (ISpaceObject)it.next();
-									if(obj.getType().equals(type))
-										ret.add(obj);
+									ret.addAll(tmp);
 								}
-								
+								else
+								{
+									for(Iterator it=tmp.iterator(); it.hasNext(); )
+									{
+										ISpaceObject obj = (ISpaceObject)it.next();
+										if(obj.getType().equals(type))
+											ret.add(obj);
+									}
+									
+								}
 							}
 						}
-					}
 					}
 				}
 			}

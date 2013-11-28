@@ -416,7 +416,9 @@ public class Vector3Double implements IVector3, Cloneable
 	public boolean equals(IVector3 vector)
 	{
 		// Perform null check, to respect equals(Object) contract
-		return vector!=null && (x_ == vector.getXAsDouble() && y_ == vector.getYAsDouble() && z_ == vector.getZAsDouble());
+		return (Double.doubleToLongBits(x_) == Double.doubleToLongBits(vector.getXAsDouble())) &&
+			   (Double.doubleToLongBits(y_) == Double.doubleToLongBits(vector.getYAsDouble())) &&
+			   (Double.doubleToLongBits(z_) == Double.doubleToLongBits(vector.getZAsDouble()));
 	}
 	
 	/** 
