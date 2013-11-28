@@ -28,6 +28,8 @@ public class NIOTCPOutputConnection	implements Closeable
 	//-------- constructors --------
 	
 //	static Map<SocketChannel, NIOTCPOutputConnection> ocons = new HashMap<SocketChannel, NIOTCPOutputConnection>();
+	static int crecnt = 0;
+	static int clocnt = 0;
 	
 	/**
 	 *  Create a new output connection.
@@ -38,11 +40,11 @@ public class NIOTCPOutputConnection	implements Closeable
 		this.address	= address;
 		this.cleaner	= cleaner;
 		
-//		synchronized(NIOTCPInputConnection.class)
-//		{
+		synchronized(NIOTCPInputConnection.class)
+		{
 //			ocons.put(sc, this);
-//			System.out.println("ocons create: "+ocons.size());
-//		}
+			System.out.println("ocons create: "+(++crecnt)+" "+clocnt+" "+(crecnt-clocnt));
+		}
 	}
 	
 	//-------- methods --------
@@ -77,13 +79,12 @@ public class NIOTCPOutputConnection	implements Closeable
 	 */
 	public void close() throws IOException
 	{
-//		synchronized(NIOTCPInputConnection.class)
-//		{
+		synchronized(NIOTCPInputConnection.class)
+		{
 //			Object old = ocons.remove(sc);
 //			System.out.println("ocons rem: "+ocons.size());
-//			if(old==null)
-//				System.out.println("!!!!!!!!!!!");
-//		}
+			System.out.println("ocons closed: "+crecnt+" "+(++clocnt)+" "+(crecnt-clocnt));
+		}
 		
 //		System.out.println("Shutdown: "+sc.socket());
 		try
