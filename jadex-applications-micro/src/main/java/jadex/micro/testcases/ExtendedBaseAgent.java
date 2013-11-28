@@ -31,6 +31,7 @@ import jadex.micro.annotation.Results;
 import jadex.micro.testcases.ProvidedServiceConfigurationsAgent.MyAService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -111,7 +112,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		}
 		else
 		{
-			tr.setReason("Wrong required services: "+reqs);
+			tr.setReason("Wrong required services: "+Arrays.toString(reqs));
 		}
 		results.add(tr);
 		
@@ -124,7 +125,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		}
 		else
 		{
-			tr.setReason("Wrong arguments: "+reqs);
+			tr.setReason("Wrong arguments: "+Arrays.toString(reqs));
 		}
 		results.add(tr);
 		
@@ -137,7 +138,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		}
 		else
 		{
-			tr.setReason("Wrong arguments: "+args);
+			tr.setReason("Wrong arguments: "+Arrays.toString(args));
 		}
 		results.add(tr);
 		
@@ -150,7 +151,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		}
 		else
 		{
-			tr.setReason("Wrong results: "+res);
+			tr.setReason("Wrong results: "+Arrays.toString(res));
 		}
 		results.add(tr);
 		
@@ -163,7 +164,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		}
 		else
 		{
-			tr.setReason("Wrong configurations: "+configs);
+			tr.setReason("Wrong configurations: "+Arrays.toString(configs));
 		}
 		results.add(tr);
 		

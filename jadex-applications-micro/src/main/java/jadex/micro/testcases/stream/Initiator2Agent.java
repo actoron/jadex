@@ -35,9 +35,6 @@ import java.util.Map;
 //)
 public class Initiator2Agent extends TestAgent
 {
-	@Agent
-	protected MicroAgent agent;
-	
 	protected IInputConnection icon;
 	
 	/**

@@ -147,7 +147,7 @@ public class ServiceSearchAgent
 				{
 					public void resultAvailable(Collection<Tuple2<ICoreDependentService, Double>> result)
 					{
-						System.out.println(Arrays.toString(((List<Tuple2<ICoreDependentService, Double>>)result).toArray()));
+						System.out.println(Arrays.toString(result.toArray()));
 						agent.scheduleStep(step, SEARCH_DELAY);
 					}
 	

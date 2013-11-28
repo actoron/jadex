@@ -206,6 +206,8 @@ public class MessagePerformanceAgent extends MicroAgent
 					{
 						IComponentStep<Void> send = new IComponentStep<Void>()
 						{
+							Random r = new Random();
+							
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								if(current==1)
@@ -215,7 +217,7 @@ public class MessagePerformanceAgent extends MicroAgent
 								}
 								
 								byte[]	content	= new byte[msgsize];	
-								new Random().nextBytes(content);
+								r.nextBytes(content);
 								String scontent	= "";
 								try
 								{
