@@ -86,8 +86,8 @@ public class RichBDI
 			public void resultAvailable(Object result)
 			{
 				System.out.println("getoneeuro fini: "+result);
-				// money++;
-				incMoney();
+				money++;
+//				incMoney();
 				proceed();
 			}
 			

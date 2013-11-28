@@ -266,17 +266,18 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				public void visitInnerClass(String name, String outerName, String innerName, int access)
 				{
 					// Exclude non-relevant inner classes (that do not belong to the application code)
-					if(iclname!=null && outerName!=null && iclname.startsWith(outerName))
+					if(iclname!=null && (outerName!=null && iclname.startsWith(outerName)) 
+						|| (outerName==null && innerName==null)) // case in anonymous inner classes
 					{
 //						System.out.println("vic: "+name+" "+outerName+" "+innerName+" "+access);
 						String icln = name.replace("/", ".");
 						if(!done.contains(icln))
 							todo.add(icln);
 					}
-//					else
-//					{
-//						System.out.println("skipping class enhancement of: "+innerName);
-//					}
+					else
+					{
+						System.out.println("skipping class enhancement of: "+innerName);
+					}
 					super.visitInnerClass(name, outerName, innerName, access);//Opcodes.ACC_PUBLIC); does not work
 				}
 				
