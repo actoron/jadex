@@ -1,11 +1,13 @@
 package jadex.bdiv3.runtime.impl;
 
+import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -13,7 +15,9 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  *  Default plan for realizing a service call.
@@ -37,15 +41,19 @@ public class ServiceCallPlan
 	/** The parameter service mapper. */
 	protected IServiceParameterMapper<Object> mapper;
 	
+	/** The plan. */
+	protected RPlan rplan;
+	
 	/**
 	 * 
 	 */
-	public ServiceCallPlan(IInternalAccess agent, String service, String method, IServiceParameterMapper<Object> mapper)
+	public ServiceCallPlan(IInternalAccess agent, String service, String method, IServiceParameterMapper<Object> mapper, RPlan rplan)
 	{
 		this.agent = agent;
 		this.service = service;
 		this.method = method;
 		this.mapper = mapper;
+		this.rplan = rplan;
 	}
 	
 	@PlanBody
@@ -59,6 +67,7 @@ public class ServiceCallPlan
 		{
 			int opencalls = 0;
 			boolean fini = false;
+			Exception ex = null;
 			public void intermediateResultAvailable(Object proxy)
 			{
 				try
@@ -80,7 +89,12 @@ public class ServiceCallPlan
 					Object[] myargs = mapper.createServiceParameters(reason, m);
 //					System.out.println("invoking service, args: "+SUtil.arrayToString(myargs));
 					
-					Object	res	= m.invoke(proxy, myargs);
+					List<Object> ar = new ArrayList<Object>();
+					ar.add(myargs);
+					Object[] meargs = ((BDIAgentInterpreter)((BDIAgent)agent).getInterpreter())
+						.getInjectionValues(m.getParameterTypes(), null, null, null, rplan, null, ar);
+					
+					Object	res	= m.invoke(proxy, meargs);
 					
 					if(res instanceof IFuture<?>)
 					{
@@ -90,16 +104,15 @@ public class ServiceCallPlan
 							{
 								mapper.handleServiceResult(reason, m, result);
 								opencalls--;
-								if(opencalls==0)
-									ret.setResult(null);
+								proceed();
 							}
 
 							public void exceptionOccurred(Exception exception)
 							{
+								ex = exception;
 								mapper.handleServiceResult(reason, m, exception);
 								opencalls--;
-								if(opencalls==0)
-									ret.setResult(null);
+								proceed();
 							}
 						});
 //						System.out.println("invoked, result: "+resu);
@@ -107,22 +120,22 @@ public class ServiceCallPlan
 					}
 					else
 					{
+						mapper.handleServiceResult(reason, m, res);
+						opencalls--;
+						proceed();
 					}
 				}
 				catch(Exception e)
 				{
 					opencalls--;
-					if(opencalls==0 && fini)
-						ret.setResult(null);
-					e.printStackTrace();
+					proceed();
 				}
 			}
 			
 			public void finished()
 			{
 				fini = true;
-				if(opencalls==0)
-					ret.setResult(null);
+				proceed();
 			}
 			
 			public void resultAvailable(Collection<Object> result)
@@ -137,6 +150,21 @@ public class ServiceCallPlan
 			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
+			}
+			
+			protected void proceed()
+			{
+				if(opencalls==0 && fini)
+				{
+					if(ex==null)
+					{
+						ret.setResult(null);
+					}
+					else
+					{
+						ret.setException(ex);
+					}
+				}
 			}
 		});
 		

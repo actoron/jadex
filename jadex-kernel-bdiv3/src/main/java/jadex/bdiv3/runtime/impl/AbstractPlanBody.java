@@ -7,6 +7,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.util.Collection;
+
 /**
  *  Abstract base class for plan body implementations.
  *   
@@ -296,7 +298,7 @@ public abstract class AbstractPlanBody implements IPlanBody
 			return null;
 		
 		return ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
-			.getInjectionValues(ptypes, null, rplan.getModelElement(), null, rplan, null);
+			.getInjectionValues(ptypes, null, rplan.getModelElement(), null, rplan, null, null);
 	}
 
 	/**

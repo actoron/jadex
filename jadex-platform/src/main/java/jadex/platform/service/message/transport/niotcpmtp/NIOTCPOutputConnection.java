@@ -40,11 +40,11 @@ public class NIOTCPOutputConnection	implements Closeable
 		this.address	= address;
 		this.cleaner	= cleaner;
 		
-		synchronized(NIOTCPInputConnection.class)
-		{
-//			ocons.put(sc, this);
-			System.out.println("ocons create: "+(++crecnt)+" "+clocnt+" "+(crecnt-clocnt));
-		}
+//		synchronized(NIOTCPInputConnection.class)
+//		{
+////			ocons.put(sc, this);
+//			System.out.println("ocons create: "+(++crecnt)+" "+clocnt+" "+(crecnt-clocnt));
+//		}
 	}
 	
 	//-------- methods --------
@@ -79,12 +79,12 @@ public class NIOTCPOutputConnection	implements Closeable
 	 */
 	public void close() throws IOException
 	{
-		synchronized(NIOTCPInputConnection.class)
-		{
-//			Object old = ocons.remove(sc);
-//			System.out.println("ocons rem: "+ocons.size());
-			System.out.println("ocons closed: "+crecnt+" "+(++clocnt)+" "+(crecnt-clocnt));
-		}
+//		synchronized(NIOTCPInputConnection.class)
+//		{
+////			Object old = ocons.remove(sc);
+////			System.out.println("ocons rem: "+ocons.size());
+//			System.out.println("ocons closed: "+crecnt+" "+(++clocnt)+" "+(crecnt-clocnt));
+//		}
 		
 //		System.out.println("Shutdown: "+sc.socket());
 		try

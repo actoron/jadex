@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
  *  that has a required service method as body.
  *   
  *  Interface that is used for mapping from a goal
- *  to the service parameters.
+ *  to the service parameters and back.
  */
 public interface IServiceParameterMapper<T>
 {

@@ -78,6 +78,14 @@ public class BDIAgent extends MicroAgent
 	{
 		return (Collection)((BDIAgentInterpreter)getInterpreter()).getCapability().getGoals();
 	}
+	
+	/**
+	 *  Get the goal api representation.
+	 */
+	public IGoal getGoal(Object goal)
+	{
+		return ((BDIAgentInterpreter)getInterpreter()).getCapability().getRGoal(goal);
+	}
 
 	/**
 	 *  Dispatch a goal wait for its result.

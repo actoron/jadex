@@ -1826,13 +1826,23 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		return invokeBooleanMethod(goal.getPojoElement(), m, goal.getModelElement(), event, null);
 	}
 	
+	/**
+	 *  Get parameter values for injection into method and constructor calls.
+	 */
+	protected Object[] getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
+	{
+		return getInjectionValues(ptypes, anns, melement, event, rplan, rpe, null);
+	}
+	
 	// todo: support parameter names via annotation in guesser (guesser with meta information)
 	/**
 	 *  Get parameter values for injection into method and constructor calls.
 	 */
-	protected Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe)
+	protected Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs)
 	{
 		Collection<Object> vals = new LinkedHashSet<Object>();
+		if(vs!=null)
+			vals.addAll(vs);
 		
 		// Find capability based on model element (or use agent).
 		String	capaname	= null;

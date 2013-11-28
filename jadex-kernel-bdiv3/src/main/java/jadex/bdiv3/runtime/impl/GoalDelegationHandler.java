@@ -8,7 +8,6 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.TerminableFuture;
 import jadex.micro.IPojoMicroAgent;
 
 import java.lang.reflect.Constructor;

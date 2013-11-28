@@ -48,4 +48,19 @@ public interface IGoal
 	 *  @return The processingState.
 	 */
 	public GoalProcessingState getProcessingState();
+	
+	/**
+	 *  Test if goal is succeeded.
+	 */
+	public boolean isSucceeded();
+	
+	/**
+	 *  Test if goal is failed.
+	 */
+	public boolean isFailed();
+	
+	/**
+	 *  Test if goal is finished.
+	 */
+	public boolean isFinished();
 }

@@ -9,6 +9,7 @@ import jadex.bdiv3.model.MGoal;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -609,6 +610,23 @@ public class RGoal extends RProcessableElement implements IGoal
 					if(isRecur())
 					{
 						setProcessingState(ia, GoalProcessingState.PAUSED);
+						if(getMGoal().getRecurDelay()>-1)
+						{
+							ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+							{
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									if(RGoal.GoalLifecycleState.ACTIVE.equals(getLifecycleState())
+										&& RGoal.GoalProcessingState.PAUSED.equals(getProcessingState()))
+									{
+										setTriedPlans(null);
+										setApplicablePlanList(null);
+										setProcessingState(ia, RGoal.GoalProcessingState.INPROCESS);
+									}
+									return IFuture.DONE;
+								}
+							}, getMGoal().getRecurDelay());
+						}
 					}
 					else
 					{
