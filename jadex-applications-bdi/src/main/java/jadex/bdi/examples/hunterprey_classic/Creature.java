@@ -249,11 +249,11 @@ public abstract class Creature extends WorldObject
 		}
 		catch(InstantiationException e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		catch(IllegalAccessException e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return ret;
 	}

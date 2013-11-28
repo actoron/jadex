@@ -124,6 +124,22 @@ public class Location implements Cloneable
 	}
 
 	/**
+	 *  Clone the object.
+	 */
+	public Object clone()
+	{
+		try
+		{
+			return super.clone();
+		}
+		catch(CloneNotSupportedException e)
+		{
+			assert false;
+			throw new RuntimeException("Clone not supported");
+		}
+	}
+
+	/**
 	 *  Test if two instances are equal.
 	 *  @return True, if equal.
 	 */
@@ -138,20 +154,19 @@ public class Location implements Cloneable
 		}
 		return ret;
 	}
-
-	/**
-	 *  Clone the object.
+	
+	/** 
+	 * 
 	 */
-	public Object clone()
+	public int hashCode()
 	{
-		try
-		{
-			return super.clone();
-		}
-		catch(CloneNotSupportedException e)
-		{
-			assert false;
-			throw new RuntimeException("Clone not supported");
-		}
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(x);
+		result = prime * result + (int)(temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(y);
+		result = prime * result + (int)(temp ^ (temp >>> 32));
+		return result;
 	}
 }

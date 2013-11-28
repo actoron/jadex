@@ -4,6 +4,7 @@ import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bdi.examples.hunterprey.ldahunter.potentialfield.JointField;
 import jadex.bdi.examples.hunterprey.ldahunter.potentialfield.PotentialFrame;
 import jadex.bdi.runtime.Plan;
+import jadex.commons.SUtil;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -98,9 +99,8 @@ public class HuntPlan extends Plan {
 		return false;
 	}
 
-	/** 
-   */
-	protected void foolAround() {
+	protected void foolAround() 
+	{
 		IVector2 to;
 		String dir = null;
 
@@ -121,7 +121,7 @@ public class HuntPlan extends Plan {
 					"last_direction").getFact();
 			dir = posDirs[randomInt(posDirs.length)];
 			for (int i = 0; i < posDirs.length; i++) {
-				if (lastDir == posDirs[i] && Math.random() > 0.2) {
+				if (SUtil.equals(lastDir, posDirs[i]) && Math.random() > 0.2) {
 					dir = lastDir;
 					break;
 				}

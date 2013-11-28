@@ -16,6 +16,7 @@ import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.commons.SUtil;
 
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -72,7 +73,7 @@ public class DFTestPlan extends Plan
 		}
 		catch(GoalFailureException gfe)
 		{
-			getLogger().info(" search failed. "+search.getParameterSet("result").getValues());
+			getLogger().info(" search failed. "+Arrays.toString(search.getParameterSet("result").getValues()));
 			tr.setReason("Search failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
@@ -158,7 +159,7 @@ public class DFTestPlan extends Plan
 			dispatchSubgoalAndWait(search);
 			if(search.getParameterSet("result").getValues().length>0)
 			{
-				getLogger().info(" lease time test failed. "+search.getParameterSet("result").getValues());
+				getLogger().info(" lease time test failed. "+Arrays.toString(search.getParameterSet("result").getValues()));
 				tr.setReason("Lease time test failed. "+SUtil.arrayToString(search.getParameterSet("result").getValues()));
 			}
 			else

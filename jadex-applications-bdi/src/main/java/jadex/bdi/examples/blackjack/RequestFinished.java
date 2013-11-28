@@ -96,4 +96,15 @@ public class RequestFinished implements IComponentAction
 		}
 		return false;
 	}
+	
+	/** 
+	 * 
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((gameresult == null) ? 0 : gameresult.hashCode());
+		return result;
+	}
 }

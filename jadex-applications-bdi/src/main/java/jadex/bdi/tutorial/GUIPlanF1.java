@@ -41,7 +41,7 @@ public class GUIPlanF1 extends Plan
 	{
 		// Could be done in a more elegant way via listeners since 0.96
 		
-		final TranslationGuiF1 gui = new TranslationGuiF1();
+		this.gui = new TranslationGuiF1();
 		
 		getEventbase().addInternalEventListener("gui_update", new IInternalEventListener()
 		{

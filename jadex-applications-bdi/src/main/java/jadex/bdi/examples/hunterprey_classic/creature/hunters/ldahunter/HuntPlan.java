@@ -8,6 +8,7 @@ import jadex.bdi.examples.hunterprey_classic.creature.hunters.ldahunter.potentia
 import jadex.bdi.examples.hunterprey_classic.creature.hunters.ldahunter.potentialfield.PotentialFrame;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.commons.SUtil;
 
 /**
  * A plan skeleton. Custom code goes into the body() method.
@@ -88,7 +89,7 @@ public class HuntPlan extends Plan {
 					"last_direction").getFact();
 			dir = posDirs[randomInt(posDirs.length)];
 			for (int i = 0; i < posDirs.length; i++) {
-				if (lastDir == posDirs[i] && Math.random() > 0.2) {
+				if(SUtil.equals(lastDir, posDirs[i]) && Math.random() > 0.2) {
 					dir = lastDir;
 					break;
 				}

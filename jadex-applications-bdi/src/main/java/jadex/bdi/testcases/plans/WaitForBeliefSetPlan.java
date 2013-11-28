@@ -1,5 +1,7 @@
 package jadex.bdi.testcases.plans;
 
+import java.util.Arrays;
+
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
 
@@ -31,7 +33,7 @@ public class WaitForBeliefSetPlan extends Plan
 			//Object val = waitForFactRemoved("some_numbers", 5000);
 			//getLogger().info("Fact removed: "+val);
 			tr.setSucceeded(true);
-			getLogger().info("Belief changed: "+getBeliefbase().getBeliefSet("some_numbers").getFacts());
+			getLogger().info("Belief changed: "+Arrays.toString(getBeliefbase().getBeliefSet("some_numbers").getFacts()));
 			getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		}
 	}

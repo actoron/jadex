@@ -139,14 +139,27 @@ public class Card
 		if(obj instanceof Card)
 		{
 			Card cmp = (Card)obj;
-			if(getColor() != cmp.getColor() && (getColor() == null || !getColor().equals(cmp.getColor())))
+			if(getColor() == null || !getColor().equals(cmp.getColor()))
 				return false;
-			if(getType() != cmp.getType() && (getType() == null || !getType().equals(cmp.getType())))
+			if(getType() == null || !getType().equals(cmp.getType()))
 				return false;
 			if(getValue() != cmp.getValue())
 				return false;
 			return true;
 		}
 		return false;
+	}
+	
+	/** 
+	 * 
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((col == null) ? 0 : col.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + val;
+		return result;
 	}
 }
