@@ -91,8 +91,20 @@ public class Property	implements IProperty, Serializable
 		return "Property(" + "name=" + getName() + ", value=" + getValue() + ")";
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
+	/** 
+	 * 
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	/**
+	 * 
 	 */
 	public boolean equals(Object obj)
 	{

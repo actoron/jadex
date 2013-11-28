@@ -13,7 +13,7 @@ import java.util.List;
 /**
  *  An component description.
  */
-public class DFComponentDescription implements IDFComponentDescription, Serializable
+public class DFComponentDescription implements IDFComponentDescription, Serializable, Cloneable
 {
 	//-------- attributes ----------
 
@@ -374,6 +374,22 @@ public class DFComponentDescription implements IDFComponentDescription, Serializ
 
 		return eq(ad.name, name) && eq(ad.leasetime, leasetime) && eq(ad.languages, languages) && eq(ad.ontologies, ontologies) && eq(ad.protocols, protocols) && eq(ad.services, services);
 	}
+	
+	/** 
+	 * 
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((languages == null) ? 0 : languages.hashCode());
+		result = prime * result + ((leasetime == null) ? 0 : leasetime.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((ontologies == null) ? 0 : ontologies.hashCode());
+		result = prime * result + ((protocols == null) ? 0 : protocols.hashCode());
+		result = prime * result + ((services == null) ? 0 : services.hashCode());
+		return result;
+	}
 
 	/** 
 	 * @param leasetime
@@ -384,7 +400,7 @@ public class DFComponentDescription implements IDFComponentDescription, Serializ
 	{
 		return (a == b) || (a != null && b != null && a.equals(b));
 	}
-
+	
 	/**
 	 *  Clone a component description.
 	 */

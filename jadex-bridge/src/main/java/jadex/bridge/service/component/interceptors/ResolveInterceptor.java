@@ -163,7 +163,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			if(found!=null)
 			{
-				final ServiceInvocationContext	domainsic	= sic.clone();
+				final ServiceInvocationContext	domainsic	= new ServiceInvocationContext(sic);//sic.clone();
 				domainsic.setMethod(found);
 				domainsic.setObject(si.getDomainService());
 				sic.setObject(si.getManagementService());

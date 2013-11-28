@@ -68,9 +68,13 @@ public class ChooseMovePlan extends Plan
 				{
 					tmpmove = (Move)apps[i].getPlan().getParameter("move").getValue();
 				}
+				catch(RuntimeException e)
+				{
+					throw e;
+				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
 				if(matchColor(board, tmpmove, same))
 				{

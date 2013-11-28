@@ -260,13 +260,13 @@ public class ServiceInvocationContext
 		this.cause = context.cause;
 	}
 	
-	/**
-	 *  Clone a service invocation context.
-	 */
-	public ServiceInvocationContext	clone()
-	{
-		return new ServiceInvocationContext(this); 
-	}
+//	/**
+//	 *  Clone a service invocation context.
+//	 */
+//	public ServiceInvocationContext	clone()
+//	{
+//		return new ServiceInvocationContext(this); 
+//	}
 
 	//-------- methods --------
 	

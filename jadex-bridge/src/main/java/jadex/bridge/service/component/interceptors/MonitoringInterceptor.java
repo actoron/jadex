@@ -189,7 +189,7 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 			final ServiceCall cur = CallAccess.getCurrentInvocation();
 			final ServiceCall next = CallAccess.getNextInvocation();
 			
-			Map<String, Object>	props	= new HashMap<String, Object>();
+//			Map<String, Object>	props	= new HashMap<String, Object>();
 //			props.put("method5", sic.getMethod().getName());
 			
 			ServiceCall sc = CallAccess.getOrCreateNextInvocation();

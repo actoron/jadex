@@ -75,7 +75,24 @@ public class DFServiceDescription implements IDFServiceDescription, Serializable
 		DFServiceDescription sd = (DFServiceDescription)obj;
 
 		return eq(sd.name, name) && eq(sd.ownership, ownership) && eq(sd.type, type) && eq(sd.languages, languages) && eq(sd.ontologies, ontologies) && eq(sd.protocols, protocols)
-				&& eq(sd.properties, properties);
+			&& eq(sd.properties, properties);
+	}
+	
+	/** 
+	 * 
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((languages == null) ? 0 : languages.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((ontologies == null) ? 0 : ontologies.hashCode());
+		result = prime * result + ((ownership == null) ? 0 : ownership.hashCode());
+		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
+		result = prime * result + ((protocols == null) ? 0 : protocols.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
 	}
 
 	//-------- accessor methods --------

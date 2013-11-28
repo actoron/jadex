@@ -134,7 +134,10 @@ public class PuzzleDispatcherServlet extends HttpServlet
 					move	= moves.get(i);
 				}
 			}
-			board.move(move);
+			if(move!=null)
+			{
+				board.move(move);
+			}
 			
 			if(board.isSolution())
 			{

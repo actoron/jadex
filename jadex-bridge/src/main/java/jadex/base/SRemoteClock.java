@@ -588,7 +588,7 @@ public class SRemoteClock
 		 */
 		public boolean equals(Object obj)
 		{
-			return obj instanceof ClockState;
+			return obj instanceof SimulationState;
 		}
 
 		public String toString()

@@ -40,7 +40,7 @@ public class ChartPanel extends JPanel
 	public ChartPanel(final IExternalAccess agent)
 	{
 		setLayout(new BorderLayout());
-		JPanel iconp = new JPanel(new BorderLayout());
+//		JPanel iconp = new JPanel(new BorderLayout());
 		final JPanel cp = new JPanel(new GridBagLayout());
 		final JLabel chartlabel = new JLabel();
 //		final JButton chartbutton = new JButton();

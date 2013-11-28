@@ -498,7 +498,7 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	 */
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof IService)
+		if(obj instanceof IService)
 		{
 			return getServiceIdentifier().equals(((IService) obj).getServiceIdentifier());
 		}

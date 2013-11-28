@@ -1030,7 +1030,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			MethodListenerHandler handler = servicelisteners.get(sid);
 			if(handler!=null)
 			{
-				MethodInfo mi = new MethodInfo(method);
+//				MethodInfo mi = new MethodInfo(method);
 				handler.notifyMethodListeners(start, proxy, method, args, callid, context);
 			}
 		}

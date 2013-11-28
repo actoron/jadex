@@ -26,9 +26,6 @@ public class ChartUserAgent extends RestServiceAgent
 {
 	//-------- attributes --------
 	
-	@Agent
-	protected MicroAgent agent;
-	
 	protected JFrame	f; 
 	
 	//-------- emthods --------

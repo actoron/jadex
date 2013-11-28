@@ -21,11 +21,6 @@ import jadex.webservice.examples.ws.geoip.gen.GeoIP;
 @RequiredServices(@RequiredService(name="geoipservice", type=IGeoIPService.class))
 public class GeoIPUserAgent extends RestServiceAgent
 {
-	//-------- attributes --------
-	
-	@Agent
-	protected MicroAgent agent;
-	
 	//-------- emthods --------
 
 	/**

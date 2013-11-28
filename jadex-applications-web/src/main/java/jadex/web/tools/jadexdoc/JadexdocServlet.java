@@ -157,7 +157,7 @@ public class JadexdocServlet extends HttpServlet
 				{
 					long	timeout	= 30000;
 					ThreadSuspendable	sus	= new ThreadSuspendable();
-					if(model.get(sus, timeout)!=null)
+					if(model!=null && model.get(sus, timeout)!=null)
 					{
 						IModelInfo	mi	= model.get(sus, timeout);
 						title	= mi.getName() + " (" + mi.getType() + ")";

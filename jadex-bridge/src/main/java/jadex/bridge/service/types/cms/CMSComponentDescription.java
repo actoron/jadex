@@ -500,6 +500,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 				ret.children = new LinkedHashSet(); 
 				ret.children.addAll(children);
 			}
+			ret.cause = new Cause(cause);
 			return ret;
 		}
 		catch(CloneNotSupportedException e)
