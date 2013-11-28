@@ -49,9 +49,9 @@ public class MultiPlatformsTest extends TestCase
 //		Thread.sleep(3000000);
 
 		
-//		for(int p=0; p<1000; p++)
-//		{
-//			long	time	= System.currentTimeMillis();
+		for(int p=0; p<1000; p++)
+		{
+			long	time	= System.currentTimeMillis();
 		int	number	= 15;	// 15; larger numbers cause timeout on toaster.
 		
 		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
@@ -106,9 +106,9 @@ public class MultiPlatformsTest extends TestCase
 		}
 		
 		
-//			time	= System.currentTimeMillis() - time;
-//			System.out.println("run "+p+" took "+time+" milliseconds.");
-//		}
+			time	= System.currentTimeMillis() - time;
+			System.out.println("run "+p+" took "+time+" milliseconds.");
+		}
 		
 		if(memtimer!=null)
 		{

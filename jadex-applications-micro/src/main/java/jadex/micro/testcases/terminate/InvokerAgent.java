@@ -73,7 +73,7 @@ public class InvokerAgent
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				tc.addReport(new TestReport("#0", "Unexpected exception", false, exception.toString()));
+				tc.addReport(new TestReport("#0", "Unexpected exception", exception));
 //				System.out.println("tests finished: "+tc);
 				agent.setResultValue("testresults", tc);
 				agent.killAgent();

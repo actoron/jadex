@@ -42,13 +42,23 @@ public class TestReport
 	/**
 	 *  Create a new test report.
 	 */
-	public TestReport(String name, String description,
-		boolean succeded, String reason)
+	public TestReport(String name, String description, boolean succeded, String reason)
 	{
 		this.name = name;
 		this.description = description;
 		this.succeeded = succeded;
 		this.reason = reason;
+	}
+
+	/**
+	 *  Create a new test report.
+	 */
+	public TestReport(String name, String description, Exception reason)
+	{
+		this.name = name;
+		this.description = description;
+		this.succeeded = false;
+		setReason(reason);
 	}
 
 	//-------- methods --------

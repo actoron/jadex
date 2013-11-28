@@ -1342,8 +1342,7 @@ public class TestCenterPanel extends JSplitPanel
 			 */
 			public void exceptionOccurred(Exception exception)
 			{
-				Testcase	res	= new Testcase(1, new TestReport[]{new TestReport("creation", "Test center report", 
-					false, "Test agent could not be created: "+exception)});
+				Testcase	res	= new Testcase(1, new TestReport[]{new TestReport("creation", "Test center report", exception)});
 				testFinished(res);
 			}
 			

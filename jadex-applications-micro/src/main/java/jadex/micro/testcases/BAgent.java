@@ -73,7 +73,7 @@ public class BAgent extends MicroAgent implements IBService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				tests.add(new TestReport("#B1", "Test if service could be found in init.", false, exception.getMessage()));
+				tests.add(new TestReport("#B1", "Test if service could be found in init.", exception));
 				setResultValue("testcases", tests);
 				ret.setResult(null);
 			}
