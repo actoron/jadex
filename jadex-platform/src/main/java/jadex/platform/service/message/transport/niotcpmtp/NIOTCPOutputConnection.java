@@ -6,8 +6,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Struct for holding information about an output connection.
