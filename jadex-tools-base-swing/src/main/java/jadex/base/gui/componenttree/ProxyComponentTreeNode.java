@@ -151,6 +151,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	{
 		busy	= true;
 		
+		
 		getConnectionState().addResultListener(new DefaultResultListener<IProxyAgentService.State>()
 		{
 			public void resultAvailable(State result)
@@ -272,6 +273,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		{
 			public void resultAvailable(IProxyAgentService pas)
 			{
+				pas.refreshLatency();	// Hack!!! perform new latency measurement.
+				
 				pas.getConnectionState().addResultListener(new IResultListener<State>()
 				{
 					public void resultAvailable(State result)

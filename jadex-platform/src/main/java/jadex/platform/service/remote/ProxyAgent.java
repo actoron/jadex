@@ -1,15 +1,14 @@
 package jadex.platform.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
 import jadex.bridge.sensor.service.LatencyProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IProxyAgentService;
@@ -18,7 +17,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -27,8 +25,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
 import java.util.Map;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 
 
@@ -64,59 +60,65 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	 */
 	public IFuture<Void> agentCreated()
 	{
-		final Future<Void> ret = new Future<Void>();
 		
-		getServiceContainer().getService(IComponentManagementService.class, rcid.getRoot()).addResultListener(
-			new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		getServiceContainer().getService(IComponentManagementService.class, rcid.getRoot())
+			.addResultListener(new IResultListener<IComponentManagementService>()
 		{
-			public void customResultAvailable(IComponentManagementService cms) 
+			public void resultAvailable(IComponentManagementService cms) 
 			{
-				rcms = cms;
-				cms.getExternalAccess(getComponentIdentifier().getRoot()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+				rcms	= cms;
+				
+				cms.getExternalAccess(getComponentIdentifier().getRoot())
+					.addResultListener(new IResultListener<IExternalAccess>()
 				{
-					public void customResultAvailable(IExternalAccess pl)
+					public void resultAvailable(IExternalAccess pl)
 					{
-						pl.getArguments().addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+						pl.getArguments().addResultListener(new IResultListener<Map<String, Object>>()
 						{
-							public void customResultAvailable(Map<String, Object> args)
+							public void resultAvailable(Map<String, Object> args)
 							{
 								Boolean b = (Boolean)args.get("sensors");
 								if(b!=null && b.booleanValue())
 								{
 									INFMixedPropertyProvider nfpp = getServiceContainer().getRequiredServicePropertyProvider(((IService)rcms).getServiceIdentifier());
 									LatencyProperty lt = new LatencyProperty(getInterpreter().getInternalAccess(), (IService)rcms, null);
-									nfpp.addNFProperty(lt).addResultListener(new DelegationResultListener<Void>(ret)
+									nfpp.addNFProperty(lt).addResultListener(new IResultListener<Void>()
 									{
-										public void customResultAvailable(Void result)
+										public void resultAvailable(Void result)
 										{
 											injected = true;
-											super.customResultAvailable(result);
+											// Call refresh for initial value.
+											refreshLatency();
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+//											exception.printStackTrace();
 										}
 									});
-//									System.out.println("created: "+getComponentIdentifier());
 								}
-								else
-								{
-									ret.setResult(null);
-								}
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+//								exception.printStackTrace();
 							}
 						});
 					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+//						exception.printStackTrace();
+					}
 				});
-				
-			
 			}
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.out.println("created: "+getComponentIdentifier()+" "+exception);
-////				exception.printStackTrace();
-//				super.exceptionOccurred(exception);
-//			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// Platform not accessible -> ignore
+			}
 		});
 		
-//		System.out.println("created1: "+getComponentIdentifier());
-		
-//		return new Future<Void>();
 		return IFuture.DONE;
 	}
 	
@@ -171,66 +173,57 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	{
 		final Future<State> ret = new Future<State>();
 		
+		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.getExternalAccess(rcid).addResultListener(new IResultListener<IExternalAccess>()
+				{
+					public void resultAvailable(IExternalAccess result) 
+					{
+						ret.setResult(State.CONNECTED);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof SecurityException)
+						{
+							ret.setResult(State.LOCKED);
+						}
+						else
+						{
+							ret.setResult(State.UNCONNECTED);
+						}
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Refresh the latency value.
+	 */
+	public IFuture<Void>	refreshLatency()
+	{
+		final Future<Void>	ret	= new Future<Void>();
 		if(rcms!=null)
 		{
-			rcms.getExternalAccess(rcid).addResultListener(new IResultListener<IExternalAccess>()
+			rcms.getExternalAccess(rcid)
+				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{
-				public void resultAvailable(IExternalAccess result) 
+				public void customResultAvailable(IExternalAccess result)
 				{
-					ret.setResult(State.CONNECTED);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					if(exception instanceof SecurityException)
-					{
-						ret.setResult(State.LOCKED);
-					}
-					else
-					{
-						ret.setResult(State.UNCONNECTED);
-					}
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
-			scheduleStep(new IComponentStep<Void>()
-			{
-				public IFuture<Void> execute(IInternalAccess ia) 
-				{
-					getConnectionState().addResultListener(new DelegationResultListener<IProxyAgentService.State>(ret));
-					return IFuture.DONE;
-				}
-			}, 10000);
+			ret.setException(new RuntimeException("Not (yet) connected."));
 		}
-		
-//		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, State>(ret)
-//		{
-//			public void customResultAvailable(IComponentManagementService cms)
-//			{
-//				cms.getExternalAccess(rcid).addResultListener(new IResultListener<IExternalAccess>()
-//				{
-//					public void resultAvailable(IExternalAccess result) 
-//					{
-//						ret.setResult(State.CONNECTED);
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						if(exception instanceof SecurityException)
-//						{
-//							ret.setResult(State.LOCKED);
-//						}
-//						else
-//						{
-//							ret.setResult(State.UNCONNECTED);
-//						}
-//					}
-//				});
-//			}
-//		});
 		
 		return ret;
 	}

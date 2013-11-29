@@ -32,4 +32,9 @@ public interface IProxyAgentService
 	 *  @return The connection state.
 	 */
 	public IFuture<State> getConnectionState();
+
+	/**
+	 *  Refresh the latency value.
+	 */
+	public IFuture<Void>	refreshLatency();
 }

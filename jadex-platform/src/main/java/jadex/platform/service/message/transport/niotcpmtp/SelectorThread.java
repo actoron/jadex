@@ -272,6 +272,7 @@ public class SelectorThread implements Runnable
 										internalPutConnection(address, new NIOTCPDeadConnection(cleaner));
 									}
 								}
+								cleaner.refresh();
 							}
 						}			
 					};
