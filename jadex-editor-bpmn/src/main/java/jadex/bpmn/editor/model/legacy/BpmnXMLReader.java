@@ -754,7 +754,7 @@ public class BpmnXMLReader
 								String dir = (String) table.get(row).getColumnValueAt(0); 		// direction
 								String name = (String) table.get(row).getColumnValueAt(1);		// name
 								String clazzname = (String) table.get(row).getColumnValueAt(2);	// class
-								String val = (String) table.get(row).getColumnValueAt(3) != "" ? (String) table.get(row).getColumnValueAt(3) : null;		// value
+								String val = !"".equals((String) table.get(row).getColumnValueAt(3)) ? (String) table.get(row).getColumnValueAt(3) : null;		// value
 								
 								UnparsedExpression exp = null;
 								if(val!=null && val.length()>0)
@@ -772,7 +772,7 @@ public class BpmnXMLReader
 							else if (table.get(row).size() == 2)
 							{
 								String name =  (String) table.get(row).getColumnValueAt(0);
-								String val = (String) table.get(row).getColumnValueAt(1) != "" ? (String) table.get(row).getColumnValueAt(1) : null;
+								String val = !"".equals((String) table.get(row).getColumnValueAt(1)) ? (String) table.get(row).getColumnValueAt(1) : null;
 								
 								// context variable
 //								IParsedExpression exp = null;
@@ -806,7 +806,7 @@ public class BpmnXMLReader
 //							assert table.get(row).size() == 2;
 			
 							String name =  (String) table.get(row).getColumnValueAt(0);
-							String val = (String) table.get(row).getColumnValueAt(1) != "" ? (String) table.get(row).getColumnValueAt(1) : null;
+							String val = !"".equals((String) table.get(row).getColumnValueAt(1)) ? (String) table.get(row).getColumnValueAt(1) : null;
 							
 							// context variable
 //							IParsedExpression exp = null;
@@ -1148,7 +1148,7 @@ public class BpmnXMLReader
 			MBpmnModel dia = (MBpmnModel)context.getRootObject();
 			MSequenceEdge edge = (MSequenceEdge)object;
 			((Map<String, MSequenceEdge>) ((Map) context.getUserContext()).get(SEQUENCE_EDGES)).put(edge.getId(), edge);
-			JavaCCExpressionParser parser = new JavaCCExpressionParser();
+//			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
 			// Read annotations from Jadex bpmn tool.
 			

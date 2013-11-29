@@ -321,9 +321,9 @@ public class MessageEventPropertyPanel extends BasePropertyPanel
 	 */
 	protected void setMessageTypeString(String msgtypestring)
 	{
-		msgtypestring = MESSAGE_NAME_MAPPING.containsKey(msgtypestring) ? MESSAGE_NAME_MAPPING.get(msgtypestring) : msgtypestring;
-		msgtypestring = "fipa".equals(msgtypestring)? null : msgtypestring;
-		//getMEvent().setPropertyValue("messagetype", msgtypestring);
+//		msgtypestring = MESSAGE_NAME_MAPPING.containsKey(msgtypestring) ? MESSAGE_NAME_MAPPING.get(msgtypestring) : msgtypestring;
+//		msgtypestring = "fipa".equals(msgtypestring)? null : msgtypestring;
+//		getMEvent().setPropertyValue("messagetype", msgtypestring);
 	}
 	
 	/**

@@ -179,13 +179,16 @@ public class BpmnEditor
 			}
 		}
 		
-		if (TASK_INFOS == null)
+		synchronized (BpmnEditor.class)
 		{
-			Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Could not load task information, using fallback...");
-			TASK_INFOS = new HashMap<String, TaskMetaInfo>();
-			for (int i = 0; i < FALLBACK_TASK_NAMES.length; ++i)
+			if (TASK_INFOS == null)
 			{
-				TASK_INFOS.put(FALLBACK_TASK_NAMES[i], null);
+				Logger.getLogger(BpmnEditor.APP_NAME).log(Level.WARNING, "Could not load task information, using fallback...");
+				TASK_INFOS = new HashMap<String, TaskMetaInfo>();
+				for (int i = 0; i < FALLBACK_TASK_NAMES.length; ++i)
+				{
+					TASK_INFOS.put(FALLBACK_TASK_NAMES[i], null);
+				}
 			}
 		}
 		

@@ -196,7 +196,7 @@ public class SCreationController
 		}
 		
 		MActivity mactivity = null;
-		if (mode != null && mode.startsWith(ModelContainer.EDIT_MODE_SUBPROCESS))
+		if (mode.startsWith(ModelContainer.EDIT_MODE_SUBPROCESS))
 		{
 			mactivity = new MSubProcess();
 			mactivity.setClazz(new ClassInfo(""));

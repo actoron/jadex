@@ -46,15 +46,14 @@ public abstract class DocumentAdapter implements DocumentListener
 		try
         {
             ret = doc.getText(0, doc.getLength());
+            if (ret.length() == 0)
+    		{
+    			ret = null;
+    		}
         }
         catch (BadLocationException e)
         {
         }
-		
-		if (ret.length() == 0)
-		{
-			ret = null;
-		}
         
         return ret;
 	}

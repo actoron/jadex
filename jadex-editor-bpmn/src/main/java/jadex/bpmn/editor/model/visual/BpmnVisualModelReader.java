@@ -266,6 +266,10 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				vedge.setSource(vmap.get(mmedge.getSource().getId()));
 				vedge.setTarget(vmap.get(mmedge.getTarget().getId()));
 			}
+			else
+			{
+				throw new RuntimeException("Unknown edge found: " + medge.getId());
+			}
 			vedge.setBpmnElement(medge);
 			
 			mxGeometry geo = vedge.getGeometry() != null? vedge.getGeometry() : new mxGeometry();

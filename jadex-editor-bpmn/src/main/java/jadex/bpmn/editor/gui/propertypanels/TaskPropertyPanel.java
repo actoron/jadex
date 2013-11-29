@@ -752,7 +752,7 @@ public class TaskPropertyPanel extends BasePropertyPanel
 			Method m = clazz.getMethod("getExtraParameters", new Class[]{Map.class, IModelContainer.class, ClassLoader.class});
 			// todo: use classloader of tool!
 			List<ParameterMetaInfo> pis = new ArrayList<ParameterMetaInfo>();
-			if(ret.getParameterInfos()!=null && !ret.getParameterInfos().isEmpty())
+			if(ret != null && ret.getParameterInfos()!=null && !ret.getParameterInfos().isEmpty())
 			{
 				pis.addAll(ret.getParameterInfos());
 			}
