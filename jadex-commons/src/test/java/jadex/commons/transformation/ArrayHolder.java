@@ -2,6 +2,8 @@ package jadex.commons.transformation;
 
 import jadex.commons.SUtil;
 
+import java.util.Arrays;
+
 
 /**
  *  Object holding a multi array as attribute.
@@ -45,6 +47,14 @@ public class ArrayHolder
 	public void setData(int[] data)
 	{
 		this.data = data;
+	}
+	
+	/** 
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return Arrays.hashCode(data);
 	}
 	
 	/**

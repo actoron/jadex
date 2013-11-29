@@ -77,13 +77,17 @@ public class IndexMap<K, V>	implements Serializable, Cloneable
 	/**
 	 *  Clone an index map.
 	 */
-	public Object clone()
+	public Object clone() throws CloneNotSupportedException
 	{
+		IndexMap<K, V> ret = (IndexMap<K, V>) super.clone();
 		ArrayList<K> listcopy = SCollection.createArrayList();
 		listcopy.addAll(list);
 		Map<K, V> mapcopy = SCollection.createHashMap();
 		mapcopy.putAll(map);
-		return new IndexMap<K, V>(listcopy, mapcopy);
+		ret.list = listcopy;
+		ret.map = mapcopy;
+		return ret;
+//		return new IndexMap<K, V>(listcopy, mapcopy);
 	}
 
 	//-------- Map methods --------

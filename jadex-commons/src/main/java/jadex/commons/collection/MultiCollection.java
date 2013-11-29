@@ -54,12 +54,16 @@ public class MultiCollection implements Map, Serializable, Cloneable
 	/**
 	 *  Clone a multi collection.
 	 */
-	public Object clone()
+	public Object clone() throws CloneNotSupportedException
 	{
+		MultiCollection ret = (MultiCollection) super.clone();
 		// Hack. does not work!!! map could be of other type.
 		HashMap mapcopy = new HashMap();
 		mapcopy.putAll(map);
-		return new MultiCollection(mapcopy, type);
+//		return new MultiCollection(mapcopy, type);
+		ret.map = mapcopy;
+		ret.type = type;
+		return ret;
 	}
 
 	//-------- Map methods --------

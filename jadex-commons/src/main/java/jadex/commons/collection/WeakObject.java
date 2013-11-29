@@ -24,6 +24,7 @@ public class WeakObject<T> extends WeakReference<T> implements Serializable
 	 */
 	public WeakObject(T object)
 	{
+		// FINDBUG: This is declared serializable without empty constructor? Reason?
 		super(object);
 		hashcode = object.hashCode();
 	}

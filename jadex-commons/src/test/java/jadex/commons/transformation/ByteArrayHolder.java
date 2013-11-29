@@ -2,6 +2,8 @@ package jadex.commons.transformation;
 
 import jadex.commons.SUtil;
 
+import java.util.Arrays;
+
 public class ByteArrayHolder
 {
 	//-------- attributes --------
@@ -35,6 +37,14 @@ public class ByteArrayHolder
 	public void	setData(byte[] data)
 	{
 		this.data	= data;
+	}
+	
+	/** 
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return Arrays.hashCode(data);
 	}
 
 	/**

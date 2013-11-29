@@ -125,6 +125,9 @@ public class SUtil
 	 * xml-style interfaces.
 	 */
 	protected static Map<String, String>			htmlwraps;
+	
+	/** Cached AndroidUtils */
+	protected static volatile AndroidUtils androidutils;
 
 	/** Holds the single characters. */
 	protected static String			seps;
@@ -3705,29 +3708,32 @@ public class SUtil
 			+glob.replace("*", "\\E.*\\Q").replace("?", "\\E.\\Q")+"\\E$");
 	}
 	
-	/** Cached AndroidUtils */
-	protected static volatile AndroidUtils androidutils;
-	
 	/**
 	 * Get the AndroidUtils, if available.
 	 * @return AndroidUtils
 	 */
 	public static AndroidUtils androidUtils() 
 	{
-		if(androidutils == null && SReflect.isAndroid()) 
+		if (SReflect.isAndroid() && androidutils == null)
 		{
-			Class<?> clazz = SReflect.classForName0("jadex.android.commons.AndroidUtilsImpl", SReflect.class.getClassLoader());
-			try
+			synchronized (SUtil.class)
 			{
-				androidutils = (AndroidUtils) clazz.newInstance();
-			}
-			catch(InstantiationException e)
-			{
-				e.printStackTrace();
-			}
-			catch(IllegalAccessException e)
-			{
-				e.printStackTrace();
+				if(androidutils == null && SReflect.isAndroid()) 
+				{
+					Class<?> clazz = SReflect.classForName0("jadex.android.commons.AndroidUtilsImpl", SReflect.class.getClassLoader());
+					try
+					{
+						androidutils = (AndroidUtils) clazz.newInstance();
+					}
+					catch(InstantiationException e)
+					{
+						e.printStackTrace();
+					}
+					catch(IllegalAccessException e)
+					{
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 		return androidutils;

@@ -13,7 +13,7 @@ import java.util.Set;
  *  A weak set for entries that will be automatically removed when
  *  no references to them are existing any more.
  */
-public class WeakSet extends AbstractSet	implements Serializable
+public class WeakSet extends AbstractSet	implements Serializable, Cloneable
 {
 	//-------- attributes ---------
 

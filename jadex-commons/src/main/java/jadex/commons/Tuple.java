@@ -148,9 +148,12 @@ public class Tuple	implements Cloneable, java.io.Serializable
 	 *  Clone this tuple.
 	 *  @return A shallow copy of this tuple.
 	 */
-	public Object clone()
+	public Object clone() throws CloneNotSupportedException
 	{
-		return new Tuple((Object[])entities.clone());
+		Tuple ret = (Tuple) super.clone();
+		ret.entities = entities.clone();
+		return ret;
+//		return new Tuple((Object[])entities.clone());
 	}
 	
 	/**

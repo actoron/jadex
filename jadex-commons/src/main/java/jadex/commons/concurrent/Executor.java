@@ -103,6 +103,7 @@ public class Executor implements Runnable
 		
 		if(monitor!=null)
 		{
+			//FINDBUGS: The monitor is used here as a barrier to wait for another thread.
 			synchronized(monitor){}
 		}
 		
