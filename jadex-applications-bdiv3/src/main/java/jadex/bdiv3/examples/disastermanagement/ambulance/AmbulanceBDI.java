@@ -10,6 +10,7 @@ import jadex.bdiv3.annotation.GoalDropCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Publish;
+import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
@@ -42,6 +43,8 @@ import jadex.micro.annotation.Configurations;
 @Configurations({@Configuration(name="do_nothing"), @Configuration(name="default")})
 public class AmbulanceBDI implements IEnvAccess
 {
+//	public static final String GOH = GoHome.class.getName();
+	
 	/** The capa. */
 	@Capability
 	protected MovementCapa movecapa = new MovementCapa();
@@ -82,7 +85,9 @@ public class AmbulanceBDI implements IEnvAccess
 		/**
 		 *  Create a new Move. 
 		 */
-		@GoalCreationCondition(rawevents={ChangeEvent.GOALADOPTED, ChangeEvent.GOALDROPPED})
+		// todo: GoHome.class.getName();
+		@GoalCreationCondition(rawevents={@RawEvent(ChangeEvent.GOALADOPTED),
+			@RawEvent(ChangeEvent.GOALDROPPED)})
 		public static GoHome checkCreate(AmbulanceBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
@@ -100,7 +105,8 @@ public class AmbulanceBDI implements IEnvAccess
 		/**
 		 *  Drop if there is another goal.
 		 */
-		@GoalDropCondition(rawevents={ChangeEvent.GOALADOPTED, ChangeEvent.GOALDROPPED})
+		@GoalDropCondition(rawevents={@RawEvent(ChangeEvent.GOALADOPTED),
+			@RawEvent(ChangeEvent.GOALDROPPED)})
 		public boolean checkDrop(AmbulanceBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
@@ -134,6 +140,7 @@ public class AmbulanceBDI implements IEnvAccess
 		 */
 		public TreatVictims(ISpaceObject disaster)
 		{
+//			System.out.println("created treat victims");
 			this.disaster = disaster;
 		}
 
@@ -149,14 +156,14 @@ public class AmbulanceBDI implements IEnvAccess
 		/**
 		 *  Drop if this goal is only option and there are others.
 		 */
-		@GoalDropCondition(rawevents={ChangeEvent.GOALOPTION, ChangeEvent.GOALADOPTED})
+		@GoalDropCondition(rawevents={@RawEvent(value=ChangeEvent.GOALOPTION, secondc=TreatVictims.class)})
 		public boolean checkDrop(AmbulanceBDI ag, IGoal goal)
 		{
 			MovementCapa capa = ag.getMoveCapa();
 			boolean ret = GoalLifecycleState.OPTION.equals(goal.getLifecycleState()) &&
 				capa.getCapability().getAgent().getGoals(TreatVictims.class).size()>1;
-//			if(ret)
-//				System.out.println("dropping treat victim: "+disaster);
+			if(ret)
+				System.out.println("dropping treat victim: "+disaster);
 			return ret;
 		}
 	}

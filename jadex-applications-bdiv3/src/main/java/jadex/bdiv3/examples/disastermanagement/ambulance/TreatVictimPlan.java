@@ -47,6 +47,8 @@ public class TreatVictimPlan
 	@PlanBody
 	public void body()
 	{
+//		System.out.println("treat vic plan for: "+goal);
+		
 		Space2D	space	= (Space2D)capa.getMoveCapa().getEnvironment();
 		ISpaceObject myself	= capa.getMoveCapa().getMyself();
 		IVector2 home = capa.getMoveCapa().getHomePosition();

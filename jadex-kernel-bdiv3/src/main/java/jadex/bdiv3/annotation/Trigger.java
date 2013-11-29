@@ -18,6 +18,11 @@ public @interface Trigger
 	public Class<?>[] goals() default {};
 	
 	/**
+	 *  Goal type finished events to react on.
+	 */
+	public Class<?>[] goalfinisheds() default {};
+	
+	/**
 	 *  The fact added belief names.
 	 */
 	public String[] factaddeds() default {};
@@ -33,7 +38,7 @@ public @interface Trigger
 	public String[] factchangeds() default {};
 	
 	/**
-	 * 
+	 *  Activate from service invocation.
 	 */
 	public ServiceTrigger service() default @ServiceTrigger();
 }

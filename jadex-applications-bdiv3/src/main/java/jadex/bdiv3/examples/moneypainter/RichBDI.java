@@ -120,17 +120,17 @@ public class RichBDI
 		money++;
 	}
 	
-//	@Plan(trigger=@Trigger(goalfinisheds=BecomeRich.class))
-//	public void printRich(BecomeRich goal)
-//	{
-//		if(agent.getGoal(goal).isSucceeded())
-//		{
-//			System.out.println("Now I am rich as I have made "+money+" euros.");
-//		}
-//		else
-//		{
-//			System.out.println("I have made only "+money+" euros, planned were "+target);
-//		}
-//	}
+	@Plan(trigger=@Trigger(goalfinisheds=BecomeRich.class))
+	public void printRich(BecomeRich goal)
+	{
+		if(agent.getGoal(goal).isSucceeded())
+		{
+			System.out.println("Now I am rich as I have made "+money+" euros.");
+		}
+		else
+		{
+			System.out.println("I have made only "+money+" euros, planned were "+target);
+		}
+	}
 }
 

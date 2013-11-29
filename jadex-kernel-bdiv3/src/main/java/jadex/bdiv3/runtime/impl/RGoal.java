@@ -16,12 +16,9 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.MethodInfo;
-import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.Event;
-import jadex.rules.eca.ICondition;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 
@@ -229,13 +226,13 @@ public class RGoal extends RProcessableElement implements IGoal
 		{
 //			if(getId().indexOf("AchieveCleanup")!=-1)
 //				System.out.println("activating: "+this);
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALINPROCESS, this));
+			ip.getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALINPROCESS, getMGoal().getName()}), this));
 			publishToolGoalEvent(ChangeEvent.GOALINPROCESS);
 			setState(ia, RProcessableElement.State.UNPROCESSED);
 		}
 		else
 		{
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALNOTINPROCESS, this));
+			ip.getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALNOTINPROCESS, getMGoal().getName()}), this));
 		}
 		
 		if(GoalProcessingState.SUCCEEDED.equals(processingstate)
@@ -256,9 +253,10 @@ public class RGoal extends RProcessableElement implements IGoal
 		if(lifecyclestate.equals(getLifecycleState()))
 			return;
 		
-//		if(/*this.toString().indexOf("Go")!=-1 && */GoalLifecycleState.ACTIVE.equals(getLifecycleState())
+//		if(this.toString().indexOf("TreatV")!=-1 && ia.getComponentIdentifier().getName().indexOf("Ambu")!=-1) //&& *///GoalLifecycleState.ACTIVE.equals(getLifecycleState())
 //			&& GoalLifecycleState.OPTION.equals(lifecyclestate))
 //		{
+//			System.out.println("treat goal: "+this);
 //			System.out.println("plan to abort: "+childplan+", "+this);
 //			((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter()).getCapability().dumpGoals();
 //		}
@@ -291,12 +289,12 @@ public class RGoal extends RProcessableElement implements IGoal
 		
 		if(GoalLifecycleState.ADOPTED.equals(lifecyclestate))
 		{
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALADOPTED, this));
+			ip.getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALADOPTED, getMGoal().getName()}), this));
 			setLifecycleState(ia, GoalLifecycleState.OPTION);
 		}
 		else if(GoalLifecycleState.ACTIVE.equals(lifecyclestate))
 		{
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALACTIVE, this));
+			ip.getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALACTIVE, getMGoal().getName()}), this));
 
 			// start means-end reasoning
 			if(onActivate())
@@ -315,7 +313,7 @@ public class RGoal extends RProcessableElement implements IGoal
 //				System.out.println("option: "+ChangeEvent.GOALOPTION+"."+getId());
 			abortPlans();
 			setProcessingState(ia, GoalProcessingState.IDLE);
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALOPTION, this));
+			ip.getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALOPTION, getMGoal().getName()}), this));
 		}
 		else if(GoalLifecycleState.SUSPENDED.equals(lifecyclestate))
 		{
@@ -325,7 +323,7 @@ public class RGoal extends RProcessableElement implements IGoal
 			
 			abortPlans();
 			setProcessingState(ia, GoalProcessingState.IDLE);
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALSUSPENDED, this));
+			ip.getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALSUSPENDED, getMGoal().getName()}), this));
 		}
 		
 		if(GoalLifecycleState.DROPPING.equals(lifecyclestate))
@@ -346,7 +344,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		}
 		else if(GoalLifecycleState.DROPPED.equals(lifecyclestate))
 		{
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALDROPPED, this));
+			ip.getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALDROPPED, getMGoal().getName()}), this));
 
 			if(getListeners()!=null)
 			{
@@ -460,7 +458,7 @@ public class RGoal extends RProcessableElement implements IGoal
 		if(inhibitors.add(inhibitor) && inhibitors.size()==1)
 		{
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-			ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALINHIBITED, this));
+			ip.getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALINHIBITED, getMGoal().getName()}), this));
 		}
 		
 //		if(inhibitor.getId().indexOf("AchieveCleanup")!=-1)
@@ -483,7 +481,7 @@ public class RGoal extends RProcessableElement implements IGoal
 			{
 //				System.out.println("goal not inhibited: "+this);
 				BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-				ip.getRuleSystem().addEvent(new Event(ChangeEvent.GOALNOTINHIBITED, this));
+				ip.getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED, getMGoal().getName()}), this));
 			}
 		}
 	}

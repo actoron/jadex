@@ -331,14 +331,14 @@ public class RPlan extends RElement implements IPlan
 		
 		if(PlanLifecycleState.BODY.equals(lifecyclestate))
 		{
-			getInterpreter().getRuleSystem().addEvent(new Event(ChangeEvent.PLANADOPTED, this));
+			getInterpreter().getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANADOPTED, getModelElement().getName()}), this));
 			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_CREATION);
 		}
 		else if(PlanLifecycleState.PASSED.equals(lifecyclestate) 
 			|| PlanLifecycleState.FAILED.equals(lifecyclestate) 
 			|| PlanLifecycleState.ABORTED.equals(lifecyclestate))
 		{
-			getInterpreter().getRuleSystem().addEvent(new Event(ChangeEvent.PLANFINISHED, this));
+			getInterpreter().getRuleSystem().addEvent(new Event(new EventType(new String[]{ChangeEvent.PLANFINISHED, getModelElement().getName()}), this));
 			publishToolPlanEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL);
 		}
 		else

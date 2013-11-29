@@ -7,7 +7,7 @@ import java.util.List;
 
 
 /**
- * 
+ *  Model element for a plan trigger.
  */
 public class MTrigger
 {
@@ -16,6 +16,8 @@ public class MTrigger
 //	protected List<MMessageEvent> messageevents;
 	
 	protected List<MGoal> goals;
+	
+	protected List<MGoal> goalfinisheds;
 	
 	protected List<String> factaddeds;
 	
@@ -26,7 +28,7 @@ public class MTrigger
 	protected List<MServiceCall> services;
 	
 	/**
-	 * 
+	 *  Create a new trigger.
 	 */
 	public MTrigger()
 	{
@@ -57,13 +59,32 @@ public class MTrigger
 	}
 
 	/**
-	 * 
+	 *  Add a goal trigger.
 	 */
 	public void addGoal(MGoal goal)
 	{
 		if(goals==null)
 			this.goals = new ArrayList<MGoal>();
 		goals.add(goal);
+	}
+	
+	/**
+	 *  Get the goalfinisheds.
+	 *  @return The goalfinisheds.
+	 */
+	public List<MGoal> getGoalFinisheds()
+	{
+		return goalfinisheds;
+	}
+	
+	/**
+	 *  Add a goal finished trigger.
+	 */
+	public void addGoalFinished(MGoal goal)
+	{
+		if(goalfinisheds==null)
+			this.goalfinisheds = new ArrayList<MGoal>();
+		goalfinisheds.add(goal);
 	}
 	
 //	/**
@@ -91,9 +112,9 @@ public class MTrigger
 //	 *  Get the goal finished events.
 //	 */
 //	public IMTriggerReference[]	getGoalFinisheds();
-	
+
 	/**
-	 * 
+	 *  Add a fact added belief trigger. 
 	 */
 	public void addFactAdded(String fact)
 	{
@@ -104,7 +125,7 @@ public class MTrigger
 	}
 	
 	/**
-	 * 
+	 *  Add a fact removed belief trigger. 
 	 */
 	public void addFactRemoved(String fact)
 	{
@@ -115,7 +136,7 @@ public class MTrigger
 	}
 	
 	/**
-	 * 
+	 *  Add a fact changed belief trigger. 
 	 */
 	public void addFactChangeds(String fact)
 	{
@@ -150,7 +171,7 @@ public class MTrigger
 	}
 	
 	/**
-	 * 
+	 *  Add a service trigger.
 	 */
 	public void addService(MServiceCall service)
 	{

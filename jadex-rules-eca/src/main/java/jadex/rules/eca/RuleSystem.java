@@ -408,9 +408,10 @@ public class RuleSystem
 		{
 			IEvent event = events.remove(0);
 			
-//			if(event.getType().getType(0).indexOf("elief")!=-1)
-//				System.out.println("Processing event: "+event);
-			
+//			if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
+//				&& event.getType().getType(1).indexOf("Ambu")!=-1)
+//				System.out.println("proc ev: "+event);
+				
 			List<IRule<?>> rules = rulebase.getRules(event.getType());
 			
 			if(rules!=null)
@@ -431,6 +432,8 @@ public class RuleSystem
 			}
 			else
 			{
+//				System.out.println("found no rules for: "+event.getType());
+				
 				ret.setFinished();
 			}
 		}
@@ -571,7 +574,13 @@ public class RuleSystem
 	 */
 	public void addEvent(IEvent event)
 	{
-//		System.out.println("added: "+event);
+//		System.out.println("added: "+event.getType());
+//		if(event.getType().getTypes().length==1)
+//			System.out.println("herer: "+event.getType());
+//		if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
+//			&& event.getType().getType(1).indexOf("Ambu")!=-1)
+//			System.out.println("add event: "+event);
+
 		events.add(event);
 	}
 	

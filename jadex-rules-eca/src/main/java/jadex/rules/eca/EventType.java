@@ -7,6 +7,8 @@ import java.util.StringTokenizer;
  */
 public class EventType 
 {
+	public static final String MATCHALL = "*";
+	
 	/** The event type elements. */
 	protected String[] types;
 	
@@ -65,7 +67,7 @@ public class EventType
 			{
 				buf.append(types[i]);
 				if(i+1<types.length)
-					buf.append(".");
+					buf.append(" . ");
 			}
 			typename = buf.toString();
 		}

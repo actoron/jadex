@@ -101,8 +101,17 @@ public class CounterResultListener<E> implements IResultListener<E>, IUndoneResu
 	{
 		boolean	notify	= false;
 		
+		// This code is potentially wrong?!
+		// notified could change its value between the synchronized blocks.
+		
 		boolean retry = false;
-		if(!notified)
+		boolean noti;
+		synchronized(this)
+		{
+			noti = notified;
+		}
+		
+		if(!noti)
 			retry = intermediateExceptionOccurred(exception);
 		
 		synchronized(this)

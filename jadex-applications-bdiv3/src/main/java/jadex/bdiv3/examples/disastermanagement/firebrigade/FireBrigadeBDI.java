@@ -12,11 +12,10 @@ import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.Publish;
+import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3.examples.disastermanagement.IExtinguishFireService;
-import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI;
-import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.GoHome;
 import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.TreatVictims;
 import jadex.bdiv3.examples.disastermanagement.movement.IDestinationGoal;
 import jadex.bdiv3.examples.disastermanagement.movement.IEnvAccess;
@@ -93,7 +92,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		/**
 		 *  Create a new Move. 
 		 */
-		@GoalCreationCondition(rawevents={ChangeEvent.GOALDROPPED})
+		@GoalCreationCondition(rawevents=@RawEvent(ChangeEvent.GOALDROPPED))
 		public static GoHome checkCreate(FireBrigadeBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
@@ -111,7 +110,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		/**
 		 *  Drop if there is another goal.
 		 */
-		@GoalDropCondition(rawevents={ChangeEvent.GOALADOPTED, ChangeEvent.GOALDROPPED})
+		@GoalDropCondition(rawevents={@RawEvent(ChangeEvent.GOALADOPTED), @RawEvent(ChangeEvent.GOALDROPPED)})
 		public boolean checkDrop(FireBrigadeBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
@@ -161,7 +160,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		/**
 		 *  Drop if this goal is only option and there are others.
 		 */
-		@GoalDropCondition(rawevents={ChangeEvent.GOALOPTION, ChangeEvent.GOALADOPTED})
+		@GoalDropCondition(rawevents={@RawEvent(ChangeEvent.GOALOPTION), @RawEvent(ChangeEvent.GOALADOPTED)})
 		public boolean checkDrop(FireBrigadeBDI ag, IGoal goal)
 		{
 			MovementCapa capa = ag.getMoveCapa();
@@ -213,7 +212,7 @@ public class FireBrigadeBDI implements IEnvAccess
 		/**
 		 *  Drop if this goal is only option and there are others.
 		 */
-		@GoalDropCondition(rawevents={ChangeEvent.GOALOPTION, ChangeEvent.GOALADOPTED})
+		@GoalDropCondition(rawevents={@RawEvent(ChangeEvent.GOALOPTION), @RawEvent(ChangeEvent.GOALADOPTED)})
 		public boolean checkDrop(FireBrigadeBDI ag, IGoal goal)
 		{
 			MovementCapa capa = ag.getMoveCapa();

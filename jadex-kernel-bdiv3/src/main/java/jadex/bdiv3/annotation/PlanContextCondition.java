@@ -20,5 +20,5 @@ public @interface PlanContextCondition
 	/**
 	 *  The events this condition should react to.
 	 */
-	public String[] rawevents() default {};
+	public RawEvent[] rawevents() default {};
 }

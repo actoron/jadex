@@ -21,6 +21,7 @@ import jadex.bdiv3.annotation.Goals;
 import jadex.bdiv3.annotation.Mapping;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.ServiceTrigger;
 import jadex.bdiv3.annotation.Trigger;
@@ -643,6 +644,14 @@ public class BDIClassReader extends MicroClassReader
 					trigger2.addGoal(bdimodel.getCapability().getGoal(mapped));
 				}
 			}
+			if(trigger.getGoalFinisheds()!=null)
+			{
+				for(MGoal goal: trigger.getGoalFinisheds())
+				{
+					String	mapped	= capa+BDIAgentInterpreter.CAPABILITY_SEPARATOR+goal.getName();
+					trigger2.addGoalFinished(bdimodel.getCapability().getGoal(mapped));
+				}
+			}
 			if(trigger.getServices()!=null)
 			{
 				for(MServiceCall ser: trigger.getServices())
@@ -695,12 +704,13 @@ public class BDIClassReader extends MicroClassReader
 		MTrigger tr = null;
 		
 		Class<?>[] gs = trigger.goals();
+		Class<?>[] gfs = trigger.goalfinisheds();
 		String[] fas = trigger.factaddeds();
 		String[] frs = trigger.factremoveds();
 		String[] fcs = trigger.factchangeds();
 		ServiceTrigger st = trigger.service();
 		
-		if(gs.length>0 || fas.length>0 || frs.length>0 || fcs.length>0 
+		if(gs.length>0 || gfs.length>0 || fas.length>0 || frs.length>0 || fcs.length>0 
 			|| st.name().length()>0 || !Object.class.equals(st.type()))
 		{
 			tr = new MTrigger();
@@ -710,6 +720,13 @@ public class BDIClassReader extends MicroClassReader
 				Goal ga = getAnnotation(gs[j], Goal.class, cl);
 				MGoal mgoal = getMGoal(bdimodel, ga, gs[j], cl, pubs);
 				tr.addGoal(mgoal);
+			}
+			
+			for(int j=0; j<gfs.length; j++)
+			{
+				Goal ga = getAnnotation(gfs[j], Goal.class, cl);
+				MGoal mgoal = getMGoal(bdimodel, ga, gfs[j], cl, pubs);
+				tr.addGoalFinished(mgoal);
 			}
 			
 			for(int j=0; j<fas.length; j++)
@@ -1032,16 +1049,16 @@ public class BDIClassReader extends MicroClassReader
 			{
 				GoalCreationCondition gc = getAnnotation(c, GoalCreationCondition.class, cl);
 				String[] evs = gc.beliefs();
-				String[] rawevs = gc.rawevents();
+				RawEvent[] rawevs = gc.rawevents();
 				String[] paramevs = gc.parameters();
 				List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(c, cl), cl);
 				for(String ev: evs)
 				{
 					addBeliefEvents(model.getCapability(), events, ev, cl);
 				}
-				for(String rawev: rawevs)
+				for(RawEvent rawev: rawevs)
 				{
-					events.add(new EventType(rawev)); 
+					events.add(BDIAgentInterpreter.createEventType(rawev)); 
 				}
 				for(String pev: paramevs)
 				{
@@ -1100,7 +1117,7 @@ public class BDIClassReader extends MicroClassReader
 	/**
 	 * 
 	 */
-	protected void addMethodCondition(MGoal mgoal, String condtype, String[] evs, String[] rawevs, String[] paramevs, 
+	protected void addMethodCondition(MGoal mgoal, String condtype, String[] evs, RawEvent[] rawevs, String[] paramevs, 
 		BDIModel model, Method m, ClassLoader cl)
 	{
 		List<EventType> events = readAnnotationEvents(model.getCapability(), getParameterAnnotations(m, cl), cl);
@@ -1108,9 +1125,9 @@ public class BDIClassReader extends MicroClassReader
 		{
 			addBeliefEvents(model.getCapability(), events, ev, cl);
 		}
-		for(String rawev: rawevs)
+		for(RawEvent rawev: rawevs)
 		{
-			events.add(new EventType(rawev)); 
+			events.add(BDIAgentInterpreter.createEventType(rawev)); 
 		}
 		for(String pev: paramevs)
 		{

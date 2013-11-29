@@ -11,6 +11,7 @@ import jadex.bdiv3.annotation.GoalInhibit;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdiv3.examples.disastermanagement.IExtinguishFireService;
@@ -28,6 +29,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.rules.eca.EventType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -100,7 +102,7 @@ public class CommanderBDI
 		/**
 		 *  Create a new HandleDisaster. 
 		 */
-		@GoalCreationCondition(rawevents=ChangeEvent.FACTADDED+".disasters")
+		@GoalCreationCondition(rawevents=@RawEvent(value=ChangeEvent.FACTADDED, second="disasters"))
 		public HandleDisaster(ISpaceObject disaster)
 		{
 			this.disaster = disaster;
@@ -111,7 +113,7 @@ public class CommanderBDI
 		 */
 		// Current limitation: As the target condition is checked only when plan finished the 
 		// completion of a disaster is not immediately noticed.
-		@GoalTargetCondition(rawevents=ChangeEvent.PLANFINISHED) // Hack! todo: allow for detecting goal parameter changes
+		@GoalTargetCondition(rawevents=@RawEvent(ChangeEvent.PLANFINISHED)) // Hack! todo: allow for detecting goal parameter changes
 		public boolean checkTarget()
 		{
 //			System.out.println("check target of: "+this);
@@ -223,7 +225,7 @@ public class CommanderBDI
 		/**
 		 * 
 		 */
-		@GoalTargetCondition(rawevents=ChangeEvent.PLANFINISHED) // Hack! todo: allow for detecting goal parameter changes
+		@GoalTargetCondition(rawevents=@RawEvent(ChangeEvent.PLANFINISHED)) // Hack! todo: allow for detecting goal parameter changes
 		public boolean checkTarget()
 		{
 			return ((Integer)getDisaster().getProperty("chemicals"))==0;
@@ -280,7 +282,7 @@ public class CommanderBDI
 		/**
 		 * 
 		 */
-		@GoalTargetCondition(rawevents=ChangeEvent.PLANFINISHED) // Hack! todo: allow for detecting goal parameter changes
+		@GoalTargetCondition(rawevents=@RawEvent(ChangeEvent.PLANFINISHED)) // Hack! todo: allow for detecting goal parameter changes
 		public boolean checkTarget()
 		{
 			return ((Integer)getDisaster().getProperty("fire"))==0;
@@ -327,7 +329,7 @@ public class CommanderBDI
 		/**
 		 * 
 		 */
-		@GoalTargetCondition(rawevents=ChangeEvent.PLANFINISHED) // Hack! todo: allow for detecting goal parameter changes
+		@GoalTargetCondition(rawevents=@RawEvent(ChangeEvent.PLANFINISHED)) // Hack! todo: allow for detecting goal parameter changes
 		public boolean checkTarget()
 		{
 			return ((Integer)getDisaster().getProperty("victims"))==0;

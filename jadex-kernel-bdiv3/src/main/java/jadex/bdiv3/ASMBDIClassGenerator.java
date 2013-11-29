@@ -274,10 +274,10 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 						if(!done.contains(icln))
 							todo.add(icln);
 					}
-					else
-					{
-						System.out.println("skipping class enhancement of: "+innerName);
-					}
+//					else
+//					{
+//						System.out.println("skipping class enhancement of: "+innerName);
+//					}
 					super.visitInnerClass(name, outerName, innerName, access);//Opcodes.ACC_PUBLIC); does not work
 				}
 				

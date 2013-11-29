@@ -202,7 +202,7 @@
 						<env:object type="hospital" >
 							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
 						</env:object>
-						<env:object type="ambulance" number="1">
+						<env:object type="ambulance" number="5">
 							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
 						</env:object>
 					</env:objects>

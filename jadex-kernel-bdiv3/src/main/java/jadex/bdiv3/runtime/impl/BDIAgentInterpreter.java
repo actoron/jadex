@@ -6,6 +6,7 @@ import jadex.bdiv3.PojoBDIAgent;
 import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.PlanContextCondition;
+import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.model.MCapability;
@@ -19,7 +20,6 @@ import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.model.MTrigger;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
-import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
@@ -666,6 +666,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	{
 		super.startBehavior();
 
+//		try
+//		{
 		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
 				
 		// Init bdi configuration
@@ -1147,7 +1149,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						}
 					});
 					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
-					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, mgoal.getName()}));
 					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
 //					rule.setEvents(cond.getEvents());
@@ -1197,7 +1199,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						}
 					});
 					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
-					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, mgoal.getName()}));
 					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
 					
@@ -1290,7 +1292,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						}
 					});
 					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
-					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, mgoal.getName()}));
 					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
 				}
@@ -1390,7 +1392,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						}
 					});
 					List<EventType> events = new ArrayList<EventType>(cond.getEvents());
-					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+					events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, mgoal.getName()}));
 					rule.setEvents(events);
 					getRuleSystem().getRulebase().addRule(rule);
 					
@@ -1486,6 +1488,23 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					}
 					rulesystem.getRulebase().addRule(rule);
 				}
+				
+				List<MGoal> gfs = trigger.getGoalFinisheds();
+				if(gfs!=null && gfs.size()>0)
+				{
+					Rule<Void> rule = new Rule<Void>("create_plan_goalfinished_"+mplan.getName(), new ICondition()
+					{
+						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+						{
+							return new Future<Tuple2<Boolean, Object>>(TRUE);
+						}
+					}, createplan);
+					for(MGoal gf: gfs)
+					{
+						rule.addEvent(new EventType(new String[]{ChangeEvent.GOALDROPPED, gf.getName()}));
+					}
+					rulesystem.getRulebase().addRule(rule);
+				}
 			}
 			
 			// context condition
@@ -1495,15 +1514,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			{
 				PlanContextCondition pcc = mi.getMethod(getClassLoader()).getAnnotation(PlanContextCondition.class);
 				String[] evs = pcc.beliefs();
-				String[] rawevs = pcc.rawevents();
+				RawEvent[] rawevs = pcc.rawevents();
 				List<EventType> events = new ArrayList<EventType>();
 				for(String ev: evs)
 				{
 					addBeliefEvents(getInternalAccess(), events, ev);
 				}
-				for(String rawev: rawevs)
+				for(RawEvent rawev: rawevs)
 				{
-					events.add(new EventType(rawev));
+					events.add(createEventType(rawev));
 				}
 				
 				IAction<Void> abortplans = new IAction<Void>()
@@ -1553,7 +1572,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			if(usedelib)
 			{
 				List<EventType> events = new ArrayList<EventType>();
-				events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
+				events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, EventType.MATCHALL}));
 				Rule<Void> rule = new Rule<Void>("goal_addinitialinhibitors", 
 					ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
@@ -1572,15 +1591,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							}
 						}
 						
-						if(getComponentIdentifier().getName().indexOf("Ambu")!=-1 && goal.inhibitors!=null && goal.inhibitors.size()>0)
-							System.out.println("initial inhibitors of: "+goal+" "+goal.inhibitors);
 						return IFuture.DONE;
 					}
 				});
 				rule.setEvents(events);
 				getRuleSystem().getRulebase().addRule(rule);
 				
-				events = getGoalEvents();
+				events = getGoalEvents(null);
 				rule = new Rule<Void>("goal_addinhibitor", 
 					new ICondition()
 					{
@@ -1717,7 +1734,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						return IFuture.DONE;
 					}
 				});
-				rule.addEvent(new EventType(new String[]{ChangeEvent.GOALINHIBITED}));
+				rule.addEvent(new EventType(new String[]{ChangeEvent.GOALINHIBITED, EventType.MATCHALL}));
 				getRuleSystem().getRulebase().addRule(rule);
 			}
 			
@@ -1744,8 +1761,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					return IFuture.DONE;
 				}
 			});
-			rule.addEvent(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED}));
-			rule.addEvent(new EventType(new String[]{ChangeEvent.GOALOPTION}));
+			rule.addEvent(new EventType(new String[]{ChangeEvent.GOALNOTINHIBITED, EventType.MATCHALL}));
+			rule.addEvent(new EventType(new String[]{ChangeEvent.GOALOPTION, EventType.MATCHALL}));
 //			rule.setEvents(SUtil.createArrayList(new String[]{ChangeEvent.GOALNOTINHIBITED, ChangeEvent.GOALOPTION}));
 			getRuleSystem().getRulebase().addRule(rule);
 		}
@@ -1757,7 +1774,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		inited	= true;
 //		if(getComponentIdentifier().getName().indexOf("Cleaner")!=-1)// && getComponentIdentifier().getName().indexOf("Burner")==-1)
 //			getCapability().dumpPlansPeriodically(getInternalAccess());
-//		if(getComponentIdentifier().getName().indexOf("Commander")!=-1)
+//		if(getComponentIdentifier().getName().indexOf("Ambulance")!=-1)
 //		{
 //			getCapability().dumpGoalsPeriodically(getInternalAccess());
 //			getCapability().dumpPlansPeriodically(getInternalAccess());
@@ -2007,7 +2024,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		if(inited && rulesystem!=null)
 			rulesystem.processAllEvents();
 		
-//		if(steps!=null && steps.size()>0)
+//		if(getComponentIdentifier().getName().indexOf("Ambu")!=-1 && steps!=null && steps.size()>0)
 //		{
 //			System.out.println("steps: "+steps.size()+" "+steps.get(0).getStep().getClass());
 //		}
@@ -2155,18 +2172,35 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 *  goalinprocess, goalnotinprocess
 	 *  events.
 	 */
-	public static List<EventType> getGoalEvents()
+	public static List<EventType> getGoalEvents(MGoal mgoal)
 	{
 		List<EventType> events = new ArrayList<EventType>();
-		events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED}));
-		events.add(new EventType(new String[]{ChangeEvent.GOALDROPPED}));
+		if(mgoal==null)
+		{
+			events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, EventType.MATCHALL}));
+			events.add(new EventType(new String[]{ChangeEvent.GOALDROPPED, EventType.MATCHALL}));
+			
+			events.add(new EventType(new String[]{ChangeEvent.GOALOPTION, EventType.MATCHALL}));
+			events.add(new EventType(new String[]{ChangeEvent.GOALACTIVE, EventType.MATCHALL}));
+			events.add(new EventType(new String[]{ChangeEvent.GOALSUSPENDED, EventType.MATCHALL}));
+			
+			events.add(new EventType(new String[]{ChangeEvent.GOALINPROCESS, EventType.MATCHALL}));
+			events.add(new EventType(new String[]{ChangeEvent.GOALNOTINPROCESS, EventType.MATCHALL}));
+		}
+		else
+		{
+			String name = mgoal.getName();
+			events.add(new EventType(new String[]{ChangeEvent.GOALADOPTED, name}));
+			events.add(new EventType(new String[]{ChangeEvent.GOALDROPPED, name}));
+			
+			events.add(new EventType(new String[]{ChangeEvent.GOALOPTION, name}));
+			events.add(new EventType(new String[]{ChangeEvent.GOALACTIVE, name}));
+			events.add(new EventType(new String[]{ChangeEvent.GOALSUSPENDED, name}));
+			
+			events.add(new EventType(new String[]{ChangeEvent.GOALINPROCESS, name}));
+			events.add(new EventType(new String[]{ChangeEvent.GOALNOTINPROCESS, name}));
+		}
 		
-		events.add(new EventType(new String[]{ChangeEvent.GOALOPTION}));
-		events.add(new EventType(new String[]{ChangeEvent.GOALACTIVE}));
-		events.add(new EventType(new String[]{ChangeEvent.GOALSUSPENDED}));
-		
-		events.add(new EventType(new String[]{ChangeEvent.GOALINPROCESS}));
-		events.add(new EventType(new String[]{ChangeEvent.GOALNOTINPROCESS}));
 		return events;
 	}
 	
@@ -2404,6 +2438,18 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		String capa = getCapabilityPart(name);
 		String pname = getNamePart(name);
 		return capa!=null? capa.replace(BDIAgentInterpreter.CAPABILITY_SEPARATOR, ".")+"."+pname: pname;
+	}
+	
+	/**
+	 * 
+	 */
+	public static EventType createEventType(RawEvent rawev)
+	{
+		String[] p = new String[2];
+		p[0] = rawev.value();
+		p[1] = Object.class.equals(rawev.secondc())? rawev.second(): rawev.secondc().getName();
+//		System.out.println("eveve: "+p[0]+" "+p[1]);
+		return new EventType(p);
 	}
 }
 
