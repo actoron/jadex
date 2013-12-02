@@ -658,7 +658,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 																						if(cinfo.getParent()==null || initinfos.get(cinfo.getParent())==null)
 																						{
 			//																				System.out.println("start: "+cid);
-																							resumeComponent(cid, true);
+																							resumeComponent(cid, true);//.addResultListener(listener)
 																						}
 																					}
 																				}
@@ -1534,14 +1534,33 @@ public class DecoupledComponentManagementService implements IComponentManagement
 									try
 									{
 										final IComponentInstance	ci	= instance;
-										instance.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
+//										instance.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
+//										{
+//											public IFuture<Void> execute(IInternalAccess ia)
+//											{
+//												ci.startBehavior();
+//												return IFuture.DONE;
+//											}
+//										}).addResultListener(new IResultListener<Void>()
+//										{
+//											public void resultAvailable(Void result)
+//											{
+//											}
+//											public void exceptionOccurred(Exception exception)
+//											{
+//												exception.printStackTrace();
+//												destroyComponent(cid);
+//											}
+//										});
+										
+										instance.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 										{
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												ci.startBehavior();
 												return IFuture.DONE;
 											}
-										});
+										}); // component kills itself in case of exception
 									}
 									catch(ComponentTerminatedException e)
 									{

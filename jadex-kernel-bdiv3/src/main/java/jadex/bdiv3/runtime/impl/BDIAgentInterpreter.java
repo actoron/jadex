@@ -665,7 +665,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public void startBehavior()
 	{
 		super.startBehavior();
-
+		
 //		try
 //		{
 		final Object agent = microagent instanceof PojoBDIAgent? ((PojoBDIAgent)microagent).getPojoAgent(): microagent;
@@ -1785,6 +1785,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //		{
 //			e.printStackTrace();
 //		}
+		
+//		throw new RuntimeException();
 	}
 	
 	/**
