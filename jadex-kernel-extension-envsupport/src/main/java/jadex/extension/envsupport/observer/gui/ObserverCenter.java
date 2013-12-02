@@ -121,8 +121,8 @@ public class ObserverCenter implements IObserverCenter
 	 */
 	public void startObserver(final String title, final IEnvironmentSpace space, ClassLoader classloader, List plugins, boolean killonexit)
 	{
-		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-			System.out.println("starting observer: "+this);
+//		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//			System.out.println("starting observer: "+this);
 		selectedObjectListeners = Collections.synchronizedList(new ArrayList());
 		this.space = (AbstractEnvironmentSpace)space;
 		this.killonexit	= killonexit;
@@ -148,8 +148,8 @@ public class ObserverCenter implements IObserverCenter
 		{
 			public void run()
 			{
-				if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-					System.out.println("starting observer2: "+this);
+//				if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//					System.out.println("starting observer2: "+this);
 				
 				if(disposed)
 					return;
@@ -194,7 +194,7 @@ public class ObserverCenter implements IObserverCenter
 								public void run()
 								{
 									repainting	= false;
-									System.out.println("update viewport by clock: "+event);
+//									System.out.println("update viewport by clock: "+event);
 									updateDisplay();
 								}
 							});
@@ -642,8 +642,8 @@ public class ObserverCenter implements IObserverCenter
 	 */
 	private void loadPlugins(List customplugins)
 	{
-		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-			System.out.println("loading plugins1: "+this);
+//		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//			System.out.println("loading plugins1: "+this);
 		ArrayList plugins = new ArrayList();
 		
 		IObserverCenterPlugin plugin = new IntrospectorPlugin();
@@ -652,8 +652,8 @@ public class ObserverCenter implements IObserverCenter
 		// TODO: remove hard coding
 		plugins.add(plugin);
 		
-		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-			System.out.println("loading plugins2: "+this);
+//		if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//			System.out.println("loading plugins2: "+this);
 		// TODO: port from simsupport
 		plugin = new VisualsPlugin();
 		plugins.add(plugin);
@@ -709,8 +709,8 @@ public class ObserverCenter implements IObserverCenter
 	{
 		synchronized(this.plugins)
 		{
-			if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-				System.out.println("activating plugin: "+this+", "+plugin);
+//			if(space.getExternalAccess().getModel().getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//				System.out.println("activating plugin: "+this+", "+plugin);
 			IObserverCenterPlugin oldPlugin = activeplugin;
 			if (oldPlugin != null)
 			{
