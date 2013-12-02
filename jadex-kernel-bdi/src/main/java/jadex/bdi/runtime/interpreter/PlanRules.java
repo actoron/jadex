@@ -537,7 +537,7 @@ public class PlanRules
 				boolean interrupted = false;
 
 				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
-				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, new Integer(step+1));
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				try
 				{
@@ -639,7 +639,7 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
 
 				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
-				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, new Integer(step+1));
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				boolean interrupted = false;
 				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
@@ -725,7 +725,7 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
 				
 				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
-				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, new Integer(step+1));
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				boolean interrupted = false;
 				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
@@ -810,7 +810,7 @@ public class PlanRules
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
 				
 				int	step	= ((Integer)assignments.getVariableValue("?step")).intValue();
-				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, new Integer(step+1));
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_step, Integer.valueOf(step+1));
 				
 				boolean interrupted = false;
 				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);

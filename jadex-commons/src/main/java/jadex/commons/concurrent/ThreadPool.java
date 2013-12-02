@@ -217,7 +217,7 @@ public class ThreadPool implements IThreadPool
 			synchronized(calls)
 			{
 				Integer	cnt	= calls.get(task.getClass());
-				calls.put(task.getClass(), new Integer(cnt==null ? 0 : cnt.intValue()+1));
+				calls.put(task.getClass(), Integer.valueOf(cnt==null ? 0 : cnt.intValue()+1));
 			}
 		}
 		

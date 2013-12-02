@@ -116,9 +116,9 @@ public class UserAgent
 				// sequential multiplexer
 			
 				List<Object[]> tasks = new ArrayList<Object[]>();
-				tasks.add(new Object[]{new Integer(1), new Integer(2)});
-				tasks.add(new Object[]{new Integer(3), new Integer(4)});
-				tasks.add(new Object[]{new Integer(5), new Integer(6)});
+				tasks.add(new Object[]{Integer.valueOf(1), Integer.valueOf(2)});
+				tasks.add(new Object[]{Integer.valueOf(3), Integer.valueOf(4)});
+				tasks.add(new Object[]{Integer.valueOf(5), Integer.valueOf(6)});
 				
 				tr = new TestReport("#5a", "Test sequential multuplexer.");
 				reports.add(tr);

@@ -65,7 +65,7 @@ public class TestInjectedResultsAgent
 						Object myres = result.get("myres");
 						Object myint = result.get("myint");
 						
-						if("def_val".equals(myres) && new Integer(99).equals(myint))
+						if("def_val".equals(myres) && Integer.valueOf(99).equals(myint))
 						{
 							tr.setSucceeded(true);
 						}
@@ -93,7 +93,7 @@ public class TestInjectedResultsAgent
 //						Object myres = Argument.getResult(results, "myres");
 //						Object myint = Argument.getResult(results, "myint");
 //						
-//						if("def_val".equals(myres) && new Integer(99).equals(myint))
+//						if("def_val".equals(myres) && Integer.valueOf(99).equals(myint))
 //						{
 //							tr.setSucceeded(true);
 //						}

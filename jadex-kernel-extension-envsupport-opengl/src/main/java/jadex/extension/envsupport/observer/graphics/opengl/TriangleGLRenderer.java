@@ -41,7 +41,7 @@ public class TriangleGLRenderer extends AbstractGLRenderer
 				gl.glEnd();
 				gl.glEndList();
 
-				list = new Integer(dList);
+				list = Integer.valueOf(dList);
 				vp.setDisplayList(listName, list);
 			}
 			dList = list.intValue();

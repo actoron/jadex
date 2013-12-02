@@ -24,11 +24,11 @@ public class ManualModifiedPlan extends Plan
 		{
 			public void factAdded(AgentEvent ae)
 			{
-				if(ae.getValue().equals(new Integer(1)))
+				if(ae.getValue().equals(Integer.valueOf(1)))
 				{
 					reports.addFact(new TestReport("#1", "Adding first fact.", true, null));
 				}
-				else if(ae.getValue().equals(new Integer(2)))
+				else if(ae.getValue().equals(Integer.valueOf(2)))
 				{
 					reports.addFact(new TestReport("#2", "Adding second fact.", true, null));
 				}
@@ -40,11 +40,11 @@ public class ManualModifiedPlan extends Plan
 
 			public void factRemoved(AgentEvent ae)
 			{
-				if(ae.getValue().equals(new Integer(1)))
+				if(ae.getValue().equals(Integer.valueOf(1)))
 				{
 					reports.addFact(new TestReport("#3", "Removing first fact.", true, null));
 				}
-				else if(ae.getValue().equals(new Integer(2)))
+				else if(ae.getValue().equals(Integer.valueOf(2)))
 				{
 					reports.addFact(new TestReport("#4", "Modifying second fact.", false, "Removed event instead of modified."));
 				}
@@ -56,11 +56,11 @@ public class ManualModifiedPlan extends Plan
 
 			public void factChanged(AgentEvent ae)
 			{
-				if(ae.getValue().equals(new Integer(1)))
+				if(ae.getValue().equals(Integer.valueOf(1)))
 				{
 					reports.addFact(new TestReport("#3", "Removing first fact.", false, "Modified event instead of removed."));
 				}
-				else if(ae.getValue().equals(new Integer(2)))
+				else if(ae.getValue().equals(Integer.valueOf(2)))
 				{
 					reports.addFact(new TestReport("#4", "Modifying second fact.", true, null));
 				}
@@ -72,8 +72,8 @@ public class ManualModifiedPlan extends Plan
 		});
 
 
-		Object obj1 = new Integer(1);
-		Object obj2 = new Integer(2);
+		Object obj1 = Integer.valueOf(1);
+		Object obj2 = Integer.valueOf(2);
 		testbel.addFact(obj1);
 		testbel.addFact(obj2);
 		testbel.removeFact(obj1);

@@ -484,7 +484,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		Property	settings	= ps.getProperty(PROPERTY_GUI_REFRESH);
 		if(settings!=null)
 		{
-			sprefresh.setValue(new Integer(settings.getValue()));
+			sprefresh.setValue(Integer.valueOf(settings.getValue()));
 		}
 		
 		return IFuture.DONE;
@@ -548,7 +548,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			
 			public void customExceptionOccurred(Exception exception)
 			{
-				sprefresh.setValue(new Integer(0));
+				sprefresh.setValue(Integer.valueOf(0));
 			}
 		});
 	}
@@ -571,7 +571,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			
 			public void customExceptionOccurred(Exception exception)
 			{
-				sprefresh.setValue(new Integer(0));
+				sprefresh.setValue(Integer.valueOf(0));
 			}
 		});
 	}

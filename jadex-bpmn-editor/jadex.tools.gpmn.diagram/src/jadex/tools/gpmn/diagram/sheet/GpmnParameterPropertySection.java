@@ -101,9 +101,9 @@ public class GpmnParameterPropertySection extends AbstractCommonTablePropertySec
 						.getDirection());
 				//if (index != -1)
 				//{
-					return new Integer(index);
+					return Integer.valueOf(index);
 				//}
-				//return new Integer(0);
+				//return Integer.valueOf(0);
 				
 			}
 

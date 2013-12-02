@@ -13,6 +13,6 @@ public class RequestReceiverPlan extends Plan
 		// if the right request was answered.
 	    Integer challenge	= (Integer) getParameter("action").getValue();
 	    int	response	= challenge.intValue() + 1;
-	    getParameter("result").setValue(new Integer(response));
+	    getParameter("result").setValue(Integer.valueOf(response));
 	}	
 }

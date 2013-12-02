@@ -89,7 +89,7 @@ public class GpmnBaseItemSemanticEditPolicy extends SemanticEditPolicy
 					.getModel();
 			if (view instanceof View)
 			{
-				Integer id = new Integer(GpmnVisualIDRegistry
+				Integer id = Integer.valueOf(GpmnVisualIDRegistry
 						.getVisualID((View) view));
 				request.getExtendedData().put(VISUAL_ID_KEY, id);
 			}

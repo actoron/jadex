@@ -35,7 +35,7 @@ public class MakeProposalPlan extends Plan
 			getLogger().info(getComponentName()+" proposed: " + acceptable_price);
 			
 			// Store proposal data in plan parameters.
-			getParameter("proposal").setValue(new Integer(acceptable_price));
+			getParameter("proposal").setValue(Integer.valueOf(acceptable_price));
 			getParameter("proposal_info").setValue(order);
 			
 			String report = "Made proposal: "+acceptable_price;

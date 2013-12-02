@@ -939,7 +939,7 @@ public class SGUI
 //			if(locations!=null && locations.containsKey(split))
 //			{
 ////				System.out.println("setDividerLocation updated: "+loc+", @"+split.hashCode());
-//				locations.put(split, new Integer(loc));
+//				locations.put(split, Integer.valueOf(loc));
 //			}
 //			
 //			// First time call.
@@ -949,7 +949,7 @@ public class SGUI
 ////				System.out.println("setDividerLocation queued: "+loc+", @"+split.hashCode());
 //				if(locations==null)
 //					locations	= new HashMap();
-//				locations.put(split, new Integer(loc));
+//				locations.put(split, Integer.valueOf(loc));
 //				SwingUtilities.invokeLater(new Runnable()
 //				{
 //					public void run()

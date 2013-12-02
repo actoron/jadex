@@ -168,11 +168,11 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	{
 		Future<Void>	ret	= new Future<Void>();
 
-		SortedSet<HighscoreEntry>	set	= entries.get(new Integer(entry.getBoardSize()));
+		SortedSet<HighscoreEntry>	set	= entries.get(Integer.valueOf(entry.getBoardSize()));
 		if(set==null)
 		{
 			set	= new TreeSet<HighscoreEntry>();
-			entries.put(new Integer(entry.getBoardSize()), set);
+			entries.put(Integer.valueOf(entry.getBoardSize()), set);
 		}
 		
 		// Add new entry to non-full highscore.
@@ -208,8 +208,8 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	 */
 	public IFuture<SortedSet<HighscoreEntry>>	getHighscore(int size)
 	{
-		return new Future<SortedSet<HighscoreEntry>>(entries.containsKey(new Integer(size))
-			? entries.get(new Integer(size)) : new TreeSet<HighscoreEntry>());
+		return new Future<SortedSet<HighscoreEntry>>(entries.containsKey(Integer.valueOf(size))
+			? entries.get(Integer.valueOf(size)) : new TreeSet<HighscoreEntry>());
 	}
 	
 	//-------- helper methods --------

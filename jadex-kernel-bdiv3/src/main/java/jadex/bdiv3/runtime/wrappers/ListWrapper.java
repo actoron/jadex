@@ -67,7 +67,7 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 		T ret = getList().set(index, element);
 		unobserveValue(ret);
 		observeValue(element);
-		getRuleSystem().addEvent(new Event(changeevent, new Object[]{ret, element, new Integer(index)}));
+		getRuleSystem().addEvent(new Event(changeevent, new Object[]{ret, element, Integer.valueOf(index)}));
 		publishToolBeliefEvent();
 		return ret;
 	}

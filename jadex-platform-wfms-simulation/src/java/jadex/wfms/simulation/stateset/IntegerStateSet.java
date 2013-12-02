@@ -26,6 +26,6 @@ public class IntegerStateSet extends AbstractNumericStateSet
 	 */
 	public Object getState(long index)
 	{
-		return new Integer((int) getStateAsLong(index));
+		return Integer.valueOf((int) getStateAsLong(index));
 	}
 }

@@ -372,7 +372,7 @@ public class DisplayPanel extends JComponent
 				Integer	percent	= (Integer)progressdata.remove(progress);
 				if(percent==null || progress.isFinished())
 				{
-					percent	= new Integer(progress.isFinished() ? 100 : 0);
+					percent	= Integer.valueOf(progress.isFinished() ? 100 : 0);
 				}
 				progressdata.put(progress, percent);
 				repaint();

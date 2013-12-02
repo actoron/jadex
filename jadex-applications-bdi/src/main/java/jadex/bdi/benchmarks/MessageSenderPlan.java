@@ -32,7 +32,7 @@ public class MessageSenderPlan	extends Plan
 			request.getParameter(SFipa.REPLY_WITH).setValue("some reply id");
 			sendMessage(request);
 			
-			getBeliefbase().getBelief("sent").setFact(new Integer(i));
+			getBeliefbase().getBelief("sent").setFact(Integer.valueOf(i));
 			
 			if(i % 10 == 0)
 			{

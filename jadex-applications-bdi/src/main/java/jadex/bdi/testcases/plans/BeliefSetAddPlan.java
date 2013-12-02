@@ -17,8 +17,8 @@ public class BeliefSetAddPlan extends Plan
 		while(true)
 		{
 			waitFor(100);
-			getBeliefbase().getBeliefSet("some_numbers").addFact(new Integer(i++));
-			//getBeliefbase().getBeliefSet("some_numbers").removeFact(new Integer(i++));
+			getBeliefbase().getBeliefSet("some_numbers").addFact(Integer.valueOf(i++));
+			//getBeliefbase().getBeliefSet("some_numbers").removeFact(Integer.valueOf(i++));
 		}
 	}
 }

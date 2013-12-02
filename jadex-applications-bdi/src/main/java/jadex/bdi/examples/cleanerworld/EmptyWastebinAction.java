@@ -21,7 +21,7 @@ public class EmptyWastebinAction  extends SimplePropertyObject implements ISpace
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{
 		ISpaceObject wastebin = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
-		wastebin.setProperty("wastes", new Integer(0));
+		wastebin.setProperty("wastes", Integer.valueOf(0));
 		return Boolean.TRUE;
 	}
 }

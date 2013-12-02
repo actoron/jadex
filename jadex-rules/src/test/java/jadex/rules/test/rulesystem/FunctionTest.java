@@ -84,14 +84,14 @@ public class FunctionTest extends TestCase
 		IOAVState state = system.getState();
 		
 		Object b1 = state.createRootObject(Numberbox.numberbox_type);
-		state.setAttributeValue(b1, Numberbox.numberbox_has_solution, new Integer(30));
+		state.setAttributeValue(b1, Numberbox.numberbox_has_solution, Integer.valueOf(30));
 		
 		int sum = 0;
 		for(int i=0; i<10; i++)
 		{
 			sum += i;
 //			System.out.println("Adding: "+i+" sum is: "+sum);
-			state.addAttributeValue(b1, Numberbox.numberbox_has_numbers, new Integer(i));
+			state.addAttributeValue(b1, Numberbox.numberbox_has_numbers, Integer.valueOf(i));
 			system.fireAllRules();
 		}
 		
@@ -141,11 +141,11 @@ public class FunctionTest extends TestCase
 		IOAVState state = system.getState();
 		
 		Object b1 = state.createRootObject(Numberbox.numberbox_type);
-		state.setAttributeValue(b1, Numberbox.numberbox_has_solution, new Integer(5));
+		state.setAttributeValue(b1, Numberbox.numberbox_has_solution, Integer.valueOf(5));
 		
 		for(int i=0; i<10; i++)
 		{
-			state.addAttributeValue(b1, Numberbox.numberbox_has_numbers, new Integer(i));
+			state.addAttributeValue(b1, Numberbox.numberbox_has_numbers, Integer.valueOf(i));
 //			System.out.println("Length is: "+(i+1));
 			system.fireAllRules();
 		}
@@ -196,11 +196,11 @@ public class FunctionTest extends TestCase
 		IOAVState state = system.getState();
 		
 		Object b1 = state.createRootObject(Numberbox.numberbox_type);
-		state.setAttributeValue(b1, Numberbox.numberbox_has_solution, new Integer(3));
+		state.setAttributeValue(b1, Numberbox.numberbox_has_solution, Integer.valueOf(3));
 		
 		for(int i=0; i<10; i++)
 		{
-			state.addAttributeValue(b1, Numberbox.numberbox_has_numbers, new Integer(i));
+			state.addAttributeValue(b1, Numberbox.numberbox_has_numbers, Integer.valueOf(i));
 //			System.out.println("i: "+i);
 			system.fireAllRules();
 		}
@@ -261,17 +261,17 @@ public class FunctionTest extends TestCase
 		IOAVState state = system.getState();
 		
 		Object n1 = state.createRootObject(Numberbox.numberbox_type);
-		state.setAttributeValue(n1, Numberbox.numberbox_has_solution, new Integer(3));
+		state.setAttributeValue(n1, Numberbox.numberbox_has_solution, Integer.valueOf(3));
 		
 		Object n2 = state.createRootObject(Numberbox.numberbox_type);
-		state.setAttributeValue(n2, Numberbox.numberbox_has_solution, new Integer(3));
+		state.setAttributeValue(n2, Numberbox.numberbox_has_solution, Integer.valueOf(3));
 		
 		system.fireAllRules();
 		
 		for(int i=0; i<10; i++)
 		{
 			//System.out.println("--------");
-			state.addAttributeValue(n1, Numberbox.numberbox_has_numbers, new Integer(i));
+			state.addAttributeValue(n1, Numberbox.numberbox_has_numbers, Integer.valueOf(i));
 			//System.out.println("Numberbox 1: "+i);
 			//System.out.println(mat.getReteMemory());
 			system.fireAllRules();
@@ -280,7 +280,7 @@ public class FunctionTest extends TestCase
 		for(int i=0; i<10; i++)
 		{
 			//System.out.println("--------");
-			state.addAttributeValue(n2, Numberbox.numberbox_has_numbers, new Integer(i));
+			state.addAttributeValue(n2, Numberbox.numberbox_has_numbers, Integer.valueOf(i));
 			//System.out.println("Numberbox 2: "+i);
 			//System.out.println(mat.getReteMemory());
 			system.fireAllRules();

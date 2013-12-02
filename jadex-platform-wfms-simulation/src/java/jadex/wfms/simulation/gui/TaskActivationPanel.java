@@ -87,12 +87,12 @@ public class TaskActivationPanel extends JPanel implements IStatePanel
 			if (c == null)
 			{
 				activationCheck.setSelected(false);
-				activationCount.setValue(new Integer(1));
+				activationCount.setValue(Integer.valueOf(1));
 			}
 			else
 			{
 				activationCheck.setSelected(true);
-				activationCount.setValue(new Integer(c.getActivationCount()));
+				activationCount.setValue(Integer.valueOf(c.getActivationCount()));
 			}
 			activationCount.setEnabled(activationCheck.isSelected());
 		}
@@ -100,7 +100,7 @@ public class TaskActivationPanel extends JPanel implements IStatePanel
 		{
 			activationCheck.setSelected(false);
 			activationCheck.setEnabled(false);
-			activationCount.setValue(new Integer(1));
+			activationCount.setValue(Integer.valueOf(1));
 			activationCount.setEnabled(false);
 		}
 	}

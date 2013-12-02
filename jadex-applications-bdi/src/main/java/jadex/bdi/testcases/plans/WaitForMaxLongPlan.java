@@ -20,7 +20,7 @@ public class WaitForMaxLongPlan extends Plan
 	public void body()
 	{
 		int	cnt	= ((Integer)getBeliefbase().getBelief("cnt").getFact()).intValue();
-		getBeliefbase().getBelief("cnt").setFact(new Integer(cnt+1));
+		getBeliefbase().getBelief("cnt").setFact(Integer.valueOf(cnt+1));
 		
 		// First and third plan test a short waitFor(...), while second plan just waits for a long time. 
 		switch(cnt)

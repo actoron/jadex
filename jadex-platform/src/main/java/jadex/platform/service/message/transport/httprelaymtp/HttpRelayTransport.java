@@ -569,12 +569,12 @@ public class HttpRelayTransport implements ITransport
 			Integer	cnt	= workers.get(address);
 			if(cnt==null)
 			{
-				cnt	= new Integer(0);
+				cnt	= Integer.valueOf(0);
 				workers.put(address, cnt);
 			}
 			if(cnt.intValue()<MAX_WORKERS)
 			{
-				workers.put(address, new Integer(cnt.intValue()+1));
+				workers.put(address, Integer.valueOf(cnt.intValue()+1));
 				startworker	= true;
 //				System.out.println("starting worker: "+workers.get(address));
 			}
@@ -630,7 +630,7 @@ public class HttpRelayTransport implements ITransport
 						Integer	cnt	= workers.get(address);
 						if(cnt.intValue()>1)
 						{
-							workers.put(address, new Integer(cnt.intValue()-1));
+							workers.put(address, Integer.valueOf(cnt.intValue()-1));
 						}
 						else
 						{

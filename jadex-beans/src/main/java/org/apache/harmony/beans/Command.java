@@ -547,7 +547,7 @@ public class Command {
             } else if (hasAttr("property")) { //$NON-NLS-1$
                 String propertyValue = getAttr("property"); //$NON-NLS-1$
                 if (hasAttr("index")) { //$NON-NLS-1$
-                    addArgument(new Argument(int.class, new Integer(
+                    addArgument(new Argument(int.class, Integer.valueOf(
                             getAttr("index"))), 0); //$NON-NLS-1$
                 }
 

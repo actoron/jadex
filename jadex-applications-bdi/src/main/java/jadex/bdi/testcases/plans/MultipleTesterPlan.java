@@ -15,7 +15,7 @@ public class MultipleTesterPlan extends Plan
 	public void body()
 	{
 		TestReport tr = new TestReport("#1", "Tests if a plan is triggered once.");
-		getBeliefbase().getBelief("bel_a").setFact(new Integer(1));
+		getBeliefbase().getBelief("bel_a").setFact(Integer.valueOf(1));
 		waitFor(100);
 		if(((Integer)getBeliefbase().getBelief("plan_cnt").getFact()).intValue()==1)
 		{

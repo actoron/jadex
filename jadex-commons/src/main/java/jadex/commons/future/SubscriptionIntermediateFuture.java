@@ -133,7 +133,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
     		Integer	index	= indices!=null ? indices.get(Thread.currentThread()) : null;
     		if(index==null)
     		{
-    			index	= new Integer(0);
+    			index	= Integer.valueOf(0);
     		}
     		ownres	= ownresults!=null ? ownresults.get(Thread.currentThread()) : null;
     		

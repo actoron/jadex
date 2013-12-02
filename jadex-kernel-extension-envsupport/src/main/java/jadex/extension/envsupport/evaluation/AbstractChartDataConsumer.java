@@ -71,7 +71,7 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 							for(int i=0; i<rows.size(); i++)
 							{
 								// Determine x, y values for series.
-								fetcher.setValue("$rowcnt", new Integer(i));
+								fetcher.setValue("$rowcnt", Integer.valueOf(i));
 								
 								Object[] row = (Object[])rows.get(i);
 								
@@ -96,7 +96,7 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 							if(sername!=null)
 							{
 								// Determine x, y values for series.
-								fetcher.setValue("$rowcnt", new Integer(0));
+								fetcher.setValue("$rowcnt", Integer.valueOf(0));
 								
 								Object[] row = (Object[])rows.get(0);
 								

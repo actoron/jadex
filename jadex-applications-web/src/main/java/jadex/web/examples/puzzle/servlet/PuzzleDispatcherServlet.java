@@ -88,7 +88,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		{
 			board	= new Board();
 			session.setAttribute("board", board);
-			session.setAttribute("hint_count", new Integer(0));
+			session.setAttribute("hint_count", Integer.valueOf(0));
 		}
 		String	view	= "/WEB-INF/jsp/puzzle/index.jsp"; 
 		if("/gamerules".equals(request.getPathInfo()))
@@ -118,7 +118,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		{
 			board	= new Board();
 			session.setAttribute("board", board);
-			session.setAttribute("hint_count", new Integer(0));
+			session.setAttribute("hint_count", Integer.valueOf(0));
 		}
 		String	view	= "/WEB-INF/jsp/puzzle/index.jsp"; 
 		if("/move".equals(request.getPathInfo()))
@@ -161,7 +161,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			int	size	= Integer.parseInt(request.getParameter("boardsize"));
 			board	= new Board(size);
 			session.setAttribute("board", board);
-			session.setAttribute("hint_count", new Integer(0));
+			session.setAttribute("hint_count", Integer.valueOf(0));
 		}
 		else if("/hint".equals(request.getPathInfo()))
 		{
@@ -169,7 +169,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			int	timeout	= Integer.parseInt(request.getParameter("timeout"))*1000;
 			int	hint_count	= ((Integer)session.getAttribute("hint_count")).intValue();
 			session.setAttribute("timeout", request.getParameter("timeout"));
-			session.setAttribute("hint_count", new Integer(hint_count+1));
+			session.setAttribute("hint_count", Integer.valueOf(hint_count+1));
 			ThreadSuspendable	sus	= new ThreadSuspendable();
 			try
 			{

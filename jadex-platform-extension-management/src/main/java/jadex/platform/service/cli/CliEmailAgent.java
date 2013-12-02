@@ -305,7 +305,7 @@ public class CliEmailAgent
 				subject.append(" ");
 			subject.append(cmd);
 
-			Tuple2<String, Integer> sess = new Tuple2<String, Integer>(SUtil.createUniqueId("emailsess"), new Integer(0));
+			Tuple2<String, Integer> sess = new Tuple2<String, Integer>(SUtil.createUniqueId("emailsess"), Integer.valueOf(0));
 			
 			cliser.executeCommand(cmd, sess).addResultListener(new IResultListener<String>()
 			{

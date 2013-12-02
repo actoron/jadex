@@ -18,7 +18,7 @@ public class CoreNumberProperty extends NFRootProperty<Integer, Void>
 	public CoreNumberProperty(final IInternalAccess comp)
 	{
 		super(comp, new NFPropertyMetaInfo(NAME, int.class, null, false, -1, Target.Root));
-		setValue(new Integer(Runtime.getRuntime().availableProcessors()));
+		setValue(Integer.valueOf(Runtime.getRuntime().availableProcessors()));
 	}
 	
 	/**
@@ -26,6 +26,6 @@ public class CoreNumberProperty extends NFRootProperty<Integer, Void>
 	 */
 	public Integer measureValue()
 	{
-		return new Integer(Runtime.getRuntime().availableProcessors());
+		return Integer.valueOf(Runtime.getRuntime().availableProcessors());
 	}
 }

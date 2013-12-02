@@ -27,12 +27,12 @@ public class PingingPlan	extends Plan
 			try
 			{
 				dispatchSubgoalAndWait(ping);
-				getParameter("missed_cnt").setValue(new Integer(0)); // Reset missed cnt.
+				getParameter("missed_cnt").setValue(Integer.valueOf(0)); // Reset missed cnt.
 			}
 			catch(Exception e)
 			{
 				int cnt = ((Integer)getParameter("missed_cnt").getValue()).intValue();
-				getParameter("missed_cnt").setValue(new Integer(cnt+1)); // Raise cnt.
+				getParameter("missed_cnt").setValue(Integer.valueOf(cnt+1)); // Raise cnt.
 //				System.out.println("Missed ping: "+cnt);
 			}
 			

@@ -53,14 +53,14 @@ public class WanderAroundPlan	extends Plan
 			Location target = me.createLocation(me.getLocation(), Creature.alldirs[dir]);
 			
 			List pod = new ArrayList();
-			pod.add(new Integer(0));	
-			pod.add(new Integer(1));			
-			pod.add(new Integer(2));			
-			pod.add(new Integer(3));
+			pod.add(Integer.valueOf(0));	
+			pod.add(Integer.valueOf(1));			
+			pod.add(Integer.valueOf(2));			
+			pod.add(Integer.valueOf(3));
 			for(int i=1; i<4 && me.getObject(target, objects) instanceof Obstacle; i++)
 			{
 			    //System.out.println("prob at: "+me.getLocation()+" "+Creature.alldirs[dir]);
-				pod.remove(new Integer(dir));
+				pod.remove(Integer.valueOf(dir));
 				dir = ((Integer)pod.get(rand.nextInt(4-i))).intValue();
 				target = me.createLocation(me.getLocation(), Creature.alldirs[dir]);
 			}

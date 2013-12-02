@@ -36,7 +36,7 @@ public class TreeStressTestAgent extends MicroAgent
 				if(depth>0)
 				{
 					Map	args	= new HashMap();
-					args.put("depth", new Integer(depth-1));
+					args.put("depth", Integer.valueOf(depth-1));
 					CreationInfo	ci	= new CreationInfo(args, getComponentIdentifier());
 					for(int i=0; i<depth; i++)
 					{
@@ -60,6 +60,6 @@ public class TreeStressTestAgent extends MicroAgent
 //	public static Object	getMetaInfo()
 //	{
 //		return new MicroAgentMetaInfo("<h1>Tree Stress Test</h1>Creates a complex tree structure of sub components.", null,
-//			new IArgument[]{new Argument("depth", "Depth of the tree.", "int", new Integer(5))}, null);
+//			new IArgument[]{new Argument("depth", "Depth of the tree.", "int", Integer.valueOf(5))}, null);
 //	}
 }

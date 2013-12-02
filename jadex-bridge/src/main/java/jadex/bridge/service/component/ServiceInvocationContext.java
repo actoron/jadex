@@ -449,7 +449,7 @@ public class ServiceInvocationContext
 			for(int i=start+1; i<interceptors.length; i++)
 			{
 				// add before to allow isApplicable fetch context values.
-				used.add(new Integer(i));
+				used.add(Integer.valueOf(i));
 				if(interceptors[i].isApplicable(this))
 				{
 					ret = interceptors[i];
@@ -457,7 +457,7 @@ public class ServiceInvocationContext
 				}
 				else
 				{
-					used.remove(new Integer(i));
+					used.remove(Integer.valueOf(i));
 				}
 			}
 		}
@@ -499,7 +499,7 @@ public class ServiceInvocationContext
 			synchronized(pcalls)
 			{
 				Integer	cnt	= pcalls.get(m);
-				pcalls.put(m, new Integer(cnt==null ? 0 : cnt.intValue()+1));
+				pcalls.put(m, Integer.valueOf(cnt==null ? 0 : cnt.intValue()+1));
 			}
 		}
 		

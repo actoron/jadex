@@ -32,6 +32,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -61,19 +62,21 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public static final String LIBRARY_SERVICE = "library_service";
 	
 	/** The pseudo system classpath rid. */
-	public static IResourceIdentifier SYSTEMCPRID;
+	public static final IResourceIdentifier SYSTEMCPRID;
 	
 	static
 	{
+		IResourceIdentifier res = null;
 		try
 		{
-			SYSTEMCPRID = new ResourceIdentifier(new LocalResourceIdentifier(new ComponentIdentifier("PSEUDO"), new URL("http://SYSTEMCPRID")), null);
+			res = new ResourceIdentifier(new LocalResourceIdentifier(new ComponentIdentifier("PSEUDO"), new URL("http://SYSTEMCPRID")), null);
 		}
 		catch(Exception e)
 		{
 			// should not happen
 			e.printStackTrace();
 		}
+		SYSTEMCPRID = res;
 	}
 	
 	//-------- attributes --------
@@ -117,7 +120,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected Tuple2<IResourceIdentifier, Map<IResourceIdentifier, List<IResourceIdentifier>>> rids;
 	
 	/** The non-managed urls (cached for speed). */
-	protected Set<URL>	nonmanaged;
+//	protected Set<URL>	nonmanaged;
+	protected Set<URI>	nonmanaged;
 	
 	//-------- constructors --------
 	
@@ -325,10 +329,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				if(SYSTEMCPRID.equals(clrid))
 				{
 					List<IResourceIdentifier> mydeps = new ArrayList<IResourceIdentifier>();
-					Set<URL> nonmans = getInternalNonManagedURLs();
-					for(URL url: nonmans)
+					Set<URI> nonmans = getInternalNonManagedURLs();
+					for(URI uri: nonmans)
 					{
-						mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null));
+						URL url = toURL0(uri);
+						if(url!=null)
+							mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null));
 					}
 					deps.put(clrid, mydeps);
 				}
@@ -361,16 +367,16 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 *  Add a new url.
 	 *  @param url The resource identifier.
 	 */
-	public IFuture<IResourceIdentifier> addURL(final IResourceIdentifier parid, URL url)
+	public IFuture<IResourceIdentifier> addURL(final IResourceIdentifier parid, URL purl)
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 
 //		System.out.println("add url: "+url);
 		
-		url = checkUrl(url);
+		URL url = checkUrl(purl);
 		if(url==null)
 		{
-			ret.setException(new RuntimeException("URL not backed by local file: "+url));
+			ret.setException(new RuntimeException("URL not backed by local file: "+purl));
 			return ret;
 		}
 //		System.out.println("add url2: "+url);
@@ -432,11 +438,11 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 *  be available for all subordinated resources. 
 	 *  @param url The url.
 	 */
-	public IFuture<Void> addTopLevelURL(@CheckNotNull URL url)
+	public IFuture<Void> addTopLevelURL(@CheckNotNull URL purl)
 	{
-		url = checkUrl(url);
+		URL url = checkUrl(purl);
 		if(url==null)
-			return new Future<Void>(new RuntimeException("URL not backed by local file: "+url));
+			return new Future<Void>(new RuntimeException("URL not backed by local file: "+purl));
 		
 		baseloader.addURL(url);
 		nonmanaged = null;
@@ -470,18 +476,34 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<List<URL>> getNonManagedURLs()
 	{
-		return new Future<List<URL>>(new ArrayList<URL>(getInternalNonManagedURLs()));
+		Set<URI> res = getInternalNonManagedURLs();
+		List<URL> ret = new ArrayList<URL>();
+		if(res!=null)
+		{
+			for(URI uri: res)
+			{
+				try
+				{
+					ret.add(uri.toURL());
+				}
+				catch(Exception e)
+				{
+					System.out.println("Problem with url: "+uri);
+				}
+			}
+		}
+		return new Future<List<URL>>(ret);
 	}
 	
 	/**
 	 *  Get other contained (but not directly managed) urls from parent classloaders.
 	 *  @return The set of urls.
 	 */
-	protected Set<URL>	getInternalNonManagedURLs()
+	protected Set<URI>	getInternalNonManagedURLs()
 	{
 		if(nonmanaged==null)
 		{
-			nonmanaged	= new LinkedHashSet<URL>();
+			nonmanaged	= new LinkedHashSet<URI>();
 			collectClasspathURLs(baseloader, nonmanaged, new HashSet<String>());
 		}
 		return nonmanaged;
@@ -509,7 +531,14 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					}
 				}
 				
-				res.addAll(getInternalNonManagedURLs());
+				Set<URI> re = getInternalNonManagedURLs();
+				for(URI uri: re)
+				{
+					URL url = toURL0(uri);
+					if(url!=null)
+						res.add(url);
+				}
+//				res.addAll();
 				
 //				System.out.println("getAllUrls: "+(System.currentTimeMillis()-start));
 				ret.setResult(res);
@@ -543,7 +572,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			ret.setResult(rootloader);
 //			System.out.println("root classloader: "+rid);
 		}
-		else if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl()))
+		else if(isLocal(rid) && getInternalNonManagedURLs().contains(toURI0(rid.getLocalIdentifier().getUrl())))
 		{
 			ret.setResult(baseloader);
 //			System.out.println("base classloader: "+rid);
@@ -631,7 +660,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		// pure global call followed by pure local call -> would mean rids have not been resolved
 		// pure local call followed by pure global call -> would mean rids have not been resolved
 		final IResourceIdentifier lrid = ResourceIdentifier.getLocalResourceIdentifier(rid);
-		if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl()))
+		if(isLocal(rid) && getInternalNonManagedURLs().contains(toURI0(rid.getLocalIdentifier().getUrl())))
 		{
 			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
 		}
@@ -729,7 +758,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
 	{
 		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
-		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl());
+		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(toURI0(rid.getLocalIdentifier().getUrl()));
 		
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 //		final URL url = rid.getLocalIdentifier().getSecondEntity();
@@ -817,7 +846,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected void addSupport(IResourceIdentifier rid, IResourceIdentifier parid)
 	{
 		if(rid==null)
-			throw new IllegalArgumentException("Must not null: "+rid);
+			throw new IllegalArgumentException("Rid must not null.");
 				
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
@@ -846,7 +875,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected void removeSupport(IResourceIdentifier rid, IResourceIdentifier parid)
 	{
 		if(rid==null)
-			throw new IllegalArgumentException("Must not null: "+rid);
+			throw new IllegalArgumentException("Rid must not null.");
 
 		DelegationURLClassLoader pacl = parid==null || rootrid.equals(parid)? rootloader: (DelegationURLClassLoader)classloaders.get(parid);
 		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
@@ -1046,7 +1075,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Collect all URLs belonging to a class loader.
 	 */
-	protected void	collectClasspathURLs(ClassLoader classloader, Set<URL> set, Set<String> jarnames)
+	protected void	collectClasspathURLs(ClassLoader classloader, Set<URI> set, Set<String> jarnames)
 	{
 		assert classloader!=null;
 		
@@ -1070,8 +1099,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			
 			for(int i = 0; i < urls.length; i++)
 			{
-				set.add(urls[i]);
-				collectManifestURLs(urls[i], set, jarnames);
+				URI uri = toURI0(urls[i]);
+				if(uri!=null)
+				{
+					set.add(uri);
+					collectManifestURLs(uri, set, jarnames);
+				}
 			}
 		}
 		
@@ -1100,7 +1133,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/**
 	 *  Collect all URLs as specified in a manifest.
 	 */
-	protected void	collectManifestURLs(URL url, Set<URL> set, Set<String> jarnames)
+	protected void	collectManifestURLs(URI url, Set<URI> set, Set<String> jarnames)
 	{
 		File	file	= SUtil.urlToFile(url.toString());
 		if(file!=null && file.exists() && !file.isDirectory())	// Todo: load manifest also from directories!?
@@ -1146,8 +1179,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		            					jarnames.add(jarname);
 		            				}
 		            				URL depurl = urlfile.toURI().toURL();
-		            				set.add(depurl);
-		            				collectManifestURLs(depurl, set, jarnames);
+		            				set.add(depurl.toURI());
+		            				collectManifestURLs(depurl.toURI(), set, jarnames);
 		            			}
 		                    	catch (Exception e)
 		                    	{
@@ -1373,6 +1406,40 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected static URL toURL0(URI uri)
+	{
+		URL ret = null;
+		try
+		{
+			ret = uri.toURL();
+		}
+		catch(Exception e)
+		{
+			System.out.println("Problem with url conversion: "+uri);
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected static URI toURI0(URL url)
+	{
+		URI ret = null;
+		try
+		{
+			ret = url.toURI();
+		}
+		catch(Exception e)
+		{
+			System.out.println("Problem with url conversion: "+url);
+		}
 		return ret;
 	}
 }

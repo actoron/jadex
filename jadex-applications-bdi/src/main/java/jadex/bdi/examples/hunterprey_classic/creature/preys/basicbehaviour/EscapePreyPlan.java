@@ -30,10 +30,10 @@ public class EscapePreyPlan extends Plan
 		Vision vision = (Vision)getBeliefbase().getBelief("vision").getFact();
 		WorldObject[] obs = vision.getObjects();
 		HashMap points = new HashMap();
-		points.put(RequestMove.DIRECTION_UP, new Integer(0));
-		points.put(RequestMove.DIRECTION_DOWN, new Integer(0));
-		points.put(RequestMove.DIRECTION_RIGHT, new Integer(0));
-		points.put(RequestMove.DIRECTION_LEFT, new Integer(0));
+		points.put(RequestMove.DIRECTION_UP, Integer.valueOf(0));
+		points.put(RequestMove.DIRECTION_DOWN, Integer.valueOf(0));
+		points.put(RequestMove.DIRECTION_RIGHT, Integer.valueOf(0));
+		points.put(RequestMove.DIRECTION_LEFT, Integer.valueOf(0));
 
 		for(int i=0; i<obs.length; i++)
 		{
@@ -44,7 +44,7 @@ public class EscapePreyPlan extends Plan
 				{
 					int actual = ((Integer)points.get(dirs[j])).intValue();
 					if(actual!=Integer.MAX_VALUE)
-						points.put(dirs[j], new Integer(((Integer)points.get(dirs[j])).intValue()+1));
+						points.put(dirs[j], Integer.valueOf(((Integer)points.get(dirs[j])).intValue()+1));
 				}
 			}
 			if(obs[i] instanceof Obstacle)
@@ -52,7 +52,7 @@ public class EscapePreyPlan extends Plan
 				if(me.getDistance(obs[i])==1)
 				{
 					String[] dirs = me.getDirections(obs[i]);
-					points.put(dirs[0], new Integer(Integer.MAX_VALUE));
+					points.put(dirs[0], Integer.valueOf(Integer.MAX_VALUE));
 				}
 			}
 		}

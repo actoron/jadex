@@ -207,7 +207,7 @@ public class ChatUser
 	 */
 	public void	addMessage(int id)
 	{
-		this.messages.add(new Integer(id));
+		this.messages.add(Integer.valueOf(id));
 		this.lastupdate	= System.currentTimeMillis();
 	}
 	
@@ -216,7 +216,7 @@ public class ChatUser
 	 */
 	public void	removeMessage(int id)
 	{
-		this.messages.remove(new Integer(id));
+		this.messages.remove(Integer.valueOf(id));
 		this.lastupdate	= System.currentTimeMillis();
 	}
 	

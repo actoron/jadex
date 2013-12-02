@@ -430,7 +430,7 @@ public abstract class ToolTab extends JPanel implements IComponentListListener, 
 			{
 				show_dead = false;
 			}
-			if(afs[i].containsValue(Component.MESSAGE_VISIBLE, new Integer(Component.NO_MESSAGES)))
+			if(afs[i].containsValue(Component.MESSAGE_VISIBLE, Integer.valueOf(Component.NO_MESSAGES)))
 			{
 				show_zero = false;
 			}
@@ -646,7 +646,7 @@ public abstract class ToolTab extends JPanel implements IComponentListListener, 
 	{
 		public void actionPerformed(ActionEvent ae)
 		{
-			changeAgentFilter(Component.MESSAGE_VISIBLE, new Integer(Component.NO_MESSAGES));
+			changeAgentFilter(Component.MESSAGE_VISIBLE, Integer.valueOf(Component.NO_MESSAGES));
 		}
 	};
 

@@ -53,9 +53,9 @@ public class OAVState	extends OAVAbstractState
 		// Get the usages of the oav object
 		Integer cnt = (Integer)externalusages.get(id);
 		if(cnt==null)
-			cnt = new Integer(1);
+			cnt = Integer.valueOf(1);
 		else
-			cnt = new Integer(cnt.intValue()+1);
+			cnt = Integer.valueOf(cnt.intValue()+1);
 		externalusages.put(id, cnt);
 		
 //		if(id.toString().indexOf("waitabstraction")!=-1)
@@ -155,7 +155,7 @@ public class OAVState	extends OAVAbstractState
 		}
 		else
 		{
-			externalusages.put(id, new Integer(cnt.intValue()-1));
+			externalusages.put(id, Integer.valueOf(cnt.intValue()-1));
 		}
 	}
 	

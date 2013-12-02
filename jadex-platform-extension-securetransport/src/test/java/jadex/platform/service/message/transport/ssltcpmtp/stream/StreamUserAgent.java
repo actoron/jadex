@@ -177,7 +177,7 @@ public class StreamUserAgent extends TestAgent
 														{
 															public void customResultAvailable(Map<String,Object> result) 
 															{
-																ret.setResult(new Integer(cnt[0]));
+																ret.setResult(Integer.valueOf(cnt[0]));
 															}
 														});
 													}
@@ -239,7 +239,7 @@ public class StreamUserAgent extends TestAgent
 														{
 															public void customResultAvailable(Map<String,Object> result) 
 															{
-																ret.setResult(new Integer(cnt[0]));
+																ret.setResult(Integer.valueOf(cnt[0]));
 															}
 														});
 													}

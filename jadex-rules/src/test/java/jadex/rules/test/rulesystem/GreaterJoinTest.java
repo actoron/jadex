@@ -80,7 +80,7 @@ public class GreaterJoinTest extends TestCase
 		
 		// Add a small block.
 		small = state.createRootObject(Blocks.block_type);
-		state.setAttributeValue(small, Blocks.block_has_size, new Integer(1));		
+		state.setAttributeValue(small, Blocks.block_has_size, Integer.valueOf(1));		
 	}
 	
 	//-------- test methods --------
@@ -109,7 +109,7 @@ public class GreaterJoinTest extends TestCase
 	{
 		// Create big block -> should trigger condition for small block.
 		Object	big	= state.createRootObject(Blocks.block_type);
-		state.setAttributeValue(big, Blocks.block_has_size, new Integer(5));
+		state.setAttributeValue(big, Blocks.block_has_size, Integer.valueOf(5));
 
 		List	test	= Collections.singletonList(small);
 		system.fireAllRules();

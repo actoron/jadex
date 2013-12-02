@@ -233,11 +233,11 @@ public abstract class AbstractParameterTablePropertySection extends
 							.equals(((MultiColumnTableRow) element)
 									.getColumnValueAt(0)))
 					{
-						return new Integer(i);
+						return Integer.valueOf(i);
 					}
 				}
 				// fall through
-				return new Integer(0);
+				return Integer.valueOf(0);
 			}
 
 			protected void doSetValue(Object element, Object value)

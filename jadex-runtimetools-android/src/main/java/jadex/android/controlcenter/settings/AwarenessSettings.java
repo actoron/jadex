@@ -314,7 +314,7 @@ public class AwarenessSettings extends AComponentSettings implements OnPreferenc
 			@Override
 			public void exceptionOccurred(Exception exception)
 			{
-				// sprefresh.setValue(new Integer(0));
+				// sprefresh.setValue(Integer.valueOf(0));
 			}
 
 			public void resultAvailable(final DiscoveryInfo[] ds)

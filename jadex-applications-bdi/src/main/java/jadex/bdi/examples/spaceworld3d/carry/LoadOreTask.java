@@ -95,8 +95,8 @@ public class LoadOreTask extends AbstractTask
 			finished	= ore==0;
 		}
 		time	= (time + progress)%TIME;
-		obj.setProperty(AnalyzeTargetTask.PROPERTY_ORE, new Integer(ore));
-		target.setProperty(targetcapprop, new Integer(capacity));
+		obj.setProperty(AnalyzeTargetTask.PROPERTY_ORE, Integer.valueOf(ore));
+		target.setProperty(targetcapprop, Integer.valueOf(capacity));
 		
 		if(finished)
 		{

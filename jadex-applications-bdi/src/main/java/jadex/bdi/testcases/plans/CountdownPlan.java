@@ -28,7 +28,7 @@ public class CountdownPlan extends Plan
 		{
 			int num = ((Integer)getBeliefbase().getBelief("num").getFact()).intValue();
 			getLogger().info(""+num);
-			getBeliefbase().getBelief("num").setFact(new Integer(num-1));
+			getBeliefbase().getBelief("num").setFact(Integer.valueOf(num-1));
 			waitFor(10);
 		}
 	}

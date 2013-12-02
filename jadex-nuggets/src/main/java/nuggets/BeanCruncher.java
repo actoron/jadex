@@ -259,7 +259,7 @@ public class BeanCruncher implements ICruncher
 		{	
 			id = seq++;
 //			ids.put(o, id = seq++);
-			idstodo.put(o, new Integer(id));
+			idstodo.put(o, Integer.valueOf(id));
 		}
 		return id;
 	}

@@ -87,7 +87,7 @@ public class Test //extends TestCase
 	{
 		List list = new ArrayList();
 		list.add("str_a");
-		list.add(new Integer(2));
+		list.add(Integer.valueOf(2));
 		list.add(getABean());
 		
 		doWriteAndRead(list);
@@ -100,7 +100,7 @@ public class Test //extends TestCase
 	{
 		Set set = new HashSet();
 		set.add("str_a");
-		set.add(new Integer(2));
+		set.add(Integer.valueOf(2));
 		set.add(getABean());
 		
 		doWriteAndRead(getABean());
@@ -113,7 +113,7 @@ public class Test //extends TestCase
 	{
 		Map map = new HashMap();
 		map.put("$", "A");
-		map.put(new Integer(2), new Integer(22));
+		map.put(Integer.valueOf(2), Integer.valueOf(22));
 		map.put("obja", getABean());
 //		for(Iterator it=map.entrySet().iterator(); it.hasNext(); )
 //		{

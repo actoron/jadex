@@ -293,7 +293,7 @@ public class EmailAccount
 		    if(ps.getProperty("smtphost")!=null)
 		    	setSmtpHost(ps.getProperty("smtphost"));
 		    if(ps.getProperty("smtpport")!=null)
-		    	setSmtpPort(new Integer(ps.getProperty("smtpport")));
+		    	setSmtpPort(Integer.valueOf(ps.getProperty("smtpport")));
 		    if(ps.getProperty("ssl")!=null)
 		    	setSsl(Boolean.parseBoolean(ps.getProperty("ssl")));
 		    if(ps.getProperty("starttls")!=null)

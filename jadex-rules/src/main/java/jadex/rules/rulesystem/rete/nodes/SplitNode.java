@@ -607,7 +607,7 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	{
 		/*List vals = new ArrayList();
 		for(int i=0; i<10; i++)
-			vals.add(new Integer(i));
+			vals.add(Integer.valueOf(i));
 		List ret = new ArrayList();
 		generateBindings(5, 0, new int[3], null, vals.toArray(), 
 			ret, new boolean[]{true,false,true}, 1);* /

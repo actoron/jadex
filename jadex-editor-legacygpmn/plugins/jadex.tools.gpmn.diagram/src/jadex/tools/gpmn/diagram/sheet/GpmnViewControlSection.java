@@ -63,7 +63,7 @@ public class GpmnViewControlSection extends GpmnCustomPropertySection
 		
 		detailSlider.addSelectionListener(new SelectionListener()
 		{
-			private Integer prevSelect = new Integer(0);
+			private Integer prevSelect = Integer.valueOf(0);
 			
 			public void widgetSelected(SelectionEvent e)
 			{
@@ -87,7 +87,7 @@ public class GpmnViewControlSection extends GpmnCustomPropertySection
 					default:
 				}
 				
-				prevSelect = new Integer(slider.getSelection());
+				prevSelect = Integer.valueOf(slider.getSelection());
 			}
 			
 			@Override

@@ -32,7 +32,7 @@ public class TiledLayerGLRenderer implements ILayerGLRenderer
 		catch(Exception e)
 		{
 			texture = vp.getTexture(gl, tl.getTexturePath());
-			layer.setRenderInfo(0, new Integer(texture));
+			layer.setRenderInfo(0, Integer.valueOf(texture));
 		}
 		
 		gl.glEnable(GL.GL_TEXTURE_2D);

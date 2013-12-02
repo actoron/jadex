@@ -127,14 +127,14 @@ public class TimeChartDataConsumer extends AbstractChartDataConsumer
 				series = new TimeSeries(seriesname, time);
 				if(maxitemcnt!=null)
 					series.setMaximumItemCount(maxitemcnt.intValue());
-				seriesmap.put(seriesname, new Integer(j));
+				seriesmap.put(seriesname, Integer.valueOf(j));
 			}
 			else
 			{
-				series = new TimeSeries(new Integer(j), time);
+				series = new TimeSeries(Integer.valueOf(j), time);
 				if(maxitemcnt!=null)
 					series.setMaximumItemCount(maxitemcnt.intValue());
-				seriesmap.put(new Integer(j), new Integer(j));
+				seriesmap.put(Integer.valueOf(j), Integer.valueOf(j));
 			}
 			dataset.addSeries(series);
 //			System.out.println("Created series: "+seriesname+" "+j);

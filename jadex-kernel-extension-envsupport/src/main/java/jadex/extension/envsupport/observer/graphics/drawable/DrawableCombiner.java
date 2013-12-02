@@ -70,7 +70,7 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 	 */
 	public void addPrimitive(Primitive p, int layer)
 	{
-		Integer l = new Integer(layer);
+		Integer l = Integer.valueOf(layer);
 		List drawList = (List)primitives.get(l);
 		if(drawList == null)
 		{

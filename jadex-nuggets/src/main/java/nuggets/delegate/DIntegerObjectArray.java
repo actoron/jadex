@@ -48,7 +48,7 @@ public class DIntegerObjectArray extends ADelegate
 		Integer[] a=new Integer[l];
 		for(int i=0; i<l; i++) {
 			try {
-				a[i] = new Integer(asm.nextToken());
+				a[i] = Integer.valueOf(asm.nextToken());
 			} catch(NumberFormatException e) { /* NOP */ }
 		}
 		return a;

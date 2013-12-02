@@ -46,7 +46,7 @@ public class BeliefIncrementPlan extends Plan
 		}
 		else
 		{
-			values	= new Number[]{new Integer(1)};
+			values	= new Number[]{Integer.valueOf(1)};
 		}
 
 		if(hasParameter("rate"))
@@ -66,7 +66,7 @@ public class BeliefIncrementPlan extends Plan
 		do
 		{
 			Number stepcnt = (Number)getBeliefbase().getBelief(beliefname).getFact();
-			stepcnt = new Integer(stepcnt.intValue()+values[cnt++%values.length].intValue());
+			stepcnt = Integer.valueOf(stepcnt.intValue()+values[cnt++%values.length].intValue());
 
 			// Do atomic, to avoid being terminated before latest value is printed.
 //			startAtomic();

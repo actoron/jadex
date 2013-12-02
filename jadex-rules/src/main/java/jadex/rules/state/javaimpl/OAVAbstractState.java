@@ -1966,9 +1966,9 @@ public abstract class OAVAbstractState	implements IOAVState
 			if(cnt!=null && whichattr.getMultiplicity().equals(OAVAttributeType.NONE))
 				throw new RuntimeException("Object already there: "+value+" "+whichid+" "+whichattr);
 			if(cnt==null)
-				cnt = new Integer(1);
+				cnt = Integer.valueOf(1);
 			else
-				cnt = new Integer(cnt.intValue()+1);
+				cnt = Integer.valueOf(cnt.intValue()+1);
 			usages.put(ref, cnt);
 
 			if(newobject && !generator.isId(value))
@@ -2024,7 +2024,7 @@ public abstract class OAVAbstractState	implements IOAVState
 			if(cnt.intValue()==1)
 				usages.remove(ref);
 			else
-				usages.put(ref, new Integer(cnt.intValue()-1));
+				usages.put(ref, Integer.valueOf(cnt.intValue()-1));
 			
 			// If this was the last reference to the object and it is 
 			// not a root object clean it up

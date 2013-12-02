@@ -1320,7 +1320,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, ret.getFirstEntity().getClass().getName(),
 //				ret.getFirstEntity().toString(), microagent.getComponentIdentifier(), getComponentDescription().getCreationTime(), getStepDetails((IComponentStep)ret.getFirstEntity())));
 //		}
-//		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
+//		notifyListeners(new ChangeEvent(this, "removeStep", Integer.valueOf(0)));
 		
 		if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{

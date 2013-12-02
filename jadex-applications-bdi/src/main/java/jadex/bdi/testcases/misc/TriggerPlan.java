@@ -44,7 +44,7 @@ public class TriggerPlan extends Plan
 			report.setFailed("Wrong execution order: Was "+no+" but should be "+cnt+".");
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
-		getBeliefbase().getBelief("cnt").setFact(new Integer(cnt));
+		getBeliefbase().getBelief("cnt").setFact(Integer.valueOf(cnt));
 		endAtomic();
 	}
 }

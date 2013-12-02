@@ -43,6 +43,7 @@ import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.bdiv3.runtime.impl.GoalDelegationHandler;
 import jadex.bdiv3.runtime.impl.IServiceParameterMapper;
+import jadex.bdiv3.runtime.wrappers.MapWrapper.MapEntry;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
@@ -252,9 +253,10 @@ public class BDIClassReader extends MicroClassReader
 		}
 		
 		// Add elements from capabilities.
-		for(String name: capas.keySet())
+		for(Map.Entry<String, BDIModel> entry: capas.entrySet())
 		{
-			BDIModel	capa	= capas.get(name);
+			String name = entry.getKey();
+			BDIModel capa = entry.getValue();
 			
 			capa.getModelInfo().getExtensionTypes(); //???
 			capa.getModelInfo().getConfigurations();	// todo!!!

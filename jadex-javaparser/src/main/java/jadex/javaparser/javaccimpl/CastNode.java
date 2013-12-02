@@ -106,7 +106,7 @@ public class CastNode	extends ExpressionNode
 					}
 					else if(type==Integer.class)
 					{
-						value	= new Integer(((Number)value).intValue());
+						value	= Integer.valueOf(((Number)value).intValue());
 					}
 					else if(type==Short.class)
 					{

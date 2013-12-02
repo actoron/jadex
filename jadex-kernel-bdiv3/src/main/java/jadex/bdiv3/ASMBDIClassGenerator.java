@@ -867,12 +867,12 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			if(domain == null)
 			{
 				method = methoddc1;
-				args = new Object[]{name, data, new Integer(0), new Integer(data.length)};
+				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length)};
 			}
 			else
 			{
 				method = methoddc2;
-				args = new Object[]{name, data, new Integer(0), new Integer(data.length), domain};
+				args = new Object[]{name, data, Integer.valueOf(0), Integer.valueOf(data.length), domain};
 			}
 
 			method.setAccessible(true);

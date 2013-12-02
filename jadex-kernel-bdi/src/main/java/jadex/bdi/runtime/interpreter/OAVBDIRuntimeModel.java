@@ -906,7 +906,7 @@ public class OAVBDIRuntimeModel
 		
 		// plan
 		plan_has_body = plan_type.createAttributeType("plan_has_body", OAVJavaType.java_object_type);
-		plan_has_step = plan_type.createAttributeType("plan_has_step", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(0));
+		plan_has_step = plan_type.createAttributeType("plan_has_step", OAVJavaType.java_integer_type, OAVAttributeType.NONE, Integer.valueOf(0));
 		//plan_has_executor = plan_type.createAttributeType("plan_has_executor", java_planexecutor_type);
 //		plan_has_event = plan_type.createAttributeType("plan_has_event", event_type);
 		plan_has_reason = plan_type.createAttributeType("plan_has_reason", OAVBDIMetaModel.object_type);

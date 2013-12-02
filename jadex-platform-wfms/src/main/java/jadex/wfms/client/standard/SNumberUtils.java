@@ -40,7 +40,7 @@ public class SNumberUtils
 		{
 			public Number parseString(String input)
 			{
-				return new Integer(Integer.parseInt(input));
+				return Integer.valueOf(Integer.parseInt(input));
 			}
 		});
 		

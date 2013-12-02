@@ -377,7 +377,7 @@ public class KeyedListsTable implements KeyedValues2D, Cloneable, Serializable//
 		// return value is null
 		if(rows.containsKey(rowKey) && ((Map)rows.get(rowKey)).containsKey(columnKey))
 		{
-			result = new Integer(((Collection)((Map)rows.get(rowKey)).get(columnKey)).size());
+			result = Integer.valueOf(((Collection)((Map)rows.get(rowKey)).get(columnKey)).size());
 		}
 		// }
 		return result;
@@ -419,7 +419,7 @@ public class KeyedListsTable implements KeyedValues2D, Cloneable, Serializable//
 		// return value is null
 		if(rows.containsKey(rowKey) && ((Map)rows.get(rowKey)).containsKey(columnKey))
 		{
-			result = new Integer(((Collection)((Map)rows.get(rowKey)).get(columnKey)).size());
+			result = Integer.valueOf(((Collection)((Map)rows.get(rowKey)).get(columnKey)).size());
 		}
 		return result;
 	}

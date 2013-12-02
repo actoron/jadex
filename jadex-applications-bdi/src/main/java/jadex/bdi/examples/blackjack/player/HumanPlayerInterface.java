@@ -166,7 +166,7 @@ public class HumanPlayerInterface extends GameStateFrame
 	public void	setBet(int bet)
 	{
 		this.bet = bet;
-		pcs.firePropertyChange("bet", null, new Integer(bet));
+		pcs.firePropertyChange("bet", null, Integer.valueOf(bet));
 	}
 	
 	/**

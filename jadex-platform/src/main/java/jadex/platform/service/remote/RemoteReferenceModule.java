@@ -860,7 +860,7 @@ public class RemoteReferenceModule
 			if(cnt==null)
 			{
 //				proxycountkeys.put(rr, rr);
-				proxycount.put(rr, new Integer(1));
+				proxycount.put(rr, Integer.valueOf(1));
 				notify = true;
 				
 				// todo: transfer lease time interval?!
@@ -872,7 +872,7 @@ public class RemoteReferenceModule
 			}
 			else
 			{
-				proxycount.put(rr, new Integer(cnt.intValue()+1));
+				proxycount.put(rr, Integer.valueOf(cnt.intValue()+1));
 			}
 				
 	//		System.out.println("Add proxy: "+rr+" "+cnt);
@@ -919,7 +919,7 @@ public class RemoteReferenceModule
 			else
 			{
 //				proxycountkeys.put(rr, rr);
-				proxycount.put(rr, new Integer(nv));
+				proxycount.put(rr, Integer.valueOf(nv));
 			}
 				
 //			System.out.println("Remove proxy: "+rr+" "+nv+" "+proxycount);

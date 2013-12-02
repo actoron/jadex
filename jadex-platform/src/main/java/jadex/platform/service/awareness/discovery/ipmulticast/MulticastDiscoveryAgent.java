@@ -66,7 +66,7 @@ public class MulticastDiscoveryAgent extends DiscoveryAgent
 	 */
 	public Object[] getAddressInfo()
 	{
-		return new Object[]{address, new Integer(port)};
+		return new Object[]{address, Integer.valueOf(port)};
 	}
 
 	/**

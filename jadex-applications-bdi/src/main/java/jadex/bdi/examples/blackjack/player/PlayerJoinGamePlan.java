@@ -55,7 +55,7 @@ public class PlayerJoinGamePlan extends Plan
 		{
 			getLogger().info("request was accepted, timeout is: " + content);
 			getBeliefbase().getBelief("timeout").setFact(
-				new Integer(((RequestJoin)((Done)content).getAction()).getTimeout()));
+				Integer.valueOf(((RequestJoin)((Done)content).getAction()).getTimeout()));
 			getBeliefbase().getBelief("dealer").setFact(dealer);
 		}
 	}

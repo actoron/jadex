@@ -494,7 +494,7 @@ public class AsyncTreeModel
 		synchronized (nodes)
 		{
 			Integer num = zombies.get(id);
-			num = new Integer(num != null ? num.intValue() + 1 : 1);
+			num = Integer.valueOf(num != null ? num.intValue() + 1 : 1);
 			zombies.put(id, num);
 			// if(id.toString().startsWith("ANDTest@"))
 			// System.out.println("Zombie node count increased: "+id+", "+num);
@@ -511,7 +511,7 @@ public class AsyncTreeModel
 			Integer num = zombies.get(node.getId());
 			if(num.intValue()>1)
 			{
-				num = new Integer(num.intValue()-1);
+				num = Integer.valueOf(num.intValue()-1);
 				zombies.put(node.getId(), num);
 				// if(node.getId().toString().startsWith("ANDTest@"))
 				// System.out.println("Zombie node count decreased: "+node+", "+num);

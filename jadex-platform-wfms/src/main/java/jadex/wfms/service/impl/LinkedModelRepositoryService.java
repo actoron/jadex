@@ -620,8 +620,8 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 		{
 			Integer refcount = (Integer) modelrefcount.get(path);
 			if (refcount == null)
-				refcount = new Integer(0);
-			refcount = new Integer(refcount.intValue() + 1);
+				refcount = Integer.valueOf(0);
+			refcount = Integer.valueOf(refcount.intValue() + 1);
 			modelrefcount.put(path, refcount);
 			fireModelAddedEvent(path);
 		}
@@ -640,7 +640,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 		Integer refcount = (Integer) modelrefcount.get(path);
 		if ((refcount != null))
 		{
-			refcount = new Integer(refcount.intValue() - 1);
+			refcount = Integer.valueOf(refcount.intValue() - 1);
 			if (refcount.intValue() <= 0)
 			{
 				modelrefcount.remove(path);

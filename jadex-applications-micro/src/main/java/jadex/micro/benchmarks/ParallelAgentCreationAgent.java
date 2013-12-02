@@ -176,7 +176,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							});
 							
 							Map	args	= new HashMap();
-							args.put("num", new Integer(0));
+							args.put("num", Integer.valueOf(0));
 							CreationInfo	cinfo	= new CreationInfo(null, args, getComponentDescription().getResourceIdentifier());
 							for(int i=1; i<=num; i++)
 							{
@@ -207,7 +207,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 //	{
 //		return new MicroAgentMetaInfo("This agents benchmarks parallel agent creation and termination.", 
 //			new String[0],
-//			new IArgument[]{new Argument("num", "Number of agents to create.", "Integer", new Integer(10000))
+//			new IArgument[]{new Argument("num", "Number of agents to create.", "Integer", Integer.valueOf(10000))
 //			{
 //				public boolean validate(String input)
 //				{

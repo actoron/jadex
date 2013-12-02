@@ -194,7 +194,7 @@ public class ObjectTableModel extends AbstractTableModel
      */
     public Class getColumnClass(int idx)
 	{
-		Class clazz = (Class)columnclasses.get(new Integer(idx));
+		Class clazz = (Class)columnclasses.get(Integer.valueOf(idx));
     	if(clazz==null)
 			clazz = Object.class;
 		return clazz;
@@ -207,7 +207,7 @@ public class ObjectTableModel extends AbstractTableModel
      */
     public void setColumnClass(Class clazz, int idx)
 	{
-		columnclasses.put(new Integer(idx), clazz);
+		columnclasses.put(Integer.valueOf(idx), clazz);
     }
 
 	/**
@@ -218,9 +218,9 @@ public class ObjectTableModel extends AbstractTableModel
 	public void setColumnEditable(boolean editable, int col)
 	{
 		if(editable)
-			columseditable.add(new Integer(col));
+			columseditable.add(Integer.valueOf(col));
 		else
-			columseditable.remove(new Integer(col));
+			columseditable.remove(Integer.valueOf(col));
 	}
 
 	/**
@@ -231,7 +231,7 @@ public class ObjectTableModel extends AbstractTableModel
      */
     public boolean isCellEditable(int rowIndex, int columnIndex)
 	{
-		return columseditable.contains(new Integer(columnIndex));
+		return columseditable.contains(Integer.valueOf(columnIndex));
     }
 
 	//-------- AbstractTableModel interface --------

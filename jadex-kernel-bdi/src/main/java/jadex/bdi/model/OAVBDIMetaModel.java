@@ -1193,8 +1193,8 @@ public class OAVBDIMetaModel
 		goal_has_exclude = goal_type.createAttributeType("mgoal_has_exclude", OAVJavaType.java_string_type, OAVAttributeType.NONE,  EXCLUDE_WHEN_TRIED);
 		goal_has_rebuild = goal_type.createAttributeType("mgoal_has_recalculate", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		goal_has_inhibits = goal_type.createAttributeType("mgoal_has_inhibits", inhibits_type, OAVAttributeType.LIST);
-//		goal_has_cardinality = goal_type.createAttributeType("mgoal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(-1));
-		goal_has_cardinality = goal_type.createAttributeType("mgoal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(Integer.MAX_VALUE));
+//		goal_has_cardinality = goal_type.createAttributeType("mgoal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, Integer.valueOf(-1));
+		goal_has_cardinality = goal_type.createAttributeType("mgoal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, Integer.valueOf(Integer.MAX_VALUE));
 		goal_has_unique = goal_type.createAttributeType("mgoal_has_unique", OAVJavaType.java_boolean_type);
 		goal_has_excludedparameter = goal_type.createAttributeType("mgoal_has_excludedparameter", OAVJavaType.java_string_type, OAVAttributeType.LIST);	// Todo: parameter sets?
 		goal_has_publish = goal_type.createAttributeType("mgoal_has_publish", publish_type);

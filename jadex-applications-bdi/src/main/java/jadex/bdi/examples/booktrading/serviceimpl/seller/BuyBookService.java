@@ -68,7 +68,7 @@ public class BuyBookService implements IBuyBookService
 		final Future<Void>	ret	= new Future<Void>();
 		final IGoal	goal	= agent.getGoalbase().createGoal("cnp_execute_task");
 		goal.getParameter("cfp").setValue(title);
-		goal.getParameter("proposal").setValue(new Integer(price));
+		goal.getParameter("proposal").setValue(Integer.valueOf(price));
 		goal.addGoalListener(new IGoalListener()
 		{
 			public void goalFinished(AgentEvent ae)

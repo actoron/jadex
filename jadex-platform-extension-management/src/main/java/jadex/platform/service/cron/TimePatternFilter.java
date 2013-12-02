@@ -233,7 +233,7 @@ public class TimePatternFilter extends ComposedFilter<Long>
 			}
 			for(int i=s; i<=e; i+=step)
 			{
-				vals.add(new Integer(i));
+				vals.add(Integer.valueOf(i));
 			}
 			ret = new SetFilter(vals);
 		}
@@ -289,7 +289,7 @@ public class TimePatternFilter extends ComposedFilter<Long>
 		int	e = Integer.parseInt(tok.substring(idx2+1));
 		for(int i=s; i<=e; i++)
 		{
-			vals.add(new Integer(i));
+			vals.add(Integer.valueOf(i));
 		}
 	}
 	

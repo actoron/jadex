@@ -161,7 +161,7 @@ public class SServiceProvider
 ////		synchronized(profiling)
 ////		{
 ////			Integer	cnt	= (Integer)profiling.get(type);
-////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 ////		}
 //		final Future ret = new Future();
 //		
@@ -228,7 +228,7 @@ public class SServiceProvider
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		
 		// Hack->remove
@@ -391,7 +391,7 @@ public class SServiceProvider
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(selector.getCacheKey());
-//			profiling.put(selector.getCacheKey(), new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//			profiling.put(selector.getCacheKey(), Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		final Future ret = new Future();
 		
@@ -463,7 +463,7 @@ public class SServiceProvider
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		final TerminableIntermediateDelegationFuture ret = new TerminableIntermediateDelegationFuture();
 		
@@ -497,7 +497,7 @@ public class SServiceProvider
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 //		final TerminableIntermediateDelegationFuture ret = new TerminableIntermediateDelegationFuture();
 		
@@ -540,7 +540,7 @@ public class SServiceProvider
 ////		synchronized(profiling)
 ////		{
 ////			Integer	cnt	= (Integer)profiling.get(type);
-////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 ////		}
 //		final Future ret = new Future();
 //		
@@ -583,7 +583,7 @@ public class SServiceProvider
 ////		synchronized(profiling)
 ////		{
 ////			Integer	cnt	= (Integer)profiling.get(type);
-////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 ////		}
 //		final Future ret = new Future();
 //		
@@ -616,7 +616,7 @@ public class SServiceProvider
 ////		synchronized(profiling)
 ////		{
 ////			Integer	cnt	= (Integer)profiling.get(type);
-////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 ////		}
 //		final Future ret = new Future();
 //		
@@ -647,7 +647,7 @@ public class SServiceProvider
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
@@ -672,7 +672,7 @@ public class SServiceProvider
 ////		synchronized(profiling)
 ////		{
 ////			Integer	cnt	= (Integer)profiling.get(type);
-////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 ////		}
 //		final IntermediateFuture ret = new IntermediateFuture();
 //		
@@ -696,7 +696,7 @@ public class SServiceProvider
 ////		synchronized(profiling)
 ////		{
 ////			Integer	cnt	= (Integer)profiling.get(type);
-////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////			profiling.put(type, Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1)); 
 ////		}
 //		final Future ret = new Future();
 //		

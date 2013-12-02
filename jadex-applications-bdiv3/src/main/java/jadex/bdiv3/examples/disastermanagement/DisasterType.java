@@ -147,7 +147,7 @@ public class DisasterType
 		ret.put("severe", new Boolean(random.nextDouble()<DISASTER_TYPES[index].getSevere()));
 		int[]	range	= DISASTER_TYPES[index].getSize();
 		int	size	= range[0]+random.nextInt(range[1]-range[0]);
-		ret.put("size", new Integer(size));
+		ret.put("size", Integer.valueOf(size));
 		
 //		ret.put("severe", cnt==1); 
 //		ret.put("victims", 2);
@@ -155,14 +155,14 @@ public class DisasterType
 //		ret.put("chemicals", 0);
 //		cnt++;
 		// Use random +/- 25% for victims/fire/chemicals value
-		ret.put("victims", new Integer(DISASTER_TYPES[index].getVictims()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getVictims()*size): 0));
-		ret.put("fire", new Integer(DISASTER_TYPES[index].getFire()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getFire()*size): 0));
-		ret.put("chemicals", new Integer(DISASTER_TYPES[index].getChemicals()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getChemicals()*size): 0));
+		ret.put("victims", Integer.valueOf(DISASTER_TYPES[index].getVictims()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getVictims()*size): 0));
+		ret.put("fire", Integer.valueOf(DISASTER_TYPES[index].getFire()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getFire()*size): 0));
+		ret.put("chemicals", Integer.valueOf(DISASTER_TYPES[index].getChemicals()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getChemicals()*size): 0));
 		
 		// Check for disaster without content. 
-		assert !ret.get("victims").equals(new Integer(0))
-			|| !ret.get("fire").equals(new Integer(0))
-			|| !ret.get("chemicals").equals(new Integer(0)) : index;
+		assert !ret.get("victims").equals(Integer.valueOf(0))
+			|| !ret.get("fire").equals(Integer.valueOf(0))
+			|| !ret.get("chemicals").equals(Integer.valueOf(0)) : index;
 		
 		// Find position that fully fits on map.
 		double	mapsize	= size*0.005;	//0.005 = scale of drawsize in application.xml

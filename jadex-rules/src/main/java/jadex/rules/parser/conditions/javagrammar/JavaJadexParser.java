@@ -2316,7 +2316,7 @@ public class JavaJadexParser extends Parser {
                     // C:\\Files\\Checkouts\\jadexv2rz\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:409:4: HexLiteral
                     {
                     HexLiteral5=(Token)match(input,HexLiteral,FOLLOW_HexLiteral_in_integerLiteral1609); 
-                    exp = new LiteralExpression(new Integer((HexLiteral5!=null?HexLiteral5.getText():null)));
+                    exp = new LiteralExpression(Integer.valueOf((HexLiteral5!=null?HexLiteral5.getText():null)));
 
                     }
                     break;
@@ -2324,7 +2324,7 @@ public class JavaJadexParser extends Parser {
                     // C:\\Files\\Checkouts\\jadexv2rz\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:410:4: OctalLiteral
                     {
                     OctalLiteral6=(Token)match(input,OctalLiteral,FOLLOW_OctalLiteral_in_integerLiteral1616); 
-                    exp = new LiteralExpression(new Integer((OctalLiteral6!=null?OctalLiteral6.getText():null)));
+                    exp = new LiteralExpression(Integer.valueOf((OctalLiteral6!=null?OctalLiteral6.getText():null)));
 
                     }
                     break;
@@ -2332,7 +2332,7 @@ public class JavaJadexParser extends Parser {
                     // C:\\Files\\Checkouts\\jadexv2rz\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\javagrammar\\JavaJadex.g:411:4: DecimalLiteral
                     {
                     DecimalLiteral7=(Token)match(input,DecimalLiteral,FOLLOW_DecimalLiteral_in_integerLiteral1623); 
-                    exp = new LiteralExpression(new Integer((DecimalLiteral7!=null?DecimalLiteral7.getText():null)));
+                    exp = new LiteralExpression(Integer.valueOf((DecimalLiteral7!=null?DecimalLiteral7.getText():null)));
 
                     }
                     break;

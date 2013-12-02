@@ -2346,7 +2346,7 @@ public class MEnvSpaceType
 			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
-			new AttributeInfo(new AccessInfo("vertices", null, null, new Integer(3), new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("vertices", null, null, Integer.valueOf(3), new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
 			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attintconv),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 			{
@@ -2478,12 +2478,12 @@ public class MEnvSpaceType
 					Integer fontstyle = (Integer) getProperty(args, "style");
 					if (fontstyle==null)
 					{
-						fontstyle = new Integer(Font.PLAIN);
+						fontstyle = Integer.valueOf(Font.PLAIN);
 					}
 					Integer fontsize = (Integer) getProperty(args, "size");
 					if (fontsize==null)
 					{
-						fontsize = new Integer(12);
+						fontsize = Integer.valueOf(12);
 					}
 					Font font = new Font(fontname, fontstyle.intValue(), fontsize.intValue());
 					
@@ -3022,7 +3022,7 @@ public class MEnvSpaceType
 			Object ret = val;
 			if(val instanceof String)
 			{
-				try{ret = new Integer((String)val);}
+				try{ret = Integer.valueOf((String)val);}
 				catch(Exception e){}
 			}
 			return ret;

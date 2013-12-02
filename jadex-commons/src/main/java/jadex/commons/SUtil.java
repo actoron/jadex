@@ -581,7 +581,7 @@ public class SUtil
 //
 //		while(cls.isArray())
 //		{
-//			lens.add(new Integer(Array.getLength(array)));
+//			lens.add(Integer.valueOf(Array.getLength(array)));
 //			cls = cls.getComponentType();
 //		}
 //
@@ -2131,7 +2131,7 @@ public class SUtil
 	 * "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
 	 * ; //System.out.println(tst); //System.out.println(SUtil.wrapText(tst));
 	 * /*String[] a = new String[]{"a1", "a2", "a3"}; Integer[] b = new
-	 * Integer[]{new Integer(1), new Integer(2), new Integer(3)};
+	 * Integer[]{Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)};
 	 * System.out.println(arrayToString(joinArbitraryArrays(new Object[]{a,
 	 * b})));
 	 */

@@ -315,11 +315,11 @@ public class EventReificator implements IOAVStateListener
 		Integer	cnt	= (Integer)observed.get(element);
 		if(cnt==null)
 		{
-			cnt	= new Integer(1);
+			cnt	= Integer.valueOf(1);
 		}
 		else
 		{
-			cnt	= new Integer(cnt.intValue()+1);
+			cnt	= Integer.valueOf(cnt.intValue()+1);
 		}
 		observed.put(element, Integer.valueOf(cnt));
 	}
@@ -332,7 +332,7 @@ public class EventReificator implements IOAVStateListener
 		Integer	cnt	= (Integer)observed.get(element);
 		if(cnt.intValue()>1)
 		{
-			cnt	= new Integer(cnt.intValue()-1);
+			cnt	= Integer.valueOf(cnt.intValue()-1);
 			observed.put(element, Integer.valueOf(cnt));
 		}
 		else

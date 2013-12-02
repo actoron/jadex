@@ -111,7 +111,7 @@ public class NodePanel extends JPanel
 		if(node!=null)
 		{
 			ret.put("Type", SReflect.getUnqualifiedClassName(node.getClass()));
-			ret.put("Id", new Integer(node.getNodeId()));
+			ret.put("Id", Integer.valueOf(node.getNodeId()));
 			//ret.put("Use count", node.getUseCount());
 			
 			if(node instanceof TypeNode)
@@ -123,7 +123,7 @@ public class NodePanel extends JPanel
 			{
 				SplitNode n = (SplitNode)node;
 				ret.put("Attribute:", n.getAttribute().getName());
-				ret.put("Split in:", new Integer(n.getSplitPattern().length));
+				ret.put("Split in:", Integer.valueOf(n.getSplitPattern().length));
 				ret.put("Split pattern:", SUtil.arrayToString(n.getSplitPattern()));
 			}
 			else if(node instanceof TestNode)
@@ -157,7 +157,7 @@ public class NodePanel extends JPanel
 			else if(node instanceof CollectNode)
 			{
 				CollectNode n = (CollectNode)node;
-				ret.put("Tuple index:", new Integer(n.getTupleIndex()));
+				ret.put("Tuple index:", Integer.valueOf(n.getTupleIndex()));
 				IConstraintEvaluator[] evas = n.getConstraintEvaluators();
 				for(int i=0; evas!=null && i<evas.length; i++)
 				{

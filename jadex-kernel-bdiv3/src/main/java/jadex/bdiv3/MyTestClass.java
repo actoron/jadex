@@ -54,7 +54,7 @@ public class MyTestClass
 //		__agent.setAbstractBeliefValue(__globalname, belief, val);
 //	}
 //	
-//	Integer	n	= new Integer(39784374);
+//	Integer	n	= Integer.valueOf(39784374);
 //	Character	c 	= new Character('d');
 //	Long	l	= new Long(247895);
 //	Float	f	= new Float(378156);

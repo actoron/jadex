@@ -49,7 +49,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 				{
 //					System.out.println("started: "+method+" "+cnt);
-					setValue(new Integer(++cnt));
+					setValue(Integer.valueOf(++cnt));
 				}
 				
 				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
@@ -57,7 +57,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 //					System.out.println("ended: "+method+" "+cnt);
 					if(cnt>0)
 						--cnt;
-					setValue(new Integer(cnt));
+					setValue(Integer.valueOf(cnt));
 				}
 			});
 			comp.getServiceContainer().addMethodInvocationListener(sid, method, listener);

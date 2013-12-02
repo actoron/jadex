@@ -508,7 +508,7 @@ class ItemTableModel extends AbstractTableModel
 		}
 		else if(column == 2)
 		{
-			value = new Integer(ii.getQuantity());
+			value = Integer.valueOf(ii.getQuantity());
 		}
 		return value;
 	}

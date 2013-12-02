@@ -86,11 +86,11 @@ public class MultifieldSplitTest extends TestCase
 		
 		// Add 5 numbers.
 		Object nb = state.createRootObject(Numberbox.numberbox_type);
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(1));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(3));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(2));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(5));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(4));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(1));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(3));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(2));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(5));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(4));
 		
 		List test = new ArrayList();
 		test.add("(1,3)");
@@ -138,12 +138,12 @@ public class MultifieldSplitTest extends TestCase
 		
 		// Add 5 numbers.
 		Object nb = state.createRootObject(Numberbox.numberbox_type);
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(3));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(3));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(2));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(5));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(5));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(5));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(3));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(3));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(2));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(5));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(5));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(5));
 		
 		//System.out.println(((RetePatternMatcher)system.getMatcher()).getReteMemory());
 		
@@ -199,11 +199,11 @@ public class MultifieldSplitTest extends TestCase
 		
 		// Add 5 numbers.
 		Object nb = state.createRootObject(Numberbox.numberbox_type);
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(1));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(3));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(2));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(5));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(4));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(1));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(3));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(2));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(5));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(4));
 		
 		List test = new ArrayList();
 		test.add("(1,3)");
@@ -257,15 +257,15 @@ public class MultifieldSplitTest extends TestCase
 			
 		// Add numbers.
 		Object nb = state.createRootObject(Numberbox.numberbox_type);
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(1));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(2));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(3));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(4));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(5));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(1));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(2));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(3));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(4));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(5));
 		
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers2, new Integer(5));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers2, new Integer(4));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers2, new Integer(3));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers2, Integer.valueOf(5));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers2, Integer.valueOf(4));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers2, Integer.valueOf(3));
 		
 //		System.out.println(((RetePatternMatcher)system.getMatcher()).getReteMemory());
 
@@ -324,18 +324,18 @@ public class MultifieldSplitTest extends TestCase
 			
 		// Add numbers.
 		Object nb = state.createRootObject(Numberbox.numberbox_type);
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(1));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(2));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(3));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(4));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(5));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(1));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(2));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(3));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(4));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(5));
 		
 //		System.out.println(((RetePatternMatcher)system.getMatcher()).getReteMemory());
 		
 		Object nb2 = state.createRootObject(Numberbox.numberbox_type);
-		state.addAttributeValue(nb2, Numberbox.numberbox_has_numbers, new Integer(5));
-		state.addAttributeValue(nb2, Numberbox.numberbox_has_numbers, new Integer(4));
-		state.addAttributeValue(nb2, Numberbox.numberbox_has_numbers, new Integer(3));
+		state.addAttributeValue(nb2, Numberbox.numberbox_has_numbers, Integer.valueOf(5));
+		state.addAttributeValue(nb2, Numberbox.numberbox_has_numbers, Integer.valueOf(4));
+		state.addAttributeValue(nb2, Numberbox.numberbox_has_numbers, Integer.valueOf(3));
 		
 //		System.out.println(((RetePatternMatcher)system.getMatcher()).getReteMemory());
 		
@@ -366,8 +366,8 @@ public class MultifieldSplitTest extends TestCase
 
 		// todo: is there another way to specify that here a virtual extractor should be used
 		BoundSelectConstraint bsc = new BoundSelectConstraint(Numberbox.numberbox_has_numbers, new Variable("$?numbers", OAVJavaType.java_integer_type, true), IOperator.EQUAL);
-		bsc.addConstraint(new LiteralConstraint(null, new Integer(5), IOperator.LESS));
-		bsc.addConstraint(new LiteralConstraint(null, new Integer(2), IOperator.GREATER));
+		bsc.addConstraint(new LiteralConstraint(null, Integer.valueOf(5), IOperator.LESS));
+		bsc.addConstraint(new LiteralConstraint(null, Integer.valueOf(2), IOperator.GREATER));
 		cond.addConstraint(bsc);
 		
 		IRule	rule	= new Rule("", cond, new IAction()
@@ -385,12 +385,12 @@ public class MultifieldSplitTest extends TestCase
 		
 		// Add numbers.
 		Object nb = state.createRootObject(Numberbox.numberbox_type);
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(1));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(10));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(2));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(9));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(3));
-		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, new Integer(8));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(1));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(10));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(2));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(9));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(3));
+		state.addAttributeValue(nb, Numberbox.numberbox_has_numbers, Integer.valueOf(8));
 		system.fireAllRules();
 		
 		//System.out.println(((RetePatternMatcher)system.getMatcher()).getReteMemory());

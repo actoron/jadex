@@ -381,7 +381,7 @@ public abstract class AReadContext<T> implements IContext
 		if(arrayinfos.containsKey(parent))
 			ret = ((Integer)arrayinfos.get(parent)).intValue();
 		
-		arrayinfos.put(parent, new Integer(ret+1));
+		arrayinfos.put(parent, Integer.valueOf(ret+1));
 	
 		return ret;
 	}

@@ -51,7 +51,7 @@ public class MovePlan extends Plan
 	public void body()
 	{
 		int triescnt = ((Integer)getBeliefbase().getBelief("triescnt").getFact()).intValue()+1;
-		getBeliefbase().getBelief("triescnt").setFact(new Integer(triescnt));
+		getBeliefbase().getBelief("triescnt").setFact(Integer.valueOf(triescnt));
 		print("Trying "+move+" ("+triescnt+") ", depth);
 
 		// Atomic block is required, because a micro plan step occurs when property change event
@@ -65,7 +65,7 @@ public class MovePlan extends Plan
 		//if(!board.isSolution()) // Comment out this line when using goal target condition in the adf.
 		{
 			IGoal mm = createGoal("makemove");
-			mm.getParameter("depth").setValue(new Integer(depth+1));
+			mm.getParameter("depth").setValue(Integer.valueOf(depth+1));
 			dispatchSubgoalAndWait(mm);
 		}
 	}

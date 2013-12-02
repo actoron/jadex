@@ -245,7 +245,7 @@ public class ReflectNode	extends ExpressionNode
 					try
 					{
 						Object	array	= type_or_value.getValue(null);
-						this.setConstantValue(new Integer(Array.getLength(array)));
+						this.setConstantValue(Integer.valueOf(Array.getLength(array)));
 						this.setConstant(true);
 					}
 					catch(Exception e)
@@ -481,7 +481,7 @@ public class ReflectNode	extends ExpressionNode
 			// Handle ".length" of arrays specially (Java Bug???).
 			else if(type==FIELD && ref!=null && ref.getClass().isArray() && getText().equals("length"))
 			{
-				value	= new Integer(Array.getLength(ref));
+				value	= Integer.valueOf(Array.getLength(ref));
  			}
 			
 			// Handle IPropertyObject

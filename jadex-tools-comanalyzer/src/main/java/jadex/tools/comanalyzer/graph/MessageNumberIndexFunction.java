@@ -82,14 +82,14 @@ public class MessageNumberIndexFunction implements EdgeIndexFunction
 					Message m2 = (Message)((MessageGroup)other).getSingelton();
 					if(!(m1.equals(m2)))
 					{
-						edge_index.put(other, new Integer(count));
+						edge_index.put(other, Integer.valueOf(count));
 						count++;
 					}
 				}
-				edge_index.put(group, new Integer(count));
-				index = new Integer(count);
+				edge_index.put(group, Integer.valueOf(count));
+				index = Integer.valueOf(count);
 			} else {
-				index = new Integer(0);
+				index = Integer.valueOf(0);
 			}
 		}
 		return index.intValue();
@@ -136,11 +136,11 @@ public class MessageNumberIndexFunction implements EdgeIndexFunction
 			MessageGroup other = (MessageGroup) it.next();
 			if(!group.equals(other))
 			{
-				edge_index.put(other, new Integer(count));
+				edge_index.put(other, Integer.valueOf(count));
 				count++;
 			}
 		}
-		edge_index.put(group, new Integer(count));
+		edge_index.put(group, Integer.valueOf(count));
 		return count;
 	}
 
@@ -170,11 +170,11 @@ public class MessageNumberIndexFunction implements EdgeIndexFunction
 			MessageGroup other = (MessageGroup)it.next();
 			if(!e.equals(other))
 			{
-				edge_index.put(other, new Integer(count));
+				edge_index.put(other, Integer.valueOf(count));
 				count++;
 			}
 		}
-		edge_index.put(e, new Integer(count));
+		edge_index.put(e, Integer.valueOf(count));
 		return count;
 	}
 }

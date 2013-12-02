@@ -84,20 +84,20 @@ public class GreaterTest extends TestCase
 		
 		// Add blocks with different weights and sizes.
 		smalllight = state.createRootObject(Blocks.block_type);
-		state.setAttributeValue(smalllight, Blocks.block_has_size, new Integer(1));
-		state.setAttributeValue(smalllight, Blocks.block_has_weight, new Integer(1));
+		state.setAttributeValue(smalllight, Blocks.block_has_size, Integer.valueOf(1));
+		state.setAttributeValue(smalllight, Blocks.block_has_weight, Integer.valueOf(1));
 		
 		smallheavy = state.createRootObject(Blocks.block_type);
-		state.setAttributeValue(smallheavy, Blocks.block_has_size, new Integer(1));
-		state.setAttributeValue(smallheavy, Blocks.block_has_weight, new Integer(5));
+		state.setAttributeValue(smallheavy, Blocks.block_has_size, Integer.valueOf(1));
+		state.setAttributeValue(smallheavy, Blocks.block_has_weight, Integer.valueOf(5));
 		
 		biglight = state.createRootObject(Blocks.block_type);
-		state.setAttributeValue(biglight, Blocks.block_has_size, new Integer(5));
-		state.setAttributeValue(biglight, Blocks.block_has_weight, new Integer(1));
+		state.setAttributeValue(biglight, Blocks.block_has_size, Integer.valueOf(5));
+		state.setAttributeValue(biglight, Blocks.block_has_weight, Integer.valueOf(1));
 		
 		bigheavy = state.createRootObject(Blocks.block_type);
-		state.setAttributeValue(bigheavy, Blocks.block_has_size, new Integer(5));
-		state.setAttributeValue(bigheavy, Blocks.block_has_weight, new Integer(5));
+		state.setAttributeValue(bigheavy, Blocks.block_has_size, Integer.valueOf(5));
+		state.setAttributeValue(bigheavy, Blocks.block_has_weight, Integer.valueOf(5));
 	}
 	
 	//-------- test methods --------

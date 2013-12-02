@@ -36,7 +36,7 @@ public interface IMathService extends IService
 //		public Object invoke(Object obj, Object[] args)
 //		{
 //			System.out.println("replaced: "+obj+", "+SUtil.arrayToString(args));
-//			return new Integer(((Number)args[0]).intValue() + ((Number)args[1]).intValue());
+//			return Integer.valueOf(((Number)args[0]).intValue() + ((Number)args[1]).intValue());
 //		}
 //	}
 	

@@ -36,12 +36,12 @@ public class SumMultiplexCollector extends FlattenMultiplexCollector
 		
 		if(fut instanceof IntermediateFuture)
 		{
-			((IntermediateFuture)fut).addIntermediateResult(new Integer(sum));
+			((IntermediateFuture)fut).addIntermediateResult(Integer.valueOf(sum));
 			((IntermediateFuture)fut).setFinished();
 		}
 		else
 		{
-			fut.setResult(new Integer(sum));
+			fut.setResult(Integer.valueOf(sum));
 		}
 	}
 }

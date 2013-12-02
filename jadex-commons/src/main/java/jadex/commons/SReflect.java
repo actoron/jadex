@@ -201,7 +201,7 @@ public class SReflect
 	
 	public static Object wrapValue(int val)
 	{
-		return new Integer(val);
+		return Integer.valueOf(val);
 	}
 	
 	public static Object wrapValue(long val)
@@ -274,7 +274,7 @@ public class SReflect
 		{
 			if(classloader==null)
 				classloader = SReflect.class.getClassLoader();
-			Integer hash = new Integer(classloader.hashCode());
+			Integer hash = Integer.valueOf(classloader.hashCode());
 
 			ret = classcache.get(new Tuple2<String, Integer>(name, hash));
 			
@@ -869,11 +869,11 @@ public class SReflect
 //			Integer cnt = res.get(tup.getSecondEntity());
 //			if(cnt==null)
 //			{
-//				res.put(tup.getSecondEntity(), new Integer(1));
+//				res.put(tup.getSecondEntity(), Integer.valueOf(1));
 //			}
 //			else
 //			{
-//				res.put(tup.getSecondEntity(), new Integer(cnt.intValue()+1));
+//				res.put(tup.getSecondEntity(), Integer.valueOf(cnt.intValue()+1));
 //			}
 //		}
 //		System.out.println("found: "+res);
@@ -1039,7 +1039,7 @@ public class SReflect
 		{
 			if(value instanceof Character)
 			{
-				value	= new Integer(((Character)value).charValue());
+				value	= Integer.valueOf(((Character)value).charValue());
 			}
 			Number	num =null;
 			if(value!=null)
@@ -1067,7 +1067,7 @@ public class SReflect
 				}
 				else if(clazz.equals(Integer.class))
 				{
-					value	= new Integer(num.intValue());
+					value	= Integer.valueOf(num.intValue());
 				}
 				else if(clazz.equals(Short.class))
 				{
@@ -1276,7 +1276,7 @@ public class SReflect
 			else if(clazz==Long.TYPE)
 				ret	= new Long(0);
 			else if(clazz==Integer.TYPE)
-				ret	= new Integer(0);
+				ret	= Integer.valueOf(0);
 		}
 		
 		return ret;

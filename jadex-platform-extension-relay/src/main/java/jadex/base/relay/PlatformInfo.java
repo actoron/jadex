@@ -101,7 +101,7 @@ public final class PlatformInfo
 		// bean constructor.
 		
 		// dummy db id to avoid saving remote platform infos
-		this.dbid	= new Integer(-1);
+		this.dbid	= Integer.valueOf(-1);
 	}
 	
 	/**

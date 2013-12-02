@@ -170,7 +170,7 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 	{
 		List<ParameterInfo> params = new ArrayList<ParameterInfo>();
 		params.add(new ParameterInfo("responses", "Number of evaluated certificate responses " +
-			"(must all be equal, use 1 for bootstrapping, use <1 to disable)", int.class, new Integer(responses)));
+			"(must all be equal, use 1 for bootstrapping, use <1 to disable)", int.class, Integer.valueOf(responses)));
 		MechanismInfo ret = new MechanismInfo("Decentralized", getClass(), params);
 		return ret;
 	}
@@ -201,7 +201,7 @@ public class DecentralizedAcquisitionMechanism extends AAcquisitionMechanism
 		this.responses = responses;
 		
 		getSecurityService().publishEvent(new ChangeEvent<Object>(getClass(), ISecurityService.PROPERTY_MECHANISMPARAMETER, 
-			new Object[]{"responses", new Integer(responses)}));
+			new Object[]{"responses", Integer.valueOf(responses)}));
 	}
 
 	/**

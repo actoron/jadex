@@ -943,9 +943,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				
 				if(results!=null)
 				{
-					while(results.containsKey(new Integer(cnt)))
+					while(results.containsKey(Integer.valueOf(cnt)))
 					{
-						Object nres = results.remove(new Integer(cnt++));
+						Object nres = results.remove(Integer.valueOf(cnt++));
 						if(nres==FINISHED)
 						{
 							ifut.setFinishedIfUndone();
@@ -965,7 +965,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				}
 				if(fini)
 				{
-					results.put(new Integer(num), FINISHED);
+					results.put(Integer.valueOf(num), FINISHED);
 				}
 				else
 				{

@@ -174,7 +174,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 		{
 			final int	refresh	= refreshs[i];
 			rb_refresh[i]	= new JRadioButton(refresh>0 ? Integer.toString(refresh/1000)+" s" : "No refresh");
-			rb_refresh[i].putClientProperty("refresh", new Integer(refresh));
+			rb_refresh[i].putClientProperty("refresh", Integer.valueOf(refresh));
 			group.add(rb_refresh[i]);
 			settings.add(rb_refresh[i], gbc);
 			rb_refresh[i].addActionListener(new ActionListener()

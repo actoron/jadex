@@ -208,7 +208,7 @@ public class MessageFormatParser extends AbstractParser
 			return new ParserEditStatus(GpmnDiagramEditorPlugin.ID,
 					IParserEditStatus.UNEDITABLE, NLS.bind(
 							Messages.MessageFormatParser_InvalidInputError,
-							new Integer(pos.getErrorIndex())));
+							Integer.valueOf(pos.getErrorIndex())));
 		}
 		return validateNewValues(values);
 	}

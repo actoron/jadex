@@ -221,7 +221,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				final Integer value = new Integer(Math.max(0, Math.min(MAX_SECONDS,
+				final Integer value = Integer.valueOf(Math.max(0, Math.min(MAX_SECONDS,
 					((Integer)cardWaitSpinner.getValue()).intValue())));
 				cardWaitSpinner.setValue(value);
 				
@@ -246,7 +246,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 			{
 				final int value = Math.max(0, Math.min(MAX_SECONDS,
 					((Integer)restartWaitSpinner.getValue()).intValue()));
-				restartWaitSpinner.setValue(new Integer(value));
+				restartWaitSpinner.setValue(Integer.valueOf(value));
 				
 				agent.scheduleStep(new IComponentStep<Void>()
 				{
@@ -254,12 +254,12 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-						bia.getBeliefbase().getBelief("restartdelay").setFact(new Integer(value));
+						bia.getBeliefbase().getBelief("restartdelay").setFact(Integer.valueOf(value));
 						return IFuture.DONE;
 					}
 				});
 				
-//				agent.getBeliefbase().setBeliefFact("restartdelay", new Integer(value));
+//				agent.getBeliefbase().setBeliefFact("restartdelay", Integer.valueOf(value));
 				
 				// todo
 //				IGoal[]	play	= agent.getGoalbase().getGoals("play_game");

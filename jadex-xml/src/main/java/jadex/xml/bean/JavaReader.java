@@ -319,7 +319,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						return new Integer((String)rawattributes.get("content"));
+						return Integer.valueOf((String)rawattributes.get("content"));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
@@ -412,7 +412,7 @@ public class JavaReader
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
 						return new URL((String)rawattributes.get("protocol"), (String)rawattributes.get("host"), 
-							new Integer((String)rawattributes.get("port")).intValue(), (String)rawattributes.get("file"));
+							Integer.valueOf((String)rawattributes.get("port")).intValue(), (String)rawattributes.get("file"));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{
@@ -569,7 +569,7 @@ public class JavaReader
 					Integer[] ret = new Integer[len];
 					
 					for(int i=0; stok.hasMoreTokens(); i++)
-						ret[i] = new Integer(stok.nextToken());
+						ret[i] = Integer.valueOf(stok.nextToken());
 					return ret;
 				}
 			};

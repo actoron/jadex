@@ -131,12 +131,12 @@ public class CollectNodeTest extends TestCase
 		CollectCondition	collect	= new CollectCondition(cmusic);
 		collect.addConstraint(new AttributeBoundConstraint(null, new Variable("$?collection", music_type, true)));
 		FunctionCall fc_length = new FunctionCall(new Length(), new Object[]{new Variable("$?collection", music_type, true)});
-		FunctionCall fc_length3 = new FunctionCall(new OperatorFunction(IOperator.EQUAL), new Object[]{fc_length, new Integer(3)});
+		FunctionCall fc_length3 = new FunctionCall(new OperatorFunction(IOperator.EQUAL), new Object[]{fc_length, Integer.valueOf(3)});
 		collect.addConstraint(new PredicateConstraint(fc_length3));
 		
 		FunctionCall fc_extract = new FunctionCall(new ExtractMulti(music_has_price), new Object[]{new Variable("$?collection", music_type, true)});
 		FunctionCall fc_sum = new FunctionCall(new Sum(), new Object[]{fc_extract});
-		FunctionCall fc_sum30 = new FunctionCall(new OperatorFunction(IOperator.LESS), new Object[]{fc_sum, new Integer(30)});
+		FunctionCall fc_sum30 = new FunctionCall(new OperatorFunction(IOperator.LESS), new Object[]{fc_sum, Integer.valueOf(30)});
 		collect.addConstraint(new PredicateConstraint(fc_sum30));
 		
 		// Add block of triggered condition to list.
@@ -166,13 +166,13 @@ public class CollectNodeTest extends TestCase
 		state.setAttributeValue(music1, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music1, music_has_title, "Kind of Blue");
 		state.setAttributeValue(music1, music_has_store, store);
-		state.setAttributeValue(music1, music_has_price, new Integer(10));
+		state.setAttributeValue(music1, music_has_price, Integer.valueOf(10));
 		
 		music2	= state.createRootObject(music_type);
 		state.setAttributeValue(music2, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music2, music_has_title, "Bitches Brew");
 		state.setAttributeValue(music2, music_has_store, store);
-		state.setAttributeValue(music2, music_has_price, new Integer(10));
+		state.setAttributeValue(music2, music_has_price, Integer.valueOf(10));
 */		
 		
 		// Matches music from "Miles Davis".
@@ -190,12 +190,12 @@ public class CollectNodeTest extends TestCase
 		CollectCondition collect	= new CollectCondition(new ObjectCondition[]{cmusic, cstore}, null);
 		collect.addConstraint(new BoundConstraint(null, new Variable("$?collection", music_type, true, false)));
 		FunctionCall fc_length = new FunctionCall(new Length(), new Object[]{new Variable("$?collection", music_type, true, false)});
-		FunctionCall fc_length3 = new FunctionCall(new OperatorFunction(IOperator.EQUAL), new Object[]{fc_length, new Integer(3)});
+		FunctionCall fc_length3 = new FunctionCall(new OperatorFunction(IOperator.EQUAL), new Object[]{fc_length, Integer.valueOf(3)});
 		collect.addConstraint(new PredicateConstraint(fc_length3));
 		
 		FunctionCall fc_extract = new FunctionCall(new ExtractMulti(music_has_price), new Object[]{new Variable("$?collection", music_type, true, false)});
 		FunctionCall fc_sum = new FunctionCall(new Sum(), new Object[]{fc_extract});
-		FunctionCall fc_sum30 = new FunctionCall(new OperatorFunction(IOperator.LESS), new Object[]{fc_sum, new Integer(30)});
+		FunctionCall fc_sum30 = new FunctionCall(new OperatorFunction(IOperator.LESS), new Object[]{fc_sum, Integer.valueOf(30)});
 		collect.addConstraint(new PredicateConstraint(fc_sum30));
 		
 		// Add block of triggered condition to list.
@@ -221,13 +221,13 @@ public class CollectNodeTest extends TestCase
 		state.setAttributeValue(music1, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music1, music_has_title, "Kind of Blue");
 		state.setAttributeValue(music1, music_has_store, store);
-		state.setAttributeValue(music1, music_has_price, new Integer(10));
+		state.setAttributeValue(music1, music_has_price, Integer.valueOf(10));
 		
 		music2	= state.createRootObject(music_type);
 		state.setAttributeValue(music2, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music2, music_has_title, "Bitches Brew");
 		state.setAttributeValue(music2, music_has_store, store);
-		state.setAttributeValue(music2, music_has_price, new Integer(10));
+		state.setAttributeValue(music2, music_has_price, Integer.valueOf(10));
 
 		// Add store and musics.
 		store	= state.createRootObject(store_type);
@@ -268,7 +268,7 @@ public class CollectNodeTest extends TestCase
 		state.setAttributeValue(music3, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music3, music_has_title, "Sketches of Spain");
 		state.setAttributeValue(music3, music_has_store, store);
-		state.setAttributeValue(music3, music_has_price, new Integer(1));
+		state.setAttributeValue(music3, music_has_price, Integer.valueOf(1));
 		state.addAttributeValue(store, store_has_cds, music3);
 
 		List	teststores	= Collections.singletonList(store);
@@ -290,7 +290,7 @@ public class CollectNodeTest extends TestCase
 		state.setAttributeValue(music3, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music3, music_has_title, "Sketches of Spain");
 		state.setAttributeValue(music3, music_has_store, store);
-		state.setAttributeValue(music3, music_has_price, new Integer(1));
+		state.setAttributeValue(music3, music_has_price, Integer.valueOf(1));
 		state.addAttributeValue(store, store_has_cds, music3);
 		
 		// Create another music -> should remove activation.
@@ -298,7 +298,7 @@ public class CollectNodeTest extends TestCase
 		state.setAttributeValue(music4, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music4, music_has_title, "Angels of Pain");
 		state.setAttributeValue(music4, music_has_store, store);
-		state.setAttributeValue(music4, music_has_price, new Integer(1));
+		state.setAttributeValue(music4, music_has_price, Integer.valueOf(1));
 		state.addAttributeValue(store, store_has_cds, music4);
 		
 		List	test	= Collections.EMPTY_LIST;
@@ -319,14 +319,14 @@ public class CollectNodeTest extends TestCase
 		state.setAttributeValue(music3, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music3, music_has_title, "Sketches of Spain");
 		state.setAttributeValue(music3, music_has_store, store);
-		state.setAttributeValue(music3, music_has_price, new Integer(1));
+		state.setAttributeValue(music3, music_has_price, Integer.valueOf(1));
 		state.addAttributeValue(store, store_has_cds, music3);
 
 		Object	music4	= state.createRootObject(music_type);
 		state.setAttributeValue(music4, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music4, music_has_title, "Angels of Pain");
 		state.setAttributeValue(music4, music_has_store, store);
-		state.setAttributeValue(music4, music_has_price, new Integer(1));
+		state.setAttributeValue(music4, music_has_price, Integer.valueOf(1));
 		state.addAttributeValue(store, store_has_cds, music4);
 		
 		List	test	= Collections.EMPTY_LIST;
@@ -354,21 +354,21 @@ public class CollectNodeTest extends TestCase
 		state.setAttributeValue(music3, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music3, music_has_title, "Sketches of Spain");
 		state.setAttributeValue(music3, music_has_store, store);
-		state.setAttributeValue(music3, music_has_price, new Integer(1));
+		state.setAttributeValue(music3, music_has_price, Integer.valueOf(1));
 		state.addAttributeValue(store, store_has_cds, music3);
 
 		Object	music4	= state.createRootObject(music_type);
 		state.setAttributeValue(music4, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music4, music_has_title, "Angels of Pain");
 		state.setAttributeValue(music4, music_has_store, store);
-		state.setAttributeValue(music4, music_has_price, new Integer(1));
+		state.setAttributeValue(music4, music_has_price, Integer.valueOf(1));
 		state.addAttributeValue(store, store_has_cds, music4);
 		
 		Object	music5	= state.createRootObject(music_type);
 		state.setAttributeValue(music5, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music5, music_has_title, "Mr. Vain");
 		state.setAttributeValue(music5, music_has_store, store);
-		state.setAttributeValue(music5, music_has_price, new Integer(1));
+		state.setAttributeValue(music5, music_has_price, Integer.valueOf(1));
 		state.addAttributeValue(store, store_has_cds, music5);
 		
 		state.dropObject(music3);
@@ -391,7 +391,7 @@ public class CollectNodeTest extends TestCase
 		state.setAttributeValue(music3, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music3, music_has_title, "Sketches of Spain");
 		state.setAttributeValue(music3, music_has_store, store);
-		state.setAttributeValue(music3, music_has_price, new Integer(10));
+		state.setAttributeValue(music3, music_has_price, Integer.valueOf(10));
 		state.addAttributeValue(store, store_has_cds, music3);
 
 		List	test	= Collections.EMPTY_LIST;
@@ -399,7 +399,7 @@ public class CollectNodeTest extends TestCase
 		assertEquals("No condition should trigger initially", test, stores);
 		assertEquals("No condition should trigger initially", test, collections);
 		
-		state.setAttributeValue(music3, music_has_price, new Integer(1));
+		state.setAttributeValue(music3, music_has_price, Integer.valueOf(1));
 		List	teststores	= Collections.singletonList(store);
 		List	testcollections	= Collections.singletonList(new HashSet(Arrays.asList(new Object[]{music1, music2, music3})));
 		system.fireAllRules();
@@ -419,7 +419,7 @@ public class CollectNodeTest extends TestCase
 		state.setAttributeValue(music3, music_has_artist, "Miles Davis");
 		state.setAttributeValue(music3, music_has_title, "Sketches of Spain");
 		state.setAttributeValue(music3, music_has_store, store);
-		state.setAttributeValue(music3, music_has_price, new Integer(10));
+		state.setAttributeValue(music3, music_has_price, Integer.valueOf(10));
 		state.addAttributeValue(store, store_has_cds, music3);
 
 		List	test	= Collections.EMPTY_LIST;
@@ -427,7 +427,7 @@ public class CollectNodeTest extends TestCase
 		assertEquals("No condition should trigger initially", test, stores);
 		assertEquals("No condition should trigger initially", test, collections);
 
-		state.setAttributeValue(music3, music_has_price, new Integer(11));
+		state.setAttributeValue(music3, music_has_price, Integer.valueOf(11));
 		system.fireAllRules();
 		assertEquals("No condition should trigger initially", test, stores);
 		assertEquals("No condition should trigger initially", test, collections);

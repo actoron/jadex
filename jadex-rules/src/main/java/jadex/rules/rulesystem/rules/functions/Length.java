@@ -16,7 +16,7 @@ public class Length implements IFunction
 	//-------- constants --------
 	
 	/** Static 0 integer. */
-	public static final Integer ZERO = new Integer(0);
+	public static final Integer ZERO = Integer.valueOf(0);
 	
 	//-------- methods --------
 
@@ -36,7 +36,7 @@ public class Length implements IFunction
 		Object val1 = paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]; 
 		
 		Collection col = (Collection)val1;
-		return col==null? ZERO: new Integer(col.size());
+		return col==null? ZERO: Integer.valueOf(col.size());
 	}
 		
 	/**

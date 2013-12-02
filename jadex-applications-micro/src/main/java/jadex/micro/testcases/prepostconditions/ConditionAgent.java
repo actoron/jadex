@@ -139,7 +139,7 @@ public class ConditionAgent implements IContractService
 	public IFuture<Integer> doSomething(String a, int x, int y)
 	{
 //		System.out.println("invoked: "+a);
-		return "null".equals(a)? new Future(null): new Future<Integer>(new Integer(x/y));
+		return "null".equals(a)? new Future(null): new Future<Integer>(Integer.valueOf(x/y));
 	}
 	
 	/**
@@ -159,11 +159,11 @@ public class ConditionAgent implements IContractService
 	{
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
 		
-		ret.addIntermediateResult(new Integer(1));
-		ret.addIntermediateResult(new Integer(2));
-		ret.addIntermediateResult(new Integer(3));
-		ret.addIntermediateResult(new Integer(4));
-		ret.addIntermediateResult(new Integer(0));
+		ret.addIntermediateResult(Integer.valueOf(1));
+		ret.addIntermediateResult(Integer.valueOf(2));
+		ret.addIntermediateResult(Integer.valueOf(3));
+		ret.addIntermediateResult(Integer.valueOf(4));
+		ret.addIntermediateResult(Integer.valueOf(0));
 		
 		return ret;
 	}

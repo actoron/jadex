@@ -38,7 +38,7 @@ public class BroadcastReceiveHandler extends MasterSlaveReceiveHandler
 			getAgent().getSocket().receive(pack);
 			byte[] data = new byte[pack.getLength()];
 			System.arraycopy(buffer, 0, data, 0, pack.getLength());
-			ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()), data};
+			ret = new Object[]{pack.getAddress(), Integer.valueOf(pack.getPort()), data};
 //			System.out.println("received packet: "+pack.getAddress());
 //		}
 //		catch(Exception e)

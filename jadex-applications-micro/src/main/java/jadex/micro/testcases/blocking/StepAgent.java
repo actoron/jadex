@@ -52,7 +52,7 @@ public class StepAgent	implements	IStepService
 				for(int i=1; i<=steps; i++)
 				{
 					ia.waitForDelay(millis).get();
-					ret.addIntermediateResult(new Integer(i));
+					ret.addIntermediateResult(Integer.valueOf(i));
 				}
 				ret.setFinished();
 				return IFuture.DONE;
@@ -76,7 +76,7 @@ public class StepAgent	implements	IStepService
 				for(int i=1; !ret.isDone(); i++)
 				{
 					ia.waitForDelay(millis).get();
-					ret.addIntermediateResult(new Integer(i));
+					ret.addIntermediateResult(Integer.valueOf(i));
 				}
 				return IFuture.DONE;
 			}

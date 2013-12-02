@@ -262,13 +262,13 @@ public class CMSTestPlan extends Plan
 		IGoal ca = createGoal("cms_create_component");
 		ca.getParameter("type").setValue("jadex.bdi.testcases.benchmarks.AgentCreation");
 		ca.getParameter("name").setValue("Creator");
-		ca.getParameterSet("arguments").addValue(new Integer(5));
+		ca.getParameterSet("arguments").addValue(Integer.valueOf(5));
 		ca.getParameter("cms").setValue(SFipa.CMS);
 		dispatchSubgoalAndWait(ca);
 		CreateAgent ca = new CreateAgent();
 		ca.setType("jadex.bdi.testcases.benchmarks.AgentCreation");
 		ca.setName("Creator");
-		ca.addArgument(new Integer(5));
+		ca.addArgument(Integer.valueOf(5));
 		IMessageEvent rca = createMessageEvent("request_create_component");
 		rca.getParameterSet(SFipa.RECEIVERS).addValue(SFipa.CMS);
 		rca.setContent(ca);

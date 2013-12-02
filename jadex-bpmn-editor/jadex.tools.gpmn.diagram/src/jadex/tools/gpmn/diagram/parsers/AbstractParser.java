@@ -424,7 +424,7 @@ public abstract class AbstractParser implements IParser
 				}
 				else if (value instanceof Number)
 				{
-					value = new Integer(((Number) value).intValue());
+					value = Integer.valueOf(((Number) value).intValue());
 				}
 				else if (value instanceof String)
 				{

@@ -243,7 +243,7 @@ public class DFTestPlan extends Plan
 		getLogger().info("Trying to keep registered (should modify each 5 sec)...");
 		IGoal keep = createGoal("dfcap.df_keep_registered");
 		keep.getParameter("description").setValue(desc);
-		keep.getParameter("leasetime").setValue(new Integer(5000));
+		keep.getParameter("leasetime").setValue(Integer.valueOf(5000));
 		keep.getParameter("df").setValue(df);
 		IEvent event = null;
 		try

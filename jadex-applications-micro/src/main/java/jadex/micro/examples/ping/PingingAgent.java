@@ -133,7 +133,7 @@ public class PingingAgent extends MicroAgent
 //			null, new IArgument[]
 //			{
 //				new Argument("receiver", "The component receiver of the ping target.", "IComponentIdentifier"),
-//				new Argument("missed_max", "Maximum number of allowed missed replies", "int", new Integer(3)),
+//				new Argument("missed_max", "Maximum number of allowed missed replies", "int", Integer.valueOf(3)),
 //				new Argument("timeout", "Timeout for reply", "long", new Long(1000)),
 //				new Argument("content", "Ping message content", "String", "ping"),
 //				

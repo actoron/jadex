@@ -126,7 +126,7 @@ public class BpmnVisualModelGenerator
 		{
 			if(depth>tup.getFirstEntity().intValue())
 			{
-				elements.put(mactivity.getId(), new Tuple3<Integer,  mxICell, mxICell>(new Integer(depth), tup.getSecondEntity(), vparent));
+				elements.put(mactivity.getId(), new Tuple3<Integer,  mxICell, mxICell>(Integer.valueOf(depth), tup.getSecondEntity(), vparent));
 			}
 		}
 		else
@@ -137,7 +137,7 @@ public class BpmnVisualModelGenerator
 			VActivity vactivity = mactivity instanceof MSubProcess? mactivity.hasProperty("file") || mactivity.hasProperty("filename")? 
 				new VExternalSubProcess(graph): new VSubProcess(graph): new VActivity(graph);
 			vactivity.setBpmnElement(mactivity);
-			elements.put(mactivity.getId(), new Tuple3<Integer,  mxICell, mxICell>(new Integer(depth), vactivity, vparent));
+			elements.put(mactivity.getId(), new Tuple3<Integer,  mxICell, mxICell>(Integer.valueOf(depth), vactivity, vparent));
 		}
 		
 		if(mactivity instanceof MSubProcess)

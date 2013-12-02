@@ -147,12 +147,12 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			{
 				// Update stop if newer sequence number
 				if(stopflag.getSecondEntity().intValue()<ackinfo.getEndSequenceNumber())
-					stopflag = new Tuple2<Boolean, Integer>(ackinfo.isStop()? Boolean.TRUE: Boolean.FALSE, new Integer(ackinfo.getEndSequenceNumber()));
+					stopflag = new Tuple2<Boolean, Integer>(ackinfo.isStop()? Boolean.TRUE: Boolean.FALSE, Integer.valueOf(ackinfo.getEndSequenceNumber()));
 				
 				// remove all acked packets
 				for(int i=ackinfo.getStartSequenceNumber(); i<=ackinfo.getEndSequenceNumber(); i++)
 				{
-					DataSendInfo tup = sent.remove(new Integer(i));
+					DataSendInfo tup = sent.remove(Integer.valueOf(i));
 					if(tup!=null)
 					{
 						tup.getFuture().setResult(null);
@@ -345,9 +345,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 //				System.out.println("readyfuture fired");
 				Future<Integer> ret = readyfuture;
 				readyfuture = null;
-//				ret.setResult(new Integer(mpmaxsize));	// todo: packet size*allowed messages?
+//				ret.setResult(Integer.valueOf(mpmaxsize));	// todo: packet size*allowed messages?
 				int pa = sent.size()-maxsend;
-				ret.setResult(new Integer(pa>0? pa*mpmaxsize: mpmaxsize));	
+				ret.setResult(Integer.valueOf(pa>0? pa*mpmaxsize: mpmaxsize));	
 			}
 			else if(isClosed())
 			{

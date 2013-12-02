@@ -367,7 +367,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     		Integer	index	= indices!=null ? indices.get(Thread.currentThread()) : null;
     		if(index==null)
     		{
-    			index	= new Integer(0);
+    			index	= Integer.valueOf(0);
     		}
     		
     		ret	= results!=null && results.size()>index.intValue();
@@ -442,7 +442,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     	synchronized(this)
     	{
 			index	= indices!=null ? indices.get(Thread.currentThread()) : null;
-			index	= index==null ? new Integer(1) : new Integer(index.intValue()+1);
+			index	= index==null ? Integer.valueOf(1) : Integer.valueOf(index.intValue()+1);
 			
 			if(indices==null)
 			{

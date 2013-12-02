@@ -29,7 +29,7 @@ public class ICNPTestPlan extends AbstractMultipleAgentsPlan
 	 */
 	public void body()
 	{
-		IProposalEvaluator	pe	= new ProposalEvaluator(new Integer(5), false);
+		IProposalEvaluator	pe	= new ProposalEvaluator(Integer.valueOf(5), false);
 		// Todo: provide default implementation.
 		IQueryNextroundInfo	qnri	= new IQueryNextroundInfo()
 		{
@@ -58,13 +58,13 @@ public class ICNPTestPlan extends AbstractMultipleAgentsPlan
 		// Create 3 participants with different offers.
 		Map[] args = new Map[]{new HashMap(), new HashMap(), new HashMap()};
 		
-		args[0].put("offer", new Integer(5));
+		args[0].put("offer", Integer.valueOf(5));
 		args[0].put("execute", Boolean.TRUE);
 		
-		args[1].put("offer", new Integer(1));
+		args[1].put("offer", Integer.valueOf(1));
 		args[1].put("execute", Boolean.TRUE);
 		
-		args[2].put("offer", new Integer(7));
+		args[2].put("offer", Integer.valueOf(7));
 		args[2].put("execute", new Boolean(executeall));	// Fails when only one is needed, to check if proposal 5 gets executed.
 
 		List agents = createAgents("/jadex/bdi/testcases/planlib/ICNPReceiver.agent.xml", args);	

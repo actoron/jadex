@@ -71,8 +71,8 @@ public class ProduceOreTask extends AbstractTask
 		capacity	+= Math.min(ore, (time + progress)/TIME);
 		ore	-= Math.min(ore, (time + progress)/TIME);
 		time	= (time + progress)%TIME;
-		target.setProperty(AnalyzeTargetTask.PROPERTY_ORE, new Integer(ore));
-		target.setProperty(PROPERTY_CAPACITY, new Integer(capacity));
+		target.setProperty(AnalyzeTargetTask.PROPERTY_ORE, Integer.valueOf(ore));
+		target.setProperty(PROPERTY_CAPACITY, Integer.valueOf(capacity));
 		
 		if(ore==0)
 		{

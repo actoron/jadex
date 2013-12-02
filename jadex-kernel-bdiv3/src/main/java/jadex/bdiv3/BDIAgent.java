@@ -481,7 +481,7 @@ public class BDIAgent extends MicroAgent
 	}
 	
 	/** Saved init writes. */
-	protected static Map<Object, List<Object[]>> initwrites = new HashMap<Object, List<Object[]>>();
+	protected final static Map<Object, List<Object[]>> initwrites = new HashMap<Object, List<Object[]>>();
 	
 	/**
 	 * 
@@ -569,7 +569,8 @@ public class BDIAgent extends MicroAgent
 		}
 		else if(byte.class.equals(ct))
 		{
-			val = new Byte(((Integer)val).byteValue());
+//			val = new Byte(((Integer)val).byteValue());
+			val = Byte.valueOf(((Integer)val).byteValue());
 		}
 		Array.set(array, index, val);
 		
@@ -677,7 +678,7 @@ public class BDIAgent extends MicroAgent
 			}
 			else if(SReflect.getWrappedType(type)!=type)	// Number type
 			{
-				ret	= new Integer(0);
+				ret	= Integer.valueOf(0);
 			}
 		}
 		
@@ -940,7 +941,8 @@ public class BDIAgent extends MicroAgent
 		}
 		else if(byte.class.equals(ct))
 		{
-			val = new Byte(((Integer)val).byteValue());
+//			val = new Byte(((Integer)val).byteValue());
+			val = Byte.valueOf(((Integer)val).byteValue());
 		}
 		Array.set(array, index, val);
 		

@@ -16,7 +16,7 @@ public class MessageReceiverPlan extends Plan
 		int msgcnt = ((Integer)getBeliefbase().getBelief("msg_cnt").getFact()).intValue();
 		int received = ((Integer)getBeliefbase().getBelief("received").getFact()).intValue();
 		received++;
-		getBeliefbase().getBelief("received").setFact(new Integer(received));
+		getBeliefbase().getBelief("received").setFact(Integer.valueOf(received));
 		
 		if(received==msgcnt)
 		{

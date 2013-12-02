@@ -48,8 +48,8 @@ public class TestNodeTest extends TestCase
 		
 		// test 1==1 -> true
 		List values = new ArrayList();
-		values.add(new Integer(1));
-		values.add(new Integer(1));
+		values.add(Integer.valueOf(1));
+		values.add(Integer.valueOf(1));
 		FunctionCall fc = new FunctionCall(new OperatorFunction(IOperator.EQUAL), values);
 		final TestCondition cond = new TestCondition(new PredicateConstraint(fc));
 				
@@ -94,7 +94,7 @@ public class TestNodeTest extends TestCase
 		
 		List values = new ArrayList();
 		values.add(new Variable("?num", OAVJavaType.java_integer_type));
-		values.add(new Integer(1));
+		values.add(Integer.valueOf(1));
 		FunctionCall fc = new FunctionCall(new OperatorFunction(IOperator.EQUAL), values);
 		TestCondition tcond = new TestCondition(new PredicateConstraint(fc));
 		
@@ -123,7 +123,7 @@ public class TestNodeTest extends TestCase
 		
 		IOAVState state = system.getState();
 		Object b1 = state.createRootObject(Numberbox.numberbox_type);
-		state.setAttributeValue(b1, Numberbox.numberbox_has_solution, new Integer(1));
+		state.setAttributeValue(b1, Numberbox.numberbox_has_solution, Integer.valueOf(1));
 		system.fireAllRules();
 		
 		assertTrue(triggers.size()==1);

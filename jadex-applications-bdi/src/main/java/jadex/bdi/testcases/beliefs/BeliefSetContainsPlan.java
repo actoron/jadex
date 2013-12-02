@@ -17,7 +17,7 @@ public class BeliefSetContainsPlan extends Plan
 		TestReport tr = new TestReport("#1", "Test if same fact can be added to belief set agentids.");
 		int before = getBeliefbase().getBeliefSet("integers").size();
 		getLogger().info("Test 1: Test if same fact is added to belief set.");
-		getBeliefbase().getBeliefSet("integers").addFact(new Integer(1));
+		getBeliefbase().getBeliefSet("integers").addFact(Integer.valueOf(1));
 		int after = getBeliefbase().getBeliefSet("integers").size();
 		if(before==after)
 		{

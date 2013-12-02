@@ -95,8 +95,8 @@ public class Component extends ParameterElement
 		parameters.put(DESCRIPTION, desc);
 
 		// parameters.put(STATE, STATE_UNKNOWN);
-		parameters.put(MESSAGE_COUNT, new Integer(NO_MESSAGES));
-		parameters.put(MESSAGE_VISIBLE, new Integer(NO_MESSAGES));
+		parameters.put(MESSAGE_COUNT, Integer.valueOf(NO_MESSAGES));
+		parameters.put(MESSAGE_VISIBLE, Integer.valueOf(NO_MESSAGES));
 
 		parameters.put(NAME, desc==null? DUMMY_NAME: desc.getName().getName());
 		parameters.put(CLASS, Component.class.getSimpleName());
@@ -141,8 +141,8 @@ public class Component extends ParameterElement
 					}
 				}
 			}
-			parameters.put(MESSAGE_VISIBLE, new Integer(msg_visible));
-			parameters.put(MESSAGE_COUNT, new Integer(messages.size()));
+			parameters.put(MESSAGE_VISIBLE, Integer.valueOf(msg_visible));
+			parameters.put(MESSAGE_COUNT, Integer.valueOf(messages.size()));
 		}
 
 		return parameters;
@@ -208,7 +208,7 @@ public class Component extends ParameterElement
 			{
 				if (zeromessages) {
 					filters.add(filter[i]);
-				} else if (!filter[i].containsValue(Component.MESSAGE_VISIBLE, new Integer(Component.NO_MESSAGES)))  {
+				} else if (!filter[i].containsValue(Component.MESSAGE_VISIBLE, Integer.valueOf(Component.NO_MESSAGES)))  {
 					filters.add(filter[i]);
 				}
 			}

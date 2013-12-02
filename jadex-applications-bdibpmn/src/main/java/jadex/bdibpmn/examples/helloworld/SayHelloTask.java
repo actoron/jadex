@@ -15,6 +15,6 @@ public class SayHelloTask	extends AbstractTask
 		int	x	= ((Number)context.getParameterValue("x")).intValue();
 		x++;
 		System.out.println("Setting x to: "+x);		
-		context.setParameterValue("x", new Integer(x));
+		context.setParameterValue("x", Integer.valueOf(x));
 	}
 }

@@ -87,7 +87,7 @@ public class OAVJavaAttributeType extends OAVAttributeType
 		// Length of arrays.
 		if("length".equals(getName()) && ((OAVJavaType)getObjectType()).getClazz().isArray())
 		{
-			ret	= new Integer(Array.getLength(object));
+			ret	= Integer.valueOf(Array.getLength(object));
 		}
 		
 		// A property of an IPropertyObject.

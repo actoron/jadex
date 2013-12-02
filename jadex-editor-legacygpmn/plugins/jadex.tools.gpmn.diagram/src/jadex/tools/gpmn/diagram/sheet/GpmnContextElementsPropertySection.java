@@ -190,9 +190,9 @@ public class GpmnContextElementsPropertySection extends
 				if (BOOLEAN_VALUES[0].equals(String
 						.valueOf(((ContextElement) element).isSet())))
 				{
-					return new Integer(0);
+					return Integer.valueOf(0);
 				}
-				return new Integer(1);
+				return Integer.valueOf(1);
 			}
 			
 			@Override

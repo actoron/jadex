@@ -91,9 +91,9 @@ public class OAVMixedWeakState	extends OAVAbstractState
 //								Object	type	= it.next();
 //								Integer	cnt	= (Integer)cnts.get(type);
 //								if(cnt!=null)
-//									cnt	= new Integer(cnt.intValue()+1);
+//									cnt	= Integer.valueOf(cnt.intValue()+1);
 //								else
-//									cnt	= new Integer(1);
+//									cnt	= Integer.valueOf(1);
 //								cnts.put(type, cnt);
 //							}
 							
@@ -104,9 +104,9 @@ public class OAVMixedWeakState	extends OAVAbstractState
 								Object type = getType(id);
 								Integer	cnt	= (Integer)cnts.get(type);
 								if(cnt!=null)
-									cnt	= new Integer(cnt.intValue()+1);
+									cnt	= Integer.valueOf(cnt.intValue()+1);
 								else
-									cnt	= new Integer(1);
+									cnt	= Integer.valueOf(1);
 								cnts.put(type, cnt);
 							}
 							

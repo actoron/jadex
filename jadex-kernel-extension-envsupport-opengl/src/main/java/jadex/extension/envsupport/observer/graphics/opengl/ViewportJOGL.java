@@ -500,7 +500,7 @@ public class ViewportJOGL extends AbstractViewport
 		// Prepare texture
 		int[] texId = new int[1];
 		gl.glGenTextures(1, texId, 0);
-		Integer texture = new Integer(texId[0]);
+		Integer texture = Integer.valueOf(texId[0]);
 
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texId[0]);

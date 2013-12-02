@@ -149,7 +149,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 //		Object[] ret = (Object[])steps.remove(0);
 //		notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_STEP, 
 //			ret[0].getClass().getName(), ret[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)ret[0])));
-////		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
+////		notifyListeners(new ChangeEvent(this, "removeStep", Integer.valueOf(0)));
 //		return ret;
 //	}
 	

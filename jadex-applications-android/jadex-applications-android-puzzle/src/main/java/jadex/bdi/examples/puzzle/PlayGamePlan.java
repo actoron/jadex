@@ -25,7 +25,7 @@ public class PlayGamePlan extends Plan
 		long	start	= getTime();
 		long	startmem	= Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 		IGoal play = createGoal("makemove");
-		play.getParameter("depth").setValue(new Integer(0));
+		play.getParameter("depth").setValue(Integer.valueOf(0));
 		try
 		{
 			dispatchSubgoalAndWait(play);

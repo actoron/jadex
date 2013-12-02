@@ -250,7 +250,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 				public void run()
 				{
 					Collection	coll = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.beliefset_has_facts);
-					integer = coll!=null ? new Integer(coll.size()): new Integer(0);
+					integer = coll!=null ? Integer.valueOf(coll.size()): Integer.valueOf(0);
 				}
 			};
 			return invoc.integer;
@@ -258,7 +258,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 		else
 		{
 			Collection	coll = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.beliefset_has_facts);
-			return coll!=null ? new Integer(coll.size()): new Integer(0);
+			return coll!=null ? Integer.valueOf(coll.size()): Integer.valueOf(0);
 		}
 	}
 	

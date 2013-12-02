@@ -66,7 +66,7 @@ public class LocalOutputConnectionHandler extends LocalAbstractConnectionHandler
 		
 		if(allowed>0)
 		{
-			ret = new Future<Integer>(new Integer(allowed));
+			ret = new Future<Integer>(Integer.valueOf(allowed));
 		}
 		else
 		{
@@ -91,7 +91,7 @@ public class LocalOutputConnectionHandler extends LocalAbstractConnectionHandler
 //			System.out.println("ready: "+available);
 			Future<Integer> fut = readyfuture;
 			readyfuture = null;
-			fut.setResult(new Integer(available));
+			fut.setResult(Integer.valueOf(available));
 		}
 	}
 	

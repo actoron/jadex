@@ -253,18 +253,18 @@ public class MathNode	extends ExpressionNode
 		if((left instanceof Boolean) && (right instanceof Boolean)
 			&& (op==AND || op==OR || op==XOR))
 		{
-			left	= new Integer(((Boolean)left).booleanValue()?1:0);
-			right	= new Integer(((Boolean)right).booleanValue()?1:0);
+			left	= Integer.valueOf(((Boolean)left).booleanValue()?1:0);
+			right	= Integer.valueOf(((Boolean)right).booleanValue()?1:0);
 			bool	= true;
 		}
 		// Hack ??? Support Character.
 		if((left instanceof Character))
 		{
-			left	= new Integer(((Character)left).charValue());
+			left	= Integer.valueOf(((Character)left).charValue());
 		}
 		if((right instanceof Character))
 		{
-			right	= new Integer(((Character)right).charValue());
+			right	= Integer.valueOf(((Character)right).charValue());
 		}
 		if(!(left instanceof Number) && left!=null)	// Support null as number???
 		{
@@ -276,8 +276,8 @@ public class MathNode	extends ExpressionNode
 		}
 
 		// Determine return type and calculate value.
-		Number	numleft	= left!=null ? (Number)left : new Integer(0);	// Support null as number???
-		Number	numright	= right!=null ? (Number)right : new Integer(0);	// Support null as number???
+		Number	numleft	= left!=null ? (Number)left : Integer.valueOf(0);	// Support null as number???
+		Number	numright	= right!=null ? (Number)right : Integer.valueOf(0);	// Support null as number???
 		Object	value	= null;
 		if(numleft instanceof Double || numright instanceof Double)
 		{
@@ -379,37 +379,37 @@ public class MathNode	extends ExpressionNode
 			switch(op)
 			{
 				case ADD:
-					value	= new Integer(numleft.intValue() + numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() + numright.intValue());
 					break;
 				case SUBSTRACT:
-					value	= new Integer(numleft.intValue() - numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() - numright.intValue());
 					break;
 				case MULTIPLY:
-					value	= new Integer(numleft.intValue() * numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() * numright.intValue());
 					break;
 				case DIVIDE:
-					value	= new Integer(numleft.intValue() / numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() / numright.intValue());
 					break;
 				case MODULO:
-					value	= new Integer(numleft.intValue() % numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() % numright.intValue());
 					break;
 				case AND:
-					value	= new Integer(numleft.intValue() & numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() & numright.intValue());
 					break;
 				case OR:
-					value	= new Integer(numleft.intValue() | numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() | numright.intValue());
 					break;
 				case XOR:
-					value	= new Integer(numleft.intValue() ^ numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() ^ numright.intValue());
 					break;
 				case LSHIFT:
-					value	= new Integer(numleft.intValue() << numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() << numright.intValue());
 					break;
 				case RSHIFT:
-					value	= new Integer(numleft.intValue() >> numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() >> numright.intValue());
 					break;
 				case URSHIFT:
-					value	= new Integer(numleft.intValue() >>> numright.intValue());
+					value	= Integer.valueOf(numleft.intValue() >>> numright.intValue());
 					break;
 			}
 		}
@@ -537,7 +537,7 @@ public class MathNode	extends ExpressionNode
 				}
 				else
 				{
-					value	= new Integer(- numval.intValue());
+					value	= Integer.valueOf(- numval.intValue());
 				}
 				break;
 			case NOT:
@@ -551,7 +551,7 @@ public class MathNode	extends ExpressionNode
 				}
 				else
 				{
-					value	= new Integer(~ numval.intValue());
+					value	= Integer.valueOf(~ numval.intValue());
 				}
 				break;
 		}

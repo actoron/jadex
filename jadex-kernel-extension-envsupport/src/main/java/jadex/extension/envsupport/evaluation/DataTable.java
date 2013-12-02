@@ -36,7 +36,7 @@ public class DataTable
 		this.columnnames = columnnames;
 		this.columns = new HashMap();
 		for(int i=0; i<columnnames.length; i++)
-			columns.put(columnnames[i], new Integer(i));
+			columns.put(columnnames[i], Integer.valueOf(i));
 	}
 	
 	//-------- methods --------

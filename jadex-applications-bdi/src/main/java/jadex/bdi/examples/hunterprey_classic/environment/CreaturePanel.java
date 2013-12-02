@@ -149,8 +149,8 @@ public class CreaturePanel extends JPanel
 							""+(i+1),
 							creatures[i] instanceof Hunter? hunter: prey,
 							creatures[i].getName(),
-							new Integer(creatures[i].getAge()),
-							new Integer(creatures[i].getPoints())},
+							Integer.valueOf(creatures[i].getAge()),
+							Integer.valueOf(creatures[i].getPoints())},
 							creatures[i]);
 					}
 					if(obs && (creatures[i] instanceof Observer))
@@ -159,7 +159,7 @@ public class CreaturePanel extends JPanel
 							""+(i+1),
 							observer,
 							creatures[i].getName(),
-							new Integer(creatures[i].getAge())},
+							Integer.valueOf(creatures[i].getAge())},
 							creatures[i]);
 					}
 				}

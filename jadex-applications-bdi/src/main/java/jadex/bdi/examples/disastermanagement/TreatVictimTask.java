@@ -55,7 +55,7 @@ public class TreatVictimTask extends AbstractTask
 			{
 				obj.setProperty(DeliverPatientTask.PROPERTY_PATIENT, Boolean.TRUE);
 				victims	= Math.max(victims-1, 0);
-				disaster.setProperty("victims", new Integer(victims));
+				disaster.setProperty("victims", Integer.valueOf(victims));
 			}
 	
 			// Remove disaster object when everything is now fine.

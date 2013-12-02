@@ -173,7 +173,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	protected ComponentFilter[] agentfilter;
 
 	/** The agentfilter for zero messages*/
-	protected static final ComponentFilter[] zeromessages = new ComponentFilter[] {new ComponentFilter(Component.MESSAGE_VISIBLE, new Integer(Component.NO_MESSAGES))};	
+	protected static final ComponentFilter[] zeromessages = new ComponentFilter[] {new ComponentFilter(Component.MESSAGE_VISIBLE, Integer.valueOf(Component.NO_MESSAGES))};	
 	
 	/** Observe all new agents. */
 	protected boolean observe_all_new;
@@ -939,10 +939,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 				af.addValue(Component.STATE, Component.STATE_DEAD);
 				filters.add(afs[i]);
 			}
-			if(afs[i].containsValue(Component.MESSAGE_VISIBLE, new Integer(Component.NO_MESSAGES)))
+			if(afs[i].containsValue(Component.MESSAGE_VISIBLE, Integer.valueOf(Component.NO_MESSAGES)))
 			{
 				ComponentFilter af = new ComponentFilter();
-				af.addValue(Component.STATE, new Integer(Component.NO_MESSAGES));
+				af.addValue(Component.STATE, Integer.valueOf(Component.NO_MESSAGES));
 				filters.add(afs[i]);
 			}
 		}

@@ -62,7 +62,7 @@ public class PurchaseBookPlan extends Plan
 		// Initiate a call-for-proposal.
 		IGoal cnp = createGoal("cnp_initiate");
 		cnp.getParameter("cfp").setValue(order.getTitle());
-		cnp.getParameter("cfp_info").setValue(new Integer(acceptable_price));
+		cnp.getParameter("cfp_info").setValue(Integer.valueOf(acceptable_price));
 		cnp.getParameterSet("receivers").addValues(sellers);		
 		try
 		{

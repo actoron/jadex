@@ -210,7 +210,7 @@ public class Hanoi
 		for(int i=discs; i>0; i--)
 		{
 			Object	disc	= state.createObject(disc_type);
-			state.setAttributeValue(disc, disc_has_size, new Integer(i));
+			state.setAttributeValue(disc, disc_has_size, Integer.valueOf(i));
 			state.addAttributeValue(agent, agent_has_tower_a, disc);
 		}
 		
@@ -351,7 +351,7 @@ public class Hanoi
 			state.setAttributeValue(rootgoal, movegoal_has_from, from);
 			state.setAttributeValue(rootgoal, movegoal_has_to, to);
 			state.setAttributeValue(rootgoal, movegoal_has_temp, temp);
-			state.setAttributeValue(rootgoal, movegoal_has_number, new Integer(num));
+			state.setAttributeValue(rootgoal, movegoal_has_number, Integer.valueOf(num));
 			state.addAttributeValue(agent, agent_has_movegoals, rootgoal);
 		}
 
@@ -444,14 +444,14 @@ public class Hanoi
 				state.setAttributeValue(subgoal1, movegoal_has_from, from);
 				state.setAttributeValue(subgoal1, movegoal_has_to, temp);
 				state.setAttributeValue(subgoal1, movegoal_has_temp, to);
-				state.setAttributeValue(subgoal1, movegoal_has_number, new Integer(number-1));
+				state.setAttributeValue(subgoal1, movegoal_has_number, Integer.valueOf(number-1));
 				state.addAttributeValue(agent, agent_has_movegoals, subgoal1);
 	
 				Object	subgoal2	= state.createObject(movegoal_type);
 				state.setAttributeValue(subgoal2, movegoal_has_from, from);
 				state.setAttributeValue(subgoal2, movegoal_has_to, to);
 				state.setAttributeValue(subgoal2, movegoal_has_temp, temp);
-				state.setAttributeValue(subgoal2, movegoal_has_number, new Integer(1));
+				state.setAttributeValue(subgoal2, movegoal_has_number, Integer.valueOf(1));
 				state.setAttributeValue(subgoal2, movegoal_has_precodition, subgoal1);
 				state.addAttributeValue(agent, agent_has_movegoals, subgoal2);
 	
@@ -459,7 +459,7 @@ public class Hanoi
 				state.setAttributeValue(subgoal3, movegoal_has_from, temp);
 				state.setAttributeValue(subgoal3, movegoal_has_to, to);
 				state.setAttributeValue(subgoal3, movegoal_has_temp, from);
-				state.setAttributeValue(subgoal3, movegoal_has_number, new Integer(number-1));
+				state.setAttributeValue(subgoal3, movegoal_has_number, Integer.valueOf(number-1));
 				state.setAttributeValue(subgoal3, movegoal_has_precodition, subgoal2);
 				state.setAttributeValue(subgoal3, movegoal_has_postcodition, goal);
 				state.addAttributeValue(agent, agent_has_movegoals, subgoal3);
@@ -671,7 +671,7 @@ public class Hanoi
 		state.setAttributeValue(rootgoal, movegoal_has_from, from);
 		state.setAttributeValue(rootgoal, movegoal_has_to, to);
 		state.setAttributeValue(rootgoal, movegoal_has_temp, temp);
-		state.setAttributeValue(rootgoal, movegoal_has_number, new Integer(num));
+		state.setAttributeValue(rootgoal, movegoal_has_number, Integer.valueOf(num));
 		state.addAttributeValue(agent, agent_has_movegoals, rootgoal);
 		state.notifyEventListeners();
 		

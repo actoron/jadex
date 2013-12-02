@@ -54,7 +54,7 @@ public class SorterFilterTableModel extends AbstractIndexTableModel implements I
         {
             if (isFiltered(getRowData(row)))
             {
-                indexList.add(new Integer(row));
+                indexList.add(Integer.valueOf(row));
             }
         }
 
@@ -71,7 +71,7 @@ public class SorterFilterTableModel extends AbstractIndexTableModel implements I
     {
         for (int row = firstRow; row <= lastRow; row++)
         {
-            int index = indexList.indexOf(new Integer(row));
+            int index = indexList.indexOf(Integer.valueOf(row));
             if (index != -1)
             {
                 indexList.remove(index);
@@ -104,10 +104,10 @@ public class SorterFilterTableModel extends AbstractIndexTableModel implements I
                     // if result >=0 then this is the position of an element found in the list
                     // note: If the list contains multiple elements equal to the specified object,
                     // there is no guarantee which one will be found
-                    int result = Collections.binarySearch(indexList, new Integer(row),  rowComparator);
+                    int result = Collections.binarySearch(indexList, Integer.valueOf(row),  rowComparator);
                     index = result < 0 ? -1 - result : result;
                 }
-                indexList.add(index, new Integer(row));
+                indexList.add(index, Integer.valueOf(row));
                 fireTableRowsInserted(index, index);
 
 
@@ -127,7 +127,7 @@ public class SorterFilterTableModel extends AbstractIndexTableModel implements I
         {
             for (int row = firstRow; row <= lastRow; row++)
             {
-                int index = indexList.indexOf(new Integer(row));
+                int index = indexList.indexOf(Integer.valueOf(row));
                 if (index != -1)
                 {
                     fireTableRowsUpdated(index, index);

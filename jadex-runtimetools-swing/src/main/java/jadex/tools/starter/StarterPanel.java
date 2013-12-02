@@ -657,8 +657,8 @@ public class StarterPanel extends JLayeredPane
 		loading.setBackground(new Color(0, 0, 0, 128));
 		loading.setVisible(false);
 		
-		this.add(content, new Integer(0));
-		this.add(loading, new Integer(1));
+		this.add(content, Integer.valueOf(0));
+		this.add(loading, Integer.valueOf(1));
 		
 		// Manually resize inner panels when layered pane is resized
 		// as layered pane does not support separate layout manager for each layer (grrr).
@@ -753,7 +753,7 @@ public class StarterPanel extends JLayeredPane
 			monicb.setSelectedItem(PublishEventLevel.OFF);
 			synccb.setSelected(false);
 			genname.setSelected(false);
-			numcomponents.setValue(new Integer(1));
+			numcomponents.setValue(Integer.valueOf(1));
 			
 			lastfile	= adf;
 			lastrid	= rid;
@@ -1078,7 +1078,7 @@ public class StarterPanel extends JLayeredPane
 				setStartSuspended(props.getBooleanProperty("startsuspended"));
 
 				setAutoGenerate(props.getBooleanProperty("autogenerate"));
-				numcomponents.setValue(new Integer(props.getIntProperty("number")));
+				numcomponents.setValue(Integer.valueOf(props.getIntProperty("number")));
 				
 				ret.setResult(null);
 			}

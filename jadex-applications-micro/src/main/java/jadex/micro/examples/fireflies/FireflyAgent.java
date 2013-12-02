@@ -124,7 +124,7 @@ public class FireflyAgent extends MicroAgent
 						params.put(ISpaceAction.OBJECT_ID, avatar.getId());
 						params.put(MoveAction.PARAMETER_POSITION, newpos);
 						params.put(MoveAction.PARAMETER_DIRECTION, new Double(newdir));
-						params.put(MoveAction.PARAMETER_CLOCK, new Integer(clock));
+						params.put(MoveAction.PARAMETER_CLOCK, Integer.valueOf(clock));
 						space.performSpaceAction("move", params, null);
 						
 						waitForTick(this);

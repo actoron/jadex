@@ -107,7 +107,7 @@ public class SwitchPlatformCommand extends ACliCommand
 									public void customResultAvailable(IExternalAccess exta)
 									{
 										Tuple2<String, Integer> osid = context.getShell().getSessionId();
-										Tuple2<String, Integer> nsid = new Tuple2<String, Integer>(osid.getFirstEntity(), new Integer(osid.getSecondEntity().intValue()+1)); 
+										Tuple2<String, Integer> nsid = new Tuple2<String, Integer>(osid.getFirstEntity(), Integer.valueOf(osid.getSecondEntity().intValue()+1)); 
 										context.getShell().addSubshell(new RemoteCliShell(cliser, nsid));
 //										ret.setResult(cliser);
 										ret.setResult(null);

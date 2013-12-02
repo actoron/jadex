@@ -37,7 +37,7 @@ public class RSChartTest extends TestCase
 		IFuture<IChartService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IChartService.class);
 		IChartService hs = fut.get(sus);
 		double[][] data = new double[][] {{30, 50, 20, 90}, {55, 88, 11, 14}};
-		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , new Integer[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get(sus);
+		byte[] result = hs.getLineChart(250, 100, data, new String[]{"a", "b", "c", "d"} , Integer.valueOf[]{Color.BLACK, Color.BLUE, Color.CYAN, Color.YELLOW}).get(sus);
 		
 		
 //		RestTemplate rt = new RestTemplate();

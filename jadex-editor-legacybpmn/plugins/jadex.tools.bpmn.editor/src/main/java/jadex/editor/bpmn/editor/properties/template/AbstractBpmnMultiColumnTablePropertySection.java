@@ -447,11 +447,11 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				{
 					if(values[i].equals(((MultiColumnTableRow)element).getColumnValueAt(i)))
 					{
-						return new Integer(i);
+						return Integer.valueOf(i);
 					}
 				}
 				// fall through
-				return new Integer(0);
+				return Integer.valueOf(0);
 			}
 	
 			protected void doSetValue(Object element, Object value)
@@ -478,12 +478,12 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			protected Object getValue(Object element)
 			{
 				Object value = ((MultiColumnTableRow)element).getColumnValueAt(idx);
-				Integer val = new Integer(0);
+				Integer val = Integer.valueOf(0);
 				if(value instanceof String && ((String)value).length()>0)
 				{
 					try
 					{
-						val = new Integer((String)value);
+						val = Integer.valueOf((String)value);
 					}
 					catch(Exception e)
 					{

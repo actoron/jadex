@@ -43,7 +43,7 @@ public class PassedFailedPlan extends Plan
 	{
 		getLogger().info("Plan passed: "+this);//getName());
 		int num = ((Integer)getBeliefbase().getBelief("cnt").getFact()).intValue();
-		getBeliefbase().getBelief("cnt").setFact(new Integer(num+1));
+		getBeliefbase().getBelief("cnt").setFact(Integer.valueOf(num+1));
 		if(num==3)
 		{
 			tr.setSucceeded(true);
@@ -63,7 +63,7 @@ public class PassedFailedPlan extends Plan
 //		getLogger().info("Plan failed: "+getName()+" reason: "+getException());
 		getLogger().info("Plan failed: "+this+" reason: "+getException());
 		int num = ((Integer)getBeliefbase().getBelief("cnt").getFact()).intValue();
-		getBeliefbase().getBelief("cnt").setFact(new Integer(num+1));
+		getBeliefbase().getBelief("cnt").setFact(Integer.valueOf(num+1));
 		if(num!=3)
 		{
 			tr.setSucceeded(true);

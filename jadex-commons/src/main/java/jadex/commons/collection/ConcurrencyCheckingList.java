@@ -226,7 +226,7 @@ public class ConcurrencyCheckingList implements List, Serializable
 			this.threads	= SCollection.createHashMap();
 
 		Integer	cnt	= (Integer)this.threads.get(Thread.currentThread());
-		cnt	= new Integer(cnt!=null ? cnt.intValue()+1 : 1);
+		cnt	= Integer.valueOf(cnt!=null ? cnt.intValue()+1 : 1);
 		threads.put(Thread.currentThread(), cnt);
 		
 		if(threads.size()>1)
@@ -253,7 +253,7 @@ public class ConcurrencyCheckingList implements List, Serializable
 		assert cnt!=null && cnt.intValue()>0;
 		if(cnt.intValue()>1)
 		{
-			cnt	= new Integer(cnt.intValue()-1);
+			cnt	= Integer.valueOf(cnt.intValue()-1);
 			threads.put(Thread.currentThread(), cnt);
 		}
 		else

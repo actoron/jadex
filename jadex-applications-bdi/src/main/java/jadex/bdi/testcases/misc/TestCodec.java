@@ -48,10 +48,10 @@ public class TestCodec implements IContentCodec, Serializable
 	 */
 	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info, IErrorReporter rep)
 	{
-		return "97".equals(new String(val, Charset.forName("UTF-8"))) ? new Integer(98) : new Integer(96);
+		return "97".equals(new String(val, Charset.forName("UTF-8"))) ? Integer.valueOf(98) : Integer.valueOf(96);
 //		try
 //		{
-//			return new Integer(val);
+//			return Integer.valueOf(val);
 //		}
 //		catch(Exception e)
 //		{

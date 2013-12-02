@@ -2743,7 +2743,7 @@ public class ClipsJadexParser extends Parser {
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:534:21: HexLiteral
                     {
                     HexLiteral7=(Token)match(input,HexLiteral,FOLLOW_HexLiteral_in_integerLiteral1438); 
-                    val = sign!=null && "-".equals(sign.getText())? new Integer("-"+(HexLiteral7!=null?HexLiteral7.getText():null)): new Integer((HexLiteral7!=null?HexLiteral7.getText():null));
+                    val = sign!=null && "-".equals(sign.getText())? Integer.valueOf("-"+(HexLiteral7!=null?HexLiteral7.getText():null)): Integer.valueOf((HexLiteral7!=null?HexLiteral7.getText():null));
 
                     }
                     break;
@@ -2751,7 +2751,7 @@ public class ClipsJadexParser extends Parser {
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:535:4: OctalLiteral
                     {
                     OctalLiteral8=(Token)match(input,OctalLiteral,FOLLOW_OctalLiteral_in_integerLiteral1445); 
-                    val = sign!=null && "-".equals(sign.getText())? new Integer("-"+(OctalLiteral8!=null?OctalLiteral8.getText():null)): new Integer((OctalLiteral8!=null?OctalLiteral8.getText():null));
+                    val = sign!=null && "-".equals(sign.getText())? Integer.valueOf("-"+(OctalLiteral8!=null?OctalLiteral8.getText():null)): Integer.valueOf((OctalLiteral8!=null?OctalLiteral8.getText():null));
 
                     }
                     break;
@@ -2759,7 +2759,7 @@ public class ClipsJadexParser extends Parser {
                     // C:\\Files\\Checkouts\\jadexv2\\jadex-rules\\src\\main\\java\\jadex\\rules\\parser\\conditions\\ClipsJadex.g:536:4: DecimalLiteral
                     {
                     DecimalLiteral9=(Token)match(input,DecimalLiteral,FOLLOW_DecimalLiteral_in_integerLiteral1452); 
-                    val = sign!=null && "-".equals(sign.getText())? new Integer("-"+(DecimalLiteral9!=null?DecimalLiteral9.getText():null)): new Integer((DecimalLiteral9!=null?DecimalLiteral9.getText():null));
+                    val = sign!=null && "-".equals(sign.getText())? Integer.valueOf("-"+(DecimalLiteral9!=null?DecimalLiteral9.getText():null)): Integer.valueOf((DecimalLiteral9!=null?DecimalLiteral9.getText():null));
 
                     }
                     break;

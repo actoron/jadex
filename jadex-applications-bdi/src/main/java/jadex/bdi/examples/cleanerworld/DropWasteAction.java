@@ -44,7 +44,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 			throw new RuntimeException("Wastebin already full: "+wastebin+" "+avatar);
 
 		int wastes = ((Integer)wastebin.getProperty("wastes")).intValue();
-		wastebin.setProperty("wastes", new Integer(wastes+1));
+		wastebin.setProperty("wastes", Integer.valueOf(wastes+1));
 		env.destroySpaceObject(waste.getId());
 		avatar.setProperty("waste", null);
 

@@ -54,7 +54,7 @@ public class ExtinguishFireTask extends AbstractTask
 		}
 		int fire	= ((Number)disaster.getProperty("fire")).intValue();
 		fire	= Math.max(fire-cnt, 0);
-		disaster.setProperty("fire", new Integer(fire));
+		disaster.setProperty("fire", Integer.valueOf(fire));
 		
 		// Remove disaster object when everything is now fine.
 		if(fire==0 && ((Number)disaster.getProperty("chemicals")).intValue()==0 && ((Number)disaster.getProperty("victims")).intValue()==0)

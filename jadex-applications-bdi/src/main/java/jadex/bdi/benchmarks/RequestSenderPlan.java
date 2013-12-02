@@ -39,7 +39,7 @@ public class RequestSenderPlan extends Plan
 			int	challenge	= (int)(Math.random()*Integer.MAX_VALUE);
 
 			IGoal request = createGoal("procap.rp_initiate");
-			request.getParameter("action").setValue(new Integer(challenge));
+			request.getParameter("action").setValue(Integer.valueOf(challenge));
 			request.getParameter("receiver").setValue(receiver);
 			dispatchSubgoalAndWait(request);
 			Integer	response	= (Integer) request.getParameter("result").getValue();

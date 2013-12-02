@@ -80,9 +80,9 @@ public class BeliefChangesPlan extends Plan
 		plans_executed[1]	= ((Integer)getBeliefbase().getBelief("plan_b_executed").getFact()).intValue();
 		plans_executed[2]	= ((Integer)getBeliefbase().getBelief("plan_c_executed").getFact()).intValue();
 		boolean	ret	= plan_a==plans_executed[0] && plan_b==plans_executed[1] && plan_c==plans_executed[2];
-		getBeliefbase().getBelief("plan_a_executed").setFact(new Integer(0));
-		getBeliefbase().getBelief("plan_b_executed").setFact(new Integer(0));
-		getBeliefbase().getBelief("plan_c_executed").setFact(new Integer(0));
+		getBeliefbase().getBelief("plan_a_executed").setFact(Integer.valueOf(0));
+		getBeliefbase().getBelief("plan_b_executed").setFact(Integer.valueOf(0));
+		getBeliefbase().getBelief("plan_c_executed").setFact(Integer.valueOf(0));
 		return ret;
 	}
 }

@@ -164,7 +164,7 @@ public abstract class GpmnAbstractExpression
 			if (targetWrapperClass.equals(Byte.class))
 				return new Byte(num.byteValue());
 			if (targetWrapperClass.equals(Integer.class))
-				return new Integer(num.intValue());
+				return Integer.valueOf(num.intValue());
 			if (targetWrapperClass.equals(Short.class))
 				return new Short(num.shortValue());
 			if (targetWrapperClass.equals(Long.class))

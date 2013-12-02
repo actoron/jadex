@@ -16,7 +16,7 @@ public class PlanConditionTesterPlan extends Plan
 	{
 		TestReport tr = new TestReport("#1", "Test if a condition triggers a plan.");
 		int a1 = ((Integer)getBeliefbase().getBelief("a").getFact()).intValue();
-		getBeliefbase().getBelief("count").setFact(new Integer(1));
+		getBeliefbase().getBelief("count").setFact(Integer.valueOf(1));
 		waitFor(100);
 		int a2 = ((Integer)getBeliefbase().getBelief("a").getFact()).intValue();
 		if(a1+1==a2)
@@ -31,7 +31,7 @@ public class PlanConditionTesterPlan extends Plan
 
 		tr = new TestReport("#2", "Test if a condition triggers a plan with binding.");
 		a1 = ((Integer)getBeliefbase().getBelief("a").getFact()).intValue();
-		getBeliefbase().getBelief("count").setFact(new Integer(2));
+		getBeliefbase().getBelief("count").setFact(Integer.valueOf(2));
 		waitFor(1000);
 		a2 = ((Integer)getBeliefbase().getBelief("a").getFact()).intValue();
 		if(a1+2==a2)

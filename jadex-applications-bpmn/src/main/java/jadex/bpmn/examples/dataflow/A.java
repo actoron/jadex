@@ -28,7 +28,7 @@ public class A extends AbstractTask
 		int a = ia!=null? ia.intValue(): 0;
 		int b = ib!=null? ib.intValue(): 0;
 		
-		context.setParameterValue("c", new Integer(a+b));
+		context.setParameterValue("c", Integer.valueOf(a+b));
 		context.setParameterValue("d", ""+a+b);
 		
 		System.out.println("got param values: "+a+" "+b);

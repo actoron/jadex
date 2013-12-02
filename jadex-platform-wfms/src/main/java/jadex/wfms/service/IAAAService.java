@@ -27,42 +27,42 @@ public interface IAAAService
 	public static final String SEC_ROLE_NONE = "none";
 	
 	// Actions
-	public static final Integer REQUEST_PD_SERVICE				 = new Integer(0);
-	public static final Integer REQUEST_MONITORING_SERVICE		 = new Integer(1);
-	public static final Integer START_PROCESS					 = new Integer(200);
-	public static final Integer REQUEST_AVAILABLE_WORKITEMS		 = new Integer(201);
-	public static final Integer REQUEST_AVAILABLE_ACTIVITIES	 = new Integer(202);
-	public static final Integer COMMIT_WORKITEM					 = new Integer(203);
-	public static final Integer ACQUIRE_WORKITEM				 = new Integer(204);
-	public static final Integer RELEASE_WORKITEM		 		 = new Integer(205);
+	public static final Integer REQUEST_PD_SERVICE				 = Integer.valueOf(0);
+	public static final Integer REQUEST_MONITORING_SERVICE		 = Integer.valueOf(1);
+	public static final Integer START_PROCESS					 = Integer.valueOf(200);
+	public static final Integer REQUEST_AVAILABLE_WORKITEMS		 = Integer.valueOf(201);
+	public static final Integer REQUEST_AVAILABLE_ACTIVITIES	 = Integer.valueOf(202);
+	public static final Integer COMMIT_WORKITEM					 = Integer.valueOf(203);
+	public static final Integer ACQUIRE_WORKITEM				 = Integer.valueOf(204);
+	public static final Integer RELEASE_WORKITEM		 		 = Integer.valueOf(205);
 	
-	public static final Integer ADD_WORKITEM_LISTENER			 = new Integer(300);
-	public static final Integer REMOVE_WORKITEM_LISTENER		 = new Integer(301);
-	public static final Integer ADD_ACTIVITY_LISTENER			 = new Integer(302);
-	public static final Integer REMOVE_ACTIVITY_LISTENER		 = new Integer(303);
+	public static final Integer ADD_WORKITEM_LISTENER			 = Integer.valueOf(300);
+	public static final Integer REMOVE_WORKITEM_LISTENER		 = Integer.valueOf(301);
+	public static final Integer ADD_ACTIVITY_LISTENER			 = Integer.valueOf(302);
+	public static final Integer REMOVE_ACTIVITY_LISTENER		 = Integer.valueOf(303);
 	
-	public static final Integer ADMIN_REQUEST_ALL_ACTIVITIES	 = new Integer(400);
-	public static final Integer ADMIN_TERMINATE_ACTIVITY		 = new Integer(401);
+	public static final Integer ADMIN_REQUEST_ALL_ACTIVITIES	 = Integer.valueOf(400);
+	public static final Integer ADMIN_TERMINATE_ACTIVITY		 = Integer.valueOf(401);
 	
-	public static final Integer ADMIN_ADD_ACTIVITIES_LISTENER	 = new Integer(500);
-	public static final Integer ADMIN_REMOVE_ACTIVITIES_LISTENER = new Integer(501);
-	public static final Integer ADMIN_ADD_LOG_LISTENER			 = new Integer(502);
-	public static final Integer ADMIN_REMOVE_LOG_LISTENER		 = new Integer(503);
-	public static final Integer ADMIN_ADD_PROCESS_LISTENER		 = new Integer(504);
-	public static final Integer ADMIN_REMOVE_PROCESS_LISTENER	 = new Integer(505);
+	public static final Integer ADMIN_ADD_ACTIVITIES_LISTENER	 = Integer.valueOf(500);
+	public static final Integer ADMIN_REMOVE_ACTIVITIES_LISTENER = Integer.valueOf(501);
+	public static final Integer ADMIN_ADD_LOG_LISTENER			 = Integer.valueOf(502);
+	public static final Integer ADMIN_REMOVE_LOG_LISTENER		 = Integer.valueOf(503);
+	public static final Integer ADMIN_ADD_PROCESS_LISTENER		 = Integer.valueOf(504);
+	public static final Integer ADMIN_REMOVE_PROCESS_LISTENER	 = Integer.valueOf(505);
 	
-	public static final Integer PD_REQUEST_MODEL_NAMES			 = new Integer(600);
-	public static final Integer PD_REQUEST_MODEL_PATHS			 = new Integer(601);
-	public static final Integer PD_ADD_PROCESS_MODEL			 = new Integer(602);
-	public static final Integer PD_REMOVE_PROCESS_MODEL			 = new Integer(603);
-	public static final Integer PD_REQUEST_PROCESS_MODEL		 = new Integer(604);
+	public static final Integer PD_REQUEST_MODEL_NAMES			 = Integer.valueOf(600);
+	public static final Integer PD_REQUEST_MODEL_PATHS			 = Integer.valueOf(601);
+	public static final Integer PD_ADD_PROCESS_MODEL			 = Integer.valueOf(602);
+	public static final Integer PD_REMOVE_PROCESS_MODEL			 = Integer.valueOf(603);
+	public static final Integer PD_REQUEST_PROCESS_MODEL		 = Integer.valueOf(604);
 	
-	public static final Integer PD_ADD_REPOSITORY_LISTENER		 = new Integer(700);
-	public static final Integer PD_REMOVE_REPOSITORY_LISTENER	 = new Integer(701);
+	public static final Integer PD_ADD_REPOSITORY_LISTENER		 = Integer.valueOf(700);
+	public static final Integer PD_REMOVE_REPOSITORY_LISTENER	 = Integer.valueOf(701);
 	
 	/** All capabilities */
 	public static final Set<Integer> CAPABILITIES = new HashSet<Integer>(Arrays.asList(
-											   new Integer[] {
+											   Integer.valueOf[] {
 											   REQUEST_PD_SERVICE,
 											   REQUEST_MONITORING_SERVICE,
 											   START_PROCESS,

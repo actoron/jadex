@@ -294,7 +294,7 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 				{
 					Object proxy = context.getProxy();
 					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
-					context.setResult(new Integer(handler.hashCode()));
+					context.setResult(Integer.valueOf(handler.hashCode()));
 					return IFuture.DONE;
 				}
 			});

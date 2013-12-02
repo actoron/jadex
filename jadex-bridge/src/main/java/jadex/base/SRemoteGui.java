@@ -514,7 +514,7 @@ public class SRemoteGui
 				try
 				{
 					int ret = SUtil.indexOfFilename(toremove, filenames);
-					return new Future<Integer>(new Integer(ret));
+					return new Future<Integer>(Integer.valueOf(ret));
 				}
 				catch(Exception e)
 				{

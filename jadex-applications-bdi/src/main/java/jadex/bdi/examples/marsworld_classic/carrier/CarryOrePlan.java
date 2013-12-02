@@ -54,14 +54,14 @@ public class CarryOrePlan extends Plan
 			//System.out.println("CARRY AGENT: Ore loaded...");
 			if(carriedore>0)
 			{
-				getBeliefbase().getBelief("ore").setFact(new Integer(carriedore));
+				getBeliefbase().getBelief("ore").setFact(Integer.valueOf(carriedore));
 				IGoal go_home = createGoal("move.move_dest");
 				go_home.getParameter("destination").setValue(getBeliefbase().getBelief("move.my_home").getFact());
 				dispatchSubgoalAndWait(go_home);
 
 				//System.out.println("CARRY AGENT: Ore delivered...");
 				env.getHomebase().deliverOre(carriedore);
-				getBeliefbase().getBelief("ore").setFact(new Integer(0));
+				getBeliefbase().getBelief("ore").setFact(Integer.valueOf(0));
 			}
 
 			oreamount = target.getOre();

@@ -57,7 +57,7 @@ public class AAgent implements IAService
 				if(cnt[0]<100)
 				{
 //					System.out.println("ma2 called "+cnt[0]+" "+agent.getComponentIdentifier().getLocalName());
-					ret.addIntermediateResult(new Integer(cnt[0]++));
+					ret.addIntermediateResult(Integer.valueOf(cnt[0]++));
 					agent.waitForDelay(10, this);
 				}
 				else

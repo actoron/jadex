@@ -91,7 +91,7 @@ public class CleanerBDI
 	
 	/** The raster for memorizing positions. */
 	@Belief
-	protected Tuple2<Integer, Integer> raster = new Tuple2<Integer, Integer>(new Integer(10), new Integer(10));
+	protected Tuple2<Integer, Integer> raster = new Tuple2<Integer, Integer>(Integer.valueOf(10), Integer.valueOf(10));
 
 	/** The visited positions. */
 	@Belief

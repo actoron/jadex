@@ -421,8 +421,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					
 					for(int j=0; j<num; j++)
 					{
-						fetcher.setValue("$number", new Integer(j));
-						fetcher.setValue("$n", new Integer(j));
+						fetcher.setValue("$number", Integer.valueOf(j));
+						fetcher.setValue("$n", Integer.valueOf(j));
 						Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
 						
 						ISpaceObject so = this.createSpaceObject((String)MEnvSpaceType.getProperty(mobj, "type"), props, null);
@@ -989,7 +989,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //				
 //				for(int j=0; j<num; j++)
 //				{
-//					fetcher.setValue("$number", new Integer(j));
+//					fetcher.setValue("$number", Integer.valueOf(j));
 //					Map props = convertProperties(mprops, fetcher);
 //					this.createSpaceObject((String)getProperty(mobj, "type"), props, null);
 //				}

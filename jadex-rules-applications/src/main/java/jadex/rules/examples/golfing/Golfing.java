@@ -109,7 +109,7 @@ public class Golfing
 		c2.addConstraint(new BoundConstraint(null, joe));
 		c2.addConstraint(new BoundConstraint(golfer_has_position, joe_pos));
 		c2.addConstraint(new BoundConstraint(golfer_has_color, joe_color));
-		c2.addConstraint(new LiteralConstraint(golfer_has_position, new Integer(2)));
+		c2.addConstraint(new LiteralConstraint(golfer_has_position, Integer.valueOf(2)));
 		c2.addConstraint(new BoundConstraint(golfer_has_position, fred_pos, IOperator.NOTEQUAL));
 		c2.addConstraint(new BoundConstraint(golfer_has_color, fred_color, IOperator.NOTEQUAL));
 
@@ -129,8 +129,8 @@ public class Golfing
 		c4.addConstraint(new BoundConstraint(null, tom));
 		c4.addConstraint(new BoundConstraint(golfer_has_position, tom_pos));
 		c4.addConstraint(new BoundConstraint(golfer_has_color, tom_color));
-		c4.addConstraint(new LiteralConstraint(golfer_has_position, new Integer(1), IOperator.NOTEQUAL));
-		c4.addConstraint(new LiteralConstraint(golfer_has_position, new Integer(4), IOperator.NOTEQUAL));
+		c4.addConstraint(new LiteralConstraint(golfer_has_position, Integer.valueOf(1), IOperator.NOTEQUAL));
+		c4.addConstraint(new LiteralConstraint(golfer_has_position, Integer.valueOf(4), IOperator.NOTEQUAL));
 		c4.addConstraint(new LiteralConstraint(golfer_has_color, "orange", IOperator.NOTEQUAL));
 		c4.addConstraint(new BoundConstraint(golfer_has_position, fred_pos, IOperator.NOTEQUAL));
 		c4.addConstraint(new BoundConstraint(golfer_has_color, fred_color, IOperator.NOTEQUAL));
@@ -140,7 +140,7 @@ public class Golfing
 		c4.addConstraint(new BoundConstraint(golfer_has_color, bob_color, IOperator.NOTEQUAL));
 
 		ObjectCondition	c5	= new ObjectCondition(golfer_type);
-		c5.addConstraint(new ValueSourceReturnValueConstraint(golfer_has_position, new FunctionCall(IFunction.SUM, new Object[]{fred_pos, new Integer(1)})));
+		c5.addConstraint(new ValueSourceReturnValueConstraint(golfer_has_position, new FunctionCall(IFunction.SUM, new Object[]{fred_pos, Integer.valueOf(1)})));
 		c5.addConstraint(new LiteralConstraint(golfer_has_color, "blue"));
 		c5.addConstraint(new OrConstraint(new IConstraint[]
 		{
@@ -237,7 +237,7 @@ public class Golfing
 	{
 		String[]	names	= new String[]{"Fred", "Joe", "Bob", "Tom"};
 		String[]	colors	= new String[]{"red", "blue", "plaid", "orange"};
-		Integer[]	positions	= new Integer[]{new Integer(1), new Integer(2), new Integer(3), new Integer(4)};
+		Integer[]	positions	= new Integer[]{Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3), Integer.valueOf(4)};
 		IOAVState	state	= OAVStateFactory.createOAVState(golfing_type_model);
 		
 		for(int i=0; i<names.length; i++)

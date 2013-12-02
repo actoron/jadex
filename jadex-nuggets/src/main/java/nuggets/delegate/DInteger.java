@@ -35,6 +35,6 @@ public class DInteger extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Integer((String)value);
+		return Integer.valueOf((String)value);
 	}
 }

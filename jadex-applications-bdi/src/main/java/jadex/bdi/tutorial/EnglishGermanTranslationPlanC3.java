@@ -50,7 +50,7 @@ public class EnglishGermanTranslationPlanC3 extends Plan
 
 				// Increment the succeeded translation counter.
 				int cnt = ((Integer)getBeliefbase().getBelief("transcnt").getFact()).intValue();
-				getBeliefbase().getBelief("transcnt").setFact(new Integer(cnt+1));
+				getBeliefbase().getBelief("transcnt").setFact(Integer.valueOf(cnt+1));
 				getLogger().info("Translation count is now:"+(cnt+1));
 			}
 			else

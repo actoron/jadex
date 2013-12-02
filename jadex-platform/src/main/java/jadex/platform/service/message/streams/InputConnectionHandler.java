@@ -199,26 +199,26 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 						forwardData(dat);
 						
 						// Forward possibly stored data
-						Tuple2<byte[], Boolean> nextdata = data.remove(new Integer(getSequenceNumber()+1));
+						Tuple2<byte[], Boolean> nextdata = data.remove(Integer.valueOf(getSequenceNumber()+1));
 						for(; nextdata!=null ;)
 						{
 //							System.out.println("forwarding stored: "+(getSequenceNumber()+1));
 							forwardData(nextdata.getFirstEntity());
-							nextdata = data.remove(new Integer(getSequenceNumber()+1));
+							nextdata = data.remove(Integer.valueOf(getSequenceNumber()+1));
 						}
 					}
 					else
 					{
 //						System.out.println("storing: "+seqnumber+", size="+data.size()+", lastack="+lastack);
 						// ack msg may be lost, repeat ack msg
-						if(lastack>=seqnumber || data.containsKey(new Integer(seqnumber)))
+						if(lastack>=seqnumber || data.containsKey(Integer.valueOf(seqnumber)))
 						{
 							// todo: ack also more than one packet?
 							sendDataAck(seqnumber, seqnumber, false);
 						}
 						else
 						{
-							data.put(new Integer(seqnumber), new Tuple2<byte[], Boolean>(dat, Boolean.FALSE));
+							data.put(Integer.valueOf(seqnumber), new Tuple2<byte[], Boolean>(dat, Boolean.FALSE));
 							if(data.size()>maxbuf)
 							{
 								System.out.println("Closing connection due to package loss: "+seqnumber+" :"+data.size());
@@ -313,8 +313,8 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 		while(seqno>lastack)
 		{
 			// Skip empty or acknowledged slots to find first unack slot from right.
-			while(seqno>getSequenceNumber() && (!data.containsKey(new Integer(seqno)) 
-				|| data.get(new Integer(seqno)).getSecondEntity().booleanValue()))
+			while(seqno>getSequenceNumber() && (!data.containsKey(Integer.valueOf(seqno)) 
+				|| data.get(Integer.valueOf(seqno)).getSecondEntity().booleanValue()))
 			{
 				seqno--;
 			}
@@ -322,11 +322,11 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 			int end	= seqno;	// End of block.
 			int start	= seqno;	// Start of block.
 			// Find block of received messages (don't exclude already acknowledged to reduce number of required messages)
-			while(seqno>getSequenceNumber() && seqno>lastack && data.containsKey(new Integer(seqno)))
+			while(seqno>getSequenceNumber() && seqno>lastack && data.containsKey(Integer.valueOf(seqno)))
 			{
-				if(!data.get(new Integer(seqno)).getSecondEntity().booleanValue())
+				if(!data.get(Integer.valueOf(seqno)).getSecondEntity().booleanValue())
 				{
-					data.put(new Integer(seqno), new Tuple2<byte[], Boolean>(data.get(new Integer(seqno)).getFirstEntity(), Boolean.TRUE));
+					data.put(Integer.valueOf(seqno), new Tuple2<byte[], Boolean>(data.get(Integer.valueOf(seqno)).getFirstEntity(), Boolean.TRUE));
 					start	= seqno;	// Only start from unacknowledged message.
 				}
 				seqno--;

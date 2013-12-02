@@ -126,8 +126,8 @@ class ObjectInspectorTreeModelExample {
 //	public int intAttribute = 1;
 //	public int[] intArrayAttribute = new int[]{1,2,3};
 //	
-//	public Integer IntegerAttribute = new Integer(1);
-//	public Integer[] IntegerArrayAttribute = new Integer[]{new Integer(6),new Integer(7),new Integer(8)};
+//	public Integer IntegerAttribute = Integer.valueOf(1);
+//	public Integer[] IntegerArrayAttribute = Integer.valueOf[]{Integer.valueOf(6),Integer.valueOf(7),Integer.valueOf(8)};
 	
 //	public String stringAttribute = "A String Attribute";
 	
@@ -181,7 +181,7 @@ class ObjectInspectorTreeModelExample {
 	public void updateNodes(int x)
 	{
 //		this.intAttribute = x;
-//		this.IntegerAttribute = new Integer(x);
+//		this.IntegerAttribute = Integer.valueOf(x);
 //		this.IntegerArrayAttribute[0] = IntegerAttribute;
 //		this.stringArrayAttribute[0] = "As String: " + IntegerAttribute.toString();
 		this.test3.someStupidIntToChange = x;

@@ -46,8 +46,8 @@ public class StartPeerPlan extends Plan
 			if(newnum<=max)
 			{
 				Map args = SCollection.createHashMap();
-				args.put("max", new Integer(max));
-				args.put("num", new Integer(newnum));
+				args.put("max", Integer.valueOf(max));
+				args.put("num", Integer.valueOf(newnum));
 				args.put("counter", counter);
 				args.put("starttime", starttime);
 				args.put("startmem", startmem);
@@ -69,8 +69,8 @@ public class StartPeerPlan extends Plan
 				if(newnum<=max)
 				{
 					Map args = SCollection.createHashMap();
-					args.put("max", new Integer(max));
-					args.put("num", new Integer(newnum));
+					args.put("max", Integer.valueOf(max));
+					args.put("num", Integer.valueOf(newnum));
 					args.put("counter", counter);
 					args.put("starttime", starttime);
 					args.put("startmem", startmem);

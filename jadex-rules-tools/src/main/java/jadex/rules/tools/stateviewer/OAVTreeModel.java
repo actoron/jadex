@@ -790,7 +790,7 @@ public class OAVTreeModel implements TreeModel
 								if (index == -1)
 								{
 									// add it to removedChildren
-									removedChildren.put(new Integer(i), oldchild);
+									removedChildren.put(Integer.valueOf(i), oldchild);
 									// don't remove child from old children here! This will change 
 									// index of other child's as well
 								}
@@ -853,7 +853,7 @@ public class OAVTreeModel implements TreeModel
 								else
 								{
 									// register children for change event
-									insertedChildren.put(new Integer(i), newchild);
+									insertedChildren.put(Integer.valueOf(i), newchild);
 								}
 							}
 							// clear selected children after use

@@ -65,7 +65,7 @@ public class MessagingTestPlan extends Plan
 		{
 			try
 			{
-				EmailAccount eacc = new EmailAccount(mailhost, new Integer(mailport),
+				EmailAccount eacc = new EmailAccount(mailhost, Integer.valueOf(mailport),
 					mailuser, mailpass, mailsender, false);
 				
 				IGoal sendem = createGoal("send_email");

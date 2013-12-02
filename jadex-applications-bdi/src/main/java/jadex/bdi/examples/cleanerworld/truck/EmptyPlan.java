@@ -35,7 +35,7 @@ public class EmptyPlan extends Plan
 			moveto.getParameter("location").setValue(pos);
 //			System.out.println("Created: "+loci[i]+" "+this);
 			dispatchSubgoalAndWait(moveto);
-			wastebins[i].setProperty("wastes", new Integer(0));
+			wastebins[i].setProperty("wastes", Integer.valueOf(0));
 			
 			Map params = new HashMap();
 			params.put(ISpaceAction.OBJECT_ID, wastebins[i]);

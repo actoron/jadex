@@ -301,7 +301,7 @@ public class TableCanvas extends ToolCanvas
 					int[] rows = table.getSelectedRows();
 					List rowlist = SUtil.arrayToList(rows);
 
-					if(rowlist.size() > 1 && rowlist.contains(new Integer(selectedRow)))
+					if(rowlist.size() > 1 && rowlist.contains(Integer.valueOf(selectedRow)))
 					{
 						mpopup = new MessageFilterMenu(tooltab.getPlugin(), getSelectedMessages());
 					}

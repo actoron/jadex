@@ -43,7 +43,7 @@ public class DistributeWorkPlan extends Plan
 				if(getone.isSucceeded())
 				{
 					int money = ((Integer)getBeliefbase().getBelief("money").getFact()).intValue();
-					getBeliefbase().getBelief("money").setFact(new Integer(money+1));
+					getBeliefbase().getBelief("money").setFact(Integer.valueOf(money+1));
 //					System.out.println("Succeeded: "+handle+"Has money: "+getBeliefbase().getBelief("money").getFact());
 				}
 				else

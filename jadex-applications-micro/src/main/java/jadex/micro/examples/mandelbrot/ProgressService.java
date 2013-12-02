@@ -42,6 +42,6 @@ public class ProgressService implements IProgressService
 			ret	= 0;
 		}
 		
-		return new Future(new Integer(ret));
+		return new Future(Integer.valueOf(ret));
 	}
 }

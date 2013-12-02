@@ -131,7 +131,7 @@ class IntegerTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, Object context)
 	{
-		return new Integer(val);
+		return Integer.valueOf(val);
 	}
 	
 }

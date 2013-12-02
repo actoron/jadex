@@ -18,7 +18,7 @@ public class ParameterStateSetFactory
 		else if ((parameter.getClazz().equals(Short.class)) || (parameter.getClazz().equals(Short.TYPE)))
 			return new ShortStateSet(parameter.getName());
 		else if ((parameter.getClazz().equals(Integer.class)) || (parameter.getClazz().equals(Integer.TYPE)))
-			return new IntegerStateSet(parameter.getName());
+			return Integer.valueOfStateSet(parameter.getName());
 		else if ((parameter.getClazz().equals(Long.class)) || (parameter.getClazz().equals(Long.TYPE)))
 			return new LongStateSet(parameter.getName());
 		else if (parameter.getClazz().equals(String[].class))

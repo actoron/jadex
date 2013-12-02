@@ -196,7 +196,7 @@ public class Reader extends AReader
 			// Handle post-processors.
 			for(int i=1; readcontext.getPostProcessors().size()>0; i++)
 			{
-				List ps = (List)readcontext.getPostProcessors().remove(new Integer(i));
+				List ps = (List)readcontext.getPostProcessors().remove(Integer.valueOf(i));
 				if(ps!=null)
 				{
 					for(int j=0; j<ps.size(); j++)
@@ -591,7 +591,7 @@ public class Reader extends AReader
 						final StackElement	ftopse	= topse;
 						final StackElement[]	stack	= readcontext.getStack();	// Use snapshot of stack for error report, as stack isn't available in delayed post processors.
 						final int fi = i;
-						readcontext.getPostProcessors().put(new Integer(postprocs[i].getPass()), new IPostProcessorCall()
+						readcontext.getPostProcessors().put(Integer.valueOf(postprocs[i].getPass()), new IPostProcessorCall()
 						{
 							public void callPostProcessor() throws Exception
 							{

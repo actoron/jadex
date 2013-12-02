@@ -29,7 +29,7 @@ public class DependentBeliefPlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 
 		tr = new TestReport("#2", "Test dependent belief set.");
-		getBeliefbase().getBeliefSet("my_values").removeFact(new Integer(1));
+		getBeliefbase().getBeliefSet("my_values").removeFact(Integer.valueOf(1));
 		if(getBeliefbase().getBelief("react_on_values").getFact().equals("magic"))
 		{
 			tr.setSucceeded(true);

@@ -38,7 +38,7 @@ public class HandlePlan extends Plan
 //		System.out.println(": "+rv+" "+pv);
 		
 		int testcnt = ((Integer)getBeliefbase().getBelief("cnt").getFact()).intValue();
-		getBeliefbase().getBelief("cnt").setFact(new Integer(testcnt+1));
+		getBeliefbase().getBelief("cnt").setFact(Integer.valueOf(testcnt+1));
 		
 		TestReport tr = new TestReport("#"+(testcnt+1), "Test if mapping works.");
 		if(SUtil.equals(rv, pv))

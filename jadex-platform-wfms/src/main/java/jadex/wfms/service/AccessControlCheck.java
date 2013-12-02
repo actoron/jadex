@@ -23,7 +23,7 @@ public class AccessControlCheck
 	
 	public AccessControlCheck(IComponentIdentifier client, Integer action)
 	{
-		this(client, new Integer[] { action });
+		this(client, Integer.valueOf[] { action });
 	}
 	
 	public void checkAccess(final Future targetFuture, IServiceContainer provider, final ICommand actionCommand)

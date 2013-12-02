@@ -73,7 +73,7 @@ public class AgentCreationAgent extends MicroAgent
 							
 							Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 							Long starttime = new Long(((IClockService)result).getTime());
-							args.put("num", new Integer(1));
+							args.put("num", Integer.valueOf(1));
 							args.put("startmem", startmem);
 							args.put("starttime", starttime);
 							
@@ -105,7 +105,7 @@ public class AgentCreationAgent extends MicroAgent
 		
 		if(num<max)
 		{
-			args.put("num", new Integer(num+1));
+			args.put("num", Integer.valueOf(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
 			getCMS().addResultListener(createResultListener(new DefaultResultListener()
@@ -310,7 +310,7 @@ public class AgentCreationAgent extends MicroAgent
 //	{
 //		return new MicroAgentMetaInfo("This agents benchmarks agent creation and termination.", 
 //			new String[0],
-//			new IArgument[]{new Argument("max", "Maximum number of agents to create.", "Integer", new Integer(10000))
+//			new IArgument[]{new Argument("max", "Maximum number of agents to create.", "Integer", Integer.valueOf(10000))
 //			{
 //				@XMLClassname("argument")
 //				public boolean validate(String input)

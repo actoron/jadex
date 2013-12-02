@@ -327,7 +327,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testIntegerArray() throws Exception
 	{
-		Integer[] data = new Integer[]{new Integer(1), new Integer(2), new Integer(3)};
+		Integer[] data = new Integer[]{Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3)};
 		
 		doWriteAndRead(data); 
 	}
@@ -740,12 +740,12 @@ public abstract class Test extends TestCase
 	public void testArray() throws Exception
 	{
 		Object[] array = new Object[6]; 
-		array[0] = new Integer(0);
-//		array[1] = new Integer(1);
-		array[2] = new Integer(2);
-		array[3] = new Integer(3);
-		array[4] = new Integer(4);
-		array[5] = new Integer(5);
+		array[0] = Integer.valueOf(0);
+//		array[1] = Integer.valueOf(1);
+		array[2] = Integer.valueOf(2);
+		array[3] = Integer.valueOf(3);
+		array[4] = Integer.valueOf(4);
+		array[5] = Integer.valueOf(5);
 		
 		doWriteAndRead(array);
 	}
@@ -781,7 +781,7 @@ public abstract class Test extends TestCase
 	{
 		List list = new ArrayList();
 		list.add("str_a");
-		list.add(new Integer(2));
+		list.add(Integer.valueOf(2));
 		list.add(getABean());
 		
 		doWriteAndRead(list);
@@ -794,7 +794,7 @@ public abstract class Test extends TestCase
 	{
 		Set set = new HashSet();
 		set.add("str_a");
-		set.add(new Integer(2));
+		set.add(Integer.valueOf(2));
 		set.add(getABean());
 		
 		doWriteAndRead(getABean());
@@ -807,7 +807,7 @@ public abstract class Test extends TestCase
 	{
 		Map map = new LinkedHashMap();
 		map.put("$", "A");
-		map.put(new Integer(2), new Integer(22));
+		map.put(Integer.valueOf(2), Integer.valueOf(22));
 		map.put("obja", getABean());
 //		for(Iterator it=map.entrySet().iterator(); it.hasNext(); )
 //		{

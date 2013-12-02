@@ -18,9 +18,9 @@ public class ExpressionParameterPlan extends Plan
 		try
 		{
 			getLogger().info("Test 1: Using an expression with parameter:");
-			Object result = getExpression("exp").execute("$num", new Integer(0));
+			Object result = getExpression("exp").execute("$num", Integer.valueOf(0));
 			getLogger().info("0: "+result);
-			result = getExpression("exp").execute("$num", new Integer(1));
+			result = getExpression("exp").execute("$num", Integer.valueOf(1));
 			getLogger().info("1: "+result);
 			tr.setSucceeded(true);
 		}

@@ -51,8 +51,8 @@ public class TimeFilter implements IFilter<Long>
 		
 //		System.out.println("match: "+SUtil.SDF.format(time)+"  "+minute+" "+hour+" "+dom+" "+month+" "+dow);
 		
-		return filters[0].filter(new Integer(minute)) && filters[1].filter(new Integer(hour)) 
-			&& filters[2].filter(new Integer(dom)) && filters[3].filter(new Integer(month)) 
-			&& filters[4].filter(new Integer(dow));
+		return filters[0].filter(Integer.valueOf(minute)) && filters[1].filter(Integer.valueOf(hour)) 
+			&& filters[2].filter(Integer.valueOf(dom)) && filters[3].filter(Integer.valueOf(month)) 
+			&& filters[4].filter(Integer.valueOf(dow));
 	}
 }

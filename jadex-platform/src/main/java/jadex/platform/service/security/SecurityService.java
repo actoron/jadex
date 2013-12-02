@@ -264,7 +264,7 @@ public class SecurityService implements ISecurityService
 											{
 												selmech = props.getIntProperty("selected_mechanism"); 
 	//											System.out.println("selm: "+selmech);
-												publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, new Integer(selmech)));
+												publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, Integer.valueOf(selmech)));
 											}
 											
 											final IExternalAccess	access	= component.getExternalAccess();
@@ -1443,7 +1443,7 @@ public class SecurityService implements ISecurityService
 		}
 		
 		if(oldselmech!=selmech)
-			publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, new Integer(selmech)));
+			publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, Integer.valueOf(selmech)));
 		
 		return IFuture.DONE;
 	}

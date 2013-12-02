@@ -31,7 +31,7 @@ public class TexturedRectangleGLRenderer extends AbstractGLRenderer
 		catch (Exception e)
 		{
 			texture = vp.getTexture(vp.getContext(), ((TexturedRectangle) primitive).getTexturePath());
-			primitive.setRenderInfo(0, new Integer(texture));
+			primitive.setRenderInfo(0, Integer.valueOf(texture));
 			
 			String listName = getClass().getName();
 			Integer list = vp.getDisplayList(listName);
@@ -52,7 +52,7 @@ public class TexturedRectangleGLRenderer extends AbstractGLRenderer
 				gl.glEnd();
 				gl.glEndList();
 
-				list = new Integer(dList);
+				list = Integer.valueOf(dList);
 				vp.setDisplayList(listName, list);
 			}
 			dList = list.intValue();

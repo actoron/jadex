@@ -123,7 +123,7 @@ public class OptionDialog extends JDialog
 						};
 						filechooser.addChoosableFileFilter(load_filter);
 						final JSpinner fontsize = new JSpinner();
-						fontsize.setValue(new Integer(sets.getFontsize()));
+						fontsize.setValue(Integer.valueOf(sets.getFontsize()));
 		
 						JPanel tf = new JPanel(new GridBagLayout());
 						tf.setBorder(BorderFactory.createTitledBorder(

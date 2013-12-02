@@ -29,6 +29,6 @@ public class LoadedClassesProperty extends NFRootProperty<Integer, MemoryUnit>
 	 */
 	public Integer measureValue()
 	{
-		return new Integer(ManagementFactory.getClassLoadingMXBean().getLoadedClassCount());
+		return Integer.valueOf(ManagementFactory.getClassLoadingMXBean().getLoadedClassCount());
 	}
 }

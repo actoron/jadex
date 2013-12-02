@@ -103,7 +103,7 @@ public class Environment implements IEnvironment
 			cleaners.remove(cleaner);
 		cleaners.add(cleaner);
 		// reset age for cleaner
-		ages.put(cleaner, new Integer(0));
+		ages.put(cleaner, Integer.valueOf(0));
 
 		//System.out.println("getVision: "+this.hashCode()+" "+cleaners.size());
 
@@ -334,7 +334,7 @@ public class Environment implements IEnvironment
 		{
 			if(!ages.containsKey(cls[i]))
 			{
-				ages.put(cls[i], new Integer(0));
+				ages.put(cls[i], Integer.valueOf(0));
 			}
 			else
 			{
@@ -346,7 +346,7 @@ public class Environment implements IEnvironment
 				}
 				else
 				{
-					ages.put(cls[i], new Integer(age+1));
+					ages.put(cls[i], Integer.valueOf(age+1));
 				}
 			}
 		}

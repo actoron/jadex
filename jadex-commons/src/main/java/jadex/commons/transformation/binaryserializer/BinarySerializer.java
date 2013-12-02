@@ -245,7 +245,7 @@ public class BinarySerializer
 			if (classname.equals(NULL_MARKER))
 				return null;
 			else if (classname.equals(REFERENCE_MARKER))
-				return context.getKnownObjects().get(new Integer((int) context.readVarInt()));
+				return context.getKnownObjects().get(Integer.valueOf((int) context.readVarInt()));
 			else
 				clazz = SReflect.findClass(classname, null, context.getClassloader());
 		}

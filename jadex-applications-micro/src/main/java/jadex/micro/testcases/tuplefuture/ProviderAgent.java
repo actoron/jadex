@@ -20,9 +20,9 @@ public class ProviderAgent implements ITestService
 	 */
 	public ITuple2Future<String, Integer> getSomeResults()
 	{
-//		Tuple2Future<String, Integer> ret = new Tuple2Future<String, Integer>("hello", new Integer(99));
+//		Tuple2Future<String, Integer> ret = new Tuple2Future<String, Integer>("hello", Integer.valueOf(99));
 		Tuple2Future<String, Integer> ret = new Tuple2Future<String, Integer>();
-		ret.setSecondResult(new Integer(99));
+		ret.setSecondResult(Integer.valueOf(99));
 		ret.setFirstResult("hello");
 //		System.out.println("called method getSomeResults()");
 		return ret;

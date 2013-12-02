@@ -137,7 +137,7 @@ public class Message extends ParameterElement
 		this.message = msg;
 		//		this.msgmap = msg.getParameterMap();
 
-		this.parameters.put(SEQ_NO, new Integer(sequence));
+		this.parameters.put(SEQ_NO, Integer.valueOf(sequence));
 		//		this.parameters.put(EVENT_DIRECTION, direction);
 		//		this.parameters.put(EVENT_TYPE, mt.getName());
 

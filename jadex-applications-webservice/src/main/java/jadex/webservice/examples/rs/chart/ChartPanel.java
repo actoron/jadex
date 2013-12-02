@@ -55,7 +55,7 @@ public class ChartPanel extends JPanel
 		final JComboBox charttype = pp.createComboBox("charttype", new String[]{"Bar Chart", "Line Chart", "Pie Chart"});
 		final JTextField width = pp.createTextField("width", "250", true);
 		final JTextField height = pp.createTextField("height", "200", true);
-//		final JList chartdata = new JList(new Integer[]{30, 50, 20, 90});
+//		final JList chartdata = new JList(Integer.valueOf[]{30, 50, 20, 90});
 		final JTextField labels = pp.createTextField("labels", "a, b, c, d", true);
 		final JTextField colors = pp.createTextField("colors", "#FF0000, #334499", true);
 		final EditableList chartdata = new EditableList("Chart Data");

@@ -179,7 +179,7 @@ public class Player
 	public void setColorValue(int colorvalue)
 	{
 		this.color	= null;
-		this.colorvalue = new Integer(colorvalue);
+		this.colorvalue = Integer.valueOf(colorvalue);
 	}
 
 	/**
@@ -245,7 +245,7 @@ public class Player
 		//		System.out.println("new_card");
 		//pcs.firePropertyChange("new_card", null, card);
 		pcs.firePropertyChange("cards", null, cards);
-		pcs.firePropertyChange("cardCnt", new Integer(cards.size()-1), new Integer(cards.size()));
+		pcs.firePropertyChange("cardCnt", Integer.valueOf(cards.size()-1), Integer.valueOf(cards.size()));
 	}
 
 	/**
@@ -265,7 +265,7 @@ public class Player
 		//		System.out.println("new_cards");
 		//pcs.firePropertyChange("new_cards", null, cards);
 		pcs.firePropertyChange("cards", null, cards);
-		pcs.firePropertyChange("cardCnt", new Integer(cards.length-1), new Integer(cards.length));
+		pcs.firePropertyChange("cardCnt", Integer.valueOf(cards.length-1), Integer.valueOf(cards.length));
 	}
 
 	/**
@@ -336,7 +336,7 @@ public class Player
 	{
 		this.bet = bet;
 		//		System.out.println("new_bet");
-		pcs.firePropertyChange("bet", null, new Integer(bet));
+		pcs.firePropertyChange("bet", null, Integer.valueOf(bet));
 	}
 
 	/**
@@ -349,7 +349,7 @@ public class Player
 		this.account -= bet;
 		this.bet = bet;
 		//		System.out.println("new_bet");
-		pcs.firePropertyChange("bet", null, new Integer(bet));
+		pcs.firePropertyChange("bet", null, Integer.valueOf(bet));
 	}
 
 	/**

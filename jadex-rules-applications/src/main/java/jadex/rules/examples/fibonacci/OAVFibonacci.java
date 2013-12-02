@@ -66,7 +66,7 @@ public class OAVFibonacci
 				
 				Object fm = state.createRootObject(fibo_type);
 				state.setAttributeValue(fm, fibo_has_value, new Long(-1));
-				state.setAttributeValue(fm, fibo_has_sequence, new Integer(fncnt-1));
+				state.setAttributeValue(fm, fibo_has_sequence, Integer.valueOf(fncnt-1));
 			}
 		}, IPriorityEvaluator.PRIORITY_1));
 
@@ -74,7 +74,7 @@ public class OAVFibonacci
 		ObjectCondition f1con = new ObjectCondition(fibo_type);
 		f1con.addConstraint(new BoundConstraint(null, f1));
 		f1con.addConstraint(new LiteralConstraint(fibo_has_value, new Long(-1)));
-		f1con.addConstraint(new LiteralConstraint(fibo_has_sequence, new Integer(1)));
+		f1con.addConstraint(new LiteralConstraint(fibo_has_sequence, Integer.valueOf(1)));
 		rete.getRulebase().addRule(new Rule("bootstrap1", f1con, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
@@ -91,7 +91,7 @@ public class OAVFibonacci
 		ObjectCondition f2con = new ObjectCondition(fibo_type);
 		f2con.addConstraint(new BoundConstraint(null, f2));
 		f2con.addConstraint(new LiteralConstraint(fibo_has_value, new Long(-1)));
-		f2con.addConstraint(new LiteralConstraint(fibo_has_sequence, new Integer(2)));
+		f2con.addConstraint(new LiteralConstraint(fibo_has_sequence, Integer.valueOf(2)));
 		rete.getRulebase().addRule(new Rule("bootstrap2", f2con, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
@@ -120,7 +120,7 @@ public class OAVFibonacci
 		f11con.addConstraint(new BoundConstraint(null, f1));
 		f11con.addConstraint(new BoundConstraint(fibo_has_sequence, f1seq));
 		f11con.addConstraint(new PredicateConstraint(new FunctionCall(new OperatorFunction(IOperator.EQUAL), 
-			new Object[]{f0seq, new FunctionCall(new Sub(), new Object[]{f1seq, new Integer(1)})})));
+			new Object[]{f0seq, new FunctionCall(new Sub(), new Object[]{f1seq, Integer.valueOf(1)})})));
 		f11con.addConstraint(new LiteralConstraint(fibo_has_value, new Long(-1), IOperator.NOTEQUAL));
 		
 		ObjectCondition f22con = new ObjectCondition(fibo_type);
@@ -128,7 +128,7 @@ public class OAVFibonacci
 		f22con.addConstraint(new BoundConstraint(fibo_has_sequence, f2seq));
 		f22con.addConstraint(new LiteralConstraint(fibo_has_value, new Long(-1)));
 		f22con.addConstraint(new PredicateConstraint(new FunctionCall(new OperatorFunction(IOperator.EQUAL), 
-			new Object[]{f1seq, new FunctionCall(new Sub(), new Object[]{f2seq, new Integer(1)})})));
+			new Object[]{f1seq, new FunctionCall(new Sub(), new Object[]{f2seq, Integer.valueOf(1)})})));
 		
 		rete.getRulebase().addRule(new Rule("calc", new AndCondition(new ICondition[]{f00con, f11con, f22con}), new IAction()
 		{
@@ -147,8 +147,8 @@ public class OAVFibonacci
 		}));
 		
 		Object f50 = state.createRootObject(fibo_type);
-		state.setAttributeValue(f50, fibo_has_value, new Integer(-1));
-		state.setAttributeValue(f50, fibo_has_sequence, new Integer(50));
+		state.setAttributeValue(f50, fibo_has_value, Integer.valueOf(-1));
+		state.setAttributeValue(f50, fibo_has_sequence, Integer.valueOf(50));
 		
 		// Initialize rule system.
 		rete.init();

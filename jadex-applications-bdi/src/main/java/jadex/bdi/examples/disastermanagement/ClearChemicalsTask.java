@@ -54,7 +54,7 @@ public class ClearChemicalsTask extends AbstractTask
 		}
 		int chemicals	= ((Number)disaster.getProperty("chemicals")).intValue();
 		chemicals	= Math.max(chemicals-cnt, 0);
-		disaster.setProperty("chemicals", new Integer(chemicals));
+		disaster.setProperty("chemicals", Integer.valueOf(chemicals));
 
 		// Remove disaster object when everything is now fine.
 		if(chemicals==0 && ((Number)disaster.getProperty("fire")).intValue()==0 && ((Number)disaster.getProperty("victims")).intValue()==0)

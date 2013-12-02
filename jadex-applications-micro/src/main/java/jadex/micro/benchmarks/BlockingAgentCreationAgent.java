@@ -86,8 +86,8 @@ public class BlockingAgentCreationAgent
 		{
 			IComponentManagementService	cms	=  getCMS(agent);
 			Map<String, Object>	args	= new HashMap<String, Object>();
-			args.put("max", new Integer(max));
-			args.put("num", new Integer(num));
+			args.put("max", Integer.valueOf(max));
+			args.put("num", Integer.valueOf(num));
 			args.put("starttime", new Long(starttime));
 			args.put("startmem", new Long(startmem));
 			cms.createComponent(createPeerName(num+1, agent.getComponentIdentifier()),

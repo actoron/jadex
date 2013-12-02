@@ -194,7 +194,7 @@ public class StatsDB
 					insert.executeUpdate();
 					ResultSet	keys	= insert.getGeneratedKeys();
 					keys.next();
-					pi.setDBId(new Integer(keys.getInt(1)));
+					pi.setDBId(Integer.valueOf(keys.getInt(1)));
 					keys.close();
 				}
 				else
@@ -300,7 +300,7 @@ public class StatsDB
 						{
 							try
 							{
-								PlatformInfo	pi	= new PlatformInfo(new Integer(rs.getInt("ID")), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+								PlatformInfo	pi	= new PlatformInfo(Integer.valueOf(rs.getInt("ID")), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
 									rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 									rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME"));
 	

@@ -151,7 +151,7 @@ public class CliAgent implements ICliService, IInternalCliService
 				final JTextArea ta = new JTextArea(40, 20);
 				ta.setEditable(false);
 
-				final Tuple2<String, Integer> guisess = new Tuple2<String, Integer>(SUtil.createUniqueId("guisess"), new Integer(0));
+				final Tuple2<String, Integer> guisess = new Tuple2<String, Integer>(SUtil.createUniqueId("guisess"), Integer.valueOf(0));
 				tf.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
@@ -218,7 +218,7 @@ public class CliAgent implements ICliService, IInternalCliService
 					public void run()
 					{
 						ThreadSuspendable sus = new ThreadSuspendable();
-						final Tuple2<String, Integer> consess = new Tuple2<String, Integer>(SUtil.createUniqueId("consess"), new Integer(0));
+						final Tuple2<String, Integer> consess = new Tuple2<String, Integer>(SUtil.createUniqueId("consess"), Integer.valueOf(0));
 						System.out.println("Jadex shell (type 'h' for help)");
 						System.out.println(getShell(consess).getShellPrompt().get(sus));
 						// redirect System.in

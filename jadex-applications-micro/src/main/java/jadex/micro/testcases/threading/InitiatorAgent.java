@@ -218,7 +218,7 @@ public class InitiatorAgent extends TestAgent
 				}
 				else
 				{
-					ret.setResult(new Integer(errcnt[0]));
+					ret.setResult(Integer.valueOf(errcnt[0]));
 				}
 			}
 		

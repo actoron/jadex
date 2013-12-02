@@ -582,7 +582,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 																			{
 																				Integer	childcount	= (Integer)childcounts.get(padesc.getName());
 																				int cc = childcount!=null ? childcount.intValue()+1 : 1;
-																				childcounts.put(padesc.getName(), new Integer(cc));
+																				childcounts.put(padesc.getName(), Integer.valueOf(cc));
 					//															System.out.println("childcount+:"+padesc.getName()+" "+cc);
 																			}
 																			
@@ -1818,7 +1818,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 						{
 							int cc = childcount.intValue()-1;
 							if(cc>0)
-								childcounts.put(padesc.getName(), new Integer(cc));
+								childcounts.put(padesc.getName(), Integer.valueOf(cc));
 							else
 								childcounts.remove(padesc.getName());
 //									System.out.println("childcount-: "+padesc.getName()+" "+cc);
@@ -2625,12 +2625,12 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				Integer cnt = cidcounts.get(key);
 				if(cnt==null)
 				{
-					cidcounts.put(key, new Integer(new Integer(1)));
+					cidcounts.put(key, Integer.valueOf(Integer.valueOf(1)));
 					ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
 				}
 				else
 				{
-					cidcounts.put(key, new Integer(cnt.intValue()+1));
+					cidcounts.put(key, Integer.valueOf(cnt.intValue()+1));
 					ret = new ComponentIdentifier(localname+cnt+"@"+platformname, addresses); // Hack?!
 				}
 			}

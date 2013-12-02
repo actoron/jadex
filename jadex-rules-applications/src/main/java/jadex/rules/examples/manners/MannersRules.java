@@ -65,20 +65,20 @@ public class MannersRules	implements IMannersRuleSet
 				System.out.println("Assign first seat: "+f1+" "+n+" "+f3+" "+c);
 				
 				Object seating = state.createRootObject(Manners.seating_type);
-				state.setAttributeValue(seating, Manners.seating_has_seat1, new Integer(1));
+				state.setAttributeValue(seating, Manners.seating_has_seat1, Integer.valueOf(1));
 				state.setAttributeValue(seating, Manners.seating_has_name1, n);
 				state.setAttributeValue(seating, Manners.seating_has_name2, n);
-				state.setAttributeValue(seating, Manners.seating_has_seat2, new Integer(1));
+				state.setAttributeValue(seating, Manners.seating_has_seat2, Integer.valueOf(1));
 				state.setAttributeValue(seating, Manners.seating_has_id, c);
-				state.setAttributeValue(seating, Manners.seating_has_pid, new Integer(0));
+				state.setAttributeValue(seating, Manners.seating_has_pid, Integer.valueOf(0));
 				state.setAttributeValue(seating, Manners.seating_has_pathdone, Boolean.TRUE);
 				
 				Object path = state.createRootObject(Manners.path_type);
 				state.setAttributeValue(path, Manners.path_has_id, c);
 				state.setAttributeValue(path, Manners.path_has_name, n);		
-				state.setAttributeValue(path, Manners.path_has_seat, new Integer(1));
+				state.setAttributeValue(path, Manners.path_has_seat, Integer.valueOf(1));
 				
-				state.setAttributeValue(f3, Manners.count_has_c, new Integer(c.intValue()+1));
+				state.setAttributeValue(f3, Manners.count_has_c, Integer.valueOf(c.intValue()+1));
 					
 				System.out.println("seat 1: "+n+" "+n+" 1 "+c+" 0 1");
 				
@@ -173,21 +173,21 @@ public class MannersRules	implements IMannersRuleSet
 				state.setAttributeValue(seating, Manners.seating_has_seat1, seat2);
 				state.setAttributeValue(seating, Manners.seating_has_name1, n2);
 				state.setAttributeValue(seating, Manners.seating_has_name2, g2);
-				state.setAttributeValue(seating, Manners.seating_has_seat2, new Integer(seat2.intValue()+1));
+				state.setAttributeValue(seating, Manners.seating_has_seat2, Integer.valueOf(seat2.intValue()+1));
 				state.setAttributeValue(seating, Manners.seating_has_id, c);
 				state.setAttributeValue(seating, Manners.seating_has_pid, id);
 				
 				Object	path	= state.createRootObject(Manners.path_type);
 				state.setAttributeValue(path, Manners.path_has_id, c);
 				state.setAttributeValue(path, Manners.path_has_name, g2);
-				state.setAttributeValue(path, Manners.path_has_seat, new Integer(seat2.intValue()+1));
+				state.setAttributeValue(path, Manners.path_has_seat, Integer.valueOf(seat2.intValue()+1));
 				
 				Object	chosen	= state.createRootObject(Manners.chosen_type);
 				state.setAttributeValue(chosen, Manners.chosen_has_id, id);
 				state.setAttributeValue(chosen, Manners.chosen_has_name, g2);
 				state.setAttributeValue(chosen, Manners.chosen_has_hobby, h1);
 				
-				state.setAttributeValue(f5, Manners.count_has_c, new Integer(c.intValue()+1));
+				state.setAttributeValue(f5, Manners.count_has_c, Integer.valueOf(c.intValue()+1));
 				
 				if(Manners.print)
 					System.out.println("find seating: seat2="+seat2+", n2="+n2+", g2="+g2+", pid="+pid);

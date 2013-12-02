@@ -124,8 +124,8 @@ public class CreationBDI
 		if(num<max)
 		{
 			final Map<String, Object> args = new HashMap<String, Object>();
-			args.put("num", new Integer(num+1));
-			args.put("max", new Integer(max));
+			args.put("num", Integer.valueOf(num+1));
+			args.put("max", Integer.valueOf(max));
 			args.put("starttime", new Long(starttime));
 			args.put("startmem", new Long(startmem));
 //			System.out.println("Args: "+num+" "+args);
@@ -286,7 +286,7 @@ public class CreationBDI
 //	{
 //		Field f = CreationBDI.class.getDeclaredField("num");
 //		f.setAccessible(true);
-//		f.set(null, new Integer(1));
+//		f.set(null, Integer.valueOf(1));
 //		System.out.println(f.get(null));
 //	}
 }

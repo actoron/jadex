@@ -48,7 +48,7 @@ public class CallbackPlan extends Plan
 				tr1.setSucceeded(true);
 			}
 		});
-		getBeliefbase().getBelief("bel").setFact(new Integer(1));
+		getBeliefbase().getBelief("bel").setFact(Integer.valueOf(1));
 		waitFor(200);
 		if(!tr1.isSucceeded())
 			tr1.setReason("Listener was not notified.");
@@ -74,7 +74,7 @@ public class CallbackPlan extends Plan
 				logger.info("fact changed: "+ae);			
 			}
 		});
-		getBeliefbase().getBeliefSet("belset").addFact(new Integer(1));
+		getBeliefbase().getBeliefSet("belset").addFact(Integer.valueOf(1));
 		waitFor(200);
 		if(!tr2.isSucceeded())
 			tr2.setReason("Listener was not notified.");
@@ -101,7 +101,7 @@ public class CallbackPlan extends Plan
 				logger.info("fact changed: "+ae);			
 			}
 		});
-		getBeliefbase().getBeliefSet("belset").removeFact(new Integer(1));
+		getBeliefbase().getBeliefSet("belset").removeFact(Integer.valueOf(1));
 		waitFor(200);
 		if(!tr2b.isSucceeded())
 			tr2b.setReason("Listener was not notified.");
@@ -199,7 +199,7 @@ public class CallbackPlan extends Plan
 			}
 		}); // todo: async was true 
 		// Create a goal by setting "bel" to 2
-		getBeliefbase().getBelief("bel").setFact(new Integer(2));
+		getBeliefbase().getBelief("bel").setFact(Integer.valueOf(2));
 		waitFor(200);
 		if(!tr4.isSucceeded())
 			tr4.setReason("Listener was not notified.");
@@ -301,7 +301,7 @@ public class CallbackPlan extends Plan
 		};
 		cond.addConditionListener(cl, false);
 		cond.traceOnce();
-		getBeliefbase().getBelief("bel").setFact(new Integer(3));
+		getBeliefbase().getBelief("bel").setFact(Integer.valueOf(3));
 		waitFor(200);
 		if(!tr10.isSucceeded())
 			tr10.setReason("Listener was not notified.");
@@ -320,7 +320,7 @@ public class CallbackPlan extends Plan
 		}, false);
 		cond = getCondition("condition");
 		cond.traceOnce();
-		getBeliefbase().getBelief("bel").setFact(new Integer(5));
+		getBeliefbase().getBelief("bel").setFact(Integer.valueOf(5));
 		waitFor(200);
 		if(!tr11.isSucceeded())
 			tr11.setReason("Listener was not notified.");
@@ -345,7 +345,7 @@ public class CallbackPlan extends Plan
 			}
 		};
 		getPlanbase().addPlanListener("plan", pl);
-		getBeliefbase().getBelief("bel").setFact(new Integer(4));
+		getBeliefbase().getBelief("bel").setFact(Integer.valueOf(4));
 		waitFor(200);
 		if(!tr12.isSucceeded())
 			tr12.setReason("Listener was not notified.");
