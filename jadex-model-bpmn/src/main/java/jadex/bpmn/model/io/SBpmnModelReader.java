@@ -784,7 +784,19 @@ public class SBpmnModelReader
 				if (attrs.containsKey("monitoring"))
 				{
 //					((ModelInfo) model.getModelInfo()).setMonitoring(Boolean.parseBoolean(attrs.get("monitoring")));
-					((ModelInfo) model.getModelInfo()).setMonitoring(PublishEventLevel.valueOf(attrs.get("monitoring")));
+					String monattr = attrs.get("monitoring");
+					if ((monattr != null) && monattr.equalsIgnoreCase("true"))
+					{
+						((ModelInfo) model.getModelInfo()).setMonitoring(PublishEventLevel.MEDIUM);
+					}
+					else if ((monattr != null) && monattr.equalsIgnoreCase("false"))
+					{
+						((ModelInfo) model.getModelInfo()).setMonitoring(PublishEventLevel.OFF);
+					}
+					else
+					{
+						((ModelInfo) model.getModelInfo()).setMonitoring(PublishEventLevel.valueOf(attrs.get("monitoring")));
+					}
 				}
 				if (attrs.containsKey("synchronous"))
 				{
@@ -851,6 +863,7 @@ public class SBpmnModelReader
 				ClassInfo itrface = attrs.get("interface") != null? new ClassInfo(attrs.get("interface")) : null;
 				ClassInfo clazz = attrs.get("class") != null? new ClassInfo(attrs.get("class")) : null;
 				String proxytype = attrs.get("proxytype");
+				String impl = attrs.get("implementation");
 				
 				ProvidedServiceInfo ps = new ProvidedServiceInfo();
 				ps.setName(name);
@@ -858,6 +871,7 @@ public class SBpmnModelReader
 				ps.setImplementation(new ProvidedServiceImplementation());
 				ps.getImplementation().setClazz(clazz);
 				ps.getImplementation().setProxytype(proxytype);
+				ps.getImplementation().setValue(impl);
 				((ModelInfo) model.getModelInfo()).addProvidedService(ps);
 			}
 			else if ("providedserviceconfiguration".equals(tag.getLocalPart()))
@@ -871,12 +885,14 @@ public class SBpmnModelReader
 				String name = attrs.get("name");
 				ClassInfo clazz = attrs.get("class") != null? new ClassInfo(attrs.get("class")) : null;
 				String proxytype = attrs.get("proxytype");
+				String impl = attrs.get("implementation");
 				
 				ProvidedServiceInfo ps = new ProvidedServiceInfo();
 				ps.setName(name);
 				ps.setImplementation(new ProvidedServiceImplementation());
 				ps.getImplementation().setClazz(clazz);
 				ps.getImplementation().setProxytype(proxytype);
+				ps.getImplementation().setValue(impl);
 				vals.add(ps);
 			}
 			else if ("requiredservice".equals(tag.getLocalPart()))
@@ -993,13 +1009,13 @@ public class SBpmnModelReader
 					}
 				}
 				
-				List<ProvidedServiceInfo> psconfs = (List<ProvidedServiceInfo>) buffer.get("psconfs");
+				List<ProvidedServiceInfo> psconfs = (List<ProvidedServiceInfo>) buffer.remove("psconfs");
 				if (psconfs != null)
 				{
 					conf.setProvidedServices(psconfs.toArray(new ProvidedServiceInfo[psconfs.size()]));
 				}
 				
-				List<RequiredServiceInfo> rsconfs = (List<RequiredServiceInfo>) buffer.get("rsconfs");
+				List<RequiredServiceInfo> rsconfs = (List<RequiredServiceInfo>) buffer.remove("rsconfs");
 				if (rsconfs != null)
 				{
 					conf.setRequiredServices(rsconfs.toArray(new RequiredServiceInfo[rsconfs.size()]));

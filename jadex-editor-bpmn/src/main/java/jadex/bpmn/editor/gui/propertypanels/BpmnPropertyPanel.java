@@ -1787,7 +1787,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			ConfigurationInfo conf = getModel().getModelInfo().getConfiguration((String) confmodel.getSelectedItem());
 			ProvidedServiceInfo cs = getProvService(ps.getName(), conf);
 			if ((columnIndex == 2 ||
-				columnIndex == 3) &&
+				columnIndex == 3 ||
+				columnIndex == 4) &&
 				cs == null &&
 				conf != null)
 			{
@@ -2044,7 +2045,8 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			RequiredServiceInfo rs = getModelInfo().getRequiredServices()[rowIndex];
 			ConfigurationInfo conf = getModel().getModelInfo().getConfiguration((String) confmodel.getSelectedItem());
 			RequiredServiceInfo cs = getReqService(rs.getName(), conf);
-			if(columnIndex == 3 &&
+			if((columnIndex == 3 ||
+				columnIndex == 4) &&
 				cs == null &&
 				conf != null)
 			{

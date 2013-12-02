@@ -462,6 +462,13 @@ public class SBpmnModelWriter
 						out.print("\" proxytype=\"");
 						out.print(escapeString(proxytype));
 					}
+					
+					String impl = ps.getImplementation().getValue();
+					if (impl != null && impl.length() > 0)
+					{
+						out.print("\" implementation=\"");
+						out.print(escapeString(impl));
+					}
 				}
 				
 				out.println("\"/>");
@@ -725,6 +732,12 @@ public class SBpmnModelWriter
 							{
 								out.print("\" proxytype=\"");
 								out.print(escapeString(ps.getImplementation().getProxytype()));
+							}
+							
+							if (ps.getImplementation().getValue() != null && ps.getImplementation().getValue().length() > 0)
+							{
+								out.print("\" implementation=\"");
+								out.print(escapeString(ps.getImplementation().getValue()));
 							}
 							
 							out.println("\"/>");
