@@ -18,7 +18,7 @@ public class MacAddressProperty extends NFRootProperty<String, Void>
 	 */
 	public MacAddressProperty(final IInternalAccess comp)
 	{
-		super(comp, new NFPropertyMetaInfo(NAME, String.class, null, false, -1, Target.Root));
+		super(comp, new NFPropertyMetaInfo(NAME, String.class, null, false, -1, false, Target.Root));
 	}
 	
 	/**

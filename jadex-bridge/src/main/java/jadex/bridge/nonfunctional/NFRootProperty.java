@@ -65,7 +65,7 @@ public abstract class NFRootProperty<T, U> extends SimpleValueNFProperty<T, U>
 						{
 							NFRootProperty.this.root = root;
 							INFPropertyMetaInfo mi = getMetaInfo();
-							NFPropertyMetaInfo cmi = new NFPropertyMetaInfo(mi.getName(), mi.getType(), mi.getUnit(), mi.isDynamic(), mi.getUpdateRate(), Target.Root);
+							NFPropertyMetaInfo cmi = new NFPropertyMetaInfo(mi.getName(), mi.getType(), mi.getUnit(), mi.isDynamic(), mi.getUpdateRate(), mi.isRealtime(), Target.Root);
 							root.addNFProperty(new NFPropertyRef<T, U>(comp.getExternalAccess(), root, cmi)).addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					});

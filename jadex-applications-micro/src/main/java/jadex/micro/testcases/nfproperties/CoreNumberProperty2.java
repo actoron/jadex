@@ -21,7 +21,7 @@ public class CoreNumberProperty2 extends AbstractNFProperty<Integer, Void>
 	 */
 	public CoreNumberProperty2()
 	{
-		super(new NFPropertyMetaInfo("componentcores", int.class, null, false, -1, null));
+		super(new NFPropertyMetaInfo("componentcores", int.class, null, false, -1, false, null));
 		cores = Runtime.getRuntime().availableProcessors();
 		
 //		Properties props = System.getProperties();

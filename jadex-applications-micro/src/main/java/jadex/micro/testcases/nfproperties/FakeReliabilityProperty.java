@@ -15,7 +15,7 @@ public class FakeReliabilityProperty extends SimpleValueNFProperty<Double, Void>
 	 */
 	public FakeReliabilityProperty(IInternalAccess comp)
 	{
-		super(comp, new NFPropertyMetaInfo("fakereliability", Double.class, Void.class, true, 10000, null));
+		super(comp, new NFPropertyMetaInfo("fakereliability", Double.class, Void.class, true, 10000, true, null));
 	}
 	
 	/**

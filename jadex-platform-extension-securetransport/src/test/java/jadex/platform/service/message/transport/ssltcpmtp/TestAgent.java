@@ -89,7 +89,7 @@ public abstract class TestAgent
 				ret.setResult(null);
 				return IFuture.DONE;
 			}
-		});
+		}, false);
 		
 		return ret;
 	}

@@ -17,7 +17,7 @@ public class FakeFreeMemoryProperty extends AbstractNFProperty<Long, MemoryUnit>
 	 */
 	public FakeFreeMemoryProperty()
 	{
-		super(new NFPropertyMetaInfo("fakefreemem", Long.class, MemoryUnit.class, true, 3000, null));
+		super(new NFPropertyMetaInfo("fakefreemem", Long.class, MemoryUnit.class, true, 3000, true, null));
 	}
 	
 	/**

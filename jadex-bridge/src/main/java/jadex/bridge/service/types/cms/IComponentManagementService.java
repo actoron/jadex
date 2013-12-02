@@ -172,7 +172,7 @@ public interface IComponentManagementService //extends IService
 	/**
 	 *  Get the external access of a component.
 	 *  @param cid The component identifier.
-	 *  @param listener The result listener (recieves an IExternalAccess object).
+	 *  @param listener The result listener (receives an IExternalAccess object).
 	 */
 	public IFuture<IExternalAccess> getExternalAccess(IComponentIdentifier cid);
 

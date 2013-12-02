@@ -476,20 +476,28 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step)
 	{
+		return waitForDelay(delay, step, false);
+	}
+	
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step, final boolean realtime)
+	{
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
-					object = getInterpreter().waitForDelay(delay, step);
+					object = getInterpreter().waitForDelay(delay, step, realtime);
 				}
 			};
 			return (IFuture<T>)invoc.object;
 		}
 		else
 		{
-			return getInterpreter().waitForDelay(delay, step);
+			return getInterpreter().waitForDelay(delay, step, realtime);
 		}
 	}
 
@@ -498,20 +506,28 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IFuture<Void> waitForDelay(final long delay)
 	{
+		return waitForDelay(delay, false);
+	}
+
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public IFuture<Void> waitForDelay(final long delay, final boolean realtime)
+	{
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
-					object = getInterpreter().waitForDelay(delay);
+					object = getInterpreter().waitForDelay(delay, realtime);
 				}
 			};
 			return (IFuture<Void>)invoc.object;
 		}
 		else
 		{
-			return getInterpreter().waitForDelay(delay);
+			return getInterpreter().waitForDelay(delay, realtime);
 		}
 	}
 
@@ -645,11 +661,10 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
 	 */
-//	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(final IFilter<IMonitoringEvent> filter, final boolean initial, final PublishEventLevel elm)
 	{
-//		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
-		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = (SubscriptionIntermediateDelegationFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, getInterpreter().getInternalAccess());
+		// No NoTimeoutFuture needed as is already created internally.
+		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
 		
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{

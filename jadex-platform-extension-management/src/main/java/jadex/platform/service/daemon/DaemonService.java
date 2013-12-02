@@ -131,7 +131,7 @@ public class DaemonService implements IDaemonService
 								}
 								return ret;
 							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
+						}, true).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					else
 					{

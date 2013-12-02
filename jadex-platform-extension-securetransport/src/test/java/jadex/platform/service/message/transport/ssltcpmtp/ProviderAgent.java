@@ -149,7 +149,7 @@ public class ProviderAgent implements ITestService
 				size[0]++;
 				if(cnt[0]++<50)
 				{
-					agent.waitForDelay(50, this);
+					agent.waitForDelay(50, this, false);
 				}
 				else
 				{
@@ -159,7 +159,7 @@ public class ProviderAgent implements ITestService
 				return IFuture.DONE;
 			}
 		};
-		agent.waitForDelay(1000, step);
+		agent.waitForDelay(1000, step, false);
 		
 		return ret;
 	}

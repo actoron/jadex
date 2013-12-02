@@ -1,7 +1,5 @@
 package jadex.platform.service.servicepool;
 
-import java.util.Map;
-
 import jadex.base.test.TestReport;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -10,14 +8,14 @@ import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+
+import java.util.Map;
 
 /**
  *  Functionality agent that provides service A.
@@ -58,7 +56,7 @@ public class AAgent implements IAService
 				{
 //					System.out.println("ma2 called "+cnt[0]+" "+agent.getComponentIdentifier().getLocalName());
 					ret.addIntermediateResult(Integer.valueOf(cnt[0]++));
-					agent.waitForDelay(10, this);
+					agent.waitForDelay(10, this, false);
 				}
 				else
 				{

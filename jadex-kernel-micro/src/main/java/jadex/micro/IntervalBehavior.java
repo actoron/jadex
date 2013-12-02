@@ -32,16 +32,20 @@ public class IntervalBehavior<T>
 	/** The current id. */
 	protected String id;
 	
+	/** The realtime flag. */
+	protected boolean realtime;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new lease time handling object.
 	 */
-	public IntervalBehavior(IInternalAccess component, long delay, IComponentStep<T> step)
+	public IntervalBehavior(IInternalAccess component, long delay, IComponentStep<T> step, boolean realtime)
 	{
 		this.component = component;
 		this.step = step;
 		this.delay = delay;
+		this.realtime	= realtime;
 //		startSendBehavior();
 	}
 	
@@ -80,7 +84,7 @@ public class IntervalBehavior<T>
 						}
 						else if(id.equals(getId()) && getDelay()>0)
 						{
-							component.waitForDelay(getDelay(), self)
+							component.waitForDelay(getDelay(), self, realtime)
 								.addResultListener(new StepResultListener<Void, Void>(ret)
 							{
 								public void customResultAvailable(Void result) 

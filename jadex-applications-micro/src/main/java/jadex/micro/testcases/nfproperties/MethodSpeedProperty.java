@@ -17,7 +17,7 @@ public class MethodSpeedProperty extends AbstractNFProperty<String, Void>
 
 	public MethodSpeedProperty()
 	{
-		super(new NFPropertyMetaInfo("methodspeed", String.class, null, false, -1, null));
+		super(new NFPropertyMetaInfo("methodspeed", String.class, null, false, -1, false, null));
 		speed = "Very fast, indeed!";
 	}
 

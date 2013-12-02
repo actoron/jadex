@@ -95,7 +95,7 @@ public class ComponentTestSuite extends TestSuite
 			"-simulation", "true",
 			"-asyncexecution", "true",
 //			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
-//			"-logging", "true" // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
+			"-logging", "true", // path.toString().indexOf("bdibpmn")!=-1 ? "true" : "false",
 //			"-debugfutures", "true",
 //			"-nostackcompaction", "true",
 			"-gui", "false",

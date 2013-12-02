@@ -56,7 +56,7 @@ public class SimulationEventClock extends AbstractClock implements ISimulationCl
 				if(tmptime>currenttime)
 					currenttime = tmptime;
 					
-				//System.out.println("time event notificaton: "+t);
+				System.out.println("time event notificaton: "+t.getTimedObject());
 				dorem = t;
 //				removeTimer(t);
 //				t.getTimedObject().timeEventOccurred();

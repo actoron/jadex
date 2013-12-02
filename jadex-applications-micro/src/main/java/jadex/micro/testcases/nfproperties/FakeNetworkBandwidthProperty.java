@@ -20,7 +20,7 @@ public class FakeNetworkBandwidthProperty extends AbstractNFProperty<Long, Memor
 	 */
 	public FakeNetworkBandwidthProperty()
 	{
-		super(new NFPropertyMetaInfo("fakenetworkbandwith", Long.class, MemoryUnit.class, false, -1, null));
+		super(new NFPropertyMetaInfo("fakenetworkbandwith", Long.class, MemoryUnit.class, false, -1, false, null));
 	}
 	
 	/**

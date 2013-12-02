@@ -114,7 +114,7 @@ public class JCCTest extends TestCase
 							});
 							return IFuture.DONE;
 						}
-					});
+					}, true);
 				}
 			});
 		}

@@ -5,7 +5,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.SFuture;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -639,11 +638,10 @@ public class ExternalAccess implements IExternalAccess
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
 	 */
-//	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(final IFilter<IMonitoringEvent> filter, final boolean initial, final PublishEventLevel elm)
 	{
-//		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
-		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = (SubscriptionIntermediateDelegationFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, interpreter.getInternalAccess());
+		// No NoTimeoutFuture needed as is already created internally.
+		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
 		
 		if(adapter.isExternalThread())
 		{

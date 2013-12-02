@@ -6,7 +6,7 @@
 %><%@ page import="java.util.*"
 %><%
 	response.setHeader("Content-Disposition", "attachment; filename=relay_statistics.csv");
-%>Relay Statistics of <%= InetAddress.getLocalHost().getHostName() %> (<%= PlatformInfo.TIME_FORMAT_LONG.format(new Date()) %>)
+%>Relay Statistics of <%= InetAddress.getLocalHost().getHostName() %> (<%= PlatformInfo.TIME_FORMAT_LONG.get().format(new Date()) %>)
 ID;Platform;Host;IP;Scheme;Connected;Disconnected;Messages;Bytes;Transfer_Time 
 <%
 	Iterator<PlatformInfo>	infos	= (Iterator<PlatformInfo>)request.getAttribute("platforms");

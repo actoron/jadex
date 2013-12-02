@@ -1494,7 +1494,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					}
 					return IFuture.DONE;
 				}
-			});
+			}, handler.isRealtime());
 		}
 		messagehandlers.add(handler);
 	}

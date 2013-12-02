@@ -7,8 +7,6 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.SFuture;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
@@ -598,11 +596,10 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
 	 */
-//	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(final IFilter<IMonitoringEvent> filter, final boolean initial, final PublishEventLevel elm)
 	{
-//		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
-		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = (SubscriptionIntermediateDelegationFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, this);
+		// No NoTimeoutFuture needed as is already created internally.
+		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
 		
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{

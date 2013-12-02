@@ -2088,6 +2088,14 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step)
 	{
+		return waitForDelay(delay, step, false);
+	}
+	
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step, final boolean realtime)
+	{
 		// todo: remember and cleanup timers in case of component removal.
 		
 		final Future<T> ret = new Future<T>();
@@ -2097,7 +2105,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		{
 			public void customResultAvailable(IClockService cs)
 			{
-				cs.createTimer(delay, new ITimedObject()
+				ITimedObject	to	= new ITimedObject()
 				{
 					public void timeEventOccurred(long currenttime)
 					{
@@ -2108,7 +2116,15 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 					{
 						return "waitForDelay[Step]("+getComponentIdentifier()+")";
 					}
-				});
+				};
+				if(realtime)
+				{
+					cs.createRealtimeTimer(delay, to);
+				}
+				else
+				{
+					cs.createTimer(delay, to);					
+				}
 			}
 		}));
 		
@@ -2120,6 +2136,14 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public IFuture<Void> waitForDelay(final long delay)
 	{
+		return waitForDelay(delay, false);
+	}
+
+	/**
+	 *  Wait for some time.
+	 */
+	public IFuture<Void> waitForDelay(final long delay, final boolean realtime)
+	{
 		final Future<Void> ret = new Future<Void>();
 		
 		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -2127,7 +2151,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		{
 			public void customResultAvailable(IClockService cs)
 			{
-				cs.createTimer(delay, new ITimedObject()
+				ITimedObject	to	=  	new ITimedObject()
 				{
 					public void timeEventOccurred(long currenttime)
 					{
@@ -2145,7 +2169,16 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 					{
 						return "waitForDelay("+getComponentIdentifier()+")";
 					}
-				});
+				};
+				
+				if(realtime)
+				{
+					cs.createRealtimeTimer(delay, to);
+				}
+				else
+				{
+					cs.createTimer(delay, to);
+				}
 			}
 		}));
 		
@@ -2246,7 +2279,6 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 *  Subscribe to monitoring events.
 	 *  @param filter An optional filter.
 	 */
-//	@Timeout(Timeout.NONE)
 	public abstract ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel els);
 	
 	/**

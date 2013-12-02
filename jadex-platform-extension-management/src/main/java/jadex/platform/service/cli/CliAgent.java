@@ -125,7 +125,7 @@ public class CliAgent implements ICliService, IInternalCliService
 				}
 				return IFuture.DONE;
 			}
-		});
+		}, true);
 		b.startBehavior();
 	}
 	

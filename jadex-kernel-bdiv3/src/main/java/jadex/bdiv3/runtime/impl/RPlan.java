@@ -808,7 +808,7 @@ public class RPlan extends RElement implements IPlan
 //				}
 				return IFuture.DONE;
 			}
-		});//.addResultListener(new DelegationResultListener<Void>(ret, true));
+		}, false);//.addResultListener(new DelegationResultListener<Void>(ret, true));
 		
 		return ret;
 	}

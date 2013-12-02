@@ -135,7 +135,17 @@ public interface IInternalAccess
 	/**
 	 *  Wait for some time and execute a component step afterwards.
 	 */
+	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime);
+
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
 	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
+
+	/**
+	 *  Wait for some time.
+	 */
+	public IFuture<Void> waitForDelay(long delay, boolean realtime);
 	
 	/**
 	 *  Wait for some time.

@@ -21,6 +21,9 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	/** Flag if should be removed. */
 	protected boolean remove;
 	
+	/** The realtime flag. */
+	protected boolean realtime; 
+	
 	//-------- constructors --------
 	
 	/**
@@ -28,49 +31,18 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	 */
 	public AbstractMessageHandler()
 	{
-		this(-1, true);
+		this(null, -1, true, false);
 	}
-	
+		
 	/**
 	 *  Create a new message handler.
 	 */
-	public AbstractMessageHandler(long timeout)
-	{
-		this(timeout, true);
-	}
-	
-	/**
-	 *  Create a new message handler.
-	 */
-	public AbstractMessageHandler(long timeout, boolean remove)
-	{
-		this(null, timeout, remove);
-	}
-	
-	/**
-	 *  Create a new message handler.
-	 */
-	public AbstractMessageHandler(IFilter filter)
-	{
-		this(filter, -1, true);
-	}
-	
-	/**
-	 *  Create a new message handler.
-	 */
-	public AbstractMessageHandler(IFilter filter, long timeout)
-	{
-		this(filter, timeout, true);
-	}
-	
-	/**
-	 *  Create a new message handler.
-	 */
-	public AbstractMessageHandler(IFilter filter, long timeout, boolean remove)
+	public AbstractMessageHandler(IFilter filter, long timeout, boolean remove, boolean realtime)
 	{
 		this.filter = filter;
 		this.timeout = timeout;
 		this.remove = remove;
+		this.realtime	= realtime;
 	}
 	
 	//-------- methods --------
@@ -127,6 +99,24 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	public void setTimeout(long timeout)
 	{
 		this.timeout = timeout;
+	}
+	
+	/**
+	 *  Test if handler should be real time.
+	 *  @return True if it should be real time. 
+	 */
+	public boolean isRealtime()
+	{
+		return realtime;
+	}
+	
+	/**
+	 *  Set the real time.
+	 *  @param realtime The real time flag to set.
+	 */
+	public void setRealtime(boolean realtime)
+	{
+		this.realtime = realtime;
 	}
 
 	/**

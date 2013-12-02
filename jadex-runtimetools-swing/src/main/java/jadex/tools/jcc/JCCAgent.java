@@ -166,7 +166,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						// If no platform found, search again after 1 second.
 						if(!connected)
 						{
-							agent.waitForDelay(RETRY_DELAY, JCCAgent.this)
+							agent.waitForDelay(RETRY_DELAY, JCCAgent.this, true)
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}
@@ -176,7 +176,7 @@ public class JCCAgent	implements IComponentStep<Void>
 						// If no platform found, search again after 1 second.
 						if(!connected)
 						{
-							agent.waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this)
+							agent.waitForDelay(exception instanceof TimeoutException ? 0 : RETRY_DELAY, JCCAgent.this, true)
 								.addResultListener(new DelegationResultListener<Void>(ret));
 						}
 					}

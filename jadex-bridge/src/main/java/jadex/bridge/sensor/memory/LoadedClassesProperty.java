@@ -21,7 +21,7 @@ public class LoadedClassesProperty extends NFRootProperty<Integer, MemoryUnit>
 	public  LoadedClassesProperty(final IInternalAccess comp)
 	{
 		super(comp, new NFPropertyMetaInfo(NAME, int.class, null, 
-			true, 5000, Target.Root));
+			true, 5000, false, Target.Root));
 	}
 	
 	/**

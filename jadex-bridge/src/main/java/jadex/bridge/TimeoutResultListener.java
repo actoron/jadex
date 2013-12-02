@@ -7,7 +7,6 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.ICommandFuture;
 import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
@@ -229,7 +228,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 										if(timeout>0 && !notified)
 										{
 											cancel();
-											if(realtime && !IClock.TYPE_SYSTEM.equals(clock.getClockType()))
+											if(realtime)
 											{
 												// each timer creates a thread!
 												
@@ -256,6 +255,11 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 //														}
 														notify.run();
 													}
+
+													public String toString()
+													{
+														return super.toString()+": "+message;
+													}
 												});
 //												System.out.println("new real trl: "+message);
 											}
@@ -271,6 +275,11 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 //															System.out.println("wrong timer: "+message);
 //														}
 														notify.run();
+													}
+													
+													public String toString()
+													{
+														return super.toString()+": "+message;
 													}
 												});
 //												System.out.println("new clock trl: "+message);

@@ -133,7 +133,7 @@ public class DirectoryDownloaderAgent
 						body();
 						return IFuture.DONE;
 					}
-				});
+				}, false);
 			}
 		});
 	}

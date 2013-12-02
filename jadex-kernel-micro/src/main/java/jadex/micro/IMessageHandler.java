@@ -29,6 +29,12 @@ public interface IMessageHandler
 	public boolean isRemove();
 	
 	/**
+	 *  Test if handler should be real time.
+	 *  @return True if it should be real time. 
+	 */
+	public boolean isRealtime();
+	
+	/**
 	 *  Handle the message.
 	 *  @param ia The internal access.
 	 *  @param msg The message.

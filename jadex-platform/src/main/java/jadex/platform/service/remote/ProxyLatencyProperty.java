@@ -21,7 +21,7 @@ public class ProxyLatencyProperty extends NFRootProperty<Long, TimeUnit>
 	 */
 	public ProxyLatencyProperty(final IInternalAccess comp)
 	{
-		super(comp, new NFPropertyMetaInfo("latency "+((ProxyAgent)comp).rcid.getName(), long.class, null, true, 10000, Target.Root), false);
+		super(comp, new NFPropertyMetaInfo("latency "+((ProxyAgent)comp).rcid.getName(), long.class, null, true, 0, true, Target.Root), false);
 	}
 	
 	/**

@@ -2193,7 +2193,6 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel emitlevel)
 	{
-//		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = new SubscriptionIntermediateFuture<IMonitoringEvent>();
 		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
 			
 		ITerminationCommand tcom = new ITerminationCommand()

@@ -42,6 +42,7 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 /**
@@ -315,6 +316,16 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 		return ret;
 	}
 	
+	/**
+	 *  Wait for an specified amount of time.
+	 *  @param time The time.
+	 *  @param step The runnable.
+	 */
+	public IFuture<ITimer> waitFor(final long time, final IComponentStep<Void> step)
+	{
+		return waitFor(time, step, false);
+	}
+
 	// for debugging.
 //	protected long	longtime	= 0;
 	/**
@@ -322,7 +333,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param time The time.
 	 *  @param step The runnable.
 	 */
-	public IFuture<ITimer> waitFor(final long time, final IComponentStep<Void> step)
+	public IFuture<ITimer> waitFor(final long time, final IComponentStep<Void> step, final boolean realtime)
 	{
 //		longtime	= Math.max(longtime, time);
 		final Future<ITimer> ret = new Future<ITimer>();
@@ -333,7 +344,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 			public void customResultAvailable(IClockService cs)
 			{
 				final ITimer[] ts = new ITimer[1];
-				ts[0] = cs.createTimer(time, new ITimedObject()
+				final ITimedObject	to	= new ITimedObject()
 				{
 					public void timeEventOccurred(long currenttime)
 					{
@@ -344,7 +355,38 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 					{
 						return getComponentIdentifier().getLocalName()+".waitFor("+time+")_#"+this.hashCode();
 					}
-				});
+				};
+				if(realtime)
+				{
+					final TimerTask	tt	= cs.createRealtimeTimer(time, to);
+					ts[0]	= new ITimer()
+					{
+						public void setNotificationTime(long time)
+						{
+							throw new UnsupportedOperationException();
+						}
+						
+						public ITimedObject getTimedObject()
+						{
+							return to;
+						}
+						
+						public long getNotificationTime()
+						{
+							return tt.scheduledExecutionTime();
+						}
+						
+						public void cancel()
+						{
+							tt.cancel();
+						}
+					};
+
+				}
+				else
+				{
+					ts[0] = cs.createTimer(time, to);					
+				}
 				if(timers==null)
 					timers	= new ArrayList<ITimer>();
 				timers.add(ts[0]);
@@ -501,6 +543,11 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 			public void timeoutOccurred()
 			{
 				handler.timeoutOccurred();
+			}
+			
+			public boolean isRealtime()
+			{
+				return handler.isRealtime();
 			}
 			
 			public IFilter getFilter()
@@ -685,21 +732,37 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		return ((IServiceContainer)interpreter.getServiceProvider()).removeService(sid);
 	}
-	
+
 	/**
 	 *  Wait for some time and execute a component step afterwards.
 	 */
-	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step)
+	public <T> IFuture<T> waitForDelay(long delay, IComponentStep<T> step)
 	{
-		return interpreter.waitForDelay(delay, step);
+		return waitForDelay(delay, step, false);
 	}
-	
+
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public <T> IFuture<T> waitForDelay(long delay, IComponentStep<T> step, boolean realtime)
+	{
+		return interpreter.waitForDelay(delay, step, realtime);
+	}
+
 	/**
 	 *  Wait for some time.
 	 */
 	public IFuture<Void> waitForDelay(long delay)
 	{
-		return interpreter.waitForDelay(delay);
+		return waitForDelay(delay, false);
+	}
+
+	/**
+	 *  Wait for some time.
+	 */
+	public IFuture<Void> waitForDelay(long delay, boolean realtime)
+	{
+		return interpreter.waitForDelay(delay, realtime);
 	}
 	
 	/**
@@ -954,7 +1017,6 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
 	 */
-//	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm)
 	{
 		return interpreter.subscribeToEvents(filter, initial, elm);

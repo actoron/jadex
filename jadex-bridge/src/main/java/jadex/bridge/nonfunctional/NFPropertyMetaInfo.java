@@ -23,6 +23,9 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	/** The update rate. */
 	protected long updaterate;
 	
+	/** Flag indicating if the update rate is real time. */
+	protected boolean realtime;
+	
 	/** The target. */
 	protected Target target;
 	
@@ -55,7 +58,7 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	 *  @param updaterate Update rate of the property.
 	 *  @param target Target of the property.
 	 */
-	public NFPropertyMetaInfo(String name, Class<?> type, Class<?> unit, boolean dynamic, long updaterate, Target target)
+	public NFPropertyMetaInfo(String name, Class<?> type, Class<?> unit, boolean dynamic, long updaterate, boolean realtime, Target target)
 	{
 		this.name = name;
 		this.type = type;
@@ -114,6 +117,17 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 	{
 		return updaterate;
 	}
+	
+	/**
+	 *  Checks if the property is real time.
+	 *
+	 *  @return The real time flag.
+	 */
+	public boolean isRealtime()
+	{
+		return realtime;
+	}
+	
 
 	/**
 	 *  Sets the name of the property.
@@ -165,6 +179,16 @@ public class NFPropertyMetaInfo implements INFPropertyMetaInfo
 		this.updaterate = updaterate;
 	}
 
+	/**
+	 *  Sets the real time flag of the property.
+	 *
+	 *  @param realtime The real time flag value.
+	 */
+	public void setRealtime(boolean realtime)
+	{
+		this.realtime = realtime;
+	}
+	
 	/**
 	 *  Get the target.
 	 *  @return The target.

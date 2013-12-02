@@ -34,6 +34,6 @@ public class OutOfMemAgent	implements IComponentStep<Void>
 			System.out.println(getClass().getSimpleName()+" accumulated "+objects.size()+" MB");
 		}
 		objects.add(new byte[1024*1024]);
-		return ia.waitForDelay(10, this);
+		return ia.waitForDelay(10, this, false);
 	}
 }

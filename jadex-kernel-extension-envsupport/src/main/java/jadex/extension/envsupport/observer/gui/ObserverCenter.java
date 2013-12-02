@@ -2,6 +2,7 @@ package jadex.extension.envsupport.observer.gui;
 
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IChangeListener;
@@ -182,16 +183,22 @@ public class ObserverCenter implements IObserverCenter
 				});
 				clocklistener	= new IChangeListener()
 				{
-					public void changeOccurred(jadex.commons.ChangeEvent event)
+					boolean repainting	= false;
+					public void changeOccurred(final jadex.commons.ChangeEvent event)
 					{
-						SwingUtilities.invokeLater(new Runnable()
+						if(IClock.EVENT_TYPE_NEXT_TIMEPOINT.equals(event.getType()))
 						{
-							public void run()
+							repainting	= true;
+							SwingUtilities.invokeLater(new Runnable()
 							{
-								System.out.println("update viewport by clock");
-								updateDisplay();
-							}
-						});
+								public void run()
+								{
+									repainting	= false;
+									System.out.println("update viewport by clock: "+event);
+									updateDisplay();
+								}
+							});
+						}
 					}
 				};
 

@@ -362,7 +362,7 @@ public class EmailAgent implements IEmailService
 					checkForNewMails();
 					return IFuture.DONE;
 				}
-			});
+			}, false);
 		}
 
 		// In any case invoke start to immediately check for new email

@@ -33,7 +33,7 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 				public void resultAvailable(Void result)
 				{
 					setValue(measureValue());
-					comp.waitForDelay(mi.getUpdateRate()).addResultListener(this);
+					comp.waitForDelay(mi.getUpdateRate(), mi.isRealtime()).addResultListener(this);
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -41,7 +41,7 @@ public abstract class SimpleValueNFProperty<T, U> extends AbstractNFProperty<T, 
 				}
 			};
 			
-			comp.waitForDelay(mi.getUpdateRate()).addResultListener(res);
+			comp.waitForDelay(mi.getUpdateRate(), mi.isRealtime()).addResultListener(res);
 		}
 		else
 		{

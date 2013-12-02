@@ -16,7 +16,7 @@ public class FakeCpuLoadProperty extends SimpleValueNFProperty<Double, Void>
 	 */
 	public FakeCpuLoadProperty(IInternalAccess comp)
 	{
-		super(comp, new NFPropertyMetaInfo("fakecpuload", Double.class, Void.class, true, 10000, null));
+		super(comp, new NFPropertyMetaInfo("fakecpuload", Double.class, Void.class, true, 10000, true, null));
 	}
 	
 	/**

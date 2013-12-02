@@ -39,6 +39,13 @@ public interface INFPropertyMetaInfo
 	public long getUpdateRate();
 	
 	/**
+	 *  Checks if the property is real time.
+	 *
+	 *  @return The real time flag.
+	 */
+	public boolean isRealtime();
+	
+	/**
 	 *  Get the target of the property. If the target is not
 	 *  the element itself a reference will be created.
 	 *  @return The target where the nf property is declared.

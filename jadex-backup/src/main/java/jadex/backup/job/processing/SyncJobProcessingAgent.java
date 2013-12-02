@@ -228,13 +228,13 @@ public class SyncJobProcessingAgent
 								public void resultAvailable(Void result)
 								{
 									System.out.println("waiting...");
-									agent.waitForDelay(delay, self);
+									agent.waitForDelay(delay, self, false);
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
 									System.out.println("waiting...");
-									agent.waitForDelay(delay, self);
+									agent.waitForDelay(delay, self, false);
 								}
 							});	
 						}
@@ -248,7 +248,7 @@ public class SyncJobProcessingAgent
 					public void exceptionOccurred(Exception exception) 
 					{
 						System.out.println("waiting... (no sync partner): "+agent.getComponentIdentifier());
-						agent.waitForDelay(delay, self);
+						agent.waitForDelay(delay, self, false);
 					}
 				});
 				

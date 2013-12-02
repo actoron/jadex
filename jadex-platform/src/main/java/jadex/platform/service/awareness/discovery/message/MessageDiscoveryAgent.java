@@ -173,7 +173,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 					msg.put(SFipa.CONTENT, "ping");
 					msg.put(SFipa.PERFORMATIVE, SFipa.QUERY_IF);
 					msg.put(SFipa.CONVERSATION_ID, SUtil.createUniqueId("msg_dis"));
-					getMicroAgent().sendMessageAndWait(msg, SFipa.FIPA_MESSAGE_TYPE, new AbstractMessageHandler(5000, true)
+					getMicroAgent().sendMessageAndWait(msg, SFipa.FIPA_MESSAGE_TYPE, new AbstractMessageHandler(null, 5000, true, true)
 					{
 						public void handleMessage(Map<String, Object> msg, MessageType type)
 						{

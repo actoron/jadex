@@ -5,7 +5,6 @@ import jadex.bridge.nonfunctional.NFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.SimpleValueNFProperty;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.MethodInfo;
 import jadex.commons.future.IFuture;
@@ -36,7 +35,7 @@ public class WaitqueueProperty extends SimpleValueNFProperty<Integer, Void>
 	 */
 	public WaitqueueProperty(IInternalAccess comp, IService service, MethodInfo method)
 	{
-		super(comp, new NFPropertyMetaInfo(NAME, int.class, Void.class, true, -1, null));
+		super(comp, new NFPropertyMetaInfo(NAME, int.class, Void.class, true, -1, false, null));
 		this.method = method;
 		this.sid = service.getServiceIdentifier();
 		
