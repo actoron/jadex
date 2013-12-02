@@ -173,7 +173,7 @@ public class NIOTCPTransport implements ITransport
 		{
 			logger.warning("Exception during shutdown: "+e);
 		}
-		selectorthread.setRunning(false);
+		selectorthread.shutdown();
 		this.shutdown	= true;
 		return IFuture.DONE;
 	}

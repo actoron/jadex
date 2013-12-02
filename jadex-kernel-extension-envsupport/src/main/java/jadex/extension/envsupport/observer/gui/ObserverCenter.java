@@ -176,6 +176,7 @@ public class ObserverCenter implements IObserverCenter
 				{
 					public void actionPerformed(ActionEvent e)
 					{
+						System.out.println("update viewport by timer");
 						updateDisplay();
 					}
 				});
@@ -187,6 +188,7 @@ public class ObserverCenter implements IObserverCenter
 						{
 							public void run()
 							{
+								System.out.println("update viewport by clock");
 								updateDisplay();
 							}
 						});

@@ -11,6 +11,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -158,6 +159,15 @@ public class SelectorThread implements Runnable
 			closeKeyAttachment(key);
 		}
 		
+		try
+		{
+			selector.close();
+		}
+		catch(IOException e)
+		{
+			logger.warning("Exception during NIO TCP shutdown: "+e);
+		}
+		
 		if(timer!=null)
 		{
 			timer.cancel();
@@ -173,6 +183,17 @@ public class SelectorThread implements Runnable
 	protected void closeKeyAttachment(SelectionKey key)
 	{
 		Object	con	= key.attachment();
+		
+		if(con instanceof Tuple2<?, ?>)
+		{
+			con	= ((Tuple2<?,?>)con).getSecondEntity();
+		}
+		
+		if(con instanceof IFuture<?> && ((IFuture<?>)con).isDone())
+		{
+			con	= ((IFuture<?>)con).get();
+		}
+
 		if(con instanceof Closeable)
 		{
 			try
@@ -184,6 +205,19 @@ public class SelectorThread implements Runnable
 			{
 			}
 		}
+		
+		else
+		{
+			try
+			{
+				SelectableChannel	sc	= key.channel();
+				sc.close();
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+			}
+		}
 	}
 	
 	//-------- methods to be called from external --------
@@ -191,9 +225,9 @@ public class SelectorThread implements Runnable
 	/**
 	 *  Set the running flag to false to gracefully terminate the thread.
 	 */
-	public void	setRunning(boolean running)
+	public void	shutdown()
 	{
-		this.running	= running;
+		this.running	= false;
 		selector.wakeup();
 	}
 	
@@ -594,7 +628,7 @@ public class SelectorThread implements Runnable
 			{
 				// Connection lost, try to reconnect before marking as dead connection.
 				internalRemoveConnection(con.getAddress());
-				System.out.println("cons (alive, dead, future): "+aliveconnections.size()+" "+deadconnections.size()+" "+futconnections.size());
+//				System.out.println("cons (alive, dead, future): "+aliveconnections.size()+" "+deadconnections.size()+" "+futconnections.size());
 			}
 			
 			// Connection failure: notify all open tasks.
@@ -781,10 +815,10 @@ public class SelectorThread implements Runnable
 					
 					if(con instanceof NIOTCPOutputConnection)
 					{
-						synchronized(aliveconnections)
-						{
-							System.out.println("cons (alive, dead, future): "+aliveconnections.size()+" "+deadconnections.size()+" "+futconnections.size());
-						}
+//						synchronized(aliveconnections)
+//						{
+//							System.out.println("cons (alive, dead, future): "+aliveconnections.size()+" "+deadconnections.size()+" "+futconnections.size());
+//						}
 						
 						try
 						{

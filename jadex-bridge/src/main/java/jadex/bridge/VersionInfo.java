@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,7 +56,9 @@ public class VersionInfo
 			{
 				// non-maven build -> use file date
 				URL	url	= VersionInfo.class.getResource("version.properties");
-				date	= new Date(url.openConnection().getLastModified());
+				URLConnection	con	= url.openConnection();
+				date	= new Date(con.getLastModified());
+				con.getInputStream().close();	// Required to release file handle!
 //				System.out.println("file date: "+date);
 			}
 			else
