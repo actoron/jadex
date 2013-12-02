@@ -177,7 +177,7 @@ public class ObserverCenter implements IObserverCenter
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						System.out.println("update viewport by timer");
+//						System.out.println("update viewport by timer");
 						updateDisplay();
 					}
 				});
@@ -186,7 +186,7 @@ public class ObserverCenter implements IObserverCenter
 					boolean repainting	= false;
 					public void changeOccurred(final jadex.commons.ChangeEvent event)
 					{
-						if(IClock.EVENT_TYPE_NEXT_TIMEPOINT.equals(event.getType()))
+						if(!repainting && IClock.EVENT_TYPE_NEXT_TIMEPOINT.equals(event.getType()))
 						{
 							repainting	= true;
 							SwingUtilities.invokeLater(new Runnable()
