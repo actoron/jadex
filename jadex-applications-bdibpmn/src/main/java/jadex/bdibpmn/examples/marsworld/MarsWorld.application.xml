@@ -106,7 +106,7 @@
 			</env:avatarmappings>
 
 			<env:perspectives>
-				<env:perspective name="icons" class="Perspective2D" opengl="false">
+				<env:perspective name="icons" class="Perspective2D">
 				
 					<!-- Target -->
 					<env:drawable objecttype="target" width="0.1" height="0.1">
@@ -200,14 +200,6 @@
 	<configurations>
 		<configuration name="1 Sentry / 2 Producers / 3 Carries">
 			<extensions>
-				<agr:agrspace name="myagrspace" type="marsagrspace">
-					<agr:group name="mymarsteam" type="marsteam">
-						<agr:position role="sentry" componenttype="Sentry" />
-						<agr:position role="producer" componenttype="Producer" />
-						<agr:position role="carrier" componenttype="Carry" />
-					</agr:group>
-				</agr:agrspace>
-	
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
 						<env:object type="homebase">
@@ -245,6 +237,13 @@
 						<env:observer name="MarsWorld" dataview="view_all" perspective="icons"/>
 					</env:observers>
 	 			</env:envspace>
+				<agr:agrspace name="myagrspace" type="marsagrspace">
+					<agr:group name="mymarsteam" type="marsteam">
+						<agr:position role="sentry" componenttype="Sentry" />
+						<agr:position role="producer" componenttype="Producer" />
+						<agr:position role="carrier" componenttype="Carry" />
+					</agr:group>
+				</agr:agrspace>	
 	 		</extensions>
 
 			<components>
@@ -256,14 +255,6 @@
 
 		<configuration name="Multi">
 			<extensions>
-				<agr:agrspace name="myagrspace" type="marsagrspace">
-					<agr:group name="mymarsteam" type="marsteam">
-						<agr:position role="sentry" componenttype="Sentry" />
-						<agr:position role="producer" componenttype="Producer" />
-						<agr:position role="carrier" componenttype="Carry" />
-					</agr:group>
-				</agr:agrspace>
-	
 				<env:envspace name="my2dspace" type="2dspace" width="2" height ="2">
 					<env:objects>
 						<env:object type="homebase">
@@ -280,6 +271,14 @@
 						<env:observer name="MarsWorld" dataview="view_all" perspective="icons"/>
 					</env:observers>
 	 			</env:envspace>
+	 			
+				<agr:agrspace name="myagrspace" type="marsagrspace">
+					<agr:group name="mymarsteam" type="marsteam">
+						<agr:position role="sentry" componenttype="Sentry" />
+						<agr:position role="producer" componenttype="Producer" />
+						<agr:position role="carrier" componenttype="Carry" />
+					</agr:group>
+				</agr:agrspace>
 			</extensions>
 
 			<components>
