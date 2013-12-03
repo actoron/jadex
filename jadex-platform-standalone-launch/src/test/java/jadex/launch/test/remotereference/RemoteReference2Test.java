@@ -2,6 +2,7 @@ package jadex.launch.test.remotereference;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -22,7 +23,7 @@ public class RemoteReference2Test extends TestCase
 {
 	public void	testRemoteReference()
 	{
-		long timeout	= 3000000;
+		long timeout	= BasicService.getLocalDefaultTimeout();
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		// Underscore in platform name assures both platforms use same password.
@@ -31,7 +32,7 @@ public class RemoteReference2Test extends TestCase
 		// Start platform1 used for remote access.
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", pid,
 //			"-relaytransport", "false",
-			"-deftimeout", Long.toString(timeout),
+//			"-deftimeout", Long.toString(timeout),
 //			"-logging", "true",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 			}).get(sus, timeout);
@@ -40,7 +41,7 @@ public class RemoteReference2Test extends TestCase
 		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", pid,
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 //			"-relaytransport", "false",
-			"-deftimeout", Long.toString(timeout),
+//			"-deftimeout", Long.toString(timeout),
 //			"-logging", "true",
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(sus, timeout);

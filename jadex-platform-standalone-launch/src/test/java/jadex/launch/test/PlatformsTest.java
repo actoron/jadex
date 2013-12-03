@@ -5,6 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -31,7 +32,7 @@ import junit.framework.TestCase;
 public class PlatformsTest extends TestCase
 {
 	// Timeout for each platform.
-	long	TIMEOUT	= 120000;
+//	long	TIMEOUT	= 120000;
 	
 	// The platforms to test as pairs of componentfactory and model.
 	String[]	PLATFORMS	= new String[]
@@ -52,7 +53,7 @@ public class PlatformsTest extends TestCase
 		"-welcome", "false",
 		"-autoshutdown", "false",
 		"-printpass", "false",
-		"-deftimeout", ""+TIMEOUT
+//		"-deftimeout", ""+TIMEOUT
 	};
 	
 	/** Arguments to exclude from comparison. */
@@ -88,7 +89,7 @@ public class PlatformsTest extends TestCase
 	 */
 	public void	testPlatforms()
 	{
-		long timeout = TIMEOUT;
+		long timeout = BasicService.getLocalDefaultTimeout();	//TIMEOUT;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];
