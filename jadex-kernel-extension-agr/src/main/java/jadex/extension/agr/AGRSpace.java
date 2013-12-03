@@ -9,11 +9,10 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.future.Future;
+import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ICommandFuture.Type;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -108,7 +107,7 @@ public class AGRSpace	implements IExtensionInstance
 		
 		final Future<Void> ret = new Future<Void>();
 		
-//		System.out.println("init space: "+ia);
+//		System.out.println("init agr space: "+exta);
 		
 		try
 		{
@@ -171,7 +170,7 @@ public class AGRSpace	implements IExtensionInstance
 						}
 					}, false, PublishEventLevel.COARSE);
 					
-					sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IIntermediateFutureCommandResultListener<IMonitoringEvent>()
+					sub.addResultListener(new IIntermediateFutureCommandResultListener<IMonitoringEvent>()
 					{
 						public void resultAvailable(Collection<IMonitoringEvent> result)
 						{
@@ -181,6 +180,7 @@ public class AGRSpace	implements IExtensionInstance
 						{
 							if(result.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START))
 							{
+//								System.out.println("agr space subscribed");
 								ret.setResult(null);
 							}	
 							else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
@@ -207,7 +207,7 @@ public class AGRSpace	implements IExtensionInstance
 					    {
 					    	// ignore timer updates
 					    }
-					}));
+					});
 					
 					return IFuture.DONE;
 				}

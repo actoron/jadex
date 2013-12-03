@@ -2881,6 +2881,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		{
 			public void customResultAvailable(Void result)
 			{
+//				System.out.println("inited space");
+				
 //				ia.addComponentListener(new IComponentListener()
 //				{
 //					IFilter filter = new IFilter()
@@ -2932,6 +2934,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					{
 						if(result.getType().equals(IMonitoringEvent.TYPE_SUBSCRIPTION_START))
 						{
+//							System.out.println("space subscribed");
 							ret.setResult(null);
 						}
 						else if(result.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))

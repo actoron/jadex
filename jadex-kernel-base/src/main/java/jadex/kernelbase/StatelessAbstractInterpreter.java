@@ -729,44 +729,44 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		}
 		else
 		{
-			if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-				System.out.println("Initing arguments: "+this);
+//			if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//				System.out.println("Initing arguments: "+this);
 			initArguments(model, config, arguments).addResultListener(
 				createResultListener(new DelegationResultListener<Void>(fut)
 			{
 				public void customResultAvailable(Void result)
 				{
-					if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-						System.out.println("Initing future properties: "+this);
+//					if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//						System.out.println("Initing future properties: "+this);
 					// properties depend on arguments (e.g. logging_level in Platform.component.xml)
 					initFutureProperties(model).addResultListener(
 						createResultListener(new DelegationResultListener<Void>(fut)
 					{
 						public void customResultAvailable(Void result)
 						{
-							if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-								System.out.println("Initing extensions: "+this);
+//							if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//								System.out.println("Initing extensions: "+this);
 							initExtensions(model, config).addResultListener(
 								createResultListener(new DelegationResultListener<Void>(fut)
 							{
 								public void customResultAvailable(Void result)
 								{
-									if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-										System.out.println("Initing required services: "+this);
+//									if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//										System.out.println("Initing required services: "+this);
 									initRequiredServices(model, config).addResultListener(
 										createResultListener(new DelegationResultListener<Void>(fut)
 									{
 										public void customResultAvailable(Void result)
 										{
-											if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-												System.out.println("Initing provided services: "+this);
+//											if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//												System.out.println("Initing provided services: "+this);
 											initProvidedServices(model, config).addResultListener(
 												createResultListener(new DelegationResultListener<Void>(fut)
 											{
 												public void customResultAvailable(Void result)
 												{
-													if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
-														System.out.println("Initing components: "+this);
+//													if(model.getFullName().equals("jadex.bdibpmn.examples.marsworld.MarsWorld"))
+//														System.out.println("Initing components: "+this);
 													initComponents(model, config).addResultListener(
 														createResultListener(new DelegationResultListener<Void>(fut)
 													{
