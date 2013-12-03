@@ -8,11 +8,14 @@ import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.IPoolStrategy;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -32,7 +35,11 @@ import java.util.Map;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IServicePoolService.class, implementation=@Implementation(expression="$component")))
+@Arguments(
+{
+	@Argument(name="serviceinfos", clazz=PoolServiceInfo[].class, description="The array of service pool infos.")
+})
+@ProvidedServices(@ProvidedService(type=IServicePoolService.class))
 public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 {
 	//-------- attributes --------
@@ -41,6 +48,33 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	protected Map<Class<?>, ServiceHandler> servicetypes;
 	
 	//-------- interface methods --------
+	
+	/**
+	 *  Called once after agent creation.
+	 */
+	public IFuture<Void> agentCreated()
+	{
+		final Future<Void> ret = new Future<Void>();
+
+		PoolServiceInfo[] psis = (PoolServiceInfo[])getArgument("serviceinfos");
+		
+		if(psis!=null)
+		{
+			CounterResultListener<Void> lis = new CounterResultListener<Void>(psis.length, true, new DelegationResultListener<Void>(ret));
+			for(PoolServiceInfo psi: psis)
+			{
+				IPoolStrategy str = psi.getPoolStrategy()==null? new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
+					Runtime.getRuntime().availableProcessors()+1): psi.getPoolStrategy();
+				addServiceType(psi.getServicetype().getType(getClassLoader()), str, psi.getWorkermodel()).addResultListener(lis);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
 	
 //	/**
 //	 *  Execute the functional body of the agent.
@@ -163,6 +197,4 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 			}
 		};
 	}
-	
-	
 }

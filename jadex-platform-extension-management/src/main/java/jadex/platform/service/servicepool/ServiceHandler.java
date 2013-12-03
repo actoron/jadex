@@ -8,6 +8,7 @@ import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
@@ -18,6 +19,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IPoolStrategy;
 import jadex.commons.SReflect;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -27,11 +29,12 @@ import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -49,8 +52,11 @@ public class ServiceHandler implements InvocationHandler
 	/** The service type. */
 	protected Class<?> servicetype;
 	
-	/** List of idle services. */
-	protected Map<IService, ITimer> servicepool;
+	/** Map of idle services. */
+	protected Map<IService, ITimer> idleservices;
+	
+	/** All services. */
+	protected Set<IService> allservices;
 
 	/** A queue of open requests. */
 	protected List<Object[]> queue;
@@ -79,9 +85,33 @@ public class ServiceHandler implements InvocationHandler
 		this.servicetype = servicetype;
 		this.strategy = strategy;
 		this.componentname = componentname;
-		this.servicepool = new LinkedHashMap<IService, ITimer>();
+		this.idleservices = new LinkedHashMap<IService, ITimer>();
+		this.allservices = new HashSet<IService>();
 		this.queue = new LinkedList<Object[]>();
 		this.info = info;
+	}
+	
+	/**
+	 * 
+	 */
+	@ServiceStart
+	public IFuture<Void> init()
+	{
+//		System.out.println("called init: "+this);
+		final Future<Void> ret = new Future<Void>();
+		if(strategy.getWorkerCount()>0)
+		{
+			CounterResultListener<IService> lis = new CounterResultListener<IService>(strategy.getWorkerCount(), new DelegationResultListener<Void>(ret));
+			for(int i=0; i<strategy.getWorkerCount(); i++)
+			{
+				createService().addResultListener(lis);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
 	}
 	
 	//-------- methods --------
@@ -91,75 +121,131 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
+//		System.out.println("called: "+method);
 		assert component.isComponentThread();
-		final IInternalAccess inta = component;
+//		final IInternalAccess inta = component;
 		
 		if(!SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			return new Future<Object>(new IllegalArgumentException("Return type must be future: "+method.getName()));
 		
-		final ServiceCall sc = ServiceCall.getCurrentInvocation();
-//		if(sc!=null && !component.getComponentIdentifier().getParent().equals(sc.getCaller()))
-//			System.out.println("wrong call: "+component.getComponentIdentifier()+" "+sc.getCaller());
-		
 		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
 		
-		// Add task to queue.
-		queue.add(new Object[]{method, args, ret, ServiceCall.getCurrentInvocation()});
-		// Notify strategy that task was added
-		boolean create = strategy.taskAdded();
-		
-		// Create new component / service if necessary
-		if(create)
-		{
-			inta.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
+//		final ServiceCall sc = ServiceCall.getCurrentInvocation();
+//		Boolean broadcast = (Boolean)sc.getProperty(IServicePoolService.POOL_BROADCAST);
+//		if(broadcast)
+//		{
+//			// Should the pool create at least one worker to handle the call?
+//			if(allservices.size()>0)
+//			{
+//				CollectionResultListener<Object> lis = new CollectionResultListener<Object>(allservices.size(), true, new IResultListener<Collection<Object>>()
+//				{
+//					public void resultAvailable(Collection<Object> res)
+//					{
+//						// If more than one result just pick first
+//						if(res.size()>0)
+//						{
+//							ret.setResult(res.iterator().next());
+//						}
+//						else
+//						{
+//							ret.setResult(null);
+//						}
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						// not called
+//					}
+//				});
+//				
+//				for(IService service: allservices)
+//				{
+//					IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
+//					res.addResultListener(lis);
+//				}
+//			}
+//			else
+//			{
+//				ret.setResult(null);
+//			}
+//		}
+//		else
+//		{
+	//		if(sc!=null && !component.getComponentIdentifier().getParent().equals(sc.getCaller()))
+	//			System.out.println("wrong call: "+component.getComponentIdentifier()+" "+sc.getCaller());
+			
+			// Add task to queue.
+			queue.add(new Object[]{method, args, ret, ServiceCall.getCurrentInvocation()});
+			// Notify strategy that task was added
+			boolean create = strategy.taskAdded();
+			
+			// Create new component / service if necessary
+			if(create)
 			{
-				public void customResultAvailable(final IComponentManagementService cms)
-				{
-					CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
-					ci.setParent(inta.getComponentIdentifier());
-					ci.setImports(inta.getModel().getAllImports());
-					cms.createComponent(null, componentname, ci, null)
-						.addResultListener(inta.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
-					{
-						public void customResultAvailable(IComponentIdentifier result)
-						{
-//							System.out.println("created: "+result);
-							cms.getExternalAccess(result)
-								.addResultListener(inta.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
-							{
-								public void customResultAvailable(IExternalAccess ea)
-								{
-									Future<Object> fut = (Future<Object>)SServiceProvider.getService(ea.getServiceProvider(), servicetype, RequiredServiceInfo.SCOPE_LOCAL);
-									fut.addResultListener(inta.createResultListener(new DelegationResultListener<Object>(ret)
-									{
-										public void customResultAvailable(Object service)
-										{
-											addFreeService((IService)service);
-										}
-									}));
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									System.out.println("method: "+method+" "+Arrays.toString(args)+" "+sc);
-									super.exceptionOccurred(exception);
-								}
-							}));
-						};
-					}));
-				}
-			});
-		}
-		else
-		{
-			addFreeService(null);
-		}
+				createService(); // Not necessary to wait for finished creating service, ret is in queue
+			}
+			else
+			{
+				addFreeService(null);
+			}
+//		}
 		
 		return ret;
 	}
 	
 	//-------- helper methods --------
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IService> createService()
+	{
+		final Future<IService> ret = new Future<IService>();
+		
+		component.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IService>(ret)
+		{
+			public void customResultAvailable(final IComponentManagementService cms)
+			{
+				CreationInfo ci  = info!=null? new CreationInfo(info): new CreationInfo();
+				ci.setParent(component.getComponentIdentifier());
+				ci.setImports(component.getModel().getAllImports());
+				cms.createComponent(null, componentname, ci, null)
+					.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IService>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier result)
+					{
+	//					System.out.println("created: "+result);
+						cms.getExternalAccess(result)
+							.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IService>(ret)
+						{
+							public void customResultAvailable(IExternalAccess ea)
+							{
+								Future<IService> fut = (Future<IService>)SServiceProvider.getService(ea.getServiceProvider(), servicetype, RequiredServiceInfo.SCOPE_LOCAL);
+								fut.addResultListener(component.createResultListener(new DelegationResultListener<IService>(ret)
+								{
+									public void customResultAvailable(IService ser)
+									{
+										allservices.add(ser);
+										addFreeService(ser);
+										ret.setResult(ser);
+									}
+								}));
+							}
+							
+	//						public void exceptionOccurred(Exception exception)
+	//						{
+	//							System.out.println("method: "+method+" "+args+" "+sc);
+	//							super.exceptionOccurred(exception);
+	//						}
+						}));
+					};
+				}));
+			}
+		});
+		
+		return ret;
+	}
 	
 	/**
 	 *  Called when a service becomes idle.
@@ -171,10 +257,10 @@ public class ServiceHandler implements InvocationHandler
 		// Invoke a service if there is a task and a free worker
 		if(!queue.isEmpty())
 		{
-			if(service==null && !servicepool.isEmpty())
+			if(service==null && !idleservices.isEmpty())
 			{
-				service = servicepool.keySet().iterator().next();
-				ITimer timer = servicepool.remove(service);
+				service = idleservices.keySet().iterator().next();
+				ITimer timer = idleservices.remove(service);
 				if(timer!=null)
 				{
 //					System.out.println("cancelled timer for: "+service);
@@ -229,13 +315,13 @@ public class ServiceHandler implements InvocationHandler
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							// When timer triggers check that pool contains service and remove it
-							if(servicepool.containsKey(service))
+							if(idleservices.containsKey(service))
 							{
 								boolean remove = strategy.workerTimeoutOccurred();
 								if(remove)
 								{
 //									System.out.println("timeout of worker: "+service);
-									servicepool.remove(service);
+									idleservices.remove(service);
 									removeService(service);
 								}
 								else
@@ -262,7 +348,7 @@ public class ServiceHandler implements InvocationHandler
 			{
 				public void customResultAvailable(ITimer timer)
 				{
-					servicepool.put(service, timer);
+					idleservices.put(service, timer);
 					ret.setResult(null);
 				}
 				
@@ -274,7 +360,7 @@ public class ServiceHandler implements InvocationHandler
 		}
 		else
 		{
-			servicepool.put(service, null);
+			idleservices.put(service, null);
 		}
 		
 		return ret;
@@ -351,7 +437,7 @@ public class ServiceHandler implements InvocationHandler
 	/**
 	 *  Remove a service and the worker.
 	 */
-	protected IFuture<Void> removeService(IService service)
+	protected IFuture<Void> removeService(final IService service)
 	{
 		assert component.isComponentThread();
 		final IInternalAccess inta = component;
@@ -375,6 +461,7 @@ public class ServiceHandler implements InvocationHandler
 					{
 //						System.out.println("removed worker: "+workercid);
 //						System.out.println("strategy state: "+strategy);
+						allservices.remove(service);
 						ret.setResult(null);
 					}
 				}));
@@ -441,7 +528,7 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	public String toString()
 	{
-		return "ServiceHandler(servicetype="+ servicetype + ", servicepool=" + servicepool 
+		return "ServiceHandler(servicetype="+ servicetype + ", servicepool=" + idleservices 
 			+ ", queue="+ queue + ", strategy=" + strategy+")";
 	}
 	

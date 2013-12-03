@@ -11,6 +11,9 @@ import jadex.commons.future.IFuture;
  */
 public interface IServicePoolService
 {
+//	/** The pool broadcast flag. */
+//	public static final String POOL_BROADCAST = "pool_broadcast";
+	
 	/**
 	 *  Add a new service type and a strategy.
 	 *  @param servicetype The service type.
