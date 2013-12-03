@@ -49,11 +49,6 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 			DEFAULT_REMOTE = Long.parseLong(dtoprop);
 			System.out.println("Setting jadex.deftimeout: "+dtoprop);
 		}
-		else
-		{
-			System.out.println("Using Jadex default timeouts: "+DEFAULT_LOCAL+", "+DEFAULT_REMOTE);
-		}
-
 	}
 	
 	/**
@@ -78,8 +73,8 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	public static void	setRemoteDefaultTimeout(long timeout)
 	{
 		DEFAULT_REMOTE	= timeout;
-		System.err.println("Setting Jadex default timeout: "+DEFAULT_REMOTE);
-		Thread.dumpStack();
+//		System.err.println("Setting Jadex default timeout: "+DEFAULT_REMOTE);
+//		Thread.dumpStack();
 	}
 
 	/**
@@ -88,8 +83,8 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	public static void	setLocalDefaultTimeout(long timeout)
 	{
 		DEFAULT_LOCAL	= timeout;
-		System.err.println("Setting Jadex default timeout: "+DEFAULT_LOCAL);
-		Thread.dumpStack();
+//		System.err.println("Setting Jadex default timeout: "+DEFAULT_LOCAL);
+//		Thread.dumpStack();
 	}
 
 	//-------- attributes --------

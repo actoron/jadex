@@ -32,10 +32,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -77,6 +79,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	
 	//-------- interface methods --------
 	
+	protected static Set<String>	SEARCHES
+		= Collections.synchronizedSet(new HashSet<String>());
+	
 	/**
 	 *  Get all services of a type.
 	 *  @param clazz The class.
@@ -94,7 +99,22 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return new TerminableIntermediateFuture<IService>(new ComponentTerminatedException(id));
 		}
 		
-		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
+		ITerminableIntermediateFuture<IService>	ret	= manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
+		final String	search	= "search: "+manager+", "+decider+", "+selector+"\n";
+		SEARCHES.add(search);
+		ret.addResultListener(new IResultListener<Collection<IService>>()
+		{
+			public void resultAvailable(Collection<IService> result)
+			{
+				SEARCHES.remove(search);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				SEARCHES.remove(search);
+			}
+		});
+		return ret;
 	}
 	
 	/**

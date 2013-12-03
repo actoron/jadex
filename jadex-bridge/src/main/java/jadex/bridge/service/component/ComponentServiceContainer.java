@@ -4,6 +4,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.service.BasicServiceContainer;
@@ -484,7 +485,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			{
 				public void resultAvailable(IComponentIdentifier[] children)
 				{
-//					System.out.println("getEx: "+id+" "+CallAccess.getCurrentInvocation());
+					if(adapter!=null)
+					{
+						adapter.getLogger().info("getChildren: "+id+"\n"+BasicServiceContainer.SEARCHES);
+					}
 					if(children!=null)
 					{
 	//					System.out.println("childs: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));
