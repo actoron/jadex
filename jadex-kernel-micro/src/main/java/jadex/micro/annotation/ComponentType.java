@@ -20,5 +20,10 @@ public @interface ComponentType
 	/**
 	 *  The component filename.
 	 */
-	public String filename();
+	public String filename() default "";
+	
+	/**
+	 *  The component clazz.
+	 */
+	public Class<?> clazz() default Object.class;
 }
