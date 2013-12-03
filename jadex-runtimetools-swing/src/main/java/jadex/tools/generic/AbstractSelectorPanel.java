@@ -6,11 +6,13 @@ import jadex.commons.Properties;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -165,9 +167,9 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 				}
 				else
 				{
-					createPanel((E)sel).addResultListener(new SwingDefaultResultListener<IAbstractViewerPanel>()
+					createPanel((E)sel).addResultListener(new SwingResultListener<IAbstractViewerPanel>(new IResultListener<IAbstractViewerPanel>()
 					{
-						public void customResultAvailable(final IAbstractViewerPanel panel)
+						public void resultAvailable(final IAbstractViewerPanel panel)
 						{
 							IFuture<Void>	propsdone;
 							if(props!=null && props.getSubproperty(PANELPROPERTIES)!=null)
@@ -189,7 +191,14 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 								}
 							});
 						}
-					});
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// Try to find sun.awt.shell.Win32ShellFolder2.access$200(Win32ShellFolder2.java:72) bug.
+							Thread.dumpStack();
+							exception.printStackTrace();
+						}
+					}));
 				}
 			}
 		});
