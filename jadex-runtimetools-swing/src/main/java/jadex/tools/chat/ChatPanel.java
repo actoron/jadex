@@ -712,17 +712,17 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				apan.add(buava, BorderLayout.EAST);
 				pp.addComponent("Image: ", apan);
 				System.err.println("init panel pre file chooser: "+this);
-				File	f	= new File(".");
-				try
-				{
-					f	= f.getCanonicalFile();
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-					f	= f.getAbsoluteFile();
-				}
-				final JFileChooser fcava = new JFileChooser(f);
+//				File	f	= new File(".");
+//				try
+//				{
+//					f	= f.getCanonicalFile();
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//					f	= f.getAbsoluteFile();
+//				}
+				final JFileChooser fcava = new JFileChooser();
 				System.err.println("init panel post file chooser: "+this);
 				fcava.setFileFilter(new FileFilter()
 				{
