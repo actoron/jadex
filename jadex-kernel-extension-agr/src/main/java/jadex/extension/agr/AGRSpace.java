@@ -203,7 +203,7 @@ public class AGRSpace	implements IExtensionInstance
 					    	e.printStackTrace();
 					    }
 					    
-					    public void commandAvailable(Type command)
+					    public void commandAvailable(Object command)
 					    {
 					    	// ignore timer updates
 					    }

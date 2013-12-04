@@ -266,7 +266,7 @@ public class InitiatorAgent extends TestAgent
 						ret.setResult(tr);
 					}
 					
-					public void commandAvailable(Type command)
+					public void commandAvailable(Object command)
 					{
 					}
 				});
@@ -281,7 +281,7 @@ public class InitiatorAgent extends TestAgent
 	 */
 	abstract class Tuple2Listener<T, E> extends DefaultTuple2ResultListener<T, E> implements IFutureCommandResultListener<Collection<TupleResult>>
 	{
-		public void commandAvailable(Type command)
+		public void commandAvailable(Object command)
 		{
 			// nop, avoids printouts
 		}
