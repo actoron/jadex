@@ -195,6 +195,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 						public void exceptionOccurred(Exception exception)
 						{
 							// Try to find sun.awt.shell.Win32ShellFolder2.access$200(Win32ShellFolder2.java:72) bug.
+							System.err.println("Error: "+this);
 							Thread.dumpStack();
 							exception.printStackTrace();
 						}
