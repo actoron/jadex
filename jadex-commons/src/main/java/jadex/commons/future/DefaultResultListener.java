@@ -2,7 +2,6 @@ package jadex.commons.future;
 
 
 import jadex.commons.DebugException;
-import jadex.commons.future.ICommandFuture.Type;
 
 import java.util.logging.Logger;
 
@@ -99,7 +98,7 @@ public abstract class DefaultResultListener<E> implements IFutureCommandResultLi
 	/**
 	 *  Called when a command is available.
 	 */
-	public void commandAvailable(Type command)
+	public void commandAvailable(Object command)
 	{
 		logger.warning("Cannot forward command: "+this+" "+command);
 	}

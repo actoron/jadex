@@ -2,6 +2,8 @@ package jadex.commons.future;
 
 
 import jadex.commons.DebugException;
+import jadex.commons.ICommand;
+import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +47,7 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	public static boolean DEBUG = false;
 	
 	/** Disable Stack unfolding for easier debugging. */
-	public static boolean NO_STACK_COMPACTION = false;
+	public static boolean NO_STACK_COMPACTION = true;
 	
 	/** The empty future. */
 	public static final IFuture<?>	EMPTY	= new Future<Object>(null);
@@ -88,6 +91,9 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	
 	/** The undone flag. */
 	protected boolean undone;
+	
+	/** The list of commands. */
+	protected Map<ICommand<Object>, IFilter<Object>> commands;
 	
 	//-------- constructors --------
 	
@@ -587,8 +593,21 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	 *  Send a command to the listeners.
 	 *  @param command The command.
 	 */
-	public void sendCommand(Type command)
+	public void sendCommand(Object command)
 	{
+		if(commands!=null)
+		{
+			for(Map.Entry<ICommand<Object>, IFilter<Object>> entry: commands.entrySet())
+			{
+				IFilter<Object> fil = entry.getValue();
+				if(fil==null || fil.filter(command))
+				{
+					ICommand<Object> com = entry.getKey();
+					com.execute(command);
+				}
+			}
+		}
+		
 		if(listener!=null)
 		{
     		notifyListenerCommand(listener, command);			
@@ -607,7 +626,7 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	 *  @param listener The listener.
 	 *  @param command The command.
 	 */
-	protected void notifyListenerCommand(IResultListener<E> listener, Type command)
+	protected void notifyListenerCommand(IResultListener<E> listener, Object command)
 	{
 		if(listener instanceof IFutureCommandListener)
 		{
@@ -617,6 +636,33 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 		{
 //			System.out.println("Cannot forward command: "+listener+" "+command);
 			Logger.getLogger("future").fine("Cannot forward command: "+listener+" "+command);
+		}
+	}
+	
+	/**
+	 *  Add a command with a filter.
+	 *  Whenever the future receives an info it will check all
+	 *  registered filters.
+	 */
+	public void addCommand(IFilter<Object> filter, ICommand<Object> command)
+	{
+		if(commands==null)
+		{
+			commands = new LinkedHashMap<ICommand<Object>, IFilter<Object>>();
+		}
+		commands.put(command, filter);
+	}
+	
+	/**
+	 *  Add a command with a filter.
+	 *  Whenever the future receives an info it will check all
+	 *  registered filters.
+	 */
+	public void removeCommand(ICommand<Object> command)
+	{
+		if(commands!=null)
+		{
+			commands.remove(command);
 		}
 	}
 }

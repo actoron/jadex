@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 
 import jadex.base.Starter;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
@@ -303,7 +302,7 @@ public class ComponentResultListener<E> implements IResultListener<E>, IFutureCo
 	/**
 	 *  Called when a command is available.
 	 */
-	public void commandAvailable(Type command)
+	public void commandAvailable(Object command)
 	{
 		if(listener instanceof IFutureCommandListener)
 		{

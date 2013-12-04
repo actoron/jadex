@@ -12,7 +12,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.commons.SReflect;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.Future;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -96,7 +95,7 @@ public class UserInteractionTask implements ITask
 				}
 			}
 			
-			public void	commandAvailable(Type command)
+			public void	commandAvailable(Object command)
 			{
 				// ignore timer updates
 			}

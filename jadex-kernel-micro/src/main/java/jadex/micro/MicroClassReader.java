@@ -587,7 +587,10 @@ public class MicroClassReader
 				
 				for(int i=0; i<ctypes.length; i++)
 				{
-					SubcomponentTypeInfo subinfo = new SubcomponentTypeInfo(ctypes[i].name(), ctypes[i].filename());
+					String val = ctypes[i].filename();
+					if(!Object.class.equals(ctypes[i].clazz()))
+						val = ctypes[i].clazz().getName()+".class";	
+					SubcomponentTypeInfo subinfo = new SubcomponentTypeInfo(ctypes[i].name(), val);
 					if(!toset.containsKey(ctypes[i].name()))
 					{
 						res.put(ctypes[i].name(), subinfo);
@@ -1426,7 +1429,9 @@ public class MicroClassReader
 			ret = new UnparsedExpression[values.length];
 			for(int i=0; i<values.length; i++)
 			{
-				ret[i] = new UnparsedExpression(values[i].name(), values[i].clazz().getName(), values[i].value(), null);
+				String val = values[i].value();
+				String clname = values[i].clazz().getName();
+				ret[i] = new UnparsedExpression(values[i].name(), clname, (val==null || val.isEmpty()) && clname!=null? clname+".class": val, null);
 			}
 		}
 		return ret;
@@ -1443,7 +1448,9 @@ public class MicroClassReader
 			ret = new ArrayList<UnparsedExpression>();
 			for(int i=0; i<values.length; i++)
 			{
-				ret.add(new UnparsedExpression(values[i].name(), values[i].clazz().getName(), values[i].value(), null));
+				String val = values[i].value();
+				String clname = values[i].clazz().getName();
+				ret.add(new UnparsedExpression(values[i].name(), clname, (val==null || val.isEmpty()) && clname!=null? clname+".class": val, null));
 			}
 		}
 		return ret;

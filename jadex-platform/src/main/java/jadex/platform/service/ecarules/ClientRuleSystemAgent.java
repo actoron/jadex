@@ -1,69 +1,94 @@
 package jadex.platform.service.ecarules;
 
 import jadex.bridge.SFuture;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.types.ecarules.IRuleService;
+import jadex.bridge.service.types.ecarules.IRuleEngineService;
 import jadex.bridge.service.types.ecarules.IRulebaseEvent;
-import jadex.commons.future.IFuture;
+import jadex.bridge.service.types.ecarules.IRulebaseService;
+import jadex.commons.future.ICommandFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 import jadex.rules.eca.IEvent;
-import jadex.rules.eca.IRule;
-import jadex.rules.eca.IRulebase;
 import jadex.rules.eca.RuleEvent;
 import jadex.rules.eca.RuleSystem;
-import jadex.rules.eca.Rulebase;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Agent that exposes an eca rule engine as service.
- *  Allows for adding/removing rules and getting events.
+ *  Agent that registers with an IRulebaseService and
+ *  follows the master rule base.
  */
+@RequiredServices(@RequiredService(name="rulebaseservice", type=IRulebaseService.class))
+@ProvidedServices(@ProvidedService(type=IRuleEngineService.class))
 @Agent
-@Service
-@ProvidedServices(@ProvidedService(type=IRuleService.class))
-public class RuleAgent extends RulebaseAgent implements IRuleService
+public class ClientRuleSystemAgent implements IRuleEngineService
 {
 	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
-
-	/** The rule engine. */
+	
+	/** The rule system. */
 	protected RuleSystem rulesystem;
 	
 	/** The subscriptions. */
 	protected List<SubscriptionIntermediateFuture<RuleEvent>> resubscribers;
 	
-	//-------- methods --------
-	
 	/**
 	 *  Init method.
 	 */
 	@AgentCreated
-	public IFuture<Void> init()
+	public void init()
 	{
 		this.rulesystem = new RuleSystem(agent);
-		this.resubscribers = new ArrayList<SubscriptionIntermediateFuture<RuleEvent>>();
-		return IFuture.DONE;
 	}
 	
 	/**
-	 *  Get the rulebase.
+	 * 
 	 */
-	public IRulebase getRulebase()
+	@AgentService
+	public void	setRulebaseService(IRulebaseService rbser)
 	{
-		return rulesystem.getRulebase();
+		final ISubscriptionIntermediateFuture<IRulebaseEvent> subscription = rbser.subscribeToRulebase();
+		subscription.addResultListener(new IntermediateDefaultResultListener<IRulebaseEvent>()
+		{
+			public void intermediateResultAvailable(IRulebaseEvent event)
+			{
+				if(event instanceof RuleAddedEvent)
+				{
+					rulesystem.getRulebase().addRule(((RuleAddedEvent)event).getRule());
+					
+					System.out.println("Added rule: "+event);
+				}
+				else if(event instanceof RuleRemovedEvent)
+				{
+					rulesystem.getRulebase().removeRule(((RuleRemovedEvent)event).getRuleName());
+					System.out.println("Removed rule: "+event);
+				}
+				((ARulebaseEvent)event).setFinished((ICommandFuture)subscription);
+			}
+			
+		    public void finished()
+		    {
+		    	// todo: find other rulebase service ?
+		    	System.out.println("Terminated subscription to rule base service");
+		    }
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
 	}
 	
 	/**

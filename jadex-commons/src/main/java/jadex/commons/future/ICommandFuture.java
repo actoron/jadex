@@ -12,5 +12,5 @@ public interface ICommandFuture
 	 *  Send a command to the listeners.
 	 *  @param command The command.
 	 */
-	public void sendCommand(Type command);
+	public void sendCommand(Object command);
 }

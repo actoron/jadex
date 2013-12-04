@@ -24,6 +24,7 @@ import jadex.commons.future.IResultListener;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -132,7 +133,9 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		Method[] methods = SReflect.getAllMethods(si.getDomainService().getClass());
+		Object obj = Proxy.isProxyClass(si.getDomainService().getClass())? Proxy.getInvocationHandler(si.getDomainService()): si.getDomainService();
+		
+		Method[] methods = SReflect.getAllMethods(obj.getClass());
 		Method found = null;
 		
 		for(int i=0; !ret.isDone() && i<methods.length; i++)
@@ -165,7 +168,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			{
 				final ServiceInvocationContext	domainsic	= new ServiceInvocationContext(sic);//sic.clone();
 				domainsic.setMethod(found);
-				domainsic.setObject(si.getDomainService());
+				domainsic.setObject(obj);
 				sic.setObject(si.getManagementService());
 				
 				if(firstorig)

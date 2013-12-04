@@ -10,7 +10,6 @@ import jadex.commons.IFilter;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ICommandFuture.Type;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,7 +101,7 @@ public class PropertyUpdateHandler
 						// ignore
 					}
 					
-					public void commandAvailable(Type command)
+					public void commandAvailable(Object command)
 					{
 					}
 					

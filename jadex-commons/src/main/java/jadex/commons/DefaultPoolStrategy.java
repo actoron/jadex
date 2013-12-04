@@ -426,7 +426,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	{
 		this.maxcnt = maxcnt;
 	}
-
+	
 	/**
 	 *  Get the string representation.
 	 */

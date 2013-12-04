@@ -6,7 +6,6 @@ import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.SwingUtilities;
@@ -124,7 +123,7 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	/**
 	 *  Called when a command is available.
 	 */
-	final public void commandAvailable(final Type command)
+	final public void commandAvailable(final Object command)
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
@@ -149,7 +148,7 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 	/**
 	 *  Called when a command is available.
 	 */
-	public void	customCommandAvailable(Type command)
+	public void	customCommandAvailable(Object command)
 	{
 		if(listener instanceof IFutureCommandListener)
 		{

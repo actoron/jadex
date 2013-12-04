@@ -40,6 +40,16 @@ public class PublishInfo
 	 *  @param pid The publish id, e.g. url.
 	 *  @param publishtype The publish type.
 	 */
+	public PublishInfo(String pid, String publishtype, Class<?> mapping)
+	{
+		this(pid, publishtype, mapping, null);
+	}
+	
+	/**
+	 *  Create a new publish info.
+	 *  @param pid The publish id, e.g. url.
+	 *  @param publishtype The publish type.
+	 */
 	public PublishInfo(String pid, String publishtype, 
 		Class<?> mapping, UnparsedExpression[] properties)
 	{

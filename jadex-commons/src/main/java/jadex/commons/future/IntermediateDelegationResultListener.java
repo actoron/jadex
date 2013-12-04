@@ -1,6 +1,5 @@
 package jadex.commons.future;
 
-import jadex.commons.future.ICommandFuture.Type;
 
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -170,7 +169,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	/**
 	 *  Called when a command is available.
 	 */
-	public void commandAvailable(Type command)
+	public void commandAvailable(Object command)
 	{
 		if(future instanceof ICommandFuture)
 		{

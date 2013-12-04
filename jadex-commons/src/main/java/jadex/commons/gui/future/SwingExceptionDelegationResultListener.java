@@ -2,7 +2,6 @@ package jadex.commons.gui.future;
 
 
 import jadex.commons.future.Future;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IUndoneResultListener;
 import jadex.commons.gui.SGUI;
@@ -149,7 +148,7 @@ public abstract class SwingExceptionDelegationResultListener<E, T> implements IU
 	/**
 	 *  Called when a command is available.
 	 */
-	final public void commandAvailable(final Type command)
+	final public void commandAvailable(final Object command)
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
@@ -174,7 +173,7 @@ public abstract class SwingExceptionDelegationResultListener<E, T> implements IU
 	/**
 	 *  Called when a command is available.
 	 */
-	public void	customCommandAvailable(Type command)
+	public void	customCommandAvailable(Object command)
 	{
 		future.sendCommand(command);
 	}

@@ -1,5 +1,7 @@
 package jadex.rules.eca;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ public class Rulebase implements IRulebase
 	/** The rules per name. */
 	protected Map<String, IRule<?>> rules;
 	
+	/** The rule matcher node. */
 	protected MatcherNode matcher;
 
 	//-------- methods --------
@@ -100,5 +103,14 @@ public class Rulebase implements IRulebase
 	public boolean containsRule(String name)
 	{
 		return rules!=null && rules.containsKey(name);
+	}
+	
+	/**
+	 *  Get all rules.
+	 *  @return The rules.
+	 */
+	public Collection<IRule<?>> getRules()
+	{
+		return rules!=null? rules.values(): Collections.EMPTY_LIST;
 	}
 }

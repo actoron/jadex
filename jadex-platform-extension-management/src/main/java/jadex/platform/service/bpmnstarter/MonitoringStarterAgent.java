@@ -307,7 +307,7 @@ public class MonitoringStarterAgent implements IMonitoringStarterService
 			{
 				public void customResultAvailable(final IRuleService rules)
 				{
-					final ISubscriptionIntermediateFuture<RuleEvent> fut = rules.subscribe();
+					final ISubscriptionIntermediateFuture<RuleEvent> fut = rules.subscribeToEngine();
 					addRemoveCommand(new Runnable()
 					{
 						public void run()

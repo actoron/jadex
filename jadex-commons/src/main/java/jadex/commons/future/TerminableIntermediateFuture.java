@@ -62,7 +62,6 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 	 */
 	public void terminate(Exception reason)
 	{
-		
 		boolean	term = !isDone() && (terminate==null || terminate.checkTermination(reason));
 		
 		if(term && setExceptionIfUndone(reason))

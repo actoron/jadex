@@ -3,7 +3,6 @@ package jadex.commons.gui.future;
 import jadex.commons.SReflect;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFutureCommandResultListener;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Component;
@@ -132,7 +131,7 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 	/**
 	 *  Called when a command is available.
 	 */
-	final public void commandAvailable(final Type command)
+	final public void commandAvailable(final Object command)
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
@@ -157,7 +156,7 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 	/**
 	 *  Called when a command is available.
 	 */
-	public void	customCommandAvailable(Type command)
+	public void	customCommandAvailable(Object command)
 	{
 		Logger.getLogger("swing-result-listener").warning("Cannot forward command: "+this+" "+command);
 	}

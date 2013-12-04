@@ -1,6 +1,5 @@
 package jadex.commons.gui.future;
 
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.IUndoneIntermediateResultListener;
 import jadex.commons.future.IntermediateFuture;
@@ -205,7 +204,7 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 	/**
 	 *  Called when a command is available.
 	 */
-	final public void commandAvailable(final Type command)
+	final public void commandAvailable(final Object command)
 	{
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
@@ -230,7 +229,7 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 	/**
 	 *  Called when a command is available.
 	 */
-	public void	customCommandAvailable(Type command)
+	public void	customCommandAvailable(Object command)
 	{
 		future.sendCommand(command);
 	}

@@ -12,7 +12,6 @@ import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
@@ -643,7 +642,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 					ret.setFinished();
 					rsms.removeProcessingCall(callid);
 				}
-				public void commandAvailable(Type command)
+				public void commandAvailable(Object command)
 				{
 					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, command, callid, 
 						returnisref, methodname, nonfunc));
@@ -670,7 +669,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 					rsms.removeProcessingCall(callid);
 				}
 				
-				public void commandAvailable(Type command)
+				public void commandAvailable(Object command)
 				{
 					ret.addIntermediateResult(new RemoteFutureSourceCommand(rec, command, callid, 
 						returnisref, methodname, nonfunc));

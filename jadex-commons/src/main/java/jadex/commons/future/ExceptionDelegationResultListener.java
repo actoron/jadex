@@ -2,7 +2,6 @@ package jadex.commons.future;
 
 import java.util.logging.Logger;
 
-import jadex.commons.future.ICommandFuture.Type;
 
 
 /**
@@ -129,7 +128,7 @@ public abstract class ExceptionDelegationResultListener<E, T> implements IResult
 	/**
 	 *  Called when a command is available.
 	 */
-	public void commandAvailable(Type command)
+	public void commandAvailable(Object command)
 	{
 		if(future instanceof ICommandFuture)
 		{

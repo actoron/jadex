@@ -3,7 +3,6 @@ package jadex.platform.service.remote.commands;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.future.ICommandFuture;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
@@ -27,7 +26,7 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 	/**
 	 *  Create a new remote intermediate result command.
 	 */
-	public RemoteFutureSourceCommand(IComponentIdentifier realreceiver, Type cmd, String callid, boolean isref, 
+	public RemoteFutureSourceCommand(IComponentIdentifier realreceiver, Object cmd, String callid, boolean isref, 
 		String methodname, Map<String, Object> nonfunc)
 	{
 		super(realreceiver, cmd, null, callid, isref, methodname, nonfunc);
@@ -44,8 +43,8 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 	{
 //		System.out.println("intermediate result command: "+result+" "+exceptioninfo+" "+callid);
 		
-		if(ICommandFuture.Type.UPDATETIMER.equals(getResult()))
-		{
+//		if(ICommandFuture.Type.UPDATETIMER.equals(getResult()))
+//		{
 			WaitingCallInfo wci = rsms.getWaitingCall(callid);
 			
 			if(wci!=null)
@@ -55,18 +54,18 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 				IFuture<?> fut = wci.getFuture();
 				if(fut instanceof ICommandFuture)
 				{
-					((ICommandFuture)fut).sendCommand((Type)getResult());
+					((ICommandFuture)fut).sendCommand(getResult());
 				}
 			}
 			else
 			{				
-				System.out.println("no waiting call to update timer: "+System.currentTimeMillis());
+				System.out.println("no waiting call to send command to: "+System.currentTimeMillis());
 			}
-		}
-		else
-		{
-			System.out.println("Unknown command: "+getResult());
-		}
+//		}
+//		else
+//		{
+//			System.out.println("Unknown command: "+getResult());
+//		}
 		
 		return IIntermediateFuture.DONE;
 	}

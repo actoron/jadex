@@ -8,7 +8,6 @@ import jadex.bdiv3.actions.ExecutePlanStepAction;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IUndoneResultListener;
@@ -141,7 +140,7 @@ public class BDIComponentResultListener<E> implements IResultListener<E>, IUndon
 	/**
 	 *  Called when a command is available.
 	 */
-	public void commandAvailable(Type command)
+	public void commandAvailable(Object command)
 	{
 		if(listener instanceof IFutureCommandListener)
 		{

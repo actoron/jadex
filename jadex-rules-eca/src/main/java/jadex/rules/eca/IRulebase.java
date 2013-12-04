@@ -1,5 +1,6 @@
 package jadex.rules.eca;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,6 +27,12 @@ public interface IRulebase
 	 *  @return The rules.
 	 */
 	public List<IRule<?>> getRules(EventType event);
+	
+	/**
+	 *  Get all rules.
+	 *  @return The rules.
+	 */
+	public Collection<IRule<?>> getRules();
 	
 	/**
 	 *  Get the rule.

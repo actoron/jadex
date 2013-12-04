@@ -1,6 +1,5 @@
 package jadex.commons.future;
 
-import jadex.commons.future.ICommandFuture.Type;
 
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -179,7 +178,7 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 	/**
 	 *  Called when a command is available.
 	 */
-	public void commandAvailable(Type command)
+	public void commandAvailable(Object command)
 	{
 		if(future instanceof ICommandFuture)
 		{

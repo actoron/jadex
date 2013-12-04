@@ -1,6 +1,5 @@
 package jadex.commons.future;
 
-import jadex.commons.future.ICommandFuture.Type;
 
 /**
  *  Additional interface for result listeners that are 
@@ -11,5 +10,5 @@ public interface IFutureCommandListener
 	/**
 	 *  Called when a command is available.
 	 */
-	public void commandAvailable(Type command);
+	public void commandAvailable(Object command);
 }

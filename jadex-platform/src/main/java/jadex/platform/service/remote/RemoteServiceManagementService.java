@@ -40,7 +40,6 @@ import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.ICommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.ITerminableFuture;
@@ -664,7 +663,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 									removeWaitingCall(callid);								
 									ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
 								}
-								public void commandAvailable(Type command)
+								public void commandAvailable(Object command)
 								{
 									// do nothing here, cannot forward
 								}
