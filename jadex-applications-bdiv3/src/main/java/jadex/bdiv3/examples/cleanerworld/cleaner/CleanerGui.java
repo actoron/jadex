@@ -6,9 +6,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
@@ -48,7 +50,17 @@ public class CleanerGui	extends JFrame
 			{
 				agent.killComponent();
 			}
-		});		
+		});
+		
+		final Timer	timer	= new Timer(50, new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				map.invalidate();
+				map.repaint();
+			}
+		});
+		timer.start();
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
@@ -75,21 +87,23 @@ public class CleanerGui	extends JFrame
 					public void intermediateResultAvailable(IMonitoringEvent result)
 					{
 						dispose();
+						timer.stop();
 					}
 				}));
 				
 				return IFuture.DONE;
 			}
-		});
-		
-		Timer	timer	= new Timer(50, new ActionListener()
+		}).addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 		{
-			public void actionPerformed(ActionEvent e)
+			public void exceptionOccurred(Exception exception)
 			{
-				map.invalidate();
-				map.repaint();
+				dispose();
+				timer.stop();
 			}
-		});
-		timer.start();
+			
+			public void resultAvailable(Void result)
+			{
+			}
+		}));
 	}		
 }
