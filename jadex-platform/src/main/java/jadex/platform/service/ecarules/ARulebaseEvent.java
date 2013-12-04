@@ -16,6 +16,9 @@ public abstract class ARulebaseEvent implements IRulebaseEvent
 	/** The id. */
 	protected int id;
 	
+	/** The call id. */
+	protected int callid;
+	
 	/**
 	 *  Create a new rule event.
 	 */
@@ -25,11 +28,20 @@ public abstract class ARulebaseEvent implements IRulebaseEvent
 	}
 	
 	/**
+	 *  Create a new rule event.
+	 */
+	public ARulebaseEvent(int callid)
+	{
+		this.id = cnt.incrementAndGet();
+		this.callid = callid;
+	}
+	
+	/**
 	 * 
 	 */
 	public void setFinished(ICommandFuture fut)
 	{
-		fut.sendCommand(new FinishedEvent(id));
+		fut.sendCommand(new FinishedEvent(callid, id));
 	}
 
 	/**
@@ -51,7 +63,28 @@ public abstract class ARulebaseEvent implements IRulebaseEvent
 	}
 	
 	/**
+	 *  Get the callid.
+	 *  @return The callid.
+	 */
+	public int getCallId()
+	{
+		return callid;
+	}
+
+	/**
+	 *  Set the callid.
+	 *  @param callid The callid to set.
+	 */
+	public void setCallId(int callid)
+	{
+		this.callid = callid;
+	}
+
+	/**
 	 * 
 	 */
-	public abstract ARulebaseEvent createCopy();
+	public ARulebaseEvent createCopy()
+	{
+		return null;
+	}
 }

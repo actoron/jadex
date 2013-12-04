@@ -21,8 +21,9 @@ public class RuleRemovedEvent extends ARulebaseEvent implements IRulebaseEvent
 	/**
 	 *  Create a new rule removed event.
 	 */
-	public RuleRemovedEvent(String rulename)
+	public RuleRemovedEvent(int callid, String rulename)
 	{
+		super(callid);
 		this.rulename = rulename;
 	}
 	
@@ -31,6 +32,7 @@ public class RuleRemovedEvent extends ARulebaseEvent implements IRulebaseEvent
 	 */
 	public RuleRemovedEvent(RuleRemovedEvent event)
 	{
+		super(event.getCallId());
 		this.rulename = event.getRuleName();
 	}
 

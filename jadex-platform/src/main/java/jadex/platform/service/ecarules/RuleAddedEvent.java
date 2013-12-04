@@ -21,8 +21,9 @@ public class RuleAddedEvent extends ARulebaseEvent implements IRulebaseEvent
 	/**
 	 *  Create a new rule added event.
 	 */
-	public RuleAddedEvent(IRule<?> rule)
+	public RuleAddedEvent(int callid, IRule<?> rule)
 	{
+		super(callid);
 		this.rule = rule;
 	}
 	/**
@@ -30,6 +31,7 @@ public class RuleAddedEvent extends ARulebaseEvent implements IRulebaseEvent
 	 */
 	public RuleAddedEvent(RuleAddedEvent event)
 	{
+		super(event.getCallId());
 		this.rule = event.getRule();
 	}
 
