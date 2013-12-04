@@ -109,7 +109,6 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 	 */
 	public IFuture<IAbstractViewerPanel> createPanel(final IComponentIdentifier cid)
 	{
-		System.err.println("create panel: "+this+", "+cid);
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
 		// Get external access using local CMS (speedup in case remote component found by remote platform is actually local).

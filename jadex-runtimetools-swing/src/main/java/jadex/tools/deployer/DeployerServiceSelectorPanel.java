@@ -55,7 +55,6 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	 */
 	public IFuture<IAbstractViewerPanel> createPanel(final IService service)
 	{
-		System.err.println("create panel: "+this);
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
 		SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)

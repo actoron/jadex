@@ -39,7 +39,6 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin<IServi
 		{
 			public IFuture<IAbstractViewerPanel> createPanel(IService service)
 			{
-				System.err.println("create panel: "+this+", "+service);
 				return AbstractServicePlugin.this.createServicePanel(service);
 			}
 		};

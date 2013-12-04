@@ -277,12 +277,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 
 		final Future<Void>	ret	= new Future<Void>();
 		
-		System.err.println("init panel1: "+this);
 		super.init(jcc, service).addResultListener(new DelegationResultListener<Void>(ret)
 		{
+			JFileChooser jfil;
+
 			public void customResultAvailable(Void result)
 			{
-				System.err.println("init panel2: "+this);
 				DefaultTableCellRenderer userrend = new DefaultTableCellRenderer()
 				{
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
@@ -711,35 +711,30 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				apan.add(tfava, BorderLayout.CENTER);
 				apan.add(buava, BorderLayout.EAST);
 				pp.addComponent("Image: ", apan);
-				System.err.println("init panel pre file chooser: "+this);
-//				File	f	= new File(".");
-//				try
-//				{
-//					f	= f.getCanonicalFile();
-//				}
-//				catch(Exception e)
-//				{
-//					e.printStackTrace();
-//					f	= f.getAbsoluteFile();
-//				}
-				final JFileChooser fcava = new JFileChooser();
-				System.err.println("init panel post file chooser: "+this);
-				fcava.setFileFilter(new FileFilter()
-				{
-					public String getDescription()
-					{
-						return "*.jpg, *.png";
-					}
-					
-					public boolean accept(File f)
-					{
-						return f.isDirectory() || f.getName().endsWith(".jpg") || f.getName().endsWith(".png");
-					}
-				});
 				buava.addActionListener(new ActionListener()
 				{
+					JFileChooser fcava;
+					
 					public void actionPerformed(ActionEvent e)
 					{
+						// Create file chooser lazily to allow jenkins build to succeed
+						// (new JFileChooser() throws exception in headless windows)
+						if(fcava==null)
+						{
+							fcava	=  new JFileChooser(".");
+							fcava.setFileFilter(new FileFilter()
+							{
+								public String getDescription()
+								{
+									return "*.jpg, *.png";
+								}
+								
+								public boolean accept(File f)
+								{
+									return f.isDirectory() || f.getName().endsWith(".jpg") || f.getName().endsWith(".png");
+								}
+							});
+						}
 						fcava.showOpenDialog(panel);
 						File sel = fcava.getSelectedFile();
 						if(sel!=null && sel.exists())
@@ -799,25 +794,29 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				playbut.setMinimumSize(bunick.getMinimumSize());
 				playbut.setMaximumSize(bunick.getMaximumSize());
 				playbut.setPreferredSize(bunick.getPreferredSize());
-				System.err.println("init panel pre file chooser2: "+this);
-				final JFileChooser jfil = new JFileChooser(".");
-				System.err.println("init panel post file chooser2: "+this);
-				jfil.setFileFilter(new FileFilter()
-				{
-					public String getDescription()
-					{
-						return "*.wav";
-					}
-					
-					public boolean accept(File f)
-					{
-						return f.isDirectory() || f.getName().endsWith(".wav");
-					}
-				});
 				jcom.addItemListener(new ItemListener()
 				{
 					public void itemStateChanged(ItemEvent e)
 					{
+						// Create file chooser lazily to allow jenkins build to succeed
+						// (new JFileChooser() throws exception in headless windows)
+						if(jfil==null)
+						{
+							 jfil	= new JFileChooser(".");
+							jfil.setFileFilter(new FileFilter()
+							{
+								public String getDescription()
+								{
+									return "*.wav";
+								}
+								
+								public boolean accept(File f)
+								{
+									return f.isDirectory() || f.getName().endsWith(".wav");
+								}
+							});
+						}
+						
 						String sel = (String)jcom.getSelectedItem();
 						if(sel!=null)
 						{
@@ -833,6 +832,24 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					public void actionPerformed(ActionEvent e)
 					{
+						// Create file chooser lazily to allow jenkins build to succeed
+						// (new JFileChooser() throws exception in headless windows)
+						if(jfil==null)
+						{
+							 jfil	= new JFileChooser(".");
+							jfil.setFileFilter(new FileFilter()
+							{
+								public String getDescription()
+								{
+									return "*.wav";
+								}
+								
+								public boolean accept(File f)
+								{
+									return f.isDirectory() || f.getName().endsWith(".wav");
+								}
+							});
+						}
 						try
 						{
 							jfil.showOpenDialog(panel);
