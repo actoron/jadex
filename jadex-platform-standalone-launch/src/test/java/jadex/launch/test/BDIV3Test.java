@@ -60,7 +60,6 @@ public class BDIV3Test	extends	ComponentTestSuite
 
 //	public void run(TestResult result)
 //	{
-//		// TODO Auto-generated method stub
 //		super.run(result);
 //		
 //		try

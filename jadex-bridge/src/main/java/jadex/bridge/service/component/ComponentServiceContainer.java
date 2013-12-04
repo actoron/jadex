@@ -485,10 +485,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			{
 				public void resultAvailable(IComponentIdentifier[] children)
 				{
-					if(adapter!=null)
-					{
-						adapter.getLogger().info("getChildren: "+id+"\n"+BasicServiceContainer.SEARCHES);
-					}
+//					if(adapter!=null)
+//					{
+//						adapter.getLogger().info("getChildren: "+id+"\n"+BasicServiceContainer.SEARCHES);
+//					}
 					if(children!=null)
 					{
 	//					System.out.println("childs: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));

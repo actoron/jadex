@@ -79,8 +79,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	
 	//-------- interface methods --------
 	
-	protected static Set<String>	SEARCHES
-		= Collections.synchronizedSet(new HashSet<String>());
+//	protected static Set<String>	SEARCHES
+//		= Collections.synchronizedSet(new HashSet<String>());
 	
 	/**
 	 *  Get all services of a type.
@@ -100,20 +100,20 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		}
 		
 		ITerminableIntermediateFuture<IService>	ret	= manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
-		final String	search	= "search: "+manager+", "+decider+", "+selector+"\n";
-		SEARCHES.add(search);
-		ret.addResultListener(new IResultListener<Collection<IService>>()
-		{
-			public void resultAvailable(Collection<IService> result)
-			{
-				SEARCHES.remove(search);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				SEARCHES.remove(search);
-			}
-		});
+//		final String	search	= "search: "+manager+", "+decider+", "+selector+"\n";
+//		SEARCHES.add(search);
+//		ret.addResultListener(new IResultListener<Collection<IService>>()
+//		{
+//			public void resultAvailable(Collection<IService> result)
+//			{
+//				SEARCHES.remove(search);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				SEARCHES.remove(search);
+//			}
+//		});
 		return ret;
 	}
 	
