@@ -22,7 +22,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -196,7 +195,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			thread.setWaiting(true);
 			
 			instance.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DefaultResultListener<IComponentManagementService>()
+				.addResultListener(new IResultListener<IComponentManagementService>()
 			{
 				public void resultAvailable(IComponentManagementService cms)
 				{
@@ -387,6 +386,20 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					};
 					
 					ret.addResultListener(lis);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					// Hack!!! Ignore exception, when component already terminated.
+					if(!(exception instanceof ComponentTerminatedException)
+						|| !instance.getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
+					{
+//						System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+						exception.printStackTrace();
+						thread.setNonWaiting();
+						thread.setException(exception);
+						instance.step(activity, instance, thread, null);
+					}
 				}
 			});
 		}
