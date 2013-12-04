@@ -70,8 +70,11 @@ public class ChatPlugin extends AbstractServicePlugin
 	 */
 	public IFuture<IAbstractViewerPanel> createServicePanel(IService service)
 	{
+		System.err.println("create panel1: "+this+", "+service);
 		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
+		System.err.println("create panel2: "+this+", "+service);
 		final ChatPanel panel = new ChatPanel();
+		System.err.println("create panel3: "+this+", "+service);
 		panel.init(getJCC(), service).addResultListener(new ExceptionDelegationResultListener<Void, IAbstractViewerPanel>(ret)
 		{
 			public void customResultAvailable(Void result)

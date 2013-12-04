@@ -277,10 +277,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 
 		final Future<Void>	ret	= new Future<Void>();
 		
+		System.err.println("init panel1: "+this);
 		super.init(jcc, service).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
+				System.err.println("init panel2: "+this);
 				DefaultTableCellRenderer userrend = new DefaultTableCellRenderer()
 				{
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
@@ -709,7 +711,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				apan.add(tfava, BorderLayout.CENTER);
 				apan.add(buava, BorderLayout.EAST);
 				pp.addComponent("Image: ", apan);
+				System.err.println("init panel pre file chooser: "+this);
 				final JFileChooser fcava = new JFileChooser(".");
+				System.err.println("init panel pre file chooser: "+this);
 				fcava.setFileFilter(new FileFilter()
 				{
 					public String getDescription()
@@ -785,7 +789,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				playbut.setMinimumSize(bunick.getMinimumSize());
 				playbut.setMaximumSize(bunick.getMaximumSize());
 				playbut.setPreferredSize(bunick.getPreferredSize());
+				System.err.println("init panel pre file chooser2: "+this);
 				final JFileChooser jfil = new JFileChooser(".");
+				System.err.println("init panel post file chooser2: "+this);
 				jfil.setFileFilter(new FileFilter()
 				{
 					public String getDescription()

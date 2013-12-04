@@ -4,7 +4,10 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bpmn.model.task.annotation.TaskParameter;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -45,6 +48,8 @@ public class ChoosePlatformTask implements ITask
 	public IFuture<Void> execute(final ITaskContext context, IInternalAccess process)
 	{
 		final Future<Void>	ret	= new Future<Void>();
+		
+		final IExternalAccess exta	= process.getExternalAccess();
 		
 		process.getServiceContainer().searchServices(IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentManagementService>, Void>(ret)
@@ -96,9 +101,23 @@ public class ChoosePlatformTask implements ITask
 								}
 							}
 						}
+						final IComponentIdentifier	fcid	= cid;	
 						
-						context.setParameterValue("cid", cid);
-						ret.setResult(null);
+						try
+						{
+							exta.scheduleStep(new IComponentStep<Void>()
+							{
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									context.setParameterValue("cid", fcid);
+									ret.setResult(null);
+									return IFuture.DONE;
+								}
+							});
+						}
+						catch(ComponentTerminatedException cte)
+						{
+						}
 					}
 				});
 			}
