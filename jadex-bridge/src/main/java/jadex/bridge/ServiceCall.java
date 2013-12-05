@@ -3,8 +3,11 @@ package jadex.bridge;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Timeout;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -34,13 +37,13 @@ public class ServiceCall
 	public static final String INHERIT = "inherit";
 	
 	/** The current service calls mapped to threads. */
-	protected static ThreadLocal<ServiceCall> CALLS	= new ThreadLocal<ServiceCall>();
+	protected static final ThreadLocal<ServiceCall> CALLS = new ThreadLocal<ServiceCall>();
 	
 	/** The upcoming service invocations. */
-	protected static ThreadLocal<ServiceCall> NEXT = new ThreadLocal<ServiceCall>();
+	protected static final ThreadLocal<ServiceCall> NEXT = new ThreadLocal<ServiceCall>();
 	
 	/** The upcoming service invocations. */
-	protected static ThreadLocal<ServiceCall> LAST = new ThreadLocal<ServiceCall>();
+	protected static final ThreadLocal<ServiceCall> LAST = new ThreadLocal<ServiceCall>();
 
 	
 	//-------- attributes --------
@@ -53,6 +56,8 @@ public class ServiceCall
 	
 	//-------- constructors --------
 	
+//	static Set<Integer> sprops = Collections.synchronizedSet(new HashSet<Integer>());
+	
 	/**
 	 *  Create a service call info object.
 	 */
@@ -62,7 +67,18 @@ public class ServiceCall
 		this.properties = props!=null? props: new HashMap<String, Object>();
 		if(!properties.containsKey(TIMEOUT))
 			properties.put(DEFTIMEOUT, BasicService.getLocalDefaultTimeout()); // todo: refactor that
-				
+	
+//		if(properties.containsKey("buibui"))
+//			System.out.println("driss");
+//		properties.put("buibui", "buibui");
+//		System.out.println("sc: "+hashCode()+" "+System.identityHashCode(properties));
+//		if(sprops.contains(System.identityHashCode(properties)))
+//		{
+//			System.out.println("driss "+System.identityHashCode(properties));
+//		}
+//		sprops.add(System.identityHashCode(properties));
+		
+		
 //		if(props!=null)
 //			properties.putAll(props);
 //		if(props!=null && props.get(CAUSE) instanceof String)
@@ -218,7 +234,7 @@ public class ServiceCall
 	 */
 	public void setTimeout(long to)
 	{
-		properties.put(TIMEOUT, new Long(to));
+		properties.put(TIMEOUT, Long.valueOf(to));
 	}
 	
 	/**
@@ -288,6 +304,9 @@ public class ServiceCall
 	 */
 	public void setProperty(String name, Object val)
 	{
+//		if(name.indexOf("__dur")!=-1)
+//			return;
+//		System.out.println("setting: "+name+" "+val+" "+this);
 		this.properties.put(name, val);
 	}
 	

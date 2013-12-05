@@ -231,7 +231,7 @@ public class SwingIntermediateDelegationResultListener<E> implements IIntermedia
 	 */
 	public void	customCommandAvailable(Object command)
 	{
-		future.sendCommand(command);
+		future.sendForwardCommand(command);
 	}
 
 	/**

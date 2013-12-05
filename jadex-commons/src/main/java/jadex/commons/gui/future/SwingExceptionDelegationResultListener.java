@@ -175,7 +175,7 @@ public abstract class SwingExceptionDelegationResultListener<E, T> implements IU
 	 */
 	public void	customCommandAvailable(Object command)
 	{
-		future.sendCommand(command);
+		future.sendForwardCommand(command);
 	}
 
 	/**

@@ -8,7 +8,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.ICommand;
 import jadex.commons.future.Future;
-import jadex.commons.future.ICommandFuture;
+import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IPullIntermediateFuture;

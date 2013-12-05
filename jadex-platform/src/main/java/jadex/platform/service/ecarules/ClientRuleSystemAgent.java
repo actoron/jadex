@@ -4,7 +4,6 @@ import jadex.bridge.SFuture;
 import jadex.bridge.service.types.ecarules.IRuleEngineService;
 import jadex.bridge.service.types.ecarules.IRulebaseEvent;
 import jadex.bridge.service.types.ecarules.IRulebaseService;
-import jadex.commons.future.ICommandFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -23,6 +22,7 @@ import jadex.rules.eca.IEvent;
 import jadex.rules.eca.RuleEvent;
 import jadex.rules.eca.RuleSystem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,6 +51,7 @@ public class ClientRuleSystemAgent implements IRuleEngineService
 	public void init()
 	{
 		this.rulesystem = new RuleSystem(agent);
+		this.resubscribers = new ArrayList<SubscriptionIntermediateFuture<RuleEvent>>();
 	}
 	
 	/**
@@ -74,7 +75,7 @@ public class ClientRuleSystemAgent implements IRuleEngineService
 					rulesystem.getRulebase().removeRule(((RuleRemovedEvent)event).getRuleName());
 					System.out.println("Removed rule: "+event);
 				}
-				((ARulebaseEvent)event).setFinished((ICommandFuture)subscription);
+				((ARulebaseEvent)event).setFinished(subscription);
 			}
 			
 		    public void finished()

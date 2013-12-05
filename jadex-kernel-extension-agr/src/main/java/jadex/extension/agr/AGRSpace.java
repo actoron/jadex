@@ -9,7 +9,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.future.Future;
-import jadex.commons.future.ICommandFuture.Type;
+import jadex.commons.future.IForwardCommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFutureCommandResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;

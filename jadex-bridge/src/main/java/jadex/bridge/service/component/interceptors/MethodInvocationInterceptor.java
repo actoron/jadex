@@ -100,7 +100,8 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 							public void customResultAvailable(Object result)
 							{
 								long dur = System.currentTimeMillis()-fstart;
-								sc.setProperty("__duration", new Long(dur));
+								sc.setProperty("__duration", Long.valueOf(dur));
+//								sc.setProperty("__duration", new Long(dur));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -117,7 +118,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 					else
 					{
 						long dur = System.currentTimeMillis()-start;
-						sc.setProperty("__duration", new Long(dur));
+						sc.setProperty("__duration", Long.valueOf(dur));
 					}
 				}
 				

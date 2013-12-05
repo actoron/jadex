@@ -3,6 +3,7 @@ package jadex.platform.service.servicepool;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.ComponentServiceContainer;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -65,7 +66,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 			{
 				IPoolStrategy str = psi.getPoolStrategy()==null? new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
 					Runtime.getRuntime().availableProcessors()+1): psi.getPoolStrategy();
-				addServiceType(psi.getServicetype().getType(getClassLoader()), str, psi.getWorkermodel()).addResultListener(lis);
+				addServiceType(psi.getServicetype().getType(getClassLoader()), str, psi.getWorkermodel(), null, psi.getPublishInfo()).addResultListener(lis);
 			}
 		}
 		else
@@ -119,7 +120,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, String componentmodel, CreationInfo info)
 	{
-		return addServiceType(servicetype, new DefaultPoolStrategy(5, 35000, 10), componentmodel, info);
+		return addServiceType(servicetype, new DefaultPoolStrategy(5, 35000, 10), componentmodel, info, null);
 	}
 	
 	/**
@@ -129,7 +130,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	 */
 	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel)
 	{
-		return addServiceType(servicetype, strategy, componentmodel, null);
+		return addServiceType(servicetype, strategy, componentmodel, null, null);
 	}
 	
 	
@@ -138,7 +139,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 	 *  @param servicetype The service type.
 	 *  @param strategy The service pool strategy.
 	 */
-	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info)
+	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi)
 	{
 		if(servicetypes==null)
 			servicetypes = new HashMap<Class<?>, ServiceHandler>();
@@ -147,7 +148,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 
 		// add service proxy
 		Object service = Proxy.newProxyInstance(getClassLoader(), new Class<?>[]{servicetype}, handler);
-		return addService(null, servicetype, service);
+		return addService(null, servicetype, service, pi);
 	}
 	
 	

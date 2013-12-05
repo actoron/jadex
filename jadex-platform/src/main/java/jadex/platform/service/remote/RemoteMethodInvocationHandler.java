@@ -7,7 +7,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Timeout;
-import jadex.bridge.service.component.MethodListenerHandler;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.SReflect;
@@ -17,7 +16,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IPullIntermediateFuture;
 import jadex.commons.future.IPullSubscriptionIntermediateFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -31,6 +29,7 @@ import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.future.Tuple2Future;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.platform.service.remote.commands.RemoteFutureBackwardCommand;
 import jadex.platform.service.remote.commands.RemoteFuturePullCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteMethodInvocationCommand;
@@ -184,6 +183,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 					}
 				}
 				
+				public void sendBackwardCommand(Object info)
+				{
+					Future<Object> res = new Future<Object>();
+					final String mycallid = SUtil.createUniqueId(compid.getName()+".pullsub."+method.toString());
+					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+					// Can be invoked directly, because internally redirects to agent thread.
+//					System.out.println("sending backward cmd");
+					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+						content, mycallid, to, res, nonfunc, sic);
+				}
+				
 				// Called from delegation listeners in RMS -> ignore if already terminated
 				public void setException(Exception exception)
 				{
@@ -235,6 +245,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 					}
 				}
 				
+				public void sendBackwardCommand(Object info)
+				{
+					Future<Object> res = new Future<Object>();
+					final String mycallid = SUtil.createUniqueId(compid.getName()+".pull."+method.toString());
+					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+					// Can be invoked directly, because internally redirects to agent thread.
+//					System.out.println("sending backward cmd");
+					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+						content, mycallid, to, res, nonfunc, sic);
+				}
+				
 				// Called from delegation listeners in RMS -> ignore if already terminated
 				public void setException(Exception exception)
 				{
@@ -273,6 +294,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
 							content, mycallid, to, res, nonfunc, sic);
 					}
+				}
+				
+				public void sendBackwardCommand(Object info)
+				{
+					Future<Object> res = new Future<Object>();
+					final String mycallid = SUtil.createUniqueId(compid.getName()+".sub."+method.toString());
+					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+					// Can be invoked directly, because internally redirects to agent thread.
+//					System.out.println("sending backward cmd");
+					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+						content, mycallid, to, res, nonfunc, sic);
 				}
 				
 				// Called from delegation listeners in RMS -> ignore if already terminated
@@ -315,6 +347,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 					}
 				}
 				
+				public void sendBackwardCommand(Object info)
+				{
+					Future<Object> res = new Future<Object>();
+					final String mycallid = SUtil.createUniqueId(compid.getName()+".interm."+method.toString());
+					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+					// Can be invoked directly, because internally redirects to agent thread.
+//					System.out.println("sending backward cmd");
+					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+						content, mycallid, to, res, nonfunc, sic);
+				}
+				
 				// Called from delegation listeners in RMS -> ignore if already terminated
 				public void setException(Exception exception)
 				{
@@ -353,6 +396,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
 							null, content, mycallid, to, res, nonfunc, sic);
 					}
+				}
+				
+				public void sendBackwardCommand(Object info)
+				{
+					Future<Object> res = new Future<Object>();
+					final String mycallid = SUtil.createUniqueId(compid.getName()+".term."+method.toString());
+					RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+					// Can be invoked directly, because internally redirects to agent thread.
+//					System.out.println("sending backward cmd");
+					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
+						content, mycallid, to, res, nonfunc, sic);
 				}
 				
 				// Called from delegation listeners in RMS -> ignore if already terminated

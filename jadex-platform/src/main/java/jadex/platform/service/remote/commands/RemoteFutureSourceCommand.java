@@ -2,7 +2,7 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
-import jadex.commons.future.ICommandFuture;
+import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
@@ -52,9 +52,9 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 //				System.out.println("remote timer refresh: "+System.currentTimeMillis());
 				wci.refresh();
 				IFuture<?> fut = wci.getFuture();
-				if(fut instanceof ICommandFuture)
+				if(fut instanceof IForwardCommandFuture)
 				{
-					((ICommandFuture)fut).sendCommand(getResult());
+					((IForwardCommandFuture)fut).sendForwardCommand(getResult());
 				}
 			}
 			else

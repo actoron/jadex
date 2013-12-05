@@ -1,5 +1,6 @@
 package jadex.platform.service.servicepool;
 
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.commons.IPoolStrategy;
 import jadex.commons.future.IFuture;
@@ -42,7 +43,7 @@ public interface IServicePoolService
 	 *  @param strategy The service pool strategy.
 	 *  @param componentmodel The component model.
 	 */
-	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info);
+	public IFuture<Void> addServiceType(Class<?> servicetype, IPoolStrategy strategy, String componentmodel, CreationInfo info, PublishInfo pi);
 	
 	/**
 	 *  Remove a service type.

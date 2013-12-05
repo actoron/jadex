@@ -6,7 +6,7 @@ package jadex.commons.future;
  *  to setException() being called with a 
  *  FutureTerminatedException.
  */
-public interface ITerminableFuture<E> extends IFuture<E>
+public interface ITerminableFuture<E> extends IFuture<E>, IBackwardCommandFuture
 {
 	/**
 	 *  Terminate the future.

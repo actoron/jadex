@@ -2,7 +2,7 @@ package jadex.bridge;
 
 import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
-import jadex.commons.future.ICommandFuture;
+import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
 
 /**
@@ -97,7 +97,7 @@ public class SFuture
 				{
 					if(!ret.isDone())
 					{
-						ret.sendCommand(ICommandFuture.Type.UPDATETIMER);
+						ret.sendForwardCommand(IForwardCommandFuture.Type.UPDATETIMER);
 						ia.waitForDelay(w, this, realtime);
 					}
 					return IFuture.DONE;

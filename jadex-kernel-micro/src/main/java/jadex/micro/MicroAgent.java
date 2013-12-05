@@ -13,6 +13,8 @@ import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.clock.IClockService;
@@ -714,6 +716,28 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future<Void> ret = new Future<Void>();
 		IFuture<IInternalService> fut = interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null, interpreter.getComponentFetcher());
+		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
+		{
+			public void customResultAvailable(IInternalService result)
+			{
+				ret.setResult(null);
+			}
+		}));
+		return ret;
+	}
+	
+	/**
+	 *  Add a service to the platform. 
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param type The public service interface.
+	 *  @param service The service.
+	 */
+	public IFuture<Void>	addService(String name, Class<?> type, Object service, PublishInfo pi)
+	{
+		final Future<Void> ret = new Future<Void>();
+		ProvidedServiceInfo psi = pi!=null? new ProvidedServiceInfo(null, type, null, pi): null;
+		IFuture<IInternalService> fut = interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, psi, interpreter.getComponentFetcher());
 		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
 		{
 			public void customResultAvailable(IInternalService result)

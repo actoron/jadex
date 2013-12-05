@@ -240,6 +240,12 @@ public class ServiceHandler implements InvocationHandler
 	//						}
 						}));
 					};
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+						super.exceptionOccurred(exception);
+					}
 				}));
 			}
 		});
@@ -383,9 +389,16 @@ public class ServiceHandler implements InvocationHandler
 			ServiceCall mcall = CallAccess.getOrCreateNextInvocation();
 			if(call!=null)
 			{
-				for(String key: call.getProperties().keySet())
+				try
 				{
-					mcall.setProperty(key, call.getProperty(key));
+					for(String key: call.getProperties().keySet())
+					{
+						mcall.setProperty(key, call.getProperty(key));
+					}
+				}
+				catch(Exception e)
+				{
+					System.out.println("exception: "+call.hashCode()+" "+System.identityHashCode(call.getProperties().hashCode()));
 				}
 			}
 			IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);

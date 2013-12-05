@@ -127,10 +127,10 @@ public class RulebaseAgent implements IRulebaseService
 	 */
 	public ISubscriptionIntermediateFuture<IRulebaseEvent> subscribeToRulebase()
 	{
-//		System.out.println("subscribed: "+ServiceCall.getCurrentInvocation().getCaller());
+		System.out.println("subscribed: "+ServiceCall.getCurrentInvocation().getCaller());
 		
 		final SubscriptionIntermediateFuture<IRulebaseEvent> ret = (SubscriptionIntermediateFuture<IRulebaseEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
-		ret.addCommand(new IFilter<Object>()
+		ret.addBackwardCommand(new IFilter<Object>()
 		{
 			public boolean filter(Object obj)
 			{

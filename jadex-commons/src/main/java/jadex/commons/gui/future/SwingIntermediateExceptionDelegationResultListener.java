@@ -210,7 +210,7 @@ public abstract class SwingIntermediateExceptionDelegationResultListener<E, T> i
 	 */
 	public void	customCommandAvailable(Object command)
 	{
-		future.sendCommand(command);
+		future.sendForwardCommand(command);
 	}
 
 	/**

@@ -58,6 +58,7 @@ import jadex.platform.service.message.contentcodecs.JadexXMLContentCodec;
 import jadex.platform.service.message.streams.InputConnection;
 import jadex.platform.service.message.streams.OutputConnection;
 import jadex.platform.service.remote.commands.AbstractRemoteCommand;
+import jadex.platform.service.remote.commands.RemoteFutureBackwardCommand;
 import jadex.platform.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.platform.service.remote.commands.RemoteGetExternalAccessCommand;
 import jadex.platform.service.remote.commands.RemoteSearchCommand;
@@ -262,6 +263,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						return IFuture.DONE;
 					}
 				});
+			}
+			
+			public void sendBackwardCommand(Object info)
+			{
+				Future<Object> res = new Future<Object>();
+				final String mycallid = SUtil.createUniqueId(component.getComponentIdentifier().getName()+".ret.getServiceProxies");
+				RemoteFutureBackwardCommand content = new RemoteFutureBackwardCommand(mycallid, callid, info);
+//				System.out.println("sending backward cmd");
+				sendMessage(rrms, null, content, mycallid, BasicService.getRemoteDefaultTimeout(), res, null, null);
 			}
 			
 			// Called from delegation listeners in RMS -> ignore if already terminated

@@ -58,7 +58,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	 */
 	public DefaultPoolStrategy(int desfree, int maxcnt)
 	{
-		this(0, desfree, -1, maxcnt);
+		this(maxcnt, desfree, -1, maxcnt);
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public class DefaultPoolStrategy implements IPoolStrategy
 	 */
 	public DefaultPoolStrategy(int desfree, long maxwait, int maxcnt)
 	{
-		this(0, desfree, maxwait, maxcnt);
+		this(maxcnt, desfree, maxwait, maxcnt);
 	}
 	
 	/**

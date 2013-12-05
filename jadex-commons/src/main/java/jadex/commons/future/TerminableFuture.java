@@ -1,5 +1,11 @@
 package jadex.commons.future;
 
+import jadex.commons.ICommand;
+import jadex.commons.IFilter;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 
 /**
  *  Future that can be terminated from caller side. 
@@ -15,6 +21,9 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 	
 	/** The termination code. */
 	protected ITerminationCommand terminate;
+	
+	/** The list of backward commands. */
+	protected Map<ICommand<Object>, IFilter<Object>> bcommands;
 	
 	//-------- constructors --------
 
@@ -56,6 +65,53 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 		{
 			if(terminate!=null)
 				terminate.terminated(reason);
+		}
+	}
+	
+	/**
+	 *  Send a backward command in direction of the source.
+	 *  @param info The command info.
+	 */
+	public void sendBackwardCommand(Object info)
+	{
+		if(bcommands!=null)
+		{
+			for(Map.Entry<ICommand<Object>, IFilter<Object>> entry: bcommands.entrySet())
+			{
+				IFilter<Object> fil = entry.getValue();
+				if(fil==null || fil.filter(info))
+				{
+					ICommand<Object> com = entry.getKey();
+					com.execute(info);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Add a backward command with a filter.
+	 *  Whenever the future receives an info it will check all
+	 *  registered filters.
+	 */
+	public void addBackwardCommand(IFilter<Object> filter, ICommand<Object> command)
+	{
+		if(bcommands==null)
+		{
+			bcommands = new LinkedHashMap<ICommand<Object>, IFilter<Object>>();
+		}
+		bcommands.put(command, filter);
+	}
+	
+	/**
+	 *  Add a command with a filter.
+	 *  Whenever the future receives an info it will check all
+	 *  registered filters.
+	 */
+	public void removeBackwardCommand(ICommand<Object> command)
+	{
+		if(bcommands!=null)
+		{
+			bcommands.remove(command);
 		}
 	}
 

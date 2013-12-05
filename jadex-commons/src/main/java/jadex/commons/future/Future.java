@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  *  a) a blocking call to get() should be used
  *  b) a callback shall be invoked
  */
-public class Future<E> implements IFuture<E>, ICommandFuture
+public class Future<E> implements IFuture<E>, IForwardCommandFuture
 {
 	static int stackcount, maxstack;
 	static double	avgstack;
@@ -50,7 +50,7 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	public static boolean NO_STACK_COMPACTION = false;
 	
 	/** The empty future. */
-	public static final IFuture<?>	EMPTY	= new Future<Object>(null);
+	public static final IFuture<?> EMPTY = new Future<Object>(null);
 	
 	/**
 	 *  Get the empty future of some type.
@@ -93,7 +93,7 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	protected boolean undone;
 	
 	/** The list of commands. */
-	protected Map<ICommand<Object>, IFilter<Object>> commands;
+	protected Map<ICommand<Object>, IFilter<Object>> fcommands;
 	
 	//-------- constructors --------
 	
@@ -590,14 +590,14 @@ public class Future<E> implements IFuture<E>, ICommandFuture
     }
     
     /**
-	 *  Send a command to the listeners.
+	 *  Send a (forward) command to the listeners.
 	 *  @param command The command.
 	 */
-	public void sendCommand(Object command)
+	public void sendForwardCommand(Object command)
 	{
-		if(commands!=null)
+		if(fcommands!=null)
 		{
-			for(Map.Entry<ICommand<Object>, IFilter<Object>> entry: commands.entrySet())
+			for(Map.Entry<ICommand<Object>, IFilter<Object>> entry: fcommands.entrySet())
 			{
 				IFilter<Object> fil = entry.getValue();
 				if(fil==null || fil.filter(command))
@@ -640,17 +640,17 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	}
 	
 	/**
-	 *  Add a command with a filter.
+	 *  Add a forward command with a filter.
 	 *  Whenever the future receives an info it will check all
 	 *  registered filters.
 	 */
-	public void addCommand(IFilter<Object> filter, ICommand<Object> command)
+	public void addForwardCommand(IFilter<Object> filter, ICommand<Object> command)
 	{
-		if(commands==null)
+		if(fcommands==null)
 		{
-			commands = new LinkedHashMap<ICommand<Object>, IFilter<Object>>();
+			fcommands = new LinkedHashMap<ICommand<Object>, IFilter<Object>>();
 		}
-		commands.put(command, filter);
+		fcommands.put(command, filter);
 	}
 	
 	/**
@@ -658,11 +658,11 @@ public class Future<E> implements IFuture<E>, ICommandFuture
 	 *  Whenever the future receives an info it will check all
 	 *  registered filters.
 	 */
-	public void removeCommand(ICommand<Object> command)
+	public void removeForwardCommand(ICommand<Object> command)
 	{
-		if(commands!=null)
+		if(fcommands!=null)
 		{
-			commands.remove(command);
+			fcommands.remove(command);
 		}
 	}
 }

@@ -7,7 +7,7 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.ICommandFuture;
+import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandListener;
 import jadex.commons.future.IResultListener;
@@ -315,7 +315,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 	{
 		// reinit the timer
 //		System.out.println("reinit of timer");
-		if(ICommandFuture.Type.UPDATETIMER.equals(command))
+		if(IForwardCommandFuture.Type.UPDATETIMER.equals(command))
 			initTimer();
 		
 		if(listener instanceof IFutureCommandListener)

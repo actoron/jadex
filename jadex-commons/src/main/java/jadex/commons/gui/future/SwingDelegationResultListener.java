@@ -182,7 +182,7 @@ public class SwingDelegationResultListener<E> implements IUndoneResultListener<E
 	 */
 	public void	customCommandAvailable(Object command)
 	{
-		future.sendCommand(command);
+		future.sendForwardCommand(command);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 package jadex.platform.service.ecarules;
 
 import jadex.bridge.service.types.ecarules.IRulebaseEvent;
-import jadex.commons.future.ICommandFuture;
+import jadex.commons.future.IBackwardCommandFuture;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,9 +39,9 @@ public abstract class ARulebaseEvent implements IRulebaseEvent
 	/**
 	 * 
 	 */
-	public void setFinished(ICommandFuture fut)
+	public void setFinished(IBackwardCommandFuture fut)
 	{
-		fut.sendCommand(new FinishedEvent(callid, id));
+		fut.sendBackwardCommand(new FinishedEvent(callid, id));
 	}
 
 	/**

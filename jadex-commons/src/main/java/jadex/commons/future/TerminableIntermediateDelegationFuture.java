@@ -1,5 +1,8 @@
 package jadex.commons.future;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *  A terminable intermediate delegation future can be used when a termination intermediate future 
  *  should be delegated. This kind of future needs to be connected to the
@@ -24,6 +27,9 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 
 	/** Exception used for notification. */
 	protected Exception reason;
+	
+	/** The list of stored infos, to be sent when src is connected. */ 
+	protected List<Object> storedinfos;
 	
 	//-------- constructors --------
 	
@@ -112,6 +118,33 @@ public class TerminableIntermediateDelegationFuture<E> extends IntermediateFutur
 		
 		if(mynotify)
 			src.terminate(reason);
+	
+		if(storedinfos!=null)
+		{
+			for(Object info: storedinfos)
+			{
+				src.sendBackwardCommand(info);
+			}
+			storedinfos = null;
+		}
+	}
+	
+	/**
+	 *  Send a backward command in direction of the source.
+	 *  @param info The command info.
+	 */
+	public void sendBackwardCommand(Object info)
+	{
+		if(src!=null)
+		{
+			src.sendBackwardCommand(info);
+		}
+		else
+		{
+			if(storedinfos==null)
+				storedinfos = new ArrayList<Object>();
+			storedinfos.add(info);
+		}
 	}
 	
 //	/**

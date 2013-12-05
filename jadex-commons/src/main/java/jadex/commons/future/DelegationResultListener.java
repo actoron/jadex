@@ -124,9 +124,9 @@ public class DelegationResultListener<E> implements IResultListener<E>, IFutureC
 	 */
 	public void commandAvailable(Object command)
 	{
-		if(future instanceof ICommandFuture)
+		if(future instanceof IForwardCommandFuture)
 		{
-			((ICommandFuture)future).sendCommand(command);
+			((IForwardCommandFuture)future).sendForwardCommand(command);
 		}
 		else
 		{
