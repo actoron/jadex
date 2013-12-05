@@ -312,25 +312,14 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			}
 		};
 		
-		FileFilter ff = new FileFilter()
-		{
-			public String getDescription()
-			{
-				return ".cer";
-			}
-			
-			public boolean accept(File f)
-			{
-				return !f.isDirectory() && f.getName().endsWith(".cer");
-			}
-		};
-		final JFileChooser chls = new JFileChooser(".");
-		chls.setFileFilter(ff);
-		
 		JScrollPane sktt = new JScrollPane(ktt);
 		
 		MouseAdapter ma = new MouseAdapter()
 		{
+			// Create file chooser lazily to allow jenkins build to succeed
+			// (new JFileChooser() throws exception in headless windows)
+			JFileChooser chls;
+			
 			public void mousePressed(MouseEvent e)
 			{
 				popup(e);
@@ -341,6 +330,23 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 			}
 			protected void	popup(MouseEvent e)
 			{
+				if(chls==null)
+				{
+					chls	= new JFileChooser(".");
+					chls.setFileFilter(new FileFilter()
+					{
+						public String getDescription()
+						{
+							return ".cer";
+						}
+						
+						public boolean accept(File f)
+						{
+							return !f.isDirectory() && f.getName().endsWith(".cer");
+						}
+					});
+				}
+
 				if(e.isPopupTrigger())
 				{
 					int	row	= ktt.rowAtPoint(e.getPoint());
