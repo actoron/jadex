@@ -24,7 +24,7 @@ public class MultiPlatformsTest extends TestCase
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		for(int p=0; p<50; p++)
+		for(int p=0; p<500; p++)
 		{
 			long	time	= System.currentTimeMillis();
 			
@@ -35,7 +35,7 @@ public class MultiPlatformsTest extends TestCase
 			System.out.println("run "+p+" took "+time+" milliseconds.");
 		}
 		
-		Thread.sleep(3000000);
+//		Thread.sleep(3000000);
 	}
 	
 	/**
