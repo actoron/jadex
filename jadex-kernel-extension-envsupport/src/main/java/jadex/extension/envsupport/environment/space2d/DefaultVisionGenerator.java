@@ -27,29 +27,29 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	//-------- constants --------
 
 	/** The maxrange property. */
-	public static String PROPERTY_MAXRANGE = "range";
+	public static final String PROPERTY_MAXRANGE = "range";
 
 	/** The maxrange property. */
-	public static String PROPERTY_RANGE = "range_property";
+	public static final String PROPERTY_RANGE = "range_property";
 	
 	/** The percept types property. */
-	public static String PROPERTY_PERCEPTTYPES = "percepttypes";
+	public static final String PROPERTY_PERCEPTTYPES = "percepttypes";
 	
 	
 	/** The appeared percept type. */
-	public static String APPEARED = "appeared";
+	public static final String APPEARED = "appeared";
 	
 	/** The disappeared percept type. */
-	public static String DISAPPEARED = "disappeared";
+	public static final String DISAPPEARED = "disappeared";
 	
 	/** The created percept type. */
-	public static String CREATED = "created";
+	public static final String CREATED = "created";
 	
 	/** The destroyed percept type. */
-	public static String DESTROYED = "destroyed";
+	public static final String DESTROYED = "destroyed";
 	
 	/** The moved percept type. */
-	public static String MOVED = "moved";
+	public static final String MOVED = "moved";
 	
 
 	/** Empty spaceobjects array. */

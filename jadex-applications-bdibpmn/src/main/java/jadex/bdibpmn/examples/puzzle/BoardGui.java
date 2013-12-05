@@ -98,8 +98,8 @@ public class BoardGui extends JFrame
 			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				
+//				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+//				
 //				bia.addComponentListener(new TerminationAdapter()
 //				{
 //					public void componentTerminated()

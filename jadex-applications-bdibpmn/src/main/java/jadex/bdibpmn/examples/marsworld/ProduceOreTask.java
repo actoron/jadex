@@ -29,24 +29,18 @@ public class ProduceOreTask extends AbstractTask
 	
 	//-------- attributes --------
 	
-	/** The target. */
-	protected ISpaceObject	target;
-	
-	/** The remaining time. */
+	/** The elapsed time. */
 	protected long	time;
 	
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new move task.
-	 *  @param destination	The destination. 
-	 *  @param listsner	The result listener to be informed when the destination is reached. 
-	 * /
-	public ProduceOreTask(ISpaceObject target, IResultListener listener)
+	 *  Create a new task.
+	 */
+	public ProduceOreTask()
 	{
-		super(listener);
-		this.target	= target;
-	}*/
+		this.time	= 0;
+	}
 	
 	//-------- AbstractTask methods --------
 	

@@ -496,7 +496,7 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	{
 		if(!(identification == null)&&!identification.equals("-1"))
 		{
-			int id = Integer.valueOf(identification).intValue();
+			int id = Integer.parseInt(identification);
 
 			Object[] objects = obscenter.getSelectedDataView().getObjects();
 			for(int j = 0; j < objects.length; ++j)
@@ -504,7 +504,7 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 
 				Object obj = objects[j];
 				Object identifier = SObjectInspector.getId(obj);
-				int sobjid = Integer.valueOf(identifier.toString()).intValue();
+				int sobjid = Integer.parseInt(identifier.toString());
 				if(sobjid == id)
 				{
 					setSelectedObject(obj);

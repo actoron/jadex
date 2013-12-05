@@ -45,24 +45,24 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	public boolean _autoRotation;
 	
 	/** Constant for 45 degree. In all three Dimensions (x,y,z) */
-	public static IVector3 DEG45X = new Vector3Double((Math.PI/180)*45, 0, 0);
-	public static IVector3 DEG45Y = new Vector3Double(0, (Math.PI/180)*45, 0);
-	public static IVector3 DEG45Z = new Vector3Double(0, 0, (Math.PI/180)*45);
+	public static final IVector3 DEG45X = new Vector3Double((Math.PI/180)*45, 0, 0);
+	public static final IVector3 DEG45Y = new Vector3Double(0, (Math.PI/180)*45, 0);
+	public static final IVector3 DEG45Z = new Vector3Double(0, 0, (Math.PI/180)*45);
 	
 	/** Constant for 90 degree. In all three Dimensions (x,y,z) */
-	public static IVector3 DEG90X = new Vector3Double((Math.PI/180)*90, 0, 0);
-	public static IVector3 DEG90Y = new Vector3Double(0, (Math.PI/180)*90, 0);
-	public static IVector3 DEG90Z = new Vector3Double(0, 0, (Math.PI/180)*90);
+	public static final IVector3 DEG90X = new Vector3Double((Math.PI/180)*90, 0, 0);
+	public static final IVector3 DEG90Y = new Vector3Double(0, (Math.PI/180)*90, 0);
+	public static final IVector3 DEG90Z = new Vector3Double(0, 0, (Math.PI/180)*90);
 	
 	/** Constant for 180 degree. In all three Dimensions (x,y,z) */
-	public static IVector3 DEG180X = new Vector3Double((Math.PI/180)*180, 0, 0);
-	public static IVector3 DEG180Y = new Vector3Double(0, (Math.PI/180)*180, 0);
-	public static IVector3 DEG180Z = new Vector3Double(0, 0, (Math.PI/180)*180);
+	public static final IVector3 DEG180X = new Vector3Double((Math.PI/180)*180, 0, 0);
+	public static final IVector3 DEG180Y = new Vector3Double(0, (Math.PI/180)*180, 0);
+	public static final IVector3 DEG180Z = new Vector3Double(0, 0, (Math.PI/180)*180);
 	
 	/** Constant for 270 degree. In all three Dimensions (x,y,z) */
-	public static IVector3 DEG270X = new Vector3Double((Math.PI/180)*270, 0, 0);
-	public static IVector3 DEG270Y = new Vector3Double(0, (Math.PI/180)*270, 0);
-	public static IVector3 DEG270Z = new Vector3Double(0, 0, (Math.PI/180)*270);
+	public static final IVector3 DEG270X = new Vector3Double((Math.PI/180)*270, 0, 0);
+	public static final IVector3 DEG270Y = new Vector3Double(0, (Math.PI/180)*270, 0);
+	public static final IVector3 DEG270Z = new Vector3Double(0, 0, (Math.PI/180)*270);
 	
 
 

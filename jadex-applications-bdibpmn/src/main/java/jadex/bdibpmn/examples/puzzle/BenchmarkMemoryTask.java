@@ -27,11 +27,12 @@ public class BenchmarkMemoryTask extends AbstractTask
 			if(print && endmem!=null)
 			{
 				long	startmem	= ((Number)context.getParameterValue("startmem")).longValue();
-				System.out.println("Needed: "+(((endmem.longValue()-startmem)*10/1024)/1024)/10.0+" Mb.");
+				long	memused	= ((endmem.longValue()-startmem)*10/1024)/1024;
+				System.out.println("Needed: "+memused/10.0+" Mb.");
 			}
 			else if(!print && endmem==null)
 			{
-				endmem	= new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+				endmem	= Long.valueOf(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 				inst.getBeliefbase().getBelief("endmem").setFact(endmem);
 			}
 		}

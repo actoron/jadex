@@ -34,7 +34,7 @@ public class GetTimeTask	 implements ITask
 				{
 					public void run()
 					{
-						context.setParameterValue("time", new Long(clock.getTime()));
+						context.setParameterValue("time", Long.valueOf(clock.getTime()));
 						ret.setResult(null);
 					}
 				});
