@@ -415,8 +415,9 @@ public class ServiceHandler implements InvocationHandler
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
-					exception.printStackTrace();
+					component.getLogger().warning("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
+//					System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
+//					exception.printStackTrace();
 					proceed();
 				}
 				
