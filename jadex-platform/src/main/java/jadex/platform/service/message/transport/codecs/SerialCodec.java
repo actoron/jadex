@@ -2,7 +2,7 @@ package jadex.platform.service.message.transport.codecs;
 
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IEncodingContext;
-import jadex.commons.ObjectInputStream;
+import jadex.commons.CLObjectInputStream;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 import java.io.ByteArrayInputStream;
@@ -75,7 +75,7 @@ public class SerialCodec implements ICodec
 		try
 		{
 			InputStream baos = bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (InputStream)bytes;
-			ObjectInputStream ois = new ObjectInputStream(baos, classloader);
+			CLObjectInputStream ois = new CLObjectInputStream(baos, classloader);
 			ret = ois.readObject();
 			baos.close();
 			ois.close();

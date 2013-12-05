@@ -508,4 +508,12 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 		}
 		return false;
 	}
+	
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return 31 + getServiceIdentifier().hashCode();
+	}
 }

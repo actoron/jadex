@@ -7,7 +7,7 @@ import jadex.commons.transformation.B;
 /**
  *  Testcases for writer and reader.
  */
-public class Test extends jadex.commons.transformation.Test
+public class BSTest extends jadex.commons.transformation.Test
 {
 	
 	//-------- methods --------
@@ -77,7 +77,7 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public static void main(String[] args)
 	{
-		Test t = new Test();
+		BSTest t = new BSTest();
 		t.performTests();
 	}
 }

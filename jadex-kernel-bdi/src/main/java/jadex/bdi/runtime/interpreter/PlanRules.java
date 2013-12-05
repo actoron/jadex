@@ -2234,7 +2234,14 @@ public class PlanRules
 		ITimer	timer	= (ITimer)state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer);
 		if(timer!=null)
 		{
-			try{timer.cancel();}catch(Exception e){} // ThreadPool could have been already shutted down
+			try
+			{
+				timer.cancel();
+			}
+			catch(RuntimeException e)
+			{
+				// ThreadPool could have been already shut down	
+			}
 			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, null);
 		}
 

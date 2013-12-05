@@ -111,7 +111,7 @@ public class SelectionLogic
 					}
 				}
 			}
-			while(parent != null && parent.getParent() != null && parent.getName() != null && !Character.isDigit(parent.getName().charAt(0)))
+			while(parent.getParent() != null && parent.getName() != null && !Character.isDigit(parent.getName().charAt(0)))
 			{
 
 				parent = parent.getParent();

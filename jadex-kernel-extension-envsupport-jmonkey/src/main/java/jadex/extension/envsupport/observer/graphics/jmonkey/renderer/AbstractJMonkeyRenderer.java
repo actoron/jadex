@@ -1,6 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
-import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
@@ -12,7 +11,6 @@ import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.Animation;
 import jadex.extension.envsupport.observer.graphics.drawable3d.special.SpatialControl;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStateCreator;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -22,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.jme3.animation.AnimChannel;
-import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.audio.AudioNode.Status;

@@ -10,7 +10,7 @@ import java.io.ObjectStreamClass;
  *  
  *  cf. bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4340158
  */
-public class ObjectInputStream extends java.io.ObjectInputStream 
+public class CLObjectInputStream extends java.io.ObjectInputStream 
 {
 	//-------- attributes --------
 	
@@ -25,7 +25,7 @@ public class ObjectInputStream extends java.io.ObjectInputStream
 	 *  @param classloader The classloader.
 	 *  @throws IOException The exception.
 	 */
-	public ObjectInputStream(InputStream in, ClassLoader classloader) throws IOException 
+	public CLObjectInputStream(InputStream in, ClassLoader classloader) throws IOException 
 	{
 		super(in);
 		this.classloader = classloader;

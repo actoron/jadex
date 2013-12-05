@@ -139,4 +139,12 @@ public class Location implements Serializable
 		//System.out.println("equals: "+this+" --- "+o);
 		return ret;
 	}
+
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return 31 + Double.valueOf(x).hashCode() + 31*Double.valueOf(y).hashCode();
+	}
 }

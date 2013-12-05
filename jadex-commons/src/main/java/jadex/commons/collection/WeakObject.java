@@ -55,7 +55,7 @@ public class WeakObject<T> extends WeakReference<T> implements Serializable
 
 		if(!ret && object instanceof WeakObject)
 		{
-			WeakObject wr = (WeakObject)object;
+			WeakObject<?> wr = (WeakObject<?>)object;
 			
 			// Check hashcodes for speed.
 			if(this.hashcode==wr.hashcode)

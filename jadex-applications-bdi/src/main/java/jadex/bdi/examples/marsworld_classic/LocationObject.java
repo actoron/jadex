@@ -91,6 +91,14 @@ public class LocationObject implements Serializable
 	}
 
 	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return 31 + id.hashCode();
+	}
+	
+	/**
 	 *  Get the string representation.
 	 *  @return The string representation.
 	 */

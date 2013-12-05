@@ -3,25 +3,20 @@ package jadex.platform.service.ecarules;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.ecarules.IRuleService;
-import jadex.bridge.service.types.ecarules.IRulebaseEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
-import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.rules.eca.IEvent;
-import jadex.rules.eca.IRule;
 import jadex.rules.eca.IRulebase;
 import jadex.rules.eca.RuleEvent;
 import jadex.rules.eca.RuleSystem;
-import jadex.rules.eca.Rulebase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +30,9 @@ import java.util.List;
 @ProvidedServices(@ProvidedService(type=IRuleService.class))
 public class RuleAgent extends RulebaseAgent implements IRuleService
 {
-	/** The agent. */
-	@Agent
-	protected MicroAgent agent;
+//	/** The agent. */
+//	@Agent
+//	protected MicroAgent agent;
 
 	/** The rule engine. */
 	protected RuleSystem rulesystem;

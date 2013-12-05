@@ -15,7 +15,7 @@ public class PointLightRenderer extends AbstractJMonkeyRenderer {
 
 	private Box	box;
 	
-	Geometry geo;
+//	Geometry geo;
 
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
 			SpaceObject sobj, ViewportJMonkey vp) {

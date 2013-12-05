@@ -15,6 +15,7 @@ import jadex.commons.future.IResultListener;
 import jadex.platform.service.message.ISendTask;
 import jadex.platform.service.message.transport.ITransport;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
@@ -150,7 +151,7 @@ public class NIOTCPTransport implements ITransport
 		catch(Exception e)
 		{
 			if(ssc!=null)
-				try{ssc.close();}catch (Exception e2){}
+				try{ssc.close();}catch(IOException e2){}
 			ret.setException(new RuntimeException("Transport initialization error: "+e.getMessage()));
 			e.printStackTrace();
 //			throw new RuntimeException("Transport initialization error: "+e.getMessage());

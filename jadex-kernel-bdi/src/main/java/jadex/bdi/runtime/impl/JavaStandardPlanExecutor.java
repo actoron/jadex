@@ -191,16 +191,16 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				e.printStackTrace();
 			}
 			
-			if(PlanExecutionTask.STATE_RUNNING.equals(task.getState()))
-			{
-				// todo:
-				
-//				agent.getLogger().warning(" plan step is running longer than maximum " +
-//						"execution time, plan will be terminated: "+agent+" "+task);
-//				task.getPlan().getRootGoal().fail(null);
-				// Todo: wait for plan termination
-				// (otherwise there are two threads running at once).
-			}
+//			if(PlanExecutionTask.STATE_RUNNING.equals(task.getState()))
+//			{
+//				// todo:
+//				
+////				agent.getLogger().warning(" plan step is running longer than maximum " +
+////						"execution time, plan will be terminated: "+agent+" "+task);
+////				task.getPlan().getRootGoal().fail(null);
+//				// Todo: wait for plan termination
+//				// (otherwise there are two threads running at once).
+//			}
 //		}
 //		task.lock.unlock();
 
@@ -337,17 +337,17 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 					e.printStackTrace(System.err);
 				}
 
-				if(PlanExecutionTask.STATE_RUNNING.equals(task.getState()))
-				{
-//					agent.getLogger().warning(" plan step is running longer than maximum " +
-//							"execution time, plan will be terminated: "+agent+" "+task);
-					
-					// todo
-					//task.getPlan().getRootGoal().fail(null);
-					
-					// Todo: wait for plan termination
-					// (otherwise there are two threads running at once).
-				}
+//				if(PlanExecutionTask.STATE_RUNNING.equals(task.getState()))
+//				{
+////					agent.getLogger().warning(" plan step is running longer than maximum " +
+////							"execution time, plan will be terminated: "+agent+" "+task);
+//					
+//					// todo
+//					//task.getPlan().getRootGoal().fail(null);
+//					
+//					// Todo: wait for plan termination
+//					// (otherwise there are two threads running at once).
+//				}
 			}
 		}
 	}

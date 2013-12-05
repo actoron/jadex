@@ -834,15 +834,15 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 		}
 	}
 
-	public Vector3Int getSelectedworldcoord()
-	{
-		return selectedworldcoord;
-	}
+//	public Vector3Int getSelectedworldcoord()
+//	{
+//		return selectedworldcoord;
+//	}
 
-	public void setSelectedworldcoord(Vector3Int selectedworldcoord)
-	{
-		this.selectedworldcoord = selectedworldcoord;
-	}
+//	public void setSelectedworldcoord(Vector3Int selectedworldcoord)
+//	{
+//		this.selectedworldcoord = selectedworldcoord;
+//	}
 
 	public void setCanvassize(Dimension canvasSize)
 	{

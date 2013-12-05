@@ -17,7 +17,7 @@ public class Task
 
 	public static final String	STATE_FINISHED	= "finished";
 
-	public static final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm MM dd yyyy");
+	public final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm MM dd yyyy");
 
 	/** The job id. */
 	protected String jobid;

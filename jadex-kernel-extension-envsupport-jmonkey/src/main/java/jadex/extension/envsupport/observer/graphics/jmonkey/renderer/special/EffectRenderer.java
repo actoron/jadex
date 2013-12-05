@@ -1,28 +1,18 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special;
 
-import java.lang.reflect.Constructor;
-
-import com.jme3.app.SimpleApplication;
-import com.jme3.asset.AssetManager;
-import com.jme3.effect.ParticleEmitter;
-import com.jme3.effect.ParticleMesh.Type;
-import com.jme3.effect.shapes.EmitterSphereShape;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-
-import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.environment.SpaceObject;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.Effect;
-import jadex.extension.envsupport.observer.graphics.drawable3d.special.Materialfile;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.special.Effect;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
-import jadex.extension.envsupport.observer.graphics.jmonkey.appstate.ICustomStateCreator;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.AbstractJMonkeyRenderer;
+
+import java.lang.reflect.Constructor;
+
+import com.jme3.asset.AssetManager;
+import com.jme3.effect.ParticleEmitter;
+import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 
 
 public class EffectRenderer extends AbstractJMonkeyRenderer

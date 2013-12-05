@@ -224,10 +224,10 @@ public class EnvironmentGui	extends JFrame
 								{
 									wastecnt.setText(""+env.getWastes().length);
 								}
-								else if("chargingstations".equals(propertyname))
-								{
-									// implement me!
-								}
+//								else if("chargingstations".equals(propertyname))
+//								{
+//									// implement me!
+//								}
 							}
 						});
 

@@ -112,4 +112,12 @@ public class AgentInfo
 	{
 		return (o instanceof AgentInfo && ((AgentInfo)o).getName().equals(name));
 	}
+
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		return 31 + name.hashCode();
+	}
 }

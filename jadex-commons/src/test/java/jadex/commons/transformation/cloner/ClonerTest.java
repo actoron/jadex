@@ -5,7 +5,7 @@ import jadex.commons.transformation.traverser.Traverser;
 /**
  *  Testcases for writer and reader.
  */
-public class Test extends jadex.commons.transformation.Test
+public class ClonerTest extends jadex.commons.transformation.Test
 {
 	
 	//-------- methods --------
@@ -31,7 +31,7 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public static void main(String[] args)
 	{
-		Test t = new Test();
+		ClonerTest t = new ClonerTest();
 		t.performTests();
 	}
 }

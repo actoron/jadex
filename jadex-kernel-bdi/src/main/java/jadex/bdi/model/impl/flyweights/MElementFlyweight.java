@@ -122,9 +122,9 @@ public class MElementFlyweight implements IMElement, IMEElement
 	public boolean equals(Object obj)
 	{
 		boolean ret = false;
-		if(obj instanceof ElementFlyweight)
+		if(obj instanceof MElementFlyweight)
 		{
-			ElementFlyweight other = (ElementFlyweight)obj;
+			MElementFlyweight other = (MElementFlyweight)obj;
 			ret = SUtil.equals(getHandle(), other.getHandle()) 
 //				&& SUtil.equals(getScope(), other.getScope()) 
 				&& SUtil.equals(getState(), other.getState());

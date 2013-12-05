@@ -15,7 +15,7 @@ import java.util.Set;
  *  Java class for concept CMSComponentDescription
  *  of beanynizer_beans_fipa_new ontology.
  */
-public class CMSComponentDescription implements IComponentDescription, Cloneable, Serializable
+public class CMSComponentDescription implements IComponentDescription, Cloneable //, Serializable
 {
 	//-------- attributes ----------
 

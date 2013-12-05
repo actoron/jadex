@@ -146,17 +146,17 @@ public class TestMain extends SimpleApplication {
 
 
     boolean removed = false;
-    int timer = 0;
+    int mtimer = 0;
     public void simpleUpdate(float tpf) {
 
-        if(!removed&&timer>100)
+        if(!removed&&mtimer>100)
         {
             remove();
             removed = true;
         }
         else if(!removed)
         {
-            timer++;
+            mtimer++;
         }
         
     }
