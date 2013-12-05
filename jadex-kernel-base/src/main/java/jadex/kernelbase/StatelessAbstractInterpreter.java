@@ -923,13 +923,15 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
-		if(getBindings()!=null)
+		
+		RequiredServiceBinding[]	bindings	= getBindings();
+		if(bindings!=null)
 		{
-			for(int i=0; i<getBindings().length; i++)
+			for(int i=0; i<bindings.length; i++)
 			{
-				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getBindings()[i].getName());
+				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(bindings[i].getName());
 				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(getBindings()[i]), ms[i].getNFRProperties());
+					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties());
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
@@ -1871,7 +1873,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 				if(ret==null)
 					ret = component.getName();
 			}
-			catch(Exception e)
+			catch(RuntimeException e)
 			{
 			}
 		}

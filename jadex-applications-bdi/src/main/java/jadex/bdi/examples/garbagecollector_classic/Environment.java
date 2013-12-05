@@ -63,7 +63,7 @@ public class Environment
 		this.pcs = new SimplePropertyChangeSupport(this);
 	}
 
-	protected static Environment instance;
+	protected static volatile Environment instance;
 	
 	/**
 	 *  Get a singleton instance.

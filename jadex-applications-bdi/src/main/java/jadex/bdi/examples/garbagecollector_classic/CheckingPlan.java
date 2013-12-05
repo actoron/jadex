@@ -34,7 +34,7 @@ public class CheckingPlan extends Plan
 		{
 			pos = new Position(pos.getX()+1, pos.getY());
 		}
-		else if(pos.getX()-1>=0 && pos.getY()%2==1)
+		else if(pos.getX()-1>=0 && pos.getY()%2!=0)
 		{
 			pos = new Position(pos.getX()-1, pos.getY());
 		}

@@ -1151,8 +1151,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture kernelSearch(final URL url, final IFilter prefilter, IResourceIdentifier rid)
 	{
-		final Future ret = new Future();
-		
 		List modellocs = searchUrl(url, new IFilter()
 		{
 			public boolean filter(Object obj)
@@ -1367,9 +1365,10 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 //		System.out.println("Searching jar: " + jar.getAbsolutePath());
 		List ret = new ArrayList();
+		JarFile jarFile	= null;
 		try
 		{
-			JarFile jarFile = new JarFile(jar);
+			jarFile = new JarFile(jar);
 			for (Enumeration entries = jarFile.entries(); entries
 					.hasMoreElements();)
 			{
@@ -1385,6 +1384,17 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			// TODO: Print warning?
 //			System.out.println("Warning: File not found: " + jar.getAbsolutePath());
 //			e.printStackTrace();
+		}
+		if(jarFile!=null)
+		{
+			try
+			{
+				jarFile.close();
+			}
+			catch(IOException e)
+			{
+				// Ignore
+			}
 		}
 		return ret;
 	}

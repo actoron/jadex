@@ -68,14 +68,11 @@ public class ReaderBenchmark
 		// Keep VM alive for profiling.
 		while(true)
 		{
-			synchronized(obj)
+			try
 			{
-				try
-				{
-					obj.wait();
-				}
-				catch(InterruptedException e){}
+				Thread.sleep(3000000);
 			}
+			catch(InterruptedException e){}
 		}
 	}
 

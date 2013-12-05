@@ -104,9 +104,13 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				Method	m	= clazz.getMethod(extensions[i+1], new Class[0]);
 				mappings.add((Set<?>)m.invoke(null, new Object[0]));
 			}
+			catch(ClassNotFoundException e)
+			{
+				// Extension not present -> ignore.
+			}
 			catch(Exception e)
 			{
-//				e.printStackTrace();
+				e.printStackTrace();				
 			}
 			
 		}

@@ -392,7 +392,7 @@ public class MarsworldGui	extends JFrame
 
 				// Do scaling of images.
 				double newscale = bounds.getWidth()/600.0;
-				if(newscale!=scale)
+				if(Math.abs(newscale-scale) > 0.00001)
 				{
 					scale = newscale;
 					Image img = ((ImageIcon)icons.getIcon("sentry")).getImage();

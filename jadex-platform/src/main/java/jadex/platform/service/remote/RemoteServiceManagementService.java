@@ -724,8 +724,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //																	}
 	//																System.out.println("sent: "+callid);
 																	// ok message could be sent.
-																	if(to>=0 && timer!=null)
+																	if(to>=0 && timer!=null && !tt.isCancelled())
+																	{
 																		timer.schedule(tt, to);
+																	}
 																}
 															});
 														}
@@ -773,6 +775,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		protected RemoteServiceManagementService rms;
 		
 		protected long timeout;
+		
+		protected boolean	cancelled;
 		
 		/**
 		 *  Create a new timer task.
@@ -833,6 +837,17 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				}
 			});
 //			System.out.println("timeout triggered: "+msg);
+		}
+		
+		public boolean cancel()
+		{
+			cancelled	= true;
+			return super.cancel();
+		}
+		
+		public boolean	isCancelled()
+		{
+			return cancelled;
 		}
 	};
 

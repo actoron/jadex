@@ -27,6 +27,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -232,14 +233,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 	
 	/**
-	 *  Get the service bindings.
-	 */
-	public RequiredServiceBinding[] getServiceBindings()
-	{
-		return bindings;
-	}
-	
-	/**
 	 *  Get the value fetcher.
 	 */
 	public IValueFetcher getFetcher()
@@ -381,7 +374,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public RequiredServiceBinding[]	getBindings()
 	{
-		return bindings;
+		return bindings!=null ? Arrays.copyOf(bindings, bindings.length) : null;
 	}
 	
 	/**

@@ -51,11 +51,11 @@ public class Terrain3d extends Primitive3d
 		_alphamap = alphamap;
 		
 		_heightmap = heightmap;
-		_terrainTexture.add(new TerrainTexture("Tex1", texture01!=null? texture01: "", tex01val!=null? tex01val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex2", texture02!=null? texture02: "", tex02val!=null? tex02val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex3", texture03!=null? texture03: "", tex03val!=null? tex03val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex4", texture04!=null? texture04: "", tex04val!=null? tex04val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex5", texture05!=null? texture05: "", tex05val!=null? tex05val: 1));
+		_terrainTexture.add(new TerrainTexture("Tex1", texture01!=null? texture01: "", tex01val!=null? tex01val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex2", texture02!=null? texture02: "", tex02val!=null? tex02val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex3", texture03!=null? texture03: "", tex03val!=null? tex03val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex4", texture04!=null? texture04: "", tex04val!=null? tex04val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex5", texture05!=null? texture05: "", tex05val!=null? tex05val.intValue(): 1));
 		_picsize = picsize;
 		_patchsize = patchsize;
 		_shadowtype = shadowtype;
@@ -88,11 +88,11 @@ public class Terrain3d extends Primitive3d
 		_terrapath = terrapath;
 		_alphamap = alphamap;
 		_heightmap = heightmap;
-		_terrainTexture.add(new TerrainTexture("Tex1", texture01!=null? texture01: "", tex01val!=null? tex01val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex2", texture02!=null? texture02: "", tex02val!=null? tex02val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex3", texture03!=null? texture03: "", tex03val!=null? tex03val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex4", texture04!=null? texture04: "", tex04val!=null? tex04val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex5", texture05!=null? texture05: "", tex05val!=null? tex05val: 1));
+		_terrainTexture.add(new TerrainTexture("Tex1", texture01!=null? texture01: "", tex01val!=null? tex01val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex2", texture02!=null? texture02: "", tex02val!=null? tex02val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex3", texture03!=null? texture03: "", tex03val!=null? tex03val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex4", texture04!=null? texture04: "", tex04val!=null? tex04val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex5", texture05!=null? texture05: "", tex05val!=null? tex05val.intValue(): 1));
 		_picsize = picsize;
 		_patchsize = patchsize;
 		_shadowtype = shadowtype;
@@ -110,11 +110,11 @@ public class Terrain3d extends Primitive3d
 		_isRnd = true;
 		_terrapath = terrapath;
 		_alphamap = alphamap;
-		_terrainTexture.add(new TerrainTexture("Tex1", texture01!=null? texture01: "", tex01val!=null? tex01val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex2", texture02!=null? texture02: "", tex02val!=null? tex02val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex3", texture03!=null? texture03: "", tex03val!=null? tex03val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex4", texture04!=null? texture04: "", tex04val!=null? tex04val: 1));
-		_terrainTexture.add(new TerrainTexture("Tex5", texture05!=null? texture05: "", tex05val!=null? tex05val: 1));
+		_terrainTexture.add(new TerrainTexture("Tex1", texture01!=null? texture01: "", tex01val!=null? tex01val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex2", texture02!=null? texture02: "", tex02val!=null? tex02val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex3", texture03!=null? texture03: "", tex03val!=null? tex03val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex4", texture04!=null? texture04: "", tex04val!=null? tex04val.intValue(): 1));
+		_terrainTexture.add(new TerrainTexture("Tex5", texture05!=null? texture05: "", tex05val!=null? tex05val.intValue(): 1));
 		
 		_tiles = tiles;
 		_iterations = iterations;

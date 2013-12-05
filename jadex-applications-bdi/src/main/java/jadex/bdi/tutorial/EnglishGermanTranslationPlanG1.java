@@ -45,6 +45,11 @@ public class EnglishGermanTranslationPlanG1 extends Plan
 		{
 			BufferedReader	in	= new BufferedReader(new InputStreamReader(client.getInputStream()));
 			String	request	= in.readLine();
+			if(request==null)
+			{
+				throw new RuntimeException("No word received from client.");
+			}
+			
 			int	slash	= request.indexOf("/");
 			int	space	= request.indexOf(" ", slash);
 			String	eword	= request.substring(slash+1, space);

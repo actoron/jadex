@@ -235,7 +235,7 @@ public class RHardConstraints
 			{
 				public void resultAvailable(Collection<T> results)
 				{
-					List<T> filteredresults = new ArrayList<T>();
+//					List<T> filteredresults = new ArrayList<T>();
 					IRemoteFilter<T> filter = (IRemoteFilter<T>) hardconstraints.getLocalFilter();
 					
 //					CollectionResultListener<T> crl = new CollectionResultListener<T>(results.size(), true, new DelegationResultListener<T>(new IResultListener<T>()
