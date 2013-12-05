@@ -220,9 +220,9 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	public boolean equals(Object obj)
 	{
 		boolean ret = false;
-		if(obj instanceof ComposedFilter)
+		if(obj instanceof ComposedRemoteFilter)
 		{
-			ComposedFilter other = (ComposedFilter)obj;
+			ComposedRemoteFilter other = (ComposedRemoteFilter)obj;
 			ret = Arrays.equals(filters, other.filters) && operator == other.operator;
 		}
 		return ret;

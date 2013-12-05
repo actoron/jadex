@@ -27,7 +27,7 @@ public class SXML
 	public static final String ARRAYLEN = "__len";
 	
 	/** The null tag. */
-	public static QName NULL = new QName(SXML.PROTOCOL_TYPEINFO, "null");
+	public static final QName NULL = new QName(SXML.PROTOCOL_TYPEINFO, "null");
 	
 	/** Constant for anonymous inner classes. */
 	public static final String XML_CLASSNAME = "XML_CLASSNAME";
@@ -36,7 +36,7 @@ public class SXML
 	public static final String lf = (String) System.getProperty("line.separator");
 
 	/** The default encoding. */
-	public static String DEFAULT_ENCODING = "utf-8";
+	public static final String DEFAULT_ENCODING = "utf-8";
 
 	/**
 	 *  Get the xmlclassname annotation.

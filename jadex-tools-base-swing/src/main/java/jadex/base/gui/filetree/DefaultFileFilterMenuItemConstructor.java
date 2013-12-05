@@ -230,7 +230,12 @@ public class DefaultFileFilterMenuItemConstructor implements IMenuItemConstructo
 					finally
 					{
 						if(file!=null)
-							file.delete();
+						{
+							if(!file.delete())
+							{
+								System.err.println("Cannot delete temp file: "+file);
+							}
+						}
 					}
 					menu.add(ff);
 					ff.addItemListener(new ItemListener()

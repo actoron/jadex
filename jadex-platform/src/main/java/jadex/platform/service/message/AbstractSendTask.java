@@ -1,13 +1,5 @@
 package jadex.platform.service.message;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.service.types.message.ICodec;
@@ -20,6 +12,14 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.platform.service.message.transport.ITransport;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *  Abstract base class for sending a message with the message service.
@@ -149,13 +149,63 @@ public abstract class AbstractSendTask implements ISendTask
 	}
 	
 	/**
-	 *  Set the data.
-	 *  @param data The data to set.
+	 *  Get the encoded message.
+	 *  Saves the message to avoid multiple encoding with different transports.
 	 */
-	public void setData(byte[] data)
+	public byte[] getData()
 	{
-		this.data = data;
+		if(data==null)
+		{
+			synchronized(this)
+			{
+				if(data==null)
+				{
+					data = fetchData();
+				}
+			}
+		}
+		return data;
 	}
+
+	/**
+	 *  Provide the data as a byte array.
+	 */
+	protected abstract byte[]	fetchData();
+	
+//	/**
+//	 *  Set the data.
+//	 *  @param data The data to set.
+//	 */
+//	public void setData(byte[] data)
+//	{
+//		this.data = data;
+//	}
+	
+	/**
+	 *  Get the prolog bytes.
+	 *  Separated from data to avoid array copies.
+	 *  Message service expects messages to be delivered in the form {prolog}{data}. 
+	 *  @return The prolog bytes.
+	 */
+	public byte[] getProlog()
+	{
+		if(prolog==null)
+		{
+			synchronized(this)
+			{
+				if(prolog==null)
+				{
+					prolog = fetchProlog();
+				}
+			}
+		}
+		return prolog;
+	}
+
+	/**
+	 *  Provide the prolog as a byte array.
+	 */
+	protected abstract byte[]	fetchProlog();
 	
 	/**
 	 *  Get the non-functional requirements.

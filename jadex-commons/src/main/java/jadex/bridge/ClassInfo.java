@@ -208,12 +208,12 @@ public class ClassInfo
 		return null;
 	}
 	
-	/**
-	 *  Main for testing
-	 */
-	public static void main(String[] args) throws Exception
-	{
-		Type t = ClassInfo.class.getMethod("getVals", new Class[0]).getGenericReturnType();
-		ClassInfo ci = new ClassInfo(t.toString());
-	}
+//	/**
+//	 *  Main for testing
+//	 */
+//	public static void main(String[] args) throws Exception
+//	{
+//		Type t = ClassInfo.class.getMethod("getVals", new Class[0]).getGenericReturnType();
+//		ClassInfo ci = new ClassInfo(t.toString());
+//	}
 }

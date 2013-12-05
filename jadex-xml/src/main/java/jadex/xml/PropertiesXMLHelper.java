@@ -27,7 +27,7 @@ public class PropertiesXMLHelper
 	//-------- static attributes --------
 	
 	/** The type infos. */
-	public static Set typeinfos;
+	public static final Set typeinfos;
 	
 //	/** The writer. */
 //	public static Writer writer;

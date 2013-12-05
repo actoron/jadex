@@ -56,7 +56,7 @@ public class ComponentSelectorDialog
 	//-------- static part --------
 
 	/** The image icons. */
-	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		// Icons.
 		"arrow_right", SGUI.makeIcon(ComponentSelectorDialog.class,	"/jadex/base/gui/images/arrow_right.png"),
@@ -287,7 +287,7 @@ public class ComponentSelectorDialog
 					}
 					else
 					{
-						proceed(selected);
+						proceed(null);
 					}
 				}
 			}

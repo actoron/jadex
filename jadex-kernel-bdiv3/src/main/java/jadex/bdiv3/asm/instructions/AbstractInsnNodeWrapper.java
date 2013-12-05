@@ -100,19 +100,11 @@ public class AbstractInsnNodeWrapper implements IAbstractInsnNode
 
 	public boolean equals(Object obj)
 	{
-		// todo: find bugs reports assymmetric equals
-		if(obj instanceof AbstractInsnNodeWrapper) 
-		{
-			return insnNode.equals(((AbstractInsnNodeWrapper)obj).insnNode);
-		} 
-		else 
-		{
-			return insnNode.equals(obj);
-		}
+		return obj instanceof AbstractInsnNodeWrapper && insnNode.equals(((AbstractInsnNodeWrapper)obj).insnNode);
 	}
 
 	public int hashCode()
 	{
-		return insnNode.hashCode();
+		return 31 + insnNode.hashCode();
 	}
 }

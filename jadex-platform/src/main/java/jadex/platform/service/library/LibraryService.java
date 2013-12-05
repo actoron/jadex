@@ -332,7 +332,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 					Set<URI> nonmans = getInternalNonManagedURLs();
 					for(URI uri: nonmans)
 					{
-						URL url = toURL0(uri);
+						URL url = SUtil.toURL0(uri);
 						if(url!=null)
 							mydeps.add(new ResourceIdentifier(new LocalResourceIdentifier(component.getComponentIdentifier().getRoot(), url), null));
 					}
@@ -534,7 +534,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				Set<URI> re = getInternalNonManagedURLs();
 				for(URI uri: re)
 				{
-					URL url = toURL0(uri);
+					URL url = SUtil.toURL0(uri);
 					if(url!=null)
 						res.add(url);
 				}
@@ -572,7 +572,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			ret.setResult(rootloader);
 //			System.out.println("root classloader: "+rid);
 		}
-		else if(isLocal(rid) && getInternalNonManagedURLs().contains(toURI0(rid.getLocalIdentifier().getUrl())))
+		else if(isLocal(rid) && getInternalNonManagedURLs().contains(SUtil.toURI0(rid.getLocalIdentifier().getUrl())))
 		{
 			ret.setResult(baseloader);
 //			System.out.println("base classloader: "+rid);
@@ -660,7 +660,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		// pure global call followed by pure local call -> would mean rids have not been resolved
 		// pure local call followed by pure global call -> would mean rids have not been resolved
 		final IResourceIdentifier lrid = ResourceIdentifier.getLocalResourceIdentifier(rid);
-		if(isLocal(rid) && getInternalNonManagedURLs().contains(toURI0(rid.getLocalIdentifier().getUrl())))
+		if(isLocal(rid) && getInternalNonManagedURLs().contains(SUtil.toURI0(rid.getLocalIdentifier().getUrl())))
 		{
 			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
 		}
@@ -758,7 +758,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support, final boolean workspace)
 	{
 		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
-		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(toURI0(rid.getLocalIdentifier().getUrl()));
+		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(SUtil.toURI0(rid.getLocalIdentifier().getUrl()));
 		
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 //		final URL url = rid.getLocalIdentifier().getSecondEntity();
@@ -1099,7 +1099,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			
 			for(int i = 0; i < urls.length; i++)
 			{
-				URI uri = toURI0(urls[i]);
+				URI uri = SUtil.toURI0(urls[i]);
 				if(uri!=null)
 				{
 					set.add(uri);
@@ -1406,40 +1406,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 		}
 		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	protected static URL toURL0(URI uri)
-	{
-		URL ret = null;
-		try
-		{
-			ret = uri.toURL();
-		}
-		catch(Exception e)
-		{
-			System.out.println("Problem with url conversion: "+uri);
-		}
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	protected static URI toURI0(URL url)
-	{
-		URI ret = null;
-		try
-		{
-			ret = url.toURI();
-		}
-		catch(Exception e)
-		{
-			System.out.println("Problem with url conversion: "+url);
-		}
 		return ret;
 	}
 }

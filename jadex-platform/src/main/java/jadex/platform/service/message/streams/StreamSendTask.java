@@ -198,26 +198,15 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 
 	/**
 	 *  Get the encoded message.
-	 *  Saves the message to avoid multiple encoding with different transports.
 	 */
-	public byte[] getData()
+	protected byte[] fetchData()
 	{
-		if(data==null)
+		Object enc_msg = message;
+		for(int i=0; i<codecs.length; i++)
 		{
-			synchronized(this)
-			{
-				if(data==null)
-				{
-					Object enc_msg = message;
-					for(int i=0; i<codecs.length; i++)
-					{
-						enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader(), encodingcontext);
-					}
-					data = (byte[])enc_msg;
-				}
-			}
+			enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader(), encodingcontext);
 		}
-		return data;
+		return (byte[])enc_msg;
 	}
 	
 	/**
@@ -226,30 +215,21 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	 *  Message service expects messages to be delivered in the form {prolog}{data}. 
 	 *  @return The prolog bytes.
 	 */
-	public byte[] getProlog()
+	protected byte[] fetchProlog()
 	{
-		if(prolog==null)
+		byte[]	prolog = new byte[7+codecids.length+(seqnumber==null? 0: 4)];
+		prolog[0] = MESSAGE_TYPE_STREAM;
+		prolog[1] = type;
+		prolog[2] = (byte)codecids.length;
+		System.arraycopy(codecids, 0, prolog, 3, codecids.length);
+		byte[] strid = SUtil.intToBytes(streamid);
+		for(int i=0; i<4; i++)
+			prolog[i+3+codecids.length] = strid[i];
+		if(seqnumber!=null)
 		{
-			synchronized(this)
-			{
-				if(prolog==null)
-				{
-					prolog = new byte[7+codecids.length+(seqnumber==null? 0: 4)];
-					prolog[0] = MESSAGE_TYPE_STREAM;
-					prolog[1] = type;
-					prolog[2] = (byte)codecids.length;
-					System.arraycopy(codecids, 0, prolog, 3, codecids.length);
-					byte[] strid = SUtil.intToBytes(streamid);
-					for(int i=0; i<4; i++)
-						prolog[i+3+codecids.length] = strid[i];
-					if(seqnumber!=null)
-					{
-						byte[] seqnum = SUtil.intToBytes(seqnumber.intValue());
-						for(int i=0; i<4; i++)
-							prolog[i+7+codecids.length] = seqnum[i];
-					}
-				}
-			}
+			byte[] seqnum = SUtil.intToBytes(seqnumber.intValue());
+			for(int i=0; i<4; i++)
+				prolog[i+7+codecids.length] = seqnum[i];
 		}
 		return prolog;
 	}

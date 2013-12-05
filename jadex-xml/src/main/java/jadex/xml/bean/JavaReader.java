@@ -412,7 +412,7 @@ public class JavaReader
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
 						return new URL((String)rawattributes.get("protocol"), (String)rawattributes.get("host"), 
-							Integer.valueOf((String)rawattributes.get("port")).intValue(), (String)rawattributes.get("file"));
+							Integer.parseInt((String)rawattributes.get("port")), (String)rawattributes.get("file"));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{

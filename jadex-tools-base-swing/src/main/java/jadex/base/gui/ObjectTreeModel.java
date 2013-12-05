@@ -45,7 +45,7 @@ public class ObjectTreeModel implements TreeModel
 	protected final static boolean enableObjectInspection = true;
 	
 	/** The image icons. */
-	protected static UIDefaults icons = new UIDefaults(new Object[]
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"javaobject", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/base/gui/images/bean.png"),
 		"javaattribute", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/base/gui/images/attribute.png"),

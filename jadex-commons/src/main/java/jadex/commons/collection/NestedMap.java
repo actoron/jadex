@@ -16,7 +16,7 @@ import java.util.Set;
  *  Modifications of this map do not affect the parent maps.
  */
 // todo: implement views.
-// todo: implement correct hashCode()/size() when keys are overriden.
+// todo: implement correct hashCode()/size() when keys are overridden.
 public class NestedMap	implements Map, java.io.Serializable
 {
 	//-------- attributes --------
@@ -384,12 +384,7 @@ public class NestedMap	implements Map, java.io.Serializable
 	 */
 	public Set entrySet()
 	{
-		// todo: eliminate dublicates
-		Set ret = local.entrySet();
-		for(int i=0; i<parents.length; i++)
-			ret.addAll(parents[i].entrySet());
-		return ret;
-		//throw new UnsupportedOperationException("entrySet() not supported for NestedMap.");
+		throw new UnsupportedOperationException("entrySet() not supported for NestedMap.");
 	}
 
 	// Comparison and hashing
@@ -426,14 +421,13 @@ public class NestedMap	implements Map, java.io.Serializable
 	 */
 	public int hashCode()
 	{
-		// To determine hash code, build union of entry sets.
 		// Hash code is obtained as sum of the entries' hash codes. 
-		Set	entries	= new HashSet(local.entrySet());
+		int	ret	= local.entrySet().hashCode();
 		for(int i=0; i<parents.length; i++)
 		{
-			entries.addAll(parents[i].entrySet());
+			ret	+= parents[i].entrySet().hashCode();
 		}
-		return entries.hashCode();
+		return ret;
 	}
 
 	/**

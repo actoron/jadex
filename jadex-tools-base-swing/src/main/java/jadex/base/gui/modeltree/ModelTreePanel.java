@@ -32,6 +32,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +77,7 @@ public class ModelTreePanel extends FileTreePanel
 	protected IExternalAccess localexta;
 	
 	/** The root entries. */
-	protected Map<URL, IResourceIdentifier>	rootentries;
+	protected Map<URI, IResourceIdentifier>	rootentries;
 	// todo: remove 
 	protected Map<String, IResourceIdentifier>	rootpathentries; 
 	
@@ -105,7 +106,7 @@ public class ModelTreePanel extends FileTreePanel
 		super(exta, remote, false);
 		this.localexta = localexta;
 		actions = new HashMap<URL, IResourceIdentifier>();
-		this.rootentries	= new LinkedHashMap<URL, IResourceIdentifier>();
+		this.rootentries	= new LinkedHashMap<URI, IResourceIdentifier>();
 		this.rootpathentries	= new LinkedHashMap<String, IResourceIdentifier>();
 		
 		final ModelFileFilterMenuItemConstructor mic = new ModelFileFilterMenuItemConstructor(getModel(), exta);
@@ -113,7 +114,13 @@ public class ModelTreePanel extends FileTreePanel
 		{
 			public IRemoteFilter getFileFilter()
 			{
-				return new ModelFileFilter(mic.isAll(), mic.getSelectedComponentTypes(), getRootEntries(), exta);
+				// Hack!!! Have to use URL for communication backwards compatibility as model file filter is transferred remotely.
+				Map<URL, IResourceIdentifier>	rids	= new HashMap();
+				for(Map.Entry<URI, IResourceIdentifier> entry: getRootEntries().entrySet())
+				{
+					rids.put(SUtil.toURL0(entry.getKey()), entry.getValue());
+				}
+				return new ModelFileFilter(mic.isAll(), mic.getSelectedComponentTypes(), rids, exta);
 			}
 		});
 		ModelIconCache ic = new ModelIconCache(exta, getTree());
@@ -392,7 +399,7 @@ public class ModelTreePanel extends FileTreePanel
 //									addRootEntry(f.toURI().toURL(), f.getAbsolutePath(), rid);
 									RIDNode rn = (RIDNode)node;
 									rn.setFile(f);
-									addRootEntry(f.toURI().toURL(), rn.getFilePath() , rid);
+									addRootEntry(f.toURI(), rn.getFilePath() , rid);
 									
 									ModelTreePanel.super.addNode(node);
 								}
@@ -427,7 +434,7 @@ public class ModelTreePanel extends FileTreePanel
 					{
 						// Todo: remove entries on remove.
 	//					System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
-						addRootEntry(tup.getFirstEntity(), filepath, tup.getSecondEntity());
+						addRootEntry(SUtil.toURI0(tup.getFirstEntity()), filepath, tup.getSecondEntity());
 						ModelTreePanel.super.addNode(node);
 					}
 					
@@ -508,7 +515,7 @@ public class ModelTreePanel extends FileTreePanel
 	/**
 	 *  Get the root entries of the tree.
 	 */
-	public Map<URL, IResourceIdentifier>	getRootEntries()
+	public Map<URI, IResourceIdentifier>	getRootEntries()
 	{
 		return rootentries;
 	}
@@ -516,19 +523,11 @@ public class ModelTreePanel extends FileTreePanel
 	/**
 	 * 
 	 */
-	public void addRootEntry(URL url, String path, IResourceIdentifier rid)
+	public void addRootEntry(URI uri, String path, IResourceIdentifier rid)
 	{
 //		System.out.println("putting: "+url+" "+path+" "+rid);
-		rootentries.put(url, rid);
+		rootentries.put(uri, rid);
 		rootpathentries.put(path, rid);
-	}
-	
-	/**
-	 * 
-	 */
-	public IResourceIdentifier getRootEntry(URL url)
-	{
-		return rootentries.get(url);
 	}
 	
 	/**

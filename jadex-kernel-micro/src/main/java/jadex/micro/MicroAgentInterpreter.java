@@ -1554,20 +1554,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
 	 */
-	public IExternalAccess getExternalAccess()
+	public IExternalAccess createExternalAccess()
 	{
-		if(access==null)
-		{
-			synchronized(this)
-			{
-				if(access==null)
-				{
-					access	= new MicroExternalAccess(microagent, this);
-				}
-			}
-		}
-		
-		return access;
+		return new MicroExternalAccess(microagent, this);
 	}
 	
 	/**

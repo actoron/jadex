@@ -38,7 +38,9 @@ class StaticFieldPersistenceDelegate extends
 			Object value = null;
 			try {
 				value = field[i].get(clz);
-			} catch (Exception e) {
+			} catch (IllegalAccessException e) {
+				return;
+			} catch (IllegalArgumentException e) {
 				return;
 			}
 			if (value.getClass() == clz) {

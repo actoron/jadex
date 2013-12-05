@@ -26,6 +26,7 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
@@ -2121,6 +2122,42 @@ public class SUtil
 		
 		return ret;
 	}
+	
+	
+	/**
+	 *  Convert a URI to a URL but ignore exceptions
+	 */
+	public static URL toURL0(URI uri)
+	{
+		URL ret = null;
+		try
+		{
+			ret = uri.toURL();
+		}
+		catch(Exception e)
+		{
+			System.out.println("Problem with url conversion: "+uri);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Convert a URL to a URI but ignore exceptions
+	 */
+	public static URI toURI0(URL url)
+	{
+		URI ret = null;
+		try
+		{
+			ret = url.toURI();
+		}
+		catch(Exception e)
+		{
+			System.out.println("Problem with url conversion: "+url);
+		}
+		return ret;
+	}
+
 
 	/**
 	 * Main method for testing. / public static void main(String[] args) {
@@ -2977,15 +3014,12 @@ public class SUtil
 			{
 			}
 		}
-		if(zip!=null)
+		try
 		{
-			try
-			{
-				zip.close();
-			}
-			catch(IOException e)
-			{
-			}
+			zip.close();
+		}
+		catch(IOException e)
+		{
 		}
 	}
 	

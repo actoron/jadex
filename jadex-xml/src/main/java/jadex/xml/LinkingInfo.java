@@ -10,7 +10,7 @@ public class LinkingInfo
 	//-------- constants --------
 
 	/** Default link mode. */
-	public static boolean DEFAULT_BULKLINK_MODE = false;
+	public static final boolean DEFAULT_BULKLINK_MODE = false;
 	
 	//-------- attributes --------
 

@@ -885,10 +885,9 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IExternalAccess getExternalAccess()
+	protected IExternalAccess createExternalAccess()
 	{
 		return new ExternalAccessFlyweight(state, rcapa);
-//		return new Future(new ExternalAccessFlyweight(state, rcapa));
 	}
 
 	//-------- expressionbase shortcut methods --------

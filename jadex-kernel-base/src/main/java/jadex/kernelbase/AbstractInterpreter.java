@@ -144,12 +144,20 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			{
 				if(access==null)
 				{
-					access	= new ExternalAccess(this);
+					access	= createExternalAccess();
 				}
 			}
 		}
 		
 		return access;
+	}
+	
+	/**
+	 *  Create the external access instance.
+	 */
+	protected IExternalAccess	createExternalAccess()
+	{
+		return new ExternalAccess(this);
 	}
 
 	/**

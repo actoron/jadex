@@ -129,26 +129,25 @@ public abstract class AMonkeyFunctions extends AMonkeyInit
 	{
 		if(terrain != null)
 		{
-			HillHeightMap heightmap = null;
 			try
 			{
-				heightmap = new HillHeightMap(513, 2000, 25, 100, (long)((byte)100 * Math.random()));
+				HillHeightMap heightmap	= new HillHeightMap(513, 2000, 25, 100, (long)((byte)100 * Math.random()));
+				Material mat = terrain.getMaterial();
+				Vector3f scale = terrain.getLocalScale();
+				Vector3f trans = terrain.getLocalTranslation();
+				rootNode.detachChildNamed("Terrain");
+				terrain = new TerrainQuad("Terrain", 65, 513, heightmap.getHeightMap());
+
+				terrain.setLocalTranslation(trans);
+				terrain.setLocalScale(scale);
+				terrain.setMaterial(mat);
+				terrain.setShadowMode(ShadowMode.Receive);
+				rootNode.attachChild(terrain);
 			}
 			catch(Exception ex)
 			{
 				ex.printStackTrace();
 			}
-			Material mat = terrain.getMaterial();
-			Vector3f scale = terrain.getLocalScale();
-			Vector3f trans = terrain.getLocalTranslation();
-			rootNode.detachChildNamed("Terrain");
-			terrain = new TerrainQuad("Terrain", 65, 513, heightmap.getHeightMap());
-
-			terrain.setLocalTranslation(trans);
-			terrain.setLocalScale(scale);
-			terrain.setMaterial(mat);
-			terrain.setShadowMode(ShadowMode.Receive);
-			rootNode.attachChild(terrain);
 		}
 	}
 

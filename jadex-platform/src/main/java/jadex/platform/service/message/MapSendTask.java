@@ -77,23 +77,12 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	}
 
 	/**
-	 *  Get the encoded message.
-	 *  Saves the message to avoid multiple encoding with different transports.
+	 *  Provide the data as a byte array.
 	 */
-	public byte[] getData()
+	protected byte[]	fetchData()
 	{
-		if(data==null)
-		{
-			synchronized(this)
-			{
-				if(data==null)
-				{
-					MessageEnvelope	envelope = new MessageEnvelope(message, Arrays.asList(receivers),  messagetype.getName());
-					data = createData(envelope, codecs, classloader, encodingcontext);
-				}
-			}
-		}
-		return data;
+		MessageEnvelope	envelope = new MessageEnvelope(message, Arrays.asList(receivers),  messagetype.getName());
+		return createData(envelope, codecs, classloader, encodingcontext);
 	}
 	
 	/**
@@ -102,19 +91,9 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	 *  Message service expects messages to be delivered in the form {prolog}{data}. 
 	 *  @return The prolog bytes.
 	 */
-	public byte[] getProlog()
+	public byte[] fetchProlog()
 	{
-		if(prolog==null)
-		{
-			synchronized(this)
-			{
-				if(prolog==null)
-				{
-					prolog = createProlog(codecids);
-				}
-			}
-		}
-		return prolog;
+		return createProlog(codecids);
 	}
 	
 	/**

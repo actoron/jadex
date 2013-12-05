@@ -13,22 +13,14 @@ public class MultiThreadTest
 	//-------- attributes --------
 
 	/** The waiting pool. */
-	protected IBlockingQueue waits;
+	protected static IBlockingQueue<ExecutionThread> waits;
 
 	/**
 	 *  Main for testing.
 	 */
 	public static void main(String[] args)
 	{
-		new MultiThreadTest();
-	}
-
-	/**
-	 *  Create a new muli thread test.
-	 */
-	public MultiThreadTest()
-	{
-		this.waits = new BlockingQueue();
+		waits = new BlockingQueue<ExecutionThread>();
 		Thread[] threads = new Thread[3];
 		MyMonitor[] monitors = new MyMonitor[threads.length];
 		for(int i=0; i<monitors.length; i++)
@@ -57,7 +49,7 @@ public class MultiThreadTest
 
 		while(true)
 		{
-			ExecutionThread et	= (ExecutionThread)waits.dequeue();
+			ExecutionThread et	= waits.dequeue();
 			MyMonitor monitor = et.getMonitor();
 			System.out.println("Restarting: "+et);
 			// wait till thread waits.
@@ -68,11 +60,11 @@ public class MultiThreadTest
 			}			
 		}
 	}
-	
+
 	/**
 	 *  A thread that
 	 */
-	class ExecutionThread extends Thread
+	static class ExecutionThread extends Thread
 	{
 		/** The pool monitor object. */
 		protected MyMonitor monitor;
@@ -139,7 +131,7 @@ public class MultiThreadTest
 	/**
 	 *  A simple monitor that saves the thread state.
 	 */
-	class MyMonitor
+	static class MyMonitor
 	{
 		/** The running state. */
 		protected boolean running;

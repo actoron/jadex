@@ -20,7 +20,7 @@ public abstract class AReader
 	//-------- constants --------
 	
 	/** The debug flag. */
-	public static boolean DEBUG = false;
+	public static final boolean DEBUG = false;
 	
 	/** The string marker object. */
 	public static final Object STRING_MARKER = new Object();

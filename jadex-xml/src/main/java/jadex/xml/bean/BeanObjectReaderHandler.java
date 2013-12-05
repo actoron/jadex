@@ -1462,7 +1462,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	protected boolean setBulkField(String fieldname, Object parent, List objects, Object converter,
 		AReadContext context, String idref) throws Exception
 	{
-		boolean set = false;
+		boolean set;
 		try
 		{
 			Field field = parent.getClass().getField(fieldname);
@@ -1478,6 +1478,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		catch(Exception e)
 		{
 			// Ignore -> try other way of setting attribute
+			set	= false;
 		}
 		
 		return set;

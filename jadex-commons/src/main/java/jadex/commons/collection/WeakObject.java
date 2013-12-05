@@ -9,7 +9,7 @@ import java.lang.ref.WeakReference;
  *  transparent equals() and hashcode() methods.
  *  WeakObject provides this support.
  */
-public class WeakObject<T> extends WeakReference<T> implements Serializable
+public class WeakObject<T> extends WeakReference<T> // implements Serializable
 {
 	//-------- attributes --------
 
@@ -24,7 +24,6 @@ public class WeakObject<T> extends WeakReference<T> implements Serializable
 	 */
 	public WeakObject(T object)
 	{
-		// FINDBUG: This is declared serializable without empty constructor? Reason?
 		super(object);
 		hashcode = object.hashCode();
 	}

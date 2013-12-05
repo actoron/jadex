@@ -57,7 +57,7 @@ public class CheckingPlanEnv
 			pos = new Vector2Int(pos.getXAsInteger()+1, pos.getYAsInteger());
 		}
 		// Go left in odd lanes
-		else if(pos.getXAsInteger()-1>=0 && pos.getYAsInteger()%2==1)
+		else if(pos.getXAsInteger()-1>=0 && pos.getYAsInteger()%2!=0)
 		{
 			pos = new Vector2Int(pos.getXAsInteger()-1, pos.getYAsInteger());
 		}

@@ -379,6 +379,9 @@ public class StatsDB
 					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
 					+"from relay.platforminfo where id>="+startid+" AND id<="+endid+" "
 					+"group by hostip, prefix order by CONTIME desc");
+				
+				PreparedStatement	ps	= con.prepareStatement("select * from relay.properties where ID=?");
+				
 				while(rs.next() && (limit==-1 || ret.size()<limit))
 				{
 					if(map.containsKey(rs.getString("HOSTIP")))
@@ -408,7 +411,8 @@ public class StatsDB
 						// Load latest properties of platform.
 						Map<String, String>	props	= new HashMap<String, String>();
 						pi.setProperties(props);
-						ResultSet	rs2	= con.createStatement().executeQuery("select * from relay.properties where ID="+pi.getDBId());
+						ps.setInt(1, pi.getDBId());
+						ResultSet	rs2	= ps.executeQuery();
 						while(rs2.next())
 						{
 							props.put(rs2.getString("NAME"), rs2.getString("VALUE"));
