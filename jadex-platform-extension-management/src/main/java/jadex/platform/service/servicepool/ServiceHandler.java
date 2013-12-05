@@ -544,6 +544,4 @@ public class ServiceHandler implements InvocationHandler
 		return "ServiceHandler(servicetype="+ servicetype + ", servicepool=" + idleservices 
 			+ ", queue="+ queue + ", strategy=" + strategy+")";
 	}
-	
-	
 }

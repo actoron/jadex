@@ -3,11 +3,8 @@ package jadex.bridge;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.annotation.Timeout;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
