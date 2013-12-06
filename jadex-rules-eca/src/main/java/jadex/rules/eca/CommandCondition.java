@@ -40,7 +40,7 @@ public class CommandCondition implements ICondition
 		final Future<Tuple2<Boolean, Object>> ret = new Future<Tuple2<Boolean, Object>>();
 		if(res==null)
 		{
-			ret.setResult(new Tuple2<Boolean, Object>(Boolean.FALSE, res));
+			ret.setResult(new Tuple2<Boolean, Object>(Boolean.FALSE, null));
 		}
 		else if(res instanceof Tuple2)
 		{

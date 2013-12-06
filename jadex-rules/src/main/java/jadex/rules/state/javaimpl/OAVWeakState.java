@@ -958,8 +958,9 @@ public class OAVWeakState	implements IOAVState
 			// Replace value with real value stored in map
 			value = map.remove(value);
 			if(value==null)
-				throw new RuntimeException("Value not contained in attribute: "
-					+object+" "+attribute+" "+value);
+			{
+				throw new RuntimeException("Value not contained in attribute: "+object+" "+attribute);
+			}
 		
 //			if(isNonValue(key))
 //				removeObjectUsage(object, attribute, key, null);

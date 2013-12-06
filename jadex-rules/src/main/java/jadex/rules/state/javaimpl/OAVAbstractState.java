@@ -1511,8 +1511,9 @@ public abstract class OAVAbstractState	implements IOAVState
 			// Replace value with real value stored in map
 			value = map.remove(value);
 			if(value==null)
-				throw new RuntimeException("Value not contained in attribute: "
-					+id+" "+attribute+" "+value);
+			{
+				throw new RuntimeException("Value not contained in attribute: "+id+" "+attribute);
+			}
 		
 			// Event handler notification must be before cleanup in order to be able
 			// to save the object within another reference.

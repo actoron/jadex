@@ -239,9 +239,10 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		}
 		else
 		{
+			// Failed: return dummy model containing error report. 
 			// Todo: capability or agent?
 			mi	= mi!=null ? mi : new ModelInfo(null, null, null, new BDIErrorReportBuilder(name, name, entries, null, state).buildErrorReport(), null, null, false, name, null, null, null, null, null, null, imports, null);
-			ret	=  new OAVCapabilityModel(state, handle, mi, types, info.getLastModified(), entries);
+			ret	=  new OAVCapabilityModel(state, null, mi, types, info.getLastModified(), entries);
 		}
 		
 		return ret;

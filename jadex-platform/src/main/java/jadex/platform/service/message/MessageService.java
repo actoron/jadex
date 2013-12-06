@@ -751,7 +751,7 @@ public class MessageService extends BasicService implements IMessageService
 		Map	props	= model.getProperties();
 		if(props!=null)
 		{
-			for(Iterator it=props.keySet().iterator(); ret==null && it.hasNext();)
+			for(Iterator it=props.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
 				if(name.startsWith("contentcodec."))
@@ -1512,7 +1512,7 @@ public class MessageService extends BasicService implements IMessageService
 								else
 								{
 //									System.out.println("cl is ridloader: "+result);
-									super.customResultAvailable(result);
+									super.customResultAvailable(null);
 								}
 							}
 							else

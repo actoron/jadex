@@ -155,12 +155,12 @@ public class BinarySerializer
 			/**
 			 *  Special handling for null objects.
 			 */
-			public Object handleNull(Object object, Class<?> clazz,
+			public Object handleNull(Class<?> clazz,
 				List<ITraverseProcessor> processors, boolean clone, Object context)
 			{
 				EncodingContext ec = (EncodingContext)context;
 				ec.writeClassname(NULL_MARKER);
-				return object;
+				return null;
 			}
 		};
 		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);

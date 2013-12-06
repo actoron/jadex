@@ -435,7 +435,7 @@ public class SyncJobProcessingAgent
 					}
 					else
 					{
-						System.out.println("Update src not available: "+remresser);
+						System.out.println("Update src not available: "+task.getSource().getPath());
 					}
 				}
 			}

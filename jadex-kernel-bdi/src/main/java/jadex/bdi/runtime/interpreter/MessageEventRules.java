@@ -1349,7 +1349,7 @@ public class MessageEventRules
 		Map	rprops = BDIInterpreter.getInterpreter(state).getProperties(rcapa);
 		if(rprops!=null)
 		{
-			for(Iterator it=rprops.keySet().iterator(); ret==null && it.hasNext();)
+			for(Iterator it=rprops.keySet().iterator(); it.hasNext();)
 			{
 				String	name	= (String) it.next();
 				if(name.startsWith("contentcodec."))

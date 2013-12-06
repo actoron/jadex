@@ -175,7 +175,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		this.classloaders = new HashMap<IResourceIdentifier, DelegationURLClassLoader>();
 		this.clfuts = new HashMap<IResourceIdentifier, Future<DelegationURLClassLoader>>();
 		this.listeners	= new LinkedHashSet<ILibraryServiceListener>();
-		this.initurls = urls!=null? urls.clone(): urls;
+		this.initurls = urls!=null? urls.clone(): null;
 		this.baseloader = baseloader!=null? new ChangeableURLClassLoader(null, baseloader)
 			: new ChangeableURLClassLoader(null, getClass().getClassLoader());
 		this.rootloader = new DelegationURLClassLoader(this.baseloader, null);

@@ -51,6 +51,7 @@ import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -760,28 +761,19 @@ public class RetePanel extends JPanel
 	 *  @param title	The title for the frame.
 	 *  @param rs	The rule system.
 	 *  @return	The frame.
-	 * /
-	public static JFrame createReteFrame(String title, RuleSystem rs, Object monitor)
-	{
-		return createReteFrame(title, rs, monitor, null);
-	}
-	
-	/**
-	 *  Create a frame for a rete structure.
-	 *  @param title	The title for the frame.
-	 *  @param rs	The rule system.
-	 *  @return	The frame.
-	 * /
-	public static JFrame createReteFrame(String title, RuleSystem rs, Object monitor, ISteppable steppable)
+	 */
+	public static JFrame createReteFrame(String title, RuleSystem rs, ISteppable steppable)
 	{
 		JFrame f = new JFrame(title);
 		f.getContentPane().setLayout(new BorderLayout());
-		RetePanel rp = new RetePanel(rs, monitor, steppable);
+		RulebasePanel	rbp	= new RulebasePanel(rs.getRulebase(), steppable);
+		RetePanel rp = new RetePanel(rs, steppable, rbp);
 		rp.showHiddenNodes();
+		f.add("West", rbp);
 		f.add("Center", rp);
 		f.pack();
         f.setVisible(true);
 		
 		return f;
-	}*/
+	}
 }

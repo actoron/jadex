@@ -114,7 +114,7 @@ public class MapWrapper<T, E> implements Map<T, E>
 		observeValue(value);
 		if(ret==null)
 		{
-			getRuleSystem().addEvent(new Event(addevent, new MapEntry<T, E>(key, value, ret)));
+			getRuleSystem().addEvent(new Event(addevent, new MapEntry<T, E>(key, value, null)));
 //			getRuleSystem().addEvent(new Event(addevent, new Tuple3<T, E, E>(key, value, ret)));
 			publishToolBeliefEvent();
 		}

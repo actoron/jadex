@@ -1189,8 +1189,8 @@ public class PlanRules
 										Object wcand = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuecandidate);
 										assert wcand!=null;
 										// Hack!!! When apl rebuilding is used, apl can be already a new object.
-										if(state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates).contains(rcand))
-											state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, rcand);
+										if(state.getAttributeValues(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates).contains(wcand))
+											state.removeAttributeValue(apl, OAVBDIRuntimeModel.apl_has_waitqueuecandidates, wcand);
 										state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuecandidate, null);
 									}
 								}

@@ -336,7 +336,7 @@ public class StarterPanel extends JLayeredPane
 								{
 									Future fut = new Future();
 									IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-									createComponent(StarterPanel.this.jcc, modelrid, typename, an, configname, args, 
+									createComponent(StarterPanel.this.jcc, modelrid, typename, null, configname, args, 
 										suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
@@ -803,7 +803,7 @@ public class StarterPanel extends JLayeredPane
 			{
 				model = null;
 				error = null;
-				updateGuiForNewModel(adf);
+				updateGuiForNewModel(null);
 				ret.setResult(null);
 			}
 		}

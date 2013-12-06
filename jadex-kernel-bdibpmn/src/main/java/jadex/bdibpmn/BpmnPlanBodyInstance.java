@@ -342,7 +342,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 					{
 						String type = (String)pt.getWaitInfo();
 						if(type==null)
-							throw new RuntimeException("Message type not specified: "+type);
+							throw new RuntimeException("Message type not specified: "+act);
 						SFlyweightFunctionality.addMessageEvent(ret, type, state, rcapa);
 						empty = false;
 					}

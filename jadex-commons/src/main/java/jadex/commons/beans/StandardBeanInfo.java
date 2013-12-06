@@ -766,7 +766,7 @@ class StandardBeanInfo extends SimpleBeanInfo {
             } else {
                 propertyDesc.setBound(false);
             }
-            if (table.get(STR_IS_CONSTRAINED) == Boolean.TRUE) { //$NON-NLS-1$
+            if (Boolean.TRUE.equals(table.get(STR_IS_CONSTRAINED))) { //$NON-NLS-1$
                 propertyDesc.setConstrained(true);
             }
             propertyList.add(propertyDesc);

@@ -15,6 +15,7 @@ import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -340,7 +341,7 @@ public class FastHashMap implements Map, java.io.Serializable
                         {
                            if (keys[i] != null) return keys[i];
                         }
-                        return null;
+                        throw new NoSuchElementException();
                      }
 
                      public void remove()
@@ -392,7 +393,7 @@ public class FastHashMap implements Map, java.io.Serializable
                         {
                            if (keys[i] != null) return values[i];
                         }
-                        return null;
+                        throw new NoSuchElementException();
                      }
 
                      public void remove()

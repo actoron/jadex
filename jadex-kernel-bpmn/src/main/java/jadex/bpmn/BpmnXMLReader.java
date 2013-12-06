@@ -1046,9 +1046,9 @@ public class BpmnXMLReader
 			MAssociationTarget target = (MAssociationTarget)dia.getAllAssociationTargets().get(asso.getId());
 			
 			if(source==null)
-				throw new RuntimeException("Could not find association source: "+source);
+				throw new RuntimeException("Could not find association source: "+asso.getId());
 			if(target==null)
-				throw new RuntimeException("Could not find association target: "+target);
+				throw new RuntimeException("Could not find association target: "+asso.getId());
 			
 			asso.setSource(source);
 			asso.setTarget(target);

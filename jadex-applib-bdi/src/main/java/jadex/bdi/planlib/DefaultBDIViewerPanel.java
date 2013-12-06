@@ -141,7 +141,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		}
 		else
 		{
-			lis.exceptionOccurred(new RuntimeException("No viewerclass: "+clname));
+			lis.exceptionOccurred(new RuntimeException("No viewerclass: "+cl));
 		}
 		
 		// Capability panels.

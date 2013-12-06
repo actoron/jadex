@@ -91,7 +91,7 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 					}
 					else
 					{
-						handleCFP(msg, auctiondesc, auctioninfo, winning_offer, offers);
+						handleCFP(msg, auctiondesc, auctioninfo, offers);
 					}
 				}
 				else if(msg.getType().equals("ea_accept_proposal"))
@@ -179,8 +179,7 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 	 *  @param auctiondesc The auction description.
 	 *  @return The participation state (Boolean) and the local auction info (Object).
 	 */
-	protected Object[] handleCFP(IMessageEvent cfp, AuctionDescription auctiondesc, Object auctioninfo,
-		Object winning_offer, List offers)
+	protected Object[] handleCFP(IMessageEvent cfp, AuctionDescription auctiondesc, Object auctioninfo, List offers)
 	{
 		//System.out.println(getAgentName()+" handleCFP: "+cfp);
 	

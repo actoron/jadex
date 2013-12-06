@@ -27,7 +27,7 @@ public class JavaCCExpressionParser	implements IExpressionParser, Serializable
 		// todo: use parameters for checking
 
 		if(expression==null)
-			throw new IllegalArgumentException("String required for parsing: "+expression);
+			throw new NullPointerException("String required for parsing.");
 		// Init the parser.
 		// Created every time, because JavaCC otherwise has memory leaks
 		// and isn't thread safe.

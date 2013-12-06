@@ -178,15 +178,21 @@ public class SortedList<T>	extends LinkedList<T>
 		if(comp==null)
 		{
 			if(o1==null && o2==null)
+			{
 				cmp	= 0;
+			}
 			else if(o1!=null && o2==null)
+			{
 				cmp	= -1;
+			}
 			else if(o1==null && o2!=null)
+			{
 				cmp	= 1;
-			else if(o1!=null)
-				cmp	= ((Comparable)o1).compareTo(o2);
-			else if(o2!=null)
-				cmp	= ((Comparable)o2).compareTo(o1);
+			}
+			else
+			{
+				cmp	= ((Comparable<T>)o1).compareTo(o2);
+			}
 		}
 		else
 		{

@@ -94,7 +94,6 @@ public class DefaultStepHandler implements IStepHandler
 				else
 				{
 					List<MActivity>	handlers	= activity.getEventHandlers();
-					MActivity nexthandler = null;
 					for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
 					{
 						MActivity	handler	= handlers.get(i);
@@ -123,14 +122,10 @@ public class DefaultStepHandler implements IStepHandler
 							// Java-style "first matching handler" behavior
 							if (handler.getClazz() == null || SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader()), ex.getClass()))
 							{
-								nexthandler = handler;
+								next = handler;
 								break;
 							}
 						}
-					}
-					if (nexthandler != null)
-					{
-						next	= nexthandler;
 					}
 				}
 				

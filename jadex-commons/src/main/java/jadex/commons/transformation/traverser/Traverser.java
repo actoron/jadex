@@ -184,7 +184,7 @@ public class Traverser
 		}
 		else
 		{
-			ret = handleNull(object, clazz, processors, clone, context);
+			ret = handleNull(clazz, processors, clone, context);
 		}
 			
 		return ret;
@@ -201,10 +201,10 @@ public class Traverser
 	/**
 	 *  Special handling for null objects.
 	 */
-	public Object handleNull(Object object, Class<?> clazz,
+	public Object handleNull(Class<?> clazz,
 		List<ITraverseProcessor> processors, boolean clone, Object context)
 	{
-		return object;
+		return null;
 	}
 }
 

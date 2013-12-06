@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.WeakHashMap;
@@ -1125,10 +1126,28 @@ public class SReflect
 			return new Iterator()
 			{
 				int i=0;
-				public boolean	hasNext()	{return i<Array.getLength(array);}
-				public Object	next()	{return Array.get(array, i++);}
-				public void	remove()	{throw new UnsupportedOperationException(
-					"remove() not supported for arrays");}
+				
+				public boolean	hasNext()
+				{
+					return i<Array.getLength(array);
+				}
+				
+				public Object	next()
+				{
+					if(Array.getLength(array)>i)
+					{
+						return Array.get(array, i++);
+					}
+					else
+					{
+						throw new NoSuchElementException();
+					}
+				}
+				
+				public void	remove()
+				{
+					throw new UnsupportedOperationException("remove() not supported for arrays");
+				}
 			};
 		}
 		else

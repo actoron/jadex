@@ -81,7 +81,7 @@ public class SimpleParameterGuesser implements IParameterGuesser
 	 */
 	public void setParent(IParameterGuesser parent)
 	{
-		if(parent!=null)
+		if(this.parent!=null)
 		{
 			throw new IllegalStateException("Already has a parent!");
 		}

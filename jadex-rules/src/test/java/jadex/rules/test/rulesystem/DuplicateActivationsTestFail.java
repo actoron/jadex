@@ -76,11 +76,12 @@ public class DuplicateActivationsTestFail extends TestCase
 		system	= new RuleSystem(state,rb, new RetePatternMatcherFunctionality(rb));
 		system.init();
 		
-//		RetePanel.createReteFrame("Duplicate Activations Test",
-//			((RetePatternMatcherFunctionality)system.getMatcherFunctionality()).getReteNode(),
-//			((RetePatternMatcherState)system.getMatcherState()).getReteMemory(),
-//			system.getAgenda(), new Object());
-//		synchronized(system){system.wait();}
+//		Class<?>	rp	= SReflect.findClass0("jadex.rules.tools.reteviewer.RetePanel", null, getClass().getClassLoader());
+//		SReflect.getMethods(rp, "createReteFrame")[0].invoke(null, "Duplicate Activations Test", system, null);
+//		synchronized(system)
+//		{
+//			system.wait();
+//		}
 
 		// Add two red blocks.
 		block1	= state.createRootObject(Blocks.block_type);
@@ -111,5 +112,21 @@ public class DuplicateActivationsTestFail extends TestCase
 		system.fireAllRules();
 		List	test	= Collections.singletonList("red");
 		assertEquals("Should trigger for second block", test, colors);
+	}
+	
+	//-------- main for testing --------
+	
+	/**
+	 *  main for testing
+	 */
+	public static void	main(String[] args) throws Exception
+	{
+		DuplicateActivationsTestFail	datf	= new DuplicateActivationsTestFail();
+		datf.setUp();
+		datf.testTriggerTwice();
+		datf.tearDown();
+		datf.setUp();
+		datf.testRemoveTrigger();
+		datf.tearDown();
 	}
 }
