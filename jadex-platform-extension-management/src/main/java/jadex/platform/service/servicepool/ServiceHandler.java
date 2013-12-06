@@ -29,6 +29,7 @@ import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -121,6 +122,11 @@ public class ServiceHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
+//		if(ServiceCall.getCurrentInvocation()==null)
+//			System.out.println("null");
+//		else
+//			System.out.println("sc: "+ServiceCall.getCurrentInvocation().hashCode());
+		
 //		System.out.println("called: "+method);
 		assert component.isComponentThread();
 //		final IInternalAccess inta = component;
@@ -130,65 +136,20 @@ public class ServiceHandler implements InvocationHandler
 		
 		final Future<Object> ret = (Future<Object>)FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality((Logger)null));
 		
-//		final ServiceCall sc = ServiceCall.getCurrentInvocation();
-//		Boolean broadcast = (Boolean)sc.getProperty(IServicePoolService.POOL_BROADCAST);
-//		if(broadcast)
-//		{
-//			// Should the pool create at least one worker to handle the call?
-//			if(allservices.size()>0)
-//			{
-//				CollectionResultListener<Object> lis = new CollectionResultListener<Object>(allservices.size(), true, new IResultListener<Collection<Object>>()
-//				{
-//					public void resultAvailable(Collection<Object> res)
-//					{
-//						// If more than one result just pick first
-//						if(res.size()>0)
-//						{
-//							ret.setResult(res.iterator().next());
-//						}
-//						else
-//						{
-//							ret.setResult(null);
-//						}
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						// not called
-//					}
-//				});
-//				
-//				for(IService service: allservices)
-//				{
-//					IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);
-//					res.addResultListener(lis);
-//				}
-//			}
-//			else
-//			{
-//				ret.setResult(null);
-//			}
-//		}
-//		else
-//		{
-	//		if(sc!=null && !component.getComponentIdentifier().getParent().equals(sc.getCaller()))
-	//			System.out.println("wrong call: "+component.getComponentIdentifier()+" "+sc.getCaller());
-			
-			// Add task to queue.
-			queue.add(new Object[]{method, args, ret, ServiceCall.getCurrentInvocation()});
-			// Notify strategy that task was added
-			boolean create = strategy.taskAdded();
-			
-			// Create new component / service if necessary
-			if(create)
-			{
-				createService(); // Not necessary to wait for finished creating service, ret is in queue
-			}
-			else
-			{
-				addFreeService(null);
-			}
-//		}
+		// Add task to queue.
+		queue.add(new Object[]{method, args, ret, ServiceCall.getCurrentInvocation()});
+		// Notify strategy that task was added
+		boolean create = strategy.taskAdded();
+		
+		// Create new component / service if necessary
+		if(create)
+		{
+			createService(); // Not necessary to wait for finished creating service, ret is in queue
+		}
+		else
+		{
+			addFreeService(null);
+		}
 		
 		return ret;
 	}
@@ -382,6 +343,8 @@ public class ServiceHandler implements InvocationHandler
 //		System.out.println("Using worker: "+service.getServiceIdentifier());
 		
 //		System.out.println("non-func in pool: "+method.getName()+" "+(call!=null? call.getProperties(): "null"));
+//		if(call!=null && call.getProperties()!=null)
+//			System.out.println("call: "+call.hashCode()+" "+System.identityHashCode(call.getProperties())+" "+service.getServiceIdentifier());
 		
 		try
 		{
@@ -389,6 +352,7 @@ public class ServiceHandler implements InvocationHandler
 			ServiceCall mcall = CallAccess.getOrCreateNextInvocation();
 			if(call!=null)
 			{
+//				Map<String, Object> clone = new HashMap<String, Object>(call.getProperties());
 				try
 				{
 					for(String key: call.getProperties().keySet())
@@ -399,6 +363,7 @@ public class ServiceHandler implements InvocationHandler
 				catch(Exception e)
 				{
 					System.out.println("exception: "+call.hashCode()+" "+System.identityHashCode(call.getProperties().hashCode()));
+//					System.out.println(clone);
 				}
 			}
 			IFuture<Object> res = (IFuture<Object>)method.invoke(service, args);

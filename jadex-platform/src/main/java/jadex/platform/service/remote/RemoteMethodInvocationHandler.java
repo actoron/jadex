@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.SecureTransmission;
 import jadex.bridge.service.annotation.Timeout;
+import jadex.bridge.service.component.ISwitchCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.SReflect;
@@ -43,7 +44,7 @@ import java.util.Map;
  *  Class that implements the Java proxy InvocationHandler, which
  *  is called when a method on a proxy is called.
  */
-public class RemoteMethodInvocationHandler implements InvocationHandler //extends MethodListenerHandler
+public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitchCall //extends MethodListenerHandler
 {
 	protected static Method schedulestep;
 	
@@ -621,6 +622,15 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 	}
 	
 	/**
+	 *  Check if a switch call should be done.
+	 *  @return True, if switch should be done.
+	 */
+	public boolean isSwitchCall()
+	{
+		return false;
+	}
+	
+	/**
 	 *  Test equality.
 	 */
 	public boolean equals(Object obj)
@@ -641,7 +651,5 @@ public class RemoteMethodInvocationHandler implements InvocationHandler //extend
 	{
 		return 31 + pr.getRemoteReference().hashCode();
 	}
-	
-	
 }
 

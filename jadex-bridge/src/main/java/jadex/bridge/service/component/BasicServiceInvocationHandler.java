@@ -60,7 +60,7 @@ import java.util.logging.Logger;
  *  Executes the list of interceptors one by one.
  *  In case no handler can be found a fallback handler is used.
  */
-public class BasicServiceInvocationHandler implements InvocationHandler
+public class BasicServiceInvocationHandler implements InvocationHandler, ISwitchCall
 {
 	//-------- constants --------
 	
@@ -102,6 +102,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 //	/** The call id. */
 //	protected AtomicLong callid;
 	
+	/** The flag if a switchcall should be done. */
+	protected boolean switchcall;
+	
 	//-------- constructors --------
 	
 	/**
@@ -114,6 +117,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.logger	= logger;
 		this.realtime	= realtime;
 		this.cause = cause;
+		this.switchcall = true;
 //		this.callid = new AtomicLong();
 	}
 	
@@ -128,6 +132,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.logger	= logger;
 		this.realtime	= realtime;
 		this.cause = cause;
+		this.switchcall = false; 
 //		this.callid = new AtomicLong();
 	}
 	
@@ -142,6 +147,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		this.logger	= logger;
 		this.realtime	= realtime;
 		this.cause = cause;
+		this.switchcall = false; // called for provided proxy which must not switch (is the object that is asked in the req proxy)
 //		this.callid = new AtomicLong();
 	}
 	
@@ -166,7 +172,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 //		if(method.getName().indexOf("getChildren")!=-1)
 //			System.out.println("call method child");
 		
-		ServiceInvocationContext sicon = null;
+//		ServiceInvocationContext sicon = null;
 		
 		if((args==null || args.length==0) && "getServiceIdentifier".equals(method.getName()))
 		{
@@ -181,7 +187,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 			final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, method, getInterceptors(), 
 				getServiceIdentifier().getProviderId().getRoot(), realtime, getServiceIdentifier(), cause);
-			sicon = sic;
+//			sicon = sic;
 			
 //			if(method.getName().indexOf("getExternalAccess")!=-1 && sic.getLastServiceCall()==null)
 //				System.out.println("call method ex");
@@ -734,6 +740,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 			return (IService)pojoproxies.get(pojo);
 		}
+	}
+	
+	/**
+	 *  Check if a switch call should be done.
+	 *  @return True, if switch should be done.
+	 */
+	public boolean isSwitchCall()
+	{
+		return switchcall;
 	}
 	
 //	/**

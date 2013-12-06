@@ -1,6 +1,7 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.ServiceCall;
+import jadex.bridge.service.component.ISwitchCall;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -32,25 +33,31 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 			// a) the method is directly the business logic or
 			// b) the method jumps from required to provided interceptor chain
 				
-//			if(sic.getMethod().getName().indexOf("getChildren")!=-1)
+//			if(sic.getMethod().getName().indexOf("method")!=-1)
 //				System.out.println("ggggg");
 			
 			// Problem that the object could be an rmi proxy itself that delegates the call
 			// Is this case the switch (current becomes next) must not occur
 			
-			// Hack, user may want to use proxy as well :-(
+			// Hack, user may want to use proxy as well :-( (and we do have other proxies such as that from service pool)!
 			// todo:
-			boolean switchcall = !Proxy.isProxyClass(sic.getObject().getClass());
+//			boolean switchcall = !Proxy.isProxyClass(sic.getObject().getClass());
 			 
+			boolean switchcall = true;
+			
 			// is not sufficient as could also be basicinvocationhandler of provided proxy
-//			if(Proxy.isProxyClass(sic.getObject().getClass()))
-//			{
-//				Object handler = Proxy.getInvocationHandler(sic.getObject());
+			if(Proxy.isProxyClass(sic.getObject().getClass()))
+			{
+				Object handler = Proxy.getInvocationHandler(sic.getObject());
+				if(handler instanceof ISwitchCall)
+				{
+					switchcall = ((ISwitchCall)handler).isSwitchCall();
+				}
 //				if(handler.getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1) // HACK!!!
 //				{
 //					switchcall = false;
 //				}
-//			}
+			}
 			
 			// Roll invocations meta infos before call
 			long start = 0;
@@ -70,7 +77,6 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 				{
 					ServiceInvocationContext.SICS.set(sic);
 				}	
-				
 				
 //				if(sic.getMethod().getName().indexOf("test")!=-1)
 //					System.out.println("setting to b: "+sic.getLastServiceCall());
@@ -101,7 +107,6 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 							{
 								long dur = System.currentTimeMillis()-fstart;
 								sc.setProperty("__duration", Long.valueOf(dur));
-//								sc.setProperty("__duration", new Long(dur));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -119,7 +124,6 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 					{
 						long dur = System.currentTimeMillis()-start;
 						sc.setProperty("__duration", Long.valueOf(dur));
-//						sc.setProperty("__duration", new Long(dur));
 					}
 				}
 				
