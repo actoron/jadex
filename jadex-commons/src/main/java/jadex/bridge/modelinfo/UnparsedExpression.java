@@ -3,8 +3,6 @@ package jadex.bridge.modelinfo;
 
 import jadex.bridge.ClassInfo;
 
-import java.util.Map;
-
 
 /**
  *  An unparsed expression for being able to transfer to other nodes.

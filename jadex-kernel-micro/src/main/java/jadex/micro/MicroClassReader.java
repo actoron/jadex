@@ -1450,7 +1450,8 @@ public class MicroClassReader
 			{
 				String val = values[i].value();
 				String clname = values[i].clazz().getName();
-				ret.add(new UnparsedExpression(values[i].name(), clname, (val==null || val.isEmpty()) && clname!=null? clname+".class": val, null));
+				String v = (val==null || val.isEmpty()) && clname!=null? clname+".class": val;
+				ret.add(new UnparsedExpression(values[i].name(), (String)null, v, null));
 			}
 		}
 		return ret;

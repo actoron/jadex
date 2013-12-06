@@ -717,8 +717,16 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						// Create goal if expression available
 						if(uexp.getValue()!=null && uexp.getValue().length()>0)
 						{
-							goal = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader());
-							gcl = goal.getClass();
+							Object o = SJavaParser.parseExpression(uexp, getModel().getAllImports(), getClassLoader()).getValue(getFetcher());
+							if(o instanceof Class)
+							{
+								gcl = (Class<?>)o;
+							}
+							else
+							{
+								goal = o;
+								gcl = o.getClass();
+							}
 						}
 						
 						if(gcl==null && uexp.getClazz()!=null)

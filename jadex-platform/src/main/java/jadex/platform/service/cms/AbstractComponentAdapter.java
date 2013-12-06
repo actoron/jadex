@@ -590,7 +590,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		if(executing)
 		{
-			System.err.println(getComponentIdentifier()+": double execution");
+			System.err.println(getComponentIdentifier()+": double execution"+" "+Thread.currentThread()+" "+componentthread);
 			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
 		}
 		executing	= true;

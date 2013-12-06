@@ -26,6 +26,14 @@ import jadex.rules.eca.annotations.Event;
 )
 public class Count2BDI
 {
+	/** The agent. */
+	@Agent
+	protected BDIAgent agent;
+	
+	/** The counter belief. */
+	@Belief
+	private int counter;
+	
 	/**
 	 *  Goal with target and drop condition.
 	 */
@@ -61,7 +69,7 @@ public class Count2BDI
 		@GoalTargetCondition
 		protected boolean target(@Event("counter") int cnt)
 		{
-			System.out.println("check target: "+cnt);
+			System.out.println("check target: "+cnt+" "+target);
 			return cnt==target;
 		}
 		
@@ -75,24 +83,16 @@ public class Count2BDI
 		}
 	}
 	
-	/** The agent. */
-	@Agent
-	protected BDIAgent agent;
-	
-	/** The counter belief. */
-	@Belief
-	private int counter;
-	
 	/**
 	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()
 	{
-		IFuture<CountGoal> fut = agent.dispatchTopLevelGoal(new Count2Goal(10, 5));
-		fut.addResultListener(new IResultListener<CountGoal>()
+		IFuture<Count2Goal> fut = agent.dispatchTopLevelGoal(new Count2Goal(5, 10));
+		fut.addResultListener(new IResultListener<Count2Goal>()
 		{
-			public void resultAvailable(CountGoal goal)
+			public void resultAvailable(Count2Goal goal)
 			{
 				System.out.println("My goal succeeded: "+goal);
 			}
@@ -101,15 +101,6 @@ public class Count2BDI
 				System.out.println("My goal failed: "+exception);
 			}
 		});
-		
-//		agent.dispatchGoalAndWait(new CountGoal(5, 10))
-//			.addResultListener(new DefaultResultListener<CountGoal>()
-//		{
-//			public void resultAvailable(CountGoal goal)
-//			{
-//				System.out.println("My goal succeeded: "+goal);
-//			}
-//		});
 		
 		System.out.println("body end: "+getClass().getName());
 	}
