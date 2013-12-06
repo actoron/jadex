@@ -9,6 +9,8 @@ import jadex.bdi.runtime.Plan;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -46,7 +48,9 @@ public class MessagingTestPlan extends Plan
 		Properties	props	= new Properties();
 		try
 		{
-			props.load(new FileInputStream(file));
+			InputStream	is	= new FileInputStream(file);
+			props.load(is);
+			is.close();
 			mailhost	= props.getProperty("mailhost");
 			mailport	= props.getProperty("mailport");
 			mailuser	= props.getProperty("mailuser");
@@ -93,7 +97,9 @@ public class MessagingTestPlan extends Plan
 				props.setProperty("mailpass", "<password for user>");
 				props.setProperty("mailsender", "<email address of mail account>");
 				props.setProperty("mailreceivers", "<comma-separated list of email addresses to send to>");
-				props.store(new FileOutputStream(file), "Account settings used by jadex.bdi.testcases.MessagingTestPlan.\n#Please edit if you want to make the test case work.");
+				OutputStream	os	= new FileOutputStream(file);
+				props.store(os, "Account settings used by jadex.bdi.testcases.MessagingTestPlan.\n#Please edit if you want to make the test case work.");
+				os.close();
 				tr1.setReason("No accountsettings found. Please edit "+file.getAbsolutePath());
 			}
 			catch(Exception e)
@@ -118,7 +124,9 @@ public class MessagingTestPlan extends Plan
 		Properties	props	= new Properties();
 		try
 		{
-			props.load(new FileInputStream(file));
+			InputStream	is	= new FileInputStream(file);
+			props.load(is);
+			is.close();
 			icqnumber	= props.getProperty("icqnumber");
 			icqpass	= props.getProperty("icqpass");
 			icqreceivers	= props.getProperty("icqreceivers");
@@ -158,7 +166,9 @@ public class MessagingTestPlan extends Plan
 				props.setProperty("icqnumber", "<icq account number>");
 				props.setProperty("icqpass", "<password for icq account>");
 				props.setProperty("icqreceivers", "<comma-separated list of icq numbers to send to>");
-				props.store(new FileOutputStream(file), "Account settings used by jadex.bdi.testcases.MessagingTestPlan.\n#Please edit if you want to make the test case work.");
+				OutputStream	os	= new FileOutputStream(file);
+				props.store(os, "Account settings used by jadex.bdi.testcases.MessagingTestPlan.\n#Please edit if you want to make the test case work.");
+				os.close();
 				tr2.setReason("No accountsettings found. Please edit "+file.getAbsolutePath());
 			}
 			catch(Exception e)
@@ -183,7 +193,9 @@ public class MessagingTestPlan extends Plan
 		Properties	props	= new Properties();
 		try
 		{
-			props.load(new FileInputStream(file));
+			InputStream	is	= new FileInputStream(file);
+			props.load(is);
+			is.close();
 			xmppnumber	= props.getProperty("xmppnumber");
 			xmpppass	= props.getProperty("xmpppass");
 			xmppreceivers	= props.getProperty("xmppreceivers");
@@ -223,7 +235,9 @@ public class MessagingTestPlan extends Plan
 				props.setProperty("xmppnumber", "<xmpp account number>");
 				props.setProperty("xmpppass", "<password for xmpp account>");
 				props.setProperty("xmppreceivers", "<comma-separated list of xmpp numbers to send to>");
-				props.store(new FileOutputStream(file), "Account settings used by jadex.bdi.testcases.MessagingTestPlan.\n#Please edit if you want to make the test case work.");
+				OutputStream	os	= new FileOutputStream(file);
+				props.store(os, "Account settings used by jadex.bdi.testcases.MessagingTestPlan.\n#Please edit if you want to make the test case work.");
+				os.close();
 				tr2.setReason("No accountsettings found. Please edit "+file.getAbsolutePath());
 			}
 			catch(Exception e)

@@ -41,12 +41,12 @@ public abstract class OAVAbstractState	implements IOAVState
 	//-------- constants --------
 	
 	/** The argument types for property change listener adding/removal (cached for speed). */
-	protected static Class[]	PCL	= new Class[]{PropertyChangeListener.class};
+	protected static final Class[]	PCL	= new Class[]{PropertyChangeListener.class};
 
 	// #endif
 
 	/** The type identifier. */
-	protected static String TYPE = ":::INTERNAL_TYPE";
+	protected static final String TYPE = ":::INTERNAL_TYPE";
 	
 	//-------- attributes --------
 	

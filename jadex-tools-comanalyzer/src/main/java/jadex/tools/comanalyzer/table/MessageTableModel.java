@@ -21,7 +21,7 @@ public class MessageTableModel extends AbstractTableModel
 	// -------- constants --------
 
 	/** List of all available column headers. */
-	public static List COLUMN_HEADERS;
+	public static final List COLUMN_HEADERS;
 
 	static
 	{

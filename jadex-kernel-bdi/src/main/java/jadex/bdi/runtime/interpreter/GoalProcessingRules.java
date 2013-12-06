@@ -1037,7 +1037,7 @@ public class GoalProcessingRules
 	/**
 	 *  Start the processing of an RGoal by setting the state to in-process.
 	 */
-	protected static IAction	GOAL_PROCESSING	= new IAction()
+	protected static final IAction	GOAL_PROCESSING	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -1051,7 +1051,7 @@ public class GoalProcessingRules
 	/**
 	 *  Set an RGoal to idle.
 	 */
-	protected static IAction	GOAL_IDLE	= new IAction()
+	protected static final IAction	GOAL_IDLE	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -1067,7 +1067,7 @@ public class GoalProcessingRules
 	 *  Retry an RGoal by setting the processingstate to apl-available.
 	 *  Requires availability of (additional) plans.
 	 */
-	protected static IAction GOAL_RETRY	= new IAction()
+	protected static final IAction GOAL_RETRY	= new IAction()
 	{
 		public void execute(final IOAVState state, IVariableAssignments assignments)
 		{	
@@ -1126,7 +1126,7 @@ public class GoalProcessingRules
 	/**
 	 *  Set an RGoal to failed.
 	 */
-	protected static IAction	GOAL_FAILED	= new IAction()
+	protected static final IAction	GOAL_FAILED	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -1139,7 +1139,7 @@ public class GoalProcessingRules
 	/**
 	 *  Set an RGoal to failed and remove a finished plan from the goal.
 	 */
-	protected static IAction	GOAL_FAILED_PLAN_REMOVE	= new IAction()
+	protected static final IAction	GOAL_FAILED_PLAN_REMOVE	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -1158,7 +1158,7 @@ public class GoalProcessingRules
 	/**
 	 *  Set an RGoal to succeeded.
 	 */
-	protected static IAction	GOAL_SUCCEEDED	= new IAction()
+	protected static final IAction	GOAL_SUCCEEDED	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -1172,7 +1172,7 @@ public class GoalProcessingRules
 	/**
 	 *  Set an RGoal to succeeded and remove a finished plan from the goal.
 	 */
-	protected static IAction	GOAL_SUCCEEDED_PLAN_REMOVE	= new IAction()
+	protected static final IAction	GOAL_SUCCEEDED_PLAN_REMOVE	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{

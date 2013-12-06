@@ -6,6 +6,7 @@ import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.HeadlessException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,7 +36,9 @@ public class JavaParserTest extends TestCase
 	{
 		// Load tests from properties.
 		Properties props	= new Properties();
-		props.load(getClass().getResourceAsStream("TestExpressions.properties"));
+		InputStream	is	= getClass().getResourceAsStream("TestExpressions.properties");
+		props.load(is);
+		is.close();
 
 		IExpressionParser	parser	= new JavaCCExpressionParser();
 		String imports[]	= null;

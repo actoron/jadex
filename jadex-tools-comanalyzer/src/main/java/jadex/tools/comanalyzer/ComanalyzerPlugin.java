@@ -1160,7 +1160,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 					String start = (String)messages[i].getParameter(Message.DATE);
 					if(start!=null)
 					{
-						long duration = clockservice.getTime() - new Long(start).longValue();
+						long duration = clockservice.getTime() - Long.parseLong(start);
 //						long duration = ((AgentControlCenter)getJCC()).getAgent().getTime() - new Long(start).longValue();
 //						long duration = getJCC().getAgent().getTime() - start.getTime();
 						messages[i].setDuration(duration);

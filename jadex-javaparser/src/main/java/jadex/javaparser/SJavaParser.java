@@ -14,7 +14,7 @@ public class SJavaParser
 	//-------- constants --------
 	
 	/** The java parser. */
-	protected static IExpressionParser parser = new JavaCCExpressionParser();
+	protected static final IExpressionParser parser = new JavaCCExpressionParser();
 
 	//-------- methods --------
 

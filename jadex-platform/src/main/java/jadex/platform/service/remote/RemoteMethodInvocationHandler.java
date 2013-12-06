@@ -46,27 +46,20 @@ import java.util.Map;
  */
 public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitchCall //extends MethodListenerHandler
 {
-	protected static Method schedulestep;
+	protected static final Method schedulestep;
 	
-	protected static Method finalize;
+	protected static final Method finalize;
 	
 	static
 	{
 		try
 		{
 			finalize = IFinalize.class.getMethod("finalize", new Class[0]);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		try
-		{
 			schedulestep = IExternalAccess.class.getMethod("scheduleStep", new Class[]{IComponentStep.class});
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 	

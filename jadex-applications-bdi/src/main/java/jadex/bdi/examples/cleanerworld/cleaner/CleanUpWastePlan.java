@@ -45,7 +45,7 @@ public class CleanUpWastePlan extends Plan
 				dispatchSubgoalAndWait(drop);
 				dropped	= true;
 			}
-			catch(Exception e)
+			catch(RuntimeException e)
 			{
 			}
 		}

@@ -56,7 +56,7 @@ public class OAVTreeModel implements TreeModel
 	/**
 	 * The image icons.
 	 */
-	protected static UIDefaults icons = new UIDefaults(new Object[]
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		// Tab icons.
 		"object", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/object.png"),

@@ -14,7 +14,7 @@ import javax.swing.UIDefaults;
 public class GUIImageLoader
 {
 	/** The image icons. */
-	public static UIDefaults	icons	= new UIDefaults(new Object[]
+	public static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"logo",	SGUI.makeIcon(GUIImageLoader.class, "/jadex/bdi/examples/blackjack/gui/images/logo.png"),
 		"blackjack",	SGUI.makeIcon(GUIImageLoader.class, "/jadex/bdi/examples/blackjack/gui/images/blackjack.png"),

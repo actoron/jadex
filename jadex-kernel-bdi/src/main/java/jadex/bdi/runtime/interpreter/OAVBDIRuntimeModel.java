@@ -176,39 +176,39 @@ public class OAVBDIRuntimeModel
 	//-------- model --------
 	
 	/** The runtime model. */
-	public static OAVTypeModel bdi_rt_model;
+	public static final OAVTypeModel bdi_rt_model;
 
 	//-------- java types --------
 	
 	/** Java type for runnables. */
-	public static OAVJavaType java_runnable_type;
+	public static final OAVJavaType java_runnable_type;
 	
 	/** Java type for maps. */
-	public static OAVJavaType java_map_type;
+	public static final OAVJavaType java_map_type;
 	
 	/** Java type for IMessageAdapter. */
-	public static OAVJavaType java_imessageadapter_type;
+	public static final OAVJavaType java_imessageadapter_type;
 	
 //	/** The plan executor type. */
 //	public static OAVJavaType java_planexecutor_type;
 	
 	/** The property change listener type. */
-	public static OAVJavaType java_propertychangelistener_type;
+	public static final OAVJavaType java_propertychangelistener_type;
 	
 	/** The timer type. */
-	public static OAVJavaType java_timer_type;
+	public static final OAVJavaType java_timer_type;
 	
 	/** The future type. */
-	public static OAVJavaType java_future_type;
+	public static final OAVJavaType java_future_type;
 	
 	/** The external condition type. */
-	public static OAVJavaType java_externalcondition_type;
+	public static final OAVJavaType java_externalcondition_type;
 	
 	/** The service provider type. */
-	public static OAVJavaType java_serviceprovider_type;
+	public static final OAVJavaType java_serviceprovider_type;
 	
 	/** The result command type. */
-	public static OAVJavaType java_resultcommand_type;
+	public static final OAVJavaType java_resultcommand_type;
 	
 	/** The component listener type. */
 //	public static OAVJavaType java_componentlistener_type;
@@ -217,15 +217,15 @@ public class OAVBDIRuntimeModel
 	//-------- element --------
 	
 	/** The element (model) type. */
-	public static OAVObjectType element_type;
+	public static final OAVObjectType element_type;
 	
 	/** The element has a model. */
-	public static OAVAttributeType element_has_model;
+	public static final OAVAttributeType element_has_model;
 	
 	//-------- agent --------
 	
 	/** The agent (model) type. */
-	public static OAVObjectType agent_type;
+	public static final OAVObjectType agent_type;
 	
 //	/** The agent has a name. */
 //	public static OAVAttributeType agent_has_name;
@@ -234,17 +234,17 @@ public class OAVBDIRuntimeModel
 //	public static OAVAttributeType agent_has_localname;
 	
 	/** The agent has a state. */
-	public static OAVAttributeType agent_has_state;
+	public static final OAVAttributeType agent_has_state;
 	
 	/** The agent has an inbox for raw messages. */
-	public static OAVAttributeType agent_has_inbox;
+	public static final OAVAttributeType agent_has_inbox;
 	
 	/** The agent has actions (invoke later actions to be executed by the agent). */
-	public static OAVAttributeType agent_has_actions;
+	public static final OAVAttributeType agent_has_actions;
 
 	/** The agent has arguments (only available during start agent action). */
 	// Hack!!! remove???
-	public static OAVAttributeType agent_has_arguments;
+	public static final OAVAttributeType agent_has_arguments;
 	
 	/** The agent results. */
 //	public static OAVAttributeType agent_has_results;
@@ -254,19 +254,19 @@ public class OAVBDIRuntimeModel
 	
 	/** The agent has init parents (only available during start agent action). */
 	// Hack!!! remove???
-	public static OAVAttributeType agent_has_initparents;
+	public static final OAVAttributeType agent_has_initparents;
 	
 	/** The agent has a timer attribute (when waiting for termination). */
-	public static OAVAttributeType agent_has_timer;
+	public static final OAVAttributeType agent_has_timer;
 	
 	/** The agent has kill future (waiting to be notified after termination). */
-	public static OAVAttributeType agent_has_killfuture;
+	public static final OAVAttributeType agent_has_killfuture;
 	
-	/** The agent has component listeners (waiting to be notified about component events */
-	public static OAVAttributeType agent_has_componentlisteners;
+//	/** The agent has component listeners (waiting to be notified about component events */
+//	public static final OAVAttributeType agent_has_componentlisteners;
 	
 	/** The agent has change events. */
-	public static OAVAttributeType agent_has_changeevents;
+	public static final OAVAttributeType agent_has_changeevents;
 	
 	/** The agent has a processable element processing attribute. 
 	    It is set to the element in the buildAPL rules to prevent that other 
@@ -284,37 +284,37 @@ public class OAVBDIRuntimeModel
 	//-------- capability --------
 	
 	/** The capability type. */
-	public static OAVObjectType capability_type;
+	public static final OAVObjectType capability_type;
 	
 	/** Capability has subcapabilities attribute. */
-	public static OAVAttributeType capability_has_subcapabilities;	
+	public static final OAVAttributeType capability_has_subcapabilities;	
 	
 	/** Capability has beliefs attribute. */
-	public static OAVAttributeType capability_has_beliefs;
+	public static final OAVAttributeType capability_has_beliefs;
 	
 	/** Capability has belief sets attribute. */
-	public static OAVAttributeType capability_has_beliefsets;
+	public static final OAVAttributeType capability_has_beliefsets;
 	
 	/** Capability has goals attribute. */
-	public static OAVAttributeType capability_has_goals;
+	public static final OAVAttributeType capability_has_goals;
 	
 	/** Capability has plans attribute. */
-	public static OAVAttributeType capability_has_plans;
+	public static final OAVAttributeType capability_has_plans;
 	
-	/** Capability has events attribute. */
-	public static OAVAttributeType capability_has_events;
-	
-	/** Capability has message events. */
-	public static OAVAttributeType capability_has_messageevents;
+//	/** Capability has events attribute. */
+//	public static final OAVAttributeType capability_has_events;
 	
 	/** Capability has message events. */
-	public static OAVAttributeType capability_has_internalevents;
+	public static final OAVAttributeType capability_has_messageevents;
 	
-	/** Capability has expressions attribute. */
-	public static OAVAttributeType capability_has_expressions;
+	/** Capability has message events. */
+	public static final OAVAttributeType capability_has_internalevents;
+	
+//	/** Capability has expressions attribute. */
+//	public static final OAVAttributeType capability_has_expressions;
 		
 	/** The capability has configuration. */
-	public static OAVAttributeType capability_has_configuration;
+	public static final OAVAttributeType capability_has_configuration;
 	
 //	/** Capability has properties attribute. */
 //	public static OAVAttributeType capability_has_properties;
@@ -322,62 +322,62 @@ public class OAVBDIRuntimeModel
 	
 
 	/** The capability has listeners. */
-	public static OAVAttributeType capability_has_listeners;
+	public static final OAVAttributeType capability_has_listeners;
 	
 	/** The capability has sent messages (for conversation tracking). */
-	public static OAVAttributeType capability_has_sentmessageevents;
+	public static final OAVAttributeType capability_has_sentmessageevents;
 	
 	/** The capability has an outbox for outgoing message events. */
-	public static OAVAttributeType capability_has_outbox;
+	public static final OAVAttributeType capability_has_outbox;
 	
 	/** The capability has external access elements (timer and dispatched element). */
-	public static OAVAttributeType capability_has_externalaccesses;
+	public static final OAVAttributeType capability_has_externalaccesses;
 		
 	/** The capability has precandidates (prematched mplans created on init). */
-	public static OAVAttributeType capability_has_precandidates;
+	public static final OAVAttributeType capability_has_precandidates;
 		
 	/** The capability has assigntosources (sources for abstract elements, assigned on init). */
-	public static OAVAttributeType capability_has_abstractsources;
+	public static final OAVAttributeType capability_has_abstractsources;
 			
 	
 	//-------- capability reference --------
 	
 	/** The capability reference type. */
-	public static OAVObjectType capabilityreference_type;
+	public static final OAVObjectType capabilityreference_type;
 	
 	/** Capability reference has name attribute. */
-	public static OAVAttributeType capabilityreference_has_name;	
+	public static final OAVAttributeType capabilityreference_has_name;	
 	
 	/** Capability reference has capability attribute. */
-	public static OAVAttributeType capabilityreference_has_capability;	
+	public static final OAVAttributeType capabilityreference_has_capability;	
 	
 	//-------- external access --------
 	
 	/** The external access type. */
-	public static OAVObjectType externalaccess_type;
+	public static final OAVObjectType externalaccess_type;
 	
 	/** External access has timer. */
-	public static OAVAttributeType externalaccess_has_waitabstraction;	
+	public static final OAVAttributeType externalaccess_has_waitabstraction;	
 	
 	/** External access has timer. */
-	public static OAVAttributeType externalaccess_has_timer;	
+	public static final OAVAttributeType externalaccess_has_timer;	
 	
 	/** External access has dispatched element. */
-	public static OAVAttributeType externalaccess_has_dispatchedelement;	
+	public static final OAVAttributeType externalaccess_has_dispatchedelement;	
 	
 	/** External access has wakeup action. */
-	public static OAVAttributeType externalaccess_has_wakeupaction;
+	public static final OAVAttributeType externalaccess_has_wakeupaction;
 	
 	//-------- abstract typed element --------
 	
 	/** The typed element type. */
-	public static OAVObjectType typedelement_type;
+	public static final OAVObjectType typedelement_type;
 	
 	/** Typed element has property change listener. */
-	public static OAVAttributeType typedelement_has_propertychangelistener;
+	public static final OAVAttributeType typedelement_has_propertychangelistener;
 	
 	/** Typed element has a timer (when update rate is used). */
-	public static OAVAttributeType typedelement_has_timer;
+	public static final OAVAttributeType typedelement_has_timer;
 	
 //	/** Typed element has class attribute. */
 //	public static OAVAttributeType typedelement_has_class;
@@ -394,68 +394,68 @@ public class OAVBDIRuntimeModel
 	//-------- belief --------
 	
 	/** The belief type. */
-	public static OAVObjectType belief_type;
+	public static final OAVObjectType belief_type;
 	
 	/** The belief has a fact. */
-	public static OAVAttributeType belief_has_fact;
+	public static final OAVAttributeType belief_has_fact;
 	
 	/** The beliefset type. */
-	public static OAVObjectType beliefset_type;
+	public static final OAVObjectType beliefset_type;
 	
 	/** The beliefset has facts. */
-	public static OAVAttributeType beliefset_has_facts;
+	public static final OAVAttributeType beliefset_has_facts;
 
 	//-------- goal --------
 	
 	/** The goal type. */
-	public static OAVObjectType goal_type;
+	public static final OAVObjectType goal_type;
 	
 	/** The goal has a parent attribute. */
 //	public static OAVAttributeType goal_has_parent;
 	
 	/** The goal has plans attribute. */
-	public static OAVAttributeType goal_has_finishedplans;
+	public static final OAVAttributeType goal_has_finishedplans;
 	
 	/** The goal has lifecyclestate attribute. */
-	public static OAVAttributeType goal_has_lifecyclestate;
+	public static final OAVAttributeType goal_has_lifecyclestate;
 
 	/** The goal has processingstate attribute. */
-	public static OAVAttributeType goal_has_processingstate;
+	public static final OAVAttributeType goal_has_processingstate;
 	
 	/** Protected goals will not be dropped when terminating. */
-	public static OAVAttributeType goal_has_protected;
+	public static final OAVAttributeType goal_has_protected;
 	
 	/** The goal has a parent plan attribute (hack!!! redundancy to plan_has_subgoals). */
-	public static OAVAttributeType goal_has_parentplan;
+	public static final OAVAttributeType goal_has_parentplan;
 	
 	/** The goal has exception attribute. */
-	public static OAVAttributeType goal_has_exception;
+	public static final OAVAttributeType goal_has_exception;
 	
 	/** The goal has tried mplan candidates. */
-	public static OAVAttributeType goal_has_triedmplans;
+	public static final OAVAttributeType goal_has_triedmplans;
 	
 	/** The goal has a retry timer. */
-	public static OAVAttributeType goal_has_retrytimer;
+	public static final OAVAttributeType goal_has_retrytimer;
 	
 	/** The goal has a recur timer. */
-	public static OAVAttributeType goal_has_recurtimer;
+	public static final OAVAttributeType goal_has_recurtimer;
 	
 	/** The goal has plans to which the finished event was already dispatched. */
-	public static OAVAttributeType goal_has_finisheddispatchedplans;
+	public static final OAVAttributeType goal_has_finisheddispatchedplans;
 	
 	/** The goal has inhibitors attribute. */
-	public static OAVAttributeType goal_has_inhibitors;
+	public static final OAVAttributeType goal_has_inhibitors;
 	
 	//-------- plan --------
 	
 	/** The plan type. */
-	public static OAVObjectType plan_type;
+	public static final OAVObjectType plan_type;
 	
 	/** The plan has a body attribute. */
-	public static OAVAttributeType plan_has_body;
+	public static final OAVAttributeType plan_has_body;
 	
 	/** The plan has a body attribute. */
-	public static OAVAttributeType plan_has_step;
+	public static final OAVAttributeType plan_has_step;
 	
 	/** The plan has an executor attribute. */
 	//public static OAVAttributeType plan_has_executor;
@@ -464,10 +464,10 @@ public class OAVBDIRuntimeModel
 //	public static OAVAttributeType plan_has_event;
 	
 	/** The plan has a reason. */
-	public static OAVAttributeType plan_has_reason;
+	public static final OAVAttributeType plan_has_reason;
 
 	/** The plan has a dispatched element (current goal/event). */
-	public static OAVAttributeType plan_has_dispatchedelement;
+	public static final OAVAttributeType plan_has_dispatchedelement;
 	
 	/** The plan has a root goal attribute. */
 //	public static OAVAttributeType plan_has_rootgoal;
@@ -476,182 +476,182 @@ public class OAVBDIRuntimeModel
 	//public static OAVAttributeType plan_has_contextcondition;
 	
 	/** The plan has subgoals attribute (hack!!! redundancy to goal_has_parentplan). */
-	public static OAVAttributeType plan_has_subgoals;
+	public static final OAVAttributeType plan_has_subgoals;
 		
 	/** The plan has a wait abstraction attribute. */
-	public static OAVAttributeType plan_has_waitabstraction;
+	public static final OAVAttributeType plan_has_waitabstraction;
 		
 	/** The plan has a waitqueue wait abstraction attribute. */
-	public static OAVAttributeType plan_has_waitqueuewa;
+	public static final OAVAttributeType plan_has_waitqueuewa;
 	
 	/** The plan has a waitqueue processable elements attribute. */
-	public static OAVAttributeType plan_has_waitqueueelements;
+	public static final OAVAttributeType plan_has_waitqueueelements;
 	
 	/** The plan has exception attribute. */
-	public static OAVAttributeType plan_has_exception;
+	public static final OAVAttributeType plan_has_exception;
 	
 	/** The plan has lifecycle state attribute. */
-	public static OAVAttributeType plan_has_lifecyclestate;
+	public static final OAVAttributeType plan_has_lifecyclestate;
 	
 	/** The plan has processing state attribute (ready or waiting). */
-	public static OAVAttributeType plan_has_processingstate;
+	public static final OAVAttributeType plan_has_processingstate;
 	
 	/** The plan has a timer attribute (when waiting). */
-	public static OAVAttributeType plan_has_timer;
+	public static final OAVAttributeType plan_has_timer;
 	
 	/** The plan has user variables. */
 //	public static OAVAttributeType plan_has_uservariables;
 	
 	/** The plan has a candidate (for exclude set / apl removal). */
-	public static OAVAttributeType plan_has_plancandidate;
-	public static OAVAttributeType plan_has_planinstancecandidate;
-	public static OAVAttributeType plan_has_waitqueuecandidate;
+	public static final OAVAttributeType plan_has_plancandidate;
+	public static final OAVAttributeType plan_has_planinstancecandidate;
+	public static final OAVAttributeType plan_has_waitqueuecandidate;
 	
 	//-------- parameter --------
 	
 	/** The parameter type. */
-	public static OAVObjectType parameter_type;
+	public static final OAVObjectType parameter_type;
 	
 	/** The parameter has a name attribute. */
-	public static OAVAttributeType parameter_has_name;
+	public static final OAVAttributeType parameter_has_name;
 	
 	/** The parameter has a value attribute. */
-	public static OAVAttributeType parameter_has_value;
+	public static final OAVAttributeType parameter_has_value;
 	
 	/** The parameter has a type. */
-	public static OAVAttributeType parameter_has_type;
+	public static final OAVAttributeType parameter_has_type;
 
 	
 	/** The parameterset type. */
-	public static OAVObjectType parameterset_type;
+	public static final OAVObjectType parameterset_type;
 	
 	/** The parameterset has a name attribute. */
-	public static OAVAttributeType parameterset_has_name;
+	public static final OAVAttributeType parameterset_has_name;
 	
 	/** The parameterset has a values attribute. */
-	public static OAVAttributeType parameterset_has_values;
+	public static final OAVAttributeType parameterset_has_values;
 	
 	/** The parameterset has a type. */
-	public static OAVAttributeType parameterset_has_type;
+	public static final OAVAttributeType parameterset_has_type;
 	
 	//-------- parameter element --------
 	
 	/** The parameter element type. */
-	public static OAVObjectType parameterelement_type;
+	public static final OAVObjectType parameterelement_type;
 	
 	/** The parameter element has parameters. */
-	public static OAVAttributeType parameterelement_has_parameters;
+	public static final OAVAttributeType parameterelement_has_parameters;
 	
 	/** The parameter element has parameter sets. */
-	public static OAVAttributeType parameterelement_has_parametersets;
+	public static final OAVAttributeType parameterelement_has_parametersets;
 	
 	//-------- processable element (knows apl) --------
 	
 	/** The processable element type. */
-	public static OAVObjectType processableelement_type;
+	public static final OAVObjectType processableelement_type;
 	
 	/** The processable element has an apl. */
-	public static OAVAttributeType processableelement_has_apl;
+	public static final OAVAttributeType processableelement_has_apl;
 	
 	/** The processable element has a state. */
-	public static OAVAttributeType processableelement_has_state;
+	public static final OAVAttributeType processableelement_has_state;
 	
 	//-------- The apl type. --------
 	
 	/** The applicable candidate list. */
-	public static OAVObjectType apl_type;
+	public static final OAVObjectType apl_type;
 	
 	/** The apl has metagoal. */
-	public static OAVAttributeType apl_has_metagoal;
+	public static final OAVAttributeType apl_has_metagoal;
 	
 	/** The apl has plan candidates. */
-	public static OAVAttributeType apl_has_plancandidates;
+	public static final OAVAttributeType apl_has_plancandidates;
 	
 	/** The apl has plan instance candidates. */
-	public static OAVAttributeType apl_has_planinstancecandidates;
+	public static final OAVAttributeType apl_has_planinstancecandidates;
 	
 	/** The apl has plan waitqueue candidates. */
-	public static OAVAttributeType apl_has_waitqueuecandidates;
+	public static final OAVAttributeType apl_has_waitqueuecandidates;
 	
 	//-------- mplancandidate --------
 	
 	/** The mplancandidate type. */
-	public static OAVObjectType	mplancandidate_type;
+	public static final OAVObjectType	mplancandidate_type;
 	
 	/** The mplancandidate has an mplan. */
-	public static OAVAttributeType	mplancandidate_has_mplan;
+	public static final OAVAttributeType	mplancandidate_has_mplan;
 
 	/** The mplancandidate has bindings. */
-	public static OAVAttributeType	mplancandidate_has_bindings;
+	public static final OAVAttributeType	mplancandidate_has_bindings;
 	
 	/** The mplancandidate has plan instance. */
-	public static OAVAttributeType	mplancandidate_has_plan;
+	public static final OAVAttributeType	mplancandidate_has_plan;
 
 	/** The mplancandidate has an rcapability. */
-	public static OAVAttributeType	mplancandidate_has_rcapa;
+	public static final OAVAttributeType	mplancandidate_has_rcapa;
 
 	//-------- plancandidate --------
 	
 	/** The plancandidate type. */
-	public static OAVObjectType	plancandidate_type;
+	public static final OAVObjectType	plancandidate_type;
 	
 	/** The plancandidate has plan instance. */
-	public static OAVAttributeType	plancandidate_has_plan;
+	public static final OAVAttributeType	plancandidate_has_plan;
 
 	/** The plancandidate has an rcapability. */
-	public static OAVAttributeType	plancandidate_has_rcapa;
+	public static final OAVAttributeType	plancandidate_has_rcapa;
 	
 	//-------- waitqueuecandidate --------
 	
 	/** The waitqueuecandidate type. */
-	public static OAVObjectType	waitqueuecandidate_type;
+	public static final OAVObjectType	waitqueuecandidate_type;
 	
 	/** The waitqueuecandidate has plan instance. */
-	public static OAVAttributeType	waitqueuecandidate_has_plan;
+	public static final OAVAttributeType	waitqueuecandidate_has_plan;
 
 	/** The waitqueuecandidate has an rcapability. */
-	public static OAVAttributeType	waitqueuecandidate_has_rcapa;
+	public static final OAVAttributeType	waitqueuecandidate_has_rcapa;
 
 	//-------- precandidate --------
 	
 	/** The precandidate type represents mplans that match an event or goal,
 	 *  but before precondition and bindings have been evaluated
 	 *  (i.e. relevant, but maybe not applicable). */
-	public static OAVObjectType	precandidate_type;
+	public static final OAVObjectType	precandidate_type;
 	
 	/** The precandidate has an mplan. */
-	public static OAVAttributeType	precandidate_has_mplan;
+	public static final OAVAttributeType	precandidate_has_mplan;
 
 	/** The precandidate has an rcapability. */
-	public static OAVAttributeType	precandidate_has_capability;
+	public static final OAVAttributeType	precandidate_has_capability;
 	
 	/** The precandidate has a trigger reference. */
-	public static OAVAttributeType	precandidate_has_triggerreference;
+	public static final OAVAttributeType	precandidate_has_triggerreference;
 
 	//-------- precandidate list --------
 	
 	/** The precandidate list contains precandidates for a given processable element. */
-	public static OAVObjectType	precandidatelist_type;
+	public static final OAVObjectType	precandidatelist_type;
 	
 	/** The precandidate list has a processable element. */
-	public static OAVAttributeType	precandidatelist_has_processableelement;
+	public static final OAVAttributeType	precandidatelist_has_processableelement;
 
 	/** The precandidate list has precandidates. */
-	public static OAVAttributeType	precandidatelist_has_precandidates;
+	public static final OAVAttributeType	precandidatelist_has_precandidates;
 	
 	//-------- assigntosource list --------
 	
 	/** The abstractsource is the concrete element (source) for an abstract element. */
-	public static OAVObjectType	abstractsource_type;
+	public static final OAVObjectType	abstractsource_type;
 	
 	/** The abstractsource has the abstract element. */
-	public static OAVAttributeType	abstractsource_has_abstract;
+	public static final OAVAttributeType	abstractsource_has_abstract;
 
 	/** The abstractsource has the source scope. */
-	public static OAVAttributeType	abstractsource_has_rcapa;
+	public static final OAVAttributeType	abstractsource_has_rcapa;
 
 	/** The abstractsource has the source (original) element. */
-	public static OAVAttributeType	abstractsource_has_source;
+	public static final OAVAttributeType	abstractsource_has_source;
 	
 	//-------- event --------
 	
@@ -661,104 +661,104 @@ public class OAVBDIRuntimeModel
 	//-------- message event --------
 	
 	/** The message event type. */
-	public static OAVObjectType messageevent_type;
+	public static final OAVObjectType messageevent_type;
 	
 	/** The message event has a native message. */
-	public static OAVAttributeType messageevent_has_nativemessage;
+	public static final OAVAttributeType messageevent_has_nativemessage;
 	
 	/** The message event has an explicit id. */
 //	public static OAVAttributeType messageevent_has_id;
 	
 	/** The message event has an original message event (if it is a reply). */
 	// Hack!!! Currently already available in processable element to unify rules.
-	public static OAVAttributeType messageevent_has_original;
+	public static final OAVAttributeType messageevent_has_original;
 	
 	/** The message event has a send future (hack???). */
-	public static OAVAttributeType messageevent_has_sendfuture;
+	public static final OAVAttributeType messageevent_has_sendfuture;
 	
 	/** The message event has a send future (hack???). */
-	public static OAVAttributeType messageevent_has_codecids;
+	public static final OAVAttributeType messageevent_has_codecids;
 	
 	//-------- internal event --------
 	
 	/** The internal event type. */
-	public static OAVObjectType internalevent_type;
+	public static final OAVObjectType internalevent_type;
 	
-	//-------- expression --------
+//	//-------- expression --------
+//	
+//	/** The expressions type. */
+//	public static final OAVObjectType expression_type;
 	
-	/** The expressions type. */
-	public static OAVObjectType expression_type;
-	
-	//-------- property --------
-	
-	/** The properties type. */
-	public static OAVObjectType property_type;
+//	//-------- property --------
+//	
+//	/** The properties type. */
+//	public static final OAVObjectType property_type;
 	
 	//-------- wait abstraction --------
 
 	/** The wait abstraction type. */
-	public static OAVObjectType waitabstraction_type;
+	public static final OAVObjectType waitabstraction_type;
 
 	/** The wait abstraction has goals to wait for. */
-	public static OAVAttributeType waitabstraction_has_goals;
+	public static final OAVAttributeType waitabstraction_has_goals;
 	
 	/** The wait abstraction has messageevent to wait for a reply. */
-	public static OAVAttributeType waitabstraction_has_messageevents;
+	public static final OAVAttributeType waitabstraction_has_messageevents;
 
 	/** The wait abstraction has goal types finisheds to wait for. */
-	public static OAVAttributeType waitabstraction_has_goalfinisheds;
+	public static final OAVAttributeType waitabstraction_has_goalfinisheds;
 	
 	/** The wait abstraction has message event types to wait for. */
-	public static OAVAttributeType waitabstraction_has_messageeventtypes;
+	public static final OAVAttributeType waitabstraction_has_messageeventtypes;
 	
 	/** The wait abstraction has internal event types to wait for. */
-	public static OAVAttributeType waitabstraction_has_internaleventtypes;
+	public static final OAVAttributeType waitabstraction_has_internaleventtypes;
 	
 	/** The wait abstraction has belief(set) types to wait for fact changes. */
-	public static OAVAttributeType waitabstraction_has_factchangeds;
+	public static final OAVAttributeType waitabstraction_has_factchangeds;
 	
 	/** The wait abstraction has beliefset types to wait for added facts. */
-	public static OAVAttributeType waitabstraction_has_factaddeds;
+	public static final OAVAttributeType waitabstraction_has_factaddeds;
 	
 	/** The wait abstraction has beliefset types to wait for removed fact. */
-	public static OAVAttributeType waitabstraction_has_factremoveds;
+	public static final OAVAttributeType waitabstraction_has_factremoveds;
 	
 	/** The wait abstraction has conditions to wait for. */
-	public static OAVAttributeType waitabstraction_has_conditiontypes;
+	public static final OAVAttributeType waitabstraction_has_conditiontypes;
 	
 	/** The wait abstraction has external conditions to wait for. */
-	public static OAVAttributeType waitabstraction_has_externalconditions;
+	public static final OAVAttributeType waitabstraction_has_externalconditions;
 	
 	//-------- change events --------
 	
 	/** The changeevent type. */
-	public static OAVObjectType changeevent_type;
+	public static final OAVObjectType changeevent_type;
 
 	/** The changeevent has an element. */
-	public static OAVAttributeType changeevent_has_element;	
+	public static final OAVAttributeType changeevent_has_element;	
 	
 	/** The changeevent has an element scope. */
-	public static OAVAttributeType changeevent_has_scope;	
+	public static final OAVAttributeType changeevent_has_scope;	
 	
 	/** The changeevent has a type. */
-	public static OAVAttributeType changeevent_has_type;	
+	public static final OAVAttributeType changeevent_has_type;	
 	
 	/** The changeevent has a value. */
-	public static OAVAttributeType changeevent_has_value;	
+	public static final OAVAttributeType changeevent_has_value;	
 	
 	//-------- listeners --------
 	
 	/** The listener entry type. */
-	public static OAVObjectType listenerentry_type;
+	public static final OAVObjectType listenerentry_type;
 
 	/** The listener has a listener object. */
-	public static OAVAttributeType listenerentry_has_listener;
+	public static final OAVAttributeType listenerentry_has_listener;
 	
 	/** The listener has a scope. */
-	public static OAVAttributeType listenerentry_has_scope;
+	public static final OAVAttributeType listenerentry_has_scope;
 	
 	/** The listener has relevants (runtime and/or modelelements). */
-	public static OAVAttributeType listenerentry_has_relevants;
+	public static final OAVAttributeType listenerentry_has_relevants;
 	
 //	/** The listener has a modelelement. */
 //	public static OAVAttributeType listenerentry_has_modelelement;
@@ -768,7 +768,7 @@ public class OAVBDIRuntimeModel
 	
 	
 	/** The runtime element to model element mapping (OAV type -> OAV type). */
-	public static Map modelmap;
+	public static final Map modelmap;
 	
 	static
 	{

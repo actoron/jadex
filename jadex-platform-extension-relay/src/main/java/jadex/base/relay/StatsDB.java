@@ -29,7 +29,7 @@ public class StatsDB
 	//-------- static part --------
 
 	/** The singleton db object. */
-	protected static StatsDB	singleton	= new StatsDB();
+	protected static final StatsDB	singleton	= new StatsDB();
 	
 	/**
 	 *  Get the db instance.
@@ -79,7 +79,8 @@ public class StatsDB
 			if(!rs.next())
 			{
 				rs.close();
-				con.createStatement().execute("CREATE TABLE RELAY.PLATFORMINFO ("
+				Statement	stmt	= con.createStatement();
+				stmt.execute("CREATE TABLE RELAY.PLATFORMINFO ("
 					+ "ID	INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
 					+ "PLATFORM	VARCHAR(60)," 
 					+ "HOSTIP	VARCHAR(32),"
@@ -91,6 +92,7 @@ public class StatsDB
 					+ "BYTES	DOUBLE,"
 					+ "TRANSTIME	DOUBLE,"
 					+ "PREFIX	VARCHAR(60))");
+				stmt.close();
 			}
 			else
 			{
@@ -99,10 +101,11 @@ public class StatsDB
 				rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
 				if(!rs.next())
 				{
-					con.createStatement().execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
+					Statement	stmt	= con.createStatement();
+					stmt.execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
 					update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
 					
-					rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo");
+					rs	= stmt.executeQuery("select ID, PLATFORM from relay.platforminfo");
 					while(rs.next())
 					{
 						int	param	= 1;
@@ -111,13 +114,16 @@ public class StatsDB
 						update.executeUpdate();
 					}
 					rs.close();
+					stmt.close();
 				}
 				
 				// Update platform entries where disconnection was missed.
-				con.createStatement().executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
+				Statement	stmt	= con.createStatement();
+				stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
 				
 				// Update platform entries where hostname is same as ip.
-				con.createStatement().executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
+				stmt.executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
+				stmt.close();
 				
 				// Replace android platform names and-xxx to and_xxx
 				PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
@@ -132,6 +138,7 @@ public class StatsDB
 					update.executeUpdate();
 				}
 				rs.close();
+				update.close();
 			}
 
 			// Create the properties table, if it doesn't exist.
@@ -371,10 +378,11 @@ public class StatsDB
 		
 		if(con!=null)
 		{
+			ResultSet	rs	= null;
 			try
 			{
 				Map<String, PlatformInfo>	map	= new HashMap<String, PlatformInfo>();
-				ResultSet	rs	= con.createStatement().executeQuery(
+				rs	= con.createStatement().executeQuery(
 					"select max(id) as ID, prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
 					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
 					+"from relay.platforminfo where id>="+startid+" AND id<="+endid+" "
@@ -420,10 +428,22 @@ public class StatsDB
 						rs2.close();
 					}
 				}
+				ps.close();
 				rs.close();
 			}
 			catch(Exception e)
 			{
+				if(rs!=null)
+				{
+					try
+					{
+						rs.close();
+					}
+					catch(SQLException sqle)
+					{
+						// ignore
+					}
+				}
 				e.printStackTrace();
 				// Ignore errors and let relay work without stats.
 				RelayHandler.getLogger().warning("Warning: Could not read from relay stats DB: "+ e);
@@ -441,7 +461,7 @@ public class StatsDB
 		{
 			if(con!=null)
 				con.close();
-			DriverManager.getConnection("jdbc:derby:;shutdown=true");
+			DriverManager.getConnection("jdbc:derby:;shutdown=true").close();
 //			DriverManager.getConnection("jdbc:derby:;shutdown=true;deregister=false");
 		}
 		catch(SQLException e)
@@ -486,6 +506,7 @@ public class StatsDB
 			{
 				System.out.println("Update count: "+stmt.getUpdateCount());
 			}
+			stmt.close();
 		}
 		else
 		{
@@ -509,12 +530,14 @@ public class StatsDB
 			System.out.println("---");
 			printPlatformInfos(db.getPlatformInfos(-1, -1, -1));
 			
-			printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
+			Statement	stmt	= db.con.createStatement();
+			printResultSet(stmt.executeQuery("select * from relay.platforminfo"));
 			DatabaseMetaData	meta	= db.con.getMetaData();
 			printResultSet(meta.getColumns(null, "RELAY", "PLATFORMINFO", null));
 			printResultSet(meta.getColumns(null, "RELAY", "PROPERTIES", null));
 			
-			printResultSet(db.con.createStatement().executeQuery("select * from relay.properties"));
+			printResultSet(stmt.executeQuery("select * from relay.properties"));
+			stmt.close();
 		}
 	}
 	

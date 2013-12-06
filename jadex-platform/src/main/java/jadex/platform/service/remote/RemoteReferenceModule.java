@@ -59,15 +59,15 @@ import java.util.WeakHashMap;
 public class RemoteReferenceModule
 {
 	/** Debug flag. */
-	public static boolean DEBUG = false;
+	public static final boolean DEBUG = false;
 
 	/** The default lease time. */
 //	public static long DEFAULT_LEASETIME = 15000;
-	public static long DEFAULT_LEASETIME = 300000;
+	public static final long DEFAULT_LEASETIME = 300000;
 	
 	/** leasetime*factor is used to determine when an entry should be removed. */
 //	public static double WAITFACTOR = 2.2;
-	public static double WAITFACTOR = 1.5;
+	public static final double WAITFACTOR = 1.5;
 	
 	//-------- attributes --------
 

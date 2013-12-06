@@ -372,7 +372,7 @@ public class BeliefRules
 	/**
 	 *  Action that gets executed when new facts available.
 	 */
-	protected static IAction PLAN_WAIT_FOR_CONDITION = new IAction()
+	protected static final IAction PLAN_WAIT_FOR_CONDITION = new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{

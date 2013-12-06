@@ -1,5 +1,6 @@
 package jadex.platform.service.servicepool;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -29,7 +30,6 @@ import jadex.commons.future.IResultListener;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -375,7 +375,8 @@ public class ServiceHandler implements InvocationHandler
 			{
 				public void resultAvailable(Object result)
 				{
-					proceed();
+					boolean	remove	= strategy.taskFinished(); 
+					proceed(remove);
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -383,12 +384,13 @@ public class ServiceHandler implements InvocationHandler
 					component.getLogger().warning("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
 //					System.out.println("Exception during service invocation in service pool:_"+method.getName()+" "+exception.getMessage());
 //					exception.printStackTrace();
-					proceed();
+					boolean remove	= strategy.taskFinished();
+					boolean killed	= exception instanceof ComponentTerminatedException && ((ComponentTerminatedException)exception).getComponentIdentifier().equals(service.getServiceIdentifier().getProviderId());
+					proceed(remove || killed);
 				}
 				
-				protected void proceed()
+				protected void proceed(boolean remove)
 				{
-					boolean remove = strategy.taskFinished();
 					if(remove)
 					{
 						addFreeService(null);

@@ -106,25 +106,22 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	
 	/** Excluded remote methods (for all methods)
 	 *	Excluded methods throw UnsupportedOperationException. */
-	public static String REMOTE_EXCLUDED = "remote_excluded";
+	public static final String REMOTE_EXCLUDED = "remote_excluded";
 	
 	/** Uncached remote methods (for methods with no parameters)
 	 *	Uncached methods will be invoked on every call. */
-	public static String REMOTE_UNCACHED = "remote_uncached";
+	public static final String REMOTE_UNCACHED = "remote_uncached";
 	
 	/** Synchronous remote methods (for methods with void return value). 
      *	If void methods are declared synchronous they will block the caller until
      *	the method has been executed on the remote side (exception thus can arrive). */
-	public static String REMOTE_SYNCHRONOUS = "remote_synchronous";
+	public static final String REMOTE_SYNCHRONOUS = "remote_synchronous";
 
 	/** Replacement methods to be executed instead of remote method invocation. */
-	public static String REMOTE_METHODREPLACEMENT = "remote_methodreplacement";
+	public static final String REMOTE_METHODREPLACEMENT = "remote_methodreplacement";
 
 	/** Timeout for remote method invocation. */
-	public static String REMOTE_TIMEOUT = "remote_timeout";
-
-	/** The default timeout. */
-	public static long DEFAULT_TIMEOUT = 15000;
+	public static final String REMOTE_TIMEOUT = "remote_timeout";
 
 	//-------- attributes --------
 	

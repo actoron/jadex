@@ -51,7 +51,7 @@ public class EdgeTransformer
 		{
 			Object ret = null;
 			if(enabled)
-				ret = Integer.valueOf(((MessageGroup)group).size()).toString();
+				ret = Integer.toString(((MessageGroup)group).size());
 			
 			return ret;
 		}

@@ -17,7 +17,7 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
  */
 public class BeanToHTMLMapper implements IValueMapper
 {
-	protected static BeanReflectionIntrospector in = new BeanReflectionIntrospector();
+	protected static final BeanReflectionIntrospector in = new BeanReflectionIntrospector();
 	
 	/**
 	 * 

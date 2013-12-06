@@ -38,10 +38,10 @@ public class MessageCanvas extends JPanel implements Serializable
 	public static final int H_TOL = 4;
 
 	/** Font used for message label. */
-	public static Font plain_font = new Font("SanSerif", Font.PLAIN, 12);
+	public static final Font plain_font = new Font("SanSerif", Font.PLAIN, 12);
 
 	//	public static Font bold_font = new Font("Helvetia", Font.BOLD, 10);
-	public static Font bold_font = new Font("SanSerif", Font.BOLD, 12);
+	public static final Font bold_font = new Font("SanSerif", Font.BOLD, 12);
 
 	// -------- attributs --------
 

@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public class ChatServiceD3 extends ChatServiceD2 implements IExtendedChatService
 {
-	protected static List<UserProfileD3> profiles;
+	protected static final List<UserProfileD3> profiles;
 
 	protected UserProfileD3 profile;
 	

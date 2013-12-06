@@ -23,7 +23,7 @@ public class ComponentCanvas extends JPanel {
 	// -------- constants --------
 
 	/** Font used for component label. */
-	public static Font componentFont = new Font("Helvetica", Font.PLAIN, 12);
+	public static final Font componentFont = new Font("Helvetica", Font.PLAIN, 12);
 
 	// -------- attributes --------
 

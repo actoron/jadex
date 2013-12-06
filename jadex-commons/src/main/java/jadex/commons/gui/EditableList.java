@@ -24,7 +24,7 @@ public class EditableList extends JTable
 	//-------- static part --------
 
 	/** The image icons. */
-	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"add", SGUI.makeIcon(EditableList.class,	"/jadex/commons/gui/images/add_small.png"),
 		"delete", SGUI.makeIcon(EditableList.class,	"/jadex/commons/gui/images/delete_small.png"),

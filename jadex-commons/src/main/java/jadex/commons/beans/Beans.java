@@ -68,6 +68,7 @@ public class Beans {
                 ObjectInputStream ois = (cls == null) ? new ObjectInputStream(
                         is) : new CustomizedObjectInputStream(is, cls);
                 result = ois.readObject();
+                ois.close();
             } catch (IOException e) {
                 // Not loadable - remember this as we may throw it later.
                 serializationException = e;

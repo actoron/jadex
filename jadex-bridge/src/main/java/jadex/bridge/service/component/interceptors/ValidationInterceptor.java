@@ -31,7 +31,7 @@ public class ValidationInterceptor extends ComponentThreadInterceptor
 	//-------- constants --------
 	
 	/** The static map of subinterceptors (method -> interceptor). */
-	protected static Set ALWAYSOK;
+	protected static final Set ALWAYSOK;
 	
 	static
 	{
@@ -62,7 +62,7 @@ public class ValidationInterceptor extends ComponentThreadInterceptor
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class DestroyComponentCommand extends ACliCommand
 {
-	public static IStringObjectConverter CID_CONVERTER = new IStringObjectConverter()
+	public static final IStringObjectConverter CID_CONVERTER = new IStringObjectConverter()
 	{
 		public Object convertString(String val, Object context) throws Exception
 		{

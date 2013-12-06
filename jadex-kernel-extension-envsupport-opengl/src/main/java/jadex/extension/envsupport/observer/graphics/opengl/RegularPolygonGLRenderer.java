@@ -30,7 +30,7 @@ public class RegularPolygonGLRenderer extends AbstractGLRenderer
 		{
 			int vertices = ((RegularPolygon) primitive).getVertexCount();
 			String listName = getClass().getName() + "_"
-					+ Integer.valueOf(vertices).toString();
+					+ Integer.toString(vertices);
 			Integer list = vp.getDisplayList(listName);
 			if(list == null)
 			{

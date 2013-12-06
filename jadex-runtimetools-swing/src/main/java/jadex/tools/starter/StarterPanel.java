@@ -92,7 +92,7 @@ public class StarterPanel extends JLayeredPane
 	//-------- static part --------
 
 	/** The image icons. */
-	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"overlay_check", SGUI.makeIcon(StarterPanel.class, "/jadex/tools/common/images/overlay_check.png"),
 		"Browse", SGUI.makeIcon(StarterPanel.class,	"/jadex/tools/common/images/dots_small.png"),

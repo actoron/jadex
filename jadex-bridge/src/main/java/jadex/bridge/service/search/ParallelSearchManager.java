@@ -232,7 +232,7 @@ public class ParallelSearchManager implements ISearchManager
 		
 //		if(!selector.isFinished(endret.getIntermediateResults()) && provider!=null 
 		if(!checkFinished(selector, endret) && provider!=null 
-			&& decider.searchNode(start==null? null: start.getId(), source==null? null: source.getId(), provider==null? null: provider.getId(), endret.getIntermediateResults()))
+			&& decider.searchNode(start==null? null: start.getId(), source==null? null: source.getId(), provider.getId(), endret.getIntermediateResults()))
 		{
 //			if(provider!=null && selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Component")!=-1)
 //				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());

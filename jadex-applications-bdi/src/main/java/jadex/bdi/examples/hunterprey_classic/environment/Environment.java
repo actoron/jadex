@@ -42,7 +42,7 @@ public class Environment implements IEnvironment
 	//-------- constants --------
 
 	/** The default number of lease ticks. */
-	public static int	DEFAULT_LEASE_TICKS	= 50;
+	public static final int	DEFAULT_LEASE_TICKS	= 50;
 
 	//-------- attributes --------
 

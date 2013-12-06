@@ -48,19 +48,19 @@ public class Golfing
 	//-------- OAV type definitions --------
 	
 	/** The golfing type model. */
-	public static OAVTypeModel golfing_type_model;
+	public static final OAVTypeModel golfing_type_model;
 	
 	/** The golfer type. */
-	public static OAVObjectType golfer_type;
+	public static final OAVObjectType golfer_type;
 	
 	/** A golfer has a name. */
-	public static OAVAttributeType golfer_has_name;
+	public static final OAVAttributeType golfer_has_name;
 	
 	/** A golfer has a pant color. */
-	public static OAVAttributeType golfer_has_color;
+	public static final OAVAttributeType golfer_has_color;
 	
 	/** A golfer has a position. */
-	public static OAVAttributeType golfer_has_position;
+	public static final OAVAttributeType golfer_has_position;
 
 	static
 	{

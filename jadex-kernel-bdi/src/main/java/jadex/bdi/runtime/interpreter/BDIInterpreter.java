@@ -114,7 +114,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	
 	/** The interpreters, one per agent (ragent -> interpreter). */
 	// Hack e.g. for fetching agent-dependent plan executors
-	public static Map interpreters;
+	public static final Map interpreters;
 	
 	//-------- attributes --------
 	
@@ -203,7 +203,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	protected Map volcache;
 	protected Map stacache;
 	
-	protected static Set stacacheelems;
+	protected static final Set stacacheelems;
 	
 	static
 	{

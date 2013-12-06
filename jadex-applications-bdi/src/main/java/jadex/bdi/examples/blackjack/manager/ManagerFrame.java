@@ -66,7 +66,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	//-------- constants --------
 
 	/** The dealer default adf. */
-	protected static String LOCAL_DEALER = "BlackjackDealer";
+	protected static final String LOCAL_DEALER = "BlackjackDealer";
 
 	//-------- attributes --------
 
@@ -194,7 +194,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				if(cid!=null)
 				{
 					dealeraid	= cid;
-					dealertf.setText(dealeraid!=null ? dealeraid.getName() : "");
+					dealertf.setText(cid.getName());
 				}
 			}
 		});
@@ -859,7 +859,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //							}
 //						});
 					}
-					catch(Exception e)
+					catch(RuntimeException e)
 					{
 					}
 					return IFuture.DONE;

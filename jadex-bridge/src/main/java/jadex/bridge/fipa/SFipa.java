@@ -62,7 +62,7 @@ public class SFipa
 	public static final String	PROTOCOL_CANCEL_META	= "fipa-cancel-meta";
 	
 	/** The standard protocols. */
-	public static Collection PROTOCOLS;
+	public static final Collection PROTOCOLS;
 
 	static
 	{
@@ -108,7 +108,7 @@ public class SFipa
 	public static final String UNKNOWN = "unknown";
 
 	/** The allowed message attributes. */
-	public static Collection PERFORMATIVES;
+	public static final Collection PERFORMATIVES;
 
 	static
 	{
@@ -162,7 +162,7 @@ public class SFipa
 	public static final String X_NONFUNCTIONAL = "x_nonfunctional";
 
 	/** The allowed message attributes. */
-	public static Set MESSAGE_ATTRIBUTES;
+	public static final Set MESSAGE_ATTRIBUTES;
 
 	static
 	{

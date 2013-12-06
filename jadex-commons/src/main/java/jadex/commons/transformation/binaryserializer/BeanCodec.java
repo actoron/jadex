@@ -358,7 +358,7 @@ public class BeanCodec extends AbstractCodec
 			basename = basename.substring(0, marker);
 		}
 		basename += "$";
-		int exclude = Integer.valueOf(startname.substring(marker + 1, startname.length()));
+		int exclude = Integer.parseInt(startname.substring(marker + 1, startname.length()));
 		Class ret = null;
 		
 		int classindex = 0;

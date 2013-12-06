@@ -1,24 +1,18 @@
 package jadex.platform.service.message.transport.codecs;
 
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IEncodingContext;
-import jadex.commons.MethodInfo;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
-import jadex.commons.future.Future;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.platform.service.remote.commands.RemoteIntermediateResultCommand;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -96,7 +90,7 @@ public class JadexBinaryCodec implements ICodec
 //	}
 	
 	/** Encoder chain cache. */
-	protected static Map<Date, List<ITraverseProcessor>> ENCODER_CHAIN_CACHE = Collections.synchronizedMap(new LRU<Date, List<ITraverseProcessor>>(100));
+	protected static final Map<Date, List<ITraverseProcessor>> ENCODER_CHAIN_CACHE = Collections.synchronizedMap(new LRU<Date, List<ITraverseProcessor>>(100));
 	
 	/** The debug flag. */
 	protected boolean DEBUG = false;

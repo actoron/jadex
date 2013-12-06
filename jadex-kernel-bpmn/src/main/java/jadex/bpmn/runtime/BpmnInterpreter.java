@@ -1147,7 +1147,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			}
 			if(coll instanceof List)
 			{
-				int index = key==null? -1: ((Number)key).intValue();
+				int index = ((Number)key).intValue();
 				if(index>=0)
 					((List)coll).add(index, value);
 				else

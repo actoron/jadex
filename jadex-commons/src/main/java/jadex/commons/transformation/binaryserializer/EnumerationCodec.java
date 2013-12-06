@@ -91,7 +91,7 @@ public class EnumerationCodec extends AbstractCodec
 			if (val != null)
 			{
 				ec.writeVarInt(count);
-				Class valclazz = val!=null? val.getClass(): null;
+				Class valclazz = val.getClass();
 				traverser.traverse(val, valclazz, traversed, processors, clone, null, ec);
 			}
 			++count;

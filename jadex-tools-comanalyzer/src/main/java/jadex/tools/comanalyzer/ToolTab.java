@@ -28,7 +28,7 @@ public abstract class ToolTab extends JPanel implements IComponentListListener, 
 	private static final String COMANALYZER_IMAGES = "/jadex/tools/comanalyzer/images/";
 
 	/** The image icons. */
-	protected static UIDefaults icons = new UIDefaults(new Object[]{
+	protected static final UIDefaults icons = new UIDefaults(new Object[]{
 			"start", SGUI.makeIcon(ToolTab.class, COMANALYZER_IMAGES + "start.png"),
 			"stop", SGUI.makeIcon(ToolTab.class, COMANALYZER_IMAGES + "stop.png"),
 			"arrow2l", SGUI.makeIcon(ToolTab.class, COMANALYZER_IMAGES + "arrow2l.png"),

@@ -97,7 +97,7 @@ public class ComponentXMLReader
 //		}
 //	};
 	
-	public static IStringObjectConverter classconv = new IStringObjectConverter()
+	public static final IStringObjectConverter classconv = new IStringObjectConverter()
 	{
 		public Object convertString(String val, Object context) throws Exception
 		{
@@ -105,7 +105,7 @@ public class ComponentXMLReader
 		}
 	};
 	
-	public static IObjectStringConverter reclassconv = new IObjectStringConverter()
+	public static final IObjectStringConverter reclassconv = new IObjectStringConverter()
 	{
 		public String convertObject(Object val, Object context)
 		{

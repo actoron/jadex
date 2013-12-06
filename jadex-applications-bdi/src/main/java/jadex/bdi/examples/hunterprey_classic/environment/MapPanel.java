@@ -37,7 +37,7 @@ public class MapPanel	extends JPanel
 	//-------- constants --------
 
 	/** The image icons. */
-	public static UIDefaults	icons	= new UIDefaults(new Object[]
+	public static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"food",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey_classic/images/food.png"),
 		"obstacle",	SGUI.makeIcon(MapPanel.class, "/jadex/bdi/examples/hunterprey_classic/images/obstacle.png"),

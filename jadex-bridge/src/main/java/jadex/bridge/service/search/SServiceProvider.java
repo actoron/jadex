@@ -43,18 +43,18 @@ public class SServiceProvider
 	//-------- constants --------
 	
 	/** The sequential search manager. */
-	public static ISearchManager sequentialmanager = new SequentialSearchManager();
+	public static final ISearchManager sequentialmanager = new SequentialSearchManager();
 //	public static ISearchManager sequentialmanagerforced = new SequentialSearchManager(true, true, true);
 
 	/** The parallel search manager. */
-	public static ISearchManager parallelmanager = new ParallelSearchManager();
+	public static final ISearchManager parallelmanager = new ParallelSearchManager();
 //	public static ISearchManager parallelmanagerforced = new ParallelSearchManager(true, true, true);
 	
 	/** The sequential search manager that searches only upwards. */
-	public static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
+	public static final ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
 
 	/** The sequential search manager that searches only locally. */
-	public static ISearchManager localmanager = new LocalSearchManager();
+	public static final ISearchManager localmanager = new LocalSearchManager();
 //	public static ISearchManager localmanagerforced = new LocalSearchManager(true);
 	
 	/** The visit decider that stops searching after one result has been found. */
@@ -62,20 +62,20 @@ public class SServiceProvider
 //	public static IVisitDecider rabortdecider = new DefaultVisitDecider(true, RequiredServiceInfo.GLOBAL_SCOPE);
 
 	/** The visit decider that never stops. */
-	public static IVisitDecider contdecider = new DefaultVisitDecider(false);
-	public static IVisitDecider rcontdecider = new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_GLOBAL);
+	public static final IVisitDecider contdecider = new DefaultVisitDecider(false);
+	public static final IVisitDecider rcontdecider = new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_GLOBAL);
 
-	public static IResultSelector contanyselector = new AnyResultSelector(false);
-	public static IResultSelector abortanyselector = new AnyResultSelector(true);
+	public static final IResultSelector contanyselector = new AnyResultSelector(false);
+	public static final IResultSelector abortanyselector = new AnyResultSelector(true);
 
-	public static Map avisitdeciders;
-	public static Map visitdeciders;
+	public static final Map avisitdeciders;
+	public static final Map visitdeciders;
 	
 //	/** The reference class cache (clazz->boolean (is reference)). */
 //	public static Map references;
 	
 	/** The reference method cache (method -> boolean[] (is reference)). */
-	public static Map methodreferences;
+	public static final Map methodreferences;
 	
 	static
 	{

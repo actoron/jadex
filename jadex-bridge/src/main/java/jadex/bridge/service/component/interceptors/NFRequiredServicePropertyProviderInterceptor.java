@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
  */
 public class NFRequiredServicePropertyProviderInterceptor extends ComponentThreadInterceptor
 {
-	protected static Method METHOD;
+	protected static final Method METHOD;
 	
 	static
 	{
@@ -26,7 +26,7 @@ public class NFRequiredServicePropertyProviderInterceptor extends ComponentThrea
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 	

@@ -46,58 +46,58 @@ public class Hanoi
 	//-------- OAV metamodel --------
 	
 	/** The type model. */
-	public static OAVTypeModel hanoi_type_model;
+	public static final OAVTypeModel hanoi_type_model;
 	
 	/** The java OAV atribute type. */
-	public static OAVObjectType java_oavattribute_type;
+	public static final OAVObjectType java_oavattribute_type;
 
 	
 	/** The agent type. */
-	public static OAVObjectType	agent_type;
+	public static final OAVObjectType	agent_type;
 	
 	/** Agent has tower A. */
-	public static OAVAttributeType	agent_has_tower_a;
+	public static final OAVAttributeType	agent_has_tower_a;
 
 	/** Agent has tower B. */
-	public static OAVAttributeType	agent_has_tower_b;
+	public static final OAVAttributeType	agent_has_tower_b;
 
 	/** Agent has tower C. */
-	public static OAVAttributeType	agent_has_tower_c;
+	public static final OAVAttributeType	agent_has_tower_c;
 	
 	/** Agent has move goals. */
-	public static OAVAttributeType	agent_has_movegoals;
+	public static final OAVAttributeType	agent_has_movegoals;
 
 	
 	/** The disc type. */
-	public static OAVObjectType	disc_type;
+	public static final OAVObjectType	disc_type;
 	
 	/** Disc has size. */
-	public static OAVAttributeType	disc_has_size;
+	public static final OAVAttributeType	disc_has_size;
 	
 	
 	/** The move goal type. */
-	public static OAVObjectType	movegoal_type;
+	public static final OAVObjectType	movegoal_type;
 	
 	/** Move goal is executing. */
-	public static OAVAttributeType	movegoal_is_executing;
+	public static final OAVAttributeType	movegoal_is_executing;
 
 	/** Move goal has precondition. */
-	public static OAVAttributeType	movegoal_has_precodition;
+	public static final OAVAttributeType	movegoal_has_precodition;
 
 	/** Move goal has postcondition. */
-	public static OAVAttributeType	movegoal_has_postcodition;
+	public static final OAVAttributeType	movegoal_has_postcodition;
 	
 	/** Move goal has from. */
-	public static OAVAttributeType	movegoal_has_from ;
+	public static final OAVAttributeType	movegoal_has_from ;
 
 	/** Move goal has to. */
-	public static OAVAttributeType	movegoal_has_to;
+	public static final OAVAttributeType	movegoal_has_to;
 
 	/** Move goal has temp. */
-	public static OAVAttributeType	movegoal_has_temp;
+	public static final OAVAttributeType	movegoal_has_temp;
 	
 	/** Move goal has number. */
-	public static OAVAttributeType	movegoal_has_number;
+	public static final OAVAttributeType	movegoal_has_number;
 
 	static
 	{

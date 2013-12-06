@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
@@ -17,16 +18,16 @@ public class VersionInfo
 	//-------- constants --------
 
 	/** The version info singleton. */
-	protected static VersionInfo	instance	= new VersionInfo();
+	protected static final VersionInfo	instance	= new VersionInfo();
 	
 	/** The text date format (e.g. January 13, 2012). */
-	public DateFormat	DATE_FORMAT_TEXT	= new SimpleDateFormat("MMMM d, yyyy");
+	public final DateFormat	DATE_FORMAT_TEXT	= new SimpleDateFormat("MMMM d, yyyy");
 	
 	/** The short date format (e.g. 2012/01/13). */
-	public DateFormat	DATE_FORMAT_NUMBER	= new SimpleDateFormat("yyyy/MM/dd");
+	public final DateFormat	DATE_FORMAT_NUMBER	= new SimpleDateFormat("yyyy/MM/dd");
 
 	/** The short date format (e.g. 2012/01/13). */
-	public DateFormat	DATE_FORMAT_TIMESTAMP	= new SimpleDateFormat("yyyyMMdd.HHmmss");
+	public final DateFormat	DATE_FORMAT_TIMESTAMP	= new SimpleDateFormat("yyyyMMdd.HHmmss");
 
 	//-------- attributes --------
 	
@@ -46,7 +47,9 @@ public class VersionInfo
 		try
 		{
 			Properties	props	= new Properties();
-			props.load(VersionInfo.class.getResourceAsStream("version.properties"));
+			InputStream	is	= VersionInfo.class.getResourceAsStream("version.properties");
+			props.load(is);
+			is.close();
 			version	= props.getProperty("jadex.version");
 			
 //			System.out.println(props);

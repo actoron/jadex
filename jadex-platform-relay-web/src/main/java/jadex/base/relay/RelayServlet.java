@@ -212,7 +212,7 @@ public class RelayServlet extends HttpServlet
 	//-------- helper methods --------
 	
 	/** Time in seconds before browsers should refresh static resources (7 days). */
-	protected static long	MAXAGE	= 60*60*24*7;
+	protected static final long	MAXAGE	= 60*60*24*7;
 	
 	/**
 	 *  Serve a static resource from the file system.

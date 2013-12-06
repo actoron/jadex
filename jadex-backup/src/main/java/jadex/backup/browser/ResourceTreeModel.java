@@ -30,7 +30,7 @@ public class ResourceTreeModel	implements TreeModel
 	//-------- constants --------
 	
 	/** Dummy object for the tree root. */
-	protected static String	ROOT	= "root";
+	protected static final String	ROOT	= "root";
 	
 	//-------- attributes --------
 

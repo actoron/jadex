@@ -125,13 +125,13 @@ public class SUtil
 	 * Mapping from single characters to encoded version for displaying on
 	 * xml-style interfaces.
 	 */
-	protected static Map<String, String>			htmlwraps;
+	protected static final Map<String, String>			htmlwraps;
 	
 	/** Cached AndroidUtils */
 	protected static volatile AndroidUtils androidutils;
 
 	/** Holds the single characters. */
-	protected static String			seps;
+	protected static final String			seps;
 	
 
 	/** An empty enumeration. */
@@ -214,10 +214,11 @@ public class SUtil
 		htmlwraps.put("\u00E7", "&ccedil;");
 		htmlwraps.put("\u00C7", "&Ccedil;");
 
-		seps = "";
+		String	tmp = "";
 		Iterator<String> it = htmlwraps.keySet().iterator();
 		while(it.hasNext())
-			seps += it.next();
+			tmp += it.next();
+		seps	= tmp;
 		
 		List<IResultCommand<ResourceInfo, URLConnection>>	mappers	= new ArrayList();
 		String	custommappers	= System.getProperty("jadex.resourcemappers");

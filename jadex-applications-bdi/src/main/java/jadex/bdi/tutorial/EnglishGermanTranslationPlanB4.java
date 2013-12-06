@@ -39,7 +39,7 @@ public class EnglishGermanTranslationPlanB4 extends Plan
 	//-------- static part --------
 
 	/** The wordtable. */
-	protected static Map wordtable;
+	protected static final Map wordtable;
 
 	static
 	{

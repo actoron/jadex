@@ -28,7 +28,7 @@ public class TablePanel extends ToolTab
 
 
 	/** The image icons. */
-	protected static UIDefaults defaults = new UIDefaults(new Object[]{"resize", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "resize.png"), "scrolllock",
+	protected static final UIDefaults defaults = new UIDefaults(new Object[]{"resize", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "resize.png"), "scrolllock",
 			SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "scrolllock.png"), "autoscroll", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "autoscroll.png"),});
 
 	//-------- attributes --------

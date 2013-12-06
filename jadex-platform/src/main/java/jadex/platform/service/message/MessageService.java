@@ -2763,7 +2763,7 @@ public class MessageService extends BasicService implements IMessageService
 								{
 									if (info != null)
 									{
-										Map<String, String> props = info != null? info.getProperties() : null;
+										Map<String, String> props = info.getProperties();
 										String stringdate = props != null? props.get(AwarenessInfo.PROPERTY_JADEXDATE): null;
 										Date date = stringdate != null? new Date(Long.parseLong(stringdate)) : null;
 										releasedatecache.put(rec.getRoot(), date);

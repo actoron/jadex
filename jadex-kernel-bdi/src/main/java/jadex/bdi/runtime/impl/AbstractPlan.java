@@ -1024,5 +1024,5 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	// Needed for passing the rplan to the abstract plan instance.
 	// Must be thread safe as more than one agent could use the table
 	// at the same time.
-	public static Map planinit	= SCollection.createHashtable();
+	public static final Map planinit	= SCollection.createHashtable();
 }

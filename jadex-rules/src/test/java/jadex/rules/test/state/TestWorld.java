@@ -13,28 +13,28 @@ public class TestWorld
 	//-------- OAV type definitions --------
 	
 	/** The testworld type model. */
-	public static OAVTypeModel testworld_type_model;
+	public static final OAVTypeModel testworld_type_model;
 	
 	/** The test type. */
-	public static OAVObjectType test_type;
+	public static final OAVObjectType test_type;
 	
 	/** A test has a name. */
-	public static OAVAttributeType test_has_name;
+	public static final OAVAttributeType test_has_name;
 	
 	/** A test has others tests. */
-	public static OAVAttributeType test_has_testslist;
+	public static final OAVAttributeType test_has_testslist;
 	
 	/** A test has others tests. */
-	public static OAVAttributeType test_has_testsset;
+	public static final OAVAttributeType test_has_testsset;
 	
 	/** A test has others tests. */
-	public static OAVAttributeType test_has_testsqueue;
+	public static final OAVAttributeType test_has_testsqueue;
 	
 	/** A test has others tests. */
-	public static OAVAttributeType test_has_testsmap;
+	public static final OAVAttributeType test_has_testsmap;
 	
 	/** The other type. */
-	public static OAVObjectType other_type;
+	public static final OAVObjectType other_type;
 	
 	static
 	{

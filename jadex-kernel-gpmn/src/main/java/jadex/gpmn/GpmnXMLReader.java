@@ -57,13 +57,13 @@ public class GpmnXMLReader
 	//-------- attributes --------
 	
 	/** The singleton reader instance. */
-	protected static AReader	reader;
+	protected static final AReader	reader;
 	
 	/** The manager. */
-	protected static TypeInfoPathManager manager;
+	protected static final TypeInfoPathManager manager;
 	
 	/** The handler. */
-	protected static IObjectReaderHandler handler;
+	protected static final IObjectReaderHandler handler;
 	
 	//-------- methods --------
 	

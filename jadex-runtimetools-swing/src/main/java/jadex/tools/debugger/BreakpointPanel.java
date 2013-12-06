@@ -48,7 +48,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	//-------- static part --------
 
 	/** The image icons. */
-	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"breakpoint", SGUI.makeIcon(BreakpointPanel.class,	"/jadex/tools/common/images/lockoverlay.png"),
 	});

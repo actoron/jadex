@@ -14,16 +14,16 @@ public class RequestMove implements IComponentAction
 	//-------- constants ----------
 
 	/** Predefined value "up" for slot direction. */
-	public static String DIRECTION_UP = "up";
+	public static final String DIRECTION_UP = "up";
 
 	/** Predefined value "down" for slot direction. */
-	public static String DIRECTION_DOWN = "down";
+	public static final String DIRECTION_DOWN = "down";
 
 	/** Predefined value "left" for slot direction. */
-	public static String DIRECTION_LEFT = "left";
+	public static final String DIRECTION_LEFT = "left";
 
 	/** Predefined value "right" for slot direction. */
-	public static String DIRECTION_RIGHT = "right";
+	public static final String DIRECTION_RIGHT = "right";
 
 	//-------- attributes ----------
 

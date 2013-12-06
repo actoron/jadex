@@ -25,7 +25,7 @@ public class GeoIPService
 	//-------- static part --------
 
 	/** The singleton db object. */
-	protected static GeoIPService	singleton	= new GeoIPService();
+	protected static final GeoIPService	singleton	= new GeoIPService();
 	
 	/**
 	 *  Get the db instance.
@@ -200,12 +200,24 @@ public class GeoIPService
 								File	oldfile	= new File(dbfile.getParentFile(), "GeoLiteCity.dat.old");
 								if(oldfile.exists())
 								{
-									oldfile.delete();
+									if(!oldfile.delete())
+									{
+										RelayHandler.getLogger().info("Cannot delete GeoIP database: "+oldfile);
+									}
 								}
-								dbfile.renameTo(oldfile);
+								if(!dbfile.renameTo(oldfile))
+								{
+									RelayHandler.getLogger().info("Cannot rename old GeoIP database to: "+oldfile);
+								}
 							}
-							tmpfile.renameTo(dbfile);
-							RelayHandler.getLogger().info("Downloaded GeoIP database to: "+dbfile);
+							if(!tmpfile.renameTo(dbfile))
+							{
+								RelayHandler.getLogger().info("Cannot rename GeoIP database to: "+dbfile);
+							}
+							else
+							{
+								RelayHandler.getLogger().info("Downloaded GeoIP database to: "+dbfile);
+							}
 						}
 					}
 					catch(Exception e)

@@ -53,7 +53,7 @@ public class ClockFrame extends JFrame
 	//-------- static part --------
 
 	/** The image icons. */
-	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"Clock", SGUI.makeIcon(ClockFrame.class,	"/jadex/bdi/examples/alarmclock/images/clock.png")
 	});

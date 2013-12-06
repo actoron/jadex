@@ -64,7 +64,7 @@ public class MessageEventRules
 	//-------- constants --------
 	
 	/** The maximum number of outstanding messages. */
-	public static String MESSAGEEVENTS_MAX = "storedmessages.size";
+	public static final String MESSAGEEVENTS_MAX = "storedmessages.size";
 		
 	/**
      * The Class object representing the class corresponding to

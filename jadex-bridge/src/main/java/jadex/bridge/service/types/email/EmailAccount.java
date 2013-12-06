@@ -3,6 +3,8 @@ package jadex.bridge.service.types.email;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 /**
@@ -267,7 +269,9 @@ public class EmailAccount
 			ps.setProperty("receivehost", getReceiveHost());
 			ps.setProperty("receiveprotocol", getReceiveProtocol());
 			
-			ps.store(new FileOutputStream(new File(filename)), null);
+			OutputStream	os	= new FileOutputStream(new File(filename));
+			ps.store(os, null);
+			os.close();
 		}
 		catch(Exception e)
 		{
@@ -282,8 +286,11 @@ public class EmailAccount
 	{
 		try 
 		{
+			InputStream	is	= new FileInputStream(filename);
 			Properties ps = new Properties();
-		    ps.load(new FileInputStream(filename));
+		    ps.load(is);
+		    is.close();
+		    
 		    if(ps.getProperty("user")!=null)
 		    	setUser(ps.getProperty("user"));
 		    if(ps.getProperty("password")!=null)

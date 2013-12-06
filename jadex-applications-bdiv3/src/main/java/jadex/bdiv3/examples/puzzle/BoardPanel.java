@@ -30,7 +30,7 @@ public class BoardPanel extends JPanel
 	//-------- constants --------
 
 	/** The image icons. */
-	public static UIDefaults	icons	= new UIDefaults(new Object[]
+	public static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"white_piece",	SGUI.makeIcon(BoardPanel.class, "/jadex/bdiv3/examples/puzzle/images/white_piece.png"),
 		"red_piece",	SGUI.makeIcon(BoardPanel.class, "/jadex/bdiv3/examples/puzzle/images/red_piece.png"),

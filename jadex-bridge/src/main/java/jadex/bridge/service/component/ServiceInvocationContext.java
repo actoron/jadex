@@ -26,7 +26,7 @@ import java.util.TimerTask;
  */
 public class ServiceInvocationContext
 {
-	public static ThreadLocal<ServiceInvocationContext> SICS = new ThreadLocal<ServiceInvocationContext>();
+	public static final ThreadLocal<ServiceInvocationContext> SICS = new ThreadLocal<ServiceInvocationContext>();
 	
 	//-------- profiling --------
 

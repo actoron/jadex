@@ -51,7 +51,7 @@ public class ConsolePanel extends JPanel
 //	-------- static part --------
 
 	/** The image icons. */
-	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"clear", SGUI.makeIcon(ConsolePanel.class,	"/jadex/tools/common/images/new_console_clear.png"),
 		"on", SGUI.makeIcon(ConsolePanel.class,	"/jadex/tools/common/images/new_console_on.png"),

@@ -64,7 +64,7 @@ public class ConversationPanel extends JSplitPane
 	/**
 	 * The image icons.
 	 */
-	protected static UIDefaults icons = new UIDefaults(new Object[]
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		// Tab icons.
 		"new_message", SGUI.makeIcon(ConversationPanel.class, "/jadex/tools/common/images/new_new_message.png"),

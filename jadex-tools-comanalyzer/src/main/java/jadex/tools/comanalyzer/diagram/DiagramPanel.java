@@ -43,7 +43,7 @@ public class DiagramPanel extends ToolTab implements ActionListener
 	private static final String COMANALYZER_IMAGES = "/jadex/tools/comanalyzer/images/";
 
 	/** The image icons. */
-	protected static UIDefaults defaults = new UIDefaults(new Object[]{
+	protected static final UIDefaults defaults = new UIDefaults(new Object[]{
 	// Menu icons.
 			"scrolllock", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "scrolllock.png"), "autoscroll", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "autoscroll.png"),});
 

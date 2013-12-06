@@ -46,7 +46,7 @@ public class NIOTCPTransport implements ITransport
 	protected static final int	MAX_KEEPALIVE	= 300000;
 
 	/** The time span for which a failed connection is not retried. */
-	public static long DEADSPAN = 60000;
+	public static final long DEADSPAN = 60000;
 	
 	/** Default port. */
 	protected static final int DEFAULT_PORT	= 8765;

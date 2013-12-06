@@ -49,6 +49,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -477,7 +478,7 @@ public class SyncJobPanel extends JPanel
 							lrtf.setText(dir);
 							job.setLocalResource(dir);
 						}
-						catch(Exception ex)
+						catch(IOException ex)
 						{
 						}
 					}

@@ -28,7 +28,7 @@ public abstract class AbstractStrategy implements IStrategy
 	protected String name;
 
 	/** The strategies. */
-	protected static List strategies;
+	protected static final List strategies;
 
 	//-------- constructors --------
 

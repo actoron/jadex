@@ -8,7 +8,7 @@ public class LyapunovAlgorithm implements IFractalAlgorithm
 	//-------- constants --------
 	
 	/** Generator string (any combination of As and Bs). */
-	public static String	GENERATOR	= "AAAAABBBBB";
+	public static final String	GENERATOR	= "AAAAABBBBB";
 	
 	//-------- IFractalAlgorithm interface --------
 	

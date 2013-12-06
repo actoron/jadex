@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class ProcessStarter
 {
-	protected static Set<String> reserved;
+	protected static final Set<String> reserved;
 	
 	static
 	{

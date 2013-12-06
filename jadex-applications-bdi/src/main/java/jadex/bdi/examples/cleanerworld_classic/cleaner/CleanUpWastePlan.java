@@ -65,7 +65,7 @@ public class CleanUpWastePlan extends Plan
 				dropped	= true;
 			}
 //			catch(GoalFailureException e){}
-			catch(Exception e)
+			catch(RuntimeException e)
 			{
 			}
 		}

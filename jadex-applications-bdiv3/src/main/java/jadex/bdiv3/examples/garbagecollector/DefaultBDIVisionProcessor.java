@@ -41,29 +41,29 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	//-------- constants --------
 
 	/** The percept types property. */
-	public static String PROPERTY_PERCEPTTYPES = "percepttypes";
+	public static final String PROPERTY_PERCEPTTYPES = "percepttypes";
 	
 	
 	/** The add action. */
-	public static String ADD = "add";
+	public static final String ADD = "add";
 	
 	/** The remove action. */
-	public static String REMOVE = "remove";
+	public static final String REMOVE = "remove";
 	
 	/** The remove_outdated action (checks all entries in the belief set, if they should be seen, but are no longer there). */
-	public static String REMOVE_OUTDATED = "remove_outdated";
+	public static final String REMOVE_OUTDATED = "remove_outdated";
 	
 	/** The set action. */
-	public static String SET = "set";
+	public static final String SET = "set";
 	
 	/** The unset action (sets a belief fact to null). */
-	public static String UNSET = "unset";
+	public static final String UNSET = "unset";
 	
 	/** The maxrange property. */
-	public static String PROPERTY_MAXRANGE = "range";
+	public static final String PROPERTY_MAXRANGE = "range";
 
 	/** The maxrange property. */
-	public static String PROPERTY_RANGE = "range_property";
+	public static final String PROPERTY_RANGE = "range_property";
 
 	//-------- attributes --------
 	

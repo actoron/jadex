@@ -22,7 +22,7 @@ public class ThreadPoolFactory
 //	protected static IThreadPool	instance;
 	
 	/** The threadpools per name. */
-	protected static Map threadpools;
+	protected static final Map threadpools;
 	
 	//-------- methods --------
 	

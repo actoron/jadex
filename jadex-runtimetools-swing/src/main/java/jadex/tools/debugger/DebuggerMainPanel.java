@@ -45,10 +45,10 @@ public class DebuggerMainPanel extends JSplitPane
 	/** The factory properties key for debugger panels
 	 * (value is a comma separated list of fully
 	 * qualified class names implementing IDebuggerPanel). */
-	public static String	KEY_DEBUGGER_PANELS	= "debugger.panels";
+	public static final String	KEY_DEBUGGER_PANELS	= "debugger.panels";
 
 	/** The model properties key for breakpoints (should contain a java.util.Collection object). */
-	public static String	KEY_DEBUGGER_BREAKPOINTS	= "debugger.breakpoints";
+	public static final String	KEY_DEBUGGER_BREAKPOINTS	= "debugger.breakpoints";
 
 	//-------- attributes --------
 	

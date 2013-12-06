@@ -12,7 +12,7 @@ import java.lang.reflect.Constructor;
 public class BeanIntrospectorFactory 
 {
 	/** If true, attempt to use delegate optimization */;
-	protected static boolean OPTIMIZE = false;
+	protected static final boolean OPTIMIZE = false;
 	
 	/** Class of the optimizing delegate introspector. */
 	protected static final String DELEGATE_INTRO_CLASS = "jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector";
@@ -34,11 +34,11 @@ public class BeanIntrospectorFactory
 	 */
 	public static BeanIntrospectorFactory getInstance() 
 	{
-		if (instance == null)
+		if(instance == null)
 		{
 			synchronized (BeanIntrospectorFactory.class)
 			{
-				if (instance == null)
+				if(instance == null)
 				{
 					instance = new BeanIntrospectorFactory();
 				}

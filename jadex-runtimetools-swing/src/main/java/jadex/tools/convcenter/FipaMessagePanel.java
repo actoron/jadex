@@ -42,7 +42,7 @@ public class FipaMessagePanel extends JPanel
 	//-------- static part --------
 
 	/** The image icons. */
-	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		// Tab icons.
 		"edit", SGUI.makeIcon(FipaMessagePanel.class,	"/jadex/tools/common/images/dots_small.png"),

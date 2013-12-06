@@ -46,7 +46,7 @@ public class AlarmSettingsDialog extends JDialog
 	//-------- static part --------
 
 	/** The image icons. */
-	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"Browse", SGUI.makeIcon(AlarmSettingsDialog.class,	"/jadex/bdiv3/examples/alarmclock/images/dots_small.png"),
 		"Play", SGUI.makeIcon(AlarmSettingsDialog.class,	"/jadex/bdiv3/examples/alarmclock/images/resume.png"),

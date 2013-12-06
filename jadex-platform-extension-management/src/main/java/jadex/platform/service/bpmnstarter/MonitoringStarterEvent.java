@@ -7,13 +7,13 @@ import jadex.bridge.IComponentIdentifier;
  */
 public class MonitoringStarterEvent
 {
-	public static String ADDED = "added";
+	public static final String ADDED = "added";
 	
-	public static String REMOVED = "removed";
+	public static final String REMOVED = "removed";
 	
-	public static String INSTANCE_CREATED = "instance_created";
+	public static final String INSTANCE_CREATED = "instance_created";
 	
-	public static String INSTANCE_TERMINATED = "instance_terminated";
+	public static final String INSTANCE_TERMINATED = "instance_terminated";
 	
 	/** The event type. */
 	protected String type;

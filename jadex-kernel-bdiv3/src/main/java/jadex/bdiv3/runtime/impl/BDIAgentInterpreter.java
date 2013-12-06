@@ -106,7 +106,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	//-------- constants --------
 	
 	/** The capability separator. */
-	public static String	CAPABILITY_SEPARATOR	= "/";
+	public static final String	CAPABILITY_SEPARATOR	= "/";
 	
 	//-------- attributes --------
 	

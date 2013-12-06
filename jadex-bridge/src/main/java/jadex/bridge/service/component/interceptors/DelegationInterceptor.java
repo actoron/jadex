@@ -38,7 +38,7 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 	//-------- constants --------
 	
 	/** The static map of subinterceptors (method -> interceptor). */
-	protected static Map SUBINTERCEPTORS = getInterceptors();
+	protected static final Map SUBINTERCEPTORS = getInterceptors();
 	
 	/** The static set of no delegation methods. */
 	protected static final Set<Method> NO_DELEGATION;

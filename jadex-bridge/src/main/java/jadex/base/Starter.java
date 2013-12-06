@@ -34,6 +34,7 @@ import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
@@ -197,10 +198,10 @@ public class Starter
 //			e.printStackTrace();
 //		}
 		
-		createPlatform(args).addResultListener(new IResultListener<IExternalAccess>()
-		{
-			public void resultAvailable(final IExternalAccess access)
-			{
+		ISuspendable.SUSPENDABLE.set(new ThreadSuspendable());
+		createPlatform(args).get();
+		
+//		IExternalAccess access	= createPlatform(args).get();
 //				Runtime.getRuntime().addShutdownHook(new Thread()
 //				{
 //					public void run()
@@ -245,13 +246,6 @@ public class Starter
 //						System.exit(0);
 //					}
 //				}, 5000);
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-				System.exit(-1);
-			}
-		});
 	}
 	
 	/**

@@ -12,13 +12,13 @@ public class MParameter extends MProperty
 	//-------- constants --------
 	
 	/** The constant for direction in. */
-	public static String DIRECTION_IN = "in";
+	public static final String DIRECTION_IN = "in";
 	
 	/** The constant for direction out. */
-	public static String DIRECTION_OUT = "out";
+	public static final String DIRECTION_OUT = "out";
 
 	/** The constant for direction inout. */
-	public static String DIRECTION_INOUT = "inout";
+	public static final String DIRECTION_INOUT = "inout";
 
 	//-------- attributes --------
 	

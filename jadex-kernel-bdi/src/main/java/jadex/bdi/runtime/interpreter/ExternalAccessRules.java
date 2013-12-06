@@ -257,7 +257,7 @@ public class ExternalAccessRules
 	/**
 	 *  External access notifcation action. Resumes the external access thread.
 	 */
-	protected static IAction EXTERNALACCESS_NOTIFY = new IAction()
+	protected static final IAction EXTERNALACCESS_NOTIFY = new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{

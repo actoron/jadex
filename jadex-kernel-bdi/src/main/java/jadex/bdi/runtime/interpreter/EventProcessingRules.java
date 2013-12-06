@@ -48,7 +48,7 @@ public class EventProcessingRules
 	/**
 	 *  Action to add matching rplan to apl.
 	 */
-	protected static IAction	ADD_RPLAN_TO_APL	= new IAction()
+	protected static final IAction	ADD_RPLAN_TO_APL	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -101,7 +101,7 @@ public class EventProcessingRules
 	/**
 	 *  Action to add matching waitqueue candidate to apl.
 	 */
-	protected static IAction	ADD_WAITQUEUECAND_TO_APL	= new IAction()
+	protected static final IAction	ADD_WAITQUEUECAND_TO_APL	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -129,7 +129,7 @@ public class EventProcessingRules
 	/**
 	 *  Action to set waitqueue candidate apl building to finished.
 	 */
-	protected static IAction	MAKE_APL_AVAILABLE	= new IAction()
+	protected static final IAction	MAKE_APL_AVAILABLE	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -578,7 +578,7 @@ public class EventProcessingRules
 		return metalevel_reasoning;
 	}
 	
-	protected static IAction METALEVEL_ACTION = new IAction()
+	protected static final IAction METALEVEL_ACTION = new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -1384,7 +1384,7 @@ public class EventProcessingRules
 		return rule;
 	}
 	
-	protected static IAction DISPATCH_WAITQUEUE_ELEMENT_ACTION = new IAction()
+	protected static final IAction DISPATCH_WAITQUEUE_ELEMENT_ACTION = new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{

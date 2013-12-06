@@ -123,7 +123,7 @@ public class GoalLifecycleRules
 	/**
 	 *  Instantiate and adopt an MGoal in a given RCapability.
 	 */
-	protected static IAction	GOAL_CREATION_ACTION	= new IAction()
+	protected static final IAction	GOAL_CREATION_ACTION	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -161,7 +161,7 @@ public class GoalLifecycleRules
 	/**
 	 *  Set an RGoal to the option state.
 	 */
-	protected static IAction GOAL_OPTION_ACTION	= new IAction()
+	protected static final IAction GOAL_OPTION_ACTION	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -181,7 +181,7 @@ public class GoalLifecycleRules
 	/**
 	 *  Suspend an RGoal.
 	 */
-	protected static IAction GOAL_SUSPEND_ACTION	= new IAction()
+	protected static final IAction GOAL_SUSPEND_ACTION	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -202,7 +202,7 @@ public class GoalLifecycleRules
 	 *  Start dropping of an RGoal.
 	 *  Will lead to abortion of plans and ultimately the goal will be dropped.
 	 */
-	protected static IAction GOAL_DROPPING_ACTION	= new IAction()
+	protected static final IAction GOAL_DROPPING_ACTION	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -220,7 +220,7 @@ public class GoalLifecycleRules
 	 *  Drop an RGoal and remove it from the goalbase. 
 	 *  Removes goal from capability.
 	 */
-	protected static IAction GOAL_DROP_ACTION	= new IAction()
+	protected static final IAction GOAL_DROP_ACTION	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{

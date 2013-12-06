@@ -14,7 +14,7 @@ public class ProxyFilter implements IRemoteFilter
 	//-------- attributes --------
 	
 	/** Static proxy filter instance. */
-	public static IRemoteFilter PROXYFILTER = new ProxyFilter();
+	public static final IRemoteFilter PROXYFILTER = new ProxyFilter();
 
 	//-------- methods --------
 	

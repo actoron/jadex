@@ -656,7 +656,7 @@ public class ServiceCallTask implements ITask
 	//					System.out.println("setting: "+method);
 						MProperty mprop = task.getProperties().get(PROPERTY_RANKING);
 						UnparsedExpression uexp = new UnparsedExpression(null, 
-							String.class, ci!=null? "\""+ci.toString()+"\"": "null", null);
+							String.class, "\""+ci.toString()+"\"", null);
 						mprop.setInitialValue(uexp);
 					}
 				}

@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class NIOBehavior
 {
-	protected static Random	rnd	= new Random();
+	protected static final Random	rnd	= new Random();
 	
 	public static void main(String[] args) throws Exception
 	{

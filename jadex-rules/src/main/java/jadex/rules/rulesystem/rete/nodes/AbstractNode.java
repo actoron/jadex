@@ -79,7 +79,7 @@ public abstract class AbstractNode implements INode
 	//-------- cloneable --------
 	
 	/** The thread local. */
-	protected static ThreadLocal clones = new ThreadLocal();
+	protected static final ThreadLocal clones = new ThreadLocal();
 	
 	/**
 	 *  Clone this object.

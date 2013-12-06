@@ -81,7 +81,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	//-------- static part --------
 	
 	/** Identifier for an undefined pool (e.g. when no 'aborted' pool is specified). */
-	protected static String	POOL_UNDEFINED	= "undefined-pool";
+	protected static final String	POOL_UNDEFINED	= "undefined-pool";
 	
 	/** The activity execution handlers (activity type -> handler). */
 	public static final Map	PLAN_ACTIVITY_HANDLERS;

@@ -23,16 +23,16 @@ public class ReferenceManagementTest extends TestCase
 	//-------- OAV type definitions --------
 	
 	/** The node type model. */
-	public static OAVTypeModel node_type_model;
+	public static final OAVTypeModel node_type_model;
 	
 	/** The node type. */
-	public static OAVObjectType node_type;
+	public static final OAVObjectType node_type;
 	
 	/** A node has a name. */
-	public static OAVAttributeType node_has_name;
+	public static final OAVAttributeType node_has_name;
 
 	/** A node has subnodes. */
-	public static OAVAttributeType node_has_subnodes;
+	public static final OAVAttributeType node_has_subnodes;
 
 	static
 	{

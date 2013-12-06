@@ -11,34 +11,34 @@ public class BasicTypeConverter //implements ITypeConverter
 	//-------- static part --------
 	
 	/** String -> String converter. (remove?) */
-	public static IStringObjectConverter STRING_CONVERTER = new StringTypeConverter();
+	public static final IStringObjectConverter STRING_CONVERTER = new StringTypeConverter();
 	
 	/** String -> Integer converter.  */
-	public static IStringObjectConverter INTEGER_CONVERTER = new IntegerTypeConverter();
+	public static final IStringObjectConverter INTEGER_CONVERTER = new IntegerTypeConverter();
 	
 	/** String -> Long converter. */
-	public static IStringObjectConverter LONG_CONVERTER = new LongTypeConverter();
+	public static final IStringObjectConverter LONG_CONVERTER = new LongTypeConverter();
 	
 	/** String -> Float converter. */
-	public static IStringObjectConverter FLOAT_CONVERTER = new FloatTypeConverter();
+	public static final IStringObjectConverter FLOAT_CONVERTER = new FloatTypeConverter();
 	
 	/** String -> Double converter. */
-	public static IStringObjectConverter DOUBLE_CONVERTER = new DoubleTypeConverter();
+	public static final IStringObjectConverter DOUBLE_CONVERTER = new DoubleTypeConverter();
 	
 	/** String -> Boolean converter. */
-	public static IStringObjectConverter BOOLEAN_CONVERTER = new BooleanTypeConverter();
+	public static final IStringObjectConverter BOOLEAN_CONVERTER = new BooleanTypeConverter();
 	
 	/** String -> Short converter. */
-	public static IStringObjectConverter SHORT_CONVERTER = new ShortTypeConverter();
+	public static final IStringObjectConverter SHORT_CONVERTER = new ShortTypeConverter();
 	
 	/** String -> Byte converter. */
-	public static IStringObjectConverter BYTE_CONVERTER = new ByteTypeConverter();
+	public static final IStringObjectConverter BYTE_CONVERTER = new ByteTypeConverter();
 	
 	/** String -> Character converter. (remove?) */
-	public static IStringObjectConverter CHARACTER_CONVERTER = new CharacterTypeConverter();
+	public static final IStringObjectConverter CHARACTER_CONVERTER = new CharacterTypeConverter();
 	
 	/** The map of basic converters. */
-	protected static Map basicconverters;
+	protected static final Map basicconverters;
 	
 	static
 	{

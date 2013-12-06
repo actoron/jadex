@@ -66,11 +66,11 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 	/**
 	 * The image icons. 
 	 */
-	protected static UIDefaults defaults = new UIDefaults(new Object[]{"refresh", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "refresh2.png"), "zoom",
+	protected static final UIDefaults defaults = new UIDefaults(new Object[]{"refresh", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "refresh2.png"), "zoom",
 			SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "zoom.png")});
 
 	/** The map of different layouts. */
-	public static Map LAYOUTS;
+	public static final Map LAYOUTS;
 	static
 	{
 		LAYOUTS = new LinkedHashMap();

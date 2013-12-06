@@ -1165,7 +1165,7 @@ public class SReflect
 			|| clazz.isArray();
 	}
 	
-	protected static Object[] EMPTY_ARRAY = new Object[0];
+	protected static final Object[] EMPTY_ARRAY = new Object[0];
 	/**
 	 *  Get an array for an arbitrary collection object.
 	 *  Supports iterators, enumerations, java.util.Collections,

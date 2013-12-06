@@ -20,18 +20,18 @@ public class OAVJavaType extends OAVObjectType
 	//-------- constants --------
 	
 	/** The value kind (for immutable java objects). */
-	public static String	KIND_VALUE	= "value";
+	public static final String	KIND_VALUE	= "value";
 	
 	/** The object kind (for normal java objects). */
-	public static String	KIND_OBJECT	= "object";
+	public static final String	KIND_OBJECT	= "object";
 	
 	/** The bean kind (for java beans supporting property changes). */
-	public static String	KIND_BEAN	= "bean";
+	public static final String	KIND_BEAN	= "bean";
 	
 	//-------- java type definitions --------
 	
 	/** The java type model. */
-	public static OAVTypeModel java_type_model;
+	public static final OAVTypeModel java_type_model;
 	
 	/** The java object type. */
 	public static final OAVJavaType java_object_type;

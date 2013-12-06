@@ -311,8 +311,8 @@ class TableCellIndex
 	protected TableCellIndex(String dimensionString)
 	{
 		String[] dimension = dimensionString.split(":");
-		this.rowCount = Integer.valueOf(dimension[0]);
-		this.columnCount = Integer.valueOf(dimension[1]);
+		this.rowCount = Integer.parseInt(dimension[0]);
+		this.columnCount = Integer.parseInt(dimension[1]);
 	}
 	
 	// ---- methods ----

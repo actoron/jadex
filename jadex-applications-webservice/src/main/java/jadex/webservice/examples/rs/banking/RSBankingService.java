@@ -33,25 +33,29 @@ import com.sun.jersey.server.wadl.WadlGenerator;
  *  Using the 'generate=true' option the missing interface methods
  *  will be automatically added by Jadex Rest publishing. 
  */
-// Note, if the class has a Path annotation jesery automatically activates it.
+// Note, if the class has a Path annotation jersey automatically activates it.
 //@Path("/")
 public class RSBankingService
 {
-	public static String info;
+	public static final String info;
 	
 	static
 	{
+		String tmp;
 		try
 		{
 			InputStream is = SUtil.getResource0("jadex/webservice/examples/rs/banking/BankingServiceInfo.html", 
 				Thread.currentThread().getContextClassLoader());
-			info = new Scanner(is).useDelimiter("\\A").next();
+			tmp = new Scanner(is).useDelimiter("\\A").next();
+			is.close();
 //			System.out.println(info);
 		}
 		catch(Exception e)
 		{
+			tmp	= null;
 			e.printStackTrace();
 		}
+		info	= tmp;
 	}
 	
 	@Context 

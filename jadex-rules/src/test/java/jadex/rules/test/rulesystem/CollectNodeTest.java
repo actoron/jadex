@@ -42,15 +42,15 @@ public class CollectNodeTest extends TestCase
 {
 	//-------- type model --------
 
-	protected static OAVTypeModel	tmodel;
-	protected static OAVObjectType	store_type;
-	protected static OAVObjectType	music_type;
-	protected static OAVAttributeType	store_has_domain;
-	protected static OAVAttributeType	store_has_cds;
-	protected static OAVAttributeType	music_has_store;
-	protected static OAVAttributeType	music_has_artist;
-	protected static OAVAttributeType	music_has_title;
-	protected static OAVAttributeType	music_has_price;
+	protected static final OAVTypeModel	tmodel;
+	protected static final OAVObjectType	store_type;
+	protected static final OAVObjectType	music_type;
+	protected static final OAVAttributeType	store_has_domain;
+	protected static final OAVAttributeType	store_has_cds;
+	protected static final OAVAttributeType	music_has_store;
+	protected static final OAVAttributeType	music_has_artist;
+	protected static final OAVAttributeType	music_has_title;
+	protected static final OAVAttributeType	music_has_price;
 	
 	static
 	{

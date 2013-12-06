@@ -10,6 +10,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
+import jadex.commons.collection.IBlockingQueue.ClosedException;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.STransformation;
@@ -63,7 +64,10 @@ public class RelayHandler
 		
 		if(!dir.exists())
 		{
-			dir.mkdirs();
+			if(!dir.mkdirs())
+			{
+				getLogger().info("Cannot mkdirs: "+dir);
+			}
 		}
 		else if(!dir.isDirectory())
 		{
@@ -731,7 +735,7 @@ public class RelayHandler
 	//							System.out.println("queing awareness info to:"+id);
 							map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
 						}
-						catch(Exception e)
+						catch(ClosedException e)
 						{
 							// Queue closed, because platform just disconnected.
 						}
@@ -771,7 +775,7 @@ public class RelayHandler
 		//								System.out.println("queing awareness info to:"+id);
 									map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
 								}
-								catch(Exception e)
+								catch(ClosedException e)
 								{
 									// Queue closed, because platform just disconnected.
 								}

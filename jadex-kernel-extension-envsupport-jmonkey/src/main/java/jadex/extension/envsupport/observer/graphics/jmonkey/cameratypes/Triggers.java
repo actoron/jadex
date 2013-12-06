@@ -13,7 +13,7 @@ import com.jme3.input.controls.Trigger;
  */
 public class Triggers
 {
-    public static Trigger leftTrigger = new KeyTrigger(KeyInput.KEY_A),
+    public static final Trigger leftTrigger = new KeyTrigger(KeyInput.KEY_A),
             rightTrigger = new KeyTrigger(KeyInput.KEY_D),
             downTrigger = new KeyTrigger(KeyInput.KEY_S),
             upTrigger = new KeyTrigger(KeyInput.KEY_W),
@@ -36,7 +36,7 @@ public class Triggers
             downsmouse = new 	 MouseAxisTrigger(MouseInput.AXIS_Y, false),
             queueButton = new KeyTrigger(KeyInput.KEY_LSHIFT),
             secondButton = new MouseButtonTrigger(MouseInput.BUTTON_RIGHT),
-            actionButton = new MouseButtonTrigger(MouseInput.BUTTON_LEFT);;
+            actionButton = new MouseButtonTrigger(MouseInput.BUTTON_LEFT);
             
             
 

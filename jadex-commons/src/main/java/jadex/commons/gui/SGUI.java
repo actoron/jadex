@@ -89,26 +89,28 @@ public class SGUI
 	public static final String	AUTO_ADJUST	= "auto-adjust";
 	
 	/** This is set to true if the VM has a working GUI environment available. */
-	public static boolean HAS_GUI = true;
+	public static final boolean HAS_GUI;
 	static
 	{
+		boolean	hasgui;
 		if (SReflect.isAndroid()) 
 		{
-			HAS_GUI = false;
+			hasgui = false;
 		} 
 		else 
 		{
 			try
 			{
-				HAS_GUI = !(GraphicsEnvironment.isHeadless() ||
+				hasgui = !(GraphicsEnvironment.isHeadless() ||
 						 	  GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length < 1);
 			}
-			catch (Error e)
+			catch(Error e)
 			{
 				// On system misconfigurations, Java throws an Error (grr).
-				HAS_GUI = false;
+				hasgui = false;
 			}
 		}
+		HAS_GUI	= hasgui;
 	}
 		
 	

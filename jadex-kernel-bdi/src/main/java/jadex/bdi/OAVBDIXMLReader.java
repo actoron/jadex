@@ -32,14 +32,16 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.IBeanObjectCreator;
+import jadex.xml.reader.AReadContext;
+import jadex.xml.reader.AReader;
 import jadex.xml.reader.IObjectLinker;
 import jadex.xml.reader.IObjectReaderHandler;
-import jadex.xml.reader.AReader;
-import jadex.xml.reader.AReadContext;
 import jadex.xml.reader.XMLReaderFactory;
+import jadex.xml.stax.ILocation;
+import jadex.xml.stax.QName;
+import jadex.xml.stax.XMLReporter;
 import jadex.xml.writer.AWriter;
 import jadex.xml.writer.IObjectWriterHandler;
-import jadex.xml.writer.Writer;
 import jadex.xml.writer.XMLWriterFactory;
 
 import java.util.ArrayList;
@@ -48,10 +50,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import jadex.xml.stax.QName;
-import jadex.xml.stax.ILocation;
-import jadex.xml.stax.XMLReporter;
 
 
 
@@ -63,17 +61,17 @@ public class OAVBDIXMLReader
 	//-------- attributes --------
 	
 	/** The singleton reader instance. */
-	protected static AReader reader;
-	protected static AWriter writer;
+	protected static final AReader reader;
+	protected static final AWriter writer;
 	
 	/** The manager. */
-	protected static TypeInfoPathManager manager;
+	protected static final TypeInfoPathManager manager;
 	
 	/** The handler. */
-	protected static IObjectReaderHandler readerhandler;
+	protected static final IObjectReaderHandler readerhandler;
 
 	/** The writer handler. */
-	protected static IObjectWriterHandler writerhandler;
+	protected static final IObjectWriterHandler writerhandler;
 
 	// Initialize reader instance.
 	static
@@ -668,7 +666,7 @@ public class OAVBDIXMLReader
 	public static class ExpressionProcessor	implements IPostProcessor
 	{
 		// Hack!!! Should be configurable.
-		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
+		protected static final IExpressionParser	exp_parser	= new JavaCCExpressionParser();
 
 		protected ClassPostProcessor clpost = new ClassPostProcessor(OAVBDIMetaModel.expression_has_classname, OAVBDIMetaModel.expression_has_class);
 				

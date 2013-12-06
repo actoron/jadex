@@ -110,15 +110,15 @@ public class BpmnXMLReader
 	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B"; //"#|#";
 
 	/** The manager. */
-	protected static TypeInfoPathManager manager;
+	protected static final TypeInfoPathManager manager;
 	
 	/** The handler. */
-	protected static IObjectReaderHandler handler;
+	protected static final IObjectReaderHandler handler;
 	
 	//-------- attributes --------
 	
 	/** The singleton reader instance. */
-	protected static AReader	reader;
+	protected static final AReader	reader;
 	
 	public static IPostProcessor configpp = new IPostProcessor()
 	{

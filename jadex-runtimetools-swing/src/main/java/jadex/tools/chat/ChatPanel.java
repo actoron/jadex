@@ -147,7 +147,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 
 	});
 	
-	protected static List<String> smileys = SUtil.createArrayList(new String[]{
+	protected static final List<String> smileys = SUtil.createArrayList(new String[]{
 		":-)", ":D", ":-(", ";-)", ":-p", ":o", ">-)", ">)", ":>"});
 
 	
@@ -176,7 +176,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public static final String	NOTIFICATION_FILE_ABORT	= "file abort";
 	
 	/** The default notification sounds. */
-	protected static Map<String, String>	NOTIFICATION_SOUNDS;
+	protected static final Map<String, String>	NOTIFICATION_SOUNDS;
 	
 	static
 	{

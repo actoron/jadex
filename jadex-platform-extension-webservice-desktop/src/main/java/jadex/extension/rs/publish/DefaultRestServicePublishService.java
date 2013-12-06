@@ -84,24 +84,24 @@ public class DefaultRestServicePublishService implements IPublishService
 	//-------- constants --------
 	
 	/** Constant for boolean flag if automatic generation should be used.*/ 
-	public static String GENERATE = "generate";
+	public static final String GENERATE = "generate";
 	
 	/** Constant for String[] for supported parameter media types.*/ 
-	public static String FORMATS = "formats";
+	public static final String FORMATS = "formats";
 	
 	/** Constant for boolean.*/ 
-	public static String GENERATE_INFO = "generateinfo";
+	public static final String GENERATE_INFO = "generateinfo";
 	
 	/** The default media formats. */
 //	public static String[] DEFAULT_FORMATS = new String[]{"xml", "json"};
-	public static MediaType[] DEFAULT_FORMATS = new MediaType[]{MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE};
+	public static final MediaType[] DEFAULT_FORMATS = new MediaType[]{MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE};
 
 //	/** The format -> media type mapping. */
 //	public static Map<String, String> formatmap = SUtil.createHashMap(DEFAULT_FORMATS, 
 //		new String[]{MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON});
 	
 	/** The service constant. */
-	public static String JADEXSERVICE = "jadexservice"; 
+	public static final String JADEXSERVICE = "jadexservice"; 
 	
 	//-------- attributes --------
 	

@@ -26,13 +26,13 @@ public class SplitNode extends AbstractNode implements IObjectConsumerNode, IObj
 	//-------- attributes --------
 	
 	/** The constant for a multi variable. */
-	public static String MULTI = "multi";
+	public static final String MULTI = "multi";
 	
 	/** The constant for a single variable. */
-	public static String SINGLE = "single";
+	public static final String SINGLE = "single";
 
 	/** The constant for a dummy multi variable. */
-	public static String MULTI_DUMMY = "multi_dummy";
+	public static final String MULTI_DUMMY = "multi_dummy";
 	
 	//-------- attributes --------
 	

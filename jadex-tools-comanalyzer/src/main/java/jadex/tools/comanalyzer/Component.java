@@ -48,7 +48,7 @@ public class Component extends ParameterElement
 	public static final String STATE_REMOTE = "remote";
 
 	/** The allowed message attributes. */
-	public static List AGENT_ATTRIBUTES;
+	public static final List AGENT_ATTRIBUTES;
 
 	static
 	{

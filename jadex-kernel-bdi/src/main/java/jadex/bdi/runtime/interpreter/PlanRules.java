@@ -1896,7 +1896,7 @@ public class PlanRules
 	/**
 	 *  Create a new plan.
 	 */
-	protected static IAction PLAN_CREATION = new IAction()
+	protected static final IAction PLAN_CREATION = new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -1933,7 +1933,7 @@ public class PlanRules
 	/**
 	 *  Create a plan in reaction to a change event.
 	 */
-	protected static IAction PLAN_CHANGECREATION = new IAction()
+	protected static final IAction PLAN_CHANGECREATION = new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -1977,7 +1977,7 @@ public class PlanRules
 	/**
 	 *  Reschedule a plan after change event.
 	 */
-	protected static IAction PLAN_CHANGEWAIT = new IAction()
+	protected static final IAction PLAN_CHANGEWAIT = new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -2001,7 +2001,7 @@ public class PlanRules
 	/**
 	 *  Add a collected event to the waitqueue
 	 */
-	protected static IAction PLAN_CHANGEWAITQUEUE = new IAction()
+	protected static final IAction PLAN_CHANGEWAITQUEUE = new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -2015,7 +2015,7 @@ public class PlanRules
 	/**
 	 *  Set an plan context to invalid.
 	 */
-	protected static IAction PLAN_ABORT	= new IAction()
+	protected static final IAction PLAN_ABORT	= new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{
@@ -2030,7 +2030,7 @@ public class PlanRules
 	/**
 	 *  Reschedule a plan after external condition becomes true
 	 */
-	protected static IAction PLAN_EXTERNALCONDITIONWAIT = new IAction()
+	protected static final IAction PLAN_EXTERNALCONDITIONWAIT = new IAction()
 	{
 		public void execute(IOAVState state, IVariableAssignments assignments)
 		{

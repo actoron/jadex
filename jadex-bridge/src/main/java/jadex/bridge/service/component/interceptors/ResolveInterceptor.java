@@ -3,17 +3,13 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.nonfunctional.INFMethodPropertyProvider;
-import jadex.bridge.nonfunctional.INFProperty;
-import jadex.bridge.nonfunctional.INFPropertyMetaInfo;
 import jadex.bridge.nonfunctional.INFPropertyProvider;
-import jadex.bridge.nonfunctional.INFRPropertyProvider;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -26,7 +22,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -45,10 +40,10 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	//-------- constants --------
 	
 	/** The static map of subinterceptors (method -> interceptor). */
-	public static Set<Method> SERVICEMETHODS;
-	protected static Method START_METHOD;
-	protected static Method SHUTDOWN_METHOD;
-	protected static Method CREATESID_METHOD;
+	public static final Set<Method> SERVICEMETHODS;
+	protected static final Method START_METHOD;
+	protected static final Method SHUTDOWN_METHOD;
+//	protected static final Method CREATESID_METHOD;
 	
 	static
 	{
@@ -79,7 +74,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 	

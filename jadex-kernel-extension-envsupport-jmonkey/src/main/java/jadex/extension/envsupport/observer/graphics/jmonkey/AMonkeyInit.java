@@ -173,14 +173,22 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	}
 
+	// Keep loggers to avoid loosings settings due to garbage collection.
+	Logger	deflogger;
+	Logger	niftylogger;
+	Logger	niftyinput;
+	
 	protected void simpleInit()
 	{
 		this.fpp = new FilterPostProcessor(assetManager);
 
 		// Base Setup
-		Logger.getLogger("").setLevel(Level.SEVERE);
-		Logger.getLogger("de.lessvoid.nifty").setLevel(Level.SEVERE);
-		Logger.getLogger("NiftyInputEventHandlingLog").setLevel(Level.SEVERE);
+		deflogger	= Logger.getLogger("");
+		niftylogger	= Logger.getLogger("de.lessvoid.nifty");
+		niftyinput	= Logger.getLogger("NiftyInputEventHandlingLog");
+		deflogger.setLevel(Level.SEVERE);
+		niftylogger.setLevel(Level.SEVERE);
+		niftyinput.setLevel(Level.SEVERE);
 
 		viewPort.setBackgroundColor(ColorRGBA.Black);
 		stateManager.getState(StatsAppState.class).toggleStats();

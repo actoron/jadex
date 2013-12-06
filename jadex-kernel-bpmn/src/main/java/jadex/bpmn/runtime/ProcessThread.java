@@ -438,7 +438,7 @@ public class ProcessThread	implements ITaskContext
 			Object coll = data.get(name);
 			if(coll instanceof List)
 			{
-				int index = key==null? -1: ((Number)key).intValue();
+				int index = ((Number)key).intValue();
 				if(index>=0)
 					((List)coll).set(index, value);
 				else

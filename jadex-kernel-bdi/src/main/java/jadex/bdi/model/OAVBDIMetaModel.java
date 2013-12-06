@@ -74,15 +74,15 @@ public class OAVBDIMetaModel
 	//-------- type model --------
 
 	/** The type model. */
-	public static OAVTypeModel bdimm_type_model;
+	public static final OAVTypeModel bdimm_type_model;
 	
 	//-------- java types --------
 	
 	/** The parsed expression java type. */
-	public static OAVJavaType	java_parsedexpression_type;
+	public static final OAVJavaType	java_parsedexpression_type;
 	
 	/** The message event type java type. */
-	public static OAVJavaType	java_messagetype_type;
+	public static final OAVJavaType	java_messagetype_type;
 	
 //	/** The provided service java type. */
 //	public static OAVJavaType	java_providedservice_type;
@@ -93,37 +93,37 @@ public class OAVBDIMetaModel
 	//-------- object --------
 	
 	/** The object type (dummy root type). */
-	public static OAVObjectType object_type;
+	public static final OAVObjectType object_type;
 	
 	//-------- abstract model element --------
 	
 	/** The model element type. */
-	public static OAVObjectType modelelement_type;
+	public static final OAVObjectType modelelement_type;
 	
 	/** Model element has name attribute. */
-	public static OAVAttributeType modelelement_has_name;
+	public static final OAVAttributeType modelelement_has_name;
 	
 	/** Model element has description attribute. */
-	public static OAVAttributeType modelelement_has_description;
+	public static final OAVAttributeType modelelement_has_description;
 	
 	//-------- referenceable element --------
 	
 	/** The referenceable element type. */
-	public static OAVObjectType referenceableelement_type;
+	public static final OAVObjectType referenceableelement_type;
 	
 	/** Referenceable element has exported attribute. */
-	public static OAVAttributeType referenceableelement_has_exported;
+	public static final OAVAttributeType referenceableelement_has_exported;
 	
 	/** Referenceable element has assignto attribute. */
-	public static OAVAttributeType referenceableelement_has_assignto;
+	public static final OAVAttributeType referenceableelement_has_assignto;
 	
 	//-------- element reference --------
 	
 	/** The element reference type. */
-	public static OAVObjectType elementreference_type;
+	public static final OAVObjectType elementreference_type;
 	
 	/** Element reference has concrete attribute. */
-	public static OAVAttributeType elementreference_has_concrete;
+	public static final OAVAttributeType elementreference_has_concrete;
 //	
 //	/** Element reference has abstract attribute. */
 //	public static OAVAttributeType elementreference_has_abstract;
@@ -134,24 +134,24 @@ public class OAVBDIMetaModel
 	//-------- abstract parameter element --------
 	
 	/** The parameter element type. */
-	public static OAVObjectType parameterelement_type;
+	public static final OAVObjectType parameterelement_type;
 	
 	/** Parameter element has parameters attribute. */
-	public static OAVAttributeType parameterelement_has_parameters;
+	public static final OAVAttributeType parameterelement_has_parameters;
 	
 	/** Parameter element has parametersets attribute. */
-	public static OAVAttributeType parameterelement_has_parametersets;
+	public static final OAVAttributeType parameterelement_has_parametersets;
 	
 	//-------- abstract processable element --------
 	
 	/** The (abstract) processable element type. */
-	public static OAVObjectType processableelement_type;
+	public static final OAVObjectType processableelement_type;
 	
 	/** Processable element has posttoall attribute. */
-	public static OAVAttributeType processableelement_has_posttoall;
+	public static final OAVAttributeType processableelement_has_posttoall;
 	
 	/** Processable element has random selection attribute. */
-	public static OAVAttributeType processableelement_has_randomselection;
+	public static final OAVAttributeType processableelement_has_randomselection;
 	
 	//-------- abstract parameter element reference --------
 	
@@ -167,23 +167,23 @@ public class OAVBDIMetaModel
 	//-------- abstract typed element --------
 	
 	/** The typed element type. */
-	public static OAVObjectType typedelement_type;
+	public static final OAVObjectType typedelement_type;
 	
 	/** Typed element has class attribute. */
-	public static OAVAttributeType typedelement_has_class;
+	public static final OAVAttributeType typedelement_has_class;
 	
 	/** Typed element has classname attribute. */
 	// Required for XML loading. Todo: remove?
-	public static OAVAttributeType typedelement_has_classname;
+	public static final OAVAttributeType typedelement_has_classname;
 	
 	/** Typed element has update rate attribute. */
-	public static OAVAttributeType typedelement_has_updaterate;
+	public static final OAVAttributeType typedelement_has_updaterate;
 	
 	/** Typed element has transient attribute. */
 //	public static OAVAttributeType typedelement_has_transient;
 	
 	/** Typed element has dynamic attribute. */
-	public static OAVAttributeType typedelement_has_evaluationmode;
+	public static final OAVAttributeType typedelement_has_evaluationmode;
 
 	//-------- typed element reference --------
 	
@@ -196,92 +196,92 @@ public class OAVBDIMetaModel
 	//-------- abstract parameter element --------
 	
 	/** The parameter type. */
-	public static OAVObjectType parameter_type;
+	public static final OAVObjectType parameter_type;
 	
 	/** Parameter has value attribute. */
-	public static OAVAttributeType parameter_has_value;
+	public static final OAVAttributeType parameter_has_value;
 	
 	/** Parameter has direction attribute. */
-	public static OAVAttributeType parameter_has_direction;
+	public static final OAVAttributeType parameter_has_direction;
 	
 	/** Parameter has optional attribute. */
-	public static OAVAttributeType parameter_has_optional;
+	public static final OAVAttributeType parameter_has_optional;
 	
 	/** Parameter has binding options attribute. */
-	public static OAVAttributeType parameter_has_bindingoptions;
+	public static final OAVAttributeType parameter_has_bindingoptions;
 	
 	//-------- abstract parameterset element --------
 	
 	/** The parameter set element type. */
-	public static OAVObjectType parameterset_type;
+	public static final OAVObjectType parameterset_type;
 	
 	/** Parameter set has values attribute. */
-	public static OAVAttributeType parameterset_has_values;
+	public static final OAVAttributeType parameterset_has_values;
 	
 	/** Parameter set has values expression attribute. */
-	public static OAVAttributeType parameterset_has_valuesexpression;
+	public static final OAVAttributeType parameterset_has_valuesexpression;
 		
 	/** Parameter set has direction attribute. */
-	public static OAVAttributeType parameterset_has_direction;
+	public static final OAVAttributeType parameterset_has_direction;
 	
 	/** Parameter set has optional attribute. */
-	public static OAVAttributeType parameterset_has_optional;
+	public static final OAVAttributeType parameterset_has_optional;
 
 	//-------- abstract goal --------
 	
 	/** The (abstract) goal type. */
-	public static OAVObjectType goal_type;
+	public static final OAVObjectType goal_type;
 	
 	/** Goal has creation condition attribute. */
-	public static OAVAttributeType goal_has_creationcondition;
+	public static final OAVAttributeType goal_has_creationcondition;
 	
 	/** Goal has context condition attribute. */
-	public static OAVAttributeType goal_has_contextcondition;
+	public static final OAVAttributeType goal_has_contextcondition;
 	
 	/** Goal has drop condition attribute. */
-	public static OAVAttributeType goal_has_dropcondition;
+	public static final OAVAttributeType goal_has_dropcondition;
 	
 	/** Goal has retry attribute. */
-	public static OAVAttributeType goal_has_retry;
+	public static final OAVAttributeType goal_has_retry;
 	
 	/** Goal has retry delay attribute. */
-	public static OAVAttributeType goal_has_retrydelay;
+	public static final OAVAttributeType goal_has_retrydelay;
 	
 	/** Goal has recur attribute. */
-	public static OAVAttributeType goal_has_recur;
+	public static final OAVAttributeType goal_has_recur;
 	
 	/** Goal has recur delay attribute. */
-	public static OAVAttributeType goal_has_recurdelay;
+	public static final OAVAttributeType goal_has_recurdelay;
 	
 	/** Goal has recur condition attribute. */
-	public static OAVAttributeType goal_has_recurcondition;
+	public static final OAVAttributeType goal_has_recurcondition;
 	
 	/** Goal has exclude attribute. */
-	public static OAVAttributeType goal_has_exclude;
+	public static final OAVAttributeType goal_has_exclude;
 	
 	/** Goal has rebuild attribute. */
-	public static OAVAttributeType goal_has_rebuild;
+	public static final OAVAttributeType goal_has_rebuild;
 	
 	/** Goal has unique attribute. */
-	public static OAVAttributeType goal_has_unique;
+	public static final OAVAttributeType goal_has_unique;
 	
 	/** Goal has excluded parameter (for unique) attribute. */
-	public static OAVAttributeType goal_has_excludedparameter;
+	public static final OAVAttributeType goal_has_excludedparameter;
 	
 	/** Goal has inhibits attribute. */
-	public static OAVAttributeType goal_has_inhibits;
+	public static final OAVAttributeType goal_has_inhibits;
 	
 	/** Goal has cardinality attribute. */
-	public static OAVAttributeType goal_has_cardinality;
+	public static final OAVAttributeType goal_has_cardinality;
 	
 	/** Goal has publish attribute. */
-	public static OAVAttributeType goal_has_publish;
+	public static final OAVAttributeType goal_has_publish;
 
 	
 	//-------- goal reference --------
 	
 	/** The goal reference type. */
-	public static OAVObjectType goalreference_type;
+	public static final OAVObjectType goalreference_type;
 	
 	/** Goalreference has inhibits attribute. */
 //	public static OAVAttributeType goalreference_has_inhibits;
@@ -292,51 +292,51 @@ public class OAVBDIMetaModel
 	//-------- inhibit --------
 	
 	/** The inhibit type. */
-	public static OAVObjectType inhibits_type;
+	public static final OAVObjectType inhibits_type;
 	
 	/** Inhibit has ref attribute. */
-	public static OAVAttributeType inhibits_has_ref;
+	public static final OAVAttributeType inhibits_has_ref;
 	
 	/** Inhibit has inhibits attribute. */
-	public static OAVAttributeType inhibits_has_inhibit;
+	public static final OAVAttributeType inhibits_has_inhibit;
 	
 	//-------- expression --------
 	
 	/** The expression type. */
-	public static OAVObjectType expression_type;
+	public static final OAVObjectType expression_type;
 
 	/** The expression ref type. */
-	public static OAVObjectType expressionreference_type;
+	public static final OAVObjectType expressionreference_type;
 	
 	/** Expression has language. */
-	public static OAVAttributeType expression_has_language;
+	public static final OAVAttributeType expression_has_language;
 
 	/** Expression has variable. */
-	public static OAVAttributeType expression_has_variable;
+	public static final OAVAttributeType expression_has_variable;
 
 	/** Expression has text attribute. */
-	public static OAVAttributeType expression_has_text;
+	public static final OAVAttributeType expression_has_text;
 	
 	/** Expression has parsed expression attribute. */
-	public static OAVAttributeType expression_has_parsed;
+	public static final OAVAttributeType expression_has_parsed;
 
 	/** Expression has classname attribute. */
-	public static OAVAttributeType expression_has_classname;
+	public static final OAVAttributeType expression_has_classname;
 
 	/** Expression has class attribute. */
-	public static OAVAttributeType expression_has_class;	
+	public static final OAVAttributeType expression_has_class;	
 
 	//-------- goalpublish --------
 	
 	/** The goal publish type. */
-	public static OAVObjectType publish_type;
+	public static final OAVObjectType publish_type;
 	
 	/** Goal publish has service name. */
-	public static OAVAttributeType publish_has_classname;
-	public static OAVAttributeType publish_has_class;
+	public static final OAVAttributeType publish_has_classname;
+	public static final OAVAttributeType publish_has_class;
 
 	/** Goal publish has service method name. */
-	public static OAVAttributeType publish_has_methodname;
+	public static final OAVAttributeType publish_has_methodname;
 
 	
 	//-------- service --------
@@ -441,12 +441,12 @@ public class OAVBDIMetaModel
 	//-------- condition --------
 	
 	/** The condition type. */
-	public static OAVObjectType condition_type;
+	public static final OAVObjectType condition_type;
 	
 	//-------- agent --------
 	
 	/** The agent (model) type. */
-	public static OAVObjectType agent_type;
+	public static final OAVObjectType agent_type;
 
 //	/** The agent has a service container type. */
 //	public static OAVAttributeType agent_has_servicecontainer;
@@ -470,61 +470,61 @@ public class OAVBDIMetaModel
 	//-------- capability --------
 	
 	/** The capability type. */
-	public static OAVObjectType capability_type;
+	public static final OAVObjectType capability_type;
 	
 //	/** Capability has package attribute. */
 //	public static OAVAttributeType capability_has_package;
 	
 	/** Capability has abstract attribute. */
-	public static OAVAttributeType capability_has_abstract;
+	public static final OAVAttributeType capability_has_abstract;
 	
 //	/** Capability has imports attribute. */
 //	public static OAVAttributeType capability_has_imports;
 	
 	/** Capability has capabilities attribute. */
-	public static OAVAttributeType capability_has_capabilityrefs;
+	public static final OAVAttributeType capability_has_capabilityrefs;
 	
 	/** Capability has beliefs attribute. */
-	public static OAVAttributeType capability_has_beliefs;
+	public static final OAVAttributeType capability_has_beliefs;
 	
 	/** Capability has beliefsets attribute. */
-	public static OAVAttributeType capability_has_beliefsets;
+	public static final OAVAttributeType capability_has_beliefsets;
 	
 	/** Capability has belief references attribute. */
-	public static OAVAttributeType capability_has_beliefrefs;
+	public static final OAVAttributeType capability_has_beliefrefs;
 	
 	/** Capability has beliefset references attribute. */
-	public static OAVAttributeType capability_has_beliefsetrefs;
+	public static final OAVAttributeType capability_has_beliefsetrefs;
 	
 	/** Capability has goals attribute. */
-	public static OAVAttributeType capability_has_goals;
+	public static final OAVAttributeType capability_has_goals;
 	
 	/** Capability has goal references attribute. */
-	public static OAVAttributeType capability_has_goalrefs;
+	public static final OAVAttributeType capability_has_goalrefs;
 	
 	/** Capability has plans attribute. */
-	public static OAVAttributeType capability_has_plans;
+	public static final OAVAttributeType capability_has_plans;
 	
 	/** Capability has message events attribute. */
-	public static OAVAttributeType capability_has_messageevents;
+	public static final OAVAttributeType capability_has_messageevents;
 	
 	/** Capability has internal events attribute. */
-	public static OAVAttributeType capability_has_internalevents;
+	public static final OAVAttributeType capability_has_internalevents;
 	
 	/** Capability has message event references attribute. */
-	public static OAVAttributeType capability_has_messageeventrefs;
+	public static final OAVAttributeType capability_has_messageeventrefs;
 	
 	/** Capability has internal event references attribute. */
-	public static OAVAttributeType capability_has_internaleventrefs;
+	public static final OAVAttributeType capability_has_internaleventrefs;
 	
 	/** Capability has expressions attribute. */
-	public static OAVAttributeType capability_has_expressions;
+	public static final OAVAttributeType capability_has_expressions;
 
 	/** Capability has expressionrefs attribute. */
-	public static OAVAttributeType capability_has_expressionrefs;
+	public static final OAVAttributeType capability_has_expressionrefs;
 
 	/** Capability has conditions attribute. */
-	public static OAVAttributeType capability_has_conditions;
+	public static final OAVAttributeType capability_has_conditions;
 				
 //	/** Capability has expressions attribute. */
 //	public static OAVAttributeType capability_has_requiredservices;
@@ -535,90 +535,90 @@ public class OAVBDIMetaModel
 //	public static OAVAttributeType capability_has_properties;
 	
 	/** Capability has default configuration attribute. */
-	public static OAVAttributeType capability_has_defaultconfiguration;
+	public static final OAVAttributeType capability_has_defaultconfiguration;
 	
 	/** Capability has configurations attribute. */
-	public static OAVAttributeType capability_has_configurations;
+	public static final OAVAttributeType capability_has_configurations;
 	
 	//-------- capability --------
 	
 	/** The properties (file) type. */
-	public static OAVObjectType properties_type;
+	public static final OAVObjectType properties_type;
 	
 	/** Properties has properties attribute. */
-	public static OAVAttributeType properties_has_properties;
+	public static final OAVAttributeType properties_has_properties;
 
 	//-------- capability reference --------
 	
 	/** The capability reference type. */
-	public static OAVObjectType	capabilityref_type;
+	public static final OAVObjectType	capabilityref_type;
 		
 	/** Capability ref has file attribute. */
-	public static OAVAttributeType capabilityref_has_file;
+	public static final OAVAttributeType capabilityref_has_file;
 	
 	/** Capability ref has capability attribute. */
-	public static OAVAttributeType capabilityref_has_capability;
+	public static final OAVAttributeType capabilityref_has_capability;
 	
 	//-------- belief --------
 	
 	/** The belief type. */
-	public static OAVObjectType belief_type;
+	public static final OAVObjectType belief_type;
 	
 	/** Belief has default value attribute. */
-	public static OAVAttributeType belief_has_fact;
+	public static final OAVAttributeType belief_has_fact;
 	
 	/** Belief has is argument flag. */
-	public static OAVAttributeType belief_has_argument;
+	public static final OAVAttributeType belief_has_argument;
 	
 	/** Belief has is result flag. */
-	public static OAVAttributeType belief_has_result;
+	public static final OAVAttributeType belief_has_result;
 	
 	//-------- belief reference --------
 	
 	/** The belief reference type. */
-	public static OAVObjectType beliefreference_type;
+	public static final OAVObjectType beliefreference_type;
 	
 	/** Belief has is argument flag. */
-	public static OAVAttributeType beliefreference_has_argument;
+	public static final OAVAttributeType beliefreference_has_argument;
 	
 	/** Belief has is result flag. */
-	public static OAVAttributeType beliefreference_has_result;
+	public static final OAVAttributeType beliefreference_has_result;
 		
 	//-------- belief set --------
 	
 	/** The belief set type. */
-	public static OAVObjectType beliefset_type;
+	public static final OAVObjectType beliefset_type;
 	
 	/** Beliefset has dynamic attribute. */
 //	public static OAVAttributeType beliefset_has_dynamic;
 	
 	/** Beliefset has default facts attribute. */
-	public static OAVAttributeType beliefset_has_facts;
+	public static final OAVAttributeType beliefset_has_facts;
 	
 	/** Beliefset has default facts expression attribute. */
-	public static OAVAttributeType beliefset_has_factsexpression;
+	public static final OAVAttributeType beliefset_has_factsexpression;
 	
 	/** Belief has is argument flag. */
-	public static OAVAttributeType beliefset_has_argument;
+	public static final OAVAttributeType beliefset_has_argument;
 	
 	/** Belief has is result flag. */
-	public static OAVAttributeType beliefset_has_result;
+	public static final OAVAttributeType beliefset_has_result;
 	
 	//-------- belief set reference --------
 	
 	/** The belief set reference type. */
-	public static OAVObjectType beliefsetreference_type;
+	public static final OAVObjectType beliefsetreference_type;
 
 	/** Belief has is argument flag. */
-	public static OAVAttributeType beliefsetreference_has_argument;
+	public static final OAVAttributeType beliefsetreference_has_argument;
 	
 	/** Belief has is result flag. */
-	public static OAVAttributeType beliefsetreference_has_result;
+	public static final OAVAttributeType beliefsetreference_has_result;
 	
 	//-------- perform goal --------
 	
 	/** The perform goal type. */
-	public static OAVObjectType performgoal_type;
+	public static final OAVObjectType performgoal_type;
 	
 //	/** The perform goal ref type. */
 //	public static OAVObjectType performgoalref_type;
@@ -626,10 +626,10 @@ public class OAVBDIMetaModel
 	//-------- achieve goal --------
 	
 	/** The achieve goal type. */
-	public static OAVObjectType achievegoal_type;
+	public static final OAVObjectType achievegoal_type;
 	
 	/** Achieve goal has target condition attribute . */
-	public static OAVAttributeType achievegoal_has_targetcondition;
+	public static final OAVAttributeType achievegoal_has_targetcondition;
 	
 	/** Achieve goal has failure condition attribute . */
 //	public static OAVAttributeType achievegoal_has_failurecondition;
@@ -640,7 +640,7 @@ public class OAVBDIMetaModel
 	//-------- query goal --------
 	
 	/** The query goal type. */
-	public static OAVObjectType querygoal_type;
+	public static final OAVObjectType querygoal_type;
 	
 //	/** Query goal has failure condition attribute . */
 //	public static OAVAttributeType querygoal_has_failurecondition;
@@ -651,13 +651,13 @@ public class OAVBDIMetaModel
 	//-------- maintain goal --------
 
 	/** The maintain goal type. */
-	public static OAVObjectType maintaingoal_type;
+	public static final OAVObjectType maintaingoal_type;
 	
 	/** Maintain goal has target condition attribute . */
-	public static OAVAttributeType maintaingoal_has_targetcondition;
+	public static final OAVAttributeType maintaingoal_has_targetcondition;
 	
 	/** Maintain goal has maintain condition attribute . */
-	public static OAVAttributeType maintaingoal_has_maintaincondition;
+	public static final OAVAttributeType maintaingoal_has_maintaincondition;
 	
 //	/** The maintain goal ref type. */
 //	public static OAVObjectType maintaingoalref_type;
@@ -665,10 +665,10 @@ public class OAVBDIMetaModel
 	//-------- meta goal --------
 
 	/** The meta goal type. */
-	public static OAVObjectType metagoal_type;
+	public static final OAVObjectType metagoal_type;
 	
 	/** Meta goal has trigger attribute. */
-	public static OAVAttributeType metagoal_has_trigger;
+	public static final OAVAttributeType metagoal_has_trigger;
 	
 //	/** The meta goal ref type. */
 //	public static OAVObjectType metagoalref_type;
@@ -676,33 +676,33 @@ public class OAVBDIMetaModel
 	//-------- plan --------
 	
 	/** The plan type. */
-	public static OAVObjectType plan_type;
+	public static final OAVObjectType plan_type;
 	
 	/** Plan has priority attribute. */
-	public static OAVAttributeType plan_has_priority;
+	public static final OAVAttributeType plan_has_priority;
 	
 	/** Plan has precondition attribute. */
-	public static OAVAttributeType plan_has_precondition;
+	public static final OAVAttributeType plan_has_precondition;
 	
 	/** Plan has contextcondition attribute. */
-	public static OAVAttributeType plan_has_contextcondition;
+	public static final OAVAttributeType plan_has_contextcondition;
 	
 	/** Plan has body . */
-	public static OAVAttributeType plan_has_body;
+	public static final OAVAttributeType plan_has_body;
 	
 	/** Plan has waitqueue attribute. */
-	public static OAVAttributeType plan_has_waitqueue;
+	public static final OAVAttributeType plan_has_waitqueue;
 	
 	/** Plan has trigger attribute. */
-	public static OAVAttributeType plan_has_trigger;
+	public static final OAVAttributeType plan_has_trigger;
 	
 	//-------- plan body --------
 	
 	/** The body type. */
-	public static OAVObjectType body_type;
+	public static final OAVObjectType body_type;
 	
 	/** Body has type attribute. */
-	public static OAVAttributeType body_has_type;
+	public static final OAVAttributeType body_has_type;
 
 	/** Body has class attribute. */
 //	public static OAVAttributeType body_has_class;
@@ -711,13 +711,13 @@ public class OAVBDIMetaModel
 //	public static OAVAttributeType body_has_classname;
 	
 	/** Body has class name attribute. */
-	public static OAVAttributeType body_has_impl;
+	public static final OAVAttributeType body_has_impl;
 	
 	/** Body has required service name attribute. */
-	public static OAVAttributeType body_has_service;
+	public static final OAVAttributeType body_has_service;
 
 	/** Body has method name attribute. */
-	public static OAVAttributeType body_has_method;
+	public static final OAVAttributeType body_has_method;
 
 
 //	/** Body has inline attribute. */
@@ -735,120 +735,120 @@ public class OAVBDIMetaModel
 	//-------- plan parameters --------
 	
 	/** The plan parameter type. */
-	public static OAVObjectType planparameter_type;
+	public static final OAVObjectType planparameter_type;
 	
 	/** Planparameter has goalmapping. */
-	public static OAVAttributeType	planparameter_has_goalmapping;
+	public static final OAVAttributeType	planparameter_has_goalmapping;
 	
 	/** Planparameter has internaleventmapping. */
-	public static OAVAttributeType	planparameter_has_internaleventmapping;
+	public static final OAVAttributeType	planparameter_has_internaleventmapping;
 	
 	/** Planparameter has messagemapping. */
-	public static OAVAttributeType	planparameter_has_messageeventmapping;
+	public static final OAVAttributeType	planparameter_has_messageeventmapping;
 
 	/** The plan parameter set type. */
-	public static OAVObjectType planparameterset_type;
+	public static final OAVObjectType planparameterset_type;
 	
 	/** Planparameterset has goalmapping. */
-	public static OAVAttributeType	planparameterset_has_goalmapping;
+	public static final OAVAttributeType	planparameterset_has_goalmapping;
 	
 	/** Planparameterset has internaleventmapping. */
-	public static OAVAttributeType	planparameterset_has_internaleventmapping;
+	public static final OAVAttributeType	planparameterset_has_internaleventmapping;
 	
 	/** Planparameterset has messageeventmapping. */
-	public static OAVAttributeType	planparameterset_has_messageeventmapping;
+	public static final OAVAttributeType	planparameterset_has_messageeventmapping;
 	
 	//-------- event --------
 	
 	/** The event type. */
-	public static OAVObjectType event_type;
+	public static final OAVObjectType event_type;
 	
 	//-------- internal event --------
 	
 	/** The internal event type. */
-	public static OAVObjectType internalevent_type;
+	public static final OAVObjectType internalevent_type;
 	
 	/** The internal event ref type. */
-	public static OAVObjectType internaleventreference_type;
+	public static final OAVObjectType internaleventreference_type;
 	
 	//-------- message event --------
 	
 	/** The message event type. */
-	public static OAVObjectType messageevent_type;
+	public static final OAVObjectType messageevent_type;
 	
 	/** Message event has direction attribute. */
-	public static OAVAttributeType messageevent_has_direction;
+	public static final OAVAttributeType messageevent_has_direction;
 	
 	/** Message event has type attribute. */
-	public static OAVAttributeType messageevent_has_type;
+	public static final OAVAttributeType messageevent_has_type;
 	
 	/** Message event has match attribute. */
-	public static OAVAttributeType messageevent_has_match;
+	public static final OAVAttributeType messageevent_has_match;
 	
 	/** Message event has a degree for matching. */
 //	public static OAVAttributeType messageevent_has_degree;
 
 	/** The message event ref type. */
-	public static OAVObjectType messageeventreference_type;
+	public static final OAVObjectType messageeventreference_type;
 	
 	//-------- trigger --------
 	
 	/** The trigger type. */
-	public static OAVObjectType trigger_type;
+	public static final OAVObjectType trigger_type;
 	
 	/** Trigger has internal events attribute. */
-	public static OAVAttributeType trigger_has_internalevents;
+	public static final OAVAttributeType trigger_has_internalevents;
 	
 	/** Trigger has message events attribute. */
-	public static OAVAttributeType trigger_has_messageevents;
+	public static final OAVAttributeType trigger_has_messageevents;
 	
 	/** Trigger has goal finisheds attribute. */
-	public static OAVAttributeType trigger_has_goalfinisheds;
+	public static final OAVAttributeType trigger_has_goalfinisheds;
 	
 //	/** Trigger has filter attribute. */
 //	public static OAVAttributeType trigger_has_filter;
 	
 	/** Trigger has fact addeds attribute. */
-	public static OAVAttributeType trigger_has_factaddeds;
+	public static final OAVAttributeType trigger_has_factaddeds;
 	
 	/** Trigger has fact removeds attribute. */
-	public static OAVAttributeType trigger_has_factremoveds;
+	public static final OAVAttributeType trigger_has_factremoveds;
 	
 	/** Trigger has fact changeds attribute. */
-	public static OAVAttributeType trigger_has_factchangeds;
+	public static final OAVAttributeType trigger_has_factchangeds;
 	
 	/** The trigger reference type. */
-	public static OAVObjectType triggerreference_type;
+	public static final OAVObjectType triggerreference_type;
 	
 	/** Trigger reference has ref attribute. */
-	public static OAVAttributeType triggerreference_has_ref;
+	public static final OAVAttributeType triggerreference_has_ref;
 	
 	/** Trigger reference has match expression attribute. */
-	public static OAVAttributeType triggerreference_has_match;
+	public static final OAVAttributeType triggerreference_has_match;
 	
 	//-------- plan trigger --------
 	
 	/** The plan trigger type. */
-	public static OAVObjectType plantrigger_type;
+	public static final OAVObjectType plantrigger_type;
 	
 	/** Plan trigger has goals attribute. */
-	public static OAVAttributeType plantrigger_has_goals;
+	public static final OAVAttributeType plantrigger_has_goals;
 	
 	/** Plan trigger has condition attribute. */
-	public static OAVAttributeType plantrigger_has_condition;
+	public static final OAVAttributeType plantrigger_has_condition;
 	
 	//-------- meta goal trigger --------
 	
 	/** The meta goal trigger type. */
-	public static OAVObjectType metagoaltrigger_type;
+	public static final OAVObjectType metagoaltrigger_type;
 	
 	/** Meta goal trigger has goals attribute. */
-	public static OAVAttributeType metagoaltrigger_has_goals;
+	public static final OAVAttributeType metagoaltrigger_has_goals;
 	
 	//-------- configuration --------
 	
 	/** The configuration type. */
-	public static OAVObjectType configuration_type;
+	public static final OAVObjectType configuration_type;
 	
 //	/** The agent has a suspend attribute. */
 //	public static OAVAttributeType configuration_has_suspend;
@@ -863,102 +863,102 @@ public class OAVBDIMetaModel
 //	public static OAVAttributeType configuration_has_autoshutdown;
 	
 	/** Configuration has initial capabilities attribute. */
-	public static OAVAttributeType configuration_has_initialcapabilities;
+	public static final OAVAttributeType configuration_has_initialcapabilities;
 	
 	/** Configuration has initial beliefs attribute. */
-	public static OAVAttributeType configuration_has_initialbeliefs;
+	public static final OAVAttributeType configuration_has_initialbeliefs;
 	
 	/** Configuration has initial beliefsets attribute. */
-	public static OAVAttributeType configuration_has_initialbeliefsets;
+	public static final OAVAttributeType configuration_has_initialbeliefsets;
 	
 	/** Configuration has initial goals attribute. */
-	public static OAVAttributeType configuration_has_initialgoals;
+	public static final OAVAttributeType configuration_has_initialgoals;
 	
 	/** Configuration has end goals attribute. */
-	public static OAVAttributeType configuration_has_endgoals;
+	public static final OAVAttributeType configuration_has_endgoals;
 	
 	/** Configuration has initial plans attribute. */
-	public static OAVAttributeType configuration_has_initialplans;
+	public static final OAVAttributeType configuration_has_initialplans;
 	
 	/** Configuration has end plans attribute. */
-	public static OAVAttributeType configuration_has_endplans;
+	public static final OAVAttributeType configuration_has_endplans;
 	
 	/** Configuration has events attribute. */
-	public static OAVAttributeType configuration_has_initialinternalevents;
+	public static final OAVAttributeType configuration_has_initialinternalevents;
 	
 	/** Configuration has initial message events attribute. */
-	public static OAVAttributeType configuration_has_initialmessageevents;
+	public static final OAVAttributeType configuration_has_initialmessageevents;
 	
 	/** Configuration has end internal events attribute. */
-	public static OAVAttributeType configuration_has_endinternalevents;
+	public static final OAVAttributeType configuration_has_endinternalevents;
 	
 	/** Configuration has end message events attribute. */
-	public static OAVAttributeType configuration_has_endmessageevents;
+	public static final OAVAttributeType configuration_has_endmessageevents;
 	
 	//-------- configuration elements --------
 	
 	/** The configelement type. */
-	public static OAVObjectType configelement_type;
+	public static final OAVObjectType configelement_type;
 	
 	/** Configelement has ref attribute. */
-	public static OAVAttributeType configelement_has_ref;
+	public static final OAVAttributeType configelement_has_ref;
 	
 	//-------- configuration beliefs --------
 
 	/** The configbelief type. */
-	public static OAVObjectType configbelief_type;
+	public static final OAVObjectType configbelief_type;
 	
 	/** Configbelief has ref attribute. */
-	public static OAVAttributeType configbelief_has_ref;
+	public static final OAVAttributeType configbelief_has_ref;
 
 	/** The configbeliefset type. */
-	public static OAVObjectType configbeliefset_type;
+	public static final OAVObjectType configbeliefset_type;
 	
 	/** Configbeliefset has ref attribute. */
-	public static OAVAttributeType configbeliefset_has_ref;
+	public static final OAVAttributeType configbeliefset_has_ref;
 
 	//-------- configuration parameters --------
 
 	/** The configparameter type. */
-	public static OAVObjectType configparameter_type;
+	public static final OAVObjectType configparameter_type;
 	
 	/** Configparameter has ref attribute. */
-	public static OAVAttributeType configparameter_has_ref;
+	public static final OAVAttributeType configparameter_has_ref;
 
 	/** The configparameterset type. */
-	public static OAVObjectType configparameterset_type;
+	public static final OAVObjectType configparameterset_type;
 	
 	/** Configparameterset has ref attribute. */
-	public static OAVAttributeType configparameterset_has_ref;
+	public static final OAVAttributeType configparameterset_has_ref;
 	
 	//-------- initial capability --------
 	// todo: rename to (config-) capability in XML 
 	
 	/** The initialcapability type. */
-	public static OAVObjectType initialcapability_type;
+	public static final OAVObjectType initialcapability_type;
 	
 	/** Initialcapability has ref attribute. */
-	public static OAVAttributeType initialcapability_has_ref;
+	public static final OAVAttributeType initialcapability_has_ref;
 
 	/** Initialcapability has configuration attribute. */
-	public static OAVAttributeType initialcapability_has_configuration;
+	public static final OAVAttributeType initialcapability_has_configuration;
 	
 	//-------- config parameterelement --------
 	
 	/** The config parameter element type. */
-	public static OAVObjectType configparameterelement_type;
+	public static final OAVObjectType configparameterelement_type;
 	
 	/** Config parameter element has parameters attribute. */
-	public static OAVAttributeType configparameterelement_has_parameters;
+	public static final OAVAttributeType configparameterelement_has_parameters;
 	
 	/** Config parameter element has parametersets attribute. */
-	public static OAVAttributeType configparameterelement_has_parametersets;
+	public static final OAVAttributeType configparameterelement_has_parametersets;
 	
 	
 	static
 	{
-		try
-		{
+//		try
+//		{
 		// type model
 		bdimm_type_model = new OAVTypeModel("bdimm_type_model");
 		bdimm_type_model.addTypeModel(OAVJavaType.java_type_model);
@@ -1327,11 +1327,11 @@ public class OAVBDIMetaModel
 		
 		// propertybase
 		properties_has_properties	= properties_type.createAttributeType("properties_has_properties", properties_type, OAVAttributeType.LIST);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 	}
 
 

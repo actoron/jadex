@@ -262,7 +262,7 @@ public class SequentialSearchManager implements ISearchManager
 			}
 			
 			if(context.decider.searchNode(start==null? null: start.getId(), 
-				source==null? null: source.getId(), provider==null? null: provider.getId(), 
+				source==null? null: source.getId(), provider.getId(), 
 				ret.getIntermediateResults()))
 			{
 				// Use fut.isDone() to reduce stack depth

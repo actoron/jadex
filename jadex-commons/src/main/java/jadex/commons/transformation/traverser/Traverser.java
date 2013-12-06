@@ -28,7 +28,7 @@ public class Traverser
 	protected static volatile Traverser instance;
 	
 	/** The default traversal processors with no special actions. */
-	protected static List<ITraverseProcessor> processors;
+	protected static final List<ITraverseProcessor> processors;
 	
 	static
 	{

@@ -32,7 +32,7 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	//-------- constants --------
 	
 	/** Notification stack for unwinding call stack to topmost future. */
-	public static ThreadLocal<List<Tuple2<Future<?>, IResultListener<?>>>>	STACK	= new ThreadLocal<List<Tuple2<Future<?>,IResultListener<?>>>>();
+	public static final ThreadLocal<List<Tuple2<Future<?>, IResultListener<?>>>>	STACK	= new ThreadLocal<List<Tuple2<Future<?>,IResultListener<?>>>>();
 	
 	/** A caller is queued for suspension. */
 	protected final String	CALLER_QUEUED	= "queued";
@@ -44,9 +44,11 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	protected final String	CALLER_SUSPENDED	= "suspended";
 	
 	/** Debug flag. */
+	// Hack!!! Non-final to be setable from Starter 
 	public static boolean DEBUG = false;
 	
 	/** Disable Stack unfolding for easier debugging. */
+	// Hack!!! Non-final to be setable from Starter 
 	public static boolean NO_STACK_COMPACTION = false;
 	
 	/** The empty future. */

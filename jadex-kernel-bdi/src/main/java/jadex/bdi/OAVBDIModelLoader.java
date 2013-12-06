@@ -93,7 +93,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	public static final String CONTEXT_OAVROOT = "oavroot";
 	
 	/** Turn on debugging output (e.g. for automatic rule selection). */
-	protected static boolean DEBUG	= false;
+	protected static final boolean DEBUG	= false;
 	
 	//-------- attributes --------
 	

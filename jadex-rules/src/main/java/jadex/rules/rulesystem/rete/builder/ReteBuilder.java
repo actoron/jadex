@@ -86,7 +86,7 @@ public class ReteBuilder
 	//-------- constants --------
 	
 	/** The flag for turning on/off reporting. */
-	public static boolean REPORTING = false;
+	public static final boolean REPORTING = false;
 	
 	//-------- attributes --------
 	

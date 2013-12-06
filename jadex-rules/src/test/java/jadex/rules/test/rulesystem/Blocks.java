@@ -33,48 +33,48 @@ public class Blocks
 	//-------- OAV type definitions --------
 	
 	/** The blocksworld type model. */
-	public static OAVTypeModel blocksworld_type_model;
+	public static final OAVTypeModel blocksworld_type_model;
 	
 	/** The java block type. */
-	public static OAVJavaType java_block_type;
+	public static final OAVJavaType java_block_type;
 
 	/** The block type. */
-	public static OAVObjectType block_type;
+	public static final OAVObjectType block_type;
 	
 	/** A block has a name. */
-	public static OAVAttributeType block_has_name;
+	public static final OAVAttributeType block_has_name;
 	
 	/** A block has a color. */
-	public static OAVAttributeType block_has_color;
+	public static final OAVAttributeType block_has_color;
 	
 	/** A block is on another block. */
-	public static OAVAttributeType block_has_on;
+	public static final OAVAttributeType block_has_on;
 	
 	/** A block is left from another block. */
-	public static OAVAttributeType block_has_left;
+	public static final OAVAttributeType block_has_left;
 	
-	/** A block has other blocks as friends. */
-	public static OAVAttributeType block_has_friends;
+//	/** A block has other blocks as friends. */
+//	public static final OAVAttributeType block_has_friends;
 	
 	/** A block has a size. */
-	public static OAVAttributeType block_has_size;
+	public static final OAVAttributeType block_has_size;
 	
 	/** A block has a weight. */
-	public static OAVAttributeType block_has_weight;
+	public static final OAVAttributeType block_has_weight;
 	
 	
 	/** The ball type. */
-	public static OAVObjectType ball_type;
+	public static final OAVObjectType ball_type;
 	
 	/** A ball has a color. */
-	public static OAVAttributeType ball_has_color;
+	public static final OAVAttributeType ball_has_color;
 	
 	
 	/** The Java blocks container. */
-	public static OAVObjectType blockcontainer_type;
+	public static final OAVObjectType blockcontainer_type;
 	
 	/** A block container can store blocks. */
-	public static OAVAttributeType blockcontainer_has_blocks;
+	public static final OAVAttributeType blockcontainer_has_blocks;
 
 	static
 	{

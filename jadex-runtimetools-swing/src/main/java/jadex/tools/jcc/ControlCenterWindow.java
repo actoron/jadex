@@ -54,7 +54,7 @@ public class ControlCenterWindow extends JFrame
 	protected static final Dimension BUTTON_DIM = new Dimension(32, 32);
 
 	/** The image icons. */
-	protected static UIDefaults	icons	= new UIDefaults(new Object[]
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"close_0", SGUI.makeIcon(ControlCenterWindow.class, "/jadex/tools/common/images/close_0.png"),
 		"close_1", SGUI.makeIcon(ControlCenterWindow.class, "/jadex/tools/common/images/close_1.png"),
