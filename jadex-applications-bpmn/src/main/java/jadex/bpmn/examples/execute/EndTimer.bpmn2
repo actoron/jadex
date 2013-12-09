@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<semantic:definitions targetNamespace="http://www.activecomponents.org/bpmn/"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                      xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                      xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                      xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                      xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
+                      xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
+  <semantic:extension>
+    <jadex:modelname>EndTimer</jadex:modelname>
+    <jadex:description>Test if process can end with intermediate timer event.</jadex:description>
+    <jadex:package>jadex.bpmn.examples.execute</jadex:package>
+    <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
+  </semantic:extension>
+  <semantic:process name="Pool" id="_SJeYUY6VEd-q-6UwAd77qg">
+    <semantic:task name="Task" id="_SJe_YY6VEd-q-6UwAd77qg">
+      <semantic:outgoing>_sMJ3EY6VEd-q-6UwAd77qg</semantic:outgoing>
+    </semantic:task>
+    <semantic:intermediateCatchEvent name="Wait for 0,5 secs" id="_sL9CwY6VEd-q-6UwAd77qg">
+      <semantic:incoming>_sMJ3EY6VEd-q-6UwAd77qg</semantic:incoming>
+      <semantic:timerEventDefinition>
+        <semantic:timeDuration>500</semantic:timeDuration>
+      </semantic:timerEventDefinition>
+      <semantic:extensionElements>
+        <jadex:property name="duration">500</jadex:property>
+      </semantic:extensionElements>
+    </semantic:intermediateCatchEvent>
+    <semantic:sequenceFlow sourceRef="_SJe_YY6VEd-q-6UwAd77qg" targetRef="_sL9CwY6VEd-q-6UwAd77qg" id="_sMJ3EY6VEd-q-6UwAd77qg">
+    </semantic:sequenceFlow>
+    <semantic:extensionElements>
+    </semantic:extensionElements>
+  </semantic:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane>
+      <bpmndi:BPMNShape bpmnElement="_SJeYUY6VEd-q-6UwAd77qg">
+        <dc:Bounds height="600.0" width="3000.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_SJe_YY6VEd-q-6UwAd77qg">
+        <dc:Bounds height="100.0" width="160.0" x="350.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="_sL9CwY6VEd-q-6UwAd77qg">
+        <dc:Bounds height="40.0" width="40.0" x="880.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_sMJ3EY6VEd-q-6UwAd77qg">
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_sMJ3EY6VEd-q-6UwAd77qg">
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</semantic:definitions>
+
