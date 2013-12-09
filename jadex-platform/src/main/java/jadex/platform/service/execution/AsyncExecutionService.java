@@ -42,7 +42,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	protected IServiceProvider provider;
 	
 	/** The running (i.e. non-blocked) executors. */
-	protected Map<IExecutable, Executor>	runningexes;
+	protected Map<IExecutable, Executor> runningexes;
 	
 	//-------- constructors --------
 	
@@ -64,7 +64,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		this.provider = provider;
 		this.running	= false;
 		this.executors	= SCollection.createHashMap();
-		this.runningexes	= SCollection.createHashMap();
+		this.runningexes = SCollection.createHashMap();
 	}
 
 	//-------- methods --------
@@ -115,7 +115,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 								
 								idf	= checkIdleFuture();
 							}
-							else if(executors!=null && executors.get(task)!=this)
+							else if(executors!=null && executors.get(task)!=this && runningexes.get(task)==this)
 							{
 								runningexes.remove(task);								
 							}
@@ -133,13 +133,10 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	
 		if(running)
 		{
-			synchronized(this)
+			boolean	exec = exe.execute();
+			if(exec)
 			{
-				boolean	exec	= exe.execute();
-				if(exec)
-				{
-					runningexes.put(task, exe);
-				}
+				runningexes.put(task, exe);
 			}
 		}
 	}

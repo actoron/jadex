@@ -31,10 +31,10 @@ public class Executor implements Runnable
 	//-------- attributes --------
 
 	/** Flag indicating if the thread is running. */
-	protected boolean	running;
+	protected boolean running;
 
 	/** Flag indicating if the thread wants to run. */
-	protected boolean	wanttorun;
+	protected boolean wanttorun;
 
 	/** Flag indicating that the executor shuts down. */
 	private boolean	shutdown;
@@ -85,6 +85,7 @@ public class Executor implements Runnable
 		this.threadpool = threadpool;
 		this.executable = executable;
 		this.shutdownfutures = new ArrayList<Future<Void>>();
+//		System.out.println("create: "+executable);
 	}
 		
 	//-------- methods --------
@@ -113,9 +114,10 @@ public class Executor implements Runnable
 		
 		boolean	iwanttorun	= true;
 		Object	switchto	= null;
+		
 		while(iwanttorun && !shutdown)
 		{
-			iwanttorun	=	code();
+			iwanttorun = code();
 
 			synchronized(this)
 			{
@@ -162,6 +164,11 @@ public class Executor implements Runnable
 				futures = new ArrayList<Future<Void>>(shutdownfutures);
 				shutdownfutures.clear();
 				shutdowned = true;
+			}
+			
+			if(switchto==null && switchtos!=null && switchtos.size()>0)
+			{
+				switchto = switchtos.remove(0);
 			}
 		}
 		if(futures!=null)
@@ -319,11 +326,12 @@ public class Executor implements Runnable
 	public void	blockThread(Object monitor)
 	{
 //		System.out.println("Executor.blockThread "+Thread.currentThread());
-		running	= false;
-		this.monitor	= monitor;
 		
 		synchronized(monitor)
 		{
+			this.running = false;
+			this.monitor = monitor;
+
 			// Todo: decide if a new thread is needed
 			// Hack!!! create new thread anyways
 			execute();
@@ -336,10 +344,11 @@ public class Executor implements Runnable
 			{
 				throw new RuntimeException(e);
 			}
+
+			this.running = true;
 		}
 		
 //		System.out.println("Executor.blockThreadFinished "+Thread.currentThread());
-		running	= true;
 	}
 
 	/**

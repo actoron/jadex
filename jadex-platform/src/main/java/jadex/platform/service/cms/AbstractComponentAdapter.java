@@ -588,12 +588,16 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		ISuspendable.SUSPENDABLE.set(new ComponentSuspendable(this));
 		
-		if(executing)
+		synchronized(this)
 		{
-			System.err.println(getComponentIdentifier()+": double execution"+" "+Thread.currentThread()+" "+componentthread);
-			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
+			if(executing)
+			{
+				System.err.println(getComponentIdentifier()+": double execution"+" "+Thread.currentThread()+" "+componentthread);
+				new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
+			}
+			executing	= true;
 		}
-		executing	= true;
+		
 		wokenup	= false;	
 		
 		// Note: wakeup() can be called from arbitrary threads (even when the
@@ -838,12 +842,16 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			System.out.println("Unblocked: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 //		}
 		
-		if(executing)
+		synchronized(this)
 		{
-			System.err.println(getComponentIdentifier()+": double execution");
-			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
+			if(executing)
+			{
+				System.err.println(getComponentIdentifier()+": double execution");
+				new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
+			}
+			this.executing	= true;
 		}
-		this.executing	= true;
+		
 		this.componentthread	= Thread.currentThread();
 		
 		component.afterBlock();

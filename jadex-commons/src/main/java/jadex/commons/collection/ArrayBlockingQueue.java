@@ -97,7 +97,7 @@ public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
 	 *  @return The element. When queue is empty
 	 *  the methods blocks until an element is added or the timeout occurs.
 	 */
-    public T dequeue(long timeout) throws ClosedException, TimeoutException
+    public T dequeue(final long timeout) throws ClosedException, TimeoutException
     {
 		if(closed)
 			throw new IBlockingQueue.ClosedException("Queue closed.");
@@ -105,11 +105,12 @@ public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
 		synchronized(monitor)
         {
 			// Uses a spin lock, because wait must not be implemented atomically.
-	        while(size==0 && (timeout>0 || timeout==-1))
+			long to = timeout;
+	        while(size==0 && (to>0 || to==-1))
 	        {
 	            try
 				{
-	            	if(timeout==-1)
+	            	if(to==-1)
 	            	{
 	            		monitor.wait();
 	            	}
@@ -117,10 +118,10 @@ public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
 	            	{
 	            		// Hack!!! Java does not distinguish between notify() and timeout (grrr).
 	            		long	starttime	= System.currentTimeMillis();
-	            		monitor.wait(timeout);
+	            		monitor.wait(to);
 	            		if(size==0)
 	            		{
-		            		timeout	= Math.max(0, timeout + starttime - System.currentTimeMillis());
+		            		to = Math.max(0, timeout + starttime - System.currentTimeMillis());
 //		            		System.out.println("Remaining timeout: "+timeout);
 	            		}
 	            	}
@@ -129,7 +130,7 @@ public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
 	
 				if(closed)
 					throw new IBlockingQueue.ClosedException("Queue closed.");
-				if(size==0 && timeout==0)
+				if(size==0 && to==0)
 					throw new TimeoutException("Timeout during dequeue().");
 			}
             
