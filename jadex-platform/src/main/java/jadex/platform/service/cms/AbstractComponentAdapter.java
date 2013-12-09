@@ -825,6 +825,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		exe.blockThread(monitor);
 		
+		// Throw thread death if component already has been terminated.
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
 //			System.out.println("terminated: "+this);

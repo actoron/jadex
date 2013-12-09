@@ -39,7 +39,7 @@ public class ComponentSuspendable implements ISuspendable
 	 */
 	public void suspend(Future<?> future, long timeout)
 	{
-		System.out.println("ComponentSuspendable.suspend "+Thread.currentThread());
+//		System.out.println("ComponentSuspendable.suspend "+Thread.currentThread());
 		
 		synchronized(this)
 		{
@@ -59,9 +59,9 @@ public class ComponentSuspendable implements ISuspendable
 			finally
 			{
 				this.future	= null;
+//				System.out.println("ComponentSuspendable.unsuspend "+Thread.currentThread());
 			}
 		}
-		System.out.println("ComponentSuspendable.unsuspend "+Thread.currentThread());
 	}
 	
 	/**

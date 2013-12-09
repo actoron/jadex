@@ -127,10 +127,6 @@ public class Executor implements Runnable
 				if(switchtos!=null && switchtos.size()>0)
 				{
 					switchto = switchtos.remove(0);
-//					if(switchtos.isEmpty())
-//					{
-//						switchtos	= null;
-//					}
 				}
 			}
 			
@@ -165,11 +161,6 @@ public class Executor implements Runnable
 			{
 				futures = new ArrayList<Future<Void>>(shutdownfutures);
 				shutdownfutures.clear();
-//				if(switchtos!=null)
-//				{
-//					mons = new ArrayList<Object>(switchtos);
-//					switchtos.clear();
-//				}
 				shutdowned = true;
 			}
 		}
