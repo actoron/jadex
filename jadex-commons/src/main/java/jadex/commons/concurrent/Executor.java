@@ -126,7 +126,7 @@ public class Executor implements Runnable
 
 				if(switchtos!=null && switchtos.size()>0)
 				{
-					switchto	= switchtos.remove(0);
+					switchto = switchtos.remove(0);
 //					if(switchtos.isEmpty())
 //					{
 //						switchtos	= null;
@@ -159,31 +159,18 @@ public class Executor implements Runnable
 
 		// Notify shutdown listeners when execution has ended.
 		List<Future<Void>> futures = null;
-		List<Object> mons = null;
 		synchronized(this)
 		{
-			if(shutdown && !shutdowned)
+			if(shutdown && !shutdowned && (switchtos==null || switchtos.isEmpty()))
 			{
 				futures = new ArrayList<Future<Void>>(shutdownfutures);
 				shutdownfutures.clear();
-				if(switchtos!=null)
-				{
-					mons = new ArrayList<Object>(switchtos);
-					switchtos.clear();
-				}
+//				if(switchtos!=null)
+//				{
+//					mons = new ArrayList<Object>(switchtos);
+//					switchtos.clear();
+//				}
 				shutdowned = true;
-			}
-		}
-		// Release waiting threads
-		// todo: let them throw exception?!
-		if(mons!=null && mons.size()>0)
-		{
-			for(Object mon: mons)
-			{
-				synchronized(mon)
-				{
-					mon.notify();
-				}
 			}
 		}
 		if(futures!=null)
@@ -191,7 +178,6 @@ public class Executor implements Runnable
 			for(int i=0; i<futures.size(); i++)
 				futures.get(i).setResult(null);
 		}
-		
 		
 		EXECUTOR.set(null);
 				
