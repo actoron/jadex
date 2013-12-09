@@ -163,7 +163,7 @@ public class RestDemoActivity extends JadexAndroidActivity
 								int width = widthBar.getProgress();
 								double[][] data = new double[count][];
 								String[] labels = labelText.getText().toString().replaceAll("[^\\w,]*", "").split(",");
-								Integer[] colors = Integer.valueOf[count];
+								Integer[] colors = new Integer[count];
 
 								for (int i = 0; i < count; i++)
 								{

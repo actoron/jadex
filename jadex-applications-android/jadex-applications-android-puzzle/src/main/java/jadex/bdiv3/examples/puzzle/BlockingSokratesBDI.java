@@ -105,7 +105,7 @@ public class BlockingSokratesBDI
 		/**
 		 *  Move goal is successful when resulting board represents a solution.
 		 */
-		@GoalTargetCondition(events="board")
+		@GoalTargetCondition(beliefs="board")
 		public boolean	isAchieved()
 		{
 			return board.isSolution();

@@ -15,7 +15,7 @@
 	<properties>
 		<jadex-android-maven-plugin-version>1.0-SNAPSHOT</jadex-android-maven-plugin-version>
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
-		<android-maven-plugin-version>3.6.1</android-maven-plugin-version>
+		<android-maven-plugin-version>3.8.1</android-maven-plugin-version>
 		<android-api-version>2.2.1</android-api-version>
 		<android-support-version>r7</android-support-version>
 		<munge-default-excludes>**/.svn/,**/ui/,**/gui/</munge-default-excludes>
@@ -197,6 +197,37 @@
 					<artifactId>maven-release-plugin</artifactId>
 					<version>2.2.1</version>
 					<configuration>
+					</configuration>
+				</plugin>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											com.jayway.maven.plugins.android.generation2
+										</groupId>
+										<artifactId>
+											android-maven-plugin
+										</artifactId>
+										<versionRange>
+											[3.8.1,)
+										</versionRange>
+										<goals>
+											<goal>consume-aar</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
 			</plugins>

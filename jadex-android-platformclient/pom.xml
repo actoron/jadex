@@ -41,11 +41,11 @@
 		</resources>
 
 		<plugins>
-			<plugin>
-				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
-				<artifactId>android-maven-plugin</artifactId>
-				<extensions>true</extensions>
-			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>com.jayway.maven.plugins.android.generation2</groupId> -->
+<!-- 				<artifactId>android-maven-plugin</artifactId> -->
+<!-- 				<extensions>true</extensions> -->
+<!-- 			</plugin> -->
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
