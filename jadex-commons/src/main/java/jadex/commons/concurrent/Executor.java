@@ -37,10 +37,10 @@ public class Executor implements Runnable
 	protected boolean	wanttorun;
 
 	/** Flag indicating that the executor shuts down. */
-	protected boolean	shutdown;
+	private boolean	shutdown;
 	
 	/** Flag indicating that the executor has shutdowned. */
-	protected boolean	shutdowned;
+	private boolean	shutdowned;
 	
 	/** The thread pool. */
 	protected IThreadPool threadpool;
@@ -60,7 +60,7 @@ public class Executor implements Runnable
 	/** The monitors of blocked threads that need to be reactivated. */
 	protected List<Object>	switchtos;
 	
-	protected Thread thread;
+//	protected Thread thread;
 		
 	//--------- constructors --------
 
@@ -94,7 +94,7 @@ public class Executor implements Runnable
 	 */
 	public void run()
 	{
-		thread = Thread.currentThread();
+//		thread = Thread.currentThread();
 		
 		synchronized(this)
 		{
@@ -112,11 +112,11 @@ public class Executor implements Runnable
 		// running is already set to true in execute()
 		
 		boolean	iwanttorun	= true;
+		Object	switchto	= null;
 		while(iwanttorun && !shutdown)
 		{
 			iwanttorun	=	code();
 
-			Object	switchto	= null;
 			synchronized(this)
 			{
 //				if(toString().indexOf("Tester@")!=-1)
@@ -124,13 +124,13 @@ public class Executor implements Runnable
 //					System.out.println("run exe: ");
 //				}
 
-				if(switchtos!=null)
+				if(switchtos!=null && switchtos.size()>0)
 				{
 					switchto	= switchtos.remove(0);
-					if(switchtos.isEmpty())
-					{
-						switchtos	= null;
-					}
+//					if(switchtos.isEmpty())
+//					{
+//						switchtos	= null;
+//					}
 				}
 			}
 			
@@ -154,33 +154,44 @@ public class Executor implements Runnable
 			{
 //				System.out.println("switchto: "+switchto);
 				iwanttorun	= false;
-				synchronized(switchto)
-				{
-					switchto.notify();
-				}
 			}
 		}
 
 		// Notify shutdown listeners when execution has ended.
 		List<Future<Void>> futures = null;
+		List<Object> mons = null;
 		synchronized(this)
 		{
-			if(shutdown)
+			if(shutdown && !shutdowned)
 			{
 				futures = new ArrayList<Future<Void>>(shutdownfutures);
 				shutdownfutures.clear();
+				if(switchtos!=null)
+				{
+					mons = new ArrayList<Object>(switchtos);
+					switchtos.clear();
+				}
+				shutdowned = true;
+			}
+		}
+		// Release waiting threads
+		// todo: let them throw exception?!
+		if(mons!=null && mons.size()>0)
+		{
+			for(Object mon: mons)
+			{
+				synchronized(mon)
+				{
+					mon.notify();
+				}
 			}
 		}
 		if(futures!=null)
 		{
 			for(int i=0; i<futures.size(); i++)
 				futures.get(i).setResult(null);
-			
-			synchronized(this)
-			{
-				shutdowned = true;
-			}
 		}
+		
 		
 		EXECUTOR.set(null);
 				
@@ -189,7 +200,15 @@ public class Executor implements Runnable
 			exethreadcnt--;
 		}
 		
-		thread = null;
+		if(switchto!=null)
+		{
+			synchronized(switchto)
+			{
+				switchto.notify();
+			}
+		}
+		
+//		thread = null;
 	}
 
 	/**
@@ -325,7 +344,7 @@ public class Executor implements Runnable
 //		System.out.println("Executor.blockThread "+Thread.currentThread());
 		running	= false;
 		this.monitor	= monitor;
-
+		
 		synchronized(monitor)
 		{
 			// Todo: decide if a new thread is needed

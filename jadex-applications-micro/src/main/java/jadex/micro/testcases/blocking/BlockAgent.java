@@ -2,9 +2,9 @@ package jadex.micro.testcases.blocking;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 
@@ -13,8 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
  */
 @Agent
 @Service
-@ProvidedServices(@ProvidedService(type=IBlockService.class,
-	implementation=@Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type=IBlockService.class))
 public class BlockAgent	implements	IBlockService
 {
 	//-------- attributes --------
@@ -30,8 +29,17 @@ public class BlockAgent	implements	IBlockService
 	 */
 	public IFuture<Void>	block(long millis)
 	{
-		agent.waitForDelay(millis).get();
-		
-		return IFuture.DONE;
+		Future<Void> ret = new Future<Void>();
+		if(millis>0)
+		{
+			agent.waitForDelay(millis).get();
+			ret.setResult(null);
+		}
+		else
+		{
+			// do not set result at all and block forever
+			ret.get();
+		}
+		return ret;
 	}
 }

@@ -1818,7 +1818,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 			{
 				// Stop execution of component. When root component services are already shutdowned.
 				cancel(adapter);
-//						exeservice.cancel(adapter);
+//				exeservice.cancel(adapter);
 				
 				killparent = desc.getMaster()!=null && desc.getMaster().booleanValue();
 				CMSComponentDescription padesc = (CMSComponentDescription)getDescription(desc.getName().getParent());

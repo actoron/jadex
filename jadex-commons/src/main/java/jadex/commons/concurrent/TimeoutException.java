@@ -12,6 +12,7 @@ public class TimeoutException	extends RuntimeException
 	 */
 	public TimeoutException()
 	{
+		System.out.println("timeout");
 	}
 	
 	/**
