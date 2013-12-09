@@ -28,12 +28,20 @@
 			<id>jadex-android</id>
 			<url>http://jadex.julakali.org/nexus/content/groups/public/</url>
 		</repository>
-<!-- 		<repository> -->
-<!-- 			<id>jadex-public-snapshots</id> -->
-<!-- 			<name>Jadex Snapshot Repository</name> -->
-<!-- 			<url>http://localhost/nexus/content/repositories/snapshots/</url> -->
-<!-- 		</repository> -->
 	</repositories>
+	
+	<distributionManagement>
+		<repository>
+			<id>jadex-public-releases</id>
+			<name>jadex public releases</name>
+			<url>http://jadex.julakali.org/nexus/content/repositories/jadex-public-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>jadex-public-snapshots</id>
+			<name>jadex public releases</name>
+			<url>http://jadex.julakali.org/nexus/content/repositories/jadex-public-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
