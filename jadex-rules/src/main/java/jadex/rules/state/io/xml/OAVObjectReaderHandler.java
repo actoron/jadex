@@ -174,14 +174,17 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		{
 			AttributeInfo info = (AttributeInfo)attrinfo;
 			attrtype = (OAVAttributeType)info.getAttributeIdentifier();
-			if(val==null && ((AttributeInfo)attrinfo).getAccessInfo().getDefaultValue()!=null)
-				val = ((AttributeInfo)attrinfo).getAccessInfo().getDefaultValue();
-			
-			if(info instanceof AttributeInfo)
+			if(val==null && info.getAccessInfo().getDefaultValue()!=null)
 			{
+				val = info.getAccessInfo().getDefaultValue();
+			}
+			else
+			{				
 				IStringObjectConverter conv = ((AttributeInfo)info).getConverter();
 				if(conv!=null)
+				{
 					val = conv.convertString(attrval, null);
+				}
 			}
 		}
 		else if(attrinfo instanceof OAVAttributeType)

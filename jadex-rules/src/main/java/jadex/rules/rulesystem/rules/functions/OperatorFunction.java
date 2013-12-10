@@ -38,7 +38,7 @@ public class OperatorFunction implements IFunction
 		if(paramvalues==null || paramvalues.length!=2)
 			throw new IllegalArgumentException("Operator function needs two parameters: "+SUtil.arrayToString(paramvalues));
 
-		return new Boolean(operator.evaluate(state, paramvalues[0], paramvalues[1]));
+		return Boolean.valueOf(operator.evaluate(state, paramvalues[0], paramvalues[1]));
 	}
 	
 	/**
@@ -84,7 +84,7 @@ public class OperatorFunction implements IFunction
 	public boolean equals(Object obj)
 	{
 		return (obj instanceof OperatorFunction) 
-			&& ((OperatorFunction)obj).getOperator().equals(obj);
+			&& ((OperatorFunction)obj).getOperator().equals(operator);
 	}
 	
 	/**

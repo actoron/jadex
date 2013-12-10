@@ -1519,7 +1519,9 @@ public class OAVWeakState	implements IOAVState
 //			System.out.println("register: "+value);
 		
 			if(pcls==null)
+			{
 				pcls = new IdentityHashMap(); // values may change, therefore identity hash map
+			}
 			PropertyChangeListener pcl = (PropertyChangeListener)pcls.get(value);
 			
 			if(pcl==null)
@@ -1539,13 +1541,20 @@ public class OAVWeakState	implements IOAVState
 			try
 			{
 				// Do not use Class.getMethod (slow).
-				Method	meth	= SReflect.getMethod(value.getClass(),
-					"addPropertyChangeListener", PCL);
+				Method	meth	= SReflect.getMethod(value.getClass(), "addPropertyChangeListener", PCL);
 				if(meth!=null)
+				{
 					meth.invoke(value, new Object[]{pcl});
+				}
 			}
-			catch(IllegalAccessException e){}
-			catch(InvocationTargetException e){}
+			catch(IllegalAccessException e)
+			{
+				System.err.println("Cannot add property change listener to OAV java bean: "+e);
+			}
+			catch(InvocationTargetException e)
+			{
+				System.err.println("Cannot add property change listener to OAV java bean: "+e);				
+			}
 		}
 	}
 
@@ -1560,23 +1569,30 @@ public class OAVWeakState	implements IOAVState
 		{
 //			System.out.println("deregister: "+value);
 			// Stop listening for bean events.
-			try
+			if(pcls!=null)
 			{
-				if(pcls!=null)
+				try
 				{
-					PropertyChangeListener pcl = (PropertyChangeListener)pcls.get(value);
-						if(pcl!=null)
+					PropertyChangeListener pcl = (PropertyChangeListener)pcls.remove(value);
+					if(pcl!=null)
+					{
+						// Do not use Class.getMethod (slow).
+						Method	meth	= SReflect.getMethod(value.getClass(), "removePropertyChangeListener", PCL);
+						if(meth!=null)
 						{
-							// Do not use Class.getMethod (slow).
-							Method	meth	= SReflect.getMethod(value.getClass(),
-								"removePropertyChangeListener", PCL);
-							if(meth!=null)
-								meth.invoke(value, new Object[]{pcl});
+							meth.invoke(value, new Object[]{pcl});
+						}
 					}
 				}
+				catch(IllegalAccessException e)
+				{
+					System.err.println("Cannot remove property change listener from OAV java bean: "+e);
+				}
+				catch(InvocationTargetException e)
+				{
+					System.err.println("Cannot remove property change listener from OAV java bean: "+e);				
+				}
 			}
-			catch(IllegalAccessException e){}
-			catch(InvocationTargetException e){}
 		}
 	}
 	

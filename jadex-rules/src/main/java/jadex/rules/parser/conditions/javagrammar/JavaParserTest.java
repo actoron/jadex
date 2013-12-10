@@ -9,12 +9,14 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 
 
 /**
@@ -104,7 +106,11 @@ public class JavaParserTest
 			
 			System.out.println("Condition after build:\n"+result+"\n");
 		}
-		catch(Exception ex)
+		catch(MalformedURLException ex)
+		{
+			ex.printStackTrace();
+		}
+		catch(RecognitionException ex)
 		{
 			ex.printStackTrace();
 		}

@@ -1,9 +1,9 @@
 package jadex.rules.test.rulesystem;
 
 import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
 
 import java.awt.Color;
-import jadex.commons.beans.PropertyChangeListener;
 
 /**
  *  A block in the blocks-world.
@@ -14,6 +14,14 @@ public class Block
 
 	/** The block counter. */
 	protected static int counter	= 0;
+	
+	/**
+	 *  Get an instance number.
+	 */
+	protected static synchronized int	getNumber()
+	{
+		return ++counter;
+	}
 
 	//-------- attributes --------
 
@@ -47,7 +55,7 @@ public class Block
 	 */
 	public Block(Color color, Block lower)
 	{
-		this(++counter, color, lower);
+		this(getNumber(), color, lower);
 	}
 
 	/**
@@ -148,7 +156,7 @@ public class Block
 //		Block	old	= this.upper;
 		this.upper	= block;
 //		this.pcs.firePropertyChange("upper", old, this.upper);
-		pcs.firePropertyChange("clear", new Boolean(oldclear), new Boolean(isClear()));
+		pcs.firePropertyChange("clear", Boolean.valueOf(oldclear), Boolean.valueOf(isClear()));
 	}
 
 	/**
@@ -159,7 +167,7 @@ public class Block
 		boolean oldclear = isClear();
 		this.upper	= null;
 //		this.pcs.firePropertyChange("upper", block, null);
-		pcs.firePropertyChange("clear", new Boolean(oldclear), new Boolean(isClear()));
+		pcs.firePropertyChange("clear", Boolean.valueOf(oldclear), Boolean.valueOf(isClear()));
 	}
 
 	/**

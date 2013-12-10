@@ -19,7 +19,7 @@ public class OAVJavaAttributeType extends OAVAttributeType
 	protected PropertyDescriptor propdesc;
 	
 	/** The property object read method. */
-	protected static Method propreadmethod;
+	protected static volatile Method propreadmethod;
 	
 	//-------- constructors --------
 	
@@ -62,7 +62,7 @@ public class OAVJavaAttributeType extends OAVAttributeType
 	{
 		boolean ret = this==obj;
 		
-		if(!ret && obj!=null && obj.getClass().equals(OAVJavaAttributeType.class))
+		if(!ret && obj!=null && obj.getClass().equals(this.getClass()))
 		{
 			OAVJavaAttributeType attr = (OAVJavaAttributeType)obj;
 			if(SUtil.equals(name, attr.getName()))
@@ -96,7 +96,9 @@ public class OAVJavaAttributeType extends OAVAttributeType
 			try
 			{
 				if(propreadmethod==null)
+				{
 					propreadmethod = IPropertyObject.class.getMethod("getProperty", new Class[]{String.class});
+				}
 				ret = propreadmethod.invoke(object, new Object[]{name});
 			}
 			catch(Exception e)

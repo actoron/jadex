@@ -67,7 +67,7 @@ public class OAVNameIdGenerator implements IOAVIdGenerator
 		if(state.containsObject(ret))
 			throw new RuntimeException("No free id available.");
 		
-		counters.put(type, new Long(id));
+		counters.put(type, Long.valueOf(id));
 		
 		return ret;
 	}

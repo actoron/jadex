@@ -73,7 +73,7 @@ public class PriorityAgenda extends AbstractAgenda
 	{
 //		total	-= System.nanoTime();
 //		System.out.println("Add: "+act);
-		this.counts.put(act, new Long(count++));
+		this.counts.put(act, Long.valueOf(count++));
 		this.activations.add(act);
 		
 		state++;

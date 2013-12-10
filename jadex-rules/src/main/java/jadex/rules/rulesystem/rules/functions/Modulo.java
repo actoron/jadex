@@ -34,7 +34,7 @@ public class Modulo implements IFunction
 		Number b = (Number)val2;
 		
 		// todo: support long/double/...
-		ret = new Long(a.longValue() % b.longValue());
+		ret = Long.valueOf(a.longValue() % b.longValue());
 		
 		return ret;
 	}

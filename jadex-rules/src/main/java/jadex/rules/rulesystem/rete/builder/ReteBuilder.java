@@ -129,9 +129,13 @@ public class ReteBuilder
 	{
 		// todo: or, exists conditions
 		
-		// System.nanoTime() : @since 1.5
-		//long start = System.nanoTime();
-		long start = System.currentTimeMillis();
+		long start;
+		if(REPORTING)
+		{
+			// System.nanoTime() : @since 1.5
+			//long start = System.nanoTime();
+			start = System.currentTimeMillis();
+		}
 		
 		BuildContext context = new BuildContext(root, rule);
 		
@@ -143,12 +147,13 @@ public class ReteBuilder
 		
 		ReteNode ret = context.getRootNode();
 		
-		// System.nanoTime() : @since 1.5
-		//long end = System.nanoTime();
-		long end = System.currentTimeMillis();
-		
 		if(REPORTING)
+		{
+			// System.nanoTime() : @since 1.5
+			//long end = System.nanoTime();
+			long end = System.currentTimeMillis();
 			report.addInfo(rule, (end-start));
+		}
 		
 		return ret;
 	}

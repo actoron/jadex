@@ -367,7 +367,7 @@ public class Operator
 			boolean ret;
 			if(val2 instanceof Class)
 			{
-				ret = ((Class)val2).isAssignableFrom(val2 instanceof Class? (Class)val2: val2.getClass());
+				ret = ((Class)val2).isAssignableFrom(val1 instanceof Class? (Class)val1: val1.getClass());
 			}
 			else //if(val2 instanceof OAVObjectType)
 			{

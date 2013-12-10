@@ -11,6 +11,7 @@ import jadex.rules.rulesystem.rules.functions.*;
 import jadex.rules.rulesystem.*;
 import jadex.rules.state.*;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -205,9 +206,6 @@ methodConstraint [OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [L
 	
 functionConstraint [OAVTypeModel tmodel, OAVObjectType otype, Map vars] returns [List constraints]	
 	:
-	{
-		List exps = new ArrayList();
-	}
 	'(' fc=functionCall[tmodel, vars] cs=constraint[tmodel, fc, vars] ')'
 	{
 		$constraints = cs;
@@ -235,12 +233,14 @@ constraint [OAVTypeModel tmodel, Object valuesource, Map vars] returns [List con
 	{
 		// Set op if first occurrence
 		if(op==null)
+		{
 			op = $ConstraintOperator.text;
+		}
 	
 		consts.add(next);
 		if(consts.size()>1)
 		{	
-			if(!$ConstraintOperator.text.equals(op))
+			if(!SUtil.equals($ConstraintOperator.text, op))
 			{
 				if(op.equals("&"))
 					last = new AndConstraint((IConstraint[])consts.toArray(new IConstraint[consts.size()]));
@@ -441,7 +441,7 @@ multiFieldVariable [OAVObjectType type, Map vars] returns [Variable var]
 		$var = (Variable)vars.get(vn);
 		if($var==null)
 		{
-			$var = new Variable(vn, type, true);
+			$var = new Variable(vn, type, true, false);
 			vars.put(vn, $var);
 		}
 		else if(type!=null)
@@ -500,7 +500,9 @@ slotname returns [String id]
 	}
 	|('[' StringLiteral ']') 
 	{
-		buf.append("[").append($StringLiteral.text.substring(1, $StringLiteral.text.length()-1)).append("]");
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $StringLiteral.text;
+		buf.append("[").append(text!=null ? text.substring(1, text.length()-1) : null).append("]");
 	}
 	)*
 	{
@@ -520,20 +522,56 @@ functionName returns [String id]
 literal	returns [Object val]	
 	: lit=floatingPointLiteral {$val = lit;}
 	| lit=integerLiteral {$val = lit;}
-	| CharacterLiteral {$val = new Character($CharacterLiteral.text.charAt(0));}
-	| StringLiteral {$val = $StringLiteral.text.substring(1, $StringLiteral.text.length()-1);}
-	| BooleanLiteral {$val = $BooleanLiteral.text.equals("true")? Boolean.TRUE: Boolean.FALSE;}
+	| CharacterLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $CharacterLiteral.text;
+		$val = text==null ? null : Character.valueOf(text.charAt(0));
+	}
+	| StringLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $StringLiteral.text;
+		$val = text==null ? null : text.substring(1, text.length()-1);
+	}
+	| BooleanLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $BooleanLiteral.text;
+		$val = text==null ? null : text.equals("true")? Boolean.TRUE: Boolean.FALSE;
+	}
 	| 'null' {$val = null;}
 	;
 
 floatingPointLiteral returns [Object val]
-	: sign=('+'|'-')? FloatingPointLiteral {$val = sign!=null && "-".equals(sign.getText())? new Double("-"+$FloatingPointLiteral.text): new Double($FloatingPointLiteral.text);}
+	: sign=('+'|'-')? FloatingPointLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $FloatingPointLiteral.text;
+		$val = text==null ? null : sign!=null && "-".equals(sign.getText())? Double.valueOf("-"+text): Double.valueOf(text);
+	}
 	;
 	
 integerLiteral returns [Object val]
-	: sign=('+'|'-')? (HexLiteral {$val = sign!=null && "-".equals(sign.getText())? new Integer("-"+$HexLiteral.text): new Integer($HexLiteral.text);}
-	| OctalLiteral {$val = sign!=null && "-".equals(sign.getText())? new Integer("-"+$OctalLiteral.text): new Integer($OctalLiteral.text);}
-	| DecimalLiteral {$val = sign!=null && "-".equals(sign.getText())? new Integer("-"+$DecimalLiteral.text): new Integer($DecimalLiteral.text);})
+	: sign=('+'|'-')?
+	( HexLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $HexLiteral.text;
+		$val = text==null ? null : sign!=null && "-".equals(sign.getText())? Integer.valueOf("-"+text): Integer.valueOf(text);
+	}
+	| OctalLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $OctalLiteral.text;
+		$val = text==null ? null : sign!=null && "-".equals(sign.getText())? Integer.valueOf("-"+text): Integer.valueOf(text);
+	}
+	| DecimalLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $DecimalLiteral.text;
+		$val = text==null ? null : sign!=null && "-".equals(sign.getText())? Integer.valueOf("-"+text): Integer.valueOf(text);
+	})
 	;
 
 operator returns [IOperator operator]

@@ -395,20 +395,55 @@ pseudovariable returns [Expression exp]
 literal returns [Expression exp]
 	: tmp = floatingPointLiteral {$exp = tmp;}
 	| tmp = integerLiteral {$exp = tmp;}
-	| CharacterLiteral {$exp = new LiteralExpression(new Character($CharacterLiteral.text.charAt(0)));}
-	| StringLiteral {$exp = new LiteralExpression($StringLiteral.text.substring(1, $StringLiteral.text.length()-1));}
-	| BooleanLiteral {$exp = new LiteralExpression($BooleanLiteral.text.equals("true")? Boolean.TRUE: Boolean.FALSE);}
+	| CharacterLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $CharacterLiteral.text;
+		$exp = new LiteralExpression(text==null ? null : Character.valueOf(text.charAt(0)));
+	}
+	| StringLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $StringLiteral.text;
+		$exp = new LiteralExpression(text==null ? null : text.substring(1, text.length()-1));
+	}
+	| BooleanLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $BooleanLiteral.text;
+		$exp = new LiteralExpression(text==null ? null : text.equals("true")? Boolean.TRUE: Boolean.FALSE);
+	}
 	| 'null' {$exp = new LiteralExpression(null);}
 	;
 
 floatingPointLiteral returns [Expression exp]
-	: FloatingPointLiteral {$exp = new LiteralExpression(new Double($FloatingPointLiteral.text));}
+	: FloatingPointLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $FloatingPointLiteral.text;
+		$exp = new LiteralExpression(text==null ? null : Double.valueOf(text));
+	}
 	;
 
 integerLiteral returns [Expression exp]
-	: HexLiteral {$exp = new LiteralExpression(new Integer($HexLiteral.text));}
-	| OctalLiteral {$exp = new LiteralExpression(new Integer($OctalLiteral.text));}
-	| DecimalLiteral {$exp = new LiteralExpression(new Integer($DecimalLiteral.text));}
+	: HexLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $HexLiteral.text;
+		$exp = new LiteralExpression(text==null ? null : Integer.valueOf(text));
+	}
+	| OctalLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $OctalLiteral.text;
+		$exp = new LiteralExpression(text==null ? null : Integer.valueOf(text));
+	}
+	| DecimalLiteral
+	{
+		// Auto-generated non-null check on literal produces scary findbugs warning when used inline.
+		String	text	= $DecimalLiteral.text;
+		$exp = new LiteralExpression(text==null ? null : Integer.valueOf(text));
+	}
 	;
 /*
 floatingPointLiteral returns [Expression exp]
