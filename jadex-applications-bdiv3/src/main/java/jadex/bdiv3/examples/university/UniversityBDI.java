@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.university;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
@@ -28,6 +29,7 @@ public class UniversityBDI
 {
 	/** The bdi agent. */
 	@Agent
+	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 	protected BDIAgent agent;
 	
 	@Belief

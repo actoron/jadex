@@ -9,6 +9,14 @@ public class Chargingstation extends LocationObject
 	/** The instance counter. */
 	protected static int instancecnt = 0;
 
+	/**
+	 *  Get an instance number.
+	 */
+	protected static synchronized int	getNumber()
+	{
+		return ++instancecnt;
+	}
+
 	//-------- attributes ----------
 
 	/** Attribute for slot name. */
@@ -29,7 +37,7 @@ public class Chargingstation extends LocationObject
 	 */
 	public Chargingstation(Location location)
 	{
-		this("Chargingstation #" + instancecnt++, location);
+		this("Chargingstation #" + getNumber(), location);
 	}
 
 	/**

@@ -1,8 +1,5 @@
 package jadex.bdiv3.examples.garbagecollector;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -11,6 +8,11 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.annotation.Agent;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * 
  */
@@ -18,6 +20,7 @@ import jadex.micro.annotation.Agent;
 public abstract class BaseAgentBDI
 {
 	@Agent
+	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 	protected BDIAgent agent;
 	
 	/** The environment. */

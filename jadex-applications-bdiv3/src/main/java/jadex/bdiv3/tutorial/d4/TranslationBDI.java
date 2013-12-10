@@ -17,6 +17,8 @@ import jadex.micro.annotation.Description;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  *  Translation agent D3.
  *  
@@ -36,6 +38,7 @@ public class TranslationBDI
 	protected Map<String, String> wordtable = new HashMap<String, String>();
 
 	@Belief
+	@SuppressFBWarnings(value="SA_FIELD_DOUBLE_ASSIGNMENT", justification="Field is a belief and agent reacts to changes automatically.")
 	protected String eword;
 	
 	/**

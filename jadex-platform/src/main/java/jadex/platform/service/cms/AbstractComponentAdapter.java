@@ -597,7 +597,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 			executing	= true;
 		}
-		
+//		if(getComponentIdentifier().toString().indexOf("@Receiver.EventSystem")!=-1)
+//		{
+//			System.err.println(getComponentIdentifier()+": execution0 "+System.identityHashCode(Executor.EXECUTOR.get()));
+//		}
 		wokenup	= false;	
 		
 		// Note: wakeup() can be called from arbitrary threads (even when the
@@ -771,6 +774,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			ret	= false;
 		}
 		
+//		if(getComponentIdentifier().toString().indexOf("@Receiver.EventSystem")!=-1)
+//		{
+//			System.err.println(getComponentIdentifier()+": !execution0 "+System.identityHashCode(Executor.EXECUTOR.get()));
+//		}
 		executing	= false;
 		ISuspendable.SUSPENDABLE.set(null);
 
@@ -812,6 +819,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		component.beforeBlock();
 		
+//		if(getComponentIdentifier().toString().indexOf("@Receiver.EventSystem")!=-1)
+//		{
+//			System.err.println(getComponentIdentifier()+": !execution1 "+System.identityHashCode(Executor.EXECUTOR.get()));
+//		}
 		this.executing	= false;
 		this.componentthread	= null;
 		
@@ -851,7 +862,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 			this.executing	= true;
 		}
-		
+//		if(getComponentIdentifier().toString().indexOf("@Receiver.EventSystem")!=-1)
+//		{
+//			System.err.println(getComponentIdentifier()+": execution1 "+System.identityHashCode(Executor.EXECUTOR.get()));
+//		}
+
 		this.componentthread	= Thread.currentThread();
 		
 		component.afterBlock();

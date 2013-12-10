@@ -24,14 +24,14 @@ public class Table	extends Block
 	/** The blocks located on top of the table. */
 	protected List	blocks;
 
-	/** The target configuration (if any). */
-	protected Table	target;
+//	/** The target configuration (if any). */
+//	protected Table	target;
 
 //	/** The block listener (if any). */
 //	protected PropertyChangeListener	listener;
 
-	/** The old solution state. */
-	protected boolean	solution;
+//	/** The old solution state. */
+//	protected boolean	solution;
 
 	//-------- constructors --------
 

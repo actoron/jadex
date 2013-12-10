@@ -6,7 +6,6 @@ import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
-import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.Plans;
 import jadex.bdiv3.annotation.ServicePlan;
 import jadex.bdiv3.annotation.Trigger;
@@ -40,9 +39,6 @@ public class RichBDI
 	/** The money. */
 	@Belief
 	protected int money;
-	
-	/** The painter. */
-	protected Object painter;
 	
 	@AgentBody
 	public void body()

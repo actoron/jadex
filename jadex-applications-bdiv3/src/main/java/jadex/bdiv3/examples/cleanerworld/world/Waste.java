@@ -9,6 +9,14 @@ public class Waste	extends LocationObject
 	//-------- static attributes --------
 
 	protected static int wastecnt;
+	
+	/**
+	 *  Get an instance number.
+	 */
+	protected static synchronized int	getNumber()
+	{
+		return ++wastecnt;
+	}
 
 	//-------- constructors --------
 
@@ -26,7 +34,7 @@ public class Waste	extends LocationObject
 	 */
 	public Waste(Location location)
 	{
-		this("Waste_#"+wastecnt++, location);
+		this("Waste_#"+getNumber(), location);
 	}
 
 	/**

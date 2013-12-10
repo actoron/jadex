@@ -1,5 +1,6 @@
 package jadex.bdiv3.testcases.misc;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
@@ -19,6 +20,7 @@ public class InitExpressionsBDI
 	
 	/** The agent. */
 	@Agent
+	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 	protected BDIAgent	agent;
 	
 	/** The agent name. */

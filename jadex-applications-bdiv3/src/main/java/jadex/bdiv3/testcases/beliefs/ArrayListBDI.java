@@ -7,11 +7,11 @@ import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.PlanBody;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Agent
@@ -43,7 +43,7 @@ public class ArrayListBDI
         {
             testArrayList.add(new int[5]);
             int[] arr = new int[]{5};
-            System.out.println("plan end");
+            System.out.println("plan end: "+Arrays.toString(arr));
         }
     }
 }

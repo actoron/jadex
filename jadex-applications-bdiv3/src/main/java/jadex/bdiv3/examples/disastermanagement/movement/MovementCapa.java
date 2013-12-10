@@ -1,5 +1,6 @@
 package jadex.bdiv3.examples.disastermanagement.movement;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jadex.bdiv3.annotation.Body;
 import jadex.bdiv3.annotation.Capability;
 import jadex.bdiv3.annotation.Goal;
@@ -30,6 +31,7 @@ public class MovementCapa implements IEnvAccess
 
 	/** The capability. */
 	@Agent
+	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 	protected ICapability capa;
 	
 	/** The environment. */

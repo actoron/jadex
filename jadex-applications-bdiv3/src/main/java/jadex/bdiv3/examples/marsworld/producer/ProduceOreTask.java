@@ -7,7 +7,6 @@ import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector2;
 
 /**
  *  Move an object towards a destination.
@@ -31,8 +30,8 @@ public class ProduceOreTask extends AbstractTask
 	
 	//-------- attributes --------
 	
-	/** The target. */
-	protected ISpaceObject	target;
+//	/** The target. */
+//	protected ISpaceObject	target;
 	
 	/** The remaining time. */
 	protected long	time;

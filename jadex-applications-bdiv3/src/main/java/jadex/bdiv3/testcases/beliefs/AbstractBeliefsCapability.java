@@ -16,6 +16,8 @@ import jadex.micro.annotation.Agent;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 @Capability
 public class AbstractBeliefsCapability
 {
@@ -87,6 +89,7 @@ public class AbstractBeliefsCapability
 	//-------- constructors --------
 	
 	@Agent
+	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 	protected BDIAgent	agent;
 	
 	public AbstractBeliefsCapability()

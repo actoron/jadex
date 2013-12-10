@@ -1,11 +1,6 @@
 package jadex.bdiv3.examples.shop;
 
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
-import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IExternalAccess;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -18,19 +13,19 @@ public class CustomerViewerPanel extends AbstractComponentViewerPanel
 	//-------- attributes --------
 	
 	/** The panel. */
-	protected JPanel panel;
+	protected JPanel panel	= new JPanel();	// Todo...
 	
 	//-------- methods --------
 	
-	/**
-	 *  Called once to initialize the panel.
-	 *  Called on the swing thread.
-	 *  @param jcc	The jcc.
-	 * 	@param component The component.
-	 */
-	public IFuture<Void> init(IControlCenter jcc, final IExternalAccess component)
-	{
-		final Future<Void> ret = new Future<Void>();
+//	/**
+//	 *  Called once to initialize the panel.
+//	 *  Called on the swing thread.
+//	 *  @param jcc	The jcc.
+//	 * 	@param component The component.
+//	 */
+//	public IFuture<Void> init(IControlCenter jcc, final IExternalAccess component)
+//	{
+//		final Future<Void> ret = new Future<Void>();
 //		super.init(jcc, component).addResultListener(new IResultListener<Void>()
 //		{
 //			public void resultAvailable(Void result)
@@ -44,8 +39,8 @@ public class CustomerViewerPanel extends AbstractComponentViewerPanel
 //				ret.setException(exception);
 //			}
 //		});
-		return ret;
-	}
+//		return ret;
+//	}
 	
 	/**
 	 *  The component to be shown in the gui.

@@ -61,5 +61,6 @@ public class ComponentTerminatedException	extends RuntimeException
 	public void printStackTrace()
 	{
 		Thread.dumpStack();
+		super.printStackTrace();
 	}
 }

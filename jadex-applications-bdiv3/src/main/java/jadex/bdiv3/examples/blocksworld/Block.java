@@ -16,6 +16,14 @@ public class Block
 	/** The block counter. */
 	protected static int counter	= 0;
 
+	/**
+	 *  Get an instance number.
+	 */
+	protected static synchronized int	getNumber()
+	{
+		return ++counter;
+	}
+
 	//-------- attributes --------
 
 	/** The number of the block. */
@@ -48,7 +56,7 @@ public class Block
 	 */
 	public Block(Color color, Block lower)
 	{
-		this(++counter, color, lower);
+		this(getNumber(), color, lower);
 	}
 
 	/**

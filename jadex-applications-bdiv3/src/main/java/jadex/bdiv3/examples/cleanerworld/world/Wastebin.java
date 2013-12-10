@@ -14,6 +14,14 @@ public class Wastebin extends LocationObject
 	/** The instance counter. */
 	protected static int instancecnt = 0;
 
+	/**
+	 *  Get an instance number.
+	 */
+	protected static synchronized int	getNumber()
+	{
+		return ++instancecnt;
+	}
+
 	//-------- attributes ----------
 
 	/** Attribute for slot wastes. */
@@ -41,7 +49,7 @@ public class Wastebin extends LocationObject
 	 */
 	public Wastebin(Location location, int capacity)
 	{
-		this("Wastebin #" + instancecnt++, location, capacity);
+		this("Wastebin #" + getNumber(), location, capacity);
 	}
 
 	/**

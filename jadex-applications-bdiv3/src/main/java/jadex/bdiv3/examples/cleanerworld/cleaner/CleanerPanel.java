@@ -256,7 +256,6 @@ class CleanerPanel extends JPanel
 		public int xcnt;
 		public int ycnt;
 		public Cleaner[] cleaners;
-		public double chargestate;
 		public Location my_location;
 		public double my_vision;
 		public double my_chargestate;

@@ -138,6 +138,7 @@ public class ServiceHandler implements InvocationHandler
 		
 		// Add task to queue.
 		queue.add(new Object[]{method, args, ret, ServiceCall.getCurrentInvocation()});
+//		System.out.println("queuesize invoke "+component.getComponentIdentifier()+": "+queue.size()+", "+this);
 		// Notify strategy that task was added
 		boolean create = strategy.taskAdded();
 		
@@ -238,6 +239,7 @@ public class ServiceHandler implements InvocationHandler
 			if(service!=null)
 			{
 				final Object[] task = queue.remove(0);
+//				System.out.println("queuesize aFS "+component.getComponentIdentifier()+": "+queue.size()+", "+this);
 				Method method = (Method)task[0];
 				Object[] args = (Object[])task[1];
 				Future<?> ret = (Future<?>)task[2];
@@ -510,6 +512,6 @@ public class ServiceHandler implements InvocationHandler
 	public String toString()
 	{
 		return "ServiceHandler(servicetype="+ servicetype + ", servicepool=" + idleservices 
-			+ ", queue="+ queue + ", strategy=" + strategy+")";
+			+ ", queue="+ queue.size() + ", strategy=" + strategy+")";
 	}
 }

@@ -10,6 +10,8 @@ import jadex.micro.annotation.Arguments;
 
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * 
  */
@@ -25,6 +27,7 @@ public class ShopAndCustomerBDI
 
 	/** The agent. */
 	@Agent
+	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 	protected BDIAgent	agent;
 	
 	/** The customer capability. */

@@ -26,8 +26,8 @@ import java.util.logging.Logger;
  */
 public class Future<E> implements IFuture<E>, IForwardCommandFuture
 {
-	static int stackcount, maxstack;
-	static double	avgstack;
+//	static int stackcount, maxstack;
+//	static double	avgstack;
 	
 	//-------- constants --------
 	
@@ -35,13 +35,13 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 	public static final ThreadLocal<List<Tuple2<Future<?>, IResultListener<?>>>>	STACK	= new ThreadLocal<List<Tuple2<Future<?>,IResultListener<?>>>>();
 	
 	/** A caller is queued for suspension. */
-	protected final String	CALLER_QUEUED	= "queued";
+	protected static final String	CALLER_QUEUED	= "queued";
 	
 	/** A caller is resumed. */
-	protected final String	CALLER_RESUMED	= "resumed";
+	protected static final String	CALLER_RESUMED	= "resumed";
 	
 	/** A caller is suspended. */
-	protected final String	CALLER_SUSPENDED	= "suspended";
+	protected static final String	CALLER_SUSPENDED	= "suspended";
 	
 	/** Debug flag. */
 	// Hack!!! Non-final to be setable from Starter 
