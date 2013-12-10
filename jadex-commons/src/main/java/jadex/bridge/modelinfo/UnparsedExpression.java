@@ -38,6 +38,23 @@ public class UnparsedExpression
 	/**
 	 *  Create a new expression.
 	 */
+	public UnparsedExpression(String name, String value)
+	{
+		this(name, (Class<?>)null, value, null);
+	}
+	
+	/**
+	 *  Create a new expression.
+	 */
+	public UnparsedExpression(String name, Class<?> clazz, String value)
+	{
+		this(name, clazz, value, null);
+	}
+	
+	
+	/**
+	 *  Create a new expression.
+	 */
 	public UnparsedExpression(String name, Class<?> clazz, String value, String language)
 	{
 		this.name = name;

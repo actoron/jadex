@@ -546,7 +546,7 @@ public class DefaultRestServicePublishService implements IPublishService
 	{
 		Object ret = null;
 		
-		System.out.println("called invoke: "+sig);
+//		System.out.println("called invoke: "+sig);
 		
 		try
 		{
@@ -628,7 +628,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			Object[] targetparams = params;
 			if(method.isAnnotationPresent(ParametersMapper.class))
 			{
-				System.out.println("foundmapper");
+//				System.out.println("foundmapper");
 				ParametersMapper mm = method.getAnnotation(ParametersMapper.class);
 				Class<?> clazz = mm.value().clazz();
 				Object mapper;
@@ -646,9 +646,9 @@ public class DefaultRestServicePublishService implements IPublishService
 				targetparams = ((IParameterMapper)mapper).convertParameters(params);
 			}
 			
-			System.out.println("method: "+method.getName()+" "+method.getDeclaringClass().getName());
-			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
-			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service);
+//			System.out.println("method: "+method.getName()+" "+method.getDeclaringClass().getName());
+//			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
+//			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service);
 //			
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)

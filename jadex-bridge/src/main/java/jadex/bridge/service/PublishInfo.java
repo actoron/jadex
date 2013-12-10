@@ -44,7 +44,7 @@ public class PublishInfo
 	{
 		this(pid, publishtype, mapping, null);
 	}
-	
+		
 	/**
 	 *  Create a new publish info.
 	 *  @param pid The publish id, e.g. url.
