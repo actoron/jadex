@@ -85,24 +85,24 @@ public class ShutdownAgent
 					public void secondResultAvailable(Map<String, Object> result)
 					{
 						System.out.println("fini2: "+result);
-						String model = ShutdownAgent.class.getName()+".class";
-						cms.createComponent(model, new CreationInfo(agent.getModel().getResourceIdentifier()))
-							.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
-						{
-							public void firstResultAvailable(IComponentIdentifier result)
-							{
+//						String model = ShutdownAgent.class.getName()+".class";
+//						cms.createComponent(model, new CreationInfo(agent.getModel().getResourceIdentifier()))
+//							.addResultListener(new DefaultTuple2ResultListener<IComponentIdentifier, Map<String, Object>>()
+//						{
+//							public void firstResultAvailable(IComponentIdentifier result)
+//							{
 								agent.killComponent();
-							}
-							
-							public void secondResultAvailable(Map<String, Object> result)
-							{
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								System.out.println("except: "+exception);
-							}
-						});
+//							}
+//							
+//							public void secondResultAvailable(Map<String, Object> result)
+//							{
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								System.out.println("except: "+exception);
+//							}
+//						});
 					}
 					
 					public void exceptionOccurred(Exception exception)
