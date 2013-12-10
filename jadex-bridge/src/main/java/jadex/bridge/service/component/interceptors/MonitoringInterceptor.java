@@ -1,13 +1,9 @@
 package jadex.bridge.service.component.interceptors;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.bridge.Cause;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
@@ -21,6 +17,9 @@ import jadex.commons.future.ExceptionResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Interceptor that creates service call start / end events and sends
@@ -65,16 +64,16 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 				//&& context.getMethod().getName().indexOf("getChildren")==-1;
 			}
 			
-	//		System.out.println("isApp: "+context.getMethod()+" "+ret);
+//			System.out.println("isApp: "+context.getMethod()+" "+ret);
 	//
-	//		if(context.getMethod().getName().indexOf("getChildren")!=-1)
-	//			System.out.println("gggggg");
+//			if(context.getMethod().getName().indexOf("isValid")!=-1)
+//				System.out.println("gggggg");
 			
 	//		if(ret)
 	//			System.out.println("ok: "+context.getMethod().getDeclaringClass()+"."+context.getMethod().getName());
 					
 	//		if(context.getMethod().getName().indexOf("getExternalAccess")!=-1)
-	//			System.out.println("getExt");
+	//			System.out.println("getExt");g
 		}
 		
 		return ret;

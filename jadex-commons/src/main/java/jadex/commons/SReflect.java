@@ -742,6 +742,8 @@ public class SReflect
 			}
 			map.put(name, ret);
 		}
+		if(name.indexOf("receive")!=-1)
+			System.out.println(Arrays.toString(ret));
 		return ret;
 	}
 	

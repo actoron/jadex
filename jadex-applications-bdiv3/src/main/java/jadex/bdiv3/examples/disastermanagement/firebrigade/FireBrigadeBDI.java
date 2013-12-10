@@ -96,6 +96,8 @@ public class FireBrigadeBDI implements IEnvAccess
 		public static GoHome checkCreate(FireBrigadeBDI ag)
 		{
 			MovementCapa capa = ag.getMoveCapa();
+//			System.out.println("check create go home: "+capa.getCapability().getAgent().getGoals().size()+" "+capa.getCapability().getAgent().getAgentName());
+			
 			if(capa.getCapability().getAgent().getGoals().size()==0 && capa.getHomePosition()!=null && capa.getPosition()!=null
 				&& capa.getEnvironment().getDistance(capa.getHomePosition(), capa.getPosition()).getAsDouble()>0.001)
 			{
@@ -153,8 +155,8 @@ public class FireBrigadeBDI implements IEnvAccess
 		@GoalTargetCondition
 		public boolean checkTarget()
 		{
-			Integer fires = (Integer)getDisaster().getProperty("fire");
-			return fires!=null && fires.intValue()==0;
+			Integer cnt = (Integer)getDisaster().getProperty("fire");
+			return cnt!=null && cnt.intValue()==0;
 		}
 
 		/**
@@ -184,7 +186,7 @@ public class FireBrigadeBDI implements IEnvAccess
 	/**
 	 * 
 	 */
-	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true, inhibits=ClearChemicals.class), 
+	@Goal(excludemode=ExcludeMode.WhenFailed, deliberation=@Deliberation(cardinalityone=true, inhibits={ExtinguishFire.class, ClearChemicals.class}), 
 		publish=@Publish(type=IClearChemicalsService.class, method="clearChemicals"))
 	public static class ClearChemicals
 	{
@@ -205,8 +207,8 @@ public class FireBrigadeBDI implements IEnvAccess
 		@GoalTargetCondition
 		public boolean checkTarget()
 		{
-			Integer fires = (Integer)getDisaster().getProperty("chemicals");
-			return fires!=null && fires.intValue()==0;
+			Integer cnt = (Integer)getDisaster().getProperty("chemicals");
+			return cnt!=null && cnt.intValue()==0;
 		}
 		
 		/**

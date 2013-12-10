@@ -7,7 +7,6 @@ import jadex.bdiv3.annotation.PlanCapability;
 import jadex.bdiv3.annotation.PlanReason;
 import jadex.bdiv3.examples.disastermanagement.DisasterType;
 import jadex.bdiv3.examples.disastermanagement.ExtinguishFireTask;
-import jadex.bdiv3.examples.disastermanagement.ambulance.AmbulanceBDI.TreatVictims;
 import jadex.bdiv3.examples.disastermanagement.firebrigade.FireBrigadeBDI.ExtinguishFire;
 import jadex.bdiv3.examples.disastermanagement.movement.MovementCapa.Move;
 import jadex.bdiv3.runtime.IPlan;

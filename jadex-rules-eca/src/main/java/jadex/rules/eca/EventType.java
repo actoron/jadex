@@ -28,6 +28,8 @@ public class EventType
 	 */
 	public EventType(String typename)
 	{
+		if(typename==null)
+			throw new IllegalArgumentException("Typename must not null");
 		this.typename = typename;
 		StringTokenizer stok = new StringTokenizer(typename, ".");
 		this.types = new String[stok.countTokens()];

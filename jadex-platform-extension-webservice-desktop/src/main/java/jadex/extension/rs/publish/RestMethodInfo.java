@@ -18,6 +18,9 @@ public class RestMethodInfo
 	/** The original method. */
 	protected Method method;
 		
+	/** The signature. */
+	protected String signature;
+	
 	/** The parameter types. */
 	protected Class<?>[] parametertypes;
 	
@@ -365,7 +368,47 @@ public class RestMethodInfo
 	{
 		this.dmname = dmname;
 	}
+	
+	/**
+	 *  Get the method signature.
+	 */
+	public String getSignature()
+	{
+		if(signature==null)
+			signature = buildSignature(getName(), getParameterTypes());
+		return signature;
+	}
+	
+	/**
+	 *  Set the signature. 
+	 *  @param signature The signature to set.
+	 */
+	public void setSignature(String signature)
+	{
+		this.signature = signature;
+	}
 
+	/**
+	 *  Get the signature.
+	 *  @param name
+	 *  @param paramtypes
+	 *  @return
+	 */
+	public static String buildSignature(String name, Class<?>[] paramtypes)
+	{
+		StringBuilder buf = new StringBuilder();
+		buf.append(name).append(" ");
+		if(paramtypes!=null)
+		{
+			for(Class<?> pt: paramtypes)
+			{
+				buf.append(pt.getName()).append(" ");
+			}
+		}
+		return buf.toString();
+	}
+	
+	
 	/**
 	 *  Get the string representation.
 	 */

@@ -601,7 +601,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		if(!PROXYTYPE_RAW.equals(proxytype))
 		{
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-			if(monitoring)
+//			if(monitoring)
 				handler.addFirstServiceInterceptor(new MonitoringInterceptor(ia));
 			handler.addFirstServiceInterceptor(new AuthenticationInterceptor(ia, false));
 			handler.addFirstServiceInterceptor(new PrePostConditionInterceptor(ia));

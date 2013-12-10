@@ -22,13 +22,13 @@ import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -328,7 +328,7 @@ public class DefaultRestServicePublishService implements IPublishService
 		}
 		catch(Exception e)
 		{
-			System.out.println("Not found, creating new: "+name);
+//			System.out.println("Not found, creating new: "+name);
 			ClassPool pool = new ClassPool(null);
 			pool.appendSystemPath();
 			
@@ -378,8 +378,12 @@ public class DefaultRestServicePublishService implements IPublishService
 				CtClass[] paramtypes = SJavassist.getCtClasses(rmi.getParameterTypes(), pool);
 				CtClass[] exceptions = SJavassist.getCtClasses(rmi.getExceptionTypes(), pool);
 				
+//				CtMethod.ConstParameter cop = CtMethod.ConstParameter.string(rmi.getSignature());
+//				if(rmi.getSignature()==null)
+//					System.out.println("sig is "+rmi.getSignature()+" "+rmi.getDelegateMethodName()+" "+rmi.getPath());
+				CtMethod.ConstParameter cop = CtMethod.ConstParameter.string(rmi.getSignature());
 				CtMethod m = CtNewMethod.wrapped(rettype, rmi.getName(),
-					paramtypes, exceptions, invoke, null, proxyclazz);
+					paramtypes, exceptions, invoke, cop, proxyclazz);
 						
 				// path.
 				attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
@@ -538,17 +542,34 @@ public class DefaultRestServicePublishService implements IPublishService
 	 *  @param params The parameters.
 	 *  @return The result.
 	 */
-	public Object invoke(Object[] params)
+	public Object invoke(Object[] params, String sig)
 	{
 		Object ret = null;
 		
-//		System.out.println("called invoke: "+params);
+		System.out.println("called invoke: "+sig);
 		
 		try
 		{
 			// find own method
-			StackTraceElement[] s = Thread.currentThread().getStackTrace();
-			String name = s[2].getMethodName();
+			
+			Method[] ms = getClass().getDeclaredMethods();
+			Method method = null;
+			for(Method m: ms)
+			{
+				if(RestMethodInfo.buildSignature(m.getName(), m.getParameterTypes()).equals(sig))
+				{
+					method = m;
+					break;
+				}
+			}
+			if(method==null)
+			{
+				System.out.println("methods: "+Arrays.toString(ms));
+				throw new RuntimeException("No method '"+sig+"' on class: "+getClass());
+			}
+			
+//			StackTraceElement[] s = Thread.currentThread().getStackTrace();
+//			String name = s[2].getMethodName();
 			
 //			System.out.println("name is: "+name);
 
@@ -557,28 +578,28 @@ public class DefaultRestServicePublishService implements IPublishService
 //				System.out.println(s[i].getMethodName());
 //			}
 //			String name = SReflect.getMethodName();
-			Method[] methods = SReflect.getMethods(getClass(), name);
-		    Method method = null;
-			if(methods.length>1)
-			{
-			    for(int i=0; i<methods.length && method==null; i++)
-			    {
-			    	Class<?>[] types = methods[i].getParameterTypes();
-			    	if(types.length==params.length)
-			    	{
-			    		// check param types
-			    		method = methods[i];
-			    	}
-			    }
-			}
-			else if(methods.length==1)
-			{
-				method = methods[0];
-			}
-			else
-			{
-				throw new RuntimeException("No method '"+name+"' on class: "+getClass());
-			}
+//			Method[] methods = SReflect.getMethods(getClass(), name);
+//		    Method method = null;
+//			if(methods.length>1)
+//			{
+//			    for(int i=0; i<methods.length && method==null; i++)
+//			    {
+//			    	Class<?>[] types = methods[i].getParameterTypes();
+//			    	if(types.length==params.length)
+//			    	{
+//			    		// check param types
+//			    		method = methods[i];
+//			    	}
+//			    }
+//			}
+//			else if(methods.length==1)
+//			{
+//				method = methods[0];
+//			}
+//			else
+//			{
+//				throw new RuntimeException("No method '"+name+"' on class: "+getClass());
+//			}
 //			System.out.println("call: "+this+" "+method+" "+SUtil.arrayToString(params)+" "+name);
 			
 			// check if mappers are there
@@ -607,6 +628,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			Object[] targetparams = params;
 			if(method.isAnnotationPresent(ParametersMapper.class))
 			{
+				System.out.println("foundmapper");
 				ParametersMapper mm = method.getAnnotation(ParametersMapper.class);
 				Class<?> clazz = mm.value().clazz();
 				Object mapper;
@@ -624,8 +646,9 @@ public class DefaultRestServicePublishService implements IPublishService
 				targetparams = ((IParameterMapper)mapper).convertParameters(params);
 			}
 			
-//			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
-//			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service);
+			System.out.println("method: "+method.getName()+" "+method.getDeclaringClass().getName());
+			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
+			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service);
 //			
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)
@@ -666,7 +689,7 @@ public class DefaultRestServicePublishService implements IPublishService
 	 *  @param params The parameters.
 	 *  @return The result.
 	 */
-	public Object getServiceInfo(Object[] params)
+	public Object getServiceInfo(Object[] params, String sig)
 	{
 		StringBuffer ret = new StringBuffer();
 		

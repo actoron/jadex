@@ -15,6 +15,10 @@ public class MethodComparator implements Comparator<Method>
 		if(ret==0)
 		{
 			ret = m1.getParameterTypes().length - m2.getParameterTypes().length;
+			if(ret==0)
+			{
+				ret = m1.toString().compareTo(m2.toString());
+			}
 		}
 		return ret;
 	}
