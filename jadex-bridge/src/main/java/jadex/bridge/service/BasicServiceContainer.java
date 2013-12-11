@@ -32,12 +32,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -157,7 +155,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param componentfetcher	 Helper to fetch corrent object for component injection based on field type.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture<Void>	addService(final IInternalService service, final ProvidedServiceInfo info, IResultCommand<Object, Class<?>> componentfetcher)
+	public IFuture<Void>	addService(final IInternalService service, final ProvidedServiceInfo info)
 	{
 		if(shutdowned)
 			return new Future<Void>(new ComponentTerminatedException(id));

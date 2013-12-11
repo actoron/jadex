@@ -80,9 +80,9 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  @param componentfetcher	 Helper to fetch corrent object for component injection based on field type.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture<Void>	addService(IInternalService service, ProvidedServiceInfo info, IResultCommand<Object, Class<?>> componentfetcher)
+	public IFuture<Void>	addService(IInternalService service, ProvidedServiceInfo info)
 	{
-		return interpreter.getServiceContainer().addService(service, info, componentfetcher);
+		return interpreter.getServiceContainer().addService(service, info);
 	}
 	
 	/**

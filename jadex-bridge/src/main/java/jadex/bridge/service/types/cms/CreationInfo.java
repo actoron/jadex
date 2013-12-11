@@ -84,7 +84,7 @@ public class CreationInfo
 			this.master = info.getMaster();
 			this.daemon = info.getDaemon();
 			this.autoshutdown = info.getAutoShutdown();
-//			this.monitoring = info.getMonitoring();
+			this.monitoring = info.getMonitoring();
 			this.synchronous = info.getSynchronous();
 			this.imports	= info.getImports();
 			this.bindings = info.getRequiredServiceBindings();

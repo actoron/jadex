@@ -471,7 +471,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Create a basic invocation handler.
 	 */
-	protected static BasicServiceInvocationHandler createHandler(String name, IInternalAccess ia, Class<?> type, Object service, boolean realtime, IResultCommand<Object, Class<?>> componentfetcher)
+	protected static BasicServiceInvocationHandler createHandler(String name, IInternalAccess ia, Class<?> type, Object service,
+		boolean realtime, IResultCommand<Object, Class<?>> componentfetcher)
 	{
 		BasicServiceInvocationHandler handler;
 		if(service instanceof IService)

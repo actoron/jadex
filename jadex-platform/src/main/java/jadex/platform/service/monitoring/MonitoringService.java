@@ -4,9 +4,11 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService;
 import jadex.commons.IFilter;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
@@ -75,6 +77,28 @@ public class MonitoringService implements IMonitoringService
 			}
 		};
 	}
+	
+	/**
+	 *  Notify subscribers that monitoring service is terminated.
+	 */
+	@ServiceShutdown
+	public IFuture<Void> shutdown()
+	{
+		Future<Void> ret = new Future<Void>();
+		if(subscriptions!=null)
+		{
+			for(SubscriptionIntermediateFuture<IMonitoringEvent> sub: subscriptions.keySet())
+			{
+				sub.setFinishedIfUndone();
+			}
+			ret.setResult(null);
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}
 
 	/**
 	 *  Publish a new event.
@@ -83,7 +107,7 @@ public class MonitoringService implements IMonitoringService
 	public IFuture<Void> publishEvent(IMonitoringEvent event)
 	{
 //		if(event.getSource().indexOf("method")!=-1)
-//			System.out.println("sdgjsdfsdfjk");
+//			System.out.println("mon service received: "+event);
 		
 		if(filter==null || filter.filter(event))
 		{

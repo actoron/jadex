@@ -104,13 +104,16 @@ public class MonitoringInterceptor extends ComponentThreadInterceptor
 //		if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
 //			System.out.println("start shut in mon: "+context.getObject());
 		
-//		if(context.getMethod().getName().indexOf("getExternalAccess")!=-1)
-//			System.out.println("getExt");
+//		if(context.getMethod().getName().indexOf("log")!=-1)
+//			System.out.println("log");
 		
 		getter.getService().addResultListener(new ExceptionDelegationResultListener<IMonitoringService, Void>(ret)
 		{
 			public void customResultAvailable(IMonitoringService monser)
 			{
+				if(context.getMethod().getName().indexOf("log")!=-1)
+					System.out.println("log");
+				
 //				if(context.getMethod().getName().equals("shutdownService") && component.getComponentIdentifier().getParent()==null)
 //					System.out.println("end shut in mon: "+context.getObject());
 				

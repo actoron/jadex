@@ -1409,8 +1409,9 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 //		boolean moni = elm!=null? !PublishEventLevel.OFF.equals(elm.getLevel()): false; 
 		boolean moni = elm!=null && !PublishEventLevel.OFF.equals(elm); 
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier(), moni, componentfetcher);
-		getServiceContainer().addService(proxy, info, componentfetcher).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
+			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), 
+			isRealtime(), getModel().getResourceIdentifier(), moni, componentfetcher);
+		getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
@@ -1442,7 +1443,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 					rsi.getName(), rsi.getType().getType(getClassLoader()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier());
 				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 					getInternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), getClassLoader(), isRealtime());
-				getServiceContainer().addService(service, info, componentfetcher).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
+				getServiceContainer().addService(service, info).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 			}
 			else
 			{
@@ -1526,8 +1527,12 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			// todo: other Class imports, how can be found out?
 			try
 			{
-				ser = SJavaParser.getParsedValue(impl, model.getAllImports(), getFetcher(), getClassLoader());
-//						System.out.println("added: "+ser+" "+model.getName());
+				SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
+				fetcher.setValue("$servicename", info.getName());
+				fetcher.setValue("$servicetype", info.getType().getType(getClassLoader()));
+//				System.out.println("sertype: "+fetcher.fetchValue("$servicetype")+" "+info.getName());
+				ser = SJavaParser.getParsedValue(impl, model.getAllImports(), fetcher, getClassLoader());
+//				System.out.println("added: "+ser+" "+model.getName());
 			}
 			catch(RuntimeException e)
 			{
