@@ -59,6 +59,7 @@ public class BpmnGraph extends mxGraph
 		addListener(mxEvent.CELLS_FOLDED, access.getFoldController());*/
 		
 		setKeepEdgesInForeground(true);
+//		setKeepEdgesInBackground(true);
 		
 //		addListener(mxEvent.CELLS_ADDED, new mxIEventListener()
 //		{
@@ -85,6 +86,10 @@ public class BpmnGraph extends mxGraph
 //						}
 //					}
 //				}
+//				
+//				Object[] cells = getChildCells(((mxICell) getModel().getRoot()).getChildAt(0));
+//				System.out.println(getChildCells(((mxICell) getModel().getRoot()).getChildAt(0)).length);
+//				orderCells(true, cells);
 //			}
 //		});
 		setStylesheet(sheet);

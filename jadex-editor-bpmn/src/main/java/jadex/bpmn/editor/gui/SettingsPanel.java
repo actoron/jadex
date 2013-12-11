@@ -51,6 +51,9 @@ public class SettingsPanel extends JPanel
 	/** Smooth zoom box. */
 	protected JCheckBox szbox;
 	
+	/** Jadex extensions box. */
+	protected JCheckBox extbox;
+	
 	/** Sequence edge enabled box. */
 	protected JCheckBox sebox;
 	
@@ -340,9 +343,20 @@ public class SettingsPanel extends JPanel
 		szbox.setMargin(new Insets(0, 0, 0, 0));
 		generalpanel.add(szbox, g);
 		
+		extbox = new JCheckBox(changeaction);
+		extbox.setText("Jadex Extensions");
+		extbox.setSelected(settings.isSmoothZoom());
+		g = new GridBagConstraints();
+		g.anchor = GridBagConstraints.WEST;
+		g.gridy = 2;
+		g.insets = new Insets(5, 5, 5, 5);
+		extbox.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
+		extbox.setMargin(new Insets(0, 0, 0, 0));
+		generalpanel.add(extbox, g);
+		
 		g = new GridBagConstraints();
 		g.gridwidth = 2;
-		g.gridy = 2;
+		g.gridy = 3;
 		g.weightx = 1.0;
 		g.weighty = 1.0;
 		g.fill = GridBagConstraints.BOTH;
@@ -407,9 +421,11 @@ public class SettingsPanel extends JPanel
 	/**
 	 *  Applies the settings.
 	 */
-	public boolean applySettings()
+	public boolean[] applySettings()
 	{
-		boolean ret = false;
+		boolean[] ret = new boolean[2];
+		ret[0] = false;
+		ret[1] = false;
 //		String pf = libpathfield.getText();
 //		pf = pf != null && pf.length() == 0 ? null : pf;
 //		if ((pf != null && settings.getLibraryHome() == null) ||
@@ -425,8 +441,18 @@ public class SettingsPanel extends JPanel
 		if (!cand.equals(orig))
 		{
 			settings.setLibraryEntries(libentries);
-			ret = true;
+			ret[0] = true;
 		}
+		
+		if (settings.isJadexExtensions() != extbox.isSelected())
+		{
+			settings.setJadexExtensions(extbox.isSelected());
+			debox.setSelected(extbox.isSelected());
+			debox.setEnabled(extbox.isSelected());
+			ntbox.setEnabled(extbox.isSelected());
+			ret[1] = true;
+		}
+		
 		settings.setSmoothZoom(szbox.isSelected());
 		settings.setDirectSequenceAutoConnect(dsbox.isSelected());
 		settings.setSequenceEdges(sebox.isSelected());

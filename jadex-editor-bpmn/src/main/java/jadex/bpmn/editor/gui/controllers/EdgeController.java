@@ -8,6 +8,7 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
 import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VInParameter;
+import jadex.bpmn.editor.model.visual.VMessagingEdge;
 import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.model.MActivity;
 
@@ -216,7 +217,14 @@ public class EdgeController extends mxConnectionHandler
 					{
 						if (cell instanceof VEdge)
 						{
-							result = graph.addCell(cell, ((VEdge) cell).getEdgeParent(), null, src, trg);
+							if (cell instanceof VMessagingEdge)
+							{
+								result = graph.addCell(cell, graph.getCurrentRoot(), null, src, trg);
+							}
+							else
+							{
+								result = graph.addCell(cell, ((VEdge) cell).getEdgeParent(), null, src, trg);
+							}
 						}
 						else
 						{

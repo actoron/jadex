@@ -33,6 +33,11 @@ public class SPropertyPanelFactory
 	public static BasePropertyPanel createPanel(Object selection, ModelContainer container)
 	{
 		BasePropertyPanel ret = EMPTY_PANEL;
+		if (!container.getSettings().isJadexExtensions())
+		{
+			return ret;
+		}
+		
 		if (selection instanceof VElement)
 		{
 			VElement velement = (VElement) selection;

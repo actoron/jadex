@@ -82,8 +82,11 @@ public class Settings
 	/** Flag if simple direct sequence edge auto-connect is enabled. */
 	protected boolean directsequenceautoconnect = true;
 	
-	/** Flag if save settings on exit is enable. */
+	/** Flag if save settings on exit is enabled. */
 	protected boolean savesettingsonexit = true;
+	
+	/** Flag if Jadex extensions are enabled. */
+	protected boolean jadexextensions = true;
 	
 	/** Smooth zoom flag. */
 	protected boolean smoothzoom = true;
@@ -234,6 +237,22 @@ public class Settings
 	public void setSmoothZoom(boolean smoothzoom)
 	{
 		this.smoothzoom = smoothzoom;
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isJadexExtensions()
+	{
+		return jadexextensions;
+	}
+	
+	/**
+	 * 
+	 */
+	public void setJadexExtensions(boolean jadexextensions)
+	{
+		this.jadexextensions = jadexextensions;
 	}
 	
 	/**
@@ -645,6 +664,8 @@ public class Settings
 		
 		props.put("smoothzoom", String.valueOf(smoothzoom));
 		
+		props.put("jadexextensions", String.valueOf(jadexextensions));
+		
 		props.put("sequenceedges", String.valueOf(sequenceedges));
 		
 		props.put("directsequenceautoconnect", String.valueOf(directsequenceautoconnect));
@@ -789,6 +810,18 @@ public class Settings
 				try
 				{
 					ret.setSmoothZoom(Boolean.parseBoolean(prop));
+				}
+				catch (Exception e)
+				{
+				}
+			}
+			
+			prop = props.getProperty("jadexextensions");
+			if (prop != null)
+			{
+				try
+				{
+					ret.setJadexExtensions(Boolean.parseBoolean(prop));
 				}
 				catch (Exception e)
 				{
