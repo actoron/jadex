@@ -23,7 +23,7 @@ public class ServicesPlan extends Plan
 		IInternalService	service	= getInterpreter().createInternalService(new PrintHelloService(), IPrintHelloService.class);
 		ProvidedServiceInfo	psi	= new ProvidedServiceInfo();
 		psi.setPublish(new PublishInfo("http://localhost:8080/hello/", IPublishService.PUBLISH_RS, IPrintHelloService.class, null));
-		getServiceContainer().addService(service, psi, null);
+		getServiceContainer().addService(service, psi);
 		
 		waitFor(500);
 		
