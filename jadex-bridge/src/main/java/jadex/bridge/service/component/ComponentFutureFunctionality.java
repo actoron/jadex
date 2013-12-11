@@ -44,6 +44,22 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	}
 	
 	/**
+	 *  Send a foward command.
+	 */
+	public void sendForwardCommand(Object info, IResultListener<Void> com)
+	{
+		notifyListener(com);
+	}
+	
+	/**
+	 *  Send a backward command.
+	 */
+	public void sendBackwardCommand(Object info, IResultListener<Void> com)
+	{
+		notifyListener(com);
+	}
+	
+	/**
 	 *  Schedule listener notification on component thread. 
 	 */
 	public void notifyListener(final IResultListener<Void> notify) 

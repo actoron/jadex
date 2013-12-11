@@ -68,12 +68,12 @@ public class ClientRuleSystemAgent implements IRuleEngineService
 				if(event instanceof RuleAddedEvent)
 				{
 					rulesystem.getRulebase().addRule(((RuleAddedEvent)event).getRule());
-					System.out.println("Added rule: "+event);
+//					System.out.println("Added rule: "+event);
 				}
 				else if(event instanceof RuleRemovedEvent)
 				{
 					rulesystem.getRulebase().removeRule(((RuleRemovedEvent)event).getRuleName());
-					System.out.println("Removed rule: "+event);
+//					System.out.println("Removed rule: "+event);
 				}
 				((ARulebaseEvent)event).setFinished(subscription);
 			}

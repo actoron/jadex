@@ -469,35 +469,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return exception;
 					}
 					
-					// Switch terminate() calls back to component thread.
-					public void terminate(Exception reason, final IResultListener<Void> terminate)
-					{
-						if(adapter.isExternalThread())
-						{
-							try
-							{
-								ea.scheduleStep(new IComponentStep<Void>()
-								{
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										terminate.resultAvailable(null);
-										return IFuture.DONE;
-									}
-								});
-							}
-							catch(ComponentTerminatedException e)
-							{
-								terminate.exceptionOccurred(e);
-							}				
-						}
-						else
-						{
-							terminate.resultAvailable(null);
-						}						
-					}
-					
-					// Switch terminate() calls back to component thread.
-					public void pullIntermediateResult(final IResultListener<Void> lis)
+					protected void internalNotifyListener(final IResultListener<Void> lis)
 					{
 						if(adapter.isExternalThread())
 						{
@@ -520,7 +492,35 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						else
 						{
 							lis.resultAvailable(null);
-						}						
+						}	
+					}
+					
+					// Switch terminate() calls back to component thread.
+					public void terminate(Exception reason, final IResultListener<Void> terminate)
+					{
+						internalNotifyListener(terminate);			
+					}
+					
+					/**
+					 *  Send a foward command.
+					 */
+					public void sendForwardCommand(Object info, IResultListener<Void> com)
+					{
+						internalNotifyListener(com);	
+					}
+					
+					/**
+					 *  Send a backward command.
+					 */
+					public void sendBackwardCommand(Object info, IResultListener<Void> com)
+					{
+						internalNotifyListener(com);	
+					}
+					
+					// Switch terminate() calls back to component thread.
+					public void pullIntermediateResult(final IResultListener<Void> lis)
+					{
+						internalNotifyListener(lis);							
 					}
 				};
 				

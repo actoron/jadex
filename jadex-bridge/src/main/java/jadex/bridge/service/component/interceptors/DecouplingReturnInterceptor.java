@@ -98,6 +98,22 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							notifyListener(terminate);
 						}
 						
+						/**
+						 *  Send a foward command.
+						 */
+						public void sendForwardCommand(Object info, IResultListener<Void> com)
+						{
+							notifyListener(com);
+						}
+						
+						/**
+						 *  Send a backward command.
+						 */
+						public void sendBackwardCommand(Object info, IResultListener<Void> com)
+						{
+							notifyListener(com);
+						}
+						
 						public void notifyListener(final IResultListener<Void> listener)
 						{
 //							if(sic.getMethod().getName().indexOf("subscribeToEvents")!=-1)

@@ -165,6 +165,22 @@ public class FutureFunctionality
 		terminate.resultAvailable(null);
 	}
 	
+	/**
+	 *  Send a foward command.
+	 */
+	public void sendForwardCommand(Object info, IResultListener<Void> com)
+	{
+		com.resultAvailable(null);
+	}
+	
+	/**
+	 *  Send a backward command.
+	 */
+	public void sendBackwardCommand(Object info, IResultListener<Void> com)
+	{
+		com.resultAvailable(null);
+	}
+	
 //	/**
 //	 *  Notify the listener.
 //	 */
@@ -613,7 +629,46 @@ class DelegatingPullSubscriptionIntermediateDelegationFuture extends PullSubscri
 			}
 		});
 	}
-
+	
+	/**
+	 *  Send a backward command.
+	 */
+	public void sendBackwardCommand(final Object info)
+	{
+		func.sendBackwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending backward command: "+exception);
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}
+		});
+	}
+	
+	/**
+	 *  Send a foward command.
+	 */
+	public void sendForwardCommand(final Object info)
+	{
+		func.sendForwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending forward command: "+exception);
+				DelegatingPullSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
+			}
+		});
+	}
 };
 
 /**
@@ -849,6 +904,46 @@ class DelegatingPullIntermediateDelegationFuture extends PullIntermediateDelegat
 			}
 		});
 	}
+	
+	/**
+	 *  Send a backward command.
+	 */
+	public void sendBackwardCommand(final Object info)
+	{
+		func.sendBackwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingPullIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending backward command: "+exception);
+				DelegatingPullIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}
+		});
+	}
+	
+	/**
+	 *  Send a foward command.
+	 */
+	public void sendForwardCommand(final Object info)
+	{
+		func.sendForwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingPullIntermediateDelegationFuture.super.sendForwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending forward command: "+exception);
+				DelegatingPullIntermediateDelegationFuture.super.sendForwardCommand(info);
+			}
+		});
+	}
 };
 
 /**
@@ -1061,6 +1156,46 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 				// Hack!!! termination in functionality failed -> should change result of future to failure?
 				func.getLogger().warning("Exception when terminating future: "+exception);
 				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
+			}
+		});
+	}
+	
+	/**
+	 *  Send a backward command.
+	 */
+	public void sendBackwardCommand(final Object info)
+	{
+		func.sendBackwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending backward command: "+exception);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}
+		});
+	}
+	
+	/**
+	 *  Send a forward command.
+	 */
+	public void sendForwardCommand(final Object info)
+	{
+		func.sendForwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending forward command: "+exception);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.sendForwardCommand(info);
 			}
 		});
 	}
@@ -1279,6 +1414,46 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			}
 		});
 	}
+	
+	/**
+	 *  Send a backward command.
+	 */
+	public void sendBackwardCommand(final Object info)
+	{
+		func.sendBackwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending backward command: "+exception);
+				DelegatingTerminableIntermediateDelegationFuture.super.sendBackwardCommand(info);
+			}
+		});
+	}
+	
+	/**
+	 *  Send a forward command.
+	 */
+	public void sendForwardCommand(final Object info)
+	{
+		func.sendForwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.sendForwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending forward command: "+exception);
+				DelegatingTerminableIntermediateDelegationFuture.super.sendForwardCommand(info);
+			}
+		});
+	}
 };
 
 /**
@@ -1413,6 +1588,46 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 				// Hack!!! termination in functionality failed -> should change result of future to failure?
 				func.getLogger().warning("Exception when terminating future: "+exception);
 				DelegatingTerminableDelegationFuture.super.terminate(reason);
+			}
+		});
+	}
+	
+	/**
+	 *  Send a backward command.
+	 */
+	public void sendBackwardCommand(final Object info)
+	{
+		func.sendBackwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingTerminableDelegationFuture.super.sendBackwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending backward command: "+exception);
+				DelegatingTerminableDelegationFuture.super.sendBackwardCommand(info);
+			}
+		});
+	}
+	
+	/**
+	 *  Send a forward command.
+	 */
+	public void sendForwardCommand(final Object info)
+	{
+		func.sendForwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingTerminableDelegationFuture.super.sendForwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending forward command: "+exception);
+				DelegatingTerminableDelegationFuture.super.sendForwardCommand(info);
 			}
 		});
 	}
@@ -1637,6 +1852,26 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			}
 		});
     }
+    
+	/**
+	 *  Send a forward command.
+	 */
+	public void sendForwardCommand(final Object info)
+	{
+		func.sendForwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingIntermediateFuture.super.sendForwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending forward command: "+exception);
+				DelegatingIntermediateFuture.super.sendForwardCommand(info);
+			}
+		});
+	}
 };
 
 /**
@@ -1744,6 +1979,26 @@ class DelegatingFuture extends Future<Object>
 				// Hack!!! functionality failed -> should change result of future to failure?
 				func.getLogger().warning("Exception when notifying: "+exception);
 				DelegatingFuture.super.notifyListener(listener);
+			}
+		});
+	}
+	
+	/**
+	 *  Send a forward command.
+	 */
+	public void sendForwardCommand(final Object info)
+	{
+		func.sendForwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingFuture.super.sendForwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending forward command: "+exception);
+				DelegatingFuture.super.sendForwardCommand(info);
 			}
 		});
 	}
@@ -1969,5 +2224,25 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 			}
 		});
     }
+    
+    /**
+	 *  Send a forward command.
+	 */
+	public void sendForwardCommand(final Object info)
+	{
+		func.sendForwardCommand(info, new IResultListener<Void>()
+		{
+			public void resultAvailable(Void v)
+			{
+				DelegatingTupleFuture.super.sendForwardCommand(info);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Hack!!! termination in functionality failed -> should change result of future to failure?
+				func.getLogger().warning("Exception when sending forward command: "+exception);
+				DelegatingTupleFuture.super.sendForwardCommand(info);
+			}
+		});
+	}
 };
 
