@@ -289,7 +289,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 		if(ambientOcclusion)
 		{
-			SSAOFilter ssaoFilter = new SSAOFilter(20.00f, 20.92f, 0.3f, 0.61f);
+//			SSAOFilter ssaoFilter = new SSAOFilter(20.00f, 20.92f, 0.3f, 0.61f);
 
 			// ssaoFilter.setUseAo(false);
 			// ssaoFilter.setUseOnlyAo(true);

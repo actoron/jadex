@@ -12,7 +12,8 @@ public class TimeoutException	extends RuntimeException
 	 */
 	public TimeoutException()
 	{
-		System.out.println("timeout");
+//		System.out.println("timeout");
+//		Thread.dumpStack();
 	}
 	
 	/**
@@ -21,6 +22,7 @@ public class TimeoutException	extends RuntimeException
 	public TimeoutException(String message)
 	{
 		super(message);
+//		Thread.dumpStack();
 	}
 	
 //	/**

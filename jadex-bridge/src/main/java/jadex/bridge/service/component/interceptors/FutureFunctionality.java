@@ -384,13 +384,9 @@ public class FutureFunctionality
 		{
 			source.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)target));
 		}
-		else if(target instanceof IFuture)
-		{
-			source.addResultListener(new DelegationResultListener((Future)target));
-		}
 		else
 		{
-			throw new IllegalArgumentException("Unknown source type: "+(source!=null ? source.getClass() : null));
+			source.addResultListener(new DelegationResultListener(target));
 		}
 	}
 }

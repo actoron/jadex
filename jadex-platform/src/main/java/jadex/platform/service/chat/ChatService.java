@@ -49,6 +49,7 @@ import jadex.commons.future.TerminationCommand;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -1326,7 +1327,7 @@ public class ChatService implements IChatService, IChatGuiService
 				setNickName(tmp);
 			tmp = props.getStringProperty("image");
 			if(tmp!=null)
-				setImage(Base64.decode(tmp.getBytes()));
+				setImage(Base64.decode(tmp.getBytes(Charset.forName("UTF-8"))));
 			
 			called.setResultIfUndone(null);
 			
@@ -1342,7 +1343,7 @@ public class ChatService implements IChatService, IChatGuiService
 			// Only save as executing when in normal mode.
 			props.addProperty(new Property("nickname", nick));
 			if(image!=null)
-				props.addProperty(new Property("image", new String(Base64.encode(image))));
+				props.addProperty(new Property("image", new String(Base64.encode(image), Charset.forName("UTF-8"))));
 			return new Future<Properties>(props);
 		}
 	}

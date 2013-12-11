@@ -30,6 +30,7 @@ package jadex.platform.service.message.transport.ssltcpmtp;
 
 import javax.net.ssl.*;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.cert.CertificateException;
@@ -113,7 +114,7 @@ public class InstallCert
 			return;
 		}
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, Charset.defaultCharset()));
 
 		System.out.println();
 		System.out.println("Server sent " + chain.length + " certificate(s):");

@@ -338,7 +338,7 @@ public class PlatformConfigPanel	extends JPanel
 				try
 				{
 					Class<?> starterclass = SReflect.classForName(Starter.class.getName(), classpath.getClassLoader());
-					Object	fut	= starterclass.getMethod("createPlatform", new Class<?>[]{String[].class}).
+					starterclass.getMethod("createPlatform", new Class<?>[]{String[].class}).
 						invoke(null, new Object[]{args.toArray(new String[args.size()])});
 				}
 				catch(Exception ex)

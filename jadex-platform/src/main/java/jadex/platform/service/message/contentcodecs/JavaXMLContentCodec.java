@@ -10,6 +10,7 @@ import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
 
@@ -77,7 +78,7 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 				}
 				else
 				{
-					System.err.println("XML decoding ERROR: "+new String(val));
+					System.err.println("XML decoding ERROR: "+new String(val, Charset.forName("UTF-8")));
 					e.printStackTrace();
 				}
 			}

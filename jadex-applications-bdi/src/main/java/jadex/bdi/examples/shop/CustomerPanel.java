@@ -504,7 +504,7 @@ class ItemTableModel extends AbstractTableModel
 		}
 		else if(column == 1)
 		{
-			value = new Double(ii.getPrice());
+			value = Double.valueOf(ii.getPrice());
 		}
 		else if(column == 2)
 		{

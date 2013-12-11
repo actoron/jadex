@@ -59,7 +59,7 @@ public class LatencyProperty extends TimedProperty
 						// May happen that property is added during ongoing call
 						if(start!=null)
 						{
-							if(context instanceof ServiceInvocationContext)
+							if(context!=null)
 							{
 								ServiceInvocationContext sic = (ServiceInvocationContext)context;
 								if(sic.getServiceCall()!=null)

@@ -309,17 +309,7 @@ public class JavaWriter
 				null
 			));
 			typeinfos.add(ti_cert);
-			
-			// java.lang.Class
-			IObjectStringConverter oclconv = new IObjectStringConverter()
-			{
-				public String convertObject(Object val, Object context)
-				{
-					String	ret	= SReflect.getClassName(val.getClass());
-					return ret;
-				}
-			};
-			
+						
 			// java.lang.String
 //			TypeInfo ti_string = new TypeInfo(null, new ObjectInfo(String.class), new MappingInfo(null, new AttributeInfo[]{
 //				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));

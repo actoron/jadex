@@ -98,7 +98,7 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 	 */
 	public IFuture add(double a, double b)
 	{
-		return new Future(new Double(a+b));
+		return new Future(Double.valueOf(a+b));
 	}
 
 	/**
@@ -106,6 +106,6 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 	 */
 	public IFuture sub(double a, double b)
 	{
-		return new Future(new Double(a-b));
+		return new Future(Double.valueOf(a-b));
 	}	
 }

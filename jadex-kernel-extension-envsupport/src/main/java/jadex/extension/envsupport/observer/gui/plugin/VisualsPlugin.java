@@ -502,9 +502,9 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		if (p instanceof Perspective2D)
 		{
 			Perspective2D pers = (Perspective2D) p;
-			zoomSpinner.setValue(new Double(pers.getZoom()));
-			((SpinnerNumberModel) zoomSpinner.getModel()).setMaximum(new Double(pers.getZoomLimit()));
-			((SpinnerNumberModel) zoomSpinner.getModel()).setStepSize(new Double(pers.getZoomStepping()));
+			zoomSpinner.setValue(Double.valueOf(pers.getZoom()));
+			((SpinnerNumberModel) zoomSpinner.getModel()).setMaximum(Double.valueOf(pers.getZoomLimit()));
+			((SpinnerNumberModel) zoomSpinner.getModel()).setStepSize(Double.valueOf(pers.getZoomStepping()));
 			
 			invertXBox.setSelected(pers.getInvertXAxis());
 			invertYBox.setSelected(pers.getInvertYAxis());

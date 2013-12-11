@@ -58,7 +58,7 @@ public class MoveToLocationPlan extends Plan
 			// Alter the charge state
 			double	charge	= ((Double)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
 			charge	-= r*0.075;
-			getBeliefbase().getBelief("my_chargestate").setFact(new Double(charge));
+			getBeliefbase().getBelief("my_chargestate").setFact(Double.valueOf(charge));
 
 			waitFor(100); // wait for 0.01 seconds
 

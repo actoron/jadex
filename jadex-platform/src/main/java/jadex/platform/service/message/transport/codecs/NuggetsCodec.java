@@ -8,6 +8,7 @@ import jadex.commons.transformation.binaryserializer.IErrorReporter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 
 //import nuggets.Nuggets;
 
@@ -72,7 +73,7 @@ public class NuggetsCodec implements ICodec
 		
 		try
 		{
-			return ((String)otx.invoke(null, new Object[]{val, classloader})).getBytes();
+			return ((String)otx.invoke(null, new Object[]{val, classloader})).getBytes(Charset.forName("UTF-8"));
 		}
 		catch(Exception e)
 		{
@@ -96,7 +97,7 @@ public class NuggetsCodec implements ICodec
 			String	input;
 			if(bytes instanceof byte[])
 			{
-				input	= new String((byte[])bytes);
+				input	= new String((byte[])bytes,  Charset.forName("UTF-8"));
 			}
 			else
 			{
@@ -106,7 +107,7 @@ public class NuggetsCodec implements ICodec
 				int read;
 				while((read=is.read(buf))!=-1)
 				{
-					sbuf.append(new String(buf, 0, read));
+					sbuf.append(new String(buf, 0, read, Charset.forName("UTF-8")));
 				}
 				input	= sbuf.toString();
 			}

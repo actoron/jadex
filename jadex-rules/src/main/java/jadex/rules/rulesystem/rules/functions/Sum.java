@@ -45,7 +45,7 @@ public class Sum implements IFunction
 			}
 		}
 		
-		return new Double(ret);
+		return Double.valueOf(ret);
 	}
 	
 	/**

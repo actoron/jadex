@@ -22,24 +22,24 @@ package jadex.xml.tutorial.jibx.example22;
 
 public class Test {
     
-    // definitions for version attribute on document root element
-	@SuppressWarnings("unused")
-	private static final String VERSION_URI = null;
-	@SuppressWarnings("unused")
-	private static final String VERSION_NAME = "version";
-    
-    // attribute text strings used for different document versions
-	@SuppressWarnings("unused")
-	private static String[] VERSION_TEXTS = {
-        "1.0", "1.1", "1.2"
-    };
-    
-    // binding names corresponding to text strings
-	@SuppressWarnings("unused")
-	private static String[] VERSION_BINDINGS = {
-        "binding0", "binding1", "binding2"
-    };
-
+//    // definitions for version attribute on document root element
+//	@SuppressWarnings("unused")
+//	private static final String VERSION_URI = null;
+//	@SuppressWarnings("unused")
+//	private static final String VERSION_NAME = "version";
+//    
+//    // attribute text strings used for different document versions
+//	@SuppressWarnings("unused")
+//	private static String[] VERSION_TEXTS = {
+//        "1.0", "1.1", "1.2"
+//    };
+//    
+//    // binding names corresponding to text strings
+//	@SuppressWarnings("unused")
+//	private static String[] VERSION_BINDINGS = {
+//        "binding0", "binding1", "binding2"
+//    };
+//
 //    public static void main(String[] args) {
 //        if (args.length == 1) {
 //            

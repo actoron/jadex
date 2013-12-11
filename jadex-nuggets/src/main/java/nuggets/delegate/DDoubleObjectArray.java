@@ -48,7 +48,7 @@ public class DDoubleObjectArray extends ADelegate
 		Double[] a=new Double[l];
 		for(int i=0; i<l; i++) {
 			try {
-				a[i] = new Double(asm.nextToken());
+				a[i] = Double.valueOf(asm.nextToken());
 			} catch(NumberFormatException e) { /* NOP */ }
 		}
 		return a;

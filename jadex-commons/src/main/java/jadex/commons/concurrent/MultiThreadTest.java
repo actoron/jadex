@@ -107,7 +107,10 @@ public class MultiThreadTest
 						waits.enqueue(this);
 						monitor.wait();
 					}
-					catch(Exception e){}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 
 				// Simulate some work.

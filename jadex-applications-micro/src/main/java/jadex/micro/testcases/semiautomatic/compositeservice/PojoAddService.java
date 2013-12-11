@@ -35,7 +35,7 @@ public class PojoAddService implements IAddService
 	public IFuture add(double a, double b)
 	{
 		System.out.println("add service called on: "+sid+", comp="+(comp!=null?comp.getComponentIdentifier():null));
-		return new Future(new Double(a+b));
+		return new Future(Double.valueOf(a+b));
 	}
 	
 	/**

@@ -225,7 +225,7 @@ public class AgentCreationAgent extends MicroAgent
 					{
 						System.out.println("Successfully destroyed peer: "+name);
 						
-						if(cnt-1>(nested?1:1))
+						if(cnt-1>1)
 //										if(cnt-1>(nested?1:0))
 						{
 							deletePeers(cnt-1, killstarttime, dur, pera, omem, upera, max, nested);

@@ -20,7 +20,7 @@ import java.util.Set;
 public abstract class NFPropertyProvider implements INFPropertyProvider
 {
 	/** The parent. */
-	protected INFPropertyProvider parent;
+	protected INFPropertyProvider nfparent;
 	
 	/** Non-functional properties. */
 	protected Map<String, INFProperty<?, ?>> nfproperties;
@@ -37,7 +37,7 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	 */
 	public NFPropertyProvider(INFPropertyProvider parent)
 	{
-		this.parent = parent;
+		this.nfparent = parent;
 	}
 	
 	/**
@@ -281,7 +281,7 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	 */
 	public INFPropertyProvider getParent()
 	{
-		return parent;
+		return nfparent;
 	}
 
 	/**
@@ -290,7 +290,7 @@ public abstract class NFPropertyProvider implements INFPropertyProvider
 	 */
 	public void setParent(INFPropertyProvider parent)
 	{
-		this.parent = parent;
+		this.nfparent = parent;
 	}
 	
 	/**

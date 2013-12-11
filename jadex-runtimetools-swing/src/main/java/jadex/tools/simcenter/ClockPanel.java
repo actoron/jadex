@@ -312,13 +312,13 @@ public class ClockPanel	extends JPanel
 			{
 				dilation.setEnabled(true);
 				((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(true);
-				dilation.setValue(new Double(state.dilation));
+				dilation.setValue(Double.valueOf(state.dilation));
 			}
 			else
 			{
 				dilation.setEnabled(false);
 				((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(false);
-				dilation.setValue(new Double(0));
+				dilation.setValue(Double.valueOf(0));
 				curdilation.setText("");
 			}
 		}
@@ -393,7 +393,7 @@ class ExponentialSpinnerModel extends AbstractSpinnerModel
 	public Object getNextValue()
 	{
 		//System.out.println("nv: "+value*rate);
-		return new Double(value*rate);
+		return Double.valueOf(value*rate);
 	}
 
 	/**
@@ -403,7 +403,7 @@ class ExponentialSpinnerModel extends AbstractSpinnerModel
 	public Object getPreviousValue()
 	{
 		//System.out.println("pv: "+value/rate);
-		return new Double(value/rate);
+		return Double.valueOf(value/rate);
 	}
 
 	/**
@@ -413,7 +413,7 @@ class ExponentialSpinnerModel extends AbstractSpinnerModel
 	public Object getValue()
 	{
 		//System.out.println("gV: "+value);
-		return new Double(value);
+		return Double.valueOf(value);
 	}
 
 	/**
@@ -428,7 +428,7 @@ class ExponentialSpinnerModel extends AbstractSpinnerModel
 		if((value == null) || !(value instanceof Number)) 
 		    throw new IllegalArgumentException("Illegal value: "+value);
 		
-		if(!value.equals(new Double(this.value))) 
+		if(!value.equals(Double.valueOf(this.value))) 
 		{
 			this.value = ((Number)value).doubleValue();
 		    fireStateChanged();

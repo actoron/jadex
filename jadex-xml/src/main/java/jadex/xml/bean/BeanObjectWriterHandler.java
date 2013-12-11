@@ -271,7 +271,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	{
 		Object value = null;
 		
-		if(attr==AccessInfo.THIS)
+		if(AccessInfo.THIS.equals(attr))
 		{
 			value = object;
 		}

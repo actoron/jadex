@@ -99,8 +99,8 @@ public class MGoal
 	 */
 	public void setName(String name)
 	{
-		name = name.replaceAll(new String(new byte[] {10}), " ");
-		name = name.replaceAll(new String(new byte[] {13}), " ");
+		name = name.replaceAll("\r", " ");
+		name = name.replaceAll("\n", " ");
 		this.name = name;
 	}
 	

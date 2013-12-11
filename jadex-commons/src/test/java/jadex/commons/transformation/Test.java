@@ -353,7 +353,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testBDoubleArray() throws Exception
 	{
-		Double[] data = new Double[]{new Double(1), new Double(2), new Double(3)};
+		Double[] data = new Double[]{Double.valueOf(1), Double.valueOf(2), Double.valueOf(3)};
 		
 		doWriteAndRead(data); 
 	}
@@ -379,7 +379,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testBFloatArray() throws Exception
 	{
-		Float[] data = new Float[]{new Float(1), new Float(2), new Float(3)};
+		Float[] data = new Float[]{Float.valueOf(1), Float.valueOf(2), Float.valueOf(3)};
 		
 		doWriteAndRead(data); 
 	}
@@ -405,7 +405,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testBLongArray() throws Exception
 	{
-		Long[] data = new Long[]{new Long(1), new Long(2), new Long(3)};
+		Long[] data = new Long[]{Long.valueOf(1), Long.valueOf(2), Long.valueOf(3)};
 		
 		doWriteAndRead(data); 
 	}
@@ -431,7 +431,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testCharacterArray() throws Exception
 	{
-		Character[] data = new Character[]{new Character('a'), new Character('b'), new Character('c')};
+		Character[] data = new Character[]{Character.valueOf('a'), Character.valueOf('b'), Character.valueOf('c')};
 		
 		doWriteAndRead(data); 
 	}
@@ -457,7 +457,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testBShortArray() throws Exception
 	{
-		Short[] data = new Short[]{new Short((short)1), new Short((short)2), new Short((short)3)};
+		Short[] data = new Short[]{Short.valueOf((short)1), Short.valueOf((short)2), Short.valueOf((short)3)};
 		
 		doWriteAndRead(data); 
 	}

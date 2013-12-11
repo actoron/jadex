@@ -30,6 +30,6 @@ public class SubService extends BasicService implements ISubService
 	 */
 	public IFuture<Double> sub(double a, double b)
 	{
-		return new Future<Double>(new Double(a-b));
+		return new Future<Double>(Double.valueOf(a-b));
 	}
 }

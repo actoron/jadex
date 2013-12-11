@@ -142,7 +142,7 @@ public class CMSCreateComponent implements IComponentAction
 
 	/**
 	 *  Set the parent of this AMSCreateComponent.
-	 * @param parent the value to be set
+	 * @param nfparent the value to be set
 	 */
 	public void setResourceIdentifier(IResourceIdentifier rid)
 	{

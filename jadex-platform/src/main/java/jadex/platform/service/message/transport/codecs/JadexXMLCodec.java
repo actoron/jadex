@@ -8,6 +8,7 @@ import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  *  The Jadex XML codec. Codec supports parallel
@@ -47,7 +48,7 @@ public class JadexXMLCodec implements ICodec
 	{
 		byte[] ret = JavaWriter.objectToByteArray(val, classloader);
 		if(DEBUG)
-			System.out.println("encode message: "+(new String(ret)));
+			System.out.println("encode message: "+(new String(ret, Charset.forName("UTF-8"))));
 		return ret;
 	}
 
@@ -63,7 +64,7 @@ public class JadexXMLCodec implements ICodec
 			? JavaReader.objectFromByteArray((byte[])bytes, classloader, rep)
 			: JavaReader.objectFromInputStream((InputStream)bytes, classloader, rep);
 		if(DEBUG)
-			System.out.println("decode message: "+(new String((byte[])bytes)));
+			System.out.println("decode message: "+(new String((byte[])bytes, Charset.forName("UTF-8"))));
 		return ret;
 	}
 }

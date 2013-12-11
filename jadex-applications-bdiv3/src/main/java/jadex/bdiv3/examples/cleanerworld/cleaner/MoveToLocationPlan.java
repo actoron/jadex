@@ -107,7 +107,7 @@ public class MoveToLocationPlan
 		// Alter the charge state
 		double	charge	= capa.getMyChargestate();
 		charge	-= r*0.075;
-		capa.setMyChargestate(new Double(charge));
+		capa.setMyChargestate(Double.valueOf(charge));
 		
 		// wait for 0.01 seconds
 		rplan.waitFor(100).addResultListener(new DelegationResultListener<Void>(ret)

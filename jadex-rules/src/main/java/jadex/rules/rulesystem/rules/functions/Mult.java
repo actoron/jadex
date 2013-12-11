@@ -43,7 +43,7 @@ public class Mult implements IFunction
 			}
 		}
 		
-		return new Double(ret);
+		return Double.valueOf(ret);
 	}
 	
 	/**

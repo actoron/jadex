@@ -540,9 +540,9 @@ public class MEnvSpaceType
 						Perspective3D ret = new Perspective3D(ambientOcclusion, camera, guiCreatorPath);
 
 											
-						if(ret instanceof Perspective3D)
+//						if(ret instanceof Perspective3D)
 						{
-							Perspective3D pers = (Perspective3D)ret;				
+//							Perspective3D pers = (Perspective3D)ret;				
 							
 							List drawables3d = (List)args.get("drawables3d");
 							if(drawables3d!=null)
@@ -641,7 +641,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
@@ -746,7 +746,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
@@ -834,7 +834,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
@@ -993,7 +993,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
@@ -1083,12 +1083,12 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
 						{
-							size = Vector3Double.getVector3(new Double(1),new Double(1),new Double(1));
+							size = Vector3Double.getVector3(Double.valueOf(1), Double.valueOf(1), Double.valueOf(1));
 						}
 						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
 						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
@@ -1219,7 +1219,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						Double width = (Double)getProperty(args, "width");
@@ -1229,7 +1229,7 @@ public class MEnvSpaceType
 						if(size==null && (width==null || height == null || depth == null) )
 						{
 							
-							size = Vector3Double.getVector3(new Double(1),new Double(1),new Double(1));
+							size = Vector3Double.getVector3(Double.valueOf(1), Double.valueOf(1), Double.valueOf(1));
 	
 						}
 						else if(size==null)
@@ -1338,7 +1338,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						Double width = (Double)getProperty(args, "width");
@@ -1348,7 +1348,7 @@ public class MEnvSpaceType
 						if(size==null && (width==null || height == null || depth == null) )
 						{
 							
-							size = Vector3Double.getVector3(new Double(1),new Double(1),new Double(1));
+							size = Vector3Double.getVector3(Double.valueOf(1), Double.valueOf(1), Double.valueOf(1));
 	
 						}
 						else if(size==null)
@@ -1455,7 +1455,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
@@ -1728,7 +1728,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
@@ -1820,7 +1820,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
@@ -1958,7 +1958,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
@@ -2050,7 +2050,7 @@ public class MEnvSpaceType
 							Double rx = (Double)getProperty(args, "rotatex");
 							Double ry = (Double)getProperty(args, "rotatey");
 							Double rz = (Double)getProperty(args, "rotatez");
-							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+							rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 						}
 						Object size = getProperty(args, "size");
 						if(size==null)
@@ -2126,7 +2126,7 @@ public class MEnvSpaceType
 						Double rx = (Double)getProperty(args, "rotatex");
 						Double ry = (Double)getProperty(args, "rotatey");
 						Double rz = (Double)getProperty(args, "rotatez");
-						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 					}
 					Object size = getProperty(args, "size");
 					if(size==null)
@@ -2198,7 +2198,7 @@ public class MEnvSpaceType
 						Double rx = (Double)getProperty(args, "rotatex");
 						Double ry = (Double)getProperty(args, "rotatey");
 						Double rz = (Double)getProperty(args, "rotatez");
-						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 					}
 					Object size = getProperty(args, "size");
 					if(size==null)
@@ -2252,7 +2252,7 @@ public class MEnvSpaceType
 						Double rx = (Double)getProperty(args, "rotatex");
 						Double ry = (Double)getProperty(args, "rotatey");
 						Double rz = (Double)getProperty(args, "rotatez");
-						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 					}
 					Object size = getProperty(args, "size");
 					if(size==null)
@@ -2308,7 +2308,7 @@ public class MEnvSpaceType
 						Double rx = (Double)getProperty(args, "rotatex");
 						Double ry = (Double)getProperty(args, "rotatey");
 						Double rz = (Double)getProperty(args, "rotatez");
-						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 					}
 					Object size = getProperty(args, "size");
 					if(size==null)
@@ -2364,7 +2364,7 @@ public class MEnvSpaceType
 						Double rx = (Double)getProperty(args, "rotatex");
 						Double ry = (Double)getProperty(args, "rotatey");
 						Double rz = (Double)getProperty(args, "rotatez");
-						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 					}
 					Object size = getProperty(args, "size");
 					if(size==null)
@@ -2422,7 +2422,7 @@ public class MEnvSpaceType
 						Double rx = (Double)getProperty(args, "rotatex");
 						Double ry = (Double)getProperty(args, "rotatey");
 						Double rz = (Double)getProperty(args, "rotatez");
-						rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						rotation = Vector3Double.getVector3(rx!=null? rx: Double.valueOf(0), ry!=null? ry: Double.valueOf(0), rz!=null? rz: Double.valueOf(0));
 					}
 					Object size = getProperty(args, "size");
 					if(size==null)
@@ -2942,15 +2942,11 @@ public class MEnvSpaceType
 		 */
 		public Object convertString(String val, Object context)
 		{
-			Object ret = val;
-			if(val instanceof String)
-			{
-				ret = SReflect.findClass0((String)val, ((IModelInfo)
+			Object ret = SReflect.findClass0((String)val, ((IModelInfo)
 					((IContext)context).getRootObject()).getAllImports(), ((IContext)context).getClassLoader());
-				if(ret==null)
-				{
-					reportError((IContext)context, "Class not found: "+val);
-				}
+			if(ret==null)
+			{
+				reportError((IContext)context, "Class not found: "+val);
 			}
 			return ret;
 		}
@@ -2969,15 +2965,9 @@ public class MEnvSpaceType
 		{
 			Object ret = val;
 		
-//			if(!(val instanceof String))
-//				throw new RuntimeException("Source value must be string: "+val);
-		
-			if(val instanceof String)
-			{
-				Color c = SGUI.stringToColor(val);
-				if (c != null)
-					ret = c;
-			}
+			Color c = SGUI.stringToColor(val);
+			if (c != null)
+				ret = c;
 			
 //			System.out.println("tolerant conv: "+val+" "+ret+" "+(ret!=null? ""+ret.getClass(): ""));
 			
@@ -2998,10 +2988,12 @@ public class MEnvSpaceType
 		public Object convertString(String val, Object context)
 		{
 			Object ret = val;
-			if(val instanceof String)
+			try
 			{
-				try{ret = new Double((String)val);}
-				catch(Exception e){}
+				ret = Double.valueOf(val);
+			}
+			catch(Exception e)
+			{
 			}
 			return ret;
 		}
@@ -3020,10 +3012,12 @@ public class MEnvSpaceType
 		public Object convertString(String val, Object context)
 		{
 			Object ret = val;
-			if(val instanceof String)
+			try
 			{
-				try{ret = Integer.valueOf((String)val);}
-				catch(Exception e){}
+				ret = Integer.valueOf(val);
+			}
+			catch(Exception e)
+			{
 			}
 			return ret;
 		}
@@ -3041,11 +3035,7 @@ public class MEnvSpaceType
 		 */
 		public Object convertString(String val, Object context)
 		{
-			Object ret = val;
-			if(val instanceof String)
-			{
-				ret = new ColorConverter().convertString(val, context);
-			}
+			Object ret = new ColorConverter().convertString(val, context);
 			
 			return ret;
 		}

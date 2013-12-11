@@ -61,7 +61,7 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 				}
 				else
 				{
-					future.setExceptionIfUndone(e);				
+					future.setException(e);				
 				}
 			}
 		}
@@ -76,7 +76,7 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 			}
 			else
 			{
-				future.setExceptionIfUndone(e);				
+				future.setException(e);				
 			}
 		}
 	}

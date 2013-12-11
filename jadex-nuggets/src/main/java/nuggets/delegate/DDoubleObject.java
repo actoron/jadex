@@ -29,7 +29,7 @@ public class DDoubleObject extends ASimpleDelegate
 	 */
 	public Object getInstance(Class clazz,IAssembler asm) throws Exception
    {
-      return new Double((String)asm.getAttributeValue("v"));
+      return Double.valueOf((String)asm.getAttributeValue("v"));
    }
 
    /** 
@@ -51,7 +51,7 @@ public class DDoubleObject extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Double((String)value);
+		return Double.valueOf((String)value);
 	}
 }
 

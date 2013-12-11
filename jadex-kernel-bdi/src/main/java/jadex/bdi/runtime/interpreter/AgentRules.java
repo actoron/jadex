@@ -484,15 +484,8 @@ public class AgentRules
 					else if(step[0] instanceof IComponentStep)
 					{
 						IComponentStep st = (IComponentStep)((Object[])step)[0];
-						Object r = st.execute(new CapabilityFlyweight(state, step[2]));
-						if(r instanceof IFuture)
-						{
-							FutureFunctionality.connectDelegationFuture(res, (IFuture)r);
-						}
-						else
-						{
-							res.setResult(r);
-						}
+						IFuture r = st.execute(new CapabilityFlyweight(state, step[2]));
+						FutureFunctionality.connectDelegationFuture(res, (IFuture)r);
 					}
 				}
 				catch(RuntimeException e)

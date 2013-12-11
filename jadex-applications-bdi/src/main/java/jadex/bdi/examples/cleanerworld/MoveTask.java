@@ -54,7 +54,7 @@ public class MoveTask extends AbstractTask
 		if(energy>0)
 		{
 			energy = Math.max(energy-maxdist/5, 0);
-			obj.setProperty(PROPERTY_CHARGESTATE, new Double(energy));
+			obj.setProperty(PROPERTY_CHARGESTATE, Double.valueOf(energy));
 			((Space2D)space).setPosition(obj.getId(), newloc);
 		}
 		else

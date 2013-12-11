@@ -1119,18 +1119,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		 */
 		public void customResultAvailable(Collection<T> result)
 		{
-			// todo: can this happen??? shouldn't it be always Collection<T>
-			
-			if(result instanceof Collection)
+			for(Iterator<T> it=((Collection<T>)result).iterator(); it.hasNext(); )
 			{
-				for(Iterator<T> it=((Collection<T>)result).iterator(); it.hasNext(); )
-				{
-					intermediateResultAvailable(it.next());
-				}
-			}
-			else
-			{
-				intermediateResultAvailable((T)result);
+				intermediateResultAvailable(it.next());
 			}
 			finished();
 			

@@ -27,7 +27,7 @@ public class DFloatObject extends ASimpleDelegate
 	 */
 	public Object getInstance(Class clazz,IAssembler asm) throws Exception
    {
-      return new Float((String)asm.getAttributeValue("v"));
+      return Float.valueOf((String)asm.getAttributeValue("v"));
    }
 
    /** 
@@ -49,7 +49,7 @@ public class DFloatObject extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Float((String)value);
+		return Float.valueOf((String)value);
 	}
 
 }

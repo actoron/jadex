@@ -992,7 +992,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
-			AgentInvocation invoc = new AgentInvocation()
+			new AgentInvocation()
 			{
 				public void run()
 				{

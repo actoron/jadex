@@ -151,7 +151,7 @@ public class ReteMemory
 	public String toString()
 	{
 		//return Srules.getInnerClassName(this.getClass())+"(values="+memory+")";
-		StringBuffer ret = new StringBuffer(SReflect.getInnerClassName(this.getClass()).toString());
+		StringBuffer ret = new StringBuffer(SReflect.getInnerClassName(this.getClass()));
 		ret.append(", size="+getTotalMemorySize());
 		ret.append(" : \n");
 		for(Iterator it=memory.keySet().iterator(); it.hasNext(); )

@@ -22,6 +22,7 @@ import jadex.platform.service.message.MapSendTask;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -471,7 +472,7 @@ public class HttpReceiver
 												}
 												catch(Exception e)
 												{
-													log(Level.WARNING, "Relay transport exception when delivering message: "+e+", "+new String(rawmsg));
+													log(Level.WARNING, "Relay transport exception when delivering message: "+e+", "+new String(rawmsg, Charset.forName("UTF-8")));
 												}
 											}
 										}

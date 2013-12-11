@@ -35,6 +35,6 @@ public class DDouble extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Double((String)value);
+		return Double.valueOf((String)value);
 	}
 }

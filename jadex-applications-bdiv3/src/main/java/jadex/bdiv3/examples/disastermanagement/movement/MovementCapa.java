@@ -29,9 +29,11 @@ public class MovementCapa implements IEnvAccess
 {
 	//-------- attributes --------
 
+	// Annotation to inform FindBugs that the uninitialized field is not a bug.
+	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
+	
 	/** The capability. */
 	@Agent
-	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 	protected ICapability capa;
 	
 	/** The environment. */

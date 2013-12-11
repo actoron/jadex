@@ -55,7 +55,7 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 				if(random_init)
 				{
 					double heat = Math.random()*100;
-					props.put("heat", new Double(heat));
+					props.put("heat", Double.valueOf(heat));
 				}
 				props.put(Space2D.PROPERTY_POSITION, new Vector2Int(x, y));
 				grid.createSpaceObject("patch", props, null);
@@ -132,7 +132,7 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 					double oldheat = ((Double)patch.getProperty("heat")).doubleValue();
 					double cool = oldheat*cooling;
 					double newheat = Math.max(0, oldheat+adds[x][y]-cool);
-					patch.setProperty("heat", new Double(newheat));
+					patch.setProperty("heat", Double.valueOf(newheat));
 //					sum += newheat;
 				}
 			}		

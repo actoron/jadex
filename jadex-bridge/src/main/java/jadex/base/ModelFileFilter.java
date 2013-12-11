@@ -154,7 +154,7 @@ public class ModelFileFilter implements IRemoteFilter
 				for(Iterator<URL> it=rids.keySet().iterator(); rid==null && it.hasNext(); )
 				{
 					URL	url	= it.next();
-					if(furl.toString().startsWith(url.toString()))
+					if(furl.startsWith(url.toString()))
 					{
 						rid	= rids.get(url);
 					}

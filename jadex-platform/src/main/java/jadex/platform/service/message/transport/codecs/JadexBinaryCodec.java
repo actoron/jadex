@@ -10,6 +10,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -116,7 +117,7 @@ public class JadexBinaryCodec implements ICodec
 	{
 		byte[] ret = BinarySerializer.objectToByteArray(val, null, getEncoderChain(context), null, classloader);
 		if(DEBUG)
-			System.out.println("encode message: "+(new String(ret)));
+			System.out.println("encode message: "+(new String(ret, Charset.forName("UTF-8"))));
 		return ret;
 	}
 
@@ -131,7 +132,7 @@ public class JadexBinaryCodec implements ICodec
 			? BinarySerializer.objectFromByteArray((byte[])bytes, null, null, classloader, rep)
 			: BinarySerializer.objectFromByteArrayInputStream((ByteArrayInputStream)bytes, null, null, classloader, rep);
 		if(DEBUG)
-			System.out.println("decode message: "+(new String((byte[])bytes)));
+			System.out.println("decode message: "+(new String((byte[])bytes, Charset.forName("UTF-8"))));
 		return ret;
 	}
 	

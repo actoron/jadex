@@ -47,6 +47,6 @@ public class BuyItemPlan extends Plan
 		// Update the account
 		// Re-read money, could have changed due to executed sell plan
 		money = ((Double)getBeliefbase().getBelief("money").getFact()).doubleValue();
-		getBeliefbase().getBelief("money").setFact(new Double(money-price));
+		getBeliefbase().getBelief("money").setFact(Double.valueOf(money-price));
 	}
 }

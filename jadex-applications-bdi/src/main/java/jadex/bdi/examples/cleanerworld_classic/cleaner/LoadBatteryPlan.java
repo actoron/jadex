@@ -56,7 +56,7 @@ public class LoadBatteryPlan extends Plan
 				waitFor(100);
 				charge	= ((Double)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
 				charge	= Math.min(charge + 0.01, 1.0);
-				getBeliefbase().getBelief("my_chargestate").setFact(new Double(charge));
+				getBeliefbase().getBelief("my_chargestate").setFact(Double.valueOf(charge));
 				location = (Location)getBeliefbase().getBelief("my_location").getFact();
 				IGoal dg = createGoal("get_vision_action");
 				dispatchSubgoalAndWait(dg);

@@ -381,7 +381,7 @@ public class CategoryPieDataset extends AbstractDataset implements PieDataset, C
 				isnull = false;
 			}
 		}
-		return isnull ? null : new Double(val);
+		return isnull ? null : Double.valueOf(val);
 	}
 
 	/**

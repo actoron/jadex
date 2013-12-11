@@ -6,11 +6,13 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 
 /**
  *  Relay as a simple java application.
@@ -71,20 +73,20 @@ public class StandaloneRelay
 							// Todo: handle peer url and initial flag.
 							String	serverurls	= handler.handleServersRequest("http://"+host+path, null, false);
 							
-							PrintStream	out	= new PrintStream(client.getOutputStream());
-							out.print("HTTP/1.0 200 OK\r\n");
-							out.print("Content-type: text/plain\r\n");
-							out.println("\r\n");
-							out.println(serverurls);
-							out.flush();
+							PrintWriter	pw	= new PrintWriter(new OutputStreamWriter(client.getOutputStream(), Charset.forName("UTF-8")));
+							pw.print("HTTP/1.0 200 OK\r\n");
+							pw.print("Content-type: text/plain\r\n");
+							pw.println("\r\n");
+							pw.println(serverurls);
+							pw.flush();
 							client.close();
 						}
 						else if(get && "/ping".equals(path))
 						{
-							PrintStream	out	= new PrintStream(client.getOutputStream());
-							out.print("HTTP/1.0 200 OK\r\n");
-							out.println("\r\n");
-							out.flush();
+							PrintWriter	pw	= new PrintWriter(new OutputStreamWriter(client.getOutputStream(), Charset.forName("UTF-8")));
+							pw.print("HTTP/1.0 200 OK\r\n");
+							pw.println("\r\n");
+							pw.flush();
 							client.close();
 						}
 						else if(get && path.startsWith("/?id="))
@@ -99,7 +101,7 @@ public class StandaloneRelay
 //							System.out.println("hostip: '"+hostip+"'");
 //							System.out.println("hostname: '"+hostname+"'");
 							OutputStream	out	= new BufferedOutputStream(client.getOutputStream(), client.getSendBufferSize());
-							out.write("HTTP/1.0 200 OK\r\n\r\n".getBytes());
+							out.write("HTTP/1.0 200 OK\r\n\r\n".getBytes(Charset.forName("UTF-8")));
 							handler.handleConnection(id, out);	// Hack!!! https?
 						}
 						else if(!get)
@@ -127,18 +129,18 @@ public class StandaloneRelay
 								{
 									handler.handleMessage(new CounterInputStream(bin, contentlength), "http");	// Hack!!! https?									
 								}
-								PrintStream	out	= new PrintStream(client.getOutputStream());
-								out.print("HTTP/1.0 200 OK\r\n");
-								out.println("\r\n");
-								out.flush();
+								PrintWriter	pw	= new PrintWriter(new OutputStreamWriter(client.getOutputStream(), Charset.forName("UTF-8")));
+								pw.print("HTTP/1.0 200 OK\r\n");
+								pw.println("\r\n");
+								pw.flush();
 								client.close();
 							}
 							catch(Exception e)
 							{
-								PrintStream	out	= new PrintStream(client.getOutputStream());
-								out.print("HTTP/1.0 404 Not Found\r\n");
-								out.println("\r\n");
-								out.flush();
+								PrintWriter	pw	= new PrintWriter(new OutputStreamWriter(client.getOutputStream(), Charset.forName("UTF-8")));
+								pw.print("HTTP/1.0 404 Not Found\r\n");
+								pw.println("\r\n");
+								pw.flush();
 								client.close();								
 							}
 						}

@@ -67,12 +67,12 @@ public class TreatVictimTask extends AbstractTask
 	
 			if(treated>1)
 			{
-				obj.setProperty(PROPERTY_TREATED, new Double(0));
+				obj.setProperty(PROPERTY_TREATED, Double.valueOf(0));
 				setFinished(space, obj, true);
 			}
 			else
 			{
-				obj.setProperty(PROPERTY_TREATED, new Double(treated));			
+				obj.setProperty(PROPERTY_TREATED, Double.valueOf(treated));			
 			}
 		}
 		else

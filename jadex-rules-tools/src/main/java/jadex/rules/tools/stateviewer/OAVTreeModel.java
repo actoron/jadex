@@ -628,7 +628,7 @@ public class OAVTreeModel implements TreeModel
 	{
 		if (l1 == l2)
 		    return true;
-		if (!(l1 instanceof List) || !(l2 instanceof List))
+		if (l1==null || l2==null)
 		    return false;
 
 		ListIterator e1 = l1.listIterator();

@@ -7,6 +7,7 @@ import jadex.commons.transformation.binaryserializer.IErrorReporter;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
 
@@ -69,7 +70,7 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 		{
 			// todo: native byte[] methods in nuggets
 			String ret = ((String)otx.invoke(null, new Object[]{val, classloader}));
-			return ret.getBytes();
+			return ret.getBytes(Charset.forName("UTF-8"));
 		}
 		catch(Exception e)
 		{
@@ -90,7 +91,7 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 		try
 		{
 			// todo: native byte[] methods in nuggets
-			return ofx.invoke(null, new Object[]{new String(val), classloader});
+			return ofx.invoke(null, new Object[]{new String(val, Charset.forName("UTF-8")), classloader});
 		}
 		catch(Exception e)
 		{

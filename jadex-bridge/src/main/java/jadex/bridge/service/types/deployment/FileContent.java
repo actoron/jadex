@@ -5,6 +5,7 @@ import jadex.commons.Base64;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.charset.Charset;
 
 /**
  *  A file data is for transferring binary file content as byte[]
@@ -200,7 +201,7 @@ public class FileContent
 		String	ret	= null;
 		if(data!=null)
 		{
-			ret	= new String(Base64.encode(data));
+			ret	= new String(Base64.encode(data), Charset.forName("UTF-8"));
 		}
 		return ret;
 	}
@@ -220,7 +221,7 @@ public class FileContent
 	 */
 	public void setDataString(String sdata)
 	{
-		this.data = Base64.decode(sdata.getBytes());
+		this.data = Base64.decode(sdata.getBytes(Charset.forName("UTF-8")));
 	}
 
 	/**

@@ -333,7 +333,7 @@ public class DropboxBackupResource implements IBackupResource
 				
 				// upload file to dropbox
 				FileInputStream fis = new FileInputStream(tmp);
-				String hash = new String(Base64.encode(SUtil.computeFileHash(tmp.getAbsolutePath())));
+				String hash = new String(Base64.encode(SUtil.computeFileHash(tmp.getAbsolutePath())), "UTF-8");
 				DropboxTest.overwriteFileData(api, localfi.getPath(), fis, tmp.length());
 				// Ask again for file to save server update time
 				FileData newf = DropboxTest.getFileData(api, remotefi.getPath());

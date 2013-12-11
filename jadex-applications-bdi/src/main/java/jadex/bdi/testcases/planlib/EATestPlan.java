@@ -36,7 +36,7 @@ public class EATestPlan extends AbstractMultipleAgentsPlan
 		for(int i=0; i<args.length; i++)
 		{
 			args[i] = SCollection.createHashMap();
-			args[i].put("max_price", new Double(115+i*5));
+			args[i].put("max_price", Double.valueOf(115+i*5));
 			//args[i].put("participate", new Boolean(i!=2));
 			args[i].put("participate", Boolean.TRUE);
 		}
@@ -50,10 +50,10 @@ public class EATestPlan extends AbstractMultipleAgentsPlan
 			{
 				IGoal ea = createGoal("eacap.ea_initiate");
 				ea.getParameterSet("receivers").addValues(agents.toArray(new IComponentIdentifier[agents.size()]));
-				ea.getParameter("cfp").setValue(new Double(110));
+				ea.getParameter("cfp").setValue(Double.valueOf(110));
 				ea.getParameter("auction_description").setValue(new AuctionDescription(getTime()+1000,
 					roundtimeout, "Test auction 1"));
-				ea.getParameter("limit").setValue(new Double(120));
+				ea.getParameter("limit").setValue(Double.valueOf(120));
 				dispatchSubgoalAndWait(ea);
 				Object[] res = (Object[])ea.getParameter("result").getValue();
 				getLogger().info("Auction result: "+SUtil.arrayToString(res));

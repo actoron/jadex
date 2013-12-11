@@ -502,32 +502,15 @@ public class ProcessThread	implements ITaskContext
 	public Object getPropertyValue(String name, MActivity activity)
 	{
 		assert activity!=null;
-		Object ret	= activity.getPropertyValue(name);
-		if(ret instanceof IParsedExpression)
+		UnparsedExpression	upex	= activity.getPropertyValue(name);
+		try
 		{
-			try
-			{
-//				System.out.println("here: "+ret);
-				ret = ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(this, true, instance.getFetcher()));
-			}
-			catch(RuntimeException e)
-			{
-				throw new RuntimeException("Error parsing property: "+instance+", "+this+", "+name+", "+ret, e);
-			}
+			return upex!=null ? ((IParsedExpression)upex.getParsed()).getValue(new ProcessThreadValueFetcher(this, true, instance.getFetcher())) : null;
 		}
-		else if (ret instanceof UnparsedExpression)
+		catch(RuntimeException e)
 		{
-			try
-			{
-//				System.out.println("here: "+ret);
-				ret = ((IParsedExpression)((UnparsedExpression) ret).getParsed()).getValue(new ProcessThreadValueFetcher(this, true, instance.getFetcher()));
-			}
-			catch(RuntimeException e)
-			{
-				throw new RuntimeException("Error parsing property: "+instance+", "+this+", "+name+", "+ret, e);
-			}
+			throw new RuntimeException("Error parsing property: "+instance+", "+this+", "+name+", "+upex, e);
 		}
-		return ret;
 	}
 	
 	/**

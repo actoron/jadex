@@ -13,7 +13,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileLock;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -196,7 +195,7 @@ public class BackupResource implements IBackupResource
 			{
 				// file.lastModified()>ret.getVTime(getLocalId()) is true because ret.getVTime(getLocalId()) is 0 at beginning
 				// update meta info
-				String	hash = file.exists()? new String(Base64.encode(SUtil.computeFileHash(file.getCanonicalPath()))): null;
+				String	hash = file.exists()? new String(Base64.encode(SUtil.computeFileHash(file.getCanonicalPath())), "UTF-8"): null;
 				ret.bumpVTime(getLocalId(), file.exists()? file.lastModified() : System.currentTimeMillis(), hash, file.exists(), file.length());
 				props.setProperty(location, ret.getVTime());
 				save();				

@@ -284,19 +284,19 @@ public class MathNode	extends ExpressionNode
 			switch(op)
 			{
 				case ADD:
-					value	= new Double(numleft.doubleValue() + numright.doubleValue());
+					value	= Double.valueOf(numleft.doubleValue() + numright.doubleValue());
 					break;
 				case SUBSTRACT:
-					value	= new Double(numleft.doubleValue() - numright.doubleValue());
+					value	= Double.valueOf(numleft.doubleValue() - numright.doubleValue());
 					break;
 				case MULTIPLY:
-					value	= new Double(numleft.doubleValue() * numright.doubleValue());
+					value	= Double.valueOf(numleft.doubleValue() * numright.doubleValue());
 					break;
 				case DIVIDE:
-					value	= new Double(numleft.doubleValue() / numright.doubleValue());
+					value	= Double.valueOf(numleft.doubleValue() / numright.doubleValue());
 					break;
 				case MODULO:
-					value	= new Double(numleft.doubleValue() % numright.doubleValue());
+					value	= Double.valueOf(numleft.doubleValue() % numright.doubleValue());
 					break;
 				case AND:
 				case OR:
@@ -312,19 +312,19 @@ public class MathNode	extends ExpressionNode
 			switch(op)
 			{
 				case ADD:
-					value	= new Float(numleft.floatValue() + numright.floatValue());
+					value	= Float.valueOf(numleft.floatValue() + numright.floatValue());
 					break;
 				case SUBSTRACT:
-					value	= new Float(numleft.floatValue() - numright.floatValue());
+					value	= Float.valueOf(numleft.floatValue() - numright.floatValue());
 					break;
 				case MULTIPLY:
-					value	= new Float(numleft.floatValue() * numright.floatValue());
+					value	= Float.valueOf(numleft.floatValue() * numright.floatValue());
 					break;
 				case DIVIDE:
-					value	= new Float(numleft.floatValue() / numright.floatValue());
+					value	= Float.valueOf(numleft.floatValue() / numright.floatValue());
 					break;
 				case MODULO:
-					value	= new Float(numleft.floatValue() % numright.floatValue());
+					value	= Float.valueOf(numleft.floatValue() % numright.floatValue());
 					break;
 				case AND:
 				case OR:
@@ -340,37 +340,37 @@ public class MathNode	extends ExpressionNode
 			switch(op)
 			{
 				case ADD:
-					value	= new Long(numleft.longValue() + numright.longValue());
+					value	= Long.valueOf(numleft.longValue() + numright.longValue());
 					break;
 				case SUBSTRACT:
-					value	= new Long(numleft.longValue() - numright.longValue());
+					value	= Long.valueOf(numleft.longValue() - numright.longValue());
 					break;
 				case MULTIPLY:
-					value	= new Long(numleft.longValue() * numright.longValue());
+					value	= Long.valueOf(numleft.longValue() * numright.longValue());
 					break;
 				case DIVIDE:
-					value	= new Long(numleft.longValue() / numright.longValue());
+					value	= Long.valueOf(numleft.longValue() / numright.longValue());
 					break;
 				case MODULO:
-					value	= new Long(numleft.longValue() % numright.longValue());
+					value	= Long.valueOf(numleft.longValue() % numright.longValue());
 					break;
 				case AND:
-					value	= new Long(numleft.longValue() & numright.longValue());
+					value	= Long.valueOf(numleft.longValue() & numright.longValue());
 					break;
 				case OR:
-					value	= new Long(numleft.longValue() | numright.longValue());
+					value	= Long.valueOf(numleft.longValue() | numright.longValue());
 					break;
 				case XOR:
-					value	= new Long(numleft.longValue() ^ numright.longValue());
+					value	= Long.valueOf(numleft.longValue() ^ numright.longValue());
 					break;
 				case LSHIFT:
-					value	= new Long(numleft.longValue() << numright.longValue());
+					value	= Long.valueOf(numleft.longValue() << numright.longValue());
 					break;
 				case RSHIFT:
-					value	= new Long(numleft.longValue() >> numright.longValue());
+					value	= Long.valueOf(numleft.longValue() >> numright.longValue());
 					break;
 				case URSHIFT:
-					value	= new Long(numleft.longValue() >>> numright.longValue());
+					value	= Long.valueOf(numleft.longValue() >>> numright.longValue());
 					break;
 			}
 		}
@@ -525,15 +525,15 @@ public class MathNode	extends ExpressionNode
 			case SUBSTRACT:
 				if(numval instanceof Double)
 				{
-					value	= new Double(- numval.doubleValue());
+					value	= Double.valueOf(- numval.doubleValue());
 				}
 				else if(numval instanceof Float)
 				{
-					value	= new Float(- numval.floatValue());
-					}
+					value	= Float.valueOf(- numval.floatValue());
+				}
 				else if(numval instanceof Long)
 				{
-					value	= new Long(- numval.longValue());
+					value	= Long.valueOf(- numval.longValue());
 				}
 				else
 				{
@@ -547,7 +547,7 @@ public class MathNode	extends ExpressionNode
 				}
 				else if(numval instanceof Long)
 				{
-					value	= new Long(~ numval.longValue());
+					value	= Long.valueOf(~ numval.longValue());
 				}
 				else
 				{

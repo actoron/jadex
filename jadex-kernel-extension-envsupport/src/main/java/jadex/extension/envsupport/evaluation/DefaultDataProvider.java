@@ -68,8 +68,8 @@ public class DefaultDataProvider implements ITableDataProvider
 		
 		SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$space", envspace);
-		fetcher.setValue("$time", new Double(time));
-		fetcher.setValue("$tick", new Double(tick));
+		fetcher.setValue("$time", Double.valueOf(time));
+		fetcher.setValue("$tick", Double.valueOf(tick));
 		for(int i=0; i<res.size(); i++)
 		{
 			Map binding = (Map)res.get(i);

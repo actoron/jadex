@@ -29,7 +29,7 @@ public class Div implements IFunction
 		
 		ret = num1.doubleValue()/num2.doubleValue();
 		
-		return new Double(ret);
+		return Double.valueOf(ret);
 	}
 	
 	/**

@@ -369,7 +369,7 @@ public class LocalResourceService	implements ILocalResourceService
 								{
 									if(time==0 || System.currentTimeMillis()-time>1000)
 									{
-										ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.DOWNLOAD_STATE, null, remotefi, new Double(result.doubleValue()/remotefi.getData().getSize())));
+										ret.addIntermediateResultIfUndone(new BackupEvent(BackupEvent.DOWNLOAD_STATE, null, remotefi, Double.valueOf(result.doubleValue()/remotefi.getData().getSize())));
 										time = System.currentTimeMillis();
 									}
 								}

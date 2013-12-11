@@ -529,7 +529,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 
 	            // Save console height of old perspective
 	    		if(oldperspective!=plugin)
-	    			consoleheights.put(oldperspective.getName()+".console.height", new Double(getConsoleHeight()));
+	    			consoleheights.put(oldperspective.getName()+".console.height", Double.valueOf(getConsoleHeight()));
 	    		// Set console height of new perspective
 	    		Double ch = (Double)consoleheights.get(currentperspective.getName()+".console.height");
 	    		//System.out.println("Found: "+ch);
@@ -705,7 +705,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		if(currentperspective!=null)
 		{
 			props.addProperty(new Property("perspective", currentperspective.getName()));
-			consoleheights.put(currentperspective.getName()+".console.height", new Double(getConsoleHeight()));
+			consoleheights.put(currentperspective.getName()+".console.height", Double.valueOf(getConsoleHeight()));
 		}
 		props.addProperty(new Property("consoleenabled", consoleenabled ? "true" : "false"));
 		props.addProperty(new Property("consoleheights", JavaWriter.objectToXML(consoleheights, getClass().getClassLoader())));

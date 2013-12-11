@@ -34,6 +34,6 @@ public class DFloat extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Float((String)value);
+		return Float.valueOf((String)value);
 	}
 }

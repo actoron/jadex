@@ -48,7 +48,7 @@ public class DFloatObjectArray extends ADelegate
 		Float[] a=new Float[l];
 		for(int i=0; i<l; i++) {
 			try {
-				a[i] = new Float(asm.nextToken());
+				a[i] = Float.valueOf(asm.nextToken());
 			} catch(NumberFormatException e) { /* NOP */ }
 		}
 		return a;

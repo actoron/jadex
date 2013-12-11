@@ -27,9 +27,11 @@ import jadex.micro.annotation.Configurations;
 @Agent
 public class UniversityBDI
 {
+	// Annotation to inform FindBugs that the uninitialized field is not a bug.
+	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
+	
 	/** The bdi agent. */
 	@Agent
-	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
 	protected BDIAgent agent;
 	
 	@Belief

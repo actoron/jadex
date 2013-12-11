@@ -147,7 +147,7 @@ class LongTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, Object context)
 	{
-		return new Long(val);
+		return Long.valueOf(val);
 	}
 	
 }
@@ -163,7 +163,7 @@ class FloatTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, Object context)
 	{
-		return new Float(val);
+		return Float.valueOf(val);
 	}
 	
 }
@@ -179,7 +179,7 @@ class DoubleTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, Object context)
 	{
-		return new Double(val);
+		return Double.valueOf(val);
 	}
 }
 
@@ -194,7 +194,7 @@ class BooleanTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, Object context)
 	{
-		return new Boolean(val);
+		return Boolean.valueOf(val);
 	}
 }
 
@@ -209,7 +209,7 @@ class ShortTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, Object context)
 	{
-		return new Short(val);
+		return Short.valueOf(val);
 	}
 }
 
@@ -224,7 +224,7 @@ class ByteTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, Object context)
 	{
-		return new Byte((String)val);
+		return Byte.valueOf((String)val);
 	}
 }
 
@@ -239,7 +239,7 @@ class CharacterTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, Object context)
 	{
-		return new Character(((String)val).charAt(0)); //?
+		return Character.valueOf(((String)val).charAt(0)); //?
 	}
 	
 }

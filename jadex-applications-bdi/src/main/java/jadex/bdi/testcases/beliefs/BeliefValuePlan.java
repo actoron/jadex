@@ -33,7 +33,7 @@ public class BeliefValuePlan extends Plan
 	{
 		TestReport tr = new TestReport("#1", "Test belief default values.");
 		Map	check	= new HashMap();
-		check.put("timeout", new Long(20000));
+		check.put("timeout", Long.valueOf(20000));
 		check.put("abel", "agent_initial_bel");
 		check.put("bbel", "capability_initial_bel");
 		check.put("cbel", "capability_default_bel");

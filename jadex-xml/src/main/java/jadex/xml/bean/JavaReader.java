@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.cert.CertificateFactory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -306,7 +307,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						return new Boolean((String)rawattributes.get("content"));
+						return Boolean.valueOf((String)rawattributes.get("content"));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
@@ -332,7 +333,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						return new Double((String)rawattributes.get("content"));
+						return Double.valueOf((String)rawattributes.get("content"));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
@@ -345,7 +346,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						return new Float((String)rawattributes.get("content"));
+						return Float.valueOf((String)rawattributes.get("content"));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
@@ -358,7 +359,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						return new Long((String)rawattributes.get("content"));
+						return Long.valueOf((String)rawattributes.get("content"));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
@@ -371,7 +372,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						return new Short((String)rawattributes.get("content"));
+						return Short.valueOf((String)rawattributes.get("content"));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
@@ -384,7 +385,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						byte[] bytes = Base64.decode(((String)rawattributes.get("content")).getBytes());
+						byte[] bytes = Base64.decode(((String)rawattributes.get("content")).getBytes(Charset.forName("UTF-8")));
 						return new Byte(bytes[0]);
 					}
 				}),
@@ -398,7 +399,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						return new Character(((String)rawattributes.get("content")).charAt(0));
+						return Character.valueOf(((String)rawattributes.get("content")).charAt(0));
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
@@ -604,7 +605,7 @@ public class JavaReader
 					Double[] ret = new Double[len];
 					
 					for(int i=0; stok.hasMoreTokens(); i++)
-						ret[i] = new Double(stok.nextToken());
+						ret[i] = Double.valueOf(stok.nextToken());
 					return ret;
 				}
 			};
@@ -639,7 +640,7 @@ public class JavaReader
 					Float[] ret = new Float[len];
 					
 					for(int i=0; stok.hasMoreTokens(); i++)
-						ret[i] = new Float(stok.nextToken());
+						ret[i] = Float.valueOf(stok.nextToken());
 					return ret;
 				}
 			};

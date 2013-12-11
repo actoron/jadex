@@ -65,7 +65,7 @@ public class ShopService implements IShopService
 		
 		final IGoal sell = comp.getGoalbase().createGoal("sell");
 		sell.getParameter("name").setValue(item);
-		sell.getParameter("price").setValue(new Double(price));
+		sell.getParameter("price").setValue(Double.valueOf(price));
 		sell.addGoalListener(new IGoalListener()
 		{
 			public void goalFinished(AgentEvent ae)

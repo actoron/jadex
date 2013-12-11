@@ -168,7 +168,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	//-------- attributes --------
 	
 	/** The micro agent model. */
-	protected MBpmnModel model;
+	protected MBpmnModel bpmnmodel;
 	
 	// todo: allow multiple pools/lanes?
 	/** The configuration. */
@@ -307,7 +307,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	protected void construct(final MBpmnModel model, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers)
 	{
-		this.model = model;
+		this.bpmnmodel = model;
 		
 		// Extract pool/lane from config.
 		String config = getConfiguration();
@@ -384,7 +384,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			
 //			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
 			
-			if(!finishing && isFinished(pool, lane) && !model.isKeepAlive() && started)
+			if(!finishing && isFinished(pool, lane) && !bpmnmodel.isKeepAlive() && started)
 			{
 //				System.out.println("terminating: "+getComponentIdentifier());
 				finishing = true;
@@ -534,7 +534,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// eventtype, mactname, event
         Tuple3<String, String, Object> trigger = (Tuple3<String, String, Object>)getArguments().get(MBpmnModel.TRIGGER);
         // Create initial thread(s).
-        List<MActivity> startevents = model.getStartActivities(null, null);
+        List<MActivity> startevents = bpmnmodel.getStartActivities(null, null);
         for(int i=0; startevents!=null && i<startevents.size(); i++)
         {
             MActivity mact = startevents.get(i);
@@ -625,7 +625,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	protected void initContextVariables()
 	{
-		List<MContextVariable>	vars	= model.getContextVariables();
+		List<MContextVariable>	vars	= bpmnmodel.getContextVariables();
 		for(Iterator<MContextVariable> it=vars.iterator(); it.hasNext(); )
 		{
 			MContextVariable	cv	= it.next();
@@ -1251,7 +1251,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //					edge.addParameterMapping("step", SJavaParser.parseExpression("step", null, null), null);
 					edge.addParameterMapping("step", exp, null);
 					act.addIncomingSequenceEdge(edge);
-					MPool pl = pool!=null? model.getPool(pool): (MPool)model.getPools().get(0);
+					MPool pl = pool!=null? bpmnmodel.getPool(pool): (MPool)bpmnmodel.getPools().get(0);
 					act.setPool(pl);
 					ProcessThread thread = new ProcessThread(""+idcnt++, act, context, BpmnInterpreter.this);
 					thread.setLastEdge(edge);
@@ -1418,7 +1418,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		{
 			// Build map of potentially matching events: method name -> {list of matching signal event activities}
 			MultiCollection	events	= new MultiCollection();
-			List<MActivity>	starts	= this.model.getStartActivities(pool, lane);
+			List<MActivity>	starts	= this.bpmnmodel.getStartActivities(pool, lane);
 			for(int i=0; i<starts.size(); i++)
 			{
 				MActivity	act	= (MActivity)starts.get(i);
@@ -1565,7 +1565,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return model.getClassLoader();
+		return bpmnmodel.getClassLoader();
 	}
 	
 	/**

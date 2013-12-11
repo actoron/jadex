@@ -67,12 +67,12 @@ public class ExtinguishFireTask extends AbstractTask
 		// use random to determine if need to move to another position for next fire.
 		if(fire==0 || cnt>0 && Math.random()>0.5)
 		{
-			obj.setProperty(PROPERTY_EXTINGUISHED, new Double(0));
+			obj.setProperty(PROPERTY_EXTINGUISHED, Double.valueOf(0));
 			setFinished(space, obj, true);
 		}
 		else
 		{
-			obj.setProperty(PROPERTY_EXTINGUISHED, new Double(extinguished));			
+			obj.setProperty(PROPERTY_EXTINGUISHED, Double.valueOf(extinguished));			
 		}
 	}
 }

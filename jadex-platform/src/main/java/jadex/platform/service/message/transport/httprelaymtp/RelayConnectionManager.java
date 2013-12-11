@@ -128,7 +128,7 @@ public class RelayConnectionManager	extends HttpConnectionManager
 				+(ownaddress!=null ? "?peerurl="+URLEncoder.encode(ownaddress, "UTF-8")+"&initial="+initial : ""));
 			if(con.getContentType()!=null && con.getContentType().startsWith("text/plain"))
 			{
-				ret	= new Scanner(con.getInputStream()).useDelimiter("\\A").next();
+				ret	= new Scanner(con.getInputStream(), "UTF-8").useDelimiter("\\A").next();
 			}
 			else
 			{

@@ -123,7 +123,7 @@ public class FireflyAgent extends MicroAgent
 						Map params = new HashMap();
 						params.put(ISpaceAction.OBJECT_ID, avatar.getId());
 						params.put(MoveAction.PARAMETER_POSITION, newpos);
-						params.put(MoveAction.PARAMETER_DIRECTION, new Double(newdir));
+						params.put(MoveAction.PARAMETER_DIRECTION, Double.valueOf(newdir));
 						params.put(MoveAction.PARAMETER_CLOCK, Integer.valueOf(clock));
 						space.performSpaceAction("move", params, null);
 						

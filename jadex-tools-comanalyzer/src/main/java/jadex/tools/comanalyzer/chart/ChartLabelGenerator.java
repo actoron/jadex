@@ -351,7 +351,7 @@ public class ChartLabelGenerator implements PieSectionLabelGenerator, PieToolTip
 			double total = DataUtilities.calculateColumnTotal(dataset, column);
 			double percent = value.doubleValue() / total;
 			result[3] = percentFormat.format(percent);
-			result[4] = new Double(total);
+			result[4] = Double.valueOf(total);
 		}
 
 		return result;

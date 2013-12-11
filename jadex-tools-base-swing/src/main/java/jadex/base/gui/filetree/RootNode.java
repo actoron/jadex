@@ -234,14 +234,8 @@ public class RootNode extends AbstractSwingTreeNode
 			}
 			else
 			{
-				if(node instanceof RemoteJarNode)
-				{
-					ret[i]	= (((RemoteFileNode)node).getRemoteFile()).getPath();
-				}
-				else
-				{
-					ret[i]	= ((RemoteFileNode)node).getRemoteFile().getPath();
-				}
+				// Todo: if(node instanceof RemoteJarNode)???
+				ret[i]	= ((RemoteFileNode)node).getRemoteFile().getPath();
 			}
 		}
 		return ret;

@@ -432,7 +432,7 @@ public class Reader extends AReader
 							Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getXMLAttributeNames();
 							for(int i=0; i<parser.getAttributeCount(); i++)
 							{
-								QName attrname = parser.getAttributePrefix(i)==null || parser.getAttributePrefix(i)==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getAttributeLocalName(i))
+								QName attrname = parser.getAttributePrefix(i)==null || XMLConstants.DEFAULT_NS_PREFIX.equals(parser.getAttributePrefix(i))? new QName(parser.getAttributeLocalName(i))
 									: new QName(parser.getAttributeNamespace(i), parser.getAttributeLocalName(i), parser.getAttributePrefix(i));
 	
 	//							System.out.println("here: "+attrname);

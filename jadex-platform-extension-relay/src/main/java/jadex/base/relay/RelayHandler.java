@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -345,7 +346,7 @@ public class RelayHandler
 					queue.enqueue(msg);
 					msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
 					sent	= true;
-					System.out.println("message sent to: "+targetid+", "+(System.currentTimeMillis()-start));
+//					System.out.println("message sent to: "+targetid+", "+(System.currentTimeMillis()-start));
 				}
 				catch(Exception e)
 				{
@@ -361,7 +362,7 @@ public class RelayHandler
 						{
 							baos.write(buffer, 0, length);
 						}
-						System.out.println("message: "+new String(baos.toByteArray()));
+						System.out.println("message: "+new String(baos.toByteArray(), Charset.forName("UTF-8")));
 						//					e.printStackTrace();
 					}
 					catch(Exception e2)

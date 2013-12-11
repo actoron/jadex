@@ -207,32 +207,32 @@ public class SReflect
 	
 	public static Object wrapValue(long val)
 	{
-		return new Long(val);
+		return Long.valueOf(val);
 	}
 	
 	public static Object wrapValue(byte val)
 	{
-		return new Byte(val);
+		return Byte.valueOf(val);
 	}
 	
 	public static Object wrapValue(char val)
 	{
-		return new Character(val);
+		return Character.valueOf(val);
 	}
 	
 	public static Object wrapValue(float val)
 	{
-		return new Float(val);
+		return Float.valueOf(val);
 	}
 	
 	public static Object wrapValue(double val)
 	{
-		return new Double(val);
+		return Double.valueOf(val);
 	}
 	
 	public static Object wrapValue(short val)
 	{
-		return new Short(val);
+		return Short.valueOf(val);
 	}
 	
 	public static Object wrapValue(Object val)
@@ -1058,15 +1058,15 @@ public class SReflect
 			
 				if(clazz.equals(Double.class))
 				{
-					value	= new Double(num.doubleValue());
+					value	= Double.valueOf(num.doubleValue());
 				}
 				else if(clazz.equals(Float.class))
 				{
-					value	= new Float(num.floatValue());
+					value	= Float.valueOf(num.floatValue());
 				}
 				else if(clazz.equals(Long.class))
 				{
-					value	= new Long(num.longValue());
+					value	= Long.valueOf(num.longValue());
 				}
 				else if(clazz.equals(Integer.class))
 				{
@@ -1074,7 +1074,7 @@ public class SReflect
 				}
 				else if(clazz.equals(Short.class))
 				{
-					value	= new Short(num.shortValue());
+					value	= Short.valueOf(num.shortValue());
 				}
 			}
 		}
@@ -1285,17 +1285,17 @@ public class SReflect
 			if(clazz==Boolean.TYPE)
 				ret	= Boolean.FALSE;
 			else if(clazz==Byte.TYPE)
-				ret	= new Byte((byte)0);
+				ret	= Byte.valueOf((byte)0);
 			else if(clazz==Character.TYPE)
-				ret	= new Character((char)0);
+				ret	= Character.valueOf((char)0);
 			else if(clazz==Short.TYPE)
-				ret	= new Short((short)0);
+				ret	= Short.valueOf((short)0);
 			else if(clazz==Double.TYPE)
-				ret	= new Double(0);
+				ret	= Double.valueOf(0);
 			else if(clazz==Float.TYPE)
-				ret	= new Float(0);
+				ret	= Float.valueOf(0);
 			else if(clazz==Long.TYPE)
-				ret	= new Long(0);
+				ret	= Long.valueOf(0);
 			else if(clazz==Integer.TYPE)
 				ret	= Integer.valueOf(0);
 		}

@@ -151,7 +151,7 @@ public class GenerateService implements IGenerateService
 						final IComponentManagementService cms = (IComponentManagementService)result;
 						Object delay = agent.getArgument("delay");
 						if(delay==null)
-							delay = new Long(5000);
+							delay = Long.valueOf(5000);
 						cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
 							new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
 							agent.getParentAccess().getComponentIdentifier()), null)

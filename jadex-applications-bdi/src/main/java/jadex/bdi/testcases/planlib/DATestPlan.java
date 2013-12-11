@@ -33,7 +33,7 @@ public class DATestPlan extends AbstractMultipleAgentsPlan
 		for(int i=0; i<args.length; i++)
 		{
 			args[i] = SCollection.createHashMap();
-			args[i].put("max_price", new Double(115+i*5));
+			args[i].put("max_price", Double.valueOf(115+i*5));
 			//args[i].put("participate", new Boolean(i!=2));
 			args[i].put("participate", Boolean.TRUE);
 		}
@@ -48,7 +48,7 @@ public class DATestPlan extends AbstractMultipleAgentsPlan
 			{
 				IGoal da = createGoal("dacap.da_initiate");
 				da.getParameterSet("receivers").addValues(agents.toArray(new IComponentIdentifier[agents.size()]));
-				da.getParameter("cfp").setValue(new Double(200));
+				da.getParameter("cfp").setValue(Double.valueOf(200));
 				da.getParameter("auction_description").setValue(new AuctionDescription(getTime()+1000,
 					roundtimeout, "Test auction 1"));
 				dispatchSubgoalAndWait(da);

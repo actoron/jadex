@@ -713,12 +713,8 @@ public class MActivity extends MAssociationTarget
 	 */
 	public Object getParsedPropertyValue(String name)
 	{
-		Object val	= getPropertyValue(name);
-		
-		if(val instanceof UnparsedExpression)
-		{
-			val = ((IParsedExpression) ((UnparsedExpression)val).getParsed()).getValue(null);
-		}
+		UnparsedExpression	upex	= getPropertyValue(name);
+		Object val = ((IParsedExpression)upex.getParsed()).getValue(null);
 		
 		return val;
 	}

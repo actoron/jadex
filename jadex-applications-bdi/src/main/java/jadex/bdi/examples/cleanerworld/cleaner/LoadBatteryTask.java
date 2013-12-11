@@ -57,7 +57,7 @@ public class LoadBatteryTask extends AbstractTask
 			chargestate = Math.min(1.0, chargestate+inc);
 		}
 		
-		obj.setProperty(PROPERTY_CHARGESTATE, new Double(chargestate));
+		obj.setProperty(PROPERTY_CHARGESTATE, Double.valueOf(chargestate));
 //		System.out.println("Increased chargestate to: "+chargestate);
 		
 		if(chargestate==1.0)

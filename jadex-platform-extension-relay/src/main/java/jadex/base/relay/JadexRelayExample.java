@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Random;
 
 
@@ -25,9 +26,9 @@ public class JadexRelayExample
 		connect(id);
 		
 		// Send a message to self.
-		send(id, "Hello Relay World!".getBytes());
+		send(id, "Hello Relay World!".getBytes(Charset.forName("UTF-8")));
 
-		send(id, "some more testing...".getBytes());
+		send(id, "some more testing...".getBytes(Charset.forName("UTF-8")));
 
 		// Wait while received message is printed on receiver thread.
 		Thread.sleep(1000);
@@ -41,7 +42,7 @@ public class JadexRelayExample
 	 */
 	public static void	deliverMessage(byte[] rawmsg)
 	{
-		System.out.println("Message received: "+new String(rawmsg));
+		System.out.println("Message received: "+new String(rawmsg, Charset.forName("UTF-8")));
 	}
 	
 	/** The relay server address. */

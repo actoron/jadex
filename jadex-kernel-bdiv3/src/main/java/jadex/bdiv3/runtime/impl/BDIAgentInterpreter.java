@@ -252,7 +252,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				
 				boolean found = false;
 				Class<?> cl = ret.getClass();
-				while(!found & !Object.class.equals(cl))
+				while(!found && !Object.class.equals(cl))
 				{
 					try
 					{

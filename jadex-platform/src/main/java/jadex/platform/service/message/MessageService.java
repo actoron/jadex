@@ -81,6 +81,7 @@ import java.lang.reflect.Proxy;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -2337,10 +2338,10 @@ public class MessageService extends BasicService implements IMessageService
 														{
 															byte[]	tmp = new byte[3000];
 															System.arraycopy(value, 0, tmp, 0, tmp.length);
-															logger.info("ContentException: "+((byte[])value).length+", "+fmessage+", "+new String(tmp));
+															logger.info("ContentException: "+((byte[])value).length+", "+fmessage+", "+new String(tmp, Charset.forName("UTF-8")));
 															value	= tmp;
 														}
-														e = new ContentException(new String((byte[])value), e);
+														e = new ContentException(new String((byte[])value, Charset.forName("UTF-8")), e);
 													}
 													fmessage.put(name, e);
 												}
@@ -2348,7 +2349,7 @@ public class MessageService extends BasicService implements IMessageService
 											
 											if(fmessage.get(name) instanceof byte[])
 											{
-												System.out.println("sfjkdghfkld\n"+new String((byte[])fmessage.get(name)));
+												System.out.println("sfjkdghfkld\n"+new String((byte[])fmessage.get(name), Charset.forName("UTF-8")));
 											}
 										}
 									}

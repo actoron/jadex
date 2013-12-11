@@ -13,7 +13,7 @@ public class DADecideIterationPlan extends Plan
 	public void body()
 	{
 		Object[] cfps = getParameterSet("history").getValues();
-		Double newcfp = new Double(((Double)cfps[cfps.length-1]).doubleValue()-5);
+		Double newcfp = Double.valueOf(((Double)cfps[cfps.length-1]).doubleValue()-5);
 		if(newcfp.doubleValue()<100)
 			fail();
 		getParameter("cfp").setValue(newcfp);

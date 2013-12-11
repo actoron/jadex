@@ -68,7 +68,7 @@ public class ExponentialPriceCalculator implements IOfferGenerator
 	{
 		this.startprice = startprice;
 		this.prices = SCollection.createArrayList();
-		this.prices.add(new Double(startprice));
+		this.prices.add(Double.valueOf(startprice));
 		this.limitprice = limitprice;
 		this.base = base;
 		this.variation = variation;
@@ -115,10 +115,10 @@ public class ExponentialPriceCalculator implements IOfferGenerator
 			if((increasing && ret>limitprice) || (!increasing && ret<limitprice))
 				ret = limitprice;
 			
-			prices.add(new Double(ret));
+			prices.add(Double.valueOf(ret));
 		}
 		
-		return new Double(ret);
+		return Double.valueOf(ret);
 	}
 	
 	/**
@@ -136,7 +136,7 @@ public class ExponentialPriceCalculator implements IOfferGenerator
 	 */
 	public Comparable getLimitOffer()
 	{
-		return new Double(limitprice);
+		return Double.valueOf(limitprice);
 	}
 	
 	/**
@@ -145,7 +145,7 @@ public class ExponentialPriceCalculator implements IOfferGenerator
 	 */
 	public Comparable getStartOffer()
 	{
-		return new Double(startprice);
+		return Double.valueOf(startprice);
 	}
 	
 	/**

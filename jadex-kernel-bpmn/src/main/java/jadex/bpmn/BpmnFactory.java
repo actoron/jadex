@@ -278,7 +278,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	/**
 	 * Create a component instance.
 	 * @param adapter The component adapter.
-	 * @param model The component model.
+	 * @param bpmnmodel The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
 	 * @param arguments The arguments for the agent as name/value pairs.
 	 * @param parent The parent component (if any).

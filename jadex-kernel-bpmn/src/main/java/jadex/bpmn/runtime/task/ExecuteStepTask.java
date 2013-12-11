@@ -7,7 +7,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 /**
  *  Execute an external step.
@@ -24,16 +23,8 @@ public class ExecuteStepTask extends AbstractTask
 	public void doExecute(ITaskContext context, IInternalAccess instance)
 	{
 		Object[] step = (Object[])context.getParameterValue("step");
-		Future ret = (Future)step[1];
-		Object res = ((IComponentStep)step[0]).execute(instance); 
-		if(res instanceof IFuture)
-		{
-			((IFuture)res).addResultListener(new DelegationResultListener(((Future)step[1])));
-		}
-		else
-		{
-			ret.setResult(res);
-		}
+		((IComponentStep)step[0]).execute(instance)
+			.addResultListener(new DelegationResultListener(((Future)step[1])));
 	}
 	
 	//-------- static methods --------

@@ -26,8 +26,8 @@ public class NIOTCPOutputConnection	implements Closeable
 	//-------- constructors --------
 	
 //	static Map<SocketChannel, NIOTCPOutputConnection> ocons = new HashMap<SocketChannel, NIOTCPOutputConnection>();
-	static int crecnt = 0;
-	static int clocnt = 0;
+//	static int crecnt = 0;
+//	static int clocnt = 0;
 	
 	/**
 	 *  Create a new output connection.

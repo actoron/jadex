@@ -119,7 +119,7 @@ public class GoalLifecycleRules
 	
 	//-------- actions --------
 	
-	static int cnt=0;
+//	static int cnt=0;
 	/**
 	 *  Instantiate and adopt an MGoal in a given RCapability.
 	 */

@@ -19,8 +19,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @Agent
 public abstract class BaseAgentBDI
 {
-	@Agent
+	// Annotation to inform FindBugs that the uninitialized field is not a bug.
 	@SuppressFBWarnings(value="UR_UNINIT_READ", justification="Agent field injected by interpreter")
+
+	@Agent
 	protected BDIAgent agent;
 	
 	/** The environment. */

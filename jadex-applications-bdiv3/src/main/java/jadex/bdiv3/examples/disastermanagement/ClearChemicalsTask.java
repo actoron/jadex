@@ -67,12 +67,12 @@ public class ClearChemicalsTask extends AbstractTask
 		// use random to determine if need to move to another position for next chemical.
 		if(chemicals==0 || cnt>0 && Math.random()>0.5)
 		{
-			obj.setProperty(PROPERTY_CLEARED, new Double(0));
+			obj.setProperty(PROPERTY_CLEARED, Double.valueOf(0));
 			setFinished(space, obj, true);
 		}
 		else
 		{
-			obj.setProperty(PROPERTY_CLEARED, new Double(cleared));			
+			obj.setProperty(PROPERTY_CLEARED, Double.valueOf(cleared));			
 		}
 	}
 }

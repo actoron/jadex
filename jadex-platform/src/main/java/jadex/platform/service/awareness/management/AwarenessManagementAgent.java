@@ -1149,9 +1149,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				props.addProperty(new Property("autocreate", ""+autocreate));
 				props.addProperty(new Property("autodelete", ""+autodelete));
 				for(int i=0; i<includes.size(); i++)
-					props.addProperty(new Property("include", includes.get(i).toString()));
+					props.addProperty(new Property("include", includes.get(i)));
 				for(int i=0; i<excludes.size(); i++)
-					props.addProperty(new Property("exclude", excludes.get(i).toString()));
+					props.addProperty(new Property("exclude", excludes.get(i)));
 				return new Future<jadex.commons.Properties>(props);
 			}
 		});		

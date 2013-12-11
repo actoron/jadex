@@ -18,9 +18,9 @@ import jadex.web.examples.puzzle.Move;
  */
 public class Main
 {
-	public static void	main(String[] args)
+	public static void	main(String[] s)
 	{
-		args	= new String[]
+		String[]	args	= new String[]
 		{
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-awareness", "false",

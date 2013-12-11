@@ -185,30 +185,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
 //		System.out.println("setResult: "+this+" "+result);
     	
-    	boolean ex = false;
     	synchronized(this)
 		{
-    		ex = intermediate;
-//    		if(results!=null)
-//    			ex = true;
+        	if(intermediate)
+        	{
+        		throw new RuntimeException("setResult() only allowed without intermediate results:"+results);
+        	}
+
+       		super.doSetResult(result);
+   			this.results = result;
 		}
-    	if(ex)
-    	{
-    		throw new RuntimeException("setResult() only allowed without intermediate results:"+results);
-    	}
-    	else
-    	{
-    		if(result!=null && !(result instanceof Collection))
-    		{
-    			throw new IllegalArgumentException("Result must be collection: "+result);
-    		}
-    		else
-    		{
-    			if(result!=null)
-    				this.results = (Collection)result;
-    			super.setResult(results);
-    		}
-    	}
+
+		resume();
     }
     
 	/**
@@ -218,30 +206,28 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public boolean	setResultIfUndone(Collection<E> result)
     {
-    	boolean ex = false;
+		boolean	ret;
     	synchronized(this)
 		{
-    		undone = true;
-    		ex = intermediate;
-//    		if(results!=null)
-//    			ex = true;
-		}
-    	if(ex)
-    	{
-    		throw new RuntimeException("setResultIfUndone() only allowed without intermediate results:"+results);
-    	}
-    	else
-    	{
-    		if(result!=null && !(result instanceof Collection))
-    		{
-    			throw new IllegalArgumentException("Result must be collection: "+result);
-    		}
-    		else
-    		{
-    			this.results = (Collection)result;
-    			return super.setResultIfUndone(result);
+	    	if(intermediate)
+	    	{
+	    		throw new RuntimeException("setResultIfUndone() only allowed without intermediate results: "+results);
+	    	}
+	    	else
+	    	{
+       			ret	= super.doSetResultIfUndone(result);
+       			if(ret)
+       			{
+       				this.results = result;
+       			}
     		}
     	}
+    		
+    	if(ret)
+    	{
+    		resume();
+    	}
+   		return ret;
     }
     
     /**
@@ -251,10 +237,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     {
 //		System.out.println("finished: "+this+" "+result);
     	
-    	Collection	res;
     	synchronized(this)
     	{
-    		res	= getIntermediateResults();
+        	Collection<E>	res	= getIntermediateResults();
+        	super.doSetResult(res);
+        	
 			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
     		// because getIntermediateResults() returns empty list when results==null.
     		if(results==null)
@@ -262,7 +249,8 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
     			results	= res;
     		}
     	}
-    	super.setResult(res);
+    	
+    	resume();
     }
     
     /**
@@ -270,27 +258,36 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements IIn
      */
     public boolean setFinishedIfUndone()
     {
-    	Collection	res;
+    	boolean	 ret;
     	synchronized(this)
 		{
         	if(isDone())
         	{
-        		return false;
+        		ret	= false;
         	}
         	else
         	{
-        		undone = true;
-        		res	= getIntermediateResults();
-    			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
-        		// because getIntermediateResults() returns empty list when results==null.
-        		if(results==null)
+            	Collection<E>	res	= getIntermediateResults();
+        		ret	= super.doSetResultIfUndone(res);
+        		
+        		if(ret)
         		{
-        			results	= res;
+	    			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
+	        		// because getIntermediateResults() returns empty list when results==null.
+	        		if(results==null)
+	        		{
+	        			results	= res;
+	        		}
         		}
         	}
 		}
-    	super.setResultIfUndone(res);
-    	return true;
+
+    	if(ret)
+    	{
+    		resume();
+    	}
+    	
+    	return ret;
     }
     
     /**

@@ -98,11 +98,11 @@ public class CastNode	extends ExpressionNode
 					type	= SReflect.getWrappedType(type);
 					if(type==Float.class)
 					{
-						value	= new Float(((Number)value).floatValue());
+						value	= Float.valueOf(((Number)value).floatValue());
 					}
 					else if(type==Long.class)
 					{
-						value	= new Long(((Number)value).longValue());
+						value	= Long.valueOf(((Number)value).longValue());
 					}
 					else if(type==Integer.class)
 					{
@@ -110,15 +110,15 @@ public class CastNode	extends ExpressionNode
 					}
 					else if(type==Short.class)
 					{
-						value	= new Short(((Number)value).shortValue());
+						value	= Short.valueOf(((Number)value).shortValue());
 					}
 					else if(type==Byte.class)
 					{
-						value	= new Byte(((Number)value).byteValue());
+						value	= Byte.valueOf(((Number)value).byteValue());
 					}
 					else if(type==Character.class)
 					{
-						value	= new Character((char)((Number)value).intValue());
+						value	= Character.valueOf((char)((Number)value).intValue());
 					}
 				}
 				else if(!SReflect.isSupertype(type, value.getClass()))

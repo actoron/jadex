@@ -12,9 +12,9 @@ import jadex.commons.future.ThreadSuspendable;
 
 public class EmailTest
 {
-	public static void	main(String[] args)
+	public static void	main(String[] s)
 	{
-		args	= new String[]
+		String[]	args	= new String[]
 		{
 			"-gui", "false"
 		};

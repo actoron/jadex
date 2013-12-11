@@ -74,7 +74,7 @@ public class ExecutionControlPanel extends JPanel
 		int	col	= 0;
 		add(stepmode, new GridBagConstraints(col++, row, 1, 1,
 			1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-		add(step, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
+		add(step, new GridBagConstraints(col, row, GridBagConstraints.REMAINDER, 1,
 			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 		
 	}

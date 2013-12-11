@@ -141,7 +141,7 @@ public class CreationInfo
 	
 	/**
 	 *  Create a new creation info.
-	 *  @param parent	The parent of the component to be created.
+	 *  @param nfparent	The parent of the component to be created.
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IResourceIdentifier rid)
 	{

@@ -334,6 +334,16 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     public void	setResult(E result)
     {
+    	doSetResult(result);
+    	
+    	resume();
+    }
+    
+    /**
+     *  Set the result without notifying listeners.
+     */
+    protected synchronized void	doSetResult(E result)
+    {
     	// There is an exception when this is ok.
     	// In BDI when belief value is a future.
 //    	if(result instanceof IFuture)
@@ -342,32 +352,27 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 //    		setException(new RuntimeException("Future in future not allowed."));
 //    	}
     	
-    	synchronized(this)
-		{
-        	if(isDone())
-        	{
-        		if(this.exception!=null)
-        		{
-//        			this.exception.printStackTrace();
-            		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
-        		}
-        		else
-        		{
-            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
-        		}
-        	}
-        	else if(DEBUG)
-        	{
-        		first	= new DebugException("first setResult()");
-        	}
-        	
-//        	System.out.println(this+" setResult: "+result);
-        	this.result = result;
-        	resultavailable = true;			
-//        	this.resultex = new Exception();
-		}
+    	if(isDone())
+    	{
+    		if(this.exception!=null)
+    		{
+//        		this.exception.printStackTrace();
+        		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
+    		}
+    		else
+    		{
+        		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
+    		}
+    	}
+    	else if(DEBUG)
+    	{
+    		first	= new DebugException("first setResult()");
+    	}
     	
-    	resume();
+//        System.out.println(this+" setResult: "+result);
+    	this.result = result;
+    	resultavailable = true;			
+//      this.resultex = new Exception();
     }
     
     /**
@@ -378,26 +383,32 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
      */
     public boolean	setResultIfUndone(E result)
     {
-    	synchronized(this)
-		{
-    		undone = true;
-        	if(isDone())
-        	{
-        		return false;
-        	}
-        	else
-        	{
-//	        	System.out.println(this+" setResult: "+result);
-        		this.result = result;
-        		resultavailable = true;	
-            	if(DEBUG)
-            	{
-            		first	= new DebugException("first setResultIfUndone()");
-            	}
-        	}
-		}
-    	
+    	boolean	ret	= doSetResultIfUndone(result);
     	resume();
+    	return ret;
+    }
+    
+    /**
+     *  Set the result without notifying listeners.
+     */
+    protected synchronized boolean	doSetResultIfUndone(E result)
+    {
+		undone = true;
+		if(isDone())
+		{
+			return false;
+		}
+		else
+		{
+//        	System.out.println(this+" setResult: "+result);
+			this.result = result;
+			resultavailable = true;	
+	    	if(DEBUG)
+	    	{
+	    		first	= new DebugException("first setResultIfUndone()");
+	    	}
+		}
+		
     	return true;
     }
 
