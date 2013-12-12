@@ -30,6 +30,6 @@ Communicate stuff:
 - news entry on sourceforge
 
 Maven:
-- deploy artifacts at staging repository using Maven
+- deploy artifacts at staging repository using Maven (automatically done by jenkins when using 'deploy' in build)
 - test staging release (stagingpom.xml), find url at https://oss.sonatype.org/index.html
 - close and promote repository to maven central

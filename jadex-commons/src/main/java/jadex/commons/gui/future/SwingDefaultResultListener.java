@@ -158,6 +158,6 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 	 */
 	public void	customCommandAvailable(Object command)
 	{
-		Logger.getLogger("swing-result-listener").warning("Cannot forward command: "+this+" "+command);
+		Logger.getLogger("swing-result-listener").fine("Cannot forward command: "+this+" "+command);
 	}
 }

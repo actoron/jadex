@@ -156,7 +156,7 @@ public class SwingResultListener<E> implements IUndoneResultListener<E>, IFuture
 		}
 		else
 		{
-			Logger.getLogger("swing-result-listener").warning("Cannot forward command: "+listener+" "+command);
+			Logger.getLogger("swing-result-listener").fine("Cannot forward command: "+listener+" "+command);
 		}
 	}
 	

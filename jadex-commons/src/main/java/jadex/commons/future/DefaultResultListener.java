@@ -100,6 +100,6 @@ public abstract class DefaultResultListener<E> implements IFutureCommandResultLi
 	 */
 	public void commandAvailable(Object command)
 	{
-		logger.warning("Cannot forward command: "+this+" "+command);
+		logger.fine("Cannot forward command: "+this+" "+command);
 	}
 }
