@@ -23,6 +23,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Value;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.FieldInfo;
@@ -73,6 +74,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -233,10 +235,10 @@ public class MicroClassReader
 	/**
 	 *  Fill the model details using annotation.
 	 */
-	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class clazz, ClassLoader cl)
+	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class<?> clazz, ClassLoader cl)
 	{
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
-		Class cma = clazz;
+		Class<?> cma = clazz;
 		
 		int cnt = 0;
 		Map toset = new HashMap();
@@ -249,6 +251,8 @@ public class MicroClassReader
 		boolean compdone = false;
 		boolean breaksdone = false;
 		boolean nfpropsdone = false;
+		
+		Set<Class<?>> serifaces = new HashSet<Class<?>>(); 
 		
 		while(cma!=null && !cma.equals(Object.class) && !cma.equals(getClass(MicroAgent.class, cl)))
 		{
@@ -284,6 +288,16 @@ public class MicroClassReader
 				if(sync!=null)
 				{
 					modelinfo.setSynchronous(sync);
+				}
+				
+				// check interfaces and add those which have service annotation to provided service interfaces
+				Class<?>[] ifaces = cma.getInterfaces();
+				for(Class<?> iface: ifaces)
+				{
+					if(isAnnotationPresent(iface, Service.class, cl))
+					{
+						serifaces.add(iface);
+					}
 				}
 			}
 			
@@ -808,6 +822,32 @@ public class MicroClassReader
 		if(cfs!=null)
 			modelinfo.setConfigurations((ConfigurationInfo[])cfs.values().toArray(new ConfigurationInfo[cfs.size()]));
 
+		// Check if there are implemented service interfaces for which the agent
+		// does not have a provided service declaration (implementation=agent)
+		
+		if(isAnnotationPresent(clazz, Agent.class, cl) && getAnnotation(clazz, Agent.class, cl).autoprovide() 
+			&& !serifaces.isEmpty())
+		{
+			ProvidedServiceInfo[] psis = modelinfo.getProvidedServices();
+			for(ProvidedServiceInfo psi: psis)
+			{
+				String val = psi.getImplementation().getValue();
+				if(psi.getImplementation().getClazz()!=null || (val!=null && !val.isEmpty() 
+					&& (val.equals("$pojoagent") || val.equals("$pojoagent!=null? $pojoagent: $component"))))
+				{
+					Class<?> tt = psi.getType().getType(cl);
+					serifaces.remove(tt);
+				}
+			}
+			
+			// All interfaces that are still in the set do not have an implementation
+			for(Class<?> iface: serifaces)
+			{
+				ProvidedServiceImplementation impl = new ProvidedServiceImplementation(null, "$pojoagent!=null? $pojoagent: $component", Implementation.PROXYTYPE_DECOUPLED, null, null);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(null, iface, impl, null);
+				modelinfo.addProvidedService(psi);
+			}
+		}
 	}
 	
 //	/**

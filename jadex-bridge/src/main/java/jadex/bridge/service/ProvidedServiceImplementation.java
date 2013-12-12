@@ -41,8 +41,8 @@ public class ProvidedServiceImplementation	extends UnparsedExpression
 	/**
 	 *  Create a new service implementation.
 	 */
-	public ProvidedServiceImplementation(Class<?> implementation,
-		String expression, String proxytype, RequiredServiceBinding binding, UnparsedExpression[] interceptors)
+	public ProvidedServiceImplementation(Class<?> implementation, String expression, 
+		String proxytype, RequiredServiceBinding binding, UnparsedExpression[] interceptors)
 	{
 		super(null, implementation, expression, null);
 		this.proxytype = proxytype;

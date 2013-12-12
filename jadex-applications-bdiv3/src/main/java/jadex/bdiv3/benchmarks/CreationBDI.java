@@ -93,28 +93,43 @@ public class CreationBDI
 	{
 		if(starttime==0)
 		{
-			getClock().addResultListener(new DefaultResultListener<IClockService>()
+			IClockService cs = getClock().get();
+			
+			System.gc();
+			try
 			{
-				public void resultAvailable(IClockService result)
-				{
-					System.gc();
-					try
-					{
-						Thread.sleep(500);
-					}
-					catch(InterruptedException e){}
-					
-					startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-					starttime = ((IClockService)result).getTime();
-					
-					step1();
-				}
-			});
+				Thread.sleep(500);
+			}
+			catch(InterruptedException e){}
+			
+			startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+			starttime = cs.getTime();
 		}
-		else
-		{
-			step1();
-		}
+		
+		step1();
+		
+//			getClock().addResultListener(new DefaultResultListener<IClockService>()
+//			{
+//				public void resultAvailable(IClockService result)
+//				{
+//					System.gc();
+//					try
+//					{
+//						Thread.sleep(500);
+//					}
+//					catch(InterruptedException e){}
+//					
+//					startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+//					starttime = ((IClockService)result).getTime();
+//					
+//					step1();
+//				}
+//			});
+//		}
+//		else
+//		{
+//			step1();
+//		}
 	}
 	
 	protected void	step1()
