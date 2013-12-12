@@ -11,6 +11,7 @@ import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.collection.LRU;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
@@ -118,6 +119,9 @@ public class DefaultRestServicePublishService implements IPublishService
 	/** The generator. */
 	protected IRestMethodGenerator generator;
 	
+	/** The proxy classes. */
+	protected LRU<Tuple2<Class<?>, Class<?>>, Class<?>> proxyclasses;
+	
 	//-------- constructors --------
 	
 	/**
@@ -134,6 +138,7 @@ public class DefaultRestServicePublishService implements IPublishService
 	public DefaultRestServicePublishService(IRestMethodGenerator generator)
 	{
 		this.generator = generator;
+		this.proxyclasses = new LRU<Tuple2<Class<?>, Class<?>>, Class<?>>(50);
 	}
 	
 	//-------- methods --------
@@ -146,6 +151,23 @@ public class DefaultRestServicePublishService implements IPublishService
 	public IFuture<Boolean> isSupported(String publishtype)
 	{
 		return new Future<Boolean>(IPublishService.PUBLISH_RS.equals(publishtype));
+	}
+	
+	/**
+	 *  Get or generate a proxy class.
+	 */
+	protected Class<?> getProxyClass(IService service, ClassLoader classloader, 
+		Class<?> baseclass, Map<String, Object> mapprops) throws Exception
+	{
+		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+		Class<?> ret = proxyclasses.get(new Tuple2<Class<?>, Class<?>>(iface, baseclass));
+		if(ret==null)
+		{
+			List<RestMethodInfo> rmis = generator.generateRestMethodInfos(service, classloader, baseclass, mapprops);
+			ret = createProxyClass(service, classloader, baseclass, mapprops, rmis);
+			proxyclasses.put(new Tuple2<Class<?>, Class<?>>(iface, baseclass), ret);
+		}
+		return ret;
 	}
 	
 	/**
@@ -178,14 +200,16 @@ public class DefaultRestServicePublishService implements IPublishService
 			}
 			
 			// If no service type was specified it has to be generated.
-			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(cl);
+//			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(cl);
 			Class<?> baseclazz = pi.getMapping()!=null? pi.getMapping().getType(cl): null;
 			
-			List<RestMethodInfo> rmis = generator.generateRestMethodInfos(service, cl, baseclazz, mapprops);
+			Class<?> rsimpl = getProxyClass(service, cl, baseclazz, mapprops);
+			
+//			List<RestMethodInfo> rmis = generator.generateRestMethodInfos(service, cl, baseclazz, mapprops);
 //			System.out.println("Produced methods: ");
 //			for(int i=0; i<rmis.size(); i++)
 //				System.out.println(rmis.get(i));
-			Class<?> rsimpl = createProxyClass(service, cl, baseclazz, mapprops, rmis);
+//			Class<?> rsimpl = createProxyClass(service, cl, baseclazz, mapprops, rmis);
 			
 			Map<String, Object> props = new HashMap<String, Object>();
 			String jerseypack = PackagesResourceConfig.PROPERTY_PACKAGES;
@@ -304,13 +328,16 @@ public class DefaultRestServicePublishService implements IPublishService
 	{
 		Class<?> ret = null;
 
+		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+//		System.out.println("Creating new proxy class: "+SReflect.getInnerClassName(iface));
+		
 		// The name of the class has to ensure that it represents the different class properties:
 		// - the package+"Proxy"+name of the baseclass or (if not available) interface
 		// - the hashcode of the properties
 		// - only same implclass name + same props => same generated classname
 		
 		StringBuilder builder = new StringBuilder();
-		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+//		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
 		Class<?> nameclazz = baseclass!=null? baseclass: iface;
 		if(nameclazz.getPackage()!=null)
 			builder.append(nameclazz.getPackage().getName());
