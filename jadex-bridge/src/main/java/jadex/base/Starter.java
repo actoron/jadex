@@ -819,7 +819,8 @@ public class Starter
 		}, "rescue_thread_"+cid.getName());
 		Tuple2<BlockingQueue, Thread> tup = new Tuple2<BlockingQueue, Thread>(bq, rescuethread);
 		rescuethreads.put(cid, tup);
-		rescuethread.setDaemon(true);
+		// rescue thread must not be daemon, otherwise shutdown code like writing platform settings might be interrupted by vm exit. 
+//		rescuethread.setDaemon(true);
 		rescuethread.start();
 	}
 	
