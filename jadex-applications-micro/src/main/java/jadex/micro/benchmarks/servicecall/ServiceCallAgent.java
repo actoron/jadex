@@ -221,7 +221,7 @@ public class ServiceCallAgent	extends TestAgent
 						if(count==0)
 						{
 							long	end	= System.currentTimeMillis();
-							System.out.println(servicename+" service call on "+service+" took "+((end-start)*10000/(max*factor))/10.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)+" millis).");
+							System.out.println(servicename+" service call on "+service+" took "+((end-start)*10000/((long)max*factor))/10.0+" microseconds per call ("+(max*factor)+" calls in "+(end-start)+" millis).");
 							ret.setResult(null);
 						}
 						else
