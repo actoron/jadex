@@ -1010,10 +1010,10 @@ public class RemoteReferenceModule
 							System.out.println("srb end");
 					}
 					
-					if(proxycount.size()>0 && diff>0)
+					if(proxycount.size()>0 && diff>0 && timer!=null) // can be null if shutdown was already called
 					{
 //						System.out.println("renewal behaviour waiting: "+diff);
-						final IComponentStep<Void>	step	= this;
+						final IComponentStep<Void>	step = this;
 						timer.schedule(new TimerTask()
 						{
 							public void run()
@@ -1078,7 +1078,7 @@ public class RemoteReferenceModule
 						}
 					}
 					
-					if(holders.size()>0)
+					if(holders.size()>0 && timer!=null) // can be null if shutdown was already called
 					{
 						final IComponentStep<Void>	step	= this;
 						timer.schedule(new TimerTask()

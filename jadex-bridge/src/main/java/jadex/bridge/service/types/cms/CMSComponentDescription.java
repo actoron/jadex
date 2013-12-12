@@ -90,8 +90,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		Boolean daemon, Boolean autoshutdown, PublishEventLevel monitoring, Boolean synchronous, String modelname, String localtype, IResourceIdentifier rid,
 		long creationtime, IComponentIdentifier creator, Cause cause)
 	{
-		if(cid.getName().indexOf("Dyn")!=-1)
-			System.out.println("created desc: "+cid+" "+hashCode());
+//		if(cid.getName().indexOf("Dyn")!=-1)
+//			System.out.println("created desc: "+cid+" "+hashCode());
 		setName(cid);
 		setType(type);
 //		setParent(parent);
