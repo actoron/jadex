@@ -201,7 +201,7 @@ public class ProcessViewPanel extends JPanel
 			{
 				return true;	
 			}
-		}, true, PublishEventLevel.COARSE);
+		}, true, PublishEventLevel.FINE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
 			public void intermediateResultAvailable(IMonitoringEvent event)
