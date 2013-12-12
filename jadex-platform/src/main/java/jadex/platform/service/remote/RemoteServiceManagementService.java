@@ -986,7 +986,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				}
 				if(fini)
 				{
-					results.put(Integer.valueOf(num), FINISHED);
+					results.put(num, FINISHED);
 				}
 				else
 				{

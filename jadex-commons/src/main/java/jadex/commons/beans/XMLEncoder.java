@@ -140,7 +140,7 @@ public class XMLEncoder extends Encoder {
     private String idSerialNoOfObject(Object obj) {
         Class<?> clazz = obj.getClass();
         Integer serialNo = (Integer) clazzCounterMap.get(clazz);
-        serialNo = serialNo == null ? 0 : serialNo;
+        serialNo = serialNo == null ? Integer.valueOf(0) : serialNo;
         String id = nameForClass(obj.getClass()) + serialNo;
         clazzCounterMap.put(clazz, ++serialNo);
         return id;

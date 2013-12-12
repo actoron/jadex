@@ -86,7 +86,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 						else if(announcements.containsKey(di.getComponentIdentifier()))
 						{
 //							System.out.println("set to null: "+di.getComponentIdentifier());
-							announcements.put(di.getComponentIdentifier(), new Long(0));
+							announcements.put(di.getComponentIdentifier(), Long.valueOf(0));
 						}
 					}
 					public void exceptionOccurred(Exception exception)
@@ -134,7 +134,7 @@ public class MessageDiscoveryAgent extends DiscoveryAgent implements IMessageAwa
 		if(old!=-1 && (time>old || time==-1))
 		{
 //			System.out.println("set to time: "+cid+", "+time);
-			announcements.put(cid, new Long(time));
+			announcements.put(cid, Long.valueOf(time));
 		}
 
 		if(!contained)

@@ -148,8 +148,8 @@ public class TimerPanel	extends JPanel
 			{
 				//model.addRow(new String[]{""+eventcnt++, ""+t[i].getNextTimepoint(), 
 				//	""+((jadex.commons.concurrent.Timer)t[i]).getTimedObject()}, t[i]);
-				model.addRow(new String[]{simp.formatTime(entries.times[i]), entries.objects[i]}, new Long(entries.times[i]));
-				Color col = (Color)rowcols.get(new Long(entries.times[i]));
+				model.addRow(new String[]{simp.formatTime(entries.times[i]), entries.objects[i]}, Long.valueOf(entries.times[i]));
+				Color col = (Color)rowcols.get(Long.valueOf(entries.times[i]));
 				if(col==null)
 				{
 					// Find out first color.
@@ -159,7 +159,7 @@ public class TimerPanel	extends JPanel
 					}
 					else
 					{
-						Color tmp = (Color)rowcols.get(new Long(entries.times[i-1]));
+						Color tmp = (Color)rowcols.get(Long.valueOf(entries.times[i-1]));
 						boolean same = entries.times[i] == entries.times[i-1];
 							col = same? tmp: (tmp==first? sec: first);
 						//System.out.println("...color "+i+" "+col);
@@ -167,7 +167,7 @@ public class TimerPanel	extends JPanel
 				}
 				if(i==0)
 					rowcols.clear();
-				rowcols.put(new Long(entries.times[i]), col);
+				rowcols.put(Long.valueOf(entries.times[i]), col);
 			}
 		}
 	}

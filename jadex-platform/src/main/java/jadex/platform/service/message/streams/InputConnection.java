@@ -238,7 +238,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		{
 			int val=internalRead();
 			if(val!=-1)
-				ofut.setResult(new Byte((byte)val));
+				ofut.setResult(Byte.valueOf((byte)val));
 		}
 		catch(Exception e)
 		{
@@ -338,7 +338,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		}
 		else if(oret!=null)
 		{
-			oret.setResult(new Byte((byte)internalRead()));
+			oret.setResult(Byte.valueOf((byte)internalRead()));
 		}
 	}
 	
@@ -443,7 +443,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 							{
 								os.write(result);
 								filesize[0] += result.length;
-								ret.addIntermediateResultIfUndone(new Long(filesize[0]));
+								ret.addIntermediateResultIfUndone(Long.valueOf(filesize[0]));
 								// todo: close con?
 							}
 							catch(Exception e)

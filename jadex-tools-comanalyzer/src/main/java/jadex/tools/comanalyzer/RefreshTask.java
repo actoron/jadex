@@ -203,7 +203,7 @@ public class RefreshTask extends TimerTask
 	 */
 	private void addExecutionDuration(long duration)
 	{
-		durations.add(new Long(duration));
+		durations.add(Long.valueOf(duration));
 	}
 
 	/**

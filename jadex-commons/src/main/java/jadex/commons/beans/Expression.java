@@ -59,7 +59,7 @@ public class Expression extends Statement {
 
             return sb.toString();
         } catch (Exception e) {
-            return new String(Messages.getString("beans.0D", e.getClass())); //$NON-NLS-1$
+            return Messages.getString("beans.0D", e.getClass()); //$NON-NLS-1$
         }
     }
 

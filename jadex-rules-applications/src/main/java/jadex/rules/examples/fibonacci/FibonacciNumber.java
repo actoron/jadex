@@ -44,7 +44,7 @@ public class FibonacciNumber
 	public void setValue(long value)
 	{
 		this.value = value;
-		pcs.firePropertyChange("value", new Long(-1), new Long(value));
+		pcs.firePropertyChange("value", Long.valueOf(-1), Long.valueOf(value));
 	}
 
 	/**

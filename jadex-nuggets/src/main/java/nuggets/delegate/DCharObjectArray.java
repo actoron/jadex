@@ -50,7 +50,7 @@ public class DCharObjectArray extends ADelegate
 		Character[] a=new Character[l];
 		for(int i=0; i<l; i++) {
 			try {
-				a[i] = new Character((char)Integer.parseInt(asm.nextToken(), 16));
+				a[i] = Character.valueOf((char)Integer.parseInt(asm.nextToken(), 16));
 			} catch(NumberFormatException e) { /* NOP */ }
 		}
 		return a;

@@ -34,6 +34,6 @@ public class DShort extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Short((String)value);
+		return Short.valueOf((String)value);
 	}  
 }

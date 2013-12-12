@@ -311,7 +311,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 		{
 			public void customResultAvailable(IClockService cs)
 			{
-				ret.setResult(new Long(cs.getTime()));
+				ret.setResult(Long.valueOf(cs.getTime()));
 			}
 		});
 		

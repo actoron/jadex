@@ -56,7 +56,7 @@ public class AtomicExceptionPlan extends Plan
 		getBeliefbase().getBelief("report").setFact(tr);
 		getLogger().info("\nTesting exception while in atomic mode. Should be reset and trigger other plan.");
 		startAtomic();
-		getBeliefbase().getBelief("a").setFact(new Boolean(true));
+		getBeliefbase().getBelief("a").setFact(Boolean.TRUE);
 		throw new PlanFailureException();
 	}
 }

@@ -50,7 +50,7 @@ public class JavaFibonacci
 		Variable fn = new Variable("?fn", fibo_type);
 		ObjectCondition fncon = new ObjectCondition(fibo_type);
 		fncon.addConstraint(new BoundConstraint(null, fn));
-		fncon.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), new Long(-1)));
+		fncon.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), Long.valueOf(-1)));
 		rb.addRule(new Rule("recurse", fncon, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
@@ -64,7 +64,7 @@ public class JavaFibonacci
 		Variable f1 = new Variable("?f1", fibo_type);
 		ObjectCondition f1con = new ObjectCondition(fibo_type);
 		f1con.addConstraint(new BoundConstraint(null, f1));
-		f1con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), new Long(-1)));
+		f1con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), Long.valueOf(-1)));
 		f1con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("sequence"), Integer.valueOf(1)));
 		rb.addRule(new Rule("bootstrap1", f1con, new IAction()
 		{
@@ -79,7 +79,7 @@ public class JavaFibonacci
 		Variable f2 = new Variable("?f2", fibo_type);
 		ObjectCondition f2con = new ObjectCondition(fibo_type);
 		f2con.addConstraint(new BoundConstraint(null, f2));
-		f2con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), new Long(-1)));
+		f2con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), Long.valueOf(-1)));
 		f2con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("sequence"), Integer.valueOf(2)));
 		rb.addRule(new Rule("bootstrap2", f2con, new IAction()
 		{
@@ -101,19 +101,19 @@ public class JavaFibonacci
 		ObjectCondition f00con = new ObjectCondition(fibo_type);
 		f00con.addConstraint(new BoundConstraint(null, f0));
 		f00con.addConstraint(new BoundConstraint(fibo_type.getAttributeType("sequence"), f0cnt));
-		f00con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), new Long(-1), IOperator.NOTEQUAL));
+		f00con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), Long.valueOf(-1), IOperator.NOTEQUAL));
 		
 		ObjectCondition f11con = new ObjectCondition(fibo_type);
 		f11con.addConstraint(new BoundConstraint(null, f1));
 		f11con.addConstraint(new BoundConstraint(fibo_type.getAttributeType("sequence"), f1cnt));
 		f11con.addConstraint(new PredicateConstraint(new FunctionCall(new OperatorFunction(IOperator.EQUAL), 
 			new Object[]{f0cnt, new FunctionCall(new Sub(), new Object[]{f1cnt, Integer.valueOf(1)})})));
-		f11con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), new Long(-1), IOperator.NOTEQUAL));
+		f11con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), Long.valueOf(-1), IOperator.NOTEQUAL));
 		
 		ObjectCondition f22con = new ObjectCondition(fibo_type);
 		f22con.addConstraint(new BoundConstraint(null, f2));
 		f22con.addConstraint(new BoundConstraint(fibo_type.getAttributeType("sequence"), f2cnt));
-		f22con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), new Long(-1)));
+		f22con.addConstraint(new LiteralConstraint(fibo_type.getAttributeType("value"), Long.valueOf(-1)));
 		f22con.addConstraint(new PredicateConstraint(new FunctionCall(new OperatorFunction(IOperator.EQUAL), 
 			new Object[]{f1cnt, new FunctionCall(new Sub(), new Object[]{f2cnt, Integer.valueOf(1)})})));
 		

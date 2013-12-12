@@ -124,7 +124,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler, ISwitch
 		{
 			nf.put(SecureTransmission.SECURE_TRANSMISSION, sec? Boolean.TRUE: Boolean.FALSE);
 		}
-		nf.put(Timeout.TIMEOUT, new Long(to));
+		nf.put(Timeout.TIMEOUT, Long.valueOf(to));
 		final Map<String, Object> nonfunc = nf; 
 		
 		CallAccess.resetNextInvocation(); 

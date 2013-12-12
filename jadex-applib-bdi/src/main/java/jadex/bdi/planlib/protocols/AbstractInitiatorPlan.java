@@ -71,7 +71,7 @@ public abstract class AbstractInitiatorPlan extends Plan
 		getLogger().info("Initiator aborting");
 		IGoal	cancel	= createGoal("cmcap.cm_initiate");
 		cancel.getParameter("message").setValue(getInitialMessage());
-		cancel.getParameter("timeout").setValue(new Long(getTimeout()));
+		cancel.getParameter("timeout").setValue(Long.valueOf(getTimeout()));
 		if(hasParameter("interaction_state"))
 		{
 			cancel.getParameter("interaction_state").setValue(getParameter("interaction_state").getValue());

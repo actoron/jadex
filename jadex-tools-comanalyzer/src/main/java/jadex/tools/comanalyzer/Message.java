@@ -313,7 +313,7 @@ public class Message extends ParameterElement
 	 */
 	public void setDuration(long duration)
 	{
-		setParameter(Message.DURATION, new Long(duration));
+		setParameter(Message.DURATION, Long.valueOf(duration));
 	}
 
 	/**

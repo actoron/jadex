@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 
@@ -31,6 +32,9 @@ public class LeastSeenWalkPlan
 	
 	@PlanAPI
 	protected IPlan rplan;
+	
+	/** Random number generator. */
+	protected Random	rnd	= new Random();
 	
 	//-------- constructors --------
 
@@ -63,7 +67,7 @@ public class LeastSeenWalkPlan
 			if(mp.getSeen()!=mp2.getSeen())
 				break;
 		}
-		mp	= (MapPoint)mps.get((int)(Math.random()*cnt));
+		mp	= (MapPoint)mps.get(rnd.nextInt(cnt));
 //		MapPoint[]	mps = (MapPoint[])getBeliefbase().getBeliefSet("visited_positions").getFacts();
 //		MapPoint mp = mps[(int)(Math.random()*mps.length)];
 

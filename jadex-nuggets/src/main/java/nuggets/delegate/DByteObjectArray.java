@@ -51,7 +51,7 @@ public class DByteObjectArray extends ADelegate
 		Byte[] a=new Byte[l];
 		for(int i=0; i<l; i++) {
 			try {
-				a[i] = new Byte(asm.nextToken());
+				a[i] = Byte.valueOf(asm.nextToken());
 			} catch(NumberFormatException e) { /* NOP */ }
 		}
 		return a;

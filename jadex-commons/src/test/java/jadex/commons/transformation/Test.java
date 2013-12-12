@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -282,7 +283,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testByteArray() throws Exception
 	{
-		byte[] data = new String("hello world").getBytes();
+		byte[] data = "hello world".getBytes(Charset.forName("UTF-8"));
 		
 		doWriteAndRead(data, new Comparator()
 		{
@@ -298,10 +299,10 @@ public abstract class Test extends TestCase
 	 */
 	public void testBByteArray() throws Exception
 	{
-		byte[] tmp = new String("hello world").getBytes();
+		byte[] tmp = "hello world".getBytes(Charset.forName("UTF-8"));
 		Byte[] data = new Byte[tmp.length];
 		for(int i=0; i<tmp.length; i++)
-			data[i] = new Byte(tmp[i]);
+			data[i] = Byte.valueOf(tmp[i]);
 		
 		doWriteAndRead(data);
 	}
@@ -609,14 +610,14 @@ public abstract class Test extends TestCase
 	{
 		Object[][] data = new Object[1][8];
 
-		data[0][0] = new Long(1);
+		data[0][0] = Long.valueOf(1);
 		data[0][1] = "A";
 		data[0][2] = "";
 		data[0][3] = "";
 		data[0][4] = "B";
 		data[0][5] = null;
 		data[0][6] = "";
-		data[0][7] = new Long(2);
+		data[0][7] = Long.valueOf(2);
         
 		doWriteAndRead(data);
 	}
@@ -634,14 +635,14 @@ public abstract class Test extends TestCase
 		
 		Object[][] data = new Object[1][8];
 
-		data[0][0] = new Long(1);
+		data[0][0] = Long.valueOf(1);
 		data[0][1] = "Hallo";
 		data[0][2] = "";
 		data[0][3] = "";
 		data[0][4] = "Moin";
 		data[0][5] = null;
 		data[0][6] = "";
-		data[0][7] = new Long(2);
+		data[0][7] = Long.valueOf(2);
 		
 		doWriteAndRead(data);
 	}

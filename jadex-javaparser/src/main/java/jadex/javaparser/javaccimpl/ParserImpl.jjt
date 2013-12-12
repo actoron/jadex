@@ -1044,17 +1044,17 @@ void Literal() #ConstantNode :
 |	( t=<FLOATING_POINT_LITERAL> )
 	{
 		if(t.image.endsWith("f") || t.image.endsWith("F"))
-			jjtThis.setValue(new Float(t.image.substring(0, t.image.length()-1)));
+			jjtThis.setValue(Float.valueOf(t.image.substring(0, t.image.length()-1)));
 		else if(t.image.endsWith("d") || t.image.endsWith("D"))
-			jjtThis.setValue(new Double(t.image.substring(0, t.image.length()-1)));
+			jjtThis.setValue(Double.valueOf(t.image.substring(0, t.image.length()-1)));
 		else
-			jjtThis.setValue(new Double(t.image));
+			jjtThis.setValue(Double.valueOf(t.image));
 	}
 
 |	( t=<CHARACTER_LITERAL> )
 	{
 		// Get unescaped character between ''.
-		jjtThis.setValue(new Character(unescape(
+		jjtThis.setValue(Character.valueOf(unescape(
 			t.image.substring(1, t.image.length()-1)).charAt(0)));
 	}
 
@@ -1065,10 +1065,10 @@ void Literal() #ConstantNode :
 	}
 
 |	"true"
-	{ jjtThis.setValue(new Boolean(true)); }
+	{ jjtThis.setValue(Boolean.TRUE); }
 
 |	"false"
-	{ jjtThis.setValue(new Boolean(false)); }
+	{ jjtThis.setValue(Boolean.FALSE); }
 
 |	"null"
 	// { jjtThis.setValue(null); }	// ;-)

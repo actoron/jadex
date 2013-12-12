@@ -14,6 +14,6 @@ public class BeliefChangeCatchPlan extends Plan
 	public void body()
 	{
 		getLogger().info("Plan invoked.");
-		getBeliefbase().getBelief("invoked").setFact(new Boolean(true));
+		getBeliefbase().getBelief("invoked").setFact(Boolean.TRUE);
 	}
 }

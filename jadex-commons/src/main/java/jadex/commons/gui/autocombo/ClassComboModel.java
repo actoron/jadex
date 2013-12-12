@@ -262,7 +262,7 @@ public class ClassComboModel extends AbstractAutoComboModel<Class<?>>
 				
 				fut[0].addResultListener(new SwingIntermediateResultListener<Class<?>>(new IIntermediateResultListener<Class<?>>()
 				{
-					List<Class<?>> res = new ArrayList<Class<?>>();
+//					List<Class<?>> res = new ArrayList<Class<?>>();
 					
 					public void intermediateResultAvailable(Class<?> result)
 					{

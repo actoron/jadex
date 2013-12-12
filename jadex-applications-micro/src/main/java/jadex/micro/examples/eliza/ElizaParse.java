@@ -56,7 +56,7 @@ public void PRINT(String s)
 msg.addElement(s);
 }
 
-int N1=36,N2=14,N3=112;
+int N1=36;//,N2=14,N3=112;
 int WORDINOUT=7;
 
 int S[]=new int[N1+1];

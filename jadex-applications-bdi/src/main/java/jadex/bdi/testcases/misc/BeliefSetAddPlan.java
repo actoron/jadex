@@ -64,7 +64,7 @@ public class BeliefSetAddPlan extends Plan
 			else
 			{
 				getLogger().info("Adding beliefset value: "+belsetname+" val :"+cnt);
-				getBeliefbase().getBeliefSet(belsetname).addFact(new Long(cnt++));
+				getBeliefbase().getBeliefSet(belsetname).addFact(Long.valueOf(cnt++));
 				waitFor(time);
 			}	
 		}

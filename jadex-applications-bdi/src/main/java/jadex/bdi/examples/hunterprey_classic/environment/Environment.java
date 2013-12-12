@@ -474,12 +474,12 @@ public class Environment implements IEnvironment
 			{
 				if(!acted.contains(params[1]))
 				{
-					tasks[i].setResult(new Boolean(eat((Creature)params[1], (WorldObject)params[2])));
+					tasks[i].setResult(Boolean.valueOf(eat((Creature)params[1], (WorldObject)params[2])));
 					acted.add(params[1]);
 				}
 				else
 				{
-					tasks[i].setResult(new Boolean(false));
+					tasks[i].setResult(Boolean.FALSE);
 				}
 			}
 		}
@@ -490,12 +490,12 @@ public class Environment implements IEnvironment
 			{
 				if(!acted.contains(params[1]))
 				{
-					tasks[i].setResult(new Boolean(move((Creature)params[1], (String)params[2])));
+					tasks[i].setResult(Boolean.valueOf(move((Creature)params[1], (String)params[2])));
 					acted.add(params[1]);
 				}
 				else
 				{
-					tasks[i].setResult(new Boolean(false));
+					tasks[i].setResult(Boolean.FALSE);
 				}
 			}
 		}

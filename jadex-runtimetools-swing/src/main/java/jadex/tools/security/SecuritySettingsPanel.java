@@ -174,7 +174,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 				try
 				{
 					long val = Long.parseLong(tfvaldur.getText());
-					secservice.setValidityDuration(new Long(val*60000));
+					secservice.setValidityDuration(val*60000);
 				}
 				catch(Exception ex)
 				{

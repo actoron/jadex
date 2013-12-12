@@ -24,6 +24,6 @@ public class MaxMemoryProperty extends MemoryProperty
 	 */
 	public Long measureValue()
 	{
-		return new Long(OperatingSystemMXBeanFacade.getTotalPhysicalMemorySize());
+		return Long.valueOf(OperatingSystemMXBeanFacade.getTotalPhysicalMemorySize());
 	}
 }

@@ -1727,18 +1727,18 @@ TOKEN : /* OPERATORS * /
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
                 if(t.image.endsWith("f") || t.image.endsWith("F"))
-                        jjtn000.setValue(new Float(t.image.substring(0, t.image.length()-1)));
+                        jjtn000.setValue(Float.valueOf(t.image.substring(0, t.image.length()-1)));
                 else if(t.image.endsWith("d") || t.image.endsWith("D"))
-                        jjtn000.setValue(new Double(t.image.substring(0, t.image.length()-1)));
+                        jjtn000.setValue(Double.valueOf(t.image.substring(0, t.image.length()-1)));
                 else
-                        jjtn000.setValue(new Double(t.image));
+                        jjtn000.setValue(Double.valueOf(t.image));
         break;
       case CHARACTER_LITERAL:
         t = jj_consume_token(CHARACTER_LITERAL);
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
                 // Get unescaped character between ''.
-                jjtn000.setValue(new Character(unescape(
+                jjtn000.setValue(Character.valueOf(unescape(
                         t.image.substring(1, t.image.length()-1)).charAt(0)));
         break;
       case STRING_LITERAL:
@@ -1752,13 +1752,13 @@ TOKEN : /* OPERATORS * /
         jj_consume_token(TRUE);
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
-          jjtn000.setValue(new Boolean(true));
+          jjtn000.setValue(Boolean.TRUE);
         break;
       case FALSE:
         jj_consume_token(FALSE);
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
-          jjtn000.setValue(new Boolean(false));
+          jjtn000.setValue(Boolean.FALSE);
         break;
       case NULL:
         jj_consume_token(NULL);

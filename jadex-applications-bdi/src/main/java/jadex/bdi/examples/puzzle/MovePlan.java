@@ -93,7 +93,7 @@ public class MovePlan extends Plan
 			Long	endmem	= (Long) getBeliefbase().getBelief("endmem").getFact();
 			if(endmem==null)
 			{
-				endmem	= new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+				endmem	= Long.valueOf(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 				getBeliefbase().getBelief("endmem").setFact(endmem);
 			}
 		}

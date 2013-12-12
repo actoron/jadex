@@ -122,7 +122,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			{
 				boolean isagentorcapa = false;
 				boolean isgoal = false;
-				boolean isplan = false;
+//				boolean isplan = false;
 //				Set<String> fields = new HashSet<String>();
 				
 	//			public void visit(int version, int access, String name,
@@ -150,10 +150,10 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 			    		{
 			    			isgoal = true;
 			    		}
-			    		else if(isPlan(desc))
-			    		{
-			    			isplan = true;
-			    		}
+//			    		else if(isPlan(desc))
+//			    		{
+//			    			isplan = true;
+//			    		}
 			    	}
 			    	return super.visitAnnotation(desc, visible);
 			    }

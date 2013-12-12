@@ -96,28 +96,28 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	{
 		MESSAGETYPES = new HashMap<Tuple, Byte>();
 		
-		MESSAGETYPES.put(new Tuple(INIT, false, true), new Byte(INIT_OUTPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(ACKINIT, false, false), new Byte(ACKINIT_OUTPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(DATA, false, true), new Byte(DATA_OUTPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(ACKDATA, false, false), new Byte(ACKDATA_OUTPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(CLOSE, false, true), new Byte(CLOSE_OUTPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(ACKCLOSE, false, false), new Byte(ACKCLOSE_OUTPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(CLOSEREQ, false, false), new Byte(CLOSEREQ_OUTPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, false, true), new Byte(ACKCLOSEREQ_OUTPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(INIT, false, true), Byte.valueOf(INIT_OUTPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKINIT, false, false), Byte.valueOf(ACKINIT_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(DATA, false, true), Byte.valueOf(DATA_OUTPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKDATA, false, false), Byte.valueOf(ACKDATA_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(CLOSE, false, true), Byte.valueOf(CLOSE_OUTPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKCLOSE, false, false), Byte.valueOf(ACKCLOSE_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(CLOSEREQ, false, false), Byte.valueOf(CLOSEREQ_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, false, true), Byte.valueOf(ACKCLOSEREQ_OUTPUT_INITIATOR));
 
-		MESSAGETYPES.put(new Tuple(INIT, true, true), new Byte(INIT_INPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(ACKINIT, true, false), new Byte(ACKINIT_INPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(DATA, true, false), new Byte(DATA_INPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(ACKDATA, true, true), new Byte(ACKDATA_INPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(CLOSE, true, false), new Byte(CLOSE_INPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(ACKCLOSE, true, true), new Byte(ACKCLOSE_INPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(CLOSEREQ, true, true), new Byte(CLOSEREQ_INPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, true, false), new Byte(ACKCLOSEREQ_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(INIT, true, true), Byte.valueOf(INIT_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKINIT, true, false), Byte.valueOf(ACKINIT_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(DATA, true, false), Byte.valueOf(DATA_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACKDATA, true, true), Byte.valueOf(ACKDATA_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(CLOSE, true, false), Byte.valueOf(CLOSE_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACKCLOSE, true, true), Byte.valueOf(ACKCLOSE_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(CLOSEREQ, true, true), Byte.valueOf(CLOSEREQ_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, true, false), Byte.valueOf(ACKCLOSEREQ_INPUT_PARTICIPANT));
 
-		MESSAGETYPES.put(new Tuple(ALIVE, true, true), new Byte(ALIVE_INITIATOR));
-		MESSAGETYPES.put(new Tuple(ALIVE, false, true), new Byte(ALIVE_INITIATOR));
-		MESSAGETYPES.put(new Tuple(ALIVE, true, false), new Byte(ALIVE_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(ALIVE, false, false), new Byte(ALIVE_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ALIVE, true, true), Byte.valueOf(ALIVE_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ALIVE, false, true), Byte.valueOf(ALIVE_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ALIVE, true, false), Byte.valueOf(ALIVE_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ALIVE, false, false), Byte.valueOf(ALIVE_PARTICIPANT));
 	}
 	
 	//-------- attributes --------

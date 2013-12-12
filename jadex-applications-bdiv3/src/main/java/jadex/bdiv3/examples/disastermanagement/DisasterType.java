@@ -144,7 +144,7 @@ public class DisasterType
 		
 		Map	ret	= new HashMap();
 		ret.put("type", DISASTER_TYPES[index].getName());
-		ret.put("severe", new Boolean(random.nextDouble()<DISASTER_TYPES[index].getSevere()));
+		ret.put("severe", Boolean.valueOf(random.nextDouble()<DISASTER_TYPES[index].getSevere()));
 		int[]	range	= DISASTER_TYPES[index].getSize();
 		int	size	= range[0]+random.nextInt(range[1]-range[0]);
 		ret.put("size", Integer.valueOf(size));

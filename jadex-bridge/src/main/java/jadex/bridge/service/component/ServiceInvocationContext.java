@@ -196,7 +196,7 @@ public class ServiceInvocationContext
 		
 		if(!call.getProperties().containsKey(ServiceCall.TIMEOUT))
 		{
-			call.setProperty(ServiceCall.TIMEOUT, new Long(BasicServiceContainer.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall())));			
+			call.setProperty(ServiceCall.TIMEOUT, Long.valueOf(BasicServiceContainer.getMethodTimeout(proxy.getClass().getInterfaces(), method, isRemoteCall())));			
 		}
 		if(!call.getProperties().containsKey(ServiceCall.REALTIME))
 		{

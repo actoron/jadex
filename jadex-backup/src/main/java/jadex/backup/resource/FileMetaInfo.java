@@ -248,7 +248,7 @@ public class FileMetaInfo
 //		if(time==0)
 //			System.out.println("herere");
 //		else
-			vtimes.put(node, new Long(time));
+			vtimes.put(node, Long.valueOf(time));
 	}
 	
 	
@@ -422,7 +422,7 @@ public class FileMetaInfo
 					int idx = tok.indexOf("@");
 					String name = tok.substring(1, idx);
 					String time = tok.substring(idx+1, tok.length());
-					vtimes.put(name, new Long(time));
+					vtimes.put(name, Long.valueOf(time));
 				}
 			}
 		}

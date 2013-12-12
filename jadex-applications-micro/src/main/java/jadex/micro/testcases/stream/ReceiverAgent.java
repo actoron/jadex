@@ -101,7 +101,7 @@ public class ReceiverAgent
 					{
 //						System.out.println("finished, size: "+cnt[0]);
 						fos.close();
-						agent.setResultValue("filesize", new Long(cnt[0]));
+						agent.setResultValue("filesize", Long.valueOf(cnt[0]));
 						agent.killAgent();
 					}
 					catch(Exception e)

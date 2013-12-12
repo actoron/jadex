@@ -185,7 +185,7 @@ public class HumanPlayerInterface extends GameStateFrame
 	public void setDrawCard(boolean drawcard)
 	{
 		this.drawcard = drawcard;
-		pcs.firePropertyChange("drawCard", null, new Boolean(drawcard));
+		pcs.firePropertyChange("drawCard", null, Boolean.valueOf(drawcard));
 	}
 
 	/**

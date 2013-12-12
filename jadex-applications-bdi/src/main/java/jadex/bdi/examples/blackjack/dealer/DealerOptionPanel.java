@@ -100,7 +100,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				final Boolean b = new Boolean(singleStepCheckBox.isSelected());
+				final Boolean b = Boolean.valueOf(singleStepCheckBox.isSelected());
 //				agent.getBeliefbase().setBeliefFact("singleStepMode", new Boolean(singleStepCheckBox.isSelected()));
 
 				// Change state of button and trigger next step, if agent currently waiting.

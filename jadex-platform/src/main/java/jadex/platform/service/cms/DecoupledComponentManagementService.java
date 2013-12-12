@@ -2644,7 +2644,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				Integer cnt = cidcounts.get(key);
 				if(cnt==null)
 				{
-					cidcounts.put(key, Integer.valueOf(Integer.valueOf(1)));
+					cidcounts.put(key, Integer.valueOf(1));
 					ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
 				}
 				else

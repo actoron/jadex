@@ -15,14 +15,13 @@ import com.jme3.material.RenderState.BlendMode;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.water.SimpleWaterProcessor;
 
 
 public class Object3dJMonkeyRenderer extends AObject3dRenderer
 {
 	/** 3d Object for jMonkey. */
 
-	private SimpleWaterProcessor	waterProcessor;
+//	private SimpleWaterProcessor	waterProcessor;
 
 
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive, SpaceObject sobj, ViewportJMonkey vp)

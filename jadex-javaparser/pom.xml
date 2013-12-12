@@ -24,12 +24,10 @@
 			<artifactId>jadex-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 
 		<dependency>
 		    <groupId>net.java.dev.javacc</groupId>
 		    <artifactId>javacc</artifactId>
 		    <version>4.0</version>
 		</dependency>
-		 -->
 	</dependencies>
 </project>

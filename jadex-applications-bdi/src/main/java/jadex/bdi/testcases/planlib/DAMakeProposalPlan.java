@@ -15,7 +15,7 @@ public class DAMakeProposalPlan extends Plan
 	{
 		Double maxprice = (Double)getBeliefbase().getBelief("max_price").getFact();
 		Double price = (Double)getParameter("cfp").getValue();
-		Boolean accept = new Boolean(price.doubleValue() <= maxprice.doubleValue());
+		Boolean accept = Boolean.valueOf(price.doubleValue() <= maxprice.doubleValue());
 		//System.out.println(getAgentName()+" accept="+accept+" price="+price+" max="+maxprice);
 		getParameter("accept").setValue(accept);
 	}

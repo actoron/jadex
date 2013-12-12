@@ -49,7 +49,7 @@ public class DShortObjectArray extends ADelegate
 		Short[] a=new Short[l];
 		for(int i=0; i<l; i++) {
 			try {
-				a[i] = new Short(asm.nextToken());
+				a[i] = Short.valueOf(asm.nextToken());
 			} catch(NumberFormatException e) { /* NOP */ }
 		}
 		return a;

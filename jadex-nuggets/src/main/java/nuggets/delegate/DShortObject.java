@@ -27,7 +27,7 @@ public class DShortObject extends ASimpleDelegate
 	 */
 	public Object getInstance(Class clazz, IAssembler asm) throws Exception
    {
-      return new Short((String)asm.getAttributeValue("v"));
+      return Short.valueOf((String)asm.getAttributeValue("v"));
    }
 
    /** 
@@ -49,6 +49,6 @@ public class DShortObject extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Short((String)value);
+		return Short.valueOf((String)value);
 	}  
 }

@@ -6,6 +6,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
 import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -14,6 +15,9 @@ import java.util.List;
  */
 public class LeastSeenWalkPlan extends Plan
 {
+	/** Random number generator. */
+	protected Random	rnd	= new Random();
+	
 	//-------- constructors --------
 
 	/**
@@ -41,7 +45,7 @@ public class LeastSeenWalkPlan extends Plan
 			if(mp.getSeen()!=mp2.getSeen())
 				break;
 		}
-		mp	= (MapPoint)mps.get((int)(Math.random()*cnt));
+		mp	= (MapPoint)mps.get(rnd.nextInt(cnt));
 //		MapPoint[]	mps = (MapPoint[])getBeliefbase().getBeliefSet("visited_positions").getFacts();
 //		MapPoint mp = mps[(int)(Math.random()*mps.length)];
 

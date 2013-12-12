@@ -96,7 +96,7 @@ public class ElizaAgent
 						{
 							eliza	= tup.getFirstEntity();
 						}
-						conversations.put(event.getComponentIdentifier(), new Tuple2<ElizaParse, Long>(eliza, new Long(System.currentTimeMillis())));
+						conversations.put(event.getComponentIdentifier(), new Tuple2<ElizaParse, Long>(eliza, Long.valueOf(System.currentTimeMillis())));
 						
 						eliza.handleLine(s);
 						writeToLog(s, event.getComponentIdentifier());

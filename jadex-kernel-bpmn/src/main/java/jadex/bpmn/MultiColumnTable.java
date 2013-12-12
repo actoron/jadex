@@ -259,7 +259,7 @@ public class MultiColumnTable
 			for (int i = 0; i < columnValues.length; i++)
 			{
 				//assert columnValues[i] != null : "Value for column index '"+i+"' is null";
-				this.columnValues[i] = new String(columnValues[i] != null ? columnValues[i] : "");
+				this.columnValues[i] = columnValues[i] != null ? columnValues[i] : "";
 			}
 			
 			//this.columnValues = columnValues;

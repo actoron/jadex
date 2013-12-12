@@ -1186,9 +1186,9 @@ public class OAVBDIMetaModel
 		goal_has_contextcondition = goal_type.createAttributeType("mgoal_has_contextcondition", condition_type);
 		goal_has_dropcondition = goal_type.createAttributeType("mgoal_has_dropcondition", condition_type);
 		goal_has_retry = goal_type.createAttributeType("mgoal_has_retry", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.TRUE);
-		goal_has_retrydelay = goal_type.createAttributeType("mgoal_has_retrydelay", OAVJavaType.java_long_type, OAVAttributeType.NONE, new Long(0));
+		goal_has_retrydelay = goal_type.createAttributeType("mgoal_has_retrydelay", OAVJavaType.java_long_type, OAVAttributeType.NONE, Long.valueOf(0));
 		goal_has_recur = goal_type.createAttributeType("mgoal_has_recur", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		goal_has_recurdelay = goal_type.createAttributeType("mgoal_has_recurdelay", OAVJavaType.java_long_type, OAVAttributeType.NONE, new Long(0));
+		goal_has_recurdelay = goal_type.createAttributeType("mgoal_has_recurdelay", OAVJavaType.java_long_type, OAVAttributeType.NONE, Long.valueOf(0));
 		goal_has_recurcondition = goal_type.createAttributeType("mgoal_has_recurcondition", condition_type);
 		goal_has_exclude = goal_type.createAttributeType("mgoal_has_exclude", OAVJavaType.java_string_type, OAVAttributeType.NONE,  EXCLUDE_WHEN_TRIED);
 		goal_has_rebuild = goal_type.createAttributeType("mgoal_has_recalculate", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);

@@ -65,7 +65,7 @@ public class ICNPTestPlan extends AbstractMultipleAgentsPlan
 		args[1].put("execute", Boolean.TRUE);
 		
 		args[2].put("offer", Integer.valueOf(7));
-		args[2].put("execute", new Boolean(executeall));	// Fails when only one is needed, to check if proposal 5 gets executed.
+		args[2].put("execute", Boolean.valueOf(executeall));	// Fails when only one is needed, to check if proposal 5 gets executed.
 
 		List agents = createAgents("/jadex/bdi/testcases/planlib/ICNPReceiver.agent.xml", args);	
 
@@ -78,7 +78,7 @@ public class ICNPTestPlan extends AbstractMultipleAgentsPlan
 				cnpini.getParameterSet("receivers").addValues(agents.toArray(new IComponentIdentifier[agents.size()]));
 				cnpini.getParameter("cfp").setValue("CFP for a task.");
 				cnpini.getParameter("cfp_info").setValue(cfp_info);
-				cnpini.getParameter("executeall").setValue(new Boolean(executeall));
+				cnpini.getParameter("executeall").setValue(Boolean.valueOf(executeall));
 				dispatchSubgoalAndWait(cnpini);
 				getLogger().info("CNP result:"+ SUtil.arrayToString(cnpini.getParameterSet("result").getValues()));
 				

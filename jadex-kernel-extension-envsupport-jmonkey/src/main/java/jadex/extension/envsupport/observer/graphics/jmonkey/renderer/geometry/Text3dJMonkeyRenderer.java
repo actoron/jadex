@@ -26,8 +26,8 @@ import com.jme3.scene.Spatial;
 
 public class Text3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 {
-	/** Text for jMonkey. */
-	private String	text;
+//	/** Text for jMonkey. */
+//	private String	text;
 
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
 			SpaceObject sobj, ViewportJMonkey vp)

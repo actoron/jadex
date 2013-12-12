@@ -591,7 +591,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Long> getValidityDuration()
 	{
-		return new Future<Long>(new Long(valdur));
+		return new Future<Long>(Long.valueOf(valdur));
 	}
 
 	/**
@@ -601,7 +601,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void> setValidityDuration(long validityduration)
 	{
 		this.valdur = validityduration;
-		publishEvent(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, new Long(valdur)));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, Long.valueOf(valdur)));
 		return IFuture.DONE;
 	}
 
@@ -819,7 +819,7 @@ public class SecurityService implements ISecurityService
 		byte[] ret;
 		// Get the digest that belongs to the secret
 		Tuple2<Long, byte[]> tst = digests.get(secret);
-		Long ts = new Long(timestamp);
+		Long ts = Long.valueOf(timestamp);
 		
 		// Check if the timestamp of the digest is still ok
 		if(tst!=null && tst.getFirstEntity().equals(ts))
@@ -1475,7 +1475,7 @@ public class SecurityService implements ISecurityService
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
-		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, new Long(valdur)));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, Long.valueOf(valdur)));
 
 //		System.out.println("ret fut is: "+ret+" "+ret.hashCode());
 		
@@ -1538,7 +1538,7 @@ public class SecurityService implements ISecurityService
 		publishEvent(new ChangeEvent<Object>(null, PROPERTY_USEPASS, usepass? Boolean.TRUE: Boolean.FALSE));
 		publishEvent(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
 		publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
-		publishEvent(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, new Long(valdur)));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, Long.valueOf(valdur)));
 	}
 	
 	//-------- static part --------

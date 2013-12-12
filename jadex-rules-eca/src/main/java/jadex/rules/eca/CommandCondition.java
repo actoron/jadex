@@ -28,7 +28,7 @@ public class CommandCondition implements ICondition
 	 */
 	public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
 	{
-		Object res = command.execute(event).booleanValue();
+		Object res = command.execute(event);
 		return evaluateResult(res);
 	}
 	

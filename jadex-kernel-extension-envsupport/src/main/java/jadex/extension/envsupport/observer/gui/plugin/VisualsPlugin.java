@@ -390,7 +390,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 			{
 				Map.Entry entry = (Map.Entry) it.next();
 				String name = (String) entry.getKey();
-				Boolean opengl = new Boolean(((IPerspective) entry.getValue()).getOpenGl());
+				Boolean opengl = Boolean.valueOf(((IPerspective) entry.getValue()).getOpenGl());
 				((DefaultTableModel) perspectivelist.getModel()).addRow(new Object[]{name, opengl});
 			}
 			String perspname = observerCenter_.getSelectedPerspective().getName();

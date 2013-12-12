@@ -139,8 +139,8 @@ class ObjectInspectorTreeModelExample {
 //	public String stringTest2 = STRING_ATTR;
 	
 	public Object[] objectArrayAttribute = new Object[]{
-			new String("string object in array")
-			,new Boolean(true)
+			"string object in array"
+			,Boolean.TRUE
 //			,new Reader()
 			,new Object()
 			,null

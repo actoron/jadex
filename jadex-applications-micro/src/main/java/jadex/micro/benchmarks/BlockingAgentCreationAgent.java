@@ -88,8 +88,8 @@ public class BlockingAgentCreationAgent
 			Map<String, Object>	args	= new HashMap<String, Object>();
 			args.put("max", Integer.valueOf(max));
 			args.put("num", Integer.valueOf(num));
-			args.put("starttime", new Long(starttime));
-			args.put("startmem", new Long(startmem));
+			args.put("starttime", Long.valueOf(starttime));
+			args.put("startmem", Long.valueOf(startmem));
 			cms.createComponent(createPeerName(num+1, agent.getComponentIdentifier()),
 				BlockingAgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
 				new CreationInfo(null, args, agent.getComponentDescription().getResourceIdentifier()), null);

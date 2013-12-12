@@ -95,7 +95,7 @@ public class MoveToLocationPlan extends Plan
 
 		if(vi!=null)
 		{
-			getBeliefbase().getBelief("daytime").setFact(new Boolean(vi.isDaytime()));
+			getBeliefbase().getBelief("daytime").setFact(Boolean.valueOf(vi.isDaytime()));
 			
 			Waste[] ws = vi.getWastes();
 			Wastebin[] wbs = vi.getWastebins();

@@ -47,7 +47,7 @@ public class GameOfLifeProcess extends SimplePropertyObject implements ISpacePro
 			for(int y=0; y<sizey; y++)
 			{
 				Map props = new HashMap();
-				Boolean alive = new Boolean(Math.random()>0.7);
+				Boolean alive = Boolean.valueOf(Math.random()>0.7);
 				props.put("alive", alive);
 				props.put(Space2D.PROPERTY_POSITION, new Vector2Int(x, y));
 				grid.createSpaceObject("cell", props, null);

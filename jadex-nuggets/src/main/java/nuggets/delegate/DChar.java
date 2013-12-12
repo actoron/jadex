@@ -34,6 +34,6 @@ public class DChar extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Character(((String)value).charAt(0));
+		return Character.valueOf(((String)value).charAt(0));
 	}
 }

@@ -129,7 +129,7 @@ public class ProxyInfo
 	{
 		if(timeouts==null)
 			timeouts = new HashMap();
-		timeouts.put(m, new Long(timeout));
+		timeouts.put(m, Long.valueOf(timeout));
 	}
 		
 	/**

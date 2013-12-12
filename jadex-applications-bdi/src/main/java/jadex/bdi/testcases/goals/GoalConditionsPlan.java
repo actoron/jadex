@@ -32,7 +32,7 @@ public class GoalConditionsPlan	extends Plan
 		
 		
 		// Now triggering goal creation (still no plan due to invalid context).
-		getBeliefbase().getBelief("creation").setFact(new Boolean(true));
+		getBeliefbase().getBelief("creation").setFact(Boolean.TRUE);
 		report	= new TestReport("trigger_creation", "Triggering goal creation", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
 		{
@@ -47,7 +47,7 @@ public class GoalConditionsPlan	extends Plan
 		
 		// Now triggering goal context to start plan.		
 		IGoal goal = getGoalbase().getGoals("test")[0];
-		getBeliefbase().getBelief("context").setFact(new Boolean(true));
+		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
 		report	= new TestReport("trigger_context", "Triggering goal context", true, null);	
 		if(!OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION.equals(goal.getLifecycleState()))
 		{
@@ -61,7 +61,7 @@ public class GoalConditionsPlan	extends Plan
 
 		
 		// Now triggering goal drop condition (goal and plan will be removed).
-		getBeliefbase().getBelief("drop").setFact(new Boolean(true));
+		getBeliefbase().getBelief("drop").setFact(Boolean.TRUE);
 		try
 		{
 			waitForGoal(goal); // wait till goal is dropped.
@@ -75,9 +75,9 @@ public class GoalConditionsPlan	extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		
 		// Now triggering goal creation again (plan will also be created).
-		getBeliefbase().getBelief("drop").setFact(new Boolean(false));
-		getBeliefbase().getBelief("creation").setFact(new Boolean(false));
-		getBeliefbase().getBelief("creation").setFact(new Boolean(true));
+		getBeliefbase().getBelief("drop").setFact(Boolean.FALSE);
+		getBeliefbase().getBelief("creation").setFact(Boolean.FALSE);
+		getBeliefbase().getBelief("creation").setFact(Boolean.TRUE);
 		goal = getGoalbase().getGoals("test")[0];
 		report	= new TestReport("trigger_creation2", "Triggering goal creation again", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
@@ -91,7 +91,7 @@ public class GoalConditionsPlan	extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		
 		// Now invalidating goal context to abort plan.
-		getBeliefbase().getBelief("context").setFact(new Boolean(false));
+		getBeliefbase().getBelief("context").setFact(Boolean.FALSE);
 		report	= new TestReport("trigger_context2", "Invalidating goal context", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
 		{
@@ -108,7 +108,7 @@ public class GoalConditionsPlan	extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
 		// Now triggering goal context again to restart plan.
-		getBeliefbase().getBelief("context").setFact(new Boolean(true));
+		getBeliefbase().getBelief("context").setFact(Boolean.TRUE);
 		report	= new TestReport("trigger_context3", "Triggering goal context again", true, null);
 		if(getGoalbase().getGoals("test").length!=1)
 		{

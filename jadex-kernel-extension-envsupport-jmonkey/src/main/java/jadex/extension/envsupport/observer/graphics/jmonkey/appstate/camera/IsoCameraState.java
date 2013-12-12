@@ -1,31 +1,26 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.appstate.camera;
 
-import java.awt.Dimension;
-
 import jadex.extension.envsupport.observer.graphics.jmonkey.MonkeyApp;
 import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.IsoCamera;
 import jadex.extension.envsupport.observer.graphics.jmonkey.cameratypes.Triggers;
 import jadex.extension.envsupport.observer.graphics.jmonkey.util.MonkeyHelper;
+
+import java.awt.Dimension;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.InputManager;
-import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import com.jme3.scene.debug.Arrow;
 
 
 public class IsoCameraState extends AbstractAppState
@@ -37,19 +32,19 @@ public class IsoCameraState extends AbstractAppState
 
 	private AssetManager	assetManager;
 
-	private AppStateManager	stateManager;
+//	private AppStateManager	stateManager;
 
 	private InputManager	inputManager;
 
-	private ViewPort		viewPort;
+//	private ViewPort		viewPort;
 
 	private Camera			cam;
 
 	private float			appSize;
 
-	private float			appScaled;
+//	private float			appScaled;
 
-	private String			cameraSelection;
+//	private String			cameraSelection;
 
 	private Node			camNode;
 
@@ -76,7 +71,7 @@ public class IsoCameraState extends AbstractAppState
 
 	private Node			vectorNode;
 
-	private int				count			= 30;
+//	private int				count			= 30;
 
 	public void initialize(AppStateManager stateManager, Application app)
 	{
@@ -84,13 +79,13 @@ public class IsoCameraState extends AbstractAppState
 		this.app = (MonkeyApp)app;
 		this.rootNode = this.app.getRootNode();
 		this.assetManager = this.app.getAssetManager();
-		this.stateManager = this.app.getStateManager();
+//		this.stateManager = this.app.getStateManager();
 		this.inputManager = this.app.getInputManager();
-		this.viewPort = this.app.getViewPort();
+//		this.viewPort = this.app.getViewPort();
 		this.cam = this.app.getCamera();
 		this.appSize = this.app.getAppSize();
-		this.appScaled = this.app.getAppScaled();
-		this.cameraSelection = this.app.getCameraSelection();
+//		this.appScaled = this.app.getAppScaled();
+//		this.cameraSelection = this.app.getCameraSelection();
 
 		camNode = new Node("camNode");
 

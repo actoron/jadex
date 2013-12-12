@@ -126,8 +126,8 @@ public class CreationBDI
 			final Map<String, Object> args = new HashMap<String, Object>();
 			args.put("num", Integer.valueOf(num+1));
 			args.put("max", Integer.valueOf(max));
-			args.put("starttime", new Long(starttime));
-			args.put("startmem", new Long(startmem));
+			args.put("starttime", Long.valueOf(starttime));
+			args.put("startmem", Long.valueOf(startmem));
 //			System.out.println("Args: "+num+" "+args);
 
 			agent.getServiceContainer().searchServiceUpwards(IComponentManagementService.class)

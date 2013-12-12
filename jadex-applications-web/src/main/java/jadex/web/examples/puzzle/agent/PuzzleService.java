@@ -41,7 +41,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	//-------- constants --------
 	
 	/** The number of entries per board size in the high score list. */
-	protected final int	MAX_ENTRIES	= 10;
+	protected static final int	MAX_ENTRIES	= 10;
 	
 	//-------- attributes --------
 	

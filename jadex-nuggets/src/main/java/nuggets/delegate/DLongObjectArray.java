@@ -48,7 +48,7 @@ public class DLongObjectArray extends ADelegate
 		Long[] a=new Long[l];
 		for(int i=0; i<l; i++) {
 			try {
-				a[i] = new Long(asm.nextToken());
+				a[i] = Long.valueOf(asm.nextToken());
 			} catch(NumberFormatException e) { /* NOP */ }
 		}
 		return a;

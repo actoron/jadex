@@ -488,7 +488,7 @@ public class HttpRelayTransport implements ITransport
 		
 		if(ping)
 		{
-			addresses.put(address, new Long(0));
+			addresses.put(address, Long.valueOf(0));
 			
 			threadpool.execute(new Runnable()
 			{
@@ -499,13 +499,13 @@ public class HttpRelayTransport implements ITransport
 					try
 					{
 						conman.ping(address);
-						addresses.put(address, new Long(System.currentTimeMillis()));
+						addresses.put(address, Long.valueOf(System.currentTimeMillis()));
 					}
 					catch(Exception e)
 					{
 //						e.printStackTrace();
 						component.getLogger().info("HTTP relay: No connection to "+address+", "+e);
-						addresses.put(address, new Long(-System.currentTimeMillis()));
+						addresses.put(address, Long.valueOf(-System.currentTimeMillis()));
 					}
 					
 					ISendTask[]	readytasks	= null;
@@ -649,7 +649,7 @@ public class HttpRelayTransport implements ITransport
 						byte[][]	data	= new byte[][]{task.getProlog(), task.getData()};
 						task	= null; // help gc when connection is aborted.
 						conman.postMessage(address, targetid, data);
-						addresses.put(address, new Long(System.currentTimeMillis()));
+						addresses.put(address, Long.valueOf(System.currentTimeMillis()));
 						ret.setResult(null);
 //						System.out.println("Sent with HTTP Relay: "+System.currentTimeMillis()+", "+address);
 					}

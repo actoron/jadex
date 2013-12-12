@@ -393,12 +393,12 @@ public class CliAgent implements ICliService, IInternalCliService
 //			System.out.println("created new shell for session: "+sessionid);
 			shell = new CliShell(agent.getExternalAccess(), agent.getExternalAccess().getComponentIdentifier().getRoot().getName(), sessionid, agent.getClassLoader());
 			shell.addAllCommandsFromClassPath(); // agent.getClassLoader()
-			shells.put(sessionid, new Tuple2<ACliShell, Long>(shell, new Long(System.currentTimeMillis())));
+			shells.put(sessionid, new Tuple2<ACliShell, Long>(shell, Long.valueOf(System.currentTimeMillis())));
 		}
 		else
 		{
 			shell = tup.getFirstEntity();
-			shells.put(sessionid, new Tuple2<ACliShell, Long>(shell, new Long(System.currentTimeMillis())));
+			shells.put(sessionid, new Tuple2<ACliShell, Long>(shell, Long.valueOf(System.currentTimeMillis())));
 		}
 		return shell;
 	}

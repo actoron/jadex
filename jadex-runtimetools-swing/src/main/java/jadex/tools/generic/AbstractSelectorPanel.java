@@ -51,7 +51,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 	});
 	
 	/** The panel properties name. */
-	public final String PANELPROPERTIES = "panelproperties";
+	public final static String PANELPROPERTIES = "panelproperties";
 
 	//-------- attributes --------
 	

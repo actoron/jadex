@@ -69,7 +69,7 @@ public class NumberCodec extends AbstractCodec
 		else if (Boolean.class.equals(clazz) || boolean.class.equals(clazz))
 			ret = context.readBoolean();
 		else if (Character.class.equals(clazz) || char.class.equals(clazz))
-			ret = new Character((char) context.readVarInt());
+			ret = Character.valueOf((char) context.readVarInt());
 		else if (Short.class.equals(clazz) || short.class.equals(clazz))
 		{
 			byte[] in = context.read(2);

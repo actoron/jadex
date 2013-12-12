@@ -132,7 +132,7 @@ public class TimePatternFilter extends ComposedFilter<Long>
 		while(cur<=end)
 		{
 			cur = gc.getTimeInMillis();
-			if(filter(new Long(cur)))
+			if(filter(Long.valueOf(cur)))
 			{
 				ret = cur;
 				break;

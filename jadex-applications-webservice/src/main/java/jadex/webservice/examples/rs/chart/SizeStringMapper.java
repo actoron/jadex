@@ -13,8 +13,8 @@ public class SizeStringMapper implements IValueMapper
 	public Object convertValue(Object value) throws Exception
 	{
 		Iterator<Integer> it = SReflect.getIterator(value);
-		Integer width = it.next().intValue();
-		Integer height = it.next().intValue();
+		Integer width = it.next();
+		Integer height = it.next();
 		return width+"x"+height;
 	}
 }

@@ -283,7 +283,7 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 					Object proxy = context.getProxy();
 					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
 					Object[] args = (Object[])context.getArguments().toArray();
-					context.setResult(new Boolean(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
+					context.setResult(Boolean.valueOf(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
 						&& handler.equals(Proxy.getInvocationHandler(args[0]))));
 					return IFuture.DONE;
 				}

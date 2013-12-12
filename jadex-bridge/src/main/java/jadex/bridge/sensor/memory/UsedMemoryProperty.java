@@ -24,7 +24,7 @@ public class UsedMemoryProperty extends MemoryProperty
 	 */
 	public Long measureValue()
 	{
-		return new Long(OperatingSystemMXBeanFacade.getTotalPhysicalMemorySize() 
+		return Long.valueOf(OperatingSystemMXBeanFacade.getTotalPhysicalMemorySize() 
 			- OperatingSystemMXBeanFacade.getFreePhysicalMemorySize());
 	}
 }

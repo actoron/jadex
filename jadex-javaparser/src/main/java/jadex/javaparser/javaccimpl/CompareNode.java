@@ -142,25 +142,25 @@ public class CompareNode	extends ExpressionNode
 			case EQUAL:
 				// Number.equals() works only for number objects of same type
 				return val1 instanceof Number && val2 instanceof Number
-					? new Boolean(compare(val1,val2)==0)
-					: new Boolean(SUtil.equals(val1,val2));
+					? Boolean.valueOf(compare(val1,val2)==0)
+					: Boolean.valueOf(SUtil.equals(val1,val2));
 			case UNEQUAL:
 				// Number.equals() works only for number objects of same type
 				return val1 instanceof Number && val2 instanceof Number
-					? new Boolean(compare(val1,val2)!=0)
-					: new Boolean(!SUtil.equals(val1,val2));
+					? Boolean.valueOf(compare(val1,val2)!=0)
+					: Boolean.valueOf(!SUtil.equals(val1,val2));
 			case GREATER:
-				return new Boolean(compare(val1,val2)>0);
+				return Boolean.valueOf(compare(val1,val2)>0);
 			case LESS:
-				return new Boolean(compare(val1,val2)<0);
+				return Boolean.valueOf(compare(val1,val2)<0);
 			case GREATEREQUAL:
-				return new Boolean(compare(val1,val2)>=0);
+				return Boolean.valueOf(compare(val1,val2)>=0);
 			case LESSEQUAL:
-				return new Boolean(compare(val1,val2)<=0);
+				return Boolean.valueOf(compare(val1,val2)<=0);
 			case INSTANCEOF:
 				// Just assume val2 is class, as the type node already
 				// takes care of generating useful errors messages.
-				return new Boolean(val1!=null
+				return Boolean.valueOf(val1!=null
 					&& SReflect.isSupertype((Class)val2, val1.getClass()));
 			default:
 				throw new RuntimeException("Unknown operator type: "+op);

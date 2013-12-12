@@ -246,7 +246,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 												
 												timer = clock.createRealtimeTimer(timeout, new ITimedObject()
 												{
-													Object	timer1	= timer;
+//													Object	timer1	= timer;
 													public void timeEventOccurred(long currenttime)
 													{
 //														if(timer!=timer1)
@@ -267,7 +267,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 											{
 												timer = clock.createTimer(timeout, new ITimedObject()
 												{
-													Object	timer1	= timer;
+//													Object	timer1	= timer;
 													public void timeEventOccurred(long currenttime)
 													{
 //														if(timer!=timer1)

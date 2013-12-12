@@ -128,7 +128,7 @@ public abstract class AMonkeyInit extends SimpleApplication implements AnimEvent
 
 	protected ArrayList<Spatial>				toAdd				= new ArrayList<Spatial>();
 
-	Vector3Int									selectedworldcoord;
+//	Vector3Int									selectedworldcoord;
 
 	BatchNode									staticbatchgeo		= new BatchNode(StringNames.BATCH_NODE);
 

@@ -26,7 +26,7 @@ public class RemoverPlan extends Plan
 	public void body()
 	{
 		waitFor(3000);
-		getBeliefbase().getBelief("mycontext").setFact(new Boolean(false));
+		getBeliefbase().getBelief("mycontext").setFact(Boolean.FALSE);
 
 		if(getPlanbase().getPlans().length==1)
 		{

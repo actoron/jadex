@@ -2781,7 +2781,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		
 		public synchronized Long getNext()
 		{
-			return new Long(count_++);
+			return Long.valueOf(count_++);
 		}
 	}
 

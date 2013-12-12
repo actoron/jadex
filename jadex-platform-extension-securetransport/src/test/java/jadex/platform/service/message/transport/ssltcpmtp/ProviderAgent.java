@@ -110,7 +110,7 @@ public class ProviderAgent implements ITestService
 			public void resultAvailable(Collection<byte[]> result)
 			{
 //				System.out.println("Result: "+result);
-				ret.setResult(new Long(size[0]));
+				ret.setResult(Long.valueOf(size[0]));
 			}
 			public void intermediateResultAvailable(byte[] result)
 			{
@@ -120,7 +120,7 @@ public class ProviderAgent implements ITestService
 			public void finished()
 			{
 //				System.out.println("finished, size: "+size[0]);
-				ret.setResult(new Long(size[0]));
+				ret.setResult(Long.valueOf(size[0]));
 			}
 			public void exceptionOccurred(Exception exception)
 			{
@@ -154,7 +154,7 @@ public class ProviderAgent implements ITestService
 				else
 				{
 					con.close();
-					ret.setResult(new Long(size[0]));
+					ret.setResult(Long.valueOf(size[0]));
 				}
 				return IFuture.DONE;
 			}

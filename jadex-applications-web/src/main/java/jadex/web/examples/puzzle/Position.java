@@ -112,7 +112,7 @@ public class Position	implements	Serializable, Cloneable
 	 */
 	public String getPrintableX()
 	{
-		return ""+new Character((char)('A'+x));
+		return ""+Character.valueOf((char)('A'+x));
 	}
 
 	/**

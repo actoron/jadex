@@ -382,7 +382,7 @@ public class TimePatternTest extends TestCase
 		cal.set(GregorianCalendar.YEAR, 2023);
 		long end = cal.getTimeInMillis();
 		
-		return new Tuple2<Long, Long>(new Long(start), new Long(end));
+		return new Tuple2<Long, Long>(Long.valueOf(start), Long.valueOf(end));
 	}
 	
 	/**

@@ -122,7 +122,7 @@ public class CodecFactory
 	 */
 	public ICodec getCodec(byte id)
 	{
-		Byte idd = new Byte(id);
+		Byte idd = Byte.valueOf(id);
 		ICodec ret = (ICodec)codeccache.get(idd);
 		if(!codecclasses.containsKey(idd))
 			throw new IllegalArgumentException("Unknown codec id: "+id);
@@ -233,7 +233,7 @@ public class CodecFactory
 		try
 		{
 			Field f = codec_class.getDeclaredField(ICodec.CODEC_ID);
-			Byte codec_id = new Byte(f.getByte(null));
+			Byte codec_id = Byte.valueOf(f.getByte(null));
 			codecclasses.put(codec_id, codec_class);
 		}
 		catch(Exception e)
@@ -251,7 +251,7 @@ public class CodecFactory
 		try
 		{
 			Field f = codec_class.getDeclaredField(ICodec.CODEC_ID);
-			Byte codec_id = new Byte(f.getByte(null));
+			Byte codec_id = Byte.valueOf(f.getByte(null));
 			codecclasses.remove(codec_id);
 			codeccache.remove(codec_id);
 		}

@@ -1486,9 +1486,9 @@ public class BpmnXMLReader
 							String recovertxt = table.getCellValue(row, 7);
 //							String creationtype = table.getCellValue(row, 8); todo
 
-							boolean dynamic = new Boolean(dynamictxt).booleanValue();
-							boolean create = new Boolean(createtxt).booleanValue();
-							boolean recover = new Boolean(recovertxt).booleanValue();
+							boolean dynamic = Boolean.parseBoolean(dynamictxt);
+							boolean create = Boolean.parseBoolean(createtxt);
+							boolean recover = Boolean.parseBoolean(recovertxt);
 							
 							// todo: interceptors, proxytype
 							
@@ -1702,7 +1702,7 @@ public class BpmnXMLReader
 								bindingname	= null;
 							Class<?> type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
 							Class<?> mtype = mtypename==null? null: SReflect.findClass0(mtypename, mi.getAllImports(), context.getClassLoader());
-							boolean multiple = new Boolean(multi).booleanValue();
+							boolean multiple = Boolean.parseBoolean(multi);
 							
 							RequiredServiceInfo rsi;
 							if(bindingname!=null)
@@ -1819,23 +1819,23 @@ public class BpmnXMLReader
 								}
 								else if("master".equals(key))
 								{
-									mi.setMaster(new Boolean(value));
+									mi.setMaster(Boolean.valueOf(value));
 								}
 								else if("daemon".equals(key))
 								{
-									mi.setDaemon(new Boolean(value));
+									mi.setDaemon(Boolean.valueOf(value));
 								}
 								else if("autoshutdown".equals(key))
 								{
-									mi.setAutoShutdown(new Boolean(value));
+									mi.setAutoShutdown(Boolean.valueOf(value));
 								}
 								else if("suspend".equals(key))
 								{
-									mi.setSuspend(new Boolean(value));
+									mi.setSuspend(Boolean.valueOf(value));
 								}
 								else if("keep alive".equals(key))
 								{
-									model.setKeepAlive(new Boolean(value).booleanValue());
+									model.setKeepAlive(Boolean.valueOf(value).booleanValue());
 								}
 								else if("parameters".equals(key))
 								{

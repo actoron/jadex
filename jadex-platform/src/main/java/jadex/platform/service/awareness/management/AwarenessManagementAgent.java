@@ -215,8 +215,8 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 							CreationInfo info = new CreationInfo(getComponentIdentifier());
 							info.setConfiguration(getConfiguration());
 							Map<String, Object> args = new HashMap<String, Object>();
-							args.put("delay", new Long(getDelay()));
-							args.put("fast", isFastAwareness() ? Boolean.TRUE : Boolean.FALSE);
+							args.put("delay", Long.valueOf(getDelay()));
+							args.put("fast", Boolean.valueOf(isFastAwareness()));
 							args.put("includes", getIncludes());
 							args.put("excludes", getExcludes());
 							info.setArguments(args);

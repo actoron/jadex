@@ -145,7 +145,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 								write(buf);
 //								System.out.println("wrote: "+filesize[0]);
 								
-								ret.addIntermediateResultIfUndone(new Long(filesize[0]));
+								ret.addIntermediateResultIfUndone(Long.valueOf(filesize[0]));
 								
 								// Hack!!! Should not assume that stream is at end, only if currently no bytes are available
 								if(is.available()>0)

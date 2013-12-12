@@ -51,7 +51,7 @@ public class StartPeerPlan extends Plan
 				args.put("counter", counter);
 				args.put("starttime", starttime);
 				args.put("startmem", startmem);
-				args.put("parallel", new Boolean(parallel));
+				args.put("parallel", Boolean.valueOf(parallel));
 				
 				IComponentIdentifier aid;
 				if(service)
@@ -74,7 +74,7 @@ public class StartPeerPlan extends Plan
 					args.put("counter", counter);
 					args.put("starttime", starttime);
 					args.put("startmem", startmem);
-					args.put("parallel", new Boolean(parallel));
+					args.put("parallel", Boolean.valueOf(parallel));
 					
 					IComponentIdentifier aid;
 					if(service)

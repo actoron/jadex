@@ -70,7 +70,7 @@ public class WaitingTimeProperty extends TimedProperty
 				public void methodCallStarted(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
 				{
 					if(clock!=null)
-						times.put(callid, new Long(clock.getTime()));
+						times.put(callid, Long.valueOf(clock.getTime()));
 				}
 				
 				public void methodCallFinished(Object proxy, Method method, Object[] args, Object callid, ServiceInvocationContext context)
@@ -114,13 +114,13 @@ public class WaitingTimeProperty extends TimedProperty
 		{
 			double sf = 2d/(10d+1); // 10 periods per default
 			double delta = value-this.value;
-			value = new Long((long)(this.value+sf*delta));
+			value = Long.valueOf((long)(this.value+sf*delta));
 		}
 		
 		if(value!=null)
 		{
 //			System.out.println("Setting value: "+value);
-			super.setValue((long)value);
+			super.setValue(value);
 		}
 	}
 	

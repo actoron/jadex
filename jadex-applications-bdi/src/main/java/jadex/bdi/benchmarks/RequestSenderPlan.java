@@ -1,5 +1,7 @@
 package jadex.bdi.benchmarks;
 
+import java.util.Random;
+
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
@@ -10,6 +12,9 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
  */
 public class RequestSenderPlan extends Plan
 {
+	/** Random number generator. */
+	protected Random	rnd	= new Random();
+	
 	public void body()
 	{
 		int max	= ((Integer)getBeliefbase().getBelief("max").getFact()).intValue();
@@ -36,7 +41,7 @@ public class RequestSenderPlan extends Plan
 
 				// Simple challenge response scheme allowing to check,
 			// if the right request was answered.
-			int	challenge	= (int)(Math.random()*Integer.MAX_VALUE);
+			int	challenge	= rnd.nextInt(Integer.MAX_VALUE);
 
 			IGoal request = createGoal("procap.rp_initiate");
 			request.getParameter("action").setValue(Integer.valueOf(challenge));

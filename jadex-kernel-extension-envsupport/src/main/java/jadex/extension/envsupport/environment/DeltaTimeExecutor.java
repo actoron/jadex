@@ -65,7 +65,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	public DeltaTimeExecutor(AbstractEnvironmentSpace space, boolean tick)
 	{
 		setProperty("space", space);
-		setProperty("tick", new Boolean(tick));
+		setProperty("tick", Boolean.valueOf(tick));
 	}
 	
 	//-------- methods --------

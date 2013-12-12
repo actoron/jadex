@@ -230,7 +230,7 @@ public class Environment implements IEnvironment
 	public synchronized void setDaytime(boolean daytime)
 	{
 		this.daytime = daytime;
-		this.pcs.firePropertyChange("daytime", null, new Boolean(daytime));
+		this.pcs.firePropertyChange("daytime", null, Boolean.valueOf(daytime));
 	}
 
 	/**

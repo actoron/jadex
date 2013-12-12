@@ -34,6 +34,6 @@ public class DLong extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Long((String)value);
+		return Long.valueOf((String)value);
 	}
 }

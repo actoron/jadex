@@ -4,18 +4,12 @@ import jadex.extension.envsupport.environment.ISpaceController;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
-import jadex.extension.envsupport.math.Vector2Int;
 import jadex.extension.envsupport.math.Vector3Double;
-import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 
 import java.awt.Canvas;
 import java.awt.EventQueue;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -65,8 +59,8 @@ public abstract class AbstractViewport3d implements IViewport3d
 	/** The listeners of the viewport. */
 	private Set<Object>					listeners_;
 	
-	/** The zoom limit */
-	private double				zoomLimit_;
+//	/** The zoom limit */
+//	private double				zoomLimit_;
 	
 	
 	private boolean							isGrid_			= false;
@@ -91,7 +85,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 		drawObjects_ = new HashSet<Object>();
 //		objectList_ = new ArrayList<Object>();
 		listeners_ = new HashSet<Object>();
-		zoomLimit_ = 20.0;
+//		zoomLimit_ = 20.0;
 		this.shader = shader;
 		this.camera = camera;
 		this.spacecontroller = spaceController;

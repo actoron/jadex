@@ -29,7 +29,7 @@ public class DCharObject extends ASimpleDelegate
     */
    public Object getInstance(Class clazz, IAssembler asm) throws Exception
    {
-      return new Character(((String)asm.getAttributeValue("v")).charAt(0));
+      return Character.valueOf(((String)asm.getAttributeValue("v")).charAt(0));
    }
 
    /** 
@@ -62,6 +62,6 @@ public class DCharObject extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Character(((String)value).charAt(0));
+		return Character.valueOf(((String)value).charAt(0));
 	}
 }

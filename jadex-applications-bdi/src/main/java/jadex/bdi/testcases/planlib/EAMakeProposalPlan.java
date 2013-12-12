@@ -15,6 +15,6 @@ public class EAMakeProposalPlan extends Plan
 	{
 		Double maxprice = (Double)getBeliefbase().getBelief("max_price").getFact();
 		Double price = (Double)getParameter("cfp").getValue();
-		getParameter("accept").setValue(new Boolean(price.doubleValue() <= maxprice.doubleValue()));
+		getParameter("accept").setValue(Boolean.valueOf(price.doubleValue() <= maxprice.doubleValue()));
 	}
 }

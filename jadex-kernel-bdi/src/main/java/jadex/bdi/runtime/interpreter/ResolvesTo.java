@@ -46,7 +46,7 @@ public class ResolvesTo implements IFunction
 		String name	= (String)state.getAttributeValue(melem, OAVBDIMetaModel.modelelement_has_name);
 		OAVObjectType otype = state.getType(melem);
 		Object[] scope	= AgentRules.resolveCapability(ref, otype, rstartcapa, state);
-		return new Boolean(name.equals(scope[0]) && rtargetcapa.equals(scope[1]));
+		return Boolean.valueOf(name.equals(scope[0]) && rtargetcapa.equals(scope[1]));
 	}
 	
 	/**

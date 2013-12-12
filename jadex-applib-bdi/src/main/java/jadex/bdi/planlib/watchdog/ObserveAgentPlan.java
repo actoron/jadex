@@ -26,7 +26,7 @@ public class ObserveAgentPlan extends Plan
 				waitFor(desc.getPingDelay());
 				IGoal pinging = createGoal("pinging");
 				pinging.getParameter("receiver").setValue(desc.getComponentIdentifier());
-				pinging.getParameter("ping_delay").setValue(new Long(desc.getPingDelay()));
+				pinging.getParameter("ping_delay").setValue(Long.valueOf(desc.getPingDelay()));
 				dispatchSubgoalAndWait(pinging);
 			}
 			catch(GoalFailureException e1)

@@ -313,7 +313,7 @@ public class FileUpdateAgent extends UpdateAgent
 		
 		if(newestversion!=0)
 		{
-			ret.setResult(new Long(newestversion));
+			ret.setResult(Long.valueOf(newestversion));
 		}
 		else if(newestversion!=-1)
 		{
@@ -336,7 +336,7 @@ public class FileUpdateAgent extends UpdateAgent
 								{
 									agent.getLogger().info(agent.getComponentIdentifier()+": curversion1 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
 									newestversion = f.lastModified();
-									ret.setResult(new Long(newestversion));
+									ret.setResult(Long.valueOf(newestversion));
 									break;
 								}
 							}
@@ -351,7 +351,7 @@ public class FileUpdateAgent extends UpdateAgent
 									{
 										agent.getLogger().info(agent.getComponentIdentifier()+": curversion2 "+new Date(f.lastModified())+", "+f.getAbsolutePath());
 										newestversion = f.lastModified();
-										ret.setResult(new Long(newestversion));
+										ret.setResult(Long.valueOf(newestversion));
 										break;
 									}
 								}

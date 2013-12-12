@@ -88,7 +88,7 @@ class StandardBeanInfo extends SimpleBeanInfo {
 
     private static PropertyComparator comparator = new PropertyComparator();
 
-    private Object[] icon = new Object[4];
+//    private Object[] icon = new Object[4];
 
     private boolean canAddPropertyChangeListener;
 

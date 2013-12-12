@@ -236,7 +236,7 @@ public class Alarm implements Cloneable, Serializable
 		if(pcs!=null)
 		{
 //			System.out.println("alarmtime changed: "+this+" "+old+" "+alarmdate);
-			pcs.firePropertyChange("alarmtime", new Long(old), new Long(alarmdate));
+			pcs.firePropertyChange("alarmtime", Long.valueOf(old), Long.valueOf(alarmdate));
 		}
 	}
 

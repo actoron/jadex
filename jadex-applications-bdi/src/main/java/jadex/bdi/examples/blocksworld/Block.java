@@ -149,7 +149,7 @@ public class Block
 //		Block	old	= this.upper;
 		this.upper	= block;
 //		this.pcs.firePropertyChange("upper", old, this.upper);
-		pcs.firePropertyChange("clear", new Boolean(oldclear), new Boolean(isClear()));
+		pcs.firePropertyChange("clear", Boolean.valueOf(oldclear), Boolean.valueOf(isClear()));
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class Block
 		boolean oldclear = isClear();
 		this.upper	= null;
 //		this.pcs.firePropertyChange("upper", block, null);
-		pcs.firePropertyChange("clear", new Boolean(oldclear), new Boolean(isClear()));
+		pcs.firePropertyChange("clear", Boolean.valueOf(oldclear), Boolean.valueOf(isClear()));
 	}
 
 	/**

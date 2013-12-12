@@ -154,7 +154,7 @@ public class StreamProviderAgent implements IStreamService
 			public void resultAvailable(Collection<byte[]> result)
 			{
 //				System.out.println("Result: "+result);
-				ret.setResult(new Long(size[0]));
+				ret.setResult(Long.valueOf(size[0]));
 			}
 			public void intermediateResultAvailable(byte[] result)
 			{
@@ -164,7 +164,7 @@ public class StreamProviderAgent implements IStreamService
 			public void finished()
 			{
 //				System.out.println("finished, size: "+size[0]);
-				ret.setResult(new Long(size[0]));
+				ret.setResult(Long.valueOf(size[0]));
 			}
 			public void exceptionOccurred(Exception exception)
 			{
@@ -198,7 +198,7 @@ public class StreamProviderAgent implements IStreamService
 				else
 				{
 					con.close();
-					ret.setResult(new Long(size[0]));
+					ret.setResult(Long.valueOf(size[0]));
 				}
 				return IFuture.DONE;
 			}

@@ -13,10 +13,10 @@ import java.nio.ByteBuffer;
 public class GrowableByteBuffer
 {
 	/** Initial buffer size. */
-	protected final int INITIAL_SIZE = 4096;
+	protected static final int INITIAL_SIZE = 4096;
 	
 	/** Buffer growth aggressiveness. */
-	protected final int GROWTH_EXPONENT = 2;
+	protected static final int GROWTH_EXPONENT = 2;
 	
 	/** Constant for a single zero byte. */
 	public static final byte[] ZERO_BYTE = new byte[] {0};

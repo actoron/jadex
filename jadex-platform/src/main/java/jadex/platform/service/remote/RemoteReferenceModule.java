@@ -865,7 +865,7 @@ public class RemoteReferenceModule
 				
 				// todo: transfer lease time interval?!
 //				rr.setExpiryDate(clock.getTime()+DEFAULT_LEASETIME);
-				proxydates.put(new Long(System.currentTimeMillis()+DEFAULT_LEASETIME), rr);
+				proxydates.put(Long.valueOf(System.currentTimeMillis()+DEFAULT_LEASETIME), rr);
 				
 				// Initiate check procedure.
 				startRenewalBehaviour();
@@ -993,7 +993,7 @@ public class RemoteReferenceModule
 							sendAddRemoteReference(rr).addResultListener(lis);
 							
 							long expirydate = System.currentTimeMillis()+DEFAULT_LEASETIME;
-							proxydates.put(new Long(expirydate), rr);
+							proxydates.put(Long.valueOf(expirydate), rr);
 							diff = DEFAULT_LEASETIME;
 						}
 						else

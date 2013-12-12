@@ -144,7 +144,7 @@ public class UserInteractionTask implements ITask
 						            	if(pane.getValue()!=JOptionPane.UNINITIALIZED_VALUE)
 						            	{
 						    				// Todo: context should not be accessed from swing thread!
-						            		context.setParameterValue(param.getName(), new Boolean(cb.isSelected()));
+						            		context.setParameterValue(param.getName(), Boolean.valueOf(cb.isSelected()));
 						            	}
 						            }
 								});

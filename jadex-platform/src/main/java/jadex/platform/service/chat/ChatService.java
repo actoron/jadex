@@ -1145,7 +1145,7 @@ public class ChatService implements IChatService, IChatGuiService
 			// Enable sending
 			if(ret!=null)
 			{
-				ret.addIntermediateResult(new Long(0));
+				ret.addIntermediateResult(Long.valueOf(0));
 			}
 			
 			final FileOutputStream fos = new FileOutputStream(ti.getFilePath());
@@ -1165,7 +1165,7 @@ public class ChatService implements IChatService, IChatGuiService
 					}
 					if(ret!=null)
 					{
-						ret.addIntermediateResult(new Long(filesize));
+						ret.addIntermediateResult(filesize);
 					}
 					if(ti.update(filesize))
 					{

@@ -152,7 +152,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 		Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
 		for(int i=codec_ids.length-1; i>-1; i--)
 		{
-			ICodec dec = codecs.get(new Byte(codec_ids[i]));
+			ICodec dec = codecs.get(Byte.valueOf(codec_ids[i]));
 			if (dec == null) {
 				throw new RuntimeException(CodecFactory.CODEC_NAMES[codec_ids[i]] + " not available!");
 			}
@@ -171,7 +171,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 		ICodec[] mcodecs = new ICodec[rawmsg[idx++]];
 		for(int i=0; i<mcodecs.length; i++)
 		{
-			mcodecs[i] = codecs.get(new Byte(rawmsg[idx++]));
+			mcodecs[i] = codecs.get(Byte.valueOf(rawmsg[idx++]));
 		}
 		return mcodecs;
 	}

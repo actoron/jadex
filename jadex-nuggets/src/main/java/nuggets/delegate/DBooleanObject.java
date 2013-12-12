@@ -29,7 +29,7 @@ public class DBooleanObject extends ASimpleDelegate
     */
    public Object getInstance(Class clazz, IAssembler asm) throws Exception
    {
-      return new Boolean((String)asm.getAttributeValue("v"));
+      return Boolean.valueOf((String)asm.getAttributeValue("v"));
    }
 
    /** 

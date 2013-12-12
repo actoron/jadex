@@ -634,7 +634,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		this.settings	= settings;
 //		tfipaddress.setText(settings.address.getHostAddress());
 //		tfport.setText(""+settings.port);
-		spdelay.setValue(new Long(settings.delay/1000));
+		spdelay.setValue(Long.valueOf(settings.delay/1000));
 		cbfast.setSelected(settings.fast);
 		cbautocreate.setSelected(settings.autocreate);
 		cbautodelete.setSelected(settings.autodelete);

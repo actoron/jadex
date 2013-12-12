@@ -200,7 +200,7 @@ public class AlarmsGui extends JFrame
 												{
 													// Cannot use add row as beliefset already contains alarm.
 													tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
-														new Boolean(alarms[i].isActive())}, alarms[i]);
+														Boolean.valueOf(alarms[i].isActive())}, alarms[i]);
 													alarms[i].addPropertyChangeListener(plis);
 												}
 											}
@@ -285,7 +285,7 @@ public class AlarmsGui extends JFrame
 //		agent.getBeliefbase().addBeliefSetFact("alarms", alarm);
 		ObjectTableModel tadata = (ObjectTableModel)alarms.getModel();
 		tadata.insertRow(rowcnt, new Object[]{alarm.getMessage(),
-			alarm.getMode(), new Boolean(alarm.isActive())}, alarm);
+			alarm.getMode(), Boolean.valueOf(alarm.isActive())}, alarm);
 	}
 
 	/**

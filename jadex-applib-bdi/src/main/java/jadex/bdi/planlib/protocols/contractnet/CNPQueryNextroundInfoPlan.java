@@ -30,6 +30,6 @@ public class CNPQueryNextroundInfoPlan extends Plan
 		getParameterSet("participants").removeValues();
 		getParameterSet("participants").addValues(nri.getParticipants());
 		
-		getParameter("iterate").setValue(new Boolean(iterate));
+		getParameter("iterate").setValue(Boolean.valueOf(iterate));
 	}
 }

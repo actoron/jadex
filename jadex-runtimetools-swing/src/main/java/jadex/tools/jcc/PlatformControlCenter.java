@@ -720,7 +720,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					if(plg!=null)
 					{
 						newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
-						toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+						toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()));
 					}
 					
 					if(i+1<ps.length)
@@ -739,7 +739,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			if(plg!=null)
 			{
 				newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
-				toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+				toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()));
 			}
 			
 			if(i+1<ps.length)

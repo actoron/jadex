@@ -218,7 +218,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		// todo: check if asynchronous handling of waittimes is a problem?
 		
 		IClockService clock = interpreter.getClockService();
-		Long ret = new Long(clock.getTime()+duration);
+		Long ret = Long.valueOf(clock.getTime()+duration);
 		waittimes.put(thread, ret);
 		
 //		SServiceProvider.getService(interpreter.getServiceProvider(), IClockService.class)

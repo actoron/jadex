@@ -28,7 +28,7 @@ public class DLongObject extends ASimpleDelegate
 	 */
 	public Object getInstance(Class clazz,IAssembler asm) throws Exception
    {
-      return new Long((String)asm.getAttributeValue("v"));
+      return Long.valueOf((String)asm.getAttributeValue("v"));
    }
 
    /** 
@@ -50,7 +50,7 @@ public class DLongObject extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Long((String)value);
+		return Long.valueOf((String)value);
 	}
 }
 

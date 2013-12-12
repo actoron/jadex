@@ -35,6 +35,6 @@ public class DByte extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Byte((String)value);
+		return Byte.valueOf((String)value);
 	}
 }

@@ -91,19 +91,19 @@ public class BooleanNode	extends ExpressionNode
 					if(op==NOT)
 					{
 						setConstant(true);
-						setConstantValue(new Boolean(!val));
+						setConstantValue(Boolean.valueOf(!val));
 					}
 					else if(op==AND && !val)
 					{
 						// If one term of AND is false, expression is false.
 						setConstant(true);
-						setConstantValue(new Boolean(false));
+						setConstantValue(Boolean.FALSE);
 					}
 					else if(op==OR && val)
 					{
 						// If one term of OR is true, expression is true.
 						setConstant(true);
-						setConstantValue(new Boolean(true));
+						setConstantValue(Boolean.TRUE);
 					}
 				}
 				catch(Exception e)
@@ -123,12 +123,12 @@ public class BooleanNode	extends ExpressionNode
 		if(op==AND && alltrue)
 		{
 			setConstant(true);
-			setConstantValue(new Boolean(true));
+			setConstantValue(Boolean.TRUE);
 		}
 		else if(op==OR && allfalse)
 		{
 			setConstant(true);
-			setConstantValue(new Boolean(false));
+			setConstantValue(Boolean.FALSE);
 		}
 	}
 
@@ -193,7 +193,7 @@ public class BooleanNode	extends ExpressionNode
 				throw new RuntimeException("Unknown operator type "+op+": "+this);
 		}
 
-		return new Boolean(ret);
+		return Boolean.valueOf(ret);
 	}
 
 	/**

@@ -71,8 +71,8 @@ public class AgentCreationAgent extends MicroAgent
 							}
 							catch(InterruptedException e){}
 							
-							Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
-							Long starttime = new Long(((IClockService)result).getTime());
+							Long startmem = Long.valueOf(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+							Long starttime = Long.valueOf(((IClockService)result).getTime());
 							args.put("num", Integer.valueOf(1));
 							args.put("startmem", startmem);
 							args.put("starttime", starttime);

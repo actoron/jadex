@@ -33,7 +33,7 @@ public enum TimeUnit implements IConvertableUnit<Long>
 			{
 				ret = Math.round(ret/1000d/60/24);
 			}
-			return new Long(ret);
+			return Long.valueOf(ret);
 		}
 		else
 		{

@@ -22,7 +22,7 @@ public class MessageSenderPlan	extends Plan
 		
 		System.out.println("Now sending " + msgcnt + " messages to " + receiver);
 		
-		getBeliefbase().getBelief("starttime").setFact(new Long(getTime()));		
+		getBeliefbase().getBelief("starttime").setFact(Long.valueOf(getTime()));		
 		
 		// Send messages.
 		for(int i=1; i<=msgcnt; i++)

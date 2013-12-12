@@ -358,7 +358,7 @@ public class CronAgent implements ICronService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<Object> res = (IFuture<Object>)jobtup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, new Long(time)));
+		IFuture<Object> res = (IFuture<Object>)jobtup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, Long.valueOf(time)));
 		res.addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)

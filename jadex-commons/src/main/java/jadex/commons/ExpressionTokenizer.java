@@ -117,7 +117,7 @@ public class ExpressionTokenizer
 			if(nestingSeparatorAt(pos))
 			{
 				char sepel	= tmp.charAt(0);
-				int	index	= closings.lastIndexOf(new Character(sepel));
+				int	index	= closings.lastIndexOf(Character.valueOf(sepel));
 
 				// When matching close separator, remove from list.
 				if(index!=-1)
@@ -136,7 +136,7 @@ public class ExpressionTokenizer
 					int	idx	= open.indexOf(sepel);
 					if(idx!=-1)
 					{
-						closings.addElement(new Character(close.charAt(idx)));
+						closings.addElement(Character.valueOf(close.charAt(idx)));
 						//System.out.println("added: "+closings);
 					}
 				}	

@@ -29,7 +29,7 @@ public class DByteObject extends ASimpleDelegate
     */
    public Object getInstance(Class clazz, IAssembler asm) throws Exception
    {
-      return new Byte((String)asm.getAttributeValue("v"));
+      return Byte.valueOf((String)asm.getAttributeValue("v"));
    }
 
    /** 
@@ -51,7 +51,7 @@ public class DByteObject extends ASimpleDelegate
 	 */
 	public Object unmarshall(Class clazz, Object value)
 	{
-		return new Byte((String)value);
+		return Byte.valueOf((String)value);
 	}
   
 }

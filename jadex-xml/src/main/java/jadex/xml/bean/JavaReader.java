@@ -386,7 +386,7 @@ public class JavaReader
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
 						byte[] bytes = Base64.decode(((String)rawattributes.get("content")).getBytes(Charset.forName("UTF-8")));
-						return new Byte(bytes[0]);
+						return Byte.valueOf(bytes[0]);
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
@@ -675,7 +675,7 @@ public class JavaReader
 					Long[] ret = new Long[len];
 					
 					for(int i=0; stok.hasMoreTokens(); i++)
-						ret[i] = new Long(stok.nextToken());
+						ret[i] = Long.valueOf(stok.nextToken());
 					return ret;
 				}
 			};
@@ -710,7 +710,7 @@ public class JavaReader
 					Short[] ret = new Short[len];
 					
 					for(int i=0; stok.hasMoreTokens(); i++)
-						ret[i] = new Short(stok.nextToken());
+						ret[i] = Short.valueOf(stok.nextToken());
 					return ret;
 				}
 			};
@@ -737,7 +737,7 @@ public class JavaReader
 					byte[] bytes = val.getBytes();
 					Byte[] bbytes = new Byte[bytes.length];
 					for(int i=0; i<bytes.length; i++)
-						bbytes[i] = new Byte(bytes[i]);
+						bbytes[i] = Byte.valueOf(bytes[i]);
 					return bbytes;
 				}
 			};
@@ -764,7 +764,7 @@ public class JavaReader
 					char[] chars = val.toCharArray();
 					Character[] bchars = new Character[chars.length];
 					for(int i=0; i<chars.length; i++)
-						bchars[i] = new Character(chars[i]);
+						bchars[i] = Character.valueOf(chars[i]);
 					return bchars;
 				}
 			};

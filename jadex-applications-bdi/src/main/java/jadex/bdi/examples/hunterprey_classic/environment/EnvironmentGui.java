@@ -245,7 +245,7 @@ public class EnvironmentGui	extends JFrame
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						final Long val = new Long(roundtimetf.getText());
+						final Long val = Long.valueOf(roundtimetf.getText());
 						agent.scheduleStep(new IComponentStep<Void>()
 						{
 							@Classname("roundtime")
@@ -337,7 +337,7 @@ public class EnvironmentGui	extends JFrame
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						final Long val = new Long(roundtimetf.getText());
+						final Long val = Long.valueOf(roundtimetf.getText());
 						agent.scheduleStep(new IComponentStep<Void>()
 						{
 							@Classname("rt")

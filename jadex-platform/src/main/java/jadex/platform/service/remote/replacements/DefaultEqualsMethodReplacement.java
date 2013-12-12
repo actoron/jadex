@@ -17,7 +17,7 @@ public class DefaultEqualsMethodReplacement implements IMethodReplacement
 	public Object invoke(Object obj, Object[] args)
 	{
 		// Todo: compare proxy infos instead of invocation handlers?
-		return new Boolean(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
+		return Boolean.valueOf(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
 			&& Proxy.getInvocationHandler(obj).equals(Proxy.getInvocationHandler(args[0])));
 	}
 }

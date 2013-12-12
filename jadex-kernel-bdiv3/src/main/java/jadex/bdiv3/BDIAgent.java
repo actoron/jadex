@@ -674,7 +674,7 @@ public class BDIAgent extends MicroAgent
 			}
 			else if(type.equals(char.class))
 			{
-				ret	= new Character((char)0);
+				ret	= Character.valueOf((char)0);
 			}
 			else if(SReflect.getWrappedType(type)!=type)	// Number type
 			{

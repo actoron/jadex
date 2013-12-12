@@ -6,15 +6,10 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.BatchNode;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
-import com.jme3.scene.shape.Sphere;
-import de.lessvoid.nifty.Nifty;
 
 /**
  * test
@@ -30,6 +25,8 @@ public class TestMain extends SimpleApplication {
     Material mat04;
     Material mat05;
     
+//	/** Random number generator. */
+//	protected Random	rndgen	= new Random();
     
         
 
@@ -62,7 +59,7 @@ public class TestMain extends SimpleApplication {
                 		complex.setLocalScale(0.1f);
                         complex.setLocalTranslation(x, y, z);
                         
-                        int rnd = (int)(Math.random()*5);
+//                        int rnd = rndgen.nextInt(5);
                         complex.setMaterial(material[2]);
                         complex.setName("Box"+x+y+z);
                         batch.attachChild(complex);

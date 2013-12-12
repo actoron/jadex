@@ -416,7 +416,7 @@ public class MathNode	extends ExpressionNode
 
 		if(bool)
 		{
-			value	= new Boolean(((Number)value).intValue()==1?true:false);
+			value	= Boolean.valueOf(((Number)value).intValue()==1?true:false);
 		}
 		return value;
 	}
