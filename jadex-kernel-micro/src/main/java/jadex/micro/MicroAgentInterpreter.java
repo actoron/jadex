@@ -722,17 +722,19 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-						// result?!
-//						System.out.println("Killing (ex): "+getComponentIdentifier().getName());
-						if(exception instanceof RuntimeException)
+						// Throw exception to cause fatal error message
+						if(!(exception instanceof ComponentTerminatedException)
+							|| !getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 						{
-							throw (RuntimeException)exception;
+							if(exception instanceof RuntimeException)
+							{
+								throw (RuntimeException)exception;
+							}
+							else
+							{
+								throw new RuntimeException(exception);
+							}
 						}
-						else
-						{
-							throw new RuntimeException(exception);
-						}
-//						microagent.killComponent();
 					}
 				}));
 				return IFuture.DONE;

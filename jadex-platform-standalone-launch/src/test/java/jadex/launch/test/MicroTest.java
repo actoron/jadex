@@ -32,7 +32,7 @@ public class MicroTest	extends ComponentTestSuite
 	{
 		// Use micro application classes directory as classpath root,
 		super(new File(path),
-//		super(new File("../jadex-applications-micro/target/classes/jadex/micro/testcases/intermediate/InvokerAgent.class"),
+//		super(new File("../jadex-applications-micro/target/classes/jadex/micro/testcases/blocking"),
 			new File(root),
 			// Exclude failing tests to allow maven build.
 			new String[]
