@@ -109,6 +109,11 @@ public class BpmnMenuBar extends JMenuBar
 							}));
 						}
 						
+						if (refreshes[1])
+						{
+							
+						}
+						
 						for (ModelContainer container : editorwindow.getModelContainers())
 						{
 							container.getGraphComponent().refresh();
@@ -124,6 +129,7 @@ public class BpmnMenuBar extends JMenuBar
 								{
 									container.setPropertyPanel(SPropertyPanelFactory.createPanel(container.getGraph().getSelectionCell(), container));
 								}
+								container.getPropertypanelcontainer().setVisible(container.getSettings().isJadexExtensions());
 							}
 						}
 					}
