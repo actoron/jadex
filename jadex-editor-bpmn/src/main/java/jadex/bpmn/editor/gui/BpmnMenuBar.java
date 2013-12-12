@@ -38,6 +38,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -109,11 +110,6 @@ public class BpmnMenuBar extends JMenuBar
 							}));
 						}
 						
-						if (refreshes[1])
-						{
-							
-						}
-						
 						for (ModelContainer container : editorwindow.getModelContainers())
 						{
 							container.getGraphComponent().refresh();
@@ -130,6 +126,10 @@ public class BpmnMenuBar extends JMenuBar
 									container.setPropertyPanel(SPropertyPanelFactory.createPanel(container.getGraph().getSelectionCell(), container));
 								}
 								container.getPropertypanelcontainer().setVisible(container.getSettings().isJadexExtensions());
+								if (container.getSettings().isJadexExtensions())
+								{
+									((JSplitPane) container.getPropertypanelcontainer().getParent()).setDividerLocation(GuiConstants.GRAPH_PROPERTY_RATIO);
+								}
 							}
 						}
 					}
