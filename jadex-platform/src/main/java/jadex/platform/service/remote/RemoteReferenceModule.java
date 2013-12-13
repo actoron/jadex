@@ -38,6 +38,7 @@ import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
 import jadex.platform.service.remote.replacements.DefaultHashcodeMethodReplacement;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -146,6 +147,19 @@ public class RemoteReferenceModule
 	{
 		checkThread();
 		
+		// Strip required service proxy if any, to avoid exception due to being called from wrong thread.
+		if(Proxy.isProxyClass(target.getClass()))
+		{
+			InvocationHandler	handler	= Proxy.getInvocationHandler(target);
+			if(handler instanceof BasicServiceInvocationHandler)
+			{
+				if(((BasicServiceInvocationHandler)handler).isRequired())
+				{
+					target	= ((BasicServiceInvocationHandler)handler).getDomainService();
+				}
+			}
+		}
+		
 		// todo: should all ids of remote objects be saved in table?
 		
 		// Note: currently agents use model information e.g. componentviewer.viewerclass
@@ -220,7 +234,7 @@ public class RemoteReferenceModule
 //			cl	= libservice.getClassLoader(((IExternalAccess)target).getModel().getResourceIdentifier());
 			properties = ((IExternalAccess)target).getModel().getProperties();		
 		}
-		else if(properties==null && target instanceof IService)
+		else if(target instanceof IService)
 		{
 			properties = ((IService)target).getPropertyMap();
 		}

@@ -130,7 +130,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			IComponentIdentifier	caller	= IComponentIdentifier.LOCAL.get();
 			if(caller!=null && !caller.equals(ea.getComponentIdentifier()))
 			{
-				throw new RuntimeException("Cannot invoke required service of other component '"+ea.getComponentIdentifier()+"'.");
+				throw new RuntimeException("Cannot invoke required service of other component '"+ea.getComponentIdentifier()+"' from component '"+caller+"'. Service method: "+sic.getMethod());
 			}
 		}
 		
