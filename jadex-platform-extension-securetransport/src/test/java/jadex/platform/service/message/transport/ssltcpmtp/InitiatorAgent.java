@@ -70,7 +70,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(new String[]{"-ssltcptransport", "true"}).addResultListener(agent.createResultListener(
+		createPlatform(new String[]{"-ssltcptransport", "true", "-logging", "false"}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -85,6 +85,7 @@ public class InitiatorAgent extends TestAgent
 						{
 							public void customResultAvailable(Map<String, Object> v)
 							{
+								platforms.remove(platform);
 								ret.setResult(result);
 							}
 						});
@@ -104,7 +105,7 @@ public class InitiatorAgent extends TestAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		createPlatform(new String[]{"-ssltcptransport", "false"}).addResultListener(agent.createResultListener(
+		createPlatform(new String[]{"-ssltcptransport", "false", "-logging", "false"}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
@@ -114,15 +115,15 @@ public class InitiatorAgent extends TestAgent
 				{
 					public void customResultAvailable(final TestReport result)
 					{
-						platform.killComponent();
-//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
-//						{
-//							public void customResultAvailable(Map<String, Object> v)
-//							{
-//								ret.setResult(result);
-//							}
-//						});
-						ret.setResult(result);
+						platform.killComponent()
+							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+						{
+							public void customResultAvailable(Map<String, Object> v)
+							{
+								platforms.remove(platform);
+								ret.setResult(result);
+							}
+						});
 					}
 				}));
 			}
@@ -142,13 +143,18 @@ public class InitiatorAgent extends TestAgent
 
 		final Future<TestReport> res = new Future<TestReport>();
 		
-		ret.addResultListener(new DelegationResultListener<TestReport>(res)
+		ret.addResultListener(new IResultListener<TestReport>()
 		{
+			public void resultAvailable(TestReport result)
+			{
+				res.setResult(result);
+			}
+			
 			public void exceptionOccurred(Exception exception)
 			{
 				TestReport tr = new TestReport("#"+testno, "Tests if secure transport works.");
 				tr.setReason(exception);
-				super.resultAvailable(tr);
+				resultAvailable(tr);
 			}
 		});
 		

@@ -1187,9 +1187,9 @@ public class MessageService extends BasicService implements IMessageService
 	public IFuture<Void> shutdownService()
 	{
 		Future<Void>	ret	= new Future<Void>();
-//		ret.addResultListener(new IResultListener()
+//		ret.addResultListener(new IResultListener<Void>()
 //		{
-//			public void resultAvailable(Object result)
+//			public void resultAvailable(Void result)
 //			{
 //				System.err.println("MessageService shutdown end");
 //			}
@@ -1203,9 +1203,9 @@ public class MessageService extends BasicService implements IMessageService
 		SendManager[] tmp = (SendManager[])managers.values().toArray(new SendManager[managers.size()]);
 		final SendManager[] sms = (SendManager[])SUtil.arrayToSet(tmp).toArray(new SendManager[0]);
 //		System.err.println("MessageService shutdown start: "+(transports.size()+sms.length+1));
-		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(transports.size()+sms.length+1, true, new DelegationResultListener<Void>(ret))
-		{
-//			public void intermediateResultAvailable(Object result)
+		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(transports.size()+sms.length+1, true, new DelegationResultListener<Void>(ret));
+//		{
+//			public void intermediateResultAvailable(Void result)
 //			{
 //				System.err.println("MessageService shutdown intermediate result: "+result+", "+cnt);
 //				super.intermediateResultAvailable(result);
@@ -1215,7 +1215,7 @@ public class MessageService extends BasicService implements IMessageService
 //				System.err.println("MessageService shutdown intermediate error: "+exception+", "+cnt);
 //				return super.intermediateExceptionOccurred(exception);
 //			}
-		};
+//		};
 		super.shutdownService().addResultListener(crl);
 
 		for(int i=0; i<sms.length; i++)

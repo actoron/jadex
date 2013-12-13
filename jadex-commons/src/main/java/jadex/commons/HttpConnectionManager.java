@@ -79,12 +79,13 @@ public class HttpConnectionManager
 	/**
 	 *  Close a connection
 	 */
-	public static	void	closeConnection(HttpURLConnection con)
+	public static	void	closeConnection(final HttpURLConnection con)
 	{
 		// Use sun.net.www.http.HttpClient.closeServer()
 		// as con.disconnect() just blocks for sun default implementation :-(
-//		if(con.getClass().getName().equals("sun.net.www.protocol.http.HttpURLConnection"))
-//		{
+		if(con.getClass().getName().startsWith("sun.net.www.protocol."))	// http+https impls.
+		{
+			// closeServer() causes leak of jadex objects on terminated http receiver thread!? see HttpRelayTransport.Worker.run()
 //			try
 //			{
 //				Field	f	= con.getClass().getDeclaredField("http");
@@ -100,25 +101,34 @@ public class HttpConnectionManager
 //				}
 //			}
 //			catch(Exception e)
-//			{
+			{
 //				con.disconnect();	// Hangs until next ping :-(
-//			}
+				Thread	t	= new Thread(new Runnable()
+				{
+					public void run()
+					{
+						con.disconnect();
+					}
+				});
+				t.setDaemon(true);
+				t.start();
+			}
+		}
+		// Special treatment for android impl not needed, because disconnect() works fine. 
+//		else if()
+//		{
+//			// org.apache.harmony.luni.internal.net.www.protocol.http.HttpURLConnectionImpl	con;
+//			// org.apache.harmony.luni.internal.net.www.protocol.http.HttpConnection	connection = con.connection;
+//			// Socket socket	= connection.socket;
+//			Field	f	= con.getClass().getDeclaredField("connection");
+//			f.setAccessible(true);
+//			Object	connection	= f.get(con);
+//			f	= connection.getClass().getDeclaredField("socket");
+//			f.setAccessible(true);
+//			Socket	socket	= (Socket)f.get(connection);
+//			socket.close();				
 //		}
-//		// Special treatment for android impl not needed, because disconnect() works fine. 
-////		else if()
-////		{
-////			// org.apache.harmony.luni.internal.net.www.protocol.http.HttpURLConnectionImpl	con;
-////			// org.apache.harmony.luni.internal.net.www.protocol.http.HttpConnection	connection = con.connection;
-////			// Socket socket	= connection.socket;
-////			Field	f	= con.getClass().getDeclaredField("connection");
-////			f.setAccessible(true);
-////			Object	connection	= f.get(con);
-////			f	= connection.getClass().getDeclaredField("socket");
-////			f.setAccessible(true);
-////			Socket	socket	= (Socket)f.get(connection);
-////			socket.close();				
-////		}
-//		else
+		else
 		{
 			con.disconnect();
 		}			

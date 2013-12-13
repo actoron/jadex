@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.DuplicateResultException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
