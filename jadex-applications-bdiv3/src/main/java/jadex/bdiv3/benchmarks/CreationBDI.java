@@ -92,45 +92,47 @@ public class CreationBDI
 	@Plan
 	protected void startPeer(RPlan rplan)
 	{
+//		if(starttime==0)
+//		{
+//			IClockService cs = getClock().get();
+//			
+//			System.gc();
+//			try
+//			{
+//				Thread.sleep(500);
+//			}
+//			catch(InterruptedException e){}
+//			
+//			startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+//			starttime = cs.getTime();
+//		}
+//		
+//		step1();
+		
 		if(starttime==0)
 		{
-			IClockService cs = getClock().get();
-			
-			System.gc();
-			try
+			getClock().addResultListener(new DefaultResultListener<IClockService>()
 			{
-				Thread.sleep(500);
-			}
-			catch(InterruptedException e){}
-			
-			startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-			starttime = cs.getTime();
+				public void resultAvailable(IClockService result)
+				{
+					System.gc();
+					try
+					{
+						Thread.sleep(500);
+					}
+					catch(InterruptedException e){}
+					
+					startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+					starttime = ((IClockService)result).getTime();
+					
+					step1();
+				}
+			});
 		}
-		
-		step1();
-		
-//			getClock().addResultListener(new DefaultResultListener<IClockService>()
-//			{
-//				public void resultAvailable(IClockService result)
-//				{
-//					System.gc();
-//					try
-//					{
-//						Thread.sleep(500);
-//					}
-//					catch(InterruptedException e){}
-//					
-//					startmem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-//					starttime = ((IClockService)result).getTime();
-//					
-//					step1();
-//				}
-//			});
-//		}
-//		else
-//		{
-//			step1();
-//		}
+		else
+		{
+			step1();
+		}
 	}
 	
 	protected void	step1()

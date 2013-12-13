@@ -196,12 +196,12 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				final String mechas = (String)getArgument("mechanisms");
 				if(mechas!=null)
 				{
-					IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
+					IFuture<IComponentManagementService> cmsfut = getServiceContainer().getRequiredService("cms");
 					cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
 						public void customResultAvailable(IComponentManagementService cms)
 						{
-							AwarenessManagementAgent.this.cms	= cms;
+							AwarenessManagementAgent.this.cms = cms;
 							StringTokenizer	stok	= new StringTokenizer(mechas, ", \r\n\t");
 							CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(stok.countTokens(), 
 								false, new DelegationResultListener<Void>(ret)

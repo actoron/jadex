@@ -615,6 +615,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 			// Remember execution thread.
 			this.componentthread	= Thread.currentThread();
+//			System.out.println("set local: "+getComponentIdentifier());
 			IComponentIdentifier.LOCAL.set(getComponentIdentifier());
 			IComponentAdapter.LOCAL.set(this);
 			

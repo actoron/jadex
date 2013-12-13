@@ -81,8 +81,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/** The external access. */
 	protected IExternalAccess ea;	
 		
-	/** The internal access. */
-	protected IInternalAccess ia;	
+//	/** The internal access. */
+//	protected IInternalAccess ia;	
 		
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
@@ -106,7 +106,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	 */
 	public DecouplingInterceptor(IInternalAccess ia, IComponentAdapter adapter, boolean copy, boolean required)
 	{
-		this.ia = ia;
+//		this.ia = ia;
 		this.ea	= ia.getExternalAccess();
 		this.adapter = adapter;
 		this.copy = copy;
@@ -128,9 +128,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		if(required)
 		{
 			IComponentIdentifier	caller	= IComponentIdentifier.LOCAL.get();
-			if(caller!=null && !caller.equals(ia.getComponentIdentifier()))
+			if(caller!=null && !caller.equals(ea.getComponentIdentifier()))
 			{
-				throw new RuntimeException("Cannot invoke required service of other component '"+ia.getComponentIdentifier()+"'.");
+				throw new RuntimeException("Cannot invoke required service of other component '"+ea.getComponentIdentifier()+"'.");
 			}
 		}
 		

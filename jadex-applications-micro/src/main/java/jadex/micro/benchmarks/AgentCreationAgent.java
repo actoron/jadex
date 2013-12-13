@@ -4,11 +4,13 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
@@ -169,10 +171,19 @@ public class AgentCreationAgent extends MicroAgent
 										exta.scheduleStep(new IComponentStep<Void>()
 										{
 											@Classname("deletePeers")
-											public IFuture<Void> execute(IInternalAccess ia)
+											public IFuture<Void> execute(final IInternalAccess ia)
 											{
-												((AgentCreationAgent)ia).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
-												return IFuture.DONE;
+												final Future<Void> ret = new Future<Void>();
+												ia.getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+													.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+												{
+													public void customResultAvailable(IClockService result)
+													{
+														((AgentCreationAgent)ia).deletePeers(max, result.getTime(), dur, pera, omem, upera, max, nested);
+														ret.setResult(null);
+													}
+												});
+												return ret;
 											}
 										});
 									}
@@ -226,7 +237,6 @@ public class AgentCreationAgent extends MicroAgent
 						System.out.println("Successfully destroyed peer: "+name);
 						
 						if(cnt-1>1)
-//										if(cnt-1>(nested?1:0))
 						{
 							deletePeers(cnt-1, killstarttime, dur, pera, omem, upera, max, nested);
 						}

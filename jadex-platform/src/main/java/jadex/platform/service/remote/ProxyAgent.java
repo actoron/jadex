@@ -59,7 +59,6 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	 */
 	public IFuture<Void> agentCreated()
 	{
-		
 		getServiceContainer().getService(IComponentManagementService.class, rcid.getRoot())
 			.addResultListener(new IResultListener<IComponentManagementService>()
 		{
@@ -207,6 +206,9 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 	 */
 	public IFuture<Void>	refreshLatency()
 	{
+//		if(getAgentAdapter().isExternalThread())
+//			System.out.println("gagagaggagaq");
+		
 		final Future<Void>	ret	= new Future<Void>();
 		if(rcms!=null)
 		{

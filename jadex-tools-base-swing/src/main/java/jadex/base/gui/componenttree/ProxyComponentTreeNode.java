@@ -151,7 +151,6 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	{
 		busy	= true;
 		
-		
 		getConnectionState().addResultListener(new DefaultResultListener<IProxyAgentService.State>()
 		{
 			public void resultAvailable(State result)
@@ -270,10 +269,13 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		final Future<State> ret = new Future<State>();
 		SServiceProvider.getService(access.getServiceProvider(), desc.getName(), IProxyAgentService.class)
 			.addResultListener(new IResultListener<IProxyAgentService>()
+//			.addResultListener(new SwingResultListener<IProxyAgentService>(new IResultListener<IProxyAgentService>()
 		{
 			public void resultAvailable(IProxyAgentService pas)
 			{
-				pas.refreshLatency();	// Hack!!! perform new latency measurement.
+				// SServiceProvider returns on platform thread and returns only a provided proxy
+				// For this reason it works because no rescheduling occurs
+				pas.refreshLatency(); // Hack!!! perform new latency measurement.
 				
 				pas.getConnectionState().addResultListener(new IResultListener<State>()
 				{

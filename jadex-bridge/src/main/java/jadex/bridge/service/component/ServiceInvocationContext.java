@@ -141,9 +141,8 @@ public class ServiceInvocationContext
 	/** The creation (root) cause. */
 	protected Cause cause;
 	
-	
 	protected IServiceIdentifier sid;
-//	public Exception ex;
+	public Exception ex;
 	
 	//-------- constructors --------
 	
@@ -154,7 +153,7 @@ public class ServiceInvocationContext
 		IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform, 
 		boolean realtime, IServiceIdentifier sid, Cause crcause)
 	{
-//		this.ex = new RuntimeException();
+		this.ex = new RuntimeException();
 		this.sid = sid;
 		
 		this.platform = platform;
