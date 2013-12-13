@@ -96,7 +96,7 @@ public class BlockingAgentCreationAgent
 		}
 		else
 		{
-			final IClockService	clock	= getClock(agent);
+			IClockService	clock	= getClock(agent);
 			long	end	= clock.getTime();
 			
 			System.gc();
@@ -125,6 +125,7 @@ public class BlockingAgentCreationAgent
 				@Classname("deletePeers")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
+					IClockService	clock	= getClock(ia);
 					long	killstarttime	= clock.getTime();
 					IComponentManagementService	cms	= getCMS(ia);
 					for(int i=max; i>1; i--)

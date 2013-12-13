@@ -17,6 +17,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -196,8 +197,19 @@ public class CreationBDI
 										@Classname("deletePeers")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											((CreationBDI)((PojoBDIAgent)ia).getPojoAgent())
-												.deletePeers(max, clock.getTime(), dur, pera, omem, upera);
+											final CreationBDI	cbdi	= (CreationBDI)((PojoBDIAgent)ia).getPojoAgent();
+											cbdi.getClock().addResultListener(new IResultListener<IClockService>()
+											{
+												public void resultAvailable(IClockService clock)
+												{
+													cbdi.deletePeers(max, clock.getTime(), dur, pera, omem, upera);
+												}
+												
+												public void exceptionOccurred(Exception exception)
+												{
+													exception.printStackTrace();
+												}
+											});
 											return IFuture.DONE;
 										}
 									});
