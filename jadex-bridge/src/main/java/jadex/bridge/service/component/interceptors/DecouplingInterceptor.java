@@ -1,6 +1,7 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -86,13 +87,16 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
+	/** Is the interceptor for a required service proxy? */
+	protected boolean required;
+	
 	/** The argument copy allowed flag. */
 	protected boolean copy;
 	
 	/** The marshal service. */
 	protected IMarshalService marshal;
 	
-	/** The clone filter (fascade for marshal). */
+	/** The clone filter (facade for marshal). */
 	protected IFilter filter;
 	
 	//-------- constructors --------
@@ -100,12 +104,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public DecouplingInterceptor(IInternalAccess ia, IComponentAdapter adapter, boolean copy)
+	public DecouplingInterceptor(IInternalAccess ia, IComponentAdapter adapter, boolean copy, boolean required)
 	{
 		this.ia = ia;
 		this.ea	= ia.getExternalAccess();
 		this.adapter = adapter;
 		this.copy = copy;
+		this.required	= required;
 //		System.out.println("copy: "+copy);
 	}
 	
@@ -120,8 +125,16 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		// Fetch marshal service first time.
-				
+		if(required)
+		{
+			IComponentIdentifier	caller	= IComponentIdentifier.LOCAL.get();
+			if(caller!=null && !caller.equals(ia.getComponentIdentifier()))
+			{
+				throw new RuntimeException("Cannot invoke required service of other component '"+ia.getComponentIdentifier()+"'.");
+			}
+		}
+		
+		// Fetch marshal service first time.		
 		if(marshal==null)
 		{
 			SServiceProvider.getService(ea.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)

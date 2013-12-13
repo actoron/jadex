@@ -16,6 +16,8 @@ import java.util.Map;
 
 /**
  *  The interface for accessing components from the outside.
+ *  
+ *  Methods may be called from any thread, but the result listener will not be scheduled back to the calling thread!
  */
 @Reference
 public interface IExternalAccess extends INFPropertyProvider//extends IRemotable

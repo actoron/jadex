@@ -72,7 +72,7 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 				{
 					public void resultAvailable(IExternalAccess pl)
 					{
-						pl.getArguments().addResultListener(new IResultListener<Map<String, Object>>()
+						pl.getArguments().addResultListener(createResultListener(new IResultListener<Map<String, Object>>()
 						{
 							public void resultAvailable(Map<String, Object> args)
 							{
@@ -102,7 +102,7 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 							{
 //								exception.printStackTrace();
 							}
-						});
+						}));
 					}
 					
 					public void exceptionOccurred(Exception exception)

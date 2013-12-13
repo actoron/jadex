@@ -8,6 +8,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
@@ -247,6 +248,15 @@ public class ProcessViewPanel extends JPanel
 				}
 //				System.out.println("ti: "+threadinfos.size()+" "+cce.getSourceName()+" "+cce.getSourceType()+" "+cce.getEventType());
 				updateViews();
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// Todo: why future terminated exception thrown?
+				if(!(exception instanceof FutureTerminatedException))
+				{
+					super.exceptionOccurred(exception);
+				}
 			}
 		}));
 						

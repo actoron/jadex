@@ -439,7 +439,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service, realtime, componentfetcher);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
-			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy, monitoring, ret.getServiceIdentifier());
+			BasicServiceInvocationHandler.addProvidedInterceptors(handler, service, ics, adapter, ia, proxytype, copy, monitoring, ret.getServiceIdentifier());
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			if(!(service instanceof IService))
@@ -592,7 +592,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 	/**
 	 *  Add the standard and custom interceptors.
 	 */
-	protected static void addInterceptors(BasicServiceInvocationHandler handler, Object service, 
+	protected static void addProvidedInterceptors(BasicServiceInvocationHandler handler, Object service, 
 		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, boolean copy, 
 		boolean monitoring, IServiceIdentifier sid)
 	{
@@ -614,7 +614,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			handler.addFirstServiceInterceptor(new ValidationInterceptor(ia));
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 			{
-				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, copy));
+				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, copy, false));
 			}
 			handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor());
 		}
@@ -680,7 +680,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			// Decoupling interceptor on required chains ensures that wrong incoming calls e.g. from gui thread
 			// are automatically pushed to the req component thread
-			handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, false));
+			handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, false, true));
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 			// service.getServiceIdentifier().getServiceType()
 			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader())}, handler); 
