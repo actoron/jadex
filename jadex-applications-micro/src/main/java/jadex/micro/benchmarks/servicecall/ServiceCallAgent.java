@@ -14,6 +14,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
@@ -45,6 +46,9 @@ public class ServiceCallAgent	extends TestAgent
 	/** The agent. */
 	@Agent
 	protected IInternalAccess	agent;
+	
+	@Agent
+	protected MicroAgent ag;
 	
 	/** The invocation count. */
 	@AgentArgument
@@ -217,6 +221,9 @@ public class ServiceCallAgent	extends TestAgent
 					
 					public void customResultAvailable(Void result)
 					{
+//						if(ag.getAgentAdapter().isExternalThread())
+//							System.out.println("wrong thread");
+						
 						count--;
 						if(count==0)
 						{

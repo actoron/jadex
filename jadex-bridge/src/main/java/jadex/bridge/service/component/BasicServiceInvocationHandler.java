@@ -685,10 +685,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 			}
 			// Decoupling interceptor on required chains ensures that wrong incoming calls e.g. from gui thread
 			// are automatically pushed to the req component thread
-			handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, false, true));
+			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype())) // done on provided side
+				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, false, true));
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 			// service.getServiceIdentifier().getServiceType()
 			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader())}, handler); 
+		
+			// todo: think about orders of decouping interceptors
+			// if we want the decoupling return interceptor to schedule back on an external caller actual order must be reversed
+			// now it can only schedule back on the hosting component of the required proxy
 		}
 		
 		return ret;
