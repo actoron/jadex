@@ -63,6 +63,11 @@ public @interface Configuration
 	 *  The suspend flag.
 	 */
 	public boolean suspend() default false;
+	
+	/**
+	 *  Replace content of the base classes.
+	 */
+	public boolean replace() default true;
 }
 
 
