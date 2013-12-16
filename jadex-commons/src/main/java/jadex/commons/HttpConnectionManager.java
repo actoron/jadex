@@ -86,21 +86,21 @@ public class HttpConnectionManager
 		if(con.getClass().getName().startsWith("sun.net.www.protocol."))	// http+https impls.
 		{
 			// closeServer() causes leak of jadex objects on terminated http receiver thread!? see HttpRelayTransport.Worker.run()
-//			try
-//			{
-//				Field	f	= con.getClass().getDeclaredField("http");
-//				f.setAccessible(true);
-//				Object	client	= f.get(con);
-//				if(client!=null)
-//				{
-//					client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
-//				}
-//				else
-//				{
-//					con.disconnect();	// Connection not open?			
-//				}
-//			}
-//			catch(Exception e)
+			try
+			{
+				Field	f	= con.getClass().getDeclaredField("http");
+				f.setAccessible(true);
+				Object	client	= f.get(con);
+				if(client!=null)
+				{
+					client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
+				}
+				else
+				{
+					con.disconnect();	// Connection not open?			
+				}
+			}
+			catch(Exception e)
 			{
 //				con.disconnect();	// Hangs until next ping :-(
 				Thread	t	= new Thread(new Runnable()
