@@ -13,15 +13,20 @@ import jadex.micro.annotation.Configurations;
 @Agent
 @ComponentTypes(
 {	
-	@ComponentType(name="empty1", clazz=EmptyAgent.class),
-	@ComponentType(name="empty2", clazz=Empty2Agent.class)
+	@ComponentType(name="emptya", clazz=EmptyAAgent.class),
+	@ComponentType(name="emptyb", clazz=EmptyBAgent.class)
 })
 @Configurations(
 {
 	@Configuration(name="main", components=
 	{
-		@Component(type="empty1", number="1"),
-		@Component(type="empty2", number="2")
+		@Component(type="emptya", number="1"),
+		@Component(type="emptyb", number="1")
+	}),
+	@Configuration(name="same", components=
+	{
+		@Component(type="emptya", number="1"),
+		@Component(type="emptyb", number="1")
 	})
 })
 public class MainAgent

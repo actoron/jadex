@@ -251,6 +251,7 @@ public class MicroClassReader
 		boolean compdone = false;
 		boolean breaksdone = false;
 		boolean nfpropsdone = false;
+		Set<String> configdone = new HashSet<String>();
 		
 		Set<Class<?>> serifaces = new HashSet<Class<?>>(); 
 		
@@ -625,69 +626,93 @@ public class MicroClassReader
 					toset.put("configurations", confs);
 				}
 				
-				for(int i=0; i<configs.length; i++)
+				for(Configuration config: configs)
 				{
-					if(!confs.containsKey(configs[i].name()))
+					// Only check super config if sub has not declared to replace it
+					if(!configdone.contains(config.name()))
 					{
-						ConfigurationInfo configinfo = new ConfigurationInfo(configs[i].name());
-						confs.put(configs[i].name(), configinfo);
+						ConfigurationInfo configinfo = (ConfigurationInfo)confs.get(config.name());
+						if(config.replace())
+							configdone.add(config.name());
+						if(configinfo==null)
+						{
+							configinfo = new ConfigurationInfo(config.name());
+							confs.put(config.name(), configinfo);
+						}
 						
-						configinfo.setMaster(configs[i].master());
-						configinfo.setDaemon(configs[i].daemon());
-						configinfo.setAutoShutdown(configs[i].autoshutdown());
-						configinfo.setSuspend(configs[i].suspend());
-						
-						NameValue[] argvals = configs[i].arguments();
+						if(configinfo.getMaster()==null)
+							configinfo.setMaster(config.master());
+						if(configinfo.getDaemon()==null)
+							configinfo.setDaemon(config.daemon());
+						if(configinfo.getAutoShutdown()==null)
+							configinfo.setAutoShutdown(config.autoshutdown());
+						if(configinfo.getSuspend()==null)
+							configinfo.setSuspend(config.suspend());
+							
+						NameValue[] argvals = config.arguments();
 						for(int j=0; j<argvals.length; j++)
 						{
-							configinfo.addArgument(new UnparsedExpression(argvals[j].name(), argvals[j].clazz(), argvals[j].value(), null));
+							if(!configinfo.hasArgument(argvals[j].name()))
+								configinfo.addArgument(new UnparsedExpression(argvals[j].name(), argvals[j].clazz(), argvals[j].value(), null));
 						}
-						NameValue[] resvals = configs[i].results();
+						NameValue[] resvals = config.results();
 						for(int j=0; j<resvals.length; j++)
 						{
-							configinfo.addResult(new UnparsedExpression(resvals[j].name(), resvals[j].clazz(), resvals[j].value(), null));
+							if(!configinfo.hasResult(resvals[j].name()))
+								configinfo.addResult(new UnparsedExpression(resvals[j].name(), resvals[j].clazz(), resvals[j].value(), null));
 						}
 						
-						ProvidedService[] provs = configs[i].providedservices();
-						ProvidedServiceInfo[] psis = new ProvidedServiceInfo[provs.length];
+						ProvidedService[] provs = config.providedservices();
+	//					ProvidedServiceInfo[] psis = new ProvidedServiceInfo[provs.length];
 						for(int j=0; j<provs.length; j++)
 						{
-							Implementation im = provs[j].implementation();
-							Value[] inters = im.interceptors();
-							UnparsedExpression[] interceptors = null;
-							if(inters.length>0)
+							if(!configinfo.hasProvidedService(provs[j].name()))
 							{
-								interceptors = new UnparsedExpression[inters.length];
-								for(int k=0; k<inters.length; k++)
+								Implementation im = provs[j].implementation();
+								Value[] inters = im.interceptors();
+								UnparsedExpression[] interceptors = null;
+								if(inters.length>0)
 								{
-									interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
+									interceptors = new UnparsedExpression[inters.length];
+									for(int k=0; k<inters.length; k++)
+									{
+										interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
+									}
 								}
+								RequiredServiceBinding bind = createBinding(im.binding());
+								ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
+									im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
+								Publish p = provs[j].publish();
+								PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
+									p.mapping(), createUnparsedExpressions(p.properties()));
+								ProvidedServiceInfo psi = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi);
+		//						configinfo.setProvidedServices(psis);
+								configinfo.addProvidedService(psi);
 							}
-							RequiredServiceBinding bind = createBinding(im.binding());
-							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
-								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
-							Publish p = provs[j].publish();
-							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
-								p.mapping(), createUnparsedExpressions(p.properties()));
-							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi);
-							configinfo.setProvidedServices(psis);
 						}
 						
-						RequiredService[] reqs = configs[i].requiredservices();
-						RequiredServiceInfo[] rsis = new RequiredServiceInfo[reqs.length];
+						RequiredService[] reqs = config.requiredservices();
+	//					RequiredServiceInfo[] rsis = new RequiredServiceInfo[reqs.length];
 						for(int j=0; j<reqs.length; j++)
 						{
-							RequiredServiceBinding binding = createBinding(reqs[j].binding());
-							List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
-							rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
-								Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops);
-							configinfo.setRequiredServices(rsis);
+							if(!configinfo.hasRequiredService(reqs[j].name()))
+							{
+								RequiredServiceBinding binding = createBinding(reqs[j].binding());
+								List<NFRPropertyInfo> nfprops = createNFRProperties(reqs[j].nfprops());
+								RequiredServiceInfo rsi = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
+									Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding, nfprops);
+		//						configinfo.setRequiredServices(rsis);
+								configinfo.addRequiredService(rsi);
+							}
 						}
 						
-						Component[] comps = configs[i].components();
+						Component[] comps = config.components();
 						for(int j=0; j<comps.length; j++)
 						{
-							configinfo.addComponentInstance(createComponentInstanceInfo(comps[j]));
+							if(!configinfo.hasComponentInstance(comps[j].name(), comps[j].type()))
+							{
+								configinfo.addComponentInstance(createComponentInstanceInfo(comps[j]));
+							}
 						}
 					}
 				}

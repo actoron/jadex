@@ -113,6 +113,26 @@ public class ConfigurationInfo extends Startable
 	}
 	
 	/**
+	 *  Test if has a component instance.
+	 */
+	public boolean hasComponentInstance(String name, String typename)
+	{
+		boolean ret = false;
+		if(components!=null)
+		{
+			for(ComponentInstanceInfo cci: components)
+			{
+				ret = cci.getName()==null && cci.getTypeName().equals(typename)
+					|| (cci.getName()!=null && cci.getName().equals(name));
+				if(ret)
+					break;
+			}
+		}
+		return ret;
+	}
+	
+	
+	/**
 	 *  Get the list of arguments.
 	 *  @return The arguments.
 	 */
@@ -142,6 +162,24 @@ public class ConfigurationInfo extends Startable
 	}
 	
 	/**
+	 *  Test if has an argument.
+	 */
+	public boolean hasArgument(String name)
+	{
+		boolean ret = false;
+		if(arguments!=null)
+		{
+			for(UnparsedExpression arg: arguments)
+			{
+				ret = arg.getName().equals(name);
+				if(ret)
+					break;
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get the list of results.
 	 *  @return The results.
 	 */
@@ -157,6 +195,24 @@ public class ConfigurationInfo extends Startable
 	public void setResults(UnparsedExpression[] results)
 	{
 		this.results = SUtil.arrayToList(results);
+	}
+	
+	/**
+	 *  Test if has a result.
+	 */
+	public boolean hasResult(String name)
+	{
+		boolean ret = false;
+		if(results!=null)
+		{
+			for(UnparsedExpression res: results)
+			{
+				ret = res.getName().equals(name);
+				if(ret)
+					break;
+			}
+		}
+		return ret;
 	}
 
 	/**
@@ -233,11 +289,30 @@ public class ConfigurationInfo extends Startable
 	 */
 	public void removeProvidedService(ProvidedServiceInfo providedservice)
 	{
-		if (providedservices!=null)
+		if(providedservices!=null)
 		{
 			providedservices.remove(providedservice);
 		}
 	}
+	
+	/**
+	 *  Test if has a provided service.
+	 */
+	public boolean hasProvidedService(String name)
+	{
+		boolean ret = false;
+		if(providedservices!=null)
+		{
+			for(ProvidedServiceInfo psi: providedservices)
+			{
+				ret = psi.getName().equals(name);
+				if(ret)
+					break;
+			}
+		}
+		return ret;
+	}
+	
 	
 	/**
 	 *  Get the required services.
@@ -279,6 +354,24 @@ public class ConfigurationInfo extends Startable
 		{
 			requiredservices.remove(requiredservice);
 		}
+	}
+	
+	/**
+	 *  Test if has a required service.
+	 */
+	public boolean hasRequiredService(String name)
+	{
+		boolean ret = false;
+		if(requiredservices!=null)
+		{
+			for(RequiredServiceInfo rsi: requiredservices)
+			{
+				ret = rsi.getName().equals(name);
+				if(ret)
+					break;
+			}
+		}
+		return ret;
 	}
 	
 	/**
