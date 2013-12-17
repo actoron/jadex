@@ -189,7 +189,7 @@ public class SelectorThread implements Runnable
 			con	= ((Tuple2<?,?>)con).getSecondEntity();
 		}
 		
-		if(con instanceof IFuture<?> && ((IFuture<?>)con).isDone())
+		if(con instanceof IFuture<?> && ((IFuture<?>)con).isDone()  && ((IFuture<?>)con).getException()==null)
 		{
 			con	= ((IFuture<?>)con).get();
 		}

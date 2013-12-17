@@ -262,7 +262,7 @@ public class ProfileNode	implements TreeTableNode
 		if(time<1000)
 			timestring	= time + " ns";
 		else if(time<100000)
-			timestring	= (time/100)/10.0 + " µs";
+			timestring	= ((int)(time/100))/10.0 + " µs";
 		else if(time<1000000)
 			timestring	= time/1000 + " µs";
 		else if(time<100000000)

@@ -530,7 +530,7 @@ public class HttpReceiver
 			}
 			else
 			{
-				System.out.println("relay timeout");
+//				System.out.println("relay timeout");
 				RelayConnectionManager.closeConnection(con);
 			}
 		}

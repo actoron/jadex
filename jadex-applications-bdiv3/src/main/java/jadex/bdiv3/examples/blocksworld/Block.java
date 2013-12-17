@@ -14,7 +14,7 @@ public class Block
 	//-------- static part --------
 
 	/** The block counter. */
-	protected static int counter	= 0;
+	static int counter	= 0;
 
 	/**
 	 *  Get an instance number.

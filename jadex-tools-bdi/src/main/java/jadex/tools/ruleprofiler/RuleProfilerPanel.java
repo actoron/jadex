@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -251,7 +252,7 @@ public class RuleProfilerPanel	extends JPanel
 	/**
 	 *  Comparator sorting profile nodes by time.
 	 */
-	public static class TimeComparator	implements Comparator
+	public static class TimeComparator	implements Comparator, Serializable	// Serializable as suggested by findbugs
 	{
 		public int compare(Object o1, Object o2)
 		{

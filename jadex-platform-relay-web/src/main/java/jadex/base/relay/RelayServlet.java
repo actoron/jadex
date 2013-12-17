@@ -237,14 +237,24 @@ public class RelayServlet extends HttpServlet
         	}
         	
 			// Copy file content to output stream.
-        	FileInputStream	in	= new FileInputStream(file);
-			byte[]	buf	= new byte[8192];  
-			int	len;
-			while((len=in.read(buf)) != -1)
-			{
-				response.getOutputStream().write(buf, 0, len);
-			}
-			in.close();
+        	FileInputStream	in	= null;
+        	try
+        	{
+	        	in	= new FileInputStream(file);
+				byte[]	buf	= new byte[8192];  
+				int	len;
+				while((len=in.read(buf)) != -1)
+				{
+					response.getOutputStream().write(buf, 0, len);
+				}
+        	}
+        	finally
+        	{
+        		if(in!=null)
+        		{
+        			in.close();
+        		}
+        	}
         }
 	}
 }

@@ -164,9 +164,9 @@ public class ThreadPool implements IThreadPool
 		this.enqueuetimes = Collections.synchronizedMap(new IdentityHashMap<Runnable, Long>());
 		this.maxparked = 500;
 		this.parked = new ArrayList<ServiceThread>();
-		this.timer = new Timer(true);
 		this.maxwait = maxwait;
 		
+		this.timer = new Timer(true);
 		timer.scheduleAtFixedRate(new TimerTask()
 		{
 			public void run()
@@ -182,7 +182,7 @@ public class ThreadPool implements IThreadPool
 						{
 							addThreads(5);
 							strategy.workersAdded(5);
-							System.out.println("Added threads due to starving task in queue: "+task+", "+strategy+", pool="+pool.size()+", parked="+parked.size()+", tasks="+tasks.size());
+//							System.out.println("Added threads due to starving task in queue: "+task+", "+strategy+", pool="+pool.size()+", parked="+parked.size()+", tasks="+tasks.size());
 						}
 					}
 				}
@@ -248,7 +248,10 @@ public class ThreadPool implements IThreadPool
 		this.running = false;
 		this.tasks.setClosed(true);
 
-		this.timer.cancel();
+		if(timer!=null)
+		{
+			this.timer.cancel();
+		}
 		
 		while(!pool.isEmpty())
 		{

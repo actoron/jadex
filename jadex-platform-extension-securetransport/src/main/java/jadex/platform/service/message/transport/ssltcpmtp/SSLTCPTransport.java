@@ -21,9 +21,7 @@ import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -45,7 +43,7 @@ import javax.net.ssl.X509TrustManager;
 public class SSLTCPTransport extends TCPTransport
 {
 	/** The schema name. */
-	public final static String[] SCHEMAS = new String[]{"ssltcp-mtp://"};
+	final static String[] SCHEMAS = new String[]{"ssltcp-mtp://"};
 
 	/** The ssl context. */
 	protected SSLContext context;
@@ -159,7 +157,7 @@ public class SSLTCPTransport extends TCPTransport
 	public ServerSocket createServerSocket() throws Exception
 	{
 		SSLServerSocketFactory fac = getSSLContext().getServerSocketFactory();
-        SSLServerSocket ret = (SSLServerSocket)fac.createServerSocket(port);
+        ServerSocket ret = fac.createServerSocket(port);
         return ret;
 	}
 	
@@ -170,7 +168,7 @@ public class SSLTCPTransport extends TCPTransport
 	public Socket createClientSocket(String host, int port) throws Exception
 	{
 		SSLSocketFactory fac = getSSLContext().getSocketFactory();
-        SSLSocket ret = (SSLSocket)fac.createSocket(host, port);
+        Socket ret = fac.createSocket(host, port);
         return ret;
 	}
 	

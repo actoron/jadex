@@ -79,16 +79,33 @@ public class HttpConnectionManager
 	/**
 	 *  Close a connection
 	 */
-	public static	void	closeConnection(final HttpURLConnection con)
+	public static	void	closeConnection(HttpURLConnection con)
 	{
+
+		
 		// Use sun.net.www.http.HttpClient.closeServer()
 		// as con.disconnect() just blocks for sun default implementation :-(
 		if(con.getClass().getName().startsWith("sun.net.www.protocol."))	// http+https impls.
 		{
+			// Get delegate from https wrapper.
+			if(con.getClass().getName().equals("sun.net.www.protocol.https.HttpsURLConnectionImpl"))
+			{
+				try
+				{
+					Field	f	= SReflect.getField(con.getClass(), "delegate");
+					f.setAccessible(true);
+					con	= (HttpURLConnection)f.get(con);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}				
+			}
+			
 			// closeServer() causes leak of jadex objects on terminated http receiver thread!? see HttpRelayTransport.Worker.run()
 			try
 			{
-				Field	f	= con.getClass().getDeclaredField("http");
+				Field	f	= SReflect.getField(con.getClass(), "http");
 				f.setAccessible(true);
 				Object	client	= f.get(con);
 				if(client!=null)
@@ -103,11 +120,12 @@ public class HttpConnectionManager
 			catch(Exception e)
 			{
 //				con.disconnect();	// Hangs until next ping :-(
+				final HttpURLConnection	fcon	= con;
 				Thread	t	= new Thread(new Runnable()
 				{
 					public void run()
 					{
-						con.disconnect();
+						fcon.disconnect();
 					}
 				});
 				t.setDaemon(true);
