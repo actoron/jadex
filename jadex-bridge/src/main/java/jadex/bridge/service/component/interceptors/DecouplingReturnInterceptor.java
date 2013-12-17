@@ -135,7 +135,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 								{
 //									if(sic.getMethod().getName().indexOf("method3")!=-1)
 //										System.out.println("setting to d: "+sic.getLastServiceCall()+", "+res);
-									final Exception ex = new Exception();
+//									final Exception ex = new Exception();
 									ada.invokeLater(new Runnable()
 									{
 										public void run()
@@ -155,9 +155,9 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 											}
 											else
 											{
-												boolean a = true;
-												if(!a)
-													ex.printStackTrace();
+//												boolean a = true;
+//												if(!a)
+//													ex.printStackTrace();
 												listener.resultAvailable(null);
 											}
 										}
