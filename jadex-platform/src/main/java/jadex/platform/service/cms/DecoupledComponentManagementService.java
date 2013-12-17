@@ -1789,6 +1789,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 
 		protected void doCleanup(Exception exception)
 		{
+			try
+			{
 			boolean	killparent	= false;
 			IComponentAdapter adapter = null;
 			IComponentAdapter pad = null;
@@ -1915,6 +1917,11 @@ public class DecoupledComponentManagementService implements IComponentManagement
 //				System.out.println("killparent: "+pad.getComponentIdentifier());
 				destroyComponent(pad.getComponentIdentifier());
 			}
+		}
+		catch(Throwable t)
+		{
+			t.printStackTrace();
+		}
 		}
 	}
 	
@@ -2963,18 +2970,25 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				for(int i=0; i<alisteners.length; i++)
 				{
 					final ICMSComponentListener lis = alisteners[i];
-					lis.componentRemoved(newdesc, results).addResultListener(createResultListener(new IResultListener<Void>()
+					try
 					{
-						public void resultAvailable(Void result)
+						lis.componentRemoved(newdesc, results).addResultListener(createResultListener(new IResultListener<Void>()
 						{
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-		//					System.out.println("prob: "+exception);
-							removeComponentListener(cid, lis);
-						}
-					}));
+							public void resultAvailable(Void result)
+							{
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+			//					System.out.println("prob: "+exception);
+								removeComponentListener(cid, lis);
+							}
+						}));
+					}
+					catch(Exception e)
+					{
+						removeComponentListener(cid, lis);
+					}
 				}
 			}
 			

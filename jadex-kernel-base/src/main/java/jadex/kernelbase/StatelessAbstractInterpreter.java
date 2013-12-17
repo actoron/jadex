@@ -855,7 +855,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		IArgument[] margs = model.getArguments();
 		for(int i=0; i<margs.length; i++)
 		{
-			if(!done.contains(margs[i].getName()))
+			if(!done.contains(margs[i].getName()) && (arguments==null || !arguments.containsKey(margs[i].getName())))
 			{
 				addArgument(margs[i].getName(),
 					SJavaParser.getParsedValue(margs[i].getDefaultValue(), model.getAllImports(), getFetcher(), getClassLoader()));

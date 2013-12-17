@@ -54,7 +54,7 @@ import javax.mail.internet.MimeMessage;
 	@Argument(name="account", clazz=EmailAccount.class, defaultvalue="new EmailAccount(\"default_account.properties\")", 
 		description="The default email account that is used to send/receive emails.")
 })
-@ProvidedServices(@ProvidedService(type = IEmailService.class, implementation = @Implementation(expression="$pojoagent")))
+@ProvidedServices(@ProvidedService(type = IEmailService.class))
 public class EmailAgent implements IEmailService
 {
 	//-------- attributes --------
