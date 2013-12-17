@@ -70,7 +70,7 @@ public class MultiPlatformsTest extends TestCase
 			}
 			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_"+i+"*",
 				"-gui", "false", "-printpass", "false", "-cli", "false",
-//				"-logging", "true",
+				"-logging", "true",
 //				"-awareness", "false",
 //				"-componentfactory", "jadex.micro.MicroAgentFactory",
 //				"-conf", "jadex.standalone.PlatformAgent",
