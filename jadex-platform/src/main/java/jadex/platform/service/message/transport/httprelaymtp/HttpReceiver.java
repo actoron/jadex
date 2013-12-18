@@ -76,8 +76,7 @@ public class HttpReceiver
 	// todo: why restarted thousand times on toaster #501?
 	public void start()
 	{
-		System.err.println("(re)star: "+access.getComponentIdentifier()+", "+System.currentTimeMillis());
-		Thread.dumpStack();
+		System.err.println("(re)start: "+access.getComponentIdentifier()+", "+System.currentTimeMillis());
 		
 		if(!shutdown)
 		{
@@ -129,6 +128,7 @@ public class HttpReceiver
 				
 				protected void restart(Exception e)
 				{
+					System.err.println("exception: "+access.getComponentIdentifier()+", "+System.currentTimeMillis());
 					e.printStackTrace();
 					String copy = address;
 					if(copy!=null)
@@ -173,6 +173,7 @@ public class HttpReceiver
 	 */
 	public void	stop()
 	{
+		System.err.println("stop: "+access.getComponentIdentifier()+", "+System.currentTimeMillis());
 		shutdown	= true;
 		access	= null;
 		address	= null;
