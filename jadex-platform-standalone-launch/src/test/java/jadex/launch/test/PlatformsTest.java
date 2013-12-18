@@ -31,9 +31,6 @@ import junit.framework.TestCase;
  */
 public class PlatformsTest extends TestCase
 {
-	// Timeout for each platform.
-//	long	TIMEOUT	= 120000;
-	
 	// The platforms to test as pairs of componentfactory and model.
 	String[]	PLATFORMS	= new String[]
 	{
@@ -89,7 +86,7 @@ public class PlatformsTest extends TestCase
 	 */
 	public void	testPlatforms()
 	{
-		long timeout = BasicService.getLocalDefaultTimeout();	//TIMEOUT;
+		long timeout = BasicService.getLocalDefaultTimeout();
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];

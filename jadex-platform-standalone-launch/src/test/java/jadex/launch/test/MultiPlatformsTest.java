@@ -2,6 +2,7 @@ package jadex.launch.test;
 
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.BasicService;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
@@ -82,6 +83,7 @@ public class MultiPlatformsTest extends TestCase
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
+		long	timeout	= BasicService.getLocalDefaultTimeout();
 		IExternalAccess[]	platforms	= new IExternalAccess[number];
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		for(int i=0; i<number; i++)
@@ -92,7 +94,7 @@ public class MultiPlatformsTest extends TestCase
 			}
 			try
 			{
-				platforms[i]	= futures.get(i).get(sus);
+				platforms[i]	= futures.get(i).get(sus, timeout);
 			}
 			catch(RuntimeException e)
 			{
@@ -109,7 +111,7 @@ public class MultiPlatformsTest extends TestCase
 			{
 				System.out.println("Killing platform "+i);
 			}
-			platforms[i].killComponent().get(sus);
+			platforms[i].killComponent().get(sus, timeout);
 		}
 		
 		if(memtimer!=null)

@@ -76,6 +76,7 @@ public class HttpReceiver
 	// todo: why restarted thousand times on toaster #501?
 	public void start()
 	{
+		System.err.println("(re)star: "+access.getComponentIdentifier()+", "+System.currentTimeMillis());
 		Thread.dumpStack();
 		
 		if(!shutdown)
