@@ -73,8 +73,11 @@ public class HttpReceiver
 	/**
 	 *  (Re-)Start the receiver.
 	 */
+	// todo: why restarted thousand times on toaster #501?
 	public void start()
 	{
+		Thread.dumpStack();
+		
 		if(!shutdown)
 		{
 			final long	lasttry	= System.currentTimeMillis();
