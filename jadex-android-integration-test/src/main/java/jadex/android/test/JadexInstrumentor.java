@@ -30,16 +30,6 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 
 	private static final String LOG_TAG = "JadexTestRunner";
 	
-    public static final String ARGUMENT_TEST_CLASS = "class";
-    public static final String ARGUMENT_TEST_PACKAGE = "package";
-    public static final String ARGUMENT_TEST_SIZE_PREDICATE = "size";
-    public static final String ARGUMENT_INCLUDE_PERF = "perf";
-    public static final String ARGUMENT_DELAY_MSEC = "delay_msec";
-
-
-    static final String ARGUMENT_ANNOTATION = "annotation";
-    static final String ARGUMENT_NOT_ANNOTATION = "notAnnotation";
-
 	private ClassLoader jadexCl;
 
 	private String targetAppDir;
@@ -142,10 +132,10 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			InvocationTargetException
 	{
 		Class<?> test = jadexCl.loadClass(testClassName);
-		Constructor<?> constructor = test.getConstructor(String.class, String.class, boolean.class);
+		Constructor<?> constructor = test.getConstructor(String.class, String.class);
 		Object testCase = null;
 		try {
-			testCase = constructor.newInstance(testsPackage, classRoot, addCleanup);
+			testCase = constructor.newInstance(testsPackage, classRoot);
 		} catch (Throwable t) {
 			ErrorReport errorReport = new ErrorReport();
 			errorReport.setErrorText(t.getMessage());
