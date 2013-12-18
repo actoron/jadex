@@ -1,5 +1,6 @@
 package jadex.commons.collection;
 
+import jadex.commons.SUtil;
 import jadex.commons.collection.IBlockingQueue.ClosedException;
 import jadex.commons.concurrent.TimeoutException;
 
@@ -211,5 +212,16 @@ public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
 	public boolean	isClosed()
 	{
 		return closed;
+	}
+	
+	/**
+	 *  Create a string representation.
+	 */
+	public String toString()
+	{
+		synchronized(monitor)
+		{
+			return SUtil.arrayToString(elements);
+		}
 	}
 }
