@@ -129,6 +129,7 @@ public class HttpReceiver
 				
 				protected void restart(Exception e)
 				{
+					e.printStackTrace();
 					String copy = address;
 					if(copy!=null)
 					{
