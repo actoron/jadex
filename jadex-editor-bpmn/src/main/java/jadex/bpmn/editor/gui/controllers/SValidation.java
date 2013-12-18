@@ -7,6 +7,7 @@ import jadex.bpmn.editor.model.visual.VOutParameter;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSubProcess;
 
 import com.mxgraph.model.mxICell;
@@ -181,12 +182,14 @@ public class SValidation
 		{
 			MActivity sact = (MActivity) ((VActivity) source).getBpmnElement();
 			MActivity tact = (MActivity) ((VActivity) target).getBpmnElement();
-			if (sact.getActivityType().startsWith("Event") &&
+			if ((sact.getActivityType().startsWith("Event") &&
 				sact.getActivityType().endsWith("Message") &&
 				sact.isThrowing() &&
 				tact.getActivityType().startsWith("Event") &&
 				tact.getActivityType().endsWith("Message") &&
-				!tact.isThrowing())
+				!tact.isThrowing()) ||
+				MBpmnModel.TASK.equals(sact.getActivityType()) &&
+				MBpmnModel.TASK.equals(tact.getActivityType()))
 			{
 				return null;
 			}
