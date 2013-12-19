@@ -82,7 +82,7 @@ public class ComponentSuspendable implements ISuspendable
 						// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 						if(future==ComponentSuspendable.this.future)
 						{
-							adapter.unblock(ComponentSuspendable.this);
+							adapter.unblock(ComponentSuspendable.this, false);
 						}
 					}
 				}
@@ -95,7 +95,7 @@ public class ComponentSuspendable implements ISuspendable
 				// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 				if(future==this.future)
 				{
-					adapter.unblock(this);
+					adapter.unblock(this, false);
 				}
 			}			
 		}

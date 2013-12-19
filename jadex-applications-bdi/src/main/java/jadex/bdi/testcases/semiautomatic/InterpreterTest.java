@@ -187,7 +187,7 @@ class ComponentAdapter implements IComponentAdapter
 	{
 	}
 	
-	public void unblock(Object monitor)
+	public void unblock(Object monitor, boolean kill)
 	{
 	}
 }

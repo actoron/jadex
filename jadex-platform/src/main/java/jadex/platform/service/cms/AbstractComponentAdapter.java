@@ -841,12 +841,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		exe.blockThread(monitor);
 		
-		// Throw thread death if component already has been terminated.
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-		{
-//			System.out.println("terminated: "+this);
-			throw new StepAborted();
-		}
+		assert !IComponentDescription.STATE_TERMINATED.equals(desc.getState());
 		
 //		if(getComponentIdentifier().toString().indexOf("GarbageCollector")!=-1)
 ////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
@@ -878,18 +873,12 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  and cease execution on the current thread.
 	 *  @param monitor	The monitor to notify.
 	 */
-	public void	unblock(Object monitor)
+	public void	unblock(Object monitor, boolean kill)
 	{
 		if(Thread.currentThread()!=componentthread)
 		{
 			throw new RuntimeException("Can only unblock current component thread: "+componentthread+", "+Thread.currentThread());
 		}
-		
-//		Executor	exe	= Executor.EXECUTOR.get();
-//		if(exe==null)
-//		{
-//			throw new RuntimeException("Cannot unblock: no executor");
-//		}
 		
 		Executor exe = blocked.remove(monitor);
 		if(blocked.isEmpty())
@@ -897,7 +886,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			blocked	= null;
 		}
 		
-		exe.switchThread(monitor);
+		// Throw thread death if component already has been terminated.
+		Throwable	t	= kill ? new StepAborted() : null;
+		
+		exe.switchThread(monitor, t);
 	}
 
 	/**
@@ -1140,7 +1132,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		}
 		while(blocked!=null && !blocked.isEmpty())
 		{
-			unblock(blocked.keySet().iterator().next());
+			unblock(blocked.keySet().iterator().next(), true);
 		}
 	}
 }

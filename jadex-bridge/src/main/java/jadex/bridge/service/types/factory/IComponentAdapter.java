@@ -35,8 +35,9 @@ public interface IComponentAdapter
 	 *  Unblock the thread waiting for the given monitor
 	 *  and cease execution on the current thread.
 	 *  @param monitor	The monitor to notify.
+	 *  @param kill	True, if the blocked thread should be killed instead of continued. 
 	 */
-	public void	unblock(Object monitor);
+	public void	unblock(Object monitor, boolean kill);
 	
 	/**
 	 *  Called by the component when it probably awoke from an idle state.

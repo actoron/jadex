@@ -228,15 +228,15 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 *  and cease execution on the current thread.
 	 *  @param monitor	The monitor to notify.
 	 */
-	public void unblock(Object monitor)
+	public void unblock(Object monitor, boolean kill)
 	{
 		if(parenta!=null)
 		{
-			parenta.unblock(monitor);
+			parenta.unblock(monitor, kill);
 		}
 		else
 		{
-			super.unblock(monitor);
+			super.unblock(monitor, kill);
 		}
 	}
 	

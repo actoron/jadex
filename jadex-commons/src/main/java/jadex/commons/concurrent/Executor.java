@@ -4,8 +4,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -59,6 +61,9 @@ public class Executor implements Runnable
 	
 	/** The monitors of blocked threads that need to be reactivated. */
 	protected List<Object>	switchtos;
+	
+	/** The exceptions (if any) to be thrown in threads that need to be reactivated. */
+	protected Map<Object, Throwable>	throwables;
 	
 //	protected Thread thread;
 		
@@ -304,8 +309,10 @@ public class Executor implements Runnable
 	/**
 	 *  Cease execution of the current thread and
 	 *  switch to another thread waiting for the given monitor.
+	 *  @param monitor	The monitor to be notified.
+	 *  @param t	The exception to be thrown on the unblocked thread (null for continuing normal execution).
 	 */
-	public void	switchThread(Object monitor)
+	public void	switchThread(Object monitor, Throwable t)
 	{
 		synchronized(this)
 		{
@@ -314,6 +321,15 @@ public class Executor implements Runnable
 				switchtos = new LinkedList<Object>();
 			}
 			switchtos.add(monitor);
+			
+			if(t!=null)
+			{
+				if(throwables==null)
+				{
+					throwables = new HashMap<Object, Throwable>();
+				}
+				throwables.put(monitor, t);
+			}
 		}
 		
 		// Make sure execution is running.
@@ -345,6 +361,26 @@ public class Executor implements Runnable
 				throw new RuntimeException(e);
 			}
 
+			if(throwables!=null)
+			{
+				Throwable	t	= throwables.remove(monitor);
+				if(t!=null)
+				{
+					if(t instanceof Error)
+					{
+						throw (Error)t;
+					}
+					else if(t instanceof RuntimeException)
+					{
+						throw (RuntimeException)t;
+					}
+					else
+					{
+						throw new RuntimeException(t);
+					}
+				}
+			}
+			
 			this.running = true;
 		}
 		
