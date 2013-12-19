@@ -15,6 +15,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.component.interceptors.CallAccess;
+import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -32,7 +33,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
@@ -104,6 +104,9 @@ public class Starter
 	/** The debug futures flag. */
 	public static final String DEBUGFUTURES = "debugfutures";
 	
+	/** The debug futures services. */
+	public static final String DEBUGSERVICES = "debugservices";
+	
 	/** The stack compaction disable flag. */
 	public static final String NOSTACKCOMPACTION = "nostackcompaction";
 	
@@ -131,6 +134,7 @@ public class Starter
 		RESERVED.add(COMPONENT);
 		RESERVED.add(PARAMETERCOPY);
 		RESERVED.add(DEBUGFUTURES);
+		RESERVED.add(DEBUGSERVICES);
 		RESERVED.add(NOSTACKCOMPACTION);
 		RESERVED.add(OPENGL);
 		RESERVED.add(DEFTIMEOUT);
@@ -314,6 +318,10 @@ public class Starter
 				else if(DEBUGFUTURES.equals(key) && "true".equals(val))
 				{
 					Future.DEBUG	= true;
+				}
+				else if(DEBUGSERVICES.equals(key) && "true".equals(val))
+				{
+					MethodInvocationInterceptor.DEBUG = true;
 				}
 				else if(DEFTIMEOUT.equals(key))
 				{

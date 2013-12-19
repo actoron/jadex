@@ -25,7 +25,12 @@ public @interface Belief
 	/**
 	 *  A dynamic belief is automatically updated when other beliefs change.
 	 */
-	public String[] events() default {};
+	public String[] beliefs() default {};
+	
+	/**
+	 *  The events this condition should react to.
+	 */
+	public RawEvent[] rawevents() default {};
 	
 	/**
 	 *  An update rate causes the belief to be reevaluated periodically.

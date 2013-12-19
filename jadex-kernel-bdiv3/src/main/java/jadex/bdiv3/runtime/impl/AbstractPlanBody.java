@@ -236,8 +236,13 @@ public abstract class AbstractPlanBody implements IPlanBody
 				ret.setResult(res);
 			}
 		}
+		catch(PlanFailureException e)
+		{
+			ret.setException(e);
+		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			ret.setException(e);
 		}
 		catch(BodyAborted ba)

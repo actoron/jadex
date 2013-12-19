@@ -350,7 +350,7 @@ public class BDIClassReader extends MicroClassReader
 					boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;
 					bdimodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i]), 
 						bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-						dynamic, bel.updaterate(), bel.events().length==0? null: bel.events()));
+						dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs()));
 //					beliefs.add(fields[i]);
 //					beliefnames.add(fields[i].getName());
 				}
@@ -418,7 +418,7 @@ public class BDIClassReader extends MicroClassReader
 						boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;
 						bdimodel.getCapability().addBelief(new MBelief(new MethodInfo(methods[i]), 
 							bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-							dynamic, bel.updaterate(), bel.events().length==0? null: bel.events()));
+							dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs()));
 					}
 				}
 			}

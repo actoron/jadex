@@ -16,6 +16,9 @@ import java.lang.reflect.Proxy;
  */
 public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 {
+	/** If debug is turned on it will print uncatched exceptions within service calls. */
+	public static boolean DEBUG = false;
+	
 	//-------- methods --------
 	
 	/**
@@ -139,22 +142,24 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 		catch(Exception e)
 		{
 //			System.out.println("e: "+sic.getMethod()+" "+sic.getObject()+" "+sic.getArgumentArray());
-//			e.printStackTrace();
+
+			Throwable	t	= e instanceof InvocationTargetException
+					? ((InvocationTargetException)e).getTargetException() : e;
+			Exception re = t instanceof Exception ? (Exception)t : new RuntimeException(t);
+			
+			if(DEBUG)
+			{
+				e.printStackTrace();
+			}
 			
 			if(sic.getMethod().getReturnType().equals(IFuture.class))
 			{
-				Future<?> fut = new Future();
-				Throwable	t	= e instanceof InvocationTargetException
-					? ((InvocationTargetException)e).getTargetException() : e;
-				fut.setException(t instanceof Exception ? (Exception)t : new RuntimeException(t));
-				sic.setResult(fut);
+				sic.setResult(new Future(re));
 			}
 			else
 			{
 //				e.printStackTrace();
-				Throwable	t	= e instanceof InvocationTargetException
-					? ((InvocationTargetException)e).getTargetException() : e;
-				throw t instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
+				throw re instanceof RuntimeException ? (RuntimeException)t : new RuntimeException(t);
 //				{
 //					public void printStackTrace()
 //					{

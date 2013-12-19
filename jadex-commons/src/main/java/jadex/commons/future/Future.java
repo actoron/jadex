@@ -352,6 +352,9 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
 //    		setException(new RuntimeException("Future in future not allowed."));
 //    	}
     	
+    	if(result!=null && result.getClass().getName().indexOf("Log")!=-1)
+    		System.out.println("setting log");
+    	
     	if(isDone())
     	{
     		if(this.exception!=null)
