@@ -1,12 +1,9 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.Base64;
 import jadex.commons.SReflect;
-import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
-import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;

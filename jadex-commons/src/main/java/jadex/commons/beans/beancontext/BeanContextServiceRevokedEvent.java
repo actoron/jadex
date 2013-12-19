@@ -17,8 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.beancontext.BeanContextEvent;
-import jadex.commons.beans.beancontext.BeanContextServices;
 
 @SuppressWarnings("unchecked")
 public class BeanContextServiceRevokedEvent extends BeanContextEvent {

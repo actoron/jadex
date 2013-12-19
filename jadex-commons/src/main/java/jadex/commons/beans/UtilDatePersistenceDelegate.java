@@ -17,11 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.DefaultPersistenceDelegate;
-import jadex.commons.beans.Encoder;
-import jadex.commons.beans.Expression;
-import jadex.commons.beans.Statement;
-
 import java.util.Date;
 
 class UtilDatePersistenceDelegate extends DefaultPersistenceDelegate {

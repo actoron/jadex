@@ -17,12 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.beancontext.BeanContext;
-import jadex.commons.beans.beancontext.BeanContextChild;
-import jadex.commons.beans.beancontext.BeanContextServiceProvider;
-import jadex.commons.beans.beancontext.BeanContextServiceRevokedListener;
-import jadex.commons.beans.beancontext.BeanContextServicesListener;
-
 import java.util.Iterator;
 import java.util.TooManyListenersException;
 @SuppressWarnings("unchecked")

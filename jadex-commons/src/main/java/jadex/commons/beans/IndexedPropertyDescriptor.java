@@ -17,10 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.IndexedPropertyDescriptor;
-import jadex.commons.beans.IntrospectionException;
-import jadex.commons.beans.PropertyDescriptor;
-
 import java.lang.reflect.Method;
 
 import org.apache.harmony.beans.BeansUtils;

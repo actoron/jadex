@@ -17,9 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.beancontext.BeanContext;
-import jadex.commons.beans.beancontext.BeanContextEvent;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;

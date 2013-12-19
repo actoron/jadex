@@ -2,6 +2,7 @@ package jadex.commons.future;
 
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 /**
  *  Future that support intermediate results.

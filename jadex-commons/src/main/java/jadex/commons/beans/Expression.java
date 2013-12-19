@@ -17,8 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.Statement;
-
 import org.apache.harmony.beans.internal.nls.Messages;
 
 public class Expression extends Statement {

@@ -1,6 +1,5 @@
 package jadex.commons.gui.autocombo;
 
-import jadex.bridge.ClassInfo;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPool;

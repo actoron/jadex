@@ -1,8 +1,6 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
 import jadex.commons.transformation.STransformation;
-import jadex.commons.transformation.annotations.Alias;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 import java.io.UnsupportedEncodingException;

@@ -17,8 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.beancontext.BeanContextMembershipEvent;
-
 import java.util.EventListener;
 
 public interface BeanContextMembershipListener extends EventListener {

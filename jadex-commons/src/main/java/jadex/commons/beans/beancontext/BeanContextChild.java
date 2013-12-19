@@ -20,7 +20,6 @@ package jadex.commons.beans.beancontext;
 import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.beans.PropertyVetoException;
 import jadex.commons.beans.VetoableChangeListener;
-import jadex.commons.beans.beancontext.BeanContext;
 
 
 public interface BeanContextChild {

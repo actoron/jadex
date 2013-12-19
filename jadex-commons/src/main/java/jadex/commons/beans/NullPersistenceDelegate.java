@@ -17,9 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.Encoder;
-import jadex.commons.beans.Expression;
-import jadex.commons.beans.PersistenceDelegate;
 
 class NullPersistenceDelegate extends PersistenceDelegate {
     @Override

@@ -1,7 +1,6 @@
 package jadex.commons.transformation.binaryserializer;
 
 import jadex.commons.MethodInfo;
-import jadex.commons.transformation.binaryserializer.EncodingContext;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 

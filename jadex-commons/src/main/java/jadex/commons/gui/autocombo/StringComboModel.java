@@ -1,21 +1,10 @@
 package jadex.commons.gui.autocombo;
 
-import jadex.commons.IFilter;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminationCommand;
 import jadex.commons.future.SubscriptionIntermediateFuture;
-import jadex.commons.gui.future.SwingIntermediateResultListener;
 
-import java.io.File;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

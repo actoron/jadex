@@ -17,10 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.BeanDescriptor;
-import jadex.commons.beans.BeanInfo;
-import jadex.commons.beans.IntrospectionException;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;

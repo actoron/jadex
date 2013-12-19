@@ -17,7 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.PropertyChangeEvent;
 
 /**
  * Indicates that a proposed property change is unacceptable.

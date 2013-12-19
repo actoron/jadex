@@ -17,10 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.FeatureDescriptor;
-import jadex.commons.beans.MethodDescriptor;
-import jadex.commons.beans.ParameterDescriptor;
-
 import java.lang.reflect.Method;
 
 /**

@@ -17,8 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.beancontext.BeanContextServices;
-
 import java.util.Iterator;
 
 @SuppressWarnings("unchecked")

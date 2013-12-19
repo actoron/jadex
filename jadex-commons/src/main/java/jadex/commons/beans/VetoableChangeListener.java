@@ -17,9 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyVetoException;
-
 import java.util.EventListener;
 
 public interface VetoableChangeListener extends EventListener {

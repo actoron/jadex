@@ -109,7 +109,7 @@ public class Executor implements Runnable
 		}
 		
 		EXECUTOR.set(this);
-		
+				
 		// running is already set to true in execute()
 		
 		boolean	iwanttorun	= true;

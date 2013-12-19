@@ -1,15 +1,24 @@
 package jadex.commons.gui;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-
-import java.util.Vector;
-import java.awt.*;
-
-import javax.swing.tree.*;
-
+import java.awt.Component;
 import java.util.Enumeration;
+import java.util.Vector;
+
+import javax.swing.AbstractListModel;
+import javax.swing.ComboBoxModel;
+import javax.swing.Icon;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JTree;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
 
 public class TreeCombo extends JComboBox {
     static final int OFFSET = 16;

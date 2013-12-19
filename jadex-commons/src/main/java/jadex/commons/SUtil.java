@@ -1,7 +1,6 @@
 package jadex.commons;
 
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.IThreadPool;
 
 import java.io.File;
 import java.io.FileInputStream;

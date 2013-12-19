@@ -17,8 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.FeatureDescriptor;
-
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;

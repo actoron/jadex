@@ -17,8 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.beancontext.BeanContextServiceAvailableEvent;
-import jadex.commons.beans.beancontext.BeanContextServiceRevokedListener;
 
 public interface BeanContextServicesListener extends
         BeanContextServiceRevokedListener {

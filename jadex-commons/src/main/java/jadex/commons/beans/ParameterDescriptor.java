@@ -17,7 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.FeatureDescriptor;
 
 public class ParameterDescriptor extends FeatureDescriptor {
 

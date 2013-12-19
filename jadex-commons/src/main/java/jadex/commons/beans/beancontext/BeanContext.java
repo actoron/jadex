@@ -19,8 +19,6 @@ package jadex.commons.beans.beancontext;
 
 import jadex.commons.beans.DesignMode;
 import jadex.commons.beans.Visibility;
-import jadex.commons.beans.beancontext.BeanContextChild;
-import jadex.commons.beans.beancontext.BeanContextMembershipListener;
 
 import java.io.IOException;
 import java.io.InputStream;

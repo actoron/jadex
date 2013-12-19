@@ -17,7 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.PropertyChangeListener;
 
 public interface Customizer {
 

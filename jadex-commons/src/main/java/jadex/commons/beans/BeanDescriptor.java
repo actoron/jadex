@@ -17,7 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.FeatureDescriptor;
 
 /**
  * Describes a bean's global information.

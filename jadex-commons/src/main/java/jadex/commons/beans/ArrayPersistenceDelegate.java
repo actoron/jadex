@@ -17,12 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.ArrayPersistenceDelegate;
-import jadex.commons.beans.Encoder;
-import jadex.commons.beans.Expression;
-import jadex.commons.beans.PersistenceDelegate;
-import jadex.commons.beans.Statement;
-
 import java.lang.reflect.Array;
 
 class ArrayPersistenceDelegate extends PersistenceDelegate {

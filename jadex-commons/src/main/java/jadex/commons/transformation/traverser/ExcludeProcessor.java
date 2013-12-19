@@ -1,7 +1,5 @@
 package jadex.commons.transformation.traverser;
 
-import jadex.commons.SReflect;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;

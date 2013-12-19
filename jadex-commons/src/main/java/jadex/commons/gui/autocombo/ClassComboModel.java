@@ -11,9 +11,7 @@ import jadex.commons.gui.future.SwingIntermediateResultListener;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.regex.Matcher;

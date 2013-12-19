@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-
 import org.apache.harmony.beans.internal.nls.Messages;
 import org.xml.sax.Attributes;
 

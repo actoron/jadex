@@ -17,8 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.beancontext.BeanContext;
-
 import java.util.EventObject;
 
 public abstract class BeanContextEvent extends EventObject {

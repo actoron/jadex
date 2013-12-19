@@ -217,14 +217,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 //						System.out.println("fret ex: "+exception);
 //					}
 //				});
-				if(method.getName().indexOf("addEntry")!=-1)
-					System.out.println("addE1");
 				sic.invoke(service, method, myargs).addResultListener(new ExceptionDelegationResultListener<Void, Object>(fret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						if(method.getName().indexOf("addEntry")!=-1)
-							System.out.println("addE1");
 						FutureFunctionality.connectDelegationFuture((Future<?>)fret, (IFuture<?>)sic.getResult());
 					}
 				});

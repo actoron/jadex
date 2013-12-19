@@ -243,7 +243,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	/**
 	 *  Clean up this component.
 	 */
-	protected void	cleanup()
+	public void cleanup()
 	{
 		super.cleanup();
 		if(parenta!=null)

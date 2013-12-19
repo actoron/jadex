@@ -23,17 +23,11 @@ import jadex.commons.beans.PropertyChangeSupport;
 import jadex.commons.beans.PropertyVetoException;
 import jadex.commons.beans.VetoableChangeListener;
 import jadex.commons.beans.VetoableChangeSupport;
-import jadex.commons.beans.beancontext.BeanContext;
-import jadex.commons.beans.beancontext.BeanContextChild;
-import jadex.commons.beans.beancontext.BeanContextServiceAvailableEvent;
-import jadex.commons.beans.beancontext.BeanContextServiceRevokedEvent;
-import jadex.commons.beans.beancontext.BeanContextServicesListener;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
 
 import org.apache.harmony.beans.internal.nls.Messages;
 

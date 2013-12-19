@@ -17,10 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.DefaultPersistenceDelegate;
-import jadex.commons.beans.Encoder;
-import jadex.commons.beans.Expression;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 

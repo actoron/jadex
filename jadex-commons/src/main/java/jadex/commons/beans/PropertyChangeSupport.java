@@ -17,12 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.IndexedPropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
-import jadex.commons.beans.PropertyChangeListenerProxy;
-import jadex.commons.beans.PropertyChangeSupport;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

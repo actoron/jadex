@@ -17,9 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
-
 import java.util.EventListenerProxy;
 
 public class PropertyChangeListenerProxy extends EventListenerProxy implements

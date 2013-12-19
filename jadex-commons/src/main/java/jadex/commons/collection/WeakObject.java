@@ -1,6 +1,5 @@
 package jadex.commons.collection;
 
-import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 

@@ -17,10 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.Encoder;
-import jadex.commons.beans.Expression;
-import jadex.commons.beans.Statement;
-
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;

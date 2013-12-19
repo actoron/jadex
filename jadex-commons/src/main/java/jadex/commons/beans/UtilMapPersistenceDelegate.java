@@ -17,12 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.DefaultPersistenceDelegate;
-import jadex.commons.beans.Encoder;
-import jadex.commons.beans.Expression;
-import jadex.commons.beans.PersistenceDelegate;
-import jadex.commons.beans.Statement;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;

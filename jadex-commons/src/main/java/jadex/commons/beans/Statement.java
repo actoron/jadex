@@ -17,8 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.Statement;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

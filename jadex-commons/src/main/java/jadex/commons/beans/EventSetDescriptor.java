@@ -17,14 +17,10 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.EventSetDescriptor;
-import jadex.commons.beans.FeatureDescriptor;
-import jadex.commons.beans.IntrospectionException;
-import jadex.commons.beans.MethodDescriptor;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.TooManyListenersException;
+
 import org.apache.harmony.beans.internal.nls.Messages;
 
 public class EventSetDescriptor extends FeatureDescriptor {

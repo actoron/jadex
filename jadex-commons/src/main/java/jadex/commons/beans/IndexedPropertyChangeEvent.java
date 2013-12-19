@@ -17,7 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.PropertyChangeEvent;
 
 /**
  * A type of {@link PropertyChangeEvent} that indicates that an indexed property

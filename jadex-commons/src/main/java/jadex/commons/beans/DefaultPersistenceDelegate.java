@@ -17,15 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.BeanInfo;
-import jadex.commons.beans.Encoder;
-import jadex.commons.beans.Expression;
-import jadex.commons.beans.IntrospectionException;
-import jadex.commons.beans.Introspector;
-import jadex.commons.beans.PersistenceDelegate;
-import jadex.commons.beans.PropertyDescriptor;
-import jadex.commons.beans.Statement;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;

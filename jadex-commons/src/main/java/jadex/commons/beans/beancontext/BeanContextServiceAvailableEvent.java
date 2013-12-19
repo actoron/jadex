@@ -17,9 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.beancontext.BeanContextEvent;
-import jadex.commons.beans.beancontext.BeanContextServices;
-
 import java.util.Iterator;
 @SuppressWarnings("unchecked")
 public class BeanContextServiceAvailableEvent extends BeanContextEvent {

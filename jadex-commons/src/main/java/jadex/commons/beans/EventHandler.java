@@ -17,12 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.BeanInfo;
-import jadex.commons.beans.EventHandler;
-import jadex.commons.beans.IntrospectionException;
-import jadex.commons.beans.Introspector;
-import jadex.commons.beans.PropertyDescriptor;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

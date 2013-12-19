@@ -17,8 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.ExceptionListener;
-import jadex.commons.beans.Expression;
 import jadex.commons.beans.Statement.MethodComparator;
 
 import java.io.InputStream;
@@ -28,7 +26,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
-
 
 import javax.xml.parsers.SAXParserFactory;
 

@@ -17,9 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.PropertyEditor;
-import jadex.commons.beans.PropertyEditorManager;
-
 import java.util.HashMap;
 import java.util.Map;
 

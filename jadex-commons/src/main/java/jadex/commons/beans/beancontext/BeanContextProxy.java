@@ -17,7 +17,6 @@
 
 package jadex.commons.beans.beancontext;
 
-import jadex.commons.beans.beancontext.BeanContextChild;
 
 public interface BeanContextProxy {
 

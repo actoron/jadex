@@ -34,7 +34,7 @@ import jadex.commons.future.ISuspendable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +83,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected volatile boolean executing;
 	
 	/** The blocked threads (i.e. monitors) to be aborted on termination. */
-	protected Set<Object>	blocked;
+	protected Map<Object, Executor>	blocked;
 	
 	//-------- steppable attributes --------
 	
@@ -835,9 +835,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		if(blocked==null)
 		{
-			blocked	= new HashSet<Object>();
+			blocked	= new HashMap<Object, Executor>();
 		}
-		blocked.add(monitor);
+		blocked.put(monitor, exe);
 		
 		exe.blockThread(monitor);
 		
@@ -885,13 +885,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			throw new RuntimeException("Can only unblock current component thread: "+componentthread+", "+Thread.currentThread());
 		}
 		
-		Executor	exe	= Executor.EXECUTOR.get();
-		if(exe==null)
-		{
-			throw new RuntimeException("Cannot unblock: no executor");
-		}
+//		Executor	exe	= Executor.EXECUTOR.get();
+//		if(exe==null)
+//		{
+//			throw new RuntimeException("Cannot unblock: no executor");
+//		}
 		
-		blocked.remove(monitor);
+		Executor exe = blocked.remove(monitor);
 		if(blocked.isEmpty())
 		{
 			blocked	= null;
@@ -1121,7 +1121,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			
 //			System.out.println("Checking ext entries after cleanup: "+cid);
 			assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
-
 		}
 	}
 
@@ -1133,15 +1132,15 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/**
 	 *  Clean up this component.
 	 */
-	protected void	cleanup()
+	public void	cleanup()
 	{
 //		if(toString().indexOf("Tester@")!=-1)
 //		{
-//			System.err.println("cleanup: "+this+", "+(blocked!=null?blocked.size():0));
+			System.err.println("cleanup: "+this+", "+(blocked!=null?blocked.size():0));
 //		}
 		while(blocked!=null && !blocked.isEmpty())
 		{
-			unblock(blocked.iterator().next());
+			unblock(blocked.keySet().iterator().next());
 		}
 	}
 }

@@ -17,7 +17,6 @@
 
 package jadex.commons.beans;
 
-import java.net.URL;
 
 public class SimpleBeanInfo implements BeanInfo {
 

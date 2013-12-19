@@ -24,11 +24,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Vector;
 
 import org.apache.harmony.beans.internal.nls.Messages;
 

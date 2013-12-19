@@ -17,12 +17,6 @@
 
 package jadex.commons.beans;
 
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyVetoException;
-import jadex.commons.beans.VetoableChangeListener;
-import jadex.commons.beans.VetoableChangeListenerProxy;
-import jadex.commons.beans.VetoableChangeSupport;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
