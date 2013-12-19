@@ -85,12 +85,14 @@ public class HttpReceiver
 			{
 				public void resultAvailable(String curadrs)
 				{
+					System.err.println("fetchServerAddresses: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 					if(!shutdown)
 					{
 						selectServer(curadrs).addResultListener(new IResultListener<String>()
 						{
 							public void resultAvailable(final String adr)
 							{
+								System.err.println("selectServer: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 								if(!shutdown)
 								{
 									handleConnection(adr).addResultListener(new IResultListener<Void>()
@@ -316,6 +318,7 @@ public class HttpReceiver
 						{
 							String	curadrs	= transport.getConnectionManager().getServers(adr);
 							log(Level.INFO, "Relay transport got server addresses from: "+adr+", "+curadrs);
+							System.err.println("fetchServerAddresses/setResultIfUndone: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 							ret.setResultIfUndone(curadrs);
 						}
 						catch(Exception e)
@@ -380,6 +383,7 @@ public class HttpReceiver
 						try
 						{
 							transport.getConnectionManager().ping(adr);
+							System.err.println("selectServer/setResultIfUndone: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 							ret.setResultIfUndone(adr);
 						}
 						catch(Exception e)
