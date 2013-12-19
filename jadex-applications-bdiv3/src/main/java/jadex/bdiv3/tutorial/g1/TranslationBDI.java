@@ -9,6 +9,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
+import jadex.micro.annotation.AgentKilled;
 
 import java.io.BufferedReader;
 import java.io.IOException;
