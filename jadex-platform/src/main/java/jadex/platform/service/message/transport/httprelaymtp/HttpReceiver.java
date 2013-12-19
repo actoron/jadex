@@ -76,7 +76,7 @@ public class HttpReceiver
 	// todo: why restarted thousand times on toaster #501?
 	public void start()
 	{
-		System.err.println("(re)start: "+access.getComponentIdentifier()+", "+System.currentTimeMillis());
+		System.err.println("(re)start: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 		
 		if(!shutdown)
 		{
@@ -98,7 +98,7 @@ public class HttpReceiver
 										public void resultAvailable(Void result)
 										{
 											// Connection should always end with error. 
-											assert true;
+											assert false;
 										}
 										
 										public void exceptionOccurred(Exception exception)
@@ -128,7 +128,7 @@ public class HttpReceiver
 				
 				protected void restart(Exception e)
 				{
-					System.err.println("exception: "+access.getComponentIdentifier()+", "+System.currentTimeMillis());
+					System.err.println("exception: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 					e.printStackTrace();
 					String copy = address;
 					if(copy!=null)
@@ -173,7 +173,7 @@ public class HttpReceiver
 	 */
 	public void	stop()
 	{
-		System.err.println("stop: "+access.getComponentIdentifier()+", "+System.currentTimeMillis());
+		System.err.println("stop: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 		shutdown	= true;
 		access	= null;
 		address	= null;
@@ -411,20 +411,24 @@ public class HttpReceiver
 	 */
 	protected IFuture<Void> handleConnection(final String adr)
 	{
+		System.err.println("handleConnection: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(access.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
 			public void customResultAvailable(final IMessageService ms)
 			{
+				System.err.println("getService: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 				ms.getAllCodecs().addResultListener(new ExceptionDelegationResultListener<Map<Byte,ICodec>, Void>(ret)
 				{
 					public void customResultAvailable(final Map<Byte,ICodec> codecs)
 					{
+						System.err.println("getAllCodecs: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 						transport.getThreadPool().execute(new Runnable()
 						{
 							public void run()
 							{
+								System.err.println("run: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 								HttpURLConnection	con	= null;
 								Timer	timeout	= null;
 								try
@@ -486,6 +490,7 @@ public class HttpReceiver
 								}
 								catch(Exception e)
 								{
+									System.err.println("setException: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 									ret.setException(e);
 								}
 								
