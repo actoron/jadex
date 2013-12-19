@@ -45,8 +45,18 @@ public class MethodPlanBody extends AbstractPlanBody
 			{
 				t	= ((InvocationTargetException)e).getTargetException();
 			}
-			throw t instanceof RuntimeException
-				? (RuntimeException)t : new RuntimeException(t);
+			if(t instanceof RuntimeException)
+			{
+				throw (RuntimeException)t;
+			}
+			else if(t instanceof Error)
+			{
+				throw (Error)t;
+			}
+			else
+			{
+				throw new RuntimeException(t);
+			}
 		}
 	}
 	

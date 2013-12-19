@@ -238,9 +238,9 @@ public class ClassPlanBody extends AbstractPlanBody
 		catch(Exception e)
 		{
 			Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
-			if(t instanceof BodyAborted)
+			if(t instanceof Error)
 			{
-				throw (BodyAborted)t;
+				throw (Error)t;
 			}
 			else if(t instanceof RuntimeException)
 			{

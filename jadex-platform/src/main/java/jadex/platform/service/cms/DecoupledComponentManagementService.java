@@ -1134,7 +1134,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
-		System.out.println("Terminating component1: "+cid.getName());
+//		System.out.println("Terminating component1: "+cid.getName());
 		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		System.err.println("kill compo: "+cid+" "+(sc!=null? sc.getCaller(): "null"));
