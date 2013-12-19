@@ -384,7 +384,10 @@ public class Future<E> implements IFuture<E>, IForwardCommandFuture
     public boolean	setResultIfUndone(E result)
     {
     	boolean	ret	= doSetResultIfUndone(result);
-    	resume();
+    	if(ret)
+    	{
+    		resume();
+    	}
     	return ret;
     }
     
