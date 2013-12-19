@@ -76,7 +76,7 @@ public class HttpReceiver
 	// todo: why restarted thousand times on toaster #501?
 	public void start()
 	{
-		System.err.println("(re)start: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//		System.err.println("(re)start: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 		
 		if(!shutdown)
 		{
@@ -85,14 +85,14 @@ public class HttpReceiver
 			{
 				public void resultAvailable(String curadrs)
 				{
-					System.err.println("fetchServerAddresses: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//					System.err.println("fetchServerAddresses: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 					if(!shutdown)
 					{
 						selectServer(curadrs).addResultListener(new IResultListener<String>()
 						{
 							public void resultAvailable(final String adr)
 							{
-								System.err.println("selectServer: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//								System.err.println("selectServer: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 								if(!shutdown)
 								{
 									handleConnection(adr).addResultListener(new IResultListener<Void>()
@@ -130,8 +130,8 @@ public class HttpReceiver
 				
 				protected void restart(Exception e)
 				{
-					System.err.println("exception: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
-					e.printStackTrace();
+//					System.err.println("exception: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//					e.printStackTrace();
 					String copy = address;
 					if(copy!=null)
 					{
@@ -175,7 +175,7 @@ public class HttpReceiver
 	 */
 	public void	stop()
 	{
-		System.err.println("stop: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//		System.err.println("stop: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 		shutdown	= true;
 		access	= null;
 		address	= null;
@@ -318,7 +318,7 @@ public class HttpReceiver
 						{
 							String	curadrs	= transport.getConnectionManager().getServers(adr);
 							log(Level.INFO, "Relay transport got server addresses from: "+adr+", "+curadrs);
-							System.err.println("fetchServerAddresses/setResultIfUndone: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//							System.err.println("fetchServerAddresses/setResultIfUndone: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 							ret.setResultIfUndone(curadrs);
 						}
 						catch(Exception e)
@@ -383,7 +383,7 @@ public class HttpReceiver
 						try
 						{
 							transport.getConnectionManager().ping(adr);
-							System.err.println("selectServer/setResultIfUndone: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//							System.err.println("selectServer/setResultIfUndone: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 							ret.setResultIfUndone(adr);
 						}
 						catch(Exception e)
@@ -415,24 +415,24 @@ public class HttpReceiver
 	 */
 	protected IFuture<Void> handleConnection(final String adr)
 	{
-		System.err.println("handleConnection: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//		System.err.println("handleConnection: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(access.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
 			public void customResultAvailable(final IMessageService ms)
 			{
-				System.err.println("getService: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//				System.err.println("getService: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 				ms.getAllCodecs().addResultListener(new ExceptionDelegationResultListener<Map<Byte,ICodec>, Void>(ret)
 				{
 					public void customResultAvailable(final Map<Byte,ICodec> codecs)
 					{
-						System.err.println("getAllCodecs: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//						System.err.println("getAllCodecs: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 						transport.getThreadPool().execute(new Runnable()
 						{
 							public void run()
 							{
-								System.err.println("run: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//								System.err.println("run: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 								HttpURLConnection	con	= null;
 								Timer	timeout	= null;
 								try
@@ -494,7 +494,7 @@ public class HttpReceiver
 								}
 								catch(Exception e)
 								{
-									System.err.println("setException: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
+//									System.err.println("setException: "+(access!=null?access.getComponentIdentifier().toString():"")+", "+System.currentTimeMillis()+", "+Thread.currentThread());
 									ret.setException(e);
 								}
 								
