@@ -291,6 +291,10 @@ public class BpmnToolbar extends AbstractEditingToolbar
 		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_CANCEL_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
 				"Throwing Cancel End Event", iconsize));
 		
+		sym = "invcircle";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_END_TERMINATE_THROWING, ImageProvider.SHAPE_ELLIPSE, sym, mxUtils.parseColor(BpmnStylesheetColor.END_EVENT_COLOR),
+				"Terminate End Event", iconsize));
+		
 		++row;
 		
 		sym = "bolt";

@@ -1008,6 +1008,16 @@ public class ImageProvider
 			g.setColor(color);
 			g.fill(shape);
 		}
+		else if ("invcircle".equals(name))
+		{
+			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+			Graphics2D g = ((BufferedImage) ret).createGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			Shape circle = EventShape.getCircleShape(0, 0, size.width, size.height);
+			g.setColor(color);
+			g.fill(circle);
+		}
 //		else if ("folder".equals(name))
 //		{
 //			ret = new BufferedImage(size.width, size.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);

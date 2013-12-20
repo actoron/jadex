@@ -143,6 +143,10 @@ public class EventShape extends mxEllipseShape
 		{
 			symbol = getPentagonShape(x, y, w, h);
 		}
+		else if (eventtype.endsWith("Terminate"))
+		{
+			symbol = getCircleShape(x, y, w, h);
+		}
 		
 		if (symbol != null)
 		{
@@ -331,6 +335,28 @@ public class EventShape extends mxEllipseShape
 		gp.lineTo(centerx + tlx2, y + th);
 		gp.closePath();
 		return gp;
+	}
+	
+	/**
+	 *  Creates a circle shape.
+	 *  
+	 *  @param x X-position.
+	 *  @param y Y-position.
+	 *  @param w Width.
+	 *  @param h Height.
+	 *  @return The shape.
+	 */
+	public static final Shape getCircleShape(double x, double y, double w, double h)
+	{
+		
+		double sf = 0.65;
+		x += (w - w * sf) * 0.5;
+		y += (h - h * sf) * 0.5;
+		w *= sf;
+		h *= sf;
+		
+		Ellipse2D ell = new Ellipse2D.Double(x, y, w, h);
+		return ell;
 	}
 	
 	/**

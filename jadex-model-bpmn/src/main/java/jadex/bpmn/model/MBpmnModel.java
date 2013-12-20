@@ -78,6 +78,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/** Constant for event end cancellation. */
 	public static final String EVENT_END_CANCEL = "EventEndCancel";
+	
+	/** Constant for event end cancellation. */
+	public static final String EVENT_END_TERMINATE = "EventEndTerminate";
 		
 	
 	/** Constant for event start empty. */

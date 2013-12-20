@@ -39,7 +39,7 @@ import java.util.Map;
 public class SBpmnModelWriter
 {
 	/** The build number */
-	public static final int BUILD = 30;
+	public static final int BUILD = 31;
 	
 	/** The indentation string. */
 	public static final String INDENT_STRING = "  ";
@@ -84,6 +84,7 @@ public class SBpmnModelWriter
 		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_SIGNAL, END_EVENT_TAG);
 		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_COMPENSATION, END_EVENT_TAG);
 		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_CANCEL, END_EVENT_TAG);
+		ACT_TYPE_MAPPING.put(MBpmnModel.EVENT_END_TERMINATE, END_EVENT_TAG);
 	}
 	
 	/**
@@ -1107,6 +1108,11 @@ public class SBpmnModelWriter
 				{
 					out.print(getIndent(baseind + 1));
 					out.println("<semantic:cancelEventDefinition/>");
+				}
+				else if (activity.getActivityType().contains("Terminate"))
+				{
+					out.print(getIndent(baseind + 1));
+					out.println("<semantic:terminateEventDefinition/>");
 				}
 				else if (activity.getActivityType().contains("Multipl"))
 				{

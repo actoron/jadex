@@ -494,6 +494,10 @@ public class SBpmnModelReader
 			{
 				evttypes.add(new Tuple2("Multiple", null));
 			}
+			else if ("terminateEventDefinition".equals(tag.getLocalPart()))
+			{
+				evttypes.add(new Tuple2("Terminate", null));
+			}
 		}
 		else if("sequenceFlow".equals(tag.getLocalPart()))
 		{
