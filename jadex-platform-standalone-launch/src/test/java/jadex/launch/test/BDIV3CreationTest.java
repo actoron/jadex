@@ -58,7 +58,8 @@ public class BDIV3CreationTest extends TestCase
 			}
 		});
 		
-		Collection<Tuple2<String, Object>>	results	= fut.get(sus, timeout);
+		// 2 times timeout should do on all build servers. if test fails, check if platform has ebcome slower ;-)
+		Collection<Tuple2<String, Object>>	results	= fut.get(sus, timeout*2);
 		
 //		// Write values to property files for hudson plot plugin.
 //		Collection<Tuple2<String, Object>>	results	= fut.get(sus, timeout);
