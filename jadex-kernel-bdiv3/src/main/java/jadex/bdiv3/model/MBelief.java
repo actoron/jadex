@@ -4,6 +4,7 @@ import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.commons.FieldInfo;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.rules.eca.EventType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -40,12 +41,15 @@ public class MBelief extends MElement
 	protected Boolean multi;
 	
 	/** The events this belief depends on. */
-	protected Set<String> events;
+	protected Collection<String> events;
+	
+	/** The raw events. */
+	protected Collection<EventType> rawevents;
 	
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, String[] events)
+	public MBelief(FieldInfo target, String impl, boolean dynamic, long updaterate, String[] events, Collection<EventType> rawevents)
 	{
 		super(target!=null? target.getName(): null);
 		this.ftarget = target;
@@ -63,6 +67,7 @@ public class MBelief extends MElement
 				this.events.add(ev);
 			}
 		}
+		this.rawevents = rawevents;
 		
 //		System.out.println("bel: "+(target!=null?target.getName():"")+" "+dynamic);
 	}
@@ -70,9 +75,9 @@ public class MBelief extends MElement
 	/**
 	 *  Create a new belief.
 	 */
-	public MBelief(MethodInfo target, String impl, boolean dynamic, long updaterate, String[] events)
+	public MBelief(MethodInfo target, String impl, boolean dynamic, long updaterate, String[] events, Collection<EventType> rawevents)
 	{
-		this((FieldInfo)null, impl, dynamic, updaterate, events);
+		this((FieldInfo)null, impl, dynamic, updaterate, events, rawevents);
 		
 		if(target.getName().startsWith("get"))
 		{
@@ -430,4 +435,24 @@ public class MBelief extends MElement
 		}
 		return ret;
 	}
+
+	/**
+	 *  Get the rawevents.
+	 *  @return The rawevents.
+	 */
+	public Collection<EventType> getRawEvents()
+	{
+		return rawevents;
+	}
+
+	/**
+	 *  Set the rawevents.
+	 *  @param rawevents The rawevents to set.
+	 */
+	public void setRawEvents(Set<EventType> rawevents)
+	{
+		this.rawevents = rawevents;
+	}
+	
+	
 }

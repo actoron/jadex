@@ -26,6 +26,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -59,6 +60,8 @@ public class BuyerBDI implements INegotiationAgent
 	@Belief
 	protected List<NegotiationReport> reports = new ArrayList<NegotiationReport>();
 	
+	protected Gui gui;
+	
 	/**
 	 *  The agent body.
 	 */
@@ -78,9 +81,21 @@ public class BuyerBDI implements INegotiationAgent
 		{
 			public void run()
 			{
-				Gui g = new Gui(agent.getExternalAccess());
+				gui = new Gui(agent.getExternalAccess());
 			}
 		});
+	}
+	
+	/**
+	 *  Called when agent terminates.
+	 */
+	@AgentKilled
+	public void shutdown()
+	{
+		if(gui!=null)
+		{
+			gui.dispose();
+		}
 	}
 	
 	@Goal(recur=true, recurdelay=10000, unique=true)
@@ -122,9 +137,11 @@ public class BuyerBDI implements INegotiationAgent
 	/**
 	 * 
 	 */
-	@Belief(rawevents={@RawEvent(ChangeEvent.GOALADOPTED), @RawEvent(ChangeEvent.GOALDROPPED)})
+	@Belief(rawevents={@RawEvent(ChangeEvent.GOALADOPTED), @RawEvent(ChangeEvent.GOALDROPPED), 
+		@RawEvent(ChangeEvent.PARAMETERCHANGED)})
 	public List<Order> getOrders()
 	{
+//		System.out.println("getOrders belief called");
 		List<Order> ret = new ArrayList<Order>();
 		Collection<PurchaseBook> goals = agent.getGoals(PurchaseBook.class);
 		for(PurchaseBook goal: goals)

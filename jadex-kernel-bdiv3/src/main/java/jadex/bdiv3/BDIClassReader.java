@@ -285,11 +285,11 @@ public class BDIClassReader extends MicroClassReader
 				MBelief	bel2;
 				if(bel.getField()!=null)
 				{
-					bel2	= new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]));
+					bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), new HashSet<EventType>(bel.getRawEvents()));
 				}
 				else
 				{
-					bel2	= new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]));
+					bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), new HashSet<EventType>(bel.getRawEvents()));
 					bel2.setSetter(bel.getSetter());
 				}
 				bel2.setName(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+bel.getName());
@@ -347,10 +347,22 @@ public class BDIClassReader extends MicroClassReader
 				{
 //					System.out.println("found belief: "+fields[i].getName());
 					Belief bel = getAnnotation(fields[i], Belief.class, cl);
-					boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;
+					
+					Set<EventType> rawevents = null;
+					if(bel.rawevents().length>0)
+					{
+						rawevents = new HashSet<EventType>();
+						RawEvent[] rawevs = bel.rawevents();
+						for(RawEvent rawev: rawevs)
+						{
+							rawevents.add(BDIAgentInterpreter.createEventType(rawev)); 
+						}
+					}
+
+					boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;// || bel.beliefs().length>0 || bel.rawevents().length>0;
 					bdimodel.getCapability().addBelief(new MBelief(new FieldInfo(fields[i]), 
 						bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-						dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs()));
+						dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs(), rawevents));
 //					beliefs.add(fields[i]);
 //					beliefnames.add(fields[i].getName());
 				}
@@ -415,10 +427,21 @@ public class BDIClassReader extends MicroClassReader
 					}
 					else
 					{
-						boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;
+						Set<EventType> rawevents = null;
+						if(bel.rawevents().length>0)
+						{
+							rawevents = new HashSet<EventType>();
+							RawEvent[] rawevs = bel.rawevents();
+							for(RawEvent rawev: rawevs)
+							{
+								rawevents.add(BDIAgentInterpreter.createEventType(rawev)); 
+							}
+						}
+						
+						boolean	dynamic	= bel.dynamic() || bel.updaterate()>0;// || rawevents!=null || bel.beliefs().length>0;
 						bdimodel.getCapability().addBelief(new MBelief(new MethodInfo(methods[i]), 
 							bel.implementation().getName().equals(Object.class.getName())? null: bel.implementation().getName(),
-							dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs()));
+							dynamic, bel.updaterate(), bel.beliefs().length==0? null: bel.beliefs(), rawevents));
 					}
 				}
 			}

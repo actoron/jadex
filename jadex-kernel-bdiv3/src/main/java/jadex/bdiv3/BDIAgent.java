@@ -152,7 +152,7 @@ public class BDIAgent extends MicroAgent
 	public void addBeliefListener(String name, final IBeliefListener listener)
 	{
 		BDIModel	bdimodel	= (BDIModel)getInterpreter().getMicroModel();
-		final String	fname	= bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
+		String fname = bdimodel.getBeliefMappings().containsKey(name) ? bdimodel.getBeliefMappings().get(name) : name;
 		
 		List<EventType> events = new ArrayList<EventType>();
 		BDIAgentInterpreter.addBeliefEvents(this, events, fname);
@@ -184,6 +184,10 @@ public class BDIAgent extends MicroAgent
 					{
 						Object[] vals = (Object[])event.getContent();
 						listener.factChanged(vals[0], vals[1], vals[2]);
+					}
+					else if(ChangeEvent.BELIEFCHANGED.equals(event.getType().getType(0)))
+					{
+						listener.beliefChanged(event.getContent());
 					}
 				}
 				return IFuture.DONE;

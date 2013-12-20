@@ -25,6 +25,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
@@ -55,6 +56,8 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 	@Belief
 	protected List<NegotiationReport> reports = new ArrayList<NegotiationReport>();
 
+	protected Gui gui;
+	
 	/**
 	 *  The agent body.
 	 */
@@ -74,9 +77,21 @@ public class SellerBDI implements IBuyBookService, INegotiationAgent
 		{
 			public void run()
 			{
-				Gui g = new Gui(agent.getExternalAccess());
+				gui = new Gui(agent.getExternalAccess());
 			}
 		});
+	}
+	
+	/**
+	 *  Called when agent terminates.
+	 */
+	@AgentKilled
+	public void shutdown()
+	{
+		if(gui!=null)
+		{
+			gui.dispose();
+		}
 	}
 	
 	@Goal(recur=true, recurdelay=10000, unique=true)

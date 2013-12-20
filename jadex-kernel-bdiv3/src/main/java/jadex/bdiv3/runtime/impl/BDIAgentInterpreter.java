@@ -816,6 +816,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		for(final MBelief mbel: beliefs)
 		{
+			List<EventType> events = new ArrayList<EventType>();
+			
 			Collection<String> evs = mbel.getEvents();
 			if(evs!=null && !evs.isEmpty())
 			{
@@ -827,26 +829,44 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				}
 				final Object	capa	= ocapa;
 
-				List<EventType> events = new ArrayList<EventType>();
 				for(String ev: evs)
 				{
 					addBeliefEvents(getInternalAccess(), events, ev);
 				}
-				
+			}
+			
+			Collection<EventType> rawevents = mbel.getRawEvents();
+			if(rawevents!=null)
+			{
+				Collection<EventType> revs = mbel.getRawEvents();
+				if(revs!=null)
+					events.addAll(revs);
+			}
+		
+			if(!events.isEmpty())
+			{
 				Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
 					ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 //						System.out.println("belief update: "+event);
-						try
+						if(mbel.isFieldBelief())
 						{
-							Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
-							um.invoke(capa, new Object[0]);
+							try
+							{
+								Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
+								um.invoke(capa, new Object[0]);
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
 						}
-						catch(Exception e)
+						else
 						{
-							e.printStackTrace();
+							Object value = mbel.getValue(BDIAgentInterpreter.this);
+							BDIAgent.createChangeEvent(value, (BDIAgent)microagent, mbel.getName());
 						}
 						return IFuture.DONE;
 					}
