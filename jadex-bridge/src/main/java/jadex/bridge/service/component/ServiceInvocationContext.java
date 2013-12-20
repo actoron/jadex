@@ -176,10 +176,10 @@ public class ServiceInvocationContext
 		// Is next call defined by user?
 		this.call = CallAccess.getNextInvocation();
 		
-		if(caller!=null && caller.toString().startsWith("rms@") && method.getName().equals("getExternalAccess") && call==null)
-		{
-			System.out.println("hierskdfj");
-		}
+//		if(caller!=null && caller.toString().startsWith("rms@") && method.getName().equals("getExternalAccess") && call==null)
+//		{
+//			System.out.println("hierskdfj");
+//		}
 
 		if(call==null)
 		{
