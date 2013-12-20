@@ -316,7 +316,8 @@ public class SCreationController
 		{
 			if (SValidation.getMessagingEdgeValidationError(source, target) == null)
 			{
-				if (SValidation.convertMessageEventsForConnection(source, target))
+				if (SValidation.areMessageEventsConnectable(source, target) &&
+					SValidation.convertMessageEventsForConnection(source, target))
 				{
 					mxICell tmp = target;
 					target = source;
