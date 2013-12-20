@@ -348,8 +348,7 @@ public class EventShape extends mxEllipseShape
 	 */
 	public static final Shape getCircleShape(double x, double y, double w, double h)
 	{
-		
-		double sf = 0.65;
+		double sf = 0.4;
 		x += (w - w * sf) * 0.5;
 		y += (h - h * sf) * 0.5;
 		w *= sf;
