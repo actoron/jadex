@@ -182,14 +182,15 @@ public class SValidation
 		{
 			MActivity sact = (MActivity) ((VActivity) source).getBpmnElement();
 			MActivity tact = (MActivity) ((VActivity) target).getBpmnElement();
-			if ((sact.getActivityType().startsWith("Event") &&
+			if (((sact.getActivityType().startsWith("Event") &&
 				sact.getActivityType().endsWith("Message") &&
 				sact.isThrowing() &&
 				tact.getActivityType().startsWith("Event") &&
 				tact.getActivityType().endsWith("Message") &&
 				!tact.isThrowing()) ||
 				MBpmnModel.TASK.equals(sact.getActivityType()) &&
-				MBpmnModel.TASK.equals(tact.getActivityType()))
+				MBpmnModel.TASK.equals(tact.getActivityType())) ||
+				SValidation.areMessageEventsConnectable(source, target))
 			{
 				return null;
 			}
@@ -246,5 +247,105 @@ public class SValidation
 		}
 		
 		return error;
+	}
+	
+	/**
+	 *  Returns if one of two message events are connectable directly or through conversion to throwing.
+	 *  
+	 *  @param evt1 First event.
+	 *  @param evt2 Second event.
+	 *  @return True if they are connectable in some direction.
+	 */
+	public static final boolean areMessageEventsConnectable(Object source, Object target)
+	{
+		return (areMessageEventsConnectableInThisDirection(source, target) ||
+				areMessageEventsConnectableInThisDirection(target, source));
+	}
+	
+	/**
+	 *  Returns if one of two message events are connectable directly or through conversion to throwing
+	 *  in the given direction.
+	 *  
+	 *  @param evt1 First event.
+	 *  @param evt2 Second event.
+	 *  @return True if they are connectable in the given direction.
+	 */
+	public static final boolean areMessageEventsConnectableInThisDirection(Object source, Object target)
+	{
+		boolean ret = false;
+		if (source instanceof VActivity && target instanceof VActivity)
+		{
+			VActivity evt1 = (VActivity) source;
+			VActivity evt2 = (VActivity) target;
+			if (evt1.getBpmnElement() != null && evt2.getBpmnElement() != null)
+			{
+				MActivity mevt1 = (MActivity) evt1.getBpmnElement();
+				MActivity mevt2 = (MActivity) evt2.getBpmnElement();
+				
+				if (mevt1.getActivityType() != null && mevt1.getActivityType().endsWith("Message") &&
+					mevt2.getActivityType() != null && mevt2.getActivityType().endsWith("Message"))
+				{
+					boolean conv1 = mevt1.isThrowing();
+					conv1 |= (mevt1.getIncomingMessagingEdges() == null? 0 : mevt1.getIncomingMessagingEdges().size()) == 0;
+					boolean conv2 = !mevt2.isThrowing();
+					conv2 |= (mevt1.getOutgoingMessagingEdges() == null? 0 : mevt1.getOutgoingMessagingEdges().size()) == 0;
+					ret = conv1 && conv2 && (mevt1.getPool() != mevt2.getPool());
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Returns if one of two message events are connectable directly or through conversion to throwing
+	 *  in the given direction.
+	 *  
+	 *  @param source First event.
+	 *  @param target Second event.
+	 *  @return True if the direction needs to be flipped.
+	 */
+	public static final boolean convertMessageEventsForConnection(Object source, Object target)
+	{
+		boolean ret = false;
+		
+		if (areMessageEventsConnectableInThisDirection(target, source) &&
+			!((MActivity) (((VActivity) source).getBpmnElement())).isThrowing() &&
+			((MActivity) (((VActivity) target).getBpmnElement())).isThrowing())
+		{
+			VActivity tmp = (VActivity) source;
+			source = target;
+			target = tmp;
+			ret = true;
+		}
+		
+		if (!areMessageEventsConnectable(source, target))
+		{
+			if (areMessageEventsConnectable(target, source))
+			{
+				VActivity tmp = (VActivity) source;
+				source = target;
+				target = tmp;
+				ret = true;
+			}
+			else
+			{
+				throw new RuntimeException("Cannot convert events: " + source + " " + target);
+			}
+		}
+		
+		MActivity mevt1 = (MActivity) ((VActivity) source).getBpmnElement();
+		MActivity mevt2 = (MActivity) ((VActivity) target).getBpmnElement();
+		
+		if (!mevt1.isThrowing())
+		{
+			mevt1.setThrowing(true);
+		}
+		
+		if (mevt2.isThrowing())
+		{
+			mevt2.setThrowing(false);
+		}
+		
+		return ret;
 	}
 }

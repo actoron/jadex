@@ -1,7 +1,9 @@
 package jadex.bpmn.editor.gui.controllers;
 
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VDataEdge;
+import jadex.bpmn.editor.model.visual.VEdge;
 import jadex.bpmn.editor.model.visual.VLane;
 import jadex.bpmn.editor.model.visual.VMessagingEdge;
 import jadex.bpmn.editor.model.visual.VPool;
@@ -12,6 +14,7 @@ import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mxgraph.util.mxEvent;
@@ -27,7 +30,11 @@ public class DeletionController implements mxIEventListener
 	public DeletionController(ModelContainer container)
 	{
 		this.modelcontainer = container;
+//		modelcontainer.getGraph().getModel().addListener(mxEvent.CHANGE, this);
 		modelcontainer.getGraph().addListener(mxEvent.REMOVE_CELLS, this);
+//		modelcontainer.getGraph().addListener(mxEvent.CELLS_REMOVED, this);
+//		modelcontainer.getGraph().getModel().addListener(mxEvent.REMOVE_CELLS, this);
+//		modelcontainer.getGraph().getSelectionModel().addListener(mxEvent.REMOVE_CELLS, this);
 	}
 	
 	/**
@@ -102,20 +109,25 @@ public class DeletionController implements mxIEventListener
 				medge.getTarget().removeIncomingMessagingEdge(medge);
 				modelcontainer.setDirty(true);
 			}
-//			else if (cells[i] instanceof VActivity)
-//			{
-//				VActivity vact = (VActivity) cells[i];
+			else if (cells[i] instanceof VActivity)
+			{
+				VActivity vact = (VActivity) cells[i];
 //				MActivity mact = (MActivity) vact.getBpmnElement();
-//				
-//				for (int j = 0; j < vact.getEdgeCount(); ++j)
-//				{
-//					VEdge edge = (VEdge) vact.getEdgeAt(j);
-//					if (edge instanceof VSequenceEdge)
-//					{
-//						
-//					}
-//				}
-//			}
+				
+				final List<VEdge> deledges = new ArrayList<VEdge>();
+				for (int j = 0; j < vact.getEdgeCount(); ++j)
+				{
+					VEdge edge = (VEdge) vact.getEdgeAt(j);
+					if (edge instanceof VMessagingEdge)
+					{
+						deledges.add(edge);
+					}
+				}
+				
+				modelcontainer.getGraph().getModel().beginUpdate();
+				modelcontainer.getGraph().removeCells(deledges.toArray());
+				modelcontainer.getGraph().getModel().endUpdate();
+			}
 		}
 	}
 }

@@ -89,7 +89,17 @@ public class EdgeController extends mxConnectionHandler
 			{
 				if (source instanceof VActivity)
 				{
-					ret = SValidation.getSequenceEdgeValidationError(source, target);
+					if (target instanceof VActivity &&
+						((MActivity) ((VActivity) source).getBpmnElement()).getActivityType().endsWith("Message") &&
+						((MActivity) ((VActivity) target).getBpmnElement()).getActivityType().endsWith("Message") &&
+						SValidation.areMessageEventsConnectable(source, target))
+					{
+						ret = SValidation.getMessagingEdgeValidationError(source, target);
+					}
+					else
+					{
+						ret = SValidation.getSequenceEdgeValidationError(source, target);
+					}
 				}
 			}
 		}
@@ -219,7 +229,9 @@ public class EdgeController extends mxConnectionHandler
 						{
 							if (cell instanceof VMessagingEdge)
 							{
-								result = graph.addCell(cell, graph.getCurrentRoot(), null, src, trg);
+								result = graph.addCell(cell, null, null, ((VEdge) cell).getSource(), ((VEdge) cell).getTarget());
+//								result = graph.addCell(cell, graph.getCurrentRoot(), null, src, trg);
+//								result = graph.addCell(cell, ((mxICell) graph.getModel().getRoot()).getChildAt(0), null, src, trg);
 							}
 							else
 							{

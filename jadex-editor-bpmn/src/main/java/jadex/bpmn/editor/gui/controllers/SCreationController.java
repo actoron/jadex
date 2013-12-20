@@ -311,10 +311,18 @@ public class SCreationController
 		mxICell ret = null;
 		mxICell source = (mxICell) src;
 		mxICell target = (mxICell) tgt;
-		if (ModelContainer.EDIT_MODE_MESSAGING_EDGE.equals(mode))
+		if (ModelContainer.EDIT_MODE_MESSAGING_EDGE.equals(mode) ||
+			SValidation.areMessageEventsConnectable(source, target))
 		{
 			if (SValidation.getMessagingEdgeValidationError(source, target) == null)
 			{
+				if (SValidation.convertMessageEventsForConnection(source, target))
+				{
+					mxICell tmp = target;
+					target = source;
+					source = tmp;
+				}
+				
 				MMessagingEdge medge = new MMessagingEdge();
 				medge.setId(modelcontainer.getIdGenerator().generateId());
 				MActivity sact = (MActivity) ((VActivity) source).getBpmnElement();

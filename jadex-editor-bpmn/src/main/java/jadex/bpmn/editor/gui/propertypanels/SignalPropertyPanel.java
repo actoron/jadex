@@ -5,7 +5,6 @@ import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MProperty;
 import jadex.bridge.ClassInfo;
-import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.gui.autocombo.AutoComboTableCellEditor;
 import jadex.commons.gui.autocombo.AutoComboTableCellRenderer;
@@ -19,7 +18,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;

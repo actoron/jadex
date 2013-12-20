@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.model.visual;
 
+import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MMessagingEdge;
 
@@ -26,7 +27,7 @@ public class VMessagingEdge extends VEdge
 				VActivity vsrc = (VActivity) getSource();
 				((MActivity) vsrc.getBpmnElement()).removeOutgoingMessagingEdge(medge);
 			}
-			super.setSource(source);
+			this.source = source;
 			if (source != null)
 			{
 				VActivity vsrc = (VActivity) getSource();
@@ -36,8 +37,9 @@ public class VMessagingEdge extends VEdge
 		}
 		else
 		{
-			super.setSource(source);
+			this.source = source;
 		}
+		((BpmnGraph) graph).refreshCellView(this);
 	}
 	
 	/**
@@ -66,4 +68,5 @@ public class VMessagingEdge extends VEdge
 			super.setTarget(target);
 		}
 	}
+	
 }

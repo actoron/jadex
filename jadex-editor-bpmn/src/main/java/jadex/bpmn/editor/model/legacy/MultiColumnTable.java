@@ -321,7 +321,7 @@ public class MultiColumnTable
 			// remove last delimiter
 			buffer.delete(buffer.length()-", ".length(), buffer.length());
 			buffer.append(")");
-			System.out.println(buffer.toString());
+//			System.out.println(buffer.toString());
 			return buffer.toString();
 		}
 		

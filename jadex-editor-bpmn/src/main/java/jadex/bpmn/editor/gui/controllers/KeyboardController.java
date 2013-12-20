@@ -45,7 +45,17 @@ public class KeyboardController extends mxKeyboardHandler
 //				}
 				
 				graph.getModel().beginUpdate();
+//				Object[] cells = graph.getSelectionCells();
+//				graph.removeCells(cells);
+//				modelcontainer.getGraphComponent().refresh();
+//				System.out.println(graph.getSelectionCells().length);
 				graph.removeCells();
+//				
+//				for (Object cell : cells)
+//				{
+//					graph.getModel().remove(cell);
+//				}
+				
 				graph.getModel().endUpdate();
 			}
 		});

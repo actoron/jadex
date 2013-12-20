@@ -8,7 +8,6 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
-import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 
 import java.awt.Dimension;
