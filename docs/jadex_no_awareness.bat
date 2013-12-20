@@ -1,1 +1,1 @@
-java -jar lib\jadex-platform-standalone-launch-2.4.jar -awareness false
+java -jar lib\jadex-platform-standalone-launch-2.5-SNAPSHOT.jar -awareness false

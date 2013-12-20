@@ -6,11 +6,11 @@ Make sure that:
 - ADF checker works and is released
 
 Bump Revision:
-- set version number in poms (search '<version> 2.4 </version>')
-- set version number in example pom (search '<jadex.version> 2.4 </jadex.version>')
-- set version number in bats, shs, settings, txts (search '-2.4.jar')
-- set javadoc link in platform xml (search 'docs/jadex-2.4-javadoc') 
-- set version number in XMLs, XSDs (search '-2.4.xsd')
+- set version number in poms (search '<version> 2.5-SNAPSHOT </version>')
+- set version number in example pom (search '<jadex.version> 2.5-SNAPSHOT </jadex.version>')
+- set version number in bats, shs, settings, txts (search '-2.5-SNAPSHOT.jar')
+- set javadoc link in platform xml (search 'docs/jadex-2.5-javadoc') 
+- set version number in XMLs, XSDs (search '-2.5.xsd')
 - rename XSDs to reflect version number (search 'jadex' in *.xsd)
 - Add tag in SVN
 - After release: set version to <next revision>-SNAPSHOT (w/o SNAPSHOT for XSDs)

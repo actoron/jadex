@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-beans</artifactId>
 	<packaging>jar</packaging>
-	<version> 2.4 </version>
+	<version> 2.5-SNAPSHOT </version>
 	<name>jadex-beans</name>
 	<url>http://jadex.sourceforge.net</url>
 
