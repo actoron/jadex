@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Mit XMLSpy v2013 sp1 (x64) (http://www.altova.com) von Philip x (Uni HH) bearbeitet -->
 <xs:schema xmlns="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://jadex.sourceforge.net/jadex-envspace" elementFormDefault="qualified">
 	<xs:complexType name="actiontype">
 		<xs:annotation>
