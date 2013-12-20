@@ -313,11 +313,12 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 										try
 										{
 											Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Agent", null, cl);
-											ret.setResult(!Modifier.isAbstract(clazz.getModifiers()));
+											ret.setResult(!Modifier.isInterface(clazz.getModifiers()) && !Modifier.isAbstract(clazz.getModifiers()));
 										}
 										catch(Exception e)
 										{
-											ret.setException(e);
+											ret.setResult(Boolean.FALSE);
+//											ret.setException(e);
 										}
 									}
 								});		
@@ -332,9 +333,16 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 								}
 								catch(Exception e)
 								{
-									ret.setException(e);
+									ret.setResult(Boolean.FALSE);
+//									ret.setException(e);
 								}
 							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setResult(Boolean.FALSE);
+//							super.exceptionOccurred(exception);
 						}
 					});
 				}

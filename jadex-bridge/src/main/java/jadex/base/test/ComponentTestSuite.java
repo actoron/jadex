@@ -173,6 +173,8 @@ public class ComponentTestSuite extends TestSuite
 			{
 				if(((Boolean)SComponentFactory.isLoadable(platform, abspath, rid).get(ts)).booleanValue())
 				{
+//					if(abspath.indexOf("INeg")!=-1)
+//						System.out.println("test");
 					if(((Boolean)SComponentFactory.isStartable(platform, abspath, rid).get(ts)).booleanValue())
 					{
 //						System.out.println("Building TestCase: " + abspath);

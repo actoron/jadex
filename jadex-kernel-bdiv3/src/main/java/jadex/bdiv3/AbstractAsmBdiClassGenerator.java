@@ -7,6 +7,7 @@ import jadex.bdiv3.asm.IInnerClassNode;
 import jadex.bdiv3.asm.IMethodNode;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.rules.eca.EventType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +57,8 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			for(MBelief mbel : mbels)
 			{
 				Collection<String> evs = mbel.getEvents();
-				if(evs!=null && !evs.isEmpty() || mbel.isDynamic())
+				Collection<EventType> rawevs = mbel.getRawEvents();
+				if((evs!=null && !evs.isEmpty()) || (rawevs!=null && !rawevs.isEmpty()) || mbel.isDynamic())
 				{
 					tododyn.add(mbel.getName());
 				}

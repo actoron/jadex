@@ -3,10 +3,12 @@ package jadex.bdiv3.runtime.wrappers;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IResultCommand;
 import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.Event;
@@ -268,7 +270,7 @@ public class CollectionWrapper <T> implements Collection<T>
 	/**
 	 * 
 	 */
-	public void observeValue(Object val)
+	public void observeValue(final Object val)
 	{
 		if(val!=null)
 		{
@@ -276,15 +278,43 @@ public class CollectionWrapper <T> implements Collection<T>
 			{
 				public IFuture<IEvent> execute(final PropertyChangeEvent event)
 				{
-					return getInterpreter().scheduleStep(new IComponentStep<IEvent>()
+					final Future<IEvent> ret = new Future<IEvent>();
+					try
 					{
-						public IFuture<IEvent> execute(IInternalAccess ia)
+						IFuture<IEvent> fut = getInterpreter().scheduleStep(new IComponentStep<IEvent>()
 						{
-							publishToolBeliefEvent();
-							Event ev = new Event(changeevent, event.getNewValue());
-							return new Future<IEvent>(ev);
-						}
-					});
+							public IFuture<IEvent> execute(IInternalAccess ia)
+							{
+								publishToolBeliefEvent();
+								Event ev = new Event(changeevent, event.getNewValue());
+								return new Future<IEvent>(ev);
+							}
+						});
+						fut.addResultListener(new DelegationResultListener<IEvent>(ret)
+						{
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof ComponentTerminatedException)
+								{
+//									System.out.println("Ex in observe: "+exception.getMessage());
+									getRuleSystem().unobserveObject(val);
+									ret.setResult(null);
+								}
+								else
+								{
+									super.exceptionOccurred(exception);
+								}
+							}
+						});
+					}
+					catch(Exception e)
+					{
+						if(!(e instanceof ComponentTerminatedException))
+							System.out.println("Ex in observe: "+e.getMessage());
+						getRuleSystem().unobserveObject(val);
+						ret.setResult(null);
+					}
+					return ret;
 				}
 			});
 		}

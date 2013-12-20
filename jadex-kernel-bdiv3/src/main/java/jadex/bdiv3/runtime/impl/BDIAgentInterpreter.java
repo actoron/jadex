@@ -819,6 +819,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			List<EventType> events = new ArrayList<EventType>();
 			
 			Collection<String> evs = mbel.getEvents();
+			Object	cap = null;
 			if(evs!=null && !evs.isEmpty())
 			{
 				Object	ocapa	= agent;
@@ -827,7 +828,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				{
 					ocapa	= getCapabilityObject(mbel.getName().substring(0, mbel.getName().lastIndexOf(CAPABILITY_SEPARATOR)));
 				}
-				final Object	capa	= ocapa;
+				cap	= ocapa;
 
 				for(String ev: evs)
 				{
@@ -845,6 +846,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 			if(!events.isEmpty())
 			{
+				final Object fcapa = cap;
 				Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
 					ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
@@ -855,8 +857,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						{
 							try
 							{
-								Method um = capa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
-								um.invoke(capa, new Object[0]);
+								Method um = fcapa.getClass().getMethod(IBDIClassGenerator.DYNAMIC_BELIEF_UPDATEMETHOD_PREFIX+SUtil.firstToUpperCase(mbel.getName()), new Class[0]);
+								um.invoke(fcapa, new Object[0]);
 							}
 							catch(Exception e)
 							{

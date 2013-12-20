@@ -18,6 +18,7 @@ import jadex.bdiv3.runtime.impl.RProcessableElement;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -29,8 +30,10 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
 import jadex.rules.eca.Event;
@@ -630,7 +633,7 @@ public class BDIAgent extends MicroAgent
 	/**
 	 * 
 	 */
-	public static void observeValue(RuleSystem rs, Object val, final BDIAgentInterpreter agent, final EventType etype, final MBelief mbel)
+	public static void observeValue(final RuleSystem rs, final Object val, final BDIAgentInterpreter agent, final EventType etype, final MBelief mbel)
 	{
 		if(val!=null)
 		{
@@ -638,18 +641,46 @@ public class BDIAgent extends MicroAgent
 			{
 				public IFuture<IEvent> execute(final PropertyChangeEvent event)
 				{
-					return agent.scheduleStep(new IComponentStep<IEvent>()
+					final Future<IEvent> ret = new Future<IEvent>();
+					try
 					{
-						public IFuture<IEvent> execute(IInternalAccess ia)
+						IFuture<IEvent> fut = agent.scheduleStep(new IComponentStep<IEvent>()
 						{
-							publishToolBeliefEvent(agent, mbel);
-							
-	//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
-	//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
-							Event ev = new Event(etype, event.getNewValue());
-							return new Future<IEvent>(ev);
-						}
-					});
+							public IFuture<IEvent> execute(IInternalAccess ia)
+							{
+								publishToolBeliefEvent(agent, mbel);
+								
+		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
+		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
+								Event ev = new Event(etype, event.getNewValue());
+								return new Future<IEvent>(ev);
+							}
+						});
+						fut.addResultListener(new DelegationResultListener<IEvent>(ret)
+						{
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof ComponentTerminatedException)
+								{
+//									System.out.println("Ex in observe: "+exception.getMessage());
+									rs.unobserveObject(val);
+									ret.setResult(null);
+								}
+								else
+								{
+									super.exceptionOccurred(exception);
+								}
+							}
+						});
+					}
+					catch(Exception e)
+					{
+						if(!(e instanceof ComponentTerminatedException))
+							System.out.println("Ex in observe: "+e.getMessage());
+						rs.unobserveObject(val);
+						ret.setResult(null);
+					}
+					return ret;
 				}
 			});
 		}

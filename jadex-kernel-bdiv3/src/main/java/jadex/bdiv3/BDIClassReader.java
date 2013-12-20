@@ -285,11 +285,11 @@ public class BDIClassReader extends MicroClassReader
 				MBelief	bel2;
 				if(bel.getField()!=null)
 				{
-					bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), new HashSet<EventType>(bel.getRawEvents()));
+					bel2 = new MBelief(bel.getField(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
 				}
 				else
 				{
-					bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), new HashSet<EventType>(bel.getRawEvents()));
+					bel2 = new MBelief(bel.getGetter(), bel.getImplClassName(), bel.isDynamic(), bel.getUpdaterate(), events.toArray(new String[events.size()]), bel.getRawEvents()!=null? new HashSet<EventType>(bel.getRawEvents()): null);
 					bel2.setSetter(bel.getSetter());
 				}
 				bel2.setName(name+BDIAgentInterpreter.CAPABILITY_SEPARATOR+bel.getName());

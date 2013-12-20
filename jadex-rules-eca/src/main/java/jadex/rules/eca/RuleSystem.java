@@ -334,7 +334,10 @@ public class RuleSystem
 								{
 									public void resultAvailable(IEvent event)
 									{
-										addEvent(event);
+										if(event!=null)
+										{
+											addEvent(event);
+										}
 									}
 									
 									public void exceptionOccurred(Exception exception)
