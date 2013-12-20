@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IService;
@@ -729,6 +730,9 @@ public class RemoteReferenceModule
 			{
 				public void customResultAvailable(IComponentManagementService cms)
 				{
+					ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+					next.setProperty("debugsource", "RemoteReferenceModule.getTargetObject()");
+					
 					// fetch target component via component identifier.
 					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 					{

@@ -2,6 +2,7 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -77,6 +78,9 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
+				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+				next.setProperty("debugsource", "RemoteGetExternalAccessCommand.execute()");
+				
 //				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getExternalAccess(compid).addResultListener(new IResultListener<IExternalAccess>()
 				{

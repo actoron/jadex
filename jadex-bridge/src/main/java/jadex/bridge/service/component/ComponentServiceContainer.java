@@ -20,6 +20,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
+import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -60,7 +61,7 @@ import java.util.logging.Logger;
  *  Service container for active components.
  */
 public class ComponentServiceContainer	extends BasicServiceContainer
-{
+{	
 	//-------- attributes --------
 	
 	/** The component adapter. */
@@ -476,8 +477,14 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		final Future<Collection<IServiceProvider>> ret = new Future<Collection<IServiceProvider>>();
 //		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
 		
+		final List<String>	search	= ISearchManager.SEARCH.get();
+		
 		if(cms!=null)
 		{
+			ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+			next.setProperty("debugsource", "ComponentServiceContainer("+id+").getChildren() "+search);
+
+			
 //			final String id = SUtil.createUniqueId("abc", 3);
 //			System.out.println("getCh: "+id+" "+CallAccess.getNextInvocation());
 			cms.getChildren(adapter.getComponentIdentifier())
@@ -491,13 +498,16 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 //					}
 					if(children!=null)
 					{
-	//					System.out.println("childs: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));
+	//					System.out.println("children: "+adapter.getComponentIdentifier()+" "+SUtil.arrayToString(childs));
 						final IResultListener<IServiceProvider> lis = new CollectionResultListener<IServiceProvider>(
 							children.length, true, new DelegationResultListener<Collection<IServiceProvider>>(ret));
 						for(int i=0; i<children.length; i++)
 						{
 							if(cms!=null)
 							{
+								ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+								next.setProperty("debugsource", "ComponentServiceContainer("+id+").getChildren()2 "+search);
+								
 								cms.getExternalAccess(children[i]).addResultListener(new IResultListener<IExternalAccess>()
 								{
 									public void resultAvailable(IExternalAccess exta)

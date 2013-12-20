@@ -5,6 +5,7 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,6 +13,8 @@ import java.util.Map;
  */
 public interface ISearchManager
 {
+	public static final ThreadLocal<List<String>>	SEARCH	= new ThreadLocal<List<String>>();
+	
 	/**
 	 *  Search for services, starting at the given service provider.
 	 *  @param provider	The service provider to start the search at.

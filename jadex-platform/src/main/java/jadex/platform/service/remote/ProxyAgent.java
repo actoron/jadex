@@ -2,6 +2,7 @@ package jadex.platform.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.annotation.NFProperties;
 import jadex.bridge.nonfunctional.annotation.NFProperty;
@@ -65,6 +66,9 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 			public void resultAvailable(IComponentManagementService cms) 
 			{
 				rcms	= cms;
+				
+				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+				next.setProperty("debugsource", "ProxyAgent.agentCreated()");
 				
 				cms.getExternalAccess(getComponentIdentifier().getRoot())
 					.addResultListener(new IResultListener<IExternalAccess>()
@@ -176,6 +180,9 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
+				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+				next.setProperty("debugsource", "ProxyAgent.getConnectionState()");
+				
 				cms.getExternalAccess(rcid).addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess result) 
@@ -212,6 +219,9 @@ public class ProxyAgent extends MicroAgent	implements IProxyAgentService
 		final Future<Void>	ret	= new Future<Void>();
 		if(rcms!=null)
 		{
+			ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+			next.setProperty("debugsource", "ProxyAgent.refreshLatency()");
+			
 			rcms.getExternalAccess(rcid)
 				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 			{

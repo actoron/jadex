@@ -1,11 +1,13 @@
 package jadex.bridge.service.search;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 

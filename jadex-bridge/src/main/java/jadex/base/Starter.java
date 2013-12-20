@@ -283,8 +283,7 @@ public class Starter
 				scn.setCause(new Cause((String)null, "createPlatform"));
 			}
 			
-			if(scn!=null)
-				CallAccess.setCurrentInvocation(scn);
+			CallAccess.setCurrentInvocation(scn);
 		}
 		
 		try

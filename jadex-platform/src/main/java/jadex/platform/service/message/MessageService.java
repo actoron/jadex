@@ -13,6 +13,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.MessageFailureException;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.ServiceTerminatedException;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -508,6 +509,10 @@ public class MessageService extends BasicService implements IMessageService
 //						{
 //							public void customResultAvailable(IComponentManagementService cms)
 //							{
+								String	smsg	= "MessageService.sendMessage("+msg+")";
+								ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+								next.setProperty("debugsource", smsg);
+								
 								cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 								{
 									public void customResultAvailable(IExternalAccess exta)

@@ -3,6 +3,7 @@ package jadex.platform.service.remote.commands;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.IResultSelector;
@@ -183,6 +184,9 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
+				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+				next.setProperty("debugsource", "RemoteSearchCommand.execute()");
+				
 //				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getExternalAccess((IComponentIdentifier)providerid).addResultListener(new IResultListener<IExternalAccess>()
 				{

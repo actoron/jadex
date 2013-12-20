@@ -174,7 +174,13 @@ public class ServiceInvocationContext
 		this.lastcall = CallAccess.getCurrentInvocation();
 		
 		// Is next call defined by user?
-		this.call = CallAccess.getNextInvocation(); 
+		this.call = CallAccess.getNextInvocation();
+		
+		if(caller!=null && caller.toString().startsWith("rms@") && method.getName().equals("getExternalAccess") && call==null)
+		{
+			System.out.println("hierskdfj");
+		}
+
 		if(call==null)
 		{
 	//		Map<String, Object> props = call!=null ? new HashMap<String, Object>(call.getProperties()) : new HashMap<String, Object>();
