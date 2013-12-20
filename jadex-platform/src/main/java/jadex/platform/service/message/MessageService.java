@@ -509,9 +509,9 @@ public class MessageService extends BasicService implements IMessageService
 //						{
 //							public void customResultAvailable(IComponentManagementService cms)
 //							{
-								String	smsg	= "MessageService.sendMessage("+msg+")";
-								ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-								next.setProperty("debugsource", smsg);
+//								String	smsg	= "MessageService.sendMessage("+msg+")";
+//								ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+//								next.setProperty("debugsource", smsg);
 								
 								cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 								{

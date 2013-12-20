@@ -14,14 +14,10 @@ import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -162,11 +158,11 @@ public class ParallelSearchManager implements ISearchManager
 			}
 		});
 		
-		List<String>	search	= new ArrayList<String>();
-		StringWriter	sw	= new StringWriter();
-		new RuntimeException().printStackTrace(new PrintWriter(sw));
-		search.add("search: "+this+"/"+provider+"/"+decider+"/"+selector+"\n"+sw);
-		SEARCH.set(search);
+//		List<String>	search	= new ArrayList<String>();
+//		StringWriter	sw	= new StringWriter();
+//		new RuntimeException().printStackTrace(new PrintWriter(sw));
+//		search.add("search: "+this+"/"+provider+"/"+decider+"/"+selector+"\n"+sw);
+//		SEARCH.set(search);
 		
 		processNode(provider, null, provider, decider, selector, services, up, ret)
 			.addResultListener(new IResultListener<Void>()
@@ -198,7 +194,7 @@ public class ParallelSearchManager implements ISearchManager
 			}
 		});
 		
-		SEARCH.set(null);
+//		SEARCH.set(null);
 
 		return del;
 	}
@@ -239,7 +235,7 @@ public class ParallelSearchManager implements ISearchManager
 	protected IFuture<Void> processNode(final IServiceProvider start, final IServiceProvider source, final IServiceProvider provider, final IVisitDecider decider, 
 		final IResultSelector selector, final Map<Class<?>, Collection<IService>> services, final boolean up, final TerminableIntermediateFuture<IService> endret)
 	{
-		final List<String>	search	= SEARCH.get();		
+//		final List<String>	search	= SEARCH.get();		
 		final Future<Void> ret	= new Future<Void>();
 		final boolean[]	finished	= new boolean[3];
 		
@@ -250,7 +246,7 @@ public class ParallelSearchManager implements ISearchManager
 //			if(provider!=null && selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Component")!=-1)
 //				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
 			
-			search.add(provider.getId().toString());
+//			search.add(provider.getId().toString());
 			
 			final ITerminableIntermediateFuture<IService> fut = provider.getServices(lsm, decider, selector);
 			addOpenCall(endret, fut);
@@ -295,7 +291,7 @@ public class ParallelSearchManager implements ISearchManager
 						// Do not go back to where we came from.
 						if(!SUtil.equals(source, target))
 						{
-							SEARCH.set(search);
+//							SEARCH.set(search);
 							processNode(start, provider, target, decider, selector, services, up, endret)
 								.addResultListener(new IResultListener<Void>()
 							{
@@ -309,7 +305,7 @@ public class ParallelSearchManager implements ISearchManager
 									checkAndSetResults(ret, finished, 1);
 								}
 							});
-							SEARCH.set(null);
+//							SEARCH.set(null);
 						}
 						else
 						{
@@ -354,11 +350,11 @@ public class ParallelSearchManager implements ISearchManager
 							});
 							for(Iterator<IServiceProvider> it=coll.iterator(); it.hasNext(); )
 							{
-								SEARCH.set(search);
+//								SEARCH.set(search);
 								IServiceProvider target = (IServiceProvider)it.next();
 								processNode(start, provider, target, decider, selector, services, false, endret)
 									.addResultListener(crl);
-								SEARCH.set(null);
+//								SEARCH.set(null);
 							}
 						}
 						else

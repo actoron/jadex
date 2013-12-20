@@ -166,6 +166,7 @@ public class ThreadPool implements IThreadPool
 		this.parked = new ArrayList<ServiceThread>();
 		this.maxwait = maxwait;
 		
+		// Todo: is this still needed?
 		this.timer = new Timer(true);
 		timer.scheduleAtFixedRate(new TimerTask()
 		{
@@ -182,8 +183,8 @@ public class ThreadPool implements IThreadPool
 						{
 							addThreads(5);
 							strategy.workersAdded(5);
-							System.out.println("Added threads due to starving task in queue: "+task+", "+strategy+", pool="+pool.size()+", parked="+parked.size()+", tasks="+tasks.size());
-							System.out.println(tasks);
+//							System.out.println("Added threads due to starving task in queue: "+task+", "+strategy+", pool="+pool.size()+", parked="+parked.size()+", tasks="+tasks.size());
+//							System.out.println(tasks);
 						}
 					}
 				}

@@ -730,8 +730,8 @@ public class RemoteReferenceModule
 			{
 				public void customResultAvailable(IComponentManagementService cms)
 				{
-					ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-					next.setProperty("debugsource", "RemoteReferenceModule.getTargetObject()");
+//					ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+//					next.setProperty("debugsource", "RemoteReferenceModule.getTargetObject()");
 					
 					// fetch target component via component identifier.
 					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)

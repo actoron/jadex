@@ -477,12 +477,12 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		final Future<Collection<IServiceProvider>> ret = new Future<Collection<IServiceProvider>>();
 //		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
 		
-		final List<String>	search	= ISearchManager.SEARCH.get();
+//		final List<String>	search	= ISearchManager.SEARCH.get();
 		
 		if(cms!=null)
 		{
-			ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-			next.setProperty("debugsource", "ComponentServiceContainer("+id+").getChildren() "+search);
+//			ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+//			next.setProperty("debugsource", "ComponentServiceContainer("+id+").getChildren() "+search);
 
 			
 //			final String id = SUtil.createUniqueId("abc", 3);
@@ -505,8 +505,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 						{
 							if(cms!=null)
 							{
-								ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-								next.setProperty("debugsource", "ComponentServiceContainer("+id+").getChildren()2 "+search);
+//								ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+//								next.setProperty("debugsource", "ComponentServiceContainer("+id+").getChildren()2 "+search);
 								
 								cms.getExternalAccess(children[i]).addResultListener(new IResultListener<IExternalAccess>()
 								{

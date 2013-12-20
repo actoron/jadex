@@ -184,8 +184,8 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
-				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-				next.setProperty("debugsource", "RemoteSearchCommand.execute()");
+//				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+//				next.setProperty("debugsource", "RemoteSearchCommand.execute()");
 				
 //				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getExternalAccess((IComponentIdentifier)providerid).addResultListener(new IResultListener<IExternalAccess>()

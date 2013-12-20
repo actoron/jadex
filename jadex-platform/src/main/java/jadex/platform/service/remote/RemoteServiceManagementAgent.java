@@ -177,8 +177,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
-			ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-			next.setProperty("debugsource", "RemoteServiceManagementAgent.messageArrived("+msg+")");
+//			ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+//			next.setProperty("debugsource", "RemoteServiceManagementAgent.messageArrived("+msg+")");
 			
 			getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener<ILibraryService>()

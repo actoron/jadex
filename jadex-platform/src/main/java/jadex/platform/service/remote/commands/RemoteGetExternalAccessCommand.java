@@ -78,8 +78,8 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 		{
 			public void resultAvailable(IComponentManagementService cms)
 			{
-				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
-				next.setProperty("debugsource", "RemoteGetExternalAccessCommand.execute()");
+//				ServiceCall	next	= ServiceCall.getOrCreateNextInvocation();
+//				next.setProperty("debugsource", "RemoteGetExternalAccessCommand.execute()");
 				
 //				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getExternalAccess(compid).addResultListener(new IResultListener<IExternalAccess>()
