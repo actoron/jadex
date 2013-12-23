@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1206,7 +1207,7 @@ public class SRemoteGui
 			{
 				try
 				{
-					SUtil.getOutForSystemIn().write(txt.getBytes());
+					SUtil.getOutForSystemIn().write(txt.getBytes(Charset.defaultCharset()));
 				}
 				catch(IOException e)
 				{

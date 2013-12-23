@@ -27,6 +27,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -226,7 +228,9 @@ public class ComponentTestSuite extends TestSuite
 							{
 								public String getErrorText()
 								{
-									return "Error loading model: "+e;
+									StringWriter	sw	= new StringWriter();
+									e.printStackTrace(new PrintWriter(sw));
+									return "Error loading model: "+sw.toString();
 								}
 								
 								public String getErrorHTML()

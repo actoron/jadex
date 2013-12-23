@@ -28,7 +28,7 @@ public class StyledDocumentOutputStream extends PrintStream
 	 */
 	public StyledDocumentOutputStream(StyledDocument doc, Style style)
 	{
-		super(new ByteArrayOutputStream()); // needs a stream
+		super(this); // needs a stream
 		this.doc = doc;
 		this.style = style;
 	}
