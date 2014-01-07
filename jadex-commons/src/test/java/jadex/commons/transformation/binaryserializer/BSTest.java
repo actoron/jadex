@@ -1,5 +1,7 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.lang.reflect.UndeclaredThrowableException;
+
 import jadex.commons.transformation.A;
 import jadex.commons.transformation.B;
 
@@ -37,10 +39,34 @@ public class BSTest extends jadex.commons.transformation.Test
 		try
 		{
 			testUnknownSubobjectClass();
+			testUndeclaredThrowableException();
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	public void testUndeclaredThrowableException() throws Exception
+	{
+		System.out.println("Reversed constructor for throwables encoding/decoding test.");
+		
+		String msg = "I'm the message.";
+		String causemsg = "I'm the throwable used as cause.";
+		UndeclaredThrowableException oute = new UndeclaredThrowableException(new RuntimeException(causemsg), msg);
+		
+		byte[] serialized = BinarySerializer.objectToByteArray(oute, null, null, null);
+		
+		UndeclaredThrowableException out = (UndeclaredThrowableException) BinarySerializer.objectFromByteArray(serialized, null, null, null, null);
+		
+		if (!msg.equals(out.getMessage()))
+		{
+			throw new RuntimeException("Messages do not match, expected: " + msg + " got: " + out.getMessage());
+		}
+		
+		if (!causemsg.equals(out.getCause().getMessage()))
+		{
+			throw new RuntimeException("Cause does not match, expected: " + causemsg + " got: " + out.getCause().getMessage());
 		}
 	}
 	
