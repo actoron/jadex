@@ -53,8 +53,37 @@ public class ThrowableCodec extends AbstractCodec
 		{
 			try
 			{
+				// At least UndeclaredThrowableException stupidly has the constructor arguments reverse... good job.
+				Constructor<?> con = clazz.getConstructor(new Class<?>[]{Throwable.class, String.class});
+				ret = con.newInstance(new Object[]{cause, msg});
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+		if(ret==null)
+		{
+			try
+			{
+				Constructor<?> con = clazz.getConstructor(new Class<?>[]{Throwable.class});
+				ret = con.newInstance(new Object[]{cause});
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+		if(ret==null)
+		{
+			try
+			{
 				Constructor<?> con = clazz.getConstructor(new Class<?>[]{String.class});
 				ret = con.newInstance(new Object[]{msg});
+				if (ret != null && cause != null)
+				{
+					((Throwable) ret).initCause(cause);
+				}
 			}
 			catch(Exception e)
 			{
@@ -68,6 +97,10 @@ public class ThrowableCodec extends AbstractCodec
 			{
 				Constructor<?> con = clazz.getConstructor(new Class<?>[0]);
 				ret = con.newInstance(new Object[0]);
+				if (ret != null && cause != null)
+				{
+					((Throwable) ret).initCause(cause);
+				}
 			}
 			catch(Exception e)
 			{

@@ -49,6 +49,17 @@ public class VarInt
 	}
 	
 	/**
+	 *  Returns the number of bytes used for this number past the first byte.
+	 *  
+	 *  @param firstbyte First byte of encoded VarInt.
+	 *  @return Number of bytes belonging to the number after the first byte.
+	 */
+	public static final byte getExtensionSize(byte firstbyte)
+	{
+		return EXTENSION_COUNT_TABLE[firstbyte & 0xFF];
+	}
+	
+	/**
 	 *  Decodes a VarInt.
 	 *  
 	 *  @param varint The encoded VarInt.
