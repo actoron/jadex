@@ -108,7 +108,7 @@ public class SequentialSearchManager implements ISearchManager
 			
 			public void customResultAvailable(Collection<IService> result)
 			{
-				System.out.println("search end: "+ret.hashCode());
+//				System.out.println("search end: "+ret.hashCode());
 				opencalls.remove(ret);
 				super.resultAvailable(result);
 			}

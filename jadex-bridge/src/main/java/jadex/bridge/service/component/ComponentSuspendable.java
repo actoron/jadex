@@ -119,4 +119,12 @@ public class ComponentSuspendable implements ISuspendable
 	{
 		return future;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "ComponentSuspendable [adapter=" + adapter + "]";
+	}
 }

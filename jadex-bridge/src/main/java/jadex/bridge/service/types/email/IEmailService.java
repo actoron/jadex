@@ -1,7 +1,6 @@
 package jadex.bridge.service.types.email;
 
 import jadex.bridge.service.annotation.CheckNotNull;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -23,6 +22,14 @@ public interface IEmailService
 	 *  @param filter The filter.
 	 *  @param account The email account.
 	 */
-	@Timeout(Timeout.NONE)
+//	@Timeout(Timeout.NONE) // replaced by internal timeout avoidance mechanism via future
 	public ISubscriptionIntermediateFuture<Email> subscribeForEmail(IFilter<Email> filter, EmailAccount account);
+	
+	/**
+	 *  Subscribe for email.
+	 *  @param filter The filter.
+	 *  @param account The email account.
+	 */
+	public ISubscriptionIntermediateFuture<Email> subscribeForEmail(IFilter<Email> filter, EmailAccount account, boolean fullconv);
+	
 }

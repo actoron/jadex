@@ -7,6 +7,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.bridge.service.types.publish.IWebPublishService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -25,6 +26,7 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -53,6 +55,7 @@ import javassist.bytecode.annotation.ClassMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
+import javax.servlet.Servlet;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -66,7 +69,11 @@ import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
+import org.glassfish.grizzly.http.server.io.NIOWriter;
+import org.glassfish.grizzly.servlet.ServletHandler;
 
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
@@ -80,7 +87,7 @@ import com.sun.jersey.multipart.FormDataParam;
  *  Publishes web services using the JDK Endpoint class.
  */
 @Service
-public class DefaultRestServicePublishService implements IPublishService
+public class DefaultRestServicePublishService implements IWebPublishService
 {
 	//-------- constants --------
 	
@@ -285,6 +292,105 @@ public class DefaultRestServicePublishService implements IPublishService
 			e.printStackTrace();
 			ret.setException(e);
 		}
+		return IFuture.DONE;
+	}
+	
+	/**
+	 * 
+	 */
+	public HttpServer getHttpServer(URI uri, PackagesResourceConfig config)
+	{
+		HttpServer server = null;
+		
+		try
+		{
+			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+			server = uriservers==null? null: uriservers.get(baseuri);
+			
+			if(server==null)
+			{
+				System.out.println("Starting new server: "+uri.getPath());
+				
+				String pub = uri.toString();
+	//			if(pub.endsWith("/"))
+	//				pub.substring(0, pub.length()-1);
+	//				pub += "/";
+				server = GrizzlyServerFactory.createHttpServer(pub, config);
+				server.start();
+	//			handler = server.getHttpHandler();
+	//			Map<HttpHandler, String[]> handlers = server.getServerConfiguration().getHttpHandlers();
+	//			for(HttpHandler hand: handlers.keySet())
+	//			{
+	//				Set<String> set = SUtil.arrayToSet(handlers.get(hand));
+	//				if(set.contains(uri.getPath()))
+	//				{
+	//					handler = hand;
+	//				}
+	//			}
+	//			if(handler==null)
+	//			{
+	//				throw new RuntimeException("Publication error, failed to get http handler: "+uri.getPath()));
+	//			}
+				
+				if(uriservers==null)
+					uriservers = new HashMap<URI, HttpServer>();
+				uriservers.put(baseuri, server);
+			}
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return server;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<Void> publishServet(URI uri, Object servlet)
+	{
+		HttpServer server = getHttpServer(uri, null);
+		ServletHandler handler = new ServletHandler((Servlet)servlet);
+		handler.setContextPath(uri.getPath());
+        ServerConfiguration sc = server.getServerConfiguration();
+		sc.addHttpHandler(handler, uri.getPath());
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<Void> publishHMTLPage(URI uri, final String html)
+	{
+		HttpServer server = getHttpServer(uri, null);
+		
+        ServerConfiguration sc = server.getServerConfiguration();
+		sc.addHttpHandler(new HttpHandler() 
+		{
+            public void service(Request request, Response resp) 
+            {
+            	try
+            	{
+	            	// Set response content type
+	                resp.setContentType("text/html");
+	
+	                // Actual logic goes here.
+	                NIOWriter out = resp.getWriter();
+	                out.write(html);
+            	}
+            	catch(Exception e)
+            	{
+            		e.printStackTrace();
+            	}
+            }
+        }, uri.getPath());
+		
 		return IFuture.DONE;
 	}
 	

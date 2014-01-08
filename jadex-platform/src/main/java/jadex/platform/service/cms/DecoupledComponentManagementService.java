@@ -1789,8 +1789,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 
 		protected void doCleanup(Exception exception)
 		{
-			try
-			{
+//			try
+//			{
 			boolean	killparent	= false;
 			IComponentAdapter adapter = null;
 			IComponentAdapter pad = null;
@@ -1917,11 +1917,11 @@ public class DecoupledComponentManagementService implements IComponentManagement
 //				System.out.println("killparent: "+pad.getComponentIdentifier());
 				destroyComponent(pad.getComponentIdentifier());
 			}
-		}
-		catch(Throwable t)
-		{
-			t.printStackTrace();
-		}
+//		}
+//		catch(Throwable t)
+//		{
+//			t.printStackTrace();
+//		}
 		}
 	}
 	

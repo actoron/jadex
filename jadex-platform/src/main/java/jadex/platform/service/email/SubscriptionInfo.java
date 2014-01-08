@@ -34,6 +34,9 @@ public class SubscriptionInfo
 	
 	/** The account. */
 	protected EmailAccount account;
+	
+	/** Flag if full email conversion is necessary for filtering. */
+	protected boolean fullconv;
 
 	/** The number of messages in the folder. */
 	protected int total;
@@ -45,13 +48,14 @@ public class SubscriptionInfo
 	/**
 	 *  Create a new subscription info.
 	 */
-	public SubscriptionInfo(IFilter<Email> filter, EmailAccount account)
+	public SubscriptionInfo(IFilter<Email> filter, EmailAccount account, boolean fullconv)
 	{
 		this.total = 0;
 		this.filter = filter;
 		this.account = account;
+		this.fullconv = fullconv;
 	}
-
+	
 	//-------- methods --------
 	
 	/**
@@ -91,6 +95,60 @@ public class SubscriptionInfo
 	}
 	
 	/**
+	 *  Get the total.
+	 *  return The total.
+	 */
+	public int getTotal()
+	{
+		return total;
+	}
+
+	/**
+	 *  Set the total. 
+	 *  @param total The total to set.
+	 */
+	public void setTotal(int total)
+	{
+		this.total = total;
+	}
+
+	/**
+	 *  Get the lastseenno.
+	 *  return The lastseenno.
+	 */
+	public int getLastSeenNo()
+	{
+		return lastseenno;
+	}
+
+	/**
+	 *  Set the lastseenno. 
+	 *  @param lastseenno The lastseenno to set.
+	 */
+	public void setLastSeenNo(int lastseenno)
+	{
+		this.lastseenno = lastseenno;
+	}
+
+	/**
+	 *  Get the lastseenmsg.
+	 *  return The lastseenmsg.
+	 */
+	public Email getLastSeenMsg()
+	{
+		return lastseenmsg;
+	}
+
+	/**
+	 *  Set the lastseenmsg. 
+	 *  @param lastseenmsg The lastseenmsg to set.
+	 */
+	public void setLastSeenMsg(Email lastseenmsg)
+	{
+		this.lastseenmsg = lastseenmsg;
+	}
+
+	/**
 	 *  Fetch new emails from the inbox.
 	 */
 	public List<Email> getNewEmails()
@@ -104,6 +162,8 @@ public class SubscriptionInfo
 			props.setProperty("mail.store.protocol", account.getReceiveProtocol());
 			Session session = Session.getDefaultInstance(props, null);
 			store = session.getStore(account.getReceiveProtocol());
+			// Warning this is a blocking call that may block the agent several seconds
+			// Should be done on worker component / thread
 			store.connect(account.getReceiveHost(), account.getUser(), account.getPassword());
 			Folder f = store.getFolder("inbox");
 			f.open(Folder.READ_ONLY);
@@ -141,9 +201,31 @@ public class SubscriptionInfo
 					ret = new ArrayList<Email>();
 					for(int i=0; i<messages.length; i++)
 					{
-						email = convertMessage(messages[i]);
+//						if(Conversion.Subject.equals(conversion))
+//						{
+//							email = convertSubjectMessage(messages[i], null);
+//						}
+//						if(Conversion.Header.equals(conversion))
+						if(!fullconv)
+						{
+							email = convertHeaderMessage(messages[i], null);
+						}
+						else //if(Conversion.Message.equals(conversion))
+						{
+							email = convertMessage(messages[i]);
+						}
+						
 						if(filter==null || filter.filter(email))
 						{
+//							if(Conversion.Subject.equals(conversion))
+//							{
+//								convertHeaderMessage(messages[i], email);
+//								convertBodyMessage(messages[i], email);
+//							}
+							if(!fullconv)//Conversion.Header.equals(conversion))
+							{
+								convertBodyMessage(messages[i], email);
+							}
 							ret.add(email);
 						}
 					}
@@ -191,10 +273,41 @@ public class SubscriptionInfo
 	 */
 	protected Email convertMessage(Message msg)
 	{
-		Email ret = null;
+		Email ret = convertHeaderMessage(msg, null);
+		convertBodyMessage(msg, ret);
+		return ret;
+	}
+	
+	/**
+	 *  Convert an email message to the simple jadex email format.
+	 */
+	protected Email convertSubjectMessage(Message msg, Email email)
+	{
+		Email ret = email==null? new Email(): email;
 		try
 		{
-			ret = new Email();
+			ret.setSubject(msg.getSubject());
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Convert an email message to the simple jadex email format.
+	 */
+	protected Email convertHeaderMessage(Message msg, Email email)
+	{
+		Email ret = email==null? new Email(): email;
+		try
+		{
 			ret.setSubject(msg.getSubject());
             ret.setSender(msg.getFrom()[0].toString());
            
@@ -205,8 +318,28 @@ public class SubscriptionInfo
             ret.setReceivers(convertAddresses(tos));
             ret.setCcs(convertAddresses(ccs));
             ret.setBccs(convertAddresses(bccs));
-            
-            Object content = msg.getContent();
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Convert an email message to the simple jadex email format.
+	 */
+	protected Email convertBodyMessage(Message msg, Email email)
+	{
+		Email ret = email==null? new Email(): email;
+		try
+		{
+			Object content = msg.getContent();
             if(content instanceof String)
             {
             	ret.setContent((String)content);
@@ -237,9 +370,13 @@ public class SubscriptionInfo
             	}
             }
 		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return ret;
 	}

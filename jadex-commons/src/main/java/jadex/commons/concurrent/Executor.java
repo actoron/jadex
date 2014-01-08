@@ -314,6 +314,8 @@ public class Executor implements Runnable
 	 */
 	public void	switchThread(Object monitor, Throwable t)
 	{
+//		System.out.println("switchThread: "+monitor);
+
 		synchronized(this)
 		{
 			if(switchtos==null)

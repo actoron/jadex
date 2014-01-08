@@ -2,6 +2,8 @@ package jadex.platform.service.email;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.types.email.Email;
@@ -21,12 +23,18 @@ import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.ComponentType;
+import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.CreationInfo;
 import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,13 +63,16 @@ import javax.mail.internet.MimeMessage;
 		description="The default email account that is used to send/receive emails.")
 })
 @ProvidedServices(@ProvidedService(type = IEmailService.class))
+@RequiredServices(@RequiredService(name="emailfetcher", type=IEmailFetcherService.class, binding=@Binding(dynamic=true, scope=RequiredServiceInfo.SCOPE_NONE,
+	create=true, creationinfo=@CreationInfo(type="fetcher"))))
+@ComponentTypes(@ComponentType(name="fetcher", clazz=EmailFetcherAgent.class))
 public class EmailAgent implements IEmailService
 {
 	//-------- attributes --------
 	
 	/** The component. */
 	@Agent
-	protected MicroAgent	agent;
+	protected MicroAgent agent;
 	
 	/** The delay between checking for mail. */
 	@AgentArgument
@@ -260,7 +271,18 @@ public class EmailAgent implements IEmailService
 	 */
 	public ISubscriptionIntermediateFuture<Email> subscribeForEmail(IFilter<Email> filter, EmailAccount acc)
 	{
-		final SubscriptionIntermediateFuture<Email> ret = new SubscriptionIntermediateFuture<Email>();
+		return subscribeForEmail(filter, acc, false);
+	}
+	
+	/**
+	 *  Subscribe for email.
+	 *  @param filter The filter.
+	 *  @param account The email account.
+	 */
+	public ISubscriptionIntermediateFuture<Email> subscribeForEmail(IFilter<Email> filter, EmailAccount acc, boolean fullconv)
+	{
+//		final SubscriptionIntermediateFuture<Email> ret = new SubscriptionIntermediateFuture<Email>();
+		final SubscriptionIntermediateFuture<Email> ret = (SubscriptionIntermediateFuture<Email>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 		
 		if(acc==null && this.account==null)
 		{
@@ -284,7 +306,7 @@ public class EmailAgent implements IEmailService
 		};
 		ret.setTerminationCommand(tcom);
 		
-		addSubscription(ret, new SubscriptionInfo(filter, account));
+		addSubscription(ret, new SubscriptionInfo(filter, account, fullconv));
 		getReceiveBehavior(checkformail);
 		
 		return ret;
@@ -325,25 +347,45 @@ public class EmailAgent implements IEmailService
 		
 		if(subscriptions!=null)
 		{
-			for(SubscriptionIntermediateFuture<Email> fut: subscriptions.keySet())
+			for(final SubscriptionIntermediateFuture<Email> fut: subscriptions.keySet().toArray(new SubscriptionIntermediateFuture[0]))
 			{
-				try
+				SubscriptionInfo si = subscriptions.get(fut);
+				final long start = System.currentTimeMillis();
+				IEmailFetcherService fetcher = (IEmailFetcherService)agent.getServiceContainer().getRequiredService("emailfetcher").get();
+				System.out.println("Email fetcher ser: "+fetcher);
+				fetcher.fetchEmails(si).addResultListener(new IResultListener<Collection<Email>>()
 				{
-					SubscriptionInfo si = subscriptions.get(fut);
-					List<Email> emails = si.getNewEmails();
-					if(emails!=null && emails.size()>0)
+					public void resultAvailable(Collection<Email> emails) 
 					{
-						for(Email email: emails)
+						long dur = (System.currentTimeMillis()-start)/1000;
+						System.out.println("Needed for email fetching [s]: "+dur);
+						
+						if(emails!=null && emails.size()>0)
 						{
-							fut.addIntermediateResult(email);
+							for(Email email: emails)
+							{
+								if(!fut.addIntermediateResultIfUndone(email))
+								{
+									subscriptions.remove(fut);
+								}
+							}
 						}
 					}
-				}
-				catch(Exception e)
-				{
-					agent.getLogger().warning("Email fetching error: "+e.getMessage());
-//					e.printStackTrace();
-				}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						agent.getLogger().warning("Email fetching error: "+exception.getMessage());
+					}
+				});
+				
+//				List<Email> emails = si.getNewEmails();
+//				if(emails!=null && emails.size()>0)
+//				{
+//					for(Email email: emails)
+//					{
+//						fut.addIntermediateResult(email);
+//					}
+//				}
 			}
 		}
 	}

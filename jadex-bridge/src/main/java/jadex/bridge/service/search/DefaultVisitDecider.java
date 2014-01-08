@@ -82,8 +82,12 @@ public class DefaultVisitDecider implements IVisitDecider
 					break;
 				}
 			}
-			
-			if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+			if(RequiredServiceInfo.SCOPE_NONE.equals(scope))
+			{
+				// Always false.
+				ret = false;
+			}
+			else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
 			{
 				// Ok when on start component.
 				ret = source==null;
