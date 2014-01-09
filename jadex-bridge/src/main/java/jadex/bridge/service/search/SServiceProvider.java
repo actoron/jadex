@@ -80,6 +80,7 @@ public class SServiceProvider
 	static
 	{
 		avisitdeciders = new HashMap();
+		avisitdeciders.put(RequiredServiceInfo.SCOPE_NONE, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_NONE));
 		avisitdeciders.put(RequiredServiceInfo.SCOPE_LOCAL, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_LOCAL));
 		avisitdeciders.put(RequiredServiceInfo.SCOPE_COMPONENT, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_COMPONENT));
 		avisitdeciders.put(RequiredServiceInfo.SCOPE_APPLICATION, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_APPLICATION));
@@ -88,6 +89,7 @@ public class SServiceProvider
 		avisitdeciders.put(RequiredServiceInfo.SCOPE_PARENT, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_PARENT));
 			
 		visitdeciders = new HashMap();
+		visitdeciders.put(RequiredServiceInfo.SCOPE_NONE, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_NONE));
 		visitdeciders.put(RequiredServiceInfo.SCOPE_LOCAL, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_LOCAL));
 		visitdeciders.put(RequiredServiceInfo.SCOPE_COMPONENT, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_COMPONENT));
 		visitdeciders.put(RequiredServiceInfo.SCOPE_APPLICATION, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_APPLICATION));

@@ -352,13 +352,13 @@ public class EmailAgent implements IEmailService
 				SubscriptionInfo si = subscriptions.get(fut);
 				final long start = System.currentTimeMillis();
 				IEmailFetcherService fetcher = (IEmailFetcherService)agent.getServiceContainer().getRequiredService("emailfetcher").get();
-				System.out.println("Email fetcher ser: "+fetcher);
+//				System.out.println("Email fetcher ser: "+fetcher);
 				fetcher.fetchEmails(si).addResultListener(new IResultListener<Collection<Email>>()
 				{
 					public void resultAvailable(Collection<Email> emails) 
 					{
 						long dur = (System.currentTimeMillis()-start)/1000;
-						System.out.println("Needed for email fetching [s]: "+dur);
+//						System.out.println("Needed for email fetching [s]: "+dur);
 						
 						if(emails!=null && emails.size()>0)
 						{

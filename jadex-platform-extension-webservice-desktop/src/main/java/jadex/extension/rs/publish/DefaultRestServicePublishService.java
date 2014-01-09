@@ -352,9 +352,36 @@ public class DefaultRestServicePublishService implements IWebPublishService
 	/**
 	 * 
 	 */
+	protected PackagesResourceConfig createConfig()
+	{
+		Map<String, Object> props = new HashMap<String, Object>();
+		String jerseypack = PackagesResourceConfig.PROPERTY_PACKAGES;
+//		props.put(uri.toString(), service);
+		StringBuilder strb = new StringBuilder("jadex.extension.rs.publish"); // Add Jadex XML body reader/writer
+		// Must not add package because a baseclass could be contained with the same path
+		// This leads to an error in jersey
+//		String pack = baseclazz!=null && baseclazz.getPackage()!=null? 
+//			baseclazz.getPackage().getName(): iface.getPackage()!=null? iface.getPackage().getName(): null;
+//		if(pack!=null)
+//			strb.append(", ").append(pack);
+		props.put(jerseypack, strb.toString());
+		props.put(PackagesResourceConfig.FEATURE_REDIRECT, Boolean.TRUE);
+		props.put("com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature", Boolean.TRUE);
+		props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+//		props.put(JADEXSERVICE, service);
+		PackagesResourceConfig config = new PackagesResourceConfig(props);
+//		config.getClasses().add(rsimpl);
+		config.getClasses().add(DummyResource.class);
+		return config;
+	}
+	
+	
+	/**
+	 * 
+	 */
 	public IFuture<Void> publishServet(URI uri, Object servlet)
 	{
-		HttpServer server = getHttpServer(uri, null);
+		HttpServer server = getHttpServer(uri, createConfig());
 		ServletHandler handler = new ServletHandler((Servlet)servlet);
 		handler.setContextPath(uri.getPath());
         ServerConfiguration sc = server.getServerConfiguration();
@@ -368,7 +395,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 	 */
 	public IFuture<Void> publishHMTLPage(URI uri, final String html)
 	{
-		HttpServer server = getHttpServer(uri, null);
+		HttpServer server = getHttpServer(uri, createConfig());
 		
         ServerConfiguration sc = server.getServerConfiguration();
 		sc.addHttpHandler(new HttpHandler() 
@@ -607,6 +634,8 @@ public class DefaultRestServicePublishService implements IWebPublishService
 				proxyclazz.addMethod(m);
 						
 				// add @QueryParam if get
+				// this means that each parameter of the method is automatically
+				// mapped to arg0, arg1 etc of the request
 				if(GET.class.equals(rmi.getRestType()))
 				{
 					int pcnt = rmi.getParameterTypes().length;
@@ -679,7 +708,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 	{
 		Object ret = null;
 		
-//		System.out.println("called invoke: "+sig);
+		System.out.println("called invoke: "+sig+" "+Arrays.toString(params));
 		
 		try
 		{
