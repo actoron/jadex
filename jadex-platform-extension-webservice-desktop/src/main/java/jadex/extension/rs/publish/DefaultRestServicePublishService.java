@@ -26,7 +26,6 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -64,6 +63,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -766,6 +766,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			
 			// check if mappers are there
 			ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
+			
 //			Object service = rc.getProperty(JADEXSERVICE);
 			Object service = rc.getProperty("jadexservice");
 
@@ -807,10 +808,24 @@ public class DefaultRestServicePublishService implements IWebPublishService
 				
 				targetparams = ((IParameterMapper)mapper).convertParameters(params);
 			}
+	
+			Class<?>[] ts = targetmethod.getParameterTypes();
+			if(ts.length==1 && SReflect.isSupertype(ts[0], Map.class))
+			{
+				UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+				MultivaluedMap<String, String> vals = ui.getPathParameters();
+				Map<String, String> ps = new HashMap<String, String>();
+				for(Map.Entry<String, List<String>> e: vals.entrySet())
+				{
+					List<String> val = e.getValue();
+					ps.put(e.getKey(), val!=null && !val.isEmpty()? val.get(0): null);
+				}
+				targetparams[0] = ps;
+			}
 			
 //			System.out.println("method: "+method.getName()+" "+method.getDeclaringClass().getName());
 //			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
-//			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service);
+			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service);
 //			
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)
