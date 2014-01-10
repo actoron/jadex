@@ -191,14 +191,23 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 				}
 				
 				Value parametermapper = null;
+				boolean automapping = false; 
 				if(method.isAnnotationPresent(ParametersMapper.class))
 				{
 					ParametersMapper pm = (ParametersMapper)method.getAnnotation(ParametersMapper.class);
-					Class<?> clazz = pm.value().clazz();
-					if(clazz!=null && !Object.class.equals(clazz))
-						parametermapper = new Value(clazz);
-					else
-						parametermapper = new Value(pm.value().value());
+					if(!pm.automapping())
+					{
+						Class<?> clazz = pm.value().clazz();
+						if(clazz!=null && !Object.class.equals(clazz))
+						{
+							parametermapper = new Value(clazz);
+						}
+						else
+						{
+							parametermapper = new Value(pm.value().value());
+						}
+					}
+					automapping = pm.automapping();
 				}
 				
 				Value resultmapper = null;
@@ -219,7 +228,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 					path = mw.getName();
 				
 				ret.add(new RestMethodInfo(method, mw.getName(), getPathName(path, paths), resttype, consumed, produced, 
-					methodmapper, parametermapper, resultmapper,
+					methodmapper, parametermapper, automapping, resultmapper,
 					DefaultRestServicePublishService.class, "invoke"));
 			}
 			// Guess how method should be restified
@@ -253,7 +262,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 				MethodInfo methodmapper = new MethodInfo(method.getName(), method.getParameterTypes());
 				
 				ret.add(new RestMethodInfo(method, mw.getName(), getPathName(mw.getName(), paths), resttype, consumed, produced,
-					methodmapper, null, null,
+					methodmapper, null, false, null,
 					DefaultRestServicePublishService.class, "invoke"));
 			}
 		}
@@ -264,7 +273,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 			List<MediaType> produced = new ArrayList<MediaType>();
 			produced.add(MediaType.TEXT_HTML_TYPE);
 			ret.add(new RestMethodInfo(new Class[0], String.class, new Class[0], "getServiceInfo", getPathName("", paths), GET.class, 
-				consumed, produced, null, null, null, 
+				consumed, produced, null, null, false, null, 
 				DefaultRestServicePublishService.class, "getServiceInfo"));
 		}
 		

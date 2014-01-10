@@ -17,5 +17,10 @@ public @interface ParametersMapper
 	/**
 	 *  The method name.
 	 */
-	public Value value();
+	public Value value() default @Value;
+	
+	/**
+	 *  Flag if automapping should be provided.
+	 */
+	public boolean automapping() default false;
 }

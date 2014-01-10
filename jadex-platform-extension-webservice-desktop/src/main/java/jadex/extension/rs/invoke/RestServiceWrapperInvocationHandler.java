@@ -145,13 +145,17 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 												produces = m.getAnnotation(Produces.class).value();
 											
 											// Test if general parameter mapper is given
-											Value pmapper = null;
+											
+											ParametersMapper pmap = null;
 											if(m.isAnnotationPresent(ParametersMapper.class))
-												pmapper = m.getAnnotation(ParametersMapper.class).value();
+											{
+												pmap = m.getAnnotation(ParametersMapper.class);
+//												pmapper = pmap.value();
+											}
 											
 											// Otherwise test if parameter specific mappers are given
 											List<Object[]> pmappers = null;
-											if(pmapper==null)
+											if(pmap==null)
 											{
 												pmappers = new ArrayList<Object[]>();
 												Annotation[][] anoss = m.getParameterAnnotations();
@@ -192,10 +196,17 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											cc.getClasses().add(JadexXMLBodyWriter.class);
 											
 											Object targetparams = args;
-											if(pmapper!=null)
+											if(pmap!=null)
 											{
-												IValueMapper pm = (IValueMapper)jadex.extension.rs.publish.Value.evaluate(pmapper, defaultimports);
-												targetparams = pm.convertValue(args);
+												Value pmapper = pmap.value();
+												if(pmapper!=null)
+												{
+													IValueMapper pm = (IValueMapper)jadex.extension.rs.publish.Value.evaluate(pmapper, defaultimports);
+													if(pm!=null)
+													{
+														targetparams = pm.convertValue(args);
+													}
+												}
 											}
 											else if(pmappers!=null)
 											{

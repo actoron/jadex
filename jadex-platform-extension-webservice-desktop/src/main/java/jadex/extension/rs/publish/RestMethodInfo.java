@@ -51,6 +51,7 @@ public class RestMethodInfo
 	
 	/** The parameter mapper info. */
 	protected Value parametermapper;
+	protected boolean automapping;
 	
 	/** The result mapper info. */
 	protected Value resultmapper;
@@ -69,7 +70,7 @@ public class RestMethodInfo
 	 */
 	public RestMethodInfo(Method method, 
 		String name, String path, Class<?> resttype, List<MediaType> consumed, List<MediaType> produced,
-		MethodInfo methodmapper, Value parametermapper, Value resultmapper, 
+		MethodInfo methodmapper, Value parametermapper, boolean automapping, Value resultmapper, 
 		Class<?> dclazz, String dmname)
 	{
 		if(method==null)
@@ -83,6 +84,7 @@ public class RestMethodInfo
 		this.produced = produced;
 		this.methodmapper = methodmapper;
 		this.parametermapper = parametermapper;
+		this.automapping = automapping;
 		this.resultmapper = resultmapper;
 		
 		this.dclazz = dclazz;
@@ -94,7 +96,7 @@ public class RestMethodInfo
 	 */
 	public RestMethodInfo(Class<?>[] parametertypes, Type returntype, Class<?>[] exceptiontypes, 
 		String name, String path, Class<?> resttype, List<MediaType> consumed, List<MediaType> produced,
-		MethodInfo methodmapper, Value parametermapper, Value resultmapper, 
+		MethodInfo methodmapper, Value parametermapper, boolean automapping, Value resultmapper, 
 		Class<?> dclazz, String dmname)
 	{
 		this.name = name;
@@ -108,6 +110,7 @@ public class RestMethodInfo
 		this.produced = produced;
 		this.methodmapper = methodmapper;
 		this.parametermapper = parametermapper;
+		this.automapping = automapping;
 		this.resultmapper = resultmapper;
 		
 		this.dclazz = dclazz;
@@ -387,6 +390,24 @@ public class RestMethodInfo
 	{
 		this.signature = signature;
 	}
+	
+	/**
+	 *  Get the automapping.
+	 *  @return The automapping.
+	 */
+	public boolean isAutomapping()
+	{
+		return automapping;
+	}
+
+	/**
+	 *  Set the automapping.
+	 *  @param automapping The automapping to set.
+	 */
+	public void setAutomapping(boolean automapping)
+	{
+		this.automapping = automapping;
+	}
 
 	/**
 	 *  Get the signature.
@@ -407,8 +428,7 @@ public class RestMethodInfo
 		}
 		return buf.toString();
 	}
-	
-	
+
 	/**
 	 *  Get the string representation.
 	 */

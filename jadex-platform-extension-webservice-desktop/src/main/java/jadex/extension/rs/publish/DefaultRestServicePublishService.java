@@ -50,6 +50,7 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.AnnotationMemberValue;
 import javassist.bytecode.annotation.ArrayMemberValue;
+import javassist.bytecode.annotation.BooleanMemberValue;
 import javassist.bytecode.annotation.ClassMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
@@ -605,15 +606,16 @@ public class DefaultRestServicePublishService implements IWebPublishService
 				}
 				
 				Value parametermapper = rmi.getParameterMapper();
-				if(parametermapper!=null)
+				if(parametermapper!=null || rmi.isAutomapping())
 				{
 					annot = new Annotation(constpool, SJavassist.getCtClass(ParametersMapper.class, pool));
 					Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.bridge.service.annotation.Value.class, pool));
-					if(parametermapper.getExpression()!=null && parametermapper.getExpression().length()==0)
+					if(parametermapper!=null && parametermapper.getExpression()!=null && parametermapper.getExpression().length()==0)
 						value.addMemberValue("value", new StringMemberValue(parametermapper.getExpression(), constpool));
-					if(parametermapper.getClazz()!=null && !parametermapper.getClazz().equals(Object.class))
+					if(parametermapper!=null && parametermapper.getClazz()!=null && !parametermapper.getClazz().equals(Object.class))
 						value.addMemberValue("clazz", new ClassMemberValue(parametermapper.getClazz().getName(), constpool));
 					annot.addMemberValue("value", new AnnotationMemberValue(value, constpool));
+					annot.addMemberValue("automapping", new BooleanMemberValue(rmi.isAutomapping(), constpool));
 					attr.addAnnotation(annot);
 				}
 				
@@ -686,7 +688,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			ret = proxyclazz.toClass(classloader, iface.getProtectionDomain());
 			proxyclazz.freeze();
 			
-			System.out.println("create proxy class: "+ret.getName());
+//			System.out.println("create proxy class: "+ret.getName());
 //			Method[] ms = ret.getMethods();
 //			for(Method m: ms)
 //			{
@@ -708,7 +710,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 	{
 		Object ret = null;
 		
-		System.out.println("called invoke: "+sig+" "+Arrays.toString(params));
+//		System.out.println("called invoke: "+sig+" "+Arrays.toString(params));
 		
 		try
 		{
@@ -793,39 +795,46 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			{
 //				System.out.println("foundmapper");
 				ParametersMapper mm = method.getAnnotation(ParametersMapper.class);
-				Class<?> clazz = mm.value().clazz();
-				Object mapper;
-				if(!Object.class.equals(clazz))
+				if(!mm.automapping())
 				{
-					mapper = clazz.newInstance();
+					Class<?> clazz = mm.value().clazz();
+					Object mapper;
+					if(!Object.class.equals(clazz))
+					{
+						mapper = clazz.newInstance();
+					}
+					else
+					{
+						mapper = SJavaParser.evaluateExpression(mm.value().value(), null);
+					}
+					if(mapper instanceof IValueMapper)
+						mapper = new DefaultParameterMapper((IValueMapper)mapper);
+					
+					targetparams = ((IParameterMapper)mapper).convertParameters(params);
 				}
 				else
 				{
-					mapper = SJavaParser.evaluateExpression(mm.value().value(), null);
+//					System.out.println("automapping detected");
+					Class<?>[] ts = targetmethod.getParameterTypes();
+					targetparams = new Object[ts.length];
+					if(ts.length==1 && SReflect.isSupertype(ts[0], Map.class))
+					{
+						UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+						MultivaluedMap<String, String> vals = ui.getQueryParameters();
+						Map<String, String> ps = new HashMap<String, String>();
+						for(Map.Entry<String, List<String>> e: vals.entrySet())
+						{
+							List<String> val = e.getValue();
+							ps.put(e.getKey(), val!=null && !val.isEmpty()? val.get(0): null);
+						}
+						targetparams[0] = ps;
+					}
 				}
-				if(mapper instanceof IValueMapper)
-					mapper = new DefaultParameterMapper((IValueMapper)mapper);
-				
-				targetparams = ((IParameterMapper)mapper).convertParameters(params);
 			}
 	
-			Class<?>[] ts = targetmethod.getParameterTypes();
-			if(ts.length==1 && SReflect.isSupertype(ts[0], Map.class))
-			{
-				UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
-				MultivaluedMap<String, String> vals = ui.getPathParameters();
-				Map<String, String> ps = new HashMap<String, String>();
-				for(Map.Entry<String, List<String>> e: vals.entrySet())
-				{
-					List<String> val = e.getValue();
-					ps.put(e.getKey(), val!=null && !val.isEmpty()? val.get(0): null);
-				}
-				targetparams[0] = ps;
-			}
-			
 //			System.out.println("method: "+method.getName()+" "+method.getDeclaringClass().getName());
 //			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
-			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service);
+			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
 //			
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)
