@@ -13,13 +13,14 @@ import jadex.bdiv3.AsmDexBdiClassGenerator;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -43,19 +44,23 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	private ClientAppFragment clientFragment;
 	private UniversalClientServiceBinder universalService;
 	private Resources resources;
-	private ClassLoader cl;
+	
+	/** this ClassLoader will change depending on the foreground app **/
+	private ClassLoader currentCl;
 	
 	private ApplicationInfo userAppInfo;
+	private static Map<String,ClassLoader> clCache = new HashMap<String, ClassLoader>();
 	
 	//** TODO: remove **/
 	public static ApplicationInfo APPINFO;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		// set default layout inflater and classLoader during onCreate()
 		userAppInflater = super.getLayoutInflater();
-		cl = this.getClassLoader();
+		currentCl = this.getClassLoader();
 		
 		super.onCreate(savedInstanceState);
 
@@ -81,8 +86,8 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 
 			if (appPath != null)
 			{
-				this.cl = getClassLoaderForExternalDex(getClass().getClassLoader(), appPath);
-				JadexPlatformManager.getInstance().setAppClassLoader(appPath, cl);
+				this.currentCl = getClassLoaderForExternalDex(getClass().getClassLoader(), appPath);
+				JadexPlatformManager.getInstance().setAppClassLoader(appPath, currentCl);
 				ClientAppFragment act = createClientFragment(className, intent);
 		
 				this.clientFragment = act;
@@ -165,11 +170,14 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		}
 	}
 
-//	@Override
-//	protected void onResume()
-//	{
-//		super.onResume();
-//	}
+	@Override
+	protected void onResume()
+	{
+		Logger.d("Resuming JadexApplicationLoader");
+		Intent intent = getIntent();
+		
+		super.onResume();
+	}
 
 	@Override
 	protected void onDestroy()
@@ -203,7 +211,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	@Override
 	public ClassLoader getClassLoader()
 	{
-		return cl;
+		return currentCl;
 	}
 
 	@Override
@@ -223,7 +231,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		ClientAppFragment act = null;
 		try
 		{
-			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
+			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) currentCl.loadClass(className);
 			act = actClass.newInstance();
 		}
 		catch (IllegalAccessException e)
@@ -260,15 +268,21 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		ta.commit();
 	}
 	
-	private DexClassLoader getClassLoaderForExternalDex(ClassLoader parent, String appPath)
+	private ClassLoader getClassLoaderForExternalDex(ClassLoader parent, String appPath)
 	{
-		// File dexInternalStoragePath = new File(getDir("dex",
-		// Context.MODE_PRIVATE), "jadex.jar");
-		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
-		AsmDexBdiClassGenerator.OUTPATH = optimizedDexOutputPath;
-
-		DexClassLoader cl = new JadexDexClassLoader(appPath, optimizedDexOutputPath.getAbsolutePath(), null, parent);
-		return cl;
+		// clCache must exist in service :(
+		ClassLoader result = clCache.get(appPath);
+		if (result == null) {
+			// File dexInternalStoragePath = new File(getDir("dex",
+			// Context.MODE_PRIVATE), "jadex.jar");
+			final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
+			AsmDexBdiClassGenerator.OUTPATH = optimizedDexOutputPath;
+			
+			result = new JadexDexClassLoader(appPath, optimizedDexOutputPath.getAbsolutePath(), null, parent);
+			clCache.put(appPath, result);
+		}
+		
+		return result;
 	}
 
 //	private ClassLoader getClassLoaderForInternalClasses(ClassLoader parent)
@@ -298,7 +312,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 			Class<?> loadClass;
 			try
 			{
-				loadClass = cl.loadClass(name);
+				loadClass = currentCl.loadClass(name);
 				Constructor<?> constructor = loadClass.getConstructor(mConstructorSignature);
 				Object[] args = mConstructorArgs;
 				args[0] = context;
