@@ -9,6 +9,9 @@ public class Email
 {
 	/** The plain content. */
 	protected String content; 
+	
+	/** The content type. */
+	protected String contenttype;
 
 	/** The subject. */
 	protected String subject;
@@ -40,17 +43,18 @@ public class Email
 	 */
 	public Email(String sender, String content, String subject, String receiver)
 	{
-		this(sender, content, subject, new String[]{receiver}, null, null);
+		this(sender, content, "text/plain", subject, new String[]{receiver}, null, null);
 	}
 	
 	/**
 	 *  Create an email.
 	 */
-	public Email(String sender, String content, String subject, String[] receivers,
+	public Email(String sender, String content, String contenttype, String subject, String[] receivers,
 		String[] ccs, String[] bccs)
 	{
 		this.sender = sender;
 		this.content = content;
+		this.contenttype = contenttype;
 		this.subject = subject;
 		this.receivers = receivers;
 		this.ccs = ccs;
@@ -182,17 +186,37 @@ public class Email
 	{
 		this.attachments = attachments;
 	}
+	
+	/**
+	 *  Get the contenttype.
+	 *  return The contenttype.
+	 */
+	public String getContentType()
+	{
+		return contenttype;
+	}
 
 	/**
-	 * 
+	 *  Set the contenttype. 
+	 *  @param contenttype The contenttype to set.
+	 */
+	public void setContentType(String contenttype)
+	{
+		this.contenttype = contenttype;
+	}
+
+	/**
+	 *  Get the hashcode.
 	 */
 	public int hashCode()
 	{
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + Arrays.hashCode(attachments);
 		result = prime * result + Arrays.hashCode(bccs);
 		result = prime * result + Arrays.hashCode(ccs);
 		result = prime * result + ((content == null) ? 0 : content.hashCode());
+		result = prime * result + ((contenttype == null) ? 0 : contenttype.hashCode());
 		result = prime * result + Arrays.hashCode(receivers);
 		result = prime * result + ((sender == null) ? 0 : sender.hashCode());
 		result = prime * result + ((subject == null) ? 0 : subject.hashCode());
@@ -200,7 +224,7 @@ public class Email
 	}
 
 	/**
-	 * 
+	 *  Test if is equal.
 	 */
 	public boolean equals(Object obj)
 	{
@@ -211,6 +235,8 @@ public class Email
 		if(getClass() != obj.getClass())
 			return false;
 		Email other = (Email)obj;
+		if(!Arrays.equals(attachments, other.attachments))
+			return false;
 		if(!Arrays.equals(bccs, other.bccs))
 			return false;
 		if(!Arrays.equals(ccs, other.ccs))
@@ -221,6 +247,13 @@ public class Email
 				return false;
 		}
 		else if(!content.equals(other.content))
+			return false;
+		if(contenttype == null)
+		{
+			if(other.contenttype != null)
+				return false;
+		}
+		else if(!contenttype.equals(other.contenttype))
 			return false;
 		if(!Arrays.equals(receivers, other.receivers))
 			return false;
@@ -241,15 +274,7 @@ public class Email
 		return true;
 	}
 
-	/**
-	 *  Get the string representation.
-	 */
-	public String toString()
-	{
-		return "Email(subject=" + subject + ", sender=" + sender
-			+ ", receivers=" + Arrays.toString(receivers) + ")";
-	}
-
+	
 //	/**
 //	 *  Get the string representation.
 //	 */
