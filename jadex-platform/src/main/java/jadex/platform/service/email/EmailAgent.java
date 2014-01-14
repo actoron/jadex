@@ -202,7 +202,7 @@ public class EmailAgent implements IEmailService
 		{
 			MimeMessage message = new MimeMessage(sess);
 			message.setFrom(new InternetAddress(account.getSender()));
-			message.setContent(email.getContent(), "text/ plain");
+			message.setContent(email.getContent(), email.getContentType());
 			message.setSubject(email.getSubject());
 			String[] recs = email.getReceivers();
 			if(recs!=null)

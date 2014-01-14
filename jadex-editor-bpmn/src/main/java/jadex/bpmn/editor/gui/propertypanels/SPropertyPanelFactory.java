@@ -87,8 +87,14 @@ public class SPropertyPanelFactory
 			{
 				ret = new MessageEventPropertyPanel(container, (VActivity) velement);
 			}
+			if (velement instanceof VActivity &&
+				(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(((MActivity) velement.getBpmnElement()).getActivityType()) || 
+				MBpmnModel.EVENT_START_RULE.equals(((MActivity) velement.getBpmnElement()).getActivityType())))
+			{
+				ret = new ECARuleEventPropertyPanel(container, (VActivity)velement);
+			}
 			else if(velement instanceof VActivity &&
-					((MActivity)velement.getBpmnElement()).getActivityType().contains("Signal"))
+				((MActivity)velement.getBpmnElement()).getActivityType().contains("Signal"))
 			{
 				if (((MActivity)velement.getBpmnElement()).isEventHandler())
 				{
