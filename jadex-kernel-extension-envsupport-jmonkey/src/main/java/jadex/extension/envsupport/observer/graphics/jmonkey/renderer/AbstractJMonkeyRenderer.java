@@ -440,10 +440,14 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			else if(primitive.getType()==Primitive3d.PRIMITIVE_TYPE_OBJECT3D)
 			{
 				Object animation = sp.getUserData("Animation");
-				if(animation instanceof Boolean && ((Boolean)animation).booleanValue())
+				boolean hasReallyAnimations = false;
+				if(((Object3d)primitive).getAnimations() != null && ((Object3d)primitive).getAnimations().size()>0){
+					hasReallyAnimations = true;
+				}
+				
+				if((animation instanceof Boolean && ((Boolean)animation).booleanValue())||hasReallyAnimations)
 				{
 					HashMap<String, AnimChannel> anichannels = vp.getAnimChannels();
-					
 					ArrayList<Animation> animations = ((Object3d)primitive).getAnimations();
 					
 					for(Animation a : animations)
@@ -481,6 +485,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 								try
 								{
 									chan.setAnim(a.getName());
+									//System.out.println(a.getName());
 								}
 								catch(Exception e)
 								{

@@ -12,6 +12,8 @@ import java.util.TreeSet;
 
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
+import com.jme3.animation.Animation;
+import com.jme3.animation.BoneTrack;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
@@ -102,11 +104,28 @@ public abstract class AObject3dRenderer extends AbstractJMonkeyRenderer
 		TreeSet<String> channels = ((TreeSet<String>)dc.getBoundValue(sobj, ((Object3d)primitive).getChannels(), vp));
 
 		object.setUserData("Animation", false);
-
-		control = object.getControl(AnimControl.class);
+		Spatial usedObject = object;
+		if(object.getControl(AnimControl.class) == null){
+			
+			
+			if(object instanceof Geometry)
+			{
+				
+			}
+			else
+			{
+			Spatial newobject = findAnimNode((Node) object);
+			if(newobject != null){
+				usedObject = newobject;
+			} else {
+				usedObject = object;
+			}
+			}
+		}
+		control = usedObject.getControl(AnimControl.class);
 		if(control != null)
 		{
-			control = object.getControl(AnimControl.class);
+			control = usedObject.getControl(AnimControl.class);
 
 			if((Boolean)((Object3d)primitive).isRigDebug())
 			{
@@ -115,13 +134,13 @@ public abstract class AObject3dRenderer extends AbstractJMonkeyRenderer
 				mat2.setColor("Color", ColorRGBA.Green);
 				mat2.getAdditionalRenderState().setDepthTest(false);
 				skeletonDebug.setMaterial(mat2);
-				((Node)object).attachChild(skeletonDebug);
+				((Node)usedObject).attachChild(skeletonDebug);
 			}
 
 
 			if(channels.size() > 0)
 			{
-				((Node)object).setUserData("Animation", true);
+				((Node)usedObject).setUserData("Animation", true);
 				animChannels = new HashMap<String, AnimChannel>();
 				for(String c : channels)
 				{
@@ -133,5 +152,34 @@ public abstract class AObject3dRenderer extends AbstractJMonkeyRenderer
 		}
 
 	}
+	
+    private static Node findAnimNode(Node node) {
+        AnimControl l_animControl;
+
+        l_animControl = node.getControl(AnimControl.class);
+        if (l_animControl != null) {
+            if (!l_animControl.getAnimationNames().isEmpty()) {
+                Animation l_anim = l_animControl.getAnim(l_animControl.getAnimationNames().iterator().next());
+                if (l_anim != null && l_anim.getTracks().length > 0 && l_anim.getTracks()[0] instanceof BoneTrack) {
+                    return node;
+                }
+            }
+        }
+        
+        for (Spatial l_child : node.getChildren()) {
+            if(l_child.getControl(AnimControl.class) != null) {
+                return (Node) l_child;
+            }
+            if(!(l_child instanceof Geometry)){
+                
+                Node l_ret = findAnimNode((Node) l_child);
+                if (l_ret != null) {
+                    return l_ret;
+                }
+            }
+        }
+
+        return null;
+    }
 
 }
