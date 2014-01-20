@@ -1217,7 +1217,7 @@ public class SBpmnModelWriter
 						}
 						out.print("\"");
 						
-						String inival = prop.getInitialValue().getValue();
+						String inival = prop.getInitialValue() != null ? prop.getInitialValue().getValue() : null;
 						if(inival != null && inival.length() > 0)
 						{
 							out.print(">");
