@@ -471,16 +471,16 @@ public class PersistentMap<K, V> implements Map<K, V>
 			    	
 //			    	synchronized(compactionshadowmap)
 //			    	{
-//				    	fos.close();
-//			    		raf.close();
-//						SUtil.moveFile(file, oldfile);
-//						SUtil.moveFile(compactfile, file);
-//						oldfile.delete();
-//						raf = new RandomAccessFile(file, mode);
-//						dirtycounter = 0;
-//						indexmap.clear();
+				    	fos.close();
+			    		raf.close();
+						SUtil.moveFile(file, oldfile);
+						SUtil.moveFile(compactfile, file);
+						oldfile.delete();
+						raf = new RandomAccessFile(file, mode);
+						dirtycounter = 0;
+						indexmap.clear();
 //	//					buildIndex();
-//						PersistentMap.this.indexmap = newindexmap;
+						PersistentMap.this.indexmap = newindexmap;
 //						
 //						for (Object key : compactionshadowmap.keySet())
 //						{
