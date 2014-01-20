@@ -172,7 +172,7 @@ public class PeerList
 		// Build list of currently connected peers.
 		else
 		{
-			boolean	https	= url.startsWith("relay-https://");
+			boolean	https	= request.startsWith("relay-https://");
 			StringBuffer	sret	= new StringBuffer();
 			sret.append(url);
 			PeerEntry[] apeers = getPeers();
