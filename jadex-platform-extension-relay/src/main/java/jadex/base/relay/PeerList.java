@@ -164,22 +164,41 @@ public class PeerList
 			ret	= request;
 			if(ret.endsWith("/servers"))
 			{
-				ret	= RelayConnectionManager.relayAddress(ret.substring(0, ret.length()-7));
+				ret	= ret.substring(0, ret.length()-7);
 			}
+			ret	=  RelayConnectionManager.relayAddress(ret);
 		}
 		
 		// Build list of currently connected peers.
 		else
 		{
-			ret	= url;
+			boolean	https	= url.startsWith("relay-https://");
+			StringBuffer	sret	= new StringBuffer();
+			sret.append(url);
 			PeerEntry[] apeers = getPeers();
 			for(PeerEntry peer: apeers)
 			{
 				if(peer.isConnected())
 				{
-					ret	+= ", "+peer.getUrl();
+					sret.append(", ");
+					boolean	phttps	= peer.getUrl().startsWith("relay-https://");
+					if(https && !phttps)
+					{
+						sret.append("relay-https://");						
+						sret.append(peer.getUrl().substring(13));						
+					}
+					else if(!https && phttps)
+					{
+						sret.append("relay-http://");						
+						sret.append(peer.getUrl().substring(14));						
+					}
+					else
+					{
+						sret.append(peer.getUrl());						
+					}
 				}
 			}
+			ret	= sret.toString();
 		}
 		return ret;
 	}
