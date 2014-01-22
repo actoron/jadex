@@ -185,6 +185,8 @@
 		<argument name="relaytransport" class="boolean">true</argument>
 		<!-- Address(es) for relay transport (one or more addresses separated by commas). -->
 		<argument name="relayaddress" class="String">jadex.platform.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS</argument>
+		<!-- Flag if relay should use HTTPS for receiving messages. -->
+		<argument name="relaysecurity" class="boolean">false</argument>
 		<!-- Flag if ssltcp transport should enabled (requires Jadex Pro add-on). -->
 		<argument name="ssltcptransport" class="boolean">false</argument>
 		<!-- Port for SSL TCP transport. -->
@@ -319,7 +321,7 @@
 						$args.tcptransport? new jadex.platform.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null,
 						$args.niotcptransport? new jadex.platform.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,
 						$args.ssltcptransport? jadex.platform.service.message.transport.ssltcpmtp.SSLTCPTransport.create($component.getServiceProvider(), $args.ssltcpport): null,
-						$args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress): null
+						$args.relaytransport? new jadex.platform.service.message.transport.httprelaymtp.HttpRelayTransport($component, $args.relayaddress, $args.relaysecurity): null
 					},
 					new jadex.bridge.service.types.message.MessageType[]
 					{

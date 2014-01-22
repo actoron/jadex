@@ -73,7 +73,6 @@ public class HttpReceiver
 	/**
 	 *  (Re-)Start the receiver.
 	 */
-	// todo: why restarted thousand times on toaster #501?
 	public void start()
 	{
 //		System.err.println("(re)start: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
@@ -301,7 +300,10 @@ public class HttpReceiver
 			public void customResultAvailable(Void result)
 			{
 				// If all threads done, but no result -> set exception.
-				ret.setExceptionIfUndone(new RuntimeException("Cannot retrieve server list."));
+				if(ret.setExceptionIfUndone(new RuntimeException("Cannot retrieve server list.")))
+				{
+					log(Level.INFO, "Relay cannot retrieve server list.");					
+				}
 			}
 		});
 		
@@ -317,9 +319,10 @@ public class HttpReceiver
 						try
 						{
 							String	curadrs	= transport.getConnectionManager().getServers(adr);
-							log(Level.INFO, "Relay transport got server addresses from: "+adr+", "+curadrs);
-//							System.err.println("fetchServerAddresses/setResultIfUndone: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
-							ret.setResultIfUndone(curadrs);
+							if(ret.setResultIfUndone(curadrs))
+							{
+								log(Level.INFO, "Relay transport got server addresses from: "+adr+", "+curadrs);
+							}
 						}
 						catch(Exception e)
 						{
@@ -358,7 +361,8 @@ public class HttpReceiver
 		while(stok.hasMoreTokens())
 		{
 			// Insert addresses randomly to distribute load across servers.
-			adrs.add(rnd.nextInt(adrs.size()+1), stok.nextToken().trim());
+			String	adr	= transport.isSecure() ? RelayConnectionManager.secureAddress(stok.nextToken().trim()) : stok.nextToken().trim();
+			adrs.add(rnd.nextInt(adrs.size()+1), adr);
 		}
 		
 		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(adrs.size(), true,
@@ -367,7 +371,10 @@ public class HttpReceiver
 			public void customResultAvailable(Void result)
 			{
 				// If all threads done, but no result -> set exception.
-				ret.setExceptionIfUndone(new RuntimeException("No server available."));
+				if(ret.setExceptionIfUndone(new RuntimeException("No server available.")))
+				{
+					log(Level.INFO, "No relay server available.");					
+				}
 			}
 		});
 		
@@ -383,8 +390,11 @@ public class HttpReceiver
 						try
 						{
 							transport.getConnectionManager().ping(adr);
-//							System.err.println("selectServer/setResultIfUndone: "+access.getComponentIdentifier()+", "+System.currentTimeMillis()+", "+Thread.currentThread());
-							ret.setResultIfUndone(adr);
+							if(ret.setResultIfUndone(adr))
+							{
+								log(Level.INFO, "Relay transport selected server address: "+adr);
+							}
+
 						}
 						catch(Exception e)
 						{

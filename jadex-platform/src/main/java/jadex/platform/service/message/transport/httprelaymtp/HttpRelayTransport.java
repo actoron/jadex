@@ -124,6 +124,9 @@ public class HttpRelayTransport implements ITransport
 	/** The default relay server lookup addresses. */
 	protected String	defaddresses;
 	
+	/** Flag if receiver connection should use https. */
+	protected boolean	secure;
+	
 	/** The connection manager. */
 	protected RelayConnectionManager	conman;
 	
@@ -147,10 +150,11 @@ public class HttpRelayTransport implements ITransport
 	/**
 	 *  Create a new relay transport.
 	 */
-	public HttpRelayTransport(IInternalAccess component, String defaddresses)
+	public HttpRelayTransport(IInternalAccess component, String defaddresses, boolean secure)
 	{
 		this.component	= component;
 		this.defaddresses	= defaddresses;
+		this.secure	= secure;
 		this.addresses	= Collections.synchronizedMap(new HashMap<String, Long>());	// Todo: cleanup unused addresses!?
 		this.workers	= new HashMap<String, Integer>();
 		this.readyqueue	= new HashMap<String, Collection<ISendTask>>();
@@ -196,6 +200,14 @@ public class HttpRelayTransport implements ITransport
 	public RelayConnectionManager	getConnectionManager()
 	{
 		return conman;
+	}
+	
+	/**
+	 *  Flag if receiver connection should use https.
+	 */
+	public boolean	isSecure()
+	{
+		return secure;
 	}
 	
 	//-------- methods --------

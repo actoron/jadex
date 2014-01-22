@@ -20,7 +20,7 @@ public class RelayConnectionManager	extends HttpConnectionManager
 	//-------- constants --------
 	
 	/** A buffer for reading response data (ignored but needs to be read for connection to be reusable). */
-	protected static final byte[]	RESPONSE_BUF	= new byte[8192];
+	static final byte[]	RESPONSE_BUF	= new byte[8192];
 	
 	//-------- methods --------
 	
@@ -241,6 +241,24 @@ public class RelayConnectionManager	extends HttpConnectionManager
 		if(!address.endsWith("/") && !address.endsWith("/awareness"))	// For compatibility with old servers: don't add slash (Todo: remove)
 		{
 			address	+= "/";
+		}
+		return address;
+	}
+	
+	
+	/**
+	 *  Convert a potential non-https address to an https address.
+	 *  Handles both relay and http addresses.
+	 */
+	public static String	secureAddress(String address)
+	{
+		if(address.startsWith("http://"))
+		{
+			address	= "https://" + address.substring(7);
+		}
+		else if(address.startsWith("relay-http://"))
+		{
+			address	= "relay-https://" + address.substring(13);
 		}
 		return address;
 	}
