@@ -46,7 +46,7 @@ public class MyJadexService extends JadexPlatformService
 
 		public void startPlatform()
 		{
-			MyJadexService.this.startJadexPlatform();
+			MyJadexService.this.startPlatform();
 		}
 
 		public void startHelloWorldAgent()

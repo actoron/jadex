@@ -140,7 +140,7 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		return jadexPlatformManager.getService(platformId, serviceClazz, scope);
 	}
 
-	public final IFuture<IExternalAccess> startJadexPlatform()
+	public IFuture<IExternalAccess> startJadexPlatform()
 	{
 		return startJadexPlatform(DEFAULT_KERNELS);
 	}
@@ -225,8 +225,11 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		if (!arguments.containsKey("androidContext")) {
 			arguments.put("androidContext", this);
 		}
+		
+		// Add RID to show jadex the class location
 		IResourceIdentifier rid = creationInfo.getResourceIdentifier();
-		if (rid == null) {
+		if (rid == null && appInfo != null) {
+			// only try to get RID in multi-app mode where we have an ApplicationInfo
 			rid = jadexPlatformManager.getRID(appInfo.sourceDir);
 			Logger.d("Setting RID before starting Component: " + rid);
 			creationInfo.setResourceIdentifier(rid);

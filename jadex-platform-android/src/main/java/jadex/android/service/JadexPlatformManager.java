@@ -2,7 +2,6 @@ package jadex.android.service;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.commons.Logger;
-import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -10,9 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.platform.IJadexPlatformManager;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -227,7 +224,8 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			Logger.i("Found running platform - using it.");
 			result.setResult(sharedPlatformAccess);
 		} else {
-			startJadexPlatform(DEFAULT_KERNELS, getRandomPlatformName(), DEFAULT_OPTIONS).addResultListener(new DefaultResultListener<IExternalAccess>()
+			Logger.i("Starting up new shared platform.");
+			startJadexPlatform(ALL_KERNELS, getRandomPlatformName(), DEFAULT_OPTIONS).addResultListener(new DefaultResultListener<IExternalAccess>()
 			{
 				@Override
 				public void resultAvailable(IExternalAccess ea)
@@ -276,50 +274,22 @@ public class JadexPlatformManager implements IJadexPlatformManager
 					public void resultAvailable(final IExternalAccess platformAccess)
 					{
 						runningPlatforms.put(platformAccess.getComponentIdentifier(), platformAccess);
-						Logger.d("Platform started, now adding lib url...");
-						addLibServiceUrl(platformAccess, defaultAppPath).addResultListener(new DefaultResultListener<Void>()
-						{
-
-							@Override
-							public void resultAvailable(Void result)
+						if (defaultAppPath != null) {
+							Logger.d("Platform started in multi-app mode, now adding lib url...");
+							addLibServiceUrl(platformAccess, defaultAppPath).addResultListener(new DefaultResultListener<Void>()
 							{
-								// TODO Auto-generated method stub
-								ret.setResult(platformAccess);
-							}
-						});
-						
-						// set custom class loader
-//						IFuture<ILibraryService> service = SServiceProvider.getService(platformAccess.getServiceProvider(), ILibraryService.class);
-//						service.addResultListener(new DefaultResultListener<ILibraryService>()
-//						{
-//
-//							@Override
-//							public void resultAvailable(ILibraryService result)
-//							{
-//								Logger.d("Setting base class loader...");
-//								if (defaultAppPath !=null) {
-//									try
-//									{
-//										URL url = SUtil.androidUtils().urlFromApkPath(defaultAppPath);
-//										result.addTopLevelURL(url);
-//									}
-//									catch (MalformedURLException e)
-//									{
-//										e.printStackTrace();
-//									}
-//								}
-//								
-//							}
-//
-//							@Override
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								super.exceptionOccurred(exception);
-//								exception.printStackTrace();
-//							}
-//							
-//							
-//						});
+	
+								@Override
+								public void resultAvailable(Void result)
+								{
+									ret.setResult(platformAccess);
+								}
+							});
+						} else {
+							// no rid handling necessary if platform is embedded in app.
+							Logger.d("Platform started in embedded mode.");
+							ret.setResult(platformAccess);
+						}
 						
 					}
 
