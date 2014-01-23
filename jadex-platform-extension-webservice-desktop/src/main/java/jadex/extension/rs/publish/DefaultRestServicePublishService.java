@@ -78,6 +78,9 @@ import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
+import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -213,7 +216,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			}
 			
 			// If no service type was specified it has to be generated.
-//			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(cl);
+			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(cl);
 			Class<?> baseclazz = pi.getMapping()!=null? pi.getMapping().getType(cl): null;
 			
 			Class<?> rsimpl = getProxyClass(service, cl, baseclazz, mapprops);
@@ -230,8 +233,8 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			StringBuilder strb = new StringBuilder("jadex.extension.rs.publish"); // Add Jadex XML body reader/writer
 			// Must not add package because a baseclass could be contained with the same path
 			// This leads to an error in jersey
-//			String pack = baseclazz!=null && baseclazz.getPackage()!=null? 
-//				baseclazz.getPackage().getName(): iface.getPackage()!=null? iface.getPackage().getName(): null;
+			String pack = baseclazz!=null && baseclazz.getPackage()!=null? 
+				baseclazz.getPackage().getName(): iface.getPackage()!=null? iface.getPackage().getName(): null;
 //			if(pack!=null)
 //				strb.append(", ").append(pack);
 			
@@ -240,8 +243,6 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			props.put("com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature", Boolean.TRUE);
 //			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			props.put(JADEXSERVICE, service);
-//			PackagesResourceConfig config = new PackagesResourceConfig(props);
-//			config.getClasses().add(rsimpl);
 			
 			final ResourceConfig rc = new ResourceConfig();
 			rc.addProperties(props);
@@ -256,7 +257,17 @@ public class DefaultRestServicePublishService implements IWebPublishService
 				}
 			});
 			
-//			URI baseuri = uri;
+			// Enable json support
+//			rc.packages("org.glassfish.jersey.examples.jackson").register(JacksonFeature.class);
+			
+			MoxyJsonConfig mc = new MoxyJsonConfig();
+		    Map<String, String> m = new HashMap<String, String>(1);
+		    m.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+		    mc.setNamespacePrefixMapper(m).setNamespaceSeparator(':');
+			rc.packages(pack).register(mc.resolver());
+//			rc.register(new MoxyJsonFeature());
+			rc.register(MultiPartFeature.class);
+			
 			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
 			
 			HttpServer server = uriservers==null? null: uriservers.get(baseuri);
