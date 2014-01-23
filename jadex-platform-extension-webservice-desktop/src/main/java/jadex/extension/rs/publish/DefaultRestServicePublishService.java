@@ -26,6 +26,7 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -55,7 +56,7 @@ import javassist.bytecode.annotation.ClassMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
-import javax.servlet.Servlet;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -68,20 +69,24 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
-import org.glassfish.grizzly.http.server.io.NIOWriter;
-import org.glassfish.grizzly.servlet.ServletHandler;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.server.ContainerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
 
-import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.multipart.FormDataParam;
+//import com.sun.jersey.api.container.ContainerFactory;
+//import com.sun.jersey.api.container.grizzly.GrizzlyServerFactory;
+//import com.sun.jersey.api.core.PackagesResourceConfig;
+//import com.sun.jersey.api.core.ResourceConfig;
+//import com.sun.jersey.api.json.JSONConfiguration;
+//import com.sun.jersey.multipart.FormDataParam;
 
 /**
  *  The default web service publish service.
@@ -220,7 +225,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 //			Class<?> rsimpl = createProxyClass(service, cl, baseclazz, mapprops, rmis);
 			
 			Map<String, Object> props = new HashMap<String, Object>();
-			String jerseypack = PackagesResourceConfig.PROPERTY_PACKAGES;
+//			String jerseypack = PackagesResourceConfig.PROPERTY_PACKAGES;
 //			props.put(uri.toString(), service);
 			StringBuilder strb = new StringBuilder("jadex.extension.rs.publish"); // Add Jadex XML body reader/writer
 			// Must not add package because a baseclass could be contained with the same path
@@ -229,13 +234,27 @@ public class DefaultRestServicePublishService implements IWebPublishService
 //				baseclazz.getPackage().getName(): iface.getPackage()!=null? iface.getPackage().getName(): null;
 //			if(pack!=null)
 //				strb.append(", ").append(pack);
-			props.put(jerseypack, strb.toString());
-			props.put(PackagesResourceConfig.FEATURE_REDIRECT, Boolean.TRUE);
+			
+//			props.put(jerseypack, strb.toString());
+//			props.put(PackagesResourceConfig.FEATURE_REDIRECT, Boolean.TRUE);
 			props.put("com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature", Boolean.TRUE);
-			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+//			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			props.put(JADEXSERVICE, service);
-			PackagesResourceConfig config = new PackagesResourceConfig(props);
-			config.getClasses().add(rsimpl);
+//			PackagesResourceConfig config = new PackagesResourceConfig(props);
+//			config.getClasses().add(rsimpl);
+			
+			final ResourceConfig rc = new ResourceConfig();
+			rc.addProperties(props);
+			rc.register(rsimpl);
+			
+			rc.register(new AbstractBinder()
+			{
+				protected void configure()
+				{
+					bind(ResourceConfig.class).in(Singleton.class);
+					bind(rc).to(ResourceConfig.class);
+				}
+			});
 			
 //			URI baseuri = uri;
 			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
@@ -245,11 +264,11 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			if(server==null)
 			{
 				System.out.println("Starting new server: "+uri.getPath());
-				String pub = uri.toString();
+//				String pub = uri.toString();
 //				if(pub.endsWith("/"))
 //					pub.substring(0, pub.length()-1);
 //					pub += "/";
-				server = GrizzlyServerFactory.createHttpServer(pub, config);
+				server = GrizzlyHttpServerFactory.createHttpServer(uri, rc);
 				server.start();
 //				handler = server.getHttpHandler();
 				Map<HttpHandler, String[]> handlers = server.getServerConfiguration().getHttpHandlers();
@@ -273,7 +292,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			else
 			{
 				System.out.println("Adding http handler to server: "+uri.getPath());
-				handler = ContainerFactory.createContainer(HttpHandler.class, config);
+				handler = ContainerFactory.createContainer(HttpHandler.class, rc);
 				ServerConfiguration sc = server.getServerConfiguration();
 				sc.addHttpHandler(handler, uri.getPath());
 //				Map h = sc.getHttpHandlers();
@@ -299,7 +318,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 	/**
 	 * 
 	 */
-	public HttpServer getHttpServer(URI uri, PackagesResourceConfig config)
+	public HttpServer getHttpServer(URI uri, ResourceConfig config)
 	{
 		HttpServer server = null;
 		
@@ -312,11 +331,11 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			{
 				System.out.println("Starting new server: "+uri.getPath());
 				
-				String pub = uri.toString();
+//				String pub = uri.toString();
 	//			if(pub.endsWith("/"))
 	//				pub.substring(0, pub.length()-1);
 	//				pub += "/";
-				server = GrizzlyServerFactory.createHttpServer(pub, config);
+				server = GrizzlyHttpServerFactory.createHttpServer(uri, config);
 				server.start();
 	//			handler = server.getHttpHandler();
 	//			Map<HttpHandler, String[]> handlers = server.getServerConfiguration().getHttpHandlers();
@@ -353,10 +372,10 @@ public class DefaultRestServicePublishService implements IWebPublishService
 	/**
 	 * 
 	 */
-	protected PackagesResourceConfig createConfig()
+	protected ResourceConfig createConfig()
 	{
 		Map<String, Object> props = new HashMap<String, Object>();
-		String jerseypack = PackagesResourceConfig.PROPERTY_PACKAGES;
+//		String jerseypack = PackagesResourceConfig.PROPERTY_PACKAGES;
 //		props.put(uri.toString(), service);
 		StringBuilder strb = new StringBuilder("jadex.extension.rs.publish"); // Add Jadex XML body reader/writer
 		// Must not add package because a baseclass could be contained with the same path
@@ -365,34 +384,39 @@ public class DefaultRestServicePublishService implements IWebPublishService
 //			baseclazz.getPackage().getName(): iface.getPackage()!=null? iface.getPackage().getName(): null;
 //		if(pack!=null)
 //			strb.append(", ").append(pack);
-		props.put(jerseypack, strb.toString());
-		props.put(PackagesResourceConfig.FEATURE_REDIRECT, Boolean.TRUE);
+//		props.put(jerseypack, strb.toString());
+//		props.put(PackagesResourceConfig.FEATURE_REDIRECT, Boolean.TRUE);
 		props.put("com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature", Boolean.TRUE);
-		props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+//		props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 //		props.put(JADEXSERVICE, service);
-		PackagesResourceConfig config = new PackagesResourceConfig(props);
-//		config.getClasses().add(rsimpl);
-		config.getClasses().add(DummyResource.class);
+		ResourceConfig config = new ResourceConfig();
+		config.addProperties(props);
+		config.register(DummyResource.class);
 		return config;
 	}
 	
+//	/**
+//	 * 
+//	 */
+//	public IFuture<Void> publishServet(URI uri, Object servlet)
+//	{
+//		HttpServer server = getHttpServer(uri, createConfig());
+//		ServletConfigImpl conf = new ServletConfigImpl();
+//		ServletHandler handler = new ServletHandler(conf);
+//		handler.setContextPath(uri.getPath());
+//        ServerConfiguration sc = server.getServerConfiguration();
+//		sc.addHttpHandler(handler, uri.getPath());
+//		
+//		WebappContext ctx = new WebappContext(uri.getPath());
+//		ServletRegistration reg = ctx.addServlet(SReflect.getInnerClassName(servlet.getClass()), servlet);
+//		reg.addMapping(alias);
+//		ctx.deploy(server);
+//		
+//		return IFuture.DONE;
+//	}
 	
 	/**
-	 * 
-	 */
-	public IFuture<Void> publishServet(URI uri, Object servlet)
-	{
-		HttpServer server = getHttpServer(uri, createConfig());
-		ServletHandler handler = new ServletHandler((Servlet)servlet);
-		handler.setContextPath(uri.getPath());
-        ServerConfiguration sc = server.getServerConfiguration();
-		sc.addHttpHandler(handler, uri.getPath());
-		
-		return IFuture.DONE;
-	}
-	
-	/**
-	 * 
+	 *  Publish an html page.
 	 */
 	public IFuture<Void> publishHMTLPage(URI uri, final String html)
 	{
@@ -409,7 +433,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 	                resp.setContentType("text/html");
 	
 	                // Actual logic goes here.
-	                NIOWriter out = resp.getWriter();
+	                Writer out = resp.getWriter();
 	                out.write(html);
             	}
             	catch(Exception e)
@@ -418,6 +442,72 @@ public class DefaultRestServicePublishService implements IWebPublishService
             	}
             }
         }, uri.getPath());
+		
+		return IFuture.DONE;
+	}
+	
+//	/**
+//	 *  Publish a resource.
+//	 */
+////	public IFuture<Void> publishResource(URI uri, final ResourceInfo ri)
+//	public IFuture<Void> publishResource(URI uri, final String type, final String filename)
+//	{
+//		HttpServer server = getHttpServer(uri, createConfig());
+//		
+//        ServerConfiguration sc = server.getServerConfiguration();
+//		sc.addHttpHandler(new HttpHandler() 
+//		{
+//            public void service(Request request, Response resp) 
+//            {
+//            	try
+//            	{
+//	            	// Set response content type
+//	                resp.setContentType(type!=null? type: "text/html");
+//	
+//	                InputStream is = null;
+//	                try
+//	        		{
+//	        			is = SUtil.getResource0(filename, null);
+//	        			OutputStream os = resp.getOutputStream();
+//	        			SUtil.copyStream(is, os);
+//	        		}
+//	        		finally
+//	        		{
+//	        			try
+//	        			{
+//	        				if(is!=null)
+//	        					is.close();
+//	        			}
+//	        			catch(Exception e)
+//	        			{
+//	        			}
+//	        		}
+//            	}
+//            	catch(Exception e)
+//            	{
+//            		e.printStackTrace();
+//            	}
+//            }
+//        }, uri.getPath());
+//		
+//		return IFuture.DONE;
+//	}
+	
+	/**
+	 *  Publish resources via a rel path.
+	 */
+	public IFuture<Void> publishResources(URI uri, String path)
+	{
+		HttpServer server = getHttpServer(uri, createConfig());
+        ServerConfiguration sc = server.getServerConfiguration();
+        path = path.endsWith("/")? path: path+"/";
+		sc.addHttpHandler(new CLStaticHttpHandler(component.getClassLoader(), path)
+		{
+			public void service(Request request, Response resp) throws Exception
+			{
+				super.service(request, resp);
+			}
+		}, uri.getPath());
 		
 		return IFuture.DONE;
 	}
@@ -771,6 +861,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			
 //			Object service = rc.getProperty(JADEXSERVICE);
 			Object service = rc.getProperty("jadexservice");
+//			System.out.println("jadex service is: "+service);
 
 			Method targetmethod = null;
 			if(method.isAnnotationPresent(MethodMapper.class))
@@ -881,8 +972,11 @@ public class DefaultRestServicePublishService implements IWebPublishService
 		
 		try
 		{
+//			System.out.println("huhu: "+getClass().getDeclaredField("__ui").get(this));
 			ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
+//			System.out.println("resconf: "+rc);
 			Object service = rc.getProperty("jadexservice");
+//			System.out.println("jadex service is: "+service);
 
 			Field fjs = getClass().getDeclaredField("__functionsjs");
 			String functionsjs = (String)fjs.get(this);

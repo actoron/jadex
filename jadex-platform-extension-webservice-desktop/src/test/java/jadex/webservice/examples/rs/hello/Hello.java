@@ -1,9 +1,6 @@
 package jadex.webservice.examples.rs.hello;
 
-import java.util.Map;
-
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.extension.rs.publish.JadexXMLBodyReader;
 import jadex.xml.bean.JavaWriter;
@@ -11,19 +8,18 @@ import jadex.xml.bean.JavaWriter;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jackson.map.ObjectMapper;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.server.ResourceConfig;
 
 @Path("")
 public class Hello extends BasicService
@@ -200,14 +196,14 @@ public class Hello extends BasicService
 	{
 		try
 		{
-			ClientConfig cc = new DefaultClientConfig();
-			cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+			ClientConfig cc = new ClientConfig();
+//			cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			cc.getClasses().add(JadexXMLBodyReader.class);
-			Client client = Client.create(cc);
-			WebResource service = client.resource("http://localhost:8080/banking1/"); 
+			Client client = ClientBuilder.newClient(cc);
+			WebTarget service = client.target("http://localhost:8080/banking1/"); 
 			ObjectMapper mapper = new ObjectMapper();
 			System.out.println("jackson json: "+mapper.writeValueAsString(null));
-			service.path("addTransactionDataJSON").type(MediaType.TEXT_PLAIN).post(Void.class, "hallo");
+			service.path("addTransactionDataJSON").request(MediaType.TEXT_PLAIN).post(Entity.text("hallo"));
 		}
 		catch(Exception e)
 		{

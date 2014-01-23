@@ -24,9 +24,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.multipart.FormDataParam;
-import com.sun.jersey.server.wadl.WadlGenerator;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.server.ResourceConfig;
+
 
 /**
  *  Rest service implementation that provides some methods by itself.

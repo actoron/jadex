@@ -33,23 +33,21 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.RequestBuilder;
-import com.sun.jersey.api.client.UniformInterface;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientResponse;
 
 /**
  *  Create a new web service wrapper invocation handler.
@@ -191,8 +189,8 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											if(m.isAnnotationPresent(ResultMapper.class))
 												rmapper = m.getAnnotation(ResultMapper.class).value();
 											
-											ClientConfig cc = new DefaultClientConfig();
-											cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+											ClientConfig cc = new ClientConfig();
+//											cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 											cc.getClasses().add(JadexXMLBodyWriter.class);
 											
 											Object targetparams = args;
@@ -210,7 +208,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											}
 											else if(pmappers!=null)
 											{
-												MultivaluedMap<String, String> mv = new MultivaluedMapImpl();
+												MultivaluedMap<String, String> mv = new MultivaluedHashMap<String, String>();
 												for(int i=0; i<pmappers.size(); i++)
 												{
 													Object[] pm = (Object[])pmappers.get(i);
@@ -231,9 +229,11 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 												targetparams = mv;
 											}
 											
-											Client client = Client.create(cc);
-											WebResource wr = client.resource(baseuri); 
-											wr = wr.path(methodname);
+											Client client = ClientBuilder.newClient(cc);
+											WebTarget wt = client.target(baseuri);
+											wt.path(methodname);
+//											WebResource wr = client.resource(baseuri); 
+//											wr = wr.path(methodname);
 											
 											ClientResponse res = null;
 
@@ -241,40 +241,82 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											if(!inurl && m.isAnnotationPresent(ParametersInURL.class))
 												inurl = m.getAnnotation(ParametersInURL.class).value();
 												
-											if(inurl)
-												wr = wr.queryParams((MultivaluedMap<String, String>)targetparams);
-											
-											RequestBuilder rb = wr;
-											for(int i=0; i<consumes.length; i++)
+											if(inurl && targetparams!=null)
 											{
-												rb = rb.type(consumes[i]);
+//												wr = wr.queryParams((MultivaluedMap<String, String>)targetparams);
+												MultivaluedMap<String, String> ps = (MultivaluedMap<String, String>)targetparams;
+												for(String key: ps.keySet())
+												{
+													wt.queryParam(key, ps.values().toArray(new String[0]));
+												}
 											}
+											
+											Invocation.Builder ib = wt.request(consumes);
+											
+//											RequestBuilder rb = wr;
+//											for(int i=0; i<consumes.length; i++)
+//											{
+//												rb = rb.type(consumes[i]);
+//											}
+											
 											for(int i=0; i<produces.length; i++)
 											{
-												rb = rb.accept(produces[i]);
+//												rb = rb.accept(produces[i]);
+												ib = ib.accept(consumes[i]);
 											}
 											
 											if(GET.class.equals(resttype))
-												res = ((UniformInterface)rb).get(ClientResponse.class);
-											else if(POST.class.equals(resttype))
-												res = ((UniformInterface)rb).post(ClientResponse.class, inurl? null: targetparams);
-											else if(PUT.class.equals(resttype))
-												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-											else if(HEAD.class.equals(resttype))
-												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-											else if(OPTIONS.class.equals(resttype))
-												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-											else if(DELETE.class.equals(resttype))
-												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+											{
+//												res = ((UniformInterface)rb).get(ClientResponse.class);
+												res = ib.get(ClientResponse.class);
+											}
+											else
+											{
+												Entity data = null;
+												if(!inurl && targetparams!=null)
+												{
+													if(targetparams instanceof MultivaluedMap)
+													{
+														data = Entity.form((MultivaluedMap)targetparams);
+													}
+												}
+												
+												if(POST.class.equals(resttype))
+												{
+//													res = ((UniformInterface)rb).post(ClientResponse.class, inurl? null: targetparams);
+													res = ib.post(data, ClientResponse.class);
+												}
+												else if(PUT.class.equals(resttype))
+												{
+//													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+													res = ib.put(data, ClientResponse.class);
+												}
+//												else if(HEAD.class.equals(resttype))
+//												{
+////													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+//													res = ib.head(ClientResponse.class);
+													// why not supported :-((
+//												}
+												else if(OPTIONS.class.equals(resttype))
+												{
+//													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+													res = ib.options(ClientResponse.class);
+												}
+												else if(DELETE.class.equals(resttype))
+												{
+//													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+													res = ib.delete(ClientResponse.class);
+												}
+											}
 											
 											Object targetret = res;
 											if(rmapper!=null)
 											{
 												IValueMapper rm = (IValueMapper)jadex.extension.rs.publish.Value.evaluate(rmapper, defaultimports);
-												RestResponse restResponse = new RestResponse(res.getEntityInputStream());
+												RestResponse restResponse = new RestResponse(res.getEntityStream());
 												restResponse.setContentLength(res.getLength());
-												restResponse.setContentType(res.getType().toString());
-												restResponse.setDate(res.getResponseDate().getTime());
+												restResponse.setContentType(res.getMediaType().toString());
+												restResponse.setDate(res.getDate().getTime());
 												targetret = rm.convertValue(restResponse);
 											}
 											

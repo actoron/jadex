@@ -3,38 +3,23 @@ package jadex.webservice.examples.rs.hello;
 import jadex.extension.rs.publish.JadexXMLBodyReader;
 import jadex.xml.bean.JavaWriter;
 
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.server.HttpServer;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.api.representation.Form;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.server.ResourceConfig;
 
 @Path("")
 public class Hello
@@ -205,14 +190,14 @@ public class Hello
 	{
 		try
 		{
-			ClientConfig cc = new DefaultClientConfig();
-			cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+			ClientConfig cc = new ClientConfig();
+//			cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			cc.getClasses().add(JadexXMLBodyReader.class);
-			Client client = Client.create(cc);
-			WebResource service = client.resource("http://localhost:8080/banking1/"); 
+			Client client = ClientBuilder.newClient(cc);
+			WebTarget service = client.target("http://localhost:8080/banking1/"); 
 			ObjectMapper mapper = new ObjectMapper();
 			System.out.println("jackson json: "+mapper.writeValueAsString(null));
-			service.path("addTransactionDataJSON").type(MediaType.TEXT_PLAIN).post(Void.class, "hallo");
+			service.path("addTransactionDataJSON").request(MediaType.TEXT_PLAIN).post(Entity.text("hello"));
 		}
 		catch(Exception e)
 		{

@@ -30,6 +30,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -1322,6 +1325,30 @@ public class SUtil
 		return ret;
 	}
 
+	/**
+	 *  Copy all data from input to output stream.
+	 */
+	public static void copyStream(InputStream is, OutputStream os) 
+	{
+		try
+		{
+	        byte[] buf = new byte[10 * 1024];
+	        int len = 0;
+	        while((len = is.read(buf)) != -1) 
+	        {
+	            os.write(buf, 0, len);
+	        }
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
 	/**
 	 * Encode an object into XML.
 	 * 

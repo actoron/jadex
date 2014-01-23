@@ -1,14 +1,9 @@
 package jadex.webservice.examples.rs.chart;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.ws.rs.core.MultivaluedMap;
-
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-
-import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
+
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * 
@@ -20,7 +15,7 @@ public class ChartParameterMapper implements IValueMapper
 	 */
 	public Object convertValue(Object value) throws Exception
 	{
-		MultivaluedMap<String, String> ret = new MultivaluedMapImpl(); 
+		MultivaluedMap<String, String> ret = new MultivaluedHashMap<String, String>(); 
 
 		Object[] params = (Object[])value;
 		int width = ((Integer)params[0]).intValue();
