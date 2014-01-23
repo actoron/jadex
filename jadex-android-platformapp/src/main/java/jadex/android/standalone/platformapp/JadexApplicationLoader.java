@@ -34,7 +34,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.LayoutInflater.Factory;
 import android.view.View;
-import dalvik.system.DexClassLoader;
 
 public class JadexApplicationLoader extends FragmentActivity implements ServiceConnection
 {
@@ -88,7 +87,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 			{
 				this.currentCl = getClassLoaderForExternalDex(getClass().getClassLoader(), appPath);
 				JadexPlatformManager.getInstance().setAppClassLoader(appPath, currentCl);
-				ClientAppFragment act = createClientFragment(className, intent);
+				ClientAppFragment act = createClientFragment(className, intent, userAppInfo);
 		
 				this.clientFragment = act;
 			}
@@ -175,7 +174,14 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	{
 		Logger.d("Resuming JadexApplicationLoader");
 		Intent intent = getIntent();
-		
+//		Parcelable newAppInfo = intent.getParcelableExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
+		if (userAppInfo != null) {
+			Logger.d("setting ClassLoader for " + userAppInfo.sourceDir);
+			String appPath = userAppInfo.sourceDir;
+			this.currentCl = getClassLoaderForExternalDex(getClass().getClassLoader(), appPath);
+		} else {
+			Logger.e("No appinfo found, resuming not possible!");
+		}
 		super.onResume();
 	}
 
@@ -224,9 +230,10 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	 * Instantiates a {@link ClientAppFragment} and starts its lifecycle.
 	 * @param className Classname of the ClientAppFragment
 	 * @param intent The Intent to pass to the Fragment.
+	 * @param userAppInfo2 
 	 * @return
 	 */
-	private ClientAppFragment createClientFragment(String className, Intent intent)
+	private ClientAppFragment createClientFragment(String className, Intent intent, ApplicationInfo appInfo)
 	{
 		ClientAppFragment act = null;
 		try
@@ -244,10 +251,10 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		}
 		catch (ClassNotFoundException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+		act.setApplicationInfo(appInfo);
 		act.setIntent(intent);
 		act.onPrepare(this);
 		return act;
@@ -270,7 +277,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	
 	private ClassLoader getClassLoaderForExternalDex(ClassLoader parent, String appPath)
 	{
-		// clCache must exist in service :(
+		// clCache must exist during whole platform lifetime = in universalService?
 		ClassLoader result = clCache.get(appPath);
 		if (result == null) {
 			// File dexInternalStoragePath = new File(getDir("dex",
@@ -285,18 +292,6 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		return result;
 	}
 
-//	private ClassLoader getClassLoaderForInternalClasses(ClassLoader parent)
-//	{
-//		PackageManager pm = getPackageManager();
-//
-//		ApplicationInfo applicationInfo = this.getApplicationInfo();
-//
-//		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
-//
-//		return new DexClassLoader(applicationInfo.sourceDir, optimizedDexOutputPath.getAbsolutePath(), null, parent);
-//	}
-	
-	
 	private Factory layoutFactory = new Factory()
 	{
 		 private final Class[] mConstructorSignature = new Class[] {
@@ -360,8 +355,8 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	public void startActivityFromFragment(Fragment fragment, Intent intent, int requestCode)
 	{
 		final String className = intent.getComponent().getClassName();
-		
-		ClientAppFragment newFragment = createClientFragment(className, intent);
+		ApplicationInfo appInfo = ((ClientAppFragment) fragment).getApplicationInfo();
+		ClientAppFragment newFragment = createClientFragment(className, intent, appInfo);
 		
 		activateClientFragment(newFragment, true);
 	}

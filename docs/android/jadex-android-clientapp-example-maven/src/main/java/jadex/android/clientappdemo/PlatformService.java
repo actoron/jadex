@@ -26,6 +26,7 @@ public class PlatformService extends JadexPlatformService
 		setPlatformAutostart(false);
 		setPlatformKernels(KERNEL_MICRO, KERNEL_COMPONENT, KERNEL_BDI);
 		setPlatformName("ClientAppDemo");
+		setUseSharedPlatform(true);
 		uiHandler = new Handler();
 	}
 	
@@ -39,7 +40,7 @@ public class PlatformService extends JadexPlatformService
 		
 
 		public IFuture<IExternalAccess> startPlatform() {
-			return PlatformService.this.startPlatform();
+			return PlatformService.this.startJadexPlatform();
 		}
 		
 		public IFuture<IComponentIdentifier> startAgent() {

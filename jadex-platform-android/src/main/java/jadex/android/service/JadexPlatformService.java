@@ -3,7 +3,6 @@ package jadex.android.service;
 import jadex.android.AndroidContextManager;
 import jadex.android.IEventReceiver;
 import jadex.android.commons.JadexPlatformOptions;
-import jadex.android.exception.WrongEventClassError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.fipa.SFipa;
@@ -20,8 +19,8 @@ import jadex.commons.future.IFuture;
 
 import java.util.Map;
 
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.IBinder;
 
 /**
@@ -37,7 +36,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	private String platformName;
 
 	private IComponentIdentifier platformId;
-
+	
 	public JadexPlatformService()
 	{
 		jadexPlatformManager = JadexPlatformManager.getInstance();
@@ -55,7 +54,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	{
 		super.onCreate();
 		if (platformAutostart) {
-			startPlatform();
+			startJadexPlatform();
 		}
 	}
 
@@ -83,7 +82,6 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 			throw new IllegalStateException("Cannot set autostart, platform already running!");
 		}
 	}
-	
 	
 	/**
 	 * Gets the Kernels.
@@ -151,12 +149,7 @@ public class JadexPlatformService extends JadexMultiPlatformService implements J
 	protected void setPlatformName(String name) {
 		this.platformName = name;
 	}
-	
-	final protected IFuture<IExternalAccess> startPlatform()
-	{
-		return startJadexPlatform(platformKernels, platformName, platformOptions);
-	}
-	
+
 	public IFuture<IMessageService> getMS()
 	{
 		return getMS(platformId);

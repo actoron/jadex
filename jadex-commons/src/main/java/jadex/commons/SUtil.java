@@ -3834,11 +3834,18 @@ public class SUtil
 
 		/**
 		 * Creates an URL object from a given Path to an android APK file
-		 * @param defaultAppPath
+		 * @param apkPath
 		 * @return {@link URL}
 		 * @throws MalformedURLException
 		 */
-		URL urlFromApkPath(String defaultAppPath) throws MalformedURLException;
+		URL urlFromApkPath(String apkPath) throws MalformedURLException;
+		
+		/**
+		 * Retrieves the APK Path from a given URL, if its an Android APK URL.
+		 * @param url
+		 * @return {@link String}
+		 */
+		String apkPathFromUrl(URL url);
 
 		/**
 		 * Get all Classes in a dex file as Enumeration.

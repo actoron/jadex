@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
@@ -182,6 +183,19 @@ public class AndroidUtilsImpl implements AndroidUtils
 	public URL urlFromApkPath(String apkPath) throws MalformedURLException
 	{
 		return new URL("file", "localhost,", apkPath);
+	}
+	
+	
+
+	@Override
+	public String apkPathFromUrl(URL url)
+	{
+		String path = url.getPath();
+		if (path.toLowerCase().endsWith("apk")) {
+			return path;
+		} else {
+			throw new IllegalArgumentException("Not an Android APK ressource.");
+		}
 	}
 
 	@Override

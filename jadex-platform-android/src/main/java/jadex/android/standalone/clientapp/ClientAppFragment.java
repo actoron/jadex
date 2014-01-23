@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -16,6 +17,9 @@ import android.view.Window;
 public class ClientAppFragment extends ActivityAdapterFragment
 {
 	private UniversalClientServiceBinder universalService;
+	
+	/** ApplicationInfo, set on instanciating this Fragment */
+	private ApplicationInfo appInfo;
 
 	public ClientAppFragment()
 	{
@@ -77,7 +81,7 @@ public class ClientAppFragment extends ActivityAdapterFragment
 					@Override
 					public void run()
 					{
-						universalService.bindClientService(service, conn, flags);	
+						universalService.bindClientService(service, conn, flags, appInfo);	
 					}
 				});
 			}
@@ -110,7 +114,7 @@ public class ClientAppFragment extends ActivityAdapterFragment
 		else
 		{
 			// individual user service requested
-			universalService.startClientService(service);
+			universalService.startClientService(service, appInfo);
 		}
 	}
 
@@ -130,6 +134,16 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	public void setUniversalClientService(UniversalClientServiceBinder service)
 	{
 		this.universalService = service;
+	}
+	
+	public void setApplicationInfo(ApplicationInfo appInfo) 
+	{
+		this.appInfo = appInfo;
+	}
+	
+	public ApplicationInfo getApplicationInfo()
+	{
+		return appInfo;
 	}
 	
 	@Override

@@ -51,6 +51,7 @@ public class SokratesService extends JadexPlatformService
 		setPlatformAutostart(false);
 		setPlatformKernels(JadexPlatformOptions.KERNEL_MICRO, JadexPlatformOptions.KERNEL_COMPONENT, JadexPlatformOptions.KERNEL_BDI, JadexPlatformOptions.KERNEL_BDIV3);
 		setPlatformName("Sokrates");
+		setUseSharedPlatform(true);
 		handler = new Handler();
 	}
 
@@ -74,7 +75,7 @@ public class SokratesService extends JadexPlatformService
 			}
 			else
 			{
-				result = SokratesService.this.startPlatform();
+				result = SokratesService.this.startJadexPlatform();
 			}
 			return result;
 		}

@@ -2,9 +2,11 @@ package jadex.android.service;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.commons.JadexPlatformOptions;
+import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -21,7 +23,9 @@ import java.util.Map;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
  * Android Service to start/stop Jadex Platforms. Platforms are terminated on
@@ -31,6 +35,12 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 {
 	
 	protected JadexPlatformManager jadexPlatformManager;
+	
+	/** Indicates whether to use a shared Platform for all Clients */
+	private boolean useSharedPlatform;
+	
+	/** Info from the application this service belongs to */
+	private ApplicationInfo appInfo;
 	
 	public JadexMultiPlatformService()
 	{
@@ -71,6 +81,21 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	{
 		super.attachBaseContext(baseContext);
 	}
+	
+	public void setApplicationInfo(ApplicationInfo appInfo)
+	{
+		this.appInfo = appInfo;
+	}
+	
+	public boolean isUseSharedPlatform()
+	{
+		return useSharedPlatform;
+	}
+
+	public void setUseSharedPlatform(boolean useSharedPlatform)
+	{
+		this.useSharedPlatform = useSharedPlatform;
+	}
 
 	/**
 	 * @deprecated use getExternalPlatformAccess()
@@ -90,58 +115,56 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		return jadexPlatformManager.isPlatformRunning(platformId);
 	}
 
-	@Override
 	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformId)
 	{
 		return getService(platformId, IComponentManagementService.class);
 	}
 
-	@Override
 	public IFuture<IMessageService> getMS(IComponentIdentifier platformId)
 	{
 		return getService(platformId, IMessageService.class);
 	}
 
-	@Override
 	public <S> S getsService(IComponentIdentifier platformId, Class<S> serviceClazz)
 	{
 		return jadexPlatformManager.getsService(platformId, serviceClazz);
 	}
 
-	@Override
 	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz)
 	{
 		return jadexPlatformManager.getService(platformId, serviceClazz);
 	}
 
-	@Override
 	public <S> IFuture<S> getService(IComponentIdentifier platformId, Class<S> serviceClazz, String scope)
 	{
 		return jadexPlatformManager.getService(platformId, serviceClazz, scope);
 	}
 
-	@Override
-	public IFuture<IExternalAccess> startJadexPlatform()
+	public final IFuture<IExternalAccess> startJadexPlatform()
 	{
 		return startJadexPlatform(DEFAULT_KERNELS);
 	}
 
-	@Override
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
+	public final IFuture<IExternalAccess> startJadexPlatform(String[] kernels)
 	{
 		return startJadexPlatform(kernels, jadexPlatformManager.getRandomPlatformName());
 	}
 
-	@Override
-	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
+	public final IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId)
 	{
 		return startJadexPlatform(kernels, platformId, null);
 	}
 
-	public final IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
+	public IFuture<IExternalAccess> startJadexPlatform(String[] kernels, String platformId, String options)
 	{
 		onPlatformStarting();
-		IFuture<IExternalAccess> fut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
+		IFuture<IExternalAccess> fut;
+		if (useSharedPlatform) {
+			Logger.i("Using shared Platform - options will be ignored!");
+			fut = jadexPlatformManager.startSharedJadexPlatform();
+		} else {
+			fut = jadexPlatformManager.startJadexPlatform(kernels, platformId, options);
+		}
 		fut.addResultListener(new DefaultResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(IExternalAccess result)
@@ -165,13 +188,11 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		shutdownJadexPlatforms();
 	}
 	
-	@Override
 	public void shutdownJadexPlatforms()
 	{
 		jadexPlatformManager.shutdownJadexPlatforms();
 	}
 
-	@Override
 	public void shutdownJadexPlatform(IComponentIdentifier platformId)
 	{
 		jadexPlatformManager.shutdownJadexPlatform(platformId);
@@ -203,6 +224,12 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		}
 		if (!arguments.containsKey("androidContext")) {
 			arguments.put("androidContext", this);
+		}
+		IResourceIdentifier rid = creationInfo.getResourceIdentifier();
+		if (rid == null) {
+			rid = jadexPlatformManager.getRID(appInfo.sourceDir);
+			Logger.d("Setting RID before starting Component: " + rid);
+			creationInfo.setResourceIdentifier(rid);
 		}
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();

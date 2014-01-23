@@ -2,7 +2,6 @@ package jadex.android.exampleproject.extended.agent;
 
 import jadex.android.exampleproject.MyEvent;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.AndroidMicroAgent;

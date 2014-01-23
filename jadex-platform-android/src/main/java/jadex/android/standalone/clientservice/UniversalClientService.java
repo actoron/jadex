@@ -17,6 +17,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ApplicationInfo;
 import android.os.Binder;
 import android.os.IBinder;
 
@@ -58,11 +59,10 @@ public class UniversalClientService extends Service
 		super.onDestroy();
 	}
 
-	private Service createClientService(String className)
+	private Service createClientService(String className, ApplicationInfo appInfo)
 	{
 		Service result;
-		ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(null);
-		@SuppressWarnings("unchecked")
+		ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(appInfo.sourceDir); //TODO: use correct client apk path
 		Class<?> clientServiceClass = SReflect.classForName0(className, cl);
 		try
 		{
@@ -72,7 +72,9 @@ public class UniversalClientService extends Service
 			if (result instanceof JadexClientAppService) {
 				((JadexClientAppService) result).attachBaseContext(baseContext);
 			} else if (result instanceof JadexPlatformService) {
-				((JadexPlatformService) result).attachBaseContext(baseContext);
+				JadexPlatformService jadexPlatformService = (JadexPlatformService) result;
+				jadexPlatformService.attachBaseContext(baseContext);
+				jadexPlatformService.setApplicationInfo(appInfo);
 			}
 		}
 		catch (Exception e)
@@ -89,32 +91,35 @@ public class UniversalClientService extends Service
 		{
 		}
 
-		public void bindClientService(Intent intent, ServiceConnection conn, int flags)
+		public void bindClientService(Intent intent, ServiceConnection conn, int flags, ApplicationInfo appInfo)
 		{
 			// TODO: handle flags
 			ComponentName clientServiceComponent = intent.getComponent();
 			String clientServiceClassName = clientServiceComponent.getClassName();
 
 			Service clientService = serviceInstances.get(clientServiceClassName);
-			// do we already have an instance?
+			// if the service instance doesn't exist yet, create it
 			if (clientService == null)
 			{
-				clientService = createClientService(clientServiceClassName);
+				clientService = createClientService(clientServiceClassName, appInfo);
+				Logger.d("Creating new Service instance: " + clientServiceClassName);
 				clientService.onCreate();
 				serviceInstances.put(clientServiceClassName, clientService);
+			} else {
+				Logger.d("Service instance found: " + clientServiceClassName);
 			}
 
 			// has the service already been bound with the given connection?
 			if (!serviceConnections.containsKey(conn))
 			{
 				Intent clientIntent = intent;
-				Logger.d("Binding existing Client Service: " + clientServiceClassName);
 				IBinder clientBinder = clientService.onBind(clientIntent);
 
 				clientIntents.put(conn, clientIntent);
 				serviceConnections.put(conn, clientService);
 				componentNames.put(conn, clientServiceComponent);
 
+				Logger.d("Binding Client Service: " + clientServiceClassName + " with binder object: " + clientBinder);
 				conn.onServiceConnected(clientServiceComponent, clientBinder);
 			}
 			else
@@ -155,14 +160,14 @@ public class UniversalClientService extends Service
 			return serviceConnections.containsKey(conn);
 		}
 		
-		public void startClientService(Intent service) {
+		public void startClientService(Intent service, ApplicationInfo appInfo) {
 			String clientServiceClassName = service.getComponent().getClassName();
 
 			Service clientService = serviceInstances.get(clientServiceClassName);
 			// do we already have an instance?
 			if (clientService == null)
 			{
-				clientService = createClientService(clientServiceClassName);
+				clientService = createClientService(clientServiceClassName, appInfo);
 				clientService.onCreate();
 				serviceInstances.put(clientServiceClassName, clientService);
 			}
@@ -200,6 +205,7 @@ public class UniversalClientService extends Service
 					}
 				}
 				if (!isBound) {
+					Logger.d("Terminating Client Service: " + clientService);
 					clientService.onDestroy();
 					serviceInstances.remove(clientService);
 				}

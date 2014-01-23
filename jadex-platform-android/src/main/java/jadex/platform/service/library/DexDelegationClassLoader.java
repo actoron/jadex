@@ -21,6 +21,11 @@ public class DexDelegationClassLoader extends DelegationURLClassLoader
 		dexCl = new DexClassLoader(url.getPath(),dexOutputPath.getAbsolutePath(), null, basecl);
 	}
 	
+	public DexDelegationClassLoader(IResourceIdentifier rid, ClassLoader basecl, DexClassLoader delegate) {
+		super(rid, basecl, null);
+		this.dexCl = delegate;
+	}
+	
 	@Override
 	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
 	{

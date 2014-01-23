@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -54,7 +55,11 @@ public class JadexPlatformManager implements IJadexPlatformManager
 
 	private Map<String,ClassLoader> platformClassLoaders;
 	
+	private Map<String, IResourceIdentifier> platformRIDs;
+	
 	private String defaultAppPath;
+	
+	private IExternalAccess sharedPlatformAccess;
 
 	private static JadexPlatformManager instance = new JadexPlatformManager();
 
@@ -67,6 +72,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	{
 		runningPlatforms = new HashMap<IComponentIdentifier, IExternalAccess>();
 		platformClassLoaders = new HashMap<String, ClassLoader>();
+		platformRIDs = new HashMap<String, IResourceIdentifier>();
 		instance = this;
 	}
 
@@ -95,10 +101,53 @@ public class JadexPlatformManager implements IJadexPlatformManager
 	 * 
 	 * @param cl
 	 */
-	public void setAppClassLoader(String appPath, ClassLoader cl)
+	public void setAppClassLoader(final String appPath, ClassLoader cl)
 	{
 		platformClassLoaders.put(appPath, cl);
 		defaultAppPath = appPath;
+		if (sharedPlatformAccess != null) {
+			// add classloader to shared platform
+			addLibServiceUrl(sharedPlatformAccess, appPath);
+		}
+	}
+
+	private IFuture<Void> addLibServiceUrl(IExternalAccess platformAccess, final String appPath)
+	{
+		final Future<Void> result = new Future<Void>();
+		IFuture<ILibraryService> libService = getService(platformAccess.getComponentIdentifier(), ILibraryService.class);
+		Logger.d("Getting LibraryService...");
+		libService.addResultListener(new DefaultResultListener<ILibraryService>()
+		{
+
+			@Override
+			public void resultAvailable(ILibraryService libService)
+			{
+				try
+				{
+					Logger.d("Found Libservice. Adding Ressource / Classloader for App: " + appPath);
+					URL url = SUtil.androidUtils().urlFromApkPath(appPath);
+//						libService.addTopLevelURL(url);
+					IFuture<IResourceIdentifier> addURL = libService.addURL(null, url);
+					addURL.addResultListener(new DefaultResultListener<IResourceIdentifier>()
+					{
+
+						@Override
+						public void resultAvailable(IResourceIdentifier rid)
+						{
+							Logger.d("Got back RID: " + rid.toString());
+							platformRIDs.put(appPath, rid);
+							result.setResult(null);
+						}
+					});
+				}
+				catch (MalformedURLException e)
+				{
+					e.printStackTrace();
+					result.setException(e);
+				}
+			}
+		});
+		return result;
 	}
 	
 	public ClassLoader getClassLoader(String apkPath)
@@ -107,6 +156,14 @@ public class JadexPlatformManager implements IJadexPlatformManager
 			apkPath = defaultAppPath;
 		}
 		return platformClassLoaders.get(apkPath);
+	}
+	
+	public IResourceIdentifier getRID(String apkPath) {
+		IResourceIdentifier rid = platformRIDs.get(apkPath);
+		if (rid == null) {
+			Logger.e("PlatformManager: returning null RID!");
+		}
+		return rid;
 	}
 	
 	/**
@@ -162,27 +219,28 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		});
 	}
 	
-//	/**
-//	 * Retrieves the CMS of the Platform with the given ID.
-//	 * @param platformID Id of the platform
-//	 * 
-//	 * @deprecated use getService() or the synchronous getsService() instead. 
-//	 */
-//	public IFuture<IComponentManagementService> getCMS(IComponentIdentifier platformID)
-//	{
-//		return getService(platformID, IComponentManagementService.class);
-//	}
-//
-//	/**
-//	 * Retrieves the MS of the Platform with the given ID.
-//	 * @param platformID Id of the platform
-//	 * 
-//	 * @deprecated use getService() or the synchronous getsService() instead. 
-//	 */
-//	public IFuture<IMessageService> getMS(IComponentIdentifier platformID)
-//	{
-//		return getService(platformID, IMessageService.class);
-//	}
+	
+	public IFuture<IExternalAccess> startSharedJadexPlatform() {
+		final Future<IExternalAccess> result = new Future<IExternalAccess>();
+		
+		if (sharedPlatformAccess != null) {
+			Logger.i("Found running platform - using it.");
+			result.setResult(sharedPlatformAccess);
+		} else {
+			startJadexPlatform(DEFAULT_KERNELS, getRandomPlatformName(), DEFAULT_OPTIONS).addResultListener(new DefaultResultListener<IExternalAccess>()
+			{
+				@Override
+				public void resultAvailable(IExternalAccess ea)
+				{
+					sharedPlatformAccess = ea;
+					result.setResult(sharedPlatformAccess);
+				}
+			});
+		}
+		
+		return result;
+		
+	}
 
 	public IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformName, final String options)
 	{
@@ -211,45 +269,57 @@ public class JadexPlatformManager implements IJadexPlatformManager
 						+ (platformName != null ? platformName : getRandomPlatformName()) + (options == null ? "" : " " + options);
 
 				IFuture<IExternalAccess> future = createPlatformWithClassloader((usedOptions).split("\\s+"), this.getClass().getClassLoader());
-
+				Logger.d("Waiting for platform startup...");
+				
 				future.addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(final IExternalAccess platformAccess)
 					{
-						// set custom class loader
-						IFuture<ILibraryService> service = SServiceProvider.getService(platformAccess.getServiceProvider(), ILibraryService.class);
-						service.addResultListener(new DefaultResultListener<ILibraryService>()
+						runningPlatforms.put(platformAccess.getComponentIdentifier(), platformAccess);
+						Logger.d("Platform started, now adding lib url...");
+						addLibServiceUrl(platformAccess, defaultAppPath).addResultListener(new DefaultResultListener<Void>()
 						{
 
 							@Override
-							public void resultAvailable(ILibraryService result)
+							public void resultAvailable(Void result)
 							{
-								Logger.d("Setting base class loader...");
-								if (defaultAppPath !=null) {
-									try
-									{
-										URL url = SUtil.androidUtils().urlFromApkPath(defaultAppPath);
-										result.addTopLevelURL(url);
-									}
-									catch (MalformedURLException e)
-									{
-										e.printStackTrace();
-									}
-								}
-								
-								runningPlatforms.put(platformAccess.getComponentIdentifier(), platformAccess);
+								// TODO Auto-generated method stub
 								ret.setResult(platformAccess);
 							}
-
-							@Override
-							public void exceptionOccurred(Exception exception)
-							{
-								super.exceptionOccurred(exception);
-								exception.printStackTrace();
-							}
-							
-							
 						});
+						
+						// set custom class loader
+//						IFuture<ILibraryService> service = SServiceProvider.getService(platformAccess.getServiceProvider(), ILibraryService.class);
+//						service.addResultListener(new DefaultResultListener<ILibraryService>()
+//						{
+//
+//							@Override
+//							public void resultAvailable(ILibraryService result)
+//							{
+//								Logger.d("Setting base class loader...");
+//								if (defaultAppPath !=null) {
+//									try
+//									{
+//										URL url = SUtil.androidUtils().urlFromApkPath(defaultAppPath);
+//										result.addTopLevelURL(url);
+//									}
+//									catch (MalformedURLException e)
+//									{
+//										e.printStackTrace();
+//									}
+//								}
+//								
+//							}
+//
+//							@Override
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								super.exceptionOccurred(exception);
+//								exception.printStackTrace();
+//							}
+//							
+//							
+//						});
 						
 					}
 

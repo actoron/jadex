@@ -46,7 +46,7 @@ public class MyJadexService extends JadexPlatformService
 
 		public void startPlatform()
 		{
-			MyJadexService.this.startPlatform();
+			MyJadexService.this.startJadexPlatform();
 		}
 
 		public void startHelloWorldAgent()
@@ -56,7 +56,7 @@ public class MyJadexService extends JadexPlatformService
 
 		public void stopPlatforms()
 		{
-			MyJadexService.this.stopPlatforms();
+			MyJadexService.this.shutdownJadexPlatforms();
 		}
 
 	}

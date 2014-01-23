@@ -11,5 +11,5 @@ public interface JadexPlatformOptions
 	public static final String KERNEL_BDIBPMN = "bdibpmn";
 	
 	public static final String[] DEFAULT_KERNELS = new String[]
-			{ KERNEL_COMPONENT, KERNEL_MICRO, KERNEL_BPMN, KERNEL_BDIV3};
+			{ KERNEL_COMPONENT, KERNEL_MICRO, KERNEL_BPMN, KERNEL_BDIV3, KERNEL_BDI, KERNEL_BDIBPMN};
 }

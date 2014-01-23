@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ApplicationInfo;
 import android.os.Binder;
 import android.os.IBinder;
 
@@ -41,7 +42,7 @@ public class UniversalClientServiceTest
 	public void testBindLifecycle()
 	{
 		MyServiceConnection conn = new MyServiceConnection();
-		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE);
+		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE, new ApplicationInfo());
 		assertTrue(conn.bound);
 		service.unbindClientService(conn);
 		assertFalse(conn.bound);
@@ -51,7 +52,7 @@ public class UniversalClientServiceTest
 	public void testServiceConnection()
 	{
 		MyServiceConnection conn = new MyServiceConnection();
-		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE);
+		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE, new ApplicationInfo());
 		assertEquals(2, conn.getResult());
 	}
 
@@ -59,7 +60,7 @@ public class UniversalClientServiceTest
 	public void testStartService()
 	{
 		MyServiceConnection conn = new MyServiceConnection();
-		service.startClientService(getIntent());
+		service.startClientService(getIntent(), new ApplicationInfo());
 		assertTrue(MyService.created);
 		assertTrue(service.isClientServiceStarted(getIntent()));
 	}
@@ -68,7 +69,7 @@ public class UniversalClientServiceTest
 	public void testStopService()
 	{
 		MyServiceConnection conn = new MyServiceConnection();
-		service.startClientService(getIntent());
+		service.startClientService(getIntent(), new ApplicationInfo());
 		service.stopClientService(getIntent());
 		assertFalse(service.isClientServiceStarted(getIntent()));
 		assertTrue(MyService.destroyed);
@@ -78,8 +79,8 @@ public class UniversalClientServiceTest
 	public void testStartBindStopLifecycle()
 	{
 		MyServiceConnection conn = new MyServiceConnection();
-		service.startClientService(getIntent());
-		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE);
+		service.startClientService(getIntent(), new ApplicationInfo());
+		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE, new ApplicationInfo());
 		service.stopClientService(getIntent());
 		assertTrue(conn.bound);
 		assertFalse(service.isClientServiceStarted(getIntent()));
@@ -90,8 +91,8 @@ public class UniversalClientServiceTest
 	public void testStartBindUnbindLifecycle()
 	{
 		MyServiceConnection conn = new MyServiceConnection();
-		service.startClientService(getIntent());
-		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE);
+		service.startClientService(getIntent(), new ApplicationInfo());
+		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE, new ApplicationInfo());
 		service.unbindClientService(conn);
 		assertFalse(conn.bound);
 		assertTrue(service.isClientServiceStarted(getIntent()));
@@ -119,7 +120,7 @@ public class UniversalClientServiceTest
 	public void testBindUnbindCycle()
 	{
 		MyServiceConnection conn = new MyServiceConnection();
-		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE);
+		service.bindClientService(getIntent(), conn, Activity.BIND_AUTO_CREATE, new ApplicationInfo());
 		service.unbindClientService(conn);
 		assertFalse(service.isClientServiceConnection(conn));
 	}
