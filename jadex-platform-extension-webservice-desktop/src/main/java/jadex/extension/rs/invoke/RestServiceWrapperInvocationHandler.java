@@ -24,6 +24,7 @@ import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -33,6 +34,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -45,6 +47,7 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientResponse;
@@ -191,7 +194,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											
 											ClientConfig cc = new ClientConfig();
 //											cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-											cc.getClasses().add(JadexXMLBodyWriter.class);
+//											cc.register(JadexXMLBodyWriter.class);
 											
 											Object targetparams = args;
 											if(pmap!=null)
@@ -231,12 +234,11 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											
 											Client client = ClientBuilder.newClient(cc);
 											WebTarget wt = client.target(baseuri);
-											wt.path(methodname);
-//											WebResource wr = client.resource(baseuri); 
-//											wr = wr.path(methodname);
+											wt = wt.path(methodname);
 											
-											ClientResponse res = null;
-
+//											ClientResponse res = null;
+											Response res = null;
+											
 											boolean inurl = GET.class.equals(resttype);
 											if(!inurl && m.isAnnotationPresent(ParametersInURL.class))
 												inurl = m.getAnnotation(ParametersInURL.class).value();
@@ -247,7 +249,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 												MultivaluedMap<String, String> ps = (MultivaluedMap<String, String>)targetparams;
 												for(String key: ps.keySet())
 												{
-													wt.queryParam(key, ps.values().toArray(new String[0]));
+													wt = wt.queryParam(key, ps.get(key).toArray(new String[0]));
 												}
 											}
 											
@@ -262,13 +264,20 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											for(int i=0; i<produces.length; i++)
 											{
 //												rb = rb.accept(produces[i]);
-												ib = ib.accept(consumes[i]);
+												ib = ib.accept(produces[i]);
 											}
 											
 											if(GET.class.equals(resttype))
 											{
 //												res = ((UniformInterface)rb).get(ClientResponse.class);
-												res = ib.get(ClientResponse.class);
+//												System.out.println("invoc: "+ib);
+
+//												res = ib.get(ClientResponse.class);
+												res = ib.get();
+//												System.out.println("res: "+r.getEntity());
+//												System.out.println("res: "+r.readEntity(ClientResponse.class));
+												
+//												res = ib.get(ClientResponse.class);
 											}
 											else
 											{
@@ -280,32 +289,31 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 														data = Entity.form((MultivaluedMap)targetparams);
 													}
 												}
-												
+//												
 												if(POST.class.equals(resttype))
 												{
 //													res = ((UniformInterface)rb).post(ClientResponse.class, inurl? null: targetparams);
-													res = ib.post(data, ClientResponse.class);
+													res = ib.post(data);
 												}
 												else if(PUT.class.equals(resttype))
 												{
 //													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-													res = ib.put(data, ClientResponse.class);
+													res = ib.put(data);
 												}
-//												else if(HEAD.class.equals(resttype))
-//												{
-////													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-//													res = ib.head(ClientResponse.class);
-													// why not supported :-((
-//												}
+												else if(HEAD.class.equals(resttype))
+												{
+//													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+													res = ib.head();
+												}
 												else if(OPTIONS.class.equals(resttype))
 												{
 //													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-													res = ib.options(ClientResponse.class);
+													res = ib.options();
 												}
 												else if(DELETE.class.equals(resttype))
 												{
 //													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-													res = ib.delete(ClientResponse.class);
+													res = ib.delete();
 												}
 											}
 											
@@ -313,7 +321,7 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 											if(rmapper!=null)
 											{
 												IValueMapper rm = (IValueMapper)jadex.extension.rs.publish.Value.evaluate(rmapper, defaultimports);
-												RestResponse restResponse = new RestResponse(res.getEntityStream());
+												RestResponse restResponse = new RestResponse((InputStream)res.getEntity());
 												restResponse.setContentLength(res.getLength());
 												restResponse.setContentType(res.getMediaType().toString());
 												restResponse.setDate(res.getDate().getTime());
