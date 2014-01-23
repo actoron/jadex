@@ -443,6 +443,8 @@ public class DefaultRestServicePublishService implements IWebPublishService
             }
         }, uri.getPath());
 		
+//		System.out.println("published at: "+uri.getPath());
+		
 		return IFuture.DONE;
 	}
 	
@@ -508,6 +510,8 @@ public class DefaultRestServicePublishService implements IWebPublishService
 				super.service(request, resp);
 			}
 		}, uri.getPath());
+		
+//		System.out.println("published at: "+uri.getPath());
 		
 		return IFuture.DONE;
 	}
@@ -925,7 +929,7 @@ public class DefaultRestServicePublishService implements IWebPublishService
 	
 //			System.out.println("method: "+method.getName()+" "+method.getDeclaringClass().getName());
 //			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
-			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
+//			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service+" "+Arrays.toString(targetparams));
 //			
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)

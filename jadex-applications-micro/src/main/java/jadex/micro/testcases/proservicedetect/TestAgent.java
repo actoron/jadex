@@ -20,7 +20,7 @@ import jadex.micro.annotation.Results;
  */
 @Agent(autoprovide=true)
 @Service
-@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
+//@ProvidedServices(@ProvidedService(type=ITestService.class, implementation=@Implementation(expression="$pojoagent")))
 //@ProvidedServices(@ProvidedService(type=ITestService.class))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class TestAgent implements ITestService
