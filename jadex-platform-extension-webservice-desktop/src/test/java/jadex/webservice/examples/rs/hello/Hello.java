@@ -10,14 +10,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -198,12 +196,12 @@ public class Hello extends BasicService
 		{
 			ClientConfig cc = new ClientConfig();
 //			cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-			cc.getClasses().add(JadexXMLBodyReader.class);
+			cc.register(JadexXMLBodyReader.class);
 			Client client = ClientBuilder.newClient(cc);
 			WebTarget service = client.target("http://localhost:8080/banking1/"); 
-			ObjectMapper mapper = new ObjectMapper();
-			System.out.println("jackson json: "+mapper.writeValueAsString(null));
-			service.path("addTransactionDataJSON").request(MediaType.TEXT_PLAIN).post(Entity.text("hallo"));
+//			ObjectMapper mapper = new ObjectMapper();
+//			System.out.println("jackson json: "+mapper.writeValueAsString(null));
+//			service.path("addTransactionDataJSON").request(MediaType.TEXT_PLAIN).post(Entity.text("hallo"));
 		}
 		catch(Exception e)
 		{
