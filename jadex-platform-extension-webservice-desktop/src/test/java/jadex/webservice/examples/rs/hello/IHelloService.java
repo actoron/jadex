@@ -13,6 +13,6 @@ public interface IHelloService
 	 *  @param request The request.
 	 *  @return The account statement.
 	 */
-	public IFuture<String> getXMLHello();
+	public IFuture<String> sayXMLHello();
 
 }

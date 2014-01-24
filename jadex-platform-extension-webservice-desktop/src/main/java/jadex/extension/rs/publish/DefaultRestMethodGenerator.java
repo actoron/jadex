@@ -300,7 +300,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 		Class<?>[] paramtypes = method.getParameterTypes();
 		
 		boolean hasparams = paramtypes.length>0;
-		boolean hasret = !rettype.equals(Void.class) && !rettype.equals(void.class);
+		boolean hasret = rettype!=null && !rettype.equals(Void.class) && !rettype.equals(void.class);
 		
 		// GET or POST if has both
 		if(hasret)

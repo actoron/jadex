@@ -10,10 +10,9 @@ import jadex.extension.rs.publish.DefaultRestServicePublishService;
 import junit.framework.TestCase;
 
 /**
- * Test the Consuming part of the Jadex Rest Webservice Extension.
- * Creates a Simple Rest Service and tries to access it via 
- * a Jadex Service.
- *
+ *  Test the consuming part of the Jadex Rest Webservice Extension.
+ *  Creates a Simple Rest Service and tries to access it via 
+ *  a Jadex Service.
  */
 public class RSHelloTest extends TestCase
 {
@@ -34,7 +33,8 @@ public class RSHelloTest extends TestCase
 		sid	= hello.getServiceIdentifier();
 		
 		pservice = new DefaultRestServicePublishService();
-		PublishInfo pi = new PublishInfo("http://localhost:9123", "", Hello.class, null);
+		PublishInfo pi = new PublishInfo("http://localhost:9123", "", IRSHelloService.class, null);
+		pi.addProperty("generate", "false");
 //		
 		IFuture<Void> publishService = pservice.publishService(getClass().getClassLoader(), hello, pi);
 //		
@@ -42,7 +42,7 @@ public class RSHelloTest extends TestCase
 		publishService.get(sus);
 
 		IFuture<IExternalAccess> fut = Starter.createPlatform(new String[]
-		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false",
+		{"-gui", "false", "-awareness", "false", "-relaytransport", "false", "-tcptransport", "false", "-deftimeout", "-1",
 //				"-componentfactory", "jadex.component.ComponentComponentFactory",
 //				"-conf", "jadex/platform/Platform.component.xml",
 				"-component", "jadex/webservice/examples/rs/hello/HelloProvider.component.xml"});
@@ -92,15 +92,22 @@ public class RSHelloTest extends TestCase
 
 	public void testAccessRestService()
 	{
+		try
+		{
 		ThreadSuspendable sus = new ThreadSuspendable();
 
 		IFuture<IHelloService> fut = SServiceProvider.getService(extAcc.getServiceProvider(), IHelloService.class);
 
 		IHelloService hs = fut.get(sus);
 
-		String xmlHello = hs.getXMLHello().get(sus);
+		String xmlHello = hs.sayXMLHello().get(sus);
 
 		assertEquals(hello.sayXMLHello(), xmlHello);
 		System.out.println("Response: " + xmlHello);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

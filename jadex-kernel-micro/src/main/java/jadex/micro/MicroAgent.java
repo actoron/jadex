@@ -248,6 +248,16 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	}
 	
 	/**
+	 *  Get an argument.
+	 *  @param name The argument name.
+	 *  @return The value. 
+	 */
+	public <T> T getArgument(String name, T type)
+	{
+		return (T)(interpreter.getArguments()==null? null: interpreter.getArguments().get(name));
+	}
+	
+	/**
 	 *  Get the configuration.
 	 *  @return the Configuration.
 	 */

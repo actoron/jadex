@@ -143,4 +143,15 @@ public class PublishInfo
 			this.properties = new ArrayList<UnparsedExpression>();
 		properties.add(property);
 	}
+	
+	/**
+	 *  Add a property.
+	 *  @param property The property to add.
+	 */
+	public void addProperty(String name, String val)
+	{
+		if(properties==null)
+			this.properties = new ArrayList<UnparsedExpression>();
+		properties.add(new UnparsedExpression(name, val));
+	}
 }

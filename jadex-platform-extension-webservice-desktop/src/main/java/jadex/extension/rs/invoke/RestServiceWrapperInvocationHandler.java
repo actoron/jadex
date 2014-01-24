@@ -323,12 +323,14 @@ public class RestServiceWrapperInvocationHandler implements InvocationHandler
 												IValueMapper rm = (IValueMapper)jadex.extension.rs.publish.Value.evaluate(rmapper, defaultimports);
 												RestResponse restResponse = new RestResponse((InputStream)res.getEntity());
 												restResponse.setContentLength(res.getLength());
-												restResponse.setContentType(res.getMediaType().toString());
-												restResponse.setDate(res.getDate().getTime());
+												if(res.getMediaType()!=null)
+													restResponse.setContentType(res.getMediaType().toString());
+												if(res.getDate()!=null)
+													restResponse.setDate(res.getDate().getTime());
 												targetret = rm.convertValue(restResponse);
 											}
 											
-//											System.out.println("result is: "+res);
+											System.out.println("result is: "+res);
 											re.setResult(targetret);
 											ia.killComponent();
 										}

@@ -24,7 +24,7 @@ public interface IRSHelloService
 	@Path("sayXMLHello")
 	@Produces(MediaType.TEXT_XML)
 	@ResultMapper(@Value(clazz=XMLResultMapper.class))
-	public IFuture<String> getXMLHello();
+	public IFuture<String> sayXMLHello();
 
 	// /**
 	// * Get a line chart.

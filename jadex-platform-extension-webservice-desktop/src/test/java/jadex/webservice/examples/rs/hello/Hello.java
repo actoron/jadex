@@ -5,14 +5,11 @@ import jadex.bridge.service.BasicService;
 import jadex.extension.rs.publish.JadexXMLBodyReader;
 import jadex.xml.bean.JavaWriter;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
@@ -22,7 +19,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 @Path("")
 public class Hello extends BasicService
 {
-	public Hello() {
+	public Hello() 
+	{
 		super(new ComponentIdentifier(), IHelloService.class, null);
 	}
 	
@@ -35,25 +33,26 @@ public class Hello extends BasicService
     @Context
     public Request request;
 	
-    @Path("sayPlainTextHello")
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
+//    @Path("sayPlainTextHello")
+//	@GET
+//	@Produces(MediaType.TEXT_PLAIN)
 	public String sayPlainTextHello()
 	{
 //		System.out.println("hi: "+rc.getProperties().get("hallo"));
 		return "Hello Jersey";
 	}
 	
-    @Path("sayXMLHello")
-	@GET
-	@Produces(MediaType.TEXT_XML)
+//    @Path("sayXMLHello")
+//	@GET
+//	@Produces(MediaType.TEXT_XML)
 	public String sayXMLHello()
 	{
 		return JavaWriter.objectToXML("Hello Jersey", null);
 	}
 	
-	@GET
-	@Produces(MediaType.TEXT_HTML)
+//    @Path("sayHTMLHello")
+//	@GET
+//	@Produces(MediaType.TEXT_HTML)
 	public String sayHTMLHello()
 	{
 		return "<html><body><h1>Hello Jersey</h1></body></html>";

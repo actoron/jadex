@@ -209,7 +209,8 @@ public class DefaultRestServicePublishService implements IWebPublishService
 			{
 				for(int i=0; i<pi.getProperties().size(); i++)
 				{
-					Object val = SJavaParser.getParsedValue(pi.getProperties().get(i), null, component.getFetcher(), component.getClassLoader());
+					Object val = SJavaParser.getParsedValue(pi.getProperties().get(i), null, component!=null? 
+						component.getFetcher(): null, component!=null? component.getClassLoader(): null);
 					mapprops.put(pi.getProperties().get(i).getName(), val);
 				}
 			}
