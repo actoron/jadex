@@ -9,7 +9,7 @@ import android.os.Bundle;
  * Subclasses can define the main Fragment (which will be loaded on application startup)
  * by implementing getClassName(). 
  */
-public abstract class JadexApplication extends Activity
+public abstract class JadexClientApplication extends Activity
 {
 	public static final String EXTRA_KEY_ACTIVITYCLASS = "net.sourceforge.jadex.EXTRA_KEY_ACTIVITYCLASS";
 	public static final String EXTRA_KEY_ORIGINALACTION = "net.sourceforge.jadex.EXTRA_KEY_ORIGINALACTION";
@@ -22,9 +22,9 @@ public abstract class JadexApplication extends Activity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		final String className = getClassName();
+		final String className = getInitialFragmentClassName();
 		if (className == null) {
-			throw new Error("ClassName missing. Please implement getClassName() correctly.");
+			throw new Error("ClassName missing. Please implement getInitialFragmentClassName() correctly.");
 		}
 		
 		Intent intent = new Intent() {{
@@ -56,7 +56,7 @@ public abstract class JadexApplication extends Activity
 	 * The given Class should inherit from ClientAppFragment.
 	 * @return the class name
 	 */
-	protected abstract String getClassName();
+	protected abstract String getInitialFragmentClassName();
 	
 	/**
 	 * Due to the nature of android, window features can only be requested

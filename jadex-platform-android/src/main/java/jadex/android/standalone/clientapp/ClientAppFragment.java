@@ -3,16 +3,12 @@ package jadex.android.standalone.clientapp;
 import jadex.android.exception.JadexAndroidError;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
 import android.app.Activity;
-import android.app.LauncherActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
-import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.Window;
 
 public class ClientAppFragment extends ActivityAdapterFragment
 {
@@ -20,23 +16,6 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	
 	/** ApplicationInfo, set on instanciating this Fragment */
 	private ApplicationInfo appInfo;
-
-	public ClientAppFragment()
-	{
-		super();
-	}
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-	}
-	
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-	}
 
 	/**
 	 * This method is called upon instantiation of the Fragment and before the
@@ -59,34 +38,44 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	@Override
 	public boolean bindService(final Intent service, final ServiceConnection conn, final int flags)
 	{
+		boolean result = false;
 		ComponentName originalComponent = service.getComponent();
-		String clientServiceName = originalComponent.getClassName();
-		if (clientServiceName.equals("jadex.android.service.JadexPlatformService"))
-		{
-			return super.bindService(service, conn, flags);
+		
+		if (originalComponent == null) {
+			// external service, pass-through intent
+			result = super.bindService(service, conn, flags);
 		}
-		else
+		else 
 		{
-			// individual user service requested
-			if (universalService.isClientServiceConnection(conn))
+			String clientServiceName = originalComponent.getClassName();
+			if (clientServiceName.equals("jadex.android.service.JadexPlatformService"))
 			{
-				// TODO: check for valid clientServiceName
-				throw new JadexAndroidError("already bound: " + clientServiceName);
+				result = super.bindService(service, conn, flags);
 			}
 			else
 			{
-				final Handler handler = new Handler();
-				handler.post(new Runnable()
+				// individual user service requested
+				if (universalService.isClientServiceConnection(conn))
 				{
-					@Override
-					public void run()
+					// TODO: check for valid clientServiceName
+					throw new JadexAndroidError("already bound: " + clientServiceName);
+				}
+				else
+				{
+					final Handler handler = new Handler();
+					handler.post(new Runnable()
 					{
-						universalService.bindClientService(service, conn, flags, appInfo);	
-					}
-				});
+						@Override
+						public void run()
+						{
+							universalService.bindClientService(service, conn, flags, appInfo);	
+						}
+					});
+				}
+				result = true;
 			}
-			return true;
 		}
+		return result;
 	}
 
 	@Override
@@ -146,26 +135,26 @@ public class ClientAppFragment extends ActivityAdapterFragment
 		return appInfo;
 	}
 	
-	@Override
-	public LayoutInflater getLayoutInflater(Bundle savedInstanceState)
-	{
-		LayoutInflater layoutInflater = super.getLayoutInflater(savedInstanceState);
-//		LayoutInflater userInflater = LayoutInflater.from(getContext());
-//		
-//		userInflater.setFactory(layoutInflater.getFactory());
-		return layoutInflater;
-	}
-	
-	@Override
-	public void startActivity(Intent intent)
-	{
-		startActivityForResult(intent, -1);
-	}
-	
-	@Override
-	public void startActivityForResult(Intent intent, int requestCode)
-	{
-		super.startActivityForResult(intent, requestCode);
-	}
+//	@Override
+//	public LayoutInflater getLayoutInflater(Bundle savedInstanceState)
+//	{
+//		LayoutInflater layoutInflater = super.getLayoutInflater(savedInstanceState);
+////		LayoutInflater userInflater = LayoutInflater.from(getContext());
+////		
+////		userInflater.setFactory(layoutInflater.getFactory());
+//		return layoutInflater;
+//	}
+//	
+//	@Override
+//	public void startActivity(Intent intent)
+//	{
+//		startActivityForResult(intent, -1);
+//	}
+//	
+//	@Override
+//	public void startActivityForResult(Intent intent, int requestCode)
+//	{
+//		super.startActivityForResult(intent, requestCode);
+//	}
 	
 }

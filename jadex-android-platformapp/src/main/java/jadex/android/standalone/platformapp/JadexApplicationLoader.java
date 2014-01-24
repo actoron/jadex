@@ -4,7 +4,7 @@ import jadex.android.commons.JadexDexClassLoader;
 import jadex.android.commons.Logger;
 import jadex.android.platformapp.R;
 import jadex.android.service.JadexPlatformManager;
-import jadex.android.standalone.JadexApplication;
+import jadex.android.standalone.JadexClientApplication;
 import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.android.standalone.clientservice.UniversalClientService;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
@@ -64,19 +64,19 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		super.onCreate(savedInstanceState);
 
 		Intent intent = getIntent();
-		if (intent != null && JadexApplication.INTENT_ACTION_LOADAPP.equals(intent.getAction()))
+		if (intent != null && JadexClientApplication.INTENT_ACTION_LOADAPP.equals(intent.getAction()))
 		{
-			userAppInfo = intent.getParcelableExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
+			userAppInfo = intent.getParcelableExtra(JadexClientApplication.EXTRA_KEY_APPLICATIONINFO);
 			String appPath = userAppInfo.sourceDir;
-			String className = intent.getStringExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
-			String originalAction = intent.getStringExtra(JadexApplication.EXTRA_KEY_ORIGINALACTION);
-			int[] windowFeatures = intent.getIntArrayExtra(JadexApplication.EXTRA_KEY_WINDOWFEATURES);
+			String className = intent.getStringExtra(JadexClientApplication.EXTRA_KEY_ACTIVITYCLASS);
+			String originalAction = intent.getStringExtra(JadexClientApplication.EXTRA_KEY_ORIGINALACTION);
+			int[] windowFeatures = intent.getIntArrayExtra(JadexClientApplication.EXTRA_KEY_WINDOWFEATURES);
 
 			intent.setAction(originalAction);
-			intent.removeExtra(JadexApplication.EXTRA_KEY_ACTIVITYCLASS);
-			intent.removeExtra(JadexApplication.EXTRA_KEY_ORIGINALACTION);
-			intent.removeExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
-			intent.removeExtra(JadexApplication.EXTRA_KEY_WINDOWFEATURES);
+			intent.removeExtra(JadexClientApplication.EXTRA_KEY_ACTIVITYCLASS);
+			intent.removeExtra(JadexClientApplication.EXTRA_KEY_ORIGINALACTION);
+			intent.removeExtra(JadexClientApplication.EXTRA_KEY_APPLICATIONINFO);
+			intent.removeExtra(JadexClientApplication.EXTRA_KEY_WINDOWFEATURES);
 
 			if (className == null)
 			{
@@ -357,7 +357,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		final String className = intent.getComponent().getClassName();
 		ApplicationInfo appInfo = ((ClientAppFragment) fragment).getApplicationInfo();
 		ClientAppFragment newFragment = createClientFragment(className, intent, appInfo);
-		
+		// TODO: check for external activities
 		activateClientFragment(newFragment, true);
 	}
 	

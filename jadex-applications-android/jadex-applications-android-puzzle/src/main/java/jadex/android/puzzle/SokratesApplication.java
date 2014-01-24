@@ -2,12 +2,12 @@ package jadex.android.puzzle;
 
 import android.content.Intent;
 import android.view.Window;
-import jadex.android.standalone.JadexApplication;
+import jadex.android.standalone.JadexClientApplication;
 
-public class SokratesApplication extends JadexApplication
+public class SokratesApplication extends JadexClientApplication
 {
 	@Override
-	protected String getClassName()
+	protected String getInitialFragmentClassName()
 	{
 		Intent intent = getIntent();
 		String action = intent.getAction();

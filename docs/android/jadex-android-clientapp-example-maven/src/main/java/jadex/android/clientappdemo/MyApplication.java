@@ -1,12 +1,12 @@
 package jadex.android.clientappdemo;
 
 import android.content.Intent;
-import jadex.android.standalone.JadexApplication;
+import jadex.android.standalone.JadexClientApplication;
 
 /**
  * This class marks the entry point for a Jadex Client Application.
  */
-public class MyApplication extends JadexApplication
+public class MyApplication extends JadexClientApplication
 {
 	/**
 	 * Based on the Intent this application was called with, different fragment classes are returned.
@@ -16,7 +16,7 @@ public class MyApplication extends JadexApplication
 	 * it will launch an activity to send the file.
 	 */
 	@Override
-	protected String getClassName()
+	protected String getInitialFragmentClassName()
 	{
 		Intent intent = getIntent();
 		String action = intent.getAction();
@@ -32,4 +32,5 @@ public class MyApplication extends JadexApplication
 	{
 		return null;
 	}
+
 }

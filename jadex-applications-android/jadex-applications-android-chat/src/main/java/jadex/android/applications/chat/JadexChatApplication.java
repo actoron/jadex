@@ -2,13 +2,13 @@ package jadex.android.applications.chat;
 
 import android.content.Intent;
 import android.view.Window;
-import jadex.android.standalone.JadexApplication;
+import jadex.android.standalone.JadexClientApplication;
 
-public class JadexChatApplication extends JadexApplication
+public class JadexChatApplication extends JadexClientApplication
 {
 
 	@Override
-	protected String getClassName()
+	protected String getInitialFragmentClassName()
 	{
 		String result;
 		Intent intent = getIntent();
