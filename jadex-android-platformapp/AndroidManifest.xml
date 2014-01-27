@@ -14,7 +14,7 @@
         android:icon="@drawable/icon"
         android:label="JadexPlatform"
         android:screenOrientation="portrait" >
-        <activity android:name="jadex.android.standalone.platformapp.JadexApplicationLoader" >
+        <activity android:name="jadex.android.standalone.platformapp.JadexMiddlewareActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

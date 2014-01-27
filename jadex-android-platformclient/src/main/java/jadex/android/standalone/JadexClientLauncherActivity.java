@@ -9,7 +9,7 @@ import android.os.Bundle;
  * Subclasses can define the main Fragment (which will be loaded on application startup)
  * by implementing getClassName(). 
  */
-public abstract class JadexClientApplication extends Activity
+public abstract class JadexClientLauncherActivity extends Activity
 {
 	public static final String EXTRA_KEY_ACTIVITYCLASS = "net.sourceforge.jadex.EXTRA_KEY_ACTIVITYCLASS";
 	public static final String EXTRA_KEY_ORIGINALACTION = "net.sourceforge.jadex.EXTRA_KEY_ORIGINALACTION";

@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 
 public class UniversalClientService extends Service
@@ -36,6 +37,8 @@ public class UniversalClientService extends Service
 	
 	private Map<Service, Boolean> startedServices;
 
+	private Handler backgroundHandler;
+
 	@Override
 	public void onCreate()
 	{
@@ -45,6 +48,7 @@ public class UniversalClientService extends Service
 		clientIntents = new HashMap<ServiceConnection, Intent>();
 		componentNames = new HashMap<ServiceConnection, ComponentName>();
 		startedServices = new HashMap<Service, Boolean>();
+		backgroundHandler = new Handler();
 	}
 
 	@Override
@@ -62,7 +66,7 @@ public class UniversalClientService extends Service
 	private Service createClientService(String className, ApplicationInfo appInfo)
 	{
 		Service result;
-		ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(appInfo.sourceDir); //TODO: use correct client apk path
+		ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(appInfo.sourceDir);
 		Class<?> clientServiceClass = SReflect.classForName0(className, cl);
 		try
 		{
@@ -91,40 +95,56 @@ public class UniversalClientService extends Service
 		{
 		}
 
-		public void bindClientService(Intent intent, ServiceConnection conn, int flags, ApplicationInfo appInfo)
+		public boolean bindClientService(final Intent intent, final ServiceConnection conn, int flags, final ApplicationInfo appInfo)
 		{
-			// TODO: handle flags
-			ComponentName clientServiceComponent = intent.getComponent();
-			String clientServiceClassName = clientServiceComponent.getClassName();
-
-			Service clientService = serviceInstances.get(clientServiceClassName);
-			// if the service instance doesn't exist yet, create it
-			if (clientService == null)
+			final ComponentName clientServiceComponent = intent.getComponent();
+			final String clientServiceClassName = clientServiceComponent.getClassName();
+			
+			backgroundHandler.post(new Runnable()
 			{
-				clientService = createClientService(clientServiceClassName, appInfo);
-				Logger.d("Creating new Service instance: " + clientServiceClassName);
-				clientService.onCreate();
-				serviceInstances.put(clientServiceClassName, clientService);
+				@Override
+				public void run()
+				{
+					// TODO: handle flags
+
+					Service clientService = serviceInstances.get(clientServiceClassName);
+					// if the service instance doesn't exist yet, create it
+					if (clientService == null)
+					{
+						clientService = createClientService(clientServiceClassName, appInfo);
+						Logger.d("Creating new Service instance: " + clientServiceClassName);
+						clientService.onCreate();
+						serviceInstances.put(clientServiceClassName, clientService);
+					} else {
+						Logger.d("Service instance found: " + clientServiceClassName);
+					}
+
+					// has the service already been bound with the given connection?
+					if (!serviceConnections.containsKey(conn))
+					{
+						Intent clientIntent = intent;
+						IBinder clientBinder = clientService.onBind(clientIntent);
+
+						clientIntents.put(conn, clientIntent);
+						serviceConnections.put(conn, clientService);
+						componentNames.put(conn, clientServiceComponent);
+
+						Logger.d("Binding Client Service: " + clientServiceClassName + " with binder object: " + clientBinder);
+						conn.onServiceConnected(clientServiceComponent, clientBinder);
+					}
+					else
+					{
+						throw new JadexAndroidError("Service already bound!");
+					}
+				}
+			});
+			
+			ClassLoader cl = JadexPlatformManager.getInstance().getClassLoader(appInfo.sourceDir);
+			Class<?> clientServiceClass = SReflect.classForName0(clientServiceClassName, cl);
+			if (clientServiceClass != null) {
+				return true;
 			} else {
-				Logger.d("Service instance found: " + clientServiceClassName);
-			}
-
-			// has the service already been bound with the given connection?
-			if (!serviceConnections.containsKey(conn))
-			{
-				Intent clientIntent = intent;
-				IBinder clientBinder = clientService.onBind(clientIntent);
-
-				clientIntents.put(conn, clientIntent);
-				serviceConnections.put(conn, clientService);
-				componentNames.put(conn, clientServiceComponent);
-
-				Logger.d("Binding Client Service: " + clientServiceClassName + " with binder object: " + clientBinder);
-				conn.onServiceConnected(clientServiceComponent, clientBinder);
-			}
-			else
-			{
-				throw new JadexAndroidError("Service already bound!");
+				return false;
 			}
 		}
 

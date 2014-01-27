@@ -1,12 +1,12 @@
 package jadex.android.clientappdemo;
 
 import android.content.Intent;
-import jadex.android.standalone.JadexClientApplication;
+import jadex.android.standalone.JadexClientLauncherActivity;
 
 /**
  * This class marks the entry point for a Jadex Client Application.
  */
-public class MyApplication extends JadexClientApplication
+public class MyApplication extends JadexClientLauncherActivity
 {
 	/**
 	 * Based on the Intent this application was called with, different fragment classes are returned.

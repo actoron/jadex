@@ -2,9 +2,9 @@ package jadex.android.applications.chat;
 
 import android.content.Intent;
 import android.view.Window;
-import jadex.android.standalone.JadexClientApplication;
+import jadex.android.standalone.JadexClientLauncherActivity;
 
-public class JadexChatApplication extends JadexClientApplication
+public class JadexChatApplication extends JadexClientLauncherActivity
 {
 
 	@Override

@@ -2,9 +2,9 @@ package jadex.android.testlauncher;
 
 import android.content.Intent;
 import android.view.Window;
-import jadex.android.standalone.JadexClientApplication;
+import jadex.android.standalone.JadexClientLauncherActivity;
 
-public class TestLauncherApplication extends JadexClientApplication
+public class TestLauncherApplication extends JadexClientLauncherActivity
 {
 	@Override
 	protected String getInitialFragmentClassName()

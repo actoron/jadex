@@ -2,9 +2,10 @@ package jadex.android.standalone.platformapp;
 
 import jadex.android.commons.JadexDexClassLoader;
 import jadex.android.commons.Logger;
+import jadex.android.exception.JadexAndroidError;
 import jadex.android.platformapp.R;
 import jadex.android.service.JadexPlatformManager;
-import jadex.android.standalone.JadexClientApplication;
+import jadex.android.standalone.JadexClientLauncherActivity;
 import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.android.standalone.clientservice.UniversalClientService;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
@@ -35,7 +36,7 @@ import android.view.LayoutInflater;
 import android.view.LayoutInflater.Factory;
 import android.view.View;
 
-public class JadexApplicationLoader extends FragmentActivity implements ServiceConnection
+public class JadexMiddlewareActivity extends FragmentActivity implements ServiceConnection
 {
 	private static String defaultEntryActivityName = "jadex.android.platformapp.DefaultApplication";
 	private LayoutInflater userAppInflater;
@@ -64,19 +65,19 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		super.onCreate(savedInstanceState);
 
 		Intent intent = getIntent();
-		if (intent != null && JadexClientApplication.INTENT_ACTION_LOADAPP.equals(intent.getAction()))
+		if (intent != null && JadexClientLauncherActivity.INTENT_ACTION_LOADAPP.equals(intent.getAction()))
 		{
-			userAppInfo = intent.getParcelableExtra(JadexClientApplication.EXTRA_KEY_APPLICATIONINFO);
+			userAppInfo = intent.getParcelableExtra(JadexClientLauncherActivity.EXTRA_KEY_APPLICATIONINFO);
 			String appPath = userAppInfo.sourceDir;
-			String className = intent.getStringExtra(JadexClientApplication.EXTRA_KEY_ACTIVITYCLASS);
-			String originalAction = intent.getStringExtra(JadexClientApplication.EXTRA_KEY_ORIGINALACTION);
-			int[] windowFeatures = intent.getIntArrayExtra(JadexClientApplication.EXTRA_KEY_WINDOWFEATURES);
+			String className = intent.getStringExtra(JadexClientLauncherActivity.EXTRA_KEY_ACTIVITYCLASS);
+			String originalAction = intent.getStringExtra(JadexClientLauncherActivity.EXTRA_KEY_ORIGINALACTION);
+			int[] windowFeatures = intent.getIntArrayExtra(JadexClientLauncherActivity.EXTRA_KEY_WINDOWFEATURES);
 
 			intent.setAction(originalAction);
-			intent.removeExtra(JadexClientApplication.EXTRA_KEY_ACTIVITYCLASS);
-			intent.removeExtra(JadexClientApplication.EXTRA_KEY_ORIGINALACTION);
-			intent.removeExtra(JadexClientApplication.EXTRA_KEY_APPLICATIONINFO);
-			intent.removeExtra(JadexClientApplication.EXTRA_KEY_WINDOWFEATURES);
+			intent.removeExtra(JadexClientLauncherActivity.EXTRA_KEY_ACTIVITYCLASS);
+			intent.removeExtra(JadexClientLauncherActivity.EXTRA_KEY_ORIGINALACTION);
+			intent.removeExtra(JadexClientLauncherActivity.EXTRA_KEY_APPLICATIONINFO);
+			intent.removeExtra(JadexClientLauncherActivity.EXTRA_KEY_WINDOWFEATURES);
 
 			if (className == null)
 			{
@@ -87,7 +88,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 			{
 				this.currentCl = getClassLoaderForExternalDex(getClass().getClassLoader(), appPath);
 				JadexPlatformManager.getInstance().setAppClassLoader(appPath, currentCl);
-				ClientAppFragment act = createClientFragment(className, intent, userAppInfo);
+				ClientAppFragment act = createClientFragment(currentCl, className, intent, userAppInfo);
 		
 				this.clientFragment = act;
 			}
@@ -124,7 +125,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 		
 		try
 		{
-			Context userContext = getApplicationContext().createPackageContext(userAppInfo.packageName, Context.CONTEXT_IGNORE_SECURITY);
+			Context userContext = getApplicationContext().createPackageContext(userAppInfo.packageName, CONTEXT_IGNORE_SECURITY);
 			userAppContext = userContext;
 			initUserAppContext(userAppInfo.packageName);
 		}
@@ -140,8 +141,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	public void onServiceDisconnected(ComponentName name)
 	{
 		universalService = null;
-		Logger.e("UniversalClientService disconnected. User Service bindings may be invalid.");
-		// TODO: crash here!?
+		throw new JadexAndroidError("UniversalClientService disconnected. User Service bindings may be invalid!");
 	}
 
 	private void initUserAppContext(String userApplicationPackage)
@@ -174,7 +174,6 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	{
 		Logger.d("Resuming JadexApplicationLoader");
 		Intent intent = getIntent();
-//		Parcelable newAppInfo = intent.getParcelableExtra(JadexApplication.EXTRA_KEY_APPLICATIONINFO);
 		if (userAppInfo != null) {
 			Logger.d("setting ClassLoader for " + userAppInfo.sourceDir);
 			String appPath = userAppInfo.sourceDir;
@@ -228,17 +227,18 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 
 	/**
 	 * Instantiates a {@link ClientAppFragment} and starts its lifecycle.
+	 * @param cl The classloader that is used to instanciate the Fragment
 	 * @param className Classname of the ClientAppFragment
 	 * @param intent The Intent to pass to the Fragment.
-	 * @param userAppInfo2 
-	 * @return
+	 * @param appInfo
+	 * @return The new ClientAppFragment
 	 */
-	private ClientAppFragment createClientFragment(String className, Intent intent, ApplicationInfo appInfo)
+	private ClientAppFragment createClientFragment(ClassLoader cl, String className, Intent intent, ApplicationInfo appInfo)
 	{
 		ClientAppFragment act = null;
 		try
 		{
-			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) currentCl.loadClass(className);
+			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
 			act = actClass.newInstance();
 		}
 		catch (IllegalAccessException e)
@@ -356,7 +356,7 @@ public class JadexApplicationLoader extends FragmentActivity implements ServiceC
 	{
 		final String className = intent.getComponent().getClassName();
 		ApplicationInfo appInfo = ((ClientAppFragment) fragment).getApplicationInfo();
-		ClientAppFragment newFragment = createClientFragment(className, intent, appInfo);
+		ClientAppFragment newFragment = createClientFragment(currentCl, className, intent, appInfo);
 		// TODO: check for external activities
 		activateClientFragment(newFragment, true);
 	}

@@ -2,9 +2,9 @@ package jadex.android.puzzle;
 
 import android.content.Intent;
 import android.view.Window;
-import jadex.android.standalone.JadexClientApplication;
+import jadex.android.standalone.JadexClientLauncherActivity;
 
-public class SokratesApplication extends JadexClientApplication
+public class SokratesApplication extends JadexClientLauncherActivity
 {
 	@Override
 	protected String getInitialFragmentClassName()

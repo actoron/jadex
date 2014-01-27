@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
-import android.os.Handler;
 
 public class ClientAppFragment extends ActivityAdapterFragment
 {
@@ -62,17 +61,17 @@ public class ClientAppFragment extends ActivityAdapterFragment
 				}
 				else
 				{
-					final Handler handler = new Handler();
-					handler.post(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							universalService.bindClientService(service, conn, flags, appInfo);	
-						}
-					});
+//					final Handler handler = new Handler();
+//					handler.post(new Runnable()
+//					{
+//						@Override
+//						public void run()
+//						{
+							result = universalService.bindClientService(service, conn, flags, appInfo);	
+//						}
+//					});
 				}
-				result = true;
+//				result = true;
 			}
 		}
 		return result;
@@ -134,27 +133,4 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	{
 		return appInfo;
 	}
-	
-//	@Override
-//	public LayoutInflater getLayoutInflater(Bundle savedInstanceState)
-//	{
-//		LayoutInflater layoutInflater = super.getLayoutInflater(savedInstanceState);
-////		LayoutInflater userInflater = LayoutInflater.from(getContext());
-////		
-////		userInflater.setFactory(layoutInflater.getFactory());
-//		return layoutInflater;
-//	}
-//	
-//	@Override
-//	public void startActivity(Intent intent)
-//	{
-//		startActivityForResult(intent, -1);
-//	}
-//	
-//	@Override
-//	public void startActivityForResult(Intent intent, int requestCode)
-//	{
-//		super.startActivityForResult(intent, requestCode);
-//	}
-	
 }
