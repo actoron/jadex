@@ -46,14 +46,14 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	{
 		List<RestMethodInfo> ret = new ArrayList<RestMethodInfo>();
 		
-		boolean gen = mapprops.get(DefaultRestServicePublishService.GENERATE)!=null? 
-			((Boolean)mapprops.get(DefaultRestServicePublishService.GENERATE)).booleanValue(): true;
-		boolean geninfo = mapprops.get(DefaultRestServicePublishService.GENERATE_INFO)!=null? 
-			((Boolean)mapprops.get(DefaultRestServicePublishService.GENERATE_INFO)).booleanValue(): true;
+		boolean gen = mapprops.get(AbstractRestServicePublishService.GENERATE)!=null? 
+			((Boolean)mapprops.get(AbstractRestServicePublishService.GENERATE)).booleanValue(): true;
+		boolean geninfo = mapprops.get(AbstractRestServicePublishService.GENERATE_INFO)!=null? 
+			((Boolean)mapprops.get(AbstractRestServicePublishService.GENERATE_INFO)).booleanValue(): true;
 		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
 		
-		MediaType[] formats = DefaultRestServicePublishService.DEFAULT_FORMATS;
-		Object tmp = mapprops.get(DefaultRestServicePublishService.FORMATS);
+		MediaType[] formats = AbstractRestServicePublishService.DEFAULT_FORMATS;
+		Object tmp = mapprops.get(AbstractRestServicePublishService.FORMATS);
 		if(tmp instanceof String[])
 		{
 			String[] fms = (String[])tmp;
@@ -229,7 +229,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 				
 				ret.add(new RestMethodInfo(method, mw.getName(), getPathName(path, paths), resttype, consumed, produced, 
 					methodmapper, parametermapper, automapping, resultmapper,
-					DefaultRestServicePublishService.class, "invoke"));
+					AbstractRestServicePublishService.class, "invoke"));
 			}
 			// Guess how method should be restified
 			else
@@ -263,7 +263,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 				
 				ret.add(new RestMethodInfo(method, mw.getName(), getPathName(mw.getName(), paths), resttype, consumed, produced,
 					methodmapper, null, false, null,
-					DefaultRestServicePublishService.class, "invoke"));
+					AbstractRestServicePublishService.class, "invoke"));
 			}
 		}
 		
@@ -274,7 +274,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 			produced.add(MediaType.TEXT_HTML_TYPE);
 			ret.add(new RestMethodInfo(new Class[0], String.class, new Class[0], "getServiceInfo", getPathName("", paths), GET.class, 
 				consumed, produced, null, null, false, null, 
-				DefaultRestServicePublishService.class, "getServiceInfo"));
+				AbstractRestServicePublishService.class, "getServiceInfo"));
 		}
 		
 //		System.out.println("paths: "+paths);

@@ -6,7 +6,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.extension.rs.publish.DefaultRestServicePublishService;
+import jadex.extension.rs.publish.GrizzlyRestServicePublishService;
 import junit.framework.TestCase;
 
 /**
@@ -22,7 +22,7 @@ public class RSHelloTest extends TestCase
 	private Hello hello;
 //	private HttpServer httpServer;
 	private IExternalAccess extAcc;
-	private DefaultRestServicePublishService pservice;
+	private GrizzlyRestServicePublishService pservice;
 	private IServiceIdentifier sid;
 	
 	
@@ -32,7 +32,7 @@ public class RSHelloTest extends TestCase
 		hello.createServiceIdentifier("hello", Hello.class, null, Hello.class);
 		sid	= hello.getServiceIdentifier();
 		
-		pservice = new DefaultRestServicePublishService();
+		pservice = new GrizzlyRestServicePublishService();
 		PublishInfo pi = new PublishInfo("http://localhost:9123", "", IRSHelloService.class, null);
 		pi.addProperty("generate", "false");
 //		

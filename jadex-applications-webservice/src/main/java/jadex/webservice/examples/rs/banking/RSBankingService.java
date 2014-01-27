@@ -2,7 +2,7 @@ package jadex.webservice.examples.rs.banking;
 
 import jadex.commons.SUtil;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.extension.rs.publish.DefaultRestServicePublishService;
+import jadex.extension.rs.publish.GrizzlyRestServicePublishService;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 

@@ -13,7 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
 @ProvidedServices(
 {
 	@ProvidedService(name="publish_rs", type=IWebPublishService.class, 
-		implementation=@Implementation(DefaultRestServicePublishService.class))
+		implementation=@Implementation(GrizzlyRestServicePublishService.class))
 })
 public class RSPublishAgent
 {
