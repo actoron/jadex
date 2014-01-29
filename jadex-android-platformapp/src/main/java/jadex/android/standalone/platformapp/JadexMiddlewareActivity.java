@@ -39,8 +39,8 @@ import android.view.View;
 public class JadexMiddlewareActivity extends FragmentActivity implements ServiceConnection
 {
 	private static String defaultEntryActivityName = "jadex.android.platformapp.DefaultApplication";
-	private LayoutInflater userAppInflater;
-	private Context userAppContext;
+	private LayoutInflater clientAppInflater;
+	private Context clientAppContext;
 	private ClientAppFragment clientFragment;
 	private UniversalClientServiceBinder universalService;
 	private Resources resources;
@@ -59,7 +59,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		// set default layout inflater and classLoader during onCreate()
-		userAppInflater = super.getLayoutInflater();
+		clientAppInflater = super.getLayoutInflater();
 		currentCl = this.getClassLoader();
 		
 		super.onCreate(savedInstanceState);
@@ -123,16 +123,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	{
 		this.universalService = (UniversalClientServiceBinder) service;
 		
-		try
-		{
-			Context userContext = getApplicationContext().createPackageContext(userAppInfo.packageName, CONTEXT_IGNORE_SECURITY);
-			userAppContext = userContext;
-			initUserAppContext(userAppInfo.packageName);
-		}
-		catch (NameNotFoundException e)
-		{
-			e.printStackTrace();
-		}
+		initUserAppContext(userAppInfo.packageName);
 		
 		activateClientFragment(clientFragment, false);
 	}
@@ -146,26 +137,36 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 
 	private void initUserAppContext(String userApplicationPackage)
 	{
-		// This LayoutInflater will make sure User Layouts are found
-		userAppInflater = LayoutInflater.from(userAppContext);
-		// This Factory will load custom Widget Classes, while android widgets
-		// are loaded by the ClassLoader inside the LayoutInflater.
-		userAppInflater.setFactory(layoutFactory);
-		// Enable the use of R.id.<layoutId> or R.string.<stringId> inside the user app
-		resources = new ResourceSet(getResources(), userAppContext.getResources());
-		// TODO: same with assets?
+		try
+		{
+			Context userContext = getApplicationContext().createPackageContext(userApplicationPackage, 0);
+			clientAppContext = userContext;
+			// This LayoutInflater will make sure User Layouts are found
+			clientAppInflater = LayoutInflater.from(clientAppContext);
+			// This Factory will load custom Widget Classes, while android widgets
+			// are loaded by the ClassLoader inside the LayoutInflater.
+			clientAppInflater.setFactory(layoutFactory);
+			// Enable the use of R.id.<layoutId> or R.string.<stringId> inside the user app
+			resources = new ResourceSet(getResources(), clientAppContext.getResources());
+			// TODO: same with assets?
+		}
+		catch (NameNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		
 	}
 
 	@Override
 	public Context getApplicationContext()
 	{
-		if (userAppContext == null)
+		if (clientAppContext == null)
 		{
 			return super.getApplicationContext();
 		}
 		else
 		{
-			return userAppContext;
+			return clientAppContext;
 		}
 	}
 
@@ -197,7 +198,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	@Override
 	public LayoutInflater getLayoutInflater()
 	{
-		return userAppInflater;
+		return clientAppInflater;
 	}
 
 	@Override
