@@ -86,6 +86,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 
 	/** The result listener. */
 //	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
+	protected SubscriptionIntermediateFuture<Tuple2<String, Object>> cmssub;
 	protected List<SubscriptionIntermediateFuture<Tuple2<String, Object>>> resultsubscriptions;
 
 	/** The monitoring service getter. */
@@ -120,18 +121,19 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.realtime = realtime;
 		this.emitlevelsub = PublishEventLevel.OFF;
 //		this.emitlevelmon = desc.getMonitoring();
-//		this.resultlistener = resultlistener;
 		if(factory != null)
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.container = createServiceContainer();
 //		this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
 		
+		
+		// In case of platform the listener nulls?
 		if(resultlistener!=null)
 		{
-			SubscriptionIntermediateFuture<Tuple2<String, Object>> fut = new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
-			fut.addResultListener(resultlistener);
+			cmssub = new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
+			cmssub.addResultListener(resultlistener);
 			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();
-			resultsubscriptions.add(fut);
+			resultsubscriptions.add(cmssub);
 		}
 	}
 	
@@ -208,11 +210,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		
 		if(resultsubscriptions!=null)
 		{
-			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resultsubscriptions)
+			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resultsubscriptions.toArray(new SubscriptionIntermediateFuture[resultsubscriptions.size()]))
 			{
-				fut.addIntermediateResultIfUndone(new Tuple2<String, Object>(name, value));
+				if(!fut.addIntermediateResultIfUndone(new Tuple2<String, Object>(name, value)))
+				{
+					resultsubscriptions.remove(fut);
+				}
 			}
-//			resultlistener.intermediateResultAvailable(new Tuple2<String, Object>(name, value));
 		}
 	}
 	
@@ -699,7 +703,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		final SubscriptionIntermediateFuture<Tuple2<String, Object>> ret = (SubscriptionIntermediateFuture<Tuple2<String, Object>>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
 		if(resultsubscriptions==null)
 		{
-			resultsubscriptions = new ArrayList<ISubscriptionIntermediateFuture<Tuple2<String,Object>>>();
+			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String, Object>>>();
 		}
 		resultsubscriptions.add(ret);
 		ret.setTerminationCommand(new ITerminationCommand()
@@ -730,4 +734,22 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		return ret;
 	}
 	
+	/**
+	 *  Terminate the result subscribers.
+	 */
+	public void terminateResultSubscribers()
+	{
+		if(resultsubscriptions!=null)
+		{
+			// terminate all but the first (cms) subscriptions
+			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> sub: resultsubscriptions)
+			{
+				if(sub.equals(cmssub))
+				{
+					continue;
+				}
+				sub.setFinishedIfUndone();
+			}
+		}
+	}
 }

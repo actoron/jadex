@@ -1,4 +1,4 @@
-package jadex.micro.testcases.intermediate;
+package jadex.micro.testcases.recfutures;
 
 import jadex.base.Starter;
 import jadex.base.test.TestReport;
@@ -8,49 +8,60 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SReflect;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.ComponentType;
+import jadex.micro.annotation.ComponentTypes;
+import jadex.micro.annotation.CreationInfo;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collection;
-
 /**
- *  The invoker agent tests if intermediate results are directly delivered 
- *  back to the invoker in local and remote case.
+ *  !!! unfinished !!!
+ * 
+ *  This test case is a first check if future in future results
+ *  could possible made to work.
+ *  
+ *  The test succeeds, yet no conceptual support for future in futures 
+ *  has been derived so far.
+ *  
+ *  Problems are:
+ *  - in local case the inner future result values do not pass
+ *    the interceptor chain
+ *  - in remote case it seems that currently the results are passed as bunch
+ *    and not individually.
  */
 @Agent
+@Service
 @Results(@Result(name="testresults", clazz=Testcase.class))
-@Description("The invoker agent tests if intermediate results are directly " +
-	"delivered back to the invoker in local and remote case.")
-public class InvokerAgent
+@ComponentTypes(@ComponentType(name="aagent", clazz=AAgent.class))
+@RequiredServices(@RequiredService(name="aser", type=IAService.class, 
+	binding=@Binding(scope=RequiredServiceInfo.SCOPE_NONE, create=true, creationinfo=@CreationInfo(type="aagent"))))
+public class UserAgent 
 {
-	//-------- attributes --------
-	
 	@Agent
 	protected MicroAgent agent;
-
-	//-------- methods --------
 	
 	/**
-	 *  The agent body.
+	 * 
 	 */
 	@AgentBody
 	public void body()
@@ -64,7 +75,6 @@ public class InvokerAgent
 		{
 			tc.setTestCount(2);	
 		}
-		
 		
 		final Future<TestReport> ret = new Future<TestReport>();
 		ret.addResultListener(agent.createResultListener(new IResultListener<TestReport>()
@@ -86,21 +96,21 @@ public class InvokerAgent
 			}
 		}));
 			
-//		testLocal().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
+//			testLocal().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
 //			{
-//				System.out.println("tests finished");
-//			}
-//		}));
+//				public void customResultAvailable(Void result)
+//				{
+//					System.out.println("tests finished");
+//				}
+//			}));
 		
-//		testRemote().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
+//			testRemote().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
 //			{
-//				System.out.println("tests finished");
-//			}
-//		}));
+//				public void customResultAvailable(Void result)
+//				{
+//					System.out.println("tests finished");
+//				}
+//			}));
 		
 		testLocal(1, 100, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
@@ -124,6 +134,47 @@ public class InvokerAgent
 				}
 			}
 		}));
+		
+//		IAService aser = (IAService)agent.getRequiredService("aser").get();
+//		
+//		IFuture<IFuture<String>> futa = aser.methodA();
+//		futa.addResultListener(new DefaultResultListener<IFuture<String>>()
+//		{
+//			public void resultAvailable(IFuture<String> fut2)
+//			{
+//				System.out.println("received first: "+fut2);
+//				
+//				fut2.addResultListener(new DefaultResultListener<String>()
+//				{
+//					public void resultAvailable(String result)
+//					{
+//						System.out.println("received second: "+result);
+//					}
+//				});
+//			}
+//		});
+//		
+//		IFuture<IIntermediateFuture<String>> futb = aser.methodB();
+//		futb.addResultListener(new DefaultResultListener<IIntermediateFuture<String>>()
+//		{
+//			public void resultAvailable(IIntermediateFuture<String> fut2)
+//			{
+//				System.out.println("received first: "+fut2);
+//				
+//				fut2.addResultListener(new IntermediateDefaultResultListener<String>()
+//				{
+//					public void intermediateResultAvailable(String result) 
+//					{
+//						System.out.println("received: "+result);
+//					}
+//					
+//					public void finished() 
+//					{
+//						System.out.println("fini");
+//					}	
+//				});
+//			}
+//		});
 	}
 	
 	/**
@@ -193,7 +244,7 @@ public class InvokerAgent
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
+				TestReport tr = new TestReport("#"+testno, "Tests if rec results work");
 				tr.setReason(exception);
 				super.resultAvailable(tr);
 			}
@@ -205,84 +256,72 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				agent.getServiceContainer().getService(IClockService.class, root)
-					.addResultListener(new ExceptionDelegationResultListener<IClockService, TestReport>(ret)
-				{
-					public void customResultAvailable(final IClockService clock)
-					{
-						IResourceIdentifier	rid	= new ResourceIdentifier(
-							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+				IResourceIdentifier	rid	= new ResourceIdentifier(
+					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
 //						System.out.println("Using rid: "+rid);
-						final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
-						CreationInfo	ci	= new CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
-						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", ci, null)
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
-						{	
-							public void customResultAvailable(final IComponentIdentifier cid)
+				final boolean	local	= root.equals(agent.getComponentIdentifier().getRoot());
+				jadex.bridge.service.types.cms.CreationInfo	ci	= new jadex.bridge.service.types.cms.CreationInfo(local ? agent.getComponentIdentifier() : root, rid);
+				cms.createComponent(null, AAgent.class.getName()+".class", ci, null)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+				{	
+					public void customResultAvailable(final IComponentIdentifier cid)
+					{
+						SServiceProvider.getService(agent.getServiceProvider(), cid, IAService.class)
+							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IAService, TestReport>(ret)
+						{
+							public void customResultAvailable(IAService service)
 							{
-//								System.out.println("cid is: "+cid);
-								SServiceProvider.getService(agent.getServiceProvider(), cid, IIntermediateResultService.class)
-									.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IIntermediateResultService, TestReport>(ret)
+								System.out.println("found service: "+((IService)service).getServiceIdentifier());
+								
+//								IFuture<IFuture<String>> futa = service.methodA();
+//								futa.addResultListener(new DefaultResultListener<IFuture<String>>()
+//								{
+//									public void resultAvailable(IFuture<String> fut2)
+//									{
+//										System.out.println("received first: "+fut2);
+//										
+//										fut2.addResultListener(new DefaultResultListener<String>()
+//										{
+//											public void resultAvailable(String result)
+//											{
+//												System.out.println("received second: "+result);
+//												TestReport tr = new TestReport("#"+testno, "Tests if rec results work");
+//												tr.setSucceeded(true);
+//												ret.setResult(tr);
+//											}
+//										});
+//									}
+//								});
+								
+								IFuture<IIntermediateFuture<String>> futb = service.methodB();
+								futb.addResultListener(new DefaultResultListener<IIntermediateFuture<String>>()
 								{
-									public void customResultAvailable(IIntermediateResultService service)
+									public void resultAvailable(IIntermediateFuture<String> fut2)
 									{
-										// Invoke service agent
-//										System.out.println("Invoking");
-										final Long[] start = new Long[1];
-										IIntermediateFuture<String> fut = service.getResults(delay, max);
-										fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<String>()
+										System.out.println("received first: "+fut2);
+										
+										fut2.addResultListener(new IntermediateDefaultResultListener<String>()
 										{
-											public void intermediateResultAvailable(String result)
+											public void intermediateResultAvailable(String result) 
 											{
-												if(start[0]==null)
-												{
-													start[0] = 	local ? clock.getTime() : System.currentTimeMillis();
-												}
-//												System.out.println("intermediateResultAvailable: "+result);
+												System.out.println("received: "+result);
 											}
-											public void finished()
+											
+											public void finished() 
 											{
-												long needed = (local ? clock.getTime() : System.currentTimeMillis())-start[0].longValue();
-//														System.out.println("finished: "+needed);
-												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-												long expected = delay*(max-1);
-												// deviation can happen because receival of results is measured
-//														System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
-												if(needed*1.1>=expected) // 10% deviation allowed
-												{
-													tr.setSucceeded(true);
-												}
-												else
-												{
-													tr.setReason("Results did arrive too fast (in bunch at the end (needed/expected): ("+needed+" / "+expected);
-												}
-												cms.destroyComponent(cid);
+												System.out.println("fini");
+												TestReport tr = new TestReport("#"+testno, "Tests if rec results work");
+												tr.setSucceeded(true);
 												ret.setResult(tr);
-											}
-											public void resultAvailable(Collection<String> result)
-											{
-												System.out.println("resultAvailable: "+result);
-												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-												tr.setReason("resultAvailable was called");
-												cms.destroyComponent(cid);
-												ret.setResult(tr);
-											}
-											public void exceptionOccurred(Exception exception)
-											{
-												System.out.println("exceptionOccurred: "+exception);
-												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
-												tr.setReason(exception);
-												ret.setResult(tr);
-											}
-										}));
-		//								System.out.println("Added listener");
-									}		
-								}));
+											}	
+										});
+									}
+								});
 							}
-						});
+						}));
 					}
 				});
-			}	
+			}
 		});
 		
 		return res;

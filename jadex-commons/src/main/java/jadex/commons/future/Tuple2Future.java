@@ -101,11 +101,41 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
     }
     
     /**
+     *  Set the result. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
+     */
+    public void	setFirstResultIfUndone(E result)
+    {
+    	setXResultIfUndone(0, result);
+    }
+    
+    /**
+     *  Set the result. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
+     */
+    public void	setSecondResultIfUndone(F result)
+    {
+    	setXResultIfUndone(1, result);
+    }
+    
+    /**
      *  Set the xth result.
      */
     protected void setXResult(int idx, Object res)
     {
     	addIntermediateResult(new TupleResult(idx, res));
+    	if(results.size()==getMax())
+    		setFinishedIfUndone();
+    }
+    
+    /**
+     *  Set the xth result.
+     */
+    protected void setXResultIfUndone(int idx, Object res)
+    {
+    	addIntermediateResultIfUndone(new TupleResult(idx, res));
     	if(results.size()==getMax())
     		setFinishedIfUndone();
     }

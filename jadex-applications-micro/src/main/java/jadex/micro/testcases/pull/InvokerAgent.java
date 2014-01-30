@@ -60,9 +60,12 @@ public class InvokerAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		if (SReflect.isAndroid()) {
+		if(SReflect.isAndroid()) 
+		{
 			tc.setTestCount(2);
-		} else {
+		} 
+		else 
+		{
 			tc.setTestCount(4);
 		}
 		
@@ -108,9 +111,12 @@ public class InvokerAgent
 			{
 				for(TestReport tr: result)
 					tc.addReport(tr);
-				if (SReflect.isAndroid()) {
+				if(SReflect.isAndroid()) 
+				{
 					ret.setResult(null);
-				} else {
+				} 
+				else 
+				{
 					testRemote(2, 100, 3).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport[], Void>(ret)
 					{
 						public void customResultAvailable(TestReport[] result)

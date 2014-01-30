@@ -58,6 +58,7 @@ import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -297,7 +298,9 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 														// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
 														if(getComponentIdentifier().getParent()!=null)
 															reslis	= createResultListener(reslis);
-																									
+														
+														terminateResultSubscribers();
+														
 														terminateServiceContainer().addResultListener(reslis);
 													}
 												}));
@@ -2287,6 +2290,16 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 *  @param filter An optional filter.
 	 */
 	public abstract ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel els);
+	
+	/**
+	 *  Subscribe to receive results.
+	 */
+	public abstract ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults();
+	
+	/**
+	 *  Terminate the result subscribers.
+	 */
+	public abstract void terminateResultSubscribers();
 	
 	/**
 	 *  Get the current state as events.

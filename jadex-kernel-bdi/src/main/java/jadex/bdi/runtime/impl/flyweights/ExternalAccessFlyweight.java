@@ -20,6 +20,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -630,6 +631,49 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		{
 			ISubscriptionIntermediateFuture<IMonitoringEvent> fut = getInterpreter().subscribeToEvents(filter, initial, elm);
 			TerminableIntermediateDelegationResultListener<IMonitoringEvent> lis = new TerminableIntermediateDelegationResultListener<IMonitoringEvent>(ret, fut);
+			fut.addResultListener(lis);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Subscribe to receive results.
+	 */
+	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
+	{
+		// No NoTimeoutFuture needed as is already created internally.
+		final SubscriptionIntermediateDelegationFuture<Tuple2<String, Object>> ret = new SubscriptionIntermediateDelegationFuture<Tuple2<String, Object>>();
+		
+		if(getInterpreter().getComponentAdapter().isExternalThread())
+		{
+			try
+			{
+				getInterpreter().getComponentAdapter().invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = getInterpreter().subscribeToResults();
+						TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
+						fut.addResultListener(lis);
+					}
+				});
+			}
+			catch(final Exception e)
+			{
+				Starter.scheduleRescueStep(getInterpreter().getComponentAdapter().getComponentIdentifier(), new Runnable()
+				{
+					public void run()
+					{
+						ret.setException(e);
+					}
+				});
+			}
+		}
+		else
+		{
+			ISubscriptionIntermediateFuture<Tuple2<String, Object>> fut = getInterpreter().subscribeToResults();
+			TerminableIntermediateDelegationResultListener<Tuple2<String, Object>> lis = new TerminableIntermediateDelegationResultListener<Tuple2<String, Object>>(ret, fut);
 			fut.addResultListener(lis);
 		}
 		

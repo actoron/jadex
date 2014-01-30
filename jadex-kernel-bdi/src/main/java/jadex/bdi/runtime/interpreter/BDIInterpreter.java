@@ -176,6 +176,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The subscriptions (subscription future -> subscription info). */
 	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>> subscriptions;
 	
+	/** The result listener. */
+//	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
+	protected List<SubscriptionIntermediateFuture<Tuple2<String, Object>>> resultsubscriptions;
+	
 	/** The event emit level for subscriptions. */
 	protected PublishEventLevel emitlevelsub;
 	
@@ -256,8 +260,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	protected boolean realtime;
 
 	
-	/** The result listener. */
-	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
+//	/** The result listener. */
+//	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
 	
 	/** The monitoring service getter. */
 	protected ServiceGetter<IMonitoringService> getter;
@@ -288,9 +292,17 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 		this.copy = copy;
 		this.realtime = realtime;
-		this.resultlistener = resultlistener;
+//		this.resultlistener = resultlistener;
 		this.inited = inited;
 		this.emitlevelsub = PublishEventLevel.OFF;
+		
+		if(resultlistener!=null)
+		{
+			SubscriptionIntermediateFuture<Tuple2<String, Object>> fut = new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
+			fut.addResultListener(resultlistener);
+			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();
+			resultsubscriptions.add(fut);
+		}
 				
 		// Hack! todo:
 		interpreters.put(state, this);
@@ -2147,7 +2159,16 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			results	= new HashMap<String, Object>();
 		results.put(name, value);
 		
-		resultlistener.intermediateResultAvailable(new Tuple2<String, Object>(name, value));
+		if(resultsubscriptions!=null)
+		{
+			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resultsubscriptions.toArray(new SubscriptionIntermediateFuture[resultsubscriptions.size()]))
+			{
+				if(!fut.addIntermediateResultIfUndone(new Tuple2<String, Object>(name, value)))
+				{
+					resultsubscriptions.remove(fut);
+				}
+			}
+		}
 	}
 
 	/**
@@ -2234,6 +2255,45 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			{
 				BulkMonitoringEvent bme = new BulkMonitoringEvent(evs.toArray(new IMonitoringEvent[evs.size()]));
 				ret.addIntermediateResult(bme);
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Subscribe to receive results.
+	 */
+	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
+	{
+		final SubscriptionIntermediateFuture<Tuple2<String, Object>> ret = (SubscriptionIntermediateFuture<Tuple2<String, Object>>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
+		if(resultsubscriptions==null)
+		{
+			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String, Object>>>();
+		}
+		resultsubscriptions.add(ret);
+		ret.setTerminationCommand(new ITerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				resultsubscriptions.remove(ret);
+			}
+			
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
+			}
+		});
+		
+		// Notify caller that subscription is done
+		ret.addIntermediateResult(null);
+		
+		// Notify about results
+		if(results!=null)
+		{
+			for(Map.Entry<String, Object> res: results.entrySet())
+			{
+				ret.addIntermediateResult(new Tuple2<String, Object>(res.getKey(), res.getValue()));
 			}
 		}
 		
@@ -2476,4 +2536,17 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return getComponentDescription().getMonitoring();
 	}
 	
+	/**
+	 *  Terminate the result subscribers.
+	 */
+	public void terminateResultSubscribers()
+	{
+		if(resultsubscriptions!=null)
+		{
+			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> sub: resultsubscriptions)
+			{
+				sub.terminate();
+			}
+		}
+	}
 }

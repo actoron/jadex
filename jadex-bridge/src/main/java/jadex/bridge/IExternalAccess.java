@@ -9,6 +9,7 @@ import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.IFilter;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
@@ -129,6 +130,11 @@ public interface IExternalAccess extends INFPropertyProvider//extends IRemotable
 	 */
 //	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel elm);
+	
+	/**
+	 *  Subscribe to receive results.
+	 */
+	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults();
 	
 	/**
 	 *  Get the component results.
