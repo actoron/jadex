@@ -92,7 +92,7 @@ public class BpmnMenuBar extends JMenuBar
 					{
 						boolean[] refreshes = spanel.applySettings();
 						
-						if (refreshes[0])
+						if(refreshes[0])
 						{
 							editorwindow.getSettings().scanForClasses().addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
 							{

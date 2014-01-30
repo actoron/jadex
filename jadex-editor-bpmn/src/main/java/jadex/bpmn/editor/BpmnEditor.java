@@ -26,7 +26,6 @@ import com.mxgraph.view.mxStylesheet;
 
 /**
  *  Class for starting the BPMN editor.
- *
  */
 public class BpmnEditor
 {

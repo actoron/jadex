@@ -25,8 +25,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -83,7 +85,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>> subscriptions;
 
 	/** The result listener. */
-	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
+//	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
+	protected List<SubscriptionIntermediateFuture<Tuple2<String, Object>>> resultsubscriptions;
 
 	/** The monitoring service getter. */
 	protected ServiceGetter<IMonitoringService> getter;
@@ -117,13 +120,19 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.realtime = realtime;
 		this.emitlevelsub = PublishEventLevel.OFF;
 //		this.emitlevelmon = desc.getMonitoring();
-		this.resultlistener = resultlistener;
+//		this.resultlistener = resultlistener;
 		if(factory != null)
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.container = createServiceContainer();
 //		this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
 		
-//		System.out.println("hhh: "+desc.getName()+" "+desc.getCause());
+		if(resultlistener!=null)
+		{
+			SubscriptionIntermediateFuture<Tuple2<String, Object>> fut = new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
+			fut.addResultListener(resultlistener);
+			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();
+			resultsubscriptions.add(fut);
+		}
 	}
 	
 	//-------- methods to be called by adapter --------
@@ -197,9 +206,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			results	= new HashMap<String, Object>();
 		results.put(name, value);
 		
-		if(resultlistener!=null)
+		if(resultsubscriptions!=null)
 		{
-			resultlistener.intermediateResultAvailable(new Tuple2<String, Object>(name, value));
+			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resultsubscriptions)
+			{
+				fut.addIntermediateResultIfUndone(new Tuple2<String, Object>(name, value));
+			}
+//			resultlistener.intermediateResultAvailable(new Tuple2<String, Object>(name, value));
 		}
 	}
 	
@@ -678,5 +691,43 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		}
 	}
 	
+	/**
+	 *  Subscribe to receive results.
+	 */
+	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
+	{
+		final SubscriptionIntermediateFuture<Tuple2<String, Object>> ret = (SubscriptionIntermediateFuture<Tuple2<String, Object>>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
+		if(resultsubscriptions==null)
+		{
+			resultsubscriptions = new ArrayList<ISubscriptionIntermediateFuture<Tuple2<String,Object>>>();
+		}
+		resultsubscriptions.add(ret);
+		ret.setTerminationCommand(new ITerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				resultsubscriptions.remove(ret);
+			}
+			
+			public boolean checkTermination(Exception reason)
+			{
+				return true;
+			}
+		});
+		
+		// Notify caller that subscription is done
+		ret.addIntermediateResult(null);
+		
+		// Notify about results
+		if(results!=null)
+		{
+			for(Map.Entry<String, Object> res: results.entrySet())
+			{
+				ret.addIntermediateResult(new Tuple2<String, Object>(res.getKey(), res.getValue()));
+			}
+		}
+		
+		return ret;
+	}
 	
 }

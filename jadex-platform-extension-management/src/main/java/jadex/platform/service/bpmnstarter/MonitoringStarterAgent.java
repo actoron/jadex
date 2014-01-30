@@ -42,12 +42,13 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.platform.service.cron.CronAgent;
 import jadex.platform.service.cron.TimePatternFilter;
 import jadex.platform.service.cron.jobs.CronCreateCommand;
+import jadex.platform.service.ecarules.RuleAgent;
 import jadex.rules.eca.CommandAction;
 import jadex.rules.eca.CommandAction.CommandData;
 import jadex.rules.eca.ExpressionCondition;
-import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
 import jadex.rules.eca.RuleEvent;
@@ -76,8 +77,8 @@ import java.util.Map;
 })
 @ComponentTypes(
 {
-	@ComponentType(name="cronagent", filename="jadex/platform/service/cron/CronAgent.class"),
-	@ComponentType(name="ruleagent", filename="jadex/platform/service/ecarules/RuleAgent.class")
+	@ComponentType(name="cronagent", clazz=CronAgent.class),
+	@ComponentType(name="ruleagent", clazz=RuleAgent.class)
 })
 public class MonitoringStarterAgent implements IMonitoringStarterService
 {

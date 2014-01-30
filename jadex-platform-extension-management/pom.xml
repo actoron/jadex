@@ -47,6 +47,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-platform</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 		    <groupId>commons-daemon</groupId>
 		    <artifactId>commons-daemon</artifactId>
 		    <version>1.0.10</version><!-- todo: update to 1.0.11 when available for compatibility with binary executables -->
