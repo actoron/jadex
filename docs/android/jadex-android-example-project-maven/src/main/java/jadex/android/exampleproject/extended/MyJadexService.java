@@ -146,7 +146,6 @@ public class MyJadexService extends JadexPlatformService
 				
 				System.out.println("calling Agent");
 				
-				IComponentManagementService getsService = getsService(IComponentManagementService.class);
 				IAgentInterface agent = getsService(IAgentInterface.class);
 				agent.callAgent("Hello Agent!");
 				

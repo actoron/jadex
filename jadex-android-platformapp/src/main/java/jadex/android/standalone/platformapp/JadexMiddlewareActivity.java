@@ -12,8 +12,6 @@ import jadex.android.standalone.clientservice.UniversalClientService.UniversalCl
 import jadex.bdiv3.AsmDexBdiClassGenerator;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,10 +29,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.LayoutInflater.Factory;
-import android.view.View;
 
 public class JadexMiddlewareActivity extends FragmentActivity implements ServiceConnection
 {
@@ -46,7 +41,9 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	private Resources resources;
 	
 	/** this ClassLoader will change depending on the foreground app **/
-	private ClassLoader currentCl;
+	ClassLoader currentCl;
+	
+	private ClientAppLayoutFactory layoutFactory;
 	
 	private ApplicationInfo userAppInfo;
 	private static Map<String,ClassLoader> clCache = new HashMap<String, ClassLoader>();
@@ -61,6 +58,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		// set default layout inflater and classLoader during onCreate()
 		clientAppInflater = super.getLayoutInflater();
 		currentCl = this.getClassLoader();
+		layoutFactory = new ClientAppLayoutFactory();
 		
 		super.onCreate(savedInstanceState);
 
@@ -86,7 +84,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 
 			if (appPath != null)
 			{
-				this.currentCl = getClassLoaderForExternalDex(getClass().getClassLoader(), appPath);
+				setCurrentCl(getClassLoaderForExternalDex(getClass().getClassLoader(), appPath));
 				JadexPlatformManager.getInstance().setAppClassLoader(appPath, currentCl);
 				ClientAppFragment act = createClientFragment(currentCl, className, intent, userAppInfo);
 		
@@ -116,6 +114,31 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 
 		Intent serviceIntent = new Intent(this, UniversalClientService.class);
 		bindService(serviceIntent, this, BIND_AUTO_CREATE);
+	}
+	
+	@Override
+	protected void onResume()
+	{
+		Logger.d("Resuming JadexApplicationLoader");
+		Intent intent = getIntent();
+		if (userAppInfo != null) {
+			Logger.d("setting ClassLoader for " + userAppInfo.sourceDir);
+			String appPath = userAppInfo.sourceDir;
+			setCurrentCl(getClassLoaderForExternalDex(getClass().getClassLoader(), appPath));
+		} else {
+			Logger.e("No appinfo found, resuming not possible!");
+		}
+		super.onResume();
+	}
+
+	@Override
+	protected void onDestroy()
+	{
+		if (universalService != null)
+		{
+			unbindService(this);
+		}
+		super.onDestroy();
 	}
 
 	@Override
@@ -148,7 +171,6 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 			clientAppInflater.setFactory(layoutFactory);
 			// Enable the use of R.id.<layoutId> or R.string.<stringId> inside the user app
 			resources = new ResourceSet(getResources(), clientAppContext.getResources());
-			// TODO: same with assets?
 		}
 		catch (NameNotFoundException e)
 		{
@@ -169,38 +191,11 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 			return clientAppContext;
 		}
 	}
-
-	@Override
-	protected void onResume()
-	{
-		Logger.d("Resuming JadexApplicationLoader");
-		Intent intent = getIntent();
-		if (userAppInfo != null) {
-			Logger.d("setting ClassLoader for " + userAppInfo.sourceDir);
-			String appPath = userAppInfo.sourceDir;
-			this.currentCl = getClassLoaderForExternalDex(getClass().getClassLoader(), appPath);
-		} else {
-			Logger.e("No appinfo found, resuming not possible!");
-		}
-		super.onResume();
-	}
-
-	@Override
-	protected void onDestroy()
-	{
-		if (universalService != null)
-		{
-			unbindService(this);
-		}
-		super.onDestroy();
-	}
-
 	@Override
 	public LayoutInflater getLayoutInflater()
 	{
 		return clientAppInflater;
 	}
-
 	@Override
 	public Resources getResources()
 	{
@@ -213,17 +208,21 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 			return super.getResources();
 		}
 	}
-	
 	@Override
 	public ClassLoader getClassLoader()
 	{
 		return currentCl;
 	}
-
 	@Override
 	public AssetManager getAssets()
 	{
 		return getApplicationContext().getAssets();
+	}
+	
+	private void setCurrentCl(ClassLoader cl)
+	{
+		this.currentCl = cl;
+		layoutFactory.setClassLoader(cl);
 	}
 
 	/**
@@ -239,6 +238,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		ClientAppFragment act = null;
 		try
 		{
+			@SuppressWarnings("unchecked")
 			Class<ClientAppFragment> actClass = (Class<ClientAppFragment>) cl.loadClass(className);
 			act = actClass.newInstance();
 		}
@@ -293,64 +293,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		return result;
 	}
 
-	private Factory layoutFactory = new Factory()
-	{
-		 private final Class[] mConstructorSignature = new Class[] {
-	            Context.class, AttributeSet.class};
-		 
-		 private final Object[] mConstructorArgs = new Object[2];
-		 
-		@Override
-		public View onCreateView(String name, Context context, AttributeSet attrs)
-		{
-			ClassLoader mCl = context.getClassLoader();
-			View result = null;
-			Class<?> loadClass;
-			try
-			{
-				loadClass = currentCl.loadClass(name);
-				Constructor<?> constructor = loadClass.getConstructor(mConstructorSignature);
-				Object[] args = mConstructorArgs;
-				args[0] = context;
-				args[1] = attrs;
-				result = (View) constructor.newInstance(args);
-			}
-			catch (ClassNotFoundException e)
-			{
-				Logger.d("Class not found in user classes: " + name);
-			}
-			catch (SecurityException e)
-			{
-				Logger.d("Cannot access class: " + name);
-			}
-			catch (NoSuchMethodException e)
-			{
-				Logger.d("Cannot instanciate class (wrong constructor?): " + name);
-			}
-			catch (IllegalArgumentException e)
-			{
-				Logger.d("Cannot instanciate class (wrong constructor?): " + name);
-			}
-			catch (InstantiationException e)
-			{
-				Logger.d("Cannot instanciate class (wrong constructor?): " + name);
-			}
-			catch (IllegalAccessException e)
-			{
-				Logger.d("Cannot access class: " + name);
-			}
-			catch (InvocationTargetException e)
-			{
-				e.printStackTrace();
-			}
-			
-			return result;
-		}
-	};
-	
-	
 	// methods that are called from clientappfragments
-	
 	
 	@Override
 	public void startActivityFromFragment(Fragment fragment, Intent intent, int requestCode)

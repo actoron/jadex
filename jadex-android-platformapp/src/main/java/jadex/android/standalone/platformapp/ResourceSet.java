@@ -26,12 +26,12 @@ import android.util.TypedValue;
  */
 public class ResourceSet extends Resources
 {
-	private Resources r2;
+	private Resources altRes;
 
 	public ResourceSet(Resources r1, Resources r2)
 	{
 		super(r1.getAssets(), r1.getDisplayMetrics(), r1.getConfiguration());
-		this.r2 = r2;
+		this.altRes = r2;
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			text = r2.getText(id);
+			text = altRes.getText(id);
 		}
 		return text;
 	}
@@ -59,7 +59,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			text = r2.getQuantityText(id, quantity);
+			text = altRes.getQuantityText(id, quantity);
 		}
 		return text;
 	}
@@ -74,7 +74,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			text = r2.getString(id);
+			text = altRes.getString(id);
 		}
 		return text;
 	}
@@ -89,7 +89,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			return r2.getString(id, formatArgs);
+			return altRes.getString(id, formatArgs);
 		}
 	}
 
@@ -103,7 +103,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			text = r2.getQuantityString(id, quantity, formatArgs);
+			text = altRes.getQuantityString(id, quantity, formatArgs);
 		}
 		return text;
 	}
@@ -118,7 +118,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			text = r2.getQuantityString(id, quantity);
+			text = altRes.getQuantityString(id, quantity);
 		}
 		return text;
 	}
@@ -130,7 +130,7 @@ public class ResourceSet extends Resources
 		text = super.getText(id, def);
 		if (text == null || text.equals(def))
 		{
-			text = r2.getText(id, def);
+			text = altRes.getText(id, def);
 		}
 		return text;
 	}
@@ -145,7 +145,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getTextArray(id);
+			result = altRes.getTextArray(id);
 		}
 		return result;
 	}
@@ -160,7 +160,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getStringArray(id);
+			result = altRes.getStringArray(id);
 		}
 		return result;
 	}
@@ -176,7 +176,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getIntArray(id);
+			result = altRes.getIntArray(id);
 		}
 		return result;
 	}
@@ -192,7 +192,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.obtainTypedArray(id);
+			result = altRes.obtainTypedArray(id);
 		}
 		return result;
 	}
@@ -207,7 +207,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getDimension(id);
+			result = altRes.getDimension(id);
 		}
 		return result;
 	}
@@ -222,7 +222,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getDimensionPixelOffset(id);
+			result = altRes.getDimensionPixelOffset(id);
 		}
 		return result;
 	}
@@ -237,7 +237,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getDimensionPixelSize(id);
+			result = altRes.getDimensionPixelSize(id);
 		}
 		return result;
 
@@ -254,7 +254,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getFraction(id, base, pbase);
+			result = altRes.getFraction(id, base, pbase);
 		}
 		return result;
 	}
@@ -270,7 +270,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getDrawable(id);
+			result = altRes.getDrawable(id);
 		}
 		return result;
 	}
@@ -286,7 +286,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getMovie(id);
+			result = altRes.getMovie(id);
 		}
 		return result;
 	}
@@ -302,7 +302,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getColor(id);
+			result = altRes.getColor(id);
 		}
 		return result;
 	}
@@ -317,7 +317,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getColorStateList(id);
+			result = altRes.getColorStateList(id);
 		}
 		return result;
 	}
@@ -333,7 +333,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getBoolean(id);
+			result = altRes.getBoolean(id);
 		}
 		return result;
 	}
@@ -349,7 +349,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getInteger(id);
+			result = altRes.getInteger(id);
 		}
 		return result;
 	}
@@ -365,7 +365,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getLayout(id);
+			result = altRes.getLayout(id);
 		}
 		return result;
 	}
@@ -380,7 +380,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getAnimation(id);
+			result = altRes.getAnimation(id);
 		}
 		return result;
 	}
@@ -396,7 +396,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getXml(id);
+			result = altRes.getXml(id);
 		}
 		return result;
 	}
@@ -411,7 +411,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.openRawResource(id);
+			result = altRes.openRawResource(id);
 		}
 		return result;
 	}
@@ -426,7 +426,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.openRawResource(id, value);
+			result = altRes.openRawResource(id, value);
 		}
 		return result;
 	}
@@ -441,7 +441,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.openRawResourceFd(id);
+			result = altRes.openRawResourceFd(id);
 		}
 		return result;
 	}
@@ -455,7 +455,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			r2.getValue(id, outValue, resolveRefs);
+			altRes.getValue(id, outValue, resolveRefs);
 		}
 	}
 
@@ -468,7 +468,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			r2.getValue(name, outValue, resolveRefs);
+			altRes.getValue(name, outValue, resolveRefs);
 		}
 	}
 
@@ -479,7 +479,7 @@ public class ResourceSet extends Resources
 		result = super.obtainAttributes(set, attrs);
 		if (result == null)
 		{
-			result = r2.obtainAttributes(set, attrs);
+			result = altRes.obtainAttributes(set, attrs);
 		}
 		return result;
 	}
@@ -506,7 +506,7 @@ public class ResourceSet extends Resources
 		result = super.getDisplayMetrics();
 		if (result == null)
 		{
-			result = r2.getDisplayMetrics();
+			result = altRes.getDisplayMetrics();
 		}
 		return result;
 	}
@@ -518,7 +518,7 @@ public class ResourceSet extends Resources
 		result = super.getConfiguration();
 		if (result == null)
 		{
-			result = r2.getConfiguration();
+			result = altRes.getConfiguration();
 		}
 		return result;
 	}
@@ -530,7 +530,7 @@ public class ResourceSet extends Resources
 		result = super.getIdentifier(name, defType, defPackage);
 		if (result == 0)
 		{
-			result = r2.getIdentifier(name, defType, defPackage);
+			result = altRes.getIdentifier(name, defType, defPackage);
 		}
 		return result;
 	}
@@ -545,7 +545,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getResourceName(resid);
+			result = altRes.getResourceName(resid);
 		}
 		return result;
 	}
@@ -560,7 +560,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getResourcePackageName(resid);
+			result = altRes.getResourcePackageName(resid);
 		}
 		return result;
 	}
@@ -575,7 +575,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getResourceTypeName(resid);
+			result = altRes.getResourceTypeName(resid);
 		}
 		return result;
 	}
@@ -590,7 +590,7 @@ public class ResourceSet extends Resources
 		}
 		catch (NotFoundException e)
 		{
-			result = r2.getResourceEntryName(resid);
+			result = altRes.getResourceEntryName(resid);
 		}
 		return result;
 	}
