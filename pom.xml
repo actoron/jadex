@@ -18,6 +18,10 @@
 	<description>
 		Maven Plugin for BDI V3 class generation on compile time.
 	</description>
+	
+	<scm>
+    	<developerConnection>scm:svn:svn+ssh://8kalinow@rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/trunk/jadex-android-maven-plugin</developerConnection>
+  	</scm>
 
 	<properties>
 		<!-- <maven-plugin-plugin.version>3.2</maven-plugin-plugin.version> -->
@@ -26,9 +30,6 @@
 	</properties>
 
 	<dependencies>
-		<!--<dependency> <groupId>net.sourceforge.jadex</groupId> <artifactId>jadex-bridge</artifactId> 
-			<version>${project.version}</version> </dependency> <dependency> <groupId>com.google.android</groupId> 
-			<artifactId>support-v4</artifactId> </dependency> -->
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-artifact</artifactId>
@@ -106,15 +107,12 @@
 							<goal>descriptor</goal>
 						</goals>
 					</execution>
-					<!-- if you want to generate help goal -->
-					<!-- <execution> -->
-					<!-- <id>help-goal</id> -->
-					<!-- <goals> -->
-					<!-- <goal>helpmojo</goal> -->
-					<!-- </goals> -->
-					<!-- </execution> -->
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+	      	</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
