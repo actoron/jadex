@@ -4,9 +4,9 @@ import jadex.android.commons.Logger;
 import jadex.android.exception.JadexAndroidError;
 import jadex.android.service.JadexPlatformManager;
 import jadex.android.service.JadexPlatformService;
-import jadex.android.standalone.clientapp.JadexClientAppService;
 import jadex.commons.SReflect;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,6 +15,7 @@ import java.util.Set;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
@@ -29,15 +30,48 @@ public class UniversalClientService extends Service
 	 */
 	private Map<String, Service> serviceInstances;
 
+	/**
+	 * Maps ServiceConnections to Service instances.
+	 */
 	private Map<ServiceConnection, Service> serviceConnections;
 	
+	/**
+	 * Maps ServiceConnections to intents for unbinding.
+	 */
 	private Map<ServiceConnection, Intent> clientIntents;
 
+	/**
+	 * Maps ServiceConnections to ComponentNames (currently debug only).
+	 */
 	private Map<ServiceConnection, ComponentName> componentNames;
 	
+	/**
+	 * Contains state of a service. True = started.
+	 */
 	private Map<Service, Boolean> startedServices;
 
+	/**
+	 * Handler to execute tasks.
+	 */
 	private Handler backgroundHandler;
+	
+	private static Method attachBaseContextMethod; 
+	
+	public UniversalClientService()
+	{
+		super();
+		if (attachBaseContextMethod == null) {
+			try
+			{
+				attachBaseContextMethod = ContextWrapper.class.getDeclaredMethod("attachBaseContext", new Class[]{Context.class});
+				attachBaseContextMethod.setAccessible(true);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
 
 	@Override
 	public void onCreate()
@@ -81,18 +115,17 @@ public class UniversalClientService extends Service
 			Logger.d("Creating new Client Service: " + className);
 			result = (Service) clientServiceClass.newInstance();
 			Context baseContext = getBaseContext();
-			if (result instanceof JadexClientAppService) {
-				((JadexClientAppService) result).attachBaseContext(baseContext);
-			} else if (result instanceof JadexPlatformService) {
+			if (result instanceof JadexPlatformService) {
 				JadexPlatformService jadexPlatformService = (JadexPlatformService) result;
 				jadexPlatformService.attachBaseContext(baseContext);
 				jadexPlatformService.setApplicationInfo(appInfo);
+			} else {
+				attachBaseContextMethod.invoke(result, baseContext);
 			}
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
-			return null;
+			throw new JadexAndroidError(e);
 		}
 		return result;
 	}

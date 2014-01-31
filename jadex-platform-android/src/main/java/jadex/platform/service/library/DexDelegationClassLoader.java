@@ -12,7 +12,7 @@ import dalvik.system.DexClassLoader;
 public class DexDelegationClassLoader extends DelegationURLClassLoader
 {
 	
-	private DexClassLoader dexCl;
+	private ClassLoader dexCl;
 
 	public DexDelegationClassLoader(IResourceIdentifier rid, ClassLoader basecl, DelegationURLClassLoader[] delegates, File dexOutputPath)
 	{
@@ -21,7 +21,7 @@ public class DexDelegationClassLoader extends DelegationURLClassLoader
 		dexCl = new DexClassLoader(url.getPath(),dexOutputPath.getAbsolutePath(), null, basecl);
 	}
 	
-	public DexDelegationClassLoader(IResourceIdentifier rid, ClassLoader basecl, DexClassLoader delegate) {
+	public DexDelegationClassLoader(IResourceIdentifier rid, ClassLoader basecl, ClassLoader delegate) {
 		super(rid, basecl, null);
 		this.dexCl = delegate;
 	}

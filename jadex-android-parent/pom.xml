@@ -13,7 +13,7 @@
 	</parent>
 
 	<properties>
-		<jadex-android-maven-plugin-version>1.0-SNAPSHOT</jadex-android-maven-plugin-version>
+		<jadex-android-maven-plugin-version>1.0</jadex-android-maven-plugin-version>
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
 		<android-maven-plugin-version>3.8.1</android-maven-plugin-version>
 		<android-api-version>2.2.1</android-api-version>

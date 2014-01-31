@@ -12,6 +12,10 @@ public class JadexAndroidError extends Error {
 		this.msg = "";
 	}
 	
+	public JadexAndroidError(Throwable t) {
+		super (t);
+	}
+	
 	public JadexAndroidError(String msg) {
 		this.msg = msg;
 	}

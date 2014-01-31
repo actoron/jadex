@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import jadex.android.CustomTestRunner;
 import jadex.android.service.JadexPlatformManager;
-import jadex.android.standalone.clientapp.JadexClientAppService;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
 
 import org.junit.Before;
@@ -13,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -162,7 +162,7 @@ public class UniversalClientServiceTest
 		}
 	}
 
-	public static class MyService extends JadexClientAppService
+	public static class MyService extends Service
 	{
 
 		public static boolean created;
