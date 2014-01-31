@@ -22,6 +22,19 @@
 	<scm>
     	<developerConnection>scm:svn:svn+ssh://8kalinow@rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/trunk/jadex-android-maven-plugin</developerConnection>
   	</scm>
+  	
+	<distributionManagement>
+		<repository>
+			<id>jadex-public-releases</id>
+			<name>jadex public releases</name>
+			<url>http://jadex.julakali.org/nexus/content/repositories/jadex-public-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>jadex-public-snapshots</id>
+			<name>jadex public releases</name>
+			<url>http://jadex.julakali.org/nexus/content/repositories/jadex-public-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<properties>
 		<!-- <maven-plugin-plugin.version>3.2</maven-plugin-plugin.version> -->
