@@ -56,8 +56,11 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.Tuple2Future;
 import jadex.kernelbase.IBootstrapFactory;
 
@@ -341,6 +344,67 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		});
 		return ret;
 	}
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  This method allows for retrieving intermediate results of the component via
+	 *  status events.
+	 *  @param name The component name or null for automatic generation.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param info Additional start information such as parent component or arguments (optional).
+	 *  @return The status events of the components. Consists of CMSCreatedEvent, (CMSIntermediateResultEvent)*, CMSTerminatedEvent
+	 */
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> createComponent(CreationInfo info, String name, String model)
+	{
+		final SubscriptionIntermediateFuture<CMSStatusEvent> ret = (SubscriptionIntermediateFuture)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
+				
+		createComponent(name, model, info, new IIntermediateResultListener<Tuple2<String, Object>>()
+		{
+			Map<String, Object> results = new HashMap<String, Object>();
+			
+			public void intermediateResultAvailable(Tuple2<String, Object> result)
+			{
+				ret.addIntermediateResult(new CMSIntermediateResultEvent(result.getFirstEntity(), result.getSecondEntity()));
+				results.put(result.getFirstEntity(), result.getSecondEntity());
+			}
+			
+			public void resultAvailable(Collection<Tuple2<String, Object>> result)
+			{
+				if(result!=null)
+				{
+					for(Tuple2<String, Object> res: result)
+					{
+						intermediateResultAvailable(res);
+					}
+				}
+				finished();
+			}
+			
+			public void finished()
+			{
+				ret.addIntermediateResult(new CMSTerminatedEvent(results));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		}).addResultListener(new IResultListener<IComponentIdentifier>()
+		{
+			public void resultAvailable(IComponentIdentifier cid)
+			{
+				ret.addIntermediateResult(new CMSCreatedEvent(cid));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
+	}
+	
 	
 	
 	/**
@@ -3361,6 +3425,162 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		public void setKillFuture(Future<Map<String, Object>> killfuture)
 		{
 			this.killfuture = killfuture;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class CMSStatusEvent
+	{
+	}
+	
+	/**
+	 * 
+	 */
+	public static class CMSCreatedEvent extends CMSStatusEvent
+	{
+		/** The cid. */
+		protected IComponentIdentifier cid;
+
+		/**
+		 *  Create a new CMSCreatedEvent. 
+		 */
+		public CMSCreatedEvent()
+		{
+		}
+		
+		/**
+		 *  Create a new CMSCreatedEvent. 
+		 */
+		public CMSCreatedEvent(IComponentIdentifier cid)
+		{
+			this.cid = cid;
+		}
+
+		/**
+		 *  Get the componentIdentifier.
+		 *  @return The componentIdentifier.
+		 */
+		public IComponentIdentifier getComponentIdentifier()
+		{
+			return cid;
+		}
+
+		/**
+		 *  Set the componentIdentifier.
+		 *  @param cid The componentIdentifier to set.
+		 */
+		public void setComponentIdentifier(IComponentIdentifier cid)
+		{
+			this.cid = cid;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public static class CMSIntermediateResultEvent extends CMSStatusEvent
+	{
+		/** The name of the result. */
+		protected String name;
+		
+		/** The value of the result. */
+		protected Object value;
+
+		/**
+		 *  Create a new CMSIntermediateResultEvent. 
+		 */
+		public CMSIntermediateResultEvent()
+		{
+		}
+		
+		/**
+		 *  Create a new CMSIntermediateResultEvent. 
+		 */
+		public CMSIntermediateResultEvent(String name, Object value)
+		{
+			this.name = name;
+			this.value = value;
+		}
+
+		/**
+		 *  Get the name.
+		 *  @return The name.
+		 */
+		public String getName()
+		{
+			return name;
+		}
+
+		/**
+		 *  Set the name.
+		 *  @param name The name to set.
+		 */
+		public void setName(String name)
+		{
+			this.name = name;
+		}
+
+		/**
+		 *  Get the value.
+		 *  @return The value.
+		 */
+		public Object getValue()
+		{
+			return value;
+		}
+
+		/**
+		 *  Set the value.
+		 *  @param value The value to set.
+		 */
+		public void setValue(Object value)
+		{
+			this.value = value;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class CMSTerminatedEvent extends CMSStatusEvent
+	{
+		/** The cid. */
+		protected Map<String, Object> results;
+
+		/**
+		 *  Create a new CMSCreatedEvent. 
+		 */
+		public CMSTerminatedEvent()
+		{
+		}
+		
+		/**
+		 *  Create a new CMSCreatedEvent. 
+		 */
+		public CMSTerminatedEvent(Map<String, Object> results)
+		{
+			this.results = results;
+		}
+
+		/**
+		 *  Get the results.
+		 *  @return The results.
+		 */
+		public Map<String, Object> getResults()
+		{
+			return results;
+		}
+
+		/**
+		 *  Set the results.
+		 *  @param results The results to set.
+		 */
+		public void setResults(Map<String, Object> results)
+		{
+			this.results = results;
 		}
 	}
 
