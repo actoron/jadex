@@ -11,7 +11,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-android-maven-plugin</artifactId>
 	<name>jadex-android-maven-plugin</name>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<description>
@@ -19,7 +19,7 @@
 	</description>
 	
 	<scm>
-    	<developerConnection>scm:svn:svn+ssh://8kalinow@rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/tags/jadex-android-maven-plugin-1.0</developerConnection>
+    	<developerConnection>scm:svn:svn+ssh://8kalinow@rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/trunk/jadex-android-maven-plugin</developerConnection>
   	</scm>
   	
 	<distributionManagement>
