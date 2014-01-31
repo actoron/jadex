@@ -87,12 +87,12 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 		this.appInfo = appInfo;
 	}
 	
-	public boolean isUseSharedPlatform()
+	public boolean isSharedPlatform()
 	{
 		return useSharedPlatform;
 	}
 
-	public void setUseSharedPlatform(boolean useSharedPlatform)
+	public void setSharedPlatform(boolean useSharedPlatform)
 	{
 		this.useSharedPlatform = useSharedPlatform;
 	}

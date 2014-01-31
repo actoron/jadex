@@ -60,9 +60,17 @@ public class UniversalClientService extends Service
 	@Override
 	public void onDestroy()
 	{
+		//TODO: destroy all services
 		super.onDestroy();
 	}
-
+	
+	@Override
+	public void onLowMemory()
+	{
+		// TODO: inform all
+		super.onLowMemory();
+	}
+	
 	private Service createClientService(String className, ApplicationInfo appInfo)
 	{
 		Service result;
@@ -122,10 +130,11 @@ public class UniversalClientService extends Service
 					// has the service already been bound with the given connection?
 					if (!serviceConnections.containsKey(conn))
 					{
-						Intent clientIntent = intent;
-						IBinder clientBinder = clientService.onBind(clientIntent);
+						IBinder clientBinder = clientService.onBind(intent);
 
-						clientIntents.put(conn, clientIntent);
+						// we need this intent for unbinding too, but no extras:
+						Intent intentCopy = intent.cloneFilter(); 
+						clientIntents.put(conn, intentCopy);
 						serviceConnections.put(conn, clientService);
 						componentNames.put(conn, clientServiceComponent);
 
@@ -159,14 +168,12 @@ public class UniversalClientService extends Service
 				Logger.d("Unbinding Client Service: " + componentName);
 				boolean onUnbind = service.onUnbind(clientIntent);
 				// onUnbind returns false by default, so don't respect it
-//				if (onUnbind) {
-					conn.onServiceDisconnected(componentName);
-					serviceConnections.remove(conn);
-					componentNames.remove(conn);
-					clientIntents.remove(conn);
-					
-					checkDestroyService(service);
-//				}
+				conn.onServiceDisconnected(componentName);
+				serviceConnections.remove(conn);
+				componentNames.remove(conn);
+				clientIntents.remove(conn);
+				
+				checkDestroyService(service);
 				result = onUnbind;
 			}
 			else

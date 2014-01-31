@@ -26,7 +26,7 @@ public class PlatformService extends JadexPlatformService
 		setPlatformAutostart(false);
 		setPlatformKernels(KERNEL_MICRO, KERNEL_COMPONENT, KERNEL_BDI);
 		setPlatformName("ClientAppDemo");
-		setUseSharedPlatform(true);
+		setSharedPlatform(true);
 		uiHandler = new Handler();
 	}
 	
