@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -12,7 +11,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-android-maven-plugin</artifactId>
 	<name>jadex-android-maven-plugin</name>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<description>
@@ -20,7 +19,7 @@
 	</description>
 	
 	<scm>
-    	<developerConnection>scm:svn:svn+ssh://8kalinow@rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/trunk/jadex-android-maven-plugin</developerConnection>
+    	<developerConnection>scm:svn:svn+ssh://8kalinow@rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/tags/jadex-android-maven-plugin-1.0</developerConnection>
   	</scm>
   	
 	<distributionManagement>
@@ -155,7 +154,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
