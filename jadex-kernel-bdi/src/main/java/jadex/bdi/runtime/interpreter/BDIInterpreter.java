@@ -178,6 +178,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	
 	/** The result listener. */
 //	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
+	protected SubscriptionIntermediateFuture<Tuple2<String, Object>> cmssub;
 	protected List<SubscriptionIntermediateFuture<Tuple2<String, Object>>> resultsubscriptions;
 	
 	/** The event emit level for subscriptions. */
@@ -296,12 +297,13 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.inited = inited;
 		this.emitlevelsub = PublishEventLevel.OFF;
 		
+		// In case of platform the listener nulls?
 		if(resultlistener!=null)
 		{
-			SubscriptionIntermediateFuture<Tuple2<String, Object>> fut = new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
-			fut.addResultListener(resultlistener);
+			cmssub = new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
+			cmssub.addResultListener(resultlistener);
 			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();
-			resultsubscriptions.add(fut);
+			resultsubscriptions.add(cmssub);
 		}
 				
 		// Hack! todo:
@@ -2543,9 +2545,14 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	{
 		if(resultsubscriptions!=null)
 		{
+			// terminate all but the first (cms) subscriptions
 			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> sub: resultsubscriptions)
 			{
-				sub.terminate();
+				if(sub.equals(cmssub))
+				{
+					continue;
+				}
+				sub.setFinishedIfUndone();
 			}
 		}
 	}

@@ -126,7 +126,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.container = createServiceContainer();
 //		this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
 		
-		
 		// In case of platform the listener nulls?
 		if(resultlistener!=null)
 		{
