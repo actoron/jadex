@@ -17,6 +17,7 @@ import java.util.Map;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
@@ -41,11 +42,12 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	private Resources resources;
 	
 	/** this ClassLoader will change depending on the foreground app **/
-	ClassLoader currentCl;
+	private ClassLoader currentCl;
+	/** this AppInfo will change depending on the foreground app **/
+	private ApplicationInfo clientAppInfo;
 	
 	private ClientAppLayoutFactory layoutFactory;
 	
-	private ApplicationInfo userAppInfo;
 	private static Map<String,ClassLoader> clCache = new HashMap<String, ClassLoader>();
 	
 	//** TODO: remove **/
@@ -65,8 +67,8 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 		Intent intent = getIntent();
 		if (intent != null && JadexClientLauncherActivity.INTENT_ACTION_LOADAPP.equals(intent.getAction()))
 		{
-			userAppInfo = intent.getParcelableExtra(JadexClientLauncherActivity.EXTRA_KEY_APPLICATIONINFO);
-			String appPath = userAppInfo.sourceDir;
+			clientAppInfo = intent.getParcelableExtra(JadexClientLauncherActivity.EXTRA_KEY_APPLICATIONINFO);
+			String appPath = clientAppInfo.sourceDir;
 			String className = intent.getStringExtra(JadexClientLauncherActivity.EXTRA_KEY_ACTIVITYCLASS);
 			String originalAction = intent.getStringExtra(JadexClientLauncherActivity.EXTRA_KEY_ORIGINALACTION);
 			int[] windowFeatures = intent.getIntArrayExtra(JadexClientLauncherActivity.EXTRA_KEY_WINDOWFEATURES);
@@ -86,7 +88,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 			{
 				setCurrentCl(getClassLoaderForExternalDex(getClass().getClassLoader(), appPath));
 				JadexPlatformManager.getInstance().setAppClassLoader(appPath, currentCl);
-				ClientAppFragment act = createClientFragment(currentCl, className, intent, userAppInfo);
+				ClientAppFragment act = createClientAppFragment(currentCl, className, intent, clientAppInfo);
 		
 				this.clientFragment = act;
 			}
@@ -121,9 +123,9 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	{
 		Logger.d("Resuming JadexApplicationLoader");
 		Intent intent = getIntent();
-		if (userAppInfo != null) {
-			Logger.d("setting ClassLoader for " + userAppInfo.sourceDir);
-			String appPath = userAppInfo.sourceDir;
+		if (clientAppInfo != null) {
+			Logger.d("setting ClassLoader for " + clientAppInfo.sourceDir);
+			String appPath = clientAppInfo.sourceDir;
 			setCurrentCl(getClassLoaderForExternalDex(getClass().getClassLoader(), appPath));
 		} else {
 			Logger.e("No appinfo found, resuming not possible!");
@@ -146,9 +148,9 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	{
 		this.universalService = (UniversalClientServiceBinder) service;
 		
-		initUserAppContext(userAppInfo.packageName);
+		initUserAppContext(clientAppInfo.packageName);
 		
-		activateClientFragment(clientFragment, false);
+		activateClientAppFragment(clientFragment, false);
 	}
 
 	@Override
@@ -162,8 +164,8 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	{
 		try
 		{
-			Context userContext = getApplicationContext().createPackageContext(userApplicationPackage, 0);
-			clientAppContext = userContext;
+			Context clientContext = createPackageContext(userApplicationPackage, 0);
+			clientAppContext = new ClientAppContextWrapper(clientContext, getOriginalApplicationContext());
 			// This LayoutInflater will make sure User Layouts are found
 			clientAppInflater = LayoutInflater.from(clientAppContext);
 			// This Factory will load custom Widget Classes, while android widgets
@@ -191,6 +193,11 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 			return clientAppContext;
 		}
 	}
+	
+	private Context getOriginalApplicationContext() {
+		return super.getApplicationContext();
+	}
+	
 	@Override
 	public LayoutInflater getLayoutInflater()
 	{
@@ -233,7 +240,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	 * @param appInfo
 	 * @return The new ClientAppFragment
 	 */
-	private ClientAppFragment createClientFragment(ClassLoader cl, String className, Intent intent, ApplicationInfo appInfo)
+	private ClientAppFragment createClientAppFragment(ClassLoader cl, String className, Intent intent, ApplicationInfo appInfo)
 	{
 		ClientAppFragment act = null;
 		try
@@ -262,7 +269,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	}
 	
 	
-	private void activateClientFragment(ClientAppFragment newFragment, boolean addToBackStack)
+	private void activateClientAppFragment(ClientAppFragment newFragment, boolean addToBackStack)
 	{
 		clientFragment = newFragment;
 		newFragment.setUniversalClientService(universalService);
@@ -298,11 +305,17 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 	@Override
 	public void startActivityFromFragment(Fragment fragment, Intent intent, int requestCode)
 	{
-		final String className = intent.getComponent().getClassName();
-		ApplicationInfo appInfo = ((ClientAppFragment) fragment).getApplicationInfo();
-		ClientAppFragment newFragment = createClientFragment(currentCl, className, intent, appInfo);
-		// TODO: check for external activities
-		activateClientFragment(newFragment, true);
+		ComponentName originalComponent = intent.getComponent();
+		
+		if (originalComponent == null) {
+			// external activity, pass-through intent
+			super.startActivityFromFragment(fragment, intent, requestCode);
+		} else {
+			String className = intent.getComponent().getClassName();
+			ApplicationInfo appInfo = ((ClientAppFragment) fragment).getApplicationInfo();
+			ClientAppFragment newFragment = createClientAppFragment(currentCl, className, intent, appInfo);
+			activateClientAppFragment(newFragment, true);
+		}
 	}
 	
 }

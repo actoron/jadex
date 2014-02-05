@@ -94,15 +94,19 @@ public class ClientAppFragment extends ActivityAdapterFragment
 	public void startService(Intent service)
 	{
 		ComponentName originalComponent = service.getComponent();
-		String clientServiceName = originalComponent.getClassName();
-		if (clientServiceName.equals("jadex.android.service.JadexPlatformService"))
-		{
+		if (originalComponent == null) {
 			super.startService(service);
-		}
-		else
-		{
-			// individual user service requested
-			universalService.startClientService(service, appInfo);
+		} else {
+			String clientServiceName = originalComponent.getClassName();
+			if (clientServiceName.equals("jadex.android.service.JadexPlatformService"))
+			{
+				super.startService(service);
+			}
+			else
+			{
+				// individual user service requested
+				universalService.startClientService(service, appInfo);
+			}
 		}
 	}
 
