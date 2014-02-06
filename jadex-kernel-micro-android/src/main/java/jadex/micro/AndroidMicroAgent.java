@@ -19,7 +19,7 @@ public class AndroidMicroAgent extends MicroAgent
 	
 	protected void dispatchEvent(final JadexAndroidEvent event) {
 		final IContextService contextService = (IContextService) getRequiredService("context").get();
-		contextService.dispatchUiEvent(event);
+		contextService.dispatchEvent(event);
 	}
 	
 }

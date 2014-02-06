@@ -80,8 +80,7 @@ public interface IContextService
 	 * @param event {@link IJadexAndroidEvent}
 	 * @return true, if at least one receiver was registered for this event and delivery was successful, else false.
 	 */
-	// todo: IJadexAndroidEvent?! generic?
-	public IFuture<Boolean> dispatchUiEvent(IJadexAndroidEvent event);
+	public IFuture<Boolean> dispatchEvent(IJadexAndroidEvent event);
 
 	/**
 	 * Get the network ips.

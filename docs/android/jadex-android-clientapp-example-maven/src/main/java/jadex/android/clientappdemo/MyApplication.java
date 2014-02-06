@@ -21,16 +21,10 @@ public class MyApplication extends JadexClientLauncherActivity
 		Intent intent = getIntent();
 		String action = intent.getAction();
 		if (Intent.ACTION_SEND.equals(action)) {
-			return "jadex.android.clientappdemo.SendActivity";
+			return "jadex.android.clientappdemo.SendFragment";
 		} else {
-			return "jadex.android.clientappdemo.ServiceActivity";
+			return "jadex.android.clientappdemo.DefaultFragment";
 		}
-	}
-
-	@Override
-	protected int[] getWindowFeatures()
-	{
-		return null;
 	}
 
 }

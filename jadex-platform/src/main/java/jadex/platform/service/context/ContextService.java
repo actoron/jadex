@@ -100,7 +100,7 @@ public class ContextService extends BasicService implements jadex.bridge.service
 	 * Dispatches an Event to the Android UI / Activity. Does nothing on Desktop
 	 * Systems.
 	 */
-	public IFuture<Boolean> dispatchUiEvent(IJadexAndroidEvent event)
+	public IFuture<Boolean> dispatchEvent(IJadexAndroidEvent event)
 	{
 		return new Future<Boolean>(Boolean.FALSE);
 	}

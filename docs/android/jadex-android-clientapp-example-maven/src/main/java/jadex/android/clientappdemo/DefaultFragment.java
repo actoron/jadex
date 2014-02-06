@@ -1,11 +1,15 @@
 package jadex.android.clientappdemo;
 
-import jadex.android.standalone.clientapp.PlatformProvidingClientAppFragment;
+import jadex.android.clientappdemo.PlatformService.PlatformBinder;
+import jadex.android.clientappdemo.PlatformService.PlatformListener;
+import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.future.DefaultResultListener;
-import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,66 +19,57 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * This is a Sample Fragment which inherits from
- * {@link PlatformProvidingClientAppFragment} to make use of the Jadex Platform.
+ * This is a Sample Client App Fragment.
  * 
- * It starts a jadex platform on creation and provides a button to start a sample BDI agent.
+ * It connects to a Service which provides access to a jadex platform.
  */
-public class DefaultFragment extends PlatformProvidingClientAppFragment
+public class DefaultFragment extends ClientAppFragment implements ServiceConnection, PlatformListener
 {
 	private TextView statusTextView;
-	private Button startAgentButton;
 
-	public DefaultFragment()
-	{
-		setPlatformAutostart(true);
-		setPlatformName("ClientAppDemo");
-		setPlatformKernels(KERNEL_COMPONENT, KERNEL_MICRO, KERNEL_BDI);
-	}
+	private PlatformBinder service;
 
-	/**
-	 * This method is called upon instantiation of the Fragment and before the
-	 * default Fragment lifecycle comes into play. 
-	 * Tasks that should be run before the layout of the Activity is set must be
-	 * performed here, such as requesting Window Features.
-	 **/
+	protected boolean platformRunning;
+
 	@Override
-	public void onPrepare(Activity act)
+	public void onCreate(Bundle savedInstanceState)
 	{
-		super.onPrepare(act);
+		super.onCreate(savedInstanceState);
+		Intent intent = new Intent(getContext(), PlatformService.class);
+		bindService(intent, this, BIND_AUTO_CREATE);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		int userlayout = R.layout.defaultactivity;
+		setTitle(R.string.app_title);
 		// inflate must be called with attachToRoot: false!
-		View view = inflater.inflate(userlayout, container, false);
+		View view = inflater.inflate(R.layout.defaultactivity, container, false);
 		statusTextView = (TextView) view.findViewById(R.id.statusTextView);
-		startAgentButton = (Button) view.findViewById(R.id.startAgentButton);
+		Button startAgentButton = (Button) view.findViewById(R.id.startAgentButton);
 		startAgentButton.setOnClickListener(new OnClickListener()
 		{
+
 			@Override
 			public void onClick(View v)
 			{
-				if (isJadexPlatformRunning())
+				if (service != null && platformRunning)
 				{
-					startComponent("myAgent", "jadex/android/clientapp/bditest/HelloWorld.agent.xml").addResultListener(
-							new DefaultResultListener<IComponentIdentifier>()
-							{
+					service.startAgent().addResultListener(new DefaultResultListener<IComponentIdentifier>()
+					{
 
-								@Override
-								public void resultAvailable(IComponentIdentifier result)
-								{
-									System.out.println("Agent Started");
-								}
-							});
+						@Override
+						public void resultAvailable(IComponentIdentifier result)
+						{
+							System.out.println("Agent Started");
+						}
+
+					});
 				}
 				else
 				{
 					runOnUiThread(new Runnable()
 					{
-
 						@Override
 						public void run()
 						{
@@ -84,32 +79,77 @@ public class DefaultFragment extends PlatformProvidingClientAppFragment
 				}
 			}
 		});
+
+		Button callAgentButton = (Button) view.findViewById(R.id.callAgentButton);
+		callAgentButton.setOnClickListener(new OnClickListener()
+		{
+
+			@Override
+			public void onClick(View v)
+			{
+				if (service != null && platformRunning)
+				{
+					service.callAgent("Message from Fragment");
+				}
+				else
+				{
+					runOnUiThread(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							Toast.makeText(getContext(), "Platform not running yet", Toast.LENGTH_LONG).show();
+						}
+					});
+				}
+			}
+		});
+
 		return view;
 	}
 
 	@Override
-	protected void onPlatformStarted(IExternalAccess result)
+	public void onDestroy()
 	{
-		super.onPlatformStarted(result);
+		super.onDestroy();
+		if (service != null)
+		{
+			unbindService(this);
+		}
+	}
+
+	@Override
+	public void onServiceConnected(ComponentName name, IBinder service)
+	{
+		this.service = (PlatformBinder) service;
+		this.service.setPlatformListener(this);
+	}
+
+	@Override
+	public void onServiceDisconnected(ComponentName name)
+	{
+		this.service = null;
+	}
+
+	@Override
+	public void platformStarted()
+	{
 		runOnUiThread(new Runnable()
 		{
-
 			@Override
 			public void run()
 			{
 				statusTextView.setText(R.string.status_started);
 			}
 		});
-
+		platformRunning = true;
 	}
 
 	@Override
-	protected void onPlatformStarting()
+	public void platformStarting()
 	{
-		super.onPlatformStarting();
 		runOnUiThread(new Runnable()
 		{
-
 			@Override
 			public void run()
 			{
@@ -117,5 +157,4 @@ public class DefaultFragment extends PlatformProvidingClientAppFragment
 			}
 		});
 	}
-
 }

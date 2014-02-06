@@ -1,4 +1,4 @@
-package jadex.android.clientappdemo.agent;
+package jadex.android.clientappdemo.bdiagent;
 
 import jadex.bdi.model.IMPlan;
 import jadex.bdi.model.IMPlanbase;

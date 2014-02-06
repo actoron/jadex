@@ -73,7 +73,7 @@ public class AndroidAgent extends MicroAgent
 
 			public void resultAvailable(Object result) {
 				IContextService contextService = (IContextService) result;
-				IFuture<Boolean> dispatchUiEvent = contextService.dispatchUiEvent(event);
+				IFuture<Boolean> dispatchUiEvent = contextService.dispatchEvent(event);
 				dispatchUiEvent.addResultListener(new DefaultResultListener<Boolean>()
 				{
 

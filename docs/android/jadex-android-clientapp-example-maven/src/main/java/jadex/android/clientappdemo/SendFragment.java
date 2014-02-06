@@ -15,7 +15,7 @@ import jadex.android.standalone.clientapp.ClientAppFragment;
 /**
  * This activity demonstrates how to work with intents in a ClientAppFragment.
  */
-public class SendActivity extends ClientAppFragment
+public class SendFragment extends ClientAppFragment
 {
 
 	private String path;

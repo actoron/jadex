@@ -138,7 +138,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 * @return true, if at least one receiver was registered for this event and
 	 *         delivery was successful, else false.
 	 */
-	public IFuture<Boolean> dispatchUiEvent(IJadexAndroidEvent event)
+	public IFuture<Boolean> dispatchEvent(IJadexAndroidEvent event)
 	{
 		Future<Boolean> result = new Future<Boolean>();
 		try

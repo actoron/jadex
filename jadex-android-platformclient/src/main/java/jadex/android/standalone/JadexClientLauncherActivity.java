@@ -64,5 +64,7 @@ public abstract class JadexClientLauncherActivity extends Activity
 	 * So, if you need window features such as Window.FEATURE_INDETERMINATE_PROGRESS,
 	 * please return them here in an array.
 	 */
-	protected abstract int[] getWindowFeatures();
+	protected int[] getWindowFeatures() {
+		return null;
+	};
 }
