@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ *  Tests waitqueue and execution time non-functional properties on 
+ *  provided services.
  */
 @Agent
 @Service

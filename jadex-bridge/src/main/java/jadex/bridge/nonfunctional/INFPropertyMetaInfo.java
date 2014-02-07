@@ -40,7 +40,6 @@ public interface INFPropertyMetaInfo
 	
 	/**
 	 *  Checks if the property is real time.
-	 *
 	 *  @return The real time flag.
 	 */
 	public boolean isRealtime();

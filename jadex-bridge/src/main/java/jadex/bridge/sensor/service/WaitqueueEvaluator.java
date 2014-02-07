@@ -37,7 +37,7 @@ public class WaitqueueEvaluator extends BasicEvaluator<Integer>
 	 */
 	public double calculateEvaluation(Integer value)
 	{
-		double ret = 1; // try out new services
+		double ret = 1; // try out new services by ranking them first time with 1
 		if(value!=null)
 		{
 			int val = value.intValue();

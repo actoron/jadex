@@ -1,7 +1,10 @@
 package jadex.micro.testcases.semiautomatic.nfpropvis;
 
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.nonfunctional.search.ComposedEvaluator;
+import jadex.bridge.sensor.service.AverageEvaluator;
 import jadex.bridge.sensor.service.WaitqueueEvaluator;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -9,6 +12,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.MethodInfo;
 import jadex.commons.Tuple2;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.MicroAgent;
@@ -46,14 +50,27 @@ import org.jfree.data.time.Week;
 import org.jfree.data.time.Year;
 import org.jfree.data.xy.XYDataset;
 
+/**
+ *  Ranking of a requires services via an waitqueue ranker.
+ */
+@RequiredServices(@RequiredService(name="aser", type=ICryptoService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, dynamic=true)))
+//ranker="new AverageEvaluator(new WaitqueueEvaluator(new MethodInfo(ICryttoService.class.getMethod(\"encrypt\", new Class[]{String.class}))))"
+
 @Agent
 @Service
-@RequiredServices(@RequiredService(name="aser", type=IAService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, dynamic=true)))
 @Configurations({@Configuration(name="default"), @Configuration(name="with gui")})
+
+//@RequiredServices(@RequiredService(name="cryptoser", type=ICryptoService.class, multiple=true, 
+//	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM, dynamic=true),
+//	nfreqs=@NFRequirement(description="select service with smallest call waitqueue", 
+//	value=WaitqueueProperty.class, methodname="encrypt", ranker=WaitqueueEvaluator.class)))
 public class UserAgent
 {
 	@Agent
 	protected MicroAgent agent;
+	
+	/** The evaluator. */
+	protected ComposedEvaluator<ICryptoService> ranker;
 		
 //	/**
 //	 *  The agent body.
@@ -92,39 +109,64 @@ public class UserAgent
 	{
 		// todo: make ITerminable in DefaultServiceFetcher
 		
-		ComposedEvaluator<IAService> ranker = new ComposedEvaluator<IAService>();
-		ranker.addEvaluator(new WaitqueueEvaluator(new MethodInfo(IAService.class.getMethod("test", new Class[0]))));
-		ITerminableIntermediateFuture<IAService> sfut = agent.getRequiredServices("aser");
-		SServiceProvider.rankServicesWithScores(sfut, ranker, null).addResultListener(new IResultListener<Collection<Tuple2<IAService, Double>>>()
+		// problem with execution time evaluator scheduling:
+		// all use the best service until that service time drops below the level of the second
+		// then all use the second and the second level drops hardly and cannot recover because
+		// no one will ever use it again
+		
+		ranker = new ComposedEvaluator<ICryptoService>();
+		AverageEvaluator eva = new AverageEvaluator(new WaitqueueEvaluator(new MethodInfo(ICryptoService.class.getMethod("encrypt", new Class[]{String.class}))));
+		ranker.addEvaluator(eva);
+//		ranker.addEvaluator(new ExecutionTimeEvaluator(new MethodInfo(IAService.class.getMethod("test", new Class[0]))));
+		
+		invoke();
+	}
+	
+	/**
+	 * 
+	 */
+	public void invoke()
+	{
+		final boolean wgui = agent.getConfiguration().equals("with gui");
+		
+		final IComponentStep step = new IComponentStep<Void>()
 		{
-			public void resultAvailable(Collection<Tuple2<IAService, Double>> res)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("Found: "+res);
-				if(agent.getConfiguration().equals("with gui"))
+				invoke();
+				return IFuture.DONE;
+			}
+		};
+		
+		ITerminableIntermediateFuture<ICryptoService> sfut = agent.getRequiredServices("aser");
+		SServiceProvider.rankServicesWithScores(sfut, ranker, null).addResultListener(new IResultListener<Collection<Tuple2<ICryptoService, Double>>>()
+		{
+			public void resultAvailable(Collection<Tuple2<ICryptoService, Double>> res)
+			{
+				if(wgui)
 					addData(res);
-				IAService aser = res.iterator().next().getFirstEntity();
-				aser.test().addResultListener(new ComponentResultListener<String>(new IResultListener<String>()
+				ICryptoService aser = res.iterator().next().getFirstEntity();
+				aser.encrypt("bla").addResultListener(new ComponentResultListener<String>(new IResultListener<String>()
 				{
 					public void resultAvailable(String result)
 					{
-						try
-						{
-							body();
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
+						invoke();
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+//						if(wgui)
+//							exception.printStackTrace();
+						agent.waitFor(2000, step);
 					}
 				}, agent.getExternalAccess()));
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
+//				if(wgui)
+//					exception.printStackTrace();
+				agent.waitFor(2000, step);
 			}	
 		});
 	}
@@ -132,11 +174,11 @@ public class UserAgent
 	/**
 	 * 
 	 */
-	public void addData(Collection<Tuple2<IAService, Double>> res)
+	public void addData(Collection<Tuple2<ICryptoService, Double>> res)
 	{
-		for(Tuple2<IAService, Double> tup: res)
+		for(Tuple2<ICryptoService, Double> tup: res)
 		{
-			IAService ser = tup.getFirstEntity();
+			ICryptoService ser = tup.getFirstEntity();
 			Double val = tup.getSecondEntity();
 			addValue(((IService)ser).getServiceIdentifier().toString(), System.currentTimeMillis(), val);
 		}
@@ -182,7 +224,7 @@ public class UserAgent
 	protected JFreeChart createChart()
 	{
 		XYDataset dataset = new TimeSeriesCollection();
-		JFreeChart chart = ChartFactory.createTimeSeriesChart("Test", "ms", "usage", dataset, true, true, true);
+		JFreeChart chart = ChartFactory.createTimeSeriesChart("Service Quality", "ms", "score", dataset, true, true, true);
 		chart.setNotify(true);
 		
 		ChartPanel panel = new ChartPanel(chart);
@@ -220,7 +262,7 @@ public class UserAgent
 		Class<?> time = Millisecond.class;
 		for(int j=sercnt; j<=seriesnum; j++)
 		{
-			Integer maxitemcnt = 100;
+			Integer maxitemcnt = 10000;
 			TimeSeries series;
 			if(seriesname!=null)
 			{

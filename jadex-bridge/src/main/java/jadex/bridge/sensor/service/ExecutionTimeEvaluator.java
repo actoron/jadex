@@ -36,7 +36,8 @@ public class ExecutionTimeEvaluator extends BasicEvaluator<Long>
 		if(value!=null)
 		{
 			// Using a scaled e^(-ax) function with a=0.01 or similar to stretch the lowering
-			double a = 0.01;
+//			double a = 0.01;
+			double a = 0.001;
 			ret = Math.exp(-value*a);
 		}
 		return ret;

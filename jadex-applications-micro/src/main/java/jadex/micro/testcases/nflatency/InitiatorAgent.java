@@ -19,7 +19,6 @@ import jadex.commons.future.DefaultTuple2ResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
-import jadex.commons.future.IForwardCommandFuture.Type;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IFutureCommandResultListener;
 import jadex.commons.future.IIntermediateFuture;
@@ -32,14 +31,12 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.testcases.TestAgent;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Map;
 
 /**
- *  Tests if non-functional properties can be changed and passed back
- *  from the receiver to the sender side of a service invocation.
+ *  Tests if non-functional properties can be used on required services.
+ *  Declares latency on a method of a service and fetches it.
  */
 @Agent
 @RequiredServices(
