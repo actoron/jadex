@@ -671,7 +671,9 @@ public class TaskPropertyPanel extends BasePropertyPanel
 					{
 						String name = pmis.get(i).getName();
 						ClassInfo clazz = pmis.get(i).getClazz();
-						UnparsedExpression inival = new UnparsedExpression(name, clazz.getTypeName(), pmis.get(i).getInitialValue(), null);
+						String inivalstr = pmis.get(i).getInitialValue();
+						inivalstr = inivalstr != null? !"null".equals(inivalstr)? inivalstr : "" : "";
+						UnparsedExpression inival = new UnparsedExpression(name, clazz.getTypeName(), inivalstr, null);
 						MParameter param = new MParameter(pmis.get(i).getDirection(), clazz, name, inival);
 						atable.addParameter(param);
 					}
