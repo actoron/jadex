@@ -24,19 +24,27 @@ public class EventType
 	}
 	
 	/**
+	 *  Create an event type.
+	 */
+	public EventType()
+	{
+	}
+	
+	/**
 	 *  Create an event type from a string.
 	 */
 	public EventType(String typename)
 	{
 		if(typename==null)
 			throw new IllegalArgumentException("Typename must not null");
-		this.typename = typename;
-		StringTokenizer stok = new StringTokenizer(typename, ".");
-		this.types = new String[stok.countTokens()];
-		for(int i=0; stok.hasMoreTokens(); i++)
-		{
-			types[i] = stok.nextToken();
-		}
+		setTypename(typename);
+//		this.typename = typename;
+//		StringTokenizer stok = new StringTokenizer(typename, ".");
+//		this.types = new String[stok.countTokens()];
+//		for(int i=0; stok.hasMoreTokens(); i++)
+//		{
+//			types[i] = stok.nextToken();
+//		}
 	}
 
 	/**
@@ -55,6 +63,39 @@ public class EventType
 	public String getType(int i)
 	{
 		return i<types.length? types[i]: null;
+	}
+
+	/**
+	 *  Get the typename.
+	 *  return The typename.
+	 */
+	public String getTypename()
+	{
+		return typename;
+	}
+
+	/**
+	 *  Set the typename. 
+	 *  @param typename The typename to set.
+	 */
+	public void setTypename(String typename)
+	{
+		this.typename = typename;
+		StringTokenizer stok = new StringTokenizer(typename, ".");
+		this.types = new String[stok.countTokens()];
+		for(int i=0; stok.hasMoreTokens(); i++)
+		{
+			types[i] = stok.nextToken();
+		}
+	}
+
+	/**
+	 *  Set the types. 
+	 *  @param types The types to set.
+	 */
+	public void setTypes(String[] types)
+	{
+		this.types = types;
 	}
 
 	/** 

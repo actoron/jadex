@@ -17,6 +17,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
@@ -38,6 +39,7 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -358,22 +360,50 @@ public class CronAgent implements ICronService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<Object> res = (IFuture<Object>)jobtup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, Long.valueOf(time)));
-		res.addResultListener(new IResultListener<Object>()
+		ISubscriptionIntermediateFuture<Object> res = (ISubscriptionIntermediateFuture<Object>)jobtup.getFirstEntity().getCommand().execute(new Tuple2<IInternalAccess, Long>(agent, Long.valueOf(time)));
+		res.addResultListener(new IIntermediateResultListener<Object>()
 		{
-			public void resultAvailable(Object result)
+			public void intermediateResultAvailable(Object result)
 			{
 				((IntermediateFuture<Object>)jobtup.getSecondEntity()).addIntermediateResultIfUndone(result);
+			}
+			
+			public void finished()
+			{
 				ret.setResult(null);
+			}
+			
+			public void resultAvailable(Collection<Object> result)
+			{
+				for(Object res: result)
+				{
+					intermediateResultAvailable(res);
+				}
+				finished();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				// or ignore?
 				jobtup.getSecondEntity().setExceptionIfUndone(exception);
 				ret.setResult(null);
 			}
 		});
+		
+//		res.addResultListener(new IResultListener<Object>()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				((IntermediateFuture<Object>)jobtup.getSecondEntity()).addIntermediateResultIfUndone(result);
+//				ret.setResult(null);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				// or ignore?
+//				jobtup.getSecondEntity().setExceptionIfUndone(exception);
+//				ret.setResult(null);
+//			}
+//		});
 		
 		return ret;
 	}

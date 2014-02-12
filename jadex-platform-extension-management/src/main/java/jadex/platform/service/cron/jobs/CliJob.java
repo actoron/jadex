@@ -15,9 +15,12 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.platform.service.cron.TimePatternFilter;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -59,7 +62,7 @@ public class CliJob extends CronJob<String>
 	/**
 	 *  The create command is used to execute a command line or script.
 	 */
-	public static class CliCommand implements IResultCommand<IFuture<String>, Tuple2<IInternalAccess, Long>>
+	public static class CliCommand implements IResultCommand<ISubscriptionIntermediateFuture<String>, Tuple2<IInternalAccess, Long>>
 	{
 		/** The command. */
 		protected String[] commands;
@@ -76,9 +79,10 @@ public class CliJob extends CronJob<String>
 		 *  Execute the command.
 		 *  @param args The argument(s) for the call.
 		 */
-		public IFuture<String> execute(final Tuple2<IInternalAccess, Long> args)
+		public ISubscriptionIntermediateFuture<String> execute(final Tuple2<IInternalAccess, Long> args)
 		{
-			final Future<String> ret = new Future<String>();
+			final SubscriptionIntermediateFuture<String> ret = new SubscriptionIntermediateFuture<String>();
+//			final Future<String> ret = new Future<String>();
 			final IInternalAccess ia = args.getFirstEntity();
 			SServiceProvider.getService(ia.getServiceContainer(), ICliService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(ia.createResultListener(new DefaultResultListener<ICliService>()
@@ -87,11 +91,13 @@ public class CliJob extends CronJob<String>
 				{
 					final StringBuffer buf = new StringBuffer();
 					executeCommands(clis, Arrays.asList(commands).iterator(), buf).addResultListener(
-						new ExceptionDelegationResultListener<Void, String>(ret)
+						new ExceptionDelegationResultListener<Void, Collection<String>>(ret)
 					{
 						public void customResultAvailable(Void result)
 						{
-							ret.setResult(buf.toString());
+//							ret.setResult(buf.toString());
+							ret.addIntermediateResult(buf.toString());
+							ret.setFinished();
 						}
 					});
 				}

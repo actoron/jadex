@@ -301,7 +301,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 		{
 			// Check if annotation is present and complain that method is not public.
 			
-			Class clazz = agent.getClass();
+			Class<?> clazz = agent.getClass();
 			
 			while(!Object.class.equals(clazz) && !found)
 			{

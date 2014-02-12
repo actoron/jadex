@@ -358,13 +358,14 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	{
 		final SubscriptionIntermediateFuture<CMSStatusEvent> ret = (SubscriptionIntermediateFuture)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 				
+		final IComponentIdentifier[] mycid = new IComponentIdentifier[1];
 		createComponent(name, model, info, new IIntermediateResultListener<Tuple2<String, Object>>()
 		{
 			Map<String, Object> results = new HashMap<String, Object>();
 			
 			public void intermediateResultAvailable(Tuple2<String, Object> result)
 			{
-				ret.addIntermediateResult(new CMSIntermediateResultEvent(result.getFirstEntity(), result.getSecondEntity()));
+				ret.addIntermediateResult(new CMSIntermediateResultEvent(mycid[0], result.getFirstEntity(), result.getSecondEntity()));
 				results.put(result.getFirstEntity(), result.getSecondEntity());
 			}
 			
@@ -382,7 +383,8 @@ public class DecoupledComponentManagementService implements IComponentManagement
 			
 			public void finished()
 			{
-				ret.addIntermediateResult(new CMSTerminatedEvent(results));
+				ret.addIntermediateResult(new CMSTerminatedEvent(mycid[0], results));
+				ret.setFinished();
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -393,6 +395,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		{
 			public void resultAvailable(IComponentIdentifier cid)
 			{
+				mycid[0] = cid;
 				ret.addIntermediateResult(new CMSCreatedEvent(cid));
 			}
 			
@@ -3428,160 +3431,6 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	public static class CMSStatusEvent
-	{
-	}
 	
-	/**
-	 * 
-	 */
-	public static class CMSCreatedEvent extends CMSStatusEvent
-	{
-		/** The cid. */
-		protected IComponentIdentifier cid;
-
-		/**
-		 *  Create a new CMSCreatedEvent. 
-		 */
-		public CMSCreatedEvent()
-		{
-		}
-		
-		/**
-		 *  Create a new CMSCreatedEvent. 
-		 */
-		public CMSCreatedEvent(IComponentIdentifier cid)
-		{
-			this.cid = cid;
-		}
-
-		/**
-		 *  Get the componentIdentifier.
-		 *  @return The componentIdentifier.
-		 */
-		public IComponentIdentifier getComponentIdentifier()
-		{
-			return cid;
-		}
-
-		/**
-		 *  Set the componentIdentifier.
-		 *  @param cid The componentIdentifier to set.
-		 */
-		public void setComponentIdentifier(IComponentIdentifier cid)
-		{
-			this.cid = cid;
-		}
-		
-	}
-	
-	/**
-	 * 
-	 */
-	public static class CMSIntermediateResultEvent extends CMSStatusEvent
-	{
-		/** The name of the result. */
-		protected String name;
-		
-		/** The value of the result. */
-		protected Object value;
-
-		/**
-		 *  Create a new CMSIntermediateResultEvent. 
-		 */
-		public CMSIntermediateResultEvent()
-		{
-		}
-		
-		/**
-		 *  Create a new CMSIntermediateResultEvent. 
-		 */
-		public CMSIntermediateResultEvent(String name, Object value)
-		{
-			this.name = name;
-			this.value = value;
-		}
-
-		/**
-		 *  Get the name.
-		 *  @return The name.
-		 */
-		public String getName()
-		{
-			return name;
-		}
-
-		/**
-		 *  Set the name.
-		 *  @param name The name to set.
-		 */
-		public void setName(String name)
-		{
-			this.name = name;
-		}
-
-		/**
-		 *  Get the value.
-		 *  @return The value.
-		 */
-		public Object getValue()
-		{
-			return value;
-		}
-
-		/**
-		 *  Set the value.
-		 *  @param value The value to set.
-		 */
-		public void setValue(Object value)
-		{
-			this.value = value;
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public static class CMSTerminatedEvent extends CMSStatusEvent
-	{
-		/** The cid. */
-		protected Map<String, Object> results;
-
-		/**
-		 *  Create a new CMSCreatedEvent. 
-		 */
-		public CMSTerminatedEvent()
-		{
-		}
-		
-		/**
-		 *  Create a new CMSCreatedEvent. 
-		 */
-		public CMSTerminatedEvent(Map<String, Object> results)
-		{
-			this.results = results;
-		}
-
-		/**
-		 *  Get the results.
-		 *  @return The results.
-		 */
-		public Map<String, Object> getResults()
-		{
-			return results;
-		}
-
-		/**
-		 *  Set the results.
-		 *  @param results The results to set.
-		 */
-		public void setResults(Map<String, Object> results)
-		{
-			this.results = results;
-		}
-	}
 
 }

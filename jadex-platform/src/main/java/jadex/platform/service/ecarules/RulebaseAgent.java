@@ -45,26 +45,27 @@ public class RulebaseAgent implements IRulebaseService
 	protected MicroAgent agent;
 	
 	/** The subscriptions. */
-	protected List<SubscriptionIntermediateFuture<IRulebaseEvent>> rbsubscribers;
+	protected List<SubscriptionIntermediateFuture<IRulebaseEvent>> rbsubscribers = new ArrayList<SubscriptionIntermediateFuture<IRulebaseEvent>>();
 	
 	/** The rulebase. */
 	protected IRulebase rulebase;
 	
 	/** The open calls (callid -> set of event ids that have to be acked. */
-	protected Map<Integer, Set<Integer>> opencalls;
+	protected Map<Integer, Set<Integer>> opencalls = new HashMap<Integer, Set<Integer>>();
 	/** callid -> future . */
-	protected Map<Integer, Future<Void>> callfutures;
+	protected Map<Integer, Future<Void>> callfutures = new HashMap<Integer, Future<Void>>();
 	
-	/**
-	 *  Called on agent creation.
-	 */
-	@AgentCreated
-	public void agentCreated()
-	{
-		this.rbsubscribers = new ArrayList<SubscriptionIntermediateFuture<IRulebaseEvent>>();
-		this.opencalls = new HashMap<Integer, Set<Integer>>();
-		this.callfutures = new HashMap<Integer, Future<Void>>();
-	}
+	// todo?!: change validation interceptor to check whether service AND agent have been initialized 
+//	/**
+//	 *  Called on agent creation.
+//	 */
+//	@AgentCreated
+//	public void agentCreated()
+//	{
+//		this.rbsubscribers = new ArrayList<SubscriptionIntermediateFuture<IRulebaseEvent>>();
+//		this.opencalls = new HashMap<Integer, Set<Integer>>();
+//		this.callfutures = new HashMap<Integer, Future<Void>>();
+//	}
 	
 	/**
 	 *  Get the rulebase.

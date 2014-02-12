@@ -48,7 +48,7 @@ public class BpmnModelLoader extends AbstractModelLoader
 	public MBpmnModel	loadBpmnModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
 		String ext = FILE_EXTENSION_BPMN;
-		if (name.endsWith(".bpmn2"))
+		if(name.endsWith(".bpmn2"))
 		{
 			ext = FILE_EXTENSION_BPMN2;
 		}

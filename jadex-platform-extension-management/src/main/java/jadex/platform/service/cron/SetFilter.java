@@ -34,4 +34,22 @@ public class SetFilter<T> implements IFilter<T>
 	{
 		return vals.contains(obj);
 	}
+
+	/**
+	 *  Get the vals.
+	 *  return The vals.
+	 */
+	public Set<T> getValues()
+	{
+		return vals;
+	}
+
+	/**
+	 *  Set the vals. 
+	 *  @param vals The vals to set.
+	 */
+	public void setValues(Set<T> vals)
+	{
+		this.vals = vals;
+	}
 }

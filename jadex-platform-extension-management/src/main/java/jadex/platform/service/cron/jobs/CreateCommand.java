@@ -2,24 +2,26 @@ package jadex.platform.service.cron.jobs;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.SFuture;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.IResultCommand;
-import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
-
-import java.util.Collection;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 /**
  *  The create command is used to create a component via the cms.
  */
-public class CreateCommand implements IResultCommand<IFuture<IComponentIdentifier>, IInternalAccess>
+public class CreateCommand implements IResultCommand<IIntermediateFuture<CMSStatusEvent>, IInternalAccess>
 {
 	/** The name. */
 	protected String name;
@@ -30,37 +32,48 @@ public class CreateCommand implements IResultCommand<IFuture<IComponentIdentifie
 	/** The creation info. */
 	protected CreationInfo info;
 	
-	/** The result listener. */
-	protected IResultListener<Collection<Tuple2<String, Object>>> resultlistener;
+//	/** The result listener. */
+//	protected IResultListener<Collection<Tuple2<String, Object>>> resultlistener;
 	
 	/**
 	 *  Create a new CreateCommand. 
 	 */
-	public CreateCommand(String name, String model, CreationInfo info,
-		IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+	public CreateCommand(String name, String model, CreationInfo info)
+//		IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{
 		this.name = name;
 		this.model = model;
 		this.info = info;
-		this.resultlistener = resultlistener;
+//		this.resultlistener = resultlistener;
 	}
 
 	/**
 	 *  Execute the command.
 	 *  @param args The argument(s) for the call.
 	 */
-	public IFuture<IComponentIdentifier> execute(final IInternalAccess ia)
+	public ISubscriptionIntermediateFuture<CMSStatusEvent> execute(final IInternalAccess ia)
 	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		final SubscriptionIntermediateDelegationFuture<CMSStatusEvent> ret = (SubscriptionIntermediateDelegationFuture<CMSStatusEvent>)
+			SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, ia);
 		
 //		final IInternalAccess ia = args.getFirstEntity();
 		SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+			.addResultListener(ia.createResultListener(new IResultListener<IComponentManagementService>()
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void resultAvailable(IComponentManagementService cms)
 			{
-				cms.createComponent(name, model, info, resultlistener).addResultListener(
-					ia.createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)));
+				ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, name, model);
+				TerminableIntermediateDelegationResultListener<CMSStatusEvent> lis = new TerminableIntermediateDelegationResultListener<CMSStatusEvent>(ret, fut);
+				fut.addResultListener(ia.createResultListener(lis));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		}));
+				
+//				cms.createComponent(name, model, info, resultlistener).addResultListener(
+//					ia.createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)));
 //				{
 //					public void resultAvailable(IComponentIdentifier cid)
 //					{
@@ -68,8 +81,6 @@ public class CreateCommand implements IResultCommand<IFuture<IComponentIdentifie
 //						ret
 //					}
 //				}));
-			}
-		}));
 		
 		return ret;
 	}
@@ -128,21 +139,21 @@ public class CreateCommand implements IResultCommand<IFuture<IComponentIdentifie
 		this.info = info;
 	}
 
-	/**
-	 *  Get the resultlistener.
-	 *  @return The resultlistener.
-	 */
-	public IResultListener<Collection<Tuple2<String, Object>>> getResultlistener()
-	{
-		return resultlistener;
-	}
-
-	/**
-	 *  Set the resultlistener.
-	 *  @param resultlistener The resultlistener to set.
-	 */
-	public void setResultlistener(IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
-	{
-		this.resultlistener = resultlistener;
-	}
+//	/**
+//	 *  Get the resultlistener.
+//	 *  @return The resultlistener.
+//	 */
+//	public IResultListener<Collection<Tuple2<String, Object>>> getResultlistener()
+//	{
+//		return resultlistener;
+//	}
+//
+//	/**
+//	 *  Set the resultlistener.
+//	 *  @param resultlistener The resultlistener to set.
+//	 */
+//	public void setResultlistener(IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
+//	{
+//		this.resultlistener = resultlistener;
+//	}
 }

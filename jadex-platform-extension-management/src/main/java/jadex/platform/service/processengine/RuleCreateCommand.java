@@ -1,16 +1,22 @@
-package jadex.platform.service.cron.jobs;
+package jadex.platform.service.processengine;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.IResultCommand;
-import jadex.commons.Tuple2;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.platform.service.cron.jobs.CreateCommand;
+import jadex.rules.eca.CommandAction.CommandData;
+
+import java.util.Collection;
 
 /**
  *  The create command is used to create a component via the cms.
+ *  
+ *  Wraps a create command in a rule engine friendly version.
  */
-public class CronCreateCommand implements IResultCommand<ISubscriptionIntermediateFuture<CMSStatusEvent>, Tuple2<IInternalAccess, Long>>
+public class RuleCreateCommand implements IResultCommand<IFuture<Collection<CMSStatusEvent>>, CommandData>
 {
 	/** The name. */
 	protected CreateCommand command;
@@ -18,7 +24,7 @@ public class CronCreateCommand implements IResultCommand<ISubscriptionIntermedia
 	/**
 	 *  Create a new CreateCommand. 
 	 */
-	public CronCreateCommand(CreateCommand command)
+	public RuleCreateCommand(CreateCommand command)
 	{
 		this.command = command;
 	}
@@ -26,19 +32,19 @@ public class CronCreateCommand implements IResultCommand<ISubscriptionIntermedia
 	/**
 	 *  Create a new CreateCommand. 
 	 */
-	public CronCreateCommand(String name, String model, CreationInfo info)
+	public RuleCreateCommand(String name, String model, CreationInfo info)
 //		IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{
-		this(new CreateCommand(name, model, info));
+		this(new CreateCommand(name, model, info));//, resultlistener));
 	}
 
 	/**
 	 *  Execute the command.
 	 *  @param args The argument(s) for the call.
 	 */
-	public ISubscriptionIntermediateFuture<CMSStatusEvent> execute(final Tuple2<IInternalAccess, Long> args)
+	public IIntermediateFuture<CMSStatusEvent> execute(final CommandData args)
 	{
-		return command.execute(args.getFirstEntity());
+		return command.execute((IInternalAccess)args.getContext());
 	}
 
 	/**

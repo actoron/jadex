@@ -1129,7 +1129,7 @@ public class SBpmnModelWriter
 				MSubProcess subproc = (MSubProcess) activity;
 				if (subproc.hasPropertyValue("file"))
 				{
-					UnparsedExpression fileexp = (UnparsedExpression) subproc.getPropertyValue("file"); 
+					UnparsedExpression fileexp = (UnparsedExpression)subproc.getPropertyValue("file"); 
 					procref = fileexp.getValue();
 					isprocrefexp = true;
 				}

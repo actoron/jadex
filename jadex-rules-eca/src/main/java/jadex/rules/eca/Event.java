@@ -16,13 +16,20 @@ public class Event implements IEvent
 	//-------- constructors --------
 
 	/**
+	 *  Create a new Event.
+	 */
+	public Event()
+	{
+	}
+	
+	/**
 	 *  Create a new event.
 	 */
 	public Event(String type, Object content)
 	{
 		this(new EventType(type), content);
 	}
-	
+
 	/**
 	 *  Create a new event.
 	 */

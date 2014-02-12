@@ -89,8 +89,6 @@ public class ThreadContext
 		return initiator;
 	}
 	
-	
-	
 	/**
 	 *  Gets the hard constraints.
 	 *

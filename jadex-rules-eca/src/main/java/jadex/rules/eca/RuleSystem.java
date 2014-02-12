@@ -9,6 +9,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.rules.eca.annotations.Action;
@@ -20,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -465,23 +467,55 @@ public class RuleSystem
 					{
 						if(result.getFirstEntity().booleanValue())
 						{
-							IFuture<Object> fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, result.getSecondEntity());
+							IFuture fut = (IFuture<Object>)rules[i].getAction().execute(event, (IRule)rules[i], context, result.getSecondEntity());
 							
-							fut.addResultListener(new IResultListener<Object>()
+							if(fut instanceof IIntermediateFuture)
 							{
-								public void resultAvailable(Object result) 
+								((IIntermediateFuture<Object>)fut).addResultListener(new IIntermediateResultListener<Object>()
 								{
-									RuleEvent ev = new RuleEvent(rules[i].getName(), result);
-									res.addIntermediateResult(ev);
-									processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-								}
-								
-								public void exceptionOccurred(Exception exception)
+									public void intermediateResultAvailable(Object result)
+									{
+										RuleIntermediateEvent ev = new RuleIntermediateEvent(rules[i].getName(), result);
+										res.addIntermediateResult(ev);
+									}
+									
+									public void finished()
+									{
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									
+									public void resultAvailable(Collection<Object> result)
+									{
+										RuleEvent ev = new RuleEvent(rules[i].getName(), result);
+										res.addIntermediateResult(ev);
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										exception.printStackTrace();
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+								});
+							}
+							else
+							{
+								fut.addResultListener(new IResultListener<Object>()
 								{
-									exception.printStackTrace();
-									processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
-								}
-							});
+									public void resultAvailable(Object result) 
+									{
+										RuleEvent ev = new RuleEvent(rules[i].getName(), result);
+										res.addIntermediateResult(ev);
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										exception.printStackTrace();
+										processRules(rules, i+1, event, res).addResultListener(new DelegationResultListener<Void>(ret));
+									}
+								});
+							}
 						}
 						else
 						{
@@ -493,6 +527,10 @@ public class RuleSystem
 					{
 					}
 				});
+			}
+			else
+			{
+				ret.setResult(null);
 			}
 		}
 		else

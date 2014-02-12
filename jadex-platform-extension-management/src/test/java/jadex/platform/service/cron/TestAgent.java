@@ -16,7 +16,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -45,7 +47,7 @@ import java.util.List;
 	@RequiredService(name="crons", type=ICronService.class, 
 		binding=@Binding(create=true, creationinfo=@CreationInfo(type="cronagent", configuration="platform clock"))),
 })
-@ComponentTypes(@ComponentType(name="cronagent", filename="jadex/platform/service/cron/CronAgent.class"))
+@ComponentTypes(@ComponentType(name="cronagent", clazz=CronAgent.class))
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class TestAgent
@@ -175,12 +177,24 @@ public class TestAgent
 		
 		final TestReport tr = new TestReport("#"+i, "Test pattern: "+pattern);
 		
+//		final CronJob<Long> job = new CronJob<Long>(pattern, new TimePatternFilter(pattern), 
+//			new IResultCommand<IFuture<Long>, Tuple2<IInternalAccess, Long>>()
+//		{
+//			public IFuture<Long> execute(Tuple2<IInternalAccess, Long> args)
+//			{
+//				return new Future<Long>(args.getSecondEntity());
+//			}
+//		});
+		
 		final CronJob<Long> job = new CronJob<Long>(pattern, new TimePatternFilter(pattern), 
-			new IResultCommand<IFuture<Long>, Tuple2<IInternalAccess, Long>>()
+			new IResultCommand<ISubscriptionIntermediateFuture<Long>, Tuple2<IInternalAccess, Long>>()
 		{
-			public IFuture<Long> execute(Tuple2<IInternalAccess, Long> args)
+			public ISubscriptionIntermediateFuture<Long> execute(Tuple2<IInternalAccess, Long> args)
 			{
-				return new Future<Long>(args.getSecondEntity());
+				SubscriptionIntermediateFuture<Long> ret = new SubscriptionIntermediateFuture<Long>();
+				ret.addIntermediateResult(args.getSecondEntity());
+				ret.setFinished();
+				return ret;
 			}
 		});
 		
@@ -205,6 +219,29 @@ public class TestAgent
 		});	
 
 		crons.addJob(job).addResultListener(jl);
+		
+//		crons.addJob(job).addResultListener(new IIntermediateResultListener<Long>()
+//		{
+//			public void intermediateResultAvailable(Long result)
+//			{
+//				System.out.println("im: "+result);
+//			}
+//			
+//			public void finished()
+//			{
+//				System.out.println("fin");
+//			}
+//			
+//			public void resultAvailable(Collection<Long> result)
+//			{
+//				System.out.println("result: "+result);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception);
+//			}
+//		});
 		
 		return ret;
 	}

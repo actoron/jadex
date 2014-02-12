@@ -713,7 +713,7 @@ public class MActivity extends MAssociationTarget
 	 */
 	public Object getParsedPropertyValue(String name)
 	{
-		UnparsedExpression	upex	= getPropertyValue(name);
+		UnparsedExpression upex = getPropertyValue(name);
 		Object val = ((IParsedExpression)upex.getParsed()).getValue(null);
 		
 		return val;
@@ -730,13 +730,13 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
-	 *  Test, if a property is declared.
+	 *  Test, if a property is declared and has nonull unparsed expression.
 	 *  @param name	The property name.
 	 *  @return True, if the property is declared.
 	 */
 	public boolean hasPropertyValue(String name)
 	{
-		return properties!=null && properties.containsKey(name);
+		return properties!=null && properties.containsKey(name) && getPropertyValue(name)!=null;
 	}
 	
 	/**

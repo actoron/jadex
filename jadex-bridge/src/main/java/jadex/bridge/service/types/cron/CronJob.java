@@ -5,7 +5,7 @@ import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  *  The cron job consists of:
@@ -27,7 +27,7 @@ public class CronJob<T>
 	protected IFilter<Long> filter;
 	
 	/** The command. */
-	protected IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> command;
+	protected IResultCommand<ISubscriptionIntermediateFuture<T>, Tuple2<IInternalAccess, Long>> command;
 	 
 	//-------- constructors --------
 	
@@ -41,7 +41,7 @@ public class CronJob<T>
 	/**
 	 *  Create a new cron job.
 	 */
-	public CronJob(String pattern, IFilter<Long> filter, IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> command)
+	public CronJob(String pattern, IFilter<Long> filter, IResultCommand<ISubscriptionIntermediateFuture<T>, Tuple2<IInternalAccess, Long>> command)
 	{
 		this.id = SUtil.createUniqueId("cronjob");
 		this.pattern = pattern;
@@ -50,24 +50,6 @@ public class CronJob<T>
 	}
 
 	//-------- methods --------
-	
-	/**
-	 *  Get the pattern.
-	 *  @return The pattern.
-	 */
-	public String getPattern()
-	{
-		return pattern;
-	}
-
-	/**
-	 *  Set the pattern.
-	 *  @param pattern The pattern to set.
-	 */
-	public void setPattern(String pattern)
-	{
-		this.pattern = pattern;
-	}
 	
 	/**
 	 *  Get the id.
@@ -85,6 +67,24 @@ public class CronJob<T>
 	public void setId(String id)
 	{
 		this.id = id;
+	}
+	
+	/**
+	 *  Get the pattern.
+	 *  @return The pattern.
+	 */
+	public String getPattern()
+	{
+		return pattern;
+	}
+
+	/**
+	 *  Set the pattern.
+	 *  @param pattern The pattern to set.
+	 */
+	public void setPattern(String pattern)
+	{
+		this.pattern = pattern;
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class CronJob<T>
 	 *  Get the command.
 	 *  @return The command.
 	 */
-	public IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> getCommand()
+	public IResultCommand<ISubscriptionIntermediateFuture<T>, Tuple2<IInternalAccess, Long>> getCommand()
 	{
 		return command;
 	}
@@ -118,7 +118,7 @@ public class CronJob<T>
 	 *  Set the command.
 	 *  @param command The command to set.
 	 */
-	public void setCommand(IResultCommand<IFuture<T>, Tuple2<IInternalAccess, Long>> command)
+	public void setCommand(IResultCommand<ISubscriptionIntermediateFuture<T>, Tuple2<IInternalAccess, Long>> command)
 	{
 		this.command = command;
 	}

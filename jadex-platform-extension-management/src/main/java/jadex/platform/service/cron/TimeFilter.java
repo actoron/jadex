@@ -23,8 +23,8 @@ public class TimeFilter implements IFilter<Long>
 	 */
 	public TimeFilter(IFilter<Integer>[] filters)
 	{
-		if(filters==null)
-			System.out.println("here");
+//		if(filters==null)
+//			System.out.println("here");
 		this.filters = filters;
 	}
 	
@@ -54,5 +54,23 @@ public class TimeFilter implements IFilter<Long>
 		return filters[0].filter(Integer.valueOf(minute)) && filters[1].filter(Integer.valueOf(hour)) 
 			&& filters[2].filter(Integer.valueOf(dom)) && filters[3].filter(Integer.valueOf(month)) 
 			&& filters[4].filter(Integer.valueOf(dow));
+	}
+
+	/**
+	 *  Get the filters.
+	 *  return The filters.
+	 */
+	public IFilter<Integer>[] getFilters()
+	{
+		return filters;
+	}
+
+	/**
+	 *  Set the filters. 
+	 *  @param filters The filters to set.
+	 */
+	public void setFilters(IFilter<Integer>[] filters)
+	{
+		this.filters = filters;
 	}
 }

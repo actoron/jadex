@@ -1,12 +1,11 @@
 package jadex.rules.eca;
 
 import jadex.commons.IResultCommand;
-import jadex.commons.Tuple3;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Wrapper that maps a command into a rule action.
  */
 public class CommandAction<T> implements IAction<T>
 {
@@ -75,7 +74,7 @@ public class CommandAction<T> implements IAction<T>
 		/**
 		 *  Create a new CommandData. 
 		 */
-		public CommandData(IEvent event, IRule< ? > rule, Object context, Object condresult)
+		public CommandData(IEvent event, IRule<?> rule, Object context, Object condresult)
 		{
 			this.event = event;
 			this.rule = rule;

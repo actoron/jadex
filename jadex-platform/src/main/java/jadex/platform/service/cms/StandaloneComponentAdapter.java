@@ -169,7 +169,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 				{
 					public void printStackTrace()
 					{
-						Thread.dumpStack();
+//						Thread.dumpStack();
 						super.printStackTrace();
 					}
 				};

@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.cron;
 
+import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -14,7 +15,7 @@ public interface ICronService
 	 *  @param job The cron job.
 	 */
 	@Timeout(Timeout.NONE)
-	public <T> ISubscriptionIntermediateFuture<T> addJob(CronJob<T> job);
+	public <T> ISubscriptionIntermediateFuture<T> addJob(@CheckNotNull CronJob<T> job);
 	
 	/**
 	 *  Remove a schedule job.

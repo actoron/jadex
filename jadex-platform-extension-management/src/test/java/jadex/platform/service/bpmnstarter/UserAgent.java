@@ -21,6 +21,8 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.platform.service.processengine.IProcessEngineService;
+import jadex.platform.service.processengine.ProcessEngineEvent;
 import jadex.rules.eca.Event;
 
 import java.util.Collection;
@@ -35,7 +37,7 @@ import java.util.Set;
 {
 	@RequiredService(name="libs", type=ILibraryService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="mons", type=IMonitoringStarterService.class, 
+	@RequiredService(name="mons", type=IProcessEngineService.class, 
 		binding=@Binding(create=true, creationinfo=@CreationInfo(type="monagent"))),
 	@RequiredService(name="rules", type=IRuleService.class)
 })
@@ -60,10 +62,10 @@ public class UserAgent
 		
 		final TestReport[] trs = new TestReport[2];
 		
-		IFuture<IMonitoringStarterService> fut = agent.getServiceContainer().getRequiredService("mons");
-		fut.addResultListener(new ExceptionDelegationResultListener<IMonitoringStarterService, Void>(ret)
+		IFuture<IProcessEngineService> fut = agent.getServiceContainer().getRequiredService("mons");
+		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, Void>(ret)
 		{
-			public void customResultAvailable(final IMonitoringStarterService mons)
+			public void customResultAvailable(final IProcessEngineService mons)
 			{
 				IFuture<ILibraryService> fut = agent.getServiceContainer().getRequiredService("libs");
 				fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
@@ -106,22 +108,22 @@ public class UserAgent
 		final long dur = 10000;
 		final String model = "jadex/bpmn/examples/execute/ConditionEventStart.bpmn";
 		
-		IFuture<IMonitoringStarterService> fut = agent.getRequiredService("mons");
-		fut.addResultListener(new ExceptionDelegationResultListener<IMonitoringStarterService, TestReport>(ret)
+		IFuture<IProcessEngineService> fut = agent.getRequiredService("mons");
+		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, TestReport>(ret)
 		{
-			public void customResultAvailable(final IMonitoringStarterService mons)
+			public void customResultAvailable(final IProcessEngineService mons)
 			{
-				ISubscriptionIntermediateFuture<MonitoringStarterEvent> fut = mons.addBpmnModel(model, null);
-				fut.addResultListener(new IIntermediateResultListener<MonitoringStarterEvent>()
+				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = mons.addBpmnModel(model, null);
+				fut.addResultListener(new IIntermediateResultListener<ProcessEngineEvent>()
 				{
 					protected Set<String> results = new HashSet<String>();
 					protected boolean fini = false;
 					
-					public void intermediateResultAvailable(MonitoringStarterEvent event)
+					public void intermediateResultAvailable(ProcessEngineEvent event)
 					{
 						System.out.println("received event: "+event);
 						
-						if(MonitoringStarterEvent.ADDED.equals(event.getType()))
+						if(ProcessEngineEvent.PROCESSMODEL_ADDED.equals(event.getType()))
 						{
 							IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
 							fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, TestReport>(ret)
@@ -136,15 +138,15 @@ public class UserAgent
 								}
 							});
 						}
-						else if(MonitoringStarterEvent.REMOVED.equals(event.getType()))
+						else if(ProcessEngineEvent.PROCESSMODEL_REMOVED.equals(event.getType()))
 						{
 							// nop
 						}
-						else if(MonitoringStarterEvent.INSTANCE_CREATED.equals(event.getType()))
+						else if(ProcessEngineEvent.INSTANCE_CREATED.equals(event.getType()))
 						{
 							// nop
 						}
-						else if(MonitoringStarterEvent.INSTANCE_TERMINATED.equals(event.getType()))
+						else if(ProcessEngineEvent.INSTANCE_TERMINATED.equals(event.getType()))
 						{
 							Map<String, Object> res = (Map<String, Object>)event.getContent();
 							results.add((String)res.get("result"));
@@ -175,9 +177,9 @@ public class UserAgent
 						proceed();
 					}
 					
-					public void resultAvailable(Collection<MonitoringStarterEvent> result)
+					public void resultAvailable(Collection<ProcessEngineEvent> result)
 					{
-						for(MonitoringStarterEvent ev: result)
+						for(ProcessEngineEvent ev: result)
 						{
 							intermediateResultAvailable(ev);
 						}
@@ -217,33 +219,33 @@ public class UserAgent
 		final String model = "jadex/bpmn/examples/execute/TimerEventStart.bpmn";
 		final TestReport tr = new TestReport("#1", "Test if bpmn rule triggering works for initial rules.");
 		
-		IFuture<IMonitoringStarterService> fut = agent.getRequiredService("mons");
-		fut.addResultListener(new ExceptionDelegationResultListener<IMonitoringStarterService, TestReport>(ret)
+		IFuture<IProcessEngineService> fut = agent.getRequiredService("mons");
+		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, TestReport>(ret)
 		{
-			public void customResultAvailable(final IMonitoringStarterService mons)
+			public void customResultAvailable(final IProcessEngineService mons)
 			{	
-				ISubscriptionIntermediateFuture<MonitoringStarterEvent> fut = mons.addBpmnModel(model, null);
-				fut.addResultListener(new IIntermediateResultListener<MonitoringStarterEvent>()
+				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = mons.addBpmnModel(model, null);
+				fut.addResultListener(new IIntermediateResultListener<ProcessEngineEvent>()
 				{
 					protected boolean fini = false;
 					
-					public void intermediateResultAvailable(MonitoringStarterEvent event)
+					public void intermediateResultAvailable(ProcessEngineEvent event)
 					{
 						System.out.println("received event: "+event);
 						
-						if(MonitoringStarterEvent.ADDED.equals(event.getType()))
+						if(ProcessEngineEvent.PROCESSMODEL_ADDED.equals(event.getType()))
 						{
 							// nop
 						}
-						else if(MonitoringStarterEvent.REMOVED.equals(event.getType()))
+						else if(ProcessEngineEvent.PROCESSMODEL_REMOVED.equals(event.getType()))
 						{
 							// nop
 						}
-						else if(MonitoringStarterEvent.INSTANCE_CREATED.equals(event.getType()))
+						else if(ProcessEngineEvent.INSTANCE_CREATED.equals(event.getType()))
 						{
 							// nop
 						}
-						else if(MonitoringStarterEvent.INSTANCE_TERMINATED.equals(event.getType()))
+						else if(ProcessEngineEvent.INSTANCE_TERMINATED.equals(event.getType()))
 						{
 							tr.setSucceeded(true);
 							proceed();
@@ -261,9 +263,9 @@ public class UserAgent
 						proceed();
 					}
 					
-					public void resultAvailable(Collection<MonitoringStarterEvent> result)
+					public void resultAvailable(Collection<ProcessEngineEvent> result)
 					{
-						for(MonitoringStarterEvent ev: result)
+						for(ProcessEngineEvent ev: result)
 						{
 							intermediateResultAvailable(ev);
 						}

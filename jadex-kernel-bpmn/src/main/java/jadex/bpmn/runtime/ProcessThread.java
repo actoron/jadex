@@ -520,7 +520,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean	hasPropertyValue(String name)
 	{
-		return activity.hasPropertyValue(name);
+		return activity.hasProperty(name);
 	}
 	
 	/**

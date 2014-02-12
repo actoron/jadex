@@ -1,7 +1,7 @@
 package jadex.rules.eca;
 
 /**
- *  Information about 
+ *  Information about execution of a rule.
  */
 public class RuleEvent
 {
@@ -61,5 +61,14 @@ public class RuleEvent
 	public void setResult(Object result)
 	{
 		this.result = result;
+	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "RuleEvent(rulename=" + rulename + ", result=" + result + ")";
 	}	
+	
 }
