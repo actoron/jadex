@@ -1,7 +1,9 @@
 package jadex;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -133,9 +135,27 @@ public class ForwardFilter implements Filter
 			// The internal absolute urls point to the internal server 
 			// and must be rewritten to point on the external one
 			
-			// Transfer back to client
-			copyStream(con.getInputStream(), response.getOutputStream());
-			response.getOutputStream().flush();
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+		    // Replace content if is html with possibly wrong links
+		    if(request.getContentType()==null || ("text/html").equals(request.getContentType().toLowerCase()))
+		    {
+		    	// todo: also replace different subpath!?
+			    String line;
+			    String internal = urlc.getProtocol()+"://"+urlc.getHost()+":"+urlc.getPort(); 
+			    String external = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
+			    while((line = rd.readLine()) != null) 
+			    { 
+			        String rep = line.replace(internal, external);
+			        response.getOutputStream().write(rep.getBytes());
+			    }
+		    }
+		    else
+		    {
+		    	// Copy without modifications
+		    	copyStream(con.getInputStream(), response.getOutputStream());
+		    }
+		    response.getOutputStream().flush();
 		} 
 		catch(Exception e) 
 		{
