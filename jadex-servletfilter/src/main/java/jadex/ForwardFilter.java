@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -22,32 +24,57 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * 
+ *  The forward filter is a kind of web proxy that offers rest methods to adjust its mappings.
+ *  A mapping expresses a source path and a target address on another web server server.
+ *  Incoming requests are checked if the begin with one of the paths in the mapping and if yes
+ *  are forwarded to the corresponding remote server.
+ *  
+ *  Answers are directly passed back as result of the web request with one exception. In
+ *  case the mime type is "text/html" the proxy will inspect the result and replace absolute
+ *  urls with its own server address. This allows links to work from the remote server.
+ *  
+ *  Supported methods are:
+ *  
+ *  /addMapping?name=a&target=b : Add a new mapping
+ *  /removeMapping?name=a       : Remove an existing mapping
+ *  /refreshMapping?name=a      : Update time stamp of mapping
+ *  /displayMappings			: Show the current mappings in html
+ *  /getLeasetime				: Get the lease time
+ *  /setLeasetime?leasetime=a	: Set the lease time			
  */
 public class ForwardFilter implements Filter
 {
-	protected static Set<ForwardInfo> infos = Collections.synchronizedSet(new TreeSet<ForwardInfo>(new Comparator<ForwardInfo>()
-	{
-		public int compare(ForwardInfo o1, ForwardInfo o2) 
-		{
-			return o1.getTime()<o2.getTime()? -1: o1.getTime()>o2.getTime()? 1: o1.hashCode()-o2.hashCode();
-		}
-	}));
+	/** The mapping infos. */
+	protected static Map<String, ForwardInfo> infos = Collections.synchronizedMap(new LinkedHashMap<String, ForwardInfo>());
 	
-	static
-	{
-		infos.add(new ForwardInfo("/banking1", "http://0.0.0.0:8081/banking1"));
-	}
+	public static final String addprefix = "/addMapping";
+	public static final String remprefix = "/removeMapping";
+	public static final String refprefix = "/refreshMapping";
+	public static final String disprefix = "/displayMappings";
+	public static final String gltprefix = "/getLeasetime";
+	public static final String sltprefix = "/setLeasetime";
+	
+	/** The lease time in millis. */
+	protected long leasetime;
 	
 	/**
-	 * 
+	 *  Init the filter.
 	 */
-	public void init(FilterConfig filterConfig) throws ServletException
+	public void init(FilterConfig conf) throws ServletException
 	{
+		String val = conf.getInitParameter("leasetime");
+		if(val!=null)
+		{
+			setLeaseTime(val);
+		}
+		else
+		{
+			setLeaseTime(5*60*1000);
+		}
 	}
 	
 	/**
-	 * 
+	 *  Destroy the filter.
 	 */
 	public void destroy()
 	{
@@ -58,52 +85,170 @@ public class ForwardFilter implements Filter
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
-		boolean forwarded = false;
+		boolean fini = false;
 		
 		if(request instanceof HttpServletRequest)
 		{
 			HttpServletRequest req = (HttpServletRequest)request;
 			HttpServletResponse res = (HttpServletResponse)response;
-//			String path = req.getRequestURI().substring(req.getContextPath().length());
-			
-			String requri = req.getRequestURI();
-			
-			for(ForwardInfo fi: getForwardInfos())
+			String requri = req.getRequestURI().substring(req.getContextPath().length());
+//			String requri = req.getRequestURI();
+		
+			if(requri.startsWith(addprefix))
 			{
-				if(requri.startsWith(fi.getAppPath()))
+				removeDueMappings();
+				
+				String apppath = request.getParameter("name");
+				String target = request.getParameter("target");
+				ForwardInfo fi = infos.get(apppath);
+				if(fi!=null)
 				{
-					// forward to other server
-					StringBuffer buf = new StringBuffer();
-					buf.append(fi.forwardpath);
-					if(requri.length()>fi.getAppPath().length())
+					fi.setForwardPath(target);
+					fi.setTime(System.currentTimeMillis());
+				}
+				else
+				{
+					infos.put(apppath, new ForwardInfo(apppath, target));
+				}
+				res.sendRedirect("displayMappings");
+				fini = true;
+			}
+			else if(requri.startsWith(remprefix))
+			{
+				removeDueMappings();
+				
+				String apppath = request.getParameter("name");
+				infos.remove(apppath);
+				res.sendRedirect("displayMappings");
+				fini = true;
+			}
+			else if(requri.startsWith(refprefix))
+			{
+				String apppath = request.getParameter("name");
+				ForwardInfo fi = infos.get(apppath);
+				if(fi!=null)
+				{
+					fi.setTime(System.currentTimeMillis());
+					res.sendRedirect("displayMappings");
+				}
+				else
+				{
+					res.sendError(500, "Mapping not found: "+apppath);
+				}
+				
+				removeDueMappings();
+				fini = true;
+			}
+			else if(requri.startsWith(disprefix))
+			{
+				removeDueMappings();
+				
+				sendDisplayMappings(res);
+				fini = true;
+			}
+			else if(requri.startsWith(gltprefix))
+			{
+				removeDueMappings();
+				
+				String apppath = request.getParameter("name");
+				ForwardInfo fi = infos.get(apppath);
+				if(fi!=null)
+				{
+					res.getWriter().write(""+leasetime);
+				}
+				else
+				{
+					res.sendError(500, "Mapping not found: "+apppath);
+				}
+				fini = true;
+			}
+			else if(requri.startsWith(sltprefix))
+			{
+				removeDueMappings();
+				
+				String lt = request.getParameter("leasetime");
+				setLeaseTime(lt);
+				res.sendRedirect("displayMappings");
+				fini = true;
+			}
+			else
+			{
+				for(ForwardInfo fi: getForwardInfos())
+				{
+					if(requri.startsWith(fi.getAppPath()))
 					{
-						String add = requri.substring(fi.getAppPath().length());
-						buf.append(add);
+						removeDueMappings();
+						
+						// forward to other server
+						StringBuffer buf = new StringBuffer();
+						buf.append(fi.forwardpath);
+						if(requri.length()>fi.getAppPath().length())
+						{
+							String add = requri.substring(fi.getAppPath().length());
+							buf.append(add);
+						}
+						if(req.getQueryString()!=null)
+						{
+							buf.append(req.getQueryString());
+						}
+						
+						// Cannot use request dispatcher as it only allows for server internal forwards :-((
+						sendForward(buf.toString(), req, res);
+						fini = true;
 					}
-					if(req.getQueryString()!=null)
-					{
-						buf.append(req.getQueryString());
-					}
-					
-					// Cannot use request dispatcher as it only allows for server internal forwards :-((
-					sendForward(buf.toString(), req, res);
-					forwarded = true;
 				}
 			}
 		}
 		
-		if(!forwarded)
+		if(!fini)
 		{
 			chain.doFilter(request, response); // Goes to default servlet.
 		}
 	}
 	
 	/**
+	 *  Remove all mappings with too old timestamps.
+	 */
+	protected void removeDueMappings()
+	{
+		long now = System.currentTimeMillis();
+		for(ForwardInfo fi: getForwardInfos())
+		{
+			if(now>fi.getTime()+leasetime)
+			{
+				infos.remove(fi.getAppPath());
+			}
+		}
+	}
+	
+	/**
+	 *  Set the lease time.
+	 *  @param leasetime The lease time.
+	 */
+	public void setLeaseTime(long leasetime) 
+	{
+		this.leasetime = leasetime;
+	}
+	
+	/**
+	 *  Set the lease time.
+	 *  @param leasetime The lease time.
+	 */
+	public void setLeaseTime(String val) 
+	{
+		if(val!=null)
+		{
+			int mins = Integer.valueOf(val);
+			leasetime = mins*60*1000;
+		}
+	}
+
+	/**
 	 * 
 	 */
 	protected ForwardInfo[] getForwardInfos()
 	{
-		return infos.toArray(new ForwardInfo[0]);
+		return infos.values().toArray(new ForwardInfo[0]);
 	}
 	
 	/**
@@ -161,13 +306,98 @@ public class ForwardFilter implements Filter
 		{
 			// todo: handle output in error case
 		    System.out.println("Exception: " + e);
-		} 
+		    try
+		    {
+		    	response.sendError(500, "Exception occurred: "+e.getMessage());
+		    }
+		    catch(Exception ex)
+		    {
+		    	// ignore
+		    }
+		}
 		finally
 		{
 			if(con!=null)
 			{
 				try{con.disconnect();}catch(Exception e){}
 			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void sendDisplayMappings(HttpServletResponse response)
+	{
+		try
+		{
+			response.setContentType("text/html");
+			PrintWriter pw = response.getWriter();
+			pw.write("<html><head></head><body>");
+			pw.write("<h1>Current Mappings</h1>");
+			ForwardInfo[] fis = getForwardInfos();
+			if(fis.length==0)
+			{
+				pw.write("No mappings available.");
+			}
+			else
+			{
+				SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+				pw.write("<table cellspacing=\"0\">");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Local Name</th>");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Remote Address</th>");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Timestamp</th>");
+				pw.write("<th style=\"border-bottom:solid 1px black; padding:10px 10px\">Actions</th>");
+				for(ForwardInfo fi: fis)
+				{
+					pw.write("<tr>");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+fi.getAppPath()+"</td>");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+fi.getForwardPath()+"</td>");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+df.format(new Date(fi.getTime()))+"</td>");
+					pw.write("<td style=\"padding:0px 10px\">");
+					pw.write("<a href=\"removeMapping?name="+fi.getAppPath()+"\">Remove</a>");
+					pw.write("  ");
+					pw.write("<a href=\"refreshMapping?name="+fi.getAppPath()+"\">Refresh</a>");
+					pw.write("</td>");
+					pw.write("</tr>");
+				}
+				pw.write("</table>");
+			}
+				
+			pw.write("<h2>Add a Mapping</h2>");
+			pw.write("<form name=\"input\" action=\"addMapping\" method=\"get\">");
+			pw.write("<table cellspacing=\"0\">");
+			pw.write("<tr><td>Application name:</td><td><input type=\"text\" name=\"name\"/></td></tr>");
+			pw.write("<tr><td>Remote server address:</td><td><input type=\"text\" name=\"target\"/></td></tr>");
+			pw.write("<tr><td><input type=\"submit\" value=\"Add\"/></td></tr>");
+			pw.write("</table>");
+			pw.write("</form>");
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+			pw.write("<h2>Leasetime</h2>");
+//			pw.write("Leasetime [mins]: ");
+			String lt = leasetime==0? "0": ""+(leasetime/1000/60);
+//			pw.write(lt);
+//			pw.write(sdf.format(new Date(leasetime-TimeZone.getDefault().getRawOffset())));
+			pw.write("<form name=\"input\" action=\"setLeasetime\" method=\"get\">");
+			pw.write("<table cellspacing=\"0\">");
+			pw.write("<tr><td>Leasetime [mins]:</td><td><input type=\"text\" name=\"leasetime\" value=\""+lt+"\"/></input></td></tr>");
+			pw.write("<tr><td><input type=\"submit\" value=\"Set\"/></td></tr>");
+			pw.write("</table>");
+			pw.write("</form>");
+			
+			pw.write("<body></html>");
+		}
+		catch(Exception e)
+		{
+			try
+		    {
+		    	response.sendError(500, "Exception occurred: "+e.getMessage());
+		    }
+		    catch(Exception ex)
+		    {
+		    	// ignore
+		    }
 		}
 	}
 	
@@ -215,7 +445,8 @@ public class ForwardFilter implements Filter
 		public ForwardInfo(String apppath, String forwardpath)
 		{
 			this.apppath = apppath;
-			this.forwardpath = forwardpath;
+//			this.apppath = apppath.startsWith("/")? apppath: "/"+apppath;
+			this.forwardpath = forwardpath.startsWith("http")? forwardpath: "http://"+forwardpath;
 			this.time = System.currentTimeMillis();
 		}
 
