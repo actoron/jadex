@@ -9,11 +9,16 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -42,7 +47,8 @@ import javax.servlet.http.HttpSession;
  *  /refreshMapping?name=a      : Update time stamp of mapping
  *  /displayMappings			: Show the current mappings in html
  *  /getLeasetime				: Get the lease time
- *  /setLeasetime?leasetime=a	: Set the lease time			
+ *  /setLeasetime?leasetime=a	: Set the lease time	
+ *  /login?user=a&pass=b		: Login		
  */
 public class ForwardFilter implements Filter
 {
@@ -52,13 +58,15 @@ public class ForwardFilter implements Filter
 	/** The known users and passwords. */
 	protected static Map<String, String> users = Collections.synchronizedMap(new HashMap<String, String>());
 	
-	public static final String addmapping = "/addMapping";
-	public static final String remmapping = "/removeMapping";
-	public static final String refreshmapping = "/refreshMapping";
-	public static final String displaymappings = "/displayMappings";
-	public static final String getleasetime = "/getLeasetime";
-	public static final String setleasetime = "/setLeasetime";
-	public static final String login = "/login";
+	public static final String addmapping = "addMapping";
+	public static final String remmapping = "removeMapping";
+	public static final String refreshmapping = "refreshMapping";
+	public static final String displaymappings = "displayMappings";
+	public static final String getleasetime = "getLeasetime";
+	public static final String setleasetime = "setLeasetime";
+	public static final String login = "login";
+	
+	public static final Set<String> commands = Collections.synchronizedSet(new HashSet<String>());
 	
 	public static final String authenticated = "authenticated";
 	
@@ -68,6 +76,14 @@ public class ForwardFilter implements Filter
 	static
 	{
 		users.put("admin", "admin");
+		
+		commands.add(addmapping);
+		commands.add(remmapping);
+		commands.add(refreshmapping);
+		commands.add(displaymappings);
+		commands.add(getleasetime);
+		commands.add(setleasetime);
+		commands.add(login);
 	}
 	
 	/**
@@ -104,41 +120,100 @@ public class ForwardFilter implements Filter
 		{
 			HttpServletRequest req = (HttpServletRequest)request;
 			HttpServletResponse res = (HttpServletResponse)response;
-			String requri = req.getRequestURI().substring(req.getContextPath().length());
-//			String requri = req.getRequestURI();
-		
-			if(requri.startsWith(login) && "https".equals(req.getScheme()))
+			String requri = req.getRequestURI().substring(req.getContextPath().length()).replace("/","");
+			List<String> mimetypes = null;
+			boolean json = false;
+			
+			if(commands.contains(requri))
 			{
-				String user = request.getParameter("user");
-				String pass = request.getParameter("pass");
-				String next = request.getParameter("next");
-				
-				if(pass.equals(users.get(user)))
+				removeDueMappings();
+				fini = checkSecure(req, res); // check if https is used
+				if(!fini && !login.equals(requri)) // check if user has logged in
 				{
-					HttpSession session = req.getSession();
-					session.setAttribute(authenticated, Boolean.TRUE);
-					if(next!=null)
+					fini = checkAuthentication(req, res);
+				}
+				if(!fini)
+				{
+					String mts = req.getHeader("Accept");
+					if(mts!=null)
 					{
-						res.sendRedirect(next);
+						StringTokenizer stok = new StringTokenizer(mts, ",");
+						while(stok.hasMoreTokens())
+						{
+							String tok = stok.nextToken();
+							StringTokenizer substok = new StringTokenizer(tok, ";");
+							String mt = substok.nextToken();
+							if(mimetypes==null)
+							{
+								mimetypes = new ArrayList<String>();
+							}
+							mimetypes.add(mt);
+						}
+						if(mimetypes.contains("application/json"))
+						{
+							json = true;
+						}
+					}
+				}
+			}
+
+			if(!fini)
+			{
+				if(login.equals(requri))
+				{
+					String user = request.getParameter("user");
+					String pass = request.getParameter("pass");
+					String next = request.getParameter("next");
+					
+					if(user==null)
+					{
+						if(json)
+						{
+							res.getWriter().write("{authenticated: false, reason=\"no username/password given\"}");
+						}
+						else
+						{
+							sendLoginPage(res);
+						}
 					}
 					else
 					{
-						res.sendRedirect("displayMappings");
+						if(pass.equals(users.get(user)))
+						{
+							HttpSession session = req.getSession();
+							session.setAttribute(authenticated, Boolean.TRUE);
+							
+							if(json)
+							{
+								res.getWriter().write("{authenticated: true}");
+							}
+							else
+							{
+								if(next!=null)
+								{
+									res.sendRedirect(next);
+								}
+								else
+								{
+									res.sendRedirect("displayMappings");
+								}
+							}
+						}
+						else
+						{
+							if(json)
+							{
+								res.getWriter().write("{authenticated: false, reason=\"username/password incorrect\"}");
+							}
+							else
+							{
+								res.sendError(401);
+							}
+						}
 					}
+					fini = true;
 				}
-				else
-				{
-					res.sendError(401);
-				}
-				fini = true;
-			}
-			else if(requri.startsWith(addmapping))
-			{
-				removeDueMappings();
-				
-				fini = checkAuthentication(req, res);
-				
-				if(!fini)
+				else if(addmapping.equals(requri))
 				{
 					String apppath = request.getParameter("name");
 					String target = request.getParameter("target");
@@ -152,38 +227,33 @@ public class ForwardFilter implements Filter
 					{
 						infos.put(apppath, new ForwardInfo(apppath, target));
 					}
-					res.sendRedirect("displayMappings");
+					if(!json)
+					{
+						res.sendRedirect("displayMappings");
+					}
 					fini = true;
 				}
-			}
-			else if(requri.startsWith(remmapping))
-			{
-				removeDueMappings();
-
-				fini = checkAuthentication(req, res);
-
-				if(!fini)
+				else if(remmapping.equals(requri))
 				{
 					String apppath = request.getParameter("name");
-					infos.remove(apppath);
-					res.sendRedirect("displayMappings");
+					ForwardInfo old = infos.remove(apppath);
+					if(!json)
+					{
+						res.sendRedirect("displayMappings");
+					}
 					fini = true;
 				}
-			}
-			else if(requri.startsWith(refreshmapping))
-			{
-				removeDueMappings();
-				
-				fini = checkAuthentication(req, res);
-
-				if(!fini)
+				else if(refreshmapping.equals(requri))
 				{
 					String apppath = request.getParameter("name");
 					ForwardInfo fi = infos.get(apppath);
 					if(fi!=null)
 					{
 						fi.setTime(System.currentTimeMillis());
-						res.sendRedirect("displayMappings");
+						if(!json)
+						{
+							res.sendRedirect("displayMappings");
+						}
 					}
 					else
 					{
@@ -191,78 +261,68 @@ public class ForwardFilter implements Filter
 					}
 					fini = true;
 				}
-			}
-			else if(requri.startsWith(displaymappings))
-			{
-				removeDueMappings();
-				
-				fini = checkAuthentication(req, res);
-
-				if(!fini)
+				else if(displaymappings.equals(requri))
 				{
+					// if(!json) ???
 					sendDisplayMappings(res);
 					fini = true;
 				}
-			}
-			else if(requri.startsWith(getleasetime))
-			{
-				removeDueMappings();
-				
-				fini = checkAuthentication(req, res);
-
-				if(!fini)
+				else if(getleasetime.equals(requri))
 				{
 					String apppath = request.getParameter("name");
-					ForwardInfo fi = infos.get(apppath);
-					if(fi!=null)
+					if(apppath!=null)
 					{
-						res.getWriter().write(""+leasetime);
+						ForwardInfo fi = infos.get(apppath);
+						if(fi!=null)
+						{
+							res.getWriter().write("{leasetime="+fi.getTime()+leasetime+"}");
+						}
+						else
+						{
+							res.sendError(500, "Mapping not found: "+apppath);
+						}
 					}
 					else
 					{
-						res.sendError(500, "Mapping not found: "+apppath);
+						res.getWriter().write("{leasetime="+leasetime+"}");
 					}
 					fini = true;
 				}
-			}
-			else if(requri.startsWith(setleasetime))
-			{
-				removeDueMappings();
-				
-				fini = checkAuthentication(req, res);
-
-				if(!fini)
+				else if(setleasetime.equals(requri))
 				{
 					String lt = request.getParameter("leasetime");
 					setLeaseTime(lt);
-					res.sendRedirect("displayMappings");
+					if(!json)
+					{
+						res.sendRedirect("displayMappings");
+					}
 					fini = true;
 				}
-			}
-			else
-			{
-				for(ForwardInfo fi: getForwardInfos())
+				else
 				{
-					if(requri.startsWith(fi.getAppPath()))
+					for(ForwardInfo fi: getForwardInfos())
 					{
-						removeDueMappings();
-						
-						// forward to other server
-						StringBuffer buf = new StringBuffer();
-						buf.append(fi.forwardpath);
-						if(requri.length()>fi.getAppPath().length())
+						if(requri.startsWith(fi.getAppPath()))
 						{
-							String add = requri.substring(fi.getAppPath().length());
-							buf.append(add);
+							removeDueMappings();
+							
+							// forward to other server
+							StringBuffer buf = new StringBuffer();
+							buf.append(fi.forwardpath);
+							if(requri.length()>fi.getAppPath().length())
+							{
+								String add = requri.substring(fi.getAppPath().length());
+								buf.append(add);
+							}
+							if(req.getQueryString()!=null)
+							{
+								buf.append(req.getQueryString());
+							}
+							
+							// Cannot use request dispatcher as it only allows for server internal forwards :-((
+							sendForward(buf.toString(), req, res);
+							fini = true;
 						}
-						if(req.getQueryString()!=null)
-						{
-							buf.append(req.getQueryString());
-						}
-						
-						// Cannot use request dispatcher as it only allows for server internal forwards :-((
-						sendForward(buf.toString(), req, res);
-						fini = true;
 					}
 				}
 			}
@@ -272,6 +332,30 @@ public class ForwardFilter implements Filter
 		{
 			chain.doFilter(request, response); // Goes to default servlet.
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean checkSecure(HttpServletRequest request, HttpServletResponse response) throws IOException
+	{
+		boolean fini = false;
+		if(!request.isSecure())
+		{
+			String url = request.getRequestURL().toString().replaceFirst("http", "https");
+			if(request.getServerPort()==8080)
+			{
+				url = url.replaceFirst("8080", "8443");
+			}
+			if(request.getQueryString()!=null)
+			{
+				url += request.getQueryString();
+			}
+			
+			response.sendRedirect(url);
+			fini = true;
+		}
+		return fini;
 	}
 	
 	/**
@@ -507,6 +591,41 @@ public class ForwardFilter implements Filter
 	}
 	
 	/**
+	 * 
+	 */
+	public void sendLoginPage(HttpServletResponse response)
+	{
+		try
+		{
+			response.setContentType("text/html");
+			PrintWriter pw = response.getWriter();
+			pw.write("<html><head></head><body>");
+			pw.write("<h1>Login</h1>");
+			
+			pw.write("<form name=\"input\" action=\"login\" method=\"get\">");
+			pw.write("<table cellspacing=\"0\">");
+			pw.write("<tr><td>User name:</td><td><input type=\"text\" name=\"user\"/></td></tr>");
+			pw.write("<tr><td>Password:</td><td><input type=\"text\" name=\"pass\"/></td></tr>");
+			pw.write("<tr><td><input type=\"submit\" value=\"Login\"/></td></tr>");
+			pw.write("</table>");
+			pw.write("</form>");
+			
+			pw.write("<body></html>");
+		}
+		catch(Exception e)
+		{
+			try
+		    {
+		    	response.sendError(500, "Exception occurred: "+e.getMessage());
+		    }
+		    catch(Exception ex)
+		    {
+		    	// ignore
+		    }
+		}
+	}
+	
+	/**
 	 *  Copy all data from input to output stream.
 	 */
 	public static void copyStream(InputStream is, OutputStream os) 
@@ -629,6 +748,39 @@ public class ForwardFilter implements Filter
 				ret = other.getAppPath().equals(getAppPath());
 			}
 			return ret;
+		}
+	}
+	
+	/**
+	 *  Main for testing. 
+	 */
+	public static void main(String[] args)
+	{
+		try
+		{
+			URL url = new URL("http://localhost:8080/test/addMapping?name=a&target=a");
+			HttpURLConnection con = (HttpURLConnection)url.openConnection();
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Accept", "application/json");
+
+			if(con.getResponseCode() != 200)
+			{
+			}
+
+			BufferedReader br = new BufferedReader(new InputStreamReader((con.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server .... \n");
+			while((output = br.readLine()) != null)
+			{
+				System.out.println(output);
+			}
+
+			con.disconnect();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 }
