@@ -11,6 +11,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *  The forward filter is a kind of web proxy that offers rest methods to adjust its mappings.
@@ -47,15 +49,26 @@ public class ForwardFilter implements Filter
 	/** The mapping infos. */
 	protected static Map<String, ForwardInfo> infos = Collections.synchronizedMap(new LinkedHashMap<String, ForwardInfo>());
 	
-	public static final String addprefix = "/addMapping";
-	public static final String remprefix = "/removeMapping";
-	public static final String refprefix = "/refreshMapping";
-	public static final String disprefix = "/displayMappings";
-	public static final String gltprefix = "/getLeasetime";
-	public static final String sltprefix = "/setLeasetime";
+	/** The known users and passwords. */
+	protected static Map<String, String> users = Collections.synchronizedMap(new HashMap<String, String>());
+	
+	public static final String addmapping = "/addMapping";
+	public static final String remmapping = "/removeMapping";
+	public static final String refreshmapping = "/refreshMapping";
+	public static final String displaymappings = "/displayMappings";
+	public static final String getleasetime = "/getLeasetime";
+	public static final String setleasetime = "/setLeasetime";
+	public static final String login = "/login";
+	
+	public static final String authenticated = "authenticated";
 	
 	/** The lease time in millis. */
 	protected long leasetime;
+	
+	static
+	{
+		users.put("admin", "admin");
+	}
 	
 	/**
 	 *  Init the filter.
@@ -94,82 +107,137 @@ public class ForwardFilter implements Filter
 			String requri = req.getRequestURI().substring(req.getContextPath().length());
 //			String requri = req.getRequestURI();
 		
-			if(requri.startsWith(addprefix))
+			if(requri.startsWith(login) && "https".equals(req.getScheme()))
 			{
-				removeDueMappings();
+				String user = request.getParameter("user");
+				String pass = request.getParameter("pass");
+				String next = request.getParameter("next");
 				
-				String apppath = request.getParameter("name");
-				String target = request.getParameter("target");
-				ForwardInfo fi = infos.get(apppath);
-				if(fi!=null)
+				if(pass.equals(users.get(user)))
 				{
-					fi.setForwardPath(target);
-					fi.setTime(System.currentTimeMillis());
+					HttpSession session = req.getSession();
+					session.setAttribute(authenticated, Boolean.TRUE);
+					if(next!=null)
+					{
+						res.sendRedirect(next);
+					}
+					else
+					{
+						res.sendRedirect("displayMappings");
+					}
 				}
 				else
 				{
-					infos.put(apppath, new ForwardInfo(apppath, target));
+					res.sendError(401);
 				}
-				res.sendRedirect("displayMappings");
 				fini = true;
 			}
-			else if(requri.startsWith(remprefix))
+			else if(requri.startsWith(addmapping))
 			{
 				removeDueMappings();
 				
-				String apppath = request.getParameter("name");
-				infos.remove(apppath);
-				res.sendRedirect("displayMappings");
-				fini = true;
-			}
-			else if(requri.startsWith(refprefix))
-			{
-				String apppath = request.getParameter("name");
-				ForwardInfo fi = infos.get(apppath);
-				if(fi!=null)
+				fini = checkAuthentication(req, res);
+				
+				if(!fini)
 				{
-					fi.setTime(System.currentTimeMillis());
+					String apppath = request.getParameter("name");
+					String target = request.getParameter("target");
+					ForwardInfo fi = infos.get(apppath);
+					if(fi!=null)
+					{
+						fi.setForwardPath(target);
+						fi.setTime(System.currentTimeMillis());
+					}
+					else
+					{
+						infos.put(apppath, new ForwardInfo(apppath, target));
+					}
 					res.sendRedirect("displayMappings");
+					fini = true;
 				}
-				else
-				{
-					res.sendError(500, "Mapping not found: "+apppath);
-				}
-				
-				removeDueMappings();
-				fini = true;
 			}
-			else if(requri.startsWith(disprefix))
+			else if(requri.startsWith(remmapping))
+			{
+				removeDueMappings();
+
+				fini = checkAuthentication(req, res);
+
+				if(!fini)
+				{
+					String apppath = request.getParameter("name");
+					infos.remove(apppath);
+					res.sendRedirect("displayMappings");
+					fini = true;
+				}
+			}
+			else if(requri.startsWith(refreshmapping))
 			{
 				removeDueMappings();
 				
-				sendDisplayMappings(res);
-				fini = true;
+				fini = checkAuthentication(req, res);
+
+				if(!fini)
+				{
+					String apppath = request.getParameter("name");
+					ForwardInfo fi = infos.get(apppath);
+					if(fi!=null)
+					{
+						fi.setTime(System.currentTimeMillis());
+						res.sendRedirect("displayMappings");
+					}
+					else
+					{
+						res.sendError(500, "Mapping not found: "+apppath);
+					}
+					fini = true;
+				}
 			}
-			else if(requri.startsWith(gltprefix))
+			else if(requri.startsWith(displaymappings))
 			{
 				removeDueMappings();
 				
-				String apppath = request.getParameter("name");
-				ForwardInfo fi = infos.get(apppath);
-				if(fi!=null)
+				fini = checkAuthentication(req, res);
+
+				if(!fini)
 				{
-					res.getWriter().write(""+leasetime);
+					sendDisplayMappings(res);
+					fini = true;
 				}
-				else
-				{
-					res.sendError(500, "Mapping not found: "+apppath);
-				}
-				fini = true;
 			}
-			else if(requri.startsWith(sltprefix))
+			else if(requri.startsWith(getleasetime))
 			{
 				removeDueMappings();
 				
-				String lt = request.getParameter("leasetime");
-				setLeaseTime(lt);
-				res.sendRedirect("displayMappings");
-				fini = true;
+				fini = checkAuthentication(req, res);
+
+				if(!fini)
+				{
+					String apppath = request.getParameter("name");
+					ForwardInfo fi = infos.get(apppath);
+					if(fi!=null)
+					{
+						res.getWriter().write(""+leasetime);
+					}
+					else
+					{
+						res.sendError(500, "Mapping not found: "+apppath);
+					}
+					fini = true;
+				}
+			}
+			else if(requri.startsWith(setleasetime))
+			{
+				removeDueMappings();
+				
+				fini = checkAuthentication(req, res);
+
+				if(!fini)
+				{
+					String lt = request.getParameter("leasetime");
+					setLeaseTime(lt);
+					res.sendRedirect("displayMappings");
+					fini = true;
+				}
 			}
 			else
 			{
@@ -204,6 +272,43 @@ public class ForwardFilter implements Filter
 		{
 			chain.doFilter(request, response); // Goes to default servlet.
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean checkAuthentication(HttpServletRequest request, HttpServletResponse response) throws IOException
+	{
+		boolean fini = false;
+		if(!isAuthenticated(request, response))
+		{
+			fini = true;
+			String next = request.getRequestURI();
+			if(request.getQueryString()==null)
+			{
+				response.sendRedirect("login?next="+next);
+			}
+			else
+			{
+				response.sendRedirect("login?next="+next+request.getQueryString());
+			}
+		}
+		return fini;
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isAuthenticated(HttpServletRequest request, HttpServletResponse response)
+	{
+		boolean ret = false;
+		HttpSession session = request.getSession(false);
+		if(session!=null)
+		{
+			Boolean auth = (Boolean)session.getAttribute(authenticated);
+			ret = auth==null? false: auth.booleanValue();
+		}
+		return ret;
 	}
 	
 	/**
