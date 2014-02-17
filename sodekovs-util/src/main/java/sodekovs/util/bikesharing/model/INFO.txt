@@ -1,9 +1,0 @@
-Diese Dateien sind mit JAXB automatisch aus dem XML-Schema zum Bikesharing generiert.
-
-Schema: /Modellierung/BikeSimulationSchema.xsd  im SodekoVS-SVN
-
-Vorgehen:
-
-1)	Es wird das Programm „xjc“ im „bin Order“ vom Java SDK genutzt, um aus dem XSD-File die Java Klassen zu generieren. Deshalb in der Console in den Ordner wechseln, dort das XSD-File reinkopieren und folgenden Befehl ausführen. WICHTIG: Unter Win7 muss die Kommandozeile (cmd) als Admin gestartet werden:
-a.	“xjc -p sodekovs.bikesharing.model BikeSimulationSchema.xsd” in die Console eintippen.
-

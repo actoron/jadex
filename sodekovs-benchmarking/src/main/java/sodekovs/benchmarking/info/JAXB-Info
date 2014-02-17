@@ -1,3 +1,0 @@
-Neuer Workfow wegen JAXB:
-1)	Es wird das Programm „xjc“ im „bin Order“ vom Java SDK genutzt, um aus dem XSD-File die Java Klassen zu generieren. Deshalb in der Console in den Ordner wechseln, dort das XSD-File reinkopieren und folgenden Befehl ausführen. WICHTIG: Unter Win7 muss die Kommandozeile (cmd) als Admin gestartet werden:
-a.	“xjc -p jadex.benchmarking.model BenchmarkingModel.xsd”
