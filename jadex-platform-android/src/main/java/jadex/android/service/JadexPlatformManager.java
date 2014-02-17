@@ -346,6 +346,7 @@ public class JadexPlatformManager implements IJadexPlatformManager
 		{
 			shutdownJadexPlatform(platformId);
 		}
+		sharedPlatformAccess = null;
 	}
 
 	/**
