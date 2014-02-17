@@ -68,6 +68,7 @@ public class JadexMultiPlatformService extends Service implements IJadexMultiPla
 	public void onDestroy()
 	{
 		super.onDestroy();
+		// TODO: check for shared platform
 		jadexPlatformManager.shutdownJadexPlatforms();
 		Context base = this.getBaseContext();
 		if (base != null) {
