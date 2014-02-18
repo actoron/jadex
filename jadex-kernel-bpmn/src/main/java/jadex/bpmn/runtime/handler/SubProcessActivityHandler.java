@@ -64,7 +64,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //			thread.setWaitingState(ProcessThread.WAITING_FOR_SUBPROCESS);
 //			thread.setWaiting(true);
 			
-			boolean	wait	= true;
+			boolean wait	= true;
 			
 			if(MSubProcess.SUBPROCESSTYPE_PARALLEL.equals(proc.getSubprocessType()))
 			{
@@ -72,12 +72,13 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				// If empty parallel activity (i.e. no items at all) continue process.
 				if(!it.hasNext())
 				{
-					wait	= false;
+					wait = false;
 				}
 				else
 				{
 					ThreadContext subcontext = new ThreadContext(proc, thread);
-					thread.getThreadContext().addSubcontext(subcontext);
+//					thread.getThreadContext().addSubcontext(subcontext);
+					thread.setSubcontext(subcontext);
 					while(it.hasNext())
 					{
 						Object	value	= it.next();
@@ -133,7 +134,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			{
 				ThreadContext subcontext = new ThreadContext(proc, thread);
 				subcontext.setHardConstraints(proc.getHardConstraints() != null? new RHardConstraints(proc.getHardConstraints()) : null);
-				thread.getThreadContext().addSubcontext(subcontext);
+//				thread.getThreadContext().addSubcontext(subcontext);
+				thread.setSubcontext(subcontext);
 				for(int i=0; i<start.size(); i++)
 				{
 					ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
@@ -142,7 +144,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //						subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
 //					instance.notifyListeners(cce);
 				}
-			}
+			}	
 			
 			if(wait)
 			{

@@ -9,8 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,6 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ *  A map implementation supporting automatic serialization its data
+ *  and persisting it on disk.
+ */
 public class PersistentMap<K, V> implements Map<K, V>
 {
 	/** The index map, key to position and size of value. */
@@ -33,8 +35,8 @@ public class PersistentMap<K, V> implements Map<K, V>
 	/** Random access to the persistence file */
 	protected RandomAccessFile raf;
 	
-	/** Counter for dirty entries. */
-	protected long dirtycounter;
+	/** Bytes of dirty entries. */
+	protected long dirtybytes;
 	
 	/** Dirty threshold for auto-compaction. */
 	protected long autocompactionthreshold;
@@ -42,8 +44,14 @@ public class PersistentMap<K, V> implements Map<K, V>
 	/** Class loader used for serialization. */
 	protected ClassLoader classloader;
 	
+	/** Lock for the compaction shadow map. */
+	protected Object shadowlock = new Object();
+	
+	/** Object counter for shadow map. */
+	protected int shadowcounter = 0;
+	
 	/** Shadow map used during compaction. */
-//	protected volatile PersistentMap<Object, Object> compactionshadowmap;
+	protected volatile PersistentMap<Object, Object> compactionshadowmap;
 	
 	/**
 	 *  Creates the map.
@@ -52,9 +60,9 @@ public class PersistentMap<K, V> implements Map<K, V>
 	 */
 	public PersistentMap(File file, boolean synchronous, ClassLoader classloader)
 	{
-		dirtycounter = 0;
+		dirtybytes = 0;
 		autocompactionthreshold = Long.MAX_VALUE;
-//		compactionshadowmap = null;
+		compactionshadowmap = null;
 		indexmap = new HashMap<K, ValueInfo>();
 		this.classloader = classloader != null? classloader : PersistentMap.class.getClassLoader();
 		if (!file.exists())
@@ -90,7 +98,7 @@ public class PersistentMap<K, V> implements Map<K, V>
 			buildIndex();
 		}
 		
-		if (dirtycounter > 0)
+		if (dirtybytes > 0)
 		{
 			compact();
 		}
@@ -136,6 +144,8 @@ public class PersistentMap<K, V> implements Map<K, V>
 		System.out.println(delta);
 		System.out.println((double) writes / delta * 1000);
 		
+		System.out.println("Dirty: " + pm.getDirtyBytes());
+		
 		for (int i = 0; i < 10000; ++i)
 		{
 			if (i % 100 == 0)
@@ -148,10 +158,11 @@ public class PersistentMap<K, V> implements Map<K, V>
 			}
 		}
 		
-		System.out.println("Dirty: " + pm.getDirtyCounter());
+		System.out.println("Dirty: " + pm.getDirtyBytes());
 		
 		ts = System.currentTimeMillis();
 		pm.compact();
+		pm.waitForCompaction();
 		System.out.println("Compaction took: " + (System.currentTimeMillis() - ts));
 //		for (int i = 0; i < 10000; ++i)
 //		{
@@ -171,7 +182,7 @@ public class PersistentMap<K, V> implements Map<K, V>
      */
     public int size()
     {
-    	return indexmap.size();
+    	return indexmap.size() + shadowcounter;
     }
 
     /**
@@ -180,6 +191,17 @@ public class PersistentMap<K, V> implements Map<K, V>
      */
     public boolean isEmpty()
     {
+    	if (compactionshadowmap != null)
+    	{
+    		synchronized (shadowlock)
+			{
+				if (compactionshadowmap != null)
+				{
+					return compactionshadowmap.isEmpty() && indexmap.isEmpty();
+				}
+			}
+    	}
+    	
     	return indexmap.isEmpty();
     }
 
@@ -189,6 +211,17 @@ public class PersistentMap<K, V> implements Map<K, V>
      */
     public boolean containsKey(Object key)
     {
+    	if (compactionshadowmap != null)
+    	{
+    		synchronized (shadowlock)
+			{
+				if (compactionshadowmap != null)
+				{
+					return indexmap.containsKey(key) || compactionshadowmap.containsKey(key);
+				}
+			}
+    	}
+    	
     	return indexmap.containsKey(key);
     }
 
@@ -200,6 +233,17 @@ public class PersistentMap<K, V> implements Map<K, V>
      */
     public boolean containsValue(Object value)
     {
+    	if (compactionshadowmap != null)
+    	{
+    		synchronized (shadowlock)
+			{
+				if (compactionshadowmap != null)
+				{
+					waitForCompaction();
+				}
+			}
+    	}
+    	
     	for (Map.Entry<K, ValueInfo> entry : indexmap.entrySet())
     	{
     		if (value != null)
@@ -226,42 +270,66 @@ public class PersistentMap<K, V> implements Map<K, V>
     public V get(Object key)
     {
     	V ret = null;
-    	ValueInfo vinfo = indexmap.get(key);
     	
-    	if (vinfo != null)
+    	boolean deleted = false;
+    	
+    	if (compactionshadowmap != null)
     	{
-	    	try
+    		synchronized (shadowlock)
+			{
+				if (compactionshadowmap != null)
+				{
+					if (compactionshadowmap.containsKey(new DeletedKey(key)))
+					{
+						deleted = true;
+					}
+					else
+					{
+						ret = (V) compactionshadowmap.get(key);
+					}
+				}
+			}
+    	}
+    	
+    	if (ret == null && !deleted)
+    	{
+	    	ValueInfo vinfo = indexmap.get(key);
+	    	
+	    	if (vinfo != null)
 	    	{
-	    		byte[] buf = new byte[vinfo.getSize()];
-	    		raf.seek(vinfo.getPosition());
-	    		raf.readFully(buf);
-//	    		ByteArrayInputStream inbuffer = new ByteArrayInputStream(buf);
-//	    		GZIPInputStream gzipinput = new GZIPInputStream(inbuffer);
-//	    		ByteArrayOutputStream outbuffer = new ByteArrayOutputStream();
-//	    		int read = 0;
-//	    		byte[] tmpbuf = new byte[16384];
-//	    		do
-//	    		{
-//	    			read = gzipinput.read(tmpbuf, 0, 16384);
-//	    			if (read > 0)
-//	    			{
-//	    				outbuffer.write(tmpbuf, 0, read);
-//	    			}
-//	    		}
-//	    		while (read != -1);
-//	    		tmpbuf = null;
-//	    		gzipinput.close();
-//	    		outbuffer.close();
-//	    		buf = outbuffer.toByteArray();
-//	    		inbuffer = null;
-//	    		gzipinput = null;
-//	    		outbuffer = null;
-	    		
-	    		ret = (V) BinarySerializer.objectFromByteArray(buf, null, null, classloader, null);
-	    	}
-	    	catch (IOException e)
-	    	{
-	    		throw new RuntimeException(e);
+		    	try
+		    	{
+		    		byte[] buf = new byte[vinfo.getSize()];
+		    		raf.seek(vinfo.getPosition());
+		    		raf.readFully(buf);
+	//	    		ByteArrayInputStream inbuffer = new ByteArrayInputStream(buf);
+	//	    		GZIPInputStream gzipinput = new GZIPInputStream(inbuffer);
+	//	    		ByteArrayOutputStream outbuffer = new ByteArrayOutputStream();
+	//	    		int read = 0;
+	//	    		byte[] tmpbuf = new byte[16384];
+	//	    		do
+	//	    		{
+	//	    			read = gzipinput.read(tmpbuf, 0, 16384);
+	//	    			if (read > 0)
+	//	    			{
+	//	    				outbuffer.write(tmpbuf, 0, read);
+	//	    			}
+	//	    		}
+	//	    		while (read != -1);
+	//	    		tmpbuf = null;
+	//	    		gzipinput.close();
+	//	    		outbuffer.close();
+	//	    		buf = outbuffer.toByteArray();
+	//	    		inbuffer = null;
+	//	    		gzipinput = null;
+	//	    		outbuffer = null;
+		    		
+		    		ret = (V) BinarySerializer.objectFromByteArray(buf, null, null, classloader, null);
+		    	}
+		    	catch (IOException e)
+		    	{
+		    		throw new RuntimeException(e);
+		    	}
 	    	}
     	}
     	
@@ -278,19 +346,20 @@ public class PersistentMap<K, V> implements Map<K, V>
      */
     public V put(K key, V value)
     {
-//    	if (compactionshadowmap != null)
-//    	{
-//    		synchronized(compactionshadowmap)
-//    		{
-//    			if (compactionshadowmap != null)
-//    			{
-//    				return (V) compactionshadowmap.put(key, value);
-//    			}
-//    		}
-//    	}
+    	if (compactionshadowmap != null)
+    	{
+    		synchronized(shadowlock)
+    		{
+    			if (compactionshadowmap != null)
+    			{
+    				++shadowcounter;
+    				return (V) compactionshadowmap.put(key, value);
+    			}
+    		}
+    	}
     	
     	V ret = doPut(key, value);
-    	if (dirtycounter > autocompactionthreshold)
+    	if (dirtybytes > autocompactionthreshold)
     	{
     		compact();
     	}
@@ -302,19 +371,22 @@ public class PersistentMap<K, V> implements Map<K, V>
      */
     public V remove(Object key)
     {
-//    	if (compactionshadowmap != null)
-//    	{
-//    		synchronized (compactionshadowmap)
-//			{
-//    			if (compactionshadowmap != null)
-//    			{
-//    				compactionshadowmap.put(new DeletedKey(key), null);
-//    			}
-//			}
-//    	}
+    	if (compactionshadowmap != null)
+    	{
+    		synchronized (shadowlock)
+			{
+    			if (compactionshadowmap != null)
+    			{
+    				V ret = get(key);
+    				compactionshadowmap.put(new DeletedKey(key), null);
+    				--shadowcounter;
+    				return ret;
+    			}
+			}
+    	}
     	
     	V ret = doRemove(key);
-    	if (dirtycounter > autocompactionthreshold)
+    	if (dirtybytes > autocompactionthreshold)
     	{
     		compact();
     	}
@@ -341,6 +413,8 @@ public class PersistentMap<K, V> implements Map<K, V>
      */
     public void clear()
     {
+    	waitForCompaction();
+    	
     	indexmap.clear();
     	try
 		{
@@ -357,9 +431,35 @@ public class PersistentMap<K, V> implements Map<K, V>
 
     /**
      *  Returns the keys of the map.
+     *  
+     *  Note: Unlike other maps, this is the preferred (fastest mode) for iteration.
      */
     public Set<K> keySet()
     {
+    	if (compactionshadowmap != null)
+    	{
+    		synchronized (shadowlock)
+			{
+    			if (compactionshadowmap != null)
+    			{
+    				Set<K> ret = new HashSet(indexmap.keySet());
+    				Set<Object> shadowkeys = compactionshadowmap.keySet();
+    				for (Object okey : shadowkeys)
+    				{
+    					if (okey instanceof PersistentMap.DeletedKey)
+    					{
+    						ret.remove(((DeletedKey) okey).getKey());
+    					}
+    					else
+    					{
+    						ret.add((K) okey);
+    					}
+    				}
+    				return ret;
+    			}
+			}
+    	}
+    	
     	return indexmap.keySet();
     }
 
@@ -370,6 +470,8 @@ public class PersistentMap<K, V> implements Map<K, V>
      */
     public Collection<V> values()
     {
+    	waitForCompaction();
+    	
     	List<V> ret = new ArrayList<V>(indexmap.size());
     	for (Map.Entry<K, ValueInfo> entry : indexmap.entrySet())
     	{
@@ -380,10 +482,14 @@ public class PersistentMap<K, V> implements Map<K, V>
 
     /**
      *  Returns the map's entry set.
+     *  
+     *  Warning: SLOW!
      */
     public Set<Map.Entry<K, V>> entrySet()
     {
     	Set<Map.Entry<K, V>> ret = new HashSet<Map.Entry<K,V>>();
+    	
+    	waitForCompaction();
     	
     	for (Map.Entry<K, ValueInfo> entry : indexmap.entrySet())
     	{
@@ -427,16 +533,19 @@ public class PersistentMap<K, V> implements Map<K, V>
      */
     public void compact()
     {
-//    	synchronized (this)
-//    	{
-//    		if (compactionshadowmap != null)
-//    		{
-//    			// Ignore spurious compaction requests?
-//    			return;
-//    		}
-//    		final File shadowfile = new File(file.getAbsolutePath() + ".shadow");
-//    		compactionshadowmap = new PersistentMap<Object, Object>(shadowfile, mode.endsWith("d"), classloader);
-//    	}
+    	synchronized (this)
+    	{
+    		if (compactionshadowmap != null)
+    		{
+    			synchronized(shadowlock)
+    			{
+    				// Ignore spurious compaction requests?
+    				return;
+    			}
+    		}
+    		final File shadowfile = new File(file.getAbsolutePath() + ".shadow");
+    		compactionshadowmap = new PersistentMap<Object, Object>(shadowfile, mode.endsWith("d"), classloader);
+    	}
     	Thread compactionthread = new Thread(new Runnable()
 		{
 			public void run()
@@ -469,32 +578,34 @@ public class PersistentMap<K, V> implements Map<K, V>
 			    		newindexmap.put(entry.getKey(), nvinfo);
 			    	}
 			    	
-//			    	synchronized(compactionshadowmap)
-//			    	{
+			    	synchronized(shadowlock)
+			    	{
 				    	fos.close();
 			    		raf.close();
 						SUtil.moveFile(file, oldfile);
 						SUtil.moveFile(compactfile, file);
 						oldfile.delete();
 						raf = new RandomAccessFile(file, mode);
-						dirtycounter = 0;
+						dirtybytes = 0;
 						indexmap.clear();
 //	//					buildIndex();
 						PersistentMap.this.indexmap = newindexmap;
-//						
-//						for (Object key : compactionshadowmap.keySet())
-//						{
-//							if (key instanceof PersistentMap.DeletedKey)
-//							{
-//								doRemove(((DeletedKey) key).getKey());
-//							}
-//							else
-//							{
-//								doPut((K) key, (V) compactionshadowmap.get(key));
-//							}
-//						}
-//						compactionshadowmap = null;
-//			    	}
+						
+						for (Object key : compactionshadowmap.keySet())
+						{
+							if (key instanceof PersistentMap.DeletedKey)
+							{
+								doRemove(((DeletedKey) key).getKey());
+							}
+							else
+							{
+								doPut((K) key, (V) compactionshadowmap.get(key));
+							}
+						}
+						compactionshadowmap = null;
+						shadowcounter = 0;
+						shadowlock.notifyAll();
+			    	}
 				}
 				catch (IOException e)
 				{
@@ -506,31 +617,59 @@ public class PersistentMap<K, V> implements Map<K, V>
     }
     
     /**
+     *  Waits for a background compaction to finish (if running).
+     */
+    public void waitForCompaction()
+    {
+    	if (compactionshadowmap != null)
+    	{
+    		synchronized (shadowlock)
+    		{
+    			while (compactionshadowmap != null)
+    			{
+    				try
+					{
+						shadowlock.wait();
+					}
+					catch (InterruptedException e)
+					{
+					}
+    			}
+    		}
+    	}
+    }
+    
+    /**
      *  Closes the persistence file.
      *  The map ceases to function after calling this.
      */
     public void close()
     {
-    	try
-		{
-			raf.close();
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
+    	synchronized (shadowlock)
+    	{
+	    	waitForCompaction();
+	    	
+	    	try
+			{
+				raf.close();
+			}
+			catch (IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+    	}
     }
     
     /**
-     *  Returns the number of stale entries.
+     *  Returns the bytes wasted due to stale entries.
      */
-    public long getDirtyCounter()
+    public long getDirtyBytes()
     {
-    	return dirtycounter;
+    	return dirtybytes;
     }
     
     /**
-     *  Sets the threshold of stale entries
+     *  Sets the threshold of stale bytes
      *  before auto-compaction is executed.
      *  Setting the threshold to Long.MAX_VALUE
      *  disables auto-compaction.
@@ -538,7 +677,7 @@ public class PersistentMap<K, V> implements Map<K, V>
     public void setAutoCompactionThreshold(long threshold)
     {
     	autocompactionthreshold = threshold;
-    	if (dirtycounter > autocompactionthreshold)
+    	if (dirtybytes > autocompactionthreshold)
     	{
     		compact();
     	}
@@ -548,14 +687,14 @@ public class PersistentMap<K, V> implements Map<K, V>
      *  Increments the dirty counter and performs
      *  auto-compaction if necessary.
      */
-    protected void incrementDirtyCousnter()
-    {
-    	++dirtycounter;
-    	if (dirtycounter > autocompactionthreshold)
-    	{
-    		compact();
-    	}
-    }
+//    protected void incrementDirtyCounter()
+//    {
+//    	++dirtycounter;
+//    	if (dirtycounter > autocompactionthreshold)
+//    	{
+//    		compact();
+//    	}
+//    }
     
     /**
      *  Builds the index.
@@ -598,16 +737,22 @@ public class PersistentMap<K, V> implements Map<K, V>
 				Object okey = BinarySerializer.objectFromByteArray(buf, null, null, classloader, null);
 				if (okey instanceof PersistentMap.DeletedKey)
 				{
-					indexmap.remove(((DeletedKey) okey).getKey());
-					++dirtycounter;
+					ValueInfo valinfo = indexmap.remove(((DeletedKey) okey).getKey());
+					if (valinfo != null)
+					{
+						dirtybytes += valinfo.getKvSize();
+						dirtybytes = Math.max(dirtybytes, 0);
+					}
 				}
 				else
 				{
 					K key = (K) okey;
 					
-					if (indexmap.containsKey(key))
+					ValueInfo valinfo = indexmap.get(key);
+					if (valinfo != null)
 					{
-						++dirtycounter;
+						dirtybytes += valinfo.getKvSize();
+						dirtybytes = Math.max(dirtybytes, 0);
 					}
 					
 					firstbyte = raf.readByte();
@@ -637,6 +782,8 @@ public class PersistentMap<K, V> implements Map<K, V>
     protected V doPut(K key, V value)
     {
     	V ret = get(key);
+    	
+    	ValueInfo oldvalinfo = indexmap.get(key);
     	
     	try
     	{
@@ -678,9 +825,10 @@ public class PersistentMap<K, V> implements Map<K, V>
     		throw new RuntimeException(e);
     	}
     	
-    	if (ret != null)
+    	if (oldvalinfo != null)
     	{
-    		++dirtycounter;
+    		dirtybytes += oldvalinfo.getKvSize();
+    		dirtybytes = Math.max(dirtybytes, 0);
     	}
     	
     	return ret;
@@ -694,7 +842,7 @@ public class PersistentMap<K, V> implements Map<K, V>
     	if (indexmap.containsKey(key))
     	{
     		ret = get(key);
-    		indexmap.remove(key);
+    		ValueInfo oldvalinfo = indexmap.remove(key);
     		DeletedKey dk = new DeletedKey(key);
     		
     		try
@@ -712,7 +860,11 @@ public class PersistentMap<K, V> implements Map<K, V>
         		throw new RuntimeException(e);
         	}
     		
-    		++dirtycounter;
+    		if (oldvalinfo != null)
+    		{
+    			dirtybytes += oldvalinfo.getKvSize();
+    			dirtybytes = Math.max(dirtybytes, 0);
+    		}
     	}
     	return ret;
     }

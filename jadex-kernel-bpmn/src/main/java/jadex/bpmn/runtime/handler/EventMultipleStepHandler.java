@@ -30,9 +30,9 @@ public class EventMultipleStepHandler implements IStepHandler
 		MSequenceEdge next	= null;
 		Object	wi	= null;	
 		
-		List outgoing = activity.getOutgoingSequenceEdges();
+		List<MSequenceEdge> outgoing = activity.getOutgoingSequenceEdges();
 		OrFilter filter = (OrFilter)thread.getWaitFilter();
-		IFilter[] filters = filter.getFilters();
+		IFilter<Object>[] filters = filter.getFilters();
 		Object[] waitinfos = (Object[])thread.getWaitInfo();
 		
 		for(int i=0; i<outgoing.size(); i++)

@@ -1,0 +1,9 @@
+*/target/**
+*/.classpath
+*/.project
+*.prefs
+*.properties
+*.copy
+keystore
+*.settings.xml
+alarmclock_settings.ser

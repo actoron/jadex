@@ -26,6 +26,9 @@ import java.util.List;
  */
 public class RHardConstraints
 {
+	/** Hard constraint model */
+	protected Collection<MHardConstraint> constraintmodel;
+	
 	/** The basic hard constraints filter */
 	protected List<IRemoteFilter<?>> filters = new ArrayList<IRemoteFilter<?>>();
 	
@@ -39,6 +42,7 @@ public class RHardConstraints
 	 */
 	public RHardConstraints(Collection<MHardConstraint> mhc)
 	{
+		constraintmodel = mhc;
 		for (MHardConstraint hc : mhc)
 		{
 			if (MHardConstraint.CONSTANT.equals(hc.getOperator()))

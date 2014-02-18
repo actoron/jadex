@@ -24,12 +24,12 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 //		System.out.println("Executed: "+activity+", "+instance);
 		
 		// Call all connected intermediate event handlers.
-		List outgoing = activity.getOutgoingSequenceEdges();
+		List<MSequenceEdge> outgoing = activity.getOutgoingSequenceEdges();
 		if(outgoing==null)
 			throw new UnsupportedOperationException("Activity must have connected activities: "+activity);
 		
 		// Execute all connected activities.
-		final IFilter[] filters = new IFilter[outgoing.size()];
+		final IFilter<Object>[] filters = new IFilter[outgoing.size()];
 		Object[] waitinfos = new Object[outgoing.size()];
 		
 		for(int i=0; i<outgoing.size(); i++)
@@ -62,7 +62,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 //		System.out.println(instance.getComponentIdentifier()+" cancel called: "+activity+", "+thread);
-		List outgoing = activity.getOutgoingSequenceEdges();
+		List<MSequenceEdge> outgoing = activity.getOutgoingSequenceEdges();
 		Object[] waitinfos = (Object[])thread.getWaitInfo();
 		
 //		if(waitinfos==null)
@@ -81,19 +81,19 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 /**
  *  Or filter implementation.
  */
-class OrFilter implements IFilter
+class OrFilter implements IFilter<Object>
 {
 	//-------- attributes ---------
 	
 	/** The filters. */
-	protected IFilter[] filters;
+	protected IFilter<Object>[] filters;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new or filter.
 	 */
-	public OrFilter(IFilter[] filters) 
+	public OrFilter(IFilter<Object>[] filters) 
 	{
 		this.filters = filters;
 	}
@@ -128,7 +128,7 @@ class OrFilter implements IFilter
 	 *  Get the filters.
 	 *  @return The filters.
 	 */
-	public IFilter[] getFilters()
+	public IFilter<Object>[] getFilters()
 	{
 		return filters;
 	}

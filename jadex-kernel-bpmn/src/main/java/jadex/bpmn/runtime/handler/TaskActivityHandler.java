@@ -22,7 +22,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 		if(thread.isCanceled())
 			return;
 		
-		Class taskimpl = activity.getClazz() != null? activity.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()) : null;
+		Class<?> taskimpl = activity.getClazz() != null? activity.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()) : null;
 		if(taskimpl!=null)
 		{
 //			thread.setWaitingState(ProcessThread.WAITING_FOR_TASK);
@@ -32,6 +32,8 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				ITask task = (ITask)taskimpl.newInstance();
 				thread.setTask(task);
 				thread.setCanceled(false);
+				// FIXME: Really bad! Some task use un-generified futures to return values in the callback
+				//		  despite Void-definition in interface.
 				task.execute(thread, instance).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)

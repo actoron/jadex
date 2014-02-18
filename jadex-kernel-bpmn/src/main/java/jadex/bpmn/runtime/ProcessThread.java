@@ -85,7 +85,10 @@ public class ProcessThread	implements ITaskContext
 	protected Map<String, Object> dataedges;
 	
 	/** The thread context. */
-	protected ThreadContext	context;
+	protected ThreadContext context;
+	
+	/** The thread subcontext (if any). */
+	protected ThreadContext subcontext;
 	
 	/** The Bpmn instance. */
 	protected BpmnInterpreter instance;
@@ -147,12 +150,6 @@ public class ProcessThread	implements ITaskContext
 	public MActivity getActivity()
 	{
 		return this.activity;
-	}
-	
-	public String getActivityId()
-	{
-		//TODO FIXME
-		return null;
 	}
 
 	/**
@@ -520,7 +517,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean	hasPropertyValue(String name)
 	{
-		return activity.hasProperty(name);
+		return activity.hasPropertyValue(name);
 	}
 	
 	/**
@@ -797,7 +794,7 @@ public class ProcessThread	implements ITaskContext
 			if(params!=null)
 			{
 				Set<String> initialized = new HashSet<String>();
-				for(Iterator it=params.values().iterator(); it.hasNext(); )
+				for(Iterator<MParameter> it=params.values().iterator(); it.hasNext(); )
 				{
 					MParameter param = (MParameter)it.next();
 					
@@ -822,9 +819,9 @@ public class ProcessThread	implements ITaskContext
 					}
 				}
 				// 2-pass to ensure correct expression evaluation?
-				for(Iterator it=params.values().iterator(); it.hasNext(); )
+				for(Iterator<MParameter> it=params.values().iterator(); it.hasNext(); )
 				{
-					MParameter param = (MParameter)it.next();
+					MParameter param = it.next();
 					if(!initialized.contains(param.getName()))
 					{
 						try
@@ -1020,6 +1017,64 @@ public class ProcessThread	implements ITaskContext
 //	public int getSplitDepth()
 //	{
 //		return splitinfos==null? 0: splitinfos.size();
+//	}
+	
+	/**
+	 *  Returns the current subcontext.
+	 * 
+	 *  @return The current subcontext.
+	 */
+	public ThreadContext getSubcontext()
+	{
+		return subcontext;
+	}
+	
+	/**
+	 *  Sets the subcontext.
+	 */
+	public  void setSubcontext(ThreadContext subcontext)
+	{
+		this.subcontext = subcontext;
+	}
+	
+	/**
+	 *  Remove a sub context but keep the corresponding thread.
+	 *  E.g. when a sub process terminates, the sub context is removed
+	 *  and the initiating thread continues in the outer context.
+	 *  @param context	The sub context to be removed.
+	 */
+	public void removeSubcontext()
+	{
+//		assert threads!=null && threads.containsKey(context.getInitiator());
+		
+		Set<ProcessThread>	subthreads	= subcontext.getThreads();
+		if(subthreads!=null)
+		{
+			ProcessThread[] subt = (ProcessThread[])subthreads.toArray(new ProcessThread[subthreads.size()]);
+			for(int i=0; i<subt.length; i++)
+			{
+				subcontext.removeThread(subt[i]);
+			}
+		}
+
+		subcontext = null;
+	}
+	
+//	public void removeSubcontext(ThreadContext context)
+//	{
+////		assert threads!=null && threads.containsKey(context.getInitiator());
+//		
+//		Set<ProcessThread>	subthreads	= context.getThreads();
+//		if(subthreads!=null)
+//		{
+//			ProcessThread[] subt = (ProcessThread[])subthreads.toArray(new ProcessThread[subthreads.size()]);
+//			for(int i=0; i<subt.length; i++)
+//			{
+//				context.removeThread(subt[i]);
+//			}
+//		}
+//
+//		threads.put(context.getInitiator(), null);
 //	}
 
 	/**

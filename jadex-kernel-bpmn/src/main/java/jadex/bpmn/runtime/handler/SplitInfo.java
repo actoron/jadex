@@ -21,6 +21,10 @@ public class SplitInfo
 	
 	//-------- constructors --------
 	
+	public SplitInfo()
+	{
+	}
+	
 	/**
 	 *  Create a new split info.
 	 */
@@ -55,5 +59,65 @@ public class SplitInfo
 	public Set<String>	getPathIds()
 	{
 		return pathids;
+	}
+
+	/**
+	 *  Gets the splitid.
+	 *
+	 *  @return The splitid.
+	 */
+	public String getSplitid()
+	{
+		return splitid;
+	}
+
+	/**
+	 *  Sets the splitid.
+	 *
+	 *  @param splitid The splitid to set.
+	 */
+	public void setSplitid(String splitid)
+	{
+		this.splitid = splitid;
+	}
+
+	/**
+	 *  Gets the pathid.
+	 *
+	 *  @return The pathid.
+	 */
+	public String getPathid()
+	{
+		return pathid;
+	}
+
+	/**
+	 *  Sets the pathid.
+	 *
+	 *  @param pathid The pathid to set.
+	 */
+	public void setPathid(String pathid)
+	{
+		this.pathid = pathid;
+	}
+
+	/**
+	 *  Gets the pathids.
+	 *
+	 *  @return The pathids.
+	 */
+	public Set<String> getPathids()
+	{
+		return pathids;
+	}
+
+	/**
+	 *  Sets the pathids.
+	 *
+	 *  @param pathids The pathids to set.
+	 */
+	public void setPathids(Set<String> pathids)
+	{
+		this.pathids = pathids;
 	}
 }

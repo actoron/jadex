@@ -53,7 +53,8 @@ public class DefaultStepHandler implements IStepHandler
 		if(AbstractEventIntermediateTimerActivityHandler.TIMER_EVENT.equals(event))
 		{
 			// Cancel subflows.
-			remove = thread.getThreadContext().getSubcontext(thread);
+			remove = thread.getSubcontext();
+//			remove = thread.getThreadContext().getSubcontext(thread);
 			
 			// Continue with timer edge.
 			List<MSequenceEdge> outedges = activity.getOutgoingSequenceEdges();
@@ -179,11 +180,12 @@ public class DefaultStepHandler implements IStepHandler
 			if(ex!=null)
 				thread.setException(ex);
 			// Todo: Callbacks for aborted threads (to abort external activities)
-			thread.getThreadContext().removeSubcontext(remove);
+//			thread.getThreadContext().removeSubcontext(remove);
+			thread.removeSubcontext();
 			
 			for(Iterator<ProcessThread> it=remove.getAllThreads().iterator(); it.hasNext(); )
 			{
-				ProcessThread	pt	= it.next();
+//				ProcessThread	pt	= it.next();
 //				ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, pt.getClass().getName(), 
 //					pt.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(pt));
 //				instance.notifyListeners(cce);

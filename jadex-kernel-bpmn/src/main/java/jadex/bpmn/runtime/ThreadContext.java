@@ -12,8 +12,6 @@ import jadex.commons.SReflect;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -25,13 +23,14 @@ public class ThreadContext
 	//-------- attributes --------
 	
 	/** The model element (process or sub process). */
-	protected MIdElement	model;
+	protected MIdElement model;
 	
 	/** The initiating thread (if any). */
-	protected ProcessThread	initiator;
+	protected ProcessThread initiator;
 	
 	/** The currently running threads (thread -> context or null, if leaf thread). */
-	protected Map<ProcessThread, ThreadContext>	threads;
+	protected Set<ProcessThread> threads;
+//	protected Map<ProcessThread, ThreadContext> threads;
 	
 	/** Service search hard constraints */;
 	protected RHardConstraints hardconstraints;
@@ -56,8 +55,8 @@ public class ThreadContext
 	 */
 	public ThreadContext(MSubProcess model, ProcessThread initiator)
 	{
-		this.model	= model;
-		this.initiator	= initiator;
+		this.model = model;
+		this.initiator = initiator;
 	}
 
 	//-------- methods --------
@@ -89,6 +88,8 @@ public class ThreadContext
 		return initiator;
 	}
 	
+	
+	
 	/**
 	 *  Gets the hard constraints.
 	 *
@@ -115,10 +116,14 @@ public class ThreadContext
 	 */
 	public void	addThread(ProcessThread thread)
 	{
+//		if(threads==null)
+//			threads	= new LinkedHashMap<ProcessThread, ThreadContext>();
+//		
+//		threads.put(thread, null);
 		if(threads==null)
-			threads	= new LinkedHashMap<ProcessThread, ThreadContext>();
+			threads	= new HashSet<ProcessThread>();
 		
-		threads.put(thread, null);
+		threads.add(thread);
 		if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
 			thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
@@ -133,11 +138,15 @@ public class ThreadContext
 	// Hack!!! Make external threads execute before others.
 	public void	addExternalThread(ProcessThread thread)
 	{
-		Map<ProcessThread, ThreadContext>	oldthreads	= threads;
-		threads	= new LinkedHashMap<ProcessThread, ThreadContext>();		
-		threads.put(thread, null);
+//		Map<ProcessThread, ThreadContext>	oldthreads	= threads;
+		Set<ProcessThread> oldthreads = threads;
+//		threads	= new LinkedHashMap<ProcessThread, ThreadContext>();
+		threads = new HashSet<ProcessThread>();
+//		threads.put(thread, null);
+		threads.add(thread);
 		if(oldthreads!=null)
-			threads.putAll(oldthreads);
+			threads.addAll(oldthreads);
+//			threads.putAll(oldthreads);
 		
 		if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
@@ -154,8 +163,10 @@ public class ThreadContext
 	{
 		if(threads!=null)
 		{
-			if(getSubcontext(thread)!=null)
-				removeSubcontext(getSubcontext(thread));
+//			if(getSubcontext(thread)!=null)
+//				removeSubcontext(getSubcontext(thread));
+			if(thread.getSubcontext()!=null)
+				thread.removeSubcontext();
 			
 			// Cancel activity (e.g. timer).
 			MActivity	act	= thread.getActivity();
@@ -165,7 +176,7 @@ public class ThreadContext
 			}
 			thread.setActivity(null);
 			
-			boolean rem = threads.containsKey(thread);
+			boolean rem = threads.contains(thread);
 			threads.remove(thread);
 			thread.setThreadContext(null);
 			
@@ -192,7 +203,8 @@ public class ThreadContext
 	 */
 	public Set<ProcessThread>	getThreads()
 	{
-		return threads!=null ? threads.keySet() : null;
+//		return threads!=null ? threads.keySet() : null;
+		return threads;
 	}
 	
 	/**
@@ -203,11 +215,13 @@ public class ThreadContext
 		Set<ProcessThread> ret = new HashSet<ProcessThread>();
 		if(threads!=null)
 		{
-			for(Iterator<ProcessThread> it=threads.keySet().iterator(); it.hasNext(); )
+//			for(Iterator<ProcessThread> it=threads.keySet().iterator(); it.hasNext(); )
+			for(Iterator<ProcessThread> it=threads.iterator(); it.hasNext(); )
 			{
 				ProcessThread pc = it.next();
 				ret.add(pc);
-				ThreadContext tc = (ThreadContext)threads.get(pc);
+//				ThreadContext tc = (ThreadContext)threads.get(pc);
+				ThreadContext tc = pc.getSubcontext();
 				if(tc!=null)
 					ret.addAll(tc.getAllThreads());
 			}
@@ -249,12 +263,12 @@ public class ThreadContext
 	 *  Add a sub context.
 	 *  @param context	The sub context to be added.
 	 */
-	public void addSubcontext(ThreadContext context)
-	{
-		assert threads!=null && threads.containsKey(context.getInitiator());
-
-		threads.put(context.getInitiator(), context);
-	}
+//	public void addSubcontext(ThreadContext context)
+//	{
+//		assert threads!=null && threads.containsKey(context.getInitiator());
+//
+//		threads.put(context.getInitiator(), context);
+//	}
 	
 	/**
 	 *  Remove a sub context but keep the corresponding thread.
@@ -262,32 +276,32 @@ public class ThreadContext
 	 *  and the initiating thread continues in the outer context.
 	 *  @param context	The sub context to be removed.
 	 */
-	public void removeSubcontext(ThreadContext context)
-	{
-		assert threads!=null && threads.containsKey(context.getInitiator());
-		
-		Set<ProcessThread>	subthreads	= context.getThreads();
-		if(subthreads!=null)
-		{
-			ProcessThread[] subt = (ProcessThread[])subthreads.toArray(new ProcessThread[subthreads.size()]);
-			for(int i=0; i<subt.length; i++)
-			{
-				context.removeThread(subt[i]);
-			}
-		}
-
-		threads.put(context.getInitiator(), null);
-	}
+//	public void removeSubcontext(ThreadContext context)
+//	{
+//		assert threads!=null && threads.containsKey(context.getInitiator());
+//		
+//		Set<ProcessThread>	subthreads	= context.getThreads();
+//		if(subthreads!=null)
+//		{
+//			ProcessThread[] subt = (ProcessThread[])subthreads.toArray(new ProcessThread[subthreads.size()]);
+//			for(int i=0; i<subt.length; i++)
+//			{
+//				context.removeThread(subt[i]);
+//			}
+//		}
+//
+//		threads.put(context.getInitiator(), null);
+//	}
 	
 	/**
 	 *  Get the subcontext of a thread.
 	 *  @param thread The thread which owns the subcontext.
 	 *  @return	The subcontext (if any).
 	 */
-	public ThreadContext getSubcontext(ProcessThread thread)
-	{
-		return (ThreadContext)threads.get(thread);
-	}
+//	public ThreadContext getSubcontext(ProcessThread thread)
+//	{
+//		return (ThreadContext)threads.get(thread);
+//	}
 	
 	/**
 	 *  The context is finished, when there are no (more) threads to execute.
@@ -300,7 +314,8 @@ public class ThreadContext
 		boolean	finished	= true;
 		if(threads!=null && !threads.isEmpty())
 		{
-			for(Iterator<ProcessThread> it=threads.keySet().iterator(); finished && it.hasNext(); )
+//			for(Iterator<ProcessThread> it=threads.keySet().iterator(); finished && it.hasNext(); )
+			for(Iterator<ProcessThread> it=threads.iterator(); finished && it.hasNext(); )
 			{
 				finished	= !it.next().belongsTo(pool, lane);
 			}
@@ -320,12 +335,14 @@ public class ThreadContext
 		ProcessThread	ret	= null;
 		if(threads!=null)
 		{
-			for(Iterator<ProcessThread> it=threads.keySet().iterator(); ret==null && it.hasNext(); )
+//			for(Iterator<ProcessThread> it=threads.keySet().iterator(); ret==null && it.hasNext(); )
+			for(Iterator<ProcessThread> it=threads.iterator(); ret==null && it.hasNext(); )
 			{
 				ProcessThread	thread	= (ProcessThread)it.next();
-				if(threads.get(thread)!=null)
+//				if(threads.get(thread)!=null)
+				if (thread.getSubcontext() != null)
 				{
-					ThreadContext	context	= (ThreadContext)threads.get(thread);
+					ThreadContext	context	= thread.getSubcontext();
 					ret	= context.getExecutableThread(pool, lane);
 				}
 				else if(!thread.isWaiting() && thread.belongsTo(pool, lane))
