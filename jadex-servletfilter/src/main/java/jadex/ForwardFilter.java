@@ -1,5 +1,8 @@
 package jadex;
 
+import jadex.commons.SUtil;
+import jadex.commons.collection.LRU;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +11,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -79,6 +85,9 @@ public class ForwardFilter implements Filter
 	/** The lease time in millis. */
 	protected long leasetime;
 	
+	/** The emitted nonces. */
+	protected LRU<String, String> nonces;
+	
 	static
 	{
 		users.put("admin", "admin");
@@ -97,6 +106,7 @@ public class ForwardFilter implements Filter
 	 */
 	public void init(FilterConfig conf) throws ServletException
 	{
+		nonces = new LRU<String, String>(5000);
 		String val = conf.getInitParameter("leasetime");
 		if(val!=null)
 		{
@@ -134,7 +144,6 @@ public class ForwardFilter implements Filter
 			HttpServletResponse res = (HttpServletResponse)response;
 			String requri = req.getRequestURI().substring(req.getContextPath().length()).replace("/","");
 			List<String> mimetypes = null;
-//			boolean json = false;
 			
 			if(commands.contains(requri))
 			{
@@ -169,10 +178,6 @@ public class ForwardFilter implements Filter
 							}
 							mimetypes.add(mt);
 						}
-//						if(mimetypes.contains("application/json"))
-//						{
-//							json = true;
-//						}
 					}
 				}
 			}
@@ -181,45 +186,14 @@ public class ForwardFilter implements Filter
 			{
 				if(login.equals(requri))
 				{
-					String user = request.getParameter("user");
-					String pass = request.getParameter("pass");
-					String next = request.getParameter("next");
-					
-					if(user==null)
-					{
-						if(isBrowserClient(mimetypes))
-						{
-							sendLoginPage(res);
-						}
-						else
-						{
-							res.sendError(403, "No username/password.");
-//							res.getWriter().write("{authenticated: false, reason=\"no username/password given\"}");
-						}
+					String auth = req.getHeader("Authorization");
+					if(auth!=null)
+					{			
+						checkDigestAuthentication(req, res, mimetypes);
 					}
 					else
 					{
-						if(pass.equals(users.get(user)))
-						{
-							HttpSession session = req.getSession();
-							session.setAttribute(authenticated, Boolean.TRUE);
-							
-							if(isBrowserClient(mimetypes))
-							{
-								if(next!=null)
-								{
-									res.sendRedirect(next);
-								}
-								else
-								{
-									res.sendRedirect("displayMappings");
-								}
-							}
-						}
-						else
-						{
-							res.sendError(403, "Wrong username/password.");
-						}
+						checkUrlParameterAuthentication(req, res, mimetypes);
 					}
 					fini = true;
 				}
@@ -388,6 +362,145 @@ public class ForwardFilter implements Filter
 			}
 		}
 		return fini;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void checkDigestAuthentication(HttpServletRequest request, HttpServletResponse response, 
+		Collection<String> mimetypes) throws IOException
+	{
+		String auth = request.getHeader("Authorization");
+		if(auth.startsWith("Digest"))
+		{
+			HashMap<String, String> vals = parseHeader(auth);
+			
+			String digest = vals.get("response");
+			String check = null;
+			
+			String method = request.getMethod();
+			String user = vals.get("username");
+			String nonce = vals.get("nonce");
+			
+			// is nonce contained in nonces, i.e fresh
+			if(nonces.remove(nonce)!=null)
+			{
+				// if user exists
+				if(users.containsKey(user))
+				{
+					String qop = vals.get("qop");
+					String realm = vals.get("realm");
+					String pass = users.get(user);
+					String uri = vals.get("uri");
+					
+					String ha1 = hex(digest(user+":"+realm+":"+pass));
+					String ha2;
+					
+					if(qop.equals("auth-int"))
+					{
+						String body = readRequestBody(request);
+						ha2 = hex(digest(method+":"+uri+":"+SUtil.hex(digest(body))));
+					}
+					else
+					{
+						ha2 = hex(digest(method+":"+uri));
+					}
+					
+					if(qop==null || qop.length()==0)
+					{
+						check = hex(digest(ha1+":"+nonce+":"+ha2));
+					}
+					else
+					{
+						String noncecnt = vals.get("nc");
+						String conce = vals.get("cnonce");
+						check = hex(digest(ha1+":"+nonce+":"+noncecnt+":"+conce+":"+qop+":"+ha2));
+					}
+
+					if(!digest.equals(check))
+					{
+						sendAuthorizationRequest(request.getServerName(), response);
+					}
+					else
+					{
+						HttpSession session = request.getSession();
+						session.setAttribute(authenticated, Boolean.TRUE);
+						
+						if(isBrowserClient(mimetypes))
+						{
+							// todo: redirect to next
+							response.sendRedirect("displayMappings");
+						}
+					}
+				}
+				else
+				{
+					response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User unknown.");
+				}
+			}
+			else
+			{
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Nonce unknown.");
+			}
+		}
+		else
+		{
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Only digest authentication supported.");
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void checkUrlParameterAuthentication(HttpServletRequest request, HttpServletResponse response, 
+		Collection<String> mimetypes) throws IOException
+	{
+		String user = request.getParameter("user");
+		String pass = request.getParameter("pass");
+		String next = request.getParameter("next");
+		
+		if(user==null)
+		{
+			if(isBrowserClient(mimetypes))
+			{
+				if(request.isSecure())
+				{
+					sendLoginPage(response);
+				}
+				else
+				{
+					sendAuthorizationRequest(request.getServerName(), response);
+				}
+			}
+			else
+			{
+				response.sendError(HttpServletResponse.SC_FORBIDDEN, "No username/password.");
+			}
+		}
+		else
+		{
+			if(pass.equals(users.get(user)))
+			{
+				HttpSession session = request.getSession();
+				session.setAttribute(authenticated, Boolean.TRUE);
+				
+				if(isBrowserClient(mimetypes))
+				{
+					if(next!=null)
+					{
+						response.sendRedirect(next);
+					}
+					else
+					{
+						response.sendRedirect("displayMappings");
+					}
+				}
+			}
+			else
+			{
+				response.sendError(HttpServletResponse.SC_FORBIDDEN, "Wrong username/password.");
+			}						
+		}
 	}
 	
 	/**
@@ -636,6 +749,23 @@ public class ForwardFilter implements Filter
 	}
 	
 	/**
+	 * 
+	 */
+	protected void sendAuthorizationRequest(String realm, HttpServletResponse response) throws IOException
+	{
+		StringBuffer buf = new StringBuffer();
+		String nonce = createNonce();
+		nonces.put(nonce, nonce);
+		buf.append("Digest realm=\"").append(realm).append("\",");
+		buf.append("qop=").append("auth").append(",");
+		buf.append("nonce=\"").append(nonce).append("\",");
+//		buf.append("opaque=\"").append(getOpaque(req.getRemoteHost(), getNonce()).append("\"");
+		buf.append("algorithm=\"MD5\"");
+		response.addHeader("WWW-Authenticate", buf.toString());
+		response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+	}
+	
+	/**
 	 *  Copy all data from input to output stream.
 	 */
 	public static void copyStream(InputStream is, OutputStream os) 
@@ -801,4 +931,331 @@ public class ForwardFilter implements Filter
 			e.printStackTrace();
 		}
 	}
+	
+//	 private String authMethod = "auth";
+//	 private String userName = "usm";
+//	 private String password = "password";
+//	 private String realm = "example.com";
+	  
+//	 public String nonce;
+	  
+	// nonce = calculateNonce();
+
+//	protected void checkAuthenticationResponse(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+//	{
+//		response.setContentType("text/html;charset=UTF-8");
+//		PrintWriter out = response.getWriter();
+//
+//		String requestBody = readRequestBody(request);
+//
+//		try
+//		{
+//			String authHeader = request.getHeader("Authorization");
+//			if(StringUtils.isBlank(authHeader))
+//			{
+//				response.addHeader("WWW-Authenticate", getAuthenticateHeader());
+//				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+//			}
+//			else
+//			{
+//				if(authHeader.startsWith("Digest"))
+//				{
+//					HashMap<String, String> vals = parseHeader(authHeader);
+//					String method = request.getMethod();
+//					String ha1 = DigestUtils.md5Hex(userName + ":" + realm + ":" + password);
+//					String qop = vals.get("qop");
+//					String ha2;
+//					String reqURI = vals.get("uri");
+//					if(!StringUtils.isBlank(qop) && qop.equals("auth-int"))
+//					{
+//						String entityBodyMd5 = DigestUtils.md5Hex(requestBody);
+//						ha2 = DigestUtils.md5Hex(method + ":" + reqURI + ":" + entityBodyMd5);
+//					}
+//					else
+//					{
+//						ha2 = DigestUtils.md5Hex(method + ":" + reqURI);
+//					}
+//
+//					String serverResponse;
+//
+//					if(StringUtils.isBlank(qop))
+//					{
+//						serverResponse = DigestUtils.md5Hex(ha1 + ":" + nonce + ":" + ha2);
+//					}
+//					else
+//					{
+//						String domain = vals.get("realm");
+//						String nonceCount = vals.get("nc");
+//						String clientNonce = vals.get("cnonce");
+//						serverResponse = DigestUtils.md5Hex(ha1 + ":" + nonce + ":" + nonceCount + ":" + clientNonce + ":" + qop + ":" + ha2);
+//					}
+//					String clientResponse = vals.get("response");
+//
+//					if(!serverResponse.equals(clientResponse))
+//					{
+//						response.addHeader("WWW-Authenticate", getAuthenticateHeader());
+//						response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+//					}
+//				}
+//				else
+//				{
+//					response.sendError(HttpServletResponse.SC_UNAUTHORIZED, " This Servlet only supports Digest Authorization");
+//				}
+//			}
+//		}
+//		finally
+//		{
+//			out.close();
+//		}
+//	}
+//
+	/**
+	 *  Convert header to key value pairs.
+	 */
+	private HashMap<String, String> parseHeader(String header)
+	{
+		String h = header.substring(header.indexOf(" ") + 1).trim();
+		HashMap<String, String> values = new HashMap<String, String>();
+		for(String keyval :  h.split(","))
+		{
+			if(keyval.contains("="))
+			{
+				String key = keyval.substring(0, keyval.indexOf("="));
+				String value = keyval.substring(keyval.indexOf("=") + 1);
+				values.put(key.trim(), value.replaceAll("\"", "").trim());
+			}
+		}
+		return values;
+	}
+
+	/**
+	 * 
+	 */
+	public String createNonce()
+	{
+		Date d = new Date();
+		SimpleDateFormat f = new SimpleDateFormat("yyyy:MM:dd:hh:mm:ss");
+		String fmtDate = f.format(d);
+		Random rand = new Random(100000);
+		Integer randomInt = rand.nextInt();
+		return SUtil.hex(digest((fmtDate+randomInt.toString()).getBytes()));
+	}
+	
+	/**
+	 *  Convert to hex value.
+	 */ 
+	public static String hex(byte[] data)
+	{
+		return SUtil.hex(data, false);
+	}
+	
+	
+	/**
+	 *  Build the digest given the timestamp and password.
+	 */
+	public static byte[] digest(String input)
+	{
+		return digest(input.getBytes());
+	}
+	
+	/**
+	 *  Build the digest given the timestamp and password.
+	 */
+	public static byte[] digest(byte[] input)
+	{
+//		System.out.println("build digest: "+timestamp+" "+secret);
+		try
+		{
+			MessageDigest	md	= MessageDigest.getInstance("MD5");
+			byte[]	output	= md.digest(input);
+			return output;
+		}
+		catch(NoSuchAlgorithmException e)
+		{
+			// Shouldn't happen?
+			throw new RuntimeException(e);
+		}
+	}
+
+//	private String getOpaque(String domain, String nonce)
+//	{
+//		return DigestUtils.md5Hex(domain + nonce);
+//	}
+//
+	/**
+	 * Returns the request body as String
+	 */
+	private String readRequestBody(HttpServletRequest request) throws IOException
+	{
+		StringBuilder buf = new StringBuilder();
+		BufferedReader reader = null;
+		try
+		{
+			InputStream is = request.getInputStream();
+			if(is != null)
+			{
+				reader = new BufferedReader(new InputStreamReader(is));
+				char[] charBuffer = new char[128];
+				int bytesRead = -1;
+				while((bytesRead = reader.read(charBuffer)) > 0)
+				{
+					buf.append(charBuffer, 0, bytesRead);
+				}
+			}
+			else
+			{
+				buf.append("");
+			}
+		}
+		catch(IOException ex)
+		{
+			throw ex;
+		}
+		finally
+		{
+			if(reader != null)
+			{
+				try
+				{
+					reader.close();
+				}
+				catch(IOException ex)
+				{
+					throw ex;
+				}
+			}
+		}
+		String body = buf.toString();
+		return body;
+	}
+	
+//	public static class HttpDigestAuth
+//	{
+//		public HttpURLConnection tryAuth(HttpURLConnection connection, String username, String password) throws IOException
+//		{
+//			int responseCode = connection.getResponseCode();
+//			if(responseCode == HttpURLConnection.HTTP_UNAUTHORIZED)
+//			{
+//				connection = tryDigestAuthentication(connection, username, password);
+//				if(connection == null)
+//				{
+//					throw new AuthenticationException();
+//				}
+//			}
+//			return connection;
+//		}
+//
+//		public static HttpURLConnection tryDigestAuthentication(HttpURLConnection input, String username, String password)
+//		{
+//			String auth = input.getHeaderField("WWW-Authenticate");
+//			if(auth == null || !auth.startsWith("Digest "))
+//			{
+//				return null;
+//			}
+//			final HashMap<String, String> authFields = splitAuthFields(auth.substring(7));
+//			MessageDigest md5 = null;
+//			try
+//			{
+//				md5 = MessageDigest.getInstance("MD5");
+//			}
+//			catch(NoSuchAlgorithmException e)
+//			{
+//				return null;
+//			}
+//			Joiner colonJoiner = Joiner.on(':');
+//			String HA1 = null;
+//			try
+//			{
+//				md5.reset();
+//				String ha1str = colonJoiner.join(username, authFields.get("realm"), password);
+//				md5.update(ha1str.getBytes("ISO-8859-1"));
+//				byte[] ha1bytes = md5.digest();
+//				HA1 = bytesToHexString(ha1bytes);
+//			}
+//			catch(UnsupportedEncodingException e)
+//			{
+//				return null;
+//			}
+//			String HA2 = null;
+//			try
+//			{
+//				md5.reset();
+//				String ha2str = colonJoiner.join(input.getRequestMethod(), input.getURL().getPath());
+//				md5.update(ha2str.getBytes("ISO-8859-1"));
+//				HA2 = bytesToHexString(md5.digest());
+//			}
+//			catch(UnsupportedEncodingException e)
+//			{
+//				return null;
+//			}
+//			String HA3 = null;
+//			try
+//			{
+//				md5.reset();
+//				String ha3str = colonJoiner.join(HA1, authFields.get("nonce"), HA2);
+//				md5.update(ha3str.getBytes("ISO-8859-1"));
+//				HA3 = bytesToHexString(md5.digest());
+//			}
+//			catch(UnsupportedEncodingException e)
+//			{
+//				return null;
+//			}
+//			StringBuilder sb = new StringBuilder(128);
+//			sb.append("Digest ");
+//			sb.append("username").append("=\"").append(username).append("\",");
+//			sb.append("realm").append("=\"").append(authFields.get("realm")).append("\",");
+//			sb.append("nonce").append("=\"").append(authFields.get("nonce")).append("\",");
+//			sb.append("uri").append("=\"").append(input.getURL().getPath()).append("\",");
+//			// sb.append("qop" ).append('=' ).append("auth" ).append(",");
+//			sb.append("response").append("=\"").append(HA3).append("\"");
+//			try
+//			{
+//				final HttpURLConnection result = (HttpURLConnection)input.getURL().openConnection();
+//				result.addRequestProperty("Authorization", sb.toString());
+//				return result;
+//			}
+//			catch(IOException e)
+//			{
+//				return null;
+//			}
+//		}
+//
+//		private static HashMap<String, String> splitAuthFields(String authString)
+//		{
+//			final HashMap<String, String> fields = Maps.newHashMap();
+//			final CharMatcher trimmer = CharMatcher.anyOf("\"\t ");
+//			final Splitter commas = Splitter.on(',').trimResults().omitEmptyStrings();
+//			final Splitter equals = Splitter.on('=').trimResults(trimmer).limit(2);
+//			String[] valuePair;
+//			for(String keyPair : commas.split(authString))
+//			{
+//				valuePair = Iterables.toArray(equals.split(keyPair), String.class);
+//				fields.put(valuePair[0], valuePair[1]);
+//			}
+//			return fields;
+//		}
+//
+//		private static final String	HEX_LOOKUP	= "0123456789abcdef";
+//
+//		private static String bytesToHexString(byte[] bytes)
+//		{
+//			StringBuilder sb = new StringBuilder(bytes.length * 2);
+//			for(int i = 0; i < bytes.length; i++)
+//			{
+//				sb.append(HEX_LOOKUP.charAt((bytes[i] & 0xF0) >> 4));
+//				sb.append(HEX_LOOKUP.charAt((bytes[i] & 0x0F) >> 0));
+//			}
+//			return sb.toString();
+//		}
+//
+//		public static class AuthenticationException extends IOException
+//		{
+//			private static final long	serialVersionUID	= 1L;
+//
+//			public AuthenticationException()
+//			{
+//				super("Problems authenticating");
+//			}
+//		}
+//	}
 }

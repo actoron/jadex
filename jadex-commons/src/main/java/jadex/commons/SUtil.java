@@ -3312,7 +3312,15 @@ public class SUtil
 	 */
 	public static String hex(byte[] data)
 	{
-		return hex(data, null, 1);
+		return hex(data, null, 1, true);
+	}
+	
+	/**
+	 *  Convert a byte array to a string representation.
+	 */
+	public static String hex(byte[] data, boolean uppercase)
+	{
+		return hex(data, null, 1, uppercase);
 	}
 	
 	/**
@@ -3320,10 +3328,18 @@ public class SUtil
 	 */
 	public static String hex(byte[] data, String delim, int block)
 	{
+		return hex(data, delim, block, true);
+	}
+	
+	/**
+	 *  Convert a byte array to a string representation.
+	 */
+	public static String hex(byte[] data, String delim, int block, boolean uppercase)
+	{
 		StringBuffer ret = new StringBuffer();
 		for(int i=0; i<data.length; i++) 
 		{
-		    ret.append(String.format("%02X", data[i]));
+		    ret.append(String.format(uppercase? "%02X": "%02x", data[i]));
 		    if(delim!=null && i+1<data.length && (i+1)%block==0)
 		    	ret.append(delim);
 		}
