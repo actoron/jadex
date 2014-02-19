@@ -7,7 +7,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.SFuture;
-import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -21,6 +20,7 @@ import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.bridge.service.types.ecarules.IRuleService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -31,7 +31,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
@@ -100,6 +99,9 @@ public class ProcessEngineAgent implements IProcessEngineService
 	/** The remove commands. */
 	protected Map<Tuple2<String, IResourceIdentifier>, List<Runnable>> remcoms;
 	
+	/** The managed process instances. */
+	protected Map<IComponentIdentifier, ProcessInfo> processes;
+	
 	//-------- methods --------
 	
 	/**
@@ -109,6 +111,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 	public IFuture<Void> init()
 	{
 		this.remcoms = new HashMap<Tuple2<String,IResourceIdentifier>, List<Runnable>>();
+		this.processes = new HashMap<IComponentIdentifier, ProcessEngineAgent.ProcessInfo>();
 		return IFuture.DONE;
 	}
 	
@@ -161,7 +164,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 	 *  @param model The bpmn model
 	 *  @param rid The resource identifier (null for all platform jar resources).
 	 */
-	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(final String model, final IResourceIdentifier urid)
+	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(final String model, final IResourceIdentifier urid, final ICorrelationFilterFactory corfac)
 	{
 //		final SubscriptionIntermediateFuture<MonitoringStarterEvent> ret = new SubscriptionIntermediateFuture<MonitoringStarterEvent>();
 		final SubscriptionIntermediateFuture<ProcessEngineEvent> ret = (SubscriptionIntermediateFuture<ProcessEngineEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
@@ -233,9 +236,9 @@ public class ProcessEngineAgent implements IProcessEngineService
 										rule.setAction(new CommandAction<Collection<CMSStatusEvent>>(createRuleCreateCommand(rid, model)));//, dellis)));
 										rules.add(rule);
 									}
+									// new variant with new models bpmn2
 									else if(mact.hasPropertyValue("eventtypes"))
 									{
-										// new variant with new models bpmn2
 										String[] etypes = (String[])mact.getParsedPropertyValue("eventtypes");
 										if(etypes!=null && etypes.length>0)
 										{
@@ -278,6 +281,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 								remcoms.put(key, null);
 							}
 							
+							// cron job process instance management
 							final Tuple2<IFuture<Void>, ISubscriptionIntermediateFuture<CMSStatusEvent>> f = addCronJob(cj, key);//, createlis);
 							IFuture<Void> f1 = f.getFirstEntity();
 							f1.addResultListener(new ExceptionDelegationResultListener<Void, Collection<ProcessEngineEvent>>(ret)
@@ -293,8 +297,8 @@ public class ProcessEngineAgent implements IProcessEngineService
 											if(result instanceof CMSCreatedEvent)
 											{
 												cid = ((CMSCreatedEvent)result).getComponentIdentifier();
-												ret.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, 
-													cid, null));
+												processes.put(cid, new ProcessInfo(null, cid));
+												ret.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, cid, null));
 											}
 											else if(result instanceof CMSTerminatedEvent)
 											{
@@ -304,6 +308,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 //													(IComponentIdentifier)res.get(IComponentIdentifier.RESULTCID), res));
 												ret.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
 													cid, ((CMSTerminatedEvent)result).getResults()));
+												processes.remove(cid);
 											}
 										}
 										
@@ -319,7 +324,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 									});
 									
 									// add rule listener if at least one rule
-									addRuleListener(rules, key, ret).addResultListener(new ExceptionDelegationResultListener<Void, Collection<ProcessEngineEvent>>(ret)
+									addRuleListener(rules, key, ret, corfac).addResultListener(new ExceptionDelegationResultListener<Void, Collection<ProcessEngineEvent>>(ret)
 									{
 										public void customResultAvailable(Void result)
 										{
@@ -352,7 +357,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 	 *  Add a rule listener on the engine that processes the received events.
 	 */
 	protected IFuture<Void> addRuleListener(List<IRule<Collection<CMSStatusEvent>>> rules, final Tuple2<String, IResourceIdentifier> key,
-		final SubscriptionIntermediateFuture<ProcessEngineEvent> res)
+		final SubscriptionIntermediateFuture<ProcessEngineEvent> res, final ICorrelationFilterFactory corfac)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -371,6 +376,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 							fut.terminate();
 						}
 					}, key);
+					
 					fut.addResultListener(new IntermediateDefaultResultListener<RuleEvent>()
 					{
 						public void intermediateResultAvailable(RuleEvent re) 
@@ -378,8 +384,22 @@ public class ProcessEngineAgent implements IProcessEngineService
 							// first event is subscribe() finished
 							if(re!=null)
 							{
-								// send instance created event
-								res.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, (IComponentIdentifier)re.getResult(), null));
+								// send event and create correlator for new instance
+								if(re.getResult() instanceof CMSCreatedEvent)
+								{
+									CMSCreatedEvent ev = (CMSCreatedEvent)re.getResult();
+									IEvent event = (IEvent)ev.getProperty("startevent");
+									IComponentIdentifier cid = ev.getComponentIdentifier();
+									processes.put(cid, new ProcessInfo(corfac==null? null: corfac.createCorrelationFilter(event), cid));
+								
+									// send instance created event
+									res.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, (IComponentIdentifier)re.getResult(), null));
+								}
+								else if(re.getResult() instanceof CMSTerminatedEvent)
+								{
+									CMSTerminatedEvent ev = (CMSTerminatedEvent)re.getResult();
+									processes.remove(ev.getComponentIdentifier());
+								}
 							}
 						}
 						
@@ -667,8 +687,9 @@ public class ProcessEngineAgent implements IProcessEngineService
 		ret = new RuleCreateCommand(null, model, ci)//, killis)
 		{
 			@Classname("RuleCreateCommand")
-			public IIntermediateFuture<CMSStatusEvent> execute(CommandData args)
+			public IIntermediateFuture<CMSStatusEvent> execute(final CommandData args)
 			{
+				IntermediateFuture<CMSStatusEvent> ret = new IntermediateFuture<CMSStatusEvent>();
 				Map<String, Object> vs = getCommand().getInfo().getArguments();
 				if(vs==null)
 				{
@@ -677,11 +698,80 @@ public class ProcessEngineAgent implements IProcessEngineService
 				}
 //				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), args.getEvent()));
 				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), args.getEvent().getContent()));
-				return super.execute(args);
+				IIntermediateFuture<CMSStatusEvent> fut = super.execute(args);
+				fut.addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(ret)
+				{
+					public void customIntermediateResultAvailable(CMSStatusEvent event)
+					{
+						System.out.println("event is: "+event);
+						if(event instanceof CMSCreatedEvent)
+						{
+							event.setProperty("startevent", args.getEvent());
+						}
+						super.customIntermediateResultAvailable(event);
+					}
+				});
+				return ret;
 			}
 		};
 		
 		return ret;
 	}
 
+	/**
+	 *  Process info struct.
+	 */
+	public static class ProcessInfo
+	{
+		/** The correlator (if any). */
+		protected IFilter<IEvent> correlator;
+		
+		/** The process instance cid. */
+		protected IComponentIdentifier cid;
+
+		/**
+		 *  Create a new ProcessInfo.
+		 */
+		public ProcessInfo(IFilter<IEvent> correlator, IComponentIdentifier cid)
+		{
+			this.correlator = correlator;
+			this.cid = cid;
+		}
+
+		/**
+		 *  Get the correlator.
+		 *  return The correlator.
+		 */
+		public IFilter<IEvent> getCorrelator()
+		{
+			return correlator;
+		}
+
+		/**
+		 *  Set the correlator. 
+		 *  @param correlator The correlator to set.
+		 */
+		public void setCorrelator(IFilter<IEvent> correlator)
+		{
+			this.correlator = correlator;
+		}
+
+		/**
+		 *  Get the cid.
+		 *  return The cid.
+		 */
+		public IComponentIdentifier getCid()
+		{
+			return cid;
+		}
+
+		/**
+		 *  Set the cid. 
+		 *  @param cid The cid to set.
+		 */
+		public void setCid(IComponentIdentifier cid)
+		{
+			this.cid = cid;
+		}
+	}
 }

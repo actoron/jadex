@@ -635,6 +635,12 @@ public class SBpmnModelReader
 	{
 		ClassLoader cl = model.getClassLoader();
 		
+//		if(tag.getLocalPart().equals("class"))
+//		{
+//			System.out.println("tagstack: "+tagstack);
+//			System.out.println("cont: "+content);
+//		}
+		
 		if ("description".equals(tag.getLocalPart()))
 		{
 			if (tagstack.size() > 0 && "extension".equals(tagstack.get(0).getLocalPart()))

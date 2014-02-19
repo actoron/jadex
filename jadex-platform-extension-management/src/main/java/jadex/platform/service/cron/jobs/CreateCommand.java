@@ -1,6 +1,5 @@
 package jadex.platform.service.cron.jobs;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.SFuture;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -9,13 +8,10 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.commons.IResultCommand;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 /**
@@ -56,7 +52,6 @@ public class CreateCommand implements IResultCommand<IIntermediateFuture<CMSStat
 		final SubscriptionIntermediateDelegationFuture<CMSStatusEvent> ret = (SubscriptionIntermediateDelegationFuture<CMSStatusEvent>)
 			SFuture.getNoTimeoutFuture(SubscriptionIntermediateDelegationFuture.class, ia);
 		
-//		final IInternalAccess ia = args.getFirstEntity();
 		SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(ia.createResultListener(new IResultListener<IComponentManagementService>()
 		{
@@ -72,16 +67,6 @@ public class CreateCommand implements IResultCommand<IIntermediateFuture<CMSStat
 			}
 		}));
 				
-//				cms.createComponent(name, model, info, resultlistener).addResultListener(
-//					ia.createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)));
-//				{
-//					public void resultAvailable(IComponentIdentifier cid)
-//					{
-//						System.out.println("created: "+cid);//+" at: "+args.getSecondEntity());
-//						ret
-//					}
-//				}));
-		
 		return ret;
 	}
 

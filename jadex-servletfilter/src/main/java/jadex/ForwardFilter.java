@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -70,6 +71,11 @@ public class ForwardFilter implements Filter
 	
 	public static final String authenticated = "authenticated";
 	
+	//-------- attributes --------
+	
+	/** Flag if https should be enforced. */
+	protected boolean https;
+	
 	/** The lease time in millis. */
 	protected long leasetime;
 	
@@ -100,6 +106,12 @@ public class ForwardFilter implements Filter
 		{
 			setLeaseTime(5*60*1000);
 		}
+		
+		val = conf.getInitParameter("https");
+		if(val!=null)
+		{
+			https = Boolean.getBoolean(val);
+		}
 	}
 	
 	/**
@@ -122,16 +134,24 @@ public class ForwardFilter implements Filter
 			HttpServletResponse res = (HttpServletResponse)response;
 			String requri = req.getRequestURI().substring(req.getContextPath().length()).replace("/","");
 			List<String> mimetypes = null;
-			boolean json = false;
+//			boolean json = false;
 			
 			if(commands.contains(requri))
 			{
 				removeDueMappings();
-				fini = checkSecure(req, res); // check if https is used
-				if(!fini && !login.equals(requri)) // check if user has logged in
+				
+				// check if https is used
+				if(https)
+				{
+					fini = checkSecure(req, res); 
+				}
+				
+				// check if user has logged in
+				if(!fini && !login.equals(requri)) 
 				{
 					fini = checkAuthentication(req, res);
 				}
+				
 				if(!fini)
 				{
 					String mts = req.getHeader("Accept");
@@ -149,10 +169,10 @@ public class ForwardFilter implements Filter
 							}
 							mimetypes.add(mt);
 						}
-						if(mimetypes.contains("application/json"))
-						{
-							json = true;
-						}
+//						if(mimetypes.contains("application/json"))
+//						{
+//							json = true;
+//						}
 					}
 				}
 			}
@@ -167,13 +187,14 @@ public class ForwardFilter implements Filter
 					
 					if(user==null)
 					{
-						if(json)
+						if(isBrowserClient(mimetypes))
 						{
-							res.getWriter().write("{authenticated: false, reason=\"no username/password given\"}");
+							sendLoginPage(res);
 						}
 						else
 						{
-							sendLoginPage(res);
+							res.sendError(403, "No username/password.");
+//							res.getWriter().write("{authenticated: false, reason=\"no username/password given\"}");
 						}
 					}
 					else
@@ -183,11 +204,7 @@ public class ForwardFilter implements Filter
 							HttpSession session = req.getSession();
 							session.setAttribute(authenticated, Boolean.TRUE);
 							
-							if(json)
-							{
-								res.getWriter().write("{authenticated: true}");
-							}
-							else
+							if(isBrowserClient(mimetypes))
 							{
 								if(next!=null)
 								{
@@ -201,14 +218,7 @@ public class ForwardFilter implements Filter
 						}
 						else
 						{
-							if(json)
-							{
-								res.getWriter().write("{authenticated: false, reason=\"username/password incorrect\"}");
-							}
-							else
-							{
-								res.sendError(401);
-							}
+							res.sendError(403, "Wrong username/password.");
 						}
 					}
 					fini = true;
@@ -227,7 +237,7 @@ public class ForwardFilter implements Filter
 					{
 						infos.put(apppath, new ForwardInfo(apppath, target));
 					}
-					if(!json)
+					if(isBrowserClient(mimetypes))
 					{
 						res.sendRedirect("displayMappings");
 					}
@@ -237,7 +247,7 @@ public class ForwardFilter implements Filter
 				{
 					String apppath = request.getParameter("name");
 					ForwardInfo old = infos.remove(apppath);
-					if(!json)
+					if(isBrowserClient(mimetypes))
 					{
 						res.sendRedirect("displayMappings");
 					}
@@ -250,7 +260,7 @@ public class ForwardFilter implements Filter
 					if(fi!=null)
 					{
 						fi.setTime(System.currentTimeMillis());
-						if(!json)
+						if(isBrowserClient(mimetypes))
 						{
 							res.sendRedirect("displayMappings");
 						}
@@ -292,7 +302,7 @@ public class ForwardFilter implements Filter
 				{
 					String lt = request.getParameter("leasetime");
 					setLeaseTime(lt);
-					if(!json)
+					if(isBrowserClient(mimetypes))
 					{
 						res.sendRedirect("displayMappings");
 					}
@@ -749,6 +759,14 @@ public class ForwardFilter implements Filter
 			}
 			return ret;
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isBrowserClient(Collection<String> mimetypes)
+	{
+		return mimetypes==null || mimetypes.contains("text/html") || mimetypes.contains("*/*");
 	}
 	
 	/**
