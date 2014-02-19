@@ -2,8 +2,6 @@ jadex change log.
 $Revision: 5350 $
 $Date: 2007-07-19 18:12:30 +0200 (Do, 19 Jul 2007) $
 
-git test 2
-
 Changes for current development version:
 
 07/19/2007
