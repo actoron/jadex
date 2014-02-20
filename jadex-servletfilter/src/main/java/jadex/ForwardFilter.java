@@ -953,50 +953,6 @@ public class ForwardFilter implements Filter
 	}
 	
 	/**
-	 *  Main for testing. 
-	 */
-	public static void main(String[] args)
-	{
-//		Map<String, String> m = new HashMap<String, String>();
-//		m.put("a", "a");
-//		m.put("b", "b");
-//		JSONObject js = new JSONObject(m);
-//		System.out.println(js);
-//		
-//		String o2 = "{\"movielist\": [\"Friday the 13th\", \"Friday the 13th Part 2\", \"Friday the 13th Part III\", \"Friday the 13th: The Final Chapter\", \"Friday the 13th: A New Beginning\"]}";
-//		Object o = JSONValue.parse(o2);
-//		o = JSONValue.parse("{\"name\":\"hans\"}");
-//		System.out.println("o: "+o);
-		
-		try
-		{
-			URL url = new URL("http://localhost:8080/test/addMapping?name=a&target=a");
-			HttpURLConnection con = (HttpURLConnection)url.openConnection();
-			con.setRequestMethod("GET");
-			con.setRequestProperty("Accept", "application/json");
-
-			if(con.getResponseCode() != 200)
-			{
-			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader((con.getInputStream())));
-
-			String output;
-			System.out.println("Output from Server .... \n");
-			while((output = br.readLine()) != null)
-			{
-				System.out.println(output);
-			}
-
-			con.disconnect();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	/**
 	 *  Convert header to key value pairs.
 	 */
 	protected Map<String, String> parseHeader(String header)
@@ -1070,19 +1026,19 @@ public class ForwardFilter implements Filter
 //	}
 //
 	/**
-	 * Returns the request body as String
+	 * Returns the request body as string.
 	 */
-	private String readRequestBody(HttpServletRequest request) throws IOException
+	protected String readRequestBody(HttpServletRequest request) throws IOException
 	{
 		StringBuilder buf = new StringBuilder();
 		BufferedReader reader = null;
 		try
 		{
 			InputStream is = request.getInputStream();
-			if(is != null)
+			if(is!=null)
 			{
 				reader = new BufferedReader(new InputStreamReader(is));
-				char[] charBuffer = new char[128];
+				char[] charBuffer = new char[256];
 				int bytesRead = -1;
 				while((bytesRead = reader.read(charBuffer)) > 0)
 				{
@@ -1108,141 +1064,53 @@ public class ForwardFilter implements Filter
 				}
 				catch(IOException ex)
 				{
-					throw ex;
 				}
 			}
 		}
-		String body = buf.toString();
-		return body;
+		return buf.toString();
 	}
 	
-//	public static class HttpDigestAuth
-//	{
-//		public HttpURLConnection tryAuth(HttpURLConnection connection, String username, String password) throws IOException
-//		{
-//			int responseCode = connection.getResponseCode();
-//			if(responseCode == HttpURLConnection.HTTP_UNAUTHORIZED)
-//			{
-//				connection = tryDigestAuthentication(connection, username, password);
-//				if(connection == null)
-//				{
-//					throw new AuthenticationException();
-//				}
-//			}
-//			return connection;
-//		}
-//
-//		public static HttpURLConnection tryDigestAuthentication(HttpURLConnection input, String username, String password)
-//		{
-//			String auth = input.getHeaderField("WWW-Authenticate");
-//			if(auth == null || !auth.startsWith("Digest "))
-//			{
-//				return null;
-//			}
-//			final HashMap<String, String> authFields = splitAuthFields(auth.substring(7));
-//			MessageDigest md5 = null;
-//			try
-//			{
-//				md5 = MessageDigest.getInstance("MD5");
-//			}
-//			catch(NoSuchAlgorithmException e)
-//			{
-//				return null;
-//			}
-//			Joiner colonJoiner = Joiner.on(':');
-//			String HA1 = null;
-//			try
-//			{
-//				md5.reset();
-//				String ha1str = colonJoiner.join(username, authFields.get("realm"), password);
-//				md5.update(ha1str.getBytes("ISO-8859-1"));
-//				byte[] ha1bytes = md5.digest();
-//				HA1 = bytesToHexString(ha1bytes);
-//			}
-//			catch(UnsupportedEncodingException e)
-//			{
-//				return null;
-//			}
-//			String HA2 = null;
-//			try
-//			{
-//				md5.reset();
-//				String ha2str = colonJoiner.join(input.getRequestMethod(), input.getURL().getPath());
-//				md5.update(ha2str.getBytes("ISO-8859-1"));
-//				HA2 = bytesToHexString(md5.digest());
-//			}
-//			catch(UnsupportedEncodingException e)
-//			{
-//				return null;
-//			}
-//			String HA3 = null;
-//			try
-//			{
-//				md5.reset();
-//				String ha3str = colonJoiner.join(HA1, authFields.get("nonce"), HA2);
-//				md5.update(ha3str.getBytes("ISO-8859-1"));
-//				HA3 = bytesToHexString(md5.digest());
-//			}
-//			catch(UnsupportedEncodingException e)
-//			{
-//				return null;
-//			}
-//			StringBuilder sb = new StringBuilder(128);
-//			sb.append("Digest ");
-//			sb.append("username").append("=\"").append(username).append("\",");
-//			sb.append("realm").append("=\"").append(authFields.get("realm")).append("\",");
-//			sb.append("nonce").append("=\"").append(authFields.get("nonce")).append("\",");
-//			sb.append("uri").append("=\"").append(input.getURL().getPath()).append("\",");
-//			// sb.append("qop" ).append('=' ).append("auth" ).append(",");
-//			sb.append("response").append("=\"").append(HA3).append("\"");
-//			try
-//			{
-//				final HttpURLConnection result = (HttpURLConnection)input.getURL().openConnection();
-//				result.addRequestProperty("Authorization", sb.toString());
-//				return result;
-//			}
-//			catch(IOException e)
-//			{
-//				return null;
-//			}
-//		}
-//
-//		private static HashMap<String, String> splitAuthFields(String authString)
-//		{
-//			final HashMap<String, String> fields = Maps.newHashMap();
-//			final CharMatcher trimmer = CharMatcher.anyOf("\"\t ");
-//			final Splitter commas = Splitter.on(',').trimResults().omitEmptyStrings();
-//			final Splitter equals = Splitter.on('=').trimResults(trimmer).limit(2);
-//			String[] valuePair;
-//			for(String keyPair : commas.split(authString))
-//			{
-//				valuePair = Iterables.toArray(equals.split(keyPair), String.class);
-//				fields.put(valuePair[0], valuePair[1]);
-//			}
-//			return fields;
-//		}
-//
-//		private static final String	HEX_LOOKUP	= "0123456789abcdef";
-//
-//		private static String bytesToHexString(byte[] bytes)
-//		{
-//			StringBuilder sb = new StringBuilder(bytes.length * 2);
-//			for(int i = 0; i < bytes.length; i++)
-//			{
-//				sb.append(HEX_LOOKUP.charAt((bytes[i] & 0xF0) >> 4));
-//				sb.append(HEX_LOOKUP.charAt((bytes[i] & 0x0F) >> 0));
-//			}
-//			return sb.toString();
-//		}
-//
-//		public static class AuthenticationException extends IOException
-//		{
-//			private static final long	serialVersionUID	= 1L;
-//
-//			public AuthenticationException()
-//			{
-//				super("Problems authenticating");
-//			}
-//		}
-//	}
+	/**
+	 *  Main for testing. 
+	 */
+	public static void main(String[] args)
+	{
+//		Map<String, String> m = new HashMap<String, String>();
+//		m.put("a", "a");
+//		m.put("b", "b");
+//		JSONObject js = new JSONObject(m);
+//		System.out.println(js);
+//		
+//		String o2 = "{\"movielist\": [\"Friday the 13th\", \"Friday the 13th Part 2\", \"Friday the 13th Part III\", \"Friday the 13th: The Final Chapter\", \"Friday the 13th: A New Beginning\"]}";
+//		Object o = JSONValue.parse(o2);
+//		o = JSONValue.parse("{\"name\":\"hans\"}");
+//		System.out.println("o: "+o);
+		
+		try
+		{
+			URL url = new URL("http://localhost:8080/test/addMapping?name=a&target=a");
+			HttpURLConnection con = (HttpURLConnection)url.openConnection();
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Accept", "application/json");
+
+			if(con.getResponseCode() != 200)
+			{
+			}
+
+			BufferedReader br = new BufferedReader(new InputStreamReader((con.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server .... \n");
+			while((output = br.readLine()) != null)
+			{
+				System.out.println(output);
+			}
+
+			con.disconnect();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 }
