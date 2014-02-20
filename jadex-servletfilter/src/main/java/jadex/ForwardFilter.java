@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -65,6 +64,7 @@ public class ForwardFilter implements Filter
 	/** The known users and passwords. */
 	protected static Map<String, String> users = Collections.synchronizedMap(new HashMap<String, String>());
 	
+	/** Supported commands. */
 	public static final String addmapping = "addMapping";
 	public static final String remmapping = "removeMapping";
 	public static final String refreshmapping = "refreshMapping";
@@ -78,6 +78,9 @@ public class ForwardFilter implements Filter
 	public static final String authenticated = "authenticated";
 	
 	//-------- attributes --------
+	
+	/** Flag if authentication is required. */
+	protected boolean authentication;
 	
 	/** Flag if https should be enforced. */
 	protected boolean https;
@@ -122,6 +125,16 @@ public class ForwardFilter implements Filter
 		{
 			https = Boolean.getBoolean(val);
 		}
+		
+		val = conf.getInitParameter("authentication");
+		if(val!=null)
+		{
+			authentication = Boolean.getBoolean(val);
+		}
+		else
+		{
+			authentication = true;
+		}
 	}
 	
 	/**
@@ -149,6 +162,8 @@ public class ForwardFilter implements Filter
 			{
 				removeDueMappings();
 				
+				mimetypes = parseMimetypes(req);
+				
 				// check if https is used
 				if(https)
 				{
@@ -156,29 +171,9 @@ public class ForwardFilter implements Filter
 				}
 				
 				// check if user has logged in
-				if(!fini && !login.equals(requri)) 
+				if(!fini && authentication && !login.equals(requri)) 
 				{
-					fini = checkAuthentication(req, res);
-				}
-				
-				if(!fini)
-				{
-					String mts = req.getHeader("Accept");
-					if(mts!=null)
-					{
-						StringTokenizer stok = new StringTokenizer(mts, ",");
-						while(stok.hasMoreTokens())
-						{
-							String tok = stok.nextToken();
-							StringTokenizer substok = new StringTokenizer(tok, ";");
-							String mt = substok.nextToken();
-							if(mimetypes==null)
-							{
-								mimetypes = new ArrayList<String>();
-							}
-							mimetypes.add(mt);
-						}
-					}
+					fini = checkAuthentication(req, res, mimetypes);
 				}
 			}
 
@@ -189,13 +184,13 @@ public class ForwardFilter implements Filter
 					String auth = req.getHeader("Authorization");
 					if(auth!=null)
 					{			
-						checkDigestAuthentication(req, res, mimetypes);
+						fini = checkDigestAuthentication(req, res, mimetypes);
 					}
 					else
 					{
 						checkUrlParameterAuthentication(req, res, mimetypes);
+						fini = true;
 					}
-					fini = true;
 				}
 				else if(addmapping.equals(requri))
 				{
@@ -214,6 +209,11 @@ public class ForwardFilter implements Filter
 					if(isBrowserClient(mimetypes))
 					{
 						res.sendRedirect("displayMappings");
+					}
+					else
+					{
+						res.setContentType("application/json");
+						res.getWriter().write("{\"leasetime\":"+getLeasetime()/1000/60+"}");
 					}
 					fini = true;
 				}
@@ -241,7 +241,7 @@ public class ForwardFilter implements Filter
 					}
 					else
 					{
-						res.sendError(500, "Mapping not found: "+apppath);
+						res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Mapping not found: "+apppath);
 					}
 					fini = true;
 				}
@@ -259,16 +259,16 @@ public class ForwardFilter implements Filter
 						ForwardInfo fi = infos.get(apppath);
 						if(fi!=null)
 						{
-							res.getWriter().write("{leasetime="+fi.getTime()+leasetime+"}");
+							res.getWriter().write("{\"leasetime\":"+fi.getTime()+getLeasetime()+"}");
 						}
 						else
 						{
-							res.sendError(500, "Mapping not found: "+apppath);
+							res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Mapping not found: "+apppath);
 						}
 					}
 					else
 					{
-						res.getWriter().write("{leasetime="+leasetime+"}");
+						res.getWriter().write("{\"leasetime\":"+getLeasetime()+"}");
 					}
 					fini = true;
 				}
@@ -321,6 +321,32 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
+	protected List<String> parseMimetypes(HttpServletRequest request)
+	{
+		List<String> mimetypes = null;
+		String mts = request.getHeader("Accept");
+		if(mts!=null)
+		{
+			mimetypes = new ArrayList<String>();
+			StringTokenizer stok = new StringTokenizer(mts, ",");
+			while(stok.hasMoreTokens())
+			{
+				String tok = stok.nextToken();
+				StringTokenizer substok = new StringTokenizer(tok, ";");
+				String mt = substok.nextToken();
+				if(mimetypes==null)
+				{
+					mimetypes = new ArrayList<String>();
+				}
+				mimetypes.add(mt);
+			}
+		}
+		return mimetypes;
+	}
+	
+	/**
+	 * 
+	 */
 	protected boolean checkSecure(HttpServletRequest request, HttpServletResponse response) throws IOException
 	{
 		boolean fini = false;
@@ -345,20 +371,27 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	protected boolean checkAuthentication(HttpServletRequest request, HttpServletResponse response) throws IOException
+	protected boolean checkAuthentication(HttpServletRequest request, HttpServletResponse response, List<String> mimetypes) throws IOException
 	{
 		boolean fini = false;
 		if(!isAuthenticated(request, response))
 		{
 			fini = true;
 			String next = request.getRequestURI();
-			if(request.getQueryString()==null)
+			if(isBrowserClient(mimetypes))
 			{
-				response.sendRedirect("login?next="+next);
+				if(request.getQueryString()==null)
+				{
+					response.sendRedirect("login?next="+next);
+				}
+				else
+				{
+					response.sendRedirect("login?next="+next+request.getQueryString());
+				}
 			}
 			else
 			{
-				response.sendRedirect("login?next="+next+request.getQueryString());
+				sendAuthorizationRequest(request.getServerName(), response);
 			}
 		}
 		return fini;
@@ -367,13 +400,15 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	protected void checkDigestAuthentication(HttpServletRequest request, HttpServletResponse response, 
+	protected boolean checkDigestAuthentication(HttpServletRequest request, HttpServletResponse response, 
 		Collection<String> mimetypes) throws IOException
 	{
+		boolean ret = true;
+		
 		String auth = request.getHeader("Authorization");
 		if(auth.startsWith("Digest"))
 		{
-			HashMap<String, String> vals = parseHeader(auth);
+			Map<String, String> vals = parseHeader(auth);
 			
 			String digest = vals.get("response");
 			String check = null;
@@ -396,7 +431,7 @@ public class ForwardFilter implements Filter
 					String ha1 = hex(digest(user+":"+realm+":"+pass));
 					String ha2;
 					
-					if(qop.equals("auth-int"))
+					if(qop!=null && qop.equals("auth-int"))
 					{
 						String body = readRequestBody(request);
 						ha2 = hex(digest(method+":"+uri+":"+SUtil.hex(digest(body))));
@@ -431,6 +466,10 @@ public class ForwardFilter implements Filter
 							// todo: redirect to next
 							response.sendRedirect("displayMappings");
 						}
+//						else
+//						{
+//							ret = false;
+//						}
 					}
 				}
 				else
@@ -440,13 +479,15 @@ public class ForwardFilter implements Filter
 			}
 			else
 			{
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Nonce unknown.");
+				sendAuthorizationRequest(request.getServerName(), response);
 			}
 		}
 		else
 		{
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Only digest authentication supported.");
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -523,12 +564,15 @@ public class ForwardFilter implements Filter
 	 */
 	protected void removeDueMappings()
 	{
-		long now = System.currentTimeMillis();
-		for(ForwardInfo fi: getForwardInfos())
+		if(getLeasetime()>0)
 		{
-			if(now>fi.getTime()+leasetime)
+			long now = System.currentTimeMillis();
+			for(ForwardInfo fi: getForwardInfos())
 			{
-				infos.remove(fi.getAppPath());
+				if(now>fi.getTime()+getLeasetime())
+				{
+					infos.remove(fi.getAppPath());
+				}
 			}
 		}
 	}
@@ -553,6 +597,15 @@ public class ForwardFilter implements Filter
 			int mins = Integer.valueOf(val);
 			leasetime = mins*60*1000;
 		}
+	}
+	
+	/**
+	 *  Get the lease time.
+	 *  @return The lease time.
+	 */
+	public long getLeasetime()
+	{
+		return leasetime;
 	}
 
 	/**
@@ -584,7 +637,7 @@ public class ForwardFilter implements Filter
 			// Write body data from request input
 			if("POST".equals(request.getMethod()))
 			{
-				copyStream(request.getInputStream(), con.getOutputStream());
+				SUtil.copyStream(request.getInputStream(), con.getOutputStream());
 				con.getOutputStream().flush();
 			}
 			
@@ -610,7 +663,7 @@ public class ForwardFilter implements Filter
 		    else
 		    {
 		    	// Copy without modifications
-		    	copyStream(con.getInputStream(), response.getOutputStream());
+		    	SUtil.copyStream(con.getInputStream(), response.getOutputStream());
 		    }
 		    response.getOutputStream().flush();
 		} 
@@ -688,7 +741,7 @@ public class ForwardFilter implements Filter
 			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 			pw.write("<h2>Leasetime</h2>");
 //			pw.write("Leasetime [mins]: ");
-			String lt = leasetime==0? "0": ""+(leasetime/1000/60);
+			String lt = getLeasetime()==0? "0": ""+(getLeasetime()/1000/60);
 //			pw.write(lt);
 //			pw.write(sdf.format(new Date(leasetime-TimeZone.getDefault().getRawOffset())));
 			pw.write("<form name=\"input\" action=\"setLeasetime\" method=\"get\">");
@@ -765,29 +818,29 @@ public class ForwardFilter implements Filter
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 	}
 	
-	/**
-	 *  Copy all data from input to output stream.
-	 */
-	public static void copyStream(InputStream is, OutputStream os) 
-	{
-		try
-		{
-	        byte[] buf = new byte[10 * 1024];
-	        int len = 0;
-	        while((len = is.read(buf)) != -1) 
-	        {
-	            os.write(buf, 0, len);
-	        }
-		}
-		catch(RuntimeException e)
-		{
-			throw e;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
+//	/**
+//	 *  Copy all data from input to output stream.
+//	 */
+//	public static void copyStream(InputStream is, OutputStream os) 
+//	{
+//		try
+//		{
+//	        byte[] buf = new byte[10 * 1024];
+//	        int len = 0;
+//	        while((len = is.read(buf)) != -1) 
+//	        {
+//	            os.write(buf, 0, len);
+//	        }
+//		}
+//		catch(RuntimeException e)
+//		{
+//			throw e;
+//		}
+//		catch(Exception e)
+//		{
+//			throw new RuntimeException(e);
+//		}
+//	}
 	
 	/**
 	 * 
@@ -904,6 +957,17 @@ public class ForwardFilter implements Filter
 	 */
 	public static void main(String[] args)
 	{
+//		Map<String, String> m = new HashMap<String, String>();
+//		m.put("a", "a");
+//		m.put("b", "b");
+//		JSONObject js = new JSONObject(m);
+//		System.out.println(js);
+//		
+//		String o2 = "{\"movielist\": [\"Friday the 13th\", \"Friday the 13th Part 2\", \"Friday the 13th Part III\", \"Friday the 13th: The Final Chapter\", \"Friday the 13th: A New Beginning\"]}";
+//		Object o = JSONValue.parse(o2);
+//		o = JSONValue.parse("{\"name\":\"hans\"}");
+//		System.out.println("o: "+o);
+		
 		try
 		{
 			URL url = new URL("http://localhost:8080/test/addMapping?name=a&target=a");
@@ -932,87 +996,10 @@ public class ForwardFilter implements Filter
 		}
 	}
 	
-//	 private String authMethod = "auth";
-//	 private String userName = "usm";
-//	 private String password = "password";
-//	 private String realm = "example.com";
-	  
-//	 public String nonce;
-	  
-	// nonce = calculateNonce();
-
-//	protected void checkAuthenticationResponse(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-//	{
-//		response.setContentType("text/html;charset=UTF-8");
-//		PrintWriter out = response.getWriter();
-//
-//		String requestBody = readRequestBody(request);
-//
-//		try
-//		{
-//			String authHeader = request.getHeader("Authorization");
-//			if(StringUtils.isBlank(authHeader))
-//			{
-//				response.addHeader("WWW-Authenticate", getAuthenticateHeader());
-//				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-//			}
-//			else
-//			{
-//				if(authHeader.startsWith("Digest"))
-//				{
-//					HashMap<String, String> vals = parseHeader(authHeader);
-//					String method = request.getMethod();
-//					String ha1 = DigestUtils.md5Hex(userName + ":" + realm + ":" + password);
-//					String qop = vals.get("qop");
-//					String ha2;
-//					String reqURI = vals.get("uri");
-//					if(!StringUtils.isBlank(qop) && qop.equals("auth-int"))
-//					{
-//						String entityBodyMd5 = DigestUtils.md5Hex(requestBody);
-//						ha2 = DigestUtils.md5Hex(method + ":" + reqURI + ":" + entityBodyMd5);
-//					}
-//					else
-//					{
-//						ha2 = DigestUtils.md5Hex(method + ":" + reqURI);
-//					}
-//
-//					String serverResponse;
-//
-//					if(StringUtils.isBlank(qop))
-//					{
-//						serverResponse = DigestUtils.md5Hex(ha1 + ":" + nonce + ":" + ha2);
-//					}
-//					else
-//					{
-//						String domain = vals.get("realm");
-//						String nonceCount = vals.get("nc");
-//						String clientNonce = vals.get("cnonce");
-//						serverResponse = DigestUtils.md5Hex(ha1 + ":" + nonce + ":" + nonceCount + ":" + clientNonce + ":" + qop + ":" + ha2);
-//					}
-//					String clientResponse = vals.get("response");
-//
-//					if(!serverResponse.equals(clientResponse))
-//					{
-//						response.addHeader("WWW-Authenticate", getAuthenticateHeader());
-//						response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-//					}
-//				}
-//				else
-//				{
-//					response.sendError(HttpServletResponse.SC_UNAUTHORIZED, " This Servlet only supports Digest Authorization");
-//				}
-//			}
-//		}
-//		finally
-//		{
-//			out.close();
-//		}
-//	}
-//
 	/**
 	 *  Convert header to key value pairs.
 	 */
-	private HashMap<String, String> parseHeader(String header)
+	protected Map<String, String> parseHeader(String header)
 	{
 		String h = header.substring(header.indexOf(" ") + 1).trim();
 		HashMap<String, String> values = new HashMap<String, String>();
@@ -1038,7 +1025,7 @@ public class ForwardFilter implements Filter
 		String fmtDate = f.format(d);
 		Random rand = new Random(100000);
 		Integer randomInt = rand.nextInt();
-		return SUtil.hex(digest((fmtDate+randomInt.toString()).getBytes()));
+		return hex(digest((fmtDate+randomInt.toString()).getBytes()));
 	}
 	
 	/**

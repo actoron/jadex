@@ -1,5 +1,6 @@
 package jadex.extension.rs.publish;
 
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -26,10 +27,13 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
-import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,7 +42,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -57,6 +64,7 @@ import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -68,6 +76,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -122,6 +133,9 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	
 	/** The proxy classes. */
 	protected LRU<Tuple2<Class<?>, Class<?>>, Class<?>> proxyclasses;
+	
+//	/** The webproxy refreshers. */
+//	protected Map<IServiceIdentifier, Object> webproxyrefrehsers;
 	
 	//-------- constructors --------
 	
@@ -230,6 +244,15 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			props.put(JADEXSERVICE, service);
 			
+			// Add info for web proxy 
+//			String wpurl = (String)mapprops.get(PublishInfo.WP_URL);
+//			if(wpurl!=null)
+//			{
+//				props.put(PublishInfo.WP_URL, wpurl);
+//				props.put(PublishInfo.WP_APPNAME, mapprops.get(PublishInfo.WP_APPNAME));
+//				props.put(PublishInfo.WP_TARGET, uri.toString());
+//			}
+			
 			final ResourceConfig rc = new ResourceConfig();
 			rc.addProperties(props);
 			rc.register(rsimpl);
@@ -257,6 +280,22 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			internalPublishService(uri, rc, service.getServiceIdentifier());
 //			System.out.println("handler: "+handler+" "+server.getServerConfiguration().getHttpHandlers());
 
+			String wpurl = (String)mapprops.get(PublishInfo.WP_URL);
+			if(wpurl!=null)
+			{
+				props.put(PublishInfo.WP_URL, wpurl);
+				props.put(PublishInfo.WP_APPNAME, mapprops.get(PublishInfo.WP_APPNAME));
+				props.put(PublishInfo.WP_TARGET, uri.toString());
+			}
+			
+			final String url = (String)mapprops.get(PublishInfo.WP_URL);
+			if(url!=null)
+			{
+				final String name = (String)mapprops.get(PublishInfo.WP_APPNAME);
+				final String target = uri.toString();
+				initWebProxyRefresh(url, name, target, service.getServiceIdentifier());
+			}
+			
 			Thread.currentThread().setContextClassLoader(ccl);
 		}
 		catch(Exception e)
@@ -267,6 +306,12 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		return IFuture.DONE;
 	}
 	
+	/**
+	 *  Unpublish a service.
+	 *  @param sid The service identifier.
+	 */
+	public abstract IFuture<Void> unpublishService(IServiceIdentifier sid);
+
 	/**
 	 * 
 	 */
@@ -380,19 +425,13 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //		return IFuture.DONE;
 //	}
 	
+	
 	/**
 	 *  Publish resources via a rel jar path.
 	 *  The resources are searched with respect to the
 	 *  component classloader (todo: allow for specifiying RID).
 	 */
 	public abstract IFuture<Void> publishResources(URI uri, String path);
-	
-	/**
-	 *  Unpublish a service.
-	 *  @param sid The service identifier.
-	 */
-	public abstract IFuture<Void> unpublishService(IServiceIdentifier sid);
-
 	
 	/**
 	 *  Create a service proxy class.
@@ -463,6 +502,18 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			attr.addAnnotation(annot);
 			ui.getFieldInfo().addAttribute(attr);
 			proxyclazz.addField(ui);
+			
+			// if webproxy refresh is need add an init method that initializes refresh
+			// problem: init annotation (Singleton/PostCreate) does not work
+//			CtMethod init = SJavassist.getCtClass(AbstractRestServicePublishService.class, pool)
+//				.getDeclaredMethod("initWebProxyRefresh");
+//			CtMethod met = CtNewMethod.wrapped(CtClass.voidType, "init",
+//				null, null, init, null, proxyclazz);
+//			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+//			annot = new Annotation(constpool, SJavassist.getCtClass(Singleton.class, pool));
+//			attr.addAnnotation(annot);
+//			met.getMethodInfo().addAttribute(attr);
+//			proxyclazz.addMethod(met);
 			
 			// Add methods 
 			for(Iterator<RestMethodInfo> it=geninfos.iterator(); it.hasNext(); )
@@ -640,6 +691,151 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		
 		return ret;
 	}
+	
+	/**
+	 * 
+	 */
+//	public Object initWebProxyRefresh(Object[] args)
+	public Void initWebProxyRefresh(final String url, final String name, final String target, final IServiceIdentifier sid)
+	{
+		if(url!=null && name!=null && target!=null)
+		{
+			System.out.println("Init web proxy refresh: "+url+" "+name+" "+target);
+			final ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+			Runnable run= new Runnable()
+			{
+				protected String sessionid = null;
+				public void run()
+				{
+					if(isPublished(sid))
+					{
+						if(sessionid==null)
+						{
+							sessionid = login(url, "admin", "admin");
+						}
+						if(sessionid!=null)
+						{
+							Integer lt = addMapping(url, name, target, sessionid);
+							if(lt==null)
+							{
+								System.out.println("Web proxy problems");
+								ses.schedule(this, 2, TimeUnit.MINUTES);
+							}
+							else
+							{
+								long dur = (long)(lt.intValue()*1000*60*0.9);
+								ses.schedule(this, dur, TimeUnit.MILLISECONDS);
+							}
+						}
+					}
+					else
+					{
+						System.out.println("Webproxy refresh ends.");
+					}
+				}
+			};
+			run.run();
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 */
+	protected String login(String url, String user, String pass)
+	{
+		String ret = null;
+		HttpURLConnection con = null;
+		try 
+		{
+			if(url.indexOf("https")!=-1)
+			{
+				URL urlc = new URL(url+"/login?name="+user+"&pass="+pass);
+				con = (HttpURLConnection)urlc.openConnection();
+				con.setRequestMethod("GET");
+				con.setRequestProperty("Accept", "application/json");
+				con.connect();
+				if(HttpServletResponse.SC_OK==con.getResponseCode())
+				{
+					String ck = con.getHeaderField("Set-Cookie");
+					Map<String, String> vals = parseHeader(ck, ",;");
+					ret = vals.get("JSESSIONID");
+				}
+			}
+			else
+			{
+				URL urlc = new URL(url+"/login");
+				con = (HttpURLConnection)urlc.openConnection();
+				con.connect();
+				
+				String auth = con.getHeaderField("WWW-Authenticate");
+				if(auth.startsWith("Digest "))
+				{
+					Map<String, String> vals = parseHeader(auth, ",");
+					String realm = vals.get("realm");
+					String nonce = vals.get("nonce");
+					String ha1 = hex(digest(user+":"+realm+":"+pass));
+					String ha2 = hex(digest(con.getRequestMethod()+":"+con.getURL().getPath()));
+					String ha3 = hex(digest(ha1+":"+nonce+":"+ha2));
+	
+					StringBuilder sb = new StringBuilder();
+					sb.append("Digest ");
+					sb.append("username").append("=\"").append(user).append("\",");
+					sb.append("realm").append("=\"").append(realm).append("\",");
+					sb.append("nonce").append("=\"").append(nonce).append("\",");
+					sb.append("uri").append("=\"").append(con.getURL().getPath()).append("\",");
+					// sb.append("qop" ).append('=' ).append("auth" ).append(",");
+					sb.append("response").append("=\"").append(ha3).append("\"");
+					HttpURLConnection con2 = (HttpURLConnection)con.getURL().openConnection();
+					con2.addRequestProperty("Authorization", sb.toString());
+					con2.setRequestProperty("Accept", "application/json");
+					if(HttpServletResponse.SC_OK==con2.getResponseCode())
+					{
+						String ck = con2.getHeaderField("Set-Cookie");
+						vals = parseHeader(ck, ",;");
+						ret = vals.get("JSESSIONID");
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected Integer addMapping(String url, String name, String target, String sessionid)
+	{
+		Integer ret = null;
+		HttpURLConnection con = null;
+		try 
+		{
+			URL urlc = new URL(url+"/addMapping?name="+name+"&target="+target);
+			con = (HttpURLConnection)urlc.openConnection();
+			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("Cookie", "JSESSIONID="+sessionid);
+			con.connect();
+			if(HttpServletResponse.SC_OK==con.getResponseCode())
+			{
+				JSONObject jo = (JSONObject)JSONValue.parse(con.getInputStream());
+				ret = (Integer)jo.get("leasetime");
+				if(ret==null)
+				{
+					ret = Integer.valueOf(0);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
 	
 	/**
 	 *  Method that is invoked when rest service is called.
@@ -1059,6 +1255,67 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 		return ret.toString();
 	}
 	
+	/**
+	 *  Test if a service is published.
+	 */
+	public abstract boolean isPublished(IServiceIdentifier sid);
+
+	/**
+	 *  Convert to hex value.
+	 */ 
+	public static String hex(byte[] data)
+	{
+		return SUtil.hex(data, false);
+	}
+	
+	
+	/**
+	 *  Build the digest given the timestamp and password.
+	 */
+	public static byte[] digest(String input)
+	{
+		return digest(input.getBytes());
+	}
+	
+	/**
+	 *  Build the digest given the timestamp and password.
+	 */
+	public static byte[] digest(byte[] input)
+	{
+//		System.out.println("build digest: "+timestamp+" "+secret);
+		try
+		{
+			MessageDigest	md	= MessageDigest.getInstance("MD5");
+			byte[]	output	= md.digest(input);
+			return output;
+		}
+		catch(NoSuchAlgorithmException e)
+		{
+			// Shouldn't happen?
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Convert header to key value pairs.
+	 */
+	protected Map<String, String> parseHeader(String header, String delims)
+	{
+		HashMap<String, String> values = new HashMap<String, String>();
+		StringTokenizer stok = new StringTokenizer(header, delims);
+		while(stok.hasMoreTokens())
+		{
+			String keyval = stok.nextToken();
+			if(keyval.contains("="))
+			{
+				String key = keyval.substring(0, keyval.indexOf("="));
+				String value = keyval.substring(keyval.indexOf("=") + 1);
+				values.put(key.trim(), value.replaceAll("\"", "").trim());
+			}
+		}
+		return values;
+	}
+	
 //	/**
 //	 *  Main for testing.
 //	 */
@@ -1069,4 +1326,5 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 //		URI newuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
 //		System.out.println(newuri);
 //	}
+
 }

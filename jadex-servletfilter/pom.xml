@@ -22,5 +22,10 @@
 			<artifactId>jadex-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!--  <dependency>
+			<groupId>net.minidev</groupId>
+			<artifactId>json-smart</artifactId>
+			<version>2.0-RC3</version>
+		</dependency>-->
 	</dependencies>
 </project>

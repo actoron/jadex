@@ -277,4 +277,12 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			ret.setException(new RuntimeException("Published service could not be stopped: "+sid));
 		return ret;
 	}
+	
+	/**
+	 *  Test if a service is published.
+	 */
+	public boolean isPublished(IServiceIdentifier sid)
+	{
+		return sidservers!=null && sidservers.containsKey(sid);
+	}
 }
