@@ -1,6 +1,9 @@
-*/target/**
-*/.classpath
-*/.project
+**/target
+**/bin
+**/gen
+**/.settings
+.classpath
+.project
 *.prefs
 *.properties
 *.copy
