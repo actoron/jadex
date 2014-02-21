@@ -22,12 +22,12 @@ public class ObjectConditionBDI
 	protected BDIAgent agent;
 	
 	@Belief 
-	protected Bean mybean;
+	protected Bean mybean = bean;
 	
 	@AgentBody
 	public void body()
 	{
-		this.mybean = bean;
+//		this.mybean = bean;
 		
 		if("1".equals(agent.getConfiguration()))
 		{
@@ -76,7 +76,6 @@ public class ObjectConditionBDI
 
 	    public void addPropertyChangeListener(PropertyChangeListener listener)
 		{
-	    	System.out.println("adding lis: "+listener);
 			pcs.addPropertyChangeListener(listener);
 	    }
 

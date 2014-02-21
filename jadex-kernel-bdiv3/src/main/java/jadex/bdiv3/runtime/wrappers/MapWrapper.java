@@ -256,23 +256,25 @@ public class MapWrapper<T, E> implements Map<T, E>
 	{
 		if(val!=null)
 		{
-			getRuleSystem().observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
+			getRuleSystem().observeObject(val, true, false, new IResultCommand<IFuture<Void>, PropertyChangeEvent>()
 			{
-				public IFuture<IEvent> execute(final PropertyChangeEvent event)
+				public IFuture<Void> execute(final PropertyChangeEvent event)
 				{
-					final Future<IEvent> ret = new Future<IEvent>();
+					final Future<Void> ret = new Future<Void>();
 					try
 					{
-						IFuture<IEvent> fut = getInterpreter().scheduleStep(new IComponentStep<IEvent>()
+						IFuture<Void> fut = getInterpreter().scheduleStep(new IComponentStep<Void>()
 						{
-							public IFuture<IEvent> execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								publishToolBeliefEvent();
 								Event ev = new Event(changeevent, event.getNewValue());
-								return new Future<IEvent>(ev);
+								getRuleSystem().addEvent(ev);
+								return IFuture.DONE;
+//								return new Future<IEvent>(ev);
 							}
 						});
-						fut.addResultListener(new DelegationResultListener<IEvent>(ret)
+						fut.addResultListener(new DelegationResultListener<Void>(ret)
 						{
 							public void exceptionOccurred(Exception exception)
 							{

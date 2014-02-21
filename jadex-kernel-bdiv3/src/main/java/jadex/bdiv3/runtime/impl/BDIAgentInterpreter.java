@@ -2058,13 +2058,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		if(inited && rulesystem!=null)
 			rulesystem.processAllEvents();
 		
-		if(steps!=null && steps.size()>0)
-		{
-			System.out.println(getComponentIdentifier()+" steps: "+steps.size()+" "+steps.get(0).getStep().getClass());
-		}
+//		if(steps!=null && steps.size()>0)
+//		{
+//			System.out.println(getComponentIdentifier()+" steps: "+steps.size()+" "+steps.get(0).getStep().getClass());
+//		}
 		boolean ret = super.executeStep();
 		
-		System.out.println(getComponentIdentifier()+" after step");
+//		System.out.println(getComponentIdentifier()+" after step");
 
 		return ret || (inited && rulesystem!=null && rulesystem.isEventAvailable());
 	}

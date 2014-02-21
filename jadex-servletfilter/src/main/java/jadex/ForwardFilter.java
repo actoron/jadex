@@ -622,12 +622,13 @@ public class ForwardFilter implements Filter
 		{
 			buf.append(request.getQueryString());
 		}
+		String fowurl = buf.toString();
 		
 		HttpURLConnection con = null;
 		try 
 		{
 			// Open connection with copied header
-			URL urlc = new URL(url);
+			URL urlc = new URL(fowurl);
 			con = (HttpURLConnection)urlc.openConnection();
 			con.setDoOutput(true);
 			con.setUseCaches(false);
@@ -658,7 +659,7 @@ public class ForwardFilter implements Filter
 			    String external = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
 			    if(fi.getAppPath().length()>0)
 			    {
-			    	external += fi.getAppPath();
+			    	external += "/"+fi.getAppPath();
 			    }
 			    while((line = rd.readLine()) != null) 
 			    { 

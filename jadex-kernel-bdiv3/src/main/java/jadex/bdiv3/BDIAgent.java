@@ -637,26 +637,28 @@ public class BDIAgent extends MicroAgent
 	{
 		if(val!=null)
 		{
-			rs.observeObject(val, true, false, new IResultCommand<IFuture<IEvent>, PropertyChangeEvent>()
+			rs.observeObject(val, true, false, new IResultCommand<IFuture<Void>, PropertyChangeEvent>()
 			{
-				public IFuture<IEvent> execute(final PropertyChangeEvent event)
+				public IFuture<Void> execute(final PropertyChangeEvent event)
 				{
-					final Future<IEvent> ret = new Future<IEvent>();
+					final Future<Void> ret = new Future<Void>();
 					try
 					{
-						IFuture<IEvent> fut = agent.scheduleStep(new IComponentStep<IEvent>()
+						IFuture<Void> fut = agent.scheduleStep(new IComponentStep<Void>()
 						{
-							public IFuture<IEvent> execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								publishToolBeliefEvent(agent, mbel);
 								
 		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
 		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
 								Event ev = new Event(etype, event.getNewValue());
-								return new Future<IEvent>(ev);
+								rs.addEvent(ev);
+								return IFuture.DONE;
+//								return new Future<IEvent>(ev);
 							}
 						});
-						fut.addResultListener(new DelegationResultListener<IEvent>(ret)
+						fut.addResultListener(new DelegationResultListener<Void>(ret)
 						{
 							public void exceptionOccurred(Exception exception)
 							{

@@ -78,7 +78,7 @@ public class RuleSystem
 	 *  - Subscribes for events
 	 */
 	public Object observeObject(final Object object, boolean bean, boolean hasrules, 
-		IResultCommand<IFuture<IEvent>, PropertyChangeEvent> eventcreator)
+		IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
 	{
 		// Create proxy object if eventcreators are present
 		Object proxy = object;
@@ -87,7 +87,7 @@ public class RuleSystem
 
 		if(bean && !(object instanceof Class))
 		{
-			addPropertyChangeListener(object, eventcreator);
+			addPropertyChangeListener(object, eventadder);
 		}
 		
 		if(hasrules)
@@ -309,7 +309,7 @@ public class RuleSystem
 	/**  
 	 *  Add a property change listener.
 	 */
-	protected void	addPropertyChangeListener(Object object, final IResultCommand<IFuture<IEvent>, PropertyChangeEvent> eventcreator)
+	protected void	addPropertyChangeListener(Object object, final IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
 	{
 		if(object!=null)
 		{
@@ -330,16 +330,16 @@ public class RuleSystem
 							// - may be called on wrong thread (-> synchronizator)
 							// - how to create correct event with type and value
 
-							if(eventcreator!=null)
+							if(eventadder!=null)
 							{
-								eventcreator.execute(evt).addResultListener(new IResultListener<IEvent>()
+								eventadder.execute(evt).addResultListener(new IResultListener<Void>()
 								{
-									public void resultAvailable(IEvent event)
+									public void resultAvailable(Void event)
 									{
-										if(event!=null)
-										{
-											addEvent(event);
-										}
+//										if(event!=null)
+//										{
+//											addEvent(event);
+//										}
 									}
 									
 									public void exceptionOccurred(Exception exception)
@@ -413,9 +413,9 @@ public class RuleSystem
 		{
 			IEvent event = events.remove(0);
 			
-			if(event.getType().getType(0).indexOf("factchanged")!=-1 && event.getType().getType(1).indexOf("mybean")!=-1)
+//			if(event.getType().getType(0).indexOf("factchanged")!=-1 && event.getType().getType(1).indexOf("mybean")!=-1)
 //				&& event.getType().getType(1).indexOf("Ambu")!=-1)
-				System.out.println("proc ev: "+event);
+//				System.out.println("proc ev: "+event);
 				
 			List<IRule<?>> rules = rulebase.getRules(event.getType());
 			
@@ -615,7 +615,7 @@ public class RuleSystem
 	 */
 	public void addEvent(IEvent event)
 	{
-		System.out.println("added: "+event.getType()+" "+this);
+//		System.out.println("added: "+event.getType()+" "+this);
 //		if(event.getType().getTypes().length==1)
 //			System.out.println("herer: "+event.getType());
 //		if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
