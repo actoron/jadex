@@ -289,23 +289,11 @@ public class ForwardFilter implements Filter
 						if(requri.startsWith(fi.getAppPath()))
 						{
 							removeDueMappings();
-							
-							// forward to other server
-							StringBuffer buf = new StringBuffer();
-							buf.append(fi.forwardpath);
-							if(requri.length()>fi.getAppPath().length())
-							{
-								String add = requri.substring(fi.getAppPath().length());
-								buf.append(add);
-							}
-							if(req.getQueryString()!=null)
-							{
-								buf.append(req.getQueryString());
-							}
-							
-							// Cannot use request dispatcher as it only allows for server internal forwards :-((
-							sendForward(buf.toString(), req, res);
+
+							// Cannot use request dispatcher as it only allows for sending server internal forwards :-((
+							sendForward(fi, req, res);
 							fini = true;
+							break;
 						}
 					}
 				}
@@ -619,8 +607,22 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	protected void sendForward(String url, HttpServletRequest request, HttpServletResponse response)
+	protected void sendForward(ForwardInfo fi, HttpServletRequest request, HttpServletResponse response)
 	{
+		// forward to other server
+		StringBuffer buf = new StringBuffer();
+		buf.append(fi.forwardpath);
+		String url = request.getRequestURI().substring(request.getContextPath().length()).replace("/","");
+		if(url.length()>fi.getAppPath().length())
+		{
+			String add = url.substring(fi.getAppPath().length());
+			buf.append(add);
+		}
+		if(request.getQueryString()!=null)
+		{
+			buf.append(request.getQueryString());
+		}
+		
 		HttpURLConnection con = null;
 		try 
 		{
@@ -650,10 +652,14 @@ public class ForwardFilter implements Filter
 		    // Replace content if is html with possibly wrong links
 		    if(request.getContentType()==null || ("text/html").equals(request.getContentType().toLowerCase()))
 		    {
-		    	// todo: also replace different subpath!?
 			    String line;
 			    String internal = urlc.getProtocol()+"://"+urlc.getHost()+":"+urlc.getPort(); 
+			    internal = fi.getForwardPath();
 			    String external = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
+			    if(fi.getAppPath().length()>0)
+			    {
+			    	external += fi.getAppPath();
+			    }
 			    while((line = rd.readLine()) != null) 
 			    { 
 			        String rep = line.replace(internal, external);
@@ -818,132 +824,6 @@ public class ForwardFilter implements Filter
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 	}
 	
-//	/**
-//	 *  Copy all data from input to output stream.
-//	 */
-//	public static void copyStream(InputStream is, OutputStream os) 
-//	{
-//		try
-//		{
-//	        byte[] buf = new byte[10 * 1024];
-//	        int len = 0;
-//	        while((len = is.read(buf)) != -1) 
-//	        {
-//	            os.write(buf, 0, len);
-//	        }
-//		}
-//		catch(RuntimeException e)
-//		{
-//			throw e;
-//		}
-//		catch(Exception e)
-//		{
-//			throw new RuntimeException(e);
-//		}
-//	}
-	
-	/**
-	 * 
-	 */
-	public static class ForwardInfo 
-	{
-		/** The application url path. */
-		protected String apppath;
-		
-		/** The forward url base path. */
-		protected String forwardpath;
-		
-		/** The timestamp. */
-		protected long time;
-
-		/**
-		 *  Create a new ForwardInfo. 
-		 */
-		public ForwardInfo(String apppath, String forwardpath)
-		{
-			this.apppath = apppath;
-//			this.apppath = apppath.startsWith("/")? apppath: "/"+apppath;
-			this.forwardpath = forwardpath.startsWith("http")? forwardpath: "http://"+forwardpath;
-			this.time = System.currentTimeMillis();
-		}
-
-		/**
-		 *  Get the apppath.
-		 *  @return The apppath.
-		 */
-		public String getAppPath()
-		{
-			return apppath;
-		}
-
-		/**
-		 *  Set the apppath.
-		 *  @param apppath The apppath to set.
-		 */
-		public void setAppPath(String apppath)
-		{
-			this.apppath = apppath;
-		}
-
-		/**
-		 *  Get the forwardpath.
-		 *  @return The forwardpath.
-		 */
-		public String getForwardPath()
-		{
-			return forwardpath;
-		}
-
-		/**
-		 *  Set the forwardpath.
-		 *  @param forwardpath The forwardpath to set.
-		 */
-		public void setForwardPath(String forwardpath)
-		{
-			this.forwardpath = forwardpath;
-		}
-
-		/**
-		 *  Get the time.
-		 *  @return The time.
-		 */
-		public long getTime()
-		{
-			return time;
-		}
-
-		/**
-		 *  Set the time.
-		 *  @param time The time to set.
-		 */
-		public void setTime(long time)
-		{
-			this.time = time;
-		}
-		
-		/** 
-		 * 
-		 */
-		public int hashCode()
-		{
-			return 31*apppath.hashCode();
-		}
-
-		/** 
-		 * 
-		 */
-		public boolean equals(Object obj)
-		{
-			boolean ret = false;
-			if(obj instanceof ForwardInfo)
-			{
-				ForwardInfo other = (ForwardInfo)obj;
-				ret = other.getAppPath().equals(getAppPath());
-			}
-			return ret;
-		}
-	}
-	
 	/**
 	 * 
 	 */
@@ -1068,6 +948,108 @@ public class ForwardFilter implements Filter
 			}
 		}
 		return buf.toString();
+	}
+	
+	/**
+	 * 
+	 */
+	public static class ForwardInfo 
+	{
+		/** The application url path. */
+		protected String apppath;
+		
+		/** The forward url base path. */
+		protected String forwardpath;
+		
+		/** The timestamp. */
+		protected long time;
+
+		/**
+		 *  Create a new ForwardInfo. 
+		 */
+		public ForwardInfo(String apppath, String forwardpath)
+		{
+			this.apppath = apppath;
+//			this.apppath = apppath.startsWith("/")? apppath: "/"+apppath;
+			this.forwardpath = forwardpath.startsWith("http")? forwardpath: "http://"+forwardpath;
+			this.time = System.currentTimeMillis();
+		}
+
+		/**
+		 *  Get the apppath.
+		 *  @return The apppath.
+		 */
+		public String getAppPath()
+		{
+			return apppath;
+		}
+
+		/**
+		 *  Set the apppath.
+		 *  @param apppath The apppath to set.
+		 */
+		public void setAppPath(String apppath)
+		{
+			this.apppath = apppath;
+		}
+
+		/**
+		 *  Get the forwardpath.
+		 *  @return The forwardpath.
+		 */
+		public String getForwardPath()
+		{
+			return forwardpath;
+		}
+
+		/**
+		 *  Set the forwardpath.
+		 *  @param forwardpath The forwardpath to set.
+		 */
+		public void setForwardPath(String forwardpath)
+		{
+			this.forwardpath = forwardpath;
+		}
+
+		/**
+		 *  Get the time.
+		 *  @return The time.
+		 */
+		public long getTime()
+		{
+			return time;
+		}
+
+		/**
+		 *  Set the time.
+		 *  @param time The time to set.
+		 */
+		public void setTime(long time)
+		{
+			this.time = time;
+		}
+		
+		/** 
+		 * 
+		 */
+		public int hashCode()
+		{
+			return 31*apppath.hashCode();
+		}
+
+		/** 
+		 * 
+		 */
+		public boolean equals(Object obj)
+		{
+			boolean ret = false;
+			if(obj instanceof ForwardInfo)
+			{
+				ForwardInfo other = (ForwardInfo)obj;
+				ret = other.getAppPath().equals(getAppPath());
+			}
+			return ret;
+		}
 	}
 	
 	/**

@@ -76,7 +76,7 @@ public class ExecutePlanStepAction implements IConditionalComponentStep<Void>
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-//		System.out.println("execute candidate: "+rplan);
+		System.out.println("execute candidate: "+rplan);
 		
 //		if(rplan.toString().indexOf("Move")!=-1)
 //			System.out.println("plan exe: "+rplan);

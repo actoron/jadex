@@ -413,9 +413,9 @@ public class RuleSystem
 		{
 			IEvent event = events.remove(0);
 			
-//			if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
+			if(event.getType().getType(0).indexOf("factchanged")!=-1 && event.getType().getType(1).indexOf("mybean")!=-1)
 //				&& event.getType().getType(1).indexOf("Ambu")!=-1)
-//				System.out.println("proc ev: "+event);
+				System.out.println("proc ev: "+event);
 				
 			List<IRule<?>> rules = rulebase.getRules(event.getType());
 			
@@ -615,7 +615,7 @@ public class RuleSystem
 	 */
 	public void addEvent(IEvent event)
 	{
-//		System.out.println("added: "+event.getType());
+		System.out.println("added: "+event.getType()+" "+this);
 //		if(event.getType().getTypes().length==1)
 //			System.out.println("herer: "+event.getType());
 //		if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
