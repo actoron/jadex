@@ -616,11 +616,11 @@ public class ForwardFilter implements Filter
 		if(url.length()>fi.getAppPath().length())
 		{
 			String add = url.substring(fi.getAppPath().length());
-			buf.append(add);
+			buf.append(add.startsWith("/")? add: "/"+add);
 		}
 		if(request.getQueryString()!=null)
 		{
-			buf.append(request.getQueryString());
+			buf.append("?").append(request.getQueryString());
 		}
 		String fowurl = buf.toString();
 		
@@ -657,9 +657,15 @@ public class ForwardFilter implements Filter
 			    String internal = urlc.getProtocol()+"://"+urlc.getHost()+":"+urlc.getPort(); 
 			    internal = fi.getForwardPath();
 			    String external = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
-			    if(fi.getAppPath().length()>0)
+			    String wppath = request.getContextPath();
+			    if(wppath.length()>0)
 			    {
-			    	external += "/"+fi.getAppPath();
+			    	external += wppath.startsWith("/")? wppath: "/"+wppath;
+			    }
+			    String appath = fi.getAppPath();
+			    if(appath.length()>0)
+			    {
+			    	external += appath.startsWith("/")? appath: "/"+appath;
 			    }
 			    while((line = rd.readLine()) != null) 
 			    { 

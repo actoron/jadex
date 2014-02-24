@@ -268,7 +268,18 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			    ServerConfiguration config = server.getServerConfiguration();
 			    config.removeHttpHandler(tup.getSecondEntity());
 			    if(config.getHttpHandlers().size()==0)
+			    {
+			    	for(Map.Entry<URI, HttpServer> entry: uriservers.entrySet())
+			    	{
+			    		if(entry.getValue().equals(server))
+			    		{
+			    			uriservers.remove(entry.getKey());
+			    			break;
+			    		}
+			    	}
 			    	server.shutdownNow();
+
+			    }
 			    stopped = true;
 				ret.setResult(null);
 			}
