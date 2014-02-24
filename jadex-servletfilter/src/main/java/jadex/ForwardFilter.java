@@ -4,6 +4,9 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -54,16 +58,24 @@ import javax.servlet.http.HttpSession;
  *  /displayMappings			: Show the current mappings in html
  *  /getLeasetime				: Get the lease time
  *  /setLeasetime?leasetime=a	: Set the lease time	
- *  /login?user=a&pass=b		: Login		
+ *  /login?user=a&pass=b		: Login	
+ *  /addUser?user=a&pass=b		: Add a new user
+ *  /removeUser?user=a&pass=b	: Remove an existing user
+ *  
+ *  Parameters in filter init:
+ *  
+ *  leasetime: [mins], default 5 mins   	leasetime for refreshs
+ *  https: true/false default=false         must use https? 
+ *  authentication: true/false default=true must service calls be authenticated?
+ *  adminpass: default="admin"				admin password
+ *  httpsport: default=8443					https port
+ *  filepath: default=tomcat home			directory for storing files
  */
 public class ForwardFilter implements Filter
 {
 	/** The mapping infos. */
 	protected static Map<String, ForwardInfo> infos = Collections.synchronizedMap(new LinkedHashMap<String, ForwardInfo>());
-	
-	/** The known users and passwords. */
-	protected static Map<String, String> users = Collections.synchronizedMap(new HashMap<String, String>());
-	
+		
 	/** Supported commands. */
 	public static final String addmapping = "addMapping";
 	public static final String remmapping = "removeMapping";
@@ -72,6 +84,9 @@ public class ForwardFilter implements Filter
 	public static final String getleasetime = "getLeasetime";
 	public static final String setleasetime = "setLeasetime";
 	public static final String login = "login";
+	public static final String adduser = "addUser";
+	public static final String remuser = "removeUser";
+	public static final String displayusers = "displayUsers";
 	
 	public static final Set<String> commands = Collections.synchronizedSet(new HashSet<String>());
 	
@@ -85,16 +100,23 @@ public class ForwardFilter implements Filter
 	/** Flag if https should be enforced. */
 	protected boolean https;
 	
+	/** The https port of the server. */
+	protected String httpsport;
+	
 	/** The lease time in millis. */
 	protected long leasetime;
+	
+	/** The file path. */
+	protected String filepath;
 	
 	/** The emitted nonces. */
 	protected LRU<String, String> nonces;
 	
+	/** The known users and passwords. */
+	protected Map<String, String> users = Collections.synchronizedMap(new HashMap<String, String>());
+	
 	static
 	{
-		users.put("admin", "admin");
-		
 		commands.add(addmapping);
 		commands.add(remmapping);
 		commands.add(refreshmapping);
@@ -102,6 +124,9 @@ public class ForwardFilter implements Filter
 		commands.add(getleasetime);
 		commands.add(setleasetime);
 		commands.add(login);
+		commands.add(adduser);
+		commands.add(remuser);
+		commands.add(displayusers);
 	}
 	
 	/**
@@ -110,6 +135,7 @@ public class ForwardFilter implements Filter
 	public void init(FilterConfig conf) throws ServletException
 	{
 		nonces = new LRU<String, String>(5000);
+				
 		String val = conf.getInitParameter("leasetime");
 		if(val!=null)
 		{
@@ -135,6 +161,31 @@ public class ForwardFilter implements Filter
 		{
 			authentication = true;
 		}
+		
+		val = conf.getInitParameter("adminpass");
+		users.put("admin", val!=null? val: "admin");
+		
+		val = conf.getInitParameter("httpsport");
+		if(val!=null)
+		{
+			httpsport = val;
+		}
+		else
+		{
+			httpsport = "8443";
+		}
+		
+		val = conf.getInitParameter("filepath");
+		if(val!=null)
+		{
+			filepath = val;
+		}
+		else
+		{
+			filepath = System.getProperty("catalina.base");
+		}
+		
+		readUsersFromFile();
 	}
 	
 	/**
@@ -164,8 +215,10 @@ public class ForwardFilter implements Filter
 				
 				mimetypes = parseMimetypes(req);
 				
-				// check if https is used
-				if(https)
+				boolean checkadmin = displayusers.equals(requri) || adduser.equals(requri) || remuser.equals(requri);
+				
+				// check if https is used or security critical operations 
+				if(https || checkadmin)
 				{
 					fini = checkSecure(req, res); 
 				}
@@ -173,13 +226,42 @@ public class ForwardFilter implements Filter
 				// check if user has logged in
 				if(!fini && authentication && !login.equals(requri)) 
 				{
-					fini = checkAuthentication(req, res, mimetypes);
+					fini = checkAuthentication(req, res, mimetypes, checkadmin? "admin": null);
 				}
 			}
 
 			if(!fini)
 			{
-				if(login.equals(requri))
+				if(displayusers.equals(requri))
+				{
+					sendDisplayUsers(res);
+					fini = true;
+				}
+				else if(adduser.equals(requri))
+				{
+					String user = request.getParameter("user");
+					String pass = request.getParameter("pass");
+					if(user!=null && pass!=null)
+					{
+						addUser(user, pass);
+					}
+					if(isBrowserClient(mimetypes))
+					{
+						res.sendRedirect("displayUsers");
+					}
+					fini = true;
+				}
+				else if(remuser.equals(requri))
+				{
+					String user = request.getParameter("user");
+					removeUser(user);
+					if(isBrowserClient(mimetypes))
+					{
+						res.sendRedirect("displayUsers");
+					}
+					fini = true;
+				}
+				else if(login.equals(requri))
 				{
 					String auth = req.getHeader("Authorization");
 					if(auth!=null)
@@ -341,10 +423,8 @@ public class ForwardFilter implements Filter
 		if(!request.isSecure())
 		{
 			String url = request.getRequestURL().toString().replaceFirst("http", "https");
-			if(request.getServerPort()==8080)
-			{
-				url = url.replaceFirst("8080", "8443");
-			}
+			int port = request.getServerPort();
+			url = url.replaceFirst(""+port, httpsport);
 			if(request.getQueryString()!=null)
 			{
 				url += request.getQueryString();
@@ -359,10 +439,11 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	protected boolean checkAuthentication(HttpServletRequest request, HttpServletResponse response, List<String> mimetypes) throws IOException
+	protected boolean checkAuthentication(HttpServletRequest request, HttpServletResponse response, List<String> mimetypes, String username) throws IOException
 	{
 		boolean fini = false;
-		if(!isAuthenticated(request, response))
+		String user = isAuthenticated(request, response);
+		if(user==null || (username!=null && !user.equals(username)))
 		{
 			fini = true;
 			String next = request.getRequestURI();
@@ -447,7 +528,7 @@ public class ForwardFilter implements Filter
 					else
 					{
 						HttpSession session = request.getSession();
-						session.setAttribute(authenticated, Boolean.TRUE);
+						session.setAttribute(authenticated, user);
 						
 						if(isBrowserClient(mimetypes))
 						{
@@ -494,7 +575,7 @@ public class ForwardFilter implements Filter
 			{
 				if(request.isSecure())
 				{
-					sendLoginPage(response);
+					sendLoginPage(response, next);
 				}
 				else
 				{
@@ -511,7 +592,7 @@ public class ForwardFilter implements Filter
 			if(pass.equals(users.get(user)))
 			{
 				HttpSession session = request.getSession();
-				session.setAttribute(authenticated, Boolean.TRUE);
+				session.setAttribute(authenticated, user);
 				
 				if(isBrowserClient(mimetypes))
 				{
@@ -535,14 +616,13 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	protected boolean isAuthenticated(HttpServletRequest request, HttpServletResponse response)
+	protected String isAuthenticated(HttpServletRequest request, HttpServletResponse response)
 	{
-		boolean ret = false;
+		String ret = null;
 		HttpSession session = request.getSession(false);
 		if(session!=null)
 		{
-			Boolean auth = (Boolean)session.getAttribute(authenticated);
-			ret = auth==null? false: auth.booleanValue();
+			ret = (String)session.getAttribute(authenticated);
 		}
 		return ret;
 	}
@@ -782,7 +862,7 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	public void sendLoginPage(HttpServletResponse response)
+	public void sendLoginPage(HttpServletResponse response, String next)
 	{
 		try
 		{
@@ -795,7 +875,70 @@ public class ForwardFilter implements Filter
 			pw.write("<table cellspacing=\"0\">");
 			pw.write("<tr><td>User name:</td><td><input type=\"text\" name=\"user\"/></td></tr>");
 			pw.write("<tr><td>Password:</td><td><input type=\"text\" name=\"pass\"/></td></tr>");
+			pw.write("<input type=\"hidden\" name=\"next\"/ value=\""+next+"\">");
 			pw.write("<tr><td><input type=\"submit\" value=\"Login\"/></td></tr>");
+			pw.write("</table>");
+			pw.write("</form>");
+			
+			pw.write("<body></html>");
+		}
+		catch(Exception e)
+		{
+			try
+		    {
+		    	response.sendError(500, "Exception occurred: "+e.getMessage());
+		    }
+		    catch(Exception ex)
+		    {
+		    	// ignore
+		    }
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void sendDisplayUsers(HttpServletResponse response)
+	{
+		try
+		{
+			response.setContentType("text/html");
+			PrintWriter pw = response.getWriter();
+			pw.write("<html><head></head><body>");
+			pw.write("<h1>Current Users</h1>");
+			if(users.isEmpty())
+			{
+				pw.write("No users available.");
+			}
+			else
+			{
+				pw.write("<table cellspacing=\"0\">");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">User Name</th>");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Password</th>");
+				pw.write("<th style=\"border-bottom:solid 1px black; padding:10px 10px\">Actions</th>");
+				Map.Entry<String, String>[] entries = users.entrySet().toArray(new Map.Entry[users.size()]);
+				for(Map.Entry<String, String> user: entries)
+				{
+					pw.write("<tr>");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+user.getKey()+"</td>");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+user.getValue()+"</td>");
+					pw.write("<td style=\"padding:0px 10px\">");
+					if(!user.getKey().equals("admin"))
+					{
+						pw.write("<a href=\"removeUser?user="+user.getKey()+"\">Remove</a>");
+					}
+					pw.write("</td>");
+					pw.write("</tr>");
+				}
+				pw.write("</table>");
+			}
+				
+			pw.write("<h2>Add a User</h2>");
+			pw.write("<form name=\"input\" action=\"addUser\" method=\"get\">");
+			pw.write("<table cellspacing=\"0\">");
+			pw.write("<tr><td>User name:</td><td><input type=\"text\" name=\"user\"/></td></tr>");
+			pw.write("<tr><td>User password:</td><td><input type=\"text\" name=\"pass\"/></td></tr>");
+			pw.write("<tr><td><input type=\"submit\" value=\"Add\"/></td></tr>");
 			pw.write("</table>");
 			pw.write("</form>");
 			
@@ -1056,6 +1199,72 @@ public class ForwardFilter implements Filter
 				ret = other.getAppPath().equals(getAppPath());
 			}
 			return ret;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addUser(String user, String pass)
+	{
+		users.put(user, pass);
+		saveUserstoFile();
+	}
+	
+	/**
+	 * 
+	 */
+	protected void removeUser(String user)
+	{
+		users.remove(user);
+		saveUserstoFile();
+	}
+	
+	/**
+	 * 
+	 */
+	protected void saveUserstoFile()
+	{
+		synchronized(users)
+		{
+			try
+			{
+				File f = new File(filepath+File.separator+"users.txt");
+				FileOutputStream fos = new FileOutputStream(f);
+				Properties p = new Properties();
+				p.putAll(users);
+				p.store(fos, null);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void readUsersFromFile()
+	{
+		synchronized(users)
+		{
+			try
+			{
+				File f = new File(filepath+File.separator+"users.txt");
+				FileInputStream fis = new FileInputStream(f);
+				Properties p = new Properties();
+				p.load(fis);
+				users.clear();
+				for(Map.Entry<Object, Object> entry: p.entrySet())
+				{
+					users.put((String)entry.getKey(), (String)entry.getValue());
+				}
+			}
+			catch(Exception e)
+			{
+				System.out.println("Could not read user file.");
+			}
 		}
 	}
 	
