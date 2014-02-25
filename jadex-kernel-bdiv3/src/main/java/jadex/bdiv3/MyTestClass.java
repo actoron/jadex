@@ -43,6 +43,10 @@ public class MyTestClass
 ////		testfield = 22;
 //	}
 	
+	public void nix()
+	{
+	}
+	
 	public static Object getNull()
 	{
 		return null;
@@ -114,5 +118,6 @@ public class MyTestClass
 //	public static void main(String[] args)
 //	{
 //		MyTestClass tm = new MyTestClass();
+////		java -classpath "asm.jar;asm-util.jar" org.objectweb.asm.util.ASMifier org/domain/package/YourClass.class
 //	}
 }

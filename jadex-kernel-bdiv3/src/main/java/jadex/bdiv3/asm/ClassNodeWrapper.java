@@ -2,9 +2,7 @@ package jadex.bdiv3.asm;
 
 import java.util.List;
 
-import org.kohsuke.asm4.tree.AnnotationNode;
 import org.kohsuke.asm4.tree.ClassNode;
-import org.kohsuke.asm4.tree.MethodNode;
 
 public class ClassNodeWrapper implements IClassNode
 {
@@ -15,17 +13,21 @@ public class ClassNodeWrapper implements IClassNode
 		this.classNode = classNode;
 	}
 
-	@Override
 	public List<IAnnotationNode> getVisibleAnnotations()
 	{
 		return AnnotationNodeWrapper.wrapList(classNode.visibleAnnotations);
 	}
 
-	@Override
 	public List<IMethodNode> getMethods()
 	{
 		return MethodNodeWrapper.wrapList(classNode.methods);
 	}
+	
+	public List<String> getInterfaces()
+	{
+		return classNode.interfaces;
+	}
+
 	
 	public static IClassNode wrap(ClassNode cn)
 	{

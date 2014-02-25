@@ -5,13 +5,30 @@ import jadex.bdiv3.asm.IClassNode;
 import jadex.bdiv3.asm.IFieldNode;
 import jadex.bdiv3.asm.IInnerClassNode;
 import jadex.bdiv3.asm.IMethodNode;
+import jadex.bdiv3.asm.MethodNodeWrapper;
 import jadex.bdiv3.model.BDIModel;
 import jadex.bdiv3.model.MBelief;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.rules.eca.EventType;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.kohsuke.asm4.Opcodes;
+import org.kohsuke.asm4.Type;
+import org.kohsuke.asm4.tree.FieldInsnNode;
+import org.kohsuke.asm4.tree.InsnList;
+import org.kohsuke.asm4.tree.InsnNode;
+import org.kohsuke.asm4.tree.LdcInsnNode;
+import org.kohsuke.asm4.tree.MethodInsnNode;
+import org.kohsuke.asm4.tree.MethodNode;
+import org.kohsuke.asm4.tree.TypeInsnNode;
+import org.kohsuke.asm4.tree.VarInsnNode;
 
 
 /**
@@ -48,6 +65,92 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 
 		if(agentclass)
 		{
+			List<String> ifaces = cn.getInterfaces();
+			for(String name: ifaces)
+			{
+				if(name.indexOf(Type.getInternalName(IAgentAPI.class))!=-1)
+				{
+					List<Class<?>> allcz = SUtil.arrayToList(SReflect.getSuperInterfaces(new Class[]{IAgentAPI.class}));
+					allcz.add(IAgentAPI.class);
+					List<Method> allms = new ArrayList<Method>();
+					for(Class<?> tmp: allcz)
+					{
+						Method[] mets = tmp.getDeclaredMethods();
+						for(Method m: mets)
+						{
+							allms.add(m);
+						}
+					}
+					
+					for(Method m: allms)
+					{
+						MethodNode mnode = new MethodNode(Opcodes.ACC_PUBLIC, m.getName(), Type.getMethodDescriptor(m), null, null);
+						Type ret = Type.getReturnType(mnode.desc);
+						InsnList nl = new InsnList();
+						nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
+						nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bdiv3/BDIAgent;"));
+						Class<?>[] ptypes = m.getParameterTypes();
+						for(int i=0; i<ptypes.length; i++)
+						{
+							if(ptypes[i].equals(boolean.class) || ptypes[i].equals(byte.class) || ptypes[i].equals(int.class) || ptypes[i].equals(short.class))
+							{
+								nl.add(new VarInsnNode(Opcodes.ILOAD, i+1));
+							}
+							else if(ptypes[i].equals(long.class))
+							{
+								nl.add(new VarInsnNode(Opcodes.LLOAD, i+1));
+							}
+							else if(ptypes[i].equals(float.class))
+							{
+								nl.add(new VarInsnNode(Opcodes.FLOAD, i+1));
+							}
+							else if(ptypes[i].equals(double.class))
+							{
+								nl.add(new VarInsnNode(Opcodes.DLOAD, i+1));
+							}
+							else
+							{
+								nl.add(new VarInsnNode(Opcodes.ALOAD, i+1));
+							}
+						}						
+						nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", mnode.name, mnode.desc));
+						Class<?> rett = m.getReturnType();
+						if(ret!=null && !rett.equals(void.class) && !rett.equals(Void.class))
+						{
+							if(rett.equals(boolean.class) || rett.equals(byte.class) || rett.equals(int.class) || rett.equals(short.class))
+							{
+								nl.add(new InsnNode(Opcodes.IRETURN));
+							}
+							else if(rett.equals(long.class))
+							{
+								nl.add(new InsnNode(Opcodes.LRETURN));
+							}
+							else if(rett.equals(float.class))
+							{
+								nl.add(new InsnNode(Opcodes.FRETURN));
+							}
+							else if(rett.equals(double.class))
+							{
+								nl.add(new InsnNode(Opcodes.DRETURN));
+							}
+							else
+							{
+								String t = ret.toString().length()>1? ret.getInternalName(): ret.toString();
+								nl.add(new TypeInsnNode(Opcodes.CHECKCAST, t));
+								nl.add(new InsnNode(Opcodes.ARETURN));
+							}
+						}
+						else
+						{
+							nl.add(new InsnNode(Opcodes.RETURN));
+						}
+						mnode.instructions = nl;
+						cn.addMethod(new MethodNodeWrapper(mnode));
+					}
+					break;
+				}
+			}
+			
 			// Check if there are dynamic beliefs
 			// and enhance getter/setter beliefs by adding event call to setter
 			List<String> tododyn = new ArrayList<String>();
@@ -180,6 +283,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 
 	// ----- Helper methods ------
 	
+	
 	/**
 	 * Check whether a given ClassNode is an Agent (or Capability) class.
 	 * @param classNode
@@ -191,7 +295,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 		List<IAnnotationNode> visibleAnnotations = classNode.getVisibleAnnotations();
 		if(visibleAnnotations!=null)
 		{
-			for (IAnnotationNode an: visibleAnnotations)
+			for(IAnnotationNode an: visibleAnnotations)
 			{
 				if(isAgentOrCapa(an.getDescription()))
 				{
@@ -211,7 +315,7 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 	protected boolean isAgentOrCapa(String annotationDescription)
 	{
 		return (annotationDescription.indexOf("Ljadex/micro/annotation/Agent;")!=-1
-	    		|| annotationDescription.indexOf("Ljadex/bdiv3/annotation/Capability;")!=-1);
+	    	|| annotationDescription.indexOf("Ljadex/bdiv3/annotation/Capability;")!=-1);
 	}
 	
 	/**

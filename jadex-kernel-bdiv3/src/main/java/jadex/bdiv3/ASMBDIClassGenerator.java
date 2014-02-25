@@ -53,6 +53,7 @@ import org.kohsuke.asm4.tree.MethodNode;
 import org.kohsuke.asm4.tree.TypeInsnNode;
 import org.kohsuke.asm4.tree.VarInsnNode;
 import org.kohsuke.asm4.util.ASMifier;
+import org.kohsuke.asm4.util.CheckClassAdapter;
 import org.kohsuke.asm4.util.TraceClassVisitor;
 
 
@@ -125,11 +126,17 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 //				boolean isplan = false;
 //				Set<String> fields = new HashSet<String>();
 				
-	//			public void visit(int version, int access, String name,
-	//				String signature, String superName, String[] interfaces)
-	//			{
-	//				super.visit(version, access, name, null, superName, interfaces);
-	//			}
+				public void visit(int version, int access, String name,
+					String signature, String superName, String[] interfaces)
+				{
+					if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
+					{
+						// erase abstract modifier
+//						access = ~Opcodes.ACC_ABSTRACT & access;
+						access = access-Opcodes.ACC_ABSTRACT;
+					}
+					super.visit(version, access, name, null, superName, interfaces);
+				}
 				
 //				public FieldVisitor visitField(int access, String name,
 //						String desc, String signature, Object value)
@@ -305,7 +312,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				cn.accept(cw);
 				byte[] data = cw.toByteArray();
 				
-//				CheckClassAdapter.verify(new ClassReader(data), false, new PrintWriter(System.out));
+				CheckClassAdapter.verify(new ClassReader(data), true, new PrintWriter(System.out));
 				
 				// Find correct cloader for injecting the class.
 				// Probes to load class without loading class.
@@ -330,7 +337,8 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				
 //				System.out.println("toClass: "+clname+" "+found);
 				Class<?> loadedClass = toClass(clname, data, found, null);
-				if (loadedClass != null) {
+				if(loadedClass != null) 
+				{
 					// if it's null, we were not allowed to generate this class
 					// e.g. java.util.Map.Entry "subclasses" (in bdiv3.tutorial.c1.TranslationBDI)
 					ret.add(loadedClass);

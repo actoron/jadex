@@ -11,6 +11,8 @@ public interface IClassNode
 	public void addMethod(IMethodNode mnode);
 
 	public void addField(IFieldNode fieldNode);
+	
+	public List<String> getInterfaces();
 
 	/**
 	 * Returns the name (including path) of the Class in internal
