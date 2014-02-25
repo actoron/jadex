@@ -15,6 +15,8 @@ public class PublishInfo
 	public static final String WP_URL = "wp_url";
 	public static final String WP_APPNAME = "wp_appname";
 	public static final String WP_TARGET = "wp_target";
+	public static final String WP_USER = "wp_user";
+	public static final String WP_PASS = "wp_pass";
 
 	//-------- attributes --------
 	

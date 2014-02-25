@@ -280,20 +280,24 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			internalPublishService(uri, rc, service.getServiceIdentifier());
 //			System.out.println("handler: "+handler+" "+server.getServerConfiguration().getHttpHandlers());
 
-			String wpurl = (String)mapprops.get(PublishInfo.WP_URL);
-			if(wpurl!=null)
-			{
-				props.put(PublishInfo.WP_URL, wpurl);
-				props.put(PublishInfo.WP_APPNAME, mapprops.get(PublishInfo.WP_APPNAME));
-				props.put(PublishInfo.WP_TARGET, uri.toString());
-			}
+//			String wpurl = (String)mapprops.get(PublishInfo.WP_URL);
+//			if(wpurl!=null)
+//			{
+//				props.put(PublishInfo.WP_URL, wpurl);
+//				props.put(PublishInfo.WP_APPNAME, mapprops.get(PublishInfo.WP_APPNAME));
+//				props.put(PublishInfo.WP_TARGET, uri.toString());
+//				props.put(PublishInfo.WP_USER, wpurl);
+//				props.put(PublishInfo.WP_PASS, wpurl);
+//			}
 			
 			final String url = (String)mapprops.get(PublishInfo.WP_URL);
 			if(url!=null)
 			{
-				final String name = (String)mapprops.get(PublishInfo.WP_APPNAME);
-				final String target = uri.toString();
-				initWebProxyRefresh(url, name, target, service.getServiceIdentifier());
+				String name = (String)mapprops.get(PublishInfo.WP_APPNAME);
+				String target = uri.toString();
+				String user = (String)mapprops.get(PublishInfo.WP_USER);
+				String pass = (String)mapprops.get(PublishInfo.WP_PASS);
+				initWebProxyRefresh(url, name, target, user, pass, service.getServiceIdentifier());
 			}
 			
 			Thread.currentThread().setContextClassLoader(ccl);
@@ -696,7 +700,8 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	 * 
 	 */
 //	public Object initWebProxyRefresh(Object[] args)
-	public Void initWebProxyRefresh(final String url, final String name, final String target, final IServiceIdentifier sid)
+	public Void initWebProxyRefresh(final String url, final String name, final String target, 
+		final String user, final String pass, final IServiceIdentifier sid)
 	{
 		if(url!=null && name!=null && target!=null)
 		{
@@ -704,18 +709,18 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			final ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
 			Runnable run= new Runnable()
 			{
-				protected String sessionid = null;
+				protected String cookie = null;
 				public void run()
 				{
 					if(isPublished(sid))
 					{
-						if(sessionid==null)
+						if(cookie==null)
 						{
-							sessionid = login(url, "admin", "admin");
+							cookie = login(url, user, pass);
 						}
-						if(sessionid!=null)
+						if(cookie!=null)
 						{
-							Integer lt = addMapping(url, name, target, sessionid);
+							Integer lt = addMapping(url, name, target, cookie);
 							if(lt==null)
 							{
 								System.out.println("Web proxy problems");
@@ -723,6 +728,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 							}
 							else
 							{
+								cookie = null;
 								long dur = (long)(lt.intValue()*1000*60*0.9);
 								ses.schedule(this, dur, TimeUnit.MILLISECONDS);
 							}
@@ -757,9 +763,9 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 				con.connect();
 				if(HttpServletResponse.SC_OK==con.getResponseCode())
 				{
-					String ck = con.getHeaderField("Set-Cookie");
-					Map<String, String> vals = parseHeader(ck, ",;");
-					ret = vals.get("JSESSIONID");
+					ret = con.getHeaderField("Set-Cookie");
+//					Map<String, String> vals = parseHeader(ck, ",;");
+//					ret = vals.get("JSESSIONID");
 				}
 			}
 			else
@@ -791,9 +797,9 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 					con2.setRequestProperty("Accept", "application/json");
 					if(HttpServletResponse.SC_OK==con2.getResponseCode())
 					{
-						String ck = con2.getHeaderField("Set-Cookie");
-						vals = parseHeader(ck, ",;");
-						ret = vals.get("JSESSIONID");
+						ret = con2.getHeaderField("Set-Cookie");
+//						vals = parseHeader(ck, ",;");
+//						ret = vals.get("JSESSIONID");
 					}
 				}
 			}
@@ -808,7 +814,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	/**
 	 * 
 	 */
-	protected Integer addMapping(String url, String name, String target, String sessionid)
+	protected Integer addMapping(String url, String name, String target, String cookie)
 	{
 		Integer ret = null;
 		HttpURLConnection con = null;
@@ -817,7 +823,8 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			URL urlc = new URL(url+"/addMapping?name="+name+"&target="+target);
 			con = (HttpURLConnection)urlc.openConnection();
 			con.setRequestProperty("Accept", "application/json");
-			con.setRequestProperty("Cookie", "JSESSIONID="+sessionid);
+//			con.setRequestProperty("Cookie", "JSESSIONID="+sessionid);
+			con.setRequestProperty("Cookie", cookie);
 			con.connect();
 			if(HttpServletResponse.SC_OK==con.getResponseCode())
 			{
