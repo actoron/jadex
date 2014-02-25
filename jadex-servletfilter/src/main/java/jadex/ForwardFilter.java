@@ -51,11 +51,13 @@ import javax.servlet.http.HttpSession;
  *  urls with its own server address. This allows links to work from the remote server.
  *  
  *  Supported methods are:
+ *  /(displayInfo)				: Display info
+ *  /displayUsers				: Show the current users
+ *  /displayMappings			: Show the current mappings in html
  *  
  *  /addMapping?name=a&target=b : Add a new mapping
  *  /removeMapping?name=a       : Remove an existing mapping
  *  /refreshMapping?name=a      : Update time stamp of mapping
- *  /displayMappings			: Show the current mappings in html
  *  /getLeasetime				: Get the lease time
  *  /setLeasetime?leasetime=a	: Set the lease time	
  *  /login?user=a&pass=b		: Login	
@@ -80,13 +82,15 @@ public class ForwardFilter implements Filter
 	public static final String addmapping = "addMapping";
 	public static final String remmapping = "removeMapping";
 	public static final String refreshmapping = "refreshMapping";
-	public static final String displaymappings = "displayMappings";
 	public static final String getleasetime = "getLeasetime";
 	public static final String setleasetime = "setLeasetime";
 	public static final String login = "login";
 	public static final String adduser = "addUser";
 	public static final String remuser = "removeUser";
+	
+	public static final String displayinfo = "displayInfo";
 	public static final String displayusers = "displayUsers";
+	public static final String displaymappings = "displayMappings";
 	
 	public static final Set<String> commands = Collections.synchronizedSet(new HashSet<String>());
 	
@@ -120,13 +124,15 @@ public class ForwardFilter implements Filter
 		commands.add(addmapping);
 		commands.add(remmapping);
 		commands.add(refreshmapping);
-		commands.add(displaymappings);
 		commands.add(getleasetime);
 		commands.add(setleasetime);
 		commands.add(login);
 		commands.add(adduser);
 		commands.add(remuser);
+
+		commands.add(displayinfo);
 		commands.add(displayusers);
+		commands.add(displaymappings);
 	}
 	
 	/**
@@ -206,7 +212,7 @@ public class ForwardFilter implements Filter
 		{
 			HttpServletRequest req = (HttpServletRequest)request;
 			HttpServletResponse res = (HttpServletResponse)response;
-			String requri = req.getRequestURI().substring(req.getContextPath().length()).replace("/","");
+			String requri = cutUrl(req.getRequestURI().substring(req.getContextPath().length()));
 			List<String> mimetypes = null;
 			
 			if(commands.contains(requri))
@@ -215,24 +221,37 @@ public class ForwardFilter implements Filter
 				
 				mimetypes = parseMimetypes(req);
 				
-				boolean checkadmin = displayusers.equals(requri) || adduser.equals(requri) || remuser.equals(requri);
+				boolean userops = displayusers.equals(requri) || adduser.equals(requri) || remuser.equals(requri);
 				
 				// check if https is used or security critical operations 
-				if(https || checkadmin)
+				if(https || userops)
 				{
 					fini = checkSecure(req, res); 
 				}
 				
+				boolean neednoauth = login.equals(requri) || displayinfo.equals(requri);
+				
 				// check if user has logged in
-				if(!fini && authentication && !login.equals(requri)) 
+				if(!fini && authentication && !neednoauth) 
 				{
-					fini = checkAuthentication(req, res, mimetypes, checkadmin? "admin": null);
+					fini = checkAuthentication(req, res, mimetypes, userops? "admin": null);
 				}
 			}
 
 			if(!fini)
 			{
-				if(displayusers.equals(requri))
+				// redirect to info
+				if(requri.length()==0)// && req.getContextPath().length()>0)
+				{
+					res.sendRedirect("displayInfo");
+					fini = true;
+				}
+				if(displayinfo.equals(requri))
+				{
+					sendDisplayInfo(res);
+					fini = true;
+				}
+				else if(displayusers.equals(requri))
 				{
 					sendDisplayUsers(res);
 					fini = true;
@@ -372,9 +391,20 @@ public class ForwardFilter implements Filter
 						{
 							removeDueMappings();
 
-							// Cannot use request dispatcher as it only allows for sending server internal forwards :-((
-							sendForward(fi, req, res);
-							fini = true;
+							if(!req.getRequestURI().endsWith("/") && cutUrl(requri).equals(cutUrl(fi.getAppPath())))
+							{
+								String redir = requri+"/";
+								if(req.getQueryString()!=null)
+									redir += "?"+req.getQueryString();
+								res.sendRedirect(redir);
+								fini = true;
+							}
+							else
+							{
+								// Cannot use request dispatcher as it only allows for sending server internal forwards :-((
+								sendForward(fi, req, res);
+								fini = true;
+							}
 							break;
 						}
 					}
@@ -386,6 +416,19 @@ public class ForwardFilter implements Filter
 		{
 			chain.doFilter(request, response); // Goes to default servlet.
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public String cutUrl(String url)
+	{
+		String ret = url;
+		if(ret.startsWith("/"))
+			ret = ret.substring(1);
+		if(ret.endsWith("/"))
+			ret = ret.substring(0, ret.length()-1);
+		return ret;
 	}
 	
 	/**
@@ -427,7 +470,7 @@ public class ForwardFilter implements Filter
 			url = url.replaceFirst(""+port, httpsport);
 			if(request.getQueryString()!=null)
 			{
-				url += request.getQueryString();
+				url += "?"+request.getQueryString();
 			}
 			
 			response.sendRedirect(url);
@@ -455,7 +498,7 @@ public class ForwardFilter implements Filter
 				}
 				else
 				{
-					response.sendRedirect("login?next="+next+request.getQueryString());
+					response.sendRedirect("login?next="+next+"?"+request.getQueryString());
 				}
 			}
 			else
@@ -691,12 +734,13 @@ public class ForwardFilter implements Filter
 	{
 		// forward to other server
 		StringBuffer buf = new StringBuffer();
-		buf.append(fi.forwardpath);
-		String url = request.getRequestURI().substring(request.getContextPath().length()).replace("/","");
+		buf.append(fi.getForwardPath());
+		String url = cutUrl(request.getRequestURI().substring(request.getContextPath().length()));
 		if(url.length()>fi.getAppPath().length())
 		{
 			String add = url.substring(fi.getAppPath().length());
-			buf.append(add.startsWith("/")? add: "/"+add);
+			boolean sep = fi.getForwardPath().endsWith("/") || add.startsWith("/");
+			buf.append(sep? add: "/"+add);
 		}
 		if(request.getQueryString()!=null)
 		{
@@ -731,25 +775,59 @@ public class ForwardFilter implements Filter
 		    BufferedReader rd = new BufferedReader(new InputStreamReader(con.getInputStream()));
 
 		    // Replace content if is html with possibly wrong links
-		    if(request.getContentType()==null || ("text/html").equals(request.getContentType().toLowerCase()))
+		    
+		    Map<String,List<String>> hd = con.getHeaderFields();
+		    if(hd!=null)
+		    {
+		    	for(Map.Entry<String, List<String>> entry: hd.entrySet())
+		    	{
+		    		if(!"Content-Length".equals(entry.getKey()))
+	    			{
+			    		for(String val: entry.getValue())
+			    		{
+			    			response.addHeader(entry.getKey(), val);
+			    		}
+	    			}
+		    	}
+		    }
+		    response.setContentType(con.getContentType());
+		    
+		    if(con.getContentType()==null || con.getContentType().toLowerCase().indexOf("text/html")!=-1
+		    	|| con.getContentType().toLowerCase().indexOf("text/css")!=-1)
 		    {
 			    String line;
-			    String internal = urlc.getProtocol()+"://"+urlc.getHost()+":"+urlc.getPort(); 
-			    internal = fi.getForwardPath();
+//			    String internal = urlc.getProtocol()+"://"+urlc.getHost()+":"+urlc.getPort(); 
+			    String internal = fi.getForwardPath();
 			    String external = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
 			    String wppath = request.getContextPath();
 			    if(wppath.length()>0)
 			    {
-			    	external += wppath.startsWith("/")? wppath: "/"+wppath;
+			    	boolean sep = wppath.startsWith("/") || external.endsWith("/");
+			    	external += sep? wppath: "/"+wppath;
 			    }
 			    String appath = fi.getAppPath();
 			    if(appath.length()>0)
 			    {
-			    	external += appath.startsWith("/")? appath: "/"+appath;
+			    	boolean sep = appath.startsWith("/") || external.endsWith("/");
+			    	external += sep? appath: "/"+appath;
 			    }
+//			    String fapp = cutUrl(urlc.getPath());
+			    URL iurl = new URL(fi.getForwardPath());
+			    String fapp = cutUrl(iurl.getPath());
 			    while((line = rd.readLine()) != null) 
 			    { 
+			    	// Replace absolute links, i.e. http://www.myserver.com
 			        String rep = line.replace(internal, external);
+			        // Replace document root related links to external ones
+			        rep = rep.replace("href=\"/"+fapp, "href=\""+external);
+			        rep = rep.replace("href='/"+fapp, "href='"+external);
+			        rep = rep.replace("src=\"/"+fapp, "src=\""+external);
+			        rep = rep.replace("src='/"+fapp, "src='"+external);
+			        rep = rep.replace("@import \"/"+fapp, "@import \""+external);
+			        rep = rep.replace("url(/"+fapp, "url("+external);
+			        rep = rep.replace("url('/"+fapp, "url('"+external);
+			        rep = rep.replace("url(\"/"+fapp, "url(\""+external);
+			        rep += "\n";
 			        response.getOutputStream().write(rep.getBytes());
 			    }
 		    }
@@ -925,7 +1003,13 @@ public class ForwardFilter implements Filter
 					pw.write("<td style=\"padding:0px 10px\">");
 					if(!user.getKey().equals("admin"))
 					{
+						pw.write("<form name=\"input\" action=\"addUser\" method=\"get\">");
 						pw.write("<a href=\"removeUser?user="+user.getKey()+"\">Remove</a>");
+						pw.write(" ");
+						pw.write("<input type=\"hidden\" name=\"user\"/ value=\""+user.getKey()+"\"/>");
+						pw.write("<input type=\"text\" name=\"pass\"/>");
+						pw.write("<input type=\"submit\" value=\"Change Pass\"/>");
+						pw.write("</form>");
 					}
 					pw.write("</td>");
 					pw.write("</tr>");
@@ -941,6 +1025,37 @@ public class ForwardFilter implements Filter
 			pw.write("<tr><td><input type=\"submit\" value=\"Add\"/></td></tr>");
 			pw.write("</table>");
 			pw.write("</form>");
+			
+			pw.write("<body></html>");
+		}
+		catch(Exception e)
+		{
+			try
+		    {
+		    	response.sendError(500, "Exception occurred: "+e.getMessage());
+		    }
+		    catch(Exception ex)
+		    {
+		    	// ignore
+		    }
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void sendDisplayInfo(HttpServletResponse response)
+	{
+		try
+		{
+			response.setContentType("text/html");
+			PrintWriter pw = response.getWriter();
+			pw.write("<html><head></head><body>");
+			pw.write("<h1>Web Proxy Menu</h1>");
+			
+			pw.write("<a href=\"displayUsers\">Manage Users</a>");
+			pw.write("<br/>");
+			pw.write("<a href=\"displayMappings\">Manage Mappings</a>");
 			
 			pw.write("<body></html>");
 		}
@@ -987,7 +1102,7 @@ public class ForwardFilter implements Filter
 	 */
 	protected Map<String, String> parseHeader(String header)
 	{
-		String h = header.substring(header.indexOf(" ") + 1).trim();
+		String h = header.substring(header.indexOf(" ")+1).trim();
 		HashMap<String, String> values = new HashMap<String, String>();
 		for(String keyval :  h.split(","))
 		{
@@ -1227,17 +1342,31 @@ public class ForwardFilter implements Filter
 	{
 		synchronized(users)
 		{
+			FileOutputStream fos = null;
 			try
 			{
 				File f = new File(filepath+File.separator+"users.txt");
-				FileOutputStream fos = new FileOutputStream(f);
+				fos = new FileOutputStream(f);
 				Properties p = new Properties();
 				p.putAll(users);
 				p.store(fos, null);
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				System.out.println("Could not access users.txt file.");
+			}
+			finally
+			{
+				if(fos!=null)
+				{
+					try
+					{
+						fos.close();
+					}
+					catch(IOException e)
+					{
+					}
+				}
 			}
 		}
 	}
@@ -1249,10 +1378,11 @@ public class ForwardFilter implements Filter
 	{
 		synchronized(users)
 		{
+			FileInputStream fis = null;
 			try
 			{
 				File f = new File(filepath+File.separator+"users.txt");
-				FileInputStream fis = new FileInputStream(f);
+				fis = new FileInputStream(f);
 				Properties p = new Properties();
 				p.load(fis);
 				users.clear();
@@ -1264,6 +1394,19 @@ public class ForwardFilter implements Filter
 			catch(Exception e)
 			{
 				System.out.println("Could not read user file.");
+			}
+			finally
+			{
+				if(fis!=null)
+				{
+					try
+					{
+						fis.close();
+					}
+					catch(IOException e)
+					{
+					}
+				}
 			}
 		}
 	}
