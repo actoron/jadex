@@ -60,7 +60,9 @@ import java.util.Set;
 public class BDIAgent extends MicroAgent
 {
 	/**
-	 *  Get the goals of a given type.
+	 *  Get the goals of a given type as pojos.
+	 *  @param clazz The pojo goal class.
+	 *  @return The currently instantiated goals of that type.
 	 */
 	public <T> Collection<T> getGoals(Class<T> clazz)
 	{
@@ -74,7 +76,8 @@ public class BDIAgent extends MicroAgent
 	}
 	
 	/**
-	 *  Get the current goals.
+	 *  Get the current goals as api representation.
+	 *  @return All currently instantiated goals.
 	 */
 	public Collection<IGoal> getGoals()
 	{
@@ -82,7 +85,9 @@ public class BDIAgent extends MicroAgent
 	}
 	
 	/**
-	 *  Get the goal api representation.
+	 *  Get the goal api representation for a pojo goal.
+	 *  @param goal The pojo goal.
+	 *  @return The api goal.
 	 */
 	public IGoal getGoal(Object goal)
 	{
@@ -90,7 +95,9 @@ public class BDIAgent extends MicroAgent
 	}
 
 	/**
-	 *  Dispatch a goal wait for its result.
+	 *  Dispatch a pojo goal wait for its result.
+	 *  @param goal The pojo goal.
+	 *  @return The goal result.
 	 */
 	public <T, E> IFuture<E> dispatchTopLevelGoal(T goal)
 	{
@@ -99,7 +106,8 @@ public class BDIAgent extends MicroAgent
 	}
 	
 	/**
-	 *  Drop a goal.
+	 *  Drop a pojo goal.
+	 *  @param goal The pojo goal.
 	 */
 	public void dropGoal(Object goal)
 	{
@@ -108,7 +116,9 @@ public class BDIAgent extends MicroAgent
 	}
 
 	/**
-	 *  Dispatch a goal wait for its result.
+	 *  Dispatch a pojo plan and wait for its result.
+	 *  @param plan The pojo plan or plan name.
+	 *  @return The plan result.
 	 */
 	public <T, E> IFuture<E> adoptPlan(T plan)
 	{
@@ -117,6 +127,9 @@ public class BDIAgent extends MicroAgent
 	
 	/**
 	 *  Dispatch a goal wait for its result.
+	 *  @param plan The pojo plan or plan name.
+	 *  @param args The plan arguments.
+	 *  @return The plan result.
 	 */
 	public <T, E> IFuture<E> adoptPlan(T plan, Object[] args)
 	{

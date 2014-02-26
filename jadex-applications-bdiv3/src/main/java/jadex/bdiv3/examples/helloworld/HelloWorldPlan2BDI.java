@@ -1,0 +1,33 @@
+package jadex.bdiv3.examples.helloworld;
+
+import jadex.bdiv3.IBDIAgent;
+import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.runtime.IPlan;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Description;
+
+@Agent
+@Description("Hello world agent that creates a hello plan.")
+public abstract class HelloWorldPlan2BDI implements IBDIAgent
+{
+	/**
+	 *  The agent body.
+	 */
+	@AgentBody(keepalive=false)
+	public void body()
+	{
+		adoptPlan("printHello").get();
+	}
+	
+	/**
+	 *  Plan that prints out goal text and passes.
+	 */
+	@Plan
+	protected void printHello(IPlan plan)
+	{
+		System.out.println("Hello World.");
+		plan.waitFor(1000).get();
+		System.out.println("Good bye.");
+	}
+}

@@ -129,7 +129,20 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				public void visit(int version, int access, String name,
 					String signature, String superName, String[] interfaces)
 				{
-					if(name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
+					// Make class non-abstract if agent implements IBDIAgent interface
+					boolean implbdiagent = false;
+					if(interfaces!=null)
+					{
+						for(String iface: interfaces)
+						{
+							if(iface.indexOf(Type.getInternalName(IBDIAgent.class))!=-1)
+							{
+								implbdiagent = true;
+								break;
+							}
+						}
+					}
+					if(implbdiagent && name.endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST))
 					{
 						// erase abstract modifier
 //						access = ~Opcodes.ACC_ABSTRACT & access;
@@ -312,7 +325,7 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 				cn.accept(cw);
 				byte[] data = cw.toByteArray();
 				
-				CheckClassAdapter.verify(new ClassReader(data), true, new PrintWriter(System.out));
+//				CheckClassAdapter.verify(new ClassReader(data), true, new PrintWriter(System.out));
 				
 				// Find correct cloader for injecting the class.
 				// Probes to load class without loading class.

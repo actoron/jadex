@@ -16,8 +16,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.kohsuke.asm4.Opcodes;
 import org.kohsuke.asm4.Type;
@@ -68,11 +70,11 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 			List<String> ifaces = cn.getInterfaces();
 			for(String name: ifaces)
 			{
-				if(name.indexOf(Type.getInternalName(IAgentAPI.class))!=-1)
+				if(name.indexOf(Type.getInternalName(IBDIAgent.class))!=-1)
 				{
-					List<Class<?>> allcz = SUtil.arrayToList(SReflect.getSuperInterfaces(new Class[]{IAgentAPI.class}));
-					allcz.add(IAgentAPI.class);
-					List<Method> allms = new ArrayList<Method>();
+					List<Class<?>> allcz = SUtil.arrayToList(SReflect.getSuperInterfaces(new Class[]{IBDIAgent.class}));
+					allcz.add(IBDIAgent.class);
+					Set<Method> allms = new HashSet<Method>();
 					for(Class<?> tmp: allcz)
 					{
 						Method[] mets = tmp.getDeclaredMethods();
