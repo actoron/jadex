@@ -63,4 +63,11 @@ public class ClassNodeWrapper implements IClassNode
 	{
 		return InnerClassNodeWrapper.wrapList(classNode.innerClasses);
 	}
+
+	@Override
+	public List<String> getInterfaces()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
