@@ -90,28 +90,30 @@ public abstract class AbstractAsmBdiClassGenerator implements IBDIClassGenerator
 						nl.add(new VarInsnNode(Opcodes.ALOAD, 0));
 						nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", "Ljadex/bdiv3/BDIAgent;"));
 						Class<?>[] ptypes = m.getParameterTypes();
+						int cnt = 1;
 						for(int i=0; i<ptypes.length; i++)
 						{
 							if(ptypes[i].equals(boolean.class) || ptypes[i].equals(byte.class) || ptypes[i].equals(int.class) || ptypes[i].equals(short.class))
 							{
-								nl.add(new VarInsnNode(Opcodes.ILOAD, i+1));
+								nl.add(new VarInsnNode(Opcodes.ILOAD, i+cnt));
 							}
 							else if(ptypes[i].equals(long.class))
 							{
-								nl.add(new VarInsnNode(Opcodes.LLOAD, i+1));
+								nl.add(new VarInsnNode(Opcodes.LLOAD, i+cnt++));
 							}
 							else if(ptypes[i].equals(float.class))
 							{
-								nl.add(new VarInsnNode(Opcodes.FLOAD, i+1));
+								nl.add(new VarInsnNode(Opcodes.FLOAD, i+cnt));
 							}
 							else if(ptypes[i].equals(double.class))
 							{
-								nl.add(new VarInsnNode(Opcodes.DLOAD, i+1));
+								nl.add(new VarInsnNode(Opcodes.DLOAD, i+cnt++));
 							}
 							else
 							{
-								nl.add(new VarInsnNode(Opcodes.ALOAD, i+1));
+								nl.add(new VarInsnNode(Opcodes.ALOAD, i+cnt));
 							}
+//							nl.add(new InsnNode(Opcodes.SWAP));
 						}						
 						nl.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "jadex/bdiv3/BDIAgent", mnode.name, mnode.desc));
 						Class<?> rett = m.getReturnType();

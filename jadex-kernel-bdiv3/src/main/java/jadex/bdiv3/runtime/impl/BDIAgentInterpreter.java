@@ -143,7 +143,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	protected MicroAgent createAgent(Class<?> agentclass, MicroModel model) throws Exception
 	{
 		MicroAgent ret;
-		
 		final Object agent = agentclass.newInstance();
 		if(agent instanceof MicroAgent)
 		{
