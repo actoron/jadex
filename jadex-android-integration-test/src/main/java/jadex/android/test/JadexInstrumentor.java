@@ -3,13 +3,11 @@ package jadex.android.test;
 import jadex.android.AndroidContextManager;
 import jadex.android.commons.JadexDexClassLoader;
 import jadex.base.test.impl.BrokenComponentTest;
-import jadex.bdiv3.AsmDexBdiClassGenerator;
 import jadex.bridge.ErrorReport;
 import jadex.commons.SUtil;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -54,10 +52,6 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			Method setAndroidContext = contextMgrClazz.getMethod("setAndroidContext", Context.class);
 			Object contextManager = getInstance.invoke(null);
 			setAndroidContext.invoke(contextManager, targetContext);
-			
-			Class<?> classGeneratorClazz= jadexCl.loadClass(AsmDexBdiClassGenerator.class.getCanonicalName());
-			Field outField = classGeneratorClazz.getDeclaredField("OUTPATH");
-			outField.set(null, optimizePath);
 		}
 		catch (Exception e)
 		{

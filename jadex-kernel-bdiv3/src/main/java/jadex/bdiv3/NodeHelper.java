@@ -1,12 +1,13 @@
 package jadex.bdiv3;
 
 import jadex.bdiv3.asm.AsmNodeHelper;
-import jadex.bdiv3.asm.IFieldNode;
-import jadex.bdiv3.asm.IInsnList;
-import jadex.bdiv3.asm.IMethodNode;
-import jadex.bdiv3.asm.instructions.IAbstractInsnNode;
-import jadex.bdiv3.asm.instructions.ILineNumberNode;
 import jadex.commons.SReflect;
+
+import org.kohsuke.asm4.tree.AbstractInsnNode;
+import org.kohsuke.asm4.tree.FieldNode;
+import org.kohsuke.asm4.tree.InsnList;
+import org.kohsuke.asm4.tree.LineNumberNode;
+import org.kohsuke.asm4.tree.MethodNode;
 
 public abstract class NodeHelper
 {
@@ -18,19 +19,7 @@ public abstract class NodeHelper
 	{
 		if (INSTANCE == null) {
 			if (SReflect.isAndroid()) {
-				Class<?> clazz = SReflect.classForName0("jadex.bdiv3.asmdex.AsmDexNodeHelper", null);
-				try
-				{
-					INSTANCE = (NodeHelper) clazz.newInstance();
-				}
-				catch (InstantiationException e)
-				{
-					e.printStackTrace();
-				}
-				catch (IllegalAccessException e)
-				{
-					e.printStackTrace();
-				}
+				throw new Error("OpcodeHelper.getInstance() is not implemented for Android.");
 			} else {
 				INSTANCE = new AsmNodeHelper();
 			}
@@ -44,16 +33,16 @@ public abstract class NodeHelper
 	 * @param mn The MethodNode to look into
 	 * @return the line number or -1, if none found
 	 */
-	public int getLineNumberOfMethod(IMethodNode mn)
+	public int getLineNumberOfMethod(MethodNode mn)
 	{
 		int ln = -1;
-		IInsnList l = mn.getInstructions();
+		InsnList l = mn.instructions;
 		for(int i=0; i<l.size(); i++)
 		{
-			IAbstractInsnNode n = l.get(i);
-			if(n instanceof ILineNumberNode)
+			AbstractInsnNode n = l.get(i);
+			if(n instanceof LineNumberNode)
 			{
-				ln = ((ILineNumberNode)n).getLine();
+				ln = ((LineNumberNode)n).line;
 				break;
 			}
 		}
@@ -66,9 +55,9 @@ public abstract class NodeHelper
 	 * @param value
 	 * @return the new method
 	 */
-	public abstract IMethodNode createReturnConstantMethod(String methodName, int value);
+	public abstract MethodNode createReturnConstantMethod(String methodName, int value);
 
-	public abstract IFieldNode createField(int access, String name, String desc, String[] signature, Object initialValue);
+	public abstract FieldNode createField(int access, String name, String desc, String[] signature, Object initialValue);
 
 	
 }

@@ -16,13 +16,16 @@ public class BDIClassGeneratorFactoryAndroid extends BDIClassGeneratorFactory
 	@Override
 	public IBDIClassGenerator createBDIClassGenerator()
 	{
-		return new AsmDexBdiClassGenerator();
+//		System.err.println("Requested BDIClassGenerator on Android!");
+//		throw new Error("Requested BDIClassGenerator on Android!");
+		return new DummyBDIClassGenerator();
 	}
 
 	@Override
 	public BDIAgentFactory createBDIAgentFactory(IServiceProvider provider, Map properties)
 	{
-		return new BDIAgentFactoryAndroid(provider, properties);
+		System.err.println("Requested BDIAgentFactory on Android!");
+		throw new Error("Requested BDIAgentFactory on Android!");
 	}
 	
 	
