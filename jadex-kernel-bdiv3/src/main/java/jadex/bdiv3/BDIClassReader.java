@@ -158,7 +158,7 @@ public class BDIClassReader extends MicroClassReader
 		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
 		modelinfo.setFilename(src+File.separator+SReflect.getClassName(cma)+".class");
 //		modelinfo.setStartable(!Modifier.isAbstract(cma.getModifiers()));
-		modelinfo.setStartable(cma.getName().endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
+//		modelinfo.setStartable(cma.getName().endsWith(BDIModelLoader.FILE_EXTENSION_BDIV3_FIRST));
 		modelinfo.setType(BDIAgentFactory.FILETYPE_BDIAGENT);
 		modelinfo.setResourceIdentifier(rid);
 		ret.setClassloader(classloader); // use parent
@@ -175,6 +175,9 @@ public class BDIClassReader extends MicroClassReader
 		fillMicroModelFromAnnotations(ret, model, cma, cl);
 		
 		fillBDIModelFromAnnotations(ret, model, cma, cl, rid, root);
+		
+		Class<?> genclass = SReflect.findClass0(cma.getName(), null, classloader);
+		modelinfo.setStartable(!Modifier.isAbstract(genclass.getModifiers()));
 		
 		return ret;
 	}
