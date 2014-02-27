@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -91,10 +92,12 @@ public class ForwardFilter implements Filter
 	public static final String displayinfo = "displayInfo";
 	public static final String displayusers = "displayUsers";
 	public static final String displaymappings = "displayMappings";
+		
+	public static final String authenticated = "authenticated";
 	
 	public static final Set<String> commands = Collections.synchronizedSet(new HashSet<String>());
-	
-	public static final String authenticated = "authenticated";
+
+	protected static String stylecss;
 	
 	//-------- attributes --------
 	
@@ -133,6 +136,27 @@ public class ForwardFilter implements Filter
 		commands.add(displayinfo);
 		commands.add(displayusers);
 		commands.add(displaymappings);
+		
+		Scanner sc = null;
+		try
+		{
+			InputStream is = SUtil.getResource0("jadex/style.css", 
+				Thread.currentThread().getContextClassLoader());
+			sc = new Scanner(is);
+			stylecss = sc.useDelimiter("\\A").next();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		finally
+		{
+			if(sc!=null)
+			{
+				sc.close();
+			}
+		}
 	}
 	
 	/**
@@ -869,8 +893,10 @@ public class ForwardFilter implements Filter
 		{
 			response.setContentType("text/html");
 			PrintWriter pw = response.getWriter();
-			pw.write("<html><head></head><body>");
-			pw.write("<h1>Current Mappings</h1>");
+			pw.write("<html><head>\n");
+			pw.write(stylecss);
+			pw.write("</head><body>\n");
+			pw.write("<h1>Current Mappings</h1>\n");
 			ForwardInfo[] fis = getForwardInfos();
 			if(fis.length==0)
 			{
@@ -879,50 +905,50 @@ public class ForwardFilter implements Filter
 			else
 			{
 				SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-				pw.write("<table cellspacing=\"0\">");
-				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Local Name</th>");
-				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Remote Address</th>");
-				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Timestamp</th>");
-				pw.write("<th style=\"border-bottom:solid 1px black; padding:10px 10px\">Actions</th>");
+				pw.write("<table cellspacing=\"0\">\n");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Local Name</th>\n");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Remote Address</th>\n");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Timestamp</th>\n");
+				pw.write("<th style=\"border-bottom:solid 1px black; padding:10px 10px\">Actions</th>\n");
 				for(ForwardInfo fi: fis)
 				{
-					pw.write("<tr>");
-					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+fi.getAppPath()+"</td>");
-					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+fi.getForwardPath()+"</td>");
-					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+df.format(new Date(fi.getTime()))+"</td>");
-					pw.write("<td style=\"padding:0px 10px\">");
-					pw.write("<a href=\"removeMapping?name="+fi.getAppPath()+"\">Remove</a>");
+					pw.write("<tr>\n");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+fi.getAppPath()+"</td>\n");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+fi.getForwardPath()+"</td>\n");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+df.format(new Date(fi.getTime()))+"</td>\n");
+					pw.write("<td style=\"padding:0px 10px\">\n");
+					pw.write("<a href=\"removeMapping?name="+fi.getAppPath()+"\">Remove</a>\n");
 					pw.write("  ");
-					pw.write("<a href=\"refreshMapping?name="+fi.getAppPath()+"\">Refresh</a>");
-					pw.write("</td>");
-					pw.write("</tr>");
+					pw.write("<a href=\"refreshMapping?name="+fi.getAppPath()+"\">Refresh</a>\n");
+					pw.write("</td>\n");
+					pw.write("</tr>\n");
 				}
-				pw.write("</table>");
+				pw.write("</table>\n");
 			}
 				
-			pw.write("<h2>Add a Mapping</h2>");
-			pw.write("<form name=\"input\" action=\"addMapping\" method=\"get\">");
-			pw.write("<table cellspacing=\"0\">");
-			pw.write("<tr><td>Application name:</td><td><input type=\"text\" name=\"name\"/></td></tr>");
-			pw.write("<tr><td>Remote server address:</td><td><input type=\"text\" name=\"target\"/></td></tr>");
-			pw.write("<tr><td><input type=\"submit\" value=\"Add\"/></td></tr>");
-			pw.write("</table>");
-			pw.write("</form>");
+			pw.write("<h2>Add a Mapping</h2>\n");
+			pw.write("<form name=\"input\" action=\"addMapping\" method=\"get\">\n");
+			pw.write("<table cellspacing=\"0\">\n");
+			pw.write("<tr><td>Application name:</td><td><input type=\"text\" name=\"name\"/></td></tr>\n");
+			pw.write("<tr><td>Remote server address:</td><td><input type=\"text\" name=\"target\"/></td></tr>\n");
+			pw.write("<tr><td><input type=\"submit\" value=\"Add\"/></td></tr>\n");
+			pw.write("</table>\n");
+			pw.write("</form>\n");
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-			pw.write("<h2>Leasetime</h2>");
+			pw.write("<h2>Leasetime</h2>\n");
 //			pw.write("Leasetime [mins]: ");
 			String lt = getLeasetime()==0? "0": ""+(getLeasetime()/1000/60);
 //			pw.write(lt);
 //			pw.write(sdf.format(new Date(leasetime-TimeZone.getDefault().getRawOffset())));
-			pw.write("<form name=\"input\" action=\"setLeasetime\" method=\"get\">");
-			pw.write("<table cellspacing=\"0\">");
-			pw.write("<tr><td>Leasetime [mins]:</td><td><input type=\"text\" name=\"leasetime\" value=\""+lt+"\"/></input></td></tr>");
-			pw.write("<tr><td><input type=\"submit\" value=\"Set\"/></td></tr>");
-			pw.write("</table>");
-			pw.write("</form>");
+			pw.write("<form name=\"input\" action=\"setLeasetime\" method=\"get\">\n");
+			pw.write("<table cellspacing=\"0\">\n");
+			pw.write("<tr><td>Leasetime [mins]:</td><td><input type=\"text\" name=\"leasetime\" value=\""+lt+"\"/></td></tr>\n");
+			pw.write("<tr><td><input type=\"submit\" value=\"Set\"/></td></tr>\n");
+			pw.write("</table>\n");
+			pw.write("</form>\n");
 			
-			pw.write("<body></html>");
+			pw.write("<body></html>\n");
 		}
 		catch(Exception e)
 		{
@@ -940,25 +966,27 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	public void sendLoginPage(HttpServletResponse response, String next)
+	protected void sendLoginPage(HttpServletResponse response, String next)
 	{
 		try
 		{
 			response.setContentType("text/html");
 			PrintWriter pw = response.getWriter();
-			pw.write("<html><head></head><body>");
-			pw.write("<h1>Login</h1>");
+			pw.write("<html><head>\n");
+			pw.write(stylecss);
+			pw.write("</head><body>\n");
+			pw.write("<h1>Login</h1>\n");
 			
-			pw.write("<form name=\"input\" action=\"login\" method=\"get\">");
-			pw.write("<table cellspacing=\"0\">");
-			pw.write("<tr><td>User name:</td><td><input type=\"text\" name=\"user\"/></td></tr>");
-			pw.write("<tr><td>Password:</td><td><input type=\"text\" name=\"pass\"/></td></tr>");
-			pw.write("<input type=\"hidden\" name=\"next\"/ value=\""+next+"\">");
-			pw.write("<tr><td><input type=\"submit\" value=\"Login\"/></td></tr>");
-			pw.write("</table>");
-			pw.write("</form>");
+			pw.write("<form name=\"input\" action=\"login\" method=\"get\">\n");
+			pw.write("<table cellspacing=\"0\">\n");
+			pw.write("<tr><td>User name:</td><td><input type=\"text\" name=\"user\"/></td></tr>\n");
+			pw.write("<tr><td>Password:</td><td><input type=\"text\" name=\"pass\"/></td></tr>\n");
+			pw.write("<input type=\"hidden\" name=\"next\"/ value=\""+next+"\">\n");
+			pw.write("<tr><td><input type=\"submit\" value=\"Login\"/></td></tr>\n");
+			pw.write("</table>\n");
+			pw.write("</form>\n");
 			
-			pw.write("<body></html>");
+			pw.write("</body></html>\n");
 		}
 		catch(Exception e)
 		{
@@ -982,51 +1010,53 @@ public class ForwardFilter implements Filter
 		{
 			response.setContentType("text/html");
 			PrintWriter pw = response.getWriter();
-			pw.write("<html><head></head><body>");
-			pw.write("<h1>Current Users</h1>");
+			pw.write("<html><head>\n");
+			pw.write(stylecss);
+			pw.write("</head><body>\n");
+			pw.write("<h1>Current Users</h1>\n");
 			if(users.isEmpty())
 			{
 				pw.write("No users available.");
 			}
 			else
 			{
-				pw.write("<table cellspacing=\"0\">");
-				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">User Name</th>");
-				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Password</th>");
-				pw.write("<th style=\"border-bottom:solid 1px black; padding:10px 10px\">Actions</th>");
+				pw.write("<table cellspacing=\"0\">\n");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">User Name</th>\n");
+				pw.write("<th style=\"border-right:solid 1px black; border-bottom:solid 1px black; padding:10px 10px\">Password</th>\n");
+				pw.write("<th style=\"border-bottom:solid 1px black; padding:10px 10px\">Actions</th>\n");
 				Map.Entry<String, String>[] entries = users.entrySet().toArray(new Map.Entry[users.size()]);
 				for(Map.Entry<String, String> user: entries)
 				{
-					pw.write("<tr>");
-					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+user.getKey()+"</td>");
-					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+user.getValue()+"</td>");
-					pw.write("<td style=\"padding:0px 10px\">");
+					pw.write("<tr>\n");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+user.getKey()+"</td>\n");
+					pw.write("<td style=\"border-right:solid 1px black; padding:0px 10px\">"+user.getValue()+"</td>\n");
+					pw.write("<td style=\"padding:0px 10px\">\n");
 					if(!user.getKey().equals("admin"))
 					{
-						pw.write("<form name=\"input\" action=\"addUser\" method=\"get\">");
-						pw.write("<a href=\"removeUser?user="+user.getKey()+"\">Remove</a>");
+						pw.write("<form name=\"input\" action=\"addUser\" method=\"get\">\n");
+						pw.write("<a href=\"removeUser?user="+user.getKey()+"\">Remove</a>\n");
 						pw.write(" ");
-						pw.write("<input type=\"hidden\" name=\"user\"/ value=\""+user.getKey()+"\"/>");
-						pw.write("<input type=\"text\" name=\"pass\"/>");
-						pw.write("<input type=\"submit\" value=\"Change Pass\"/>");
+						pw.write("<input type=\"hidden\" name=\"user\"/ value=\""+user.getKey()+"\"/>\n");
+						pw.write("<input type=\"text\" name=\"pass\"/>\n");
+						pw.write("<input type=\"submit\" value=\"Change Pass\"/>\n");
 						pw.write("</form>");
 					}
-					pw.write("</td>");
-					pw.write("</tr>");
+					pw.write("</td>\n");
+					pw.write("</tr>\n");
 				}
-				pw.write("</table>");
+				pw.write("</table>\n");
 			}
 				
-			pw.write("<h2>Add a User</h2>");
-			pw.write("<form name=\"input\" action=\"addUser\" method=\"get\">");
-			pw.write("<table cellspacing=\"0\">");
-			pw.write("<tr><td>User name:</td><td><input type=\"text\" name=\"user\"/></td></tr>");
-			pw.write("<tr><td>User password:</td><td><input type=\"text\" name=\"pass\"/></td></tr>");
-			pw.write("<tr><td><input type=\"submit\" value=\"Add\"/></td></tr>");
-			pw.write("</table>");
-			pw.write("</form>");
+			pw.write("<h2>Add a User</h2>\n");
+			pw.write("<form name=\"input\" action=\"addUser\" method=\"get\">\n");
+			pw.write("<table cellspacing=\"0\">\n");
+			pw.write("<tr><td>User name:</td><td><input type=\"text\" name=\"user\"/></td></tr>\n");
+			pw.write("<tr><td>User password:</td><td><input type=\"text\" name=\"pass\"/></td></tr>\n");
+			pw.write("<tr><td><input type=\"submit\" value=\"Add\"/></td></tr>\n");
+			pw.write("</table>\n");
+			pw.write("</form>\n");
 			
-			pw.write("<body></html>");
+			pw.write("</body></html>\n");
 		}
 		catch(Exception e)
 		{
@@ -1050,14 +1080,16 @@ public class ForwardFilter implements Filter
 		{
 			response.setContentType("text/html");
 			PrintWriter pw = response.getWriter();
-			pw.write("<html><head></head><body>");
-			pw.write("<h1>Web Proxy Menu</h1>");
+			pw.write("<html><head>\n");
+			pw.write(stylecss);
+			pw.write("</head><body>\n");
+			pw.write("<h1>Web Proxy Menu</h1>\n");
 			
-			pw.write("<a href=\"displayUsers\">Manage Users</a>");
-			pw.write("<br/>");
-			pw.write("<a href=\"displayMappings\">Manage Mappings</a>");
+			pw.write("<a href=\"displayUsers\">Manage Users</a>\n");
+			pw.write("<br/>\n");
+			pw.write("<a href=\"displayMappings\">Manage Mappings</a>\n");
 			
-			pw.write("<body></html>");
+			pw.write("</body></html>\n");
 		}
 		catch(Exception e)
 		{

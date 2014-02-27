@@ -1037,11 +1037,13 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			String functionsjs = (String)fjs.get(this);
 			if(functionsjs==null)
 			{
+				Scanner sc = null;
 				try
 				{
 					InputStream is = SUtil.getResource0("jadex/extension/rs/publish/functions.js", 
 						Thread.currentThread().getContextClassLoader());
-					functionsjs = new Scanner(is).useDelimiter("\\A").next();
+					sc = new Scanner(is);
+					functionsjs = sc.useDelimiter("\\A").next();
 					fjs.set(this, functionsjs);
 //					System.out.println(functionsjs);
 				}
@@ -1050,17 +1052,26 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 					e.printStackTrace();
 					throw new RuntimeException(e);
 				}
+				finally
+				{
+					if(sc!=null)
+					{
+						sc.close();
+					}
+				}
 			}
 			
 			Field scss = getClass().getDeclaredField("__stylecss");
 			String stylecss = (String)scss.get(this);
 			if(stylecss==null)
 			{
+				Scanner sc = null;
 				try
 				{
 					InputStream is = SUtil.getResource0("jadex/extension/rs/publish/style.css", 
 						Thread.currentThread().getContextClassLoader());
-					stylecss = new Scanner(is).useDelimiter("\\A").next();
+					sc = new Scanner(is);
+					stylecss = sc.useDelimiter("\\A").next();
 					scss.set(this, stylecss);
 //					System.out.println(functionsjs);
 				}
@@ -1069,8 +1080,15 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 					e.printStackTrace();
 					throw new RuntimeException(e);
 				}
+				finally
+				{
+					if(sc!=null)
+					{
+						sc.close();
+					}
+				}
 			}
-		
+			
 			ret.append("<html>");
 			ret.append("<head>");
 			ret.append(stylecss);
