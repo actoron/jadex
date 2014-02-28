@@ -10,3 +10,5 @@
 keystore
 *.settings.xml
 alarmclock_settings.ser
+**/testkeystore
+jadex-platform-standalone-launch/highscore.dmp
