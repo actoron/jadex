@@ -2,6 +2,7 @@ package jadex.android.test;
 
 import jadex.android.AndroidContextManager;
 import jadex.android.commons.JadexDexClassLoader;
+import jadex.android.service.JadexPlatformManager;
 import jadex.base.test.impl.BrokenComponentTest;
 import jadex.bridge.ErrorReport;
 import jadex.commons.SUtil;
@@ -30,65 +31,23 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 	
 	private ClassLoader jadexCl;
 
-	private String targetAppDir;
-
-	private File optimizePath;
+	private String	sourceDir;
 
 	@Override
 	public void onCreate(Bundle arguments)
 	{
 		Context targetContext = getTargetContext();
-		targetAppDir = targetContext.getApplicationInfo().sourceDir;
-		optimizePath = targetContext.getDir("outdex", Context.MODE_PRIVATE);
-		jadexCl = createJadexClassLoader(targetContext);
+		sourceDir = targetContext.getApplicationInfo().sourceDir;
+		jadexCl = this.getClass().getClassLoader();
 		
-		try
-		{
-			// Set Context:
-			Class<?> contextMgrClazz =
-//			jadexCl.loadClass("jadex.android.AndroidContextManager");
-			jadexCl.loadClass(AndroidContextManager.class.getCanonicalName());
-			Method getInstance = contextMgrClazz.getMethod("getInstance");
-			Method setAndroidContext = contextMgrClazz.getMethod("setAndroidContext", Context.class);
-			Object contextManager = getInstance.invoke(null);
-			setAndroidContext.invoke(contextManager, targetContext);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		// Set Context:
+		AndroidContextManager.getInstance().setAndroidContext(targetContext);
+		// Set Classloader for app:
+		JadexPlatformManager.getInstance().setAppClassLoader(sourceDir, jadexCl);
 		
 		super.onCreate(arguments);
 	}
 	
-	private ClassLoader createJadexClassLoader(Context targetContext)
-	{
-		Context myContext = getContext();
-		ClassLoader myCl = myContext.getClassLoader();
-		ClassLoader systemCl = myCl.getParent();
-		
-		Collection<? extends URL> collectDexPathUrls = SUtil.androidUtils().collectDexPathUrls(myCl);
-
-		// The original classpath contains /system/framework/android.test.runner.jar.
-		// we need to extract that for our own classloader, because it contains classes
-		// needed for unit testing.
-		String testlib = null;
-		for (URL url : collectDexPathUrls)
-		{
-			if (!url.toString().contains(".apk")) {
-				testlib = url.getPath();
-			}
-		}
-		
-		PathClassLoader testlibsloader = new PathClassLoader(testlib, systemCl);
-		PathClassLoader integrationLoader = new PathClassLoader(myContext.getApplicationInfo().sourceDir, testlibsloader);
-		
-		JadexDexClassLoader jadexCl = new JadexDexClassLoader(targetAppDir, optimizePath.getAbsolutePath(), null, integrationLoader);
-		jadexCl.defineClass("jadex.android.commons.JadexDexClassLoader", JadexDexClassLoader.class);
-		return jadexCl;
-	}
-
-
 	@Override
 	public TestSuite getTestSuite()
 	{
@@ -98,12 +57,12 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		try
 		{
 			// To execute a single test:
-//			Test singleTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases.stream.InitiatorAgent", targetAppDir, true);
+//			Test singleTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases.stream.InitiatorAgent", sourceDir);
 //			suite.addTest(singleTest);
 			
 			
-			Test bdiTest = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", targetAppDir, false);
-			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", targetAppDir, true);
+			Test bdiTest = createTest("jadex.launch.test.BDIV3Test", "jadex.bdiv3.testcases", sourceDir);
+			Test microTest = createTest("jadex.launch.test.MicroTest", "jadex.micro.testcases", sourceDir);
 
 			suite.addTest(bdiTest);
 			suite.addTest(microTest);
@@ -118,11 +77,18 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 			suite.addTest(error);
 		}
 		
+		if (suite.countTestCases() < 10) {
+			ErrorReport errorReport = new ErrorReport();
+			errorReport.setErrorText("Less than 10 Testcases found - Problem with loading them?");
+			BrokenComponentTest error = new BrokenComponentTest("creation", errorReport);
+			suite.addTest(error);
+		}
+		
 		return suite;
 	}
 
 
-	private Test createTest(String testClassName, String testsPackage, String classRoot, boolean addCleanup) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+	private Test createTest(String testClassName, String testsPackage, String classRoot) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
 			InvocationTargetException
 	{
 		Class<?> test = jadexCl.loadClass(testClassName);
@@ -131,6 +97,7 @@ public class JadexInstrumentor extends InstrumentationTestRunner
 		try {
 			testCase = constructor.newInstance(testsPackage, classRoot);
 		} catch (Throwable t) {
+			t.printStackTrace();
 			ErrorReport errorReport = new ErrorReport();
 			errorReport.setErrorText(t.getMessage());
 			BrokenComponentTest error = new BrokenComponentTest(testClassName, errorReport);

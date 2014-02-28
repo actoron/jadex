@@ -30,6 +30,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
@@ -341,6 +342,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						
 						public void exceptionOccurred(Exception exception)
 						{
+							Logger.getLogger(MicroAgentFactory.class.toString()).warning(exception.getMessage());
 							ret.setResult(Boolean.FALSE);
 //							super.exceptionOccurred(exception);
 						}
