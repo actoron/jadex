@@ -2,6 +2,8 @@ package jadex.javaparser;
 
 import jadex.commons.IValueFetcher;
 
+import java.util.Set;
+
 
 /**
  *  An expression, that can be evaluated in a given state.
@@ -29,5 +31,10 @@ public interface IParsedExpression
 	 *  the static type is null.
 	 *  @return The static type.
 	 */
-	public Class getStaticType();
+	public Class<?> getStaticType();
+	
+	/**
+	 *  Get the parameters used in the expression.
+	 */
+	public Set<String>	getParameters();
 }

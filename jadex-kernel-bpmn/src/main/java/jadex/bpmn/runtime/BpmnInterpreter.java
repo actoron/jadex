@@ -14,6 +14,7 @@ import jadex.bpmn.runtime.handler.EventIntermediateErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateNotificationHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateRuleHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.handler.EventMultipleStepHandler;
 import jadex.bpmn.runtime.handler.GatewayORActivityHandler;
@@ -147,7 +148,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// Missing: link, compensation, cancel
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateNotificationHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateRuleHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new EventIntermediateErrorActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventIntermediateMultipleActivityHandler());

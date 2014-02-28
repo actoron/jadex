@@ -237,17 +237,17 @@ public class ProcessEngineAgent implements IProcessEngineService
 										rules.add(rule);
 									}
 									// new variant with new models bpmn2
-									else if(mact.hasPropertyValue("eventtypes"))
+									else if(mact.hasPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES))
 									{
-										String[] etypes = (String[])mact.getParsedPropertyValue("eventtypes");
+										String[] etypes = (String[])mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
 										if(etypes!=null && etypes.length>0)
 										{
 											Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(key.toString()+" "+i+" "+mact.getId());
 											
 											List<String> events = SUtil.arrayToList(etypes);
-											if(mact.hasPropertyValue("condition"))
+											if(mact.hasPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION))
 											{
-												String cond = (String)mact.getParsedPropertyValue("condition");
+												String cond = (String)mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
 												if(cond!=null)
 												{
 													UnparsedExpression up = new UnparsedExpression(null, Boolean.class, cond, null);

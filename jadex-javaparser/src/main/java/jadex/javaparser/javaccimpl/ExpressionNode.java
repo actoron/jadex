@@ -6,6 +6,8 @@ import jadex.javaparser.IParsedExpression;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 
 /**
@@ -207,9 +209,23 @@ public abstract class ExpressionNode	extends SimpleNode	implements IParsedExpres
 	 *  the static type is null.
 	 *  @return The static type.
 	 */
-	public Class getStaticType()
+	public Class<?> getStaticType()
 	{
 		return static_type;
+	}
+	
+	
+	/**
+	 *  Get the parameters used in the expression.
+	 */
+	public Set<String>	getParameters()
+	{
+		Set<String>	ret	= new LinkedHashSet<String>();
+		for(ParameterNode n: getUnboundParameterNodes())
+		{
+			ret.add(n.getText());
+		}
+		return ret;
 	}
 
 	//-------- expression methods --------
