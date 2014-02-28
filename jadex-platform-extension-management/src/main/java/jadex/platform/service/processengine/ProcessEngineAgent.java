@@ -82,13 +82,13 @@ import java.util.Map;
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="crons", type=ICronService.class, 
 		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="cronagent"))),
-	@RequiredService(name="rules", type=IRuleService.class, 
-		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="ruleagent")))
+//	@RequiredService(name="rules", type=IRuleService.class, 
+//		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="ruleagent")))
 })
 @ComponentTypes(
 {
-	@ComponentType(name="cronagent", clazz=CronAgent.class),
-	@ComponentType(name="ruleagent", clazz=RuleAgent.class)
+	@ComponentType(name="cronagent", clazz=CronAgent.class)//,
+//	@ComponentType(name="ruleagent", clazz=RuleAgent.class)
 })
 public class ProcessEngineAgent implements IProcessEngineService
 {
@@ -297,6 +297,8 @@ public class ProcessEngineAgent implements IProcessEngineService
 											if(result instanceof CMSCreatedEvent)
 											{
 												cid = ((CMSCreatedEvent)result).getComponentIdentifier();
+												// Without correlator when not started with rule event
+												// todo: support a task that sets the evaluator manually
 												processes.put(cid, new ProcessInfo(null, cid));
 												ret.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, cid, null));
 											}

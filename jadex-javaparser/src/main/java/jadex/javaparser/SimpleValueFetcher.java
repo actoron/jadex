@@ -102,7 +102,7 @@ public class SimpleValueFetcher implements IValueFetcher
 	 *  Set values.
 	 *  @param values The values map.
 	 */
-	public void setValues(Map values)
+	public void setValues(Map<String, Object> values)
 	{
 		if(this.values==null)
 			this.values = new HashMap();
