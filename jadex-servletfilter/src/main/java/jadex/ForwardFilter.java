@@ -62,6 +62,7 @@ import javax.servlet.http.HttpSession;
  *  /getLeasetime				: Get the lease time
  *  /setLeasetime?leasetime=a	: Set the lease time	
  *  /login?user=a&pass=b		: Login	
+ *  /logout						: Logout
  *  /addUser?user=a&pass=b		: Add a new user
  *  /removeUser?user=a&pass=b	: Remove an existing user
  *  
@@ -86,6 +87,7 @@ public class ForwardFilter implements Filter
 	public static final String getleasetime = "getLeasetime";
 	public static final String setleasetime = "setLeasetime";
 	public static final String login = "login";
+	public static final String logout = "logout";
 	public static final String adduser = "addUser";
 	public static final String remuser = "removeUser";
 	
@@ -97,7 +99,7 @@ public class ForwardFilter implements Filter
 	
 	public static final Set<String> commands = Collections.synchronizedSet(new HashSet<String>());
 
-	protected static String stylecss;
+//	protected static String stylecss;
 	
 	//-------- attributes --------
 	
@@ -120,7 +122,7 @@ public class ForwardFilter implements Filter
 	protected LRU<String, String> nonces;
 	
 	/** The known users and passwords. */
-	protected Map<String, String> users = Collections.synchronizedMap(new HashMap<String, String>());
+	protected Map<String, String> users = Collections.synchronizedMap(new LinkedHashMap<String, String>());
 	
 	static
 	{
@@ -130,6 +132,7 @@ public class ForwardFilter implements Filter
 		commands.add(getleasetime);
 		commands.add(setleasetime);
 		commands.add(login);
+		commands.add(logout);
 		commands.add(adduser);
 		commands.add(remuser);
 
@@ -137,26 +140,26 @@ public class ForwardFilter implements Filter
 		commands.add(displayusers);
 		commands.add(displaymappings);
 		
-		Scanner sc = null;
-		try
-		{
-			InputStream is = SUtil.getResource0("jadex/style.css", 
-				Thread.currentThread().getContextClassLoader());
-			sc = new Scanner(is);
-			stylecss = sc.useDelimiter("\\A").next();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-		finally
-		{
-			if(sc!=null)
-			{
-				sc.close();
-			}
-		}
+//		Scanner sc = null;
+//		try
+//		{
+//			InputStream is = SUtil.getResource0("jadex/style.css", 
+//				Thread.currentThread().getContextClassLoader());
+//			sc = new Scanner(is);
+//			stylecss = sc.useDelimiter("\\A").next();
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//			throw new RuntimeException(e);
+//		}
+//		finally
+//		{
+//			if(sc!=null)
+//			{
+//				sc.close();
+//			}
+//		}
 	}
 	
 	/**
@@ -272,12 +275,12 @@ public class ForwardFilter implements Filter
 				}
 				if(displayinfo.equals(requri))
 				{
-					sendDisplayInfo(res);
+					sendDisplayInfo(req,res);
 					fini = true;
 				}
 				else if(displayusers.equals(requri))
 				{
-					sendDisplayUsers(res);
+					sendDisplayUsers(req, res);
 					fini = true;
 				}
 				else if(adduser.equals(requri))
@@ -316,6 +319,19 @@ public class ForwardFilter implements Filter
 						checkUrlParameterAuthentication(req, res, mimetypes);
 						fini = true;
 					}
+				}
+				else if(logout.equals(requri))
+				{
+					HttpSession sess = req.getSession(false);
+					if(sess!=null)
+					{
+						sess.removeAttribute(authenticated);
+					}
+					if(isBrowserClient(mimetypes))
+					{
+						res.sendRedirect("");
+					}
+					fini = true;
 				}
 				else if(addmapping.equals(requri))
 				{
@@ -372,8 +388,7 @@ public class ForwardFilter implements Filter
 				}
 				else if(displaymappings.equals(requri))
 				{
-					// if(!json) ???
-					sendDisplayMappings(res);
+					sendDisplayMappings(req, res);
 					fini = true;
 				}
 				else if(getleasetime.equals(requri))
@@ -642,7 +657,7 @@ public class ForwardFilter implements Filter
 			{
 				if(request.isSecure())
 				{
-					sendLoginPage(response, next);
+					sendLoginPage(request, response, next);
 				}
 				else
 				{
@@ -749,6 +764,14 @@ public class ForwardFilter implements Filter
 	protected ForwardInfo[] getForwardInfos()
 	{
 		return infos.values().toArray(new ForwardInfo[0]);
+	}
+	
+	/**
+	 * 
+	 */
+	protected Map.Entry<String, String>[] getUsers()
+	{
+		return users.entrySet().toArray(new Map.Entry[users.size()]);
 	}
 	
 	/**
@@ -887,14 +910,14 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	protected void sendDisplayMappings(HttpServletResponse response)
+	protected void sendDisplayMappings(HttpServletRequest request, HttpServletResponse response)
 	{
 		try
 		{
 			response.setContentType("text/html");
 			PrintWriter pw = response.getWriter();
 			pw.write("<html><head>\n");
-			pw.write(stylecss);
+//			pw.write(stylecss);
 			pw.write("</head><body>\n");
 			pw.write("<h1>Current Mappings</h1>\n");
 			ForwardInfo[] fis = getForwardInfos();
@@ -966,14 +989,14 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	protected void sendLoginPage(HttpServletResponse response, String next)
+	protected void sendLoginPage(HttpServletRequest request, HttpServletResponse response, String next)
 	{
 		try
 		{
 			response.setContentType("text/html");
 			PrintWriter pw = response.getWriter();
 			pw.write("<html><head>\n");
-			pw.write(stylecss);
+//			pw.write(stylecss);
 			pw.write("</head><body>\n");
 			pw.write("<h1>Login</h1>\n");
 			
@@ -1004,14 +1027,14 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	protected void sendDisplayUsers(HttpServletResponse response)
+	protected void sendDisplayUsers(HttpServletRequest request, HttpServletResponse response)
 	{
 		try
 		{
 			response.setContentType("text/html");
 			PrintWriter pw = response.getWriter();
 			pw.write("<html><head>\n");
-			pw.write(stylecss);
+//			pw.write(stylecss);
 			pw.write("</head><body>\n");
 			pw.write("<h1>Current Users</h1>\n");
 			if(users.isEmpty())
@@ -1074,14 +1097,14 @@ public class ForwardFilter implements Filter
 	/**
 	 * 
 	 */
-	protected void sendDisplayInfo(HttpServletResponse response)
+	protected void sendDisplayInfo(HttpServletRequest request, HttpServletResponse response)
 	{
 		try
 		{
 			response.setContentType("text/html");
 			PrintWriter pw = response.getWriter();
 			pw.write("<html><head>\n");
-			pw.write(stylecss);
+//			pw.write(stylecss);
 			pw.write("</head><body>\n");
 			pw.write("<h1>Web Proxy Menu</h1>\n");
 			
