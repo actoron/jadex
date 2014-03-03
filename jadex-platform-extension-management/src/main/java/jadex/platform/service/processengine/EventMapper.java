@@ -74,36 +74,36 @@ public class EventMapper
 		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValues(vals);
 		
-		IFilter<Object> filter = new IFilter<Object>()
-		{
-			public boolean filter(Object obj)
-			{
-				exp.getValue(fetcher);
-				return false;
-			}
-		};
-		
-		for(String event: events)
-		{
-			List<MappingInfo> mis = instancemappings.get(event);
-			if(mis==null)
-			{
-				mis = new ArrayList<MappingInfo>();
-				modelmappings.put(event, mis);
-			}
-			MappingInfo mi = new MappingInfo(event, filter, modelname);
-		}
-		
-		
-		mis.add(mi);
-		
-		List<MappingInfo> rems = modelprocs.get(event);
-		if(rems==null)
-		{
-			rems = new ArrayList<MappingInfo>();
-			modelprocs.put(modelname, rems);
-		}
-		rems.add(mi);
+//		IFilter<Object> filter = new IFilter<Object>()
+//		{
+//			public boolean filter(Object obj)
+//			{
+//				exp.getValue(fetcher);
+//				return false;
+//			}
+//		};
+//		
+//		for(String event: events)
+//		{
+//			List<MappingInfo> mis = instancemappings.get(event);
+//			if(mis==null)
+//			{
+//				mis = new ArrayList<MappingInfo>();
+//				modelmappings.put(event, mis);
+//			}
+//			MappingInfo mi = new MappingInfo(event, filter, modelname);
+//		}
+//		
+//		
+//		mis.add(mi);
+//		
+//		List<MappingInfo> rems = modelprocs.get(event);
+//		if(rems==null)
+//		{
+//			rems = new ArrayList<MappingInfo>();
+//			modelprocs.put(modelname, rems);
+//		}
+//		rems.add(mi);
 	}
 	
 
