@@ -9,9 +9,9 @@
 <%@page import="java.net.InetAddress"%>
 <%
 	String	pkgid	= "0";
-	IModelInfo	model	= ((IFuture<IModelInfo>)request.getAttribute("model")).get(null);
-	if(model!=null)
+	if(request.getAttribute("model")!=null)
 	{
+		IModelInfo	model	= ((IFuture<IModelInfo>)request.getAttribute("model")).get(null);
 		Collection<IModelInfo>	models	= ((IIntermediateFuture<IModelInfo>)request.getAttribute("models")).getIntermediateResults();
 		
 		MultiCollection	pmodels	= new MultiCollection();

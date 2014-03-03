@@ -165,6 +165,7 @@ public class JadexdocServlet extends HttpServlet
 					}
 					else
 					{
+						request.setAttribute("model", null);
 						title	= "File not found.";
 						view	= "/WEB-INF/jsp/jadexdoc/notfound.jsp";
 					}
@@ -172,6 +173,7 @@ public class JadexdocServlet extends HttpServlet
 			}
 			catch(Exception e)
 			{
+				request.setAttribute("model", null);
 				request.setAttribute("exception", e);
 				title	= "File could not be loaded.";
 				view	= "/WEB-INF/jsp/jadexdoc/exception.jsp";				
