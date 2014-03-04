@@ -92,7 +92,7 @@
 				</DIV>
 			</DIV>
 			<P style="text-align: center; color: black;">
-				Copyright (C) 2002-2012 Lars Braubach, Alexander Pokahr
+				Copyright (C) 2002-2014 Lars Braubach, Alexander Pokahr, Kai Jander
 			</P>
 		</DIV>
 	</DIV>
