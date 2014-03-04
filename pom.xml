@@ -624,5 +624,20 @@
 			</modules>
 		</profile>
 		
+		<!-- ======== Web proxy modules ======== -->
+				
+		<profile>
+		    <id>jadex-webproxy</id>
+	        <activation>
+	            <file>
+	                <exists>jadex-servletfilter-web</exists>
+	            </file>
+	        </activation>
+	        <modules>
+		        <module>jadex-servletfilter</module> 
+		        <module>jadex-servletfilter-web</module>
+		    </modules>
+		</profile>
+		
 	</profiles>
 </project>
