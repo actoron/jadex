@@ -5,7 +5,6 @@
 .classpath
 .project
 *.prefs
-*.properties
 *.copy
 keystore
 *.settings.xml
