@@ -126,7 +126,7 @@
 			</DIV>
 			<P style="text-align: center; color: black;">
 				Copyright (C) 2002-2014 Lars Braubach, Alexander Pokahr, Kai Jander</br>
-				Release <%= VersionInfo.getInstance().getVersion()+" from "+VersionInfo.getInstance().getNumberDateString() %>
+				Version <%= VersionInfo.getInstance().getVersion()+" from "+VersionInfo.getInstance().getNumberDateString() %>
 			</P>
 		</DIV>
 	</DIV>

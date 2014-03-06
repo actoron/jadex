@@ -8,6 +8,7 @@
 <%@page import="java.util.Collection"%>
 <%@page import="jadex.commons.future.IIntermediateFuture"%>
 <%@page import="jadex.bridge.modelinfo.IModelInfo"%>
+<%@page import="jadex.bridge.VersionInfo"%>
 <%
 	Collection<IModelInfo>	models	= ((IIntermediateFuture<IModelInfo>)request.getAttribute("models")).getIntermediateResults();
 	
@@ -92,7 +93,8 @@
 				</DIV>
 			</DIV>
 			<P style="text-align: center; color: black;">
-				Copyright (C) 2002-2014 Lars Braubach, Alexander Pokahr, Kai Jander
+				Copyright (C) 2002-2014 Lars Braubach, Alexander Pokahr, Kai Jander</br>
+				Version <%= VersionInfo.getInstance().getVersion()+" from "+VersionInfo.getInstance().getNumberDateString() %>
 			</P>
 		</DIV>
 	</DIV>

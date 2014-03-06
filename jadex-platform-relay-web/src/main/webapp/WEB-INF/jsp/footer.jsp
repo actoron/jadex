@@ -1,5 +1,6 @@
 <%@page session="false"%>
 <%@page import="java.util.Date"%>
+<%@page import="jadex.bridge.VersionInfo"%>
 
 							</DIV>
 							<DIV class="clearfloats"></DIV>
@@ -90,7 +91,8 @@
 				</DIV>
 			</DIV>
 			<P style="text-align: center; color: black;">
-				Copyright (C) 2002-2014 Lars Braubach, Alexander Pokahr, Kai Jander
+				Copyright (C) 2002-2014 Lars Braubach, Alexander Pokahr, Kai Jander</br>
+				Version <%= VersionInfo.getInstance().getVersion()+" from "+VersionInfo.getInstance().getNumberDateString() %>
 			</P>
 		</DIV>
 	</DIV>
