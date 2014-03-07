@@ -109,12 +109,12 @@ public class UserAgent
 		final long dur = 10000;
 		final String model = "jadex.platform.service.processengine.ConditionEventStart.bpmn2";
 		
-		IFuture<IProcessEngineService> fut = agent.getRequiredService("mons");
+		IFuture<IProcessEngineService> fut = agent.getRequiredService("engine");
 		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, TestReport>(ret)
 		{
-			public void customResultAvailable(final IProcessEngineService mons)
+			public void customResultAvailable(final IProcessEngineService engine)
 			{
-				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = mons.addBpmnModel(model, null);
+				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = engine.addBpmnModel(model, null);
 				fut.addResultListener(new IIntermediateResultListener<ProcessEngineEvent>()
 				{
 					protected Set<String> results = new HashSet<String>();
@@ -126,18 +126,10 @@ public class UserAgent
 						
 						if(ProcessEngineEvent.PROCESSMODEL_ADDED.equals(event.getType()))
 						{
-							IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
-							fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, TestReport>(ret)
-							{
-								public void customResultAvailable(final IRuleService rules)
-								{
-									// fire events to start process instances
-									rules.addEvent(new Event("file_added", Boolean.TRUE));
-									rules.addEvent(new Event("file_added", Boolean.FALSE));
-									rules.addEvent(new Event("file_removed", Boolean.TRUE));
-									rules.addEvent(new Event("file_removed", Boolean.FALSE));
-								}
-							});
+							engine.processEvent(new Event("file_added", Boolean.TRUE), "file_added");
+							engine.processEvent(new Event("file_added", Boolean.FALSE), "file_added");
+							engine.processEvent(new Event("file_removed", Boolean.TRUE), "file_removed");
+							engine.processEvent(new Event("file_removed", Boolean.FALSE), "file_removed");
 						}
 						else if(ProcessEngineEvent.PROCESSMODEL_REMOVED.equals(event.getType()))
 						{
@@ -192,7 +184,7 @@ public class UserAgent
 						if(!fini)
 						{
 							fini = true;
-							mons.removeBpmnModel(model, null).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+							engine.removeBpmnModel(model, null).addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
 							{
 								public void customResultAvailable(Void result)
 								{
@@ -220,7 +212,7 @@ public class UserAgent
 		final String model = "jadex.platform.service.processengine.TimerEventStart.bpmn2";
 		final TestReport tr = new TestReport("#1", "Test if bpmn rule triggering works for initial rules.");
 		
-		IFuture<IProcessEngineService> fut = agent.getRequiredService("mons");
+		IFuture<IProcessEngineService> fut = agent.getRequiredService("engine");
 		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, TestReport>(ret)
 		{
 			public void customResultAvailable(final IProcessEngineService mons)

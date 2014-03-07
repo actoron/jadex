@@ -18,10 +18,10 @@ public interface IInternalProcessEngineService
 	 *  Register an event description to be notified, when the event happens.
 	 *  @return An id to be used for deregistration.
 	 */
-	IFuture<String>	addEventMatcher(String[] eventtypes, UnparsedExpression expression, String[] imports, Map<String, Object> params, ICommand<Object> command);
+	public IFuture<String>	addEventMatcher(String[] eventtypes, UnparsedExpression expression, String[] imports, Map<String, Object> params, ICommand<Object> command);
 	
 	/**
 	 *  Register an event description to be notified, when the event happens.
 	 */
-	IFuture<Void>	removeEventMatcher(String id);
+	public IFuture<Void>	removeEventMatcher(String id);
 }
