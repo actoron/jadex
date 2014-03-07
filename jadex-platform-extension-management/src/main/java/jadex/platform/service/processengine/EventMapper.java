@@ -4,7 +4,6 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
-import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.javaparser.IParsedExpression;
@@ -41,6 +40,8 @@ public class EventMapper
 	public EventMapper()
 	{
 		this.modelmappings = new HashMap<String, List<MappingInfo>>();
+		this.instancemappings = new HashMap<String, List<MappingInfo>>();
+		this.instanceprocs = new HashMap<String, List<MappingInfo>>();
 		this.modelprocs = new HashMap<String, List<MappingInfo>>();
 	}
 	
@@ -122,6 +123,10 @@ public class EventMapper
 		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValues(vals);
 		String	id	= SUtil.createUniqueId("EventMapping");
+		while(instancemappings.containsKey(id))
+		{
+			id	= SUtil.createUniqueId("EventMapping");
+		}
 		
 		IFilter<Object> filter = new IFilter<Object>()
 		{
@@ -132,12 +137,8 @@ public class EventMapper
 			}
 		};
 		
-		List<MappingInfo> rems = instanceprocs.get(cmd);
-		if(rems==null)
-		{
-			rems = new ArrayList<MappingInfo>();
-			instanceprocs.put(id, rems);
-		}
+		List<MappingInfo> rems	= new ArrayList<MappingInfo>();
+		instanceprocs.put(id, rems);
 		
 		for(String event: events)
 		{

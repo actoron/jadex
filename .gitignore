@@ -11,3 +11,8 @@ keystore
 alarmclock_settings.ser
 **/testkeystore
 jadex-platform-standalone-launch/highscore.dmp
+/jadex-editor-bpmn/config/classes.cache
+/jadex-editor-bpmn/config/settings.cfg
+/microcreationtime.properties
+/microkillingtime.properties
+/micromem.properties

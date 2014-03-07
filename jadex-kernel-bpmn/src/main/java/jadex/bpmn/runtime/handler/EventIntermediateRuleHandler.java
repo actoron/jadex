@@ -111,7 +111,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 									ret	= new Future<Void>(new RuntimeException("Process thread not found: "+procid));
 								}
 								
-								instance.notify(activity, thread, null);
+								instance.notify(activity, thread, event);
 								return ret;
 							}
 						}).addResultListener(new IResultListener<Void>()
