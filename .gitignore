@@ -1,9 +1,13 @@
-*/target/**
-*/.classpath
-*/.project
+**/target
+**/bin
+**/gen
+**/.settings
+.classpath
+.project
 *.prefs
-*.properties
 *.copy
 keystore
 *.settings.xml
 alarmclock_settings.ser
+**/testkeystore
+jadex-platform-standalone-launch/highscore.dmp
