@@ -134,18 +134,27 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	protected List<MPool> pools;
 	
 	/** The artifacts. */
-	protected List artifacts;
+	protected List<MArtifact> artifacts;
 	
 	/** The messages. */
-	protected List messages;
+	protected List<MMessagingEdge> messages;
 			
 	//-------- init structures --------
 	
 	/** The cached edges of the model. */
-	protected Map alledges;
+	protected Map<String, MSequenceEdge> alledges;
 
 	/** The cached activities of the model. */
 	protected Map<String, MActivity> allactivities;
+	
+	/** The cached event subprocess start events of the model. */
+	protected List<MActivity> eventsubprocessstartevents;
+	
+	/** The cached instance-matched events thaqt require waiting. */
+	protected List<MActivity> waitingevents;
+	
+	/** The cached type-matched start events of the model. */
+	protected List<MActivity> typematchedstartevents;
 
 	/** The association sources. */
 	protected Map associationsources;
@@ -154,7 +163,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	protected Map associationtargets;
 	
 	/** The messaging edges. */
-	protected Map allmessagingedges;
+	protected Map<String, MMessagingEdge> allmessagingedges;
 	
 	//-------- added structures --------
 
@@ -300,7 +309,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get the artifacts.
 	 *  @return The artifacts. 
 	 */
-	public List getArtifacts()
+	public List<MArtifact> getArtifacts()
 	{
 		return artifacts;
 	}
@@ -312,7 +321,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	public void addArtifact(MArtifact artifact)
 	{
 		if(artifacts==null)
-			artifacts = new ArrayList();
+			artifacts = new ArrayList<MArtifact>();
 		artifacts.add(artifact);
 	}
 	
@@ -330,7 +339,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get the message edges.
 	 *  @return The message edges.  
 	 */
-	public List getMessagingEdges()
+	public List<MMessagingEdge> getMessagingEdges()
 	{
 		return messages;
 	}
@@ -342,7 +351,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	public void addMessagingEdge(MMessagingEdge message)
 	{
 		if(messages==null)
-			messages = new ArrayList();
+			messages = new ArrayList<MMessagingEdge>();
 		messages.add(message);
 	}
 	
@@ -362,13 +371,13 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get all message edges.
 	 *  @return The message edges (id -> edge).
 	 */
-	public Map getAllMessagingEdges()
+	public Map<String, MMessagingEdge> getAllMessagingEdges()
 	{
 		if(this.allmessagingedges==null)
 		{
-			this.allmessagingedges = new HashMap();
+			this.allmessagingedges = new HashMap<String, MMessagingEdge>();
 			
-			List messages = getMessagingEdges();
+			List<MMessagingEdge> messages = getMessagingEdges();
 			if(messages!=null)
 			{
 				for(int i=0; i<messages.size(); i++)
@@ -425,18 +434,18 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		{
 			this.allactivities = new HashMap<String, MActivity>();
 			
-			List pools = getPools();
+			List<MPool> pools = getPools();
 			if(pools!=null)
 			{
 				for(int i=0; i<pools.size(); i++)
 				{
-					MPool tmp = (MPool)pools.get(i);
+					MPool tmp = pools.get(i);
 					List<MActivity> acts = tmp.getActivities();
 					if(acts!=null)
 					{
 						for(int j=0; j<acts.size(); j++)
 						{
-							MActivity mact = (MActivity)acts.get(j);
+							MActivity mact = acts.get(j);
 							allactivities.put(mact.getId(), acts.get(j));
 							if(mact instanceof MSubProcess)
 							{
@@ -1256,5 +1265,106 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	public String getFilename()
 	{
 		return modelinfo.getFilename();
+	}
+	
+	/**
+	 *  Returns all start events triggered based on type matching.
+	 * 
+	 *  @return Events triggered based on type matching.
+	 */
+	public List<MActivity> getTypeMatchedStartEvents()
+	{
+		if(typematchedstartevents == null)
+		{
+			initMatchedStartEventCache();
+		}
+		return typematchedstartevents;
+	}
+	
+	/**
+	 *  Returns all start events in event subprocesses.
+	 * 
+	 *  @return Start events in event subprocesses.
+	 */
+	public List<MActivity> getEventSubProcessStartEvents()
+	{
+		if(eventsubprocessstartevents == null)
+		{
+			initMatchedStartEventCache();
+		}
+		return eventsubprocessstartevents;
+	}
+	
+	/**
+	 *  Returns all events waiting for outside triggers.
+	 * 
+	 *  @return Events waiting for outside triggers.
+	 */
+	public List<MActivity> getWaitingEvents()
+	{
+		if(waitingevents == null)
+		{
+			initMatchedStartEventCache();
+		}
+		return waitingevents;
+	}
+	
+	/**
+	 *  Initializes the type and instance event trigger caches.
+	 */
+	protected void initMatchedStartEventCache()
+	{
+		eventsubprocessstartevents = new ArrayList<MActivity>();
+		typematchedstartevents = new ArrayList<MActivity>();
+		waitingevents = new ArrayList<MActivity>();
+		List<MActivity> starteventtriggers = new ArrayList<MActivity>();
+		List<MSubProcess> subprocesses = new ArrayList<MSubProcess>();
+		Map<String, MActivity> allactivities = getAllActivities();
+		for (Map.Entry<String, MActivity> entry : allactivities.entrySet())
+		{
+			if (MBpmnModel.EVENT_START_RULE.equals(entry.getValue().getActivityType()) ||
+				MBpmnModel.EVENT_START_TIMER.equals(entry.getValue().getActivityType()) ||
+				MBpmnModel.EVENT_START_MESSAGE.equals(entry.getValue().getActivityType()))
+			{
+				starteventtriggers.add(entry.getValue());
+			}
+			else if (MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(entry.getValue().getActivityType()) ||
+					  MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(entry.getValue().getActivityType()) ||
+					  MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(entry.getValue().getActivityType()))
+			{
+				waitingevents.add(entry.getValue());
+			}
+			else if (entry.getValue() instanceof MSubProcess &&
+					  ((MSubProcess) entry.getValue()).getActivities() != null &&
+					  !((MSubProcess) entry.getValue()).getActivities().isEmpty())
+			{
+				subprocesses.add((MSubProcess) entry.getValue());
+			}
+		}
+		
+		for (MActivity startevent : starteventtriggers)
+		{
+			boolean contained = false;
+			for (MSubProcess subproc : subprocesses)
+			{
+				if (subproc.getActivities().contains(startevent))
+				{
+					contained = true;
+					if (MSubProcess.SUBPROCESSTYPE_EVENT.equals(subproc.getSubprocessType()))
+					{
+						eventsubprocessstartevents.add(startevent);
+					}
+					else
+					{
+						waitingevents.add(startevent);
+					}
+					break;
+				}
+			}
+			if (!contained)
+			{
+				typematchedstartevents.add(startevent);
+			}
+		}
 	}
 }
