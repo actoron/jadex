@@ -322,6 +322,12 @@ public class SBpmnModelReader
 			{
 				LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
 				act = sps.pop();
+				
+				String eventsp = attrs.get("triggeredByEvent");
+				if ((eventsp != null) && eventsp.equalsIgnoreCase("true"))
+				{
+					((MSubProcess) act).setSubprocessType(MSubProcess.SUBPROCESSTYPE_EVENT);
+				}
 			}
 			else
 			{
@@ -634,6 +640,12 @@ public class SBpmnModelReader
 												   Map<String, MIdElement> emap)
 	{
 		ClassLoader cl = model.getClassLoader();
+		
+//		if(tag.getLocalPart().equals("class"))
+//		{
+//			System.out.println("tagstack: "+tagstack);
+//			System.out.println("cont: "+content);
+//		}
 		
 		if ("description".equals(tag.getLocalPart()))
 		{
