@@ -79,6 +79,8 @@ public class IntermediateTestAgent
 		IComponentManagementService	cms	= agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getServiceContainer().getRequiredService("engine").get();
 
+		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
+		
 		pes.processEvent("test-event", null).get();
 		
 		agent.waitForDelay(500).get();

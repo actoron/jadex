@@ -65,6 +65,7 @@ import jadex.rules.eca.Rule;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,6 +107,9 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/** The event waitqueue. */
 	protected Map<String, Set<Object>>	waitqueue;
 	
+	/** The event types to be put in waitqueue. */
+	protected Map<String, Set<Tuple2<String, IResourceIdentifier>>>	waitqueuetypes;
+	
 	//-------- methods --------
 	
 	/**
@@ -117,6 +121,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		this.remcoms = new HashMap<Tuple2<String,IResourceIdentifier>, List<Runnable>>();
 		this.processes = new HashMap<IComponentIdentifier, ProcessEngineAgent.ProcessInfo>();
 		this.waitqueue	= new HashMap<String, Set<Object>>();
+		this.waitqueuetypes	= new HashMap<String, Set<Tuple2<String,IResourceIdentifier>>>();
 		this.eventmapper = new EventMapper();
 		return IFuture.DONE;
 	}
@@ -192,7 +197,45 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 						{
 							// load the bpmn model
 							BpmnModelLoader loader = new BpmnModelLoader();
-							MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getComponentIdentifier().getRoot()});
+							final MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getComponentIdentifier().getRoot()});
+							
+							// register waitqueue events
+							for(MActivity mevent: amodel.getWaitingEvents())
+							{
+								String[]	types	= (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+								for(String type: types)
+								{
+									Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
+									if(set==null)
+									{
+										set	= new HashSet<Tuple2<String,IResourceIdentifier>>();
+										waitqueuetypes.put(type, set);
+									}
+									set.add(key);
+								}
+							}
+							addRemoveCommand(new Runnable()
+							{
+								public void run()
+								{
+									for(MActivity mevent: amodel.getWaitingEvents())
+									{
+										String[]	types	= (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+										for(String type: types)
+										{
+											Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
+											if(set!=null)
+											{
+												set.remove(key);
+												if(set.isEmpty())
+												{
+													waitqueuetypes.remove(type);
+												}
+											}
+										}
+									}
+								}
+							}, key);
 						
 							// Search timer, rule start events in model 
 							List<MActivity> startevents = new ArrayList<MActivity>();
@@ -490,6 +533,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	{
 		final Future<Void> ret = new Future<Void>();
 		
+		type	= EventMapper.getEventType(event, type);
+		
 		if(eventmapper.processInstanceEvent(event, type))
 		{
 			ret.setResult(null);
@@ -524,10 +569,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 			}
 			
 			// Not processed -> add to waitqueue.
-			else if(add)
+			else if(add && waitqueuetypes.containsKey(type))
 			{
-				// Todo: check if event type is known in some model.
-				type	= EventMapper.getEventType(event, type);
 				Set<Object>	wq	= waitqueue.get(type);
 				if(wq==null)
 				{
@@ -553,6 +596,11 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 				});
 				
 				ret.setResult(null);
+			}
+			
+			else
+			{
+				ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
 			}
 		}
 		
