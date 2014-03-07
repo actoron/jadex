@@ -8,6 +8,7 @@
                       xmlns:jadex="http://www.activecomponents.org/bpmnextensions"
                       xmlns:jadexvisual="http://www.activecomponents.org/bpmnvisualextensions">
   <semantic:extension>
+    <jadex:modelname>TestIntermediateEvent</jadex:modelname>
     <jadex:componentflags suspend="false" master="false" daemon="false" autoshutdown="false" monitoring="OFF" synchronous="false" keepalive="false"/>
   </semantic:extension>
   <semantic:process name="Pool" id="mXGzRdvHUI25sRaq">
@@ -51,19 +52,19 @@
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane>
       <bpmndi:BPMNShape bpmnElement="mXGzRdvHUI25sRaq">
-        <dc:Bounds height="600.0" width="3000.0" x="50.0" y="50.0"/>
+        <dc:Bounds height="200.0" width="900.0" x="50.0" y="60.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="mLR+eRTFPqwse2ET">
-        <dc:Bounds height="40.0" width="40.0" x="170.0" y="240.0"/>
+        <dc:Bounds height="40.0" width="40.0" x="80.0" y="70.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="j3TO7R2uWjWqewLp">
-        <dc:Bounds height="100.0" width="160.0" x="280.0" y="210.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="190.0" y="40.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="z5CP/CF3O5zCvQ2w">
-        <dc:Bounds height="40.0" width="40.0" x="570.0" y="240.0"/>
+        <dc:Bounds height="40.0" width="40.0" x="480.0" y="70.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="yAMNau1/DbrnVBzw">
-        <dc:Bounds height="100.0" width="160.0" x="740.0" y="210.0"/>
+        <dc:Bounds height="100.0" width="160.0" x="650.0" y="40.0"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="lVGrbSa5270++aH7">
       </bpmndi:BPMNEdge>

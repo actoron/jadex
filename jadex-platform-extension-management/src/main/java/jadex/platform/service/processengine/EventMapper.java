@@ -68,8 +68,8 @@ public class EventMapper
 	public boolean processInstanceEvent(Object event, String type)
 	{
 		boolean ret = false;
-		if(type==null)
-			type = event.getClass().getName();
+		type	= getEventType(event, type);
+		
 		List<MappingInfo> mis = instancemappings.get(type);
 		if(mis!=null)
 		{
@@ -95,8 +95,7 @@ public class EventMapper
 	public Tuple2<IResourceIdentifier, String> processModelEvent(Object event, String type)
 	{
 		Tuple2<IResourceIdentifier, String> ret = null;
-		if(type==null)
-			type = event.getClass().getName();
+		type = getEventType(event, type);
 		List<MappingInfo> mis = modelmappings.get(type);
 		if(mis!=null)
 		{
@@ -110,6 +109,20 @@ public class EventMapper
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 *  Get the event type.
+	 *  Extracs the type from the event object, when the type nulls.
+	 */
+	public static String getEventType(Object event, String type)
+	{
+		if(type==null)
+		{
+			type = event.getClass().getName();
+		}
+		
+		return type;
 	}
 	
 	/**
