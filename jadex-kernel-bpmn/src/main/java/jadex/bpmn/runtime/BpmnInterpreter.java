@@ -532,8 +532,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		super.startBehavior();
 		
 		// Check if triggered by external event
-		// eventtype, mactname, event
+		// eventtype, mactid, event
         Tuple3<String, String, Object> trigger = (Tuple3<String, String, Object>)getArguments().get(MBpmnModel.TRIGGER);
+        
         // Create initial thread(s).
         List<MActivity> startevents = bpmnmodel.getStartActivities(null, null);
         for(int i=0; startevents!=null && i<startevents.size(); i++)
@@ -563,7 +564,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
                     context.addThread(thread);
                 }
             }
-            else if(trigger!=null && MBpmnModel.EVENT_START_RULE.equals(trigger.getFirstEntity()))
+            else if(trigger!=null && trigger.getSecondEntity()!=null && MBpmnModel.EVENT_START_RULE.equals(trigger.getFirstEntity()))
             {
             	// Was rule for that start event?
             	if(trigger.getSecondEntity().endsWith(mact.getId()))

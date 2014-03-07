@@ -1,11 +1,14 @@
 package jadex.platform.service.processengine;
 
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -45,21 +48,6 @@ public class EventMapper
 		this.modelprocs = new HashMap<String, List<MappingInfo>>();
 	}
 	
-//	/**
-//	 *  Map an event to a process instance.
-//	 *  @param event The event object.
-//	 *  @return The process model.
-//	 */
-//	public String processEvent(Object event)
-//	{
-//		String ret = null;
-//		if(!processInstanceEvent(event))
-//		{
-//			ret = processModelEvent(event);
-//		}
-//		return ret;
-//	}
-	
 	/**
 	 *  Map an event to a process instance.
 	 *  @param event The event object.
@@ -92,9 +80,9 @@ public class EventMapper
 	 *  @param event The event object.
 	 *  @return The process model.
 	 */
-	public Tuple2<IResourceIdentifier, String> processModelEvent(Object event, String type)
+	public ModelDetails processModelEvent(Object event, String type)
 	{
-		Tuple2<IResourceIdentifier, String> ret = null;
+		ModelDetails ret = null;
 		type = getEventType(event, type);
 		List<MappingInfo> mis = modelmappings.get(type);
 		if(mis!=null)
@@ -103,7 +91,7 @@ public class EventMapper
 			{
 				if(mi.getFilter()==null || mi.getFilter().filter(event))
 				{
-					ret = (Tuple2<IResourceIdentifier, String>)mi.getInfo();
+					ret = (ModelDetails)mi.getInfo();
 					break;
 				}
 			}
@@ -195,7 +183,8 @@ public class EventMapper
 	 *  @param filter The optional filter.
 	 *  @param modelname The modelname.
 	 */
-	public void addModelMapping(String[] events, IFilter<Object> filter, String modelname, IResourceIdentifier rid)
+	public void addModelMapping(String[] events, IFilter<Object> filter, String modelname, IResourceIdentifier rid, 
+		String actid, SubscriptionIntermediateFuture<ProcessEngineEvent> fut)
 	{
 		for(String event: events)
 		{
@@ -205,7 +194,7 @@ public class EventMapper
 				mis = new ArrayList<MappingInfo>();
 				modelmappings.put(event, mis);
 			}
-			MappingInfo mi = new MappingInfo(event, filter, new Tuple2<IResourceIdentifier, String>(rid, modelname));
+			MappingInfo mi = new MappingInfo(event, filter, new ModelDetails(rid, modelname, actid, fut));
 			mis.add(mi);
 			
 			List<MappingInfo> rems = modelprocs.get(modelname);
@@ -312,6 +301,109 @@ public class EventMapper
 		public void setInfo(Object info)
 		{
 			this.info = info;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static class ModelDetails
+	{
+		/** The resource identifier. */
+		protected IResourceIdentifier rid; 
+		
+		/** The model name. */
+		protected String model;
+		
+		/** The start event id. */
+		protected String eventid;
+		
+		/** The registration future. */
+		protected SubscriptionIntermediateFuture<ProcessEngineEvent> future;
+
+		/**
+		 *  Create a new ModelDetails.
+		 */
+		public ModelDetails(IResourceIdentifier rid, String model, String eventid,
+			SubscriptionIntermediateFuture<ProcessEngineEvent> future)
+		{
+			super();
+			this.rid = rid;
+			this.model = model;
+			this.eventid = eventid;
+			this.future = future;
+		}
+
+		/**
+		 *  Get the rid.
+		 *  return The rid.
+		 */
+		public IResourceIdentifier getRid()
+		{
+			return rid;
+		}
+
+		/**
+		 *  Set the rid. 
+		 *  @param rid The rid to set.
+		 */
+		public void setRid(IResourceIdentifier rid)
+		{
+			this.rid = rid;
+		}
+
+		/**
+		 *  Get the model.
+		 *  return The model.
+		 */
+		public String getModel()
+		{
+			return model;
+		}
+		
+		/**
+		 *  Set the model. 
+		 *  @param model The model to set.
+		 */
+		public void setModel(String model)
+		{
+			this.model = model;
+		}
+
+		/**
+		 *  Get the eventid.
+		 *  return The eventid.
+		 */
+		public String getEventId()
+		{
+			return eventid;
+		}
+
+		/**
+		 *  Set the eventid. 
+		 *  @param eventid The eventid to set.
+		 */
+		public void setEventId(String eventid)
+		{
+			this.eventid = eventid;
+		}
+
+		/**
+		 *  Get the future.
+		 *  return The future.
+		 */
+		public SubscriptionIntermediateFuture<ProcessEngineEvent> getFuture()
+		{
+			return future;
+		}
+
+		/**
+		 *  Set the future. 
+		 *  @param future The future to set.
+		 */
+		public void setFuture(SubscriptionIntermediateFuture<ProcessEngineEvent> future)
+		{
+			this.future = future;
 		}
 	}
 }
