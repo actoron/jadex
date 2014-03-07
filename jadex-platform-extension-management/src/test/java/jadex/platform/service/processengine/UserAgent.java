@@ -167,6 +167,7 @@ public class UserAgent
 					{
 						if(!fini)
 							tr.setFailed("Exception: "+exception);
+						exception.printStackTrace();
 						proceed();
 					}
 					
