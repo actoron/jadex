@@ -83,13 +83,13 @@ public class AboutDialog extends JAutoPositionDialog
 	 */
 	public String generateText()
 	{
-		infotext = "<head/><body>(c) 2002-2012<br>"
+		infotext = "<head/><body>(c) 2002-2014<br>"
 			+ "Alexander Pokahr, Lars Braubach<br>"
 			+ "All rights reserved<br>";
 		String rn = VersionInfo.getInstance().getVersion();
 		String rd = VersionInfo.getInstance().getNumberDateString();
 		infotext += "Version " + rn + " (" + rd + ")<br>";
-		infotext += "<a href=\"http://sourceforge.net/projects/jadex\">http://sourceforge.net/projects/jadex</a><br>";
+		infotext += "<a href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a><br>";
 		infotext += "</body>";
 		
 		return infotext;

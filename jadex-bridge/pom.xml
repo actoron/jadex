@@ -18,13 +18,14 @@
 		their management.  
 	</description>
 	
+	<!--
 	<properties>
 	    <timestamp>${maven.build.timestamp}</timestamp>
 	    <maven.build.timestamp.format>yyyyMMdd.HHmmss</maven.build.timestamp.format>
 	</properties>
 	
 	<build>
-	    <!-- Filter the version.properties file but nothing else -->
+	    <!- - Filter the version.properties file but nothing else - ->
 	    <resources>
 	        <resource>
 	            <directory>
@@ -53,7 +54,7 @@
 				</excludes>
 			</resource>
 		</resources>    
-	</build>
+	</build> -->
 
 	<dependencies>
 		<dependency>

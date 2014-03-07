@@ -11,9 +11,6 @@ public class Notifier
 {
 	//-------- attributes --------
 	
-	/** The handler. */
-	protected EventIntermediateNotificationHandler handler;
-	
 	/** The activity. */
 	protected MActivity activity;
 	
@@ -28,10 +25,8 @@ public class Notifier
 	/**
 	 *  Create a notifier.
 	 */
-	public Notifier(EventIntermediateNotificationHandler handler, MActivity activity,
-		BpmnInterpreter instance, ProcessThread thread)
+	public Notifier(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
-		this.handler = handler;
 		this.activity = activity;
 		this.instance = instance;
 		this.thread = thread;

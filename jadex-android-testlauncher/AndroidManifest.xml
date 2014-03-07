@@ -14,7 +14,7 @@
         android:icon="@drawable/icon"
         android:label="TestLauncher"
         android:screenOrientation="portrait" >
-        <activity android:name="jadex.android.testlauncher.TestLauncherApplication" >
+        <activity android:name="jadex.android.testlauncher.TestLauncherActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

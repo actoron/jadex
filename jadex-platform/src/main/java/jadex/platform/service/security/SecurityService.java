@@ -1546,7 +1546,7 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Build the digest given the timestamp and password.
 	 */
-	public static byte[]	buildDigest(long timestamp, String secret)
+	public static byte[] buildDigest(long timestamp, String secret)
 	{
 //		System.out.println("build digest: "+timestamp+" "+secret);
 		byte[]	input	= (byte[])SUtil.joinArrays(secret.getBytes(), SUtil.longToBytes(timestamp));
@@ -1556,7 +1556,7 @@ public class SecurityService implements ISecurityService
 	/**
 	 *  Build the digest given the timestamp and password.
 	 */
-	public static byte[]	buildDigest(byte[] input)
+	public static byte[] buildDigest(byte[] input)
 	{
 //		System.out.println("build digest: "+timestamp+" "+secret);
 		try

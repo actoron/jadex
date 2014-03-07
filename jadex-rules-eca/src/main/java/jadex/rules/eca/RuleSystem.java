@@ -1,10 +1,8 @@
 package jadex.rules.eca;
 
 import jadex.commons.IResultCommand;
-import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -14,10 +12,10 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.rules.eca.annotations.Action;
 import jadex.rules.eca.annotations.Condition;
+import jadex.rules.eca.propertychange.PropertyChangeManager;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -34,13 +32,8 @@ import java.util.Map;
  */
 public class RuleSystem
 {
-	/** The argument types for property change listener adding/removal (cached for speed). */
-	protected static Class<?>[]	PCL	= new Class[]{PropertyChangeListener.class};
 	
 	//-------- attributes --------
-	
-	/** The event list. */
-	protected List<IEvent> events;
 	
 	/** The rulebase. */
 	protected IRulebase rulebase;
@@ -48,11 +41,11 @@ public class RuleSystem
 	/** The rules generated for an object. */
 	protected IdentityHashMap<Object, Tuple2<Object, IRule<?>[]>> rules;
 
-	/** The Java beans property change listeners. */
-	protected Map<Object, PropertyChangeListener> pcls;
-	
 	/** The context for rule action execution. */
 	protected Object context;
+	
+	/** The PropertyChangeManager to add/remove handlers and manage events */
+	protected PropertyChangeManager pcman;
 	
 	//-------- constructors --------
 	
@@ -62,9 +55,9 @@ public class RuleSystem
 	public RuleSystem(Object context)
 	{
 		this.context = context;
-		this.events = new ArrayList<IEvent>();
 		this.rulebase = new Rulebase();
 		this.rules = new IdentityHashMap<Object, Tuple2<Object, IRule<?>[]>>(); // objects may change
+		this.pcman = PropertyChangeManager.createInstance();
 	}
 
 	//-------- methods --------
@@ -78,7 +71,7 @@ public class RuleSystem
 	 *  - Subscribes for events
 	 */
 	public Object observeObject(final Object object, boolean bean, boolean hasrules, 
-		IResultCommand<IFuture<IEvent>, PropertyChangeEvent> eventcreator)
+		IResultCommand<IFuture<Void>, PropertyChangeEvent> eventadder)
 	{
 		// Create proxy object if eventcreators are present
 		Object proxy = object;
@@ -87,7 +80,7 @@ public class RuleSystem
 
 		if(bean && !(object instanceof Class))
 		{
-			addPropertyChangeListener(object, eventcreator);
+			pcman.addPropertyChangeListener(object, eventadder);
 		}
 		
 		if(hasrules)
@@ -197,7 +190,7 @@ public class RuleSystem
 		if(object==null)
 			return;
 		
-		removePropertyChangeListener(object);
+		pcman.removePropertyChangeListener(object);
 
 		Tuple2<Object, IRule<?>[]> tup = rules.remove(object);
 		if(tup!=null)
@@ -306,99 +299,6 @@ public class RuleSystem
 		return rulebase;
 	}
 	
-	/**  
-	 *  Add a property change listener.
-	 */
-	protected void	addPropertyChangeListener(Object object, final IResultCommand<IFuture<IEvent>, PropertyChangeEvent> eventcreator)
-	{
-		if(object!=null)
-		{
-			// Invoke addPropertyChangeListener on value
-			try
-			{
-				if(pcls==null)
-					pcls = new IdentityHashMap<Object, PropertyChangeListener>(); // values may change, therefore identity hash map
-				PropertyChangeListener pcl = (PropertyChangeListener)pcls.get(object);
-				
-				if(pcl==null)
-				{
-					pcl = new PropertyChangeListener()
-					{
-						public void propertyChange(PropertyChangeEvent evt)
-						{
-							// todo: problems:
-							// - may be called on wrong thread (-> synchronizator)
-							// - how to create correct event with type and value
-
-							if(eventcreator!=null)
-							{
-								eventcreator.execute(evt).addResultListener(new IResultListener<IEvent>()
-								{
-									public void resultAvailable(IEvent event)
-									{
-										if(event!=null)
-										{
-											addEvent(event);
-										}
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										System.out.println("Event creator had exception: "+exception);
-									}
-								});
-							}
-							else
-							{
-								Event event = new Event(evt.getPropertyName(), evt.getNewValue());
-								addEvent(event);
-							}
-						}
-					};
-				}
-				
-				// Do not use Class.getMethod (slow).
-				Method	meth = SReflect.getMethod(object.getClass(), "addPropertyChangeListener", PCL);
-				if(meth!=null)
-					meth.invoke(object, new Object[]{pcl});				
-	
-				pcls.put(object, pcl);
-			}
-			catch(IllegalAccessException e){e.printStackTrace();}
-			catch(InvocationTargetException e){e.printStackTrace();}
-		}
-	}
-	
-	/**
-	 *  Deregister a value for observation.
-	 *  if its a bean then remove the property listener.
-	 */
-	protected void	removePropertyChangeListener(Object object)
-	{
-		if(object!=null)
-		{
-//			System.out.println("deregister ("+cnt[0]+"): "+value);
-			// Stop listening for bean events.
-			if(pcls!=null)
-			{
-				PropertyChangeListener pcl = (PropertyChangeListener)pcls.remove(object);
-				if(pcl!=null)
-				{
-					try
-					{
-//						System.out.println(getTypeModel().getName()+": Deregister: "+value+", "+type);						
-						// Do not use Class.getMethod (slow).
-						Method	meth = SReflect.getMethod(object.getClass(), "removePropertyChangeListener", PCL);
-						if(meth!=null)
-							meth.invoke(object, new Object[]{pcl});
-					}
-					catch(IllegalAccessException e){e.printStackTrace();}
-					catch(InvocationTargetException e){e.printStackTrace();}
-				}
-			}
-		}
-	}
-	
 	/**
 	 *  Process the next event by
 	 *  - finding rules that are sensible to the event type
@@ -409,11 +309,11 @@ public class RuleSystem
 	{
 		final IntermediateFuture<RuleEvent> ret = new IntermediateFuture<RuleEvent>();
 		
-		if(events.size()>0)
+		if(pcman.hasEvents())
 		{
-			IEvent event = events.remove(0);
+			IEvent event = pcman.removeEvent(0);
 			
-//			if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
+//			if(event.getType().getType(0).indexOf("factchanged")!=-1 && event.getType().getType(1).indexOf("mybean")!=-1)
 //				&& event.getType().getType(1).indexOf("Ambu")!=-1)
 //				System.out.println("proc ev: "+event);
 				
@@ -602,7 +502,7 @@ public class RuleSystem
 	{
 		int i=0;
 		
-		for(i=0; events.size()>0 && (max==-1 || i<max); i++)
+		for(i=0; pcman.hasEvents() && (max==-1 || i<max); i++)
 		{
 			processEvent();
 		}
@@ -615,14 +515,14 @@ public class RuleSystem
 	 */
 	public void addEvent(IEvent event)
 	{
-//		System.out.println("added: "+event.getType());
+//		System.out.println("added: "+event.getType()+" "+this);
 //		if(event.getType().getTypes().length==1)
 //			System.out.println("herer: "+event.getType());
 //		if(event.getType().getType(0).indexOf("goaloption")!=-1 && event.getType().getType(1).indexOf("Treat")!=-1
 //			&& event.getType().getType(1).indexOf("Ambu")!=-1)
 //			System.out.println("add event: "+event);
 
-		events.add(event);
+		pcman.addEvent(event);
 	}
 	
 	/**
@@ -630,7 +530,7 @@ public class RuleSystem
 	 */
 	public boolean isEventAvailable()
 	{
-		return !events.isEmpty();
+		return pcman.hasEvents();
 	}
 }
 

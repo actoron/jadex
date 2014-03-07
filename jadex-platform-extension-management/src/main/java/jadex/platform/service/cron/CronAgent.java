@@ -291,6 +291,17 @@ public class CronAgent implements ICronService
 	}
 	
 	/**
+	 *  Test if a job is scheduled with an id.
+	 *  @param jobid The jobid.
+	 */
+	public IFuture<Boolean> containsJob(String jobid)
+	{
+		Future<Boolean> ret = new Future<Boolean>();
+		ret.setResult(jobs!=null && jobs.containsKey(jobid)? Boolean.TRUE: Boolean.FALSE);
+		return ret;
+	}
+	
+	/**
 	 *  Execute a job on worker agent or directly.
 	 */
 	protected IFuture<Void> executeJob(final Tuple2<CronJob<?>, SubscriptionIntermediateFuture<?>> jobtup, final long time)

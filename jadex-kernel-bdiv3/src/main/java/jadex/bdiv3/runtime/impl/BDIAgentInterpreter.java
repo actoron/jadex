@@ -143,7 +143,6 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	protected MicroAgent createAgent(Class<?> agentclass, MicroModel model) throws Exception
 	{
 		MicroAgent ret;
-		
 		final Object agent = agentclass.newInstance();
 		if(agent instanceof MicroAgent)
 		{
@@ -2058,11 +2057,13 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		if(inited && rulesystem!=null)
 			rulesystem.processAllEvents();
 		
-//		if(getComponentIdentifier().getName().indexOf("Ambu")!=-1 && steps!=null && steps.size()>0)
+//		if(steps!=null && steps.size()>0)
 //		{
-//			System.out.println("steps: "+steps.size()+" "+steps.get(0).getStep().getClass());
+//			System.out.println(getComponentIdentifier()+" steps: "+steps.size()+" "+steps.get(0).getStep().getClass());
 //		}
 		boolean ret = super.executeStep();
+		
+//		System.out.println(getComponentIdentifier()+" after step");
 
 		return ret || (inited && rulesystem!=null && rulesystem.isEventAvailable());
 	}

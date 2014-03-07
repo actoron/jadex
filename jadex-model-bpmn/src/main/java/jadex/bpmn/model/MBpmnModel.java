@@ -110,8 +110,17 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** Constant for event intermediate multiple. */
 	public static final String EVENT_INTERMEDIATE_MULTIPLE = "EventIntermediateMultiple";
 	
+	// Todo: add (or move from runtime handlers) constants for all properties supported in editor.
+	
 	/** Property name for error events. */
 	public static final String PROPERTY_EVENT_ERROR = "exception";
+	
+	/** Property name for condition of rule events. */
+	public static final String PROPERTY_EVENT_RULE_CONDITION = "condition";	
+	
+	/** Property name for event types of rule events. */
+	public static final String PROPERTY_EVENT_RULE_EVENTTYPES = "eventtypes";	
+	
 	
 	/** The signal event handler trigger parameter name. Used to put the trigger in the signal event arguments. */
 	public static final String SIGNAL_EVENT_TRIGGER = "signal_trigger";

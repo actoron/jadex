@@ -15,6 +15,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITuple2Future;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -293,6 +294,9 @@ public interface IComponentManagementService //extends IService
 	{
 		/** The cid. */
 		protected IComponentIdentifier cid;
+		
+		/** Optional properties. */
+		protected Map<String, Object> properties;
 
 		/**
 		 *  Create a new CMSStatusEvent.
@@ -325,6 +329,42 @@ public interface IComponentManagementService //extends IService
 		public void setComponentIdentifier(IComponentIdentifier cid)
 		{
 			this.cid = cid;
+		}
+
+		/**
+		 *  Get the properties.
+		 *  return The properties.
+		 */
+		public Map<String, Object> getProperties()
+		{
+			return properties;
+		}
+
+		/**
+		 *  Set the properties. 
+		 *  @param properties The properties to set.
+		 */
+		public void setProperties(Map<String, Object> properties)
+		{
+			this.properties = properties;
+		}
+		
+		/**
+		 *  Add a property.
+		 */
+		public void setProperty(String name, Object value)
+		{
+			if(properties==null)
+				properties = new HashMap<String, Object>();
+			properties.put(name, value);
+		}
+		
+		/**
+		 *  Get a property.
+		 */
+		public Object getProperty(String name)
+		{
+			return properties==null? null: properties.get(name);
 		}
 	}
 	

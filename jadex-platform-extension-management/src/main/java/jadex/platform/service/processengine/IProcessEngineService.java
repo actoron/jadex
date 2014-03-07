@@ -20,9 +20,10 @@ public interface IProcessEngineService
 	 *  Add a bpmn model that is monitored for start events.
 	 *  @param model The bpmn model
 	 *  @param rid The resource identifier (null for all platform jar resources).
+	 *  @param cortype The correlation factory.
 	 */
-//	@Timeout(Timeout.NONE)
-	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(@CheckNotNull String model, IResourceIdentifier rid);
+//	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(@CheckNotNull String model, IResourceIdentifier rid, Class<IFilter<IEvent>> cortype);
+	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(@CheckNotNull String model, IResourceIdentifier rid, ICorrelationFilterFactory corfac);
 	
 	/**
 	 *  Remove a bpmn model.

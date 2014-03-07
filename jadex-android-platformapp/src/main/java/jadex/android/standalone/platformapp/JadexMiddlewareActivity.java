@@ -9,7 +9,6 @@ import jadex.android.standalone.JadexClientLauncherActivity;
 import jadex.android.standalone.clientapp.ClientAppFragment;
 import jadex.android.standalone.clientservice.UniversalClientService;
 import jadex.android.standalone.clientservice.UniversalClientService.UniversalClientServiceBinder;
-import jadex.bdiv3.AsmDexBdiClassGenerator;
 
 import java.io.File;
 import java.util.HashMap;
@@ -17,7 +16,6 @@ import java.util.Map;
 
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
@@ -291,7 +289,7 @@ public class JadexMiddlewareActivity extends FragmentActivity implements Service
 			// File dexInternalStoragePath = new File(getDir("dex",
 			// Context.MODE_PRIVATE), "jadex.jar");
 			final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
-			AsmDexBdiClassGenerator.OUTPATH = optimizedDexOutputPath;
+//			AsmDexBdiClassGenerator.OUTPATH = optimizedDexOutputPath;
 			
 			result = new JadexDexClassLoader(appPath, optimizedDexOutputPath.getAbsolutePath(), null, parent);
 			clCache.put(appPath, result);

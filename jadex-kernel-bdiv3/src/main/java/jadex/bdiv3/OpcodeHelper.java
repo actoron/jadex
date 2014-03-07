@@ -16,19 +16,7 @@ public abstract class OpcodeHelper
 	{
 		if (INSTANCE == null) {
 			if (SReflect.isAndroid()) {
-				Class<?> clazz = SReflect.classForName0("jadex.bdiv3.asmdex.AsmDexOpcodeHelper", null);
-				try
-				{
-					INSTANCE = (OpcodeHelper) clazz.newInstance();
-				}
-				catch (InstantiationException e)
-				{
-					e.printStackTrace();
-				}
-				catch (IllegalAccessException e)
-				{
-					e.printStackTrace();
-				}
+				throw new Error("OpcodeHelper.getInstance() is not implemented for Android.");
 			} else {
 				INSTANCE = new AsmOpcodeHelper();
 			}

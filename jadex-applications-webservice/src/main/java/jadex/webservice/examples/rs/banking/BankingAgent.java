@@ -1,5 +1,6 @@
 package jadex.webservice.examples.rs.banking;
 
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Description;
@@ -25,8 +26,17 @@ import jadex.micro.annotation.Publish;
 {	
 	//a) Generate everything (no own implementation)
 	@ProvidedService(name="banking1", type=IBankingService.class, implementation=@Implementation(BankingService.class),
-		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking1",
-		properties=@NameValue(name="formats", value="new javax.ws.rs.core.MediaType[]{javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE}")))
+		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8081/banking1",
+		properties={
+			@NameValue(name=PublishInfo.WP_URL, value="\"http://localhost:8080/test\""),
+			@NameValue(name=PublishInfo.WP_APPNAME, value="\"bank\""),
+			@NameValue(name="formats", value="new javax.ws.rs.core.MediaType[]{javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE}")
+		}))
+	
+//	//a) Generate everything (no own implementation)
+//	@ProvidedService(name="banking1", type=IBankingService.class, implementation=@Implementation(BankingService.class),
+//		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking1",
+//		properties=@NameValue(name="formats", value="new javax.ws.rs.core.MediaType[]{javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE}")))
 	
 //	// b) Use custom service class (no generation) Note: the publish id here is taken from the implementation class directly
 //	@ProvidedService(name="banking2", type=IBankingService.class, implementation=@Implementation(BankingService.class),

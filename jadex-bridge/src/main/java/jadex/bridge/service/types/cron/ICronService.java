@@ -22,4 +22,11 @@ public interface ICronService
 	 *  @param jobid The jobid.
 	 */
 	public IFuture<Void> removeJob(String jobid);
+	
+	/**
+	 *  Test if a job is scheduled with an id.
+	 *  @param jobid The jobid.
+	 */
+	public IFuture<Boolean> containsJob(String jobid);
+
 }

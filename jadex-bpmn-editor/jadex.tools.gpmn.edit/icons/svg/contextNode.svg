@@ -1,7 +1,0 @@
-<svg contentScriptType="text/ecmascript" width="64.0px" xmlns:xlink="http://www.w3.org/1999/xlink" zoomAndPan="magnify" contentStyleType="text/css" height="64.0px" viewBox="0 0 64.0 64.0" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" version="1.0">
-<defs/>
-<rect x="0" y="10.8" transform="matrix( 1, 0, 0, 1, 0.5, -4)" width="62.8" style="stroke-width:2.0;stroke:#000000;fill:#ffffff;" rx="3.0" ry="3.0" height="45"/>
-<text x="10.5" y="28" id="1" style="font-size:11pt;font-weight:bold;fill:#000000;" transform="matrix( 1, 0, 0, 1, -6.25, 2.25)">
-Context</text>
-<line transform="matrix( 1.1826761447926797, 0, 0, 1, -4.126425249369694, 30)" x1="4.8" x2="56.8" y1="13.2" style="stroke:#000000;fill:none;" y2="13" id="0"/>
-</svg>
