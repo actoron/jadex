@@ -30,7 +30,7 @@
       <semantic:conditionalEventDefinition/>
       <semantic:extensionElements>
         <jadex:property name="condition">value==7</jadex:property>
-        <jadex:property name="eventtypes">new java.lang.String[]{&quot;java.lang.String&quot;}</jadex:property>
+        <jadex:property name="eventtypes">new java.lang.String[]{&quot;Intermediate&quot;}</jadex:property>
       </semantic:extensionElements>
     </semantic:intermediateCatchEvent>
     <semantic:task name="Task" id="yAMNau1/DbrnVBzw">

@@ -21,6 +21,8 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,15 +52,38 @@ public class IntermediateTestAgent
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final TestReport[] trs = new TestReport[1];
+		final List<TestReport> trs = new ArrayList<TestReport>();
 		
-		testIntemediateBpmn().addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+		testIntermediateBpmn("jadex.platform.service.processengine.TestIntermediateEvent.bpmn2", "Intermediate",
+			new TestReport("#1", "Test if bpmn rule triggering works for intermediate events."))
+			.addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
 			public void customResultAvailable(TestReport tr)
 			{
-				trs[0] = tr;
-				agent.setResultValue("testresults", new Testcase(trs.length, trs));
-				ret.setResult(null);
+				trs.add(tr);
+				
+//				testIntermediateBpmn("jadex.platform.service.processengine.TestSubprocessStartEvent.bpmn2", "SubprocessStart",
+//					new TestReport("#2", "Test if bpmn rule triggering works for start events of active subprocesses."))
+//					.addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+//				{
+//					public void customResultAvailable(TestReport tr)
+//					{
+//						trs.add(tr);
+		
+						testEventIgnore("Ignored",
+							new TestReport("#2", "Test if unknown event produces exception."))
+							.addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+						{
+							public void customResultAvailable(TestReport tr)
+							{
+								trs.add(tr);
+								
+								agent.setResultValue("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
+								ret.setResult(null);
+							}
+						});
+//					}
+//				});
 			}
 		});
 	
@@ -68,20 +93,41 @@ public class IntermediateTestAgent
 	/**
 	 *  Monitor an intermediate rule condition.
 	 */
-	protected IFuture<TestReport> testIntemediateBpmn()
+	protected IFuture<TestReport> testEventIgnore(String eventtype, TestReport tr)
 	{
-		final Future<TestReport> ret = new Future<TestReport>();
+		Future<TestReport> ret = new Future<TestReport>();
 		
-		final TestReport tr = new TestReport("#1", "Test if bpmn rule triggering works for intermediate events.");
-		
-		final String model = "jadex.platform.service.processengine.TestIntermediateEvent.bpmn2";
+		IProcessEngineService	pes	= (IProcessEngineService)agent.getServiceContainer().getRequiredService("engine").get();
 
+		try
+		{
+			pes.processEvent("test-event", eventtype).get();
+			tr.setFailed("No exception on unknown event.");
+		}
+		catch(RuntimeException e)
+		{
+			System.out.println(e.getMessage());
+			tr.setSucceeded(true);
+		}
+		
+		ret.setResult(tr);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Monitor an intermediate rule condition.
+	 */
+	protected IFuture<TestReport> testIntermediateBpmn(String model, String eventtype, TestReport tr)
+	{
+		Future<TestReport> ret = new Future<TestReport>();
+		
 		IComponentManagementService	cms	= agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getServiceContainer().getRequiredService("engine").get();
 
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
-		pes.processEvent("test-event", null).get();
+		pes.processEvent("test-event", eventtype).get();
 		
 		agent.waitForDelay(500).get();
 		
