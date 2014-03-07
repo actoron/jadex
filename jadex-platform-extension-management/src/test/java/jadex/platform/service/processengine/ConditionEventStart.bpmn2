@@ -59,8 +59,8 @@
       <semantic:conditionalEventDefinition/>
       <semantic:extensionElements>
         <jadex:property name="notifier">&quot;file_added; $event.getContent()&quot;</jadex:property>
-        <jadex:property name="eventtypes">new java.lang.String[]{&quot;AddEvent&quot;}</jadex:property>
         <jadex:property name="condition">$event</jadex:property>
+        <jadex:property name="eventtypes">new java.lang.String[]{&quot;add_event&quot;}</jadex:property>
       </semantic:extensionElements>
     </semantic:startEvent>
     <semantic:startEvent id="_VBdxsSdsEeKVjbAWuDmuDw">
@@ -69,7 +69,7 @@
       <semantic:extensionElements>
         <jadex:property name="notifier">&quot;file_added; !$event.getContent()&quot;</jadex:property>
         <jadex:property name="condition">!$event</jadex:property>
-        <jadex:property name="eventtypes">new java.lang.String[]{&quot;AddEvent&quot;}</jadex:property>
+        <jadex:property name="eventtypes">new java.lang.String[]{&quot;add_event&quot;}</jadex:property>
       </semantic:extensionElements>
     </semantic:startEvent>
     <semantic:startEvent id="_7aMIMSf9EeKVjbAWuDmuDw">
@@ -77,8 +77,8 @@
       <semantic:conditionalEventDefinition/>
       <semantic:extensionElements>
         <jadex:property name="notifier">&quot;file_removed; $event.getContent()&quot;</jadex:property>
-        <jadex:property name="eventtypes">new java.lang.String[]{&quot;RemoveEvent&quot;}</jadex:property>
         <jadex:property name="condition">$event</jadex:property>
+        <jadex:property name="eventtypes">new java.lang.String[]{&quot;remove_event&quot;}</jadex:property>
       </semantic:extensionElements>
     </semantic:startEvent>
     <semantic:startEvent id="_NOFnoCf-EeKVjbAWuDmuDw">
@@ -87,7 +87,7 @@
       <semantic:extensionElements>
         <jadex:property name="notifier">&quot;file_removed; !$event.getContent()&quot;</jadex:property>
         <jadex:property name="condition">!$event</jadex:property>
-        <jadex:property name="eventtypes">new java.lang.String[]{&quot;RemoveEvent&quot;}</jadex:property>
+        <jadex:property name="eventtypes">new java.lang.String[]{&quot;remove_event&quot;}</jadex:property>
       </semantic:extensionElements>
     </semantic:startEvent>
     <semantic:endEvent id="_GFQk0ScvEeKSvNRxWcVdjQ">

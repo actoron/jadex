@@ -64,11 +64,12 @@ public class EventMapper
 	 *  @param event The event object.
 	 *  @return The process model.
 	 */
-	public boolean processInstanceEvent(Object event)
+	public boolean processInstanceEvent(Object event, String type)
 	{
 		boolean ret = false;
-		String name = event.getClass().getName();
-		List<MappingInfo> mis = instancemappings.get(name);
+		if(type==null)
+			type = event.getClass().getName();
+		List<MappingInfo> mis = instancemappings.get(type);
 		if(mis!=null)
 		{
 			for(MappingInfo mi: mis)
@@ -90,11 +91,12 @@ public class EventMapper
 	 *  @param event The event object.
 	 *  @return The process model.
 	 */
-	public Tuple2<IResourceIdentifier, String> processModelEvent(Object event)
+	public Tuple2<IResourceIdentifier, String> processModelEvent(Object event, String type)
 	{
 		Tuple2<IResourceIdentifier, String> ret = null;
-		String name = event.getClass().getName();
-		List<MappingInfo> mis = modelmappings.get(name);
+		if(type==null)
+			type = event.getClass().getName();
+		List<MappingInfo> mis = modelmappings.get(type);
 		if(mis!=null)
 		{
 			for(MappingInfo mi: mis)
