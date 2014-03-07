@@ -129,50 +129,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		return IFuture.DONE;
 	}
 	
-//	/**
-//	 *  The agent body.
-//	 */
-//	@AgentBody
-//	public void body()
-//	{		
-//		final long dur = 10000;
-////		final String model = "jadex/bpmn/examples/execute/TimerEventStart.bpmn";
-//		final String model = "jadex/bpmn/examples/execute/ConditionEventStart.bpmn";
-//		
-//		final IMonitoringStarterService sts = (IMonitoringStarterService)agent.getServiceContainer().getProvidedService(IMonitoringStarterService.class);
-//		sts.addBpmnModel(model, null).addResultListener(new DefaultResultListener<Void>()
-//		{
-//			public void resultAvailable(Void result)
-//			{
-//				System.out.println("monitoring "+dur/1000+"s "+model);
-//				
-//				IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
-//				fut.addResultListener(new DefaultResultListener<IRuleService>()
-//				{
-//					public void resultAvailable(final IRuleService rules)
-//					{
-//						rules.addEvent(new Event("new_file", "some event"));
-//					}
-//				});
-//				
-//				agent.waitFor(dur, new IComponentStep<Void>()
-//				{
-//					public IFuture<Void> execute(IInternalAccess ia)
-//					{
-//						sts.removeBpmnModel(model, null).addResultListener(new DefaultResultListener<Void>()
-//						{
-//							public void resultAvailable(Void result)
-//							{
-//								System.out.println("monitoring ended");
-//							}
-//						});
-//						return IFuture.DONE;
-//					}
-//				});
-//			}
-//		});
-//	}
-	
 	/**
 	 *  Add a bpmn model that is monitored for start events.
 	 *  @param model The bpmn model
@@ -349,22 +305,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 										}, key);
 										ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.PROCESSMODEL_ADDED, null, null));
 									}
-									
-//									// add rule listener if at least one rule
-//									addRuleListener(rules, key, ret, corfac).addResultListener(new ExceptionDelegationResultListener<Void, Collection<ProcessEngineEvent>>(ret)
-//									{
-//										public void customResultAvailable(Void result)
-//										{
-//											addRuleJobs(rules.iterator(), key).addResultListener(new ExceptionDelegationResultListener<Void, Collection<ProcessEngineEvent>>(ret)
-//											{
-//												public void customResultAvailable(Void result)
-//												{
-//													// first event to state that monitoring is complete
-//													ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.PROCESSMODEL_ADDED, null, null));
-//												}
-//											});
-//										}
-//									});
 								}
 							});
 						}
@@ -379,73 +319,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		return ret;
 	}
-	
-//	/**
-//	 *  Add a rule listener on the engine that processes the received events.
-//	 */
-//	protected IFuture<Void> addRuleListener(List<IRule<Collection<CMSStatusEvent>>> rules, final Tuple2<String, IResourceIdentifier> key,
-//		final SubscriptionIntermediateFuture<ProcessEngineEvent> res, final ICorrelationFilterFactory corfac)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		if(rules.size()>0)
-//		{
-//			IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
-//			fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Void>(ret)
-//			{
-//				public void customResultAvailable(final IRuleService rules)
-//				{
-//					final ISubscriptionIntermediateFuture<RuleEvent> fut = rules.subscribeToEngine();
-//					addRemoveCommand(new Runnable()
-//					{
-//						public void run()
-//						{
-//							fut.terminate();
-//						}
-//					}, key);
-//					
-//					fut.addResultListener(new IntermediateDefaultResultListener<RuleEvent>()
-//					{
-//						public void intermediateResultAvailable(RuleEvent re) 
-//						{
-//							// first event is subscribe() finished
-//							if(re!=null)
-//							{
-//								// send event and create correlator for new instance
-//								if(re.getResult() instanceof CMSCreatedEvent)
-//								{
-//									CMSCreatedEvent ev = (CMSCreatedEvent)re.getResult();
-//									IEvent event = (IEvent)ev.getProperty("startevent");
-//									IComponentIdentifier cid = ev.getComponentIdentifier();
-//									processes.put(cid, new ProcessInfo(corfac==null? null: corfac.createCorrelationFilter(event), cid));
-//								
-//									// send instance created event
-//									res.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, (IComponentIdentifier)re.getResult(), null));
-//								}
-//								else if(re.getResult() instanceof CMSTerminatedEvent)
-//								{
-//									CMSTerminatedEvent ev = (CMSTerminatedEvent)re.getResult();
-//									processes.remove(ev.getComponentIdentifier());
-//								}
-//							}
-//						}
-//						
-//						public void exceptionOccurred(Exception exception)
-//						{
-//							res.setExceptionIfUndone(exception);
-//						}
-//					});
-//					ret.setResult(null);
-//				}
-//			});
-//		}
-//		else
-//		{
-//			ret.setResult(null);
-//		}
-//		
-//		return ret;
-//	}
 	
 	/**
 	 *  Remove a bpmn model.
@@ -673,63 +546,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		coms.add(com);
 	}
 	
-//	/**
-//	 *  Add rule jobs to the engine.
-//	 */
-//	protected IFuture<Void> addRuleJobs(final Iterator<IRule<Collection<CMSStatusEvent>>> it, final Tuple2<String, IResourceIdentifier> key)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		if(it.hasNext())
-//		{
-//			addRuleJob(it.next(), key).addResultListener(new DelegationResultListener<Void>(ret)
-//			{
-//				public void customResultAvailable(Void result)
-//				{
-//					addRuleJobs(it, key).addResultListener(new DelegationResultListener<Void>(ret));
-//				}
-//			});
-//		}
-//		else
-//		{
-//			ret.setResult(null);
-//		}
-//		
-//		return ret;
-//	}
-	
-//	/**
-//	 *  Add a rule to the rule engine.
-//	 */
-//	protected IFuture<Void> addRuleJob(final IRule<?> rule, final Tuple2<String, IResourceIdentifier> key)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
-//		final String rulename = rule.getName();
-//		fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Void>(ret)
-//		{
-//			public void customResultAvailable(final IRuleService rules)
-//			{
-//				Runnable com = new Runnable()
-//				{
-//					public void run()
-//					{
-//						rules.removeRule(rulename).addResultListener(new DefaultResultListener<Void>()
-//						{
-//							public void resultAvailable(Void result)
-//							{
-////								System.out.println("removed rule: "+rule);
-//							}
-//						});
-//					}
-//				};
-//				addRemoveCommand(com, key);
-//				rules.addRule(rule).addResultListener(new DelegationResultListener<Void>(ret));
-//			}
-//		});
-//		return ret;
-//	}
-	
 	/**
 	 *  Create a new cron create component command.
 	 */
@@ -759,50 +575,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		return ret;
 	}
 	
-//	/**
-//	 *  Create a new rule create component command.
-//	 */
-//	protected static RuleCreateCommand createRuleCreateCommand(IResourceIdentifier rid, String model)//, IResultListener<Collection<Tuple2<String, Object>>> killis)
-//	{
-//		RuleCreateCommand ret = null;
-//		
-//		// add implicit triggering event 
-//		CreationInfo ci = new CreationInfo(rid);
-//		
-//		ret = new RuleCreateCommand(null, model, ci)//, killis)
-//		{
-//			@Classname("RuleCreateCommand")
-//			public IIntermediateFuture<CMSStatusEvent> execute(final CommandData args)
-//			{
-//				IntermediateFuture<CMSStatusEvent> ret = new IntermediateFuture<CMSStatusEvent>();
-//				Map<String, Object> vs = getCommand().getInfo().getArguments();
-//				if(vs==null)
-//				{
-//					vs = new HashMap<String, Object>();
-//					getCommand().getInfo().setArguments(vs);
-//				}
-////				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), args.getEvent()));
-//				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), args.getEvent().getContent()));
-//				IIntermediateFuture<CMSStatusEvent> fut = super.execute(args);
-//				fut.addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(ret)
-//				{
-//					public void customIntermediateResultAvailable(CMSStatusEvent event)
-//					{
-//						System.out.println("event is: "+event);
-//						if(event instanceof CMSCreatedEvent)
-//						{
-//							event.setProperty("startevent", args.getEvent());
-//						}
-//						super.customIntermediateResultAvailable(event);
-//					}
-//				});
-//				return ret;
-//			}
-//		};
-//		
-//		return ret;
-//	}
-
 	/**
 	 *  Process info struct.
 	 */
