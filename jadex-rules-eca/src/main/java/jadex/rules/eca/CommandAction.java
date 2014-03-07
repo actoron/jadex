@@ -95,7 +95,7 @@ public class CommandAction<T> implements IAction<T>
 		 *  Get the rule.
 		 *  @return The rule.
 		 */
-		public IRule< ? > getRule()
+		public IRule<?> getRule()
 		{
 			return rule;
 		}

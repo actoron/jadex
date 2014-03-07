@@ -12,28 +12,27 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
-import jadex.bridge.service.types.ecarules.IRuleService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
@@ -56,21 +55,17 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.cron.CronAgent;
 import jadex.platform.service.cron.TimePatternFilter;
 import jadex.platform.service.cron.jobs.CronCreateCommand;
-import jadex.platform.service.ecarules.RuleAgent;
 import jadex.rules.eca.CommandAction;
-import jadex.rules.eca.CommandAction.CommandData;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.ExpressionCondition;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 import jadex.rules.eca.Rule;
-import jadex.rules.eca.RuleEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -241,7 +236,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 										{
 											rule.setCondition(ICondition.TRUE_CONDITION);
 										}
-										rule.setAction(new CommandAction<Collection<CMSStatusEvent>>(createRuleCreateCommand(rid, model)));//, dellis)));
+//										rule.setAction(new CommandAction<Collection<CMSStatusEvent>>(createRuleCreateCommand(rid, model)));//, dellis)));
 										rules.add(rule);
 									}
 									// new variant with new models bpmn2
@@ -266,7 +261,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 											{
 												rule.setCondition(ICondition.TRUE_CONDITION);
 											}
-											rule.setAction(new CommandAction<Collection<CMSStatusEvent>>(createRuleCreateCommand(rid, model)));//, dellis)));
+//											rule.setAction(new CommandAction<Collection<CMSStatusEvent>>(createRuleCreateCommand(rid, model)));//, dellis)));
 											rule.setEventNames(events);
 											rules.add(rule);
 										}
@@ -355,7 +350,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 											{
 												events[i] = ets.get(i).getTypename();
 											}
-											eventmapper.addModelMapping(events, filter, model);
+											eventmapper.addModelMapping(events, filter, model, rid);
 										}
 										addRemoveCommand(new Runnable()
 										{
@@ -513,7 +508,80 @@ public class ProcessEngineAgent implements IProcessEngineService
 		
 		if(!eventmapper.processInstanceEvent(event))
 		{
-			String model = eventmapper.processModelEvent(event);
+			Tuple2<IResourceIdentifier, String> tup = eventmapper.processModelEvent(event);
+			if(tup!=null)
+			{
+				final IResourceIdentifier rid = tup.getFirstEntity();
+				final String model = tup.getSecondEntity();
+				
+				SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(agent.createResultListener(new IResultListener<IComponentManagementService>()
+				{
+					public void resultAvailable(IComponentManagementService cms)
+					{
+						CreationInfo info = new CreationInfo(agent.getComponentIdentifier(), rid);
+						Map<String, Object> vs = new HashMap<String, Object>();
+//						vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), event));
+						vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, null, event));
+
+						ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, null, model);
+						fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+						{
+							public void intermediateResultAvailable(CMSStatusEvent stevent)
+							{
+								System.out.println("event is: "+stevent);
+								
+								if(stevent!=null)
+								{
+									if(stevent instanceof CMSCreatedEvent)
+									{
+										CMSCreatedEvent ev = (CMSCreatedEvent)stevent;
+										stevent.setProperty("startevent", event);
+										ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, 
+											ev.getComponentIdentifier(), null));
+									}
+									else if(stevent instanceof CMSIntermediateResultEvent)
+									{
+										CMSIntermediateResultEvent ev = (CMSIntermediateResultEvent)stevent;
+										ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_RESULT_RECEIVED, 
+											ev.getComponentIdentifier(), new Tuple2<String, Object>(ev.getName(), ev.getValue())));
+									}
+									else if(stevent instanceof CMSTerminatedEvent)
+									{
+										CMSTerminatedEvent ev = (CMSTerminatedEvent)stevent;
+										ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
+											ev.getComponentIdentifier(), ev.getResults()));
+									}
+								}
+							}
+							
+							public void finished()
+							{
+								ret.setFinished();
+							}
+							
+							public void resultAvailable(Collection<CMSStatusEvent> result)
+							{
+								for(CMSStatusEvent ste: result)
+								{
+									intermediateResultAvailable(ste);
+								}
+								ret.setFinished();
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				}));
+			}
 		}
 		
 //		IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
@@ -722,49 +790,49 @@ public class ProcessEngineAgent implements IProcessEngineService
 		return ret;
 	}
 	
-	/**
-	 *  Create a new rule create component command.
-	 */
-	protected static RuleCreateCommand createRuleCreateCommand(IResourceIdentifier rid, String model)//, IResultListener<Collection<Tuple2<String, Object>>> killis)
-	{
-		RuleCreateCommand ret = null;
-		
-		// add implicit triggering event 
-		CreationInfo ci = new CreationInfo(rid);
-		
-		ret = new RuleCreateCommand(null, model, ci)//, killis)
-		{
-			@Classname("RuleCreateCommand")
-			public IIntermediateFuture<CMSStatusEvent> execute(final CommandData args)
-			{
-				IntermediateFuture<CMSStatusEvent> ret = new IntermediateFuture<CMSStatusEvent>();
-				Map<String, Object> vs = getCommand().getInfo().getArguments();
-				if(vs==null)
-				{
-					vs = new HashMap<String, Object>();
-					getCommand().getInfo().setArguments(vs);
-				}
-//				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), args.getEvent()));
-				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), args.getEvent().getContent()));
-				IIntermediateFuture<CMSStatusEvent> fut = super.execute(args);
-				fut.addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(ret)
-				{
-					public void customIntermediateResultAvailable(CMSStatusEvent event)
-					{
-						System.out.println("event is: "+event);
-						if(event instanceof CMSCreatedEvent)
-						{
-							event.setProperty("startevent", args.getEvent());
-						}
-						super.customIntermediateResultAvailable(event);
-					}
-				});
-				return ret;
-			}
-		};
-		
-		return ret;
-	}
+//	/**
+//	 *  Create a new rule create component command.
+//	 */
+//	protected static RuleCreateCommand createRuleCreateCommand(IResourceIdentifier rid, String model)//, IResultListener<Collection<Tuple2<String, Object>>> killis)
+//	{
+//		RuleCreateCommand ret = null;
+//		
+//		// add implicit triggering event 
+//		CreationInfo ci = new CreationInfo(rid);
+//		
+//		ret = new RuleCreateCommand(null, model, ci)//, killis)
+//		{
+//			@Classname("RuleCreateCommand")
+//			public IIntermediateFuture<CMSStatusEvent> execute(final CommandData args)
+//			{
+//				IntermediateFuture<CMSStatusEvent> ret = new IntermediateFuture<CMSStatusEvent>();
+//				Map<String, Object> vs = getCommand().getInfo().getArguments();
+//				if(vs==null)
+//				{
+//					vs = new HashMap<String, Object>();
+//					getCommand().getInfo().setArguments(vs);
+//				}
+////				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), args.getEvent()));
+//				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), args.getEvent().getContent()));
+//				IIntermediateFuture<CMSStatusEvent> fut = super.execute(args);
+//				fut.addResultListener(new IntermediateDelegationResultListener<CMSStatusEvent>(ret)
+//				{
+//					public void customIntermediateResultAvailable(CMSStatusEvent event)
+//					{
+//						System.out.println("event is: "+event);
+//						if(event instanceof CMSCreatedEvent)
+//						{
+//							event.setProperty("startevent", args.getEvent());
+//						}
+//						super.customIntermediateResultAvailable(event);
+//					}
+//				});
+//				return ret;
+//			}
+//		};
+//		
+//		return ret;
+//	}
 
 	/**
 	 *  Process info struct.

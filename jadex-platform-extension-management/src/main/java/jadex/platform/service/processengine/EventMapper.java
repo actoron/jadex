@@ -1,9 +1,11 @@
 package jadex.platform.service.processengine;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.Tuple2;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -87,9 +89,9 @@ public class EventMapper
 	 *  @param event The event object.
 	 *  @return The process model.
 	 */
-	public String processModelEvent(Object event)
+	public Tuple2<IResourceIdentifier, String> processModelEvent(Object event)
 	{
-		String ret = null;
+		Tuple2<IResourceIdentifier, String> ret = null;
 		String name = event.getClass().getName();
 		List<MappingInfo> mis = modelmappings.get(name);
 		if(mis!=null)
@@ -98,7 +100,7 @@ public class EventMapper
 			{
 				if(mi.getFilter()==null || mi.getFilter().filter(event))
 				{
-					ret = (String)mi.getInfo();
+					ret = (Tuple2<IResourceIdentifier, String>)mi.getInfo();
 					break;
 				}
 			}
@@ -175,7 +177,7 @@ public class EventMapper
 	 *  @param filter The optional filter.
 	 *  @param modelname The modelname.
 	 */
-	public void addModelMapping(String[] events, IFilter<Object> filter, String modelname)
+	public void addModelMapping(String[] events, IFilter<Object> filter, String modelname, IResourceIdentifier rid)
 	{
 		for(String event: events)
 		{
@@ -185,7 +187,7 @@ public class EventMapper
 				mis = new ArrayList<MappingInfo>();
 				modelmappings.put(event, mis);
 			}
-			MappingInfo mi = new MappingInfo(event, filter, modelname);
+			MappingInfo mi = new MappingInfo(event, filter, new Tuple2<IResourceIdentifier, String>(rid, modelname));
 			mis.add(mi);
 			
 			List<MappingInfo> rems = modelprocs.get(modelname);
