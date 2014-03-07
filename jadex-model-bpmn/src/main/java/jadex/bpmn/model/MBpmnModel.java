@@ -145,7 +145,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	protected Map alledges;
 
 	/** The cached activities of the model. */
-	protected Map allactivities;
+	protected Map<String, MActivity> allactivities;
 
 	/** The association sources. */
 	protected Map associationsources;
@@ -419,11 +419,11 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get all activities.
 	 *  @return The activities (id -> activity).
 	 */
-	public Map getAllActivities()
+	public Map<String, MActivity> getAllActivities()
 	{
 		if(this.allactivities==null)
 		{
-			this.allactivities = new HashMap();
+			this.allactivities = new HashMap<String, MActivity>();
 			
 			List pools = getPools();
 			if(pools!=null)
@@ -431,7 +431,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 				for(int i=0; i<pools.size(); i++)
 				{
 					MPool tmp = (MPool)pools.get(i);
-					List acts = tmp.getActivities();
+					List<MActivity> acts = tmp.getActivities();
 					if(acts!=null)
 					{
 						for(int j=0; j<acts.size(); j++)
@@ -454,9 +454,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/**
 	 *  Add all subactivities.
 	 */
-	public void addAllSubActivities(MSubProcess proc, Map activities)
+	public void addAllSubActivities(MSubProcess proc, Map<String, MActivity> activities)
 	{
-		List acts = proc.getActivities();
+		List<MActivity> acts = proc.getActivities();
 		if(acts!=null)
 		{
 			for(int i=0; i<acts.size(); i++)
@@ -469,7 +469,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 				}
 			}
 		}
-		List	handlers	= proc.getEventHandlers();
+		List<MActivity>	handlers	= proc.getEventHandlers();
 		if(handlers!=null)
 		{
 			for(int i=0; i<handlers.size(); i++)
