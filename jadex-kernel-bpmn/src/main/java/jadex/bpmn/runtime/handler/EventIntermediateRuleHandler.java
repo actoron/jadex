@@ -41,12 +41,10 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 		thread.setWaiting(true);
 
 		final String[]	eventtypes	= (String[]) thread.getActivity().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
-		String	condition	= (String)thread.getActivity().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
-		UnparsedExpression	upex	= null;
+		UnparsedExpression	upex	= thread.getActivity().getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
 		Map<String, Object>	params	= null; 
-		if(condition!=null)
+		if(upex!=null)
 		{
-			upex	= new UnparsedExpression(null, condition);
 			IParsedExpression	exp	= SJavaParser.parseExpression(upex, instance.getModel().getAllImports(), instance.getClassLoader());
 			for(String param: exp.getParameters())
 			{

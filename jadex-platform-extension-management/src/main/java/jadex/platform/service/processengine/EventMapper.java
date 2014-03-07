@@ -5,6 +5,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
@@ -30,8 +31,8 @@ public class EventMapper
 	/** The map of event types to process models. */
 	protected Map<String, List<MappingInfo>> instancemappings;
 	
-	/** The map of event types to process models. */
-	protected Map<ICommand<Object>, List<MappingInfo>> instanceprocs;
+	/** The map of registration id to mapping infos. */
+	protected Map<String, List<MappingInfo>> instanceprocs;
 
 	
 	/**
@@ -115,11 +116,12 @@ public class EventMapper
 	 *  @param info The modelname.
 	 */
 //	public void addModelMapping(IFilter<Object> filter)
-	public void addInstanceMapping(UnparsedExpression uexp, String[] events, Map<String, Object> vals, String[] imports, ICommand<Object> cmd)
+	public String	addInstanceMapping(UnparsedExpression uexp, String[] events, Map<String, Object> vals, String[] imports, ICommand<Object> cmd)
 	{
 		final IParsedExpression exp = SJavaParser.parseExpression(uexp, imports, null);
 		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValues(vals);
+		String	id	= SUtil.createUniqueId("EventMapping");
 		
 		IFilter<Object> filter = new IFilter<Object>()
 		{
@@ -134,7 +136,7 @@ public class EventMapper
 		if(rems==null)
 		{
 			rems = new ArrayList<MappingInfo>();
-			instanceprocs.put(cmd, rems);
+			instanceprocs.put(id, rems);
 		}
 		
 		for(String event: events)
@@ -143,24 +145,24 @@ public class EventMapper
 			if(mis==null)
 			{
 				mis = new ArrayList<MappingInfo>();
-				modelmappings.put(event, mis);
+				instancemappings.put(event, mis);
 			}
 			MappingInfo mi = new MappingInfo(event, filter, cmd);
 			mis.add(mi);
-
 			rems.add(mi);
 		}
 		
+		return id;
 	}
 	
 	/**
 	 *  Remove mappings for a process instance.
-	 *  @param modelname The modelname.
+	 *  @param id The id from the registration.
 	 */
-	public void removeInstanceMappings(ICommand<Object> cmd)
+	public void removeInstanceMappings(String id)
 	{
 		// Get mappinginfos to remove and remove them
-		List<MappingInfo> rems = instanceprocs.remove(cmd);
+		List<MappingInfo> rems = instanceprocs.remove(id);
 		if(rems!=null)
 		{
 			for(MappingInfo mi: rems)

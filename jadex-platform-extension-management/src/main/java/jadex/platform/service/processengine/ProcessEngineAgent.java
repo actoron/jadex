@@ -3,6 +3,7 @@ package jadex.platform.service.processengine;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.runtime.IInternalProcessEngineService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -20,6 +21,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedE
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -47,15 +49,11 @@ import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.cron.CronAgent;
 import jadex.platform.service.cron.TimePatternFilter;
 import jadex.platform.service.cron.jobs.CronCreateCommand;
-import jadex.rules.eca.CommandAction;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.ExpressionCondition;
 import jadex.rules.eca.ICondition;
@@ -72,9 +70,8 @@ import java.util.Map;
 /**
  *  Agent that implements the bpmn monitoring starter interface.
  */
-@Agent
+@Agent(autoprovide=true)
 @Service
-@ProvidedServices(@ProvidedService(type=IProcessEngineService.class, implementation=@Implementation(expression="$pojoagent")))
 @RequiredServices(
 {
 	@RequiredService(name="libs", type=ILibraryService.class, 
@@ -89,7 +86,7 @@ import java.util.Map;
 	@ComponentType(name="cronagent", clazz=CronAgent.class)//,
 //	@ComponentType(name="ruleagent", clazz=RuleAgent.class)
 })
-public class ProcessEngineAgent implements IProcessEngineService
+public class ProcessEngineAgent implements IProcessEngineService, IInternalProcessEngineService
 {
 	/** The agent. */
 	@Agent
@@ -639,6 +636,28 @@ public class ProcessEngineAgent implements IProcessEngineService
 //		});
 		return ret;
 	}
+	
+	//-------- IInternalProcessEngine interface --------
+	
+	/**
+	 *  Register an event description to be notified, when the event happens.
+	 *  @return An id to be used for deregistration.
+	 */
+	public IFuture<String>	addEventMatcher(String[] events, UnparsedExpression uexp, String[] imports, Map<String, Object> vals, ICommand<Object> cmd)
+	{
+		return new Future<String>(eventmapper.addInstanceMapping(uexp, events, vals, imports, cmd));
+	}
+	
+	/**
+	 *  Register an event description to be notified, when the event happens.
+	 */
+	public IFuture<Void>	removeEventMatcher(String id)
+	{
+		eventmapper.removeInstanceMappings(id);
+		return IFuture.DONE;
+	}
+
+	//-------- --------
 	
 	/**
 	 *  Add a cron job to the cron service.

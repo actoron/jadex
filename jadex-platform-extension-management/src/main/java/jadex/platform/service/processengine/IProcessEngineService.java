@@ -7,7 +7,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.rules.eca.IEvent;
 
 /**
  *  This monitoring service can be used to start bpmn processes
