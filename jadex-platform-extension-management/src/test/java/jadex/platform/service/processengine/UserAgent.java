@@ -3,7 +3,6 @@ package jadex.platform.service.processengine;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.ecarules.IRuleService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -21,9 +20,6 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.platform.service.processengine.IProcessEngineService;
-import jadex.platform.service.processengine.ProcessEngineAgent;
-import jadex.platform.service.processengine.ProcessEngineEvent;
 import jadex.rules.eca.Event;
 
 import java.util.Collection;
@@ -122,14 +118,14 @@ public class UserAgent
 					
 					public void intermediateResultAvailable(ProcessEngineEvent event)
 					{
-						System.out.println("received event: "+event);
+//						System.out.println("received event: "+event);
 						
 						if(ProcessEngineEvent.PROCESSMODEL_ADDED.equals(event.getType()))
 						{
 							engine.processEvent(new Event("file_added", Boolean.TRUE), "file_added");
-//							engine.processEvent(new Event("file_added", Boolean.FALSE), "file_added");
-//							engine.processEvent(new Event("file_removed", Boolean.TRUE), "file_removed");
-//							engine.processEvent(new Event("file_removed", Boolean.FALSE), "file_removed");
+							engine.processEvent(new Event("file_added", Boolean.FALSE), "file_added");
+							engine.processEvent(new Event("file_removed", Boolean.TRUE), "file_removed");
+							engine.processEvent(new Event("file_removed", Boolean.FALSE), "file_removed");
 						}
 						else if(ProcessEngineEvent.PROCESSMODEL_REMOVED.equals(event.getType()))
 						{
@@ -137,6 +133,7 @@ public class UserAgent
 						}
 						else if(ProcessEngineEvent.INSTANCE_CREATED.equals(event.getType()))
 						{
+							System.out.println("created: "+event);
 							// nop
 						}
 						else if(ProcessEngineEvent.INSTANCE_TERMINATED.equals(event.getType()))

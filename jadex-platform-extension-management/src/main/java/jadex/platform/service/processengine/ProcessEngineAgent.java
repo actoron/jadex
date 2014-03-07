@@ -15,6 +15,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
+import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.cron.CronJob;
@@ -30,6 +31,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -52,6 +54,7 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.platform.service.cron.CronAgent;
 import jadex.platform.service.cron.TimePatternFilter;
 import jadex.platform.service.cron.jobs.CronCreateCommand;
+import jadex.platform.service.processengine.EventMapper.ModelDetails;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.ExpressionCondition;
 import jadex.rules.eca.ICondition;
@@ -212,7 +215,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 										String[] etypes = (String[])mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
 										if(etypes!=null && etypes.length>0)
 										{
-											Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(key.toString()+" "+i+" "+mact.getId());
+//											Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(key.toString()+" "+i+" "+mact.getId());
+											Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(mact.getId());
 											
 											List<String> events = SUtil.arrayToList(etypes);
 											if(mact.hasPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION))
@@ -258,41 +262,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 								public void customResultAvailable(Void result)
 								{
 									ISubscriptionIntermediateFuture<CMSStatusEvent> f2 = f.getSecondEntity();
-									f2.addResultListener(new IntermediateDefaultResultListener<CMSStatusEvent>()
-									{
-										protected IComponentIdentifier cid;
-										public void intermediateResultAvailable(CMSStatusEvent result) 
-										{
-											if(result instanceof CMSCreatedEvent)
-											{
-												cid = ((CMSCreatedEvent)result).getComponentIdentifier();
-												// Without correlator when not started with rule event
-												// todo: support a task that sets the evaluator manually
-												processes.put(cid, new ProcessInfo(null, cid));
-												ret.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, cid, null));
-											}
-											else if(result instanceof CMSTerminatedEvent)
-											{
-												// send instance terminated event 
-//												Map<String, Object> res = Argument.convertArguments(results);
-//												ret.addIntermediateResultIfUndone(new MonitoringStarterEvent(MonitoringStarterEvent.INSTANCE_TERMINATED, 
-//													(IComponentIdentifier)res.get(IComponentIdentifier.RESULTCID), res));
-												ret.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
-													cid, ((CMSTerminatedEvent)result).getResults()));
-												processes.remove(cid);
-											}
-										}
-										
-										public void finished() 
-										{
-											ret.setFinishedIfUndone();
-										}
-										
-										public void exceptionOccurred(Exception exception) 
-										{
-											ret.setExceptionIfUndone(exception);
-										}
-									});
+									f2.addResultListener(new ConversionListener(ret));
 									
 									if(rules!=null)
 									{
@@ -317,7 +287,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 											{
 												events[i] = ets.get(i).getTypename();
 											}
-											eventmapper.addModelMapping(events, filter, model, rid);
+											eventmapper.addModelMapping(events, filter, model, rid, rule.getName(), ret);
 										}
 										addRemoveCommand(new Runnable()
 										{
@@ -480,23 +450,21 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		}
 		else
 		{
-			Tuple2<IResourceIdentifier, String> tup = eventmapper.processModelEvent(event, type);
-			if(tup!=null)
+			final ModelDetails det = eventmapper.processModelEvent(event, type);
+			if(det!=null)
 			{
-				final IResourceIdentifier rid = tup.getFirstEntity();
-				final String model = tup.getSecondEntity();
-				
 				SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(agent.createResultListener(new IResultListener<IComponentManagementService>()
 				{
 					public void resultAvailable(IComponentManagementService cms)
 					{
-						CreationInfo info = new CreationInfo(agent.getComponentIdentifier(), rid);
-						Map<String, Object> vs = new HashMap<String, Object>();
-//						vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, args.getRule().getName(), event));
-						vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, null, event));
+						CreationInfo info = new CreationInfo(agent.getComponentIdentifier(), det.getRid());
+						Map<String, Object> args = new HashMap<String, Object>();
+						args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
+						info.setArguments(args);
 
-						ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, null, model);
+						ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, null, det.getModel());
+						fut.addResultListener(new ConversionListener(det.getFuture()));
 						ret.setResult(null);
 					}
 					
@@ -785,6 +753,70 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		public void setCid(IComponentIdentifier cid)
 		{
 			this.cid = cid;
+		}
+	}
+	
+	/**
+	 *  Listener that converts cms events to engine events.
+	 */
+	class ConversionListener extends IntermediateDefaultResultListener<CMSStatusEvent>
+	{
+		/** The delegate future. */
+		protected SubscriptionIntermediateFuture<ProcessEngineEvent> delegate;
+		
+		/** The conversation id. */
+		protected IComponentIdentifier cid;
+		
+		/**
+		 *  Create a new ConversionListener.
+		 */
+		public ConversionListener(SubscriptionIntermediateFuture<ProcessEngineEvent> delegate)
+		{
+			this.delegate = delegate;
+		}
+		
+		public void intermediateResultAvailable(CMSStatusEvent result) 
+		{
+			if(result instanceof CMSCreatedEvent)
+			{
+				cid = ((CMSCreatedEvent)result).getComponentIdentifier();
+				// Without correlator when not started with rule event
+				// todo: support a task that sets the evaluator manually
+				processes.put(cid, new ProcessInfo(null, cid));
+				delegate.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, cid, null));
+			}
+			else if(result instanceof CMSTerminatedEvent)
+			{
+				// send instance terminated event 
+				delegate.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
+					cid, ((CMSTerminatedEvent)result).getResults()));
+				processes.remove(cid);
+			}
+			else if(result instanceof CMSIntermediateResultEvent)
+			{
+				CMSIntermediateResultEvent ev = (CMSIntermediateResultEvent)result;
+				delegate.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_RESULT_RECEIVED, 
+					cid, new Tuple2<String, Object>(ev.getName(), ev.getValue())));
+			}
+		}
+		
+		public void resultAvailable(Collection<CMSStatusEvent> result)
+		{
+			for(CMSStatusEvent ev: result)
+			{
+				intermediateResultAvailable(ev);
+			}
+			delegate.setFinishedIfUndone();
+		}
+		
+		public void finished() 
+		{
+			delegate.setFinishedIfUndone();
+		}
+		
+		public void exceptionOccurred(Exception exception) 
+		{
+			delegate.setExceptionIfUndone(exception);
 		}
 	}
 }
