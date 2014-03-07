@@ -45,21 +45,6 @@ public class EventMapper
 		this.modelprocs = new HashMap<String, List<MappingInfo>>();
 	}
 	
-//	/**
-//	 *  Map an event to a process instance.
-//	 *  @param event The event object.
-//	 *  @return The process model.
-//	 */
-//	public String processEvent(Object event)
-//	{
-//		String ret = null;
-//		if(!processInstanceEvent(event))
-//		{
-//			ret = processModelEvent(event);
-//		}
-//		return ret;
-//	}
-	
 	/**
 	 *  Map an event to a process instance.
 	 *  @param event The event object.

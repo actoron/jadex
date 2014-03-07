@@ -127,9 +127,9 @@ public class UserAgent
 						if(ProcessEngineEvent.PROCESSMODEL_ADDED.equals(event.getType()))
 						{
 							engine.processEvent(new Event("file_added", Boolean.TRUE), "file_added");
-							engine.processEvent(new Event("file_added", Boolean.FALSE), "file_added");
-							engine.processEvent(new Event("file_removed", Boolean.TRUE), "file_removed");
-							engine.processEvent(new Event("file_removed", Boolean.FALSE), "file_removed");
+//							engine.processEvent(new Event("file_added", Boolean.FALSE), "file_added");
+//							engine.processEvent(new Event("file_removed", Boolean.TRUE), "file_removed");
+//							engine.processEvent(new Event("file_removed", Boolean.FALSE), "file_removed");
 						}
 						else if(ProcessEngineEvent.PROCESSMODEL_REMOVED.equals(event.getType()))
 						{

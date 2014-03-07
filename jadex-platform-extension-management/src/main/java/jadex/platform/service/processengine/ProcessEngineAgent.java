@@ -304,6 +304,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 												public boolean filter(Object obj)
 												{
 													SimpleValueFetcher fetcher = new SimpleValueFetcher();
+													fetcher.setValue("$event", obj);
 													Object ret = exp.getValue(fetcher);
 													return ret instanceof Boolean? ((Boolean)ret).booleanValue(): false;
 												}
@@ -502,6 +503,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 						ret.setException(exception);
 					}
 				}));
+			}
+			else
+			{
+				ret.setResult(null);
 			}
 		}
 		
