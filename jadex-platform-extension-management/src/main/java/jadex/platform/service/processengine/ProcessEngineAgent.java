@@ -187,7 +187,9 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getComponentIdentifier().getRoot()});
 						
 							// Search timer, rule start events in model 
-							List<MActivity> startevents = amodel.getStartActivities(null, null);
+							List<MActivity> startevents = new ArrayList<MActivity>();
+							startevents.addAll(amodel.getTypeMatchedStartEvents());
+							startevents.addAll(amodel.getEventSubProcessStartEvents());
 							StringBuffer timing = new StringBuffer();
 							final List<IRule<Collection<CMSStatusEvent>>> rules = new ArrayList<IRule<Collection<CMSStatusEvent>>>();
 							

@@ -1,9 +1,9 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
-import jadex.base.Starter;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.javaparser.SJavaParser;
 
@@ -93,8 +93,8 @@ public class ECARuleEventPropertyPanel extends BasePropertyPanel
 				}
 				buf.append("}");
 				
-				UnparsedExpression dur = new UnparsedExpression("eventtypes", "java.lang.String[]", buf.toString(), null);
-				((MActivity)ECARuleEventPropertyPanel.this.event.getBpmnElement()).setPropertyValue("eventtypes", dur);
+				UnparsedExpression dur = new UnparsedExpression(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES, "java.lang.String[]", buf.toString(), null);
+				((MActivity)ECARuleEventPropertyPanel.this.event.getBpmnElement()).setPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES, dur);
 				container.setDirty(true);
 			}
 		});
