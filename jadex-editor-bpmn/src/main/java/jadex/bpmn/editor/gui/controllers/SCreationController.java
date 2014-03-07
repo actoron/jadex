@@ -195,6 +195,32 @@ public class SCreationController
 			return null;
 		}
 		
+		if (targetcell instanceof VSubProcess &&
+			MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)((VSubProcess) targetcell).getBpmnElement()).getSubprocessType()))
+		{
+			if (mode.startsWith("EventStart"))
+			{
+				 if (ModelContainer.EDIT_MODE_EVENT_START_RULE.equals(mode))
+				 {
+					 List<MActivity> acts = ((MSubProcess)((VSubProcess) targetcell).getBpmnElement()).getActivities();
+					 if (acts != null)
+					 {
+						 for (MActivity act : acts)
+						 {
+							 if (MBpmnModel.EVENT_START_RULE.equals(act.getActivityType()))
+							 {
+								 return null;
+							 }
+						 }
+					 }
+				 }
+				 else
+				 {
+					 return null;
+				 }
+			}
+		}
+		
 		MActivity mactivity = null;
 		if (mode.startsWith(ModelContainer.EDIT_MODE_SUBPROCESS))
 		{
@@ -221,6 +247,20 @@ public class SCreationController
 			mactivity.addProperty(mprop);
 			vactivity = new VExternalSubProcess(modelcontainer.getGraph());
 //			vactivity.setCollapsed(true);
+		}
+		else if (ModelContainer.EDIT_MODE_EVENT_SUBPROCESS.equals(mode))
+		{
+			
+			if (!(targetcell instanceof VSubProcess))
+			{
+			mactivity.setActivityType(MBpmnModel.SUBPROCESS);
+			vactivity = new VSubProcess(modelcontainer.getGraph());
+			((MSubProcess) mactivity).setSubprocessType(MSubProcess.SUBPROCESSTYPE_EVENT);
+			}
+			else
+			{
+				return null;
+			}
 		}
 		else
 		{

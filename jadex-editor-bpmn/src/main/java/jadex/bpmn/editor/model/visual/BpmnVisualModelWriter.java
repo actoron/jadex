@@ -70,7 +70,7 @@ public class BpmnVisualModelWriter implements IBpmnVisualModelWriter
 				mxRectangle alt = geo.getAlternateBounds();
 				if (alt != null)
 				{
-					bounds = new Rectangle2D.Double(alt.getX(), alt.getY(), alt.getWidth(), alt.getHeight());
+					altbounds = new Rectangle2D.Double(alt.getX(), alt.getY(), alt.getWidth(), alt.getHeight());
 				}
 			}
 			

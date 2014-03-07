@@ -66,6 +66,9 @@ public class ModelContainer implements IModelContainer
 	/** Edit mode for adding tasks. */
 	public static final String EDIT_MODE_EXTERNAL_SUBPROCESS = MBpmnModel.SUBPROCESS + "External";
 	
+	/** Edit mode for adding tasks. */
+	public static final String EDIT_MODE_EVENT_SUBPROCESS = MBpmnModel.SUBPROCESS + "Event";
+	
 	/** Edit mode for adding xor-gateways. */
 	public static final String EDIT_MODE_GW_XOR = MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE;
 	

@@ -21,6 +21,9 @@ public class MSubProcess extends MActivity
 	/** The looping subprocess type. */
 	public static final String	SUBPROCESSTYPE_LOOPING	= "looping";
 	
+	/** The event subprocess type. */
+	public static final String	SUBPROCESSTYPE_EVENT	= "event";
+	
 	//-------- attributes --------
 	
 	/** The vertices. */
@@ -221,7 +224,8 @@ public class MSubProcess extends MActivity
 	{
 		assert SUBPROCESSTYPE_NONE.equals(subprocesstype)
 			|| SUBPROCESSTYPE_PARALLEL.equals(subprocesstype)
-			|| SUBPROCESSTYPE_LOOPING.equals(subprocesstype) : subprocesstype+", "+this;
+			|| SUBPROCESSTYPE_LOOPING.equals(subprocesstype)
+			|| SUBPROCESSTYPE_EVENT.equals(subprocesstype) : subprocesstype+", "+this;
 
 		this.subprocesstype	= subprocesstype;
 	}

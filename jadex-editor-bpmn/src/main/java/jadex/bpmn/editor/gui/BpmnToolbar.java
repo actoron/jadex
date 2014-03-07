@@ -178,8 +178,12 @@ public class BpmnToolbar extends AbstractEditingToolbar
 				"Internal Sub-Process", iconsize));
 		
 		sym = "ESP";
-		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.SUBPROCESS_COLOR),
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EXTERNAL_SUBPROCESS, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.EXTERNAL_SUBPROCESS_COLOR),
 				"External Sub-Process", iconsize));
+		
+		sym = "EvtSP";
+		tasks.add(new IconGenerationTask(imgprovider, false, row, ModelContainer.EDIT_MODE_EVENT_SUBPROCESS, ImageProvider.SHAPE_ROUNDED_RECTANGLE, ImageProvider.THIN_FRAME_TYPE, sym, mxUtils.parseColor(BpmnStylesheetColor.EVENT_SUBPROCESS_COLOR),
+				"Event Sub-Process", iconsize));
 		
 		sym = "GW_X";
 		tasks.add(new IconGenerationTask(imgprovider, true, row, ModelContainer.EDIT_MODE_GW_XOR, ImageProvider.SHAPE_RHOMBUS, sym, mxUtils.parseColor(BpmnStylesheetColor.GATEWAY_COLOR),
