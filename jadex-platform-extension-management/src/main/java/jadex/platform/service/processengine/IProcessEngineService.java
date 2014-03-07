@@ -22,8 +22,7 @@ public interface IProcessEngineService
 	 *  @param rid The resource identifier (null for all platform jar resources).
 	 *  @param cortype The correlation factory.
 	 */
-//	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(@CheckNotNull String model, IResourceIdentifier rid, Class<IFilter<IEvent>> cortype);
-	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(@CheckNotNull String model, IResourceIdentifier rid, ICorrelationFilterFactory corfac);
+	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(@CheckNotNull String model, IResourceIdentifier rid);
 	
 	/**
 	 *  Remove a bpmn model.
@@ -41,7 +40,8 @@ public interface IProcessEngineService
 	/**
 	 *  Process an event.
 	 */
-	public ISubscriptionIntermediateFuture<ProcessEngineEvent> processEvent(IEvent event);
+//	public ISubscriptionIntermediateFuture<ProcessEngineEvent> processEvent(IEvent event);
+	public ISubscriptionIntermediateFuture<ProcessEngineEvent> processEvent(Object event);
 	
 //	/**
 //	 *  Subscribe to events of the monitoring starter.

@@ -39,6 +39,9 @@ import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -56,6 +59,7 @@ import jadex.platform.service.cron.jobs.CronCreateCommand;
 import jadex.platform.service.ecarules.RuleAgent;
 import jadex.rules.eca.CommandAction;
 import jadex.rules.eca.CommandAction.CommandData;
+import jadex.rules.eca.EventType;
 import jadex.rules.eca.ExpressionCondition;
 import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
@@ -102,6 +106,9 @@ public class ProcessEngineAgent implements IProcessEngineService
 	/** The managed process instances. */
 	protected Map<IComponentIdentifier, ProcessInfo> processes;
 	
+	/** The event mapper. */
+	protected EventMapper eventmapper;
+	
 	//-------- methods --------
 	
 	/**
@@ -112,6 +119,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 	{
 		this.remcoms = new HashMap<Tuple2<String,IResourceIdentifier>, List<Runnable>>();
 		this.processes = new HashMap<IComponentIdentifier, ProcessEngineAgent.ProcessInfo>();
+		this.eventmapper = new EventMapper();
 		return IFuture.DONE;
 	}
 	
@@ -164,7 +172,7 @@ public class ProcessEngineAgent implements IProcessEngineService
 	 *  @param model The bpmn model
 	 *  @param rid The resource identifier (null for all platform jar resources).
 	 */
-	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(final String model, final IResourceIdentifier urid, final ICorrelationFilterFactory corfac)
+	public ISubscriptionIntermediateFuture<ProcessEngineEvent> addBpmnModel(final String model, final IResourceIdentifier urid)//, final ICorrelationFilterFactory corfac)
 	{
 //		final SubscriptionIntermediateFuture<MonitoringStarterEvent> ret = new SubscriptionIntermediateFuture<MonitoringStarterEvent>();
 		final SubscriptionIntermediateFuture<ProcessEngineEvent> ret = (SubscriptionIntermediateFuture<ProcessEngineEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
@@ -325,21 +333,54 @@ public class ProcessEngineAgent implements IProcessEngineService
 										}
 									});
 									
-									// add rule listener if at least one rule
-									addRuleListener(rules, key, ret, corfac).addResultListener(new ExceptionDelegationResultListener<Void, Collection<ProcessEngineEvent>>(ret)
+									if(rules!=null)
 									{
-										public void customResultAvailable(Void result)
+										for(IRule<Collection<CMSStatusEvent>> rule: rules)
 										{
-											addRuleJobs(rules.iterator(), key).addResultListener(new ExceptionDelegationResultListener<Void, Collection<ProcessEngineEvent>>(ret)
+											ExpressionCondition ec = (ExpressionCondition)rule.getCondition();
+											final IParsedExpression exp = SJavaParser.parseExpression(ec.getExpression(), null, null); // todo: classloader?
+											
+											IFilter<Object> filter = new IFilter<Object>()
 											{
-												public void customResultAvailable(Void result)
+												public boolean filter(Object obj)
 												{
-													// first event to state that monitoring is complete
-													ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.PROCESSMODEL_ADDED, null, null));
+													SimpleValueFetcher fetcher = new SimpleValueFetcher();
+													Object ret = exp.getValue(fetcher);
+													return ret instanceof Boolean? ((Boolean)ret).booleanValue(): false;
 												}
-											});
+											};
+											List<EventType> ets = rule.getEvents();
+											String[] events = new String[ets.size()];
+											for(int i=0; i<ets.size(); i++)
+											{
+												events[i] = ets.get(i).getTypename();
+											}
+											eventmapper.addModelMapping(events, filter, model);
 										}
-									});
+										addRemoveCommand(new Runnable()
+										{
+											public void run()
+											{
+												eventmapper.removeModelMappings(model);
+											}
+										}, key);
+									}
+									
+//									// add rule listener if at least one rule
+//									addRuleListener(rules, key, ret, corfac).addResultListener(new ExceptionDelegationResultListener<Void, Collection<ProcessEngineEvent>>(ret)
+//									{
+//										public void customResultAvailable(Void result)
+//										{
+//											addRuleJobs(rules.iterator(), key).addResultListener(new ExceptionDelegationResultListener<Void, Collection<ProcessEngineEvent>>(ret)
+//											{
+//												public void customResultAvailable(Void result)
+//												{
+//													// first event to state that monitoring is complete
+//													ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.PROCESSMODEL_ADDED, null, null));
+//												}
+//											});
+//										}
+//									});
 								}
 							});
 						}
@@ -355,72 +396,72 @@ public class ProcessEngineAgent implements IProcessEngineService
 		return ret;
 	}
 	
-	/**
-	 *  Add a rule listener on the engine that processes the received events.
-	 */
-	protected IFuture<Void> addRuleListener(List<IRule<Collection<CMSStatusEvent>>> rules, final Tuple2<String, IResourceIdentifier> key,
-		final SubscriptionIntermediateFuture<ProcessEngineEvent> res, final ICorrelationFilterFactory corfac)
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		if(rules.size()>0)
-		{
-			IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
-			fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Void>(ret)
-			{
-				public void customResultAvailable(final IRuleService rules)
-				{
-					final ISubscriptionIntermediateFuture<RuleEvent> fut = rules.subscribeToEngine();
-					addRemoveCommand(new Runnable()
-					{
-						public void run()
-						{
-							fut.terminate();
-						}
-					}, key);
-					
-					fut.addResultListener(new IntermediateDefaultResultListener<RuleEvent>()
-					{
-						public void intermediateResultAvailable(RuleEvent re) 
-						{
-							// first event is subscribe() finished
-							if(re!=null)
-							{
-								// send event and create correlator for new instance
-								if(re.getResult() instanceof CMSCreatedEvent)
-								{
-									CMSCreatedEvent ev = (CMSCreatedEvent)re.getResult();
-									IEvent event = (IEvent)ev.getProperty("startevent");
-									IComponentIdentifier cid = ev.getComponentIdentifier();
-									processes.put(cid, new ProcessInfo(corfac==null? null: corfac.createCorrelationFilter(event), cid));
-								
-									// send instance created event
-									res.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, (IComponentIdentifier)re.getResult(), null));
-								}
-								else if(re.getResult() instanceof CMSTerminatedEvent)
-								{
-									CMSTerminatedEvent ev = (CMSTerminatedEvent)re.getResult();
-									processes.remove(ev.getComponentIdentifier());
-								}
-							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							res.setExceptionIfUndone(exception);
-						}
-					});
-					ret.setResult(null);
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Add a rule listener on the engine that processes the received events.
+//	 */
+//	protected IFuture<Void> addRuleListener(List<IRule<Collection<CMSStatusEvent>>> rules, final Tuple2<String, IResourceIdentifier> key,
+//		final SubscriptionIntermediateFuture<ProcessEngineEvent> res, final ICorrelationFilterFactory corfac)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		
+//		if(rules.size()>0)
+//		{
+//			IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
+//			fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Void>(ret)
+//			{
+//				public void customResultAvailable(final IRuleService rules)
+//				{
+//					final ISubscriptionIntermediateFuture<RuleEvent> fut = rules.subscribeToEngine();
+//					addRemoveCommand(new Runnable()
+//					{
+//						public void run()
+//						{
+//							fut.terminate();
+//						}
+//					}, key);
+//					
+//					fut.addResultListener(new IntermediateDefaultResultListener<RuleEvent>()
+//					{
+//						public void intermediateResultAvailable(RuleEvent re) 
+//						{
+//							// first event is subscribe() finished
+//							if(re!=null)
+//							{
+//								// send event and create correlator for new instance
+//								if(re.getResult() instanceof CMSCreatedEvent)
+//								{
+//									CMSCreatedEvent ev = (CMSCreatedEvent)re.getResult();
+//									IEvent event = (IEvent)ev.getProperty("startevent");
+//									IComponentIdentifier cid = ev.getComponentIdentifier();
+//									processes.put(cid, new ProcessInfo(corfac==null? null: corfac.createCorrelationFilter(event), cid));
+//								
+//									// send instance created event
+//									res.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, (IComponentIdentifier)re.getResult(), null));
+//								}
+//								else if(re.getResult() instanceof CMSTerminatedEvent)
+//								{
+//									CMSTerminatedEvent ev = (CMSTerminatedEvent)re.getResult();
+//									processes.remove(ev.getComponentIdentifier());
+//								}
+//							}
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							res.setExceptionIfUndone(exception);
+//						}
+//					});
+//					ret.setResult(null);
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Remove a bpmn model.
@@ -466,63 +507,68 @@ public class ProcessEngineAgent implements IProcessEngineService
 	/**
 	 *  Process an event and get the consequence events.
 	 */
-	public ISubscriptionIntermediateFuture<ProcessEngineEvent> processEvent(final IEvent event)
+	public ISubscriptionIntermediateFuture<ProcessEngineEvent> processEvent(final Object event)
 	{
 		final SubscriptionIntermediateFuture<ProcessEngineEvent> ret = (SubscriptionIntermediateFuture<ProcessEngineEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
 		
-		IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
-		fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Collection<ProcessEngineEvent>>(ret)
+		if(!eventmapper.processInstanceEvent(event))
 		{
-			public void customResultAvailable(final IRuleService rules)
-			{
-				rules.addEvent(event).addResultListener(new IIntermediateResultListener<RuleEvent>()
-				{
-					public void intermediateResultAvailable(RuleEvent event)
-					{
-						if(event!=null)
-						{
-							if(event.getResult() instanceof CMSCreatedEvent)
-							{
-								CMSCreatedEvent ev = (CMSCreatedEvent)event.getResult();
-								ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, 
-									ev.getComponentIdentifier(), null));
-							}
-							else if(event.getResult() instanceof CMSIntermediateResultEvent)
-							{
-								CMSIntermediateResultEvent ev = (CMSIntermediateResultEvent)event.getResult();
-								ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_RESULT_RECEIVED, 
-									ev.getComponentIdentifier(), new Tuple2<String, Object>(ev.getName(), ev.getValue())));
-							}
-							else if(event.getResult() instanceof CMSTerminatedEvent)
-							{
-								CMSTerminatedEvent ev = (CMSTerminatedEvent)event.getResult();
-								ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
-									ev.getComponentIdentifier(), ev.getResults()));
-							}
-						}
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
-					}
-					
-					public void finished()
-					{
-						ret.setFinished();
-					}
-					
-					public void resultAvailable(Collection<RuleEvent> result)
-					{
-						for(RuleEvent re: result)
-						{
-							intermediateResultAvailable(re);
-						}
-						finished();
-					}
-				});
-			}
-		});
+			String model = eventmapper.processModelEvent(event);
+		}
+		
+//		IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
+//		fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Collection<ProcessEngineEvent>>(ret)
+//		{
+//			public void customResultAvailable(final IRuleService rules)
+//			{
+//				rules.addEvent(event).addResultListener(new IIntermediateResultListener<RuleEvent>()
+//				{
+//					public void intermediateResultAvailable(RuleEvent event)
+//					{
+//						if(event!=null)
+//						{
+//							if(event.getResult() instanceof CMSCreatedEvent)
+//							{
+//								CMSCreatedEvent ev = (CMSCreatedEvent)event.getResult();
+//								ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, 
+//									ev.getComponentIdentifier(), null));
+//							}
+//							else if(event.getResult() instanceof CMSIntermediateResultEvent)
+//							{
+//								CMSIntermediateResultEvent ev = (CMSIntermediateResultEvent)event.getResult();
+//								ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_RESULT_RECEIVED, 
+//									ev.getComponentIdentifier(), new Tuple2<String, Object>(ev.getName(), ev.getValue())));
+//							}
+//							else if(event.getResult() instanceof CMSTerminatedEvent)
+//							{
+//								CMSTerminatedEvent ev = (CMSTerminatedEvent)event.getResult();
+//								ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
+//									ev.getComponentIdentifier(), ev.getResults()));
+//							}
+//						}
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						ret.setException(exception);
+//					}
+//					
+//					public void finished()
+//					{
+//						ret.setFinished();
+//					}
+//					
+//					public void resultAvailable(Collection<RuleEvent> result)
+//					{
+//						for(RuleEvent re: result)
+//						{
+//							intermediateResultAvailable(re);
+//						}
+//						finished();
+//					}
+//				});
+//			}
+//		});
 		return ret;
 	}
 	
@@ -590,62 +636,62 @@ public class ProcessEngineAgent implements IProcessEngineService
 		coms.add(com);
 	}
 	
-	/**
-	 *  Add rule jobs to the engine.
-	 */
-	protected IFuture<Void> addRuleJobs(final Iterator<IRule<Collection<CMSStatusEvent>>> it, final Tuple2<String, IResourceIdentifier> key)
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		if(it.hasNext())
-		{
-			addRuleJob(it.next(), key).addResultListener(new DelegationResultListener<Void>(ret)
-			{
-				public void customResultAvailable(Void result)
-				{
-					addRuleJobs(it, key).addResultListener(new DelegationResultListener<Void>(ret));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Add rule jobs to the engine.
+//	 */
+//	protected IFuture<Void> addRuleJobs(final Iterator<IRule<Collection<CMSStatusEvent>>> it, final Tuple2<String, IResourceIdentifier> key)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		
+//		if(it.hasNext())
+//		{
+//			addRuleJob(it.next(), key).addResultListener(new DelegationResultListener<Void>(ret)
+//			{
+//				public void customResultAvailable(Void result)
+//				{
+//					addRuleJobs(it, key).addResultListener(new DelegationResultListener<Void>(ret));
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+//		}
+//		
+//		return ret;
+//	}
 	
-	/**
-	 *  Add a rule to the rule engine.
-	 */
-	protected IFuture<Void> addRuleJob(final IRule<?> rule, final Tuple2<String, IResourceIdentifier> key)
-	{
-		final Future<Void> ret = new Future<Void>();
-		IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
-		final String rulename = rule.getName();
-		fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Void>(ret)
-		{
-			public void customResultAvailable(final IRuleService rules)
-			{
-				Runnable com = new Runnable()
-				{
-					public void run()
-					{
-						rules.removeRule(rulename).addResultListener(new DefaultResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-//								System.out.println("removed rule: "+rule);
-							}
-						});
-					}
-				};
-				addRemoveCommand(com, key);
-				rules.addRule(rule).addResultListener(new DelegationResultListener<Void>(ret));
-			}
-		});
-		return ret;
-	}
+//	/**
+//	 *  Add a rule to the rule engine.
+//	 */
+//	protected IFuture<Void> addRuleJob(final IRule<?> rule, final Tuple2<String, IResourceIdentifier> key)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
+//		final String rulename = rule.getName();
+//		fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Void>(ret)
+//		{
+//			public void customResultAvailable(final IRuleService rules)
+//			{
+//				Runnable com = new Runnable()
+//				{
+//					public void run()
+//					{
+//						rules.removeRule(rulename).addResultListener(new DefaultResultListener<Void>()
+//						{
+//							public void resultAvailable(Void result)
+//							{
+////								System.out.println("removed rule: "+rule);
+//							}
+//						});
+//					}
+//				};
+//				addRemoveCommand(com, key);
+//				rules.addRule(rule).addResultListener(new DelegationResultListener<Void>(ret));
+//			}
+//		});
+//		return ret;
+//	}
 	
 	/**
 	 *  Create a new cron create component command.

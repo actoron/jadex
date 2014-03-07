@@ -113,7 +113,7 @@ public class UserAgent
 		{
 			public void customResultAvailable(final IProcessEngineService mons)
 			{
-				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = mons.addBpmnModel(model, null, null);
+				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = mons.addBpmnModel(model, null);
 				fut.addResultListener(new IIntermediateResultListener<ProcessEngineEvent>()
 				{
 					protected Set<String> results = new HashSet<String>();
@@ -224,7 +224,7 @@ public class UserAgent
 		{
 			public void customResultAvailable(final IProcessEngineService mons)
 			{	
-				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = mons.addBpmnModel(model, null, null);
+				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = mons.addBpmnModel(model, null);
 				fut.addResultListener(new IIntermediateResultListener<ProcessEngineEvent>()
 				{
 					protected boolean fini = false;

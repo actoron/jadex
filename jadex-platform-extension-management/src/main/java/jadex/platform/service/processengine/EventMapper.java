@@ -24,8 +24,12 @@ public class EventMapper
 	/** The map of process to mapping infos. */
 	protected Map<String, List<MappingInfo>> modelprocs;
 	
+	
 	/** The map of event types to process models. */
 	protected Map<String, List<MappingInfo>> instancemappings;
+	
+	/** The map of event types to process models. */
+	protected Map<ICommand<Object>, List<MappingInfo>> instanceprocs;
 
 	
 	/**
@@ -37,12 +41,53 @@ public class EventMapper
 		this.modelprocs = new HashMap<String, List<MappingInfo>>();
 	}
 	
+//	/**
+//	 *  Map an event to a process instance.
+//	 *  @param event The event object.
+//	 *  @return The process model.
+//	 */
+//	public String processEvent(Object event)
+//	{
+//		String ret = null;
+//		if(!processInstanceEvent(event))
+//		{
+//			ret = processModelEvent(event);
+//		}
+//		return ret;
+//	}
+	
+	/**
+	 *  Map an event to a process instance.
+	 *  @param event The event object.
+	 *  @return The process model.
+	 */
+	public boolean processInstanceEvent(Object event)
+	{
+		boolean ret = false;
+		String name = event.getClass().getName();
+		List<MappingInfo> mis = instancemappings.get(name);
+		if(mis!=null)
+		{
+			for(MappingInfo mi: mis)
+			{
+				if(mi.getFilter()==null || mi.getFilter().filter(event))
+				{
+					ICommand<Object> cmd = (ICommand<Object>)mi.getInfo();
+					cmd.execute(event);
+					ret = true;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+	
 	/**
 	 *  Map an event to a process model.
 	 *  @param event The event object.
 	 *  @return The process model.
 	 */
-	public String map(Object event)
+	public String processModelEvent(Object event)
 	{
 		String ret = null;
 		String name = event.getClass().getName();
@@ -74,38 +119,55 @@ public class EventMapper
 		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValues(vals);
 		
-//		IFilter<Object> filter = new IFilter<Object>()
-//		{
-//			public boolean filter(Object obj)
-//			{
-//				exp.getValue(fetcher);
-//				return false;
-//			}
-//		};
-//		
-//		for(String event: events)
-//		{
-//			List<MappingInfo> mis = instancemappings.get(event);
-//			if(mis==null)
-//			{
-//				mis = new ArrayList<MappingInfo>();
-//				modelmappings.put(event, mis);
-//			}
-//			MappingInfo mi = new MappingInfo(event, filter, modelname);
-//		}
-//		
-//		
-//		mis.add(mi);
-//		
-//		List<MappingInfo> rems = modelprocs.get(event);
-//		if(rems==null)
-//		{
-//			rems = new ArrayList<MappingInfo>();
-//			modelprocs.put(modelname, rems);
-//		}
-//		rems.add(mi);
+		IFilter<Object> filter = new IFilter<Object>()
+		{
+			public boolean filter(Object obj)
+			{
+				Object ret = exp.getValue(fetcher);
+				return ret instanceof Boolean? ((Boolean)ret).booleanValue(): false;
+			}
+		};
+		
+		List<MappingInfo> rems = instanceprocs.get(cmd);
+		if(rems==null)
+		{
+			rems = new ArrayList<MappingInfo>();
+			instanceprocs.put(cmd, rems);
+		}
+		
+		for(String event: events)
+		{
+			List<MappingInfo> mis = instancemappings.get(event);
+			if(mis==null)
+			{
+				mis = new ArrayList<MappingInfo>();
+				modelmappings.put(event, mis);
+			}
+			MappingInfo mi = new MappingInfo(event, filter, cmd);
+			mis.add(mi);
+
+			rems.add(mi);
+		}
+		
 	}
 	
+	/**
+	 *  Remove mappings for a process instance.
+	 *  @param modelname The modelname.
+	 */
+	public void removeInstanceMappings(ICommand<Object> cmd)
+	{
+		// Get mappinginfos to remove and remove them
+		List<MappingInfo> rems = instanceprocs.remove(cmd);
+		if(rems!=null)
+		{
+			for(MappingInfo mi: rems)
+			{
+				List<MappingInfo> mis = instancemappings.get(mi.getEvent());
+				mis.remove(mi);
+			}
+		}
+	}
 
 	/**
 	 *  Added a mapping.
@@ -113,24 +175,27 @@ public class EventMapper
 	 *  @param filter The optional filter.
 	 *  @param modelname The modelname.
 	 */
-	public void addModelMapping(String event, IFilter<Object> filter, String modelname)
+	public void addModelMapping(String[] events, IFilter<Object> filter, String modelname)
 	{
-		List<MappingInfo> mis = modelmappings.get(event);
-		if(mis==null)
+		for(String event: events)
 		{
-			mis = new ArrayList<MappingInfo>();
-			modelmappings.put(event, mis);
+			List<MappingInfo> mis = modelmappings.get(event);
+			if(mis==null)
+			{
+				mis = new ArrayList<MappingInfo>();
+				modelmappings.put(event, mis);
+			}
+			MappingInfo mi = new MappingInfo(event, filter, modelname);
+			mis.add(mi);
+			
+			List<MappingInfo> rems = modelprocs.get(modelname);
+			if(rems==null)
+			{
+				rems = new ArrayList<MappingInfo>();
+				modelprocs.put(modelname, rems);
+			}
+			rems.add(mi);
 		}
-		MappingInfo mi = new MappingInfo(event, filter, modelname);
-		mis.add(mi);
-		
-		List<MappingInfo> rems = modelprocs.get(event);
-		if(rems==null)
-		{
-			rems = new ArrayList<MappingInfo>();
-			modelprocs.put(modelname, rems);
-		}
-		rems.add(mi);
 	}
 	
 	/**
