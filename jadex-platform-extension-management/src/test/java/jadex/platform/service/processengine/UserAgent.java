@@ -22,10 +22,10 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.rules.eca.Event;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Agent that tests the rule and timer monitoring of initial events in bpmn processes.
@@ -113,7 +113,7 @@ public class UserAgent
 				ISubscriptionIntermediateFuture<ProcessEngineEvent> fut = engine.addBpmnModel(model, null);
 				fut.addResultListener(new IIntermediateResultListener<ProcessEngineEvent>()
 				{
-					protected Set<String> results = new HashSet<String>();
+					protected List<String> results = new ArrayList<String>();
 					protected boolean fini = false;
 					
 					public void intermediateResultAvailable(ProcessEngineEvent event)
@@ -133,11 +133,13 @@ public class UserAgent
 						}
 						else if(ProcessEngineEvent.INSTANCE_CREATED.equals(event.getType()))
 						{
-							System.out.println("created: "+event);
+//							System.out.println("created: "+event);
 							// nop
 						}
 						else if(ProcessEngineEvent.INSTANCE_TERMINATED.equals(event.getType()))
 						{
+//							System.out.println("received term: "+results);
+							
 							Map<String, Object> res = (Map<String, Object>)event.getContent();
 							results.add((String)res.get("result"));
 							if(results.size()==4)
@@ -251,6 +253,7 @@ public class UserAgent
 					public void exceptionOccurred(Exception exception)
 					{
 						tr.setFailed("Exception: "+exception);
+						exception.printStackTrace();
 						proceed();
 					}
 					

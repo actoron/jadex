@@ -687,7 +687,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		
 		public void finished() 
 		{
-			delegate.setFinishedIfUndone();
+			// Do not finish the future of the addMonitoring() only when one instance is terminated
+//			delegate.setFinishedIfUndone();
 		}
 		
 		public void exceptionOccurred(Exception exception) 
