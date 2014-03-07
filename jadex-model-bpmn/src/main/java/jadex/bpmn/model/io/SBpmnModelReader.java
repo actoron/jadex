@@ -322,6 +322,12 @@ public class SBpmnModelReader
 			{
 				LinkedList<MSubProcess> sps = (LinkedList<MSubProcess>) buffer.get("subprocessstack");
 				act = sps.pop();
+				
+				String eventsp = attrs.get("triggeredByEvent");
+				if ((eventsp != null) && eventsp.equalsIgnoreCase("true"))
+				{
+					((MSubProcess) act).setSubprocessType(MSubProcess.SUBPROCESSTYPE_EVENT);
+				}
 			}
 			else
 			{

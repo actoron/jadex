@@ -74,6 +74,9 @@ public class BpmnStylesheetColor extends mxStylesheet
 	/** BPMN External Sub-Process Color */
 	public static final String EXTERNAL_SUBPROCESS_COLOR = "#b0f1d3";
 	
+	/** BPMN Event-Sub-Process Color */
+	public static final String EVENT_SUBPROCESS_COLOR = "#e8c9d5";
+	
 	/** BPMN Gateway Color */
 	public static final String GATEWAY_COLOR = "#ff81ac";
 	
@@ -110,6 +113,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 	{
 		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.TASK, new Dimension(160, 100));
 		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, new Dimension(480, 200));
+		DEFAULT_ACTIVITY_SIZES.put(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Event", new Dimension(480, 200));
 		DEFAULT_ACTIVITY_SIZES.put(VExternalSubProcess.class.getSimpleName(), new Dimension(160, 100));
 		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new Dimension(60, 60));
 		DEFAULT_ACTIVITY_SIZES.put(MBpmnModel.GATEWAY_PARALLEL, new Dimension(60, 60));
@@ -499,6 +503,11 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style.put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_LEFT);
 		style.put(mxConstants.STYLE_SPACING, 10);
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS, style);
+		
+		style = new HashMap<String, Object>(style);
+		style.put(mxConstants.STYLE_FILLCOLOR, EVENT_SUBPROCESS_COLOR);
+		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
+		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Event", style);
 		
 		style = new HashMap<String, Object>();
 		style.put(mxConstants.STYLE_SHAPE, MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE);

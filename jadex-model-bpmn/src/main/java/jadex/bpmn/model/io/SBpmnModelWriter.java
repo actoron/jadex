@@ -1014,6 +1014,12 @@ public class SBpmnModelWriter
 			out.print(" id=\"");
 			out.print(activity.getId());
 			
+			if (activity instanceof MSubProcess &&
+				MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess) activity).getSubprocessType()))
+			{
+				out.print("\" triggeredByEvent=\"true");
+			}
+			
 			List<MSequenceEdge> edges = activity.getOutgoingSequenceEdges();
 			if (edges != null)
 			{
