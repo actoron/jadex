@@ -1,4 +1,4 @@
-package jadex.platform.service.bpmnstarter;
+package jadex.platform.service.processengine;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -22,6 +22,7 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.platform.service.processengine.IProcessEngineService;
+import jadex.platform.service.processengine.ProcessEngineAgent;
 import jadex.platform.service.processengine.ProcessEngineEvent;
 import jadex.rules.eca.Event;
 
@@ -37,11 +38,11 @@ import java.util.Set;
 {
 	@RequiredService(name="libs", type=ILibraryService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="mons", type=IProcessEngineService.class, 
-		binding=@Binding(create=true, creationinfo=@CreationInfo(type="monagent"))),
-	@RequiredService(name="rules", type=IRuleService.class)
+	@RequiredService(name="engine", type=IProcessEngineService.class, 
+		binding=@Binding(create=true, creationinfo=@CreationInfo(type="engine"))),
+//	@RequiredService(name="rules", type=IRuleService.class)
 })
-@ComponentTypes(@ComponentType(name="monagent", filename="jadex/platform/service/bpmnstarter/MonitoringStarterAgent.class"))
+@ComponentTypes(@ComponentType(name="engine", clazz=ProcessEngineAgent.class))
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class UserAgent
@@ -62,7 +63,7 @@ public class UserAgent
 		
 		final TestReport[] trs = new TestReport[2];
 		
-		IFuture<IProcessEngineService> fut = agent.getServiceContainer().getRequiredService("mons");
+		IFuture<IProcessEngineService> fut = agent.getServiceContainer().getRequiredService("engine");
 		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, Void>(ret)
 		{
 			public void customResultAvailable(final IProcessEngineService mons)
@@ -106,7 +107,7 @@ public class UserAgent
 		final TestReport tr = new TestReport("#1", "Test if bpmn rule triggering works for initial rules.");
 		
 		final long dur = 10000;
-		final String model = "jadex/bpmn/examples/execute/ConditionEventStart.bpmn";
+		final String model = "jadex.platform.service.processengine.ConditionEventStart.bpmn2";
 		
 		IFuture<IProcessEngineService> fut = agent.getRequiredService("mons");
 		fut.addResultListener(new ExceptionDelegationResultListener<IProcessEngineService, TestReport>(ret)
@@ -216,7 +217,7 @@ public class UserAgent
 		final Future<TestReport> ret = new Future<TestReport>();
 		
 		final long dur = 65000;
-		final String model = "jadex/bpmn/examples/execute/TimerEventStart.bpmn";
+		final String model = "jadex.platform.service.processengine.TimerEventStart.bpmn2";
 		final TestReport tr = new TestReport("#1", "Test if bpmn rule triggering works for initial rules.");
 		
 		IFuture<IProcessEngineService> fut = agent.getRequiredService("mons");
