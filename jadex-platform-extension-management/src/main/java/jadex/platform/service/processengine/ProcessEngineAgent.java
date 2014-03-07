@@ -206,38 +206,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 								}
 								else if(MBpmnModel.EVENT_START_RULE.equals(mact.getActivityType()))
 								{
-									// old style
-									if(mact.hasPropertyValue("notifier"))
-									{
-										String val = (String)mact.getParsedPropertyValue("notifier");
-										Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(key.toString()+" "+i+" "+mact.getId());
-										String type = val;
-										String cond = null;
-										int idx = val.indexOf(";");
-										if(idx!=-1)
-										{
-											type = val.substring(0, idx);
-											cond = val.substring(idx+1);
-										}
-										
-										// todo multiple events
-										List<String> events = new ArrayList<String>();
-										events.add(type);
-										rule.setEventNames(events);
-										if(cond!=null)
-										{
-											UnparsedExpression up = new UnparsedExpression(null, Boolean.class, cond, null);
-											rule.setCondition(new ExpressionCondition(up, null)); // todo: fetcher?
-										}
-										else
-										{
-											rule.setCondition(ICondition.TRUE_CONDITION);
-										}
-//										rule.setAction(new CommandAction<Collection<CMSStatusEvent>>(createRuleCreateCommand(rid, model)));//, dellis)));
-										rules.add(rule);
-									}
 									// new variant with new models bpmn2
-									else if(mact.hasPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES))
+									if(mact.hasPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES))
 									{
 										String[] etypes = (String[])mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
 										if(etypes!=null && etypes.length>0)
@@ -247,11 +217,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 											List<String> events = SUtil.arrayToList(etypes);
 											if(mact.hasPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION))
 											{
-												String cond = (String)mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
+												UnparsedExpression cond = (UnparsedExpression)mact.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
 												if(cond!=null)
 												{
-													UnparsedExpression up = new UnparsedExpression(null, Boolean.class, cond, null);
-													rule.setCondition(new ExpressionCondition(up, null)); // todo: fetcher?
+													rule.setCondition(new ExpressionCondition(cond, null)); // todo: fetcher?
 												}
 											}
 											if(rule.getCondition()==null)
@@ -356,6 +325,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 												eventmapper.removeModelMappings(model);
 											}
 										}, key);
+										ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.PROCESSMODEL_ADDED, null, null));
 									}
 									
 //									// add rule listener if at least one rule
@@ -499,11 +469,9 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/**
 	 *  Process an event and get the consequence events.
 	 */
-//	public ISubscriptionIntermediateFuture<ProcessEngineEvent> processEvent(final Object event)
-	public IFuture<Boolean> processEvent(final Object event, final String type)
+	public IFuture<Void> processEvent(final Object event, final String type)
 	{
-//		final SubscriptionIntermediateFuture<ProcessEngineEvent> ret = (SubscriptionIntermediateFuture<ProcessEngineEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, agent);
-		final Future<Boolean> ret = new Future<Boolean>();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(!eventmapper.processInstanceEvent(event, type))
 		{
@@ -524,56 +492,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 						vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, null, event));
 
 						ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, null, model);
-						ret.setResult(Boolean.TRUE);
-//						fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
-//						{
-//							public void intermediateResultAvailable(CMSStatusEvent stevent)
-//							{
-//								System.out.println("event is: "+stevent);
-//								
-//								if(stevent!=null)
-//								{
-//									if(stevent instanceof CMSCreatedEvent)
-//									{
-//										CMSCreatedEvent ev = (CMSCreatedEvent)stevent;
-//										stevent.setProperty("startevent", event);
-//										ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, 
-//											ev.getComponentIdentifier(), null));
-//									}
-//									else if(stevent instanceof CMSIntermediateResultEvent)
-//									{
-//										CMSIntermediateResultEvent ev = (CMSIntermediateResultEvent)stevent;
-//										ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_RESULT_RECEIVED, 
-//											ev.getComponentIdentifier(), new Tuple2<String, Object>(ev.getName(), ev.getValue())));
-//									}
-//									else if(stevent instanceof CMSTerminatedEvent)
-//									{
-//										CMSTerminatedEvent ev = (CMSTerminatedEvent)stevent;
-//										ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
-//											ev.getComponentIdentifier(), ev.getResults()));
-//									}
-//								}
-//							}
-//							
-//							public void finished()
-//							{
-//								ret.setFinished();
-//							}
-//							
-//							public void resultAvailable(Collection<CMSStatusEvent> result)
-//							{
-//								for(CMSStatusEvent ste: result)
-//								{
-//									intermediateResultAvailable(ste);
-//								}
-//								ret.setFinished();
-//							}
-//							
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								ret.setException(exception);
-//							}
-//						});
+						ret.setResult(null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -584,59 +503,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 			}
 		}
 		
-//		IFuture<IRuleService> fut = agent.getServiceContainer().getRequiredService("rules");
-//		fut.addResultListener(new ExceptionDelegationResultListener<IRuleService, Collection<ProcessEngineEvent>>(ret)
-//		{
-//			public void customResultAvailable(final IRuleService rules)
-//			{
-//				rules.addEvent(event).addResultListener(new IIntermediateResultListener<RuleEvent>()
-//				{
-//					public void intermediateResultAvailable(RuleEvent event)
-//					{
-//						if(event!=null)
-//						{
-//							if(event.getResult() instanceof CMSCreatedEvent)
-//							{
-//								CMSCreatedEvent ev = (CMSCreatedEvent)event.getResult();
-//								ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, 
-//									ev.getComponentIdentifier(), null));
-//							}
-//							else if(event.getResult() instanceof CMSIntermediateResultEvent)
-//							{
-//								CMSIntermediateResultEvent ev = (CMSIntermediateResultEvent)event.getResult();
-//								ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_RESULT_RECEIVED, 
-//									ev.getComponentIdentifier(), new Tuple2<String, Object>(ev.getName(), ev.getValue())));
-//							}
-//							else if(event.getResult() instanceof CMSTerminatedEvent)
-//							{
-//								CMSTerminatedEvent ev = (CMSTerminatedEvent)event.getResult();
-//								ret.addIntermediateResult(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
-//									ev.getComponentIdentifier(), ev.getResults()));
-//							}
-//						}
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						ret.setException(exception);
-//					}
-//					
-//					public void finished()
-//					{
-//						ret.setFinished();
-//					}
-//					
-//					public void resultAvailable(Collection<RuleEvent> result)
-//					{
-//						for(RuleEvent re: result)
-//						{
-//							intermediateResultAvailable(re);
-//						}
-//						finished();
-//					}
-//				});
-//			}
-//		});
 		return ret;
 	}
 	

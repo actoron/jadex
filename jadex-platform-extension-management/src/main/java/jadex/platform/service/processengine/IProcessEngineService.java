@@ -41,7 +41,7 @@ public interface IProcessEngineService
 	 */
 //	public ISubscriptionIntermediateFuture<ProcessEngineEvent> processEvent(IEvent event);
 //	public ISubscriptionIntermediateFuture<ProcessEngineEvent> processEvent(Object event, String type);
-	public IFuture<Boolean> processEvent(Object event, String type);
+	public IFuture<Void> processEvent(Object event, String type);
 	
 //	/**
 //	 *  Subscribe to events of the monitoring starter.
