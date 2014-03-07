@@ -5,22 +5,26 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IInternalProcessEngineService;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.ThreadContext;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ICommand;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
-import jadex.kernelbase.InterpreterFetcher;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  *  Wait for an external notification (could be a signal or a fired rule).
- *  Makes available a notfier object as "notifier" property.
+ *  The event is registered at the process engine service of the application.
  */
 public class EventIntermediateRuleHandler extends DefaultActivityHandler
 {
@@ -36,7 +40,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 	{
 		thread.setWaiting(true);
 
-		String[]	eventtypes	= (String[]) thread.getActivity().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+		final String[]	eventtypes	= (String[]) thread.getActivity().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
 		String	condition	= (String)thread.getActivity().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
 		UnparsedExpression	upex	= null;
 		Map<String, Object>	params	= null; 
@@ -58,27 +62,82 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 			}
 		}
 		
+		final UnparsedExpression	fupex	= upex;
+		final Map<String, Object>	fparams	= params;
+		
 		// Todo: allow injecting service binding from outside?
 		instance.getServiceContainer().searchService(IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION)
 			.addResultListener(new IResultListener<IInternalProcessEngineService>()
 		{
 			public void resultAvailable(IInternalProcessEngineService ipes)
 			{
-				final IExternalAccess	exta	= instance.getExternalAccess(); 
-//				IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, params, instance.getModel().getAllImports(), new ICommand<Object>()
-//				{
-//					public void execute(final Object event)
-//					{
-//						exta.scheduleStep(step);
-//					}
-//				});
-//				thread.setWaitInfo(fut);
+				final IExternalAccess	exta	= instance.getExternalAccess();
+				final String	actid	= activity.getId();
+				final String	procid	= thread.getId();
+				IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, new ICommand<Object>()
+				{
+					public void execute(final Object event)
+					{
+						exta.scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								IFuture<Void>	ret	= IFuture.DONE;
+								
+								BpmnInterpreter	instance	= (BpmnInterpreter)ia;
+								MActivity	activity	= instance.getModelElement().getAllActivities().get(actid);
+								StringTokenizer	stok	= new StringTokenizer(procid, ":");
+								ProcessThread	thread	= null;
+								ThreadContext	context	= instance.getThreadContext();
+								while(stok.hasMoreTokens() && context!=null)
+								{
+									thread	= null;
+									String	pid	= stok.nextToken();
+									for(ProcessThread pt: context.getThreads())
+									{
+										if(pt.getId().equals(pid))
+										{
+											thread	= pt;
+											context	= thread.getSubcontext();
+											break;
+										}
+									}
+								}
+								
+								if(activity==null)
+								{
+									ret	= new Future<Void>(new RuntimeException("Activity not found: "+actid));
+								}
+								else if(thread==null)
+								{
+									ret	= new Future<Void>(new RuntimeException("Process thread not found: "+procid));
+								}
+								
+								instance.notify(activity, thread, null);
+								return ret;
+							}
+						}).addResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void result)
+							{
+								// done.
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								System.err.println("Could not notify process: "+exta.getComponentIdentifier());
+								exception.printStackTrace();
+							}
+						});
+					}
+				});
+				thread.setWaitInfo(fut);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				thread.setNonWaiting();
 				thread.setException(exception);
+				instance.notify(activity, thread, null);
 			}
 		});
 	}
@@ -107,6 +166,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 							{
 								public void resultAvailable(Void result)
 								{
+									// done.
 								}
 								
 								public void exceptionOccurred(Exception exception)
