@@ -10,12 +10,12 @@ import java.util.Set;
  *  A set based on identity comparison.
  */
 // todo: Ordering for repeatability
-public class IdentityHashSet	implements Set
+public class IdentityHashSet<T>	implements Set<T>
 {
 	//-------- attributes --------
 	
 	/** The backing map. */
-    protected	Map	map;
+    protected	Map<T, T>	map;
 
     //-------- constructors --------
     
@@ -24,7 +24,7 @@ public class IdentityHashSet	implements Set
      */
     public IdentityHashSet()
     {
-    	map	= new IdentityHashMap();
+    	map	= new IdentityHashMap<T, T>();
     }
 
     //-------- Set interface --------
@@ -78,7 +78,7 @@ public class IdentityHashSet	implements Set
      *
      * @return an iterator over the elements in this set.
      */
-    public Iterator iterator()
+    public Iterator<T> iterator()
     {
     	return map.keySet().iterator();
     }
@@ -108,7 +108,7 @@ public class IdentityHashSet	implements Set
      *            of the runtime type of every element in this set.
      * @throws NullPointerException if the specified array is <tt>null</tt>.
      */
-    public Object[] toArray(Object a[])
+    public <E> E[] toArray(E[] a)
     {
     	return map.keySet().toArray(a);
     }
@@ -146,7 +146,7 @@ public class IdentityHashSet	implements Set
      * @throws IllegalArgumentException if some aspect of the specified element
      *         prevents it from being added to this set.
      */
-    public boolean add(Object o)
+    public boolean add(T o)
     {
     	return map.put(o, o)==null;
     }
@@ -196,7 +196,7 @@ public class IdentityHashSet	implements Set
      *         <tt>null</tt>.
      * @see    #contains(Object)
      */
-    public boolean containsAll(Collection c)
+    public boolean containsAll(Collection<?> c)
     {
     	return map.keySet().containsAll(c);
     }
@@ -225,10 +225,10 @@ public class IdentityHashSet	implements Set
      *		  set.
      * @see #add(Object)
      */
-    public boolean addAll(Collection c)
+    public boolean addAll(Collection<? extends T> c)
     {
     	boolean	ret	= false;
-    	for(Iterator it=c.iterator(); it.hasNext();)
+    	for(Iterator<? extends T> it=c.iterator(); it.hasNext();)
     	{
     		ret	= add(it.next()) || ret;
     	}
@@ -258,10 +258,10 @@ public class IdentityHashSet	implements Set
      *           <tt>null</tt>.
      * @see #remove(Object)
      */
-    public boolean retainAll(Collection c)
+    public boolean retainAll(Collection<?> c)
     {
     	boolean	ret	= false;
-    	for(Iterator it=map.keySet().iterator(); it.hasNext();)
+    	for(Iterator<?> it=map.keySet().iterator(); it.hasNext();)
     	{
     		if(!c.contains(it.next()))
     		{
@@ -296,10 +296,10 @@ public class IdentityHashSet	implements Set
      *           <tt>null</tt>.
      * @see    #remove(Object)
      */
-    public boolean removeAll(Collection c)
+    public boolean removeAll(Collection<?> c)
     {
     	boolean	ret	= false;
-    	for(Iterator it=c.iterator(); it.hasNext();)
+    	for(Iterator<?> it=c.iterator(); it.hasNext();)
     	{
     		ret	= remove(it.next()) || ret;
     	}
@@ -365,7 +365,7 @@ public class IdentityHashSet	implements Set
     public String	toString()
     {
     	StringBuffer	ret	= new StringBuffer("{");
-    	for(Iterator it=iterator(); it.hasNext();)
+    	for(Iterator<T> it=iterator(); it.hasNext();)
     	{
     		ret.append(it.next());
     		if(it.hasNext())

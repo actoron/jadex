@@ -79,14 +79,15 @@ public class IntermediateTestAgent
 		IComponentManagementService	cms	= agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
 		IProcessEngineService	pes	= (IProcessEngineService)agent.getServiceContainer().getRequiredService("engine").get();
 
-		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
-		fut.getFirstResult();
-		
-		agent.waitForDelay(500).get();
+		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
 		pes.processEvent("test-event", null).get();
 		
-		cms.destroyComponent(fut.getFirstResult()).get();
+		agent.waitForDelay(500).get();
+		
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
+		fut.getFirstResult();
+		fut.getSecondResult();
 		
 		tr.setSucceeded(true);
 		ret.setResult(tr);

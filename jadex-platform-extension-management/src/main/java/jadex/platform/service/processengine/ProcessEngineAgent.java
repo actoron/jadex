@@ -5,10 +5,12 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.IInternalProcessEngineService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.SFuture;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
@@ -26,6 +28,7 @@ import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
+import jadex.commons.collection.IdentityHashSet;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -65,8 +68,10 @@ import jadex.rules.eca.Rule;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Agent that implements the bpmn monitoring starter interface.
@@ -102,6 +107,12 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/** The event mapper. */
 	protected EventMapper eventmapper;
 	
+	/** The event waitqueue. */
+	protected Map<String, Set<Object>>	waitqueue;
+	
+	/** The event types to be put in waitqueue. */
+	protected Map<String, Set<Tuple2<String, IResourceIdentifier>>>	waitqueuetypes;
+	
 	//-------- methods --------
 	
 	/**
@@ -112,6 +123,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	{
 		this.remcoms = new HashMap<Tuple2<String,IResourceIdentifier>, List<Runnable>>();
 		this.processes = new HashMap<IComponentIdentifier, ProcessEngineAgent.ProcessInfo>();
+		this.waitqueue	= new HashMap<String, Set<Object>>();
+		this.waitqueuetypes	= new HashMap<String, Set<Tuple2<String,IResourceIdentifier>>>();
 		this.eventmapper = new EventMapper();
 		return IFuture.DONE;
 	}
@@ -187,7 +200,45 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 						{
 							// load the bpmn model
 							BpmnModelLoader loader = new BpmnModelLoader();
-							MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getComponentIdentifier().getRoot()});
+							final MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getComponentIdentifier().getRoot()});
+							
+							// register waitqueue events
+							for(MActivity mevent: amodel.getWaitingEvents())
+							{
+								String[]	types	= (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+								for(String type: types)
+								{
+									Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
+									if(set==null)
+									{
+										set	= new HashSet<Tuple2<String,IResourceIdentifier>>();
+										waitqueuetypes.put(type, set);
+									}
+									set.add(key);
+								}
+							}
+							addRemoveCommand(new Runnable()
+							{
+								public void run()
+								{
+									for(MActivity mevent: amodel.getWaitingEvents())
+									{
+										String[]	types	= (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+										for(String type: types)
+										{
+											Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
+											if(set!=null)
+											{
+												set.remove(key);
+												if(set.isEmpty())
+												{
+													waitqueuetypes.remove(type);
+												}
+											}
+										}
+									}
+								}
+							}, key);
 						
 							// Search timer, rule start events in model 
 							List<MActivity> startevents = new ArrayList<MActivity>();
@@ -440,9 +491,20 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/**
 	 *  Process an event and get the consequence events.
 	 */
-	public IFuture<Void> processEvent(final Object event, final String type)
+	public IFuture<Void> processEvent(final Object event, String type)
+	{
+		return internalProcessEvent(event, type, true);
+	}
+	
+	/**
+	 *  Process an event and get the consequence events.
+	 *  Called internally when event should not be added to waitqueue.
+	 */
+	public IFuture<Void> internalProcessEvent(final Object event, String type, boolean add)
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+		type	= EventMapper.getEventType(event, type);
 		
 		if(eventmapper.processInstanceEvent(event, type))
 		{
@@ -474,9 +536,38 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 					}
 				}));
 			}
+			// Not processed -> add to waitqueue.
+			else if(add && waitqueuetypes.containsKey(type))
+			{
+				Set<Object>	wq	= waitqueue.get(type);
+				if(wq==null)
+				{
+					wq	= new IdentityHashSet<Object>();
+					waitqueue.put(type, wq);
+				}
+				wq.add(event);
+				
+				// Todo: use event time-to-live from registered models?
+				final Set<Object>	fwq	= wq;
+				final String	ftype	= type;
+				agent.waitFor(BasicService.getLocalDefaultTimeout(), new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						fwq.remove(event);
+						if(fwq.isEmpty())
+						{
+							waitqueue.remove(ftype);
+						}
+						return IFuture.DONE;
+					}
+				});
+				
+				ret.setResult(null);
+			}
 			else
 			{
-				ret.setResult(null);
+				ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
 			}
 		}
 		
@@ -491,7 +582,20 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 */
 	public IFuture<String>	addEventMatcher(String[] events, UnparsedExpression uexp, String[] imports, Map<String, Object> vals, ICommand<Object> cmd)
 	{
-		return new Future<String>(eventmapper.addInstanceMapping(uexp, events, vals, imports, cmd));
+		String	id	= eventmapper.addInstanceMapping(uexp, events, vals, imports, cmd);
+		
+		for(String type: events)
+		{
+			if(waitqueue.containsKey(type))
+			{
+				for(Object event: waitqueue.get(type))
+				{
+					internalProcessEvent(event, type, false);
+				}
+			}
+		}
+		
+		return new Future<String>(id);
 	}
 	
 	/**
