@@ -15,7 +15,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSCreatedEvent;
-import jadex.bridge.service.types.cms.IComponentManagementService.CMSIntermediateResultEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSStatusEvent;
 import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedEvent;
 import jadex.bridge.service.types.cron.CronJob;
@@ -31,7 +30,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -473,7 +471,11 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(!eventmapper.processInstanceEvent(event, type))
+		if(eventmapper.processInstanceEvent(event, type))
+		{
+			ret.setResult(null);
+		}
+		else
 		{
 			Tuple2<IResourceIdentifier, String> tup = eventmapper.processModelEvent(event, type);
 			if(tup!=null)

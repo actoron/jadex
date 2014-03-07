@@ -8,7 +8,6 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ITuple2Future;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -22,7 +21,6 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -86,31 +84,7 @@ public class IntermediateTestAgent
 		
 		agent.waitForDelay(500).get();
 		
-		pes.processEvent("test-event").addResultListener(new IIntermediateResultListener<ProcessEngineEvent>()
-		{
-			public void intermediateResultAvailable(ProcessEngineEvent result)
-			{
-				System.out.println("Event: "+result);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-			
-			public void finished()
-			{
-				System.out.println("Finished.");
-			}
-			
-			public void resultAvailable(Collection<ProcessEngineEvent> result)
-			{
-				for(ProcessEngineEvent pee: result)
-				{
-					intermediateResultAvailable(pee);
-				}
-			}
-		});
+		pes.processEvent("test-event", null).get();
 		
 		cms.destroyComponent(fut.getFirstResult()).get();
 		
