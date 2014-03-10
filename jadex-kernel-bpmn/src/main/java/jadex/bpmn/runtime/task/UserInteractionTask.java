@@ -6,10 +6,12 @@ import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
 import jadex.bpmn.model.task.annotation.Task;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -24,11 +26,16 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -62,28 +69,10 @@ public class UserInteractionTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @listener	To be notified, when the task has completed.
 	 */
-	public IFuture<Void> execute(final ITaskContext context, final IInternalAccess instance)
+	public IFuture<Void> execute(final ITaskContext context, IInternalAccess instance)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		final IComponentListener	lis	= new TerminationAdapter()
-//		{
-//			public void componentTerminated()
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						if(dialog!=null)
-//						{
-//							dialog.setVisible(false);
-//						}
-//					}
-//				});
-//			}
-//		};
-//		instance.addComponentListener(lis);
-
 		final ISubscriptionIntermediateFuture<IMonitoringEvent> sub = instance.subscribeToEvents(IMonitoringEvent.TERMINATION_FILTER, false, PublishEventLevel.FINE);
 		sub.addResultListener(new SwingIntermediateResultListener<IMonitoringEvent>(new IntermediateDefaultResultListener<IMonitoringEvent>()
 		{
@@ -101,7 +90,35 @@ public class UserInteractionTask implements ITask
 			}
 		}));
 		
-		final MActivity	task	= context.getModelElement();
+		final IExternalAccess	exta	= instance.getExternalAccess();
+		MActivity	task	= context.getModelElement();
+		final String	taskname	= task.getName();
+
+		// Simple pseudo struct for parameters.
+		final int NAME	= 0;
+		final int TYPE	= 1;
+		final int VALUE	= 2;
+		final int DIRECTION	= 3;
+		final int NEWVALUE	= 4;
+		final List<Object[]>	lparameters = new ArrayList<Object[]>();
+		
+		IndexMap<String, MParameter>	parameters	= task.getParameters();
+		if(parameters!=null)
+		{
+			for(MParameter param: parameters.values())
+			{
+				Object	value	= context.getParameterValue(param.getName());
+				Class<?>	clazz	= param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports());
+				lparameters.add(new Object[]
+				{
+					param.getName(),
+					clazz,
+					value,
+					param.getDirection(),
+					value
+				});
+			}
+		}
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -109,102 +126,75 @@ public class UserInteractionTask implements ITask
 			{
 				final JOptionPane	pane;
 				JComponent	message;
-				IndexMap<String, MParameter>	parameters	= task.getParameters();
 				
-				if(parameters!=null && !parameters.isEmpty())
+				if(!lparameters.isEmpty())
 				{
 					Insets	insets	= new Insets(2,2,2,2);
 					message	= new JPanel(new GridBagLayout());
-					message.add(new JLabel("Please enter values for task "+task.getName()),
+					message.add(new JLabel("Please enter values for task "+taskname),
 						new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 					
 					pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
 					pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 
 					int i=0;
-					for(Iterator<MParameter> it=parameters.values().iterator(); it.hasNext(); i++)
+					for(final Object[] param: lparameters)
 					{
-						final MParameter param = it.next();
-						Object	value	= context.getParameterValue(param.getName());
 						JComponent	comp;
-						if(SReflect.getWrappedType(param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports())).equals(Boolean.class))
+						if(SReflect.getWrappedType((Class<?>)param[TYPE]).equals(Boolean.class))
 						{
 							final JCheckBox	cb	= new JCheckBox();
-							cb.setSelected(value instanceof Boolean && ((Boolean)value).booleanValue());
-							if(param.getDirection().equals(MParameter.DIRECTION_IN))
+							cb.setSelected(param[VALUE] instanceof Boolean && ((Boolean)param[VALUE]).booleanValue());
+							if(param[DIRECTION].equals(MParameter.DIRECTION_IN))
 							{
 								cb.setEnabled(false);
 							}
 							else
 							{
-						        pane.addPropertyChangeListener(new PropertyChangeListener()
-						        {
-						            public void propertyChange(PropertyChangeEvent event)
-						            {
-						            	if(pane.getValue()!=JOptionPane.UNINITIALIZED_VALUE)
-						            	{
-						    				// Todo: context should not be accessed from swing thread!
-						            		context.setParameterValue(param.getName(), Boolean.valueOf(cb.isSelected()));
-						            	}
-						            }
+								cb.addItemListener(new ItemListener()
+								{
+									public void itemStateChanged(ItemEvent e)
+									{
+										param[NEWVALUE]	= cb.isSelected();
+									}
 								});
 							}
 							comp	= cb;
 						}
 						else
 						{
-							final JTextField	tf	= new JTextField(value!=null ? ""+value : "");
-							if(param.getDirection().equals(MParameter.DIRECTION_IN))
+							final JTextField	tf	= new JTextField(param[VALUE]!=null ? ""+param[VALUE] : "");
+							if(param[DIRECTION].equals(MParameter.DIRECTION_IN))
 							{
 								tf.setEditable(false);
 							}
 							else
 							{
-						        pane.addPropertyChangeListener(new PropertyChangeListener()
-						        {
-						            public void propertyChange(PropertyChangeEvent event)
-						            {
-						            	if(pane.getValue()!=JOptionPane.UNINITIALIZED_VALUE)
-						            	{
-											String	text	= tf.getText();
-											try
-											{
-												// Todo: access thread context for imports etc.!?
-												IParsedExpression	pex	= new JavaCCExpressionParser().parseExpression(text, null, null, null);
-												context.setParameterValue(param.getName(), pex.getValue(null));
-											}
-											catch(Exception ex)
-											{
-												// Hack!!! Fallback: if no expression entered for string, use value directly.
-												if(param.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()).equals(String.class))
-												{
-													context.setParameterValue(param.getName(), text);
-												}
-												else
-												{
-													ex.printStackTrace();
-												}
-											}
-						            	}
+								tf.addKeyListener(new KeyAdapter()
+								{
+									public void keyPressed(KeyEvent e)
+									{
+										param[NEWVALUE]	= tf.getText();
 									}
 								});
 							}
 							comp	= tf;
 						}
-						message.add(new JLabel(param.getName()),
+						message.add(new JLabel((String)param[NAME]),
 							new GridBagConstraints(0, i+1, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 						message.add(comp,
 							new GridBagConstraints(1, i+1, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
+						i++;
 					}
 				}
 				else
 				{
-					message = new JLabel("Please perform task "+task.getName());
+					message = new JLabel("Please perform task "+taskname);
 					pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
 					pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 				}
 				
-				dialog = new JDialog((JFrame)null, task.getName());
+				dialog = new JDialog((JFrame)null, taskname);
 				dialog.getContentPane().setLayout(new BorderLayout());
 				dialog.getContentPane().add(pane, BorderLayout.CENTER);
 
@@ -214,7 +204,7 @@ public class UserInteractionTask implements ITask
 		            {
 		                pane.setValue(null);
 		                
-		                instance.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+		                exta.scheduleStep(new IComponentStep<Void>()
 						{
 		                	@Classname("rem")
 							public IFuture<Void> execute(IInternalAccess ia)
@@ -247,6 +237,40 @@ public class UserInteractionTask implements ITask
 			                }
 			                else
 			                {
+			                	// Write changed value, if any.
+			                	for(Object[] param: lparameters)
+			                	{
+			                		if(!SUtil.equals(param[VALUE], param[NEWVALUE]))
+			                		{
+			                			if(param[NEWVALUE] instanceof String)
+			                			{
+											try
+											{
+												// Todo: access thread context for imports etc.!?
+												IParsedExpression	pex	= new JavaCCExpressionParser().parseExpression((String)param[NEWVALUE], null, null, null);
+												context.setParameterValue((String)param[NAME], pex.getValue(null));
+											}
+											catch(Exception ex)
+											{
+												// Hack!!! Fallback: if no expression entered for string, use value directly.
+												if(param[TYPE].equals(String.class))
+												{
+													context.setParameterValue((String)param[NAME], param[NEWVALUE]);
+												}
+												else
+												{
+													ex.printStackTrace();
+												}
+											}
+			                			}
+			                			else
+			                			{
+											context.setParameterValue((String)param[NAME], param[NEWVALUE]);
+			                				
+			                			}
+			                		}
+			                	}
+			                	
 			                	ret.setResultIfUndone(null);
 			                }
 		            	}
@@ -279,18 +303,4 @@ public class UserInteractionTask implements ITask
 		});
 		return ret;
 	}
-	
-//	//-------- static methods --------
-//	
-//	/**
-//	 *  Get the meta information about the agent.
-//	 */
-//	public static TaskMetaInfo getMetaInfo()
-//	{
-//		String desc = "The user interaction task can be used for fetching in parameter values " +
-//			"via an interactive user interface dialog. The task automatically uses all declared" +
-//			"in parameters.";
-//		
-//		return new TaskMetaInfo(desc, (ParameterMetaInfo[])null); 
-//	}
 }
