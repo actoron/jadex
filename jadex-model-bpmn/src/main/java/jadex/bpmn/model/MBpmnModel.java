@@ -148,7 +148,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	protected Map<String, MActivity> allactivities;
 	
 	/** The cached event subprocess start events of the model. */
-	protected List<MActivity> eventsubprocessstartevents;
+	protected Map<MSubProcess, MActivity> eventsubprocessstartevents;
 	
 	/** The cached instance-matched events thaqt require waiting. */
 	protected List<MActivity> waitingevents;
@@ -1292,6 +1292,20 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		{
 			initMatchedStartEventCache();
 		}
+		return new ArrayList<MActivity>(eventsubprocessstartevents.values());
+	}
+	
+	/**
+	 *  Returns a mapping from event subprocesses to their start events.
+	 * 
+	 *  @return The mapping
+	 */
+	public Map<MSubProcess, MActivity> getEventSubProcessStartEventMapping()
+	{
+		if(eventsubprocessstartevents == null)
+		{
+			initMatchedStartEventCache();
+		}
 		return eventsubprocessstartevents;
 	}
 	
@@ -1314,7 +1328,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	protected void initMatchedStartEventCache()
 	{
-		eventsubprocessstartevents = new ArrayList<MActivity>();
+		eventsubprocessstartevents = new HashMap<MSubProcess, MActivity>();
 		typematchedstartevents = new ArrayList<MActivity>();
 		waitingevents = new ArrayList<MActivity>();
 		List<MActivity> starteventtriggers = new ArrayList<MActivity>();
@@ -1352,7 +1366,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 					contained = true;
 					if (MSubProcess.SUBPROCESSTYPE_EVENT.equals(subproc.getSubprocessType()))
 					{
-						eventsubprocessstartevents.add(startevent);
+						eventsubprocessstartevents.put(subproc, startevent);
 					}
 					else
 					{

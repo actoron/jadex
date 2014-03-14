@@ -6,6 +6,7 @@ import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
@@ -38,6 +39,7 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -50,6 +52,7 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
+import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
@@ -58,6 +61,7 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -80,6 +84,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -342,6 +347,86 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		this.messages = new ArrayList<Object>();
 		this.streams = new ArrayList<IConnection>();
 		this.variables	= getArguments()!=null ? new HashMap<String, Object>(getArguments()) : new HashMap<String, Object>();
+	}
+	
+	public IFuture<Void> init(IModelInfo model, String config,
+			Map<String, Object> arguments)
+	{
+		final Future<Void> ret = new Future<Void>();
+		IFuture<Void> fut = super.init(model, config, arguments);
+		fut.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				IFuture<IInternalProcessEngineService> fut = getServiceContainer().searchService(IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION);
+				fut.addResultListener(new IResultListener<IInternalProcessEngineService>()
+				{
+					public void resultAvailable(IInternalProcessEngineService ipes)
+					{
+						Map<MSubProcess, MActivity> evtsubstarts = bpmnmodel.getEventSubProcessStartEventMapping();
+						
+						final CounterResultListener<String> crl = new CounterResultListener<String>(evtsubstarts.size(), new DelegationResultListener<Void>(ret));
+						
+						for (Map.Entry<MSubProcess, MActivity> evtsubentry : evtsubstarts.entrySet())
+						{
+							String[] eventtypes = (String[]) evtsubentry.getValue().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+							UnparsedExpression	upex	= evtsubentry.getValue().getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
+							Map<String, Object>	params	= null; 
+							if(upex!=null)
+							{
+								IParsedExpression	exp	= SJavaParser.parseExpression(upex, getModel().getAllImports(), getClassLoader());
+								for(String param: exp.getParameters())
+								{
+									Object	val	= getContextVariable(param);
+									if(val!=null)	// omit null values (also excludes '$event')
+									{
+										if(params==null)
+										{
+											params	= new LinkedHashMap<String, Object>();
+										}
+										params.put(param, val);
+									}
+								}
+								
+								final Map.Entry<MSubProcess, MActivity> fevtsubentry = evtsubentry;
+								final IExternalAccess exta = getExternalAccess();
+								IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, new ICommand<Object>()
+								{
+									public void execute(final Object event)
+									{
+										exta.scheduleStep(new IComponentStep<Void>()
+										{
+											public IFuture<Void> execute(IInternalAccess ia)
+											{
+												ThreadContext subcontext = new ThreadContext(fevtsubentry.getKey(), (ProcessThread) null);
+												ProcessThread subthread = new ProcessThread(""+idcnt++, fevtsubentry.getValue(), subcontext, (BpmnInterpreter) ia);
+												subcontext.addThread(subthread);
+												subthread.setParameterValue("$event", event);
+												context.addThread(subthread);
+												return IFuture.DONE;
+											}
+										});
+									}
+								});
+								
+								fut.addResultListener(crl);
+							}
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		return ret;
 	}
 	
 	//-------- IComponentInstance interface --------
