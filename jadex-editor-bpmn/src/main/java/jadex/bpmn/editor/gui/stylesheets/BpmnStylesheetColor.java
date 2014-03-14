@@ -507,6 +507,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 		style = new HashMap<String, Object>(style);
 		style.put(mxConstants.STYLE_FILLCOLOR, EVENT_SUBPROCESS_COLOR);
 		style.put(mxConstants.STYLE_DASHED, Boolean.TRUE);
+		style.put(mxConstants.STYLE_DASH_PATTERN, new float[] { 10.0f, 10.0f });
 		putCellStyle(VActivity.class.getSimpleName() + "_" + MBpmnModel.SUBPROCESS + "_Event", style);
 		
 		style = new HashMap<String, Object>();
