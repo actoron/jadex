@@ -122,23 +122,27 @@ public class EventMapper
 //	public void addModelMapping(IFilter<Object> filter)
 	public String	addInstanceMapping(UnparsedExpression uexp, String[] events, Map<String, Object> vals, String[] imports, ICommand<Object> cmd)
 	{
-		final IParsedExpression exp = SJavaParser.parseExpression(uexp, imports, null);
-		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-		fetcher.setValues(vals);
 		String	id	= SUtil.createUniqueId("EventMapping");
 		while(instancemappings.containsKey(id))
 		{
 			id	= SUtil.createUniqueId("EventMapping");
 		}
+		IFilter<Object> filter = null;
 		
-		IFilter<Object> filter = new IFilter<Object>()
+		if(uexp!=null)
 		{
-			public boolean filter(Object obj)
+			final IParsedExpression exp = SJavaParser.parseExpression(uexp, imports, null);
+			final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValues(vals);
+			filter = new IFilter<Object>()
 			{
-				Object ret = exp.getValue(fetcher);
-				return ret instanceof Boolean? ((Boolean)ret).booleanValue(): false;
-			}
-		};
+				public boolean filter(Object obj)
+				{
+					Object ret = exp.getValue(fetcher);
+					return ret instanceof Boolean? ((Boolean)ret).booleanValue(): false;
+				}
+			};
+		}
 		
 		List<MappingInfo> rems	= new ArrayList<MappingInfo>();
 		instanceprocs.put(id, rems);

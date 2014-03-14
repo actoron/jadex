@@ -387,30 +387,29 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 										params.put(param, val);
 									}
 								}
-								
-								final Map.Entry<MSubProcess, MActivity> fevtsubentry = evtsubentry;
-								final IExternalAccess exta = getExternalAccess();
-								IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, new ICommand<Object>()
-								{
-									public void execute(final Object event)
-									{
-										exta.scheduleStep(new IComponentStep<Void>()
-										{
-											public IFuture<Void> execute(IInternalAccess ia)
-											{
-												ThreadContext subcontext = new ThreadContext(fevtsubentry.getKey(), (ProcessThread) null);
-												ProcessThread subthread = new ProcessThread(""+idcnt++, fevtsubentry.getValue(), subcontext, (BpmnInterpreter) ia);
-												subcontext.addThread(subthread);
-												subthread.setParameterValue("$event", event);
-												context.addThread(subthread);
-												return IFuture.DONE;
-											}
-										});
-									}
-								});
-								
-								fut.addResultListener(crl);
 							}
+							final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), evtsubentry.getValue());
+							final IExternalAccess exta = getExternalAccess();
+							IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, new ICommand<Object>()
+							{
+								public void execute(final Object event)
+								{
+									exta.scheduleStep(new IComponentStep<Void>()
+									{
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											ThreadContext subcontext = new ThreadContext(fevtsubentry.getFirstEntity(), (ProcessThread) null);
+											ProcessThread subthread = new ProcessThread(""+idcnt++, fevtsubentry.getSecondEntity(), subcontext, (BpmnInterpreter) ia);
+											subcontext.addThread(subthread);
+											subthread.setParameterValue("$event", event);
+											context.addThread(subthread);
+											return IFuture.DONE;
+										}
+									});
+								}
+							});
+							
+							fut.addResultListener(crl);
 						}
 					}
 					

@@ -161,16 +161,19 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							// register waitqueue events
 							for(MActivity mevent: amodel.getWaitingEvents())
 							{
-								String[]	types	= (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
-								for(String type: types)
+								if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
 								{
-									Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
-									if(set==null)
+									String[] types = (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+									for(String type: types)
 									{
-										set	= new HashSet<Tuple2<String,IResourceIdentifier>>();
-										waitqueuetypes.put(type, set);
+										Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
+										if(set==null)
+										{
+											set	= new HashSet<Tuple2<String,IResourceIdentifier>>();
+											waitqueuetypes.put(type, set);
+										}
+										set.add(key);
 									}
-									set.add(key);
 								}
 							}
 							addRemoveCommand(new Runnable()
@@ -179,16 +182,19 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 								{
 									for(MActivity mevent: amodel.getWaitingEvents())
 									{
-										String[]	types	= (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
-										for(String type: types)
+										if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
 										{
-											Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
-											if(set!=null)
+											String[]	types	= (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+											for(String type: types)
 											{
-												set.remove(key);
-												if(set.isEmpty())
+												Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
+												if(set!=null)
 												{
-													waitqueuetypes.remove(type);
+													set.remove(key);
+													if(set.isEmpty())
+													{
+														waitqueuetypes.remove(type);
+													}
 												}
 											}
 										}
