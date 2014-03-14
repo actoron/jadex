@@ -415,7 +415,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setException(exception);
+						getLogger().warning("Process contains event subprocesses but no event source found. Subprocess start events will not trigger...");
+						ret.setResult(null);
 					}
 				});
 			}
