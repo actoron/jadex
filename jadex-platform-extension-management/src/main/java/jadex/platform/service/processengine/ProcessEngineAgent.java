@@ -201,7 +201,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							startevents.addAll(amodel.getTypeMatchedStartEvents());
 							startevents.addAll(amodel.getEventSubProcessStartEvents());
 							StringBuffer timing = new StringBuffer();
-							final List<IRule<Collection<CMSStatusEvent>>> rules = new ArrayList<IRule<Collection<CMSStatusEvent>>>();
+//							final List<IRule<Collection<CMSStatusEvent>>> rules = new ArrayList<IRule<Collection<CMSStatusEvent>>>();
+							final List<EventInfo> infos = new ArrayList<EventInfo>();
 							
 							for(int i=0; startevents!=null && i<startevents.size(); i++)
 							{
@@ -223,7 +224,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 										if(etypes!=null && etypes.length>0)
 										{
 //											Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(key.toString()+" "+i+" "+mact.getId());
-											Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(mact.getId());
+//											Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(mact.getId());
+											EventInfo info = new EventInfo();
 											
 											List<String> events = SUtil.arrayToList(etypes);
 											if(mact.hasPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION))
@@ -231,16 +233,19 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 												UnparsedExpression cond = (UnparsedExpression)mact.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
 												if(cond!=null)
 												{
-													rule.setCondition(new ExpressionCondition(cond, null)); // todo: fetcher?
+													info.setCondition(cond);
+//													rule.setCondition(new ExpressionCondition(cond, null)); // todo: fetcher?
 												}
 											}
-											if(rule.getCondition()==null)
-											{
-												rule.setCondition(ICondition.TRUE_CONDITION);
-											}
+//											if(rule.getCondition()==null)
+//											{
+//												rule.setCondition(ICondition.TRUE_CONDITION);
+//											}
 //											rule.setAction(new CommandAction<Collection<CMSStatusEvent>>(createRuleCreateCommand(rid, model)));//, dellis)));
-											rule.setEventNames(events);
-											rules.add(rule);
+											info.setEventNames(events);
+											info.setActivityId(mact.getId());
+											infos.add(info);
+//											rules.add(rule);
 										}
 									}
 								}
@@ -256,7 +261,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							}
 							
 							// add observed flag if no jobs
-							if(cj==null && rules.size()==0)
+							if(cj==null && infos.isEmpty())
 							{
 								remcoms.put(key, null);
 							}
@@ -271,30 +276,29 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 									ISubscriptionIntermediateFuture<CMSStatusEvent> f2 = f.getSecondEntity();
 									f2.addResultListener(new ConversionListener(ret));
 									
-									if(rules!=null)
+									if(infos!=null)
 									{
-										for(IRule<Collection<CMSStatusEvent>> rule: rules)
+										for(EventInfo info: infos)
 										{
-											ExpressionCondition ec = (ExpressionCondition)rule.getCondition();
-											final IParsedExpression exp = SJavaParser.parseExpression(ec.getExpression(), null, null); // todo: classloader?
+//											ExpressionCondition ec = (ExpressionCondition)rule.getCondition();
 											
-											IFilter<Object> filter = new IFilter<Object>()
+											IFilter<Object> filter = null;
+											if(info.getCondition()!=null)
 											{
-												public boolean filter(Object obj)
+												final IParsedExpression exp = SJavaParser.parseExpression(info.getCondition(), null, null); // todo: classloader?
+												
+												filter = new IFilter<Object>()
 												{
-													SimpleValueFetcher fetcher = new SimpleValueFetcher();
-													fetcher.setValue("$event", obj);
-													Object ret = exp.getValue(fetcher);
-													return ret instanceof Boolean? ((Boolean)ret).booleanValue(): false;
-												}
-											};
-											List<EventType> ets = rule.getEvents();
-											String[] events = new String[ets.size()];
-											for(int i=0; i<ets.size(); i++)
-											{
-												events[i] = ets.get(i).getTypename();
+													public boolean filter(Object obj)
+													{
+														SimpleValueFetcher fetcher = new SimpleValueFetcher();
+														fetcher.setValue("$event", obj);
+														Object ret = exp.getValue(fetcher);
+														return ret instanceof Boolean? ((Boolean)ret).booleanValue(): false;
+													}
+												};
 											}
-											eventmapper.addModelMapping(events, filter, model, rid, rule.getName(), ret);
+											eventmapper.addModelMapping(info.getEventNames().toArray(new String[0]), filter, model, rid, info.getActivityId(), ret);
 										}
 										addRemoveCommand(new Runnable()
 										{
@@ -694,6 +698,75 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		public void exceptionOccurred(Exception exception) 
 		{
 			delegate.setExceptionIfUndone(exception);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected static class EventInfo
+	{
+		/** The event names. */
+		protected List<String> eventNames;
+		
+		/** The activity id. */
+		protected String activityid;
+		
+		/** The condition expression. */
+		protected UnparsedExpression condition;
+
+		/**
+		 *  Get the eventNames.
+		 *  return The eventNames.
+		 */
+		public List<String> getEventNames()
+		{
+			return eventNames;
+		}
+
+		/**
+		 *  Set the eventNames. 
+		 *  @param eventNames The eventNames to set.
+		 */
+		public void setEventNames(List<String> eventNames)
+		{
+			this.eventNames = eventNames;
+		}
+
+		/**
+		 *  Get the activityId.
+		 *  return The activityId.
+		 */
+		public String getActivityId()
+		{
+			return activityid;
+		}
+
+		/**
+		 *  Set the activityId. 
+		 *  @param activityId The activityId to set.
+		 */
+		public void setActivityId(String activityId)
+		{
+			this.activityid = activityId;
+		}
+
+		/**
+		 *  Get the condition.
+		 *  return The condition.
+		 */
+		public UnparsedExpression getCondition()
+		{
+			return condition;
+		}
+
+		/**
+		 *  Set the condition. 
+		 *  @param condition The condition to set.
+		 */
+		public void setCondition(UnparsedExpression condition)
+		{
+			this.condition = condition;
 		}
 	}
 }
