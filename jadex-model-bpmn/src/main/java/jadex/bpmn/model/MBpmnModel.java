@@ -932,7 +932,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 			for(Iterator<MActivity> it=activities.iterator(); it.hasNext(); )
 			{
 				MActivity	activity	= it.next();
-				if(activity.getIncomingSequenceEdges()==null || activity.getIncomingSequenceEdges().isEmpty())
+				if((activity.getIncomingSequenceEdges()==null ||
+				    activity.getIncomingSequenceEdges().isEmpty()) &&
+				    !((activity instanceof MSubProcess) &&
+				    (MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess) activity).getSubprocessType()))))
 				{
 					if(ret==null)
 					{
