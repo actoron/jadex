@@ -56,7 +56,7 @@ public class EventMapper
 	public boolean processInstanceEvent(Object event, String type)
 	{
 		boolean ret = false;
-		type	= getEventType(event, type);
+		type = getEventType(event, type);
 		
 		List<MappingInfo> mis = instancemappings.get(type);
 		if(mis!=null)

@@ -349,6 +349,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		this.variables	= getArguments()!=null ? new HashMap<String, Object>(getArguments()) : new HashMap<String, Object>();
 	}
 	
+	/**
+	 * 
+	 */
 	public IFuture<Void> init(IModelInfo model, String config,
 			Map<String, Object> arguments)
 	{
