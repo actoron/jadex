@@ -67,7 +67,7 @@ public class ECARuleEventPropertyPanel extends BasePropertyPanel
 			}
 		}
 		
-		final AddRemoveTablePanel p = new AddRemoveTablePanel("Event Types", container.getSettings().getImageProvider(), vals);
+		final AddRemoveTablePanel p = new AddRemoveTablePanel("Event Types", container.getSettings().getImageProvider(), "Event", vals);
 		
 		p.getTable().getModel().addTableModelListener(new TableModelListener()
 		{

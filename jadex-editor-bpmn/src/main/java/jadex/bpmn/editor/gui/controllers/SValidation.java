@@ -8,7 +8,12 @@ import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import com.mxgraph.model.mxICell;
 
@@ -20,15 +25,52 @@ public class SValidation
 {
 	public static String getMoveValidationError(Object[] cells, Object target)
 	{
+		boolean hasoutedge = false;
+		Set<MActivity> acts = new HashSet<MActivity>();
+		for (int i = 0; i < cells.length; ++i)
+		{
+			if (cells[i] instanceof VActivity)
+			{
+				acts.add((MActivity) ((VActivity) cells[i]).getBpmnElement());
+			}
+		}
+		
+		edgesearch:
+		for (MActivity mactivity : acts)
+		{
+			List<MSequenceEdge> edges = mactivity.getOutgoingSequenceEdges();
+			if (edges != null)
+			{
+				for (MSequenceEdge edge : edges)
+				{
+					if (!acts.contains(edge.getTarget()))
+					{
+						hasoutedge = true;
+						break edgesearch;
+					}
+				}
+			}
+			
+			edges = mactivity.getIncomingSequenceEdges();
+			if (edges != null)
+			{
+				for (MSequenceEdge edge : edges)
+				{
+					if (!acts.contains(edge.getSource()))
+					{
+						hasoutedge = true;
+						break edgesearch;
+					}
+				}
+			}
+		}
+		
 		for (int i = 0; i < cells.length; ++i)
 		{
 			if (cells[i] instanceof VActivity)
 			{
 				VActivity vactivity = (VActivity) cells[i];
 				MActivity mactivity = (MActivity) vactivity.getBpmnElement();
-				
-				int sedgecount = mactivity.getOutgoingSequenceEdges() != null? mactivity.getOutgoingSequenceEdges().size() : 0;
-				sedgecount += mactivity.getIncomingSequenceEdges() != null? mactivity.getIncomingSequenceEdges().size() : 0;
 				
 				if (target instanceof VLane || target instanceof VPool)
 				{
@@ -46,13 +88,13 @@ public class SValidation
 						}
 					}
 					
-					if (vactivity.getParent() instanceof VSubProcess && sedgecount > 0)
+					if (vactivity.getParent() instanceof VSubProcess && hasoutedge)
 					{
 						return "Activities transferred out of sub-processes cannot have sequence edges.";
 					}
 					
 					// Only allow cross-pool activity transfers if no sequence edges are connected
-					if (!targetpool.getBpmnElement().equals(mactivity.getPool()) && sedgecount > 0)
+					if (!targetpool.getBpmnElement().equals(mactivity.getPool()) && hasoutedge)
 					{
 						return "Activities transferred between pools cannot have sequence edges.";
 					}
@@ -61,14 +103,14 @@ public class SValidation
 				{
 					MSubProcess msubproc = (MSubProcess) ((VSubProcess) target).getBpmnElement();
 					
-					if (!msubproc.getPool().getId().equals(mactivity.getPool().getId()) && sedgecount > 0)
+					if (!msubproc.getPool().getId().equals(mactivity.getPool().getId()) && hasoutedge)
 					{
 						return "Activities transferred between pools cannot have sequence edges."; 
 					}
 					
 					if (!(msubproc.getActivities() != null &&
 						msubproc.getActivities().contains(mactivity)) &&
-						sedgecount > 0)
+						hasoutedge)
 					{
 						return "Activities transferred into sub-processes cannot have sequence edges.";
 					}

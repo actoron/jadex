@@ -1,6 +1,7 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
 import jadex.bpmn.editor.gui.ImageProvider;
+import jadex.bpmn.editor.gui.SHelper;
 import jadex.bpmn.editor.gui.propertypanels.BpmnPropertyPanel.ImportTableModel;
 import jadex.commons.SUtil;
 
@@ -26,12 +27,13 @@ import javax.swing.table.AbstractTableModel;
  */
 public class AddRemoveTablePanel extends JPanel
 {
+	/** The table. */
 	protected JTable table;
 	
 	/**
 	 * 
 	 */
-	public AddRemoveTablePanel(String name, ImageProvider imgprovider, String[] vals)
+	public AddRemoveTablePanel(String name, ImageProvider imgprovider, final String defaultval, String[] vals)
 	{
 		final SimpleTableModel tm = new SimpleTableModel(name, vals);
 		table = new JTable(tm);
@@ -40,7 +42,8 @@ public class AddRemoveTablePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				tm.addValue("bla");
+				String newentry = BasePropertyPanel.createFreeName(defaultval, new BasePropertyPanel.CollectionContains(tm.entries));
+				tm.addValue(newentry);
 			}
 		};
 		Action removeaction = new AbstractAction("Remove Entry")
