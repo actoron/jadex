@@ -88,6 +88,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *  The bpmn interpreter is able to execute bpmn diagrams.
@@ -404,6 +405,18 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 												subthread.setParameterValue("$event", event);
 												context.addThread(subthread);
 												return IFuture.DONE;
+											}
+										}).addResultListener(new IResultListener<Void>()
+										{
+											public void resultAvailable(
+													Void result)
+											{
+											}
+											
+											public void exceptionOccurred(
+													Exception exception)
+											{
+												Logger.getAnonymousLogger().warning("Event " + event + " could not be delivered to instance: " + exception.getMessage());
 											}
 										});
 									}
