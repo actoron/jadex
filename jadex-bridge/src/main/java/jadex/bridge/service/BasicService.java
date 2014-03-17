@@ -69,11 +69,27 @@ public class BasicService extends NFMethodPropertyProvider implements IInternalS
 	}
 
 	/**
+	 *  Get the scaled remote default timeout.
+	 */
+	public static long	getScaledRemoteDefaultTimeout(double scale)
+	{
+		return DEFAULT_REMOTE==-1 ? -1 : (long)(DEFAULT_REMOTE*scale);
+	}
+
+	/**
 	 *  Get the local default timeout.
 	 */
 	public static long	getLocalDefaultTimeout()
 	{
 		return DEFAULT_LOCAL;
+	}
+
+	/**
+	 *  Get the scaled local default timeout.
+	 */
+	public static long	getScaledLocalDefaultTimeout(double scale)
+	{
+		return DEFAULT_LOCAL==-1 ? -1 : (long)(DEFAULT_LOCAL*scale);
 	}
 
 	/**

@@ -2521,7 +2521,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			}
 			else if(column==5)
 			{
-				ret = Double.valueOf(((double)files[row].getDone())/files[row].getSize());
+				ret = files[row].getSize()==0 ? 1 : Double.valueOf(((double)files[row].getDone())/files[row].getSize());
 			}
 			else if(column==6)
 			{

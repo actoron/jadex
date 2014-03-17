@@ -2,6 +2,7 @@ package jadex.platform.service.message.streams;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
@@ -576,19 +577,29 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 */
 	protected TimerTask	createBulkAckTimer(final Object id)
 	{
-		// Test if packets have been sent till last timer was inited
-		return ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
+		TimerTask	ret;
+		if(acktimeout!=Timeout.NONE)
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			// Test if packets have been sent till last timer was inited
+			ret	= ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
 			{
-				DataSendInfo tup = sent.get(id);
-				if(tup!=null)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					tup.doResend();
+					DataSendInfo tup = sent.get(id);
+					if(tup!=null)
+					{
+						tup.doResend();
+					}
+					return IFuture.DONE;
 				}
-				return IFuture.DONE;
-			}
-		});
+			});
+		}
+		else
+		{
+			ret	= null;
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -721,7 +732,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 					
 					public void exceptionOccurred(Exception exception)
 					{
-//						System.out.println("no ack from close output side: "+exception);
+						System.out.println("no ack from close output side: "+exception);
 						// Set connection as closed.
 						con.setClosed();
 //						closesent = true;

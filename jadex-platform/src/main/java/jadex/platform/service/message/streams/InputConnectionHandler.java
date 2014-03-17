@@ -2,6 +2,7 @@ package jadex.platform.service.message.streams;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -145,7 +146,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 						
 						public void exceptionOccurred(Exception exception)
 						{
-	//						System.out.println("no close ack: "+exception);
+							System.out.println("no close ack: "+exception);
 							// Todo: what about already received data!?
 							scheduleStep(new IComponentStep<Void>()
 							{
@@ -288,7 +289,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler implements
 	public void createDataTimer(long acktimeout)
 	{
 		// Test if packets have been received till creation
-		if(datatimer==null && rseqno>lastack)
+		if(datatimer==null && rseqno>lastack && acktimeout!=Timeout.NONE)
 		{
 			datatimer = ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
 			{
