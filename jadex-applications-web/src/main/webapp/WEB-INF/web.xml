@@ -25,6 +25,14 @@
     <servlet-name>PuzzleDispatcher</servlet-name>
     <url-pattern>/puzzle/*</url-pattern>
   </servlet-mapping>
+   <servlet>
+    <servlet-name>HelloBDIV3Dispatcher</servlet-name>
+    <servlet-class>jadex.web.examples.hellobdiv3.JadexDispatcherServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HelloBDIV3Dispatcher</servlet-name>
+    <url-pattern>/hellobdiv3/*</url-pattern>
+  </servlet-mapping>
   <!-- 
   <servlet>
     <servlet-name>Jaxcent</servlet-name>
