@@ -638,7 +638,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
         MActivity triggeractivity = null;
         
         // Create initial thread(s).
-        Set<MActivity> startevents = new HashSet<MActivity>(bpmnmodel.getStartActivities(null, null));
+        List<MActivity> startacts	= bpmnmodel.getStartActivities(null, null);
+        Set<MActivity> startevents = startacts!=null ? new HashSet<MActivity>(startacts) : new HashSet<MActivity>();
         if (trigger != null)
         {
         	Map<String, MActivity> allacts = bpmnmodel.getAllActivities();
