@@ -88,6 +88,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *  The bpmn interpreter is able to execute bpmn diagrams.
@@ -350,7 +351,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	}
 	
 	/**
-	 * 
+	 *  Special init that is used to announce event start events to process engine (if any).
 	 */
 	public IFuture<Void> init(IModelInfo model, String config,
 			Map<String, Object> arguments)
@@ -370,7 +371,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 						
 						final CounterResultListener<String> crl = new CounterResultListener<String>(evtsubstarts.size(), new DelegationResultListener<Void>(ret));
 						
-						for (Map.Entry<MSubProcess, MActivity> evtsubentry : evtsubstarts.entrySet())
+						for(Map.Entry<MSubProcess, MActivity> evtsubentry : evtsubstarts.entrySet())
 						{
 							String[] eventtypes = (String[]) evtsubentry.getValue().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
 							UnparsedExpression	upex	= evtsubentry.getValue().getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
@@ -391,6 +392,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 									}
 								}
 							}
+							
 							final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), evtsubentry.getValue());
 							final IExternalAccess exta = getExternalAccess();
 							IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, new ICommand<Object>()
@@ -401,17 +403,28 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											ThreadContext subcontext = new ThreadContext(fevtsubentry.getFirstEntity(), (ProcessThread) null);
+											ProcessThread thread = new ProcessThread(""+idcnt++, fevtsubentry.getFirstEntity(), ((BpmnInterpreter) ia).getThreadContext(), ((BpmnInterpreter) ia));
+						            		context.addThread(thread);
+						            		ThreadContext subcontext = new ThreadContext(fevtsubentry.getFirstEntity(), thread);
+						            		thread.setSubcontext(subcontext);
 											ProcessThread subthread = new ProcessThread(""+idcnt++, fevtsubentry.getSecondEntity(), subcontext, (BpmnInterpreter) ia);
 											subcontext.addThread(subthread);
-											subthread.setParameterValue("$event", event);
-											context.addThread(subthread);
 											return IFuture.DONE;
+										}
+									}).addResultListener(new IResultListener<Void>()
+									{
+										public void resultAvailable(Void result)
+										{
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											Logger.getAnonymousLogger().warning("Event " + event + " could not be delivered to instance: " + exception.getMessage());
 										}
 									});
 								}
 							});
-							
+								
 							fut.addResultListener(crl);
 						}
 					}
@@ -622,57 +635,59 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// Check if triggered by external event
 		// eventtype, mactid, event
         Tuple3<String, String, Object> trigger = (Tuple3<String, String, Object>)getArguments().get(MBpmnModel.TRIGGER);
+        MSubProcess triggersubproc = null;
+        MActivity triggeractivity = null;
         
-        // Create initial thread(s).
-        List<MActivity> startevents = bpmnmodel.getStartActivities(null, null);
-        for(int i=0; startevents!=null && i<startevents.size(); i++)
+        // Search and add trigger activity for event processes (that have trigger event in a subprocess)
+        Set<MActivity> startevents = new HashSet<MActivity>(bpmnmodel.getStartActivities(null, null));
+        if(trigger != null)
         {
-            MActivity mact = startevents.get(i);
-            if(trigger!=null && MBpmnModel.EVENT_START_TIMER.equals(trigger.getFirstEntity()))
+        	Map<String, MActivity> allacts = bpmnmodel.getAllActivities();
+        	triggeractivity = allacts.get(trigger.getSecondEntity());
+        	for(Map.Entry<String, MActivity> act : allacts.entrySet())
+        	{
+        		if(act instanceof MSubProcess)
+        		{
+        			MSubProcess subproc = (MSubProcess)act;
+        			if(subproc.getActivities() != null && subproc.getActivities().contains(triggeractivity));
+        			{
+        				triggersubproc = subproc;
+        				break;
+        			}
+        		}
+        	}
+        	
+        	startevents.add(triggeractivity);
+        }
+        
+        for(MActivity mact : startevents)
+        {
+            if(trigger!=null && trigger.getSecondEntity().equals(mact.getId()))
             {
-            	// Must perform time pattern check via reflection to avoid dependency
-                Boolean b = Boolean.TRUE;
-                try
-                {
-                    String val = (String)mact.getParsedPropertyValue("duration");
-                    Class<?> cl = SReflect.findClass("jadex.platform.service.cron.TimePatternFilter", null, getClassLoader());
-                    Object o = cl.newInstance();
-                    Method m = cl.getMethod("setPattern", new Class[]{String.class});
-                    m.invoke(o, new Object[]{val});
-                    m = cl.getMethod("filter", new Class[]{Object.class});
-                    b = (Boolean)m.invoke(o, new Object[]{trigger.getThirdEntity()});
-                }
-                catch(Exception e)
-                {
-                }
-                if(b.booleanValue())
-                {
-                    ProcessThread    thread    = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+            	if(triggersubproc != null)
+            	{
+            		ProcessThread thread = new ProcessThread(""+idcnt++, triggersubproc, context, this);
+            		context.addThread(thread);
+            		ThreadContext subcontext = new ThreadContext(triggersubproc, thread);
+            		thread.setSubcontext(subcontext);
+					ProcessThread subthread = new ProcessThread(""+idcnt++, triggeractivity, subcontext, this);
+					subcontext.addThread(subthread);
+					subthread.setParameterValue("$event", trigger.getThirdEntity());
+            	}
+            	else
+            	{
+                    ProcessThread    thread    = new ProcessThread(""+idcnt++, mact, context, BpmnInterpreter.this);
                     thread.setParameterValue("$event", trigger.getThirdEntity());
                     context.addThread(thread);
-                }
-            }
-            else if(trigger!=null && trigger.getSecondEntity()!=null && MBpmnModel.EVENT_START_RULE.equals(trigger.getFirstEntity()))
-            {
-            	// Was rule for that start event?
-            	if(trigger.getSecondEntity().endsWith(mact.getId()))
-            	{
-            		ProcessThread thread = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
-            		thread.setParameterValue("$event", trigger.getThirdEntity());
-            		context.addThread(thread);
             	}
-            }	
+            }
             else //if(MBpmnModel.EVENT_START_EMPTY.equals(mact.getActivityType())
                 //|| MBpmnModel.TASK.equals(mact.getActivityType())
                 //|| MBpmnModel.SUBPROCESS.equals(mact.getActivityType()))
             {
-                ProcessThread thread = new ProcessThread(""+idcnt++, (MActivity)startevents.get(i), context, BpmnInterpreter.this);
+                ProcessThread thread = new ProcessThread(""+idcnt++, mact, context, BpmnInterpreter.this);
                 context.addThread(thread);
             }
-//            else
-//            {
-//                System.out.println("Not starting act: "+mact);
-//            }
         } 
         
         started = true;

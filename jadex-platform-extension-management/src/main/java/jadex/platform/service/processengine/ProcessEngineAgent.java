@@ -206,8 +206,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							List<MActivity> startevents = new ArrayList<MActivity>();
 							startevents.addAll(amodel.getTypeMatchedStartEvents());
 							startevents.addAll(amodel.getEventSubProcessStartEvents());
-							StringBuffer timing = new StringBuffer();
-//							final List<IRule<Collection<CMSStatusEvent>>> rules = new ArrayList<IRule<Collection<CMSStatusEvent>>>();
+							List<Tuple2<String, String>> timers = new ArrayList<Tuple2<String,String>>();
 							final List<EventInfo> infos = new ArrayList<EventInfo>();
 							
 							for(int i=0; startevents!=null && i<startevents.size(); i++)
@@ -217,9 +216,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 								if(MBpmnModel.EVENT_START_TIMER.equals(mact.getActivityType()))
 								{
 									Object val = mact.getParsedPropertyValue("duration");
-									if(timing.length()>0)
-										timing.append("|");
-									timing.append(val);
+									timers.add(new Tuple2<String, String>(""+val, mact.getId()));
 								}
 								else if(MBpmnModel.EVENT_START_RULE.equals(mact.getActivityType()))
 								{
@@ -229,8 +226,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 										String[] etypes = (String[])mact.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
 										if(etypes!=null && etypes.length>0)
 										{
-//											Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(key.toString()+" "+i+" "+mact.getId());
-//											Rule<Collection<CMSStatusEvent>> rule = new Rule<Collection<CMSStatusEvent>>(mact.getId());
 											EventInfo info = new EventInfo();
 											
 											List<String> events = SUtil.arrayToList(etypes);
@@ -240,18 +235,11 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 												if(cond!=null)
 												{
 													info.setCondition(cond);
-//													rule.setCondition(new ExpressionCondition(cond, null)); // todo: fetcher?
 												}
 											}
-//											if(rule.getCondition()==null)
-//											{
-//												rule.setCondition(ICondition.TRUE_CONDITION);
-//											}
-//											rule.setAction(new CommandAction<Collection<CMSStatusEvent>>(createRuleCreateCommand(rid, model)));//, dellis)));
 											info.setEventNames(events);
 											info.setActivityId(mact.getId());
 											infos.add(info);
-//											rules.add(rule);
 										}
 									}
 								}
@@ -259,11 +247,14 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							
 							// if has found some timer start
 							CronJob<CMSStatusEvent> cj = null;
-							if(timing.length()>0)
+							if(!timers.isEmpty())
 							{
-								// add cron job automatically adds a remove command for the removal
-								cj = new CronJob<CMSStatusEvent>(timing.toString(), new TimePatternFilter(timing.toString()),
-									createCronCreateCommand(rid, model));//, dellis));
+								for(Tuple2<String, String> tup: timers)
+								{
+									// add cron job automatically adds a remove command for the removal
+									cj = new CronJob<CMSStatusEvent>(tup.getFirstEntity(), new TimePatternFilter(tup.getFirstEntity()),
+										createCronCreateCommand(rid, model, tup.getSecondEntity()));//, dellis));
+								}
 							}
 							
 							// add observed flag if no jobs
@@ -286,8 +277,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 									{
 										for(EventInfo info: infos)
 										{
-//											ExpressionCondition ec = (ExpressionCondition)rule.getCondition();
-											
 											IFilter<Object> filter = null;
 											if(info.getCondition()!=null)
 											{
@@ -559,7 +548,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/**
 	 *  Create a new cron create component command.
 	 */
-	protected static CronCreateCommand createCronCreateCommand(IResourceIdentifier rid, String model)//, IResultListener<Collection<Tuple2<String, Object>>> killis)
+	protected static CronCreateCommand createCronCreateCommand(IResourceIdentifier rid, String model, final String mactid)//, IResultListener<Collection<Tuple2<String, Object>>> killis)
 	{
 		CronCreateCommand ret = null;
 		
@@ -577,7 +566,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 					getCommand().getInfo().setArguments(vs);
 				}
 				// One could put in the activity name but how to determine then if multiple timers match?
-				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_TIMER, null, args.getSecondEntity()));
+				vs.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_TIMER, mactid, args.getSecondEntity()));
 				return super.execute(args);
 			}
 		};
