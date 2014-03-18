@@ -5,6 +5,10 @@ import jadex.bpmn.model.MSubProcess;
 
 import com.mxgraph.view.mxGraph;
 
+/**
+ *  Visual representation of a subprocess.
+ *
+ */
 public class VSubProcess extends VActivity
 {
 	public VSubProcess(mxGraph graph)

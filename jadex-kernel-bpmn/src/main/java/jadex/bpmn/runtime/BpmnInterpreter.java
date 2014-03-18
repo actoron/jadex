@@ -409,6 +409,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 						            		thread.setSubcontext(subcontext);
 											ProcessThread subthread = new ProcessThread(""+((BpmnInterpreter) ia).idcnt++, fevtsubentry.getSecondEntity(), subcontext, (BpmnInterpreter) ia);
 											subcontext.addThread(subthread);
+											subthread.setParameterValue("$event", event);
 											return IFuture.DONE;
 										}
 									}).addResultListener(new IResultListener<Void>()
