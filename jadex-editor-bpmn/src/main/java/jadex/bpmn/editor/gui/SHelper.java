@@ -1,5 +1,7 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.service.annotation.ParameterInfo;
 
 import java.io.InputStream;
@@ -136,6 +138,28 @@ public class SHelper
 			}
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Tests if an object is a event subprocess.
+	 */
+	public static final boolean isEventSubProcess(Object obj)
+	{
+		boolean ret = false;
+		if (obj instanceof VActivity)
+		{
+			obj = ((VActivity) obj).getBpmnElement();
+		}
+		
+		if (obj instanceof MSubProcess)
+		{
+			MSubProcess sp = (MSubProcess) obj;
+			if (MSubProcess.SUBPROCESSTYPE_EVENT.equals(sp.getSubprocessType()))
+			{
+				ret = true;
+			}
+		}
 		return ret;
 	}
 }

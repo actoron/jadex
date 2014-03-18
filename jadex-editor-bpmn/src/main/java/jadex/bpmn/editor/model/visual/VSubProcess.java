@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.model.visual;
 
+import jadex.bpmn.editor.gui.SHelper;
 import jadex.bpmn.model.MSubProcess;
 
 import com.mxgraph.view.mxGraph;
@@ -23,5 +24,17 @@ public class VSubProcess extends VActivity
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Checks if connectable.
+	 */
+	public boolean isConnectable()
+	{
+		if (SHelper.isEventSubProcess(getBpmnElement()))
+		{
+			return false;
+		}
+		return super.isConnectable();
 	}
 }
