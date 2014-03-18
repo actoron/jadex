@@ -1,5 +1,6 @@
 package jadex.bpmn.editor.gui.controllers;
 
+import jadex.bpmn.editor.gui.SHelper;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VInParameter;
 import jadex.bpmn.editor.model.visual.VLane;
@@ -166,6 +167,10 @@ public class SValidation
 				 ((MActivity) ((VActivity) target).getBpmnElement()).getActivityType().startsWith("EventStart"))
 		{
 			error = "Start events cannot be the target of a sequence.";
+		}
+		else if (SHelper.isEventSubProcess(source) || SHelper.isEventSubProcess(target))
+		{
+			error = "Event subprocesses cannot be connected with sequence edges.";
 		}
 		else
 		{
