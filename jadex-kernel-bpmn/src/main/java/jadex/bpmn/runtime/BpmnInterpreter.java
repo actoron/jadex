@@ -403,8 +403,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
+											// todo: currently only supports event process at root level (and in external subprocesses)
 											ProcessThread thread = new ProcessThread(""+idcnt++, fevtsubentry.getFirstEntity(), ((BpmnInterpreter) ia).getThreadContext(), ((BpmnInterpreter) ia));
-											((BpmnInterpreter) ia).getThreadContext().addThread(thread);
+											((BpmnInterpreter)ia).getThreadContext().addThread(thread);
 						            		ThreadContext subcontext = new ThreadContext(fevtsubentry.getFirstEntity(), thread);
 						            		thread.setSubcontext(subcontext);
 											ProcessThread subthread = new ProcessThread(""+idcnt++, fevtsubentry.getSecondEntity(), subcontext, (BpmnInterpreter) ia);
