@@ -290,7 +290,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 				catch(Exception e)
 				{
 					e = (Exception)(e instanceof InvocationTargetException && ((InvocationTargetException)e)
-						.getCause() instanceof Exception? ((InvocationTargetException)e).getCause(): e);
+						.getTargetException() instanceof Exception? ((InvocationTargetException)e).getTargetException(): e);
 					ret.setException(e);
 					break;
 				}

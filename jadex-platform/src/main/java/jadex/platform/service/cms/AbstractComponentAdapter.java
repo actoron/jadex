@@ -12,6 +12,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.bridge.service.search.SServiceProvider;
@@ -24,12 +25,14 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
+import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -800,7 +803,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  Block the current thread and allow execution on other threads.
 	 *  @param monitor	The monitor to wait for.
 	 */
-	public void	block(Object monitor)
+	public void	block(final Object monitor, long timeout)
 	{
 		if(Thread.currentThread()!=componentthread)
 		{
@@ -839,7 +842,36 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		}
 		blocked.put(monitor, exe);
 		
+		
+		
+		
+		final boolean[]	unblocked	= new boolean[1];
+		
+		if(timeout!=Timeout.NONE)
+		{
+			((StatelessAbstractInterpreter)getComponentInstance()).waitForDelay(timeout)
+				.addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					if(!unblocked[0])
+					{
+						unblock(monitor, new TimeoutException());
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			});
+		}
+		
 		exe.blockThread(monitor);
+		
+		unblocked[0]	= true;
+		
+		
+		
 		
 		assert !IComponentDescription.STATE_TERMINATED.equals(desc.getState());
 		
@@ -873,7 +905,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  and cease execution on the current thread.
 	 *  @param monitor	The monitor to notify.
 	 */
-	public void	unblock(Object monitor, boolean kill)
+	public void	unblock(Object monitor, Throwable exception)
 	{
 		if(Thread.currentThread()!=componentthread)
 		{
@@ -885,11 +917,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		{
 			blocked	= null;
 		}
-		
-		// Throw thread death if component already has been terminated.
-		Throwable	t	= kill ? new StepAborted() : null;
-		
-		exe.switchThread(monitor, t);
+				
+		exe.switchThread(monitor, exception);
 	}
 
 	/**
@@ -1132,7 +1161,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		}
 		while(blocked!=null && !blocked.isEmpty())
 		{
-			unblock(blocked.keySet().iterator().next(), true);
+			// Unblock throwing thread death as component already has been terminated.
+			unblock(blocked.keySet().iterator().next(), new StepAborted());
 		}
 	}
 }
