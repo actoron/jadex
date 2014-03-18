@@ -424,7 +424,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
 
-//		System.out.println("create compo: "+modelname);
+		System.out.println("create compo: "+modelname);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();

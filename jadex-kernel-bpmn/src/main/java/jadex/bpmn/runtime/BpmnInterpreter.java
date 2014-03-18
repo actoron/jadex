@@ -639,7 +639,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
         MActivity triggeractivity = null;
         
         // Search and add trigger activity for event processes (that have trigger event in a subprocess)
-        Set<MActivity> startevents = new HashSet<MActivity>(bpmnmodel.getStartActivities(null, null));
+        List<MActivity> startacts	= bpmnmodel.getStartActivities(null, null);
+        Set<MActivity> startevents = startacts!=null ? new HashSet<MActivity>(startacts) : new HashSet<MActivity>();
         if(trigger != null)
         {
         	Map<String, MActivity> allacts = bpmnmodel.getAllActivities();

@@ -1,7 +1,6 @@
 package jadex.web.examples.hellobdiv3;
 
 import jadex.base.Starter;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -26,7 +25,7 @@ public class JadexDispatcherServlet extends HttpServlet
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IExternalAccess platform;
+	protected IExternalAccess	platform;
 	
 	//-------- constructors --------
 	
@@ -50,9 +49,8 @@ public class JadexDispatcherServlet extends HttpServlet
 		};
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		this.platform	= Starter.createPlatform(args).get(sus, 30000);
-		
-		IComponentManagementService cms = SServiceProvider.getService(platform.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
-		IComponentIdentifier cid = cms.createComponent("jadex.web.examples.hellobdiv3.HelloWorldBDI.class", null).getFirstResult();
+		IComponentManagementService cms = SServiceProvider.getService(platform.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus, 30000);
+		cms.createComponent("jadex.web.examples.hellobdiv3.SayHelloBDI.class", null).getFirstResult(sus);
 	}
 	
 	/**
@@ -72,12 +70,13 @@ public class JadexDispatcherServlet extends HttpServlet
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		IHelloService hs = (IHelloService)SServiceProvider.getService(platform.getServiceProvider(), IHelloService.class).get();
-		String text = hs.sayHello().get();
+		ThreadSuspendable	sus	= new ThreadSuspendable();
+		ISayHelloService shs = SServiceProvider.getService(platform.getServiceProvider(), ISayHelloService.class).get(sus, 30000);
+		String text = shs.sayHello().get(sus, 30000);
+		request.setAttribute("text", text);
 		
 		HttpSession	session	= request.getSession();
 		session.setAttribute("platform", platform);
-		session.setAttribute("text", text);
 		RequestDispatcher	rd	= getServletContext().getRequestDispatcher("/WEB-INF/jsp/hellobdiv3/index.jsp");
 		rd.forward(request, response);
 	}

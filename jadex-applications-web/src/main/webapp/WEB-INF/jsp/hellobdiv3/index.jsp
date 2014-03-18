@@ -10,8 +10,7 @@
 </head>
 <body>
 
-The platform name is <%= platform.getComponentIdentifier() %>.<br/>
-Hello from BDIV3 agent: <%= request.getParameter("text") %>
+<%= request.getAttribute("text") %>.
 
 </body>
 </html>

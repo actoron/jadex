@@ -19,6 +19,7 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
@@ -1372,34 +1373,37 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public void startStreamSendAliveBehavior()
 	{
-		component.scheduleStep(new IComponentStep<Void>()
+		if(StreamSendTask.MIN_LEASETIME!=Timeout.NONE)
 		{
-			@Classname("sendAlive")
-			public IFuture<Void> execute(IInternalAccess ia)
+			component.scheduleStep(new IComponentStep<Void>()
 			{
-//				System.out.println("sendAlive: "+pcons+" "+icons);
-				AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
-				for(int i=0; i<mypcons.length; i++)
+				@Classname("sendAlive")
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					if(!mypcons[i].isClosed())
+	//				System.out.println("sendAlive: "+pcons+" "+icons);
+					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+					for(int i=0; i<mypcons.length; i++)
 					{
-						mypcons[i].sendAlive();
+						if(!mypcons[i].isClosed())
+						{
+							mypcons[i].sendAlive();
+						}
 					}
-				}
-				AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
-				for(int i=0; i<myicons.length; i++)
-				{
-					if(!myicons[i].isClosed())
+					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+					for(int i=0; i<myicons.length; i++)
 					{
-						myicons[i].sendAlive();
+						if(!myicons[i].isClosed())
+						{
+							myicons[i].sendAlive();
+						}
 					}
+					
+					waitForRealDelay(StreamSendTask.MIN_LEASETIME, this);
+					
+					return IFuture.DONE;
 				}
-				
-				waitForRealDelay(StreamSendTask.MIN_LEASETIME, this);
-				
-				return IFuture.DONE;
-			}
-		});
+			});
+		}
 	}
 	
 	/**
@@ -1407,40 +1411,43 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public void startStreamCheckAliveBehavior()
 	{
-		component.scheduleStep(new IComponentStep<Void>()
+		if(StreamSendTask.MIN_LEASETIME!=Timeout.NONE)
 		{
-			@Classname("checkAlive")
-			public IFuture<Void> execute(IInternalAccess ia)
+			component.scheduleStep(new IComponentStep<Void>()
 			{
-//				final IComponentStep<Void> step = this;
-//				final Future<Void> ret = new Future<Void>();
-				
-				AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
-				for(int i=0; i<mypcons.length; i++)
+				@Classname("checkAlive")
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					if(!mypcons[i].isConnectionAlive())
+	//				final IComponentStep<Void> step = this;
+	//				final Future<Void> ret = new Future<Void>();
+					
+					AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
+					for(int i=0; i<mypcons.length; i++)
 					{
-//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+mypcons[i].getConnectionId());
-						mypcons[i].close();
-						pcons.remove(Integer.valueOf(mypcons[i].getConnectionId()));
+						if(!mypcons[i].isConnectionAlive())
+						{
+	//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+mypcons[i].getConnectionId());
+							mypcons[i].close();
+							pcons.remove(Integer.valueOf(mypcons[i].getConnectionId()));
+						}
 					}
-				}
-				AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
-				for(int i=0; i<myicons.length; i++)
-				{
-					if(!myicons[i].isConnectionAlive())
+					AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
+					for(int i=0; i<myicons.length; i++)
 					{
-//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+myicons[i].getConnectionId());
-						myicons[i].close();
-						icons.remove(Integer.valueOf(myicons[i].getConnectionId()));
+						if(!myicons[i].isConnectionAlive())
+						{
+	//						System.out.println("removed con: "+component+", "+System.currentTimeMillis()+", "+myicons[i].getConnectionId());
+							myicons[i].close();
+							icons.remove(Integer.valueOf(myicons[i].getConnectionId()));
+						}
 					}
+					
+					waitForRealDelay(StreamSendTask.MIN_LEASETIME, this);
+					
+					return IFuture.DONE;
 				}
-				
-				waitForRealDelay(StreamSendTask.MIN_LEASETIME, this);
-				
-				return IFuture.DONE;
-			}
-		});
+			});
+		}
 	}
 	
 

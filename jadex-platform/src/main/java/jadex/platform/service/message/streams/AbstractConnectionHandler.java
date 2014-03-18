@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -73,7 +74,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	public AbstractConnectionHandler(MessageService ms, Map<String, Object> nonfunc)
 	{
 		// Use timeouts relative to deftimeout
-		this(ms, nonfunc, 3, BasicService.getRemoteDefaultTimeout()/3, BasicService.getRemoteDefaultTimeout()/2);
+		this(ms, nonfunc, 3, BasicService.getScaledRemoteDefaultTimeout(1.0/3), BasicService.getScaledRemoteDefaultTimeout(1.0/2));
 	}
 	
 	/**
@@ -148,7 +149,10 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 				if(si!=null)
 				{
 //					System.out.println("received ack: "+si.getId()+" "+si.getTryCnt());
-					si.getTimer().cancel();
+					if(si.getTimer()!=null)
+					{
+						si.getTimer().cancel();
+					}
 					si.getResult().setResult(content);
 				}
 				return IFuture.DONE;
@@ -491,66 +495,40 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	protected TimerTask	createAckTimer(final Object id)
 	{
-		// Test if packets have been sent till last timer was inited
-		return ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				SendInfo si = unacked.get(id);
-				if(si!=null)
-				{
-					if(si.getTryCnt()>=maxresends)
-					{
-//						System.out.println("Message could not be sent.");
-						si.getResult().setException(new RuntimeException("Message could not be sent."));
-						unacked.remove(id);
-					}
-					else
-					{
-						sendAcknowledgedMessage(si.getTask(), id);
-						createAckTimer(id);
-					}
-				}
-				return IFuture.DONE;
-			}
-		});
-//		ITimer ret = ms.getClockService().createTimer(, new ITimedObject()
-//		{
-//			public void timeEventOccurred(long currenttime)
-//			{
-//				try
-//				{
-//					scheduleStep(new IComponentStep<Void>()
-//					{
-//						public IFuture<Void> execute(IInternalAccess ia)
-//						{
-//							SendInfo si = unacked.get(id);
-//							if(si!=null)
-//							{
-//								if(si.getTryCnt()>=maxresends)
-//								{
-//									System.out.println("Message could not be sent.");
-//									si.getResult().setException(new RuntimeException("Message could not be sent."));
-//									unacked.remove(id);
-//								}
-//								else
-//								{
-//									sendAcknowledgedMessage(si.getTask(), id);
-//									createAckTimer(id);
-//								}
-//							}
-//							return IFuture.DONE;
-//						}
-//					});
-//				}
-//				catch(ComponentTerminatedException e)
-//				{
-//					// nop
-//				}
-//			}
-//		});
+		TimerTask	ret;
 		
-//		return ret;
+		if(acktimeout!=Timeout.NONE)
+		{
+			// Test if packets have been sent till last timer was inited
+			ret	= ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					SendInfo si = unacked.get(id);
+					if(si!=null)
+					{
+						if(si.getTryCnt()>=maxresends)
+						{
+	//						System.out.println("Message could not be sent.");
+							si.getResult().setException(new RuntimeException("Message could not be sent."));
+							unacked.remove(id);
+						}
+						else
+						{
+							sendAcknowledgedMessage(si.getTask(), id);
+							createAckTimer(id);
+						}
+					}
+					return IFuture.DONE;
+				}
+			});
+		}
+		else
+		{
+			ret	= null;
+		}
+		
+		return ret;
 	}
 	
 	/**
