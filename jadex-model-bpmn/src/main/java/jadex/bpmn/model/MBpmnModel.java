@@ -13,9 +13,11 @@ import jadex.commons.SUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 
@@ -127,7 +129,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/** The process trigger name. Used to put the trigger event in the process arguments. */
 	public static final String TRIGGER = "_process_trigger";
-	
+		
 	//-------- attributes --------
 	
 	/** The pools. */

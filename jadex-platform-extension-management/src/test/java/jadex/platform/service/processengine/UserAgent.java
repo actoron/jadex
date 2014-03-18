@@ -102,7 +102,6 @@ public class UserAgent
 		
 		final TestReport tr = new TestReport("#1", "Test if bpmn rule triggering works for initial rules.");
 		
-		final long dur = 10000;
 		final String model = "jadex.platform.service.processengine.ConditionEventStart.bpmn2";
 		
 		IFuture<IProcessEngineService> fut = agent.getRequiredService("engine");
@@ -208,7 +207,6 @@ public class UserAgent
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
-		final long dur = 65000;
 		final String model = "jadex.platform.service.processengine.TimerEventStart.bpmn2";
 		final TestReport tr = new TestReport("#1", "Test if bpmn rule triggering works for initial rules.");
 		

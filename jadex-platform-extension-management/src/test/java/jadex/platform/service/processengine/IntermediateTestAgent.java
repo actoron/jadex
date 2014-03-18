@@ -62,13 +62,13 @@ public class IntermediateTestAgent
 			{
 				trs.add(tr);
 				
-//				testIntermediateBpmn("jadex.platform.service.processengine.TestSubprocessStartEvent.bpmn2", "SubprocessStart",
-//					new TestReport("#2", "Test if bpmn rule triggering works for start events of active subprocesses."))
-//					.addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
-//				{
-//					public void customResultAvailable(TestReport tr)
-//					{
-//						trs.add(tr);
+				testIntermediateBpmn("jadex.platform.service.processengine.TestSubprocessStartEvent.bpmn2", "SubprocessStart",
+					new TestReport("#2", "Test if bpmn rule triggering works for start events of active subprocesses."))
+					.addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+				{
+					public void customResultAvailable(TestReport tr)
+					{
+						trs.add(tr);
 		
 						testEventIgnore("Ignored",
 							new TestReport("#2", "Test if unknown event produces exception."))
@@ -82,8 +82,8 @@ public class IntermediateTestAgent
 								ret.setResult(null);
 							}
 						});
-//					}
-//				});
+					}
+				});
 			}
 		});
 	
