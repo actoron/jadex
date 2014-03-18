@@ -353,8 +353,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	/**
 	 *  Special init that is used to announce event start events to process engine (if any).
 	 */
-	public IFuture<Void> init(IModelInfo model, String config,
-			Map<String, Object> arguments)
+	public IFuture<Void> init(IModelInfo model, String config, Map<String, Object> arguments)
 	{
 		final Future<Void> ret = new Future<Void>();
 		IFuture<Void> fut = super.init(model, config, arguments);
@@ -403,11 +402,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											ProcessThread thread = new ProcessThread(""+((BpmnInterpreter) ia).idcnt++, fevtsubentry.getFirstEntity(), ((BpmnInterpreter) ia).getThreadContext(), ((BpmnInterpreter) ia));
+											ProcessThread thread = new ProcessThread(""+((BpmnInterpreter)ia).idcnt++, fevtsubentry.getFirstEntity(), ((BpmnInterpreter) ia).getThreadContext(), ((BpmnInterpreter) ia));
 											((BpmnInterpreter) ia).getThreadContext().addThread(thread);
 						            		ThreadContext subcontext = new ThreadContext(fevtsubentry.getFirstEntity(), thread);
 						            		thread.setSubcontext(subcontext);
-											ProcessThread subthread = new ProcessThread(""+((BpmnInterpreter) ia).idcnt++, fevtsubentry.getSecondEntity(), subcontext, (BpmnInterpreter) ia);
+											ProcessThread subthread = new ProcessThread(""+((BpmnInterpreter)ia).idcnt++, fevtsubentry.getSecondEntity(), subcontext, (BpmnInterpreter) ia);
 											subcontext.addThread(subthread);
 											return IFuture.DONE;
 										}

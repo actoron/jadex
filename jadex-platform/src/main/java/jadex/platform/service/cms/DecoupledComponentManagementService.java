@@ -424,7 +424,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		if(modelname==null)
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
 
-		System.out.println("create compo: "+modelname);
+//		System.out.println("create compo: "+modelname);
 		
 		ServiceCall sc = ServiceCall.getCurrentInvocation();
 		final IComponentIdentifier creator = sc==null? null: sc.getCaller();
@@ -1201,7 +1201,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
-		System.out.println("Terminating component1: "+cid.getName());
+//		System.out.println("Terminating component1: "+cid.getName());
 		
 //		ServiceCall sc = ServiceCall.getCurrentInvocation();
 //		System.err.println("kill compo: "+cid+" "+(sc!=null? sc.getCaller(): "null"));
