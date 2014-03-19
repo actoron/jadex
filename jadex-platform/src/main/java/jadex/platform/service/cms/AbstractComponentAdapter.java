@@ -122,7 +122,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected IClockService clock;
 	
 	/** Retained listener notifications when switching threads due to blocking. */
-	List<Tuple2<Future<?>, IResultListener<?>>>	notifications;
+	protected List<Tuple2<Future<?>, IResultListener<?>>>	notifications;
 	
 	//-------- constructors --------
 
@@ -246,6 +246,11 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		return logger;
 	}
 
+	/**
+	 *  Get the logger name.
+	 *  @param cid The component identifier.
+	 *  @return The name.
+	 */
 	public static String getLoggerName(IComponentIdentifier cid)
 	{
 		// Prepend parent names for nested loggers.

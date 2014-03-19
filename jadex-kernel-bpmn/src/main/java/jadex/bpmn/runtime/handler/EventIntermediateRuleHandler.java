@@ -72,7 +72,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 				final IExternalAccess	exta	= instance.getExternalAccess();
 				final String	actid	= activity.getId();
 				final String	procid	= thread.getId();
-				IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, new ICommand<Object>()
+				IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new ICommand<Object>()
 				{
 					public void execute(final Object event)
 					{

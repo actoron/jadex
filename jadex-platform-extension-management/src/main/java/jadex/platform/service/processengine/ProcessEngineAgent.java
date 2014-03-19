@@ -29,11 +29,14 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.IdentityHashSet;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -57,7 +60,6 @@ import jadex.platform.service.cron.CronAgent;
 import jadex.platform.service.cron.TimePatternFilter;
 import jadex.platform.service.cron.jobs.CronCreateCommand;
 import jadex.platform.service.processengine.EventMapper.ModelDetails;
-import jadex.rules.eca.IEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,13 +80,10 @@ import java.util.Set;
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="crons", type=ICronService.class, 
 		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="cronagent"))),
-//	@RequiredService(name="rules", type=IRuleService.class, 
-//		binding=@Binding(create=true, creationinfo=@jadex.micro.annotation.CreationInfo(type="ruleagent")))
 })
 @ComponentTypes(
 {
-	@ComponentType(name="cronagent", clazz=CronAgent.class)//,
-//	@ComponentType(name="ruleagent", clazz=RuleAgent.class)
+	@ComponentType(name="cronagent", clazz=CronAgent.class)
 })
 public class ProcessEngineAgent implements IProcessEngineService, IInternalProcessEngineService
 {
@@ -98,19 +97,25 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/** The managed process instances. */
 	protected Map<IComponentIdentifier, ProcessInfo> processes;
 	
+	/** The number of processes according to their process type. */
+	protected Map<Tuple2<String, IResourceIdentifier>, Integer> processespertype;
+	
 	/** The event mapper. */
 	protected EventMapper eventmapper;
 	
 	/** The event waitqueue. */
-	protected Map<String, Set<Object>>	waitqueue;
+	protected Map<String, Set<Object>> waitqueue;
 	
 	/** The event types to be put in waitqueue. */
 	protected Map<String, Set<Tuple2<String, IResourceIdentifier>>>	waitqueuetypes;
 	
+	/** The set of currently creating process instances. */ 
+	protected Set<Future<Void>> creating;
+	
 	//-------- methods --------
 	
 	/**
-	 * 
+	 *  Init method.
 	 */
 	@AgentCreated
 	public IFuture<Void> init()
@@ -120,6 +125,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		this.waitqueue	= new HashMap<String, Set<Object>>();
 		this.waitqueuetypes	= new HashMap<String, Set<Tuple2<String,IResourceIdentifier>>>();
 		this.eventmapper = new EventMapper();
+		this.creating = new HashSet<Future<Void>>();
+		this.processespertype = new HashMap<Tuple2<String,IResourceIdentifier>, Integer>();
 		return IFuture.DONE;
 	}
 	
@@ -152,47 +159,63 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							BpmnModelLoader loader = new BpmnModelLoader();
 							final MBpmnModel amodel = loader.loadBpmnModel(model, null, cl, new Object[]{rid, agent.getComponentIdentifier().getRoot()});
 							
+							// Find all instance wait activities
 							// register waitqueue events
-							for(MActivity mevent: amodel.getWaitingEvents())
+							List<MActivity> wevsa = amodel.getWaitingEvents();
+							List<MActivity> epvsa = amodel.getEventSubProcessStartEvents();
+							final Set<String> wevs = new HashSet<String>();
+							final Set<String> epvs = new HashSet<String>();
+							
+							for(MActivity mevent: wevsa)
 							{
-								if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
-								{
-									String[] types = (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
-									for(String type: types)
-									{
-										Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
-										if(set==null)
-										{
-											set	= new HashSet<Tuple2<String,IResourceIdentifier>>();
-											waitqueuetypes.put(type, set);
-										}
-										set.add(key);
-									}
-								}
+								extractDomainEventTypes(mevent, key, wevs);
 							}
+							
+							for(MActivity mevent: epvsa)
+							{
+								extractDomainEventTypes(mevent, key, epvs);
+							}
+							
 							addRemoveCommand(new Runnable()
 							{
 								public void run()
 								{
-									for(MActivity mevent: amodel.getWaitingEvents())
+//									Set<String> all = new HashSet<String>();
+//									all.addAll(wevs);
+//									all.addAll(epvs);
+									
+									for(String type: wevs)
 									{
-										if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
+										Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
+										if(set!=null)
 										{
-											String[]	types	= (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
-											for(String type: types)
+											set.remove(key);
+											if(set.isEmpty())
 											{
-												Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
-												if(set!=null)
-												{
-													set.remove(key);
-													if(set.isEmpty())
-													{
-														waitqueuetypes.remove(type);
-													}
-												}
+												waitqueuetypes.remove(type);
 											}
 										}
 									}
+									
+//									for(MActivity mevent: amodel.getWaitingEvents())
+//									{
+//										if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
+//										{
+//											String[]	types	= (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+//											for(String type: types)
+//											{
+//												Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
+//												if(set!=null)
+//												{
+//													set.remove(key);
+//													if(set.isEmpty())
+//													{
+//														waitqueuetypes.remove(type);
+//													}
+//												}
+//											}
+//										}
+//									}
 								}
 							}, key);
 						
@@ -202,7 +225,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							startevents.addAll(amodel.getEventSubProcessStartEvents());
 							List<Tuple2<String, String>> timers = new ArrayList<Tuple2<String,String>>();
 							final List<EventInfo> infos = new ArrayList<EventInfo>();
-							
+														
 							for(int i=0; startevents!=null && i<startevents.size(); i++)
 							{
 								MActivity mact = (MActivity)startevents.get(i);
@@ -221,7 +244,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 										if(etypes!=null && etypes.length>0)
 										{
 											EventInfo info = new EventInfo();
-											
 											List<String> events = SUtil.arrayToList(etypes);
 											if(mact.hasPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION))
 											{
@@ -265,7 +287,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 								public void customResultAvailable(Void result)
 								{
 									ISubscriptionIntermediateFuture<CMSStatusEvent> f2 = f.getSecondEntity();
-									f2.addResultListener(new ConversionListener(ret));
+									f2.addResultListener(new ConversionListener(key, ret));
 									
 									if(infos!=null)
 									{
@@ -287,7 +309,9 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 													}
 												};
 											}
-											eventmapper.addModelMapping(info.getEventNames().toArray(new String[0]), filter, model, rid, info.getActivityId(), ret);
+											
+											eventmapper.addModelMapping(info.getEventNames().toArray(new String[0]), filter, model, rid, 
+												info.getActivityId(), ret, wevs, epvs);
 										}
 										addRemoveCommand(new Runnable()
 										{
@@ -311,6 +335,32 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void extractDomainEventTypes(MActivity mevent, Tuple2<String, IResourceIdentifier> model, Set<String> evs)
+	{
+		if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
+		{
+			String[] etypes = (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+			if(etypes!=null && etypes.length>0)
+			{
+				for(String etype: etypes)
+				{
+					evs.add(etype);
+					
+					Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(etype);
+					if(set==null)
+					{
+						set	= new HashSet<Tuple2<String,IResourceIdentifier>>();
+						waitqueuetypes.put(etype, set);
+					}
+					set.add(model);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -366,75 +416,268 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 *  Process an event and get the consequence events.
 	 *  Called internally when event should not be added to waitqueue.
 	 */
-	public IFuture<Void> internalProcessEvent(final Object event, String type, boolean add)
+	public IFuture<Void> internalProcessEvent(final Object event, final String atype, final boolean add)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		type	= EventMapper.getEventType(event, type);
+		// Auto-determine event type if is null
+		final String type = EventMapper.getEventType(event, atype);
 		
+		// First check if an instance match occurred
 		if(eventmapper.processInstanceEvent(event, type))
 		{
 			ret.setResult(null);
 		}
 		else
 		{
-			final ModelDetails det = eventmapper.processModelEvent(event, type);
-			if(det!=null)
+			final IResultListener<Void> lis = new IResultListener<Void>()
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(agent.createResultListener(new IResultListener<IComponentManagementService>()
+				public void resultAvailable(Void result)
 				{
-					public void resultAvailable(IComponentManagementService cms)
+					// If not check if a model has a corresponding start event
+					final ModelDetails det = eventmapper.processModelEvent(event, type);
+					if(det!=null)
 					{
-						CreationInfo info = new CreationInfo(agent.getComponentIdentifier(), det.getRid());
-						Map<String, Object> args = new HashMap<String, Object>();
-						args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
-						info.setArguments(args);
-
-						ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, null, det.getModel());
-						fut.addResultListener(new ConversionListener(det.getFuture()));
+						createProcessInstance(event, det);//.addResultListener(new DelegationResultListener<Void>(ret));
+					}
+					else if(waitqueuetypes.containsKey(type))
+					{
+						dispatchToWaitqueue(event, type);
 						ret.setResult(null);
+					}
+					else
+					{
+						ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
+					}
+					
+//					Set<Tuple2<String, IResourceIdentifier>> models = waitqueuetypes.get(type);
+//					boolean isinstance = false;
+//					
+//					// Check if there is a process instance that could handle the event
+//					if(add && models!=null)
+//					{
+//						for(Tuple2<String, IResourceIdentifier> model: models)
+//						{
+//							Integer num = processespertype.get(model);
+//							isinstance = num!=null && num.intValue()>0;
+//							if(isinstance==true)
+//								break;
+//						}
+//					}
+//					
+//					System.out.println("isinstance: "+isinstance+" "+processespertype);
+//					if(isinstance)
+//					{
+//						dispatchToWaitqueue(event, type);
+//						ret.setResult(null);
+//					}
+//					else
+//					{
+//						// If not check if a model has a corresponding start event
+//						final ModelDetails det = eventmapper.processModelEvent(event, type);
+//						if(det!=null)
+//						{
+//							createProcessInstance(event, det);//.addResultListener(new DelegationResultListener<Void>(ret));
+//						}
+//						else
+//						{
+//							ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
+//						}
+//					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			};
+			
+			// If no instance match was found check if instances are currently created
+			if(!creating.isEmpty() && eventmapper.isEventInstanceWaitRelevant(type))
+			{
+				defer().addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						if(eventmapper.processInstanceEvent(event, type))
+						{
+							ret.setResult(null);
+						}
+						else
+						{
+							lis.resultAvailable(null);
+						}
+					}
+				});
+			}
+			else
+			{
+				lis.resultAvailable(null);
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void createProcessInstance(final Object event, final ModelDetails det)
+	{
+		System.out.println("create instance for: "+event);
+		final Future<Void> ret = new Future<Void>();
+
+		creating.add(ret);
+		
+		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
+		Integer cnt = processespertype.get(model);
+		if(cnt==null)
+		{
+			processespertype.put(model, Integer.valueOf(1));
+		}
+		else
+		{
+			processespertype.put(model, Integer.valueOf(cnt.intValue()+1));
+		}
+		
+		SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(agent.createResultListener(new IResultListener<IComponentManagementService>()
+		{
+			public void resultAvailable(IComponentManagementService cms)
+			{
+				CreationInfo info = new CreationInfo(agent.getComponentIdentifier(), det.getRid());
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put(MBpmnModel.TRIGGER, new Tuple3<String, String, Object>(MBpmnModel.EVENT_START_RULE, det.getEventId(), event));
+				info.setArguments(args);
+	
+				ISubscriptionIntermediateFuture<CMSStatusEvent> fut = cms.createComponent(info, null, det.getModel());
+				fut.addResultListener(new ConversionListener(new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid()), det.getFuture())); // Add converion listener for addmodel() future 
+				
+				fut.addResultListener(new IIntermediateResultListener<CMSStatusEvent>()
+				{
+					public void intermediateResultAvailable(CMSStatusEvent result)
+					{
+						if(result instanceof CMSCreatedEvent)
+						{
+							System.out.println("created: "+result);
+							cont();
+						}
+					}
+					
+					public void resultAvailable(Collection<CMSStatusEvent> result)
+					{
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setException(exception);
+						exception.printStackTrace();
+						cont();
 					}
-				}));
-			}
-			// Not processed -> add to waitqueue.
-			else if(add && waitqueuetypes.containsKey(type))
-			{
-				Set<Object>	wq	= waitqueue.get(type);
-				if(wq==null)
-				{
-					wq	= new IdentityHashSet<Object>();
-					waitqueue.put(type, wq);
-				}
-				wq.add(event);
-				
-				// Todo: use event time-to-live from registered models?
-				final Set<Object>	fwq	= wq;
-				final String	ftype	= type;
-				agent.waitFor(BasicService.getLocalDefaultTimeout(), new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
+					
+					public void finished()
 					{
-						fwq.remove(event);
-						if(fwq.isEmpty())
+					}
+					
+					protected void cont()
+					{
+						if(creating.remove(ret))
 						{
-							waitqueue.remove(ftype);
+							ret.setResult(null);
+							System.out.println("creating fini");
 						}
-						return IFuture.DONE;
 					}
 				});
-				
-				ret.setResult(null);
 			}
-			else
+			
+			public void exceptionOccurred(Exception exception)
 			{
-				ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
+				ret.setException(exception);
 			}
+		}));
+	}
+	
+	/**
+	 * 
+	 */
+	protected void dispatchToWaitqueue(final Object event, String type)
+	{
+		System.out.println("dispatch to waitqueue: "+event+" "+type+" "+waitqueue);
+		Set<Object>	wq	= waitqueue.get(type);
+		if(wq==null)
+		{
+			wq	= new IdentityHashSet<Object>();
+			waitqueue.put(type, wq);
+		}
+		wq.add(event);
+		
+		// Todo: use event time-to-live from registered models?
+		final Set<Object>	fwq	= wq;
+		final String	ftype	= type;
+		
+		if(BasicService.getLocalDefaultTimeout()>0)
+		{
+			agent.waitFor(BasicService.getLocalDefaultTimeout(), new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					fwq.remove(event);
+					if(fwq.isEmpty())
+					{
+						waitqueue.remove(ftype);
+					}
+					return IFuture.DONE;
+				}
+			});
+		}
+	}
+	
+	/**
+	 *  Dispatch events from the waitqueue.
+	 *  @param type The event type. Events of that type will be redispatched. 
+	 */
+	protected void dispatchFromWaitqueue(final String type, boolean add)
+	{
+		if(waitqueue.containsKey(type))
+		{
+			for(final Object event: waitqueue.get(type).toArray())
+			{
+				internalProcessEvent(event, type, add).addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						// Handled -> remove from waitqueue.
+						Set<Object>	wq	= waitqueue.get(type);
+						if(wq!=null)
+						{
+							wq.remove(event);
+							if(wq.isEmpty())
+							{
+								waitqueue.remove(wq);
+							}
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// Not handled -> ignore
+					}
+				});
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> defer()
+	{
+		System.out.println("Defer event processing");
+		final Future<Void> ret = new Future<Void>();
+		
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(creating.size(), new DelegationResultListener<Void>(ret));
+		
+		for(Future<Void> fut: creating)
+		{
+			fut.addResultListener(lis);
 		}
 		
 		return ret;
@@ -446,39 +689,13 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 *  Register an event description to be notified, when the event happens.
 	 *  @return An id to be used for deregistration.
 	 */
-	public IFuture<String>	addEventMatcher(String[] events, UnparsedExpression uexp, String[] imports, Map<String, Object> vals, ICommand<Object> cmd)
+	public IFuture<String>	addEventMatcher(String[] events, UnparsedExpression uexp, String[] imports, Map<String, Object> vals, boolean remove, ICommand<Object> cmd)
 	{
-		String	id	= eventmapper.addInstanceMapping(uexp, events, vals, imports, cmd);
+		String	id	= eventmapper.addInstanceMapping(uexp, events, vals, imports, remove, cmd);
 		
 		for(final String type: events)
 		{
-			if(waitqueue.containsKey(type))
-			{
-				for(final Object event: waitqueue.get(type).toArray())
-				{
-					internalProcessEvent(event, type, false).addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-							// Handled -> remove from waitqueue.
-							Set<Object>	wq	= waitqueue.get(type);
-							if(wq!=null)
-							{
-								wq.remove(event);
-								if(wq.isEmpty())
-								{
-									waitqueue.remove(wq);
-								}
-							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// Not handled -> ignore
-						}
-					});
-				}
-			}
+			dispatchFromWaitqueue(type, false);
 		}
 		
 		return new Future<String>(id);
@@ -488,7 +705,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 *  Register an event description to be notified, when the event happens.
 	 */
 	public IFuture<Void>	removeEventMatcher(String id)
-	{
+	{	
 		eventmapper.removeInstanceMappings(id);
 		return IFuture.DONE;
 	}
@@ -593,8 +810,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 */
 	public static class ProcessInfo
 	{
-		/** The correlator (if any). */
-		protected IFilter<IEvent> correlator;
+		protected Tuple2<String, IResourceIdentifier> model;
 		
 		/** The process instance cid. */
 		protected IComponentIdentifier cid;
@@ -602,28 +818,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		/**
 		 *  Create a new ProcessInfo.
 		 */
-		public ProcessInfo(IFilter<IEvent> correlator, IComponentIdentifier cid)
+		public ProcessInfo(Tuple2<String, IResourceIdentifier> model, IComponentIdentifier cid)
 		{
-			this.correlator = correlator;
+			this.model = model;
 			this.cid = cid;
-		}
-
-		/**
-		 *  Get the correlator.
-		 *  return The correlator.
-		 */
-		public IFilter<IEvent> getCorrelator()
-		{
-			return correlator;
-		}
-
-		/**
-		 *  Set the correlator. 
-		 *  @param correlator The correlator to set.
-		 */
-		public void setCorrelator(IFilter<IEvent> correlator)
-		{
-			this.correlator = correlator;
 		}
 
 		/**
@@ -643,6 +841,24 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		{
 			this.cid = cid;
 		}
+
+		/**
+		 *  Get the model.
+		 *  return The model.
+		 */
+		public Tuple2<String, IResourceIdentifier> getModel()
+		{
+			return model;
+		}
+
+		/**
+		 *  Set the model. 
+		 *  @param model The model to set.
+		 */
+		public void setModel(Tuple2<String, IResourceIdentifier> model)
+		{
+			this.model = model;
+		}
 	}
 	
 	/**
@@ -653,14 +869,18 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		/** The delegate future. */
 		protected SubscriptionIntermediateFuture<ProcessEngineEvent> delegate;
 		
-		/** The conversation id. */
+		/** The component identifier. */
 		protected IComponentIdentifier cid;
+		
+		/** The model. */
+		protected Tuple2<String, IResourceIdentifier> model;
 		
 		/**
 		 *  Create a new ConversionListener.
 		 */
-		public ConversionListener(SubscriptionIntermediateFuture<ProcessEngineEvent> delegate)
+		public ConversionListener(Tuple2<String, IResourceIdentifier> model, SubscriptionIntermediateFuture<ProcessEngineEvent> delegate)
 		{
+			this.model = model;
 			this.delegate = delegate;
 		}
 		
@@ -669,9 +889,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 			if(result instanceof CMSCreatedEvent)
 			{
 				cid = ((CMSCreatedEvent)result).getComponentIdentifier();
-				// Without correlator when not started with rule event
-				// todo: support a task that sets the evaluator manually
-				processes.put(cid, new ProcessInfo(null, cid));
+				processes.put(cid, new ProcessInfo(model, cid));
 				delegate.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, cid, null));
 			}
 			else if(result instanceof CMSTerminatedEvent)
@@ -680,6 +898,11 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 				delegate.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
 					cid, ((CMSTerminatedEvent)result).getResults()));
 				processes.remove(cid);
+				Integer cnt = processespertype.remove(model);
+				if(cnt.intValue()>1)
+				{
+					processespertype.put(model, Integer.valueOf(cnt.intValue()-1));
+				}
 			}
 			else if(result instanceof CMSIntermediateResultEvent)
 			{

@@ -1,13 +1,10 @@
 package jadex.platform.service.processengine;
 
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
@@ -15,8 +12,10 @@ import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -26,16 +25,19 @@ public class EventMapper
 	/** The map of event types to mapping infos. */
 	protected Map<String, List<MappingInfo>> modelmappings;
 	
-	/** The map of process to mapping infos. */
+	/** The map of process to mapping infos (for cleanup). */
 	protected Map<String, List<MappingInfo>> modelprocs;
 	
 	
 	/** The map of event types to process models. */
 	protected Map<String, List<MappingInfo>> instancemappings;
 	
-	/** The map of registration id to mapping infos. */
+	/** The map of registration id to mapping infos (for cleanup). */
 	protected Map<String, List<MappingInfo>> instanceprocs;
 
+	
+	/** The model to instance wait event types. */
+	protected Map<String, Set<String>> instancewaits;
 	
 	/**
 	 *  Create a new event mapper.
@@ -46,6 +48,7 @@ public class EventMapper
 		this.instancemappings = new HashMap<String, List<MappingInfo>>();
 		this.instanceprocs = new HashMap<String, List<MappingInfo>>();
 		this.modelprocs = new HashMap<String, List<MappingInfo>>();
+		this.instancewaits = new HashMap<String, Set<String>>();
 	}
 	
 	/**
@@ -120,13 +123,16 @@ public class EventMapper
 	 *  @param info The modelname.
 	 */
 //	public void addModelMapping(IFilter<Object> filter)
-	public String	addInstanceMapping(UnparsedExpression uexp, String[] events, Map<String, Object> vals, String[] imports, ICommand<Object> cmd)
+	public String addInstanceMapping(UnparsedExpression uexp, String[] events, Map<String, Object> vals, String[] imports, boolean remove, ICommand<Object> cmd)
 	{
 		String	id	= SUtil.createUniqueId("EventMapping");
 		while(instancemappings.containsKey(id))
 		{
 			id	= SUtil.createUniqueId("EventMapping");
 		}
+		
+		System.out.println("adding instance event matcher: "+id+" "+SUtil.arrayToString(events));
+
 		IFilter<Object> filter = null;
 		
 		if(uexp!=null)
@@ -146,6 +152,20 @@ public class EventMapper
 		
 		List<MappingInfo> rems	= new ArrayList<MappingInfo>();
 		instanceprocs.put(id, rems);
+		
+		final ICommand<Object> fcmd = cmd;
+		final String fid = id;
+		if(remove)
+		{
+			cmd = new ICommand<Object>()
+			{
+				public void execute(Object args)
+				{
+					fcmd.execute(args);
+					removeInstanceMappings(fid);
+				}
+			};
+		}
 		
 		for(String event: events)
 		{
@@ -169,6 +189,8 @@ public class EventMapper
 	 */
 	public void removeInstanceMappings(String id)
 	{
+		System.out.println("removing instance event matcher: "+id);
+		
 		// Get mappinginfos to remove and remove them
 		List<MappingInfo> rems = instanceprocs.remove(id);
 		if(rems!=null)
@@ -188,7 +210,7 @@ public class EventMapper
 	 *  @param modelname The modelname.
 	 */
 	public void addModelMapping(String[] events, IFilter<Object> filter, String modelname, IResourceIdentifier rid, 
-		String actid, SubscriptionIntermediateFuture<ProcessEngineEvent> fut)
+		String actid, SubscriptionIntermediateFuture<ProcessEngineEvent> fut, Set<String> waittypes, Set<String> epstarttypes)
 	{
 		for(String event: events)
 		{
@@ -198,7 +220,7 @@ public class EventMapper
 				mis = new ArrayList<MappingInfo>();
 				modelmappings.put(event, mis);
 			}
-			MappingInfo mi = new MappingInfo(event, filter, new ModelDetails(rid, modelname, actid, fut));
+			MappingInfo mi = new MappingInfo(event, filter, new ModelDetails(rid, modelname, actid, waittypes, epstarttypes, fut));
 			mis.add(mi);
 			
 			List<MappingInfo> rems = modelprocs.get(modelname);
@@ -208,6 +230,20 @@ public class EventMapper
 				modelprocs.put(modelname, rems);
 			}
 			rems.add(mi);
+		}
+		
+		Set<String> evs = new HashSet<String>();
+		if(waittypes!=null)
+		{
+			evs.addAll(waittypes);
+		}
+		if(epstarttypes!=null)
+		{
+			evs.addAll(epstarttypes);
+		}
+		if(!evs.isEmpty())
+		{
+			instancewaits.put(modelname, evs);
 		}
 	}
 	
@@ -227,6 +263,24 @@ public class EventMapper
 				mis.remove(mi);
 			}
 		}
+		
+		instancewaits.remove(modelmappings);
+	}
+	
+	/**
+	 *  Test if an event type is potentially matched by any of the
+	 *  intermediate wait events (domain types). 
+	 */
+	public boolean isEventInstanceWaitRelevant(String event)
+	{
+		boolean ret = false;
+		
+		for(Set<String> events: instancewaits.values())
+		{
+			ret = events.contains(event);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -325,16 +379,23 @@ public class EventMapper
 		/** The registration future. */
 		protected SubscriptionIntermediateFuture<ProcessEngineEvent> future;
 
+		/** The intermediate wait events. */
+		protected Set<String> waittypes;
+		
+		/** The event process start events. */
+		protected Set<String> epstarttypes;
+		
 		/**
 		 *  Create a new ModelDetails.
 		 */
-		public ModelDetails(IResourceIdentifier rid, String model, String eventid,
+		public ModelDetails(IResourceIdentifier rid, String model, String eventid, Set<String> waittypes, Set<String> epstarttypes,
 			SubscriptionIntermediateFuture<ProcessEngineEvent> future)
 		{
-			super();
 			this.rid = rid;
 			this.model = model;
 			this.eventid = eventid;
+			this.waittypes = waittypes;
+			this.epstarttypes = epstarttypes;
 			this.future = future;
 		}
 
@@ -409,5 +470,42 @@ public class EventMapper
 		{
 			this.future = future;
 		}
+
+		/**
+		 *  Get the waittypes.
+		 *  @return The waittypes.
+		 */
+		public Set<String> getEventWaitTypes()
+		{
+			return waittypes;
+		}
+
+		/**
+		 *  Set the waittypes.
+		 *  @param waittypes The waittypes to set.
+		 */
+		public void setEventWaitTypes(Set<String> waittypes)
+		{
+			this.waittypes = waittypes;
+		}
+
+		/**
+		 *  Get the epstarttypes.
+		 *  @return The epstarttypes.
+		 */
+		public Set<String> getEventProcessStartTypes()
+		{
+			return epstarttypes;
+		}
+
+		/**
+		 *  Set the epstarttypes.
+		 *  @param epstarttypes The epstarttypes to set.
+		 */
+		public void setEventProcessStartTypes(Set<String> epstarttypes)
+		{
+			this.epstarttypes = epstarttypes;
+		}
+		
 	}
 }
