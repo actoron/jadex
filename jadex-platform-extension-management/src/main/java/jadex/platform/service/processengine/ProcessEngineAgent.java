@@ -36,6 +36,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -59,7 +60,6 @@ import jadex.platform.service.cron.CronAgent;
 import jadex.platform.service.cron.TimePatternFilter;
 import jadex.platform.service.cron.jobs.CronCreateCommand;
 import jadex.platform.service.processengine.EventMapper.ModelDetails;
-import jadex.rules.eca.IEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
