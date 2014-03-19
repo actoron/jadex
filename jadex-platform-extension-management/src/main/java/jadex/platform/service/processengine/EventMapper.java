@@ -1,13 +1,10 @@
 package jadex.platform.service.processengine;
 
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-import jadex.commons.Tuple3;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
@@ -17,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -26,16 +24,19 @@ public class EventMapper
 	/** The map of event types to mapping infos. */
 	protected Map<String, List<MappingInfo>> modelmappings;
 	
-	/** The map of process to mapping infos. */
+	/** The map of process to mapping infos (for cleanup). */
 	protected Map<String, List<MappingInfo>> modelprocs;
 	
 	
 	/** The map of event types to process models. */
 	protected Map<String, List<MappingInfo>> instancemappings;
 	
-	/** The map of registration id to mapping infos. */
+	/** The map of registration id to mapping infos (for cleanup). */
 	protected Map<String, List<MappingInfo>> instanceprocs;
 
+	
+	/** The model to instance wait event types. */
+	protected Map<String, Set<String>> instancewaits;
 	
 	/**
 	 *  Create a new event mapper.
@@ -46,6 +47,7 @@ public class EventMapper
 		this.instancemappings = new HashMap<String, List<MappingInfo>>();
 		this.instanceprocs = new HashMap<String, List<MappingInfo>>();
 		this.modelprocs = new HashMap<String, List<MappingInfo>>();
+		this.instancewaits = new HashMap<String, Set<String>>();
 	}
 	
 	/**
@@ -188,7 +190,7 @@ public class EventMapper
 	 *  @param modelname The modelname.
 	 */
 	public void addModelMapping(String[] events, IFilter<Object> filter, String modelname, IResourceIdentifier rid, 
-		String actid, SubscriptionIntermediateFuture<ProcessEngineEvent> fut)
+		String actid, SubscriptionIntermediateFuture<ProcessEngineEvent> fut, Set<String> ievents)
 	{
 		for(String event: events)
 		{
@@ -209,6 +211,11 @@ public class EventMapper
 			}
 			rems.add(mi);
 		}
+		
+		if(ievents!=null)
+		{
+			instancewaits.put(modelname, ievents);
+		}
 	}
 	
 	/**
@@ -227,6 +234,24 @@ public class EventMapper
 				mis.remove(mi);
 			}
 		}
+		
+		instancewaits.remove(modelmappings);
+	}
+	
+	/**
+	 *  Test if an event type is potentially matched by any of the
+	 *  intermediate wait events (domain types). 
+	 */
+	public boolean isEventInstanceWaitRelevant(String event)
+	{
+		boolean ret = false;
+		
+		for(Set<String> events: instancewaits.values())
+		{
+			ret = events.contains(event);
+		}
+		
+		return ret;
 	}
 	
 	/**
