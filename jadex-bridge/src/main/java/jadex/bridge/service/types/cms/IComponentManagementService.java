@@ -8,6 +8,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.ParameterInfo;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -365,6 +366,14 @@ public interface IComponentManagementService //extends IService
 		public Object getProperty(String name)
 		{
 			return properties==null? null: properties.get(name);
+		}
+
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return SReflect.getInnerClassName(getClass())+ "[cid=" + cid + ", properties=" + properties + "]";
 		}
 	}
 	

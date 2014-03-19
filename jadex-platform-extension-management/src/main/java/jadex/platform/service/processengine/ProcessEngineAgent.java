@@ -97,14 +97,14 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/** The managed process instances. */
 	protected Map<IComponentIdentifier, ProcessInfo> processes;
 	
-	/** The processes according to their process types. */
-	protected Map<Tuple2<String, IResourceIdentifier>, Set<IComponentIdentifier>> processespertype;
+	/** The number of processes according to their process type. */
+	protected Map<Tuple2<String, IResourceIdentifier>, Integer> processespertype;
 	
 	/** The event mapper. */
 	protected EventMapper eventmapper;
 	
 	/** The event waitqueue. */
-	protected Map<String, Set<Object>>	waitqueue;
+	protected Map<String, Set<Object>> waitqueue;
 	
 	/** The event types to be put in waitqueue. */
 	protected Map<String, Set<Tuple2<String, IResourceIdentifier>>>	waitqueuetypes;
@@ -126,7 +126,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		this.waitqueuetypes	= new HashMap<String, Set<Tuple2<String,IResourceIdentifier>>>();
 		this.eventmapper = new EventMapper();
 		this.creating = new HashSet<Future<Void>>();
-		this.processespertype = new HashMap<Tuple2<String,IResourceIdentifier>, Set<IComponentIdentifier>>();
+		this.processespertype = new HashMap<Tuple2<String,IResourceIdentifier>, Integer>();
 		return IFuture.DONE;
 	}
 	
@@ -161,55 +161,30 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							
 							// Find all instance wait activities
 							// register waitqueue events
-							List<MActivity> was = amodel.getWaitingEvents();
-							was.addAll(amodel.getEventSubProcessStartEvents());
-							final Set<String> winfos = new HashSet<String>();
-							for(MActivity mevent: was)
+							List<MActivity> wevsa = amodel.getWaitingEvents();
+							List<MActivity> epvsa = amodel.getEventSubProcessStartEvents();
+							final Set<String> wevs = new HashSet<String>();
+							final Set<String> epvs = new HashSet<String>();
+							
+							for(MActivity mevent: wevsa)
 							{
-								if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
-								{
-									String[] etypes = (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
-									if(etypes!=null && etypes.length>0)
-									{
-										for(String etype: etypes)
-										{
-											winfos.add(etype);
-											
-											Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(etype);
-											if(set==null)
-											{
-												set	= new HashSet<Tuple2<String,IResourceIdentifier>>();
-												waitqueuetypes.put(etype, set);
-											}
-											set.add(key);
-										}
-									}
-								}
+								extractDomainEventTypes(mevent, key, wevs);
 							}
 							
-//							// register waitqueue events
-//							for(MActivity mevent: amodel.getWaitingEvents())
-//							{
-//								if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
-//								{
-//									String[] types = (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
-//									for(String type: types)
-//									{
-//										Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
-//										if(set==null)
-//										{
-//											set	= new HashSet<Tuple2<String,IResourceIdentifier>>();
-//											waitqueuetypes.put(type, set);
-//										}
-//										set.add(key);
-//									}
-//								}
-//							}
+							for(MActivity mevent: epvsa)
+							{
+								extractDomainEventTypes(mevent, key, epvs);
+							}
+							
 							addRemoveCommand(new Runnable()
 							{
 								public void run()
 								{
-									for(String type: winfos)
+//									Set<String> all = new HashSet<String>();
+//									all.addAll(wevs);
+//									all.addAll(epvs);
+									
+									for(String type: wevs)
 									{
 										Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(type);
 										if(set!=null)
@@ -221,6 +196,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 											}
 										}
 									}
+									
 //									for(MActivity mevent: amodel.getWaitingEvents())
 //									{
 //										if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
@@ -335,7 +311,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 											}
 											
 											eventmapper.addModelMapping(info.getEventNames().toArray(new String[0]), filter, model, rid, 
-												info.getActivityId(), ret, winfos);
+												info.getActivityId(), ret, wevs, epvs);
 										}
 										addRemoveCommand(new Runnable()
 										{
@@ -359,6 +335,32 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void extractDomainEventTypes(MActivity mevent, Tuple2<String, IResourceIdentifier> model, Set<String> evs)
+	{
+		if(mevent.getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES)!=null)
+		{
+			String[] etypes = (String[])mevent.getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+			if(etypes!=null && etypes.length>0)
+			{
+				for(String etype: etypes)
+				{
+					evs.add(etype);
+					
+					Set<Tuple2<String, IResourceIdentifier>>	set	= waitqueuetypes.get(etype);
+					if(set==null)
+					{
+						set	= new HashSet<Tuple2<String,IResourceIdentifier>>();
+						waitqueuetypes.put(etype, set);
+					}
+					set.add(model);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -432,39 +434,56 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 			{
 				public void resultAvailable(Void result)
 				{
-					Set<Tuple2<String, IResourceIdentifier>> models = waitqueuetypes.get(type);
-					boolean isinstance = false;
-					
-					if(add && models!=null)
+					// If not check if a model has a corresponding start event
+					final ModelDetails det = eventmapper.processModelEvent(event, type);
+					if(det!=null)
 					{
-						for(Tuple2<String, IResourceIdentifier> model: models)
-						{
-							Set<IComponentIdentifier> procs = processespertype.get(model);
-							isinstance = procs!=null && !procs.isEmpty();
-							if(isinstance==true)
-								break;
-						}
+						createProcessInstance(event, det);//.addResultListener(new DelegationResultListener<Void>(ret));
 					}
-					
-					System.out.println("isinstance: "+isinstance+" "+processespertype);
-					if(isinstance)
+					else if(waitqueuetypes.containsKey(type))
 					{
 						dispatchToWaitqueue(event, type);
 						ret.setResult(null);
 					}
 					else
 					{
-						// If not check if a model has a corresponding start event
-						final ModelDetails det = eventmapper.processModelEvent(event, type);
-						if(det!=null)
-						{
-							createProcessInstance(event, det);//.addResultListener(new DelegationResultListener<Void>(ret));
-						}
-						else
-						{
-							ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
-						}
+						ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
 					}
+					
+//					Set<Tuple2<String, IResourceIdentifier>> models = waitqueuetypes.get(type);
+//					boolean isinstance = false;
+//					
+//					// Check if there is a process instance that could handle the event
+//					if(add && models!=null)
+//					{
+//						for(Tuple2<String, IResourceIdentifier> model: models)
+//						{
+//							Integer num = processespertype.get(model);
+//							isinstance = num!=null && num.intValue()>0;
+//							if(isinstance==true)
+//								break;
+//						}
+//					}
+//					
+//					System.out.println("isinstance: "+isinstance+" "+processespertype);
+//					if(isinstance)
+//					{
+//						dispatchToWaitqueue(event, type);
+//						ret.setResult(null);
+//					}
+//					else
+//					{
+//						// If not check if a model has a corresponding start event
+//						final ModelDetails det = eventmapper.processModelEvent(event, type);
+//						if(det!=null)
+//						{
+//							createProcessInstance(event, det);//.addResultListener(new DelegationResultListener<Void>(ret));
+//						}
+//						else
+//						{
+//							ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
+//						}
+//					}
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -509,6 +528,17 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 
 		creating.add(ret);
 		
+		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
+		Integer cnt = processespertype.get(model);
+		if(cnt==null)
+		{
+			processespertype.put(model, Integer.valueOf(1));
+		}
+		else
+		{
+			processespertype.put(model, Integer.valueOf(cnt.intValue()+1));
+		}
+		
 		SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(agent.createResultListener(new IResultListener<IComponentManagementService>()
 		{
@@ -526,9 +556,9 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 				{
 					public void intermediateResultAvailable(CMSStatusEvent result)
 					{
-						System.out.println("rec: "+result);
 						if(result instanceof CMSCreatedEvent)
 						{
+							System.out.println("created: "+result);
 							cont();
 						}
 					}
@@ -539,6 +569,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						cont();
 					}
 					
@@ -551,11 +582,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 						if(creating.remove(ret))
 						{
 							ret.setResult(null);
+							System.out.println("creating fini");
 						}
-						System.out.println("creating fini");
 					}
 				});
-				ret.setResult(null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -570,7 +600,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 */
 	protected void dispatchToWaitqueue(final Object event, String type)
 	{
-		System.out.println("dispatch to waitqueue: "+event+" "+type);
+		System.out.println("dispatch to waitqueue: "+event+" "+type+" "+waitqueue);
 		Set<Object>	wq	= waitqueue.get(type);
 		if(wq==null)
 		{
@@ -582,18 +612,57 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		// Todo: use event time-to-live from registered models?
 		final Set<Object>	fwq	= wq;
 		final String	ftype	= type;
-		agent.waitFor(BasicService.getLocalDefaultTimeout(), new IComponentStep<Void>()
+		
+		if(BasicService.getLocalDefaultTimeout()>0)
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			agent.waitFor(BasicService.getLocalDefaultTimeout(), new IComponentStep<Void>()
 			{
-				fwq.remove(event);
-				if(fwq.isEmpty())
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					waitqueue.remove(ftype);
+					fwq.remove(event);
+					if(fwq.isEmpty())
+					{
+						waitqueue.remove(ftype);
+					}
+					return IFuture.DONE;
 				}
-				return IFuture.DONE;
+			});
+		}
+	}
+	
+	/**
+	 *  Dispatch events from the waitqueue.
+	 *  @param type The event type. Events of that type will be redispatched. 
+	 */
+	protected void dispatchFromWaitqueue(final String type, boolean add)
+	{
+		if(waitqueue.containsKey(type))
+		{
+			for(final Object event: waitqueue.get(type).toArray())
+			{
+				internalProcessEvent(event, type, add).addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						// Handled -> remove from waitqueue.
+						Set<Object>	wq	= waitqueue.get(type);
+						if(wq!=null)
+						{
+							wq.remove(event);
+							if(wq.isEmpty())
+							{
+								waitqueue.remove(wq);
+							}
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// Not handled -> ignore
+					}
+				});
 			}
-		});
+		}
 	}
 	
 	/**
@@ -620,39 +689,13 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 *  Register an event description to be notified, when the event happens.
 	 *  @return An id to be used for deregistration.
 	 */
-	public IFuture<String>	addEventMatcher(String[] events, UnparsedExpression uexp, String[] imports, Map<String, Object> vals, ICommand<Object> cmd)
+	public IFuture<String>	addEventMatcher(String[] events, UnparsedExpression uexp, String[] imports, Map<String, Object> vals, boolean remove, ICommand<Object> cmd)
 	{
-		String	id	= eventmapper.addInstanceMapping(uexp, events, vals, imports, cmd);
+		String	id	= eventmapper.addInstanceMapping(uexp, events, vals, imports, remove, cmd);
 		
 		for(final String type: events)
 		{
-			if(waitqueue.containsKey(type))
-			{
-				for(final Object event: waitqueue.get(type).toArray())
-				{
-					internalProcessEvent(event, type, false).addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-							// Handled -> remove from waitqueue.
-							Set<Object>	wq	= waitqueue.get(type);
-							if(wq!=null)
-							{
-								wq.remove(event);
-								if(wq.isEmpty())
-								{
-									waitqueue.remove(wq);
-								}
-							}
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// Not handled -> ignore
-						}
-					});
-				}
-			}
+			dispatchFromWaitqueue(type, false);
 		}
 		
 		return new Future<String>(id);
@@ -662,7 +705,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 *  Register an event description to be notified, when the event happens.
 	 */
 	public IFuture<Void>	removeEventMatcher(String id)
-	{
+	{	
 		eventmapper.removeInstanceMappings(id);
 		return IFuture.DONE;
 	}
@@ -847,13 +890,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 			{
 				cid = ((CMSCreatedEvent)result).getComponentIdentifier();
 				processes.put(cid, new ProcessInfo(model, cid));
-				Set<IComponentIdentifier> cis = processespertype.get(model);
-				if(cis==null)
-				{
-					cis = new HashSet<IComponentIdentifier>();
-					processespertype.put(model, cis);
-				}
-				cis.add(cid);
 				delegate.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_CREATED, cid, null));
 			}
 			else if(result instanceof CMSTerminatedEvent)
@@ -862,10 +898,10 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 				delegate.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
 					cid, ((CMSTerminatedEvent)result).getResults()));
 				processes.remove(cid);
-				Set<IComponentIdentifier> cis = processespertype.get(model);
-				if(cis!=null)
+				Integer cnt = processespertype.remove(model);
+				if(cnt.intValue()>1)
 				{
-					cis.remove(cid);
+					processespertype.put(model, Integer.valueOf(cnt.intValue()-1));
 				}
 			}
 			else if(result instanceof CMSIntermediateResultEvent)

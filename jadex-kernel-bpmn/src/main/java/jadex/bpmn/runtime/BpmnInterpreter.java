@@ -355,6 +355,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public IFuture<Void> init(IModelInfo model, String config, Map<String, Object> arguments)
 	{
+		System.out.println("init: "+model);
+		
 		final Future<Void> ret = new Future<Void>();
 		IFuture<Void> fut = super.init(model, config, arguments);
 		fut.addResultListener(new IResultListener<Void>()
@@ -368,7 +370,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					{
 						Map<MSubProcess, MActivity> evtsubstarts = bpmnmodel.getEventSubProcessStartEventMapping();
 						
-						final CounterResultListener<String> crl = new CounterResultListener<String>(evtsubstarts.size(), new DelegationResultListener<Void>(ret));
+						final CounterResultListener<String> crl = new CounterResultListener<String>(evtsubstarts.size(), new DelegationResultListener<Void>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								System.out.println("init done");
+								super.customResultAvailable(result);
+							}
+						});
 						
 						for(Map.Entry<MSubProcess, MActivity> evtsubentry : evtsubstarts.entrySet())
 						{
@@ -394,7 +403,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 							
 							final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), evtsubentry.getValue());
 							final IExternalAccess exta = getExternalAccess();
-							IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, new ICommand<Object>()
+							IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, false, new ICommand<Object>()
 							{
 								public void execute(final Object event)
 								{
@@ -431,6 +440,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						System.out.println("sdfsdfsd");
 						getLogger().warning("Process contains event subprocesses but no event source found. Subprocess start events will not trigger...");
 						ret.setResult(null);
 					}
@@ -439,6 +449,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				System.out.println("sdfsdfsd");
 				ret.setException(exception);
 			}
 		});

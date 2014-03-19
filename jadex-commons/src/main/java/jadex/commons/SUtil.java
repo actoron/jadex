@@ -371,13 +371,23 @@ public class SUtil
 	 */
 	public static Object joinArrays(Object a1, Object a2)
 	{
-		int l1 = Array.getLength(a1);
-		int l2 = Array.getLength(a2);
-		Object res = Array.newInstance(a1.getClass().getComponentType(), l1
-				+ l2);
-		System.arraycopy(a1, 0, res, 0, l1);
-		System.arraycopy(a2, 0, res, l1, l2);
-		return res;
+		if(a1==null)
+		{
+			return a2;
+		}
+		else if(a2==null)
+		{
+			return a1;
+		}
+		else
+		{
+			int l1 = Array.getLength(a1);
+			int l2 = Array.getLength(a2);
+			Object res = Array.newInstance(a1.getClass().getComponentType(), l1+ l2);
+			System.arraycopy(a1, 0, res, 0, l1);
+			System.arraycopy(a2, 0, res, l1, l2);
+			return res;
+		}
 	}
 
 	/**
