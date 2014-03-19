@@ -36,7 +36,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -60,12 +59,7 @@ import jadex.platform.service.cron.CronAgent;
 import jadex.platform.service.cron.TimePatternFilter;
 import jadex.platform.service.cron.jobs.CronCreateCommand;
 import jadex.platform.service.processengine.EventMapper.ModelDetails;
-import jadex.rules.eca.EventType;
-import jadex.rules.eca.ExpressionCondition;
-import jadex.rules.eca.ICondition;
 import jadex.rules.eca.IEvent;
-import jadex.rules.eca.IRule;
-import jadex.rules.eca.Rule;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -630,13 +624,33 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	{
 		String	id	= eventmapper.addInstanceMapping(uexp, events, vals, imports, cmd);
 		
-		for(String type: events)
+		for(final String type: events)
 		{
 			if(waitqueue.containsKey(type))
 			{
-				for(Object event: waitqueue.get(type))
+				for(final Object event: waitqueue.get(type).toArray())
 				{
-					internalProcessEvent(event, type, false);
+					internalProcessEvent(event, type, false).addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+							// Handled -> remove from waitqueue.
+							Set<Object>	wq	= waitqueue.get(type);
+							if(wq!=null)
+							{
+								wq.remove(event);
+								if(wq.isEmpty())
+								{
+									waitqueue.remove(wq);
+								}
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// Not handled -> ignore
+						}
+					});
 				}
 			}
 		}

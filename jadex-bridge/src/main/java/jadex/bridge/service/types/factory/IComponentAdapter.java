@@ -28,16 +28,17 @@ public interface IComponentAdapter
 	/**
 	 *  Block the current thread and allow execution on other threads.
 	 *  @param monitor	The monitor to wait for.
+	 *  @param timeout	The timeout.
 	 */
-	public void	block(Object monitor);
+	public void	block(Object monitor, long timeout);
 	
 	/**
 	 *  Unblock the thread waiting for the given monitor
 	 *  and cease execution on the current thread.
 	 *  @param monitor	The monitor to notify.
-	 *  @param kill	True, if the blocked thread should be killed instead of continued. 
+	 *  @param exception	An exception, that the blocked thread should throw instead of continuing. 
 	 */
-	public void	unblock(Object monitor, boolean kill);
+	public void	unblock(Object monitor, Throwable exception);
 	
 	/**
 	 *  Called by the component when it probably awoke from an idle state.

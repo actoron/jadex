@@ -45,16 +45,10 @@ public class ComponentSuspendable implements ISuspendable
 		{
 			this.future	= future;
 			
-			// Todo: timeout
-//			if(timeout>0)
-//			{
-//				this.wait(timeout);
-//			}
-			
 			try
 			{
 				COMSUPS.set(this);
-				adapter.block(this);
+				adapter.block(this, timeout);
 			}
 			finally
 			{
@@ -82,7 +76,7 @@ public class ComponentSuspendable implements ISuspendable
 						// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 						if(future==ComponentSuspendable.this.future)
 						{
-							adapter.unblock(ComponentSuspendable.this, false);
+							adapter.unblock(ComponentSuspendable.this, null);
 						}
 					}
 				}
@@ -95,7 +89,7 @@ public class ComponentSuspendable implements ISuspendable
 				// Only wake up if still waiting for same future (invalid resume might be called from outdated future after timeout already occurred).
 				if(future==this.future)
 				{
-					adapter.unblock(this, false);
+					adapter.unblock(this, null);
 				}
 			}			
 		}

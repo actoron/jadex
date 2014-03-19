@@ -211,15 +211,15 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 *  Block the current thread and allow execution on other threads.
 	 *  @param monitor	The monitor to wait for.
 	 */
-	public void block(Object monitor)
+	public void block(Object monitor, long timeout)
 	{
 		if(parenta!=null)
 		{
-			parenta.block(monitor);
+			parenta.block(monitor, timeout);
 		}
 		else
 		{
-			super.block(monitor);
+			super.block(monitor, timeout);
 		}
 	}
 	
@@ -228,15 +228,15 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 *  and cease execution on the current thread.
 	 *  @param monitor	The monitor to notify.
 	 */
-	public void unblock(Object monitor, boolean kill)
+	public void unblock(Object monitor, Throwable exception)
 	{
 		if(parenta!=null)
 		{
-			parenta.unblock(monitor, kill);
+			parenta.unblock(monitor, exception);
 		}
 		else
 		{
-			super.unblock(monitor, kill);
+			super.unblock(monitor, exception);
 		}
 	}
 	

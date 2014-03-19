@@ -183,11 +183,11 @@ class ComponentAdapter implements IComponentAdapter
 		return null;
 	}
 	
-	public void block(Object monitor)
+	public void block(Object monitor, long timeout)
 	{
 	}
 	
-	public void unblock(Object monitor, boolean kill)
+	public void unblock(Object monitor, Throwable exception)
 	{
 	}
 }

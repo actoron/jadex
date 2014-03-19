@@ -682,9 +682,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
                     context.addThread(thread);
             	}
             }
-            else //if(MBpmnModel.EVENT_START_EMPTY.equals(mact.getActivityType())
-                //|| MBpmnModel.TASK.equals(mact.getActivityType())
-                //|| MBpmnModel.SUBPROCESS.equals(mact.getActivityType()))
+            else if(!MBpmnModel.EVENT_START_MESSAGE.equals(mact.getActivityType())
+            	&& !MBpmnModel.EVENT_START_MULTIPLE.equals(mact.getActivityType())
+            	&& !MBpmnModel.EVENT_START_RULE.equals(mact.getActivityType())
+            	&& !MBpmnModel.EVENT_START_SIGNAL.equals(mact.getActivityType())
+            	&& !MBpmnModel.EVENT_START_TIMER.equals(mact.getActivityType()))
             {
                 ProcessThread thread = new ProcessThread(""+idcnt++, mact, context, BpmnInterpreter.this);
                 context.addThread(thread);
