@@ -87,10 +87,11 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 								StringTokenizer	stok	= new StringTokenizer(procid, ":");
 								ProcessThread	thread	= null;
 								ThreadContext	context	= instance.getThreadContext();
+								String	pid	= null;
 								while(stok.hasMoreTokens() && context!=null)
 								{
 									thread	= null;
-									String	pid	= stok.nextToken();
+									pid	= pid!=null ? pid+":"+stok.nextToken() : stok.nextToken();
 									for(ProcessThread pt: context.getThreads())
 									{
 										if(pt.getId().equals(pid))

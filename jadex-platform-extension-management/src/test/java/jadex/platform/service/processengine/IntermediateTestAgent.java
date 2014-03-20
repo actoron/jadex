@@ -163,7 +163,7 @@ public class IntermediateTestAgent
 	}
 	
 	/**
-	 *  Monitor an intermediate rule condition.
+	 *  Monitor that the intermediate rule condition does not trigger.
 	 */
 	protected IFuture<TestReport> testNoEventIntermediateBpmn(String model, TestReport tr)
 	{
@@ -176,16 +176,16 @@ public class IntermediateTestAgent
 		
 		agent.waitForDelay(500).get();
 		
-//		try
-//		{
-//			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
-//			fut.get(3000);
-//			tr.setFailed("No timeout exception.");
-//		}
-//		catch(TimeoutException e)
-//		{
+		try
+		{
+			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
+			fut.get(3000);
+			tr.setFailed("No timeout exception.");
+		}
+		catch(TimeoutException e)
+		{
 			tr.setSucceeded(true);
-//		}
+		}
 		
 		ret.setResult(tr);
 		
