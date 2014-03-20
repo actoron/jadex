@@ -726,9 +726,16 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						if(!(exception instanceof ComponentTerminatedException)
 							|| !getComponentIdentifier().equals(((ComponentTerminatedException)exception).getComponentIdentifier()))
 						{
-							if(exception instanceof RuntimeException)
+							Throwable	t	= exception instanceof InvocationTargetException
+								? ((InvocationTargetException)exception).getTargetException() : exception;
+								
+							if(t instanceof RuntimeException)
 							{
 								throw (RuntimeException)exception;
+							}
+							else if(t instanceof Error)
+							{
+								throw (Error)t;
 							}
 							else
 							{

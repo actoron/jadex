@@ -861,7 +861,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					if(!unblocked[0])
 					{
-						unblock(monitor, new TimeoutException());
+						// Cannot use timeout exception as component would not be correctly entered.
+						// Todo: allow informing future about timeout.
+						unblock(monitor, null); //new TimeoutException());
 					}
 				}
 				
