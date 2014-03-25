@@ -3796,6 +3796,61 @@ public class SUtil
 	}
 	
 	/**
+	 *  Read a file to string.
+	 *  @param filename The file name.
+	 *  @return The string.
+	 */
+	public static String readFile(String filename)
+	{
+		String ret = null;
+		Scanner sc = null;
+		try
+		{
+			InputStream is = SUtil.getResource0(filename, null);
+			sc = new Scanner(is);
+			ret = sc.useDelimiter("\\A").next();
+		}
+		finally
+		{
+			try
+			{
+				if(sc!=null)
+					sc.close();
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Write a string to a file.
+	 *  @param val The string to write.
+	 *  @param filename The file name.
+	 */
+	public static void writeFile(String val, String filename)
+	{
+		PrintWriter out = null;
+		try
+		{
+			out = new PrintWriter(filename);
+			out.print(val);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if(out!=null)
+			{
+				out.close();
+			}
+		}
+	}
+	
+	/**
 	 * Get the AndroidUtils, if available.
 	 * @return AndroidUtils
 	 */
