@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.commons.DebugException;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
@@ -2011,6 +2012,9 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 	/** The future functionality. */
 	protected FutureFunctionality func;
 	
+	/** creation stack trace. */
+	protected Exception	creaex;
+	
 	/**
 	 * 
 	 */
@@ -2019,6 +2023,8 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
+		
+		this.creaex	= new DebugException();
 	}
 	
 	/**

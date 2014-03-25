@@ -16,12 +16,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * 
  */
 public class EventMapper
 {
+	/** The logger. */
+	protected Logger	logger;
+	
 	/** The map of event types to mapping infos. */
 	protected Map<String, List<MappingInfo>> modelmappings;
 	
@@ -42,8 +46,9 @@ public class EventMapper
 	/**
 	 *  Create a new event mapper.
 	 */
-	public EventMapper()
+	public EventMapper(Logger logger)
 	{
+		this.logger	= logger;
 		this.modelmappings = new HashMap<String, List<MappingInfo>>();
 		this.instancemappings = new HashMap<String, List<MappingInfo>>();
 		this.instanceprocs = new HashMap<String, List<MappingInfo>>();
@@ -66,10 +71,29 @@ public class EventMapper
 		{
 			for(MappingInfo mi: mis)
 			{
-				if(mi.getFilter()==null || mi.getFilter().filter(event))
+				boolean	match;
+				try
 				{
-					ICommand<Object> cmd = (ICommand<Object>)mi.getInfo();
-					cmd.execute(event);
+					match	= mi.getFilter()==null || mi.getFilter().filter(event);
+				}
+				catch(RuntimeException e)
+				{
+					logger.warning("Event mapper filter threw exception: "+e);
+					match	= false;
+				}
+				
+				if(match)
+				{
+					try
+					{
+						ICommand<Object> cmd = (ICommand<Object>)mi.getInfo();
+						cmd.execute(event);
+					}
+					catch(RuntimeException e)
+					{
+						logger.severe("Event mapper command threw exception: "+e);						
+					}
+					
 					ret = true;
 					break;
 				}
@@ -139,11 +163,15 @@ public class EventMapper
 		{
 			final IParsedExpression exp = SJavaParser.parseExpression(uexp, imports, null);
 			final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValues(vals);
+			if(vals!=null)
+			{
+				fetcher.setValues(vals);
+			}
 			filter = new IFilter<Object>()
 			{
 				public boolean filter(Object obj)
 				{
+					fetcher.setValue("$event", obj);
 					Object ret = exp.getValue(fetcher);
 					return ret instanceof Boolean? ((Boolean)ret).booleanValue(): false;
 				}

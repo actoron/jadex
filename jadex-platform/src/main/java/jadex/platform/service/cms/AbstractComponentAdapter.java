@@ -25,7 +25,6 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;

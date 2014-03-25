@@ -19,7 +19,8 @@ public class ManagementExtensionTest extends ComponentTestSuite
 		super(new File("target/test-classes"), new File("target/test-classes"),
 			new String[]
 			{
-				"ManualUser"	// extends user to allow manual testing with gui.
+				"ManualUser",	// extends user to allow manual testing with gui.
+				"TestSubprocessStartEvent"	// part of test and sometimes produces exception when started alone.
 			});
 	}
 	

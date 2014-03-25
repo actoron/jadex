@@ -57,7 +57,6 @@ import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -440,8 +439,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						System.out.println("sdfsdfsd");
-						getLogger().warning("Process contains event subprocesses but no event source found. Subprocess start events will not trigger...");
+						getLogger().warning("Process "+getComponentIdentifier()+" contains event subprocesses but no process engine found. Subprocess start events will not trigger...");
 						ret.setResult(null);
 					}
 				});
@@ -449,7 +447,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("sdfsdfsd");
 				ret.setException(exception);
 			}
 		});
