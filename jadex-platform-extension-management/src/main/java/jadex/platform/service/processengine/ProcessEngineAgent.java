@@ -97,9 +97,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/** The managed process instances. */
 	protected Map<IComponentIdentifier, ProcessInfo> processes;
 	
-	/** The number of processes according to their process type. */
-	protected Map<Tuple2<String, IResourceIdentifier>, Integer> processespertype;
-	
 	/** The event mapper. */
 	protected EventMapper eventmapper;
 	
@@ -124,9 +121,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		this.processes = new HashMap<IComponentIdentifier, ProcessEngineAgent.ProcessInfo>();
 		this.waitqueue	= new HashMap<String, Set<Object>>();
 		this.waitqueuetypes	= new HashMap<String, Set<Tuple2<String,IResourceIdentifier>>>();
-		this.eventmapper = new EventMapper();
+		this.eventmapper = new EventMapper(agent.getLogger());
 		this.creating = new HashSet<Future<Void>>();
-		this.processespertype = new HashMap<Tuple2<String,IResourceIdentifier>, Integer>();
 		return IFuture.DONE;
 	}
 	
@@ -416,7 +412,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 *  Process an event and get the consequence events.
 	 *  Called internally when event should not be added to waitqueue.
 	 */
-	public IFuture<Void> internalProcessEvent(final Object event, final String atype, final boolean add)
+	protected IFuture<Void> internalProcessEvent(final Object event, final String atype, final boolean add)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -529,15 +525,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		creating.add(ret);
 		
 		Tuple2<String, IResourceIdentifier> model = new Tuple2<String, IResourceIdentifier>(det.getModel(), det.getRid());
-		Integer cnt = processespertype.get(model);
-		if(cnt==null)
-		{
-			processespertype.put(model, Integer.valueOf(1));
-		}
-		else
-		{
-			processespertype.put(model, Integer.valueOf(cnt.intValue()+1));
-		}
 		
 		SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(agent.createResultListener(new IResultListener<IComponentManagementService>()
@@ -898,11 +885,6 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 				delegate.addIntermediateResultIfUndone(new ProcessEngineEvent(ProcessEngineEvent.INSTANCE_TERMINATED, 
 					cid, ((CMSTerminatedEvent)result).getResults()));
 				processes.remove(cid);
-				Integer cnt = processespertype.remove(model);
-				if(cnt.intValue()>1)
-				{
-					processespertype.put(model, Integer.valueOf(cnt.intValue()-1));
-				}
 			}
 			else if(result instanceof CMSIntermediateResultEvent)
 			{

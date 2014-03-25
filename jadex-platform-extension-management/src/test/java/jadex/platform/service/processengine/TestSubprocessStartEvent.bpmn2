@@ -19,13 +19,14 @@
         <semantic:conditionalEventDefinition/>
         <semantic:extensionElements>
           <jadex:property name="eventtypes">new java.lang.String[]{&quot;SubprocessStart&quot;}</jadex:property>
+          <jadex:property name="condition">$event.value==7</jadex:property>
         </semantic:extensionElements>
       </semantic:startEvent>
       <semantic:task name="Task" id="yAMNau1/DbrnVBzw">
         <semantic:incoming>zssMLLpd7lPShQPE</semantic:incoming>
         <semantic:extensionElements>
           <jadex:class>jadex.bpmn.runtime.task.PrintTask</jadex:class>
-          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;after event: &quot;+$event</jadex:parameter>
+          <jadex:parameter direction="in" name="text" type="java.lang.String">&quot;&quot;+$component.getComponentIdentifier()+&quot; after event: &quot;+$event</jadex:parameter>
         </semantic:extensionElements>
       </semantic:task>
     </semantic:subProcess>
