@@ -125,7 +125,13 @@ public interface IPlan
 	/**
 	 *  Wait for a collection change.
 	 */
-	public <T> IFuture<ChangeInfo<T>> waitForCollectionChange(String belname, long timeout, IFilter<T> filter);
+	public <T> IFuture<ChangeInfo<T>> waitForCollectionChange(String belname, long timeout, IFilter<ChangeInfo<T>> filter);
+	
+	/**
+	 *  Wait for a collection change.
+	 */
+	public <T> IFuture<ChangeInfo<T>> waitForCollectionChange(String belname, long timeout, Object id);
+
 	
 	/**
 	 *  Wait for a condition.

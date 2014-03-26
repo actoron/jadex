@@ -17,7 +17,6 @@ import jadex.bdiv3.runtime.WaitAbstraction;
 import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
-import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.types.clock.ITimer;
@@ -1117,72 +1116,32 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 *  Wait for a collection change.
 	 */
-	public <T> IFuture<ChangeInfo<T>> waitForCollectionChange(String belname, long timeout, final IFilter<T> filter)
+	public <T> IFuture<ChangeInfo<T>> waitForCollectionChange(String belname, long timeout, IFilter<ChangeInfo<T>> filter)
+//	public IFuture<ChangeInfo<?>> waitForCollectionChange(String belname, long timeout, IFilter<ChangeInfo<?>> filter)
 	{
-		Future<ChangeInfo<T>> ret = new BDIFuture<ChangeInfo<T>>();
-		
-		// Also set waitabstraction to know what the plan is waiting for
-		WaitAbstraction wa = new WaitAbstraction();
-		
-		final EventType eta = new EventType(new String[]{ChangeEvent.FACTADDED, belname});
-		final EventType etb = new EventType(new String[]{ChangeEvent.FACTREMOVED, belname});
-		final EventType etc = new EventType(new String[]{ChangeEvent.FACTCHANGED, belname});
-		
-		wa.addChangeEventType(eta.toString());
-		wa.addChangeEventType(etb.toString());
-		wa.addChangeEventType(etc.toString());
-//		setWaitAbstraction(wa);
-		
-		Object obj = getFromWaitqueue(wa);
-		if(obj!=null)
+		// buahhh :-((( how to get this generics nightmare?
+		IFuture fut = waitForFactX(belname, new String[]{ChangeEvent.FACTCHANGED, ChangeEvent.FACTADDED, ChangeEvent.FACTREMOVED}, timeout, (IFilter)filter);
+		return (IFuture<ChangeInfo<T>>)fut;
+	}
+	
+	/**
+	 *  Wait for a collection change.
+	 */
+	public <T> IFuture<ChangeInfo<T>> waitForCollectionChange(String belname, long timeout, final Object id)
+	{
+		IFuture fut = waitForFactX(belname, new String[]{ChangeEvent.FACTCHANGED, ChangeEvent.FACTADDED, ChangeEvent.FACTREMOVED}, timeout, new IFilter<ChangeInfo<?>>()
 		{
-			ret.setResult((ChangeInfo<T>)((ChangeEvent)obj).getValue());
-//			ret = new Future<ChangeEvent>((ChangeEvent)obj);
-		}
-		else
-		{
-			final String rulename = getRuleName();
-			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
-			
-			final ResumeCommand<ChangeInfo<T>> rescom = new ResumeCommand<ChangeInfo<T>>(ret, rulename, false);
-//			setResumeCommand(rescom);
-			addResumeCommand(rescom);
-			
-			IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
-			cont.addResultListener(new DefaultResultListener<ITimer>()
+			public boolean filter(ChangeInfo<?> info)
 			{
-				public void resultAvailable(final ITimer timer)
+				boolean ret = false;
+				if(info.getInfo()!=null)
 				{
-					if(timer!=null)
-						rescom.setTimer(timer);
-					
-					Rule<Void> rule = new Rule<Void>(rulename, new ICondition()
-					{
-						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
-						{
-							
-							return null;
-						}
-					}, new IAction<Void>()
-					{
-						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
-						{
-//							if(rescom.equals(getResumeCommand()))
-							{
-								setDispatchedElement(new ChangeEvent(event));
-								RPlan.executePlan(RPlan.this, ia, rescom);
-							}
-							return IFuture.DONE;
-						}
-					});
-					rule.addEvent(eta);
-					rule.addEvent(etb);
-					ip.getRuleSystem().getRulebase().addRule(rule);
+					ret = info.getInfo().equals(id);
 				}
-			});
-		}
-		
-		return ret;
+				return ret;
+			}
+		});
+		return (IFuture<ChangeInfo<T>>)fut;
 	}
 	
 	/**
