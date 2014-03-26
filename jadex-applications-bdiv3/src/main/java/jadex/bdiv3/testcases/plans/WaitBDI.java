@@ -8,6 +8,7 @@ import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.impl.RPlan;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.CounterResultListener;
@@ -125,9 +126,9 @@ public class WaitBDI
 		
 		final CounterResultListener<Void> lis = new CounterResultListener<Void>(2, new DelegationResultListener<Void>(ret));
 		
-		rplan.waitForFactAdded("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		rplan.waitForFactAdded("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ChangeInfo<?> result)
 			{
 				System.out.println("plan continues 1: "+rplan.getId()+" "+result);
 				tr[0].setSucceeded(true);
@@ -135,9 +136,9 @@ public class WaitBDI
 			}
 		}));
 		
-		rplan.waitForFactRemoved("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		rplan.waitForFactRemoved("names").addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<ChangeInfo<?>, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ChangeInfo<?> result)
 			{
 				System.out.println("plan continues 2: "+rplan.getId()+" "+result);
 				tr[1].setSucceeded(true);

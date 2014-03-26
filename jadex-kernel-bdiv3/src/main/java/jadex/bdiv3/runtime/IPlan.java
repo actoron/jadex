@@ -1,5 +1,7 @@
 package jadex.bdiv3.runtime;
 
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
+import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 import jadex.rules.eca.ICondition;
@@ -83,42 +85,47 @@ public interface IPlan
 	/**
 	 *  Wait for a fact change of a belief.
 	 */
-	public IFuture<Object> waitForFactChanged(String belname);
+	public IFuture<ChangeInfo<?>> waitForFactChanged(String belname);
 	
 	/**
 	 *  Wait for a fact change of a belief.
 	 */
-	public IFuture<Object> waitForFactChanged(String belname, long timeout);
+	public IFuture<ChangeInfo<?>> waitForFactChanged(String belname, long timeout);
 	
 	/**
 	 *  Wait for a fact being added to a belief.
 	 */
-	public IFuture<Object> waitForFactAdded(String belname);
+	public IFuture<ChangeInfo<?>> waitForFactAdded(String belname);
 	
 	/**
 	 *  Wait for a fact being added to a belief.
 	 */
-	public IFuture<Object> waitForFactAdded(String belname, long timeout);
+	public IFuture<ChangeInfo<?>> waitForFactAdded(String belname, long timeout);
 
 	/**
 	 *  Wait for a fact being removed from a belief.
 	 */
-	public IFuture<Object> waitForFactRemoved(String belname);
+	public IFuture<ChangeInfo<?>> waitForFactRemoved(String belname);
 	
 	/**
 	 *  Wait for a fact being removed from a belief.
 	 */
-	public IFuture<Object> waitForFactRemoved(String belname, long timeout);
+	public IFuture<ChangeInfo<?>> waitForFactRemoved(String belname, long timeout);
 	
 	/**
 	 *  Wait for a fact being added or removed to a belief.
 	 */
-	public IFuture<ChangeEvent> waitForFactAddedOrRemoved(String belname);
+	public IFuture<ChangeInfo<?>> waitForFactAddedOrRemoved(String belname);
 	
 	/**
 	 *  Wait for a fact being added or removed to a belief.
 	 */
-	public IFuture<ChangeEvent> waitForFactAddedOrRemoved(String belname, long timeout);
+	public IFuture<ChangeInfo<?>> waitForFactAddedOrRemoved(String belname, long timeout);
+	
+	/**
+	 *  Wait for a collection change.
+	 */
+	public <T> IFuture<ChangeInfo<T>> waitForCollectionChange(String belname, long timeout, IFilter<T> filter);
 	
 	/**
 	 *  Wait for a condition.
@@ -139,4 +146,5 @@ public interface IPlan
 	 * 
 	 */
 	public void addPlanListener(IPlanListener<?> listener);
+
 }

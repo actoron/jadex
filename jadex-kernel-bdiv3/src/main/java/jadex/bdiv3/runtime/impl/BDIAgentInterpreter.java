@@ -849,6 +849,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				Rule<Void> rule = new Rule<Void>(mbel.getName()+"_belief_update", 
 					ICondition.TRUE_CONDITION, new IAction<Void>()
 				{
+					Object oldval = null;
+					
 					public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 					{
 //						System.out.println("belief update: "+event);
@@ -867,7 +869,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						else
 						{
 							Object value = mbel.getValue(BDIAgentInterpreter.this);
-							BDIAgent.createChangeEvent(value, (BDIAgent)microagent, mbel.getName());
+							// todo: save old value?!
+							BDIAgent.createChangeEvent(value, oldval, null, (BDIAgent)microagent, mbel.getName());
+							oldval = value;
 						}
 						return IFuture.DONE;
 					}
@@ -900,6 +904,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						cs.createTimer(mbel.getUpdaterate(), new ITimedObject()
 						{
 							ITimedObject	self	= this;
+							Object oldval = null;
+							
 							public void timeEventOccurred(long currenttime)
 							{
 								try
@@ -920,7 +926,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 												else
 												{
 													Object value = mbel.getValue(capa, getClassLoader());
-													BDIAgent.createChangeEvent(value, (BDIAgent)microagent, mbel.getName());
+													BDIAgent.createChangeEvent(value, oldval, null, (BDIAgent)microagent, mbel.getName());
+													oldval = value;
 												}
 											}
 											catch(Exception e)

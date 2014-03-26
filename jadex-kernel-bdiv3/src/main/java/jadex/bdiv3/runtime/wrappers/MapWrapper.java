@@ -116,14 +116,16 @@ public class MapWrapper<T, E> implements Map<T, E>
 		observeValue(value);
 		if(ret==null)
 		{
-			getRuleSystem().addEvent(new Event(addevent, new MapEntry<T, E>(key, value, null)));
+			getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<E>(value, null, key)));
+//			getRuleSystem().addEvent(new Event(addevent, new MapEntry<T, E>(key, value, null)));
 //			getRuleSystem().addEvent(new Event(addevent, new Tuple3<T, E, E>(key, value, ret)));
 			publishToolBeliefEvent();
 		}
 		else
 		{
 //			getRuleSystem().addEvent(new Event(changeevent, new Tuple3<T, E, E>(key, value, ret)));
-			getRuleSystem().addEvent(new Event(changeevent, new MapEntry<T, E>(key, value, ret)));
+//			getRuleSystem().addEvent(new Event(changeevent, new MapEntry<T, E>(key, value, ret)));
+			getRuleSystem().addEvent(new Event(changeevent, new ChangeInfo<E>(value, ret, key)));
 			publishToolBeliefEvent();
 		}
 		return ret;
@@ -137,7 +139,8 @@ public class MapWrapper<T, E> implements Map<T, E>
 		E ret = delegate.remove(key);
 		unobserveValue(ret);
 //		getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>((T)key, ret)));
-		getRuleSystem().addEvent(new Event(remevent, new MapEntry<T, E>((T)key, ret, null)));
+//		getRuleSystem().addEvent(new Event(remevent, new MapEntry<T, E>((T)key, ret, null)));
+		getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<E>(null, ret, key)));
 		publishToolBeliefEvent();
 		return ret;
 	}
@@ -165,7 +168,7 @@ public class MapWrapper<T, E> implements Map<T, E>
 		{
 			unobserveValue(e.getValue());
 //			getRuleSystem().addEvent(new Event(remevent, new Tuple2<T, E>(e.getKey(), e.getValue())));
-			getRuleSystem().addEvent(new Event(remevent, new MapEntry<T, E>(e.getKey(), e.getValue(), null)));
+			getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<E>(e.getValue(), null, e.getKey())));
 			publishToolBeliefEvent();
 		}
 	}
@@ -320,58 +323,58 @@ public class MapWrapper<T, E> implements Map<T, E>
 		((BDIAgent)getInterpreter().getAgent()).publishToolBeliefEvent(getInterpreter(), mbel);//, evtype);
 	}
 	
-	/**
-	 * 
-	 */
-	public static class MapEntry<T, E> implements Map.Entry<T, E>
-	{
-		protected T key;
-		protected E value;
-		protected E oldvalue;
-		
-		/**
-		 *  Create a new MapEntry.
-		 */
-		public MapEntry(T key, E value, E oldvalue)
-		{
-			this.key = key;
-			this.value = value;
-			this.oldvalue = oldvalue;
-		}
-		
-		/**
-		 *  Get the key.
-		 *  @return The key.
-		 */
-		public T getKey()
-		{
-			return key;
-		}
-
-		/**
-		 *  Get the value.
-		 *  @return The value.
-		 */
-		public E getValue()
-		{
-			return value;
-		}
-
-		/**
-		 *  Get the oldvalue.
-		 *  @return The oldvalue.
-		 */
-		public E getOldValue()
-		{
-			return oldvalue;
-		}
-
-		/**
-		 * 
-		 */
-		public E setValue(E value)
-		{
-			throw new UnsupportedOperationException();
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	public static class MapEntry<T, E> implements Map.Entry<T, E>
+//	{
+//		protected T key;
+//		protected E value;
+//		protected E oldvalue;
+//		
+//		/**
+//		 *  Create a new MapEntry.
+//		 */
+//		public MapEntry(T key, E value, E oldvalue)
+//		{
+//			this.key = key;
+//			this.value = value;
+//			this.oldvalue = oldvalue;
+//		}
+//		
+//		/**
+//		 *  Get the key.
+//		 *  @return The key.
+//		 */
+//		public T getKey()
+//		{
+//			return key;
+//		}
+//
+//		/**
+//		 *  Get the value.
+//		 *  @return The value.
+//		 */
+//		public E getValue()
+//		{
+//			return value;
+//		}
+//
+//		/**
+//		 *  Get the oldvalue.
+//		 *  @return The oldvalue.
+//		 */
+//		public E getOldValue()
+//		{
+//			return oldvalue;
+//		}
+//
+//		/**
+//		 * 
+//		 */
+//		public E setValue(E value)
+//		{
+//			throw new UnsupportedOperationException();
+//		}
+//	}
 }

@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -52,9 +53,9 @@ public class MethodBeliefAgentBDI
 	public void	body(final BDIAgent agent)
 	{
 		final TestReport	tr	= new TestReport("#1", "Test if method beliefs work.");
-		agent.addBeliefListener("value", new BeliefAdapter()
+		agent.addBeliefListener("value", new BeliefAdapter<String>()
 		{
-			public void beliefChanged(Object value)
+			public void beliefChanged(ChangeInfo<String> value)
 			{
 				if(!tr.isFinished())
 				{

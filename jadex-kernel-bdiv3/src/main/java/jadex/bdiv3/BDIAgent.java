@@ -15,6 +15,7 @@ import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
@@ -53,6 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javassist.expr.Instanceof;
 
 /**
  *  Base class for application agents.
@@ -183,26 +186,28 @@ public class BDIAgent extends MicroAgent
 			{
 				if(!multi)
 				{
-					listener.beliefChanged(event.getContent());
+					if(!(event.getContent() instanceof ChangeInfo))
+						System.out.println("sadfsdf");
+					listener.beliefChanged((ChangeInfo)event.getContent());
 				}
 				else
 				{
 					if(ChangeEvent.FACTADDED.equals(event.getType().getType(0)))
 					{
-						listener.factAdded(event.getContent());
+						listener.factAdded((ChangeInfo)event.getContent());
 					}
 					else if(ChangeEvent.FACTREMOVED.equals(event.getType().getType(0)))
 					{
-						listener.factAdded(event.getContent());
+						listener.factAdded((ChangeInfo)event.getContent());
 					}
 					else if(ChangeEvent.FACTCHANGED.equals(event.getType().getType(0)))
 					{
-						Object[] vals = (Object[])event.getContent();
-						listener.factChanged(vals[0], vals[1], vals[2]);
+//						Object[] vals = (Object[])event.getContent();
+						listener.factChanged((ChangeInfo)event.getContent());
 					}
 					else if(ChangeEvent.BELIEFCHANGED.equals(event.getType().getType(0)))
 					{
-						listener.beliefChanged(event.getContent());
+						listener.beliefChanged((ChangeInfo)event.getContent());
 					}
 				}
 				return IFuture.DONE;
@@ -601,7 +606,7 @@ public class BDIAgent extends MicroAgent
 			{
 				publishToolBeliefEvent(ip, mbel);
 
-				Event ev = new Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}), val); // todo: index
+				Event ev = new Event(new EventType(new String[]{ChangeEvent.FACTCHANGED, belname}), new ChangeInfo<Object>(val, oldval, Integer.valueOf(index))); // todo: index
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 
@@ -758,18 +763,25 @@ public class BDIAgent extends MicroAgent
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = (ip).getRuleSystem();
 			rs.unobserveObject(old);	
-			createChangeEvent(value, this, mbel.getName());
+			createChangeEvent(value, old, null, this, mbel.getName());
 			observeValue(rs, value, ip, ChangeEvent.FACTCHANGED+"."+mbel.getName(), mbel);
 		}
 	}
 	
+//	public static void createChangeEvent(Object val, final BDIAgent agent, final String belname)
+//	{
+//		createChangeEvent(val, null, null, agent, belname);
+//	}
+	
 	/**
+	 *  Caution: this method is used from byte engineered code, change signature with caution
+	 * 
 	 *  Create a belief changed event.
 	 *  @param val The new value.
 	 *  @param agent The agent.
 	 *  @param belname The belief name.
 	 */
-	public static void createChangeEvent(Object val, final BDIAgent agent, final String belname)
+	public static void createChangeEvent(Object val, Object oldval, Object info, final BDIAgent agent, final String belname)
 //	public static void createChangeEvent(Object val, final BDIAgent agent, MBelief mbel)
 	{
 //		System.out.println("createEv: "+val+" "+agent+" "+belname);
@@ -778,7 +790,7 @@ public class BDIAgent extends MicroAgent
 		MBelief mbel = ip.getBDIModel().getCapability().getBelief(belname);
 		
 		RuleSystem rs = (ip).getRuleSystem();
-		rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
+		rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, oldval, info)));
 		
 		publishToolBeliefEvent(ip, mbel);
 	}
@@ -1001,7 +1013,7 @@ public class BDIAgent extends MicroAgent
 			
 			if(!SUtil.equals(val, oldval))
 			{
-				Event ev = new Event(new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname}), val); // todo: index
+				Event ev = new Event(new EventType(new String[]{ChangeEvent.VALUECHANGED, mgoal.getName(), fieldname}), new ChangeInfo<Object>(val, oldval, Integer.valueOf(index)));
 				rs.addEvent(ev);
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 

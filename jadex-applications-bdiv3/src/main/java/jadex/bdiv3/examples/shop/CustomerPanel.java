@@ -3,6 +3,7 @@ package jadex.bdiv3.examples.shop;
 import jadex.bdiv3.examples.shop.CustomerCapability.BuyItem;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
@@ -184,15 +185,15 @@ public class CustomerPanel extends JPanel
 			@Classname("money")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				capa.addBeliefListener("money", new BeliefAdapter()
+				capa.addBeliefListener("money", new BeliefAdapter<Object>()
 				{
-					public void beliefChanged(final Object value)
+					public void beliefChanged(final ChangeInfo<Object> info)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()
 							{
-								money.setText(df.format(value));
+								money.setText(df.format(info.getValue()));
 							}
 						});
 					}
@@ -243,33 +244,33 @@ public class CustomerPanel extends JPanel
 			{
 				try
 				{
-					capa.addBeliefListener("inventory", new BeliefAdapter()
+					capa.addBeliefListener("inventory", new BeliefAdapter<Object>()
 					{
-						public void factRemoved(final Object value)
+						public void factRemoved(final ChangeInfo<Object> value)
 						{
 							SwingUtilities.invokeLater(new Runnable()
 							{
 								public void run()
 								{
-									invlist.remove(value);
+									invlist.remove(value.getValue());
 									invmodel.fireTableDataChanged();
 								}
 							});
 						}
 						
-						public void factAdded(final Object value)
+						public void factAdded(final ChangeInfo<Object> value)
 						{
 							SwingUtilities.invokeLater(new Runnable()
 							{
 								public void run()
 								{
-									invlist.add(value);
+									invlist.add(value.getValue());
 									invmodel.fireTableDataChanged();
 								}
 							});
 						}
 						
-						public void factChanged(final Object value, Object oldvalue, Object info)
+						public void factChanged(ChangeInfo<Object> object)
 						{
 							SwingUtilities.invokeLater(new Runnable()
 							{

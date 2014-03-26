@@ -586,12 +586,19 @@ public class ASMBDIClassGenerator extends AbstractAsmBdiClassGenerator
 		{
 			nl.add(new InsnNode(Opcodes.ACONST_NULL));
 		}
-		nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the object
+		
+		nl.add(new InsnNode(Opcodes.ACONST_NULL)); // oldvalue ?
+		nl.add(new InsnNode(Opcodes.ACONST_NULL)); // no index/key
+		
+		nl.add(new VarInsnNode(Opcodes.ALOAD, 0)); // loads the agent object
 		nl.add(new FieldInsnNode(Opcodes.GETFIELD, iclname, "__agent", Type.getDescriptor(BDIAgent.class)));
+		
 		nl.add(new LdcInsnNode(belname));
+		
 //		nl.add(new LdcInsnNode(mbel));
 		nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createChangeEvent", 
-			"(Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+//			"(Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
+			"(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljadex/bdiv3/BDIAgent;Ljava/lang/String;)V"));
 //			nl.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "jadex/bdiv3/BDIAgent", "createEvent", 
 //				"()V"));
 

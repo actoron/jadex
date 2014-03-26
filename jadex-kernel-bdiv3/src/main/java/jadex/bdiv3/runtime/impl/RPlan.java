@@ -14,8 +14,10 @@ import jadex.bdiv3.runtime.IGoal;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bdiv3.runtime.IPlanListener;
 import jadex.bdiv3.runtime.WaitAbstraction;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConditionalComponentStep;
+import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.types.clock.ITimer;
@@ -24,7 +26,9 @@ import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLeve
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
 import jadex.commons.ICommand;
+import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
+import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -912,76 +916,83 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 *  Wait for a fact change of a belief.
 	 */
-	public IFuture<Object> waitForFactChanged(String belname)
+	public IFuture<ChangeInfo<?>> waitForFactChanged(String belname)
 	{
-		return waitForFactX(belname, ChangeEvent.FACTCHANGED, -1);
+		return waitForFactX(belname, new String[]{ChangeEvent.FACTCHANGED}, -1, null);
 	}
 	
 	/**
 	 *  Wait for a fact change of a belief.
 	 */
-	public IFuture<Object> waitForFactChanged(String belname , long timeout)
+	public IFuture<ChangeInfo<?>> waitForFactChanged(String belname , long timeout)
 	{
-		return waitForFactX(belname, ChangeEvent.FACTCHANGED, timeout);
+		return waitForFactX(belname, new String[]{ChangeEvent.FACTCHANGED}, timeout, null);
 	}
 	
 	/**
 	 *  Wait for a fact being added to a belief.
 	 */
-	public IFuture<Object> waitForFactAdded(String belname)
+	public IFuture<ChangeInfo<?>> waitForFactAdded(String belname)
 	{
-		return waitForFactX(belname, ChangeEvent.FACTADDED, -1);
+		return waitForFactX(belname, new String[]{ChangeEvent.FACTADDED}, -1, null);
 	}
 	
 	/**
 	 *  Wait for a fact being added to a belief.
 	 */
-	public IFuture<Object> waitForFactAdded(String belname, long timeout)
+	public IFuture<ChangeInfo<?>> waitForFactAdded(String belname, long timeout)
 	{
-		return waitForFactX(belname, ChangeEvent.FACTADDED, timeout);
+		return waitForFactX(belname, new String[]{ChangeEvent.FACTADDED}, timeout, null);
 	}
 
 	/**
 	 *  Wait for a fact being removed from a belief.
 	 */
-	public IFuture<Object> waitForFactRemoved(String belname)
+	public IFuture<ChangeInfo<?>> waitForFactRemoved(String belname)
 	{
-		return waitForFactX(belname, ChangeEvent.FACTREMOVED, -1);
+		return waitForFactX(belname, new String[]{ChangeEvent.FACTREMOVED}, -1, null);
 	}
 	
 	/**
 	 *  Wait for a fact being removed from a belief.
 	 */
-	public IFuture<Object> waitForFactRemoved(String belname, long timeout)
+	public IFuture<ChangeInfo<?>> waitForFactRemoved(String belname, long timeout)
 	{
-		return waitForFactX(belname, ChangeEvent.FACTREMOVED, timeout);
+		return waitForFactX(belname, new String[]{ChangeEvent.FACTREMOVED}, timeout, null);
 	}
 	
 	/**
 	 *  Wait for a fact being added to a belief..
 	 */
-	public IFuture<Object> waitForFactX(String belname, String evtype, long timeout)
+	public IFuture<ChangeInfo<?>> waitForFactX(String belname, String[] evtypes, long timeout, final IFilter<ChangeInfo<?>> filter)
 	{
-		Future<Object> ret = new Future<Object>();
+		Future<ChangeInfo<?>> ret = new Future<ChangeInfo<?>>();
 		
 		final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 				
 		// Also set waitabstraction to know what the plan is waiting for
-		final EventType et = new EventType(new String[]{evtype, belname});
+		final List<EventType> ets = new ArrayList<EventType>();
 		WaitAbstraction wa = new WaitAbstraction();
-		wa.addChangeEventType(et.toString());
+		for(String evtype: evtypes)
+		{
+			EventType et = new EventType(new String[]{evtype, belname});
+			wa.addChangeEventType(et.toString());
+			ets.add(et);
+		}
 //		setWaitAbstraction(wa);
 		
 		Object obj = getFromWaitqueue(wa);
 		if(obj!=null)
 		{
-			ret = new Future<Object>(obj);
+			ret.setResult((ChangeInfo<?>)((ChangeEvent)obj).getValue());
+//			ret = new Future<Object>(obj);
 		}
 		else
 		{
 			final String rulename = getRuleName();
 			
-			final ResumeCommand<Object> rescom = new ResumeCommand<Object>(ret, rulename, false);
+			final ResumeCommand<ChangeInfo<?>> rescom = new ResumeCommand<ChangeInfo<?>>(ret, rulename, false);
+//			final ResumeCommand<Object> rescom = new ResumeCommand<Object>(ret, rulename, false);
 //			setResumeCommand(rescom);
 			addResumeCommand(rescom);
 			
@@ -993,7 +1004,13 @@ public class RPlan extends RElement implements IPlan
 					if(timer!=null)
 						rescom.setTimer(timer);
 					
-					Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
+					Rule<Void> rule = new Rule<Void>(rulename, filter==null? ICondition.TRUE_CONDITION: new ICondition()
+					{
+						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+						{
+							return new Future<Tuple2<Boolean, Object>>(filter.filter((ChangeInfo<?>)event.getContent())? ICondition.TRUE: ICondition.FALSE);
+						}
+					}, new IAction<Void>()
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
@@ -1006,19 +1023,21 @@ public class RPlan extends RElement implements IPlan
 						}
 					});
 					
-					rule.addEvent(et);
+//					rule.addEvent(et);
+					rule.setEvents(ets);
 					ip.getRuleSystem().getRulebase().addRule(rule);
 				}
 			});
 		}
 		
-		Future<Object> fut = new BDIFuture<Object>();
-		ret.addResultListener(new DelegationResultListener<Object>(fut)
+		Future<ChangeInfo<?>> fut = new BDIFuture<ChangeInfo<?>>();
+		ret.addResultListener(new DelegationResultListener<ChangeInfo<?>>(fut)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ChangeInfo<?> result)
 			{
-				ChangeEvent ce = (ChangeEvent)result;
-				super.customResultAvailable(ce.getValue());
+//				ChangeEvent ce = (ChangeEvent)result;
+//				super.customResultAvailable(ce.getValue());
+				super.customResultAvailable(result);
 			}
 		});
 		
@@ -1028,7 +1047,7 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 *  Wait for a fact being added or removed to a belief.
 	 */
-	public IFuture<ChangeEvent> waitForFactAddedOrRemoved(String belname)
+	public IFuture<ChangeInfo<?>> waitForFactAddedOrRemoved(String belname)
 	{
 		return waitForFactAddedOrRemoved(belname, -1);
 	}
@@ -1036,29 +1055,96 @@ public class RPlan extends RElement implements IPlan
 	/**
 	 *  Wait for a fact being added or removed to a belief.
 	 */
-	public IFuture<ChangeEvent> waitForFactAddedOrRemoved(String belname, long timeout)
+	public IFuture<ChangeInfo<?>> waitForFactAddedOrRemoved(String belname, long timeout)
 	{
-		Future<ChangeEvent> ret = new BDIFuture<ChangeEvent>();
+		return waitForFactX(belname, new String[]{ChangeEvent.FACTADDED, ChangeEvent.FACTREMOVED}, timeout, null);
+		
+//		Future<ChangeInfo<?>> ret = new BDIFuture<ChangeInfo<?>>();
+//		
+//		// Also set waitabstraction to know what the plan is waiting for
+//		WaitAbstraction wa = new WaitAbstraction();
+//		final EventType eta = new EventType(new String[]{ChangeEvent.FACTADDED, belname});
+//		final EventType etb = new EventType(new String[]{ChangeEvent.FACTREMOVED, belname});
+//		wa.addChangeEventType(eta.toString());
+//		wa.addChangeEventType(etb.toString());
+////		setWaitAbstraction(wa);
+//		
+//		Object obj = getFromWaitqueue(wa);
+//		if(obj!=null)
+//		{
+//			ret.setResult((ChangeInfo<?>)((ChangeEvent)obj).getValue());
+////			ret = new Future<ChangeEvent>((ChangeEvent)obj);
+//		}
+//		else
+//		{
+//			final String rulename = getRuleName();
+//			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
+//			
+//			final ResumeCommand<ChangeInfo<?>> rescom = new ResumeCommand<ChangeInfo<?>>(ret, rulename, false);
+////			setResumeCommand(rescom);
+//			addResumeCommand(rescom);
+//			
+//			IFuture<ITimer> cont = createTimer(timeout, ip, rescom);
+//			cont.addResultListener(new DefaultResultListener<ITimer>()
+//			{
+//				public void resultAvailable(final ITimer timer)
+//				{
+//					if(timer!=null)
+//						rescom.setTimer(timer);
+//					
+//					Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
+//					{
+//						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
+//						{
+////							if(rescom.equals(getResumeCommand()))
+//							{
+//								setDispatchedElement(new ChangeEvent(event));
+//								RPlan.executePlan(RPlan.this, ia, rescom);
+//							}
+//							return IFuture.DONE;
+//						}
+//					});
+//					rule.addEvent(eta);
+//					rule.addEvent(etb);
+//					ip.getRuleSystem().getRulebase().addRule(rule);
+//				}
+//			});
+//		}
+//		
+//		return ret;
+	}
+	
+	/**
+	 *  Wait for a collection change.
+	 */
+	public <T> IFuture<ChangeInfo<T>> waitForCollectionChange(String belname, long timeout, final IFilter<T> filter)
+	{
+		Future<ChangeInfo<T>> ret = new BDIFuture<ChangeInfo<T>>();
 		
 		// Also set waitabstraction to know what the plan is waiting for
 		WaitAbstraction wa = new WaitAbstraction();
+		
 		final EventType eta = new EventType(new String[]{ChangeEvent.FACTADDED, belname});
 		final EventType etb = new EventType(new String[]{ChangeEvent.FACTREMOVED, belname});
+		final EventType etc = new EventType(new String[]{ChangeEvent.FACTCHANGED, belname});
+		
 		wa.addChangeEventType(eta.toString());
 		wa.addChangeEventType(etb.toString());
+		wa.addChangeEventType(etc.toString());
 //		setWaitAbstraction(wa);
 		
 		Object obj = getFromWaitqueue(wa);
 		if(obj!=null)
 		{
-			ret = new Future<ChangeEvent>((ChangeEvent)obj);
+			ret.setResult((ChangeInfo<T>)((ChangeEvent)obj).getValue());
+//			ret = new Future<ChangeEvent>((ChangeEvent)obj);
 		}
 		else
 		{
 			final String rulename = getRuleName();
 			final BDIAgentInterpreter ip = (BDIAgentInterpreter)((BDIAgent)ia).getInterpreter();
 			
-			final ResumeCommand<ChangeEvent> rescom = new ResumeCommand<ChangeEvent>(ret, rulename, false);
+			final ResumeCommand<ChangeInfo<T>> rescom = new ResumeCommand<ChangeInfo<T>>(ret, rulename, false);
 //			setResumeCommand(rescom);
 			addResumeCommand(rescom);
 			
@@ -1070,7 +1156,14 @@ public class RPlan extends RElement implements IPlan
 					if(timer!=null)
 						rescom.setTimer(timer);
 					
-					Rule<Void> rule = new Rule<Void>(rulename, ICondition.TRUE_CONDITION, new IAction<Void>()
+					Rule<Void> rule = new Rule<Void>(rulename, new ICondition()
+					{
+						public IFuture<Tuple2<Boolean, Object>> evaluate(IEvent event)
+						{
+							
+							return null;
+						}
+					}, new IAction<Void>()
 					{
 						public IFuture<Void> execute(IEvent event, IRule<Void> rule, Object context, Object condresult)
 						{
@@ -1144,6 +1237,8 @@ public class RPlan extends RElement implements IPlan
 		});
 		return ret;
 	}
+	
+	
 	
 	/**
 	 * 
@@ -1306,7 +1401,12 @@ public class RPlan extends RElement implements IPlan
 						}
 						else
 						{
-							waitfuture.setResultIfUndone(isvoid? null: (T)getDispatchedElement());
+							Object o = getDispatchedElement();
+							if(o instanceof ChangeEvent)
+							{
+								o = ((ChangeEvent)o).getValue();
+							}
+							waitfuture.setResultIfUndone(isvoid? null: (T)o);
 						}
 					}
 					else

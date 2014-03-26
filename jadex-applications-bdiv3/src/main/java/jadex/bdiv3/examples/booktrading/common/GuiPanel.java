@@ -6,6 +6,7 @@ import jadex.bdiv3.examples.booktrading.buyer.BuyerBDI.PurchaseBook;
 import jadex.bdiv3.examples.booktrading.seller.SellerBDI.SellBook;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -266,24 +267,24 @@ public class GuiPanel extends JPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INegotiationAgent ag = (INegotiationAgent)((IPojoMicroAgent)ia).getPojoAgent();
-				ag.getAgent().addBeliefListener("orders", new IBeliefListener()
+				ag.getAgent().addBeliefListener("orders", new IBeliefListener<Object>()
 				{
-					public void factRemoved(Object value)
+					public void factRemoved(ChangeInfo<Object> info)
 					{
 						refresh();
 					}
 					
-					public void factChanged(Object value, Object oldvalue, Object info)
+					public void factChanged(ChangeInfo<Object> info)
 					{
 						refresh();
 					}
 					
-					public void factAdded(Object value)
+					public void factAdded(ChangeInfo<Object> info)
 					{
 						refresh();
 					}
 					
-					public void beliefChanged(Object value)
+					public void beliefChanged(ChangeInfo<Object> info)
 					{
 						refresh();
 					}
@@ -318,24 +319,24 @@ public class GuiPanel extends JPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				INegotiationAgent ag = (INegotiationAgent)((IPojoMicroAgent)ia).getPojoAgent();
-				ag.getAgent().addBeliefListener("reports", new IBeliefListener()
+				ag.getAgent().addBeliefListener("reports", new IBeliefListener<Object>()
 				{
-					public void factRemoved(Object value)
+					public void factRemoved(ChangeInfo<Object> info)
 					{
 						refreshDetails();
 					}
 					
-					public void factChanged(Object value, Object oldvalue, Object info)
+					public void factChanged(ChangeInfo<Object> info)
 					{
 						refreshDetails();
 					}
 					
-					public void factAdded(Object value)
+					public void factAdded(ChangeInfo<Object> info)
 					{
 						refreshDetails();
 					}
 					
-					public void beliefChanged(Object value)
+					public void beliefChanged(ChangeInfo<Object> info)
 					{
 						refreshDetails();
 					}

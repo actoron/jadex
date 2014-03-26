@@ -1,17 +1,18 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.runtime.IBeliefListener;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 
 /**
  *  Belief listener adapter that implements empty all methods.
  */
-public class BeliefAdapter implements IBeliefListener
+public class BeliefAdapter<T> implements IBeliefListener<T>
 {
 	/**
 	 *  Invoked when a belief has been changed.
 	 *  @param event The change event.
 	 */ 
-	public void beliefChanged(Object value)
+	public void beliefChanged(ChangeInfo<T> info)
 	{
 	}
 	
@@ -20,7 +21,7 @@ public class BeliefAdapter implements IBeliefListener
 	 *  The new fact is contained in the agent event.
 	 *  @param event The change event.
 	 */
-	public void factAdded(Object value)
+	public void factAdded(ChangeInfo<T> info)
 	{
 	}
 
@@ -29,7 +30,7 @@ public class BeliefAdapter implements IBeliefListener
 	 *  The removed fact is contained in the agent event.
 	 *  @param event The change event.
 	 */
-	public void factRemoved(Object value)
+	public void factRemoved(ChangeInfo<T> info)
 	{
 	}
 
@@ -39,7 +40,7 @@ public class BeliefAdapter implements IBeliefListener
 	 *  @param oldvalue The old value.
 	 *  @param info Extra info (such as the index of the element if applicable).
 	 */  
-	public void factChanged(Object value, Object oldvalue, Object info)
+	public void factChanged(ChangeInfo<T> info)
 	{
 	}
 }

@@ -83,7 +83,7 @@ public class ChangeEvent
 	protected Object value;
 	
 	/** The change identifier, e.g. index or key. */
-	protected Object changeid;
+	protected Object info;
 
 	/**
 	 *  Create a new ChangeEvent. 
@@ -98,12 +98,12 @@ public class ChangeEvent
 	 *  @param source
 	 *  @param value
 	 */
-	public ChangeEvent(String type, Object source, Object value, Object changeid)
+	public ChangeEvent(String type, Object source, Object value, Object info)
 	{
 		this.type = type;
 		this.source = source;
 		this.value = value;
-		this.changeid = changeid;
+		this.info = info;
 	}
 
 	/**
@@ -114,7 +114,6 @@ public class ChangeEvent
 		this.type = event.getType().getType(0);
 		this.source = event.getType().getType(1);
 		this.value = event.getContent();
-//		this.changeid = event.getChangeID();
 	}
 	
 //	/**
@@ -182,21 +181,21 @@ public class ChangeEvent
 	}
 	
 	/**
-	 *  Get the changeid.
-	 *  return The changeid.
+	 *  Get the info.
+	 *  @return The info.
 	 */
-	public Object getChangeId()
+	public Object getInfo()
 	{
-		return changeid;
+		return info;
 	}
 
 	/**
-	 *  Set the changeid. 
-	 *  @param changeid The changeid to set.
+	 *  Set the info.
+	 *  @param info The info to set.
 	 */
-	public void setChangeId(Object changeid)
+	public void setInfo(Object info)
 	{
-		this.changeid = changeid;
+		this.info = info;
 	}
 
 	/**
@@ -204,6 +203,6 @@ public class ChangeEvent
 	 */
 	public String toString()
 	{
-		return "ChangeEvent [type=" + type + ", source=" + source + ", value=" + value + ", changeid=" + changeid + "]";
+		return "ChangeEvent [type=" + type + ", source=" + source + ", value=" + value + ", info=" + info + "]";
 	}
 }

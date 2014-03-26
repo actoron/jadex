@@ -37,6 +37,9 @@ public class Event implements IEvent
 	{
 		this.type = type;
 		this.content = content;
+		
+		if(type.toString().indexOf("beliefchanged.value")!=-1 && content instanceof String)
+			System.out.println("sdfsdf");
 	}
 	
 	//-------- methods --------

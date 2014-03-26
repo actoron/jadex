@@ -123,7 +123,8 @@ public class CollectionWrapper <T> implements Collection<T>
 		if(ret)
 		{
 			observeValue(e);
-			getRuleSystem().addEvent(new Event(addevent, new CollectionEntry<T>(e, null, delegate.size())));
+			getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<T>(e, null, delegate.size())));
+//			getRuleSystem().addEvent(new Event(addevent, new CollectionEntry<T>(e, null, delegate.size())));
 			publishToolBeliefEvent();
 		}
 		return ret;
@@ -138,7 +139,7 @@ public class CollectionWrapper <T> implements Collection<T>
 		if(ret)
 		{
 			unobserveValue(o);
-			getRuleSystem().addEvent(new Event(remevent, new CollectionEntry<T>(null, (T)o, null)));
+			getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<T>(null, (T)o, null)));
 			publishToolBeliefEvent();
 		}
 		return ret;
@@ -163,7 +164,7 @@ public class CollectionWrapper <T> implements Collection<T>
 			for(T t: c)
 			{
 				observeValue(t);
-				getRuleSystem().addEvent(new Event(addevent, new CollectionEntry<T>(t, null, null)));
+				getRuleSystem().addEvent(new Event(addevent, new ChangeInfo<T>(t, null, null)));
 				publishToolBeliefEvent();
 			}
 		}	
@@ -181,7 +182,7 @@ public class CollectionWrapper <T> implements Collection<T>
 			for(Object t: c)
 			{
 				unobserveValue(t);
-				getRuleSystem().addEvent(new Event(remevent, new CollectionEntry<T>((T)t, null, null)));
+				getRuleSystem().addEvent(new Event(remevent, new ChangeInfo<T>((T)t, null, null)));
 				publishToolBeliefEvent();
 			}
 		}	
@@ -337,78 +338,5 @@ public class CollectionWrapper <T> implements Collection<T>
 	{
 		((BDIAgent)getInterpreter().getAgent()).publishToolBeliefEvent(getInterpreter(), mbel);//, evtype);
 	}
-	
-	/**
-	 * 
-	 */
-	public static class CollectionEntry<T>
-	{
-		protected T value;
-		protected T oldvalue;
-		protected Integer index;
-		
-		/**
-		 *  Create a new CollectionEntry.
-		 */
-		public CollectionEntry(T value, T oldvalue, Integer index)
-		{
-			this.value = value;
-			this.oldvalue = oldvalue;
-			this.index = index;
-		}
 
-		/**
-		 *  Get the value.
-		 *  return The value.
-		 */
-		public T getValue()
-		{
-			return value;
-		}
-
-		/**
-		 *  Set the value. 
-		 *  @param value The value to set.
-		 */
-		public void setValue(T value)
-		{
-			this.value = value;
-		}
-
-		/**
-		 *  Get the oldvalue.
-		 *  return The oldvalue.
-		 */
-		public T getOldValue()
-		{
-			return oldvalue;
-		}
-
-		/**
-		 *  Set the oldvalue. 
-		 *  @param oldvalue The oldvalue to set.
-		 */
-		public void setOldValue(T oldvalue)
-		{
-			this.oldvalue = oldvalue;
-		}
-
-		/**
-		 *  Get the index.
-		 *  return The index.
-		 */
-		public Integer getIndex()
-		{
-			return index;
-		}
-
-		/**
-		 *  Set the index. 
-		 *  @param index The index to set.
-		 */
-		public void setIndex(Integer index)
-		{
-			this.index = index;
-		}
-	}
 }
