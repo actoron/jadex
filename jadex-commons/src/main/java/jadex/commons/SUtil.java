@@ -3807,6 +3807,8 @@ public class SUtil
 		try
 		{
 			InputStream is = SUtil.getResource0(filename, null);
+			if(is==null)
+				throw new RuntimeException("Resource not found: "+filename);
 			sc = new Scanner(is);
 			ret = sc.useDelimiter("\\A").next();
 		}

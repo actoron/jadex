@@ -186,8 +186,6 @@ public class BDIAgent extends MicroAgent
 			{
 				if(!multi)
 				{
-					if(!(event.getContent() instanceof ChangeInfo))
-						System.out.println("sadfsdf");
 					listener.beliefChanged((ChangeInfo)event.getContent());
 				}
 				else

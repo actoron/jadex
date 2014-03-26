@@ -606,7 +606,7 @@ public class MicroClassReader
 					if(!Object.class.equals(ctypes[i].clazz()))
 						val = ctypes[i].clazz().getName()+".class";	
 					SubcomponentTypeInfo subinfo = new SubcomponentTypeInfo(ctypes[i].name(), val);
-					if(!toset.containsKey(ctypes[i].name()))
+					if(!res.containsKey(ctypes[i].name()))
 					{
 						res.put(ctypes[i].name(), subinfo);
 					}
