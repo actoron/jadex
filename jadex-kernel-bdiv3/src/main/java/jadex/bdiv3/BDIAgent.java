@@ -154,7 +154,7 @@ public class BDIAgent extends MicroAgent
 				}
 			}
 		});
-		rplan.setReason(new ChangeEvent(null, null, args));
+		rplan.setReason(new ChangeEvent(null, null, args, null));
 		RPlan.executePlan(rplan, getInterpreter().getInternalAccess(), null);
 		return ret;
 	}

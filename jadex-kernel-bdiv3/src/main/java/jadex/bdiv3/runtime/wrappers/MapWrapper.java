@@ -366,6 +366,9 @@ public class MapWrapper<T, E> implements Map<T, E>
 			return oldvalue;
 		}
 
+		/**
+		 * 
+		 */
 		public E setValue(E value)
 		{
 			throw new UnsupportedOperationException();

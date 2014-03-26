@@ -1,11 +1,9 @@
 package jadex.bdiv3.runtime.wrappers;
 
 import jadex.bdiv3.model.MBelief;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
-import jadex.rules.eca.RuleSystem;
 
 import java.util.Collection;
 import java.util.List;
@@ -67,7 +65,8 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 		T ret = getList().set(index, element);
 		unobserveValue(ret);
 		observeValue(element);
-		getRuleSystem().addEvent(new Event(changeevent, new Object[]{ret, element, Integer.valueOf(index)}));
+		getRuleSystem().addEvent(new Event(changeevent, new CollectionEntry<T>(element, ret, index)));
+//				new Object[]{ret, element, Integer.valueOf(index)}));
 		publishToolBeliefEvent();
 		return ret;
 	}
@@ -79,7 +78,7 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 	{
 		getList().add(index, element);
 		observeValue(element);
-		getRuleSystem().addEvent(new Event(addevent, element));
+		getRuleSystem().addEvent(new Event(addevent, new CollectionEntry<T>(element, null, index)));
 		publishToolBeliefEvent();
 	}
 
@@ -90,7 +89,7 @@ public class ListWrapper<T> extends CollectionWrapper<T> implements List<T>
 	{
 		T ret = getList().remove(index);
 		unobserveValue(ret);
-		getRuleSystem().addEvent(new Event(remevent, ret));
+		getRuleSystem().addEvent(new Event(remevent, new CollectionEntry<T>(null, ret, index)));
 		publishToolBeliefEvent();
 		return ret;
 	}
