@@ -2,8 +2,10 @@ package jadex.platform.service.servicepool;
 
 import jadex.bridge.ClassInfo;
 import jadex.bridge.service.PublishInfo;
-import jadex.commons.DefaultPoolStrategy;
 import jadex.commons.IPoolStrategy;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -23,6 +25,9 @@ public class PoolServiceInfo
 	/** The publication info. */
 	protected PublishInfo publishinfo;
 
+	/** The argument names. */
+	protected Map<String, Object> arguments;
+	
 	/**
 	 *  Create a new PoolServiceInfo.
 	 */
@@ -36,7 +41,7 @@ public class PoolServiceInfo
 	 */
 	public PoolServiceInfo(String workermodel, Class<?> servicetype, PublishInfo publishinfo)
 	{
-		this(workermodel, servicetype, null, publishinfo);
+		this(workermodel, servicetype, null, publishinfo, null, null);
 	}
 	
 	/**
@@ -44,19 +49,35 @@ public class PoolServiceInfo
 	 */
 	public PoolServiceInfo(String workermodel, Class<?> servicetype, IPoolStrategy poolstrategy)
 	{
-		this(workermodel, servicetype, poolstrategy, null);
+		this(workermodel, servicetype, poolstrategy, null, null, null);
 	}
 
 	/**
 	 *  Create a new PoolServiceInfo.
 	 */
+	public PoolServiceInfo(String workermodel, Class<?> servicetype, String[] argnames, Object[] argvals)
+	{
+		this(workermodel, servicetype, null, null, argnames, argvals);
+	}
+	
+	/**
+	 *  Create a new PoolServiceInfo.
+	 */
 	public PoolServiceInfo(String workermodel, Class<?> servicetype,
-		IPoolStrategy poolstrategy, PublishInfo publishinfo)
+		IPoolStrategy poolstrategy, PublishInfo publishinfo, String[] argnames, Object[] argvals)
 	{
 		this.workermodel = workermodel;
 		this.servicetype = new ClassInfo(servicetype);
 		this.poolstrategy = poolstrategy;
 		this.publishinfo = publishinfo;
+		if(argnames!=null && argnames.length>0)
+		{
+			this.arguments = new HashMap<String, Object>();
+			for(int i=0; i<argnames.length; i++)
+			{
+				arguments.put(argnames[i], argvals[i]);
+			}
+		}
 	}
 
 	/**
@@ -130,5 +151,22 @@ public class PoolServiceInfo
 	{
 		this.poolstrategy = poolstrategy;
 	}
-	
+
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public Map<String, Object> getArguments()
+	{
+		return arguments;
+	}
+
+	/**
+	 *  Set the arguments.
+	 *  @param arguments The arguments to set.
+	 */
+	public void setArguments(Map<String, Object> arguments)
+	{
+		this.arguments = arguments;
+	}
 }
