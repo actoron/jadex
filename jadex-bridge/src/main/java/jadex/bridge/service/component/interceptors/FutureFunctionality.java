@@ -2023,8 +2023,10 @@ class DelegatingTupleFuture extends Tuple2Future<Object, Object>
 		if(func==null)
 			throw new IllegalArgumentException("Func must not null.");
 		this.func = func;
-		
-		this.creaex	= new DebugException();
+		if(Future.DEBUG)
+		{
+			this.creaex	= new DebugException();
+		}
 	}
 	
 	/**
