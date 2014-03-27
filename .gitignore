@@ -1,7 +1,7 @@
-**/target
-**/bin
-**/gen
-**/.settings
+target
+bin
+gen
+.settings
 .classpath
 .project
 *.prefs

@@ -8,7 +8,10 @@ import jadex.commons.future.IFuture;
 
 import java.io.Writer;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
@@ -33,8 +36,8 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	/** The servers per service id. */
 	protected Map<IServiceIdentifier, Tuple2<HttpServer, HttpHandler>> sidservers;
 	
-	/** The servers per uri. */
-	protected Map<URI, HttpServer> uriservers;
+	/** The servers per port. */
+	protected Map<Integer, HttpServer> portservers;
 	
 	//-------- constructors --------
 	
@@ -101,19 +104,19 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		
 		try
 		{
-			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
-			server = uriservers==null? null: uriservers.get(baseuri);
+//			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+			server = portservers==null? null: portservers.get(uri.getPort());
 			
 			if(server==null)
 			{
-				System.out.println("Starting new server: "+uri.getPath());
+				System.out.println("Starting new server: "+uri.getPort());
 				
 				server = GrizzlyHttpServerFactory.createHttpServer(uri);
 				server.start();
 				
-				if(uriservers==null)
-					uriservers = new HashMap<URI, HttpServer>();
-				uriservers.put(baseuri, server);
+				if(portservers==null)
+					portservers = new HashMap<Integer, HttpServer>();
+				portservers.put(uri.getPort(), server);
 			}
 		}
 		catch(RuntimeException e)
@@ -156,25 +159,27 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 		HttpServer server = getHttpServer(uri);
 		
         ServerConfiguration sc = server.getServerConfiguration();
-		sc.addHttpHandler(new HttpHandler() 
-		{
-            public void service(Request request, Response resp) 
-            {
-            	try
-            	{
-	            	// Set response content type
-	                resp.setContentType("text/html");
-	
-	                // Actual logic goes here.
-	                Writer out = resp.getWriter();
-	                out.write(html);
-            	}
-            	catch(Exception e)
-            	{
-            		e.printStackTrace();
-            	}
-            }
-        }, uri.getPath());
+        Map<HttpHandler, String[]>	handlers	= sc.getHttpHandlers();
+        HtmlHandler	htmlh	= null;
+        for(Map.Entry<HttpHandler, String[]> entry: handlers.entrySet())
+        {
+        	if(entry.getKey() instanceof HtmlHandler)
+        	{
+        		if(Arrays.asList(entry.getValue()).contains(uri.getPath()))
+        		{
+	        		htmlh	= (HtmlHandler)entry.getKey();
+	        		break;
+        		}
+        	}
+        }
+        
+        if(htmlh==null)
+        {
+        	htmlh	= new HtmlHandler();
+    		sc.addHttpHandler(htmlh, uri.getPath());
+        }
+        
+       	htmlh.addMapping(uri.getHost(), html);
 		
 //		System.out.println("published at: "+uri.getPath());
 		
@@ -269,11 +274,11 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 			    config.removeHttpHandler(tup.getSecondEntity());
 			    if(config.getHttpHandlers().size()==0)
 			    {
-			    	for(Map.Entry<URI, HttpServer> entry: uriservers.entrySet())
+			    	for(Iterator<HttpServer> servers=portservers.values().iterator(); servers.hasNext(); )
 			    	{
-			    		if(entry.getValue().equals(server))
+			    		if(servers.next().equals(server))
 			    		{
-			    			uriservers.remove(entry.getKey());
+			    			servers.remove();
 			    			break;
 			    		}
 			    	}
@@ -295,5 +300,83 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	public boolean isPublished(IServiceIdentifier sid)
 	{
 		return sidservers!=null && sidservers.containsKey(sid);
+	}
+	
+	//-------- helper classes --------
+	
+	/**
+	 *	Allow responding with different htmls based on virtual host name. 
+	 */
+	// Hack!! only works if no different contexts are published at overlapping resources: e.g. hugo.com/foo/bar vs. dummy.com/foo.
+	public static class HtmlHandler extends HttpHandler
+	{
+		//-------- attributes --------
+		
+		/** The html responses (host->response). */
+		protected Map<String, String>	mapping;
+
+		//-------- constructors --------
+		
+		/**
+		 *  Create an html handler.
+		 */
+		public HtmlHandler()
+		{
+			this.mapping = new LinkedHashMap<String, String>();
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Add a mapping.
+		 */
+		public void	addMapping(String host, String html)
+		{
+			this.mapping.put(host, html);
+		}
+		
+		//-------- HttpHandler methods --------
+
+		/**
+		 *  Service the request.
+		 */
+		public void service(Request request, Response resp) 
+		{
+			String	host	= request.getHeader("host");
+			int	idx	= host.indexOf(":");
+			if(idx!=-1)
+			{
+				host	= host.substring(0, idx);
+			}
+			String	html	= null;
+			
+			for(Map.Entry<String, String> entry: mapping.entrySet())
+			{
+				if(entry.getKey().equals(host))
+				{
+					html	= entry.getValue();
+					break;
+				}
+				else if(html==null)
+				{
+					// Use first entry, when no other match is found.
+					html	= entry.getValue(); 
+				}
+			}
+			
+			try
+			{
+		    	// Set response content type
+		        resp.setContentType("text/html");
+
+		        // Actual logic goes here.
+		        Writer out = resp.getWriter();
+		        out.write(html);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }
