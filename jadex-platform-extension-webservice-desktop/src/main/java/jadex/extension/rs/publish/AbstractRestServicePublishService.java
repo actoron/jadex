@@ -26,6 +26,7 @@ import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -1071,6 +1072,10 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 						Thread.currentThread().getContextClassLoader());
 					sc = new Scanner(is);
 					stylecss = sc.useDelimiter("\\A").next();
+					
+					String	stripes	= SUtil.loadBinary("jadex/extension/rs/publish/jadex_stripes.png");
+					stylecss	= stylecss.replace("$stripes", stripes);
+					
 					scss.set(this, stylecss);
 //					System.out.println(functionsjs);
 				}
@@ -1267,6 +1272,8 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 			}
 			
 			ret.append("</div>");
+			
+			ret.append("<div class=\"powered\"> <span class=\"powered\">powered by</span> <span class=\"jadex\">Jadex Active Components</span> <a class=\"jadexurl\" href=\"http://www.activecomponents.org\">http://www.activecomponents.org</a> </div>");
 		}
 		catch(Exception e)
 		{

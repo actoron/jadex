@@ -2,6 +2,7 @@ package jadex.commons;
 
 import jadex.commons.collection.SCollection;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -3958,6 +3959,57 @@ public class SUtil
 //		System.out.println("Here: " + createUniqueId("test", 3));
 //		System.out.println(htmlwraps);
 //		testIntByteConversion();
+	}
+
+	/**
+	 *  Load a binary file as base 64 string, e.g. for embedded html images.
+	 */
+	public static String	loadBinary(String file)
+	{
+		String	ret;
+		
+		InputStream is = getResource0(file, Thread.currentThread().getContextClassLoader());
+		byte[]	buf	= new byte[8192];
+		ByteArrayOutputStream	baos	= new ByteArrayOutputStream(buf.length);
+		try
+		{
+			for(int len=is.read(buf); len!=-1; len=is.read(buf))
+			{
+				baos.write(buf, 0, len);
+			}
+			
+			ret	= new String(Base64.encode(baos.toByteArray()), "UTF-8");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		finally
+		{
+			if(is!=null)
+			{
+				try
+				{
+					is.close();
+				}
+				catch(IOException e)
+				{
+				}
+			}
+			if(baos!=null)
+			{
+				try
+				{
+					baos.close();
+				}
+				catch(IOException e)
+				{
+				}
+			}
+		}
+		
+		return ret;
 	}
 	
 }

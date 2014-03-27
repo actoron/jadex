@@ -42,7 +42,7 @@ body
 
 .header
 {
-	padding-left: 25px;
+	/*padding-left: 25px;*/
 	background: white;	
 }
 
@@ -88,6 +88,7 @@ h1
     font-weight: normal;
     line-height: 1.1em;
     margin: 20px 0 15px;
+    padding-left: 25px;
 }
 
 h2 
@@ -123,6 +124,44 @@ h5
     font-weight: normal;
     line-height: 1.1em;
     margin: 8px 0 5px;
+}
+
+span.powered
+{
+	margin-left:	25px; 
+}
+
+.jadexurl
+{
+	margin-right:	25px; 
+}
+
+/** Jadex stripes before powered by jadex. */
+div.powered::before
+{
+	display:	block;
+	content:	'';
+	height:	10;
+	clear:	both;
+	background:	url(data:image/jpeg;base64,$stripes);
+	margin:	5px 0px;
+}
+
+/** dash before jadex url. */
+.jadexurl::before
+{
+	content:	' - ';
+}
+
+/** Jadex stripes after heading. */
+.header::after
+{
+	display:	block;
+	content:	'';
+	height:	10;
+	clear:	both;
+	background:	url(data:image/jpeg;base64,$stripes);
+	margin:	5px 0px 7px;
 }
 
 </style>
