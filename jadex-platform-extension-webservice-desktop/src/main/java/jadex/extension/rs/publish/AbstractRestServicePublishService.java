@@ -1,6 +1,5 @@
 package jadex.extension.rs.publish;
 
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -380,7 +379,7 @@ public abstract class AbstractRestServicePublishService implements IWebPublishSe
 	/**
 	 *  Publish an html page.
 	 */
-	public abstract IFuture<Void> publishHMTLPage(URI uri, final String html);
+	public abstract IFuture<Void> publishHMTLPage(URI uri, String vhost, String html);
 	
 //	/**
 //	 *  Publish a resource.

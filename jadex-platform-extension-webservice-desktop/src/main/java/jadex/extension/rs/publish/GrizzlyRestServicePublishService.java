@@ -154,7 +154,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
 	/**
 	 *  Publish an html page.
 	 */
-	public IFuture<Void> publishHMTLPage(URI uri, final String html)
+	public IFuture<Void> publishHMTLPage(URI uri, String vhost, String html)
 	{
 		HttpServer server = getHttpServer(uri);
 		
@@ -179,7 +179,7 @@ public class GrizzlyRestServicePublishService extends AbstractRestServicePublish
     		sc.addHttpHandler(htmlh, uri.getPath());
         }
         
-       	htmlh.addMapping(uri.getHost(), html);
+       	htmlh.addMapping(vhost, html);
 		
 //		System.out.println("published at: "+uri.getPath());
 		
