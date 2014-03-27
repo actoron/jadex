@@ -42,7 +42,7 @@ body
 
 .header
 {
-	/*padding-left: 25px;*/
+	padding-left: 25px;
 	background: white;	
 }
 
@@ -88,7 +88,6 @@ h1
     font-weight: normal;
     line-height: 1.1em;
     margin: 20px 0 15px;
-    padding-left: 25px;
 }
 
 h2 
@@ -144,7 +143,7 @@ div.powered::before
 	height:	10;
 	clear:	both;
 	background:	url(data:image/jpeg;base64,$stripes);
-	margin:	5px 0px;
+	margin:	25px 0px 7px;
 }
 
 /** dash before jadex url. */
@@ -153,7 +152,7 @@ div.powered::before
 	content:	' - ';
 }
 
-/** Jadex stripes after heading. */
+/** Jadex stripes after heading. * /
 .header::after
 {
 	display:	block;
@@ -161,7 +160,7 @@ div.powered::before
 	height:	10;
 	clear:	both;
 	background:	url(data:image/jpeg;base64,$stripes);
-	margin:	5px 0px 7px;
-}
+	margin:	5px 0px;
+}*/
 
 </style>
