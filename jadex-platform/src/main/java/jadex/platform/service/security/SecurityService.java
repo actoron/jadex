@@ -1073,6 +1073,16 @@ public class SecurityService implements ISecurityService
 
 		return IFuture.DONE;		
 	}
+	
+	/**
+	 *  Get the virtual names and their contents.
+	 *  @return The map of virtual names and their platform mappings.
+	 */
+	@SecureTransmission
+	public IFuture<Map<String, Set<String>>> getVirtuals()
+	{
+		return new Future<Map<String, Set<String>>>(virtualsmap);
+	}
 
 	
 	/**

@@ -1,6 +1,5 @@
 package jadex.tools.security;
 
-import jadex.commons.Base64;
 import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -12,8 +11,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
@@ -24,8 +21,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-
-import org.bouncycastle.openssl.PEMWriter;
 
 /**
  *  Panel for displaying a certificate.

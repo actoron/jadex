@@ -93,9 +93,11 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 		assert SwingUtilities.isEventDispatchThread();
 		
 		IdTreeNode<T> child = (IdTreeNode<T>)getChildAt(idx);
-		tm.removeNode(child);
 		super.remove(idx);
-		tm.nodesWereRemoved(this, new int[]{idx}, new TreeNode[]{child});
+		if(tm.removeNode(child))
+		{
+			tm.nodesWereRemoved(this, new int[]{idx}, new TreeNode[]{child});
+		}
 	}
 	
 	/**
@@ -107,9 +109,11 @@ public class IdTreeNode<T> extends DefaultMutableTreeNode
 		assert SwingUtilities.isEventDispatchThread();
 		
 		int idx = getIndex(child);
-		tm.removeNode((IdTreeNode<T>)child);
-		super.remove(child);
-		tm.nodesWereRemoved(this, new int[]{idx}, new TreeNode[]{child});
+		if(tm.removeNode((IdTreeNode<T>)child))
+		{
+			super.remove(child);
+			tm.nodesWereRemoved(this, new int[]{idx}, new TreeNode[]{child});
+		}
 	}
 	
 	/**

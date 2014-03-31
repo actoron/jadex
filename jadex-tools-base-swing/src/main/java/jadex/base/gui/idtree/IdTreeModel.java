@@ -52,11 +52,11 @@ public class IdTreeModel<T> extends DefaultTreeModel
 	 *  Remove a node.
 	 *  @param node The node.
 	 */
-	public void removeNode(IdTreeNode<T> node)
+	public boolean removeNode(IdTreeNode<T> node)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
-		deregisterAll(node);
+		return deregisterAll(node);
 	}
 	
 	/**
@@ -81,14 +81,19 @@ public class IdTreeModel<T> extends DefaultTreeModel
 	 *  Deregister a node and all its children.
 	 *  @param node The node.
 	 */
-	protected void deregisterAll(IdTreeNode<T> node)
+	protected boolean deregisterAll(IdTreeNode<T> node)
 	{
-		nodes.remove(node.getId());
+		boolean ret = nodes.remove(node.getId())!=null;
 		
-		for(int i=node.getChildCount()-1; i>=0; i--)
+		if(ret)
 		{
-			deregisterAll((IdTreeNode<T>)node.getChildAt(i));
+			for(int i=node.getChildCount()-1; i>=0; i--)
+			{
+				deregisterAll((IdTreeNode<T>)node.getChildAt(i));
+			}
 		}
+		
+		return ret;
 	}
 	
 	/**

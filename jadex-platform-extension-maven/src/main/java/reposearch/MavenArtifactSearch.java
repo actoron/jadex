@@ -198,7 +198,7 @@ public class MavenArtifactSearch
                     System.out.println( " - Done" );
                 }
             };
-            ResourceFetcher fetcher = new WagonHelper.WagonFetcher( wagon, listener, null, null );
+            ResourceFetcher fetcher = new WagonHelper.WagonFetcher(wagon, listener, null, null );
 
             Date centralContextCurrentTimestamp = centralContext.getTimestamp();
             IndexUpdateRequest updateRequest = new IndexUpdateRequest( centralContext, fetcher );

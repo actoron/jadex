@@ -12,6 +12,7 @@ import jadex.commons.future.ISubscriptionIntermediateFuture;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  The security service is responsible for
@@ -249,6 +250,13 @@ public interface ISecurityService
 	 */
 	@SecureTransmission
 	public IFuture<Void> removeVirtual(String virtual, String name);
+	
+	/**
+	 *  Get the virtual names and their contents.
+	 *  @return The map of virtual names and their platform mappings.
+	 */
+	@SecureTransmission
+	public IFuture<Map<String, Set<String>>> getVirtuals();
 	
 	//-------- keystore handling --------
 	
