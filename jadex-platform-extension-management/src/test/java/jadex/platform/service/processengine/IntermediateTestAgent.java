@@ -70,30 +70,30 @@ public class IntermediateTestAgent
 			
 			public void finished()
 			{
-//				runTests("jadex.platform.service.processengine.TestSubprocessStartEvent.bpmn2", "SubprocessStart")
-//					.addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
-//				{
-//					public void intermediateResultAvailable(TestReport result)
-//					{
-//						trs.add(result);
-//					}
-//					
-//					public void finished()
-//					{
-//						testEventIgnore("Ignored",
-//							new TestReport("Ignored#1", "Test if unknown event produces exception."))
-//							.addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
-//						{
-//							public void customResultAvailable(TestReport tr)
-//							{
-//								trs.add(tr);
+				runTests("jadex.platform.service.processengine.TestSubprocessStartEvent.bpmn2", "SubprocessStart")
+					.addResultListener(new IntermediateExceptionDelegationResultListener<TestReport, Void>(ret)
+				{
+					public void intermediateResultAvailable(TestReport result)
+					{
+						trs.add(result);
+					}
+					
+					public void finished()
+					{
+						testEventIgnore("Ignored",
+							new TestReport("Ignored#1", "Test if unknown event produces exception."))
+							.addResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
+						{
+							public void customResultAvailable(TestReport tr)
+							{
+								trs.add(tr);
 								
 								agent.setResultValue("testresults", new Testcase(trs.size(), trs.toArray(new TestReport[trs.size()])));
 								ret.setResult(null);
-//							}
-//						});
-//					}
-//				});
+							}
+						});
+					}
+				});
 			}
 		});
 	
@@ -107,27 +107,27 @@ public class IntermediateTestAgent
 	{
 		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 		
-//		testWrongEventValueIntermediateBpmn(model, eventtype, new TestReport(eventtype+"#1", "Test if bpmn rule triggering works for: "+eventtype))
-//			.addResultListener(new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
-//		{
-//			public void customResultAvailable(TestReport tr)
-//			{
-//				ret.addIntermediateResult(tr);
-//				
-//				testWQIntermediateBpmn(model, eventtype, new TestReport(eventtype+"#2", "Test if bpmn rule triggering from wait queue works for: "+eventtype))
-//					.addResultListener(new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
-//				{
-//					public void customResultAvailable(TestReport tr)
-//					{
-//						ret.addIntermediateResult(tr);
-//						
-//						testNoEventIntermediateBpmn(model, new TestReport(eventtype+"#3", "Test if bpmn rule not triggering works for: "+eventtype))
-//							.addResultListener(new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
-//						{
-//							public void customResultAvailable(TestReport tr)
-//							{
-//								ret.addIntermediateResult(tr);
-								testIntermediateBpmn(model, eventtype, new TestReport(eventtype+"#4", "Test if bpmn rule not triggering for wrong event value works for: "+eventtype))
+		testWrongEventValueIntermediateBpmn(model, eventtype, new TestReport(eventtype+"#1", "Test if bpmn rule not triggering for wrong event value works for: "+eventtype))
+			.addResultListener(new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
+		{
+			public void customResultAvailable(TestReport tr)
+			{
+				ret.addIntermediateResult(tr);
+				
+				testWQIntermediateBpmn(model, eventtype, new TestReport(eventtype+"#2", "Test if bpmn rule triggering from wait queue works for: "+eventtype))
+					.addResultListener(new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
+				{
+					public void customResultAvailable(TestReport tr)
+					{
+						ret.addIntermediateResult(tr);
+						
+						testNoEventIntermediateBpmn(model, new TestReport(eventtype+"#3", "Test if bpmn rule not triggering works for: "+eventtype))
+							.addResultListener(new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
+						{
+							public void customResultAvailable(TestReport tr)
+							{
+								ret.addIntermediateResult(tr);
+								testIntermediateBpmn(model, eventtype, new TestReport(eventtype+"#4", "Test if bpmn rule triggering works for: "+eventtype))
 									.addResultListener(new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
 								{
 									public void customResultAvailable(TestReport tr)
@@ -144,12 +144,12 @@ public class IntermediateTestAgent
 										});
 									}
 								});
-//							}
-//						});
-//					}
-//				});
-//			}
-//		});
+							}
+						});
+					}
+				});
+			}
+		});
 	
 		return ret;
 	}		
@@ -208,6 +208,14 @@ public class IntermediateTestAgent
 		catch(TimeoutException e)
 		{
 			tr.setFailed("Timeout exception.");
+			try
+			{
+				cms.destroyComponent(fut.getFirstResult());
+			}
+			catch(Exception ex)
+			{
+				agent.getLogger().warning("Exception when terminating process: "+model+", "+ex);
+			}
 		}
 		ret.setResult(tr);
 		
@@ -219,6 +227,8 @@ public class IntermediateTestAgent
 	 */
 	protected IFuture<TestReport> testIntermediateBpmn(String model, String eventtype, TestReport tr)
 	{
+		System.out.println("testIntermediateBpmn: "+model);
+		
 		Future<TestReport> ret = new Future<TestReport>();
 		
 		IComponentManagementService	cms	= agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
@@ -243,6 +253,14 @@ public class IntermediateTestAgent
 		catch(TimeoutException e)
 		{
 			tr.setFailed("Timeout exception.");
+			try
+			{
+				cms.destroyComponent(fut.getFirstResult());
+			}
+			catch(Exception ex)
+			{
+				agent.getLogger().warning("Exception when terminating process: "+model+", "+ex);
+			}
 		}
 		ret.setResult(tr);
 		
@@ -269,7 +287,7 @@ public class IntermediateTestAgent
 		agent.waitForDelay(500).get();
 		
 		Map<String, Object>	event	= new HashMap<String, Object>();
-		event.put("value", 7);
+		event.put("value", 8);
 		pes.processEvent(event, eventtype).get();
 
 		try
@@ -280,6 +298,14 @@ public class IntermediateTestAgent
 		catch(TimeoutException e)
 		{
 			tr.setSucceeded(true);
+			try
+			{
+				cms.destroyComponent(fut.getFirstResult());
+			}
+			catch(Exception ex)
+			{
+				agent.getLogger().warning("Exception when terminating process: "+model+", "+ex);
+			}
 		}
 		ret.setResult(tr);
 		
@@ -317,6 +343,14 @@ public class IntermediateTestAgent
 		catch(TimeoutException e)
 		{
 			tr.setSucceeded(true);
+			try
+			{
+				cms.destroyComponent(fut.getFirstResult());
+			}
+			catch(Exception ex)
+			{
+				agent.getLogger().warning("Exception when terminating process: "+model+", "+ex);
+			}
 		}
 		
 		ret.setResult(tr);
@@ -329,6 +363,8 @@ public class IntermediateTestAgent
 	 */
 	protected IFuture<TestReport> testNoEventIntermediateBpmn(String model, TestReport tr)
 	{
+		System.out.println("testNoEventIntermediateBpmn: "+model);
+
 		Future<TestReport> ret = new Future<TestReport>();
 		
 		IComponentManagementService	cms	= agent.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get();
@@ -337,16 +373,25 @@ public class IntermediateTestAgent
 		pes.addBpmnModel(model, agent.getModel().getResourceIdentifier()).getNextIntermediateResult();
 		
 		agent.waitForDelay(500).get();
+
+		ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 		
 		try
 		{
-			ITuple2Future<IComponentIdentifier, Map<String, Object>>	fut = cms.createComponent(model, new jadex.bridge.service.types.cms.CreationInfo(agent.getComponentIdentifier()));
 			fut.get(3000);
 			tr.setFailed("No timeout exception.");
 		}
 		catch(TimeoutException e)
 		{
 			tr.setSucceeded(true);
+			try
+			{
+				cms.destroyComponent(fut.getFirstResult());
+			}
+			catch(Exception ex)
+			{
+				agent.getLogger().warning("Exception when terminating process: "+model+", "+ex);
+			}
 		}
 		
 		ret.setResult(tr);

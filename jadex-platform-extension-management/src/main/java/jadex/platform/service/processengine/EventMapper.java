@@ -1,10 +1,15 @@
 package jadex.platform.service.processengine;
 
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
@@ -16,15 +21,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * 
  */
 public class EventMapper
 {
-	/** The logger. */
-	protected Logger	logger;
+	/** The process engine component. */
+	protected IInternalAccess	component;
 	
 	/** The map of event types to mapping infos. */
 	protected Map<String, List<MappingInfo>> modelmappings;
@@ -46,9 +50,9 @@ public class EventMapper
 	/**
 	 *  Create a new event mapper.
 	 */
-	public EventMapper(Logger logger)
+	public EventMapper(IInternalAccess component)
 	{
-		this.logger	= logger;
+		this.component	= component;
 		this.modelmappings = new HashMap<String, List<MappingInfo>>();
 		this.instancemappings = new HashMap<String, List<MappingInfo>>();
 		this.instanceprocs = new HashMap<String, List<MappingInfo>>();
@@ -61,45 +65,99 @@ public class EventMapper
 	 *  @param event The event object.
 	 *  @return The process model.
 	 */
-	public boolean processInstanceEvent(Object event, String type)
+	public IFuture<Boolean> processInstanceEvent(Object event, String type)
 	{
-		boolean ret = false;
-		type = getEventType(event, type);
+		Future<Boolean> ret = new Future<Boolean>();
 		
+		type = getEventType(event, type);
 		List<MappingInfo> mis = instancemappings.get(type);
-		if(mis!=null)
+		if(mis!=null && !mis.isEmpty())
 		{
-			for(MappingInfo mi: mis)
-			{
-				boolean	match;
-				try
-				{
-					match	= mi.getFilter()==null || mi.getFilter().filter(event);
-				}
-				catch(RuntimeException e)
-				{
-					logger.warning("Event mapper filter threw exception: "+e);
-					match	= false;
-				}
+			// Copy list to allow concurrent changes
+			internalProcessInstanceEvent(event, type, new ArrayList<EventMapper.MappingInfo>(mis), 0, ret);
+		}
+		else
+		{
+			ret.setResult(false);
+		}
+
+		return ret;
+	}
+	
+	protected void	internalProcessInstanceEvent(final Object event, final String type, final List<MappingInfo> mis, final int i, final Future<Boolean> ret)
+	{
+		MappingInfo	mi	= mis.get(i);
+		
+		boolean	match;
+		try
+		{
+			match	= mi.getFilter()==null || mi.getFilter().filter(event);
+		}
+		catch(RuntimeException e)
+		{
+			component.getLogger().warning("Event mapper filter threw exception: "+e);
+			match	= false;
+		}
 				
-				if(match)
+		if(match)
+		{
+			try
+			{
+				IResultCommand<IFuture<Void>, Object> cmd = (IResultCommand<IFuture<Void>, Object>)mi.getInfo();
+				cmd.execute(event).addResultListener(component.createResultListener(
+					new IResultListener<Void>()
 				{
-					try
+					public void resultAvailable(Void result)
 					{
-						ICommand<Object> cmd = (ICommand<Object>)mi.getInfo();
-						cmd.execute(event);
-					}
-					catch(RuntimeException e)
-					{
-						logger.severe("Event mapper command threw exception: "+e);						
+						ret.setResult(true);
 					}
 					
-					ret = true;
-					break;
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof ComponentTerminatedException)
+						{
+							if(i<mis.size()-1)
+							{
+								internalProcessInstanceEvent(event, type, mis, i+1, ret);
+							}
+							else
+							{
+								ret.setResult(false);
+							}
+						}
+						else
+						{
+							component.getLogger().severe("Event mapper command threw exception: "+exception);
+							ret.setResult(true);
+						}
+					}
+				}));
+			}
+			catch(ComponentTerminatedException e)
+			{
+				if(i<mis.size()-1)
+				{
+					internalProcessInstanceEvent(event, type, mis, i+1, ret);
+				}
+				else
+				{
+					ret.setResult(false);
 				}
 			}
+			catch(RuntimeException e)
+			{
+				component.getLogger().severe("Event mapper command threw exception: "+e);
+				ret.setResult(true);
+			}
 		}
-		return ret;
+		else if(i<mis.size()-1)
+		{
+			internalProcessInstanceEvent(event, type, mis, i+1, ret);
+		}
+		else
+		{
+			ret.setResult(false);
+		}
 	}
 	
 	/**
@@ -147,7 +205,7 @@ public class EventMapper
 	 *  @param info The modelname.
 	 */
 //	public void addModelMapping(IFilter<Object> filter)
-	public String addInstanceMapping(UnparsedExpression uexp, String[] events, Map<String, Object> vals, String[] imports, boolean remove, ICommand<Object> cmd)
+	public String addInstanceMapping(UnparsedExpression uexp, String[] events, Map<String, Object> vals, String[] imports, boolean remove, IResultCommand<IFuture<Void>, Object> cmd)
 	{
 		String	id	= SUtil.createUniqueId("EventMapping");
 		while(instancemappings.containsKey(id))
@@ -181,16 +239,16 @@ public class EventMapper
 		List<MappingInfo> rems	= new ArrayList<MappingInfo>();
 		instanceprocs.put(id, rems);
 		
-		final ICommand<Object> fcmd = cmd;
+		final IResultCommand<IFuture<Void>, Object> fcmd = cmd;
 		final String fid = id;
 		if(remove)
 		{
-			cmd = new ICommand<Object>()
+			cmd = new IResultCommand<IFuture<Void>, Object>()
 			{
-				public void execute(Object args)
+				public IFuture<Void> execute(Object args)
 				{
-					fcmd.execute(args);
 					removeInstanceMappings(fid);
+					return fcmd.execute(args);
 				}
 			};
 		}

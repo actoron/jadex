@@ -53,7 +53,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
@@ -88,7 +87,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  *  The bpmn interpreter is able to execute bpmn diagrams.
@@ -402,11 +400,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 							
 							final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), evtsubentry.getValue());
 							final IExternalAccess exta = getExternalAccess();
-							IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, false, new ICommand<Object>()
+							IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, false, new IResultCommand<IFuture<Void>, Object>()
 							{
-								public void execute(final Object event)
+								public IFuture<Void> execute(final Object event)
 								{
-									exta.scheduleStep(new IComponentStep<Void>()
+									return exta.scheduleStep(new IComponentStep<Void>()
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
@@ -418,16 +416,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 											subcontext.addThread(subthread);
 											subthread.setParameterValue("$event", event);
 											return IFuture.DONE;
-										}
-									}).addResultListener(new IResultListener<Void>()
-									{
-										public void resultAvailable(Void result)
-										{
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											Logger.getAnonymousLogger().warning("Event " + event + " could not be delivered to instance: " + exception.getMessage());
 										}
 									});
 								}
