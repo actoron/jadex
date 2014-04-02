@@ -864,7 +864,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		((JTabbedPane)inner).addTab("Key Store", spv);
 		((JTabbedPane)inner).addTab("Remote Passwords", ppp);
 		((JTabbedPane)inner).addTab("Network Names", npp);
-		((JTabbedPane)inner).addTab("Virtual Platform Names", new VirtualNamesPanel(secservice));
+		((JTabbedPane)inner).addTab("Virtual Platform Names", new DualVirtualNamesPanel(jcc.getPlatformAccess(), secservice, jcc.getCMSHandler()));
 			
 		// Gui listeners.
 		buapply.setEnabled(false);

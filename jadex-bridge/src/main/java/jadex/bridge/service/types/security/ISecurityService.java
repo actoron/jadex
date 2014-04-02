@@ -64,6 +64,9 @@ public interface ISecurityService
 	/** The validity duration changed. */
 	public static final String PROPERTY_VALIDITYDURATION = "validityduration";
 
+	/** The validity duration changed. */
+	public static final String PROPERTY_VIRTUALS = "virtuals";
+
 	
 	//-------- password management --------
 	
@@ -260,6 +263,9 @@ public interface ISecurityService
 	
 	//-------- keystore handling --------
 	
+	//todo: add 
+	// IFuture<Certificate> getPlatformCertificate(String type, String val);
+	// IFuture<Set<Certificate>> getPlatformCertificates(); // allow more than 1
 	/**
 	 *  Get the certificate of a platform.
 	 *  @param cid The platform component identifier (null for own certificate).

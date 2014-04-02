@@ -344,6 +344,16 @@ public class SecurityService implements ISecurityService
 																}
 															}
 															
+															Properties sb = props.getSubproperty("virtuals");
+															if(sb!=null)
+															{
+																Property[] ps = sb.getProperties();
+																for(Property p: ps)
+																{
+																	addVirtual(p.getType(), p.getValue());
+																}
+															}
+															
 															publishCurrentState();
 															
 															return IFuture.DONE;
@@ -389,6 +399,27 @@ public class SecurityService implements ISecurityService
 																for(AAcquisitionMechanism mech: mechanisms)
 																{
 																	ret.addSubproperties(SReflect.getInnerClassName(mech.getClass()), mech.getProperties());
+																}
+															}
+															
+															if(virtualsmap!=null && !virtualsmap.isEmpty())
+															{
+																Properties sb = new Properties();
+																ret.addSubproperties("virtuals", sb);
+																for(Map.Entry<String, Set<String>> virtual: virtualsmap.entrySet())
+																{
+																	Set<String> vals = virtual.getValue();
+																	if(vals==null || vals.isEmpty())
+																	{
+																		sb.addProperty(new Property(virtual.getKey(), null));
+																	}
+																	else
+																	{
+																		for(String value: virtual.getValue())
+																		{
+																			sb.addProperty(new Property(virtual.getKey(), value));
+																		}
+																	}
 																}
 															}
 															
@@ -1049,7 +1080,10 @@ public class SecurityService implements ISecurityService
 			names	= new HashSet<String>();
 			virtualsmap.put(virtual, names);
 		}
-		names.add(name);
+		if(name!=null)
+		{
+			names.add(name);
+		}
 
 		return IFuture.DONE;
 	}
@@ -1064,11 +1098,18 @@ public class SecurityService implements ISecurityService
 		Set<String> names = virtualsmap.get(virtual);
 		if(names!=null)
 		{
-			names.remove(name);
-			if(names.isEmpty())
+			if(name==null)
 			{
 				virtualsmap.remove(virtual);
 			}
+			else
+			{
+				names.remove(name);
+			}
+//			if(names.isEmpty())
+//			{
+//				virtualsmap.remove(virtual);
+//			}
 		}
 
 		return IFuture.DONE;		
@@ -1486,6 +1527,7 @@ public class SecurityService implements ISecurityService
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
 		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, Long.valueOf(valdur)));
+		ret.addIntermediateResultIfUndone(new ChangeEvent<Object>(null, PROPERTY_VIRTUALS, virtualsmap));
 
 //		System.out.println("ret fut is: "+ret+" "+ret.hashCode());
 		
@@ -1549,6 +1591,7 @@ public class SecurityService implements ISecurityService
 		publishEvent(new ChangeEvent<Object>(null, PROPERTY_TRUSTEDLAN, trustedlan? Boolean.TRUE: Boolean.FALSE));
 		publishEvent(new ChangeEvent<Object>(null, PROPERTY_SELECTEDMECHANISM, selmech));
 		publishEvent(new ChangeEvent<Object>(null, PROPERTY_VALIDITYDURATION, Long.valueOf(valdur)));
+		publishEvent(new ChangeEvent<Object>(null, PROPERTY_VIRTUALS, virtualsmap));
 	}
 	
 	//-------- static part --------
