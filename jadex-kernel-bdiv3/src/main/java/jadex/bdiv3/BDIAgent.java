@@ -523,7 +523,8 @@ public class BDIAgent extends MicroAgent
 					RuleSystem rs = ip.getRuleSystem();
 					final String belname = (String)write[1];
 					Object val = write[0];
-					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
+//					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
+					rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, new ChangeInfo<Object>(val, null, null)));
 					MBelief	mbel = ((MCapability)ip.getCapability().getModelElement()).getBelief(belname);
 					observeValue(rs, val, (BDIAgentInterpreter)agent.getInterpreter(), ChangeEvent.FACTCHANGED+"."+belname, mbel);
 				}

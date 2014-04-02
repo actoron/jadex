@@ -8,6 +8,7 @@ import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
@@ -204,7 +205,22 @@ public class ClassPlanBody extends AbstractPlanBody
 							}
 							else
 							{
-								f.set(plan, ((ChangeEvent)r).getValue());
+								Object val = ((ChangeEvent)r).getValue();
+								if(val instanceof ChangeInfo)
+								{
+									if(ft.equals(ChangeInfo.class))
+									{
+										f.set(plan, val);
+									}
+									else
+									{
+										f.set(plan, ((ChangeInfo<?>)val).getValue());
+									}
+								}
+								else
+								{
+									f.set(plan, val);
+								}
 							}
 						}
 					}
