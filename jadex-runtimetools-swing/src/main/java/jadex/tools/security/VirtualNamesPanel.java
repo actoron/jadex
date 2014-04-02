@@ -3,6 +3,7 @@ package jadex.tools.security;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.PlatformSelectorDialog;
 import jadex.base.gui.componenttree.ComponentIconCache;
+import jadex.base.gui.idtree.IdTreeCellRenderer;
 import jadex.base.gui.idtree.IdTreeModel;
 import jadex.base.gui.idtree.IdTreeNode;
 import jadex.bridge.IComponentIdentifier;
@@ -18,6 +19,8 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingResultListener;
+import jadex.tools.email.EmailClientPlugin;
+import jadex.tools.libtool.LibraryServicePlugin;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -38,6 +41,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.UIDefaults;
 import javax.swing.tree.TreePath;
 
 /**
@@ -45,6 +49,17 @@ import javax.swing.tree.TreePath;
  */
 public class VirtualNamesPanel extends JPanel
 {
+	//-------- constants --------
+
+	/** The image icons. */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"virtual", SGUI.makeIcon(VirtualNamesPanel.class, "/jadex/tools/security/images/virtual.png"),
+		"platform", SGUI.makeIcon(VirtualNamesPanel.class, "/jadex/tools/security/images/platform.png"),
+	});
+	
+	//-------- attributes --------
+	
 	/** The external access of the platform. */
 	protected IExternalAccess ea;
 	
@@ -94,6 +109,7 @@ public class VirtualNamesPanel extends JPanel
 		tree = new JTree(model);
 		new TreeExpansionHandler(tree);
 		tree.setRootVisible(false);
+		tree.setCellRenderer(new IdTreeCellRenderer());
 		tree.expandPath(new TreePath(root.getPath()));
 	
 		add(new JScrollPane(tree), BorderLayout.CENTER);
@@ -321,7 +337,7 @@ public class VirtualNamesPanel extends JPanel
 		 */
 		public VirtualPlatformNode(String name)
 		{
-			super(name+"_"+vpcnt++, name, model, null, null, null, null);
+			super(name+"_"+vpcnt++, name, model, null, icons.getIcon("virtual"), null, null);
 		}
 	}
 	
@@ -336,7 +352,7 @@ public class VirtualNamesPanel extends JPanel
 		 */
 		public PlatformNode(String name)
 		{
-			super(name+"_"+pcnt++, name, model, null, null, null, null);
+			super(name+"_"+pcnt++, name, model, null, icons.getIcon("platform"), null, null);
 		}
 	}
 	
