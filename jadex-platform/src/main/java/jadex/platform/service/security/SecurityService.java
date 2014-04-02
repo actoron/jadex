@@ -1074,6 +1074,8 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Void> addVirtual(String virtual, String name)
 	{
+		Future<Void> ret = new Future<Void>();
+		
 		Set<String> names = virtualsmap.get(virtual);
 		if(names==null)
 		{
@@ -1082,10 +1084,21 @@ public class SecurityService implements ISecurityService
 		}
 		if(name!=null)
 		{
-			names.add(name);
+			if(!names.add(name))
+			{
+				ret.setException(new RuntimeException("Virtual name already assigned."));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
 		}
 
-		return IFuture.DONE;
+		return ret;
 	}
 	
 	/**

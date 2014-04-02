@@ -19,8 +19,6 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.future.SwingResultListener;
-import jadex.tools.email.EmailClientPlugin;
-import jadex.tools.libtool.LibraryServicePlugin;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -35,13 +33,18 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIDefaults;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
 
 /**
@@ -79,6 +82,9 @@ public class VirtualNamesPanel extends JPanel
 	/** The change listeners. */
 	protected List<IChangeListener<String>> listeners;
 	
+	/** Empty platforms kept because not saved in security service. */
+	protected Set<String> emptyplatforms;
+	
 	/**
 	 *  Create a new panel. 
 	 */
@@ -89,6 +95,7 @@ public class VirtualNamesPanel extends JPanel
 		this.cmshandler = cmshandler;
 		this.platform = platform;
 		this.listeners = new ArrayList<IChangeListener<String>>();
+		this.emptyplatforms = new HashSet<String>();
 		
 		setLayout(new BorderLayout());
 		
@@ -166,6 +173,7 @@ public class VirtualNamesPanel extends JPanel
 					{
 						if(node.getParent() instanceof RootNode)
 						{
+							menu.add(new SelectVirtualPlatformAction(node));
 							menu.add(new AddVirtualPlatformAction(node));
 						}
 						menu.add(new RemoveAction(node));
@@ -226,13 +234,13 @@ public class VirtualNamesPanel extends JPanel
 				{
 					String v = virtual.getKey();
 					VirtualPlatformNode vn = new VirtualPlatformNode(v);
-					root.add(vn);
+					insertNode(root, vn);
 					if(virtual.getValue()!=null)
 					{
 						for(String pl: virtual.getValue())
 						{
 							PlatformNode pn = new PlatformNode(pl);
-							vn.add(pn);
+							insertNode(vn, pn);
 						}
 					}
 				}
@@ -285,17 +293,29 @@ public class VirtualNamesPanel extends JPanel
 					}
 				}
 				
+				for(String pl: new HashSet<String>(emptyplatforms))
+				{
+					if(!plats.containsKey(pl))
+					{
+						plats.put(pl, null);
+					}
+					else
+					{
+						emptyplatforms.remove(pl);
+					}
+				}
+				
 				for(Map.Entry<String, Set<String>> plat: plats.entrySet())
 				{
 					String p = plat.getKey();
 					PlatformNode pn = new PlatformNode(p);
-					root.add(pn);
+					insertNode(root, pn);
 					if(plat.getValue()!=null)
 					{
 						for(String v: plat.getValue())
 						{
 							VirtualPlatformNode vn = new VirtualPlatformNode(v);
-							pn.add(vn);
+							insertNode(pn, vn);
 						}
 					}
 				}
@@ -392,7 +412,7 @@ public class VirtualNamesPanel extends JPanel
 					public void resultAvailable(Void result) 
 					{
 						VirtualPlatformNode cn = new VirtualPlatformNode(v);
-						node.add(cn);
+						insertNode(node, cn);
 						tree.setSelectionPath(new TreePath(cn.getPath()));
 						notifyListeners(new ChangeEvent<String>(null));
 //						TreePath tp = new TreePath(cn.getPath());
@@ -405,6 +425,99 @@ public class VirtualNamesPanel extends JPanel
 					}
 				}));
 			}
+		}
+	};
+	
+	/**
+	 * 
+	 */
+	class SelectVirtualPlatformAction extends AbstractAction
+	{
+		protected IdTreeNode<String> node;
+		
+		public SelectVirtualPlatformAction(IdTreeNode<String> node)
+		{
+			super("Select virtual platform");
+			this.node = node;
+		}
+		
+		public void actionPerformed(ActionEvent e)
+		{
+			secser.getVirtuals().addResultListener(new SwingResultListener<Map<String,Set<String>>>(new IResultListener<Map<String,Set<String>>>()
+			{
+				public void resultAvailable(Map<String, Set<String>> vs)
+				{
+					JPanel pan = new JPanel(new BorderLayout());
+					final JTextField tfname = new JTextField();
+
+					IdTreeNode<String>[] childs = node.getChildren();
+					for(IdTreeNode<String> child: childs)
+					{
+						vs.remove(child.getName());
+					}
+					
+					if(!vs.isEmpty())
+					{
+						DefaultListModel model =new DefaultListModel();
+						JList list = new JList(model);
+						for(String v: vs.keySet())
+						{
+							model.addElement(v);
+						}
+						list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+						
+						list.addListSelectionListener(new ListSelectionListener() 
+						{
+							public void valueChanged(ListSelectionEvent e) 
+						    {
+								boolean adjust = e.getValueIsAdjusting();
+								if(!adjust) 
+								{
+									JList list = (JList)e.getSource();
+									tfname.setText(""+list.getSelectedValue());
+								}
+						    }
+						});
+						pan.add(list, BorderLayout.CENTER);
+					}
+					pan.add(tfname, BorderLayout.SOUTH);
+					
+					int res	= JOptionPane.showOptionDialog(VirtualNamesPanel.this, pan, "Virtual Platform Name", JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.QUESTION_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
+					if(JOptionPane.YES_OPTION==res)
+					{
+						final String v = tfname.getText();
+						String p = null;
+						if(!(node instanceof RootNode))
+						{
+							p = node.getName();
+						}
+//						System.out.println("add: "+v+" "+p);
+						
+						secser.addVirtual(v, p).addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void result) 
+							{
+								VirtualPlatformNode cn = new VirtualPlatformNode(v);
+								insertNode(node, cn);
+								tree.setSelectionPath(new TreePath(cn.getPath()));
+								notifyListeners(new ChangeEvent<String>(null));
+//								TreePath tp = new TreePath(cn.getPath());
+//								System.out.println("tp: "+tp+" "+Thread.currentThread());
+//								tree.expandPath(new TreePath(cn.getPath()));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+							}
+						}));
+					}
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			}));
 		}
 	};
 	
@@ -437,7 +550,7 @@ public class VirtualNamesPanel extends JPanel
 						public void resultAvailable(Void result) 
 						{
 							PlatformNode cn = new PlatformNode(name);
-							node.add(cn);
+							insertNode(node, cn);
 							tree.setSelectionPath(new TreePath(cn.getPath()));
 							notifyListeners(new ChangeEvent<String>(null));
 						}
@@ -450,7 +563,7 @@ public class VirtualNamesPanel extends JPanel
 				else
 				{
 					PlatformNode cn = new PlatformNode(name);
-					node.add(cn);
+					insertNode(node, cn);
 					tree.setSelectionPath(new TreePath(cn.getPath()));
 				}
 			}
@@ -487,7 +600,7 @@ public class VirtualNamesPanel extends JPanel
 						public void resultAvailable(Void result) 
 						{
 							PlatformNode cn = new PlatformNode(name);
-							node.add(cn);
+							insertNode(node, cn);
 							tree.setSelectionPath(new TreePath(cn.getPath()));
 							notifyListeners(new ChangeEvent<String>(null));
 	//						TreePath tp = new TreePath(cn.getPath());
@@ -503,7 +616,7 @@ public class VirtualNamesPanel extends JPanel
 				else
 				{
 					PlatformNode cn = new PlatformNode(name);
-					node.add(cn);
+					insertNode(node, cn);
 					tree.setSelectionPath(new TreePath(cn.getPath()));
 				}
 			}
@@ -559,6 +672,25 @@ public class VirtualNamesPanel extends JPanel
 				{
 				}
 			}));
+			
+			// Remove also all virtual node children
+			if(node instanceof PlatformNode && node.getChildCount()>0)
+			{
+				for(IdTreeNode<String> child: node.getChildren())
+				{
+					secser.removeVirtual(child.getName(), p).addResultListener(new SwingResultListener<Void>(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result) 
+						{
+							// do nothing
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+					}));
+				}
+			}
 		}
 	}
 	
@@ -612,6 +744,53 @@ public class VirtualNamesPanel extends JPanel
 		for(IChangeListener<String> lis: listeners)
 		{
 			lis.changeOccurred(e);
+		}
+	}
+	
+	/**
+	 *  Insert a node at alphabetical order in the tree.
+	 */
+	protected void insertNode(IdTreeNode<?> parent, IdTreeNode<?> child)
+	{
+		if(platform)
+		{
+			if(child instanceof PlatformNode && child.getChildCount()==0)
+			{
+				emptyplatforms.add(child.getName());
+			}
+			else if(child instanceof VirtualPlatformNode && child.getParent()!=null && child.getParent().getChildCount()==0)
+			{
+				emptyplatforms.remove(parent.getName());
+			}
+		}
+			
+		insertNode(parent, child, true);
+	}
+	
+	/**
+	 *  Insert a node at alphabetical order in the tree.
+	 */
+	protected void insertNode(IdTreeNode<?> parent, IdTreeNode<?> child, boolean up)
+	{
+		int cnt = parent.getChildCount();
+		boolean done = false;
+		if(cnt>0)
+		{
+			for(int i=0; i<cnt && !done; i++)
+			{
+				IdTreeNode<?> tmp = (IdTreeNode<?>)parent.getChildAt(i);
+				if((up && tmp.toString().compareTo(child.toString())>=0) 
+					|| (!up && tmp.toString().compareTo(child.toString())<=0))
+				{
+					parent.insert(child, i);
+					done = true;
+				}
+			}
+		}
+		
+		if(!done)
+		{
+			parent.add(child);
 		}
 	}
 	
