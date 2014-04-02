@@ -6,12 +6,13 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IInternalProcessEngineService;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.commons.ICommand;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -72,11 +73,17 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 				final IExternalAccess	exta	= instance.getExternalAccess();
 				final String	actid	= activity.getId();
 				final String	procid	= thread.getId();
-				IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new ICommand<Object>()
+				
+				System.out.println("Adding event matcher: "+instance.getComponentIdentifier());
+				
+				final IComponentIdentifier	cid	= instance.getComponentIdentifier();
+				IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new IResultCommand<IFuture<Void>, Object>()
 				{
-					public void execute(final Object event)
+					public IFuture<Void> execute(final Object event)
 					{
-						exta.scheduleStep(new IComponentStep<Void>()
+						System.out.println("Triggered event matcher: "+cid);
+						
+						return exta.scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
@@ -115,18 +122,6 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 								instance.notify(activity, thread, event);
 								return ret;
 							}
-						}).addResultListener(new IResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-								// done.
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								System.err.println("Could not notify process: "+exta.getComponentIdentifier());
-								exception.printStackTrace();
-							}
 						});
 					}
 				});
@@ -146,6 +141,8 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 	 */
 	public void cancel(MActivity activity, final BpmnInterpreter instance, ProcessThread thread)
 	{
+		System.out.println("Cancel event matcher: "+instance.getComponentIdentifier());
+		
 		IFuture<String> fut = (IFuture<String>)thread.getWaitInfo();
 		if(fut!=null)
 		{			
@@ -160,6 +157,8 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 					{
 						public void resultAvailable(IInternalProcessEngineService ipes)
 						{
+							System.out.println("Cancel event matcher1: "+instance.getComponentIdentifier());
+							
 							ipes.removeEventMatcher(id)
 								.addResultListener(new IResultListener<Void>()
 							{

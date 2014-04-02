@@ -140,20 +140,6 @@ public class Tuple2Future<E, F> extends IntermediateFuture<TupleResult> implemen
     		setFinishedIfUndone();
     }
     
-    @Override
-    public void addIntermediateResult(TupleResult result)
-    {
-    	// TODO Auto-generated method stub
-    	super.addIntermediateResult(result);
-    }
-    
-    @Override
-    public boolean addIntermediateResultIfUndone(TupleResult result)
-    {
-    	// TODO Auto-generated method stub
-    	return super.addIntermediateResultIfUndone(result);
-    }
-     
     /**  
 	 *  Get the x result.
 	 *  @return	The next intermediate result.

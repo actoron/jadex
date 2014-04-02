@@ -23,8 +23,8 @@ import jadex.bridge.service.types.cms.IComponentManagementService.CMSTerminatedE
 import jadex.bridge.service.types.cron.CronJob;
 import jadex.bridge.service.types.cron.ICronService;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.ICommand;
 import jadex.commons.IFilter;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
@@ -121,7 +121,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		this.processes = new HashMap<IComponentIdentifier, ProcessEngineAgent.ProcessInfo>();
 		this.waitqueue	= new HashMap<String, Set<Object>>();
 		this.waitqueuetypes	= new HashMap<String, Set<Tuple2<String,IResourceIdentifier>>>();
-		this.eventmapper = new EventMapper(agent.getLogger());
+		this.eventmapper = new EventMapper(agent);
 		this.creating = new HashSet<Future<Void>>();
 		return IFuture.DONE;
 	}
@@ -420,96 +420,76 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 		final String type = EventMapper.getEventType(event, atype);
 		
 		// First check if an instance match occurred
-		if(eventmapper.processInstanceEvent(event, type))
+		eventmapper.processInstanceEvent(event, type)
+			.addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
 		{
-			ret.setResult(null);
-		}
-		else
-		{
-			final IResultListener<Void> lis = new IResultListener<Void>()
+			public void customResultAvailable(Boolean result)
 			{
-				public void resultAvailable(Void result)
+				if(result.booleanValue())
 				{
-					// If not check if a model has a corresponding start event
-					final ModelDetails det = eventmapper.processModelEvent(event, type);
-					if(det!=null)
+					ret.setResult(null);
+				}
+				else
+				{
+					final IResultListener<Void> lis = new IResultListener<Void>()
 					{
-						createProcessInstance(event, det);//.addResultListener(new DelegationResultListener<Void>(ret));
-					}
-					else if(waitqueuetypes.containsKey(type))
+						public void resultAvailable(Void result)
+						{
+							// If not check if a model has a corresponding start event
+							final ModelDetails det = eventmapper.processModelEvent(event, type);
+							if(det!=null)
+							{
+								createProcessInstance(event, det);//.addResultListener(new DelegationResultListener<Void>(ret));
+							}
+							else if(waitqueuetypes.containsKey(type))
+							{
+								dispatchToWaitqueue(event, type);
+								ret.setResult(null);
+							}
+							else
+							{
+								ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
+							}					
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+						}
+					};
+					
+					// If no instance match was found, check if instances are currently created
+					if(!creating.isEmpty() && eventmapper.isEventInstanceWaitRelevant(type))
 					{
-						dispatchToWaitqueue(event, type);
-						ret.setResult(null);
+						defer().addResultListener(new DelegationResultListener<Void>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								// Check again, if an instance match occurred
+								eventmapper.processInstanceEvent(event, type)
+									.addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
+								{
+									public void customResultAvailable(Boolean result)
+									{
+										if(result.booleanValue())
+										{
+											ret.setResult(null);
+										}
+										else
+										{
+											lis.resultAvailable(null);
+										}
+									}
+								});
+							}
+						});
 					}
 					else
 					{
-						ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
+						lis.resultAvailable(null);
 					}
-					
-//					Set<Tuple2<String, IResourceIdentifier>> models = waitqueuetypes.get(type);
-//					boolean isinstance = false;
-//					
-//					// Check if there is a process instance that could handle the event
-//					if(add && models!=null)
-//					{
-//						for(Tuple2<String, IResourceIdentifier> model: models)
-//						{
-//							Integer num = processespertype.get(model);
-//							isinstance = num!=null && num.intValue()>0;
-//							if(isinstance==true)
-//								break;
-//						}
-//					}
-//					
-//					System.out.println("isinstance: "+isinstance+" "+processespertype);
-//					if(isinstance)
-//					{
-//						dispatchToWaitqueue(event, type);
-//						ret.setResult(null);
-//					}
-//					else
-//					{
-//						// If not check if a model has a corresponding start event
-//						final ModelDetails det = eventmapper.processModelEvent(event, type);
-//						if(det!=null)
-//						{
-//							createProcessInstance(event, det);//.addResultListener(new DelegationResultListener<Void>(ret));
-//						}
-//						else
-//						{
-//							ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
-//						}
-//					}
 				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			};
-			
-			// If no instance match was found check if instances are currently created
-			if(!creating.isEmpty() && eventmapper.isEventInstanceWaitRelevant(type))
-			{
-				defer().addResultListener(new DelegationResultListener<Void>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
-						if(eventmapper.processInstanceEvent(event, type))
-						{
-							ret.setResult(null);
-						}
-						else
-						{
-							lis.resultAvailable(null);
-						}
-					}
-				});
 			}
-			else
-			{
-				lis.resultAvailable(null);
-			}
-		}
+		});
 		
 		return ret;
 	}
@@ -676,7 +656,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 *  Register an event description to be notified, when the event happens.
 	 *  @return An id to be used for deregistration.
 	 */
-	public IFuture<String>	addEventMatcher(String[] events, UnparsedExpression uexp, String[] imports, Map<String, Object> vals, boolean remove, ICommand<Object> cmd)
+	public IFuture<String>	addEventMatcher(String[] events, UnparsedExpression uexp, String[] imports, Map<String, Object> vals, boolean remove, IResultCommand<IFuture<Void>, Object> cmd)
 	{
 		String	id	= eventmapper.addInstanceMapping(uexp, events, vals, imports, remove, cmd);
 		
