@@ -68,8 +68,11 @@ public class ComponentSelectorDialog
 	/** The parent component. */
 	protected Component	parent;
 	
-	/** The service provider. */
+	/** The shown platform. */
 	protected IExternalAccess access;
+	
+	/** The local platform. */
+	protected IExternalAccess jccaccess;
 	
 	/** The cms handler. */
 	protected CMSUpdateHandler cmshandler;
@@ -110,11 +113,12 @@ public class ComponentSelectorDialog
 	/**
 	 *  Create a new AgentSelectorDialog.
 	 */
-	public ComponentSelectorDialog(Component parent, IExternalAccess access, 
+	public ComponentSelectorDialog(Component parent, IExternalAccess access, IExternalAccess jccaccess, 
 		CMSUpdateHandler cmshandler, PropertyUpdateHandler prophandler, ComponentIconCache iconcache)
 	{
 		this.parent	= parent;
 		this.access	= access;
+		this.jccaccess	= jccaccess;
 		this.cmshandler	= cmshandler;
 		this.iconcache	= iconcache;
 	}
@@ -461,7 +465,7 @@ public class ComponentSelectorDialog
 	 */
 	protected JComponent createTreeView()
 	{
-		final ComponentTreePanel comptree = new ComponentTreePanel(access, cmshandler, prophandler, iconcache);
+		final ComponentTreePanel comptree = new ComponentTreePanel(access, jccaccess, cmshandler, prophandler, iconcache);
 		comptree.setPreferredSize(new Dimension(200, 100));
 		comptree.addNodeHandler(new ISwingNodeHandler()
 		{

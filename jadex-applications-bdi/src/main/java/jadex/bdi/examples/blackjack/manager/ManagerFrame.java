@@ -184,7 +184,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		
 		final	CMSUpdateHandler	cmsuh	= new CMSUpdateHandler(access);
 		
-		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access, cmsuh, null, new ComponentIconCache(access));
+		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access, access, cmsuh, null, new ComponentIconCache(access));
 		JButton	dealerbut	= new JButton("...");
 		dealerbut.addActionListener(new ActionListener()
 		{

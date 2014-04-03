@@ -21,15 +21,15 @@ public class DualVirtualNamesPanel extends JPanel
 	/**
 	 *  Create a new panel. 
 	 */
-	public DualVirtualNamesPanel(final IExternalAccess ea, final ISecurityService secser, final CMSUpdateHandler cmshandler)
+	public DualVirtualNamesPanel(final IExternalAccess ea, final IExternalAccess jccaccess, final ISecurityService secser, final CMSUpdateHandler cmshandler)
 	{
 		setLayout(new BorderLayout());
 		
 		JSplitPanel sp = new JSplitPanel(JSplitPane.HORIZONTAL_SPLIT);
 		sp.setOneTouchExpandable(true);
 		sp.setDividerLocation(0.5);
-		final VirtualNamesPanel vnp1 = new VirtualNamesPanel(ea, secser, cmshandler, false);
-		final VirtualNamesPanel vnp2 = new VirtualNamesPanel(ea, secser, cmshandler, true);
+		final VirtualNamesPanel vnp1 = new VirtualNamesPanel(ea, jccaccess, secser, cmshandler, false);
+		final VirtualNamesPanel vnp2 = new VirtualNamesPanel(ea, jccaccess, secser, cmshandler, true);
 		
 		vnp1.addChangeListener(new IChangeListener<String>()
 		{

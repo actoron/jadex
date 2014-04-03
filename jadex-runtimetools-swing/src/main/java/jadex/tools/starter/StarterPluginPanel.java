@@ -258,7 +258,7 @@ public class StarterPluginPanel extends JPanel
   		};
   		mpanel.getTree().addMouseListener(ml);
 
-		comptree = new ComponentTreePanel(jcc.getPlatformAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), jcc.getIconCache(), JSplitPane.HORIZONTAL_SPLIT);
+		comptree = new ComponentTreePanel(jcc.getPlatformAccess(), jcc.getJCCAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), jcc.getIconCache(), JSplitPane.HORIZONTAL_SPLIT);
 		comptree.setMinimumSize(new Dimension(0, 0));
 		comptree.getModel().addNodeListener(new INodeListener()
 		{

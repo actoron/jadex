@@ -67,8 +67,11 @@ public class VirtualNamesPanel extends JPanel
 	
 	//-------- attributes --------
 	
-	/** The external access of the platform. */
+	/** The external access of the service platform. */
 	protected IExternalAccess ea;
+	
+	/** The external access of the gui platform. */
+	protected IExternalAccess jccaccess;
 	
 	/** The security service. */
 	protected ISecurityService secser;
@@ -92,7 +95,7 @@ public class VirtualNamesPanel extends JPanel
 	/**
 	 *  Create a new panel. 
 	 */
-	public VirtualNamesPanel(final IExternalAccess ea, final ISecurityService secser, final CMSUpdateHandler cmshandler, boolean platform)
+	public VirtualNamesPanel(final IExternalAccess ea, final IExternalAccess jccaccess, final ISecurityService secser, final CMSUpdateHandler cmshandler, boolean platform)
 	{
 		this.ea = ea;
 		this.secser = secser;
@@ -567,7 +570,7 @@ public class VirtualNamesPanel extends JPanel
 		
 		public void actionPerformed(ActionEvent e)
 		{
-			final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(VirtualNamesPanel.this), ea, cmshandler, null, new ComponentIconCache(ea));
+			final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(VirtualNamesPanel.this), ea, jccaccess, cmshandler, null, new ComponentIconCache(ea));
 			
 			IComponentIdentifier cid = csd.selectAgent(null);
 			
