@@ -14,6 +14,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
@@ -25,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +36,7 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -59,6 +62,7 @@ public class VirtualNamesPanel extends JPanel
 	{
 		"virtual", SGUI.makeIcon(VirtualNamesPanel.class, "/jadex/tools/security/images/virtual.png"),
 		"platform", SGUI.makeIcon(VirtualNamesPanel.class, "/jadex/tools/security/images/platform.png"),
+		"overlay_exclamation", SGUI.makeIcon(VirtualNamesPanel.class, "/jadex/tools/security/images/overlay_exclamation.png")
 	});
 	
 	//-------- attributes --------
@@ -374,6 +378,31 @@ public class VirtualNamesPanel extends JPanel
 		{
 			super(name+"_"+pcnt++, name, model, null, icons.getIcon("platform"), null, null);
 		}
+		
+		/**
+		 *  Test if node is saved in security service (is only possible when has at least one virtual mapping).
+		 */
+		protected boolean isSaved()
+		{
+			return getParent() instanceof VirtualPlatformNode || getChildCount()>0;
+		}
+		
+		/**
+		 *  Get the icon.
+		 *  @return The icon.
+		 */
+		public Icon getIcon()
+		{
+			return isSaved()? super.getIcon(): new CombiIcon(new Icon[]{super.getIcon(), icons.getIcon("overlay_exclamation")});
+		}
+		
+		/**
+		 *  Get the tooltip text.
+		 */
+		public String getTooltipText()
+		{
+			return isSaved()? super.getTooltipText(): "Change will be lost when not at least one virtual platform is assiged.";
+		}
 	}
 	
 	/**
@@ -458,9 +487,11 @@ public class VirtualNamesPanel extends JPanel
 					
 					if(!vs.isEmpty())
 					{
+						List<String> vals = new ArrayList<String>(vs.keySet());
+						Collections.sort(vals);
 						DefaultListModel model =new DefaultListModel();
 						JList list = new JList(model);
-						for(String v: vs.keySet())
+						for(String v: vals)
 						{
 							model.addElement(v);
 						}
