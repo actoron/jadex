@@ -222,7 +222,7 @@ public class UserAgent
 					
 					public void intermediateResultAvailable(ProcessEngineEvent event)
 					{
-						System.out.println("received event: "+event);
+//						System.out.println("received event: "+event);
 						
 						if(ProcessEngineEvent.PROCESSMODEL_ADDED.equals(event.getType()))
 						{

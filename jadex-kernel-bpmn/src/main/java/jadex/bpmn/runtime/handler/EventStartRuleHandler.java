@@ -1,6 +1,7 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 
@@ -24,7 +25,10 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 		// Top level event -> just move forward to next activity.
-		if(thread.getThreadContext().getParent()==null)
+		// Or start event of event subprocess -> just move forward.
+		if(thread.getThreadContext().getParent()==null
+			|| (thread.getThreadContext().getModelElement() instanceof MSubProcess
+				&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getThreadContext().getModelElement()).getSubprocessType())))
 		{
 			doExecute(activity, instance, thread);
 			instance.step(activity, instance, thread, null);

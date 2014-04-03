@@ -439,7 +439,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							final ModelDetails det = eventmapper.processModelEvent(event, type);
 							if(det!=null)
 							{
-								createProcessInstance(event, det);//.addResultListener(new DelegationResultListener<Void>(ret));
+								createProcessInstance(event, det).addResultListener(new DelegationResultListener<Void>(ret));
 							}
 							else if(waitqueuetypes.containsKey(type))
 							{
@@ -448,6 +448,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 							}
 							else
 							{
+								System.out.println("No process to handle event: "+type+", "+event);
 								ret.setException(new RuntimeException("No process to handle event: "+type+", "+event));
 							}					
 						}
@@ -460,10 +461,12 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 					// If no instance match was found, check if instances are currently created
 					if(!creating.isEmpty() && eventmapper.isEventInstanceWaitRelevant(type))
 					{
+//						System.out.println("defer: "+event);
 						defer().addResultListener(new DelegationResultListener<Void>(ret)
 						{
 							public void customResultAvailable(Void result)
 							{
+//								System.out.println("after defer: "+event);
 								// Check again, if an instance match occurred
 								eventmapper.processInstanceEvent(event, type)
 									.addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
@@ -497,9 +500,9 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	/**
 	 * 
 	 */
-	protected void createProcessInstance(final Object event, final ModelDetails det)
+	protected IFuture<Void> createProcessInstance(final Object event, final ModelDetails det)
 	{
-		System.out.println("create instance for: "+event);
+//		System.out.println("create instance for: "+event);
 		final Future<Void> ret = new Future<Void>();
 
 		creating.add(ret);
@@ -525,7 +528,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 					{
 						if(result instanceof CMSCreatedEvent)
 						{
-							System.out.println("created: "+result);
+//							System.out.println("created: "+result);
 							cont();
 						}
 					}
@@ -549,7 +552,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 						if(creating.remove(ret))
 						{
 							ret.setResult(null);
-							System.out.println("creating fini");
+//							System.out.println("creating fini");
 						}
 					}
 				});
@@ -560,6 +563,8 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 				ret.setException(exception);
 			}
 		}));
+		
+		return ret;
 	}
 	
 	/**
@@ -567,7 +572,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 */
 	protected void dispatchToWaitqueue(final Object event, String type)
 	{
-		System.out.println("dispatch to waitqueue: "+event+" "+type+" "+waitqueue);
+//		System.out.println("dispatch to waitqueue: "+event+" "+type+" "+waitqueue);
 		Set<Object>	wq	= waitqueue.get(type);
 		if(wq==null)
 		{
@@ -637,7 +642,7 @@ public class ProcessEngineAgent implements IProcessEngineService, IInternalProce
 	 */
 	protected IFuture<Void> defer()
 	{
-		System.out.println("Defer event processing");
+//		System.out.println("Defer event processing");
 		final Future<Void> ret = new Future<Void>();
 		
 		CounterResultListener<Void> lis = new CounterResultListener<Void>(creating.size(), new DelegationResultListener<Void>(ret));

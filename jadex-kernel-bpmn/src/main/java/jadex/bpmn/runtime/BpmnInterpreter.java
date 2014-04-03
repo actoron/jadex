@@ -352,7 +352,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public IFuture<Void> init(IModelInfo model, String config, Map<String, Object> arguments)
 	{
-		System.out.println("init: "+model);
+//		System.out.println("init: "+model);
 		
 		final Future<Void> ret = new Future<Void>();
 		IFuture<Void> fut = super.init(model, config, arguments);
@@ -371,7 +371,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 						{
 							public void customResultAvailable(Void result)
 							{
-								System.out.println("init done");
+//								System.out.println("init done");
 								super.customResultAvailable(result);
 							}
 						});
@@ -944,7 +944,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			if(handler==null)
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 
-//			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity());
+//			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity()+" "+thread.getActivity().getId());
 			MActivity act = thread.getActivity();
 			
 //			notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));

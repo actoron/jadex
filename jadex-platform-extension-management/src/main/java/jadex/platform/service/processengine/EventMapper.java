@@ -84,6 +84,14 @@ public class EventMapper
 		return ret;
 	}
 	
+	/**
+	 * 
+	 * @param event
+	 * @param type
+	 * @param mis
+	 * @param i
+	 * @param ret
+	 */
 	protected void	internalProcessInstanceEvent(final Object event, final String type, final List<MappingInfo> mis, final int i, final Future<Boolean> ret)
 	{
 		MappingInfo	mi	= mis.get(i);
@@ -104,8 +112,7 @@ public class EventMapper
 			try
 			{
 				IResultCommand<IFuture<Void>, Object> cmd = (IResultCommand<IFuture<Void>, Object>)mi.getInfo();
-				cmd.execute(event).addResultListener(component.createResultListener(
-					new IResultListener<Void>()
+				cmd.execute(event).addResultListener(component.createResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -213,7 +220,7 @@ public class EventMapper
 			id	= SUtil.createUniqueId("EventMapping");
 		}
 		
-		System.out.println("adding instance event matcher: "+id+" "+SUtil.arrayToString(events));
+//		System.out.println("adding instance event matcher: "+id+" "+SUtil.arrayToString(events));
 
 		IFilter<Object> filter = null;
 		
