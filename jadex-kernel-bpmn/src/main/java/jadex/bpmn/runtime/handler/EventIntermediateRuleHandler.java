@@ -74,7 +74,7 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 				final String	actid	= activity.getId();
 				final String	procid	= thread.getId();
 				
-				System.out.println("Adding event matcher: "+instance.getComponentIdentifier());
+//				System.out.println("Adding event matcher: "+instance.getComponentIdentifier());
 				
 				final IComponentIdentifier	cid	= instance.getComponentIdentifier();
 				IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new IResultCommand<IFuture<Void>, Object>()

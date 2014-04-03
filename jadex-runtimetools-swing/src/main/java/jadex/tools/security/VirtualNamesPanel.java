@@ -45,6 +45,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -64,6 +65,8 @@ public class VirtualNamesPanel extends JPanel
 		"platform", SGUI.makeIcon(VirtualNamesPanel.class, "/jadex/tools/security/images/platform.png"),
 		"overlay_exclamation", SGUI.makeIcon(VirtualNamesPanel.class, "/jadex/tools/security/images/overlay_exclamation.png")
 	});
+
+	public static final String VIRTUAL = "Role";
 	
 	//-------- attributes --------
 	
@@ -106,7 +109,7 @@ public class VirtualNamesPanel extends JPanel
 		
 		setLayout(new BorderLayout());
 		
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), platform? "Platform -> Virtual Name": "Virtual Name -> Platform"));
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), platform? "Platform -> "+VIRTUAL: VIRTUAL+" -> Platform"));
 	
 		model = new IdTreeModel<String>()
 		{
@@ -125,6 +128,7 @@ public class VirtualNamesPanel extends JPanel
 		tree.setRootVisible(false);
 		tree.setCellRenderer(new IdTreeCellRenderer());
 		tree.expandPath(new TreePath(root.getPath()));
+		ToolTipManager.sharedInstance().registerComponent(tree);
 	
 		add(new JScrollPane(tree), BorderLayout.CENTER);
 		
@@ -144,7 +148,7 @@ public class VirtualNamesPanel extends JPanel
 			{
 				if(e.isPopupTrigger())
 				{
-					JPopupMenu menu = new JPopupMenu("Virtuals menu");
+					JPopupMenu menu = new JPopupMenu();
 					
 					TreePath path = tree.getPathForLocation(e.getX(), e.getY());
 					if(path==null)
@@ -404,7 +408,7 @@ public class VirtualNamesPanel extends JPanel
 		 */
 		public String getTooltipText()
 		{
-			return isSaved()? super.getTooltipText(): "Change will be lost when not at least one virtual platform is assiged.";
+			return isSaved()? super.getTooltipText(): "Changes will be lost when not at least one "+VIRTUAL.toLowerCase()+" is assiged.";
 		}
 	}
 	
@@ -417,16 +421,16 @@ public class VirtualNamesPanel extends JPanel
 		
 		public AddVirtualPlatformAction(IdTreeNode<String> node)
 		{
-			super("Add virtual platform");
+			super("Add "+VIRTUAL.toLowerCase());
 			this.node = node;
 		}
 		
 		public void actionPerformed(ActionEvent e)
 		{
 			PropertiesPanel pp = new PropertiesPanel();
-			final JTextField tfname = pp.createTextField("Virtual name: ", null, true);
+			final JTextField tfname = pp.createTextField(VIRTUAL+" name: ", null, true);
 			
-			int res	= JOptionPane.showOptionDialog(VirtualNamesPanel.this, pp, "Virtual Platform Name", JOptionPane.YES_NO_CANCEL_OPTION,
+			int res	= JOptionPane.showOptionDialog(VirtualNamesPanel.this, pp, VIRTUAL+" Name", JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.QUESTION_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
 			if(JOptionPane.YES_OPTION==res)
 			{
@@ -469,7 +473,7 @@ public class VirtualNamesPanel extends JPanel
 		
 		public SelectVirtualPlatformAction(IdTreeNode<String> node)
 		{
-			super("Select virtual platform");
+			super("Select "+VIRTUAL.toLowerCase());
 			this.node = node;
 		}
 		
@@ -516,7 +520,7 @@ public class VirtualNamesPanel extends JPanel
 					}
 					pan.add(tfname, BorderLayout.SOUTH);
 					
-					int res	= JOptionPane.showOptionDialog(VirtualNamesPanel.this, pan, "Virtual Platform Name", JOptionPane.YES_NO_CANCEL_OPTION,
+					int res	= JOptionPane.showOptionDialog(VirtualNamesPanel.this, pan, VIRTUAL+" Name", JOptionPane.YES_NO_CANCEL_OPTION,
 						JOptionPane.QUESTION_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
 					if(JOptionPane.YES_OPTION==res)
 					{
@@ -666,7 +670,7 @@ public class VirtualNamesPanel extends JPanel
 		
 		public RemoveAction(IdTreeNode<String> node)
 		{
-			super("Remove platform");
+			super("Remove "+(node instanceof VirtualPlatformNode? VIRTUAL.toLowerCase(): "platform"));
 			this.node = node;
 		}
 		
@@ -735,13 +739,13 @@ public class VirtualNamesPanel extends JPanel
 	{
 		public SwitchViewAction()
 		{
-			super(platform? "Switch to virtual view": "Switch to platform view");
+			super(platform? "Switch to "+VIRTUAL.toLowerCase()+" view": "Switch to platform view");
 		}
 		
 		public void actionPerformed(ActionEvent e)
 		{
 			platform = !platform;
-			setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), platform? "Platform -> Virtual Name": "Virtual Name -> Platform"));
+			setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), platform? "Platform -> "+VIRTUAL: VIRTUAL+" -> Platform"));
 
 			if(platform)
 			{
