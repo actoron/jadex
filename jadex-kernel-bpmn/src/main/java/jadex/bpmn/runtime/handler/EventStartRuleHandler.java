@@ -28,7 +28,7 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 		// Or start event of event subprocess -> just move forward.
 		if(thread.getThreadContext().getParent()==null
 			|| (thread.getThreadContext().getModelElement() instanceof MSubProcess
-				&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getThreadContext().getModelElement()).getSubprocessType())))
+			&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getThreadContext().getModelElement()).getSubprocessType())))
 		{
 			doExecute(activity, instance, thread);
 			instance.step(activity, instance, thread, null);
@@ -52,4 +52,5 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 			super.execute(activity, instance, thread);
 		}
 	}
+	
 }
