@@ -11,6 +11,7 @@ import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventEndSignalActivityHandler;
+import jadex.bpmn.runtime.handler.EventEndTerminateActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
@@ -161,6 +162,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// End events.
 		// Options: empty, message, error, compensation, terminate, signal, multi, cancel, link
 		// Missing: link, compensation, cancel, terminate, signal, multi
+		activityhandlers.put(MBpmnModel.EVENT_END_TERMINATE, new EventEndTerminateActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_MESSAGE, new EventIntermediateMessageActivityHandler());
@@ -352,7 +354,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public IFuture<Void> init(IModelInfo model, String config, Map<String, Object> arguments)
 	{
-//		System.out.println("init: "+model);
+//		System.out.println("init: "+model+" "+arguments);
 		
 		final Future<Void> ret = new Future<Void>();
 		IFuture<Void> fut = super.init(model, config, arguments);
@@ -378,7 +380,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 						
 						for(Map.Entry<MSubProcess, MActivity> evtsubentry : evtsubstarts.entrySet())
 						{
-							String[] eventtypes = (String[]) evtsubentry.getValue().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+							String[] eventtypes = (String[])evtsubentry.getValue().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
 							UnparsedExpression	upex	= evtsubentry.getValue().getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
 							Map<String, Object>	params	= null; 
 							if(upex!=null)
@@ -386,14 +388,17 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 								IParsedExpression	exp	= SJavaParser.parseExpression(upex, getModel().getAllImports(), getClassLoader());
 								for(String param: exp.getParameters())
 								{
-									Object	val	= getContextVariable(param);
-									if(val!=null)	// omit null values (also excludes '$event')
+									if(hasContextVariable(param))
 									{
-										if(params==null)
+										Object	val	= getContextVariable(param);
+										if(val!=null)	// omit null values (also excludes '$event')
 										{
-											params	= new LinkedHashMap<String, Object>();
+											if(params==null)
+											{
+												params	= new LinkedHashMap<String, Object>();
+											}
+											params.put(param, val);
 										}
-										params.put(param, val);
 									}
 								}
 							}
@@ -482,7 +487,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			
 //			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
 			
-			if(!finishing && isFinished(pool, lane) && !bpmnmodel.isKeepAlive() && started)
+			if(!finishing && isFinished(pool, lane) && !bpmnmodel.isKeepAlive() && started 
+				&& bpmnmodel.getEventSubProcessStartEvents().isEmpty()) // keep alive also process with event subprocesses
 			{
 //				System.out.println("terminating: "+getComponentIdentifier());
 				finishing = true;
@@ -657,7 +663,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
         	startevents.add(triggeractivity);
         }
         
-        for(MActivity mact : startevents)
+        for(MActivity mact: startevents)
         {
             if(trigger!=null && trigger.getSecondEntity().equals(mact.getId()))
             {

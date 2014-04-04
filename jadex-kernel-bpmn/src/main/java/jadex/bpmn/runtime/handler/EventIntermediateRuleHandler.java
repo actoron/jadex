@@ -132,9 +132,19 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 			{
 				thread.setException(exception);
 				instance.notify(activity, thread, null);
+//				processEngineNotFound(activity, instance, thread, exception);
 			}
 		});
 	}
+	
+//	/**
+//	 *  Called from execute when service is not available.
+//	 */
+//	protected void processEngineNotFound(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Exception exception)
+//	{
+//		thread.setException(exception);
+//		instance.notify(activity, thread, null);
+//	}
 	
 	/**
 	 *  Called when the process thread is aborted and waiting is no longer wanted.
