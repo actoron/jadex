@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  A map processor allows for traversing maps.
@@ -45,15 +46,22 @@ public class MapProcessor implements ITraverseProcessor
 		
 		traversed.put(object, ret);
 		
-		Object[] keys = map.keySet().toArray(new Object[map.size()]);
+		Set keyset = map.keySet();
+		Object[] keys = keyset.toArray(new Object[keyset.size()]);
 		for(int i=0; i<keys.length; i++)
 		{
 			Object val = map.get(keys[i]);
-			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone, targetcl, context);
+			Class<?> valclazz = val!=null? val.getClass(): null;
+			Object key = keys[i];
+			Class<?> keyclazz = key != null? key.getClass() : null;
+			Object newkey = traverser.doTraverse(key, keyclazz, traversed, processors, clone, targetcl, context);
+			Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
 			
-			if(clone || newval!=val)
-				ret.put(keys[i], newval);
+			if (newkey != Traverser.IGNORE_RESULT && newval != Traverser.IGNORE_RESULT)
+			{
+				if(clone || newval!=val)
+					ret.put(newkey, newval);
+			}
 		}
 		
 		return ret;

@@ -64,7 +64,7 @@ public class LogRecordCodec extends AbstractCodec
 	{
 		LogRecord rec = (LogRecord) object;
 		Level level = rec.getLevel();
-		traverser.traverse(level, level.getClass(), traversed, processors, clone, null, ec);
+		traverser.doTraverse(level, level.getClass(), traversed, processors, clone, null, ec);
 		ec.writeString(rec.getMessage());
 		ec.writeSignedVarInt(rec.getMillis());
 		

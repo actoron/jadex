@@ -49,7 +49,11 @@ public class TupleProcessor implements ITraverseProcessor
 			
 			for(int i=0; i<vals.length; i++) 
 			{
-				dest[i] = traverser.traverse(vals[i], null, traversed, processors, clone, targetcl, context);
+				Object newval = traverser.doTraverse(vals[i], null, traversed, processors, clone, targetcl, context);
+				if (newval != Traverser.IGNORE_RESULT)
+				{
+					dest[i] = newval;
+				}
 			}
 		}
 		return ret;

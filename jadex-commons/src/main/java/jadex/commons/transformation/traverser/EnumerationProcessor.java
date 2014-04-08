@@ -51,9 +51,12 @@ public class EnumerationProcessor implements ITraverseProcessor
 		for(; en.hasMoreElements(); )
 		{
 			Object val = en.nextElement();
-			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone, targetcl, context);
-			copy.add(newval);
+			Class<?> valclazz = val!=null? val.getClass(): null;
+			Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+			if (newval != Traverser.IGNORE_RESULT)
+			{
+				copy.add(newval);
+			}
 		}
 		
 		return ret;

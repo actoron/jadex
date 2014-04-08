@@ -75,7 +75,7 @@ public class MethodCodec
 		ec.writeClass(method.getDeclaringClass());
 		ec.writeString(method.getName());
 		Class<?>[] params = method.getParameterTypes();
-		traverser.traverse(params, params.getClass(), traversed, processors, clone, null, ec);
+		traverser.doTraverse(params, params.getClass(), traversed, processors, clone, null, ec);
 		
 		return object;
 	}

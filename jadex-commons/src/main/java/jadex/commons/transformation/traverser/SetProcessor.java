@@ -43,17 +43,20 @@ public class SetProcessor implements ITraverseProcessor
 		for(int i=0; i<vals.length; i++)
 		{
 			Class valclazz = vals[i]!=null? vals[i].getClass(): null;
-			Object newval = traverser.traverse(vals[i], valclazz, traversed, processors, clone, targetcl, context);
+			Object newval = traverser.doTraverse(vals[i], valclazz, traversed, processors, clone, targetcl, context);
 			
-			if(clone)
+			if (newval != Traverser.IGNORE_RESULT)
 			{
-				ret.add(newval);
-			}
-			else if(vals[i]!=newval)
-			{
-				// todo: could cause problems when not cloning but ordered set
-				ret.remove(vals[i]);
-				ret.add(newval);
+				if(clone)
+				{
+					ret.add(newval);
+				}
+				else if(vals[i]!=newval)
+				{
+					// todo: could cause problems when not cloning but ordered set
+					ret.remove(vals[i]);
+					ret.add(newval);
+				}
 			}
 		}
 		

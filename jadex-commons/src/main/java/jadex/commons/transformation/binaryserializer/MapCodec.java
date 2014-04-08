@@ -104,7 +104,7 @@ public class MapCodec extends AbstractCodec
 			}
 			else
 			{
-				traverser.traverse(ev, ev.getClass(), traversed, processors, clone, null, ec);
+				traverser.doTraverse(ev, ev.getClass(), traversed, processors, clone, null, ec);
 			}
 			
 			ev = entry.getValue();
@@ -115,7 +115,7 @@ public class MapCodec extends AbstractCodec
 			}
 			else
 			{
-				traverser.traverse(ev, ev.getClass(), traversed, processors, clone, null, ec);
+				traverser.doTraverse(ev, ev.getClass(), traversed, processors, clone, null, ec);
 			}
 		}
 		
