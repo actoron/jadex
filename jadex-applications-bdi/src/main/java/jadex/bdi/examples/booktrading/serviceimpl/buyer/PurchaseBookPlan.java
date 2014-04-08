@@ -1,8 +1,8 @@
 package jadex.bdi.examples.booktrading.serviceimpl.buyer;
 
-import jadex.bdi.examples.booktrading.serviceimpl.IBuyBookService;
 import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
+import jadex.bdi.examples.booktrading.serviceimpl.IBuyBookService;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;

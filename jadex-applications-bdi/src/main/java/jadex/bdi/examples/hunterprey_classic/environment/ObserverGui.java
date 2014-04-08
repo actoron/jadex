@@ -4,10 +4,10 @@ import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
@@ -48,7 +48,7 @@ public class ObserverGui	extends EnvironmentGui
 	/**
 	 *  Create a new gui plan.
 	 */
-	public ObserverGui(IBDIExternalAccess agent)
+	public ObserverGui(IExternalAccess agent)
 	{
 		super(agent);
 	}
@@ -58,7 +58,7 @@ public class ObserverGui	extends EnvironmentGui
 	/**
 	 *  Create the options panel.
 	 */
-	protected JPanel	createOptionsPanel(final IBDIExternalAccess agent)
+	protected JPanel	createOptionsPanel(final IExternalAccess agent)
 	{
 		JPanel	options	= new JPanel(new GridBagLayout());
 		options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Observer Control"));
@@ -95,7 +95,7 @@ public class ObserverGui	extends EnvironmentGui
 	/**
 	 *  Refresh the highscore.
 	 */
-	protected void	refreshHighscore(IBDIExternalAccess agent)
+	protected void	refreshHighscore(IExternalAccess agent)
 	{
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
@@ -186,7 +186,7 @@ public class ObserverGui	extends EnvironmentGui
 	/**
 	 *  Ensure that the gui is updated on changes in the environment.
 	 */
-	protected void	enableGuiUpdate(final IBDIExternalAccess agent)
+	protected void	enableGuiUpdate(final IExternalAccess agent)
 	{
 		agent.scheduleStep(new IComponentStep<Void>()
 		{

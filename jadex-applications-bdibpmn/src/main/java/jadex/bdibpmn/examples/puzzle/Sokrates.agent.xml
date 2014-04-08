@@ -29,7 +29,7 @@
 
 		<!-- The gui of the game board. -->
 		<belief name="board_gui" class="jadex.commons.gui.GuiCreator">
-			<fact>new jadex.commons.gui.GuiCreator(BoardGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class, IBoard.class}, 
+			<fact>new jadex.commons.gui.GuiCreator(BoardGui.class, new Class[]{jadex.bridge.IExternalAccess.class, IBoard.class}, 
 				new Object[]{$scope.getExternalAccess(), $beliefbase.board})</fact>
 		</belief>
 		<!-- The number of moves already tried. -->

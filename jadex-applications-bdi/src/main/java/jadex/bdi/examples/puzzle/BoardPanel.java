@@ -1,5 +1,6 @@
 package jadex.bdi.examples.puzzle;
 
+import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Color;
@@ -12,7 +13,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import jadex.commons.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;

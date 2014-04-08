@@ -1,8 +1,8 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -64,7 +64,7 @@ public class ClockFrame extends JFrame
 	protected JLabel	time;
 
 	/** The external access. */
-	protected IBDIExternalAccess agent;
+	protected IExternalAccess agent;
 
 	/** The timer. */
 	protected Timer timer;
@@ -95,7 +95,7 @@ public class ClockFrame extends JFrame
 	/**
 	 *  Create a new clock frame.
 	 */
-	public ClockFrame(IBDIExternalAccess agent)
+	public ClockFrame(IExternalAccess agent)
 	{
 		super("Jadex Clock");
 		this.agent = agent;

@@ -1,7 +1,6 @@
 package jadex.bdi.examples.moneypainter;
 
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 
 /**
  * 

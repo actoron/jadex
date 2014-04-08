@@ -83,7 +83,7 @@
 		</belief>
 		
 		<belief name="gui" class="jadex.commons.gui.GuiCreator">
-			<fact>new jadex.commons.gui.GuiCreator(DealerFrame.class, new Class[]{Dealer.class, jadex.bdi.runtime.IBDIExternalAccess.class}, 
+			<fact>new jadex.commons.gui.GuiCreator(DealerFrame.class, new Class[]{Dealer.class, jadex.bridge.IExternalAccess.class}, 
 				new Object[]{$beliefbase.myself, $scope.getExternalAccess()})</fact>
 		</belief>
 

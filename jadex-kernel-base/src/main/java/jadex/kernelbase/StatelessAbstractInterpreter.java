@@ -269,6 +269,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 															
 															protected void proceed(final Exception ex)
 															{
+//																invalidateAccess();
+																
 																if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 																{
 																	MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
@@ -295,9 +297,12 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 																}
 															}
 														};
+														
 														// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
 														if(getComponentIdentifier().getParent()!=null)
+														{
 															reslis	= createResultListener(reslis);
+														}
 														
 														terminateResultSubscribers();
 														
@@ -2301,6 +2306,11 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public abstract void terminateResultSubscribers();
 	
+	/**
+	 *  Invalidate the external access.
+	 */
+	public abstract void invalidateAccess();
+
 	/**
 	 *  Get the current state as events.
 	 */

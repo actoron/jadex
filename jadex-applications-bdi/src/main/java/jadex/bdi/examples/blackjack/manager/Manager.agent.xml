@@ -50,7 +50,7 @@
 		
 		<!-- The gui object. -->
 		<belief name="gui" class="ManagerFrame">
-			<fact>new jadex.commons.gui.GuiCreator(ManagerFrame.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+			<fact>new jadex.commons.gui.GuiCreator(ManagerFrame.class, new Class[]{jadex.bridge.IExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 		

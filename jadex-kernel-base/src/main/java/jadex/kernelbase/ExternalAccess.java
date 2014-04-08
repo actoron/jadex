@@ -41,6 +41,12 @@ public class ExternalAccess implements IExternalAccess
 {
 	//-------- attributes --------
 
+	/** The valid flag. */
+	protected boolean	valid;
+	
+	/** The component identifier. */
+	protected IComponentIdentifier	cid;
+	
 	/** The component. */
 	protected StatelessAbstractInterpreter interpreter;
 
@@ -60,10 +66,12 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public ExternalAccess(StatelessAbstractInterpreter interpreter)
 	{
+		this.valid	= true;
 		this.interpreter = interpreter;
+		this.cid	= interpreter.getComponentIdentifier();
 		this.adapter = interpreter.getComponentAdapter();
-		this.tostring = interpreter.getComponentIdentifier().getLocalName();
 		this.provider = interpreter.getServiceContainer();
+		this.tostring = cid.getLocalName();
 	}
 
 	//-------- methods --------
@@ -82,7 +90,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return adapter.getComponentIdentifier();
+		return cid;
 	}
 	
 //	/**
@@ -143,12 +151,12 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-//				if(adapter.getComponentIdentifier().getParent()==null)
+//				if(cid.getParent()==null)
 //				{
-//					System.out.println("platform e: "+adapter.getComponentIdentifier().getName());
+//					System.out.println("platform e: "+cid.getName());
 //					Thread.dumpStack();
 //				}
-//				System.out.println("ext kill: "+getComponentIdentifier());
+//				System.out.println("ext kill: "+cid);
 				adapter.invokeLater(new Runnable() 
 				{
 					public void run() 
@@ -165,7 +173,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -176,9 +184,9 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-//			if(adapter.getComponentIdentifier().getParent()==null)
+//			if(cid.getParent()==null)
 //			{
-//				System.err.println("platform i: "+adapter.getComponentIdentifier().getName());
+//				System.err.println("platform i: "+cid.getName());
 //				Thread.dumpStack();
 //			}
 			interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
@@ -220,7 +228,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -259,7 +267,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -308,7 +316,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -374,9 +382,9 @@ public class ExternalAccess implements IExternalAccess
 			catch(final Exception e)
 			{
 				// Allow executing steps on platform during (and after?) shutdown.
-				if(adapter.getComponentIdentifier().getParent()==null)
+				if(cid.getParent()==null)
 				{
-					Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+					Starter.scheduleRescueStep(cid, new Runnable()
 					{
 						public void run()
 						{
@@ -440,7 +448,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		catch(final Exception e)
 		{
-			Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+			Starter.scheduleRescueStep(cid, new Runnable()
 			{
 				public void run()
 				{
@@ -536,7 +544,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -576,7 +584,7 @@ public class ExternalAccess implements IExternalAccess
 //			}
 //			catch(final Exception e)
 //			{
-//				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+//				Starter.scheduleRescueStep(cid, new Runnable()
 //				{
 //					public void run()
 //					{
@@ -617,7 +625,7 @@ public class ExternalAccess implements IExternalAccess
 //			}
 //			catch(final Exception e)
 //			{
-//				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+//				Starter.scheduleRescueStep(cid, new Runnable()
 //				{
 //					public void run()
 //					{
@@ -660,7 +668,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -703,7 +711,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -744,7 +752,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -783,7 +791,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -825,7 +833,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -865,7 +873,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -905,7 +913,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -946,7 +954,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1008,7 +1016,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1095,7 +1103,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1158,7 +1166,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1200,7 +1208,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1240,7 +1248,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1275,6 +1283,28 @@ public class ExternalAccess implements IExternalAccess
 	public boolean isExternalThread()
 	{
 		return adapter.isExternalThread();
+	}
+	
+	/**
+	 *  Check if the component is directly available.
+	 *  An external access becomes invalid, when a component
+	 *  is persisted or terminated.
+	 */
+	public boolean	isValid()
+	{
+		return valid;
+	}
+	
+	
+	/**
+	 *  Invalidate the external access.
+	 */
+	public void	invalidate()
+	{
+		this.valid	= false;
+		this.interpreter	= null;
+		this.adapter	= null;
+		this.provider	= null;
 	}
 
 	/**

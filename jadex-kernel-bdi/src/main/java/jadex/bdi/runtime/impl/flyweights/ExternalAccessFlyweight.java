@@ -3,10 +3,10 @@ package jadex.bdi.runtime.impl.flyweights;
 import jadex.base.Starter;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFProperty;
@@ -37,9 +37,12 @@ import java.util.StringTokenizer;
 /**
  *  External access interface.
  */
-public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExternalAccess
+public class ExternalAccessFlyweight extends ElementFlyweight implements IExternalAccess
 {
 	//-------- attributes --------
+	
+	/** The valid flag. */
+	protected boolean	valid;	
 	
 	/** The service provider. */
 	protected IServiceProvider provider;
@@ -1130,5 +1133,25 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Check if the component is directly available.
+	 *  An external access becomes invalid, when a component
+	 *  is persisted or terminated.
+	 */
+	public boolean	isValid()
+	{
+		return valid;
+	}
+	
+	/**
+	 *  Invalidate the external access.
+	 */
+	public void	invalidate()
+	{
+		this.valid	= false;
+		this.provider	= null;
+		cleanup();	// ???
 	}
 }

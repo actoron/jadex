@@ -7,13 +7,13 @@ import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
@@ -89,14 +89,14 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	protected JTable dealertable;
 	protected TableModel dealermodel;
 
-	protected IBDIExternalAccess agent;
+	protected IExternalAccess agent;
 	
 	//-------- constructors --------
 
 	/**
 	 * Create a new plan.
 	 */
-	public ManagerFrame(final IBDIExternalAccess access)
+	public ManagerFrame(final IExternalAccess access)
 	{
 		super("Blackjack Manager");
 		

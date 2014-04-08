@@ -1,12 +1,12 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -52,7 +52,7 @@ public class GetExternalAccessPlan extends Plan
 		{
 			public void resultAvailable(Object result)
 			{
-				IBDIExternalAccess exta = (IBDIExternalAccess)result;
+				IExternalAccess exta = (IExternalAccess)result;
 				gotexta[0]	= true;
 //				System.out.println("Got external access: "+exta);
 				

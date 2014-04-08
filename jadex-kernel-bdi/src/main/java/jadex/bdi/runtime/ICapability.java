@@ -29,12 +29,6 @@ public interface ICapability	extends IElement
 	public IExternalAccess getExternalAccess();
 
 	/**
-	 *  Get the scope.
-	 *  @return The scope.
-	 */
-	public IBDIExternalAccess getBDIExternalAccess();
-
-	/**
 	 *  Get the parent (if any).
 	 *  @return The parent.
 	 */

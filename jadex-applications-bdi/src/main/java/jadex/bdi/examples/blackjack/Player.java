@@ -5,9 +5,9 @@ import jadex.bdi.examples.blackjack.player.strategies.IStrategy;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
 
 import java.awt.Color;
-import jadex.commons.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 

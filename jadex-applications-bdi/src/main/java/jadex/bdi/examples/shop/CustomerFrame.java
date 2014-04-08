@@ -1,8 +1,8 @@
 package jadex.bdi.examples.shop;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -26,7 +26,7 @@ public class CustomerFrame extends JFrame
 	/**
 	 *  Create a new frame.
 	 */
-	public CustomerFrame(final IBDIExternalAccess agent)
+	public CustomerFrame(final IExternalAccess agent)
 	{
 		super(agent.getComponentIdentifier().getName());
 		

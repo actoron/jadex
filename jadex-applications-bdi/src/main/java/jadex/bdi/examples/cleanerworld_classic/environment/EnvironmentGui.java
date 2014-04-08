@@ -6,9 +6,9 @@ import jadex.bdi.examples.cleanerworld_classic.Environment;
 import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -89,7 +89,7 @@ public class EnvironmentGui	extends JFrame
 	/**
 	 *  Create a new gui plan.
 	 */
-	public EnvironmentGui(final IBDIExternalAccess agent)
+	public EnvironmentGui(final IExternalAccess agent)
 	{
 		super(agent.getComponentIdentifier().getLocalName());
 

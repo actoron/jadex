@@ -1,10 +1,10 @@
 package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -28,7 +28,7 @@ public class MessageGui extends JFrame
 	/**
 	 *  Create a new message gui.
 	 */
-	public MessageGui(IBDIExternalAccess agent)
+	public MessageGui(IExternalAccess agent)
 	{
 		final JLabel sent = new JLabel("Sent: [0]");
 		final JLabel rec = new JLabel("Received: [0]");

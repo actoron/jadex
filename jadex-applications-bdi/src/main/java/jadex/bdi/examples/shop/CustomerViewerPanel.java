@@ -2,7 +2,6 @@ package jadex.bdi.examples.shop;
 
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -36,7 +35,7 @@ public class CustomerViewerPanel extends AbstractComponentViewerPanel
 		{
 			public void resultAvailable(Void result)
 			{
-				panel = new CustomerPanel((IBDIExternalAccess)component);
+				panel = new CustomerPanel((IExternalAccess)component);
 				ret.setResult(result);
 			}
 			

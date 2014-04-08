@@ -7,7 +7,6 @@ import jadex.commons.gui.GuiCreator;
 import java.awt.Component;
 import java.awt.Toolkit;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 

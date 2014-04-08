@@ -1,7 +1,6 @@
 package jadex.bdi.examples.booktrading.common;
 
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IExpression;
@@ -13,8 +12,8 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Binding;
 
@@ -70,7 +69,7 @@ public class GuiPanel extends JPanel
 	private String itemlabel;
 	private String goalname;
 	private String addorderlabel;
-	private IBDIExternalAccess agent;
+	private IExternalAccess agent;
 	private List orders = new ArrayList();
 	private JTable table;
 	private DefaultTableModel detailsdm; 
@@ -157,7 +156,7 @@ public class GuiPanel extends JPanel
 	/**
 	 *  Shows the gui, and updates it when beliefs change.
 	 */
-	public GuiPanel(final IBDIExternalAccess agent)//, final boolean buy)
+	public GuiPanel(final IExternalAccess agent)//, final boolean buy)
 	{
 		setLayout(new BorderLayout());
 		

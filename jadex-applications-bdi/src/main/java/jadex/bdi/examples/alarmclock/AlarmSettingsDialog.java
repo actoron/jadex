@@ -1,11 +1,11 @@
 package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
@@ -82,14 +82,14 @@ public class AlarmSettingsDialog extends JDialog
 	protected IGoal playing;
 	
 	/** The agent. */
-	protected IBDIExternalAccess	agent;
+	protected IExternalAccess	agent;
 
 	//-------- constructors --------
 
 	/**
 	 *  Create a new alarm settings panel.
 	 */
-	public AlarmSettingsDialog(final IBDIExternalAccess agent, JFrame owner, Alarm alarm)
+	public AlarmSettingsDialog(final IExternalAccess agent, JFrame owner, Alarm alarm)
 	{
 		super(owner, "Alarm Settings", true);
 		this.agent	= agent;
@@ -576,7 +576,7 @@ public class AlarmSettingsDialog extends JDialog
 	 *  @param alarm The alarm.
 	 *  @return The new alarm or null.
 	 */
-	public static Alarm showDialog(IBDIExternalAccess agent, JFrame owner, Alarm alarm)
+	public static Alarm showDialog(IExternalAccess agent, JFrame owner, Alarm alarm)
 	{
 		Alarm ret = null;
 		AlarmSettingsDialog asd = new AlarmSettingsDialog(agent, owner, alarm);

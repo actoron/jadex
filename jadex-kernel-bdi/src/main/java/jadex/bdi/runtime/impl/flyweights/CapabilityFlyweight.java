@@ -3,7 +3,6 @@ package jadex.bdi.runtime.impl.flyweights;
 import jadex.base.Starter;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
@@ -20,7 +19,6 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.SFuture;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.service.IServiceContainer;
@@ -85,15 +83,6 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IExternalAccess getExternalAccess()
 	{
-		return getBDIExternalAccess();
-	}
-		
-	/**
-	 *  Get the scope.
-	 *  @return The scope.
-	 */
-	public IBDIExternalAccess getBDIExternalAccess()
-	{
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
@@ -103,7 +92,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					object = new ExternalAccessFlyweight(getState(), getScope());
 				}
 			};
-			return (IBDIExternalAccess)invoc.object;
+			return (IExternalAccess)invoc.object;
 		}
 		else
 		{

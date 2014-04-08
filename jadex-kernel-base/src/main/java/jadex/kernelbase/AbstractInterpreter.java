@@ -25,7 +25,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminationCommand;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 import java.util.ArrayList;
@@ -749,6 +748,17 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 				}
 				sub.setFinishedIfUndone();
 			}
+		}
+	}
+	
+	/**
+	 *  Invalidate the external access.
+	 */
+	public void invalidateAccess()
+	{
+		if(access instanceof ExternalAccess)
+		{
+			((ExternalAccess)access).invalidate();
 		}
 	}
 }

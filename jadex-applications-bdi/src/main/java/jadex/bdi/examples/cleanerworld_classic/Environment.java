@@ -1,8 +1,8 @@
 package jadex.bdi.examples.cleanerworld_classic;
 
 import jadex.commons.SimplePropertyChangeSupport;
-
 import jadex.commons.beans.PropertyChangeListener;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -2,6 +2,8 @@ package jadex.bdi.examples.blackjack.gui;
 
 import jadex.bdi.examples.blackjack.GameState;
 import jadex.bdi.examples.blackjack.Player;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.collection.SCollection;
 
 import java.awt.Component;
@@ -9,8 +11,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;

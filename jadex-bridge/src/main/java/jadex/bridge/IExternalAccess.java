@@ -172,4 +172,11 @@ public interface IExternalAccess extends INFPropertyProvider//extends IRemotable
 //	 *  @return True if the current thread is not the component thread.
 //	 */
 //	public IFuture<Boolean> isExternalThread();
+	
+	/**
+	 *  Check if the component is directly available.
+	 *  An external access becomes invalid, when a component
+	 *  is persisted or terminated.
+	 */
+	public boolean	isValid();
 }

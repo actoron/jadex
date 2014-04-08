@@ -3,13 +3,13 @@ package jadex.bdi.examples.blackjack.gui;
 import jadex.bdi.examples.blackjack.Card;
 import jadex.bdi.examples.blackjack.CardSet;
 import jadex.bdi.examples.blackjack.Player;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;

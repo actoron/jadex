@@ -5,9 +5,9 @@ import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Homebase;
 import jadex.bdi.examples.marsworld_classic.Location;
 import jadex.bdi.examples.marsworld_classic.Target;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -88,7 +88,7 @@ public class MarsworldGui	extends JFrame
 	/**
 	 *  Create a new gui.
 	 */
-	public MarsworldGui(final IBDIExternalAccess agent)
+	public MarsworldGui(final IExternalAccess agent)
 	{
 		super("Mars Environment - Agents collecting ore from targets...");
 		

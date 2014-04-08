@@ -1,8 +1,8 @@
 package jadex.bdi.examples.booktrading.common;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -30,7 +30,7 @@ public class Gui extends JFrame
 	/**
 	 *  Shows the gui, and updates it when beliefs change.
 	 */
-	public Gui(final IBDIExternalAccess agent)//, final boolean buy)
+	public Gui(final IExternalAccess agent)//, final boolean buy)
 	{
 		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getComponentIdentifier().getName());
 		
