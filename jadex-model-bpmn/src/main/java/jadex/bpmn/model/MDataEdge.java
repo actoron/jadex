@@ -6,18 +6,12 @@ import jadex.commons.Tuple2;
 /**
  *  A data edge is a data flow edge between activity parameters.
  */
-public class MDataEdge extends MNamedIdElement
+public class MDataEdge extends MEdge
 {
 	//-------- attributes --------
-	
-	/** The source activity. */
-	protected MActivity source;
 
 	/** The source parameter. */
 	protected String sourceparam;
-	
-	/** The target activity. */
-	protected MActivity target;
 	
 	/** The target parameter. */
 	protected String targetparam;
@@ -75,41 +69,6 @@ public class MDataEdge extends MNamedIdElement
 		
 		this.source = null;
 		this.target = null;
-	}
-	
-	/**
-	 *  Get the source.
-	 *  @return The source.
-	 */
-	public MActivity getSource()
-	{
-		return source;
-	}
-	
-	/**
-	 *  Set the source.
-	 */
-	public void setSource(MActivity source)
-	{
-		this.source = source;
-	}
-	
-	/**
-	 *  Get the target.
-	 *  @return The target.
-	 */
-	public MActivity getTarget()
-	{
-		return target;
-	}
-	
-	/**
-	 *  Set the target.
-	 *  @param target The target.
-	 */
-	public void setTarget(MActivity target)
-	{
-		this.target = target;
 	}
 
 	/**

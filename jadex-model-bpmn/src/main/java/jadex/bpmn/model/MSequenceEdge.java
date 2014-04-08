@@ -8,15 +8,9 @@ import jadex.javaparser.IParsedExpression;
 /**
  *  A sequence edge is a control flow edge between activities.
  */
-public class MSequenceEdge extends MAssociationTarget
+public class MSequenceEdge extends MEdge
 {
 	//-------- attributes --------
-	
-	/** The outgoing edges. */
-	protected MActivity source;
-	
-	/** The incoming edges. */
-	protected MActivity target;
 	
 	/** The type. */
 	protected String type;
@@ -78,41 +72,6 @@ public class MSequenceEdge extends MAssociationTarget
 		
 		this.source = null;
 		this.target = null;
-	}
-
-	/**
-	 *  Get the source.
-	 *  @return The source.
-	 */
-	public MActivity getSource()
-	{
-		return source;
-	}
-	
-	/**
-	 *  Set the source.
-	 */
-	public void setSource(MActivity source)
-	{
-		this.source = source;
-	}
-	
-	/**
-	 *  Get the target.
-	 *  @return The target.
-	 */
-	public MActivity getTarget()
-	{
-		return target;
-	}
-	
-	/**
-	 *  Set the target.
-	 *  @param target The target.
-	 */
-	public void setTarget(MActivity target)
-	{
-		this.target = target;
 	}
 
 	/**
