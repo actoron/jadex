@@ -833,8 +833,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		}
 		this.executing	= false;
 		this.componentthread	= null;
-		
-//		if(getComponentIdentifier().toString().indexOf("GarbageCollector")!=-1)
+//		
+//		if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
 ////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
 //		{
 //			System.out.println("Blocking: "+getComponentIdentifier()+", "+System.currentTimeMillis());
@@ -860,10 +860,19 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					if(!unblocked[0])
 					{
+//						if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
+//						{
+//							System.out.println("Unblocking after timeout: "+getComponentIdentifier()+", "+System.currentTimeMillis());
+//						}
+						
 						// Cannot use timeout exception as component would not be correctly entered.
 						// Todo: allow informing future about timeout.
 						unblock(monitor, null); //new TimeoutException());
 					}
+//					else if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
+//					{
+//						System.out.println("Not unblocking after timeout (already unblocked): "+getComponentIdentifier()+", "+System.currentTimeMillis());
+//					}
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -881,12 +890,12 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		assert !IComponentDescription.STATE_TERMINATED.equals(desc.getState());
 		
-//		if(getComponentIdentifier().toString().indexOf("GarbageCollector")!=-1)
+//		if(getComponentIdentifier().toString().indexOf("IntermediateTest")!=-1)
 ////		if(getModel().getFullName().indexOf("marsworld.sentry")!=-1)
 //		{
 //			System.out.println("Unblocked: "+getComponentIdentifier()+", "+System.currentTimeMillis());
 //		}
-		
+//		
 		synchronized(this)
 		{
 			if(executing)

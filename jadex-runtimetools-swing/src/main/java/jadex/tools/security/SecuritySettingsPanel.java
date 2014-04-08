@@ -419,7 +419,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 							{
 								public void actionPerformed(ActionEvent e)
 								{
-									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
+									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, jcc.getPlatformAccess(), 
 										jcc.getJCCAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), new ComponentIconCache(jcc.getJCCAccess()));
 									IComponentIdentifier cid = psd.selectAgent(null);
 									if(cid!=null)
@@ -503,7 +503,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 							{
 								public void actionPerformed(ActionEvent e)
 								{
-									final PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
+									final PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, jcc.getPlatformAccess(),
 										jcc.getJCCAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), new ComponentIconCache(jcc.getJCCAccess()));
 									cid[0] = psd.selectAgent(null);
 									if(cid[0]!=null)
@@ -595,7 +595,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 							{
 								public void actionPerformed(ActionEvent e)
 								{
-									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
+									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, jcc.getPlatformAccess(),
 										jcc.getJCCAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), new ComponentIconCache(jcc.getJCCAccess()));
 									IComponentIdentifier cid = psd.selectAgent(null);
 									if(cid!=null)
@@ -658,7 +658,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 							{
 								public void actionPerformed(ActionEvent e)
 								{
-									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, 
+									PlatformSelectorDialog psd = new PlatformSelectorDialog(inner, jcc.getPlatformAccess(),
 										jcc.getJCCAccess(), jcc.getCMSHandler(), jcc.getPropertyHandler(), new ComponentIconCache(jcc.getJCCAccess()));
 									IComponentIdentifier cid = psd.selectAgent(null);
 									if(cid!=null)
@@ -724,7 +724,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		updateact.run();
 
 		// The acquire certificate settings
-		final AcquireCertificatePanel acp = new AcquireCertificatePanel(jcc.getJCCAccess(), secservice, jcc.getCMSHandler());
+		final AcquireCertificatePanel acp = new AcquireCertificatePanel(jcc.getPlatformAccess(), jcc.getJCCAccess(), secservice, jcc.getCMSHandler());
 		secservice.getAcquisitionMechanisms().addResultListener(new SwingDefaultResultListener<List<MechanismInfo>>()
 		{
 			public void customResultAvailable(List<MechanismInfo> result) 
@@ -864,7 +864,7 @@ public class SecuritySettingsPanel	implements IServiceViewerPanel
 		((JTabbedPane)inner).addTab("Key Store", spv);
 		((JTabbedPane)inner).addTab("Remote Passwords", ppp);
 		((JTabbedPane)inner).addTab("Network Names", npp);
-		((JTabbedPane)inner).addTab("Virtual Platform Names", new VirtualNamesPanel(secservice));
+		((JTabbedPane)inner).addTab("Virtual Platform Names", new DualVirtualNamesPanel(jcc.getPlatformAccess(), jcc.getJCCAccess(), secservice, jcc.getCMSHandler()));
 			
 		// Gui listeners.
 		buapply.setEnabled(false);

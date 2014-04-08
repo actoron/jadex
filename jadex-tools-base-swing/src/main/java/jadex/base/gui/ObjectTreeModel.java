@@ -772,7 +772,7 @@ public class ObjectTreeModel implements TreeModel
 			{	
 				this.fields = new ArrayList();
 			
-				// find all fields for a class expect strings and null values
+				// find all fields for a class except strings and null values
 				if (!type.isPrimitive() && !type.isArray() && !type.equals(String.class) && nodeObject != null)
 				{
 					// iterate over fields from the class and superclasses
@@ -784,7 +784,7 @@ public class ObjectTreeModel implements TreeModel
 						for (int i = 0; i < f.length; i++)
 						{
 							// get only nonstatic fields
-							if(Modifier.isStatic(f[i].getModifiers()))
+							if(!Modifier.isStatic(f[i].getModifiers()))
 							{
 								fields.add(f[i]);
 							}

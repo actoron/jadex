@@ -11,6 +11,7 @@ import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventEndSignalActivityHandler;
+import jadex.bpmn.runtime.handler.EventEndTerminateActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
@@ -53,7 +54,6 @@ import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.bridge.service.types.monitoring.MonitoringEvent;
-import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.IValueFetcher;
@@ -88,7 +88,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  *  The bpmn interpreter is able to execute bpmn diagrams.
@@ -163,6 +162,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		// End events.
 		// Options: empty, message, error, compensation, terminate, signal, multi, cancel, link
 		// Missing: link, compensation, cancel, terminate, signal, multi
+		activityhandlers.put(MBpmnModel.EVENT_END_TERMINATE, new EventEndTerminateActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_MESSAGE, new EventIntermediateMessageActivityHandler());
@@ -354,7 +354,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public IFuture<Void> init(IModelInfo model, String config, Map<String, Object> arguments)
 	{
-		System.out.println("init: "+model);
+//		System.out.println("init: "+model+" "+arguments);
 		
 		final Future<Void> ret = new Future<Void>();
 		IFuture<Void> fut = super.init(model, config, arguments);
@@ -373,14 +373,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 						{
 							public void customResultAvailable(Void result)
 							{
-								System.out.println("init done");
+//								System.out.println("init done");
 								super.customResultAvailable(result);
 							}
 						});
 						
 						for(Map.Entry<MSubProcess, MActivity> evtsubentry : evtsubstarts.entrySet())
 						{
-							String[] eventtypes = (String[]) evtsubentry.getValue().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
+							String[] eventtypes = (String[])evtsubentry.getValue().getParsedPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_EVENTTYPES);
 							UnparsedExpression	upex	= evtsubentry.getValue().getPropertyValue(MBpmnModel.PROPERTY_EVENT_RULE_CONDITION);
 							Map<String, Object>	params	= null; 
 							if(upex!=null)
@@ -388,25 +388,28 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 								IParsedExpression	exp	= SJavaParser.parseExpression(upex, getModel().getAllImports(), getClassLoader());
 								for(String param: exp.getParameters())
 								{
-									Object	val	= getContextVariable(param);
-									if(val!=null)	// omit null values (also excludes '$event')
+									if(hasContextVariable(param))
 									{
-										if(params==null)
+										Object	val	= getContextVariable(param);
+										if(val!=null)	// omit null values (also excludes '$event')
 										{
-											params	= new LinkedHashMap<String, Object>();
+											if(params==null)
+											{
+												params	= new LinkedHashMap<String, Object>();
+											}
+											params.put(param, val);
 										}
-										params.put(param, val);
 									}
 								}
 							}
 							
 							final Tuple2<MSubProcess, MActivity> fevtsubentry = new Tuple2<MSubProcess, MActivity>(evtsubentry.getKey(), evtsubentry.getValue());
 							final IExternalAccess exta = getExternalAccess();
-							IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, false, new ICommand<Object>()
+							IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, upex, getModel().getAllImports(), params, false, new IResultCommand<IFuture<Void>, Object>()
 							{
-								public void execute(final Object event)
+								public IFuture<Void> execute(final Object event)
 								{
-									exta.scheduleStep(new IComponentStep<Void>()
+									return exta.scheduleStep(new IComponentStep<Void>()
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
@@ -418,16 +421,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 											subcontext.addThread(subthread);
 											subthread.setParameterValue("$event", event);
 											return IFuture.DONE;
-										}
-									}).addResultListener(new IResultListener<Void>()
-									{
-										public void resultAvailable(Void result)
-										{
-										}
-										
-										public void exceptionOccurred(Exception exception)
-										{
-											Logger.getAnonymousLogger().warning("Event " + event + " could not be delivered to instance: " + exception.getMessage());
 										}
 									});
 								}
@@ -494,7 +487,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			
 //			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
 			
-			if(!finishing && isFinished(pool, lane) && !bpmnmodel.isKeepAlive() && started)
+			if(!finishing && isFinished(pool, lane) && !bpmnmodel.isKeepAlive() && started 
+				&& bpmnmodel.getEventSubProcessStartEvents().isEmpty()) // keep alive also process with event subprocesses
 			{
 //				System.out.println("terminating: "+getComponentIdentifier());
 				finishing = true;
@@ -669,7 +663,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
         	startevents.add(triggeractivity);
         }
         
-        for(MActivity mact : startevents)
+        for(MActivity mact: startevents)
         {
             if(trigger!=null && trigger.getSecondEntity().equals(mact.getId()))
             {
@@ -956,7 +950,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			if(handler==null)
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 
-//			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity());
+//			System.out.println("step: "+getComponentIdentifier()+" "+thread.getId()+" "+thread.getActivity()+" "+thread.getActivity().getId());
 			MActivity act = thread.getActivity();
 			
 //			notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, thread, thread.getActivity()));

@@ -50,10 +50,10 @@ public class PlatformSelectorDialog extends ComponentSelectorDialog
 	/**
 	 *  Create a new AgentSelectorDialog.
 	 */
-	public PlatformSelectorDialog(Component parent, IExternalAccess access, CMSUpdateHandler cmshandler, 
+	public PlatformSelectorDialog(Component parent, IExternalAccess access, IExternalAccess jccaccess, CMSUpdateHandler cmshandler, 
 		PropertyUpdateHandler prophandler, ComponentIconCache iconcache)
 	{
-		super(parent, access, cmshandler, prophandler, iconcache);
+		super(parent, access, jccaccess, cmshandler, prophandler, iconcache);
 		this.valmap = new HashMap<IComponentIdentifier, IComponentIdentifier>();
 	}
 	

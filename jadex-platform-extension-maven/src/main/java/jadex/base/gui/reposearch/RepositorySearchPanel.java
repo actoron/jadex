@@ -551,7 +551,7 @@ public class RepositorySearchPanel extends JPanel
 			{
 				IdTreeNode tmp = (IdTreeNode)parent.getChildAt(i);
 				if((up && tmp.toString().compareTo(child.toString())>=0) 
-					|| tmp.toString().compareTo(child.toString())<=0)
+					|| (!up && tmp.toString().compareTo(child.toString())<=0))
 				{
 					parent.insert(child, i);
 					done = true;

@@ -1312,7 +1312,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/**
 	 *  Returns all start events triggered based on type matching.
-	 * 
 	 *  @return Events triggered based on type matching.
 	 */
 	public List<MActivity> getTypeMatchedStartEvents()
@@ -1326,7 +1325,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/**
 	 *  Returns all start events in event subprocesses.
-	 * 
 	 *  @return Start events in event subprocesses.
 	 */
 	public List<MActivity> getEventSubProcessStartEvents()
@@ -1340,7 +1338,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/**
 	 *  Returns a mapping from event subprocesses to their start events.
-	 * 
 	 *  @return The mapping
 	 */
 	public Map<MSubProcess, MActivity> getEventSubProcessStartEventMapping()
@@ -1354,7 +1351,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/**
 	 *  Returns all events waiting for outside triggers.
-	 * 
 	 *  @return Events waiting for outside triggers.
 	 */
 	public List<MActivity> getWaitingEvents()

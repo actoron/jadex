@@ -16,7 +16,9 @@ import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -147,8 +149,11 @@ public class ComponentTreePanel extends JSplitPane
 	
 	//-------- attributes --------
 	
-	/** The external access. */
+	/** The external access of the shown platform. */
 	protected final IExternalAccess	access;
+	
+	/** The external access of the platform running the gui. */
+	protected final IExternalAccess	jccaccess;
 	
 	/** The component tree model. */
 	protected final AsyncSwingTreeModel	model;
@@ -173,16 +178,16 @@ public class ComponentTreePanel extends JSplitPane
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ComponentTreePanel(IExternalAccess access, CMSUpdateHandler cmshandler, 
+	public ComponentTreePanel(IExternalAccess access, IExternalAccess jccaccess, CMSUpdateHandler cmshandler, 
 		PropertyUpdateHandler prophandler, ComponentIconCache cic)
 	{
-		this(access, cmshandler, prophandler, cic, VERTICAL_SPLIT);
+		this(access, jccaccess, cmshandler, prophandler, cic, VERTICAL_SPLIT);
 	}
 	
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ComponentTreePanel(final IExternalAccess access, CMSUpdateHandler cmshandler, 
+	public ComponentTreePanel(final IExternalAccess access, final IExternalAccess jccaccess, CMSUpdateHandler cmshandler, 
 		PropertyUpdateHandler prophandler, final ComponentIconCache cic, int orientation)
 	{
 		super(orientation);
@@ -190,6 +195,7 @@ public class ComponentTreePanel extends JSplitPane
 		
 		this.actions = new HashMap();
 		this.access	= access;
+		this.jccaccess	= jccaccess;
 		this.model	= new AsyncSwingTreeModel();
 		this.tree	= new JTree(model);
 		tree.setCellRenderer(new AsyncTreeCellRenderer());
@@ -471,13 +477,26 @@ public class ComponentTreePanel extends JSplitPane
 					{
 						//IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
 						IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getDescription().getName();
-						cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener((Component)null)
+						cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener<IExternalAccess>((Component)null)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IExternalAccess ea)
 							{
-								IExternalAccess	ea	= (IExternalAccess)result;
-								JPanel panel = new ObjectInspectorPanel(ea);
-								showProperties(panel);
+								
+								if(ea.getComponentIdentifier().getRoot().equals(jccaccess.getComponentIdentifier().getRoot()))
+								{
+									ea.scheduleStep(new IComponentStep<Void>()
+									{
+										public IFuture<Void>	execute(IInternalAccess access)
+										{
+											showProperties(new ObjectInspectorPanel(access));
+											return IFuture.DONE;
+										}
+									});
+								}
+								else
+								{
+									showProperties(new ObjectInspectorPanel(ea));
+								}
 							}
 						});
 					}

@@ -2,7 +2,7 @@ package jadex.bpmn.runtime;
 
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.annotation.Service;
-import jadex.commons.ICommand;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;
@@ -19,7 +19,7 @@ public interface IInternalProcessEngineService
 	 *  @return An id to be used for deregistration.
 	 */
 	public IFuture<String>	addEventMatcher(String[] eventtypes, UnparsedExpression expression, String[] imports, 
-		Map<String, Object> params, boolean remove, ICommand<Object> command);
+		Map<String, Object> params, boolean remove, IResultCommand<IFuture<Void>, Object> command);
 	
 	/**
 	 *  Register an event description to be notified, when the event happens.

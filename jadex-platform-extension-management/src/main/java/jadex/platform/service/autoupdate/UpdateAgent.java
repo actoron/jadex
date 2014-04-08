@@ -305,7 +305,7 @@ public class UpdateAgent implements IUpdateService
 							{
 								return new Future<String>(getLocalVersionInfo());
 							}
-						}).addResultListener(new DelegationResultListener<String>(ret));
+						}).addResultListener(agent.createResultListener(new DelegationResultListener<String>(ret)));
 					}
 				});
 			}
@@ -453,7 +453,7 @@ public class UpdateAgent implements IUpdateService
 //		Starter.createPlatform(new String[]{"-component", "jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")"})
 //		Starter.createPlatform(new String[]{"-deftimeout", "-1", "-component", "jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")"})
 		Starter.createPlatform(new String[]{"-maven_dependencies", "false", "-component", "jadex.platform.service.autoupdate.UpdateAgent.class(:"+deser+")"})
-			.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
+			.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(IExternalAccess result)
 			{
@@ -461,7 +461,7 @@ public class UpdateAgent implements IUpdateService
 				ret.setResult(cid);
 //				acknowledgeUpdate(cid.getRoot());
 			}
-		});
+		}));
 		
 		return ret;
 	}
@@ -540,7 +540,7 @@ public class UpdateAgent implements IUpdateService
 				{
 					public void customResultAvailable(IExternalAccess plat)
 					{
-						plat.getArguments().addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, StartOptions>(ret)
+						plat.getArguments().addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Map<String,Object>, StartOptions>(ret)
 						{
 							public void customResultAvailable(Map<String, Object> args)
 							{
@@ -583,7 +583,7 @@ public class UpdateAgent implements IUpdateService
 								
 								ret.setResult(so);
 							}
-						});
+						}));
 					}
 				});
 			}

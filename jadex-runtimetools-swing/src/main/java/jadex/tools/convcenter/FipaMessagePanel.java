@@ -93,7 +93,7 @@ public class FipaMessagePanel extends JPanel
 	 *  @param cmshandler	The shared CMS update handler.
 	 *  @param comptree	The comptree (if any) will be repainted when new receivers are set in the panel.
 	 */
-	public FipaMessagePanel(Map message, IExternalAccess access, CMSUpdateHandler cmshandler,
+	public FipaMessagePanel(Map message, IExternalAccess access, IExternalAccess jccaccess, CMSUpdateHandler cmshandler,
 		ComponentIconCache iconcache,  final Component comptree)
 	{
 		super(new GridBagLayout());
@@ -300,7 +300,7 @@ public class FipaMessagePanel extends JPanel
 
 
 		// Actions for agent selection.
-		final ComponentSelectorDialog	agentselector	= new ComponentSelectorDialog(this, access, cmshandler, null, iconcache);
+		final ComponentSelectorDialog	agentselector	= new ComponentSelectorDialog(this, access, jccaccess, cmshandler, null, iconcache);
 		setsender.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

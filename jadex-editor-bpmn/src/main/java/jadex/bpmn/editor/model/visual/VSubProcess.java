@@ -33,12 +33,12 @@ public class VSubProcess extends VActivity
 	/**
 	 *  Checks if connectable.
 	 */
-	public boolean isConnectable()
-	{
-		if (SHelper.isEventSubProcess(getBpmnElement()))
-		{
-			return false;
-		}
-		return super.isConnectable();
-	}
+//	public boolean isConnectable()
+//	{
+//		if (SHelper.isEventSubProcess(getBpmnElement()))
+//		{
+//			return false;
+//		}
+//		return super.isConnectable();
+//	}
 }

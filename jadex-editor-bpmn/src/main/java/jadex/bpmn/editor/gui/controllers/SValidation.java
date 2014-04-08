@@ -168,9 +168,9 @@ public class SValidation
 		{
 			error = "Start events cannot be the target of a sequence.";
 		}
-		else if (SHelper.isEventSubProcess(source) || SHelper.isEventSubProcess(target))
+		else if (SHelper.isEventSubProcess(target))
 		{
-			error = "Event subprocesses cannot be connected with sequence edges.";
+			error = "Event subprocesses cannot be targeted with sequence edges.";
 		}
 		else
 		{

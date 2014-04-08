@@ -24,6 +24,7 @@ import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
@@ -1947,6 +1948,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		{
 			vals.add(event);
 			vals.add(event.getValue());
+			if(event.getValue() instanceof ChangeInfo)
+			{
+				vals.add(((ChangeInfo<?>)event.getValue()).getValue());
+			}
 		}
 
 		// Add processable element values if any (for plan and APL).

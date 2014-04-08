@@ -51,6 +51,9 @@ public class AcquireCertificatePanel extends JPanel
 	/** The external access. */
 	protected IExternalAccess ea;
 	
+	/** The platform running the gui. */
+	protected IExternalAccess jccaccess;
+	
 	/** The security service. */
 	protected ISecurityService secser;
 	
@@ -74,9 +77,10 @@ public class AcquireCertificatePanel extends JPanel
 	/**
 	 *  Create the acquire certificate panel.
 	 */
-	public AcquireCertificatePanel(IExternalAccess ea, ISecurityService secser, final CMSUpdateHandler cmshandler)
+	public AcquireCertificatePanel(IExternalAccess ea, IExternalAccess jccaccess, ISecurityService secser, final CMSUpdateHandler cmshandler)
 	{
 		this.ea = ea;
+		this.jccaccess = jccaccess;
 		this.secser = secser;
 		this.cmshandler = cmshandler;
 		this.updateactions = new HashMap<String, ICommand<Object>>();
@@ -314,7 +318,7 @@ public class AcquireCertificatePanel extends JPanel
 		
 		pp.addComponent(pi.getName(), p);
 
-		final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(AcquireCertificatePanel.this), ea, cmshandler, null, new ComponentIconCache(ea));
+		final PlatformSelectorDialog csd = new PlatformSelectorDialog(SGUI.getWindowParent(AcquireCertificatePanel.this), ea, jccaccess, cmshandler, null, new ComponentIconCache(ea));
 		
 		bu.addActionListener(new ActionListener()
 		{

@@ -107,4 +107,16 @@ public class IdTreeModel<T> extends DefaultTreeModel
 		
 		return nodes.get(id);
 	}
+	
+	/**
+	 *  Get a node per id.
+	 *  @param id The node id.
+	 *  @return The node.
+	 */
+	public Map<String, IdTreeNode<T>> getNodes()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		
+		return nodes;
+	}
 }
