@@ -44,8 +44,9 @@ public class IteratorProcessor implements ITraverseProcessor
 		{
 			Object val = it.next();
 			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone, targetcl, context);
-			copy.add(newval);
+			Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+			if (newval != Traverser.IGNORE_RESULT)
+				copy.add(newval);
 		}
 		
 		return ret;

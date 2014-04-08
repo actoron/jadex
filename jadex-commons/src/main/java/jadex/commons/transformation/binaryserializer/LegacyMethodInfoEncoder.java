@@ -41,10 +41,10 @@ public class LegacyMethodInfoEncoder implements ITraverseProcessor
 		
 		ec.writeVarInt(2);
 		ec.writeString("name");
-		traverser.traverse(mi.getName(), String.class, traversed, processors, clone, targetcl, context);
+		traverser.doTraverse(mi.getName(), String.class, traversed, processors, clone, targetcl, context);
 		ec.writeString("ParameterTypes");
 		Class<?>[] paramclasses = mi.getParameterTypes(targetcl);
-		traverser.traverse(paramclasses, null, traversed, processors, clone, targetcl, context);
+		traverser.doTraverse(paramclasses, null, traversed, processors, clone, targetcl, context);
 		
 		return object;
 	}

@@ -77,7 +77,7 @@ public class CertificateCodec extends AbstractCodec
 		{
 			ec.writeString(((Certificate)object).getType());
 			byte[] encimg = ((Certificate)object).getEncoded();
-			traverser.traverse(encimg, encimg.getClass(), traversed, processors, clone, null, ec);
+			traverser.doTraverse(encimg, encimg.getClass(), traversed, processors, clone, null, ec);
 			return object;
 		}
 		catch(RuntimeException e)

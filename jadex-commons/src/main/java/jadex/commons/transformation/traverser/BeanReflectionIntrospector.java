@@ -56,11 +56,6 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	 */
 	public Map getBeanProperties(Class clazz, boolean includemethods, boolean includefields)
 	{
-		if(Proxy.isProxyClass(clazz))
-		{
-			System.out.println("sdfkljgosdkj");
-		}
-		
 		// includefields component of key is call based to avoid reflection calls during cache hits.
 		Tuple3<Class, Boolean, Boolean> beaninfokey = new Tuple3<Class, Boolean, Boolean>(clazz, includemethods, includefields);
 		Map ret = null;

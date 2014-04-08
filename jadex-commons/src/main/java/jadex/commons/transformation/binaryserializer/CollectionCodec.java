@@ -115,7 +115,7 @@ public class CollectionCodec extends AbstractCodec
 				if (val != null)
 				{
 					Class valclazz = val.getClass();
-					traverser.traverse(val, valclazz, traversed, processors, clone, null, ec);
+					traverser.doTraverse(val, valclazz, traversed, processors, clone, null, ec);
 				}
 				else
 				{

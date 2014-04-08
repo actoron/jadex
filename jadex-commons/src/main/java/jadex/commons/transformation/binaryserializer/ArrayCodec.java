@@ -180,7 +180,7 @@ public class ArrayCodec extends AbstractCodec
 					if (ignoreclass)
 						ec.ignoreNextClassWrite();
 					
-					traverser.traverse(val, val.getClass(), traversed, processors, clone, null, ec);
+					traverser.doTraverse(val, val.getClass(), traversed, processors, clone, null, ec);
 				}
 			}
 		}
