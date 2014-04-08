@@ -10,6 +10,7 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.model.task.ITask;
 import jadex.bpmn.model.task.ITaskContext;
+import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
@@ -101,7 +102,8 @@ public class ProcessThread	implements ITaskContext
 	protected boolean waiting;
 	
 	/** The wait info. */
-	protected Object waitinfo;
+//	protected Object waitinfo;
+	protected ICancelable cancelinfo;
 	
 	/** The wait filter. */
 	protected IFilter<Object> waitfilter;
@@ -242,7 +244,8 @@ public class ProcessThread	implements ITaskContext
 	public void	setNonWaiting()
 	{
 		this.waiting = false;
-		this.waitinfo = null;
+//		this.waitinfo = null;
+		this.cancelinfo = null;
 		this.waitfilter = null;
 //		System.out.println("Thread: "+ComponentIdentifier.LOCAL.get()+", "+getId()+" "+waiting);
 	}
@@ -272,9 +275,10 @@ public class ProcessThread	implements ITaskContext
 	 *  Set the process waiting info. 
 	 *  @param waiting	The waiting info.
 	 */
-	public void setWaitInfo(Object waitinfo)
+	public void setWaitInfo(ICancelable cancelinfo)
 	{
-		this.waitinfo = waitinfo;
+//		this.waitinfo = waitinfo;
+		this.cancelinfo = cancelinfo;
 //		System.out.println("Thread waitinfo: "+ComponentIdentifier.LOCAL.get()+", "+getId()+" "+waitinfo);
 	}
 	
@@ -282,9 +286,9 @@ public class ProcessThread	implements ITaskContext
 	 *  Get the waitinfo.
 	 *  @return The waitinfo.
 	 */
-	public Object getWaitInfo()
+	public ICancelable getWaitInfo()
 	{
-		return this.waitinfo;
+		return this.cancelinfo;
 	}
 	
 	/**

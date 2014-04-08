@@ -10,6 +10,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -30,11 +31,11 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 */
 	public void	doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final long duration)
 	{
-		final Future	wifuture	= new Future(); 
+		final Future<ITimer>	wifuture	= new Future<ITimer>(); 
 		SServiceProvider.getService(instance.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(instance.createResultListener(new IResultListener()
+			.addResultListener(instance.createResultListener(new IResultListener<IClockService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IClockService cs)
 			{
 				ITimedObject	to	= new ITimedObject()
 				{
@@ -52,17 +53,16 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 					}
 				};
 				
-				
-				Object waitinfo; 
+				ITimer timer; 
 				if(duration==TICK_TIMER)
 				{
-					waitinfo = ((IClockService)result).createTickTimer(to);
+					timer = cs.createTickTimer(to);
 				}
 				else
 				{
-					waitinfo = ((IClockService)result).createTimer(duration, to);
+					timer = cs.createTimer(duration, to);
 				}
-				wifuture.setResult(waitinfo);
+				wifuture.setResult(timer);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
@@ -70,33 +70,52 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 			}
 		}));
 		
-		thread.setWaitInfo(wifuture);	// Immediate result required for multiple events handler
+		ICancelable ca = new ICancelable()
+		{
+			public IFuture<Void> cancel()
+			{
+				final Future<Void> ret = new Future<Void>();
+				wifuture.addResultListener(new ExceptionDelegationResultListener<ITimer, Void>(ret)
+				{
+					public void customResultAvailable(ITimer timer)
+					{
+						timer.cancel();
+					}
+				});
+				return ret;
+			}
+		};
+		
+		thread.setWaitInfo(ca);	
 	}
 	
-	/**
-	 *  Execute an activity.
-	 *  @param activity	The activity to execute.
-	 *  @param instance	The process instance.
-	 *  @param thread The process thread.
-	 *  @param info The info object.
-	 */
-	public void cancel(final MActivity activity, BpmnInterpreter instance, final ProcessThread thread)
-	{
-//		System.out.println(instance.getComponentIdentifier()+" cancel called: "+activity+", "+thread);
-		((IFuture)thread.getWaitInfo()).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-//				System.out.println("executing cancel: "+activity+", "+thread+", "+result);
-				if(result instanceof ITimer)
-				{
-					((ITimer)result).cancel();
-				}
-				else
-				{
-					throw new RuntimeException("Internal timer error: "+result);
-				}
-			}
-		});
-	}
+//	/**
+//	 *  Execute an activity.
+//	 *  @param activity	The activity to execute.
+//	 *  @param instance	The process instance.
+//	 *  @param thread The process thread.
+//	 *  @param info The info object.
+//	 */
+//	public void cancel(final MActivity activity, BpmnInterpreter instance, final ProcessThread thread)
+//	{
+//		ICancelable ca = (ICancelable)thread.getWaitInfo();
+//		ca.cancel(); // todo: wait?
+//	
+////		System.out.println(instance.getComponentIdentifier()+" cancel called: "+activity+", "+thread);
+//		((IFuture)thread.getWaitInfo()).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+////				System.out.println("executing cancel: "+activity+", "+thread+", "+result);
+//				if(result instanceof ITimer)
+//				{
+//					((ITimer)result).cancel();
+//				}
+//				else
+//				{
+//					throw new RuntimeException("Internal timer error: "+result);
+//				}
+//			}
+//		});
+//	}
 }

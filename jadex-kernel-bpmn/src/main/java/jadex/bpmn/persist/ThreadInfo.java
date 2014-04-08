@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class ThreadInfo
 {
+	/** 
+	
 	/** ID of the next activity. */
 	protected String activityid;
 	
@@ -26,7 +28,7 @@ public class ThreadInfo
 	protected boolean canceled;
 	
 	/** The id counter for sub processes. */
-	protected int	idcnt;
+	protected int idcnt;
 	
 	/** The split infos. */
 	protected Map<String, SplitInfo>	splitinfos;
