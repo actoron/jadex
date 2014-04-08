@@ -49,4 +49,20 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param duration	The duration to wait.
 	 */
 	public abstract void doWait(MActivity activity, BpmnInterpreter instance, ProcessThread thread, long duration);
+
+	/**
+	 *  Execute an activity.
+	 *  @param activity	The activity to execute.
+	 *  @param instance	The process instance.
+	 *  @param thread The process thread.
+	 *  @param info The info object.
+	 */
+	public void cancel(final MActivity activity, BpmnInterpreter instance, final ProcessThread thread)
+	{
+		ICancelable ca = (ICancelable)thread.getWaitInfo();
+		if(ca!=null)
+		{
+			ca.cancel(); // todo: wait?
+		}
+	}
 }

@@ -5,10 +5,10 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  *  Wait for an external notification (could be a signal or a fired rule).
@@ -34,22 +34,30 @@ public class EventIntermediateNotificationHandler extends DefaultActivityHandler
 		thread.setWaiting(true);
 		
 		// Create a shallow copy of properties.
-		HashMap props = new HashMap();
+		HashMap<String, Object> props = new HashMap<String, Object>();
 		IndexMap<String, MParameter> params = thread.getActivity().getParameters();
 		if(params!=null)
 		{
-			for(Iterator it=params.values().iterator(); it.hasNext(); )
+			for(Iterator<MParameter> it=params.values().iterator(); it.hasNext(); )
 			{
 				MParameter param = (MParameter)it.next();
 				props.put(param.getName(), thread.getParameterValue(param.getName()));
 			}
 		}
 		
-		IExternalNotifier ext = (IExternalNotifier)thread.getPropertyValue(PROPERTY_EXTERNALNOTIFIER);
+		final IExternalNotifier ext = (IExternalNotifier)thread.getPropertyValue(PROPERTY_EXTERNALNOTIFIER);
 		if(ext!=null)
 		{
 			ext.activateWait(props, new Notifier(activity, instance, thread));
-			thread.setWaitInfo(ext);
+			thread.setWaitInfo(new ICancelable()
+			{
+				public IFuture<Void> cancel()
+				{
+					ext.cancel();
+					thread.setWaitInfo(null);
+					return IFuture.DONE;
+				}
+			});
 		}
 //		else
 //			System.out.println("Warning, thread is waiting forever, no external notification system specified.");
@@ -57,13 +65,13 @@ public class EventIntermediateNotificationHandler extends DefaultActivityHandler
 //		System.out.println("Waiting for notification.");
 	}
 	
-	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
-	{
-		IExternalNotifier ext = (IExternalNotifier)thread.getWaitInfo();
-		if(ext!=null)
-		{
-			ext.cancel();
-			thread.setWaitInfo(null);
-		}		
-	}
+//	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+//	{
+//		IExternalNotifier ext = (IExternalNotifier)thread.getWaitInfo();
+//		if(ext!=null)
+//		{
+//			ext.cancel();
+//			thread.setWaitInfo(null);
+//		}		
+//	}
 }

@@ -28,12 +28,12 @@ public class EventMultipleStepHandler implements IStepHandler
 		thread.updateParametersAfterStep(activity, instance);
 
 		MSequenceEdge next	= null;
-		Object	wi	= null;	
+		ICancelable ca = null;	
 		
 		List<MSequenceEdge> outgoing = activity.getOutgoingSequenceEdges();
 		OrFilter filter = (OrFilter)thread.getWaitFilter();
 		IFilter<Object>[] filters = filter.getFilters();
-		Object[] waitinfos = (Object[])thread.getWaitInfo();
+		CompositeCancelable cancelable = (CompositeCancelable)thread.getWaitInfo();
 		
 		for(int i=0; i<outgoing.size(); i++)
 		{
@@ -44,21 +44,21 @@ public class EventMultipleStepHandler implements IStepHandler
 				|| filters[i]!=null && filters[i].filter(event))
 			{
 				next = tmp;
-				wi = waitinfos[i];
+				ca = cancelable.getSubcancelInfos()[i];
 			}
 			else
 			{
 				MActivity act = tmp.getTarget();
-				thread.setWaitInfo(waitinfos[i]);	// Hack!!! change wait infos for cancel() call
+				thread.setWaitInfo(cancelable.getSubcancelInfos()[i]);	// Hack!!! change wait infos for cancel() call
 				instance.getActivityHandler(act).cancel(act, instance, thread);
-				thread.setWaitInfo(waitinfos);
+				thread.setWaitInfo(cancelable);
 			}
 		}
 		
 		if(next==null)
 			throw new RuntimeException("Could not determine next edge: "+this);
 		
-		thread.setWaitInfo(wi);
+		thread.setWaitInfo(ca);
 		// Move thread to triggered event. Todo: process edge in between
 		thread.setActivity(next.getTarget());	
 		instance.step(next.getTarget(), instance, thread, event);

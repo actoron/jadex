@@ -5,6 +5,7 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.commons.IFilter;
+import jadex.commons.future.IFuture;
 
 import java.util.List;
 
@@ -19,18 +20,18 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 //		System.out.println("Executed: "+activity+", "+instance);
 		
 		// Call all connected intermediate event handlers.
-		List<MSequenceEdge> outgoing = activity.getOutgoingSequenceEdges();
+		final List<MSequenceEdge> outgoing = activity.getOutgoingSequenceEdges();
 		if(outgoing==null)
 			throw new UnsupportedOperationException("Activity must have connected activities: "+activity);
 		
 		// Execute all connected activities.
 		final IFilter<Object>[] filters = new IFilter[outgoing.size()];
-		Object[] waitinfos = new Object[outgoing.size()];
+		final ICancelable[] waitinfos = new ICancelable[outgoing.size()];
 		
 		for(int i=0; i<outgoing.size(); i++)
 		{
@@ -49,33 +50,34 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_MULTI);
 		thread.setWaiting(true);
 		thread.setWaitFilter(new OrFilter(filters));
-		thread.setWaitInfo(waitinfos);
+//		thread.setWaitInfo(waitinfos);
+		thread.setWaitInfo(new CompositeCancelable(outgoing, thread, instance, waitinfos));
 	}
 	
-	/**
-	 *  Execute an activity.
-	 *  @param activity	The activity to execute.
-	 *  @param instance	The process instance.
-	 *  @param thread The process thread.
-	 *  @param info The info object.
-	 */
-	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
-	{
-//		System.out.println(instance.getComponentIdentifier()+" cancel called: "+activity+", "+thread);
-		List<MSequenceEdge> outgoing = activity.getOutgoingSequenceEdges();
-		Object[] waitinfos = (Object[])thread.getWaitInfo();
-		
-//		if(waitinfos==null)
-//			System.out.println("here");
-	
-		for(int i=0; i<outgoing.size(); i++)
-		{
-			MSequenceEdge next = (MSequenceEdge)outgoing.get(i);
-			MActivity act = next.getTarget();
-			thread.setWaitInfo(waitinfos[i]);
-			instance.getActivityHandler(act).cancel(act, instance, thread);
-		}
-	}
+//	/**
+//	 *  Execute an activity.
+//	 *  @param activity	The activity to execute.
+//	 *  @param instance	The process instance.
+//	 *  @param thread The process thread.
+//	 *  @param info The info object.
+//	 */
+//	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+//	{
+////		System.out.println(instance.getComponentIdentifier()+" cancel called: "+activity+", "+thread);
+//		List<MSequenceEdge> outgoing = activity.getOutgoingSequenceEdges();
+//		Object[] waitinfos = (Object[])thread.getWaitInfo();
+//		
+////		if(waitinfos==null)
+////			System.out.println("here");
+//	
+//		for(int i=0; i<outgoing.size(); i++)
+//		{
+//			MSequenceEdge next = (MSequenceEdge)outgoing.get(i);
+//			MActivity act = next.getTarget();
+//			thread.setWaitInfo(waitinfos[i]);
+//			instance.getActivityHandler(act).cancel(act, instance, thread);
+//		}
+//	}
 }
 
 /**
@@ -133,3 +135,4 @@ class OrFilter implements IFilter<Object>
 		return filters;
 	}
 }
+

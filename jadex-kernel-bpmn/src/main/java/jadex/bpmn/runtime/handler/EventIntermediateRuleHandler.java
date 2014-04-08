@@ -12,7 +12,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.IResultCommand;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -77,11 +79,11 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 //				System.out.println("Adding event matcher: "+instance.getComponentIdentifier());
 				
 				final IComponentIdentifier	cid	= instance.getComponentIdentifier();
-				IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new IResultCommand<IFuture<Void>, Object>()
+				final IFuture<String>	fut	= ipes.addEventMatcher(eventtypes, fupex, instance.getModel().getAllImports(), fparams, true, new IResultCommand<IFuture<Void>, Object>()
 				{
 					public IFuture<Void> execute(final Object event)
 					{
-						System.out.println("Triggered event matcher: "+cid);
+//						System.out.println("Triggered event matcher: "+cid);
 						
 						return exta.scheduleStep(new IComponentStep<Void>()
 						{
@@ -125,7 +127,49 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 						});
 					}
 				});
-				thread.setWaitInfo(fut);
+				
+				ICancelable ca = new ICancelable()
+				{
+					public IFuture<Void> cancel()
+					{
+						final Future<Void> ret = new Future<Void>();
+						fut.addResultListener(new ExceptionDelegationResultListener<String, Void>(ret)
+						{
+							public void customResultAvailable(final String id)
+							{
+								instance.getServiceContainer().searchService(IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION)
+									.addResultListener(new IResultListener<IInternalProcessEngineService>()
+								{
+									public void resultAvailable(IInternalProcessEngineService ipes)
+									{
+										System.out.println("Cancel event matcher1: "+instance.getComponentIdentifier());
+										
+										ipes.removeEventMatcher(id).addResultListener(new IResultListener<Void>()
+										{
+											public void resultAvailable(Void result)
+											{
+												// done.
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												instance.getLogger().warning("Event deregistration failed: "+exception);
+											}
+										});
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										instance.getLogger().warning("Event deregistration failed: "+exception);
+									}
+								});		
+							}
+						});
+						return ret;
+					}
+				};
+				
+				thread.setWaitInfo(ca);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -146,56 +190,55 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 //		instance.notify(activity, thread, null);
 //	}
 	
-	/**
-	 *  Called when the process thread is aborted and waiting is no longer wanted.
-	 */
-	public void cancel(MActivity activity, final BpmnInterpreter instance, ProcessThread thread)
-	{
-		System.out.println("Cancel event matcher: "+instance.getComponentIdentifier());
-		
-		IFuture<String> fut = (IFuture<String>)thread.getWaitInfo();
-		if(fut!=null)
-		{			
-			thread.setWaitInfo(null);
-			
-			fut.addResultListener(new IResultListener<String>()
-			{
-				public void resultAvailable(final String id)
-				{
-					instance.getServiceContainer().searchService(IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION)
-						.addResultListener(new IResultListener<IInternalProcessEngineService>()
-					{
-						public void resultAvailable(IInternalProcessEngineService ipes)
-						{
-							System.out.println("Cancel event matcher1: "+instance.getComponentIdentifier());
-							
-							ipes.removeEventMatcher(id)
-								.addResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-									// done.
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									instance.getLogger().warning("Event deregistration failed: "+exception);
-								}
-							});
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							instance.getLogger().warning("Event deregistration failed: "+exception);
-						}
-					});			
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					instance.getLogger().warning("Event registration failed: "+exception);
-				}
-			});
-		}		
-	}
+//	/**
+//	 *  Called when the process thread is aborted and waiting is no longer wanted.
+//	 */
+//	public void cancel(MActivity activity, final BpmnInterpreter instance, ProcessThread thread)
+//	{
+//		System.out.println("Cancel event matcher: "+instance.getComponentIdentifier());
+//		
+//		IFuture<String> fut = (IFuture<String>)thread.getWaitInfo();
+//		if(fut!=null)
+//		{			
+//			thread.setWaitInfo(null);
+//			
+//			fut.addResultListener(new IResultListener<String>()
+//			{
+//				public void resultAvailable(final String id)
+//				{
+//					instance.getServiceContainer().searchService(IInternalProcessEngineService.class, RequiredServiceInfo.SCOPE_APPLICATION)
+//						.addResultListener(new IResultListener<IInternalProcessEngineService>()
+//					{
+//						public void resultAvailable(IInternalProcessEngineService ipes)
+//						{
+//							System.out.println("Cancel event matcher1: "+instance.getComponentIdentifier());
+//							
+//							ipes.removeEventMatcher(id).addResultListener(new IResultListener<Void>()
+//							{
+//								public void resultAvailable(Void result)
+//								{
+//									// done.
+//								}
+//								
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									instance.getLogger().warning("Event deregistration failed: "+exception);
+//								}
+//							});
+//						}
+//						
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							instance.getLogger().warning("Event deregistration failed: "+exception);
+//						}
+//					});			
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					instance.getLogger().warning("Event registration failed: "+exception);
+//				}
+//			});
+//		}		
+//	}
 }

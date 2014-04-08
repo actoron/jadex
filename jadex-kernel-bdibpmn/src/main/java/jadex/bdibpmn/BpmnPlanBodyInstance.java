@@ -41,6 +41,7 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdibpmn.handler.DummyCancelable;
 import jadex.bdibpmn.handler.EventIntermediateMessageActivityHandler;
 import jadex.bdibpmn.handler.EventIntermediateRuleActicityHandler;
 import jadex.bdibpmn.handler.EventIntermediateSignalActivityHandler;
@@ -52,6 +53,8 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
+import jadex.bpmn.runtime.handler.CompositeCancelable;
+import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -332,15 +335,17 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			ret = getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
 			boolean empty = true;
 			
-			for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
+			for(Iterator<ProcessThread> it=context.getAllThreads().iterator(); it.hasNext(); )
 			{
-				ProcessThread pt = (ProcessThread)it.next();
+				ProcessThread pt = it.next();
 				if(pt.isWaiting() && pt.belongsTo(pool, null))
 				{
-					MActivity act = pt.getActivity();				
+					MActivity act = pt.getActivity();		
+					
 					if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(act.getActivityType()))
 					{
-						String type = (String)pt.getWaitInfo();
+						DummyCancelable da = (DummyCancelable)pt.getWaitInfo();
+						String type = da.getType();
 						if(type==null)
 							throw new RuntimeException("Message type not specified: "+act);
 						SFlyweightFunctionality.addMessageEvent(ret, type, state, rcapa);
@@ -348,7 +353,8 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 					}
 					else if(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL.equals(act.getActivityType()))
 					{
-						String type = (String)pt.getWaitInfo();
+						DummyCancelable da = (DummyCancelable)pt.getWaitInfo();
+						String type = da.getType();
 						if(type==null)
 							throw new RuntimeException("Internal event type not specified: "+type);
 						SFlyweightFunctionality.addInternalEvent(ret, type, state, rcapa);
@@ -356,7 +362,8 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 					}
 					else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(act.getActivityType()))
 					{
-						String type = (String)pt.getWaitInfo();
+						DummyCancelable da = (DummyCancelable)pt.getWaitInfo();
+						String type = da.getType();
 						if(type==null)
 							throw new RuntimeException("Rule type not specified: "+type);
 						SFlyweightFunctionality.addCondition(ret, type, state, rcapa);
@@ -365,15 +372,16 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 					else if(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(act.getActivityType()))
 					{
 						List edges = pt.getActivity().getOutgoingSequenceEdges();
-						Object[] was = (Object[])pt.getWaitInfo();
+						CompositeCancelable was = (CompositeCancelable)pt.getWaitInfo();
 		
 						for(int i=0; i<edges.size(); i++)
 						{
+							DummyCancelable sca = (DummyCancelable)was.getSubcancelInfos()[i];
 							MSequenceEdge edge = (MSequenceEdge)edges.get(i);
 							MActivity nextact = edge.getTarget();
 							if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(nextact.getActivityType()))
 							{
-								String type = (String)was[i];
+								String type = (String)sca.getType();
 								if(type==null)
 									throw new RuntimeException("Message type not specified: "+type);
 								SFlyweightFunctionality.addMessageEvent(ret, type, state, rcapa);
@@ -381,7 +389,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 							}
 							else if(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL.equals(nextact.getActivityType()))
 							{
-								String type = (String)was[i];
+								String type = (String)sca.getType();
 								if(type==null)
 									throw new RuntimeException("Internal event type not specified: "+type);
 								SFlyweightFunctionality.addInternalEvent(ret, type, state, rcapa);
@@ -389,7 +397,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 							}
 							else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(nextact.getActivityType()))
 							{
-								String type = (String)was[i];
+								String type = (String)sca.getType();
 								if(type==null)
 									throw new RuntimeException("Rule type not specified: "+type);
 								SFlyweightFunctionality.addCondition(ret, type, state, rcapa);

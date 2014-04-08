@@ -9,7 +9,9 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
+import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.commons.IFilter;
+import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -66,11 +68,11 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	//		thread.setWaitingState(ProcessThread.WAITING_FOR_MESSAGE);
 			final String	type	= (String)thread.getPropertyValue("type", activity);
 			thread.setWaiting(true);
-			thread.setWaitInfo(type);
+			thread.setWaitInfo(new DummyCancelable(type));
 //			System.out.println("Waiting for message: "+type);
 			
 			// Does currently only match message type name.
-			thread.setWaitFilter(new IFilter()
+			thread.setWaitFilter(new IFilter<Object>()
 			{
 				public boolean filter(Object event)
 				{
@@ -91,3 +93,6 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 		}		
 	}
 }
+
+
+

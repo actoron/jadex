@@ -52,7 +52,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new deloyer panel.
+	 *  Create a new deployer panel.
 	 */
 	public DeployerPanel(final IControlCenter jcc)
 	{

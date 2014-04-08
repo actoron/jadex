@@ -28,11 +28,11 @@ public class EventIntermediateSignalActivityHandler	extends DefaultActivityHandl
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_MESSAGE);
 		final String type = (String)thread.getPropertyValue("type", activity);
 		thread.setWaiting(true);
-		thread.setWaitInfo(type);
+		thread.setWaitInfo(new DummyCancelable(type));
 //		System.out.println("Waiting for internal event: "+type);
 		
 		// Does currently only match message type name.
-		thread.setWaitFilter(new IFilter()
+		thread.setWaitFilter(new IFilter<Object>()
 		{
 			public boolean filter(Object event)
 			{

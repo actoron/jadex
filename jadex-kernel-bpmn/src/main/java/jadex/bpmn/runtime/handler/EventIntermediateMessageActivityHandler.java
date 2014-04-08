@@ -77,29 +77,27 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	protected void sendMessage(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 		SServiceProvider.getService(instance.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(instance.createResultListener(new DefaultResultListener()
+			.addResultListener(instance.createResultListener(new DefaultResultListener<IMessageService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IMessageService ms)
 			{
-				final IMessageService	ms	= (IMessageService)result;
 				SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(instance.createResultListener(new DefaultResultListener()
+					.addResultListener(instance.createResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IComponentManagementService cms)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
 						String mtname = (String)thread.getPropertyValue(PROPERTY_MESSAGETYPE, activity);
 						MessageType mt = mtname!=null? ms.getMessageType(mtname): ms.getMessageType("fipa");
 						
-						Map msg;
+						Map<String, Object> msg;
 						
 						if(thread.hasPropertyValue(PROPERTY_MESSAGE))
 						{
-							msg = (Map)thread.getPropertyValue(PROPERTY_MESSAGE);
+							msg = (Map<String, Object>)thread.getPropertyValue(PROPERTY_MESSAGE);
 						}
 						else
 						{
-							msg = new HashMap();
+							msg = new HashMap<String, Object>();
 						}
 							
 						// Convenience conversion of strings to component identifiers for receivers.
@@ -107,10 +105,10 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 						if(thread.hasPropertyValue(ri))
 						{
 							Object recs = thread.getPropertyValue(ri);
-							List newrecs = new ArrayList();
+							List<IComponentIdentifier> newrecs = new ArrayList<IComponentIdentifier>();
 							if(SReflect.isIterable(recs))
 							{
-								for(Iterator it=SReflect.getIterator(recs); it.hasNext(); )
+								for(Iterator<IComponentIdentifier> it=SReflect.getIterator(recs); it.hasNext(); )
 								{
 									Object rec = it.next();
 									if(rec instanceof String)
@@ -118,9 +116,9 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 //										newrecs.add(cms.createComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent(), null));
 										newrecs.add(new ComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent()));
 									}
-									else
+									else if(rec instanceof IComponentIdentifier)
 									{
-										newrecs.add(rec);
+										newrecs.add((IComponentIdentifier)rec);
 									}
 								}
 							}
@@ -131,9 +129,9 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 //									newrecs.add(cms.createComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent(), null));
 									newrecs.add(new ComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent()));
 								}
-								else if(recs!=null)
+								else if(recs instanceof IComponentIdentifier)
 								{
-									newrecs.add(recs);
+									newrecs.add((IComponentIdentifier)recs);
 								}
 								else
 								{
@@ -177,11 +175,10 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 						}
 						
 						thread.setWaiting(true);
-						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), 
-							instance.getModel().getResourceIdentifier(), null, codecids)
-							.addResultListener(new IResultListener()
+						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getModel().getResourceIdentifier(), null, codecids)
+							.addResultListener(new IResultListener<Void>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(Void result)
 							{
 								instance.notify(activity, thread, null);
 							}
@@ -211,7 +208,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 		IFilter filter = (IFilter)thread.getPropertyValue(PROPERTY_FILTER, activity);
 		if(filter==null)
 		{
-			filter	= new IFilter()
+			filter	= new IFilter<Object>()
 			{
 				public boolean filter(Object obj)
 				{

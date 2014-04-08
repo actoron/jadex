@@ -1047,11 +1047,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					{
 						if(isCurrentActivity(activity, thread))
 						{
-							if(thread.getThreadContext()==null)
-							{
-								System.out.println("gfeqhzydilgh");
-							}
-
 //							System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
 							step(activity, BpmnInterpreter.this, thread, event);
 							thread.setNonWaiting();
