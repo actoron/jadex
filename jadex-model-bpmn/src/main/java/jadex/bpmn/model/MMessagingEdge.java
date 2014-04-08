@@ -1,12 +1,11 @@
 package jadex.bpmn.model;
 
-import java.util.List;
 
 /**
  *  A messaging edge is an edge describing a message flow between some sender and receiver.
  *  Used only for communication across pools.
  */
-public class MMessagingEdge extends MAssociationTarget
+public class MMessagingEdge extends MEdge
 {
 	//-------- attributes --------
 	
@@ -15,13 +14,6 @@ public class MMessagingEdge extends MAssociationTarget
 
 	/** The target description. */
 	protected String targetdescription;
-	
-	
-	/** The outgoing edges. */
-	protected MActivity source;
-	
-	/** The incoming edges. */
-	protected MActivity target;
 	
 	/** The type. */
 	protected String type;
@@ -88,42 +80,6 @@ public class MMessagingEdge extends MAssociationTarget
 	public void setTargetDescription(String targetdescription)
 	{
 		this.targetdescription = targetdescription;
-	}
-
-	/**
-	 *  Get the source.
-	 *  @return The source.
-	 */
-	public MActivity getSource()
-	{
-		return source;
-	}
-	
-	/**
-	 *  Set the source.
-	 *  @param source The source.
-	 */
-	public void setSource(MActivity source)
-	{
-		this.source = source;
-	}
-	
-	/**
-	 *  Get the target.
-	 *  @param target The target.
-	 */
-	public MActivity getTarget()
-	{
-		return target;
-	}
-	
-	/**
-	 *  Set the target.
-	 *  @param target The target.
-	 */
-	public void setTarget(MActivity target)
-	{
-		this.target = target;
 	}
 
 	/**

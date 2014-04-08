@@ -1,5 +1,6 @@
 package jadex.bpmn.model;
 
+import jadex.bpmn.model.io.IdGenerator;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -9,15 +10,17 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.collection.BiHashMap;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 
@@ -152,11 +155,14 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** The cached event subprocess start events of the model. */
 	protected Map<MSubProcess, MActivity> eventsubprocessstartevents;
 	
-	/** The cached instance-matched events thaqt require waiting. */
+	/** The cached instance-matched events that require waiting. */
 	protected List<MActivity> waitingevents;
 	
 	/** The cached type-matched start events of the model. */
 	protected List<MActivity> typematchedstartevents;
+	
+	/** Parents of activities. */
+	protected Map<MActivity, MNamedIdElement> parents;
 
 	/** The association sources. */
 	protected Map associationsources;
@@ -435,6 +441,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		if(this.allactivities==null)
 		{
 			this.allactivities = new HashMap<String, MActivity>();
+			this.parents = new HashMap<MActivity, MNamedIdElement>();
 			
 			List<MPool> pools = getPools();
 			if(pools!=null)
@@ -448,11 +455,15 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 						for(int j=0; j<acts.size(); j++)
 						{
 							MActivity mact = acts.get(j);
+							MLane lane = mact.getLane();
+							parents.put(mact, lane != null? lane : tmp);
 							allactivities.put(mact.getId(), acts.get(j));
 							if(mact instanceof MSubProcess)
 							{
 								addAllSubActivities((MSubProcess)mact, allactivities);
 							}
+							
+							
 						}
 					}
 				}
@@ -474,6 +485,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 			{
 				MActivity mact = (MActivity)acts.get(i);
 				allactivities.put(mact.getId(), acts.get(i));
+				parents.put(mact, proc);
 				if(mact instanceof MSubProcess)
 				{
 					addAllSubActivities((MSubProcess)mact, activities);
@@ -487,6 +499,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 			{
 				MActivity mact = (MActivity)handlers.get(i);
 				allactivities.put(mact.getId(), handlers.get(i));
+				parents.put(handlers.get(i), mact);
 				if(mact instanceof MSubProcess)
 				{
 					addAllSubActivities((MSubProcess)mact, activities);
@@ -1270,6 +1283,31 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	public String getFilename()
 	{
 		return modelinfo.getFilename();
+	}
+	
+	/**
+	 *  Gets the parent of an element.
+	 *  
+	 *  @param element The element.
+	 *  @return The parent.
+	 */
+	public MIdElement getParent(MIdElement element)
+	{
+		if (parents == null)
+		{
+			getAllActivities();
+		}
+		MIdElement ret = null;
+		if (element instanceof MActivity)
+		{
+			ret = parents.get(element);
+		}
+		else if (element instanceof MEdge)
+		{
+			element = ((MEdge) element).getSource();
+			ret = parents.get(element);
+		}
+		return ret;
 	}
 	
 	/**
