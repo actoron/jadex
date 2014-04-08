@@ -1,6 +1,7 @@
 package jadex.kernelbase;
 
 import jadex.base.Starter;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -44,6 +45,9 @@ public class ExternalAccess implements IExternalAccess
 	/** The valid flag. */
 	protected boolean	valid;
 	
+	/** The terminated flag. */
+	protected boolean	terminated;
+	
 	/** The component identifier. */
 	protected IComponentIdentifier	cid;
 	
@@ -58,6 +62,9 @@ public class ExternalAccess implements IExternalAccess
 	
 	/** The provider. */
 	protected IServiceProvider provider;
+	
+	/** The results (cached after termination). */
+	protected Map<String, Object>	results;
 	
 	// -------- constructors --------
 
@@ -147,7 +154,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -214,7 +225,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -253,7 +268,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -294,7 +313,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<String> ret = new Future<String>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -366,7 +389,11 @@ public class ExternalAccess implements IExternalAccess
 		Method	m	= SReflect.getMethod(step.getClass(), "execute", new Class[]{IInternalAccess.class});
 		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(m.getReturnType(), new FutureFunctionality((Logger)null)) : new Future<T>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -374,8 +401,17 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						IFuture<T>	fut	= interpreter.scheduleStep(step);
-						FutureFunctionality.connectDelegationFuture(ret, fut);
+						// Hack!!! Should not be called after termination.
+						if(terminated)
+						{
+							ret.setException(new ComponentTerminatedException(cid));
+						}
+						else
+						{
+							IFuture<T>	fut	= interpreter.scheduleStep(step);
+							FutureFunctionality.connectDelegationFuture(ret, fut);
+						}
+							
 					}
 				});
 			}
@@ -471,21 +507,28 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<T> ret = new Future<T>();
 		
-		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+		if(terminated)
 		{
-			public void customResultAvailable(Object result)
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else
+		{
+			SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
 			{
-				IClockService cs = (IClockService)result;
-				cs.createTimer(delay, new ITimedObject()
+				public void customResultAvailable(Object result)
 				{
-					public void timeEventOccurred(long currenttime)
+					IClockService cs = (IClockService)result;
+					cs.createTimer(delay, new ITimedObject()
 					{
-						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
-					}
-				});
-			}
-		}));
+						public void timeEventOccurred(long currenttime)
+						{
+							scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+						}
+					});
+				}
+			}));
+		}
 		
 		return ret;
 	}
@@ -502,21 +545,28 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<T> ret = new Future<T>();
 		
-		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+		if(terminated)
 		{
-			public void customResultAvailable(Object result)
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else
+		{
+			SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
 			{
-				IClockService cs = (IClockService)result;
-				cs.createTimer(delay, new ITimedObject()
+				public void customResultAvailable(Object result)
 				{
-					public void timeEventOccurred(long currenttime)
+					IClockService cs = (IClockService)result;
+					cs.createTimer(delay, new ITimedObject()
 					{
-						scheduleImmediate(step).addResultListener(new DelegationResultListener(ret));
-					}
-				});
-			}
-		}));
+						public void timeEventOccurred(long currenttime)
+						{
+							scheduleImmediate(step).addResultListener(new DelegationResultListener(ret));
+						}
+					});
+				}
+			}));
+		}
 		
 		return ret;
 	}
@@ -530,7 +580,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<IExtensionInstance> ret = new Future<IExtensionInstance>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -561,88 +615,6 @@ public class ExternalAccess implements IExternalAccess
 		return ret;
 	}
 
-//	/**
-//	 *  Add an component listener.
-//	 *  @param listener The listener.
-//	 */
-//	public IFuture<Void> addComponentListener(final IComponentListener listener)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		if(adapter.isExternalThread())
-//		{
-//			try
-//			{
-//				adapter.invokeLater(new Runnable() 
-//				{
-//					public void run() 
-//					{
-//						interpreter.addComponentListener(listener)
-//							.addResultListener(new DelegationResultListener<Void>(ret));
-//					}
-//				});
-//			}
-//			catch(final Exception e)
-//			{
-//				Starter.scheduleRescueStep(cid, new Runnable()
-//				{
-//					public void run()
-//					{
-//						ret.setException(e);
-//					}
-//				});
-//			}
-//		}
-//		else
-//		{
-//			interpreter.addComponentListener(listener)
-//				.addResultListener(new DelegationResultListener<Void>(ret));
-//		}
-//		
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Remove a component listener.
-//	 *  @param listener The listener.
-//	 */
-//	public IFuture<Void> removeComponentListener(final IComponentListener listener)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		if(adapter.isExternalThread())
-//		{
-//			try
-//			{
-//				adapter.invokeLater(new Runnable() 
-//				{
-//					public void run() 
-//					{
-//						interpreter.removeComponentListener(listener)
-//							.addResultListener(new DelegationResultListener<Void>(ret));
-//					}
-//				});
-//			}
-//			catch(final Exception e)
-//			{
-//				Starter.scheduleRescueStep(cid, new Runnable()
-//				{
-//					public void run()
-//					{
-//						ret.setException(e);
-//					}
-//				});
-//			}
-//		}
-//		else
-//		{
-//			interpreter.removeComponentListener(listener)
-//				.addResultListener(new DelegationResultListener<Void>(ret));
-//		}
-//		
-//		return ret;
-//	}
-	
 	/**
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
@@ -652,7 +624,11 @@ public class ExternalAccess implements IExternalAccess
 		// No NoTimeoutFuture needed as is already created internally.
 		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -695,7 +671,11 @@ public class ExternalAccess implements IExternalAccess
 		// No NoTimeoutFuture needed as is already created internally.
 		final SubscriptionIntermediateDelegationFuture<Tuple2<String, Object>> ret = new SubscriptionIntermediateDelegationFuture<Tuple2<String, Object>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -738,7 +718,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -777,7 +761,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setResult(results);
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -819,7 +807,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -859,7 +851,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -899,7 +895,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -940,7 +940,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -981,7 +985,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1068,7 +1076,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1151,7 +1163,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1194,7 +1210,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1234,7 +1254,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1295,12 +1319,18 @@ public class ExternalAccess implements IExternalAccess
 		return valid;
 	}
 	
-	
 	/**
 	 *  Invalidate the external access.
+	 *  @param terminated	Invalidated due to termination?
 	 */
-	public void	invalidate()
+	public void	invalidate(boolean terminated)
 	{
+		if(terminated)
+		{
+			this.results	= interpreter.getResults();
+			this.terminated	= true;
+		}
+		
 		this.valid	= false;
 		this.interpreter	= null;
 		this.adapter	= null;

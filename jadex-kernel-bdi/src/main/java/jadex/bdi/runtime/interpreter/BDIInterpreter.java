@@ -2559,7 +2559,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Invalidate the external access.
 	 */
-	public void invalidateAccess()
+	public void invalidateAccess(boolean terminate)
 	{
 		// Todo...
 	}

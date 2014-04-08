@@ -754,11 +754,12 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/**
 	 *  Invalidate the external access.
 	 */
-	public void invalidateAccess()
+	public void invalidateAccess(boolean terminate)
 	{
-		if(access instanceof ExternalAccess)
+		if(access instanceof ExternalAccess
+			&& getComponentIdentifier().getParent()!=null)	// Do not invalidate platform access, otherwise shutdown doesn't work.
 		{
-			((ExternalAccess)access).invalidate();
+			((ExternalAccess)access).invalidate(terminate);
 		}
 	}
 }

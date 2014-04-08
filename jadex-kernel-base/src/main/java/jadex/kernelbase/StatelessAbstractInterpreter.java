@@ -269,7 +269,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 															
 															protected void proceed(final Exception ex)
 															{
-//																invalidateAccess();
+																invalidateAccess(true);
 																
 																if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 																{
@@ -2309,7 +2309,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	/**
 	 *  Invalidate the external access.
 	 */
-	public abstract void invalidateAccess();
+	public abstract void invalidateAccess(boolean terminate);
 
 	/**
 	 *  Get the current state as events.
