@@ -1,11 +1,11 @@
 package jadex.platform.service.remote.commands;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.annotations.Alias;
-import jadex.micro.IMicroExternalAccess;
 import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 
@@ -66,7 +66,7 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IIntermediateFuture<IRemoteCommand> execute(IMicroExternalAccess component, final RemoteServiceManagementService rsms)
+	public IIntermediateFuture<IRemoteCommand> execute(IExternalAccess component, final RemoteServiceManagementService rsms)
 	{
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		

@@ -259,6 +259,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				IFuture<Void> fut = sic.invoke(service, method, myargs);
 				if(fut.isDone())
 				{
+					fut.get();	// Throw exception, if any.
 					ret = sic.getResult();
 				}
 				else

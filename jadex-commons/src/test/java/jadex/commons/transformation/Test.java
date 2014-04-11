@@ -1,5 +1,6 @@
 package jadex.commons.transformation;
 
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
@@ -817,6 +818,15 @@ public abstract class Test extends TestCase
 //		}
 		
 		doWriteAndRead(map);
+	}
+	
+	/**
+	 *  Test if method info transfer works.
+	 */
+	public void testMethodInfo() throws Exception
+	{
+		MethodInfo	mi	= new MethodInfo(Object.class.getMethod("hashCode"));		
+		doWriteAndRead(mi);
 	}
 	
 	/**

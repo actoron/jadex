@@ -1,10 +1,10 @@
 package jadex.micro.examples.helpline;
 
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
-import jadex.commons.IFilter;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -16,7 +16,6 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateResultListener;
 import jadex.commons.gui.jtable.DateTimeRenderer;
-import jadex.micro.IMicroExternalAccess;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -56,14 +55,14 @@ public class HelplinePanel extends JPanel
 	//-------- attributes --------
 	
 	/** The external access of the agent. */
-	protected IMicroExternalAccess agent;
+	protected IExternalAccess agent;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new gui.
 	 */
-	public HelplinePanel(final IMicroExternalAccess agent)
+	public HelplinePanel(final IExternalAccess agent)
 	{
 		this.agent = agent;
 		this.setLayout(new BorderLayout());
@@ -336,7 +335,7 @@ public class HelplinePanel extends JPanel
 	/**
 	 *  Create a customer gui frame.
 	 */
-	public static void createHelplineGui(final IMicroExternalAccess agent)
+	public static void createHelplineGui(final IExternalAccess agent)
 	{
 		final JFrame f = new JFrame();
 		f.add(new HelplinePanel(agent));

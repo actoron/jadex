@@ -49,6 +49,7 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.ExternalAccess;
 import jadex.micro.annotation.AgentService;
 
 import java.io.PrintWriter;
@@ -1565,7 +1566,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public IExternalAccess createExternalAccess()
 	{
-		return new MicroExternalAccess(microagent, this);
+		return new ExternalAccess(this);
 	}
 	
 	/**

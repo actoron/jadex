@@ -256,7 +256,14 @@ public class SServiceProvider
 //						System.out.println("fin");
 					if(!ret.isDone())
 					{
-						ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
+						ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName())
+						{
+							public void printStackTrace()
+							{
+								Thread.dumpStack();
+								super.printStackTrace();
+							}
+						});
 					}
 				}
 				

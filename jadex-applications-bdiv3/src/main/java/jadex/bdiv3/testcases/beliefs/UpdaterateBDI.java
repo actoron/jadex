@@ -7,6 +7,7 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
+import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
@@ -67,11 +68,11 @@ public class UpdaterateBDI
 	@Plan(trigger=@Trigger(factchangeds={"cntbel"}))
 	public void	beliefChanged(ChangeEvent event)
 	{
-		if(cntbel==5 && ((Integer)event.getValue()).intValue()==5)
+		if(cntbel==5 && ((ChangeInfo<Integer>)event.getValue()).getValue().intValue()==5)
 		{
 			tr.setSucceeded(true);
 		}
-		else if(cntbel>5 || ((Integer)event.getValue()).intValue()>5)
+		else if(cntbel>5 || ((ChangeInfo<Integer>)event.getValue()).getValue().intValue()>5)
 		{
 			tr.setFailed("Inconsistent values: "+cntbel+", "+event.getValue());
 		}

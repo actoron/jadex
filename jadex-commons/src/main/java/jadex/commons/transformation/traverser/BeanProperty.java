@@ -30,7 +30,7 @@ public class BeanProperty
 	protected boolean writable = true;
 	
 	/** The setter type. */
-	protected Class	settertype;
+	protected Class<?>	settertype;
 
 	/** The field. */
 	protected Field field;
@@ -51,7 +51,7 @@ public class BeanProperty
 	/**
 	 *  Create a new bean property.
 	 */
-	public BeanProperty(String name, Class type, Method getter, Method setter, Class settertype, IBeanDelegateProvider delegateprovider, boolean readable, boolean writable)
+	public BeanProperty(String name, Class<?> type, Method getter, Method setter, Class<?> settertype, IBeanDelegateProvider delegateprovider, boolean readable, boolean writable)
 	{
 		this.name = name;
 		this.type = type;
@@ -99,7 +99,7 @@ public class BeanProperty
 	 *  Get the type.
 	 *  @return The type.
 	 */
-	public Class getType()
+	public Class<?> getType()
 	{
 		return this.type;
 	}
@@ -108,7 +108,7 @@ public class BeanProperty
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(Class type)
+	public void setType(Class<?> type)
 	{
 		this.type = type;
 	}
@@ -173,7 +173,7 @@ public class BeanProperty
 	 *  Get the setter_type.
 	 *  @return The setterttype.
 	 */
-	public Class getSetterType()
+	public Class<?> getSetterType()
 	{
 		return this.settertype;
 	}
@@ -182,7 +182,7 @@ public class BeanProperty
 	 *  Set the setter type.
 	 *  @param settertype The setter type to set.
 	 */
-	public void setSetterType(Class settertype)
+	public void setSetterType(Class<?> settertype)
 	{
 		this.settertype = settertype;
 	}

@@ -1,9 +1,8 @@
 package jadex.platform.service.remote;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.transformation.annotations.Alias;
-import jadex.micro.IMicroExternalAccess;
 
 
 /**
@@ -18,5 +17,5 @@ public interface IRemoteCommand	extends IAuthorizable
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IIntermediateFuture<IRemoteCommand> execute(IMicroExternalAccess component, RemoteServiceManagementService rsms);
+	public IIntermediateFuture<IRemoteCommand> execute(IExternalAccess component, RemoteServiceManagementService rsms);
 }

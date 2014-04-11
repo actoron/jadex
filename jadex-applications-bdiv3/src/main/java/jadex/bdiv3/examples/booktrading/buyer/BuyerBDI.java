@@ -17,6 +17,7 @@ import jadex.bdiv3.examples.booktrading.common.NegotiationReport;
 import jadex.bdiv3.examples.booktrading.common.Order;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.impl.PlanFailureException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.Tuple2;
@@ -81,7 +82,13 @@ public class BuyerBDI implements INegotiationAgent
 		{
 			public void run()
 			{
-				gui = new Gui(agent.getExternalAccess());
+				try
+				{
+					gui = new Gui(agent.getExternalAccess());
+				}
+				catch(ComponentTerminatedException cte)
+				{
+ 				}
 			}
 		});
 	}

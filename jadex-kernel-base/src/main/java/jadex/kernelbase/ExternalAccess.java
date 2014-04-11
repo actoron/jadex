@@ -89,6 +89,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IModelInfo getModel()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return interpreter.getModel();
 	}
 	
@@ -136,6 +141,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IExternalAccess getParentAccess()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return adapter.getParent();
 	}
 	
@@ -144,6 +154,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IServiceProvider getServiceProvider()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return provider;
 	}
 
@@ -370,6 +385,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public String getLocalType()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return interpreter.getLocalType();
 	}
 	
@@ -1297,6 +1317,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public StatelessAbstractInterpreter getInterpreter()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return interpreter;
 	}
 	
@@ -1306,6 +1331,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public boolean isExternalThread()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return adapter.isExternalThread();
 	}
 	

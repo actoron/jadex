@@ -1,11 +1,11 @@
 package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.SReflect;
 import jadex.commons.future.IForwardCommandFuture;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.micro.IMicroExternalAccess;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
 
@@ -39,7 +39,7 @@ public class RemoteFutureSourceCommand extends RemoteResultCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IIntermediateFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IIntermediateFuture execute(IExternalAccess component, RemoteServiceManagementService rsms)
 	{
 //		System.out.println("intermediate result command: "+result+" "+exceptioninfo+" "+callid);
 		

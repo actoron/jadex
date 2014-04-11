@@ -3,8 +3,8 @@ package jadex.platform.service.remote;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -26,7 +26,6 @@ import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.STransformation;
-import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -104,7 +103,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							public void customResultAvailable(final IMessageService msgservice)
 							{
 //								boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
-								rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), libservice, marshalservice, msgservice);//, binarymode);
+								rms = new RemoteServiceManagementService((IExternalAccess)getExternalAccess(), libservice, marshalservice, msgservice);//, binarymode);
 								addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 								ret.setResult(null);
 							}
@@ -266,7 +265,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //											System.out.println("No caller: "+msg.get(SFipa.SENDER)+", "+((RemoteMethodInvocationCommand)com).getMethodName());
 //										}
 										
-										com.execute((IMicroExternalAccess)getExternalAccess(), rms)
+										com.execute((IExternalAccess)getExternalAccess(), rms)
 											.addResultListener(createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
 									}
 									

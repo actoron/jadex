@@ -1,18 +1,17 @@
 package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.bridge.service.component.interceptors.CallAccess;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.transformation.annotations.Alias;
-import jadex.micro.IMicroExternalAccess;
 import jadex.platform.service.remote.RemoteReferenceModule;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 import jadex.platform.service.remote.RemoteServiceManagementService.WaitingCallInfo;
@@ -117,7 +116,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IIntermediateFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IIntermediateFuture execute(IExternalAccess component, RemoteServiceManagementService rsms)
 	{
 //		System.out.println("result command: "+result+" "+exceptioninfo+" "+callid);
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
