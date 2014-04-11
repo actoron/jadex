@@ -2002,18 +2002,47 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					
 					if(event!=null && event.getSource()!=null && event.getSource().equals(source))
 					{
-						if(SReflect.getWrappedType(ptypes[i]).isInstance(event.getValue()))
-						{
-							ret[i]	= event.getValue();
-						}
-						else if(SReflect.isSupertype(ptypes[i], ChangeEvent.class))
+						boolean set = false;
+						if(SReflect.isSupertype(ptypes[i], ChangeEvent.class))
 						{
 							ret[i]	= event;
+							set = true;
 						}
 						else
 						{
+							if(SReflect.getWrappedType(ptypes[i]).isInstance(event.getValue()))
+							{
+								ret[i]	= event.getValue();
+								set = true;
+							}
+							else if(event.getValue() instanceof ChangeInfo)
+							{
+								ChangeInfo<?> ci = (ChangeInfo<?>)event.getValue();
+								if(ptypes[i].equals(ChangeInfo.class))
+								{
+									ret[i] = ci;
+									set = true;
+								}
+								else if(SReflect.getWrappedType(ptypes[i]).isInstance(ci.getValue()))
+								{
+									ret[i] = ci.getValue();
+									set = true;
+								}
+							}
+						}
+						if(!set)
+						{
 							throw new IllegalArgumentException("Unexpected type for event injection: "+event+", "+ptypes[i]);
 						}
+						
+//						else if(SReflect.isSupertype(ptypes[i], ChangeEvent.class))
+//						{
+//							ret[i]	= event;
+//						}
+//						else
+//						{
+//							throw new IllegalArgumentException("Unexpected type for event injection: "+event+", "+ptypes[i]);
+//						}
 					}
 					else
 					{
