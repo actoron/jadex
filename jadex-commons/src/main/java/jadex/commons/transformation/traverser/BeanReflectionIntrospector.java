@@ -60,6 +60,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 		// includefields component of key is call based to avoid reflection calls during cache hits.
 		Tuple3<Class<?>, Boolean, Boolean> beaninfokey = new Tuple3<Class<?>, Boolean, Boolean>(clazz, includemethods, includefields);
 		Map<String, BeanProperty> ret = null;
+		
 		try
 		{
 			ret = beaninfos.get(beaninfokey);

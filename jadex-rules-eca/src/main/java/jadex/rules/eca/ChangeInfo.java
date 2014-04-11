@@ -1,4 +1,4 @@
-package jadex.bdiv3.runtime.wrappers;
+package jadex.rules.eca;
 
 /**
  * 

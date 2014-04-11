@@ -1,6 +1,6 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
+import jadex.rules.eca.ChangeInfo;
 
 
 /**

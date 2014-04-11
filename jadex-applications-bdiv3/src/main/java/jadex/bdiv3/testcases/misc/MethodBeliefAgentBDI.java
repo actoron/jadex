@@ -5,12 +5,12 @@ import jadex.base.test.Testcase;
 import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.rules.eca.ChangeInfo;
 
 /**
  *  Test using injected values in init expressions or constructors.

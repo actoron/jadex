@@ -15,7 +15,6 @@ import jadex.bdiv3.runtime.impl.BeliefInfo;
 import jadex.bdiv3.runtime.impl.RGoal;
 import jadex.bdiv3.runtime.impl.RPlan;
 import jadex.bdiv3.runtime.impl.RProcessableElement;
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
@@ -36,6 +35,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.MicroAgent;
+import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
@@ -318,7 +318,7 @@ public class BDIAgent extends MicroAgent
 			{
 				publishToolBeliefEvent(ip, mbel);
 //				rs.addEvent(new Event(ChangeEvent.BELIEFCHANGED+"."+belname, val));
-				rs.addEvent(new Event(ev1, val));
+				rs.addEvent(new Event(ev1, new ChangeInfo<Object>(val, oldval, null)));
 				// execute rulesystem immediately to ensure that variable values are not changed afterwards
 				rs.processAllEvents(); 
 			}
@@ -668,7 +668,7 @@ public class BDIAgent extends MicroAgent
 								
 		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname+"."+event.getPropertyName(), event.getNewValue());
 		//						Event ev = new Event(ChangeEvent.FACTCHANGED+"."+fieldname, event.getNewValue());
-								Event ev = new Event(etype, event.getNewValue());
+								Event ev = new Event(etype, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
 								rs.addEvent(ev);
 								return IFuture.DONE;
 //								return new Future<IEvent>(ev);

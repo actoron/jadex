@@ -7,12 +7,12 @@ import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.runtime.ChangeEvent;
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.rules.eca.ChangeInfo;
 
 /**
  *  Test beliefs with update rate.
