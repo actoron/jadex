@@ -1,9 +1,9 @@
 package jadex.bdiv3.runtime;
 
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IFuture;
+import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.ICondition;
 
 import java.util.List;

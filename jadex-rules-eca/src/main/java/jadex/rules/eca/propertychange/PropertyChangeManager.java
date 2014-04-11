@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.IEvent;
 
@@ -108,7 +109,7 @@ public abstract class PropertyChangeManager
 				}
 				else
 				{
-					Event event = new Event(evt.getPropertyName(), evt.getNewValue());
+					Event event = new Event(evt.getPropertyName(), new ChangeInfo<Object>(evt.getNewValue(), evt.getOldValue(), null));
 					addEvent(event);
 				}
 			}

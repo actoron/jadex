@@ -1,5 +1,6 @@
 package jadex.commons.transformation.traverser;
 
+import jadex.commons.MethodInfo;
 import jadex.commons.Tuple3;
 import jadex.commons.collection.LRU;
 import jadex.commons.transformation.annotations.Exclude;
@@ -59,6 +60,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 		// includefields component of key is call based to avoid reflection calls during cache hits.
 		Tuple3<Class, Boolean, Boolean> beaninfokey = new Tuple3<Class, Boolean, Boolean>(clazz, includemethods, includefields);
 		Map ret = null;
+		
 		try
 		{
 			ret = (Map)beaninfos.get(beaninfokey);

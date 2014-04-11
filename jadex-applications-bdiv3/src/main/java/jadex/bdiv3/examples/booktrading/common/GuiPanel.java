@@ -6,7 +6,6 @@ import jadex.bdiv3.examples.booktrading.buyer.BuyerBDI.PurchaseBook;
 import jadex.bdiv3.examples.booktrading.seller.SellerBDI.SellBook;
 import jadex.bdiv3.runtime.IBeliefListener;
 import jadex.bdiv3.runtime.IGoal;
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -19,6 +18,7 @@ import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.IPojoMicroAgent;
 import jadex.micro.annotation.Binding;
+import jadex.rules.eca.ChangeInfo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

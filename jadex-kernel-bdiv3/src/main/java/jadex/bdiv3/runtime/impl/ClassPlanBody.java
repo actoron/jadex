@@ -8,11 +8,11 @@ import jadex.bdiv3.model.MBody;
 import jadex.bdiv3.model.MPlan;
 import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.ICapability;
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.micro.IPojoMicroAgent;
+import jadex.rules.eca.ChangeInfo;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
