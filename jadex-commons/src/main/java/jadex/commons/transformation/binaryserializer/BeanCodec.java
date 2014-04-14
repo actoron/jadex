@@ -323,10 +323,12 @@ public class BeanCodec extends AbstractCodec
 					{
 						prop.setPropertyValue(object, val);
 					}
-					else if(prop!=null)
-					{
-						throw new RuntimeException("Property is write-protected: " + prop.getName());
-					}
+					// else ignore
+					
+//					else if(prop!=null)
+//					{
+//						throw new RuntimeException("Property is write-protected: " + prop.getName());
+//					}
 				}
 				catch (Exception e)
 				{

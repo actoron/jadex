@@ -305,6 +305,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	//				field = ((BeanProperty)attr).getField();
 	//			}
 			}
+			else if(attr instanceof BeanProperty && !((BeanProperty)attr).isReadable())
+			{
+				found = true;
+			}
 			else if(attr instanceof String)
 			{
 				method = findGetMethod(object, (String)attr, new String[]{"get", "is"});

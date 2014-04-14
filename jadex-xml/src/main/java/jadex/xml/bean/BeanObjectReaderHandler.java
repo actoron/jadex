@@ -1080,7 +1080,12 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			Map props = introspector.getBeanProperties(object.getClass(), true, true);
 			Object prop = props.get(accessinfo instanceof String? accessinfo: xmlname.getLocalPart());
-			if(prop instanceof BeanProperty && ((BeanProperty) prop).isWritable())
+			if(prop instanceof BeanProperty && !((BeanProperty)prop).isWritable())
+			{
+				// Ignore properties marked as not writeable.
+				set	= true;
+			}
+			else if(prop instanceof BeanProperty && ((BeanProperty)prop).isWritable())
 			{
 				BeanProperty	bprop	= (BeanProperty)prop;
 				Object arg = convertValue(val, bprop.getSetterType(), converter, context, id);

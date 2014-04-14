@@ -1,5 +1,7 @@
 package jadex.commons.transformation;
 
+import jadex.commons.transformation.annotations.Exclude;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +17,10 @@ public class A
 	protected List bs;
 	
 	protected int[] ints;
+	
+	protected String	excluded;
+	protected String	rexcluded;
+	protected String	wexcluded;
 	
 	public A()
 	{
@@ -102,6 +108,40 @@ public class A
 	public void setInts(int[] ints)
 	{
 		this.ints = ints;
+	}
+	
+	@Exclude
+	public void	setExcluded(String s)
+	{
+		excluded	= s;
+	}
+	
+	@Exclude
+	public String	getExcluded()
+	{
+		return excluded;
+	}
+
+	public void	setReadExcluded(String s)
+	{
+		rexcluded	= s;
+	}
+	
+	@Exclude
+	public String	getReadExcluded()
+	{
+		return rexcluded;
+	}
+
+	@Exclude
+	public void	setWriteExcluded(String s)
+	{
+		wexcluded	= s;
+	}
+	
+	public String	getWriteExcluded()
+	{
+		return wexcluded;
 	}
 
 	public int hashCode()

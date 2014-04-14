@@ -86,9 +86,10 @@ public class CodecFactory
 		}
 		else
 		{
-			default_ids = !SReflect.isAndroid()
-				? new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID}
-				: new byte[]{JadexBinaryCodec.CODEC_ID, GZIPCodec.CODEC_ID};
+//			default_ids = !SReflect.isAndroid()
+//					? new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID}
+//					: new byte[]{JadexBinaryCodec.CODEC_ID, GZIPCodec.CODEC_ID};
+			default_ids = new byte[]{JadexBinaryCodec.CODEC_ID, GZIPCodec.CODEC_ID};
 		}
 	}
 	
