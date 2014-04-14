@@ -188,7 +188,15 @@ public class ExternalAccess implements IExternalAccess
 					public void run() 
 					{
 //						System.out.println("int kill");
-						interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+						if(terminated)
+						{
+							// Todo: consistency between external access and invokeLater()
+							ret.setException(new ComponentTerminatedException(cid));
+						}
+						else
+						{
+							interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+						}
 					}
 					
 //					public String toString()
