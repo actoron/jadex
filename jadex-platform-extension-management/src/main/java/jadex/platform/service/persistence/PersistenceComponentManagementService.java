@@ -15,6 +15,8 @@ public class PersistenceComponentManagementService	extends DecoupledComponentMan
 	public PersistenceComponentManagementService(IComponentAdapter root, IBootstrapFactory componentfactory,
 		boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
-		super(root, componentfactory, copy, realtime, persist, uniqueids);
-	}	
+		super(root, componentfactory, copy, realtime, uniqueids);
+	}
+	
+	
 }
