@@ -525,7 +525,7 @@ public class BpmnEditorWindow extends JFrame
 			graph.deactivate();
 			graph.setEventsEnabled(false);
 			graph.getModel().beginUpdate();
-			mmodel = SBpmnModelReader.readModel(file, vreader);
+			mmodel = SBpmnModelReader.readModel(new FileInputStream(file), file.getPath(), vreader);
 			graph.getModel().endUpdate();
 			graph.setEventsEnabled(true);
 			graph.activate();
