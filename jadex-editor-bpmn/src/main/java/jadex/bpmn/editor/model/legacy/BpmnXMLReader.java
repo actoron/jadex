@@ -1751,7 +1751,8 @@ public class BpmnXMLReader
 											// todo: interceptors
 //											psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
 											psim = new ProvidedServiceImplementation();
-											psim.setClazz(implname != null? new ClassInfo(implname) : null);
+//											psim.setClazz(implname != null? new ClassInfo(implname) : null);
+											psim.setValue(implname);
 											psim.setProxytype(proxytype);
 											psim.setBinding(binding);
 										}
