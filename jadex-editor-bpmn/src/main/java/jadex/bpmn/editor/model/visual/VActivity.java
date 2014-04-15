@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -281,7 +282,7 @@ public class VActivity extends VNamedNode
 	 */
 	public void refreshParameterObjectGeometry()
 	{
-		Map<String, Object[]> parametermap = new HashMap<String, Object[]>();
+		Map<String, Object[]> parametermap = new LinkedHashMap<String, Object[]>();
 		for (int i = 0; i < getChildCount(); ++i)
 		{
 			mxICell child = getChildAt(i);
