@@ -1,18 +1,20 @@
-package jadex.bpmn.persist;
+package jadex.bpmn.runtime.persist;
 
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.SplitInfo;
 
+import java.util.List;
 import java.util.Map;
 
+/**
+ *  Thread info object.
+ */
 public class ThreadInfo
 {
-	/** 
-	
-	/** ID of the next activity. */
+	/** Id of the next activity. */
 	protected String activityid;
 	
-	/** ID of the last edge (if any). */
+	/** Id of the last edge (if any). */
 	protected String edgeid;
 	
 	/** The data of the current or last activity. */
@@ -28,16 +30,25 @@ public class ThreadInfo
 	protected boolean canceled;
 	
 	/** The id counter for sub processes. */
-	protected int idcnt;
+//	protected int idcnt;
 	
 	/** The split infos. */
-	protected Map<String, SplitInfo>	splitinfos;
+	protected Map<String, SplitInfo> splitinfos;
+	
+	/** Subthread infos. */
+	protected List<ThreadInfo> subthreadinfos;
 	
 	
+	/**
+	 *  Create a new ThreadInfo.
+	 */
 	public ThreadInfo()
 	{
 	}
 	
+	/**
+	 *  Create a new ThreadInfo.
+	 */
 	public ThreadInfo(ProcessThread thread)
 	{
 		activityid = thread.getActivity().getId();
@@ -46,13 +57,12 @@ public class ThreadInfo
 		dataedges = thread.getDataEdges();
 		exception = thread.getException();
 		canceled = thread.isCanceled();
-		idcnt = thread.idcnt;
+//		idcnt = thread.idcnt;
 		splitinfos = thread.splitinfos;
 	}
 
 	/**
 	 *  Gets the activityid.
-	 *
 	 *  @return The activityid.
 	 */
 	public String getActivityid()
@@ -62,7 +72,6 @@ public class ThreadInfo
 
 	/**
 	 *  Sets the activityid.
-	 *
 	 *  @param activityid The activityid to set.
 	 */
 	public void setActivityid(String activityid)
@@ -72,7 +81,6 @@ public class ThreadInfo
 
 	/**
 	 *  Gets the edgeid.
-	 *
 	 *  @return The edgeid.
 	 */
 	public String getEdgeid()
@@ -82,7 +90,6 @@ public class ThreadInfo
 
 	/**
 	 *  Sets the edgeid.
-	 *
 	 *  @param edgeid The edgeid to set.
 	 */
 	public void setEdgeid(String edgeid)
@@ -92,7 +99,6 @@ public class ThreadInfo
 
 	/**
 	 *  Gets the data.
-	 *
 	 *  @return The data.
 	 */
 	public Map<String, Object> getData()
@@ -102,7 +108,6 @@ public class ThreadInfo
 
 	/**
 	 *  Sets the data.
-	 *
 	 *  @param data The data to set.
 	 */
 	public void setData(Map<String, Object> data)
@@ -112,7 +117,6 @@ public class ThreadInfo
 
 	/**
 	 *  Gets the dataedges.
-	 *
 	 *  @return The dataedges.
 	 */
 	public Map<String, Object> getDataedges()
@@ -122,7 +126,6 @@ public class ThreadInfo
 
 	/**
 	 *  Sets the dataedges.
-	 *
 	 *  @param dataedges The dataedges to set.
 	 */
 	public void setDataedges(Map<String, Object> dataedges)
@@ -132,7 +135,6 @@ public class ThreadInfo
 
 	/**
 	 *  Gets the exception.
-	 *
 	 *  @return The exception.
 	 */
 	public Exception getException()
@@ -142,7 +144,6 @@ public class ThreadInfo
 
 	/**
 	 *  Sets the exception.
-	 *
 	 *  @param exception The exception to set.
 	 */
 	public void setException(Exception exception)
@@ -152,7 +153,6 @@ public class ThreadInfo
 
 	/**
 	 *  Gets the canceled.
-	 *
 	 *  @return The canceled.
 	 */
 	public boolean isCanceled()
@@ -162,7 +162,6 @@ public class ThreadInfo
 
 	/**
 	 *  Sets the canceled.
-	 *
 	 *  @param canceled The canceled to set.
 	 */
 	public void setCanceled(boolean canceled)
@@ -170,29 +169,26 @@ public class ThreadInfo
 		this.canceled = canceled;
 	}
 
-	/**
-	 *  Gets the idcnt.
-	 *
-	 *  @return The idcnt.
-	 */
-	public int getIdcnt()
-	{
-		return idcnt;
-	}
-
-	/**
-	 *  Sets the idcnt.
-	 *
-	 *  @param idcnt The idcnt to set.
-	 */
-	public void setIdcnt(int idcnt)
-	{
-		this.idcnt = idcnt;
-	}
+//	/**
+//	 *  Gets the idcnt.
+//	 *  @return The idcnt.
+//	 */
+//	public int getIdcnt()
+//	{
+//		return idcnt;
+//	}
+//
+//	/**
+//	 *  Sets the idcnt.
+//	 *  @param idcnt The idcnt to set.
+//	 */
+//	public void setIdcnt(int idcnt)
+//	{
+//		this.idcnt = idcnt;
+//	}
 
 	/**
 	 *  Gets the splitinfos.
-	 *
 	 *  @return The splitinfos.
 	 */
 	public Map<String, SplitInfo> getSplitinfos()
@@ -202,7 +198,6 @@ public class ThreadInfo
 
 	/**
 	 *  Sets the splitinfos.
-	 *
 	 *  @param splitinfos The splitinfos to set.
 	 */
 	public void setSplitinfos(Map<String, SplitInfo> splitinfos)

@@ -152,7 +152,7 @@ public class SequenceEdgePropertyPanel extends BasePropertyPanel
 		gc.fill = GridBagConstraints.NONE;
 		gc.insets = new Insets(0, 0, 5, 5);
 		mappanel.add(buttonpanel, gc);
-		//configureAndAddInputLine(column, null, mappanel, y++);
+		configureAndAddInputLine(column, null, mappanel, y++);
 		
 		gc = new GridBagConstraints();
 		gc.gridx = 0;

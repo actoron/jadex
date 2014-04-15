@@ -2320,6 +2320,14 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public abstract ServiceGetter<IMonitoringService> getMonitoringServiceGetter();
 
+	/**
+	 *  Get the state of the interpreter.
+	 *  @return The state of the interpreter.
+	 */
+	public IFuture<Object> getPersistableState()
+	{
+		return null;
+	}
 		
 //	/**
 //	 *  Publish a monitoring event. This event is automatically send

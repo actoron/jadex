@@ -53,11 +53,12 @@ public class ProcessServiceInvocationHandler implements InvocationHandler
 		Future<Void> ret = new Future<Void>();
 		
 		MActivity	act	= (MActivity)events.get(method);
-		ThreadContext	tc	= instance.getThreadContext();
-		ProcessThread	thread	= new ProcessThread(""+instance.idcnt++, act, tc, instance);
-		tc.addThread(thread);
+//		ThreadContext	tc	= instance.getThreadContext();
+		ProcessThread	thread	= new ProcessThread(""+instance.idcnt++, act, instance.getTopLevelThread(), instance);
+		instance.getTopLevelThread().addThread(thread);
+//		tc.addThread(thread);
 
-		String[]	params	= act.getPropertyNames();
+		String[] params	= act.getPropertyNames();
 		for(int i=0; i<params.length; i++)
 		{
 			thread.setParameterValue(params[i], args[i]);

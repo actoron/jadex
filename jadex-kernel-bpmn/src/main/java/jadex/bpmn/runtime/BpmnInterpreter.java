@@ -25,6 +25,7 @@ import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
+import jadex.bpmn.runtime.persist.BpmnPersistInfo;
 import jadex.bpmn.runtime.task.ExecuteStepTask;
 import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.ClassInfo;
@@ -190,10 +191,13 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	protected Map<String, IStepHandler> stephandlers;
 
 	/** The thread context. */
-	protected ThreadContext	context;
+//	protected ThreadContext	context;
 	
-	/** The context variables. */
-	protected Map<String, Object> variables;
+	/** The top level process thread. */
+	protected ProcessThread topthread;
+	
+//	/** The context variables. */
+//	protected Map<String, Object> variables;
 	
 	/** The finishing flag marker. */
 	protected boolean finishing;
@@ -231,18 +235,25 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		this.adapter = adapter;
 		this.container = container;
 		
-		variables.put("$cms", cms);
-		variables.put("$clock", cs);
-		variables.put("$msgservice", ms);
+		topthread = new ProcessThread(""+idcnt++, null, null, this);
+		topthread.setParameterValue("$cms", cms);
+		topthread.setParameterValue("$clock", cs);
+		topthread.setParameterValue("$msgservice", ms);
+		
+//		variables.put("$cms", cms);
+//		variables.put("$clock", cs);
+//		variables.put("$msgservice", ms);
 		
 		initContextVariables();
+		
 		
 		// Create initial thread(s). 
 		List<MActivity> startevents = model.getStartActivities(null, null);
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
-			ProcessThread	thread	= new ProcessThread(""+idcnt++, startevents.get(i), context, BpmnInterpreter.this);
-			context.addThread(thread);
+			ProcessThread	thread	= new ProcessThread(""+idcnt++, startevents.get(i), topthread, BpmnInterpreter.this);
+			topthread.addThread(thread);
+//			context.addThread(thread);
 		}
 	}	
 		
@@ -258,7 +269,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, resultlistener, inited);
 		this.inited = inited;
-		this.variables	= new HashMap<String, Object>();
+//		this.variables = new HashMap<String, Object>();
 		construct(model, activityhandlers, stephandlers);
 		
 		scheduleStep(new IComponentStep<Void>()
@@ -267,7 +278,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			{
 //				executeInitStep2();
 				// Initialize context variables.
-				variables.put("$interpreter", BpmnInterpreter.this);
+//				variables.put("$interpreter", BpmnInterpreter.this);
+				topthread.setParameterValue("$interpreter", BpmnInterpreter.this);
 				init(getModel(), getConfiguration(), arguments)
 					.addResultListener(createResultListener(new DelegationResultListener<Void>(inited)
 				{
@@ -343,10 +355,19 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
-		this.context = new ThreadContext(model);
+//		this.context = new ThreadContext(model);
+		this.topthread = new ProcessThread(""+idcnt++, null, null, this);
 		this.messages = new ArrayList<Object>();
 		this.streams = new ArrayList<IConnection>();
-		this.variables	= getArguments()!=null ? new HashMap<String, Object>(getArguments()) : new HashMap<String, Object>();
+//		this.variables	= getArguments()!=null ? new HashMap<String, Object>(getArguments()) : new HashMap<String, Object>();
+		
+		if(getArguments()!=null)
+		{
+			for(Map.Entry<String, Object> entry: getArguments().entrySet())
+			{
+				topthread.setParameterValue(entry.getKey(), entry.getValue());
+			}
+		}
 	}
 	
 	/**
@@ -413,12 +434,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 									{
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											ProcessThread thread = new ProcessThread(""+((BpmnInterpreter)ia).idcnt++, fevtsubentry.getFirstEntity(), ((BpmnInterpreter) ia).getThreadContext(), ((BpmnInterpreter) ia));
-											((BpmnInterpreter) ia).getThreadContext().addThread(thread);
-						            		ThreadContext subcontext = new ThreadContext(fevtsubentry.getFirstEntity(), thread);
-						            		thread.setSubcontext(subcontext);
-											ProcessThread subthread = new ProcessThread(""+((BpmnInterpreter)ia).idcnt++, fevtsubentry.getSecondEntity(), subcontext, (BpmnInterpreter) ia);
-											subcontext.addThread(subthread);
+											ProcessThread thread = new ProcessThread(""+((BpmnInterpreter)ia).idcnt++, fevtsubentry.getFirstEntity(), ((BpmnInterpreter)ia).getTopLevelThread(), ((BpmnInterpreter) ia));
+											((BpmnInterpreter)ia).getTopLevelThread().addThread(thread);
+//						            		ThreadContext subcontext = new ThreadContext(fevtsubentry.getFirstEntity(), thread);
+//						            		thread.setSubcontext(subcontext);
+											ProcessThread subthread = new ProcessThread(""+((BpmnInterpreter)ia).idcnt++, fevtsubentry.getSecondEntity(), thread, (BpmnInterpreter)ia);
+											thread.addThread(subthread);
 											subthread.setParameterValue("$event", event);
 											return IFuture.DONE;
 										}
@@ -669,19 +690,22 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             {
             	if(triggersubproc != null)
             	{
-            		ProcessThread thread = new ProcessThread(""+idcnt++, triggersubproc, context, this);
-            		context.addThread(thread);
-            		ThreadContext subcontext = new ThreadContext(triggersubproc, thread);
-            		thread.setSubcontext(subcontext);
-					ProcessThread subthread = new ProcessThread(""+idcnt++, triggeractivity, subcontext, this);
-					subcontext.addThread(subthread);
+            		ProcessThread thread = new ProcessThread(""+idcnt++, triggersubproc, getTopLevelThread(), this);
+            		getTopLevelThread().addThread(thread);
+//            		context.addThread(thread);
+//            		ThreadContext subcontext = new ThreadContext(triggersubproc, thread);
+//            		thread.setSubcontext(subcontext);
+					ProcessThread subthread = new ProcessThread(""+idcnt++, triggeractivity, thread, this);
+					thread.addThread(subthread);
+//					subcontext.addThread(subthread);
 					subthread.setParameterValue("$event", trigger.getThirdEntity());
             	}
             	else
             	{
-                    ProcessThread    thread    = new ProcessThread(""+idcnt++, mact, context, BpmnInterpreter.this);
+                    ProcessThread    thread    = new ProcessThread(""+idcnt++, mact, getTopLevelThread(), BpmnInterpreter.this);
                     thread.setParameterValue("$event", trigger.getThirdEntity());
-                    context.addThread(thread);
+                    getTopLevelThread().addThread(thread);
+//                    context.addThread(thread);
             	}
             }
             else if(!MBpmnModel.EVENT_START_MESSAGE.equals(mact.getActivityType())
@@ -690,8 +714,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             	&& !MBpmnModel.EVENT_START_SIGNAL.equals(mact.getActivityType())
             	&& !MBpmnModel.EVENT_START_TIMER.equals(mact.getActivityType()))
             {
-                ProcessThread thread = new ProcessThread(""+idcnt++, mact, context, BpmnInterpreter.this);
-                context.addThread(thread);
+                ProcessThread thread = new ProcessThread(""+idcnt++, mact, getTopLevelThread(), BpmnInterpreter.this);
+//                context.addThread(thread);
+                getTopLevelThread().addThread(thread);
             }
         } 
         
@@ -739,7 +764,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		for(Iterator<MContextVariable> it=vars.iterator(); it.hasNext(); )
 		{
 			MContextVariable	cv	= it.next();
-			if(!variables.containsKey(cv.getName()))	// Don't overwrite arguments.
+//			if(!variables.containsKey(cv.getName()))	// Don't overwrite arguments.
+			if(!topthread.hasParameterValue(cv.getName()))	// Don't overwrite arguments.
 			{
 				Object	value	= null;
 				UnparsedExpression	exp	= cv.getValue(getConfiguration());
@@ -756,7 +782,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 						throw new RuntimeException("Error parsing context variable: "+this+", "+cv.getName()+", "+exp, e);
 					}
 				}
-				variables.put(cv.getName(), value);
+				topthread.setParameterValue(cv.getName(), value);
+//				variables.put(cv.getName(), value);
 			}
 		}
 	}
@@ -777,7 +804,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				// Iterate through process threads and dispatch message to first
 				// waiting and fitting one (filter check).
 				boolean processed = false;
-				for(Iterator<ProcessThread> it=context.getAllThreads().iterator(); it.hasNext() && !processed; )
+				for(Iterator<ProcessThread> it=getTopLevelThread().getAllThreads().iterator(); it.hasNext() && !processed; )
 				{
 					ProcessThread pt = it.next();
 					if(pt.isWaiting())
@@ -817,7 +844,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				// Iterate through process threads and dispatch message to first
 				// waiting and fitting one (filter check).
 				boolean processed = false;
-				for(Iterator<ProcessThread> it=context.getAllThreads().iterator(); it.hasNext() && !processed; )
+				for(Iterator<ProcessThread> it=getTopLevelThread().getAllThreads().iterator(); it.hasNext() && !processed; )
 				{
 					ProcessThread pt = (ProcessThread)it.next();
 					if(pt.isWaiting())
@@ -856,12 +883,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //			public void run()
 //			{	
 				// Remove all threads (calls cancel on running activities)
-				if(getThreadContext().getThreads()!=null)
+				if(getTopLevelThread().getSubthreads()!=null)
 				{
-					ProcessThread[]	threads	= getThreadContext().getThreads().toArray(new ProcessThread[0]);
+					ProcessThread[]	threads	= getTopLevelThread().getSubthreads().toArray(new ProcessThread[0]);
 					for(ProcessThread pt: threads)
 					{
-						pt.getThreadContext().removeThread(pt);
+						getTopLevelThread().removeThread(pt);
 					}
 				}
 				
@@ -883,7 +910,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 		boolean	isatbreakpoint	= false;
 		Set<String>	bps	= new HashSet<String>(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
-		for(Iterator<ProcessThread> it=context.getAllThreads().iterator(); !isatbreakpoint && it.hasNext(); )
+		for(Iterator<ProcessThread> it=getTopLevelThread().getAllThreads().iterator(); !isatbreakpoint && it.hasNext(); )
 		{
 			ProcessThread	pt	= (ProcessThread)it.next();
 			isatbreakpoint	= bps.contains(pt.getActivity().getBreakpointId());
@@ -899,16 +926,24 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public MBpmnModel getModelElement()
 	{
-		return (MBpmnModel)context.getModelElement();
+		return bpmnmodel;//(MBpmnModel)context.getModelElement();
 	}
 	
+//	/**
+//	 *  Get the thread context.
+//	 *  @return The thread context.
+//	 */
+//	public ThreadContext getThreadContext()
+//	{
+//		return context;
+//	}
+	
 	/**
-	 *  Get the thread context.
-	 *  @return The thread context.
+	 * 
 	 */
-	public ThreadContext getThreadContext()
+	public ProcessThread getTopLevelThread()
 	{
-		return context;
+		return topthread;
 	}
 	
 	/**
@@ -919,7 +954,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public boolean isFinished(String pool, String lane)
 	{
-		return context.isFinished(pool, lane);
+		return topthread.isFinished(pool, lane);
 	}
 
 	/**
@@ -935,7 +970,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		if(!isReady(pool, lane))
 			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
 		
-		ProcessThread	thread	= context.getExecutableThread(pool, lane);
+		ProcessThread thread = topthread.getExecutableThread(pool, lane);
+//		ProcessThread	thread	= context.getExecutableThread(pool, lane);
 		
 		// Thread may be null when external entry has not changed waiting state of any active plan. 
 		if(thread!=null)
@@ -1002,7 +1038,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				}
 			}
 			
-			if(thread.getThreadContext()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(thread.getActivity()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 			}
@@ -1023,7 +1059,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //		{
 //			ready	= !ext_entries.isEmpty();
 //		}
-		ready	= context.getExecutableThread(pool, lane)!=null;
+		ready = topthread.getExecutableThread(pool, lane)!=null;
 		return ready;
 	}
 	
@@ -1050,7 +1086,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //							System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
 							step(activity, BpmnInterpreter.this, thread, event);
 							thread.setNonWaiting();
-							if(thread.getThreadContext()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+							if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 							{
 								publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 							}
@@ -1074,7 +1110,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //				System.out.println("Notify2: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
 				step(activity, BpmnInterpreter.this, thread, event);
 				thread.setNonWaiting();
-				if(thread.getThreadContext()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+				if(thread.getActivity()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{
 					publishEvent(createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 				}
@@ -1149,7 +1185,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 //		System.out.println("step: "+activity.getName());
 //		notifyListeners(createActivityEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, thread, activity));
-		if(thread.getThreadContext()!=null && hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{
 			publishEvent(createActivityEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread, activity), PublishTarget.TOALL);
 		}
@@ -1167,7 +1203,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public boolean hasContextVariable(String name)
 	{
-		return (variables!=null && variables.containsKey(name)) || getModel().getArgument(name)!=null  || getModel().getResult(name)!=null;
+		return (topthread.hasParameterValue(name)) || getModel().getArgument(name)!=null  || getModel().getResult(name)!=null;
+//		return (variables!=null && variables.containsKey(name)) || getModel().getArgument(name)!=null  || getModel().getResult(name)!=null;
 	}
 	
 	/**
@@ -1178,9 +1215,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public Object getContextVariable(String name)
 	{
 		Object ret;
-		if(variables!=null && variables.containsKey(name))
+		if(topthread.hasParameterValue(name))
 		{
-			ret = variables.get(name);			
+			ret = topthread.getParameterValue(name);			
 		}
 		else if(getModel().getArgument(name)!=null)
 		{
@@ -1214,7 +1251,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public void setContextVariable(String name, Object key, Object value)
 	{
-		boolean isvar = variables!=null && variables.containsKey(name);
+//		boolean isvar = variables!=null && variables.containsKey(name);
+		boolean isvar = topthread.hasParameterValue(name);
+		
 		boolean isres = getModel().getResult(name)!=null;
 		if(!isres && !isvar)
 		{
@@ -1236,7 +1275,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			}
 			else
 			{
-				variables.put(name, value);	
+//				variables.put(name, value);	
+				topthread.setParameterValue(name, value);
 			}
 		}
 		else
@@ -1248,7 +1288,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			}
 			else
 			{
-				coll = variables.get(name);
+//				coll = variables.get(name);
+				coll = topthread.getParameterValue(name);
 			}
 			if(coll instanceof List)
 			{
@@ -1358,10 +1399,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					act.addIncomingSequenceEdge(edge);
 					MPool pl = pool!=null? bpmnmodel.getPool(pool): (MPool)bpmnmodel.getPools().get(0);
 					act.setPool(pl);
-					ProcessThread thread = new ProcessThread(""+idcnt++, act, context, BpmnInterpreter.this);
+					ProcessThread thread = new ProcessThread(""+idcnt++, act, topthread, BpmnInterpreter.this);
 					thread.setLastEdge(edge);
 					thread.setParameterValue("step", new Object[]{step, ret});
-					context.addExternalThread(thread);
+					topthread.addExternalThread(thread);
 				}
 			});
 		}
@@ -1679,10 +1720,33 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public List<IMonitoringEvent> getCurrentStateEvents()
 	{
 		final List<IMonitoringEvent>	events	= new ArrayList<IMonitoringEvent>();
-		for(Iterator<ProcessThread> it=getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+		for(Iterator<ProcessThread> it= topthread.getAllThreads().iterator(); it.hasNext(); )
 		{
 			events.add(createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, it.next()));
 		}
 		return events;
+	}
+	
+	/**
+	 *  Get the variables.
+	 *  return The variables.
+	 */
+	public Map<String, Object> getVariables()
+	{
+//		return variables;
+		return topthread.getParameters();
+	}
+
+	/**
+	 *  Get the state of the interpreter.
+	 *  @return The state of the interpreter.
+	 */
+	public IFuture<Object> getPersistableState()
+	{
+		final Future<Object> ret = new Future<Object>();
+		
+		new BpmnPersistInfo(this);
+		
+		return ret;
 	}
 }

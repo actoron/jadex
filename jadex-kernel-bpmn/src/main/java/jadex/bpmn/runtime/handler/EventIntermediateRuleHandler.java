@@ -5,14 +5,12 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IInternalProcessEngineService;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -95,18 +93,19 @@ public class EventIntermediateRuleHandler extends DefaultActivityHandler
 								MActivity	activity	= instance.getModelElement().getAllActivities().get(actid);
 								StringTokenizer	stok	= new StringTokenizer(procid, ":");
 								ProcessThread	thread	= null;
-								ThreadContext	context	= instance.getThreadContext();
+//								ThreadContext	context	= instance.getThreadContext();
+								ProcessThread context = instance.getTopLevelThread();
 								String	pid	= null;
 								while(stok.hasMoreTokens() && context!=null)
 								{
 									thread	= null;
 									pid	= pid!=null ? pid+":"+stok.nextToken() : stok.nextToken();
-									for(ProcessThread pt: context.getThreads())
+									for(ProcessThread pt: context.getSubthreads())
 									{
 										if(pt.getId().equals(pid))
 										{
 											thread	= pt;
-											context	= thread.getSubcontext();
+											context	= thread;
 											break;
 										}
 									}

@@ -9,10 +9,8 @@ import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ProcessThreadValueFetcher;
-import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -76,17 +74,17 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				}
 				else
 				{
-					ThreadContext subcontext = new ThreadContext(proc, thread);
+//					ThreadContext subcontext = new ThreadContext(proc, thread);
 //					thread.getThreadContext().addSubcontext(subcontext);
-					thread.setSubcontext(subcontext);
+//					thread.setSubcontext(subcontext);
 					while(it.hasNext())
 					{
 						Object	value	= it.next();
 						for(int i=0; i<start.size(); i++)
 						{
-							ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
+							ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), thread, instance);
 							subthread.setParameterValue("item", value);	// Hack!!! parameter not declared?
-							subcontext.addThread(subthread);
+							thread.addThread(subthread);
 //							ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
 //								subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
 //							instance.notifyListeners(cce);
@@ -132,14 +130,15 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			}
 			else
 			{
-				ThreadContext subcontext = new ThreadContext(proc, thread);
-				subcontext.setHardConstraints(proc.getHardConstraints() != null? new RHardConstraints(proc.getHardConstraints()) : null);
+//				ThreadContext subcontext = new ThreadContext(proc, thread);
+//				subcontext.setHardConstraints(proc.getHardConstraints() != null? new RHardConstraints(proc.getHardConstraints()) : null);
 //				thread.getThreadContext().addSubcontext(subcontext);
-				thread.setSubcontext(subcontext);
+//				thread.setSubcontext(subcontext);
 				for(int i=0; i<start.size(); i++)
 				{
-					ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
-					subcontext.addThread(subthread);
+					ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), thread, instance);
+					thread.addThread(subthread);
+//					subcontext.addThread(subthread);
 //					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
 //						subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
 //					instance.notifyListeners(cce);
@@ -257,7 +256,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 										// todo: allow this, does not work because handler is used for waiting for service calls!
 //										newthread.setActivity(act);
 										newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
-										thread.getThreadContext().addThread(newthread);
+										thread.getParent().addThread(newthread);
 										
 //										ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 //											thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(newthread));
@@ -348,7 +347,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 									}
 								}
 								
-								if (activity.getOutgoingDataEdges() != null)	
+								if(activity.getOutgoingDataEdges() != null)	
 								{
 									for (MDataEdge de : activity.getOutgoingDataEdges())
 									{

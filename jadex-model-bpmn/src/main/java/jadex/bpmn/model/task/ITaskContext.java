@@ -50,12 +50,11 @@ public interface ITaskContext
 	 */
 	public void	setParameterValue(String name, Object key, Object value);
 	
-	/**
-	 *  Gets the hard constraints.
-	 *
-	 *  @return The hard constraints.
-	 */
-	public RHardConstraints getHardConstraints();
+//	/**
+//	 *  Gets the hard constraints.
+//	 *  @return The hard constraints.
+//	 */
+//	public RHardConstraints getHardConstraints();
 	
 	/**
 	 *  Get the value of a property.

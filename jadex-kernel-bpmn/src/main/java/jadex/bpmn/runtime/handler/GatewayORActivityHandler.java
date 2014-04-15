@@ -52,7 +52,7 @@ public class GatewayORActivityHandler	extends AbstractGatewayActivityHandler	 im
 				{
 					ProcessThread	newthread	= thread.createCopy();
 					newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
-					thread.getThreadContext().addThread(newthread);
+					thread.getParent().addThread(newthread);
 //					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 //						thread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(newthread));
 //					instance.notifyListeners(cce);

@@ -8,7 +8,6 @@ import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -39,7 +38,8 @@ public class DefaultStepHandler implements IStepHandler
 		thread.updateParametersAfterStep(activity, instance);
 		
 		MNamedIdElement	next	= null;
-		ThreadContext	remove	= null;	// Context that needs to be removed (if any).
+//		ThreadContext	remove	= null;	// Context that needs to be removed (if any).
+		ProcessThread remove = null;
 		Exception ex = thread.getException();
 		
 		// Store event (if any).
@@ -53,7 +53,8 @@ public class DefaultStepHandler implements IStepHandler
 		if(AbstractEventIntermediateTimerActivityHandler.TIMER_EVENT.equals(event))
 		{
 			// Cancel subflows.
-			remove = thread.getSubcontext();
+//			remove = thread.getSubcontext();
+			remove = thread;
 //			remove = thread.getThreadContext().getSubcontext(thread);
 			
 			// Continue with timer edge.
@@ -72,7 +73,8 @@ public class DefaultStepHandler implements IStepHandler
 		else
 		{
 			boolean	outside	= false;
-			ThreadContext	context	= thread.getThreadContext();
+//			ThreadContext	context	= thread.getThreadContext();
+			ProcessThread context = thread.getParent();
 			
 			while(next==null && !outside)
 			{
@@ -121,7 +123,7 @@ public class DefaultStepHandler implements IStepHandler
 //							}
 							
 							// Java-style "first matching handler" behavior
-							if (handler.getClazz() == null || SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader()), ex.getClass()))
+							if(handler.getClazz() == null || SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader()), ex.getClass()))
 							{
 								next = handler;
 								break;
@@ -136,7 +138,7 @@ public class DefaultStepHandler implements IStepHandler
 					if(next==null && !outside)
 					{
 						// When last thread or exception, mark current context for removal.
-						if(context.getThreads().size()==1 || ex!=null)
+						if(context.getSubthreads().size()==1 || ex!=null)
 						{
 							activity = (MActivity)context.getModelElement();
 							remove	= context;
@@ -149,13 +151,13 @@ public class DefaultStepHandler implements IStepHandler
 								for(int i=0; handlers!=null && i<handlers.size(); i++)
 								{
 									MActivity handler = (MActivity)handlers.get(i);
-									instance.getActivityHandler(handler).cancel(handler, instance, remove.getInitiator());
+									instance.getActivityHandler(handler).cancel(handler, instance, remove.getParent());
 								}
 							}
 						}
 						
 						// If more threads are available in current context just exit loop.
-						else if(context.getThreads().size()>1)
+						else if(context.getSubthreads().size()>1)
 						{
 							outside	= true;
 						}
@@ -175,7 +177,7 @@ public class DefaultStepHandler implements IStepHandler
 		// Remove inner context(s), if any.
 		if(remove!=null)
 		{
-			thread	= remove.getInitiator();
+			thread	= remove;
 			thread.setNonWaiting();
 			if(ex!=null)
 				thread.setException(ex);
@@ -201,7 +203,7 @@ public class DefaultStepHandler implements IStepHandler
 //				thread.getId(), instance.getComponentIdentifier(), instance.getComponentDescription().getCreationTime(), instance.createProcessThreadInfo(thread));
 //			instance.notifyListeners(cce);
 //			instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_CHANGED, thread);
-			if(instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+			if(thread.getActivity()!=null && instance.hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 			{
 				instance.publishEvent(instance.createThreadEvent(IMonitoringEvent.EVENT_TYPE_MODIFICATION, thread), PublishTarget.TOALL);
 			}
@@ -239,7 +241,11 @@ public class DefaultStepHandler implements IStepHandler
 		else if(next==null)
 		{
 			thread.setActivity(null);
-			thread.getThreadContext().removeThread(thread);
+//			thread.getThreadContext().removeThread(thread);
+			if(thread.getParent()!=null)
+			{
+				thread.getParent().removeThread(thread);
+			}
 		} 
 		else
 		{

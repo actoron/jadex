@@ -153,15 +153,15 @@ public class BpmnPlanExecutor implements IPlanExecutor //, Serializable
 				String	abortpool	= bodyinstance.getPool(bodyinstance.getLastState());
 				if(!BpmnPlanBodyInstance.POOL_UNDEFINED.equals(abortpool))
 				{
-					Set	threads	= bodyinstance.getThreadContext().getAllThreads();
+					Set<ProcessThread>	threads	= bodyinstance.getTopLevelThread().getAllThreads();
 					if(threads!=null && !threads.isEmpty())
 					{
-						for(Iterator it=threads.iterator(); it.hasNext(); )
+						for(Iterator<ProcessThread> it=threads.iterator(); it.hasNext(); )
 						{
 							ProcessThread	thread	= (ProcessThread)it.next();
-							if(thread.belongsTo(abortpool, null) && thread.getThreadContext()!=null)
+							if(thread.belongsTo(abortpool, null) && thread.getParent()!=null)
 							{
-								thread.getThreadContext().removeThread(thread);
+								thread.getParent().removeThread(thread);
 							}
 						}
 					}

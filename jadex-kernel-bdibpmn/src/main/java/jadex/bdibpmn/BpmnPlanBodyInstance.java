@@ -275,7 +275,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		
 		if(dispelem!=null)
 		{
-			for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
+			for(Iterator<ProcessThread> it=getTopLevelThread().getAllThreads().iterator(); it.hasNext(); )
 			{
 				ProcessThread thread = (ProcessThread)it.next();
 				try
@@ -335,7 +335,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			ret = getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
 			boolean empty = true;
 			
-			for(Iterator<ProcessThread> it=context.getAllThreads().iterator(); it.hasNext(); )
+			for(Iterator<ProcessThread> it=getTopLevelThread().getAllThreads().iterator(); it.hasNext(); )
 			{
 				ProcessThread pt = it.next();
 				if(pt.isWaiting() && pt.belongsTo(pool, null))

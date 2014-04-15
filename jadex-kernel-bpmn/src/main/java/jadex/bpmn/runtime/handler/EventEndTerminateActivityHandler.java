@@ -15,7 +15,7 @@ public class EventEndTerminateActivityHandler extends DefaultActivityHandler
 	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		// Top level event -> kill the component.
-		if(thread.getThreadContext().getParent()==null)
+		if(thread.getParent()==null)
 		{
 			instance.killComponent();
 		}
@@ -23,11 +23,12 @@ public class EventEndTerminateActivityHandler extends DefaultActivityHandler
 		// Internal subprocess -> terminate all threads in context, except own thread (which is terminated after interpreter step).
 		else
 		{
-			for(ProcessThread pt: thread.getThreadContext().getThreads().toArray(new ProcessThread[thread.getThreadContext().getThreads().size()]))
+//			for(ProcessThread pt: thread.getThreadContext().getThreads().toArray(new ProcessThread[thread.getThreadContext().getThreads().size()]))
+			for(ProcessThread pt: thread.getParent().getSubthreads().toArray(new ProcessThread[thread.getParent().getSubthreads().size()]))
 			{
 				if(pt!=thread)
 				{
-					thread.getThreadContext().removeThread(pt);
+					thread.getParent().removeThread(pt);
 				}
 			}
 		}

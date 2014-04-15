@@ -142,7 +142,7 @@ public abstract class AbstractGatewayActivityHandler
 		}
 			
 		SplitInfo	joinspi	= null;
-		for(Iterator<ProcessThread> it=thread.getThreadContext().getThreads().iterator(); joinspi==null && it.hasNext(); )
+		for(Iterator<ProcessThread> it=thread.getParent().getSubthreads().iterator(); joinspi==null && it.hasNext(); )
 		{
 			ProcessThread oldthread	= (ProcessThread)it.next();
 			// Is the thread waiting at an incoming edge? 
@@ -271,7 +271,7 @@ public abstract class AbstractGatewayActivityHandler
 						}
 					}
 					
-					thread.getThreadContext().removeThread(pt);
+					thread.getParent().removeThread(pt);
 //					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
 //						thread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(pt));
 //					instance.notifyListeners(cce);

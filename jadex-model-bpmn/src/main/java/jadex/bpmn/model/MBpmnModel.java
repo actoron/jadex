@@ -176,7 +176,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	//-------- added structures --------
 
 	/** The context variables (name -> [class, initexpression]). */
-	protected Map<String, MContextVariable> variabls;
+	protected Map<String, MContextVariable> variables;
 	
 	/** The pool/names in configurations. */
 	protected Map configpoollanes;
@@ -970,10 +970,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	public void addContextVariable(MContextVariable variable)
 	{
-		if(variabls==null)
-			variabls	= new HashMap<String, MContextVariable>();
+		if(variables==null)
+			variables	= new HashMap<String, MContextVariable>();
 		
-		variabls.put(variable.getName(), variable);
+		variables.put(variable.getName(), variable);
 	}
 
 	/**
@@ -982,13 +982,13 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	public void removeContextVariable(String name)
 	{
-		if(variabls!=null)
+		if(variables!=null)
 		{
-			variabls.remove(name);
+			variables.remove(name);
 			
-			if(variabls.isEmpty())
+			if(variables.isEmpty())
 			{
-				variabls	= null;
+				variables	= null;
 			}
 		}
 	}
@@ -1008,7 +1008,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	public List<MContextVariable> getContextVariables()
 	{
-		return variabls!=null ? new ArrayList<MContextVariable>(variabls.values()) : Collections.EMPTY_LIST;
+		return variables!=null ? new ArrayList<MContextVariable>(variables.values()) : Collections.EMPTY_LIST;
 	}
 
 	/**
@@ -1018,7 +1018,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	public MContextVariable getContextVariable(String name)
 	{
-		return variabls != null? variabls.get(name) : null;
+		return variables != null? variables.get(name) : null;
 	}
 
 	/**
@@ -1040,7 +1040,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	{
 		if (config == null && exp instanceof MContextVariable)
 		{
-			variabls.put(exp.getName(), (MContextVariable) exp);
+			variables.put(exp.getName(), (MContextVariable) exp);
 		}
 		else if (config != null)
 		{

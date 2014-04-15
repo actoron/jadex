@@ -26,9 +26,11 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 	{
 		// Top level event -> just move forward to next activity.
 		// Or start event of event subprocess -> just move forward.
-		if(thread.getThreadContext().getParent()==null
-			|| (thread.getThreadContext().getModelElement() instanceof MSubProcess
-			&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getThreadContext().getModelElement()).getSubprocessType())))
+		if(thread.getParent()==null
+			|| (thread.getParent().getModelElement() instanceof MSubProcess
+			&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getParent().getModelElement()).getSubprocessType())))
+//			|| (thread.getThreadContext().getModelElement() instanceof MSubProcess
+//			&& MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)thread.getThreadContext().getModelElement()).getSubprocessType())))
 		{
 			doExecute(activity, instance, thread);
 			instance.step(activity, instance, thread, null);
@@ -47,7 +49,8 @@ public class EventStartRuleHandler extends EventIntermediateRuleHandler
 	public void cancel(MActivity activity, final BpmnInterpreter instance, ProcessThread thread)
 	{
 		// Internal subprocess -> treat like intermediate event.
-		if(thread.getThreadContext().getParent()!=null)
+//		if(thread.getThreadContext().getParent()!=null)
+		if(thread.getParent()!=null)
 		{
 			super.execute(activity, instance, thread);
 		}

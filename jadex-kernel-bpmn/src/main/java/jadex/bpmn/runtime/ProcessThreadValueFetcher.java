@@ -72,7 +72,7 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 		Object	value	= null;
 		
 		// Check for parameter value.
-		for(ProcessThread t=thread; t!=null && !found; t=t.getThreadContext().getInitiator() )
+		for(ProcessThread t=thread; t!=null && !found; t=t.getParent() )
 		{
 			if(t.hasParameterValue(name))
 			{

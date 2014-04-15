@@ -44,8 +44,8 @@ import java.util.Map;
 @Description("Test if services of (earlier) sibling components can be found and used.")
 @Results(@Result(name="testresults", clazz=Testcase.class))
 @ComponentTypes({
-    @ComponentType(name="a", filename="jadex.micro.testcases.AAgent.class"),
-    @ComponentType(name="b", filename="jadex.micro.testcases.BAgent.class")
+    @ComponentType(name="a", clazz=AAgent.class),
+    @ComponentType(name="b", clazz=BAgent.class)
 })
 @Configurations(@Configuration(name="def", components={
     @Component(type="a"),

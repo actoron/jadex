@@ -14,6 +14,9 @@ import jadex.bpmn.runtime.handler.ICancelable;
 import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.nonfunctional.hardconstraints.RHardConstraints;
+import jadex.bridge.service.types.monitoring.IMonitoringEvent;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
+import jadex.bridge.service.types.monitoring.IMonitoringService.PublishTarget;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -85,11 +88,17 @@ public class ProcessThread	implements ITaskContext
 	/** The data of the current data edges. */
 	protected Map<String, Object> dataedges;
 	
-	/** The thread context. */
-	protected ThreadContext context;
+//	/** The thread context. */
+//	protected ThreadContext context;
+//	
+//	/** The thread subcontext (if any). */
+//	protected ThreadContext subcontext;
 	
-	/** The thread subcontext (if any). */
-	protected ThreadContext subcontext;
+	/** The parent process thread. */
+	protected ProcessThread parent;
+	
+	/** The subthreads. */
+	protected List<ProcessThread> subthreads;
 	
 	/** The Bpmn instance. */
 	protected BpmnInterpreter instance;
@@ -118,7 +127,7 @@ public class ProcessThread	implements ITaskContext
 	public int	idcnt;
 	
 	/** The split infos. */
-	public Map<String, SplitInfo>	splitinfos;
+	public Map<String, SplitInfo> splitinfos;
 	
 	//-------- constructors --------
 
@@ -126,11 +135,11 @@ public class ProcessThread	implements ITaskContext
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(String id, MActivity activity, ThreadContext context, BpmnInterpreter instance)
+	public ProcessThread(String id, MActivity activity, ProcessThread parent, BpmnInterpreter instance)
 	{
 		this.id	= id;
 		this.activity	= activity;
-		this.context	= context;
+		this.parent = parent;
 		this.instance = instance;
 	}
 	
@@ -309,30 +318,30 @@ public class ProcessThread	implements ITaskContext
 		this.waitfilter = waitfilter;
 	}
 	
-	/**
-	 *  Get the thread context
-	 *  @return	The thread context.
-	 */
-	public ThreadContext getThreadContext()
-	{
-		return context;
-	}
-	
-	/**
-	 *  Set the context.
-	 *  @param context The context to set.
-	 */
-	public void setThreadContext(ThreadContext context)
-	{
-		this.context = context;
-	}
+//	/**
+//	 *  Get the thread context
+//	 *  @return	The thread context.
+//	 */
+//	public ThreadContext getThreadContext()
+//	{
+//		return context;
+//	}
+//	
+//	/**
+//	 *  Set the context.
+//	 *  @param context The context to set.
+//	 */
+//	public void setThreadContext(ThreadContext context)
+//	{
+//		this.context = context;
+//	}
 
 	/**
 	 *  Create a copy of this thread (e.g. for a parallel split).
 	 */
 	public ProcessThread createCopy()
 	{
-		ProcessThread	ret	= new ProcessThread(id+"."+idcnt++, activity, context, instance);
+		ProcessThread	ret	= new ProcessThread(id+"."+idcnt++, activity, parent, instance);
 		ret.edge	= edge;
 		ret.data	= data!=null? new HashMap<String, Object>(data): null;
 		ret.dataedges	= dataedges!=null? new HashMap<String, Object>(dataedges): null;
@@ -359,8 +368,8 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean hasParameterValue(String name)
 	{
-		return hasOwnParameterValue(name) || getThreadContext().getInitiator()!=null 
-			&& getThreadContext().getInitiator().hasParameterValue(name);
+		return hasOwnParameterValue(name) || getParent()!=null 
+			&& getParent().hasParameterValue(name);
 	}
 
 	/**
@@ -380,8 +389,16 @@ public class ProcessThread	implements ITaskContext
 	public Object getParameterValue(String name)
 	{
 		return hasOwnParameterValue(name)? data.get(name): 
-			getThreadContext().getInitiator()!=null? 
-			getThreadContext().getInitiator().getParameterValue(name): null;
+			getParent()!=null? getParent().getParameterValue(name): null;
+	}
+	
+	/**
+	 *  Get the parameters.
+	 *  @return The parameters.
+	 */
+	public Map<String, Object> getParameters()
+	{
+		return data;
 	}
 	
 	/**
@@ -391,7 +408,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setDataEdgeValue(String name, Object value)
 	{
-		if (dataedges == null)
+		if(dataedges == null)
 		{
 			dataedges = new HashMap<String, Object>();
 		}
@@ -415,12 +432,12 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setParameterValue(String name, Object key, Object value)
 	{
-		if(!getActivity().hasParameter(name))
+		if(getActivity()!=null && !getActivity().hasParameter(name))
 		{
 //			if(getThreadContext()==null)
 //				System.out.println("sdkljl");
 			
-			ProcessThread pt = getThreadContext().getInitiator();
+			ProcessThread pt = getParent();
 			if(pt!=null)
 			{
 				pt.setParameterValue(name, key, value);
@@ -524,15 +541,14 @@ public class ProcessThread	implements ITaskContext
 		return activity.hasPropertyValue(name);
 	}
 	
-	/**
-	 *  Gets the hard constraints.
-	 *
-	 *  @return The hard constraints.
-	 */
-	public RHardConstraints getHardConstraints()
-	{
-		return context.getHardConstraints();
-	}
+//	/**
+//	 *  Gets the hard constraints.
+//	 *  @return The hard constraints.
+//	 */
+//	public RHardConstraints getHardConstraints()
+//	{
+//		return context.getHardConstraints();
+//	}
 	
 //	/**
 //	 *  Check if the value of a result is set.
@@ -858,6 +874,8 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public  void updateParametersAfterStep(MActivity activity, BpmnInterpreter instance)
 	{
+		System.out.println("after: "+activity.getId());
+		
 //		System.out.println("after: "+act);
 		if(MBpmnModel.TASK.equals(activity.getActivityType()) || activity instanceof MSubProcess)
 		{
@@ -1023,23 +1041,22 @@ public class ProcessThread	implements ITaskContext
 //		return splitinfos==null? 0: splitinfos.size();
 //	}
 	
-	/**
-	 *  Returns the current subcontext.
-	 * 
-	 *  @return The current subcontext.
-	 */
-	public ThreadContext getSubcontext()
-	{
-		return subcontext;
-	}
-	
-	/**
-	 *  Sets the subcontext.
-	 */
-	public  void setSubcontext(ThreadContext subcontext)
-	{
-		this.subcontext = subcontext;
-	}
+//	/**
+//	 *  Returns the current subcontext.
+//	 *  @return The current subcontext.
+//	 */
+//	public ThreadContext getSubcontext()
+//	{
+//		return subcontext;
+//	}
+//	
+//	/**
+//	 *  Sets the subcontext.
+//	 */
+//	public  void setSubcontext(ThreadContext subcontext)
+//	{
+//		this.subcontext = subcontext;
+//	}
 	
 	/**
 	 *  Remove a sub context but keep the corresponding thread.
@@ -1051,18 +1068,132 @@ public class ProcessThread	implements ITaskContext
 	{
 //		assert threads!=null && threads.containsKey(context.getInitiator());
 		
-		Set<ProcessThread>	subthreads	= subcontext.getThreads();
+		List<ProcessThread>	subthreads	= getSubthreads();
 		if(subthreads!=null)
 		{
 			ProcessThread[] subt = (ProcessThread[])subthreads.toArray(new ProcessThread[subthreads.size()]);
 			for(int i=0; i<subt.length; i++)
 			{
-				subcontext.removeThread(subt[i]);
+				removeThread(subt[i]);
 			}
 		}
-
-		subcontext = null;
 	}
+	
+	/**
+	 *  Remove a thread from this context.
+	 *  @param thread	The thread to be removed.
+	 */
+	public void removeThread(ProcessThread thread)
+	{
+		if(hasSubthreads())
+		{
+//			if(getSubcontext(thread)!=null)
+//				removeSubcontext(getSubcontext(thread));
+//			if(thread.hasSubthreads())
+//			
+			thread.removeSubcontext();
+			
+			// Cancel activity (e.g. timer).
+			MActivity	act	= thread.getActivity();
+			if(act!=null && thread.isWaiting())
+			{
+				thread.getInstance().getActivityHandler(act).cancel(act, thread.getInstance(), thread);
+			}
+			thread.setActivity(null);
+			
+			boolean rem = getSubthreads().remove(thread);
+//			thread.setThreadContext(null);
+			
+			if(getSubthreads().isEmpty())
+				subthreads	= null;
+		
+			if(rem)
+			{
+//				System.out.println("remove1: "+thread);
+				BpmnInterpreter in = thread.getInstance();
+				if(thread.getActivity()!=null && thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+				{	
+					in.publishEvent(in.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
+				}
+			}
+		}
+		
+//		System.out.println("remove0: "+thread);
+	}
+	
+	/**
+	 *  Add a thread to this context.
+	 *  @param thread	The thread to be added.
+	 */
+	public void	addThread(ProcessThread thread)
+	{
+//		if(threads==null)
+//			threads	= new LinkedHashMap<ProcessThread, ThreadContext>();
+//		
+//		threads.put(thread, null);
+		if(subthreads==null)
+			subthreads	= new ArrayList<ProcessThread>();
+		
+		subthreads.add(thread);
+		if(thread.getActivity()!=null && thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		{	
+			thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+		}
+//		System.out.println("add: "+thread);
+	}
+	
+	/**
+	 *  Add an external thread to this context.
+	 *  @param thread	The thread to be added.
+	 */
+	// Hack!!! Make external threads execute before others.
+	public void	addExternalThread(ProcessThread thread)
+	{
+		if(subthreads==null)
+			subthreads	= new ArrayList<ProcessThread>();
+		subthreads.add(0, thread);
+////		Map<ProcessThread, ThreadContext>	oldthreads	= threads;
+//		Set<ProcessThread> oldthreads = threads;
+////		threads	= new LinkedHashMap<ProcessThread, ThreadContext>();
+//		threads = new HashSet<ProcessThread>();
+////		threads.put(thread, null);
+//		threads.add(thread);
+//		if(oldthreads!=null)
+//		{
+//			threads.addAll(oldthreads);
+////			threads.putAll(oldthreads);
+//		}
+		
+		if(thread.getActivity()!=null && thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		{	
+			thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
+		}
+//		System.out.println("add: "+thread);
+	}
+	
+	/**
+	 *  Get all threads of the context and all subcontexts.
+	 */
+	public Set<ProcessThread> getAllThreads()
+	{
+		Set<ProcessThread> ret = new HashSet<ProcessThread>();
+		if(subthreads!=null)
+		{
+//			for(Iterator<ProcessThread> it=threads.keySet().iterator(); it.hasNext(); )
+			for(Iterator<ProcessThread> it=subthreads.iterator(); it.hasNext(); )
+			{
+				ProcessThread pc = it.next();
+				ret.add(pc);
+//				ThreadContext tc = (ThreadContext)threads.get(pc);
+				//ThreadContext tc = pc.getSubcontext();
+				if(pc.hasSubthreads())
+				{
+					ret.addAll(pc.getAllThreads());
+				}
+			}
+		}
+		return ret;
+	}	
 	
 //	public void removeSubcontext(ThreadContext context)
 //	{
@@ -1080,7 +1211,90 @@ public class ProcessThread	implements ITaskContext
 //
 //		threads.put(context.getInitiator(), null);
 //	}
+	
+	/**
+	 *  Get the parent.
+	 *  return The parent.
+	 */
+	public ProcessThread getParent()
+	{
+		return parent;
+	}
 
+	/**
+	 *  Set the parent. 
+	 *  @param parent The parent to set.
+	 */
+	public void setParent(ProcessThread parent)
+	{
+		this.parent = parent;
+	}
+	
+	/**
+	 *  Get the subthreads.
+	 */
+	public List<ProcessThread> getSubthreads()
+	{
+		return subthreads;
+	}
+	
+	/**
+	 *  Test if thread has subthreads.
+	 */
+	public boolean hasSubthreads()
+	{
+		return subthreads!=null && !subthreads.isEmpty();
+	}
+	
+	/**
+	 *  The context is finished, when there are no (more) threads to execute.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return True, when the process instance is finished with regards to the specified pool/lane. When both pool and lane are null, true is returned only when all pools/lanes are finished.
+	 */
+	public boolean	isFinished(String pool, String lane)
+	{
+		boolean	finished	= true;
+		if(subthreads!=null && !subthreads.isEmpty())
+		{
+//			for(Iterator<ProcessThread> it=threads.keySet().iterator(); finished && it.hasNext(); )
+			for(Iterator<ProcessThread> it=subthreads.iterator(); finished && it.hasNext(); )
+			{
+				finished	= !it.next().belongsTo(pool, lane);
+			}
+		}
+		return finished;
+	}
+	
+	/**
+	 *  Get an executable thread in the context or its sub contexts.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return	An executable thread (if any).
+	 */
+	public ProcessThread getExecutableThread(String pool, String lane)
+	{
+		// Iterate over all thread contexts and find executable thread
+		ProcessThread	ret	= null;
+		if(getSubthreads()!=null)
+		{
+			for(Iterator<ProcessThread> it=getSubthreads().iterator(); ret==null && it.hasNext(); )
+			{
+				ProcessThread thread = (ProcessThread)it.next();
+				
+				if(thread.getSubthreads()!=null)
+				{
+					ret	= thread.getExecutableThread(pool, lane);
+				}
+				else if(!thread.isWaiting() && thread.belongsTo(pool, lane))
+				{
+					ret	= thread;
+				}
+			}
+		}
+		return ret;
+	}
+	
 	/**
 	 *  Create a string representation of this process thread.
 	 *  @return A string representation of this process thread.
