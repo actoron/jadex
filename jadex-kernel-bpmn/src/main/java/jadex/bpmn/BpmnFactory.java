@@ -286,7 +286,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
 		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, 
-		final boolean copy, final boolean realtime, final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
+		final boolean copy, final boolean realtime, final boolean persist, final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
@@ -300,7 +300,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 					try
 					{
 						MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-						BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, realtime, resultlistener, inited);
+						BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, realtime, persist, resultlistener, inited);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
 					catch(Exception e)
@@ -316,7 +316,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 			{
 				ClassLoader cl = getClass().getClassLoader();
 				MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-				BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, realtime, resultlistener, inited);
+				BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, realtime, persist, resultlistener, inited);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}
 			catch(Exception e)

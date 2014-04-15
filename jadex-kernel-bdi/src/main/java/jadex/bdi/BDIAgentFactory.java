@@ -261,7 +261,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	 * @return An instance of a component.
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, final IModelInfo modelinfo, 
-		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime,
+		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, boolean persist,
 		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
 	{
 //		System.out.println("create: "+modelinfo.getFilename());

@@ -101,6 +101,9 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The flag if local timeouts should be realtime. */
 	protected boolean realtime;
 	
+	/** The flag if persistence is enabled. */
+	protected boolean persist;
+	
 	//-------- constructors --------
 	
 	/**
@@ -108,7 +111,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
+		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
 		this.config = config!=null? config: model.getConfigurationNames().length>0? 
@@ -118,6 +121,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.bindings = bindings;
 		this.copy = copy;
 		this.realtime = realtime;
+		this.persist	= persist;
 		this.emitlevelsub = PublishEventLevel.OFF;
 //		this.emitlevelmon = desc.getMonitoring();
 		if(factory != null)

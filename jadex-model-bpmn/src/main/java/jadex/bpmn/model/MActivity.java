@@ -573,7 +573,7 @@ public class MActivity extends MAssociationTarget
 		
 		if(clazz!=null)
 		{
-			Class<?> task = clazz.getType(cl);
+			Class<?> task = clazz.getType(cl, model.getAllImports());
 			try
 			{
 				Method m = task.getMethod("getExtraParameters", new Class[]{Map.class});

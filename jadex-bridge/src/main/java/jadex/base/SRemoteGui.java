@@ -23,7 +23,6 @@ import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
-import jadex.bridge.service.types.threadpool.IDaemonThreadPoolService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
@@ -32,7 +31,6 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -104,7 +102,7 @@ public class SRemoteGui
 								sis[i] = service.getServiceIdentifier();
 								pis[i]	= new ProvidedServiceInfo(service.getServiceIdentifier().getServiceName(), 
 	//								service.getServiceIdentifier().getServiceType(), null, null);
-									sis[i].getServiceType().getType(ia.getClassLoader()), null, null);
+									sis[i].getServiceType().getType(ia.getClassLoader(), ia.getModel().getAllImports()), null, null);
 							}
 							
 							ret.setResult(new Object[]{pis, ris, sis});

@@ -226,7 +226,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container)
 	{
-		super(null, model.getModelInfo(), config, null, parent, null, true, true, null, new Future<Void>());
+		super(null, model.getModelInfo(), config, null, parent, null, true, true, false, null, new Future<Void>());
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? new BpmnInstanceFetcher(this, fetcher) :null;
 		this.adapter = adapter;
@@ -254,10 +254,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	// Constructor for self-contained bpmn components
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, final Map<String, Object> arguments, 
 		String config, final IExternalAccess parent, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers, 
-		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
+		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, resultlistener, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, resultlistener, inited);
 		this.inited = inited;
 		this.variables	= new HashMap<String, Object>();
 		construct(model, activityhandlers, stephandlers);
@@ -1543,7 +1543,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			// Build map of potentially matching events: method name -> {list of matching signal event activities}
 			MultiCollection	events	= new MultiCollection();
 			List<MActivity>	starts	= this.bpmnmodel.getStartActivities(pool, lane);
-			for(int i=0; i<starts.size(); i++)
+			for(int i=0; starts!=null && i<starts.size(); i++)
 			{
 				MActivity	act	= (MActivity)starts.get(i);
 				if(MBpmnModel.EVENT_START_MULTIPLE.equals(act.getActivityType())
@@ -1569,7 +1569,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			// Find matching events for each method.
 			final Future<Void>	fut	= new Future<Void>();
 			ret	= fut;
-			Class<?>	type	= info.getType().getType(getClassLoader());
+			Class<?>	type	= info.getType().getType(getClassLoader(), model.getAllImports());
 			Method[]	meths	= type.getMethods();
 			Map<Method, MActivity>	methods	= new HashMap<Method, MActivity>(); // method -> event.
 			for(int i=0; !fut.isDone() && i<meths.length; i++)
@@ -1601,8 +1601,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			// Todo: interceptors
 			if(!fut.isDone())
 			{
-				addService(info.getName(), info.getType().getType(getClassLoader()), info.getImplementation().getProxytype(), null,
-					Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType().getType(getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null, componentfetcher)
+				addService(info.getName(), info.getType().getType(getClassLoader(), model.getAllImports()), info.getImplementation().getProxytype(), null,
+					Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType().getType(getClassLoader(), model.getAllImports())}, new ProcessServiceInvocationHandler(this, methods)), null, componentfetcher)
 					.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(fut)
 				{
 					public void customResultAvailable(IInternalService result)

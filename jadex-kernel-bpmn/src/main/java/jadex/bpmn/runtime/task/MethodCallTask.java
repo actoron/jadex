@@ -153,7 +153,7 @@ public class MethodCallTask implements ITask
 		{
 			public void customResultAvailable(Object result)
 			{
-				Class<?> servicetype = process.getServiceContainer().getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader());
+				Class<?> servicetype = process.getServiceContainer().getRequiredServiceInfo(fservice).getType().getType(process.getClassLoader(), process.getModel().getAllImports());
 				//Method	m	= SReflect.getMethod(result.getClass(), fmethod, (Class[])argtypes.toArray(new Class[argtypes.size()]));
 				
 				Method[] methods = servicetype.getMethods();
@@ -366,7 +366,7 @@ public class MethodCallTask implements ITask
 					RequiredServiceInfo reqser = mi.getRequiredService(reqname);
 					if(reqser!=null)
 					{
-						Class<?> type = reqser.getType().getType(cl==null? MethodCallTask.class.getClassLoader(): cl);
+						Class<?> type = reqser.getType().getType(cl==null? MethodCallTask.class.getClassLoader(): cl, mi.getAllImports());
 						
 						if(type!=null)
 						{
@@ -466,7 +466,7 @@ public class MethodCallTask implements ITask
 					if(reqname!=null && model.getRequiredService(reqname)!=null)
 					{
 						RequiredServiceInfo reqser = model.getRequiredService(reqname);
-						Class<?> type = reqser.getType().getType(cl==null? MethodCallTask.class.getClassLoader(): cl);
+						Class<?> type = reqser.getType().getType(cl==null? MethodCallTask.class.getClassLoader(): cl, model.getAllImports());
 						
 						if(type!=null)
 						{
@@ -548,7 +548,7 @@ public class MethodCallTask implements ITask
 					RequiredServiceInfo reqser = model.getRequiredService(sername);
 					if(reqser!=null)
 					{
-						Class<?> type = reqser.getType().getType(cl==null? MethodCallTask.class.getClassLoader(): cl);
+						Class<?> type = reqser.getType().getType(cl==null? MethodCallTask.class.getClassLoader(): cl, model.getAllImports());
 						
 						if(type!=null)
 						{

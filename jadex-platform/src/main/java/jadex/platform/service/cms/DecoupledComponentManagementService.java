@@ -142,6 +142,9 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	/** The default copy parameters flag for service calls. */
 	protected boolean copy;
 	
+	/** The persist flag. */
+	protected boolean persist;
+	
 	/** The realtime timeout flag. */
 	protected boolean realtime;
 	
@@ -164,22 +167,14 @@ public class DecoupledComponentManagementService implements IComponentManagement
      *  Create a new component execution service.
      *  @param exta	The service provider.
      */
-    public DecoupledComponentManagementService(IComponentAdapter root)
-	{
-    	this(root, null, true, true, false);
-    }
-    
-    /**
-     *  Create a new component execution service.
-     *  @param exta	The service provider.
-     */
     public DecoupledComponentManagementService(IComponentAdapter root, 
-    	IBootstrapFactory componentfactory, boolean copy, boolean realtime, boolean uniqueids)
+    	IBootstrapFactory componentfactory, boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
 		this.root = root;
 		this.componentfactory = componentfactory;
 		this.copy = copy;
 		this.realtime = realtime;
+		this.persist	= persist;
 		this.uniqueids = uniqueids;
 		
 		// Todo: why some collections synchronized? single thread access!?
@@ -798,7 +793,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																						
 																	factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, reslis, resfut)
+																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, persist, reslis, resfut)
 																		.addResultListener(createResultListener(new IResultListener<Tuple2<IComponentInstance, IComponentAdapter>>()
 																	{
 																		public void resultAvailable(Tuple2<IComponentInstance, IComponentAdapter> comp)
@@ -3033,6 +3028,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				
 		//		System.out.println("comp changed: "+desc+" "+listeners);
 		//		logger.info("Component changed: "+desc+" "+listeners);
+				
 				
 				for(int i=0; i<alisteners.length; i++)
 				{

@@ -586,7 +586,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
 			final IComponentAdapterFactory factory, final IModelInfo model, final String config,
 			final Map<String, Object> arguments, final IExternalAccess parent,
-			final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime,
+			final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime, final boolean persist,
 			final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret)
 	{
 //		System.out.println("createComponentInstance: "+model.getName());
@@ -594,7 +594,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
 		IComponentFactory fac = (IComponentFactory) getCacheResultForModel(model.getFilename(), factorycache);
 		if(fac != null)
-			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, resultlistener, ret);
+			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, resultlistener, ret);
 		
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
@@ -602,7 +602,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void customResultAvailable(Object result)
 			{
-				((IComponentFactory)result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, resultlistener, ret).addResultListener(new DelegationResultListener(res));
+				((IComponentFactory)result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, realtime, persist, resultlistener, ret).addResultListener(new DelegationResultListener(res));
 			}
 		}));
 		return res;
