@@ -1,9 +1,9 @@
 package jadex.micro;
 
 /**
- *  Interface for pojo mirco agent.
+ *  Interface for pojo micro agent.
  *  Allows fetching the user pojo agent object
- *  from thus mirco agent.
+ *  from the micro agent.
  */
 // Todo: implementing IMicroAgent makes no sense!
 public interface IPojoMicroAgent extends IMicroAgent
