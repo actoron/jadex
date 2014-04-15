@@ -4,6 +4,7 @@ import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.propertypanels.BasePropertyPanel;
 import jadex.bpmn.editor.gui.propertypanels.SPropertyPanelFactory;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelWriter;
+import jadex.bpmn.editor.model.visual.VElement;
 import jadex.bpmn.model.io.SBpmnModelWriter;
 import jadex.commons.SUtil;
 import jadex.commons.future.IResultListener;
@@ -60,7 +61,7 @@ public class BpmnMenuBar extends JMenuBar
 {
 	/** The editor window. */
 	protected BpmnEditorWindow editorwindow;
-	
+	protected List<VElement> copycells;
 	/**
 	 *  Creates the menu bar.
 	 *  
@@ -183,6 +184,38 @@ public class BpmnMenuBar extends JMenuBar
 		filemenu.add(createExitMenuItem());
 		add(filemenu);
 		
+		JMenu editmenu = new JMenu("Edit");
+		add(editmenu);
+		
+		JMenuItem copyitem = new JMenuItem(new AbstractAction("Copy")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ModelContainer mc = editorwindow.getSelectedModelContainer();
+				BpmnGraph graph = mc.getGraph();
+				Object[] cells = graph.getSelectionCells();
+				copycells = SHelper.copy(graph, mc.getBpmnModel(), cells);
+			}
+		});
+		editmenu.add(copyitem);
+		
+		JMenuItem pasteitem = new JMenuItem(new AbstractAction("Paste")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (copycells != null)
+				{
+					for (Object obj : copycells)
+					{
+						mxICell cell = (mxICell) obj;
+						editorwindow.getSelectedModelContainer().getGraph().addCell(cell, cell.getParent());
+//						editorwindow.getSelectedModelContainer().getGraph().addCell(cell);
+					}
+				}
+//				editorwindow.getSelectedModelContainer().getGraph().addCells(copycells);
+			}
+		});
+		editmenu.add(pasteitem);
 		
 		JMenu viewmenu = new JMenu("View");
 		add(viewmenu);

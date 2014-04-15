@@ -224,6 +224,15 @@ public class MActivity extends MAssociationTarget
 	{
 		return outseqedges;
 	}
+	
+	/**
+	 * Set the outgoing sequence edges.
+	 * @param outseqedges The outgoing sequence edges.
+	 */
+	public void setOutgoingSequenceEdges(List<MSequenceEdge> outseqedges)
+	{
+		this.outseqedges = outseqedges;
+	}
 
 	/**
 	 *  Add an outgoing edge.
@@ -256,6 +265,16 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Set the incoming edges.
+	 *  
+	 *  @param inseqedges The incoming edges.
+	 */
+	public void getIncomingSequenceEdges(List<MSequenceEdge> inseqedges)
+	{
+		this.inseqedges = inseqedges;
+	}
+	
+	/**
 	 *  Add an incoming edge.
 	 *  @param edge The edge.
 	 */
@@ -284,6 +303,15 @@ public class MActivity extends MAssociationTarget
 	{
 		return outmsgedges;
 	}
+	
+	/**
+	 *  Set the outgoing message edges.
+	 *  @param outmsgedges The outgoing message edges.
+	 */
+	public void getOutgoingMessagingEdges(List<MMessagingEdge> outmsgedges)
+	{
+		this.outmsgedges = outmsgedges;
+	}
 
 	/**
 	 *  Add an outgoing message edge.
@@ -307,12 +335,21 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
-	 *  Get the inconimg message edges.
+	 *  Get the incoming message edges.
 	 *  @return the incoming message edges.
 	 */
 	public List<MMessagingEdge> getIncomingMessagingEdges()
 	{
 		return inmsgedges;
+	}
+	
+	/**
+	 *  Set the incoming message edges.
+	 *  @param inmsgedges The incoming message edges.
+	 */
+	public void setIncomingMessagingEdges(List<MMessagingEdge> inmsgedges)
+	{
+		this.inmsgedges = inmsgedges;
 	}
 	
 	/**
@@ -388,12 +425,30 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Set the incoming data edges.
+	 *  @param indataedges The incoming data edges.
+	 */
+	public void setIncomingDataEdges(List<MDataEdge> indataedges)
+	{
+		this.indataedges = indataedges;
+	}
+	
+	/**
 	 *  Get the outgoing data edges.
 	 *  @return the outgoing data edges.
 	 */
 	public List<MDataEdge> getOutgoingDataEdges()
 	{
 		return outdataedges;
+	}
+	
+	/**
+	 *  Set the outgoing data edges.
+	 *  @param outdataedges The outgoing data edges.
+	 */
+	public void setOutgoingDataEdges(List<MDataEdge> outdataedges)
+	{
+		this.outdataedges = outdataedges;
 	}
 
 	/**
@@ -612,6 +667,16 @@ public class MActivity extends MAssociationTarget
 	}
 	
 	/**
+	 *  Sets the parameters.
+	 *  
+	 *  @param parameters The parameters.
+	 */
+	public void setParameters(IndexMap<String, MParameter> parameters)
+	{
+		this.parameters = parameters;
+	}
+	
+	/**
 	 *  Test if a prop exists.
 	 */
 	public boolean hasParameter(String name)
@@ -746,6 +811,16 @@ public class MActivity extends MAssociationTarget
 	public IndexMap<String, MProperty>	getProperties()
 	{
 		return properties;
+	}
+	
+	/**
+	 *  Set the properties.
+	 *  
+	 *  @param properties
+	 */
+	public void setProperties(IndexMap<String, MProperty> properties)
+	{
+		this.properties = properties;
 	}
 	
 	/**

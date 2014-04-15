@@ -255,7 +255,7 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			if (medge instanceof MSequenceEdge)
 			{
 				MSequenceEdge mseqedge = (MSequenceEdge) medge;
-				vedge = new VSequenceEdge(graph, VSequenceEdge.class.getSimpleName());
+				vedge = new VSequenceEdge(graph);
 				vedge.setSource(vmap.get(mseqedge.getSource().getId()));
 				vedge.setTarget(vmap.get(mseqedge.getTarget().getId()));
 			}

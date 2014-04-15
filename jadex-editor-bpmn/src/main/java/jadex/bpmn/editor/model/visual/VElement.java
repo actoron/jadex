@@ -4,6 +4,7 @@ import jadex.bpmn.model.MIdElement;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
+import com.mxgraph.model.mxICell;
 import com.mxgraph.view.mxGraph;
 
 /**
@@ -60,5 +61,13 @@ public abstract class VElement extends mxCell
 	public void setBpmnElement(MIdElement bpmnelement)
 	{
 		this.bpmnelement = bpmnelement;
+	}
+	
+	/**
+	 *  Sets the visual parent without side effects.
+	 */
+	public void setVisualParent(mxICell parent)
+	{
+		super.setParent(parent);
 	}
 }

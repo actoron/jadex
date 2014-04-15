@@ -1,20 +1,39 @@
 package jadex.bpmn.editor.gui;
 
 import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VEdge;
+import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.editor.model.visual.VSequenceEdge;
+import jadex.bpmn.editor.model.visual.VSubProcess;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MEdge;
+import jadex.bpmn.model.MIdElement;
+import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.service.annotation.ParameterInfo;
+import jadex.commons.Tuple2;
+import jadex.commons.collection.BiHashMap;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.kohsuke.asm4.ClassReader;
 import org.kohsuke.asm4.Type;
 import org.kohsuke.asm4.tree.ClassNode;
 import org.kohsuke.asm4.tree.LocalVariableNode;
 import org.kohsuke.asm4.tree.MethodNode;
+
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.util.mxRectangle;
 
 
 /**
@@ -160,6 +179,156 @@ public class SHelper
 				ret = true;
 			}
 		}
+		return ret;
+	}
+	
+	/**
+	 * FIXME: Finish!
+	 */
+	public static final List<VElement> copy(BpmnGraph graph, final MBpmnModel model, Object[] incells)
+	{
+		Map<String, MIdElement> tmpmmap = new HashMap<String, MIdElement>();
+		for (Object cell : incells)
+		{
+			if (cell instanceof VElement &&
+				!(cell instanceof VPool) &&
+				!(cell instanceof VLane))
+			{
+				VElement velem = (VElement) cell;
+				MIdElement melem = velem.getBpmnElement();
+				tmpmmap.put(melem.getId(), melem);
+			}
+		}
+		
+		Map<String, VElement> vmap = new HashMap<String, VElement>();
+		final Map<String, MIdElement> mmap = new HashMap<String, MIdElement>();
+		for (Object cell : incells)
+		{
+			if (cell instanceof VElement &&
+					!(cell instanceof VPool) &&
+					!(cell instanceof VLane))
+			{
+				VElement velem = (VElement) cell;
+				MIdElement melem = velem.getBpmnElement();
+				MIdElement parent = model.getParent(melem);
+				if (parent == null || !model.isContainedInParentSet(tmpmmap, parent))
+				{
+					mmap.put(melem.getId(), melem);
+					vmap.put(melem.getId(), velem);
+				}
+			}
+		}
+		tmpmmap = null;
+		
+		Tuple2<BiHashMap<String, String>, List<MIdElement>> cloned = model.cloneElements(mmap);
+		List<VElement> clonedvisuals = generateVisualClones(graph, cloned.getFirstEntity(), vmap, cloned.getSecondEntity(), null);
+		
+		for (VElement clonedvisual : clonedvisuals)
+		{
+			String oldid = cloned.getFirstEntity().rget(clonedvisual.getBpmnElement().getId());
+			VElement orig = vmap.get(oldid);
+			clonedvisual.setVisualParent(orig.getParent());
+		}
+		
+		return clonedvisuals;
+	}
+	
+	/**
+	 * 
+	 * @param graph
+	 * @param mclones
+	 * @param vclones
+	 * @return
+	 */
+	protected static final List<VElement> generateVisualClones(BpmnGraph graph, BiHashMap<String, String> idmap, Map<String, VElement> oldvmap, List<MIdElement> mclones, Map<String, VElement> vclones)
+	{
+		List<VElement> ret = new ArrayList<VElement>();
+		if (vclones == null)
+		{
+			vclones = new HashMap<String, VElement>();
+		}
+		
+		List<MEdge> medges = new ArrayList<MEdge>();
+		
+		for (MIdElement mclone : mclones)
+		{
+			VElement genelem = null;
+			if (mclone instanceof MSubProcess)
+			{
+				MSubProcess msp = (MSubProcess) mclone;
+				if (msp.hasProperty("file") || msp.hasProperty("filename"))
+				{
+					VExternalSubProcess vextsp = new VExternalSubProcess(graph);
+					genelem = vextsp;
+				}
+				else
+				{
+					genelem = new VSubProcess(graph);
+					vclones.put(genelem.getId(), genelem);
+					
+					List<MIdElement> subelements = new ArrayList<MIdElement>(msp.getActivities());
+					subelements.addAll(msp.getActivities());
+					subelements.addAll(msp.getEdges());
+					List<VElement> elements = generateVisualClones(graph, idmap, oldvmap, subelements, vclones);
+					for (VElement element : elements)
+					{
+						element.setVisualParent(genelem);
+					}
+				}
+			}
+			else if (mclone instanceof MActivity)
+			{
+				VActivity act = new VActivity(graph);
+				genelem = act;
+			}
+			else if (mclone instanceof MEdge)
+			{
+				medges.add((MEdge) mclone);
+			}
+			
+			if (genelem != null)
+			{
+				if (genelem instanceof VActivity)
+				{
+					String oldid = idmap.rget(mclone.getId());
+					VElement oldelem = oldvmap.get(oldid);
+					genelem.setCollapsed(oldelem.isCollapsed());
+					mxGeometry oldgeo = oldelem.getGeometry();
+					mxGeometry newgeo = new mxGeometry(oldgeo.getX(), oldgeo.getY(), oldgeo.getWidth(), oldgeo.getHeight());
+					mxRectangle ab = oldgeo.getAlternateBounds() != null? new mxRectangle(oldgeo.getAlternateBounds()) : null;
+					newgeo.setAlternateBounds(ab);
+					genelem.setGeometry(newgeo);
+					
+					List<MActivity> handlers = ((MActivity) mclone).getEventHandlers();
+					if (handlers != null)
+					{
+						for (MActivity handler : handlers)
+						{
+							VActivity hact = new VActivity(graph);
+							hact.setVisualParent(genelem);
+							hact.setBpmnElement(handler);
+						}
+					}
+				}
+				
+				ret.add(genelem);
+				vclones.put(genelem.getId(), genelem);
+				genelem.setBpmnElement(mclone);
+			}
+		}
+		
+		for (MEdge medge : medges)
+		{
+			VEdge vedge = null;
+			if (medge instanceof MSequenceEdge)
+			{
+				vedge = new VSequenceEdge(graph);
+				vedge.setSource(vclones.get(medge.getSource().getId()));
+				vedge.setTarget(vclones.get(medge.getTarget().getId()));
+				vedge.setBpmnElement(medge);
+			}
+		}
+		
 		return ret;
 	}
 }

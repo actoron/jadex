@@ -10,6 +10,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.BiHashMap;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -462,8 +463,19 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 							{
 								addAllSubActivities((MSubProcess)mact, allactivities);
 							}
-							
-							
+							else
+							{
+								List<MActivity>	handlers = mact.getEventHandlers();
+								if(handlers!=null)
+								{
+									for(int k=0; j<handlers.size(); k++)
+									{
+										MActivity mhact = (MActivity)handlers.get(k);
+										allactivities.put(mhact.getId(), mhact);
+										parents.put(mhact, mact);
+									}
+								}
+							}
 						}
 					}
 				}
@@ -1419,5 +1431,111 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 				typematchedstartevents.add(startevent);
 			}
 		}
+	}
+	
+	/**
+	 *  Clones a set of elements.
+	 *  
+	 * 	@param originals The original elements.
+	 * 	@return Mapping of original IDs to cloned IDs, cloned elements.
+	 */
+	public Tuple2<BiHashMap<String,String>, List<MIdElement>> cloneElements(final Map<String, MIdElement> originals)
+	{
+		final BiHashMap<String, String> idmap = new BiHashMap<String, String>();
+		final IdGenerator idgen = new IdGenerator();
+		Traverser trav = new Traverser()
+		{
+			public Object doTraverse(Object object, Class<?> clazz, Map<Object, Object> traversed, List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
+			{
+				Object ret = super.doTraverse(object, clazz, traversed, processors, clone, targetcl, context);
+				if (object != ret && ret instanceof MIdElement)
+				{
+					String oldid = ((MIdElement) ret).getId();
+					((MIdElement) ret).setId(idgen.generateId());
+					idmap.put(oldid, ((MIdElement) ret).getId());
+				}
+				return ret;
+			}
+		};
+		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
+		procs.add(new ITraverseProcessor()
+		{
+			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				return Traverser.IGNORE_RESULT;
+			}
+			
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				boolean ret = false;
+				if (object instanceof MEdge)
+				{
+					MEdge medge = (MEdge) object;
+					if (!isContainedInParentSet(originals, medge.getSource()) ||
+						!isContainedInParentSet(originals, medge.getTarget()))
+					{
+						ret = true;
+					}
+				}
+				return ret;
+			}
+		});
+		procs.add(new ITraverseProcessor()
+		{
+			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				return object;
+			}
+			
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				return object instanceof MPool ||
+						object instanceof MLane ||
+						(object instanceof MIdElement && !isContainedInParentSet(originals, (MIdElement) object));
+			}
+		});
+		procs.addAll(Traverser.getDefaultProcessors());
+		
+		List<MIdElement> mclone = new ArrayList<MIdElement>(originals.values());
+		mclone = (List<MIdElement>) trav.traverse(mclone, null, new IdentityHashMap<Object, Object>(), procs, true, null, null);
+		
+		return new Tuple2<BiHashMap<String,String>, List<MIdElement>>(idmap, mclone);
+	}
+	
+	/**
+	 *  Checks if an element or one of its parents is in a set.
+	 *  
+	 * 	@param mmap The set.
+	 *	@param idelem The element
+	 * 	@return True, if contained.
+	 */
+	public boolean isContainedInParentSet(Map<String, MIdElement> mmap, MIdElement idelem)
+	{
+		boolean ret = false;
+		
+		ret = mmap.containsKey(idelem.getId());
+		boolean running = true;
+		while (!ret && running)
+		{
+			MIdElement parent = null;
+			parent = this.getParent(idelem);
+			if (parent == null)
+			{
+				running = false;
+			}
+			else
+			{
+				if (mmap.containsKey(parent))
+				{
+					ret = true;
+				}
+				else
+				{
+					idelem = parent;
+				}
+			}
+		}
+		
+		return ret;
 	}
 }

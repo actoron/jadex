@@ -31,7 +31,20 @@ public class VEdge extends VElement
 	{
 		super.setSource(source);
 		setParent(getEdgeParent());
-		((BpmnGraph) graph).refreshCellView(this);
+		if (getBpmnElement() != null)
+		{
+			((BpmnGraph) graph).refreshCellView(this);
+		}
+	}
+	
+	/**
+	 *  Gets the parent.
+	 */
+	public mxICell getParent()
+	{
+		if (super.getParent() == null)
+			setParent(getEdgeParent());
+		return super.getParent();
 	}
 	
 	/**
