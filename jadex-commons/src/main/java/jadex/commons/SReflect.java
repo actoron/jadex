@@ -15,6 +15,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -428,6 +430,14 @@ public class SReflect
 			{
 				ret	= "n/a";
 			}
+		}
+		else if(t instanceof WildcardType)
+		{
+			ret	= "?";
+		}
+		else if(t instanceof TypeVariable)
+		{
+			ret	= "?";
 		}
 		else if(c!=null)
 		{
