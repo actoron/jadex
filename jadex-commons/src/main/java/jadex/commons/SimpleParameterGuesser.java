@@ -51,8 +51,8 @@ public class SimpleParameterGuesser implements IParameterGuesser
 		{
 			for(Object val: values)
 			{
-				if(val!=null && ((exact && val.getClass().equals(type))
-					|| (!exact && type.isInstance(val))))
+				if(val!=null && ((exact && val.getClass().equals(SReflect.getWrappedType(type)))
+					|| (!exact && SReflect.isSupertype(type, val.getClass()))))
 				{
 					ret = val;
 					found = true;

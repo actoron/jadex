@@ -1955,6 +1955,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			vals.add(event.getValue());
 			if(event.getValue() instanceof ChangeInfo)
 			{
+				vals.add(new ChangeInfoEntryMapper((ChangeInfo<?>)event.getValue()));
 				vals.add(((ChangeInfo<?>)event.getValue()).getValue());
 			}
 		}
@@ -2022,7 +2023,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							}
 							else if(event.getValue() instanceof ChangeInfo)
 							{
-								ChangeInfo<?> ci = (ChangeInfo<?>)event.getValue();
+								final ChangeInfo<?> ci = (ChangeInfo<?>)event.getValue();
 								if(ptypes[i].equals(ChangeInfo.class))
 								{
 									ret[i] = ci;
@@ -2031,6 +2032,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								else if(SReflect.getWrappedType(ptypes[i]).isInstance(ci.getValue()))
 								{
 									ret[i] = ci.getValue();
+									set = true;
+								}
+								else if(ptypes[i].equals(Map.Entry.class))
+								{
+									ret[i] = new ChangeInfoEntryMapper(ci);
 									set = true;
 								}
 							}
@@ -2314,6 +2320,55 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		return events;
 	}
 	
+	/**
+	 *  Map a change info as Map:Entry.
+	 */
+	public static class ChangeInfoEntryMapper implements Map.Entry
+	{
+		protected ChangeInfo<?>	ci;
+
+		public ChangeInfoEntryMapper(ChangeInfo<?> ci)
+		{
+			this.ci = ci;
+		}
+
+		public Object getKey()
+		{
+			return ci.getInfo();
+		}
+
+		public Object getValue()
+		{
+			return ci.getValue();
+		}
+
+		public Object setValue(Object value)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean equals(Object obj)
+		{
+			boolean	ret	= false;
+			
+			if(obj instanceof Map.Entry)
+			{
+				Map.Entry<?,?>	e1	= this;
+				Map.Entry<?,?>	e2	= (Map.Entry<?,?>)obj;
+				ret	= (e1.getKey()==null ? e2.getKey()==null : e1.getKey().equals(e2.getKey()))
+					&& (e1.getValue()==null ? e2.getValue()==null : e1.getValue().equals(e2.getValue()));
+			}
+			
+			return ret;
+		}
+
+		public int hashCode()
+		{
+			return (getKey()==null ? 0 : getKey().hashCode())
+				^ (getValue()==null ? 0 : getValue().hashCode());
+		}
+	}
+
 	/**
 	 *  Condition for checking the lifecycle state of a goal.
 	 */

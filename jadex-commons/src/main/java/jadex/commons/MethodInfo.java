@@ -5,7 +5,6 @@ import jadex.bridge.ClassInfo;
 import jadex.commons.transformation.annotations.Exclude;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 
@@ -51,12 +50,13 @@ public class MethodInfo
 	public MethodInfo(Method m)
 	{
 		this.name = m.getName();
+		
 		Type[] pts = m.getGenericParameterTypes();
 		Class<?>[] raw = m.getParameterTypes();
 		String[] str = new String[pts.length];
 		for(int i=0; i<pts.length; i++)
 		{
-			str[i] = getGenericClassName(pts[i], raw[i]);
+			str[i] = SReflect.getGenericClassName(pts[i], raw[i]);
 		}
 		this.parametertypes = new ClassInfo[pts.length];
 		for(int i = 0; i < parametertypes.length; ++i)
@@ -64,7 +64,7 @@ public class MethodInfo
 			this.parametertypes[i] = new ClassInfo(str[i]);
 		}
 		this.classname = m.getDeclaringClass().getName();
-		this.returntype = new ClassInfo(getGenericClassName(m.getGenericReturnType(), m.getReturnType()));
+		this.returntype = new ClassInfo(SReflect.getGenericClassName(m.getGenericReturnType(), m.getReturnType()));
 	}
 	
 	/**
@@ -354,42 +354,5 @@ public class MethodInfo
 			buf.append(")");
 		}
 		return buf.toString();
-	}
-	
-	/**
-	 *  Returns generic type name.
-	 *  
-	 *  @param t The type.
-	 *  @param c The class, optional.
-	 *  @return The name of the type.
-	 */
-	protected String getGenericClassName(Type t, Class c)
-	{
-		String ret = null;
-		if(t instanceof Class)
-		{
-			ret = SReflect.getClassName(((Class)t));
-		}
-		else if(t instanceof ParameterizedType)
-		{
-			// Bug in Android 2.2. see http://code.google.com/p/android/issues/detail?id=6636
-			if(!SReflect.isAndroid() ||  SUtil.androidUtils().getAndroidVersion() > 8)
-			{
-				ret = t.toString();
-			}
-			else
-			{
-				ret	= "n/a";
-			}
-		}
-		else if (c != null)
-		{
-			ret = SReflect.getClassName(c);
-		}
-		else
-		{
-			throw new RuntimeException("Unknown type: " + t);
-		}
-		return ret;
-	}
+	}	
 }

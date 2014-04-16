@@ -43,9 +43,9 @@ public class DynamicBeliefBDI
 	 *  Plan that reacts on belief changes of num2.
 	 */
 	@Plan(trigger=@Trigger(factchangeds="num2"))
-	protected void successPlan(ChangeEvent event)
+	protected void successPlan(int num)
 	{
-		System.out.println("plan activated: num2 changed to "+event.getValue());
+		System.out.println("plan activated: num2 changed to "+num);
 		tr.setSucceeded(true);
 		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 		agent.killAgent();
