@@ -13,6 +13,7 @@ import jadex.bdiv3.annotation.GoalMaintainCondition;
 import jadex.bdiv3.annotation.GoalTargetCondition;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Plans;
+import jadex.bdiv3.annotation.RawEvent;
 import jadex.bdiv3.annotation.Trigger;
 import jadex.bdiv3.annotation.Goal.ExcludeMode;
 import jadex.bdiv3.examples.cleanerworld.world.Chargingstation;
@@ -26,9 +27,11 @@ import jadex.bdiv3.examples.cleanerworld.world.Vision;
 import jadex.bdiv3.examples.cleanerworld.world.Waste;
 import jadex.bdiv3.examples.cleanerworld.world.Wastebin;
 import jadex.bdiv3.model.MGoal;
+import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.bdiv3.runtime.IPlan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -45,6 +48,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
 import javax.swing.SwingUtilities;
 
 @Agent
@@ -117,7 +121,8 @@ public class CleanerBDI
 	
 	/** The chargestate. */
 	@Belief
-	protected double my_chargestate = 0.21;
+//	protected double my_chargestate = 0.21;
+	protected double my_chargestate = 1.0;
 	
 	/** The carried waste (or null). */
 	@Belief
@@ -177,10 +182,16 @@ public class CleanerBDI
 		/**
 		 *  Create a new goal.
 		 */
+//		@GoalCreationCondition(beliefs="wastes")
+		// Must not create achieve goals for null wastes (e.g. when the whole set is initialized to a hashset)
+//		@GoalCreationCondition(rawevents={@RawEvent(value=ChangeEvent.FACTADDED, second="wastes")})
+//		public AchieveCleanup(Waste waste)
 		@GoalCreationCondition(beliefs="wastes")
-		public AchieveCleanup(Waste waste)
+		public AchieveCleanup(@CheckNotNull Waste waste)
 		{
-//			System.out.println("new achieve cleanup: "+waste);
+//			System.out.println("chargestate: "+my_chargestate);
+//			if(waste==null)
+//				System.out.println("new achieve cleanup: "+waste);
 			this.waste = waste;
 		}
 		
@@ -827,14 +838,14 @@ public class CleanerBDI
 		agent.dispatchTopLevelGoal(new MaintainBatteryLoaded());
 		agent.dispatchTopLevelGoal(new PerformMemorizePositions());
 		
-		agent.waitFor(100, new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				setMyChargestate(0.1);
-				return IFuture.DONE;
-			}
-		});
+//		agent.waitFor(100, new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				setMyChargestate(0.1);
+//				return IFuture.DONE;
+//			}
+//		});
 	}
 
 	/**

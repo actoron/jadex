@@ -322,8 +322,11 @@ public class APL
 				{
 					m.setAccessible(true);
 					
-					Object app = m.invoke(pojo, ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
-						.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element));
+					Object[] params = ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter())
+						.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), element.getModelElement(), null, null, element);
+					if(params==null)
+						System.out.println("Invalid parameter assignment");
+					Object app = m.invoke(pojo, params);
 					if(app instanceof Boolean)
 					{
 						if(((Boolean)app).booleanValue())
