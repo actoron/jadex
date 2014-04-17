@@ -15,6 +15,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -377,6 +379,75 @@ public class SReflect
 			classname	+= "[]";
 		}
 		return classname;
+	}
+
+	/**
+	 *  Returns generic type name.
+	 *  
+	 *  @param t The type.
+	 *  @param c The class, used when type is variable declaration.
+	 *  @return The name of the type.
+	 */
+	public static String getGenericClassName(Type t, Class<?> c)
+	{
+		String ret = null;
+		if(t instanceof Class)
+		{
+			ret = SReflect.getClassName(((Class<?>)t));
+		}
+		else if(t instanceof ParameterizedType)
+		{
+			// Bug in Android 2.2. see http://code.google.com/p/android/issues/detail?id=6636
+			if(!SReflect.isAndroid() ||  SUtil.androidUtils().getAndroidVersion() > 8)
+			{
+				// Hack!!! Bug in JDK returning the owner type twice!?
+//				ret = t.toString();
+				
+				ParameterizedType	pt	= (ParameterizedType)t;
+				Type	raw	= pt.getRawType();
+				Type[]	types	= pt.getActualTypeArguments();
+				ret	= SReflect.getClassName(((Class<?>)raw));
+				for(int i=0; i<types.length; i++)
+				{
+					if(i==0)
+					{
+						ret	+= "<";
+					}
+					
+					ret	+= SReflect.getGenericClassName(types[i], null);
+					
+					if(i==types.length-1)
+					{
+						ret	+= ">";
+					}
+					else
+					{
+						ret	+= ", ";
+					}
+				}
+			}
+			else
+			{
+				ret	= "n/a";
+			}
+		}
+		else if(t instanceof WildcardType)
+		{
+			ret	= "?";
+		}
+		else if(t instanceof TypeVariable)
+		{
+			ret	= "?";
+		}
+		else if(c!=null)
+		{
+			ret = SReflect.getClassName(c);
+		}
+		else
+		{
+			throw new RuntimeException("Unknown type: " + t);
+		}
+		return ret;
 	}
 
 	/**

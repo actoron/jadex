@@ -6,13 +6,11 @@ import jadex.bdiv3.BDIAgent;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.annotation.Trigger;
-import jadex.bdiv3.runtime.ChangeEvent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.rules.eca.ChangeInfo;
 
 /**
  *  Test beliefs with update rate.
@@ -66,15 +64,15 @@ public class UpdaterateBDI
 	 *  Plan that is triggered when fact changes.
 	 */
 	@Plan(trigger=@Trigger(factchangeds={"cntbel"}))
-	public void	beliefChanged(ChangeEvent event)
+	public void	beliefChanged(int cntevt)
 	{
-		if(cntbel==5 && ((ChangeInfo<Integer>)event.getValue()).getValue().intValue()==5)
+		if(cntbel==5 && cntevt==5)
 		{
 			tr.setSucceeded(true);
 		}
-		else if(cntbel>5 || ((ChangeInfo<Integer>)event.getValue()).getValue().intValue()>5)
+		else if(cntbel!=cntevt)
 		{
-			tr.setFailed("Inconsistent values: "+cntbel+", "+event.getValue());
+			tr.setFailed("Inconsistent values: "+cntbel+", "+cntevt);
 		}
 		
 		if(tr.isFinished())
