@@ -33,6 +33,7 @@ public interface INFMethodPropertyProvider
 	
 	/**
 	 *  Returns the names of all non-functional properties of this method.
+	 *  This includes the properties of all parent components.
 	 *  @return The names of the non-functional properties of this method.
 	 */
 	public IFuture<String[]> getMethodNFAllPropertyNames(MethodInfo method);
