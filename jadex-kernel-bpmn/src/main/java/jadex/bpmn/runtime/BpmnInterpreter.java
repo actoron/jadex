@@ -260,14 +260,12 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, inited);
 		this.inited = inited;
-//		this.variables = new HashMap<String, Object>();
 		construct(model, activityhandlers, stephandlers);
 		
 		scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//				executeInitStep2();
 				// Initialize context variables.
 				topthread.setParameterValue("$interpreter", BpmnInterpreter.this);
 				init(getModel(), getConfiguration(), arguments)

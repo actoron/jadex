@@ -179,8 +179,8 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** The context variables (name -> [class, initexpression]). */
 	protected Map<String, MContextVariable> variables;
 	
-	/** The pool/names in configurations. */
-	protected Map configpoollanes;
+	/** The configurations (config name -> start elements). */
+	protected Map<String, List<MNamedIdElement>> configurations;
 	
 	/** The keep alive flag that allows processes to stay after end event. */
 	protected boolean keepalive;
@@ -195,7 +195,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	
 	/** The model info. */
 	protected ModelInfo modelinfo;
-	
 	
 	/** The classloader. */
 	protected ClassLoader classloader;
@@ -846,25 +845,62 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		return ret;
 	}
 	
+//	/**
+//	 *  Add a pool/lane activation for a configurations.
+//	 *  @param config The configuration name.
+//	 *  @param poollane The poollane name (dot separated).
+//	 */
+//	public void addPoolLane(String config, String poollane)
+//	{
+//		if(configpoollanes==null)
+//			configpoollanes = new HashMap();
+//		configpoollanes.put(config, poollane);
+//	}
+//	
+//	/**
+//	 *  Get the pool lane.
+//	 *  @param config The configurations.
+//	 */
+//	public String getPoolLane(String config)
+//	{
+//		return configpoollanes==null? null: (String)configpoollanes.get(config);
+//	}
+//	
+//	/**
+//	 *  Removes a pool/lane activation for a configurations.
+//	 *  @param config The configuration name.
+//	 *  @return The poollane name (dot separated).
+//	 */
+//	public String removePoolLane(String config)
+//	{
+//		return configpoollanes != null? (String) configpoollanes.remove(config): null;
+//	}
+	
 	/**
-	 *  Add a pool/lane activation for a configurations.
+	 *  Add a start element for a configurations.
 	 *  @param config The configuration name.
-	 *  @param poollane The poollane name (dot separated).
+	 *  @param element The start element name.
 	 */
-	public void addPoolLane(String config, String poollane)
+	public void addStartElement(String config, MNamedIdElement element)
 	{
-		if(configpoollanes==null)
-			configpoollanes = new HashMap();
-		configpoollanes.put(config, poollane);
+		if(configurations==null)
+			configurations = new HashMap<String, List<MNamedIdElement>>();
+		List<MNamedIdElement> elems = configurations.get(config);
+		if(elems==null)
+		{
+			elems = new ArrayList<MNamedIdElement>();
+			configurations.put(config, elems);
+		}
+		elems.add(element);
 	}
 	
 	/**
 	 *  Get the pool lane.
 	 *  @param config The configurations.
 	 */
-	public String getPoolLane(String config)
+	public List<MNamedIdElement> getStartElements(String config)
 	{
-		return configpoollanes==null? null: (String)configpoollanes.get(config);
+		return configurations==null? null: (List<MNamedIdElement>)configurations.get(config);
 	}
 	
 	/**
@@ -872,9 +908,29 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  @param config The configuration name.
 	 *  @return The poollane name (dot separated).
 	 */
-	public String removePoolLane(String config)
+	public void removeStartElement(String config, MNamedIdElement element)
 	{
-		return configpoollanes != null? (String) configpoollanes.remove(config): null;
+		if(configurations!=null)
+		{
+			List<MNamedIdElement> elems = configurations.get(config);
+			if(elems!=null)
+			{
+				elems.remove(element);
+			}
+		}
+	}
+	
+	/**
+	 *  Removes a pool/lane activation for a configurations.
+	 *  @param config The configuration name.
+	 *  @return The poollane name (dot separated).
+	 */
+	public void removeConfiguration(String config)
+	{
+		if(configurations!=null)
+		{
+			configurations.remove(config);
+		}
 	}
 
 //	/**
