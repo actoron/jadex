@@ -36,6 +36,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
@@ -1675,9 +1676,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 *  Get the state of the interpreter.
 	 *  @return The state of the interpreter.
 	 */
-	public IFuture<Object> getPersistableState()
+	public IFuture<IPersistInfo> getPersistableState()
 	{
-		final Future<Object> ret = new Future<Object>();
+		final Future<IPersistInfo> ret = new Future<IPersistInfo>();
 		
 		new BpmnPersistInfo(this);
 		

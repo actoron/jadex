@@ -1,24 +1,23 @@
 package jadex.bpmn.runtime.persist;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.kernelbase.AbstractPersistInfo;
 
 /**
  *  Class containing persistence information about
- *  a BPMN process instance.
+ *  a Bpmn process instance.
  */
-public class BpmnPersistInfo
+public class BpmnPersistInfo extends AbstractPersistInfo
 {
 	/** The context variables. */
 	protected ThreadInfo topthread;
-	
-//	/** The thread id counter. */
-//	protected int idcnt;
 	
 	/**
 	 *  Create a new BpmnPersistInfo.
 	 */
 	public BpmnPersistInfo(BpmnInterpreter interpreter)
 	{
+		super(interpreter);
 		topthread = new ThreadInfo(interpreter.getTopLevelThread());
 	}
 }

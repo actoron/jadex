@@ -18,7 +18,7 @@ public abstract class AbstractPersistInfo implements IPersistInfo
 	protected String config;
 	
 	/** The arguments. */
-	private Map<String, Object> arguments;
+	protected Map<String, Object> arguments;
 	
 	/** The results. */
 	protected Map<String, Object> results;
