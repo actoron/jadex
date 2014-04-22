@@ -3,7 +3,6 @@ package jadex.bdiv3.examples.shop;
 import jadex.bdiv3.examples.shop.CustomerCapability.BuyItem;
 import jadex.bdiv3.runtime.ICapability;
 import jadex.bdiv3.runtime.impl.BeliefAdapter;
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
@@ -15,6 +14,7 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.rules.eca.ChangeInfo;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

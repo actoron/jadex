@@ -1,7 +1,6 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IElement;
@@ -40,6 +39,7 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -55,7 +55,6 @@ import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -72,7 +71,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	
 	/** The external access. */
 	// cached because requested from external thread
-	protected IBDIExternalAccess access;
+	protected IExternalAccess access;
 	
 	/** The runtime plan element. */
 	private Object rplan;
@@ -670,7 +669,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IBDIExternalAccess getExternalAccess()
+	public IExternalAccess getExternalAccess()
 	{
 		return access;
 	}

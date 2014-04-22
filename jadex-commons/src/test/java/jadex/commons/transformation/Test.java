@@ -1,5 +1,6 @@
 package jadex.commons.transformation;
 
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
@@ -87,71 +88,72 @@ public abstract class Test extends TestCase
 			{
 				testException();
 
-//				testCertificate(); 
-//
-//				testTimestamp();
-//
-//				testEnum();
-//
-//				testByte();
-//				testDouble();
-////				testBigData();
-//				testSpecialCharacter();
-//					
-//				testByteArray();
-//				testBByteArray();
-//				testIntArray();
-//				testIntegerArray();
-//				testDoubleArray();
-//				testBDoubleArray();
-//				testFloatArray();
-//				testBFloatArray();
-//				testLongArray();
-//				testBLongArray();
-//				testCharArray();
-//				testCharacterArray();
-//				testShortArray();
-//				testBShortArray();
-//				testBooleanArray();
-//				testBBooleanArray();
-//				testVectorModel();
-//				testMultiCollection();
-//				testEmptySet();
-//				testEmptyList();
-//				testEmptyMap();
-//				testArray();
-//				testList();
-//				testSet();
-//				testMap();
-//				testEmptyArray();
-//				testArrayOrder();
-//				testMultiArray();
-//				testMultiArray2();
-//				testMultiArrayAttribute();
-//				testByteArrayAttribute();
-//				
-//				testClass();
-//				testDate();
-//				testUUID();
-//				testInnerClass();
-//				testURL();
-//				testLoggingLevel();
-//				testLogRecord();
-//				testInetAddress();
-//				testTuple();
-//				testTuple2();
-//				testTimestamp();
-//			
-//				testBean();
-//				testBeanWithPublicFields();
-//				testBeanWithIncludedFields();
-//				testAnonymousInnerClass();
-//				testAnonymousInnerClassWithSimpleTypes();
-//				testSelfReferenceBean();
-//			
-//				testColor();
-//				testImage();
-//				testRectangle();
+				testCertificate(); 
+
+				testTimestamp();
+
+				testEnum();
+
+				testByte();
+				testDouble();
+//				testBigData();
+				testSpecialCharacter();
+					
+				testByteArray();
+				testBByteArray();
+				testIntArray();
+				testIntegerArray();
+				testDoubleArray();
+				testBDoubleArray();
+				testFloatArray();
+				testBFloatArray();
+				testLongArray();
+				testBLongArray();
+				testCharArray();
+				testCharacterArray();
+				testShortArray();
+				testBShortArray();
+				testBooleanArray();
+				testBBooleanArray();
+				testVectorModel();
+				testMultiCollection();
+				testEmptySet();
+				testEmptyList();
+				testEmptyMap();
+				testArray();
+				testList();
+				testSet();
+				testMap();
+				testEmptyArray();
+				testArrayOrder();
+				testMultiArray();
+				testMultiArray2();
+				testMultiArrayAttribute();
+				testByteArrayAttribute();
+				
+				testClass();
+				testDate();
+				testUUID();
+				testInnerClass();
+				testURL();
+				testLoggingLevel();
+				testLogRecord();
+				testInetAddress();
+				testTuple();
+				testTuple2();
+				testTimestamp();
+			
+				testBean();
+				testExcluded();
+				testBeanWithPublicFields();
+				testBeanWithIncludedFields();
+				testAnonymousInnerClass();
+				testAnonymousInnerClassWithSimpleTypes();
+				testSelfReferenceBean();
+			
+				testColor();
+				testImage();
+				testRectangle();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -168,15 +170,15 @@ public abstract class Test extends TestCase
 	/**
 	 *  Method for writing and reading an object.
 	 */
-	protected void doWriteAndRead(Object wo) throws Exception
+	protected Object	doWriteAndRead(Object wo) throws Exception
 	{
-		doWriteAndRead(wo, null);
+		return doWriteAndRead(wo, null);
 	}
 	
 	/**
 	 *  Method for writing and reading an object.
 	 */
-	protected void doWriteAndRead(Object wo, Comparator comp) throws Exception
+	protected Object	doWriteAndRead(Object wo, Comparator comp) throws Exception
 	{
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
@@ -205,6 +207,8 @@ public abstract class Test extends TestCase
 		compare(wo, ro, written, comp);
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+		
+		return ro;
 	}
 	
 	/**
@@ -760,6 +764,21 @@ public abstract class Test extends TestCase
 	}
 	
 	/**
+	 * Test if excluded properties work.
+	 */
+	public void testExcluded() throws Exception
+	{
+		A	a	= getABean();
+		a.setExcluded("dummy");
+		a.setReadExcluded("dummy");
+		a.setWriteExcluded("dummy");
+		A	a2	= (A)doWriteAndRead(a);
+		assertNull("Excluded property not null: "+a2.getExcluded(), a2.getExcluded());
+		assertNull(a2.getReadExcluded());
+		assertNull(a2.getWriteExcluded());
+	}
+
+	/**
 	 *  Test if references work.
 	 */
 	public void testSelfReferenceBean() throws Exception
@@ -817,6 +836,15 @@ public abstract class Test extends TestCase
 //		}
 		
 		doWriteAndRead(map);
+	}
+	
+	/**
+	 *  Test if method info transfer works.
+	 */
+	public void testMethodInfo() throws Exception
+	{
+		MethodInfo	mi	= new MethodInfo(Object.class.getMethod("hashCode"));		
+		doWriteAndRead(mi);
 	}
 	
 	/**
@@ -1073,7 +1101,7 @@ public abstract class Test extends TestCase
 	/**
 	 *  Get some bean.
 	 */
-	protected Object getABean()
+	protected A	getABean()
 	{
 		B b1 = new B("test b1");
 		B b2 = new B("test b2");

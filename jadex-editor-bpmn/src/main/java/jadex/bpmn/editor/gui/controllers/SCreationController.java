@@ -405,7 +405,7 @@ public class SCreationController
 //				msrc.getPool().addSequenceEdge(medge);
 //			}
 			
-			VSequenceEdge vedge = new VSequenceEdge(modelcontainer.getGraph(), VSequenceEdge.class.getSimpleName());
+			VSequenceEdge vedge = new VSequenceEdge(modelcontainer.getGraph());
 			vedge.setBpmnElement(medge);
 			vedge.setSource(source);
 			vedge.setTarget(target);
@@ -667,7 +667,7 @@ public class SCreationController
 			{
 				MSequenceEdge medge = new MSequenceEdge();
 				medge.setId(idgenerator.generateId());
-				VSequenceEdge seqedge = new VSequenceEdge(graph, VSequenceEdge.class.getSimpleName());
+				VSequenceEdge seqedge = new VSequenceEdge(graph);
 				seqedge.setBpmnElement(medge);
 				seqedge.setSource(vsactivity);
 				seqedge.setTarget(vtactivity);

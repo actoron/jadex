@@ -1,6 +1,5 @@
 package jadex.bdi.testcases.service;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -18,7 +17,7 @@ public class BeliefGetter extends BasicService implements IBeliefGetter
 	//-------- attributes --------
 	
 	/** The agent's external access. */
-	protected IBDIExternalAccess agent;
+	protected IExternalAccess agent;
 	
 	//-------- constructors --------
 	
@@ -28,7 +27,7 @@ public class BeliefGetter extends BasicService implements IBeliefGetter
 	public BeliefGetter(IExternalAccess agent)
 	{
 		super(agent.getServiceProvider().getId(), IBeliefGetter.class, null);
-		this.agent = (IBDIExternalAccess)agent;
+		this.agent = agent;
 	}
 	
 	//-------- methods --------

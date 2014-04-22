@@ -237,4 +237,55 @@ public class Cause
 			+ ", targetid=" + targetid + ")";//, sourcename=" + sourcename
 			//+ ", targetname=" + targetname + ")";
 	}
+
+	/**
+	 *  Get the hash code.
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((origin == null) ? 0 : origin.hashCode());
+		result = prime * result + ((sourceid == null) ? 0 : sourceid.hashCode());
+		result = prime * result	+ ((targetid == null) ? 0 : targetid.hashCode());
+		return result;
+	}
+
+	/**
+	 *  Test for equality.
+	 */
+	public boolean equals(Object obj)
+	{
+		if(this == obj)
+			return true;
+		if(obj == null)
+			return false;
+		if(getClass() != obj.getClass())
+			return false;
+		Cause other = (Cause)obj;
+		if(origin == null)
+		{
+			if(other.origin != null)
+				return false;
+		}
+		else if(!origin.equals(other.origin))
+			return false;
+		if(sourceid == null)
+		{
+			if(other.sourceid != null)
+				return false;
+		}
+		else if(!sourceid.equals(other.sourceid))
+			return false;
+		if(targetid == null)
+		{
+			if(other.targetid != null)
+				return false;
+		}
+		else if(!targetid.equals(other.targetid))
+			return false;
+		return true;
+	}
+	
+	
 }

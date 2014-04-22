@@ -54,8 +54,9 @@ public class CollectionProcessor implements ITraverseProcessor
 		{
 			Object val = it.next();
 			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone, targetcl, context);
-			ret.add(newval);
+			Object newval = traverser.doTraverse(val, valclazz, traversed, processors, clone, targetcl, context);
+			if (newval != Traverser.IGNORE_RESULT)
+				ret.add(newval);
 		}
 		}
 		catch(Exception e)
@@ -110,7 +111,7 @@ public class CollectionProcessor implements ITraverseProcessor
 //		{
 //			Object val = it.next();
 //			Class valclazz = val!=null? val.getClass(): null;
-//			Object newval = traverser.traverse(val, valclazz, traversed, processors);
+//			Object newval = traverser.doTraverse(val, valclazz, traversed, processors);
 //			copy.add(newval);
 //			
 //			if(val!=newval)

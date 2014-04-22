@@ -137,10 +137,10 @@ public class ThrowableCodec extends AbstractCodec
 	{
 		Throwable t = (Throwable)object;
 		
-		traverser.traverse(t.getMessage(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
+		traverser.doTraverse(t.getMessage(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
 	
 		Object val = t.getCause();
-		traverser.traverse(val, val!=null? val.getClass(): Throwable.class, 
+		traverser.doTraverse(val, val!=null? val.getClass(): Throwable.class, 
 			traversed, processors, clone, null, ec);
 
 		BeanCodec.writeBeanProperties(object, clazz, processors, traverser, traversed, clone, ec, intro);

@@ -1,8 +1,8 @@
 package jadex.bdibpmn.examples.marsworld;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
@@ -51,7 +51,7 @@ public class MoveTask extends AbstractTask
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
-		final IBDIExternalAccess scope = (IBDIExternalAccess)getProperty(PROPERTY_SCOPE);
+		final IExternalAccess scope = (IExternalAccess)getProperty(PROPERTY_SCOPE);
 
 		double	speed	= ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
 		double	maxdist	= progress*speed*0.001;

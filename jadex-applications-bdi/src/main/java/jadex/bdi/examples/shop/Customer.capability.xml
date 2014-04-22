@@ -18,10 +18,10 @@
 		
 		<belief name="gui" class="jadex.commons.gui.GuiCreator">
 			<fact>new jadex.commons.gui.GuiCreator(CustomerFrame.class, 
-				new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+				new Class[]{jadex.bridge.IExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
 			<!-- <fact>new jadex.commons.gui.GuiCreator(CustomerPanel.class.getMethod("createCustomerGui", 
-				new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}), new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+				new Class[]{jadex.bridge.IExternalAccess.class}), new Class[]{jadex.bridge.IExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact> -->
 		</belief>
 	</beliefs>

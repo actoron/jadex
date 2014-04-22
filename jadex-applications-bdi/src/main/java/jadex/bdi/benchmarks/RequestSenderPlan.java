@@ -1,11 +1,11 @@
 package jadex.bdi.benchmarks;
 
-import java.util.Random;
-
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+
+import java.util.Random;
 
 /**
  *	Handle requests and generate reply value.

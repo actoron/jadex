@@ -269,6 +269,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 															
 															protected void proceed(final Exception ex)
 															{
+																invalidateAccess(true);
+																
 																if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.COARSE))
 																{
 																	MonitoringEvent event = new MonitoringEvent(getComponentDescription().getName(), getComponentDescription().getCreationTime(),
@@ -295,9 +297,12 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 																}
 															}
 														};
+														
 														// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
 														if(getComponentIdentifier().getParent()!=null)
+														{
 															reslis	= createResultListener(reslis);
+														}
 														
 														terminateResultSubscribers();
 														
@@ -909,8 +914,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 		Map<String, RequiredServiceInfo>	sermap = new LinkedHashMap<String, RequiredServiceInfo>();
 		for(int i=0; i<ms.length; i++)
 		{
-			ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType().getType(getClassLoader()), ms[i].isMultiple(), 
-				ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), ms[i].getDefaultBinding(), ms[i].getNFRProperties());
+			ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType().getType(getClassLoader(), getModel().getAllImports()), ms[i].isMultiple(), 
+				ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader(), getModel().getAllImports()), ms[i].getDefaultBinding(), ms[i].getNFRProperties());
 			sermap.put(ms[i].getName(), ms[i]);
 		}
 
@@ -921,8 +926,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			for(int i=0; i<cs.length; i++)
 			{
 				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getServicePrefix()+cs[i].getName());
-				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-					ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(cs[i].getDefaultBinding()), ms[i].getNFRProperties());
+				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader(), getModel().getAllImports()), rsi.isMultiple(), 
+					ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader(), getModel().getAllImports()), new RequiredServiceBinding(cs[i].getDefaultBinding()), ms[i].getNFRProperties());
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
@@ -933,8 +938,8 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			for(int i=0; i<bindings.length; i++)
 			{
 				RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(bindings[i].getName());
-				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties());
+				RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader(), getModel().getAllImports()), rsi.isMultiple(), 
+					rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(getClassLoader(), getModel().getAllImports()), new RequiredServiceBinding(bindings[i]), ms[i].getNFRProperties());
 				sermap.put(rsi.getName(), newrsi);
 			}
 		}
@@ -952,7 +957,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 				for(NFRPropertyInfo nfprop: nfprops)
 				{
 					MethodInfo mi = nfprop.getMethodInfo();
-					Class<?> clazz = nfprop.getClazz().getType(getClassLoader());
+					Class<?> clazz = nfprop.getClazz().getType(getClassLoader(), getModel().getAllImports());
 					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), null, nfprop.getMethodInfo());
 					if(mi==null)
 					{
@@ -987,7 +992,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			Map<Object, ProvidedServiceInfo> sermap = new LinkedHashMap<Object, ProvidedServiceInfo>();
 			for(int i=0; i<ps.length; i++)
 			{
-				Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType().getType(getClassLoader());
+				Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType().getType(getClassLoader(), getModel().getAllImports());
 				if(sermap.put(key, ps[i])!=null)
 					throw new RuntimeException("Services with same type must have different name.");  // Is catched and set to ret below
 			}
@@ -997,9 +1002,9 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 				ProvidedServiceInfo[] cs = cinfo.getProvidedServices();
 				for(int i=0; i<cs.length; i++)
 				{
-					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType().getType(getClassLoader());
+					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType().getType(getClassLoader(), getModel().getAllImports());
 					ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
-					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(getClassLoader()), 
+					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(getClassLoader(), getModel().getAllImports()), 
 						new ProvidedServiceImplementation(cs[i].getImplementation()), psi.getPublish());
 					sermap.put(key, newpsi);
 				}
@@ -1117,7 +1122,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			{
 				try
 				{
-					Class<?> clazz = nfprop.getClazz().getType(getClassLoader());
+					Class<?> clazz = nfprop.getClazz().getType(getClassLoader(), getModel().getAllImports());
 					INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, getInternalAccess(), null, null);
 					addNFProperty(nfp);
 				}
@@ -1441,9 +1446,9 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			if(impl!=null && impl.getBinding()!=null)
 			{
 				RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType().getType( 
-					getClassLoader()))+":virtual", info.getType().getType(getClassLoader()));
+					getClassLoader(), getModel().getAllImports()))+":virtual", info.getType().getType(getClassLoader(), getModel().getAllImports()));
 				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
-					rsi.getName(), rsi.getType().getType(getClassLoader()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier());
+					rsi.getName(), rsi.getType().getType(getClassLoader(), getModel().getAllImports()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier());
 				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 					getInternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), getClassLoader(), isRealtime());
 				getServiceContainer().addService(service, info).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
@@ -1493,7 +1498,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 						}
 					}
 					
-					final Class<?> type = info.getType().getType(getClassLoader());
+					final Class<?> type = info.getType().getType(getClassLoader(), getModel().getAllImports());
 					addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser, info, componentfetcher)
 						.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
 					{
@@ -1532,7 +1537,7 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 			{
 				SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
 				fetcher.setValue("$servicename", info.getName());
-				fetcher.setValue("$servicetype", info.getType().getType(getClassLoader()));
+				fetcher.setValue("$servicetype", info.getType().getType(getClassLoader(), getModel().getAllImports()));
 //				System.out.println("sertype: "+fetcher.fetchValue("$servicetype")+" "+info.getName());
 				ser = SJavaParser.getParsedValue(impl, model.getAllImports(), fetcher, getClassLoader());
 //				System.out.println("added: "+ser+" "+model.getName());
@@ -1543,11 +1548,11 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 				throw new RuntimeException("Service creation error: "+info, e);
 			}
 		}
-		else if(impl!=null && impl.getClazz().getType(getClassLoader())!=null)
+		else if(impl!=null && impl.getClazz().getType(getClassLoader(), getModel().getAllImports())!=null)
 		{
 			try
 			{
-				ser = impl.getClazz().getType(getClassLoader()).newInstance();
+				ser = impl.getClazz().getType(getClassLoader(), getModel().getAllImports()).newInstance();
 			}
 			catch(Exception e)
 			{
@@ -2301,6 +2306,11 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 */
 	public abstract void terminateResultSubscribers();
 	
+	/**
+	 *  Invalidate the external access.
+	 */
+	public abstract void invalidateAccess(boolean terminate);
+
 	/**
 	 *  Get the current state as events.
 	 */

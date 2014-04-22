@@ -20,6 +20,7 @@ public class MicroTest	extends ComponentTestSuite
 	public MicroTest() 	throws Exception
 	{
 		this("../jadex-applications-micro/target/classes/", "../jadex-applications-micro/target/classes");
+//		this("../jadex-applications-micro/target/classes/jadex/micro/testcases/recfutures", "../jadex-applications-micro/target/classes");
 	}
 	
 	/**

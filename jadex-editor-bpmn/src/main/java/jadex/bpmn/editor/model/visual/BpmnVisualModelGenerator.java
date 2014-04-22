@@ -102,7 +102,7 @@ public class BpmnVisualModelGenerator
 		{
 			for(MSequenceEdge medge : seqedges)
 			{
-				VSequenceEdge vedge = new VSequenceEdge(graph, VSequenceEdge.class.getSimpleName());
+				VSequenceEdge vedge = new VSequenceEdge(graph);
 				vedge.setSource(elements.get(medge.getSource().getId()).getSecondEntity());
 				vedge.setTarget(elements.get(medge.getTarget().getId()).getSecondEntity());
 				vedge.setBpmnElement(medge);

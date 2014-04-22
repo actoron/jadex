@@ -10,78 +10,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 						http://jadex.sourceforge.net/jadex-component-2.5.xsd"
 	name="Platform" package="jadex.platform">
-	
-	<!--
-	<imports> 
-		<import>jadex.commons.*</import>
-		<import>jadex.commons.future.*</import>
-		<import>jadex.bridge.*</import>
-		<import>jadex.bridge.service.*</import>
-		<import>jadex.commons.concurrent.*</import>
-		<import>jadex.bridge.fipa.*</import>
-		<import>jadex.base.*</import>
-		<import>jadex.platform.service.simulation.*</import>
-		<import>jadex.platform.service.remote.*</import>
-		<import>jadex.standalone.service.*</import>
-		<import>jadex.component.*</import>
-		<import>jadex.application.*</import>
-		<import>java.util.*</import>
-		<!- - <import>java.util.logging.Level</import> - ->
-		<import>java.lang.reflect.*</import>
-		<import>java.net.*</import>
-		<import>jadex.benchmarking.services.*</import>
 		
-		<import>jadex.bridge.service.types.clock.*</import>
-	<!- - 
-		<import>jadex.bridge.service.types.awareness.*</import>
-		<import>jadex.bridge.service.types.cms.*</import>
-		<import>jadex.bridge.service.types.deployment.*</import>
-		<import>jadex.bridge.service.types.df.*</import>
-		<import>jadex.bridge.service.types.execution.*</import>
-		<import>jadex.bridge.service.types.factory.*</import>
-		<import>jadex.bridge.service.types.library.*</import>
-		<import>jadex.bridge.service.types.marshal.*</import>
-		<import>jadex.bridge.service.types.message.*</import>
-		<import>jadex.bridge.service.types.remote.*</import>
-		<import>jadex.bridge.service.types.settings.*</import>
-		<import>jadex.bridge.service.types.simulation.*</import>
-		<import>jadex.bridge.service.types.threadpool.*</import>
-		<import>jadex.bridge.service.types.publish.*</import>
-		<import>jadex.bridge.service.types.security.*</import>
-		<import>jadex.bridge.service.*</import>
-	 - ->
-		
-		<import>jadex.platform.service.android.*</import>
-		<import>jadex.platform.service.awareness.*</import>
-		<import>jadex.platform.service.clock.*</import>
-		<import>jadex.platform.service.cms.*</import>
-		<import>jadex.platform.service.deployment.*</import>
-		<import>jadex.platform.service.df.*</import>
-		<import>jadex.platform.service.execution.*</import>
-		<import>jadex.platform.service.factory.*</import>
-		<import>jadex.platform.service.library.*</import>
-		<import>jadex.platform.service.marshal.*</import>
-		<import>jadex.platform.service.message.*</import>
-		<import>jadex.platform.service.remote.*</import>
-		<import>jadex.platform.service.settings.*</import>
-		<import>jadex.platform.service.simulation.*</import>
-		<import>jadex.platform.service.threadpool.*</import>
-		<import>jadex.platform.service.dependency.maven.*</import>
-		<import>jadex.platform.service.security.*</import>
-
-		<import>jadex.extension.ws.publish.*</import>
-		<import>jadex.extension.rs.publish.*</import>
-		
-		<import>jadex.platform.service.message.transport.*</import>
-		<import>jadex.platform.service.message.transport.localmtp.*</import>
-		<import>jadex.platform.service.message.transport.tcpmtp.*</import>
-		<import>jadex.platform.service.message.transport.niotcpmtp.*</import>
-		<!- - <import>jadex.platform.service.message.transport.httprelaymtp.*</import> - ->
-		<import>jadex.platform.service.message.transport.httprelaymtp.nio.*</import>
-		<import>jadex.platform.service.message.transport.codecs.*</import>
-	</imports>
-	-->
-	
 	<arguments>
 	
 		<!-- ======== Arguments used by starter unless supplied from command line. ======== -->
@@ -124,6 +53,8 @@
 		<argument name="parametercopy" class="boolean">true</argument>
 		<!-- Flag if local timeouts should be realtime (instead of clock dependent) . -->
 		<argument name="realtimetimeout" class="boolean">true</argument>
+		<!-- Flag to enable component persistence. -->
+		<argument name="persist" class="boolean">false</argument>
 		<!-- Flag if CIDs may be reused (true for not). -->
 		<argument name="uniqueids" class="boolean">true</argument>
 		<!-- Flag for deferring thread creation/deletion in thread pool -->
@@ -336,8 +267,12 @@
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService">
 			<implementation>
-				new jadex.platform.service.cms.DecoupledComponentManagementService($component.getComponentAdapter(), 
-					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.uniqueids)
+				jadex.commons.SReflect.classForName0("jadex.platform.service.persistence.PersistenceComponentManagementService",
+					jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
+				? jadex.platform.service.persistence.PersistenceComponentManagementService.create($component.getComponentAdapter(), 
+					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
+			    : new jadex.platform.service.cms.DecoupledComponentManagementService($component.getComponentAdapter(), 
+					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.df.IDF">

@@ -7,7 +7,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.IMicroExternalAccess;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -37,7 +36,7 @@ public class HelplineViewerPanel extends AbstractComponentViewerPanel
 		{
 			public void resultAvailable(Void result)
 			{
-				panel = new HelplinePanel((IMicroExternalAccess)component);
+				panel = new HelplinePanel(component);
 				ret.setResult(result);
 			}
 			

@@ -4,7 +4,6 @@ import jadex.base.Starter;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.OAVCapabilityModel;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
@@ -220,7 +219,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		stacacheelems.add(IExpressionbase.class);
 		stacacheelems.add(IPropertybase.class);
 		stacacheelems.add(ICapability.class);
-		stacacheelems.add(IBDIExternalAccess.class);
+		stacacheelems.add(IExternalAccess.class);
 		stacacheelems.add(IBelief.class);
 		stacacheelems.add(IBeliefSet.class);
 	}
@@ -2555,5 +2554,13 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				sub.setFinishedIfUndone();
 			}
 		}
+	}
+
+	/**
+	 *  Invalidate the external access.
+	 */
+	public void invalidateAccess(boolean terminate)
+	{
+		// Todo...
 	}
 }

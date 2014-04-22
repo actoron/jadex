@@ -55,6 +55,31 @@ public class MSubProcess extends MActivity
 	}
 	
 	/**
+	 *  Get the edges.
+	 *  @return The edges.
+	 */
+	public List<MEdge> getEdges()
+	{
+		List<MEdge> ret = new ArrayList<MEdge>();
+		for (MActivity act : activities)
+		{
+			if (act.getOutgoingDataEdges() != null)
+			{
+				ret.addAll(act.getOutgoingDataEdges());
+			}
+			if (act.getOutgoingSequenceEdges() != null)
+			{
+				ret.addAll(act.getOutgoingSequenceEdges());
+			}
+			if (act.getOutgoingMessagingEdges() != null)
+			{
+				ret.addAll(act.getOutgoingMessagingEdges());
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Add an activity.
 	 *  @param activity The activity.
 	 */ 

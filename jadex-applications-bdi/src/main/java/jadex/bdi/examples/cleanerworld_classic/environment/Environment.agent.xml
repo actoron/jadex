@@ -38,7 +38,7 @@
 		</beliefref>
 		
 		<belief name="gui" class="jadex.commons.gui.GuiCreator">
-			<fact>new jadex.commons.gui.GuiCreator(EnvironmentGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+			<fact>new jadex.commons.gui.GuiCreator(EnvironmentGui.class, new Class[]{jadex.bridge.IExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 	</beliefs>

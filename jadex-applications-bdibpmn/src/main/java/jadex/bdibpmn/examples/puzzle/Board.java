@@ -1,8 +1,8 @@
 package jadex.bdibpmn.examples.puzzle;
 
 import jadex.commons.SimplePropertyChangeSupport;
-
 import jadex.commons.beans.PropertyChangeListener;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;

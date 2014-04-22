@@ -1,15 +1,17 @@
 package jadex.bdi.examples.booktrading.common;
 
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.commons.SimplePropertyChangeSupport;
-
 import jadex.commons.beans.PropertyChangeListener;
+
 import java.util.Date;
 
 /**
  * The order for purchasing or selling books.
  */
+@Reference(local=true)
 public class Order
 {
 	//-------- constants --------

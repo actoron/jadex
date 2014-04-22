@@ -3,7 +3,6 @@ package jadex.platform.service.remote.commands;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.IResultSelector;
@@ -12,18 +11,14 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.TypeResultSelector;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminationCommand;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.TerminationCommand;
 import jadex.commons.transformation.annotations.Alias;
-import jadex.micro.IMicroExternalAccess;
 import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteReferenceModule;
 import jadex.platform.service.remote.RemoteServiceManagementService;
@@ -33,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  Command for performing a remote service search.
@@ -140,7 +134,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IIntermediateFuture<IRemoteCommand> execute(final IMicroExternalAccess component, final RemoteServiceManagementService rsms)
+	public IIntermediateFuture<IRemoteCommand> execute(final IExternalAccess component, final RemoteServiceManagementService rsms)
 	{
 		final TerminableIntermediateFuture<IRemoteCommand> ret = new TerminableIntermediateFuture<IRemoteCommand>(new TerminationCommand()
 		{

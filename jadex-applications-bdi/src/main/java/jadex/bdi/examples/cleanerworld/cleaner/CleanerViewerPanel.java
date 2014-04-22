@@ -1,13 +1,13 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;

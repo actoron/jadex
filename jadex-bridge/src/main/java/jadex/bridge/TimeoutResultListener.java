@@ -170,7 +170,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>, IFutureComm
 		{
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IClockService.class)
+				SServiceProvider.getServiceUpwards(ia.getServiceContainer(), IClockService.class)
 					.addResultListener(ia.createResultListener(new DefaultResultListener<IClockService>()
 				{
 					public void resultAvailable(final IClockService clock)

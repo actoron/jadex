@@ -4,10 +4,10 @@ import jadex.bdi.examples.blackjack.Dealer;
 import jadex.bdi.examples.blackjack.GameState;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.GameStateFrame;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -42,7 +42,7 @@ public class DealerFrame extends GameStateFrame
 	//-------- attributes --------
 
 	/** The agent access object. */
-	protected IBDIExternalAccess	agent;
+	protected IExternalAccess	agent;
 	
 	/** child windows (e.g. statistics). */
 	protected Set	children;
@@ -54,7 +54,7 @@ public class DealerFrame extends GameStateFrame
 	 * Here, the GUI is build up for the first time, all
 	 * panels are instantiated and shown on the screen.
 	 */
-	public DealerFrame(final Dealer me, final IBDIExternalAccess agent)
+	public DealerFrame(final Dealer me, final IExternalAccess agent)
 	{
 		super(null, null);
 		

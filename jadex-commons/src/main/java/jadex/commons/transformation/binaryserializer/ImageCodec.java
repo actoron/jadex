@@ -64,7 +64,7 @@ public class ImageCodec extends AbstractCodec
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
 		byte[] encimg = SGUI.imageToStandardBytes((Image) object, "image/png");
-		traverser.traverse(encimg, encimg.getClass(), traversed, processors, clone, null, ec);
+		traverser.doTraverse(encimg, encimg.getClass(), traversed, processors, clone, null, ec);
 		
 		return object;
 	}

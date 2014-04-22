@@ -17,7 +17,6 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.io.IOException;

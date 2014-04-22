@@ -3,10 +3,10 @@ package jadex.bdi.examples.blackjack.dealer;
 import jadex.bdi.examples.blackjack.GameStatistics;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.StatisticGraph;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -51,7 +51,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 	//-------- attributes --------
 
 	/** The agent access. */
-	protected IBDIExternalAccess	agent;
+	protected IExternalAccess	agent;
 	
 	/** the progressbar */
 	private JProgressBar progressBar;
@@ -79,7 +79,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 	/**
 	 *  Create a new option panel.
 	 */
-	public DealerOptionPanel(final IBDIExternalAccess agent, final DealerFrame frame)
+	public DealerOptionPanel(final IExternalAccess agent, final DealerFrame frame)
 	{
 		super(new BorderLayout());
 

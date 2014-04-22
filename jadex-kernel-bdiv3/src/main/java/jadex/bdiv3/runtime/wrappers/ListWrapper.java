@@ -2,6 +2,7 @@ package jadex.bdiv3.runtime.wrappers;
 
 import jadex.bdiv3.model.MBelief;
 import jadex.bdiv3.runtime.impl.BDIAgentInterpreter;
+import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 

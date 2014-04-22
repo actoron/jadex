@@ -347,7 +347,12 @@ public class SelectorThread implements Runnable
 				SelectionKey key = null;
 				try
 				{
-					key = con.getSocketChannel().keyFor(selector);
+					SocketChannel	sc	= con.getSocketChannel();
+					if(sc==null)
+					{
+						throw new RuntimeException("Connection closed: "+con);
+					}
+					key = sc.keyFor(selector);
 					if(key!=null && key.isValid())
 					{
 						// Convert message into buffers.

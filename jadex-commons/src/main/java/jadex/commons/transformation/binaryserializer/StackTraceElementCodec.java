@@ -55,9 +55,9 @@ public class StackTraceElementCodec extends AbstractCodec
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
 		StackTraceElement ste = (StackTraceElement)object;
-		traverser.traverse(ste.getClassName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
-		traverser.traverse(ste.getMethodName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
-		traverser.traverse(ste.getFileName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
+		traverser.doTraverse(ste.getClassName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
+		traverser.doTraverse(ste.getMethodName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
+		traverser.doTraverse(ste.getFileName(), String.class, traversed, processors, clone, ec.getClassLoader(), ec);
 		ec.writeSignedVarInt(ste.getLineNumber());
 		
 		return object;

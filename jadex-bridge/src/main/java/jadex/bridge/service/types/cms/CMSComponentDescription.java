@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
 
-import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -496,11 +495,14 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 			CMSComponentDescription ret = (CMSComponentDescription)super.clone();
 			if(name!=null)
 				ret.setName((ComponentIdentifier)((ComponentIdentifier)name).clone());
-			if(children!=null)
-			{
-				ret.children = new LinkedHashSet(); 
-				ret.children.addAll(children);
-			}
+			
+			// Do not clone -> only used internally
+//			if(children!=null)
+//			{
+//				ret.children = new LinkedHashSet(); 
+//				ret.children.addAll(children);
+//			}
+			
 			ret.cause = cause!=null ? new Cause(cause) : cause;
 			return ret;
 		}

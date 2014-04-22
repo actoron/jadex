@@ -1,11 +1,11 @@
 package jadex.bdi.planlib.messaging;
 
+import jadex.bdi.runtime.Plan;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Message;
-
-import jadex.bdi.runtime.Plan;
 
 /**
  *  Send an instant message.

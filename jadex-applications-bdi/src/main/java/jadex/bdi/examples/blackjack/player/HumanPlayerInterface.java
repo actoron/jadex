@@ -5,9 +5,9 @@ import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.GameStateFrame;
 import jadex.bdi.examples.blackjack.gui.PlayerPanel;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -58,7 +58,7 @@ public class HumanPlayerInterface extends GameStateFrame
 	/**
 	 *  Create a new human player interface.
 	 */
-	public HumanPlayerInterface(Player player, GameState gamestate, final IBDIExternalAccess agent)
+	public HumanPlayerInterface(Player player, GameState gamestate, final IExternalAccess agent)
 	{
 		super(gamestate, null);
 		setControlPanel(new HumanPlayerControlPanel(player, gamestate));

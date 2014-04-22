@@ -1,9 +1,9 @@
 package jadex.bdi.examples.garbagecollector_classic;
 
 import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.collection.MultiCollection;
 
-import jadex.commons.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

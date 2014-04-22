@@ -7,8 +7,8 @@
 package jadex.bdi.examples.blackjack;
 
 import jadex.commons.SimplePropertyChangeSupport;
-
 import jadex.commons.beans.PropertyChangeListener;
+
 import java.util.ArrayList;
 import java.util.List;
 

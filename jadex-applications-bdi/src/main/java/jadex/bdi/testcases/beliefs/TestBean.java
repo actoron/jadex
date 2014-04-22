@@ -2,7 +2,6 @@ package jadex.bdi.testcases.beliefs;
 
 import jadex.commons.SReflect;
 import jadex.commons.SimplePropertyChangeSupport;
-
 import jadex.commons.beans.PropertyChangeListener;
 
 /**

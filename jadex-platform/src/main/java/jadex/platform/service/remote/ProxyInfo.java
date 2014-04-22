@@ -60,8 +60,6 @@ public class ProxyInfo
 	public ProxyInfo(Class[] targetinterfaces)
 	{
 		setTargetInterfaces(targetinterfaces);
-		
-//		System.out.println("proxy with: "+SUtil.arrayToString(targetinterfaces));
 	}
 	
 	//-------- methods --------

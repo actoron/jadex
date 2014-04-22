@@ -54,7 +54,7 @@
 		<belief name="gui" class="HumanPlayerInterface">
 		 	<fact>
 				$beliefbase.myself.getStrategyName().equals(AbstractStrategy.HUMAN_PLAYER)
- 				? new jadex.commons.gui.GuiCreator(HumanPlayerInterface.class, new Class[]{Player.class, GameState.class, jadex.bdi.runtime.IBDIExternalAccess.class}, 
+ 				? new jadex.commons.gui.GuiCreator(HumanPlayerInterface.class, new Class[]{Player.class, GameState.class, jadex.bridge.IExternalAccess.class}, 
 				new Object[]{$beliefbase.myself, $beliefbase.gamestate, $scope.getExternalAccess()})
  				: null
 		 	</fact>

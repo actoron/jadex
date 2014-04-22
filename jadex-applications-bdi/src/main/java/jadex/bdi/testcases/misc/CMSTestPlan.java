@@ -2,11 +2,11 @@ package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.fipa.SearchConstraints;
@@ -159,7 +159,7 @@ public class CMSTestPlan extends Plan
 				try
 				{
 					dispatchSubgoalAndWait(gext);
-					IBDIExternalAccess ext = (IBDIExternalAccess)gext.getParameter("result").getValue();
+					IExternalAccess ext = (IExternalAccess)gext.getParameter("result").getValue();
 					if(ext!=null)
 						tr.setSucceeded(true);
 				}

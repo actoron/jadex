@@ -1,7 +1,7 @@
 package jadex.bdiv3.runtime.impl;
 
 import jadex.bdiv3.runtime.IBeliefListener;
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
+import jadex.rules.eca.ChangeInfo;
 
 /**
  *  Belief listener adapter that implements empty all methods.

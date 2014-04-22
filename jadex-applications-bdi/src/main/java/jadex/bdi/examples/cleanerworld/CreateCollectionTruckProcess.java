@@ -1,9 +1,9 @@
 package jadex.bdi.examples.cleanerworld;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -111,7 +111,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 									}
 									public void resultAvailable(Object result)
 									{
-										IBDIExternalAccess ex = (IBDIExternalAccess)result;
+										IExternalAccess ex = (IExternalAccess)result;
 										ex.scheduleStep(new IComponentStep<Void>()
 										{
 											@Classname("rem")

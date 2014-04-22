@@ -11,6 +11,7 @@ import jadex.commons.beans.PropertyChangeEvent;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.Event;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IEvent;
@@ -271,7 +272,7 @@ public class MapWrapper<T, E> implements Map<T, E>
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								publishToolBeliefEvent();
-								Event ev = new Event(changeevent, event.getNewValue());
+								Event ev = new Event(changeevent, new ChangeInfo<Object>(event.getNewValue(), event.getOldValue(), null));
 								getRuleSystem().addEvent(ev);
 								return IFuture.DONE;
 //								return new Future<IEvent>(ev);

@@ -1,6 +1,7 @@
 package jadex.micro.examples.hunterprey;
 
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -15,7 +16,6 @@ import jadex.extension.envsupport.environment.IPerceptProcessor;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.micro.IMicroExternalAccess;
 
 /**
  *  Dumb prey vision processer.
@@ -48,7 +48,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 					public void resultAvailable(Object result)
 					{
 						final Space2D	space2d	= (Space2D)space;
-						final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
+						final IExternalAccess	exta	= (IExternalAccess)result;
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							@Classname("food")

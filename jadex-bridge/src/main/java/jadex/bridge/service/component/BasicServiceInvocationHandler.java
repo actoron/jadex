@@ -259,6 +259,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				IFuture<Void> fut = sic.invoke(service, method, myargs);
 				if(fut.isDone())
 				{
+					fut.get();	// Throw exception, if any.
 					ret = sic.getResult();
 				}
 				else
@@ -649,7 +650,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ia, info, binding, null, sid, realtime));
 		handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(/*ea, null,*/));
 //		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
-		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader)}, handler); //sid.getServiceType()
+		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader, ia.getModel().getAllImports())}, handler); //sid.getServiceType()
 	}
 
 	/**
@@ -693,7 +694,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler, ISwitch
 				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia, adapter, false, true));
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
 			// service.getServiceIdentifier().getServiceType()
-			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader())}, handler); 
+			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, INFRPropertyProvider.class, info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports())}, handler); 
 		
 			// todo: think about orders of decouping interceptors
 			// if we want the decoupling return interceptor to schedule back on an external caller actual order must be reversed

@@ -1,8 +1,7 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -36,7 +35,7 @@ public class CleanerGui	extends JFrame
 	/**
 	 *  Shows the gui, and updates it when beliefs change.
 	 */
-	public CleanerGui(final IBDIExternalAccess agent)
+	public CleanerGui(final IExternalAccess agent)
 	{
 		super(agent.getComponentIdentifier().getName());
 		final JPanel map = new CleanerPanel(agent);

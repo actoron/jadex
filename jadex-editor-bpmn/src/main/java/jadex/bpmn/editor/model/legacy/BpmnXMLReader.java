@@ -30,6 +30,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -1694,21 +1695,31 @@ public class BpmnXMLReader
 //								}
 //							}
 							RequiredServiceBinding binding = implname!=null ? (RequiredServiceBinding)bindings.get(implname) : null;
-//							ProvidedServiceImplementation psim	= null;
-//							if(binding!=null)
-//							{
-//								// todo: interceptors
+							ProvidedServiceImplementation psim	= null;
+							if(binding!=null)
+							{
+								// todo: interceptors
 //								psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
-//							}
-//							else
-//							{
-//								// todo: interceptors
+								psim = new ProvidedServiceImplementation();
+								psim.setClazz(implname != null? new ClassInfo(implname) : null);
+								psim.setProxytype(proxytype);
+								psim.setBinding(binding);
+							}
+							else
+							{
+								// todo: interceptors
 //								psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
-//							}
+								psim = new ProvidedServiceImplementation();
+//								psim.setClazz(implname != null? new ClassInfo(implname) : null);
+								psim.setValue(implname);
+								//TODO? Expression?
+								psim.setProxytype(proxytype);
+								psim.setBinding(binding);
+							}
 							
 							// todo: support publish
-//							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null);
-							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, null, null);
+							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, psim, null);
+//							ProvidedServiceInfo psi = new ProvidedServiceInfo(name, type, null, null);
 							mi.addProvidedService(psi);
 							
 							if(table.getRowSize()>4)
@@ -1736,9 +1747,29 @@ public class BpmnXMLReader
 //											// todo: interceptors
 //											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
 //										}
+										if(binding!=null)
+										{
+											// todo: interceptors
+//											psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
+											psim = new ProvidedServiceImplementation();
+											psim.setClazz(implname != null? new ClassInfo(implname) : null);
+											psim.setProxytype(proxytype);
+											psim.setBinding(binding);
+										}
+										else
+										{
+											// todo: interceptors
+//											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
+											psim = new ProvidedServiceImplementation();
+//											psim.setClazz(implname != null? new ClassInfo(implname) : null);
+											psim.setValue(implname);
+											//TODO? Expression?
+											psim.setProxytype(proxytype);
+											psim.setBinding(binding);
+										}
 										// todo: support publish
-//										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null));
-										ci.addProvidedService(new ProvidedServiceInfo(name, type, null, null));
+										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null));
+//										ci.addProvidedService(new ProvidedServiceInfo(name, type, null, null));
 									}
 								}
 							}

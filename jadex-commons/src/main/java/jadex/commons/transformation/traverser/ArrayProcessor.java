@@ -49,8 +49,8 @@ public class ArrayProcessor implements ITraverseProcessor
 		for(int i=0; i<length; i++) 
 		{
 			Object val = Array.get(object, i);
-			Object newval = traverser.traverse(val, type, traversed, processors, clone, targetcl, context);
-			if(clone || newval!=val)
+			Object newval = traverser.doTraverse(val, type, traversed, processors, clone, targetcl, context);
+			if(newval != Traverser.IGNORE_RESULT && (clone || newval!=val))
 				Array.set(ret, i, newval);
 		}
 		return ret;

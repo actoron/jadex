@@ -1,5 +1,6 @@
 package jadex.micro.examples.helpline;
 
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.types.clock.IClockService;
@@ -7,7 +8,6 @@ import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
-import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
@@ -64,7 +64,7 @@ public class HelplineAgent extends MicroAgent
 		{
 			public void run()
 			{
-				HelplinePanel.createHelplineGui((IMicroExternalAccess)getExternalAccess());
+				HelplinePanel.createHelplineGui((IExternalAccess)getExternalAccess());
 			}
 		});
 		return IFuture.DONE;

@@ -145,7 +145,7 @@
 				 <initialbelief ref="gui">
 					<fact>
 						new jadex.commons.gui.GuiCreator(Gui.class, 
-						new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+						new Class[]{jadex.bridge.IExternalAccess.class}, 
 						new Object[]{$scope.getExternalAccess()})
 					</fact>
 				</initialbelief> 

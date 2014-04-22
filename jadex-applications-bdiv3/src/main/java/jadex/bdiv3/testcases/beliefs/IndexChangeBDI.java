@@ -10,7 +10,6 @@ import jadex.bdiv3.annotation.BDIConfigurations;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Plan;
 import jadex.bdiv3.runtime.IPlan;
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IFilter;
@@ -19,6 +18,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.rules.eca.ChangeInfo;
 
 /**
  *  Agent that tests if waiting for a specific index change in a collection works.

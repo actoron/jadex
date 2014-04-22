@@ -24,6 +24,8 @@ import java.util.Map;
  */
 public class Traverser
 {
+	public static final Object IGNORE_RESULT = new Object();
+	
 	/** The default cloner. */
 	protected static volatile Traverser instance;
 	
@@ -35,10 +37,10 @@ public class Traverser
 		processors = new ArrayList<ITraverseProcessor>();
 		processors.add(new ExcludeProcessor());
 		processors.add(new ImmutableProcessor());
-		processors.add(new CloneProcessor());
 		processors.add(new ArrayProcessor());
 		processors.add(new ListProcessor());
 		processors.add(new SetProcessor());
+		processors.add(new MultiCollectionProcessor());
 		processors.add(new MapProcessor());
 		processors.add(new CollectionProcessor());
 		processors.add(new IteratorProcessor());
@@ -54,6 +56,7 @@ public class Traverser
 		processors.add(new LogRecordProcessor());
 		processors.add(new DateProcessor());
 		processors.add(new UUIDProcessor());
+		processors.add(new CloneProcessor());
 		processors.add(new BeanProcessor());
 //		processors.add(new FieldProcessor());
 	}
@@ -144,6 +147,29 @@ public class Traverser
 	 *  @return The processed object.
 	 */
 	public Object traverse(Object object, Class<?> clazz, Map<Object, Object> traversed, 
+		List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
+	{
+		if (processors == null)
+		{
+			processors = getDefaultProcessors();
+		}
+		
+		Object obj = doTraverse(object, clazz, traversed, processors, clone, targetcl, context);
+		if (obj == IGNORE_RESULT)
+		{
+			obj = null;
+		}
+		return obj;
+	}
+	
+	/**
+	 *  Traverse an object.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The processed object.
+	 */
+	public Object doTraverse(Object object, Class<?> clazz, Map<Object, Object> traversed, 
 		List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
 	{
 		Object ret = object;

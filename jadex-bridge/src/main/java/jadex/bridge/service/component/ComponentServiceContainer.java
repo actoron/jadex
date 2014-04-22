@@ -4,7 +4,6 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.nonfunctional.INFMixedPropertyProvider;
 import jadex.bridge.nonfunctional.NFMethodPropertyProvider;
 import jadex.bridge.service.BasicServiceContainer;
@@ -20,7 +19,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.multiinvoke.MultiServiceInvocationHandler;
-import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -156,7 +154,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 
 		if(info.getMultiplexType()!=null)
 		{
-			T ms = getMultiService(info.getName(), (Class<T>)info.getMultiplexType().getType(instance.getClassLoader()));
+			T ms = getMultiService(info.getName(), (Class<T>)info.getMultiplexType().getType(instance.getClassLoader(), instance.getModel().getAllImports()));
 			return new Future<T>(ms);
 		}
 		
@@ -512,7 +510,14 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 								{
 									public void resultAvailable(IExternalAccess exta)
 									{
-										lis.resultAvailable(exta.getServiceProvider());
+										try
+										{
+											lis.resultAvailable(exta.getServiceProvider());
+										}
+										catch(ComponentTerminatedException cte)
+										{
+											lis.exceptionOccurred(cte);
+										}
 									}
 									
 									public void exceptionOccurred(Exception exception)
@@ -774,9 +779,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 
 		final Future<Class<?>> ret = new Future<Class<?>>();
-		if(sid.getServiceType().getType(instance.getClassLoader())!=null)
+		if(sid.getServiceType().getType(instance.getClassLoader(), instance.getModel().getAllImports())!=null)
 		{
-			ret.setResult(sid.getServiceType().getType(instance.getClassLoader())); // todo: only local? remote would cause nullpointer
+			ret.setResult(sid.getServiceType().getType(instance.getClassLoader(), instance.getModel().getAllImports())); // todo: only local? remote would cause nullpointer
 		}
 		else
 		{

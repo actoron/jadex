@@ -1,7 +1,6 @@
 package jadex.bdi.examples.cleanerworld_classic;
 
 import jadex.commons.SimplePropertyChangeSupport;
-
 import jadex.commons.beans.PropertyChangeListener;
 
 

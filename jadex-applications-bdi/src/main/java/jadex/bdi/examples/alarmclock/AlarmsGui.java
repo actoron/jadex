@@ -1,10 +1,12 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.beans.PropertyChangeEvent;
+import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
@@ -20,8 +22,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import jadex.commons.beans.PropertyChangeEvent;
-import jadex.commons.beans.PropertyChangeListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -43,7 +43,7 @@ public class AlarmsGui extends JFrame
 	protected JTable alarms;
 
 	/** The agent. */
-	protected IBDIExternalAccess agent;
+	protected IExternalAccess agent;
 
 	/** The property change listener. */
 	protected PropertyChangeListener plis;
@@ -53,7 +53,7 @@ public class AlarmsGui extends JFrame
 	/**
 	 *  Create a new test center panel.
 	 */
-	public AlarmsGui(final IBDIExternalAccess agent)
+	public AlarmsGui(final IExternalAccess agent)
 	{
 		super("Alarms");
 		this.agent = agent;
@@ -243,7 +243,7 @@ public class AlarmsGui extends JFrame
 	 *  @param sel The selected row.
 	 *  @param agent The agent.
 	 */
-	protected void handleEdit(JTable alarms, int sel, IBDIExternalAccess agent)
+	protected void handleEdit(JTable alarms, int sel, IExternalAccess agent)
 	{
 		if(sel==-1)
 			return;

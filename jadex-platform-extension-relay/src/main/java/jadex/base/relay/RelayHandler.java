@@ -590,7 +590,7 @@ public class RelayHandler
 			byte[]	peerinfo	= null;
 			for(PeerEntry peer: peers.getPeers())
 			{
-				if(peer.isConnected())
+//				if(peer.isConnected())
 				{
 					if(peerinfo==null)
 					{

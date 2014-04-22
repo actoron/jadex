@@ -233,7 +233,7 @@ public class BeanCodec extends AbstractCodec
 //		{
 //			ec.writeString(names.get(i));
 //			Object val = values.get(i);
-//			traverser.traverse(val, clazzes.get(i), traversed, processors, clone, null, ec);
+//			traverser.doTraverse(val, clazzes.get(i), traversed, processors, clone, null, ec);
 //		}
 		
 		/*for(Iterator it=props.keySet().iterator(); it.hasNext(); )
@@ -250,11 +250,11 @@ public class BeanCodec extends AbstractCodec
 					//if (val == null)
 						//BinarySerializer.NULL_HANDLER.process(val, prop.getType(), null, null, null, false, context);
 					//else
-						//traverser.traverse(val, prop.getType(), traversed, processors, clone, context);
+						//traverser.doTraverse(val, prop.getType(), traversed, processors, clone, context);
 					if (val != null)
 					{
 						ec.writeString(name);
-						traverser.traverse(val, prop.getType(), traversed, processors, clone, context);
+						traverser.doTraverse(val, prop.getType(), traversed, processors, clone, context);
 					}
 				}
 			}
@@ -298,7 +298,7 @@ public class BeanCodec extends AbstractCodec
 		{
 			ec.writeString(names.get(i));
 			Object val = values.get(i);
-			traverser.traverse(val, clazzes.get(i), traversed, processors, clone, null, ec);
+			traverser.doTraverse(val, clazzes.get(i), traversed, processors, clone, null, ec);
 		}
 	}
 	
@@ -323,10 +323,12 @@ public class BeanCodec extends AbstractCodec
 					{
 						prop.setPropertyValue(object, val);
 					}
-					else if(prop!=null)
-					{
-						throw new RuntimeException("Property is write-protected: " + prop.getName());
-					}
+					// else ignore
+					
+//					else if(prop!=null)
+//					{
+//						throw new RuntimeException("Property is write-protected: " + prop.getName());
+//					}
 				}
 				catch (Exception e)
 				{

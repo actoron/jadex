@@ -1,8 +1,8 @@
 package jadex.bdi.examples.puzzle;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -35,7 +35,7 @@ public class BoardGui extends JFrame
 	/**
 	 *  Create a new board gui.
 	 */
-	public BoardGui(IBDIExternalAccess agent, final IBoard board)
+	public BoardGui(IExternalAccess agent, final IBoard board)
 	{
 		this(agent, board, false);
 	}
@@ -43,7 +43,7 @@ public class BoardGui extends JFrame
 	/**
 	 *  Create a new board gui.
 	 */
-	public BoardGui(final IBDIExternalAccess agent, final IBoard board, boolean controls)
+	public BoardGui(final IExternalAccess agent, final IBoard board, boolean controls)
 	{
 		this.board = board;
 		final BoardPanel bp = new BoardPanel(board);

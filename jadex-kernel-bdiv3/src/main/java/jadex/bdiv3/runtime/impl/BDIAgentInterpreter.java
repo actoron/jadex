@@ -24,7 +24,6 @@ import jadex.bdiv3.runtime.IGoal.GoalLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanLifecycleState;
 import jadex.bdiv3.runtime.impl.RPlan.PlanProcessingState;
 import jadex.bdiv3.runtime.impl.RPlan.ResumeCommand;
-import jadex.bdiv3.runtime.wrappers.ChangeInfo;
 import jadex.bdiv3.runtime.wrappers.ListWrapper;
 import jadex.bdiv3.runtime.wrappers.MapWrapper;
 import jadex.bdiv3.runtime.wrappers.SetWrapper;
@@ -68,6 +67,7 @@ import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
 import jadex.micro.annotation.Agent;
+import jadex.rules.eca.ChangeInfo;
 import jadex.rules.eca.EventType;
 import jadex.rules.eca.IAction;
 import jadex.rules.eca.ICondition;
@@ -130,10 +130,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final BDIModel model, Class<?> agentclass, final Map<String, Object> args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, 
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
-		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, listener, inited);
+		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, persist, listener, inited);
 		this.bdimodel = model;
 		this.capa = new RCapability(bdimodel.getCapability());
 	}
@@ -994,9 +994,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 									
 									for(int i=0; i<ptypes.length; i++)
 									{
-										if(event.getContent()!=null && SReflect.isSupertype(ptypes[i], event.getContent().getClass()))
+										Object	o	= event.getContent();
+										if(o!=null && SReflect.isSupertype(ptypes[i], o.getClass()))
 										{
-											pvals[i] = event.getContent();
+											pvals[i] = o;
+										}
+										else if(o instanceof ChangeInfo<?> && ((ChangeInfo)o).getValue()!=null && SReflect.isSupertype(ptypes[i], ((ChangeInfo)o).getValue().getClass()))
+										{
+											pvals[i] = ((ChangeInfo)o).getValue();
 										}
 										else if(SReflect.isSupertype(agent.getClass(), ptypes[i]))
 										{
@@ -2002,18 +2007,47 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 					
 					if(event!=null && event.getSource()!=null && event.getSource().equals(source))
 					{
-						if(SReflect.getWrappedType(ptypes[i]).isInstance(event.getValue()))
-						{
-							ret[i]	= event.getValue();
-						}
-						else if(SReflect.isSupertype(ptypes[i], ChangeEvent.class))
+						boolean set = false;
+						if(SReflect.isSupertype(ptypes[i], ChangeEvent.class))
 						{
 							ret[i]	= event;
+							set = true;
 						}
 						else
 						{
+							if(SReflect.getWrappedType(ptypes[i]).isInstance(event.getValue()))
+							{
+								ret[i]	= event.getValue();
+								set = true;
+							}
+							else if(event.getValue() instanceof ChangeInfo)
+							{
+								ChangeInfo<?> ci = (ChangeInfo<?>)event.getValue();
+								if(ptypes[i].equals(ChangeInfo.class))
+								{
+									ret[i] = ci;
+									set = true;
+								}
+								else if(SReflect.getWrappedType(ptypes[i]).isInstance(ci.getValue()))
+								{
+									ret[i] = ci.getValue();
+									set = true;
+								}
+							}
+						}
+						if(!set)
+						{
 							throw new IllegalArgumentException("Unexpected type for event injection: "+event+", "+ptypes[i]);
 						}
+						
+//						else if(SReflect.isSupertype(ptypes[i], ChangeEvent.class))
+//						{
+//							ret[i]	= event;
+//						}
+//						else
+//						{
+//							throw new IllegalArgumentException("Unexpected type for event injection: "+event+", "+ptypes[i]);
+//						}
 					}
 					else
 					{

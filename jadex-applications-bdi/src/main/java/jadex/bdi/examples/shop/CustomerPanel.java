@@ -1,13 +1,13 @@
 package jadex.bdi.examples.shop;
 
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
@@ -61,7 +61,7 @@ public class CustomerPanel extends JPanel
 {
 	//-------- attributes --------
 	
-	protected IBDIExternalAccess agent;
+	protected IExternalAccess agent;
 	protected List shoplist = new ArrayList();
 	protected JCheckBox remote;
 	protected JTable shoptable;
@@ -77,7 +77,7 @@ public class CustomerPanel extends JPanel
 	/**
 	 *  Create a new gui.
 	 */
-	public CustomerPanel(final IBDIExternalAccess agent)
+	public CustomerPanel(final IExternalAccess agent)
 	{
 		this.agent = agent;
 		this.shops	= new HashMap();
@@ -384,7 +384,7 @@ public class CustomerPanel extends JPanel
 	/**
 	 *  Create a customer gui frame.
 	 * /
-	public static void createCustomerGui(final IBDIExternalAccess agent)
+	public static void createCustomerGui(final IExternalAccess agent)
 	{
 		final JFrame f = new JFrame();
 		f.add(new CustomerPanel(agent));

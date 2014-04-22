@@ -12,6 +12,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+import jadex.rules.eca.ChangeInfo;
 
 /**
  *  Test beliefs with update rate.
@@ -67,11 +68,11 @@ public class UpdaterateBDI
 	@Plan(trigger=@Trigger(factchangeds={"cntbel"}))
 	public void	beliefChanged(ChangeEvent event)
 	{
-		if(cntbel==5 && ((Integer)event.getValue()).intValue()==5)
+		if(cntbel==5 && ((ChangeInfo<Integer>)event.getValue()).getValue().intValue()==5)
 		{
 			tr.setSucceeded(true);
 		}
-		else if(cntbel>5 || ((Integer)event.getValue()).intValue()>5)
+		else if(cntbel>5 || ((ChangeInfo<Integer>)event.getValue()).getValue().intValue()>5)
 		{
 			tr.setFailed("Inconsistent values: "+cntbel+", "+event.getValue());
 		}

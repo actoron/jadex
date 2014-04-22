@@ -3,6 +3,7 @@ package jadex.micro.benchmarks;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
@@ -14,7 +15,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -167,7 +167,7 @@ public class AgentCreationAgent extends MicroAgent
 								{
 									public void resultAvailable(Object result)
 									{
-										IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
+										IExternalAccess	exta	= (IExternalAccess)result;
 										exta.scheduleStep(new IComponentStep<Void>()
 										{
 											@Classname("deletePeers")

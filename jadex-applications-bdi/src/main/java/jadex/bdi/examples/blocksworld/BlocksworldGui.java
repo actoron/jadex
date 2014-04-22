@@ -1,10 +1,10 @@
 package jadex.bdi.examples.blocksworld;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -61,7 +61,7 @@ public class BlocksworldGui	extends JFrame
 	/**
 	 *  Create the blocksworld gui.
 	 */
-	public BlocksworldGui(final IBDIExternalAccess agent)
+	public BlocksworldGui(final IExternalAccess agent)
 	{
 		super();
 		initGui(agent);
@@ -71,7 +71,7 @@ public class BlocksworldGui	extends JFrame
 	 *  Init the gui.
 	 *  Method runs on AWT thread.
 	 */
-	protected void	initGui(final IBDIExternalAccess agent)
+	protected void	initGui(final IExternalAccess agent)
 	{
 		// HACK!! ensure that agent is inited
 //		try

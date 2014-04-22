@@ -84,7 +84,7 @@ class FieldProcessor implements ITraverseProcessor
 						val = fields[i].get(object);
 						if(val!=null) 
 						{
-							Object newval = traverser.traverse(val, fields[i].getType(), cloned, processors, clone, targetcl, context);
+							Object newval = traverser.doTraverse(val, fields[i].getType(), cloned, processors, clone, targetcl, context);
 							if(clone || val!=newval)
 								fields[i].set(ret, newval);
 						}

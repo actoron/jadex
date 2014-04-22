@@ -2,7 +2,6 @@ package jadex.platform.service.remote.commands;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -10,7 +9,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.transformation.annotations.Alias;
-import jadex.micro.IMicroExternalAccess;
 import jadex.platform.service.remote.IRemoteCommand;
 import jadex.platform.service.remote.RemoteServiceManagementService;
 
@@ -64,7 +62,7 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IIntermediateFuture<IRemoteCommand> execute(final IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IIntermediateFuture<IRemoteCommand> execute(final IExternalAccess component, RemoteServiceManagementService rsms)
 	{
 		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
@@ -120,7 +118,7 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 	 *  Get the target id.
 	 *  @return the target id.
 	 */
-	public Object getTargetId()
+	public IComponentIdentifier getTargetId()
 	{
 		return cid;
 	}

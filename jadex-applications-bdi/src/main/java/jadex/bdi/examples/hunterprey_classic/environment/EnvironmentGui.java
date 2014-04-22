@@ -4,10 +4,10 @@ import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Prey;
 import jadex.bdi.examples.hunterprey_classic.Vision;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.monitoring.IMonitoringEvent;
 import jadex.bridge.service.types.monitoring.IMonitoringService.PublishEventLevel;
@@ -72,7 +72,7 @@ public class EnvironmentGui	extends JFrame
 	/**
 	 *  Create a new gui plan.
 	 */
-	public EnvironmentGui(final IBDIExternalAccess agent)
+	public EnvironmentGui(final IExternalAccess agent)
 	{
 		super(agent.getComponentIdentifier().getName());
 		
@@ -215,7 +215,7 @@ public class EnvironmentGui	extends JFrame
 	/**
 	 *  Create a panel for the options area.
 	 */
-	protected JPanel createOptionsPanel(final IBDIExternalAccess agent)
+	protected JPanel createOptionsPanel(final IExternalAccess agent)
 	{
 		final JPanel options = new JPanel(new GridBagLayout());
 
@@ -485,7 +485,7 @@ public class EnvironmentGui	extends JFrame
 	/**
 	 *  Ensure that the gui is updated on changes in the environment.
 	 */
-	protected void	enableGuiUpdate(IBDIExternalAccess agent)
+	protected void	enableGuiUpdate(IExternalAccess agent)
 	{
 		agent.scheduleStep(new IComponentStep<Void>()
 		{

@@ -4,7 +4,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ServiceCall;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IService;
@@ -33,7 +32,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.SJavaParser;
-import jadex.micro.MicroExternalAccess;
+import jadex.kernelbase.ExternalAccess;
 import jadex.platform.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.platform.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.platform.service.remote.replacements.DefaultEqualsMethodReplacement;
@@ -1292,7 +1291,7 @@ public class RemoteReferenceModule
 		if(DEBUG)
 		{
 			// Hack!
-			if(((MicroExternalAccess)rsms.getComponent()).getInterpreter().getComponentAdapter().isExternalThread())
+			if(((ExternalAccess)rsms.getComponent()).getInterpreter().getComponentAdapter().isExternalThread())
 			{
 				System.out.println("wrong thread: "+Thread.currentThread());
 				Thread.dumpStack();

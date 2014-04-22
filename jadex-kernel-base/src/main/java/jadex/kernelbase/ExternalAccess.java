@@ -1,6 +1,7 @@
 package jadex.kernelbase;
 
 import jadex.base.Starter;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -41,6 +42,15 @@ public class ExternalAccess implements IExternalAccess
 {
 	//-------- attributes --------
 
+	/** The valid flag. */
+	protected boolean	valid;
+	
+	/** The terminated flag. */
+	protected boolean	terminated;
+	
+	/** The component identifier. */
+	protected IComponentIdentifier	cid;
+	
 	/** The component. */
 	protected StatelessAbstractInterpreter interpreter;
 
@@ -53,6 +63,9 @@ public class ExternalAccess implements IExternalAccess
 	/** The provider. */
 	protected IServiceProvider provider;
 	
+	/** The results (cached after termination). */
+	protected Map<String, Object>	results;
+	
 	// -------- constructors --------
 
 	/**
@@ -60,10 +73,12 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public ExternalAccess(StatelessAbstractInterpreter interpreter)
 	{
+		this.valid	= true;
 		this.interpreter = interpreter;
+		this.cid	= interpreter.getComponentIdentifier();
 		this.adapter = interpreter.getComponentAdapter();
-		this.tostring = interpreter.getComponentIdentifier().getLocalName();
 		this.provider = interpreter.getServiceContainer();
+		this.tostring = cid.getLocalName();
 	}
 
 	//-------- methods --------
@@ -74,6 +89,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IModelInfo getModel()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return interpreter.getModel();
 	}
 	
@@ -82,7 +102,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return adapter.getComponentIdentifier();
+		return cid;
 	}
 	
 //	/**
@@ -121,6 +141,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IExternalAccess getParentAccess()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return adapter.getParent();
 	}
 	
@@ -129,6 +154,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IServiceProvider getServiceProvider()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return provider;
 	}
 
@@ -139,22 +169,34 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
-//				if(adapter.getComponentIdentifier().getParent()==null)
+//				if(cid.getParent()==null)
 //				{
-//					System.out.println("platform e: "+adapter.getComponentIdentifier().getName());
+//					System.out.println("platform e: "+cid.getName());
 //					Thread.dumpStack();
 //				}
-//				System.out.println("ext kill: "+getComponentIdentifier());
+//				System.out.println("ext kill: "+cid);
 				adapter.invokeLater(new Runnable() 
 				{
 					public void run() 
 					{
 //						System.out.println("int kill");
-						interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+						if(terminated)
+						{
+							// Todo: consistency between external access and invokeLater()
+							ret.setException(new ComponentTerminatedException(cid));
+						}
+						else
+						{
+							interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
+						}
 					}
 					
 //					public String toString()
@@ -165,7 +207,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -176,9 +218,9 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-//			if(adapter.getComponentIdentifier().getParent()==null)
+//			if(cid.getParent()==null)
 //			{
-//				System.err.println("platform i: "+adapter.getComponentIdentifier().getName());
+//				System.err.println("platform i: "+cid.getName());
 //				Thread.dumpStack();
 //			}
 			interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
@@ -206,7 +248,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -220,7 +266,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -245,7 +291,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -259,7 +309,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -286,7 +336,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<String> ret = new Future<String>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -308,7 +362,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -339,6 +393,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public String getLocalType()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return interpreter.getLocalType();
 	}
 	
@@ -358,7 +417,11 @@ public class ExternalAccess implements IExternalAccess
 		Method	m	= SReflect.getMethod(step.getClass(), "execute", new Class[]{IInternalAccess.class});
 		final Future<T>	ret = m!=null ? (Future<T>)FutureFunctionality.getDelegationFuture(m.getReturnType(), new FutureFunctionality((Logger)null)) : new Future<T>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -366,17 +429,26 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						IFuture<T>	fut	= interpreter.scheduleStep(step);
-						FutureFunctionality.connectDelegationFuture(ret, fut);
+						// Hack!!! Should not be called after termination.
+						if(terminated)
+						{
+							ret.setException(new ComponentTerminatedException(cid));
+						}
+						else
+						{
+							IFuture<T>	fut	= interpreter.scheduleStep(step);
+							FutureFunctionality.connectDelegationFuture(ret, fut);
+						}
+							
 					}
 				});
 			}
 			catch(final Exception e)
 			{
 				// Allow executing steps on platform during (and after?) shutdown.
-				if(adapter.getComponentIdentifier().getParent()==null)
+				if(cid.getParent()==null)
 				{
-					Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+					Starter.scheduleRescueStep(cid, new Runnable()
 					{
 						public void run()
 						{
@@ -440,7 +512,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		catch(final Exception e)
 		{
-			Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+			Starter.scheduleRescueStep(cid, new Runnable()
 			{
 				public void run()
 				{
@@ -463,21 +535,28 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<T> ret = new Future<T>();
 		
-		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+		if(terminated)
 		{
-			public void customResultAvailable(Object result)
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else
+		{
+			SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
 			{
-				IClockService cs = (IClockService)result;
-				cs.createTimer(delay, new ITimedObject()
+				public void customResultAvailable(Object result)
 				{
-					public void timeEventOccurred(long currenttime)
+					IClockService cs = (IClockService)result;
+					cs.createTimer(delay, new ITimedObject()
 					{
-						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
-					}
-				});
-			}
-		}));
+						public void timeEventOccurred(long currenttime)
+						{
+							scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+						}
+					});
+				}
+			}));
+		}
 		
 		return ret;
 	}
@@ -494,21 +573,28 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<T> ret = new Future<T>();
 		
-		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
+		if(terminated)
 		{
-			public void customResultAvailable(Object result)
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else
+		{
+			SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
 			{
-				IClockService cs = (IClockService)result;
-				cs.createTimer(delay, new ITimedObject()
+				public void customResultAvailable(Object result)
 				{
-					public void timeEventOccurred(long currenttime)
+					IClockService cs = (IClockService)result;
+					cs.createTimer(delay, new ITimedObject()
 					{
-						scheduleImmediate(step).addResultListener(new DelegationResultListener(ret));
-					}
-				});
-			}
-		}));
+						public void timeEventOccurred(long currenttime)
+						{
+							scheduleImmediate(step).addResultListener(new DelegationResultListener(ret));
+						}
+					});
+				}
+			}));
+		}
 		
 		return ret;
 	}
@@ -522,7 +608,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<IExtensionInstance> ret = new Future<IExtensionInstance>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -536,7 +626,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -553,88 +643,6 @@ public class ExternalAccess implements IExternalAccess
 		return ret;
 	}
 
-//	/**
-//	 *  Add an component listener.
-//	 *  @param listener The listener.
-//	 */
-//	public IFuture<Void> addComponentListener(final IComponentListener listener)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		if(adapter.isExternalThread())
-//		{
-//			try
-//			{
-//				adapter.invokeLater(new Runnable() 
-//				{
-//					public void run() 
-//					{
-//						interpreter.addComponentListener(listener)
-//							.addResultListener(new DelegationResultListener<Void>(ret));
-//					}
-//				});
-//			}
-//			catch(final Exception e)
-//			{
-//				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
-//				{
-//					public void run()
-//					{
-//						ret.setException(e);
-//					}
-//				});
-//			}
-//		}
-//		else
-//		{
-//			interpreter.addComponentListener(listener)
-//				.addResultListener(new DelegationResultListener<Void>(ret));
-//		}
-//		
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Remove a component listener.
-//	 *  @param listener The listener.
-//	 */
-//	public IFuture<Void> removeComponentListener(final IComponentListener listener)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		if(adapter.isExternalThread())
-//		{
-//			try
-//			{
-//				adapter.invokeLater(new Runnable() 
-//				{
-//					public void run() 
-//					{
-//						interpreter.removeComponentListener(listener)
-//							.addResultListener(new DelegationResultListener<Void>(ret));
-//					}
-//				});
-//			}
-//			catch(final Exception e)
-//			{
-//				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
-//				{
-//					public void run()
-//					{
-//						ret.setException(e);
-//					}
-//				});
-//			}
-//		}
-//		else
-//		{
-//			interpreter.removeComponentListener(listener)
-//				.addResultListener(new DelegationResultListener<Void>(ret));
-//		}
-//		
-//		return ret;
-//	}
-	
 	/**
 	 *  Subscribe to component events.
 	 *  @param filter An optional filter.
@@ -644,7 +652,11 @@ public class ExternalAccess implements IExternalAccess
 		// No NoTimeoutFuture needed as is already created internally.
 		final SubscriptionIntermediateDelegationFuture<IMonitoringEvent> ret = new SubscriptionIntermediateDelegationFuture<IMonitoringEvent>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -660,7 +672,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -687,7 +699,11 @@ public class ExternalAccess implements IExternalAccess
 		// No NoTimeoutFuture needed as is already created internally.
 		final SubscriptionIntermediateDelegationFuture<Tuple2<String, Object>> ret = new SubscriptionIntermediateDelegationFuture<Tuple2<String, Object>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -703,7 +719,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -730,7 +746,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -744,7 +764,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -769,7 +789,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setResult(results);
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -783,7 +807,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -811,7 +835,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Map<String, INFPropertyMetaInfo>> ret = new Future<Map<String, INFPropertyMetaInfo>>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -825,7 +853,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -851,7 +879,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -865,7 +897,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -891,7 +923,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<String[]> ret = new Future<String[]>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -905,7 +941,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -932,7 +968,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<INFPropertyMetaInfo> ret = new Future<INFPropertyMetaInfo>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -946,7 +986,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -973,7 +1013,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1008,7 +1052,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1060,7 +1104,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1095,7 +1143,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1143,7 +1191,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1158,7 +1210,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1186,7 +1238,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1200,7 +1256,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1226,7 +1282,11 @@ public class ExternalAccess implements IExternalAccess
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(adapter.isExternalThread())
+		if(terminated)
+		{
+			ret.setException(new ComponentTerminatedException(cid));
+		}
+		else if(adapter.isExternalThread())
 		{
 			try
 			{
@@ -1240,7 +1300,7 @@ public class ExternalAccess implements IExternalAccess
 			}
 			catch(final Exception e)
 			{
-				Starter.scheduleRescueStep(adapter.getComponentIdentifier(), new Runnable()
+				Starter.scheduleRescueStep(cid, new Runnable()
 				{
 					public void run()
 					{
@@ -1265,6 +1325,11 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public StatelessAbstractInterpreter getInterpreter()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return interpreter;
 	}
 	
@@ -1274,7 +1339,40 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public boolean isExternalThread()
 	{
+		if(terminated)
+		{
+			throw new ComponentTerminatedException(cid);
+		}
+
 		return adapter.isExternalThread();
+	}
+	
+	/**
+	 *  Check if the component is directly available.
+	 *  An external access becomes invalid, when a component
+	 *  is persisted or terminated.
+	 */
+	public boolean	isValid()
+	{
+		return valid;
+	}
+	
+	/**
+	 *  Invalidate the external access.
+	 *  @param terminated	Invalidated due to termination?
+	 */
+	public void	invalidate(boolean terminated)
+	{
+		if(terminated)
+		{
+			this.results	= interpreter.getResults();
+			this.terminated	= true;
+		}
+		
+		this.valid	= false;
+		this.interpreter	= null;
+		this.adapter	= null;
+		this.provider	= null;
 	}
 
 	/**

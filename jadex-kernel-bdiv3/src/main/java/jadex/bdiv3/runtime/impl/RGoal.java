@@ -23,6 +23,7 @@ import jadex.rules.eca.IEvent;
 import jadex.rules.eca.IRule;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Map;
@@ -870,7 +871,8 @@ public class RGoal extends RProcessableElement implements IGoal
 								}
 								catch(Exception e)
 								{
-									e.printStackTrace();
+									Throwable	t	= e instanceof InvocationTargetException ? ((InvocationTargetException)e).getTargetException() : e;
+									ia.getLogger().severe("Exception in inhibits expression: "+t);
 								}
 							}
 						}

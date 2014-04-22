@@ -18,10 +18,10 @@ public class VSequenceEdge extends VEdge
 	 *  @param graph The BPMN graph.
 	 *  @param style The style.
 	 */
-	public VSequenceEdge(mxGraph graph, String style)
+	public VSequenceEdge(mxGraph graph)
 	{
-		super(graph, style);
-		super.setStyle(style);
+		super(graph, VSequenceEdge.class.getSimpleName());
+		super.setStyle(VSequenceEdge.class.getSimpleName());
 	}
 	
 	/**

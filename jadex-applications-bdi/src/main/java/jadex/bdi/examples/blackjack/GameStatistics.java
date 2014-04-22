@@ -2,9 +2,9 @@ package jadex.bdi.examples.blackjack;
 
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.Tuple;
+import jadex.commons.beans.PropertyChangeListener;
 import jadex.commons.collection.MultiCollection;
 
-import jadex.commons.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.List;
 

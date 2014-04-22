@@ -1,8 +1,8 @@
 package jadex.bdi.planlib;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -107,7 +107,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 						}
 						public void resultAvailable(Object result)
 						{
-							final IBDIExternalAccess exta = (IBDIExternalAccess)result;
+							final IExternalAccess exta = (IExternalAccess)result;
 							
 							for(int i=0; i<metainfos.length; i++)
 							{

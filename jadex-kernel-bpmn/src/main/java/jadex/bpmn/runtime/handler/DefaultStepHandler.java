@@ -123,7 +123,7 @@ public class DefaultStepHandler implements IStepHandler
 //							}
 							
 							// Java-style "first matching handler" behavior
-							if(handler.getClazz() == null || SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader()), ex.getClass()))
+							if (handler.getClazz() == null || SReflect.isSupertype(handler.getClazz().getType(instance.getClassLoader(), instance.getModel().getAllImports()), ex.getClass()))
 							{
 								next = handler;
 								break;

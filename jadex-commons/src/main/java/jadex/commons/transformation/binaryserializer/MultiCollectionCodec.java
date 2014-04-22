@@ -112,7 +112,7 @@ public class MultiCollectionCodec extends AbstractCodec
 			Field mapfield = MultiCollection.class.getDeclaredField("map");
 			mapfield.setAccessible(true);
 			Map map = (Map) mapfield.get(mc);
-			traverser.traverse(map, map.getClass(), traversed, processors, clone, null, ec);
+			traverser.doTraverse(map, map.getClass(), traversed, processors, clone, null, ec);
 			
 			Field typefield = MultiCollection.class.getDeclaredField("type");
 			typefield.setAccessible(true);
