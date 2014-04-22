@@ -216,6 +216,18 @@ public class SBpmnModelReader
 		    }
 		}
 		
+		Map<String, List<String>> semap = (Map<String, List<String>>) buffer.get("startelementsmap");
+		if (semap != null)
+		{
+			for (Map.Entry<String, List<String>> entry : semap.entrySet())
+			{
+				for (String id : entry.getValue())
+				{
+					ret.addStartElement(entry.getKey(), (MNamedIdElement) bpmnelementmap.get(id));
+				}
+			}
+		}
+		
 		return ret;
 	}
 	
@@ -678,7 +690,7 @@ public class SBpmnModelReader
 		{
 			buffer.put(tag.getLocalPart(), content);
 		}
-		else if ("startelement".equals(tag.getLocalPart()))
+		else if ("startElement".equals(tag.getLocalPart()))
 		{
 			List<String> startelements = (List<String>) buffer.get("startelements");
 			if (startelements == null)

@@ -45,6 +45,9 @@ public class ModelContainer implements IModelContainer
 	/** Edit mode for selection. */
 	public static final String EDIT_MODE_SELECTION = "Select";
 	
+	/** Edit mode for stealth selection. */
+	public static final String EDIT_MODE_STEALTH_SELECTION = "StealthSelect";
+	
 	/** Edit mode for adding control points. */
 	public static final String EDIT_MODE_ADD_CONTROL_POINT = "AddControlPoint";
 	

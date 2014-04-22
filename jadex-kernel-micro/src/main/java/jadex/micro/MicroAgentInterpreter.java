@@ -115,7 +115,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		try
 		{
 			this.classloader = model.getClassloader();
-			this.microagent = createAgent(microclass, model);
+			this.microagent = createAgent(microclass, model, persistinfo);
 
 			this.container = createMyServiceContainer(args);
 					
@@ -159,11 +159,22 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Create the agent.
 	 */
-	protected MicroAgent createAgent(Class<?> microclass, MicroModel model) throws Exception
+	protected MicroAgent createAgent(Class<?> microclass, MicroModel model, IPersistInfo pinfo) throws Exception
 	{
 		MicroAgent ret = null;
 		
-		final Object agent = microclass.newInstance();
+		Object tmpagent = null;
+		if (pinfo != null)
+		{
+			MicroAgentPersistInfo mapi = (MicroAgentPersistInfo) pinfo;
+			tmpagent = mapi.getUserAgentObject();
+		}
+		else
+		{
+			tmpagent = microclass.newInstance();
+		}
+		
+		final Object agent = tmpagent;
 		if(agent instanceof MicroAgent)
 		{
 			ret = (MicroAgent)agent;
@@ -193,6 +204,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //				}
 			}
 		}
+		
+		if (pinfo != null)
+		{
+		}
+		
 		return ret;
 	}
 	

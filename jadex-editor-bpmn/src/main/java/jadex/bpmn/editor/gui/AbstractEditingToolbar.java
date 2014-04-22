@@ -127,6 +127,11 @@ public abstract class AbstractEditingToolbar extends JPanel
 	 */
 	public String getEditMode()
 	{
+		if (toolgroup.getSelection() == null)
+		{
+			return ModelContainer.EDIT_MODE_STEALTH_SELECTION;
+		}
+		
 		return toolgroup.getSelection().getActionCommand();
 	}
 	
@@ -144,9 +149,10 @@ public abstract class AbstractEditingToolbar extends JPanel
 			if (editmode.equals(button.getActionCommand()))
 			{
 				toolgroup.setSelected(button.getModel(), true);
-				break;
+				return;
 			}
 		}
+		toolgroup.clearSelection();
 	}
 	
 	/**

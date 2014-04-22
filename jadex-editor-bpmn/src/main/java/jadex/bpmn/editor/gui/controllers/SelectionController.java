@@ -29,6 +29,11 @@ public class SelectionController implements mxIEventListener
 	 */
 	public void invoke(Object sender, mxEventObject evt)
 	{
+		if (ModelContainer.EDIT_MODE_STEALTH_SELECTION.equals(modelcontainer.getEditMode()))
+		{
+			return;
+		}
+		
 		//TODO: JGraphX Bug! added and removed are switched.
 		String removed = "added";
 		//String added = "removed";
