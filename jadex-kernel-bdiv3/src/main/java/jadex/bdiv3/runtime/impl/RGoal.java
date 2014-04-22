@@ -818,6 +818,8 @@ public class RGoal extends RProcessableElement implements IGoal
 				Method m = (Method)wa;
 				BDIAgentInterpreter	bai	= ((BDIAgentInterpreter)((BDIAgent)ia).getInterpreter());
 				Object[] params = bai.getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(), rplan.getModelElement(), event, rplan, rpe);
+				if(params==null)
+					System.out.println("Invalid parameter assignment");
 				m.invoke(getPojoElement(), params);
 			}
 			catch(Exception e)

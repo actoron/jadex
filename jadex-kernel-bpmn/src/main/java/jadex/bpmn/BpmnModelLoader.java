@@ -1,8 +1,5 @@
 package jadex.bpmn;
 
-import java.io.File;
-import java.net.URL;
-
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bridge.IComponentIdentifier;
@@ -14,6 +11,8 @@ import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
+
+import java.net.URL;
 
 /**
  *  Loader for eclipse STP BPMN models (.bpmn files).
@@ -69,7 +68,7 @@ public class BpmnModelLoader extends AbstractModelLoader
 	{	
 		if (name != null && name.endsWith(".bpmn2"))
 		{
-			MBpmnModel model = SBpmnModelReader.readModel(new File(info.getFilename()), null, classloader);
+			MBpmnModel model = SBpmnModelReader.readModel(info.getInputStream(), info.getFilename(), null, classloader);
 			IResourceIdentifier rid = (IResourceIdentifier)((Object[])context)[0];
 			if(rid==null)
 			{

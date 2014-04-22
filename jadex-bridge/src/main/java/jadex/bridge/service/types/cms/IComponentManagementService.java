@@ -5,6 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.ParameterInfo;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -22,7 +23,7 @@ import java.util.Map;
 /**
  *  General interface for components that the container can execute.
  */
-public interface IComponentManagementService //extends IService
+public interface IComponentManagementService
 {
 	//-------- management methods --------
 	
@@ -214,6 +215,14 @@ public interface IComponentManagementService //extends IService
 	 *  @return The children component descriptions.
 	 */
 	public IFuture<IComponentDescription[]> getChildrenDescriptions(IComponentIdentifier cid);
+	
+	/**
+	 *  Gets the component state.
+	 *  
+	 *  @param cid The component.
+	 *  @return The component state.
+	 */
+	public IFuture<IPersistInfo> getPersistableState(IComponentIdentifier cid);
 	
 	//-------- create methods for cms objects --------
 	

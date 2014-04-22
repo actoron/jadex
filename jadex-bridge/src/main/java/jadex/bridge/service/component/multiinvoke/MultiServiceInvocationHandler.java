@@ -54,7 +54,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		RequiredServiceInfo reqs = agent.getServiceContainer().getRequiredServiceInfo(reqname);
 		if(reqs==null)
 			throw new RuntimeException("Required service not found: "+reqname);
-		this.servicetype = reqs.getType().getType(agent.getClassLoader());
+		this.servicetype = reqs.getType().getType(agent.getClassLoader(), agent.getModel().getAllImports());
 		this.muxservicetype = muxservicetype;
 	}
 	

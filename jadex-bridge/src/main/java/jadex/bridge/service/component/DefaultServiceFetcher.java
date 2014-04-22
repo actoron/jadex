@@ -105,7 +105,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 //		System.out.println("searching: "+info.getName());
 		
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
-		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader());
+		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 		
 //		System.out.println(info.getType().getTypeName().toString());
 //		if(info.getType().getTypeName().indexOf("IDis")!=-1)
@@ -215,7 +215,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		final RequiredServiceBinding bd, boolean rebind, final IRemoteFilter<T> filter)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
-		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader());
+		final Class<T> type = (Class<T>)info.getType().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 		
 		final TerminableIntermediateFuture<T> ret = new TerminableIntermediateFuture<T>();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
@@ -893,7 +893,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 										for(NFRPropertyInfo nfprop: nfprops)
 										{
 											MethodInfo mi = nfprop.getMethodInfo();
-											Class<?> clazz = nfprop.getClazz().getType(ia.getClassLoader());
+											Class<?> clazz = nfprop.getClazz().getType(ia.getClassLoader(), ia.getModel().getAllImports());
 											INFProperty<?, ?> nfp = AbstractNFProperty.createProperty(clazz, ia, (IService)ret, nfprop.getMethodInfo());
 											if(mi==null)
 											{

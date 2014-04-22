@@ -29,7 +29,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,9 +89,9 @@ public class SBpmnModelReader
 	 *  @param file The model file.
 	 *  @param vreader The visual model reader, may be null.
 	 */
-	public static final MBpmnModel readModel(File file, IBpmnVisualModelReader vreader) throws Exception
+	public static final MBpmnModel readModel(InputStream in, String filename, IBpmnVisualModelReader vreader) throws Exception
 	{
-		return readModel(file, vreader, null);
+		return readModel(in, filename, vreader, null);
 	}
 	
 	/**
@@ -101,9 +101,9 @@ public class SBpmnModelReader
 	 *  @param vreader The visual model reader, may be null.
 	 *  @param cl The class loader for parsing expressions, may be null.
 	 */
-	public static final MBpmnModel readModel(File file, IBpmnVisualModelReader vreader, ClassLoader cl) throws Exception
+	public static final MBpmnModel readModel(InputStream in, String filename, IBpmnVisualModelReader vreader, ClassLoader cl) throws Exception
 	{
-		BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file));
+		BufferedInputStream fis = new BufferedInputStream(in);
 		XMLInputFactory fac = XMLInputFactory.newInstance(); 
 		XMLStreamReader reader = fac.createXMLStreamReader(fis);
 		
@@ -113,8 +113,8 @@ public class SBpmnModelReader
 		
 		MBpmnModel ret = new MBpmnModel();
 		ret.setClassLoader(cl);
-		ret.setFilename(file.getPath());
-		ret.setName(file.getName().substring(0, file.getName().length() - 6));
+		ret.setFilename(filename);
+		ret.setName(new File(filename).getName().substring(0, new File(filename).getName().length() - 6));
 		Map<String, MIdElement> bpmnelementmap = new HashMap<String, MIdElement>();
 		Map<String, MLane> lanemap = new HashMap<String, MLane>();
 		Map<String, String> laneparents = new HashMap<String, String>();

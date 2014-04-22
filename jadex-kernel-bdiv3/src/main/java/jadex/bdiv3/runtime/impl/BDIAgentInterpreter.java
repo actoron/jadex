@@ -37,6 +37,7 @@ import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.component.ComponentSuspendable;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -130,10 +131,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final BDIModel model, Class<?> agentclass, final Map<String, Object> args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, 
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
-		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, listener, inited);
+		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, persist, listener, inited);
 		this.bdimodel = model;
 		this.capa = new RCapability(bdimodel.getCapability());
 	}
@@ -989,8 +990,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								Object pojogoal = null;
 								try
 								{
+									boolean ok = true;
 									Class<?>[] ptypes = c.getParameterTypes();
 									Object[] pvals = new Object[ptypes.length];
+									
+									Annotation[][] anns = c.getParameterAnnotations();
+									int skip = ptypes.length - anns.length;
 									
 									for(int i=0; i<ptypes.length; i++)
 									{
@@ -1007,9 +1012,25 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 										{
 											pvals[i] = agent;
 										}
+										
+										// ignore implicit parameters of inner class constructor
+										if(pvals[i]==null && i>=skip)
+										{
+											for(int j=0; anns!=null && j<anns[i-skip].length; j++)
+											{
+												if(anns[i-skip][j] instanceof CheckNotNull)
+												{
+													ok = false;
+													break;
+												}
+											}
+										}
 									}
 									
-									pojogoal = c.newInstance(pvals);
+									if(ok)
+									{
+										pojogoal = c.newInstance(pvals);
+									}
 								}
 								catch(RuntimeException e)
 								{
@@ -1020,7 +1041,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 									throw new RuntimeException(e);
 								}
 								
-								if(!getCapability().containsGoal(pojogoal))
+								if(pojogoal!=null && !getCapability().containsGoal(pojogoal))
 								{
 									final Object fpojogoal = pojogoal;
 									dispatchTopLevelGoal(pojogoal)
@@ -1058,8 +1079,9 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							protected Object invokeMethod(IEvent event) throws Exception
 							{
 								m.setAccessible(true);
-								return m.invoke(null, getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
-									mgoal, new ChangeEvent(event), null, null));
+								Object[] pvals = getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
+									mgoal, new ChangeEvent(event), null, null);
+								return pvals!=null? m.invoke(null, pvals): null;
 							}
 														
 //							public Tuple2<Boolean, Object> prepareResult(Object res)
@@ -1121,20 +1143,29 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 //									{
 										Constructor<?>[] cons = gcl.getConstructors();
 										Object pojogoal = null;
+										boolean ok = false;
 										for(Constructor<?> c: cons)
 										{
 											try
 											{
-												pojogoal = c.newInstance(getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(),
-													mgoal, new ChangeEvent(event), null, null));
-												dispatchTopLevelGoal(pojogoal);
-												break;
+												Object[] vals = getInjectionValues(c.getParameterTypes(), c.getParameterAnnotations(),
+													mgoal, new ChangeEvent(event), null, null);
+												if(vals!=null)
+												{
+													pojogoal = c.newInstance(vals);
+													dispatchTopLevelGoal(pojogoal);
+													break;
+												}
+												else
+												{
+													ok = true;
+												}
 											}
 											catch(Exception e)
 											{
 											}
 										}
-										if(pojogoal==null)
+										if(pojogoal==null && !ok)
 											throw new RuntimeException("Unknown how to create goal: "+gcl);
 									}
 //								}
@@ -1900,6 +1931,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	// todo: support parameter names via annotation in guesser (guesser with meta information)
 	/**
 	 *  Get parameter values for injection into method and constructor calls.
+	 *  @return A valid assigment or null if no assignment could be found.
 	 */
 	protected Object[]	getInjectionValues(Class<?>[] ptypes, Annotation[][] anns, MElement melement, ChangeEvent event, RPlan rplan, RProcessableElement rpe, Collection<Object> vs)
 	{
@@ -1955,6 +1987,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			vals.add(event.getValue());
 			if(event.getValue() instanceof ChangeInfo)
 			{
+				vals.add(new ChangeInfoEntryMapper((ChangeInfo<?>)event.getValue()));
 				vals.add(((ChangeInfo<?>)event.getValue()).getValue());
 			}
 		}
@@ -1985,6 +2018,8 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		}
 		
 		// Fill in values from annotated events or using parameter guesser.
+		boolean[] notnulls = new boolean[ptypes.length];
+		
 		Object[]	ret	= new Object[ptypes.length];
 		SimpleParameterGuesser	g	= new SimpleParameterGuesser(vals);
 		for(int i=0; i<ptypes.length; i++)
@@ -2022,7 +2057,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 							}
 							else if(event.getValue() instanceof ChangeInfo)
 							{
-								ChangeInfo<?> ci = (ChangeInfo<?>)event.getValue();
+								final ChangeInfo<?> ci = (ChangeInfo<?>)event.getValue();
 								if(ptypes[i].equals(ChangeInfo.class))
 								{
 									ret[i] = ci;
@@ -2031,6 +2066,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 								else if(SReflect.getWrappedType(ptypes[i]).isInstance(ci.getValue()))
 								{
 									ret[i] = ci.getValue();
+									set = true;
+								}
+								else if(ptypes[i].equals(Map.Entry.class))
+								{
+									ret[i] = new ChangeInfoEntryMapper(ci);
 									set = true;
 								}
 							}
@@ -2056,6 +2096,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 
 					}
 				}
+				else if(anns[i][j] instanceof CheckNotNull)
+				{
+					notnulls[i] = true;
+				}
 			}
 			
 			if(!done)
@@ -2071,6 +2115,15 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			for(int i=0; i<ret.length; i++)
 			{
 				ret[i]	= adaptToCapability(ret[i], capaname);
+			}
+		}
+		
+		for(int i=0; i<ptypes.length; i++)
+		{
+			if(notnulls[i] && ret[i]==null)
+			{
+				ret = null;
+				break;
 			}
 		}
 		
@@ -2203,8 +2256,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		{
 			m.setAccessible(true);
 			
-			Object[]	vals	= getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
+			Object[] vals = getInjectionValues(m.getParameterTypes(), m.getParameterAnnotations(),
 				modelelement, event!=null ? new ChangeEvent(event) : null, rplan, null);
+			if(vals==null)
+				System.out.println("Invalid parameter assignment");
 			Object app = m.invoke(pojo, vals);
 			if(app instanceof Boolean)
 			{
@@ -2314,6 +2369,55 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		return events;
 	}
 	
+	/**
+	 *  Map a change info as Map:Entry.
+	 */
+	public static class ChangeInfoEntryMapper implements Map.Entry
+	{
+		protected ChangeInfo<?>	ci;
+
+		public ChangeInfoEntryMapper(ChangeInfo<?> ci)
+		{
+			this.ci = ci;
+		}
+
+		public Object getKey()
+		{
+			return ci.getInfo();
+		}
+
+		public Object getValue()
+		{
+			return ci.getValue();
+		}
+
+		public Object setValue(Object value)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean equals(Object obj)
+		{
+			boolean	ret	= false;
+			
+			if(obj instanceof Map.Entry)
+			{
+				Map.Entry<?,?>	e1	= this;
+				Map.Entry<?,?>	e2	= (Map.Entry<?,?>)obj;
+				ret	= (e1.getKey()==null ? e2.getKey()==null : e1.getKey().equals(e2.getKey()))
+					&& (e1.getValue()==null ? e2.getValue()==null : e1.getValue().equals(e2.getValue()));
+			}
+			
+			return ret;
+		}
+
+		public int hashCode()
+		{
+			return (getKey()==null ? 0 : getKey().hashCode())
+				^ (getValue()==null ? 0 : getValue().hashCode());
+		}
+	}
+
 	/**
 	 *  Condition for checking the lifecycle state of a goal.
 	 */

@@ -154,7 +154,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 
 		if(info.getMultiplexType()!=null)
 		{
-			T ms = getMultiService(info.getName(), (Class<T>)info.getMultiplexType().getType(instance.getClassLoader()));
+			T ms = getMultiService(info.getName(), (Class<T>)info.getMultiplexType().getType(instance.getClassLoader(), instance.getModel().getAllImports()));
 			return new Future<T>(ms);
 		}
 		
@@ -779,9 +779,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 
 		final Future<Class<?>> ret = new Future<Class<?>>();
-		if(sid.getServiceType().getType(instance.getClassLoader())!=null)
+		if(sid.getServiceType().getType(instance.getClassLoader(), instance.getModel().getAllImports())!=null)
 		{
-			ret.setResult(sid.getServiceType().getType(instance.getClassLoader())); // todo: only local? remote would cause nullpointer
+			ret.setResult(sid.getServiceType().getType(instance.getClassLoader(), instance.getModel().getAllImports())); // todo: only local? remote would cause nullpointer
 		}
 		else
 		{

@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
@@ -153,5 +154,7 @@ public interface IComponentInstance
 	 *  Called after unblocking the component thread.
 	 */
 	public void	afterBlock();
+	
+	public IFuture<IPersistInfo> getPersistableState();
 
 }

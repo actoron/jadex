@@ -85,17 +85,24 @@ public interface IComponentFactory
 	
 	/**
 	 * Create a component instance.
+	 * @param desc	The component description.
 	 * @param factory The component adapter factory.
 	 * @param model The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
 	 * @param arguments The arguments for the component as name/value pairs.
 	 * @param parent The parent component (if any).
+	 * @param bindings	Optional bindings to override bindings from model.
+	 * @param copy	Global flag for parameter copying.
+	 * @param realtime	Global flag for real time timeouts.
+	 * @param persist	Global flag for persistence support.
+	 * @param resultlistener	Optional listener to be notified when the component finishes.
+	 * @param init	Future to be notified when init of the component is completed.
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
 	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, 
 		IComponentAdapterFactory factory, IModelInfo model, String config, Map<String, Object> arguments, 
-		IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
+		IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> init);
 
 }

@@ -67,7 +67,7 @@ public class ServicePoolAgent extends MicroAgent implements IServicePoolService
 				IPoolStrategy str = psi.getPoolStrategy()==null? new DefaultPoolStrategy(Runtime.getRuntime().availableProcessors()+1, 
 					Runtime.getRuntime().availableProcessors()+1): psi.getPoolStrategy();
 				CreationInfo ci = psi.getArguments()!=null? new CreationInfo(psi.getArguments()): null;
-				addServiceType(psi.getServicetype().getType(getClassLoader()), str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
+				addServiceType(psi.getServicetype().getType(getClassLoader(), getModel().getAllImports()), str, psi.getWorkermodel(), ci, psi.getPublishInfo()).addResultListener(lis);
 			}
 		}
 		else
