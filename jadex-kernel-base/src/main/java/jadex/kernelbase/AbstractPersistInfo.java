@@ -1,7 +1,9 @@
 package jadex.kernelbase;
 
-import java.util.Map;
 import jadex.bridge.modelinfo.IPersistInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
+
+import java.util.Map;
 
 /**
  *  Interpreter state information used to persist components.
@@ -11,8 +13,13 @@ import jadex.bridge.modelinfo.IPersistInfo;
  */
 public abstract class AbstractPersistInfo implements IPersistInfo
 {
+	//-------- attributes --------
+	
 	/** File name of the model. */
 	protected String modelfilename;
+	
+	/** The component description. */
+	protected IComponentDescription	desc;
 	
 	/** The application configuration. */
 	protected String config;
@@ -26,6 +33,8 @@ public abstract class AbstractPersistInfo implements IPersistInfo
 	/** The properties. */
 	protected Map<String, Object> properties;
 	
+	//-------- constructors --------
+	
 	/**
 	 *  Empty constructor for bean compatibility.
 	 */
@@ -38,12 +47,15 @@ public abstract class AbstractPersistInfo implements IPersistInfo
 	 */
 	public AbstractPersistInfo(AbstractInterpreter interpreter)
 	{
-		modelfilename = interpreter.getModel().getFilename();
+		modelfilename	= interpreter.getModel().getFilename();
+		desc = interpreter.getComponentDescription();
 		config = interpreter.getConfiguration();
 		arguments = interpreter.getArguments();
 		results = interpreter.getResults();
 		properties = interpreter.getProperties();
 	}
+	
+	//-------- methods --------
 
 	/**
 	 *  Gets the model file name.
@@ -63,6 +75,26 @@ public abstract class AbstractPersistInfo implements IPersistInfo
 	public void setModelFileName(String modelfilename)
 	{
 		this.modelfilename = modelfilename;
+	}
+	
+	/**
+	 *  Get the component description.
+	 *
+	 *  @return The component description
+	 */
+	public IComponentDescription getComponentDescription()
+	{
+		return desc;
+	}
+
+	/**
+	 *  Set the component description.
+	 *
+	 *  @param desc	The component description
+	 */
+	public void	setComponentDescription(IComponentDescription desc)
+	{
+		this.desc	= desc;
 	}
 
 	/**

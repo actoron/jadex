@@ -234,7 +234,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		this.adapter = adapter;
 		this.container = container;
 		
-		topthread = new ProcessThread(""+idcnt++, null, null, this);
 		topthread.setParameterValue("$cms", cms);
 		topthread.setParameterValue("$clock", cs);
 		topthread.setParameterValue("$msgservice", ms);
@@ -270,7 +269,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Initialize context variables.
-				topthread.setParameterValue("$interpreter", BpmnInterpreter.this);
 				init(getModel(), getConfiguration(), arguments)
 					.addResultListener(createResultListener(new DelegationResultListener<Void>(inited)
 				{
@@ -637,9 +635,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 //	 */
 //	protected void executeInitStep2()
 //	{
-//		// Initialize context variables.
-//		variables.put("$interpreter", this);
-//		
 //		init(getModel(), getConfiguration(), arguments)
 //			.addResultListener(createResultListener(new DelegationResultListener(inited)
 //		{
