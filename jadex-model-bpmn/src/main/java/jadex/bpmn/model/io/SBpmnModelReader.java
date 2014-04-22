@@ -217,11 +217,14 @@ public class SBpmnModelReader
 		}
 		
 		Map<String, List<String>> semap = (Map<String, List<String>>) buffer.get("startelementsmap");
-		for (Map.Entry<String, List<String>> entry : semap.entrySet())
+		if (semap != null)
 		{
-			for (String id : entry.getValue())
+			for (Map.Entry<String, List<String>> entry : semap.entrySet())
 			{
-				ret.addStartElement(entry.getKey(), (MNamedIdElement) bpmnelementmap.get(id));
+				for (String id : entry.getValue())
+				{
+					ret.addStartElement(entry.getKey(), (MNamedIdElement) bpmnelementmap.get(id));
+				}
 			}
 		}
 		
