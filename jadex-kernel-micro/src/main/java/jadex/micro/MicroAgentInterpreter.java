@@ -12,6 +12,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -1716,6 +1717,19 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		return microagent;
 	}
+	
+	/**
+     *  Get the state of the interpreter.
+     *  @return The state of the interpreter.
+     */
+    public IFuture<IPersistInfo> getPersistableState()
+    {
+        final Future<IPersistInfo> ret = new Future<IPersistInfo>();
+
+        ret.setResult(new MicroAgentPersistInfo(this));
+
+        return ret;
+    }
 
 	/**
 	 *  Info struct for steps.
