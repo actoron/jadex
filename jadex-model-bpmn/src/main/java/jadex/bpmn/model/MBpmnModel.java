@@ -207,7 +207,6 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	public MBpmnModel()
 	{
 		this.modelinfo = new ModelInfo();
-		//FIXME: Hack!
 		modelinfo.setType("BPMN Process");
 	}
 	
@@ -781,6 +780,15 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get all start activities of the model.
 	 *  @return A non-empty List of start activities or null, if none.
 	 */
+	public List<MActivity> getStartActivities()
+	{
+		return getStartActivities(null, null);
+	}
+	
+	/**
+	 *  Get all start activities of the model.
+	 *  @return A non-empty List of start activities or null, if none.
+	 */
 	public List<MActivity> getStartActivities(String poolname, String lanename)
 	{
 		List<MActivity> ret	= null;
@@ -1180,48 +1188,50 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 */
 	protected String[] getConfigurations()
 	{
-		// Todo: more in configuration than just pools/lanes?
-		String[]	ret;
-		List	pools	= getPools();
-		if(pools!=null)
-		{
-			List	aret	= new ArrayList();
-			if(pools.size()>1)
-			{
-				aret.add("All");
-			}
-			
-			for(int i=0; i<pools.size(); i++)
-			{
-				MPool	pool	= (MPool)pools.get(i);
-				aret.add(pool.getName());
+		return configurations==null? new String[0]: configurations.keySet().toArray(new String[configurations.size()]);
 				
-				List	lanes	= pool.getLanes();
-				if(lanes!=null)
-				{
-					for(int j=0; j<lanes.size(); j++)
-					{
-						MLane	lane	= (MLane)lanes.get(j);
-						String	name	= lane.getName();
-						while(lane.getLane()!=null)
-						{
-							lane	= lane.getLane();
-							name	= lane.getName() + "." + name;
-						}
-						
-						aret.add(pool.getName()+"."+name);
-					}
-					ret	= (String[])aret.toArray(new String[aret.size()]);
-				}
-			}			
-			ret	= (String[])aret.toArray(new String[aret.size()]);
-		}
-		else
-		{
-			ret	= SUtil.EMPTY_STRING_ARRAY;
-		}
-		
-		return ret;
+//		// Todo: more in configuration than just pools/lanes?
+//		String[]	ret;
+//		List	pools	= getPools();
+//		if(pools!=null)
+//		{
+//			List	aret	= new ArrayList();
+//			if(pools.size()>1)
+//			{
+//				aret.add("All");
+//			}
+//			
+//			for(int i=0; i<pools.size(); i++)
+//			{
+//				MPool	pool	= (MPool)pools.get(i);
+//				aret.add(pool.getName());
+//				
+//				List	lanes	= pool.getLanes();
+//				if(lanes!=null)
+//				{
+//					for(int j=0; j<lanes.size(); j++)
+//					{
+//						MLane	lane	= (MLane)lanes.get(j);
+//						String	name	= lane.getName();
+//						while(lane.getLane()!=null)
+//						{
+//							lane	= lane.getLane();
+//							name	= lane.getName() + "." + name;
+//						}
+//						
+//						aret.add(pool.getName()+"."+name);
+//					}
+//					ret	= (String[])aret.toArray(new String[aret.size()]);
+//				}
+//			}			
+//			ret	= (String[])aret.toArray(new String[aret.size()]);
+//		}
+//		else
+//		{
+//			ret	= SUtil.EMPTY_STRING_ARRAY;
+//		}
+//		
+//		return ret;
 	}
 	
 	/**

@@ -3,6 +3,9 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
+import jadex.bpmn.model.MIdElement;
+import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
@@ -181,10 +184,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	
 	// todo: allow multiple pools/lanes?
 	/** The configuration. */
-	protected String pool;
+//	protected String pool;
 	
 	/** The configuration. */
-	protected String lane;
+//	protected String lane;
 	
 	/** The activity handlers. */
 	protected Map<String, IActivityHandler> activityhandlers;
@@ -315,34 +318,35 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 		this.bpmnmodel = model;
 		
-		// Extract pool/lane from config.
-		String config = getConfiguration();
-		if(config==null || ALL.equals(config))
-		{
-			this.pool	= null;
-			this.lane	= null;
-		}
-		else
-		{
-			String poollane = model.getPoolLane(config);
-			if(poollane!=null && poollane.length()>0)
-			{
-				int idx	= config.indexOf('.');
-				if(idx==-1)
-				{
-					this.pool	= config;
-					this.lane	= null;
-				}
-				else
-				{
-					this.pool	= config.substring(0, idx);
-					this.lane	= config.substring(idx+1);
-				}
-			}
-		}
+//		// Extract pool/lane from config.
+//		String config = getConfiguration();
+//		if(config==null || ALL.equals(config))
+//		{
+//			this.pool	= null;
+//			this.lane	= null;
+//		}
+//		else
+//		{
+//			String poollane = model.getPoolLane(config);
+//			if(poollane!=null && poollane.length()>0)
+//			{
+//				int idx	= config.indexOf('.');
+//				if(idx==-1)
+//				{
+//					this.pool	= config;
+//					this.lane	= null;
+//				}
+//				else
+//				{
+//					this.pool	= config.substring(0, idx);
+//					this.lane	= config.substring(idx+1);
+//				}
+//			}
+//		}
 		
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
+		
 		this.topthread = new ProcessThread(""+idcnt++, null, null, this);
 		this.messages = new ArrayList<Object>();
 		this.streams = new ArrayList<IConnection>();
@@ -490,7 +494,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		
 		try
 		{
-			if(!isFinished(pool, lane) && isReady(pool, lane))
+			if(!isFinished() && isReady())
 			{
 				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{
@@ -499,7 +503,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 						System.currentTimeMillis(), PublishEventLevel.FINE), PublishTarget.TOALL);
 				}
 				
-				executeStep(pool, lane);
+//				executeStep(pool, lane);
+				executeStep(null, null);
 				
 				if(hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{
@@ -511,7 +516,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			
 //			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
 			
-			if(!finishing && isFinished(pool, lane) && !bpmnmodel.isKeepAlive() && started 
+			if(!finishing && isFinished() && !bpmnmodel.isKeepAlive() && started 
 				&& bpmnmodel.getEventSubProcessStartEvents().isEmpty()) // keep alive also process with event subprocesses
 			{
 //				System.out.println("terminating: "+getComponentIdentifier());
@@ -537,7 +542,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			
 //			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
 			
-			ret = !isFinished(pool, lane) && isReady(pool, lane);
+			ret = !isFinished() && isReady();
 		}
 		catch(ComponentTerminatedException ate)
 		{
@@ -665,7 +670,39 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
         MActivity triggeractivity = null;
         
         // Search and add trigger activity for event processes (that have trigger event in a subprocess)
-        List<MActivity> startacts	= bpmnmodel.getStartActivities(null, null);
+        List<MActivity> startacts = new ArrayList<MActivity>();
+        if(getConfiguration()!=null)
+        {
+        	List<MNamedIdElement> elems = bpmnmodel.getStartElements(getConfiguration());
+        	for(MNamedIdElement elem: elems)
+        	{
+        		if(elem instanceof MActivity)
+        		{
+        			startacts.add((MActivity)elem);
+        		}
+        		else if(elem instanceof MPool)
+        		{
+        			startacts.addAll(bpmnmodel.getStartActivities(elem.getName(), null));
+        		}
+        		else if(elem instanceof MLane)
+        		{
+        			MLane lane = (MLane)elem;
+        			
+        			MIdElement tmp = lane;
+        			for(; tmp!=null && !(tmp instanceof MPool); tmp = bpmnmodel.getParent(tmp))
+        			{
+        			}
+        			String poolname = tmp==null? null: ((MPool)tmp).getName();
+        			
+          			startacts.addAll(bpmnmodel.getStartActivities(poolname, elem.getName()));
+        		}
+        	}
+        }
+        else
+        {
+        	startacts = bpmnmodel.getStartActivities();
+        }
+        
         Set<MActivity> startevents = startacts!=null ? new HashSet<MActivity>(startacts) : new HashSet<MActivity>();
         if(trigger != null)
         {
@@ -695,12 +732,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             	{
             		ProcessThread thread = new ProcessThread(""+idcnt++, triggersubproc, getTopLevelThread(), this);
             		getTopLevelThread().addThread(thread);
-//            		context.addThread(thread);
-//            		ThreadContext subcontext = new ThreadContext(triggersubproc, thread);
-//            		thread.setSubcontext(subcontext);
 					ProcessThread subthread = new ProcessThread(""+idcnt++, triggeractivity, thread, this);
 					thread.addThread(subthread);
-//					subcontext.addThread(subthread);
 					subthread.setParameterValue("$event", trigger.getThirdEntity());
             	}
             	else
@@ -708,7 +741,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
                     ProcessThread    thread    = new ProcessThread(""+idcnt++, mact, getTopLevelThread(), BpmnInterpreter.this);
                     thread.setParameterValue("$event", trigger.getThirdEntity());
                     getTopLevelThread().addThread(thread);
-//                    context.addThread(thread);
             	}
             }
             else if(!MBpmnModel.EVENT_START_MESSAGE.equals(mact.getActivityType())
@@ -955,6 +987,17 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
 	 *  @return True, when the process instance is finished with regards to the specified pool/lane. When both pool and lane are null, true is returned only when all pools/lanes are finished.
 	 */
+	public boolean isFinished()
+	{
+		return topthread.isFinished(null, null);
+	}
+	
+	/**
+	 *  Check, if the process has terminated.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 *  @return True, when the process instance is finished with regards to the specified pool/lane. When both pool and lane are null, true is returned only when all pools/lanes are finished.
+	 */
 	public boolean isFinished(String pool, String lane)
 	{
 		return topthread.isFinished(pool, lane);
@@ -1049,6 +1092,16 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		}
 	}
 
+	/**
+	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
+	 *  @param pool	The pool to be executed or null for any.
+	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
+	 */
+	public boolean	isReady()
+	{
+		return isReady(null, null);
+	}
+	
 	/**
 	 *  Check if the process is ready, i.e. if at least one process thread can currently execute a step.
 	 *  @param pool	The pool to be executed or null for any.
@@ -1399,7 +1452,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					SJavaParser.parseExpression(exp, null, null);
 					edge.addParameterMapping("step", exp, null);
 					act.addIncomingSequenceEdge(edge);
-					MPool pl = pool!=null? bpmnmodel.getPool(pool): (MPool)bpmnmodel.getPools().get(0);
+//					MPool pl = pool!=null? bpmnmodel.getPool(pool): (MPool)bpmnmodel.getPools().get(0);
+					MPool pl = (MPool)bpmnmodel.getPools().get(0);
 					act.setPool(pl);
 					ProcessThread thread = new ProcessThread(""+idcnt++, act, topthread, BpmnInterpreter.this);
 					thread.setLastEdge(edge);
@@ -1512,7 +1566,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		{
 			// Build map of potentially matching events: method name -> {list of matching signal event activities}
 			MultiCollection	events	= new MultiCollection();
-			List<MActivity>	starts	= this.bpmnmodel.getStartActivities(pool, lane);
+//			List<MActivity>	starts	= this.bpmnmodel.getStartActivities(pool, lane);
+			List<MActivity>	starts	= this.bpmnmodel.getStartActivities();
 			for(int i=0; starts!=null && i<starts.size(); i++)
 			{
 				MActivity	act	= (MActivity)starts.get(i);

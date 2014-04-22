@@ -38,7 +38,7 @@ public class MSubProcess extends MActivity
 	//-------- added --------
 	
 	/** The subprocess type (e.g. looping). */
-	protected String	subprocesstype;
+	protected String subprocesstype;
 	
 	/** Non-functional hard constraints valid during the subprocess */
 	protected List<MHardConstraint> hardconstraints;

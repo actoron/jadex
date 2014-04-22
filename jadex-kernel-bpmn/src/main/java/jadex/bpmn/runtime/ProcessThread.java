@@ -635,7 +635,7 @@ public class ProcessThread	implements ITaskContext
 	{
 		// Pool null for external steps.
 		MPool po = getActivity().getPool();
-		assert po !=null: getActivity();
+		assert po!=null: getActivity();
 		boolean	ret	= pool==null || pool.equals(po.getName());
 		
 		// Test lane
@@ -1260,7 +1260,7 @@ public class ProcessThread	implements ITaskContext
 //			for(Iterator<ProcessThread> it=threads.keySet().iterator(); finished && it.hasNext(); )
 			for(Iterator<ProcessThread> it=subthreads.iterator(); finished && it.hasNext(); )
 			{
-				finished	= !it.next().belongsTo(pool, lane);
+				finished = !it.next().belongsTo(pool, lane);
 			}
 		}
 		return finished;
