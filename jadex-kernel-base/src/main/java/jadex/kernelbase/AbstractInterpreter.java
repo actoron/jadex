@@ -36,120 +36,117 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
- *  The abstract interpreter add state to the 
- *  stateless interpreter and implements several abstract methods.
+ * The abstract interpreter add state to the stateless interpreter and
+ * implements several abstract methods.
  */
 public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 {
-	//-------- attributes --------
-	
+	// -------- attributes --------
+
 	/** The application type. */
-	protected IModelInfo model;
+	protected IModelInfo																									model;
 
 	/** The application configuration. */
-	protected String config;
-	
+	protected String																										config;
+
 	/** The arguments. */
-	private Map<String, Object> arguments;
-	
+	private Map<String, Object>																								arguments;
+
 	/** The results. */
-	protected Map<String, Object> results;
-	
+	protected Map<String, Object>																							results;
+
 	/** The properties. */
-	protected Map<String, Object> properties;
-	
+	protected Map<String, Object>																							properties;
+
 	/** The parent component. */
-	protected IExternalAccess parent;
+	protected IExternalAccess																								parent;
 
 	/** The component adapter. */
-	protected IComponentAdapter	adapter;
-	
-	/** The value fetcher. */
-	protected IValueFetcher	fetcher;
-	
-	/** The service container. */
-	protected IServiceContainer container;
-		
-	/** The external access (cached). */
-	protected volatile IExternalAccess access;
-	
-	/** The required service binding information. */
-	protected RequiredServiceBinding[] bindings;
-	
-	/** The extension instances. */
-	protected Map<String, IExtensionInstance> extensions;	
+	protected IComponentAdapter																								adapter;
 
-	
+	/** The value fetcher. */
+	protected IValueFetcher																									fetcher;
+
+	/** The service container. */
+	protected IServiceContainer																								container;
+
+	/** The external access (cached). */
+	protected volatile IExternalAccess																						access;
+
+	/** The required service binding information. */
+	protected RequiredServiceBinding[]																						bindings;
+
+	/** The extension instances. */
+	protected Map<String, IExtensionInstance>																				extensions;
+
+
 	/** The subscriptions (subscription future -> subscription info). */
-	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>> subscriptions;
+	protected Map<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>>	subscriptions;
 
 	/** The result listener. */
-//	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
-	protected SubscriptionIntermediateFuture<Tuple2<String, Object>> cmssub;
-	protected List<SubscriptionIntermediateFuture<Tuple2<String, Object>>> resultsubscriptions;
+	// protected IIntermediateResultListener<Tuple2<String, Object>>
+	// resultlistener;
+	protected SubscriptionIntermediateFuture<Tuple2<String, Object>>														cmssub;
+
+	protected List<SubscriptionIntermediateFuture<Tuple2<String, Object>>>													resultsubscriptions;
 
 	/** The monitoring service getter. */
-	protected ServiceGetter<IMonitoringService> getter;
-	
+	protected ServiceGetter<IMonitoringService>																				getter;
+
 	/** The event emit level for subscriptions. */
-	protected PublishEventLevel emitlevelsub;
-	
-	
+	protected PublishEventLevel																								emitlevelsub;
+
+
 	/** The parameter copy allowed flag. */
-	protected boolean copy;
+	protected boolean																										copy;
 
 	/** The flag if local timeouts should be realtime. */
-	protected boolean realtime;
-	
+	protected boolean																										realtime;
+
 	/** The flag if persistence is enabled. */
-	protected boolean persist;
-	
-	//-------- constructors --------
-	
+	protected boolean																										persist;
+
+	// -------- constructors --------
+
 	/**
-	 *  Create a new context.
+	 * Create a new context.
 	 */
-	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
-		final IComponentAdapterFactory factory, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
-		IPersistInfo persistinfo,
-		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
+	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, final IComponentAdapterFactory factory, final IExternalAccess parent,
+		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist, IPersistInfo persistinfo, IIntermediateResultListener<Tuple2<String, Object>> resultlistener,
+		final Future<Void> inited)
 	{
-		this.config = config!=null? config: model.getConfigurationNames().length>0? 
-			model.getConfigurationNames()[0]: null;
+		this.config = config != null ? config : model.getConfigurationNames().length > 0 ? model.getConfigurationNames()[0] : null;
 		this.model = model;
 		this.parent = parent;
 		this.bindings = bindings;
 		this.copy = copy;
 		this.realtime = realtime;
-		this.persist	= persist;
+		this.persist = persist;
 		this.emitlevelsub = PublishEventLevel.OFF;
-//		this.emitlevelmon = desc.getMonitoring();
+		// this.emitlevelmon = desc.getMonitoring();
 		if(factory != null)
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.container = createServiceContainer();
-//		this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
-		
+		// this.arguments = arguments!=null? new HashMap(arguments): null; //
+		// clone arguments
+
 		// In case of platform the listener nulls?
-		if(resultlistener!=null)
+		if(resultlistener != null)
 		{
-			cmssub = new SubscriptionIntermediateFuture<Tuple2<String,Object>>();
+			cmssub = new SubscriptionIntermediateFuture<Tuple2<String, Object>>();
 			cmssub.addResultListener(resultlistener);
-			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String,Object>>>();
+			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String, Object>>>();
 			resultsubscriptions.add(cmssub);
 		}
 	}
-	
-	//-------- methods to be called by adapter --------
-		
+
+	// -------- methods to be called by adapter --------
+
 	/**
-	 *  Can be called concurrently (also during executeAction()).
-	 * 
-	 *  Get the external access for this component.
-	 *  The specific external access interface is kernel specific
-	 *  and has to be casted to its corresponding incarnation.
-	 *  @param listener	External access is delivered via result listener.
+	 * Can be called concurrently (also during executeAction()). Get the
+	 * external access for this component. 
 	 */
 	public IExternalAccess getExternalAccess()
 	{
@@ -163,58 +160,62 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 				}
 			}
 		}
-		
-		return access;
+
+		return persist ? new ShadowAccess(access) : access;
 	}
-	
+
 	/**
-	 *  Create the external access instance.
+	 * Create the external access instance.
 	 */
-	protected IExternalAccess	createExternalAccess()
+	protected IExternalAccess createExternalAccess()
 	{
 		return new ExternalAccess(this);
 	}
 
 	/**
-	 *  Get the arguments.
-	 *  @return The arguments.
+	 * Get the arguments.
+	 * 
+	 * @return The arguments.
 	 */
 	public Map<String, Object> getArguments()
 	{
-		return arguments!=null ? arguments : Collections.EMPTY_MAP;
+		return arguments != null ? arguments : Collections.EMPTY_MAP;
 	}
-	
+
 	/**
-	 *  Get the results of the component (considering it as a functionality).
-	 *  Note: The method cannot make use of the asynchronous result listener
-	 *  mechanism, because the it is called when the component is already
-	 *  terminated (i.e. no invokerLater can be used).
-	 *  @return The results map (name -> value). 
+	 * Get the results of the component (considering it as a functionality).
+	 * Note: The method cannot make use of the asynchronous result listener
+	 * mechanism, because the it is called when the component is already
+	 * terminated (i.e. no invokerLater can be used).
+	 * 
+	 * @return The results map (name -> value).
 	 */
 	public Map<String, Object> getResults()
 	{
 		// Todo: should be unmodifiable?
-//		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
-		return results!=null? results: Collections.EMPTY_MAP;
+		// return results!=null? Collections.unmodifiableMap(results):
+		// Collections.EMPTY_MAP;
+		return results != null ? results : Collections.EMPTY_MAP;
 	}
-	
+
 	/**
-	 *  Set a result value.
-	 *  @param name The result name.
-	 *  @param value The result value.
+	 * Set a result value.
+	 * 
+	 * @param name The result name.
+	 * @param value The result value.
 	 */
 	public void setResultValue(String name, Object value)
 	{
 		assert !getComponentAdapter().isExternalThread();
-		
+
 		// todo: store results only within listener?!
-		if(results==null)
-			results	= new HashMap<String, Object>();
+		if(results == null)
+			results = new HashMap<String, Object>();
 		results.put(name, value);
-		
-		if(resultsubscriptions!=null)
+
+		if(resultsubscriptions != null)
 		{
-			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut: resultsubscriptions.toArray(new SubscriptionIntermediateFuture[resultsubscriptions.size()]))
+			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> fut : resultsubscriptions.toArray(new SubscriptionIntermediateFuture[resultsubscriptions.size()]))
 			{
 				if(!fut.addIntermediateResultIfUndone(new Tuple2<String, Object>(name, value)))
 				{
@@ -223,30 +224,33 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			}
 		}
 	}
-	
+
 	/**
-	 *  Get the properties.
-	 *  @return the properties.
+	 * Get the properties.
+	 * 
+	 * @return the properties.
 	 */
 	public Map<String, Object> getProperties()
 	{
 		return properties;
 	}
-	
+
 	/**
-	 *  Get the parent.
-	 *  @return The parent.
+	 * Get the parent.
+	 * 
+	 * @return The parent.
 	 */
 	public IExternalAccess getParentAccess()
 	{
 		return parent;
 	}
-	
-	//-------- abstract interpreter methods --------
-	
+
+	// -------- abstract interpreter methods --------
+
 	/**
-	 *  Get the component adapter.
-	 *  @return The component adapter.
+	 * Get the component adapter.
+	 * 
+	 * @return The component adapter.
 	 */
 	public IComponentAdapter getComponentAdapter()
 	{
@@ -254,21 +258,21 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 
 	/**
-	 *  Get the model.
+	 * Get the model.
 	 */
 	public IModelInfo getModel()
 	{
 		return model;
 	}
-	
+
 	/**
-	 *  Get the value fetcher.
+	 * Get the value fetcher.
 	 */
 	public IValueFetcher getFetcher()
 	{
 		assert !getComponentAdapter().isExternalThread();
-		
-		if(fetcher==null)
+
+		if(fetcher == null)
 		{
 			fetcher = new InterpreterFetcher(this);
 		}
@@ -276,161 +280,171 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 
 	/**
-	 *  Add a default value for an argument (if not already present).
-	 *  Called once for each argument during init.
-	 *  @param name	The argument name.
-	 *  @param value	The argument value.
+	 * Add a default value for an argument (if not already present). Called once
+	 * for each argument during init.
+	 * 
+	 * @param name The argument name.
+	 * @param value The argument value.
 	 */
 	public boolean addArgument(String name, Object value)
 	{
 		boolean ret = false;
-		
+
 		// Also called from constructor.
-//		assert !getComponentAdapter().isExternalThread();
-		
-		if(arguments==null)
+		// assert !getComponentAdapter().isExternalThread();
+
+		if(arguments == null)
 		{
-			arguments	= new HashMap<String, Object>();
+			arguments = new HashMap<String, Object>();
 		}
 		if(!arguments.containsKey(name))
 		{
 			arguments.put(name, value);
 			ret = true;
 		}
-		
+
 		return ret;
 	}
 
 	/**
-	 *  Add a default value for a result (if not already present).
-	 *  Called once for each result during init.
-	 *  @param name	The result name.
-	 *  @param value	The result value.
+	 * Add a default value for a result (if not already present). Called once
+	 * for each result during init.
+	 * 
+	 * @param name The result name.
+	 * @param value The result value.
 	 */
-	public void	addDefaultResult(String name, Object value)
+	public void addDefaultResult(String name, Object value)
 	{
 		assert !getComponentAdapter().isExternalThread();
-		
-//		System.out.println("add def res: "+name+" "+value);
-		
-		if(results==null)
+
+		// System.out.println("add def res: "+name+" "+value);
+
+		if(results == null)
 		{
-			results	= new HashMap<String, Object>();
+			results = new HashMap<String, Object>();
 		}
 		results.put(name, value);
 	}
-	
+
 	/**
-	 *  Add an extension.
-	 *  @param name	The argument name.
-	 *  @param value	The extension.
+	 * Add an extension.
+	 * 
+	 * @param name The argument name.
+	 * @param value The extension.
 	 */
-	public void	addExtension(String name, IExtensionInstance value)
+	public void addExtension(String name, IExtensionInstance value)
 	{
 		assert !getComponentAdapter().isExternalThread();
-		
-		if(extensions==null)
+
+		if(extensions == null)
 		{
 			extensions = new HashMap<String, IExtensionInstance>();
 		}
 		extensions.put(name, value);
 	}
-	
+
 	/**
-	 *  Add a property value.
-	 *  @param name The name.
-	 *  @param val The value.
+	 * Add a property value.
+	 * 
+	 * @param name The name.
+	 * @param val The value.
 	 */
 	public void addProperty(String name, Object val)
 	{
 		assert !getComponentAdapter().isExternalThread();
-		
-		if(properties==null)
+
+		if(properties == null)
 			properties = new HashMap<String, Object>();
 		properties.put(name, val);
 	}
-	
+
 	/**
-	 *  Get a space of the application.
-	 *  @param name	The name of the space.
-	 *  @return	The space.
+	 * Get a space of the application.
+	 * 
+	 * @param name The name of the space.
+	 * @return The space.
 	 */
 	public IExtensionInstance getExtension(final String name)
 	{
 		assert !getComponentAdapter().isExternalThread();
-		
-		return extensions==null? null: (IExtensionInstance)extensions.get(name);
+
+		return extensions == null ? null : (IExtensionInstance)extensions.get(name);
 	}
-	
+
 	/**
-	 *  Get a space of the application.
-	 *  @param name	The name of the space.
-	 *  @return	The space.
+	 * Get a space of the application.
+	 * 
+	 * @param name The name of the space.
+	 * @return The space.
 	 */
 	public IExtensionInstance[] getExtensions()
 	{
-		// Hack!!! When init fails , terminateExtensions() can not be called on component thread
+		// Hack!!! When init fails , terminateExtensions() can not be called on
+		// component thread
 		// as component already terminated.
 		assert !getComponentAdapter().isExternalThread() || IComponentDescription.STATE_TERMINATED.equals(getComponentDescription().getState());
-		
-		return extensions==null? new IExtensionInstance[0]: 
-			(IExtensionInstance[])extensions.values().toArray(new IExtensionInstance[extensions.size()]);
+
+		return extensions == null ? new IExtensionInstance[0] : (IExtensionInstance[])extensions.values().toArray(new IExtensionInstance[extensions.size()]);
 	}
-	
+
 	/**
-	 *  Check if threa is allowed. 
-	 *  
-	 *  There is the problem that a component is already terminated and calls come back later.
-	 *  In that case we allow the listeners to be called on the wrong thread.
+	 * Check if threa is allowed. There is the problem that a component is
+	 * already terminated and calls come back later. In that case we allow the
+	 * listeners to be called on the wrong thread.
 	 */
 	public void checkAllowedThread()
 	{
 		assert !getComponentAdapter().isExternalThread() || IComponentDescription.STATE_TERMINATED.equals(getComponentDescription().getState());
 	}
-	
+
 	/**
-	 *  Get the configuration.
-	 *  @return The configuration.
+	 * Get the configuration.
+	 * 
+	 * @return The configuration.
 	 */
 	public String getConfiguration()
 	{
 		return this.config;
 	}
-	
+
 	/**
-	 *  Get the bindings.
-	 *  @return The bindings.
+	 * Get the bindings.
+	 * 
+	 * @return The bindings.
 	 */
-	public RequiredServiceBinding[]	getBindings()
+	public RequiredServiceBinding[] getBindings()
 	{
-		return bindings!=null ? Arrays.copyOf(bindings, bindings.length) : null;
+		return bindings != null ? Arrays.copyOf(bindings, bindings.length) : null;
 	}
-	
+
 	/**
-	 *  Create the service container.
-	 *  @return The service conainer.
+	 * Create the service container.
+	 * 
+	 * @return The service conainer.
 	 */
 	public IServiceContainer createServiceContainer()
 	{
-		assert container==null;
+		assert container == null;
 		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess(), isRealtime());
 	}
-	
+
 	/**
-	 *  Create the service container.
-	 *  @return The service container.
+	 * Create the service container.
+	 * 
+	 * @return The service container.
 	 */
 	public IServiceContainer getServiceContainer()
 	{
-		assert container!=null;
-//		if(container==null)
-//			container = createServiceContainer();
+		assert container != null;
+		// if(container==null)
+		// container = createServiceContainer();
 		return container;
 	}
 
 	/**
-	 *  Get the copy.
-	 *  @return the copy.
+	 * Get the copy.
+	 * 
+	 * @return the copy.
 	 */
 	public boolean isCopy()
 	{
@@ -438,153 +452,155 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	}
 
 	/**
-	 *  Get the realtime.
-	 *  @return The realtime.
+	 * Get the realtime.
+	 * 
+	 * @return The realtime.
 	 */
 	public boolean isRealtime()
 	{
 		return realtime;
 	}
-	
-	//-------- component listeners --------
-	
-//	/**
-//	 *  Add an component listener.
-//	 *  @param listener The listener.
-//	 */
-//	public IFuture<Void> addComponentListener(IComponentListener listener)
-//	{
-//		assert !getComponentAdapter().isExternalThread();
-//		
-//		if(componentlisteners==null)
-//			componentlisteners = new ArrayList<IComponentListener>();
-//		
-//		// Hack! How to find out if remote listener?
-//		if(Proxy.isProxyClass(listener.getClass()))
-//			listener = new RemoteComponentListener(getExternalAccess(), listener);
-//		
-//		componentlisteners.add(listener);
-//		return IFuture.DONE;
-//	}
-//	
-//	/**
-//	 *  Remove a component listener.
-//	 *  @param listener The listener.
-//	 */
-//	public IFuture<Void> removeComponentListener(IComponentListener listener)
-//	{
-//		assert !getComponentAdapter().isExternalThread();
-//		
-//		// Hack! How to find out if remote listener?
-//		if(Proxy.isProxyClass(listener.getClass()))
-//			listener = new RemoteComponentListener(getExternalAccess(), listener);
-//		
-//		if(componentlisteners!=null)
-//			componentlisteners.remove(listener);
-//		
-////		System.out.println("cl: "+componentlisteners);
-//		return IFuture.DONE;
-//	}
-	
-//	/**
-//	 *  Get the component listeners.
-//	 *  @return The component listeners.
-//	 */
-//	public IComponentListener[] getComponentListeners()
-//	{
-//		assert !getComponentAdapter().isExternalThread();
-//		
-//		return componentlisteners==null? new IComponentListener[0]: 
-//			(IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
-//	}
-//	
-//	/**
-//	 *  Get the component listeners.
-//	 *  @return The component listeners.
-//	 */
-//	public Collection<IComponentListener> getInternalComponentListeners()
-//	{
-//		assert !getComponentAdapter().isExternalThread();
-//		
-//		return componentlisteners;	
-//	}
-	
-//	/**
-//	 *  Check if event targets exist.
-//	 */
-//	public boolean hasEventTargets(boolean tomonitor)
-//	{
-//		return (subscriptions!=null && !subscriptions.isEmpty()) 
-//			||  (tomonitor && getComponentDescription().getMonitoring()!=null && getComponentDescription().getMonitoring().booleanValue());
-//	}
-	
-	
+
+	// -------- component listeners --------
+
+	// /**
+	// * Add an component listener.
+	// * @param listener The listener.
+	// */
+	// public IFuture<Void> addComponentListener(IComponentListener listener)
+	// {
+	// assert !getComponentAdapter().isExternalThread();
+	//
+	// if(componentlisteners==null)
+	// componentlisteners = new ArrayList<IComponentListener>();
+	//
+	// // Hack! How to find out if remote listener?
+	// if(Proxy.isProxyClass(listener.getClass()))
+	// listener = new RemoteComponentListener(getExternalAccess(), listener);
+	//
+	// componentlisteners.add(listener);
+	// return IFuture.DONE;
+	// }
+	//
+	// /**
+	// * Remove a component listener.
+	// * @param listener The listener.
+	// */
+	// public IFuture<Void> removeComponentListener(IComponentListener listener)
+	// {
+	// assert !getComponentAdapter().isExternalThread();
+	//
+	// // Hack! How to find out if remote listener?
+	// if(Proxy.isProxyClass(listener.getClass()))
+	// listener = new RemoteComponentListener(getExternalAccess(), listener);
+	//
+	// if(componentlisteners!=null)
+	// componentlisteners.remove(listener);
+	//
+	// // System.out.println("cl: "+componentlisteners);
+	// return IFuture.DONE;
+	// }
+
+	// /**
+	// * Get the component listeners.
+	// * @return The component listeners.
+	// */
+	// public IComponentListener[] getComponentListeners()
+	// {
+	// assert !getComponentAdapter().isExternalThread();
+	//
+	// return componentlisteners==null? new IComponentListener[0]:
+	// (IComponentListener[])componentlisteners.toArray(new
+	// IComponentListener[componentlisteners.size()]);
+	// }
+	//
+	// /**
+	// * Get the component listeners.
+	// * @return The component listeners.
+	// */
+	// public Collection<IComponentListener> getInternalComponentListeners()
+	// {
+	// assert !getComponentAdapter().isExternalThread();
+	//
+	// return componentlisteners;
+	// }
+
+	// /**
+	// * Check if event targets exist.
+	// */
+	// public boolean hasEventTargets(boolean tomonitor)
+	// {
+	// return (subscriptions!=null && !subscriptions.isEmpty())
+	// || (tomonitor && getComponentDescription().getMonitoring()!=null &&
+	// getComponentDescription().getMonitoring().booleanValue());
+	// }
+
+
 	/**
-	 *  Check if event targets exist.
+	 * Check if event targets exist.
 	 */
 	public boolean hasEventTargets(PublishTarget pt, PublishEventLevel pi)
 	{
 		boolean ret = false;
-		
-		if(pi.getLevel()<=getPublishEmitLevelSubscriptions().getLevel() 
-			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOSUBSCRIBERS.equals(pt)))
+
+		if(pi.getLevel() <= getPublishEmitLevelSubscriptions().getLevel() && (PublishTarget.TOALL.equals(pt) || PublishTarget.TOSUBSCRIBERS.equals(pt)))
 		{
-			ret = subscriptions!=null && !subscriptions.isEmpty();
+			ret = subscriptions != null && !subscriptions.isEmpty();
 		}
-		if(!ret && pi.getLevel()<=getPublishEmitLevelMonitoring().getLevel()
-			&& (PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt)))
+		if(!ret && pi.getLevel() <= getPublishEmitLevelMonitoring().getLevel() && (PublishTarget.TOALL.equals(pt) || PublishTarget.TOMONITORING.equals(pt)))
 		{
 			ret = true;
 		}
-		
+
 		return ret;
-	}
-	
-	/**
-	 *  Get the monitoring event emit level.
-	 */
-	public PublishEventLevel getPublishEmitLevelMonitoring()
-	{
-		return getComponentDescription().getMonitoring()!=null? getComponentDescription().getMonitoring(): PublishEventLevel.OFF;
-//		return emitlevelmon;
 	}
 
 	/**
-	 *  Get the monitoring event emit level for subscriptions.
-	 *  Is the maximum level of all subscriptions (cached for speed).
+	 * Get the monitoring event emit level.
+	 */
+	public PublishEventLevel getPublishEmitLevelMonitoring()
+	{
+		return getComponentDescription().getMonitoring() != null ? getComponentDescription().getMonitoring() : PublishEventLevel.OFF;
+		// return emitlevelmon;
+	}
+
+	/**
+	 * Get the monitoring event emit level for subscriptions. Is the maximum
+	 * level of all subscriptions (cached for speed).
 	 */
 	public PublishEventLevel getPublishEmitLevelSubscriptions()
 	{
 		return emitlevelsub;
 	}
-	
+
 	/**
-	 *  Get the monitoring service getter.
-	 *  @return The monitoring service getter.
+	 * Get the monitoring service getter.
+	 * 
+	 * @return The monitoring service getter.
 	 */
 	public ServiceGetter<IMonitoringService> getMonitoringServiceGetter()
 	{
-		if(getter==null)
+		if(getter == null)
 			getter = new ServiceGetter<IMonitoringService>(getInternalAccess(), IMonitoringService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		return getter;
 	}
-	
+
 	/**
-	 *  Forward event to all currently registered subscribers.
+	 * Forward event to all currently registered subscribers.
 	 */
 	public void publishLocalEvent(IMonitoringEvent event)
 	{
-		if(subscriptions!=null)
+		if(subscriptions != null)
 		{
-			for(SubscriptionIntermediateFuture<IMonitoringEvent> sub: subscriptions.keySet().toArray(new SubscriptionIntermediateFuture[0]))
+			for(SubscriptionIntermediateFuture<IMonitoringEvent> sub : subscriptions.keySet().toArray(new SubscriptionIntermediateFuture[0]))
 			{
 				publishLocalEvent(event, sub);
 			}
 		}
 	}
-	
+
 	/**
-	 *  Forward event to one subscribers.
+	 * Forward event to one subscribers.
 	 */
 	protected void publishLocalEvent(IMonitoringEvent event, SubscriptionIntermediateFuture<IMonitoringEvent> sub)
 	{
@@ -592,13 +608,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		try
 		{
 			PublishEventLevel el = tup.getSecondEntity();
-//			System.out.println("rec ev: "+event);
-			if(event.getLevel().getLevel()<=el.getLevel())
+			// System.out.println("rec ev: "+event);
+			if(event.getLevel().getLevel() <= el.getLevel())
 			{
 				IFilter<IMonitoringEvent> fil = tup.getFirstEntity();
-				if(fil==null || fil.filter(event))
+				if(fil == null || fil.filter(event))
 				{
-	//				System.out.println("forward to: "+event+" "+sub);
+					// System.out.println("forward to: "+event+" "+sub);
 					if(!sub.addIntermediateResultIfUndone(event))
 					{
 						subscriptions.remove(sub);
@@ -612,36 +628,38 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 *  Subscribe to monitoring events.
-	 *  @param filter An optional filter.
+	 * Subscribe to monitoring events.
+	 * 
+	 * @param filter An optional filter.
 	 */
 	public ISubscriptionIntermediateFuture<IMonitoringEvent> subscribeToEvents(IFilter<IMonitoringEvent> filter, boolean initial, PublishEventLevel emitlevel)
 	{
-		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
-			
+		final SubscriptionIntermediateFuture<IMonitoringEvent> ret = (SubscriptionIntermediateFuture<IMonitoringEvent>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class,
+			getInternalAccess());
+
 		ITerminationCommand tcom = new ITerminationCommand()
 		{
 			public void terminated(Exception reason)
 			{
 				removeSubscription(ret);
 			}
-			
+
 			public boolean checkTermination(Exception reason)
 			{
 				return true;
 			}
 		};
 		ret.setTerminationCommand(tcom);
-		
+
 		// Signal that subscription has been done
-		MonitoringEvent	subscribed	= new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), 
-			IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(), PublishEventLevel.COARSE);
-		boolean	post = false;
+		MonitoringEvent subscribed = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), IMonitoringEvent.TYPE_SUBSCRIPTION_START, System.currentTimeMillis(),
+			PublishEventLevel.COARSE);
+		boolean post = false;
 		try
 		{
-			post = filter==null || filter.filter(subscribed);
+			post = filter == null || filter.filter(subscribed);
 		}
 		catch(Exception e)
 		{
@@ -652,60 +670,63 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		}
 
 		addSubscription(ret, filter, emitlevel);
-		
+
 		if(initial)
 		{
 			List<IMonitoringEvent> evs = getCurrentStateEvents();
-			if(evs!=null && evs.size()>0)
+			if(evs != null && evs.size() > 0)
 			{
 				BulkMonitoringEvent bme = new BulkMonitoringEvent(evs.toArray(new IMonitoringEvent[evs.size()]));
 				ret.addIntermediateResult(bme);
 			}
 		}
-		
+
 		return ret;
 	}
-		
+
 	/**
-	 *  Add a new subscription.
-	 *  @param future The subscription future.
-	 *  @param si The subscription info.
+	 * Add a new subscription.
+	 * 
+	 * @param future The subscription future.
+	 * @param si The subscription info.
 	 */
 	protected void addSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> future, IFilter<IMonitoringEvent> filter, PublishEventLevel emitlevel)
 	{
-		if(subscriptions==null)
+		if(subscriptions == null)
 			subscriptions = new LinkedHashMap<SubscriptionIntermediateFuture<IMonitoringEvent>, Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>>();
-		if(emitlevel.getLevel()>emitlevelsub.getLevel())
+		if(emitlevel.getLevel() > emitlevelsub.getLevel())
 			emitlevelsub = emitlevel;
 		subscriptions.put(future, new Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel>(filter, emitlevel));
 	}
-	
+
 	/**
-	 *  Remove an existing subscription.
-	 *  @param fut The subscription future to remove.
+	 * Remove an existing subscription.
+	 * 
+	 * @param fut The subscription future to remove.
 	 */
 	protected void removeSubscription(SubscriptionIntermediateFuture<IMonitoringEvent> fut)
 	{
-		if(subscriptions==null || !subscriptions.containsKey(fut))
-			throw new RuntimeException("Subscriber not known: "+fut);
+		if(subscriptions == null || !subscriptions.containsKey(fut))
+			throw new RuntimeException("Subscriber not known: " + fut);
 		subscriptions.remove(fut);
 		emitlevelsub = PublishEventLevel.OFF;
-		for(Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel> tup: subscriptions.values())
+		for(Tuple2<IFilter<IMonitoringEvent>, PublishEventLevel> tup : subscriptions.values())
 		{
-			if(tup.getSecondEntity().getLevel()>emitlevelsub.getLevel())
+			if(tup.getSecondEntity().getLevel() > emitlevelsub.getLevel())
 				emitlevelsub = tup.getSecondEntity();
 			if(PublishEventLevel.COARSE.equals(emitlevelsub))
 				break;
 		}
 	}
-	
+
 	/**
-	 *  Subscribe to receive results.
+	 * Subscribe to receive results.
 	 */
 	public ISubscriptionIntermediateFuture<Tuple2<String, Object>> subscribeToResults()
 	{
-		final SubscriptionIntermediateFuture<Tuple2<String, Object>> ret = (SubscriptionIntermediateFuture<Tuple2<String, Object>>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class, getInternalAccess());
-		if(resultsubscriptions==null)
+		final SubscriptionIntermediateFuture<Tuple2<String, Object>> ret = (SubscriptionIntermediateFuture<Tuple2<String, Object>>)SFuture.getNoTimeoutFuture(SubscriptionIntermediateFuture.class,
+			getInternalAccess());
+		if(resultsubscriptions == null)
 		{
 			resultsubscriptions = new ArrayList<SubscriptionIntermediateFuture<Tuple2<String, Object>>>();
 		}
@@ -716,37 +737,37 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			{
 				resultsubscriptions.remove(ret);
 			}
-			
+
 			public boolean checkTermination(Exception reason)
 			{
 				return true;
 			}
 		});
-		
+
 		// Notify caller that subscription is done
 		ret.addIntermediateResult(null);
-		
+
 		// Notify about results
-		if(results!=null)
+		if(results != null)
 		{
-			for(Map.Entry<String, Object> res: results.entrySet())
+			for(Map.Entry<String, Object> res : results.entrySet())
 			{
 				ret.addIntermediateResult(new Tuple2<String, Object>(res.getKey(), res.getValue()));
 			}
 		}
-		
+
 		return ret;
 	}
-	
+
 	/**
-	 *  Terminate the result subscribers.
+	 * Terminate the result subscribers.
 	 */
 	public void terminateResultSubscribers()
 	{
-		if(resultsubscriptions!=null)
+		if(resultsubscriptions != null)
 		{
 			// terminate all but the first (cms) subscriptions
-			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> sub: resultsubscriptions)
+			for(SubscriptionIntermediateFuture<Tuple2<String, Object>> sub : resultsubscriptions)
 			{
 				if(sub.equals(cmssub))
 				{
@@ -756,14 +777,21 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 			}
 		}
 	}
-	
+
 	/**
-	 *  Invalidate the external access.
+	 * Invalidate the external access.
 	 */
 	public void invalidateAccess(boolean terminate)
 	{
-		if(access instanceof ExternalAccess
-			&& getComponentIdentifier().getParent()!=null)	// Do not invalidate platform access, otherwise shutdown doesn't work.
+		if(access instanceof ExternalAccess && getComponentIdentifier().getParent() != null) // Do
+																								// not
+																								// invalidate
+																								// platform
+																								// access,
+																								// otherwise
+																								// shutdown
+																								// doesn't
+																								// work.
 		{
 			((ExternalAccess)access).invalidate(terminate);
 		}

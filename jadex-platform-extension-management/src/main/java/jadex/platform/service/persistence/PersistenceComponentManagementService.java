@@ -2,10 +2,16 @@ package jadex.platform.service.persistence;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.kernelbase.IBootstrapFactory;
@@ -56,6 +62,52 @@ public class PersistenceComponentManagementService	extends DecoupledComponentMan
 			}
 		});
 		
+		return ret;
+	}
+	
+	/**
+	 *  Resurrect a persisted component.
+	 */
+	public IFuture<Void>	resurrectComponent(final IPersistInfo pi)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+				
+		// Todo: allow unpersisting at a different parent? 
+		getExternalAccess(pi.getComponentDescription().getName().getParent())
+			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+		{
+			public void customResultAvailable(final IExternalAccess parent)
+			{
+				// cinfo only needed for imports -> can be empty as model name is fully qualified.
+				getComponentFactory(pi.getModelFileName(), new CreationInfo(), pi.getComponentDescription().getResourceIdentifier())
+					.addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentFactory, Void>(ret)
+				{
+					public void customResultAvailable(final IComponentFactory factory)
+					{
+						factory.loadModel(pi.getModelFileName(), null, pi.getComponentDescription().getResourceIdentifier())
+							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IModelInfo, Void>(ret)
+						{
+							public void customResultAvailable(IModelInfo model)
+							{
+								// Todo: allow adapting component identifier (e.g. to changed platform suffix).
+								factory.createComponentInstance(pi.getComponentDescription(), getComponentAdapterFactory(), model, 
+										null, null, parent, null, copy, realtime, persist, pi, null, null)
+									.addResultListener(createResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, Void>(ret)
+								{
+									public void customResultAvailable(Tuple2<IComponentInstance, IComponentAdapter> tup)
+									{
+										adapters.put(pi.getComponentDescription().getName(), tup.getSecondEntity());
+										tup.getSecondEntity().wakeup();
+										ret.setResult(null);
+									}
+								}));
+							}
+						}));
+					}
+				}));
+			}
+		}));
+
 		return ret;
 	}
 }

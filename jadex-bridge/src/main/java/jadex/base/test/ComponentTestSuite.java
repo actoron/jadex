@@ -108,6 +108,7 @@ public class ComponentTestSuite extends TestSuite
 			"-autoshutdown", "false",
 			"-opengl", "false",
 			"-cli", "false",
+			"-persist", "true", // for testing persistence
 //			"-niotcptransport", "false",
 //			"-tcptransport", "true",
 //			"-deftimeout", "-1",

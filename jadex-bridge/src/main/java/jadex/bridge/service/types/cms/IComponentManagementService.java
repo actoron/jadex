@@ -224,6 +224,11 @@ public interface IComponentManagementService
 	 */
 	public IFuture<IPersistInfo> getPersistableState(IComponentIdentifier cid);
 	
+	/**
+	 *  Resurrect a persisted component.
+	 */
+	public IFuture<Void>	resurrectComponent(IPersistInfo pi);
+	
 	//-------- create methods for cms objects --------
 	
 	// todo: remove all following methods 

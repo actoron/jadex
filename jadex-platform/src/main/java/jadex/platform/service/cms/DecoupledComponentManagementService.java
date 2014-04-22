@@ -1019,14 +1019,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 					fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
 					{
 						public void customResultAvailable(Collection<IComponentFactory> facts)
-						{	
-							factories = facts;
-//							for(Iterator it=factories.iterator(); it.hasNext(); )
-//							{
-//								Object o = it.next();
-//								System.out.println("is: "+o+" "+(o instanceof IComponentFactory));
-//							}
-							
+						{								
 							// Reorder factories to assure that delegating multi loaders are last (if present).
 							if(facts.size()>1)
 							{
@@ -1046,6 +1039,13 @@ public class DecoupledComponentManagementService implements IComponentManagement
 								facts	= singles;
 								facts.addAll(multies);
 							}
+
+							factories = facts;
+//							for(Iterator it=factories.iterator(); it.hasNext(); )
+//							{
+//								Object o = it.next();
+//								System.out.println("is: "+o+" "+(o instanceof IComponentFactory));
+//							}
 
 							selectComponentFactory((IComponentFactory[])factories.toArray(new IComponentFactory[factories.size()]), model, cinfo, rid, 0)
 								.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
@@ -2530,11 +2530,17 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	 */
 	public IFuture<IPersistInfo> getPersistableState(IComponentIdentifier cid)
 	{
-		Future<IPersistInfo> ret = new Future<IPersistInfo>(new UnsupportedOperationException("Persisting components unsupported in this version."));
-		
-		return ret;
+		return new Future<IPersistInfo>(new UnsupportedOperationException("Jadex platform management extension addon required for enabling component persistence."));
 	}
 	
+	/**
+	 *  Resurrect a persisted component.
+	 */
+	public IFuture<Void>	resurrectComponent(IPersistInfo pi)
+	{
+		return new Future<Void>(new UnsupportedOperationException("Jadex platform management extension addon required for enabling component persistence."));
+	}
+
 	/**
 	 *  Get the component identifiers.
 	 *  @return The component identifiers.
@@ -3080,7 +3086,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	/**
 	 *  Create result listener that tolerates when agent is null at shutdown.
 	 */
-	protected IResultListener createResultListener(IResultListener listener)
+	protected <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
 		return agent==null? listener: agent.createResultListener(listener);
 	}

@@ -51,8 +51,8 @@ public class ThreadInfo
 	 */
 	public ThreadInfo(ProcessThread thread)
 	{
-		activityid = thread.getActivity().getId();
-		edgeid = thread.getLastEdge().getId();
+		activityid = thread.getActivity()!=null ? thread.getActivity().getId() : null;
+		edgeid = thread.getLastEdge()!=null ? thread.getLastEdge().getId() : null;
 		data = thread.getData();
 		dataedges = thread.getDataEdges();
 		exception = thread.getException();
