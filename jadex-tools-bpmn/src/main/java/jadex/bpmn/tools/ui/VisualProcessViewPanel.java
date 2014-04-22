@@ -1,13 +1,11 @@
 package jadex.bpmn.tools.ui;
 
 import jadex.bpmn.editor.BpmnEditor;
-import jadex.bpmn.editor.gui.BpmnEditorPanel;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.ZoomSlider;
-import jadex.bpmn.editor.gui.controllers.SelectionController;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
@@ -28,12 +26,8 @@ import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
 
 import java.awt.BorderLayout;
-import java.awt.ComponentOrientation;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -53,10 +47,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
-
-import com.mxgraph.util.mxEvent;
 
 /**
  * 
@@ -330,7 +321,7 @@ public class VisualProcessViewPanel extends JPanel
 	 */
 	protected class ProcessThreadModel extends AbstractTableModel
 	{
-		protected String[] colnames = new String[]{"Process-Id", "Activity", "Pool", "Lane", "Exception", "Data", "Status"};
+		protected String[] colnames = new String[]{"Process-Id", "Parent-Id", "Activity", "Pool", "Lane", "Exception", "Data", "Status"};
 		
 		public String getColumnName(int column)
 		{
@@ -350,7 +341,7 @@ public class VisualProcessViewPanel extends JPanel
 		public Object getValueAt(int row, int column)
 		{
 			Object ret = null;
-			ProcessThreadInfo	info	= (ProcessThreadInfo)threadinfos.toArray()[row];
+			ProcessThreadInfo info = (ProcessThreadInfo)threadinfos.toArray()[row];
 			
 			if(column==0)
 			{
@@ -358,25 +349,29 @@ public class VisualProcessViewPanel extends JPanel
 			}
 			else if(column==1)
 			{
-				ret = info.getActivity();
+				ret = info.getParentId();
 			}
 			else if(column==2)
 			{
-				ret = info.getPool(); 
+				ret = info.getActivity();
 			}
 			else if(column==3)
 			{
-				ret = info.getLane(); 
+				ret = info.getPool(); 
 			}
 			else if(column==4)
 			{
-				ret = info.getException();
+				ret = info.getLane(); 
 			}
 			else if(column==5)
 			{
-				ret = info.getData();
+				ret = info.getException();
 			}
 			else if(column==6)
+			{
+				ret = info.getData();
+			}
+			else if(column==7)
 			{
 				ret = info.isWaiting() ? "waiting" : "ready";
 			}
