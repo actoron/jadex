@@ -1,8 +1,16 @@
 package jadex.bpmn.editor.gui.propertypanels;
 
 import jadex.bpmn.editor.gui.ModelContainer;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VElement;
+import jadex.bpmn.editor.model.visual.VLane;
+import jadex.bpmn.editor.model.visual.VPool;
+import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MContextVariable;
+import jadex.bpmn.model.MLane;
+import jadex.bpmn.model.MNamedIdElement;
+import jadex.bpmn.model.MPool;
 import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -69,8 +77,11 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	/** The column names for the imports table. */
 	protected String[] IMPORTS_COLUMN_NAMES = { "Import" };
 	
+	/** The column names for the start activities table. */
+	protected String[] START_ACTIVITIES_COLUMN_NAMES = { "Type", "ID" };
+	
 	/** The column names for the configurations table. */
-	protected String[] CONFIGURATIONS_COLUMN_NAMES = { "Name", "Activated Pool.Lane", "Suspend", "Master", "Daemon", "Autoshutdown" };
+	protected String[] CONFIGURATIONS_COLUMN_NAMES = { "Name", "Suspend", "Master", "Daemon", "Autoshutdown" };
 	
 	/** The column names for the parameters table. */
 	protected String[] PARAMETERS_COLUMN_NAMES = { "Name", "Argument", "Result", "Description", "Type", "Initial Value" };
@@ -106,6 +117,9 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	
 	/** The configurations table. */
 	protected JTable conftable;
+	
+	/** The start elements table. */
+	protected JTable startelementstable;
 	
 	/** The configuration models for configuration choosers */
 	protected List<ConfigurationModel> confmodels = new ArrayList<ConfigurationModel>();
@@ -293,6 +307,10 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		
 		setupConfigurationsTable(tabpane);
 		
+		final int startelementsindex = tabpane.getTabCount();
+		
+		setupStartElementsTable(tabpane);
+		
 		setupParametersTable(tabpane);
 		
 		setupPropertiesTable(tabpane);
@@ -307,8 +325,27 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		
 		tabpane.addChangeListener(new ChangeListener()
 		{
+			boolean wasstealth = false;
+			
 			public void stateChanged(ChangeEvent e)
 			{
+				JTabbedPane tabpane = (JTabbedPane) e.getSource();
+				
+				if (startelementsindex == tabpane.getSelectedIndex())
+				{
+					modelcontainer.setEditMode(ModelContainer.EDIT_MODE_STEALTH_SELECTION);
+					wasstealth = true;
+				}
+				else
+				{
+					if (wasstealth)
+					{
+						wasstealth = false;
+						modelcontainer.getGraph().clearSelection();
+						modelcontainer.setEditMode(ModelContainer.EDIT_MODE_SELECTION);
+					}
+				}
+				
 				terminateEditing();
 			}
 		});
@@ -420,6 +457,13 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				modelcontainer.setDirty(true);
 				((ConfigurationTableModel) conftable.getModel()).fireTableRowsInserted(row, row);
 				
+				if (paramtable != null)
+				{
+					for (ConfigurationModel model : confmodels)
+					{
+						model.fireModelChange();
+					}
+				}
 			}
 		};
 		Action removeaction = new AbstractAction("Remove Configurations")
@@ -435,7 +479,14 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 				{
 					ConfigurationInfo conf = confcache.remove(ind[i]);
 					getModelInfo().setConfigurations((ConfigurationInfo[]) confcache.toArray(new ConfigurationInfo[confcache.size()]));
-					getModel().removePoolLane(conf.getName());
+					List<MNamedIdElement> startelements = getModel().getStartElements(conf.getName());
+					
+					if (startelements != null)
+					{
+						for (MNamedIdElement element : startelements)
+							getModel().removeStartElement(conf.getName(), element);
+					}
+					
 					modelcontainer.setDirty(true);
 					((ConfigurationTableModel) conftable.getModel()).fireTableRowsDeleted(ind[i], ind[i]);
 					
@@ -453,6 +504,13 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 						}
 					}
 				}
+				if (paramtable != null)
+				{
+					for (ConfigurationModel model : confmodels)
+					{
+						model.fireModelChange();
+					}
+				}
 			}
 		};
 		JPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
@@ -463,6 +521,98 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		gc.insets = new Insets(0, 0, 5, 5);
 		tablepanel.add(buttonpanel, gc);
 		tabpane.add(tablepanel, "Configurations");
+	}
+	
+	/**
+	 *  Initializes the start elements table.
+	 */
+	protected void setupStartElementsTable(JTabbedPane tabpane)
+	{
+		JPanel tablepanel = new JPanel(new GridBagLayout());
+		
+		final ConfigurationModel confmodel = new ConfigurationModel(modelcontainer.getBpmnModel().getModelInfo());
+		StartElementsTableModel samodel = new StartElementsTableModel(confmodel);
+		confmodels.add(confmodel);
+		ConfigComboBox confbox = new ConfigComboBox(confmodel, samodel);
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx = 0;
+		gc.anchor = GridBagConstraints.WEST;
+		gc.fill = GridBagConstraints.NONE;
+		gc.insets = new Insets(0, 5, 5, 0);
+		tablepanel.add(confbox, gc);
+		
+		gc = new GridBagConstraints();
+		gc.gridy = 1;
+		gc.gridheight = 2;
+		gc.weightx = 1.0;
+		gc.weighty = 1.0;
+		gc.fill = GridBagConstraints.BOTH;
+		gc.insets = new Insets(0, 5, 5, 0);
+		startelementstable = new JTable(samodel);
+		JScrollPane tablescrollpane = new JScrollPane(startelementstable);
+		tablepanel.add(tablescrollpane, gc);
+		
+		Action addaction = new AbstractAction("Add Start Activities")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Object[] scells = modelcontainer.getGraph().getSelectionCells();
+				
+				if (scells != null && confmodel.getSelectedItem() != null)
+				{
+					for (Object scell : scells)
+					{
+						if (scell instanceof VActivity ||
+							scell instanceof VPool ||
+							scell instanceof VLane)
+						{
+							terminateEditing();
+							
+							MNamedIdElement element = (MNamedIdElement) ((VElement) scell).getBpmnElement();
+							
+							int row = startelementstable.getRowCount();
+							List<MNamedIdElement> startelements = getModel().getStartElements((String) confmodel.getSelectedItem());
+							if (startelements == null || !startelements.contains(element))
+							{
+								getModel().addStartElement((String) confmodel.getSelectedItem(), element);
+								modelcontainer.setDirty(true);
+								((StartElementsTableModel) startelementstable.getModel()).fireTableRowsInserted(row, row);
+							}
+						}
+					}
+				}
+			}
+		};
+		Action removeaction = new AbstractAction("Remove Start Activities")
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				terminateEditing();
+				
+				int[] ind = startelementstable.getSelectedRows();
+				Arrays.sort(ind);
+				
+				List<MNamedIdElement> startactivities = getModel().getStartElements((String) confmodel.getSelectedItem());
+				if (startactivities != null)
+				{
+					for (int i = ind.length - 1; i >= 0; --i)
+					{
+						
+						startactivities.remove(ind[i]);
+						((StartElementsTableModel) startelementstable.getModel()).fireTableRowsDeleted(ind[i], ind[i]);
+					}
+					modelcontainer.setDirty(true);
+				}
+			}
+		};
+		AddRemoveButtonPanel buttonpanel = new AddRemoveButtonPanel(modelcontainer.getSettings().getImageProvider(), addaction, removeaction);
+		gc = new GridBagConstraints();
+		gc.gridy = 1;
+		gc.gridx = 1;
+		gc.fill = GridBagConstraints.NONE;
+		gc.insets = new Insets(0, 0, 5, 5);
+		tablepanel.add(buttonpanel, gc);
+		tabpane.add(tablepanel, "Start Elements");
 	}
 	
 	/**
@@ -1130,6 +1280,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	{
 		stopEditing(importtable);
 		stopEditing(conftable);
+		stopEditing(startelementstable);
 		stopEditing(paramtable);
 		stopEditing(proptable);
 		stopEditing(pstable);
@@ -1222,7 +1373,7 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 		 */
 		public Class<?> getColumnClass(int columnIndex)
 		{
-			if (columnIndex > 1)
+			if (columnIndex > 0)
 			{
 				return Boolean.class;
 			}
@@ -1283,24 +1434,22 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			Object ret = null;
 			switch (columnIndex)
 			{
+				default:
 				case 0:
 					ret = confcache.get(rowIndex).getName();
 					break;
-				case 2:
+				case 1:
 					ret = convBool(confcache.get(rowIndex).getSuspend());
 					break;
-				case 3:
+				case 2:
 					ret = convBool(confcache.get(rowIndex).getMaster());
 					break;
-				case 4:
+				case 3:
 					ret = convBool(confcache.get(rowIndex).getDaemon());
 					break;
-				case 5:
+				case 4:
 					ret = convBool(confcache.get(rowIndex).getAutoShutdown());
 					break;
-				case 1:
-				default:
-					ret = getModel().getPoolLane(confcache.get(rowIndex).getName());
 			}
 			return ret;
 		}
@@ -1317,14 +1466,15 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 			switch (columnIndex)
 			{
 				case 0:
+				default:
 					if (!value.equals(getValueAt(rowIndex, columnIndex)))
 					{
 						ConfigurationInfo cinfo = confcache.get(rowIndex);
 						String oldname = cinfo.getName();
-						String poollane = getModel().removePoolLane(oldname);
+//						String poollane = getModel().removePoolLane(oldname);
 						cinfo.setName(createFreeName((String) value, new ConfigurationContains(confcache)));
 						getModelInfo().setConfigurations((ConfigurationInfo[]) confcache.toArray(new ConfigurationInfo[confcache.size()]));
-						getModel().addPoolLane(cinfo.getName(), poollane);
+//						getModel().addPoolLane(cinfo.getName(), poollane);
 						
 						for (MContextVariable cv : getModel().getContextVariables())
 						{
@@ -1356,21 +1506,21 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 						((AbstractTableModel) rstable.getModel()).fireTableStructureChanged();
 					}
 					break;
-				case 2:
+				case 1:
 					confcache.get(rowIndex).setSuspend((Boolean) value);
 					break;
-				case 3:
+				case 2:
 					confcache.get(rowIndex).setMaster(((Boolean) value));
 					break;
-				case 4:
+				case 3:
 					confcache.get(rowIndex).setDaemon(((Boolean) value));
 					break;
-				case 5:
+				case 4:
 					confcache.get(rowIndex).setAutoShutdown(((Boolean) value));
 					break;
-				case 1:
-				default:
-					getModel().addPoolLane(confcache.get(rowIndex).getName(), (String) value);
+//				case 1:
+//				
+//					getModel().addPoolLane(confcache.get(rowIndex).getName(), (String) value);
 			}
 			fireTableCellUpdated(rowIndex, columnIndex);
 			modelcontainer.setDirty(true);
@@ -1378,7 +1528,109 @@ public class BpmnPropertyPanel extends BasePropertyPanel
 	}
 	
 	/**
-	 *  Table model for imports.
+	 *  Table model for start elements.
+	 */
+	protected class StartElementsTableModel extends AbstractTableModel
+	{
+		/** The configuration model. */
+		protected ConfigurationModel confmodel;
+		
+		/**
+		 * 
+		 */
+		public StartElementsTableModel(ConfigurationModel confmodel)
+		{
+			this.confmodel = confmodel;
+			conftable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+			{
+				public void valueChanged(ListSelectionEvent e)
+				{
+					fireTableStructureChanged();
+				}
+			});
+		}
+		
+		/**
+		 *  Gets the column name.
+		 *  
+		 *  @return The column name.
+		 */
+		public String getColumnName(int column)
+		{
+			String ret = START_ACTIVITIES_COLUMN_NAMES[column];
+			return ret;
+		}
+		
+		/**
+	     *  Returns whether a cell is editable.
+	     *
+	     *  @param  rowIndex The row being queried.
+	     *  @param  columnIndex The column being queried.
+	     *  @return If a cell is editable.
+	     */
+		public boolean isCellEditable(int rowIndex, int columnIndex)
+		{
+			return false;
+		}
+		
+		/**
+		 *  Returns the row count.
+		 *  
+		 *  @return The row count.
+		 */
+		public int getRowCount()
+		{
+			String confname = (String) confmodel.getSelectedItem();
+			List<MNamedIdElement> startelements = modelcontainer.getBpmnModel().getStartElements(confname);
+			return startelements != null? startelements.size() : 0;
+		}
+		
+		/**
+		 *  Returns the column count.
+		 *  
+		 *  @return The column count.
+		 */
+		public int getColumnCount()
+		{
+			return START_ACTIVITIES_COLUMN_NAMES.length;
+		}
+		
+		/**
+		 *  Gets the value.
+		 *  
+		 *  @param rowIndex The row.
+		 *  @param columnIndex The column.
+		 *  @return The value.
+		 */
+		public Object getValueAt(int rowIndex, int columnIndex)
+		{
+			String confname = (String) confmodel.getSelectedItem();
+			MNamedIdElement element = modelcontainer.getBpmnModel().getStartElements(confname).get(rowIndex);
+			switch(columnIndex)
+			{
+				case 0:
+				default:
+					if (element instanceof MActivity)
+					{
+						return ((MActivity) element).getActivityType();
+					}
+					if (element instanceof MLane)
+					{
+						return "Lane";
+					}
+					if (element instanceof MPool)
+					{
+						return "Pool";
+					}
+					return "Unknown";
+				case 1:
+					return element.getId();
+			}
+		}
+	}
+	
+	/**
+	 *  Table model for parameters.
 	 */
 	protected class ParameterTableModel extends AbstractTableModel
 	{

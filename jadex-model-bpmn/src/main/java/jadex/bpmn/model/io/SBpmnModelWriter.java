@@ -637,9 +637,9 @@ public class SBpmnModelWriter
 					for (MNamedIdElement element : startelements)
 					{
 						out.print(getIndent(ind));
-						out.print("<jadex:startactivity>");
+						out.print("<jadex:startElement>");
 						out.print(escapeString(element.getId()));
-						out.println("</jadex:startactivity>");
+						out.println("</jadex:startElement>");
 					}
 				}
 				

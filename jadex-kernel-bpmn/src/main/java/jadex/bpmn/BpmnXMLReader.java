@@ -1458,8 +1458,8 @@ public class BpmnXMLReader
 							ConfigurationInfo ci = new ConfigurationInfo(name);
 							mi.addConfiguration(ci);
 							configurations.put(id, ci);
-							if(poollane!=null && poollane.length()>0)
-								model.addPoolLane(name, poollane);
+//							if(poollane!=null && poollane.length()>0)
+//								model.addPoolLane(name, poollane);
 						}
 						break;
 					}

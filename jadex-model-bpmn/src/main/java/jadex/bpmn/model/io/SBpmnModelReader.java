@@ -690,7 +690,7 @@ public class SBpmnModelReader
 		{
 			buffer.put(tag.getLocalPart(), content);
 		}
-		else if ("startelement".equals(tag.getLocalPart()))
+		else if ("startElement".equals(tag.getLocalPart()))
 		{
 			List<String> startelements = (List<String>) buffer.get("startelements");
 			if (startelements == null)
