@@ -105,9 +105,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final MicroModel model, Class<?> microclass, final Map<String, Object> args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
+		final IPersistInfo persistinfo,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, resultlistener, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, inited);
 		
 		this.micromodel = model;
 		

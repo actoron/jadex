@@ -4,6 +4,7 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
@@ -103,6 +104,7 @@ public interface IComponentFactory
 	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, 
 		IComponentAdapterFactory factory, IModelInfo model, String config, Map<String, Object> arguments, 
 		IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
+		IPersistInfo persistinfo, 
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> init);
 
 }

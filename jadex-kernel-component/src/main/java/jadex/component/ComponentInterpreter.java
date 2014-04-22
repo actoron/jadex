@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -58,10 +59,11 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	public ComponentInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map<String, Object> arguments, 
 		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
+		IPersistInfo persistinfo,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited,
 		ClassLoader classloader)
 	{
-		super(desc, model, config, factory, parent, bindings, copy, realtime, persist, resultlistener, inited);
+		super(desc, model, config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, inited);
 		this.steps = new ArrayList();
 		this.classloader = classloader;
 	

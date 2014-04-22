@@ -2339,15 +2339,6 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
     {
     	return new Future<IPersistInfo>(new UnsupportedOperationException("Persistence not supported for this component type."));
     }
-
-	/**
-	 *  Get the state of the interpreter.
-	 *  @return The state of the interpreter.
-	 */
-	public IFuture<Object> getPersistableState()
-	{
-		return null;
-	}
 		
 //	/**
 //	 *  Publish a monitoring event. This event is automatically send

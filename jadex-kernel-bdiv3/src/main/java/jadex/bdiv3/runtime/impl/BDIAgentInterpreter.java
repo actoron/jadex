@@ -32,6 +32,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -132,9 +133,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final BDIModel model, Class<?> agentclass, final Map<String, Object> args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
+		IPersistInfo persistinfo,
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
-		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, persist, listener, inited);
+		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, persist, persistinfo, listener, inited);
 		this.bdimodel = model;
 		this.capa = new RCapability(bdimodel.getCapability());
 	}

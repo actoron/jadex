@@ -225,7 +225,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container)
 	{
-		super(null, model.getModelInfo(), config, null, parent, null, true, true, false, null, new Future<Void>());
+		super(null, model.getModelInfo(), config, null, parent, null, true, true, false, null, null, new Future<Void>());
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? new BpmnInstanceFetcher(this, fetcher) :null;
 		this.adapter = adapter;
@@ -235,10 +235,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		topthread.setParameterValue("$cms", cms);
 		topthread.setParameterValue("$clock", cs);
 		topthread.setParameterValue("$msgservice", ms);
-		
-//		variables.put("$cms", cms);
-//		variables.put("$clock", cs);
-//		variables.put("$msgservice", ms);
 		
 		initContextVariables();
 		
@@ -259,9 +255,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, final Map<String, Object> arguments, 
 		String config, final IExternalAccess parent, Map<String, IActivityHandler> activityhandlers, Map<String, IStepHandler> stephandlers, 
 		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, boolean persist,
+		IPersistInfo persistinfo,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, resultlistener, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, realtime, persist, persistinfo, resultlistener, inited);
 		this.inited = inited;
 //		this.variables = new HashMap<String, Object>();
 		construct(model, activityhandlers, stephandlers);
@@ -1679,9 +1676,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	public IFuture<IPersistInfo> getPersistableState()
 	{
 		final Future<IPersistInfo> ret = new Future<IPersistInfo>();
-		
-		new BpmnPersistInfo(this);
-		
+		ret.setResult(new BpmnPersistInfo(this));
 		return ret;
 	}
 }

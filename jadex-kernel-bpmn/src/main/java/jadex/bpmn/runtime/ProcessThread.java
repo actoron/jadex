@@ -874,7 +874,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public  void updateParametersAfterStep(MActivity activity, BpmnInterpreter instance)
 	{
-		System.out.println("after: "+activity.getId());
+//		System.out.println("after: "+activity.getId());
 		
 //		System.out.println("after: "+act);
 		if(MBpmnModel.TASK.equals(activity.getActivityType()) || activity instanceof MSubProcess)
