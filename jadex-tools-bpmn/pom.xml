@@ -37,6 +37,12 @@
 			<artifactId>jadex-runtimetools-swing</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-editor-bpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 	</dependencies>
 </project>

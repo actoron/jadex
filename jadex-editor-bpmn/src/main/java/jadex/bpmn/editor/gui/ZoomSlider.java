@@ -17,10 +17,12 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 /**
  *  Box for zoom setting.
- *
  */
 public class ZoomSlider extends JPanel
 {
+	/** The bpmn component. */
+	protected BpmnGraphComponent bpmncomp;
+	
 	/** The editor window. */
 	protected BpmnEditorWindow editorwindow;
 	
@@ -32,6 +34,60 @@ public class ZoomSlider extends JPanel
 	
 	/** The slider. */
 	protected JSlider slider;
+	
+	/**
+	 *  Creates the box
+	 *  @param window The editor window.
+	 */
+	public ZoomSlider(BpmnGraphComponent bpmncomp, ModelContainer modelcontainer)
+	{
+		setLayout(new GridBagLayout());
+		this.bpmncomp = bpmncomp;
+		this.currentcontainer = modelcontainer;
+		
+		slider = new JSlider(GuiConstants.MIN_ZOOM_LEVEL, GuiConstants.MAX_ZOOM_LEVEL);
+		
+		changelistener = new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				int val = slider.getValue();
+				MouseController.setScale(currentcontainer, currentcontainer.getGraph().getView().getScale(), val * 0.01, null);
+			}
+		};
+		
+		final mxIEventListener zoomlistener = new mxIEventListener()
+		{
+			public void invoke(Object sender, mxEventObject evt)
+			{
+				if(currentcontainer != null)
+				{
+					setZoomText(currentcontainer.getGraph().getView().getScale());
+				}
+			}
+		};
+		currentcontainer.getGraph().getView().addListener(mxEvent.SCALE, zoomlistener);
+		
+		slider.addChangeListener(changelistener);
+		
+		final JLabel label = new JLabel();
+		slider.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				label.setText(String.valueOf(slider.getValue()) + "%");
+			}
+		});
+		
+		GridBagConstraints g = new GridBagConstraints();
+		g.fill = GridBagConstraints.NONE;
+		add(label, g);
+		g = new GridBagConstraints();
+		g.fill = GridBagConstraints.HORIZONTAL;
+		g.weightx = 1.0;
+		g.gridx = 1;
+		add(slider, g);
+	}
 	
 	/**
 	 *  Creates the box
@@ -58,7 +114,7 @@ public class ZoomSlider extends JPanel
 		{
 			public void invoke(Object sender, mxEventObject evt)
 			{
-				if (currentcontainer != null)
+				if(currentcontainer != null)
 				{
 					setZoomText(currentcontainer.getGraph().getView().getScale());
 				}
@@ -69,7 +125,7 @@ public class ZoomSlider extends JPanel
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				if (currentcontainer != null)
+				if(currentcontainer != null)
 				{
 					currentcontainer.getGraph().getView().removeListener(zoomlistener);
 				}
@@ -83,8 +139,6 @@ public class ZoomSlider extends JPanel
 				}
 			}
 		});
-		
-		
 		
 		slider.addChangeListener(changelistener);
 		
@@ -109,7 +163,6 @@ public class ZoomSlider extends JPanel
 	
 	/**
 	 *  Sets the zoom text.
-	 *  
 	 *  @param scale The scale.
 	 */
 	protected void setZoomText(double scale)

@@ -11,25 +11,28 @@ public class ProcessThreadInfo
 	//-------- attributes --------
 	
 	/** The thread that executed this activity. */
-	protected String	id;
+	protected String id;
+	
+	/** The parent id. */
+	protected String parentid;
 	
 	/** The activity name. */
-	protected String	activity;
+	protected String activity;
 
 	/** The pool name. */
-	protected String	pool;
+	protected String pool;
 
 	/** The lane name. */
-	protected String	lane;
+	protected String lane;
 	
 	/** The exception that has just occurred in the process (if any). */
-	protected String	exception;
+	protected String exception;
 	
 	/** Is the process in a waiting state. */
-	protected boolean	waiting;
+	protected boolean waiting;
 	
 	/** The data of the process. */
-	protected String	data;
+	protected String data;
 
 	//-------- constructors --------
 	
@@ -44,9 +47,10 @@ public class ProcessThreadInfo
 	/**
 	 *  Create a new history info.
 	 */
-	public ProcessThreadInfo(String id, String activity, String pool, String lane)
+	public ProcessThreadInfo(String id, String parentid, String activity, String pool, String lane)
 	{
 		this.id = id;
+		this.parentid = parentid;
 		this.activity = activity;
 		this.pool = pool;
 		this.lane = lane;
@@ -55,9 +59,11 @@ public class ProcessThreadInfo
 	/**
 	 *  Create a new process info.
 	 */
-	public ProcessThreadInfo(String id, String activity, String pool, String lane, String exception, boolean waiting, String data)
+	public ProcessThreadInfo(String id, String parentid, String activity, String pool, String lane, 
+		String exception, boolean waiting, String data)
 	{
 		this.id = id;
+		this.parentid = parentid;
 		this.activity = activity;
 		this.pool = pool;
 		this.lane = lane;
@@ -86,6 +92,24 @@ public class ProcessThreadInfo
 		this.id	= id;
 	}
 	
+	/**
+	 *  Get the parentid.
+	 *  return The parentid.
+	 */
+	public String getParentId()
+	{
+		return parentid;
+	}
+
+	/**
+	 *  Set the parentid. 
+	 *  @param parentid The parentid to set.
+	 */
+	public void setParentId(String parentid)
+	{
+		this.parentid = parentid;
+	}
+
 	/**
 	 *  Get the activity.
 	 *  @return The activity.

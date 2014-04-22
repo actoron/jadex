@@ -2,6 +2,7 @@ package jadex.tools.debugger.bpmn;
 
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bpmn.tools.ui.ProcessViewPanel;
+import jadex.bpmn.tools.ui.VisualProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
@@ -30,7 +31,8 @@ public class BpmnDebuggerPanel	implements IDebuggerPanel
 	//-------- IDebuggerPanel methods --------
 	
 	/** The gui component. */
-	protected ProcessViewPanel processpanel;
+//	protected ProcessViewPanel processpanel;
+	protected VisualProcessViewPanel processpanel;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -44,7 +46,8 @@ public class BpmnDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
-		this.processpanel = new ProcessViewPanel(access, bpp);
+//		this.processpanel = new ProcessViewPanel(access, bpp);
+		this.processpanel = new VisualProcessViewPanel(access, bpp);
 	}
 
 	/**

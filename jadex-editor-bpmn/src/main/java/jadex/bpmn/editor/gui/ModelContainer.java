@@ -545,7 +545,7 @@ public class ModelContainer implements IModelContainer
 	public void setBpmnModel(MBpmnModel model)
 	{
 		this.model = model;
-		generateClassLoader();
+//		generateClassLoader();
 	}
 
 	/** 
@@ -735,7 +735,7 @@ public class ModelContainer implements IModelContainer
 	 */
 	public String getEditMode()
 	{
-		return editingtoolbar.getEditMode();
+		return editingtoolbar==null? "" : editingtoolbar.getEditMode();
 	}
 
 	/**
@@ -745,7 +745,8 @@ public class ModelContainer implements IModelContainer
 	 */
 	public void setEditMode(String editmode)
 	{
-		editingtoolbar.setEditMode(editmode);
+		if(editingtoolbar!=null)
+			editingtoolbar.setEditMode(editmode);
 	}
 	
 	/**
@@ -957,6 +958,9 @@ public class ModelContainer implements IModelContainer
 	 */
 	protected void setupClassInfos()
 	{
+		if(settings==null)
+			return;
+		
 		taskclasses = settings.getGlobalTaskClasses();
 		interclasses = settings.getGlobalInterfaces();
 		exceptionclasses = settings.getGlobalExceptions();

@@ -214,7 +214,7 @@ public class MouseController extends MouseAdapter
 	
 	protected void setTargetScale(double scale)
 	{
-		if (modelcontainer.getSettings().isSmoothZoom())
+		if(modelcontainer.getSettings()!=null && modelcontainer.getSettings().isSmoothZoom())
 		{
 			modelcontainer.getGraphComponent().stopEditing(true);
 			targetscale = scale;

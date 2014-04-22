@@ -27,7 +27,6 @@ import com.mxgraph.view.mxStylesheet;
 
 /**
  *  Graph for BPMN models.
- *
  */
 public class BpmnGraph extends mxGraph
 {
@@ -172,11 +171,25 @@ public class BpmnGraph extends mxGraph
 			cell instanceof VOutParameter ||
 			cell instanceof VDataEdge)
 		{
-			ret &= modelcontainer.getSettings().isDataEdges();
+			if(modelcontainer.getSettings()==null)
+			{
+				ret = true;
+			}
+			else
+			{
+				ret &= modelcontainer.getSettings().isDataEdges();
+			}
 		}
 		else if (cell instanceof VSequenceEdge)
 		{
-			ret &= modelcontainer.getSettings().isSequenceEdges();
+			if(modelcontainer.getSettings()==null)
+			{
+				ret = true;
+			}
+			else
+			{
+				ret &= modelcontainer.getSettings().isSequenceEdges();
+			}
 		}
 		
 		return ret;
