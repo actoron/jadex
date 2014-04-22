@@ -33,7 +33,7 @@ public class SPropertyPanelFactory
 	public static BasePropertyPanel createPanel(Object selection, ModelContainer container)
 	{
 		BasePropertyPanel ret = EMPTY_PANEL;
-		if (!container.getSettings().isJadexExtensions())
+		if(container.getSettings()==null || !container.getSettings().isJadexExtensions())
 		{
 			return ret;
 		}

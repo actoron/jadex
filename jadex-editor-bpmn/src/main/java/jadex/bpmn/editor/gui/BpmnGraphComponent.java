@@ -1,7 +1,10 @@
 package jadex.bpmn.editor.gui;
 
+import jadex.bpmn.editor.gui.controllers.DeletionController;
 import jadex.bpmn.editor.gui.controllers.EdgeController;
 import jadex.bpmn.editor.gui.controllers.GraphOperationsController;
+import jadex.bpmn.editor.gui.controllers.KeyboardController;
+import jadex.bpmn.editor.gui.controllers.MouseController;
 import jadex.bpmn.editor.model.visual.VActivity;
 import jadex.bpmn.editor.model.visual.VPool;
 import jadex.bpmn.editor.model.visual.VSubProcess;
@@ -29,6 +32,7 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxConnectionHandler;
 import com.mxgraph.swing.handler.mxGraphHandler;
 import com.mxgraph.swing.handler.mxPanningHandler;
+import com.mxgraph.swing.handler.mxRubberband;
 import com.mxgraph.swing.view.mxCellEditor;
 import com.mxgraph.swing.view.mxICellEditor;
 import com.mxgraph.swing.view.mxInteractiveCanvas;
@@ -108,6 +112,33 @@ public class BpmnGraphComponent extends mxGraphComponent
 		collapseimageicon = new ImageIcon(img);
 		
 		setToolTips(true);
+	}
+	
+	/**
+	 *  Perform default init.
+	 */
+	public void init(ModelContainer modelcontainer)
+	{
+		setDragEnabled(false);
+		setPanning(true);
+		setCenterZoom(false);
+		setAutoscrolls(true);
+		setAutoExtend(true);
+		getViewport().setOpaque(false);
+		setBackground(Color.WHITE);
+		setOpaque(true);
+		setTextAntiAlias(true);
+		modelcontainer.setGraphComponent(this);
+		
+		MouseController mc = new MouseController(modelcontainer);
+		getGraphControl().addMouseListener(mc);
+		getGraphControl().addMouseWheelListener(mc);
+		
+		new DeletionController(modelcontainer);
+		
+		new KeyboardController(this, modelcontainer);
+		
+		new mxRubberband(this);
 	}
 	
 	/**

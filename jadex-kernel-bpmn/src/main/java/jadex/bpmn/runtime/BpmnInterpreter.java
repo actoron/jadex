@@ -1502,12 +1502,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public ProcessThreadInfo createProcessThreadInfo(ProcessThread thread)
 	{
-		 ProcessThreadInfo info = new ProcessThreadInfo(thread.getId(), thread.getActivity().getBreakpointId(),
-            thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null,
-            thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null,
-            thread.getException()!=null ? thread.getException().toString() : "",
-            thread.isWaiting(), thread.getData()!=null ? thread.getData().toString() : "");
-		 return info;
+		String poolname = thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null;
+		String parentid = thread.getParent()!=null? thread.getParent().getId(): null;
+		String lanename =  thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null;
+		String ex = thread.getException()!=null ? thread.getException().toString() : "";
+		String data = thread.getData()!=null ? thread.getData().toString() : "";
+		ProcessThreadInfo info = new ProcessThreadInfo(thread.getId(), parentid, thread.getActivity().getBreakpointId(),
+			poolname, lanename, ex, thread.isWaiting(), data);
+		return info;
 	}
 
 	//-------- abstract interpreter methods --------
