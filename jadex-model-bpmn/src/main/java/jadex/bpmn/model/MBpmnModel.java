@@ -163,7 +163,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	protected List<MActivity> typematchedstartevents;
 	
 	/** Parents of activities. */
-	protected Map<MActivity, MNamedIdElement> parents;
+	protected Map<MIdElement, MIdElement> parents;
 
 	/** The association sources. */
 	protected Map associationsources;
@@ -441,7 +441,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		if(this.allactivities==null)
 		{
 			this.allactivities = new HashMap<String, MActivity>();
-			this.parents = new HashMap<MActivity, MNamedIdElement>();
+			this.parents = new HashMap<MIdElement, MIdElement>();
 			
 			List<MPool> pools = getPools();
 			if(pools!=null)
@@ -449,6 +449,16 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 				for(int i=0; i<pools.size(); i++)
 				{
 					MPool tmp = pools.get(i);
+					
+					List<MLane> lanes = tmp.getLanes();
+					if (lanes != null)
+					{
+						for (MLane lane : lanes)
+						{
+							parents.put(lane, tmp);
+						}
+					}
+					
 					List<MActivity> acts = tmp.getActivities();
 					if(acts!=null)
 					{
@@ -1366,7 +1376,8 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 			getAllActivities();
 		}
 		MIdElement ret = null;
-		if (element instanceof MActivity)
+		if (element instanceof MActivity ||
+			element instanceof MLane)
 		{
 			ret = parents.get(element);
 		}
