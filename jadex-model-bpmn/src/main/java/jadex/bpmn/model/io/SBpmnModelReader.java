@@ -7,6 +7,7 @@ import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MIdElement;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
+import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
@@ -677,6 +678,16 @@ public class SBpmnModelReader
 		{
 			buffer.put(tag.getLocalPart(), content);
 		}
+		else if ("startelement".equals(tag.getLocalPart()))
+		{
+			List<String> startelements = (List<String>) buffer.get("startelements");
+			if (startelements == null)
+			{
+				startelements = new ArrayList<String>();
+				buffer.put("startelements", startelements);
+			}
+			startelements.add(content);
+		}
 		else if ("parametermapping".equals(tag.getLocalPart()))
 		{
 			Map<String, String> mappings = (Map<String, String>) buffer.get("parametermappings");
@@ -992,7 +1003,23 @@ public class SBpmnModelReader
 				
 				if (buffer.containsKey("poollane"))
 				{
-					model.addPoolLane(conf.getName(), (String) buffer.remove("poollane"));
+					buffer.remove("poollane");
+					System.out.println("Warning: Ignoring obsolete pool/lane element.");
+//					model.addPoolLane(conf.getName(), (String) buffer.remove("poollane"));
+				}
+				
+				if (buffer.containsKey("startelements"))
+				{
+					List<String> startelements = (List<String>) buffer.remove("startelements");
+					
+					Map<String, List<String>> startelementsmap = (Map<String, List<String>>) buffer.get("startelementsmap");
+					if (startelementsmap == null)
+					{
+						startelementsmap = new HashMap<String, List<String>>();
+						buffer.put("startelementsmap", startelementsmap);
+					}
+					
+					startelementsmap.put(conf.getName(), startelements);
 				}
 				
 				Map<String, String> vals = (Map<String, String>) buffer.remove("argvalues");

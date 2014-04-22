@@ -6,6 +6,7 @@ import jadex.bpmn.model.MContextVariable;
 import jadex.bpmn.model.MDataEdge;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
+import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MProperty;
@@ -621,13 +622,25 @@ public class SBpmnModelWriter
 					out.println("</jadex:description>");
 				}
 				
-				String poollane = mmodel.getPoolLane(conf.getName());
-				if (poollane != null && poollane.length() > 0)
+//				String poollane = mmodel.getPoolLane(conf.getName());
+//				if (poollane != null && poollane.length() > 0)
+//				{
+//					out.print(getIndent(ind));
+//					out.print("<jadex:poollane>");
+//					out.print(escapeString(poollane));
+//					out.println("</jadex:poollane>");
+//				}
+				
+				List<MNamedIdElement> startelements = mmodel.getStartElements(conf.getName());
+				if (startelements != null && startelements.size() > 0)
 				{
-					out.print(getIndent(ind));
-					out.print("<jadex:poollane>");
-					out.print(escapeString(poollane));
-					out.println("</jadex:poollane>");
+					for (MNamedIdElement element : startelements)
+					{
+						out.print(getIndent(ind));
+						out.print("<jadex:startactivity>");
+						out.print(escapeString(element.getId()));
+						out.println("</jadex:startactivity>");
+					}
 				}
 				
 				if (conf.getArguments().length > 0 || conf.getResults().length > 0 || ctvconfexp.containsKey(conf.getName()))
