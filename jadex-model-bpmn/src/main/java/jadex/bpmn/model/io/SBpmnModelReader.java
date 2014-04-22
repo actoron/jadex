@@ -29,6 +29,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,6 +82,20 @@ public class SBpmnModelReader
 		
 		ACT_TYPE_MAPPING.put("userTask", MBpmnModel.TASK);
 		
+	}
+	
+	/**
+	 *  Loads the model from a file without parsing expressions.
+	 *  
+	 *  @param file The model file.
+	 *  @param vreader The visual model reader, may be null.
+	 */
+	public static final MBpmnModel readModel(File file, IBpmnVisualModelReader vreader) throws Exception
+	{
+		FileInputStream fis = new FileInputStream(file);
+		MBpmnModel ret = readModel(fis, file.getName(), vreader, null);
+		fis.close();
+		return ret;
 	}
 	
 	/**

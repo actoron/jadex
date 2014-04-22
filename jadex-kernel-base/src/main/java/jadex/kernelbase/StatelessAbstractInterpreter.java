@@ -16,6 +16,7 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IExtensionInfo;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.NFPropertyInfo;
 import jadex.bridge.modelinfo.NFRPropertyInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
@@ -2329,6 +2330,15 @@ public abstract class StatelessAbstractInterpreter extends NFPropertyProvider im
 	 *  @return The monitoring service getter.
 	 */
 	public abstract ServiceGetter<IMonitoringService> getMonitoringServiceGetter();
+	
+	/**
+     *  Get the state of the interpreter.
+     *  @return The state of the interpreter.
+     */
+    public IFuture<IPersistInfo> getPersistableState()
+    {
+    	return new Future<IPersistInfo>(new UnsupportedOperationException("Persistence not supported for this component type."));
+    }
 
 	/**
 	 *  Get the state of the interpreter.

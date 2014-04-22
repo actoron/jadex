@@ -16,6 +16,7 @@ import jadex.bridge.SFuture;
 import jadex.bridge.ServiceCall;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.modelinfo.IPersistInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -2518,6 +2519,19 @@ public class DecoupledComponentManagementService implements IComponentManagement
 		
 		fut.setResult(ret);
 		return fut;
+	}
+	
+	/**
+	 *  Gets the component state.
+	 *  
+	 *  @param cid The component.
+	 *  @return The component state.
+	 */
+	public IFuture<IPersistInfo> getPersistableState(IComponentIdentifier cid)
+	{
+		Future<IPersistInfo> ret = new Future<IPersistInfo>(new UnsupportedOperationException("Persisting components unsupported in this version."));
+		
+		return ret;
 	}
 	
 	/**

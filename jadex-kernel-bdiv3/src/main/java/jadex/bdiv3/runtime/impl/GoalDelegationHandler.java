@@ -99,7 +99,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 		{
 			public void terminate(Exception reason, IResultListener<Void> terminate)
 			{
-				System.out.println("terminated call: "+fgoal);
+//				System.out.println("terminated call: "+fgoal);
 				ip.dropGoal(fgoal);
 				super.terminate(reason, terminate);
 			}
