@@ -147,13 +147,31 @@ public class VisualProcessViewPanel extends JPanel
 				{
 					if(threadinfos!=null)
 					{
+						boolean w = false;
+						boolean r = false;
 						for(ProcessThreadInfo pti: threadinfos)
 						{
 							if(pti.getActId().equals(myid))
 							{
-								ret += "_sel";
-								break;
+								if(pti.isWaiting())
+								{
+									w = true;
+								}
+								else
+								{
+									r = true;
+									break;
+								}
 							}
+						}
+						
+						if(r)
+						{
+							ret += "_ready";
+						}
+						else if(w)
+						{
+							ret += "_waiting";
 						}
 					}
 					return ret;

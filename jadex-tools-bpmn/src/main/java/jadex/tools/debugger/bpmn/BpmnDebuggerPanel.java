@@ -1,7 +1,6 @@
 package jadex.tools.debugger.bpmn;
 
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bpmn.tools.ui.ProcessViewPanel;
 import jadex.bpmn.tools.ui.VisualProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -17,14 +16,15 @@ import javax.swing.UIDefaults;
  *  A generic debugger panel that can display
  *  arbitrary java objects.
  */
-public class BpmnDebuggerPanel	implements IDebuggerPanel
+public class BpmnDebuggerPanel implements IDebuggerPanel
 {
 	//-------- constants --------
 
 	/**
 	 * The image icons.
 	 */
-	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
+	{
 		"contents", SGUI.makeIcon(BpmnDebuggerPanel.class, "/jadex/tools/common/images/bug_small.png")
 	});
 

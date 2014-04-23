@@ -182,13 +182,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	/** The micro agent model. */
 	protected MBpmnModel bpmnmodel;
 	
-	// todo: allow multiple pools/lanes?
-	/** The configuration. */
-//	protected String pool;
-	
-	/** The configuration. */
-//	protected String lane;
-	
 	/** The activity handlers. */
 	protected Map<String, IActivityHandler> activityhandlers;
 	
@@ -751,7 +744,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
             	&& !MBpmnModel.EVENT_START_TIMER.equals(mact.getActivityType()))
             {
                 ProcessThread thread = new ProcessThread(""+idcnt++, mact, getTopLevelThread(), BpmnInterpreter.this);
-//                context.addThread(thread);
                 getTopLevelThread().addThread(thread);
             }
         } 
@@ -965,17 +957,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		return bpmnmodel;//(MBpmnModel)context.getModelElement();
 	}
 	
-//	/**
-//	 *  Get the thread context.
-//	 *  @return The thread context.
-//	 */
-//	public ThreadContext getThreadContext()
-//	{
-//		return context;
-//	}
-	
 	/**
-	 * 
+	 *  Get the top level thread (is not executed and just acts as top level thread container).
 	 */
 	public ProcessThread getTopLevelThread()
 	{
