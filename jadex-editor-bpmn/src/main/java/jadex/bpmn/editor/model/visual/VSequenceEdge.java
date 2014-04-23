@@ -37,7 +37,7 @@ public class VSequenceEdge extends VEdge
 	public String getStyle()
 	{
 		String ret = super.getStyle();
-		if (((MSequenceEdge) getBpmnElement()).isDefault())
+		if(((MSequenceEdge) getBpmnElement()).isDefault())
 		{
 			ret += "_DEFAULT";
 		}

@@ -1503,13 +1503,15 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 */
 	public ProcessThreadInfo createProcessThreadInfo(ProcessThread thread)
 	{
-		String poolname = thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null;
+		String poolname = thread.getActivity()!=null && thread.getActivity().getPool()!=null ? thread.getActivity().getPool().getName() : null;
 		String parentid = thread.getParent()!=null? thread.getParent().getId(): null;
-		String lanename =  thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null;
+		String actname = thread.getActivity()!=null? thread.getActivity().getBreakpointId(): null;
+		String actid = thread.getActivity()!=null? thread.getActivity().getId(): null;
+		String lanename =  thread.getActivity()!=null && thread.getActivity().getLane()!=null ? thread.getActivity().getLane().getName() : null;
 		String ex = thread.getException()!=null ? thread.getException().toString() : "";
 		String data = thread.getData()!=null ? thread.getData().toString() : "";
-		ProcessThreadInfo info = new ProcessThreadInfo(thread.getId(), parentid, thread.getActivity().getBreakpointId(),
-			poolname, lanename, ex, thread.isWaiting(), data);
+		ProcessThreadInfo info = new ProcessThreadInfo(thread.getId(), parentid, actname,
+			actid, poolname, lanename, ex, thread.isWaiting(), data);
 		return info;
 	}
 
@@ -1677,8 +1679,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 		MonitoringEvent event = new MonitoringEvent(getComponentIdentifier(), getComponentDescription().getCreationTime(), type+"."+TYPE_THREAD, System.currentTimeMillis(), PublishEventLevel.FINE);
 		event.setProperty("thread_id", thread.getId());
-		if(!type.startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
-			event.setProperty("details", createProcessThreadInfo(thread));
+//		if(!type.startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
+		event.setProperty("details", createProcessThreadInfo(thread));
 		return event;
 	}
 	

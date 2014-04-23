@@ -13,10 +13,10 @@ public class BpmnStylesheetColorGradient extends BpmnStylesheetColor
 	
 	public BpmnStylesheetColorGradient()
 	{
-		for (String key : styles.keySet())
+		for(String key : styles.keySet())
 		{
 			String lkey = key.toLowerCase();
-			if (lkey.contains("activity") || lkey.contains("task") || lkey.contains("subprocess"))
+			if(lkey.contains("activity") || lkey.contains("task") || lkey.contains("subprocess"))
 			{
 				styles.get(key).put(mxConstants.STYLE_GRADIENTCOLOR, "#ffffff");
 				styles.get(key).put(mxConstants.STYLE_GRADIENT_DIRECTION, "northwest");

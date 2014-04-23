@@ -1111,7 +1111,7 @@ public class ProcessThread	implements ITaskContext
 			{
 //				System.out.println("remove1: "+thread);
 				BpmnInterpreter in = thread.getInstance();
-				if(thread.getActivity()!=null && thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+				if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 				{	
 					in.publishEvent(in.createThreadEvent(IMonitoringEvent.EVENT_TYPE_DISPOSAL, thread), PublishTarget.TOALL);
 				}
@@ -1135,7 +1135,7 @@ public class ProcessThread	implements ITaskContext
 			subthreads	= new ArrayList<ProcessThread>();
 		
 		subthreads.add(thread);
-		if(thread.getActivity()!=null && thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
 			thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
 		}
@@ -1164,7 +1164,7 @@ public class ProcessThread	implements ITaskContext
 ////			threads.putAll(oldthreads);
 //		}
 		
-		if(thread.getActivity()!=null && thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
+		if(thread.getInstance().hasEventTargets(PublishTarget.TOALL, PublishEventLevel.FINE))
 		{	
 			thread.getInstance().publishEvent(thread.getInstance().createThreadEvent(IMonitoringEvent.EVENT_TYPE_CREATION, thread), PublishTarget.TOALL);
 		}

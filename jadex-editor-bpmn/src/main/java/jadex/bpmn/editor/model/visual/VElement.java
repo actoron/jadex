@@ -9,7 +9,6 @@ import com.mxgraph.view.mxGraph;
 
 /**
  *  Generic Visual BPMN Element.
- *
  */
 public abstract class VElement extends mxCell
 {

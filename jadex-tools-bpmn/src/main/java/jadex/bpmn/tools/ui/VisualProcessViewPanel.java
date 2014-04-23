@@ -1,12 +1,14 @@
 package jadex.bpmn.tools.ui;
 
-import jadex.bpmn.editor.BpmnEditor;
 import jadex.bpmn.editor.gui.BpmnGraph;
 import jadex.bpmn.editor.gui.BpmnGraphComponent;
 import jadex.bpmn.editor.gui.GuiConstants;
 import jadex.bpmn.editor.gui.ModelContainer;
 import jadex.bpmn.editor.gui.ZoomSlider;
 import jadex.bpmn.editor.model.visual.BpmnVisualModelReader;
+import jadex.bpmn.editor.model.visual.VActivity;
+import jadex.bpmn.editor.model.visual.VExternalSubProcess;
+import jadex.bpmn.editor.model.visual.VSubProcess;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.io.SBpmnModelReader;
 import jadex.bpmn.runtime.BpmnInterpreter;
@@ -80,6 +82,9 @@ public class VisualProcessViewPanel extends JPanel
 	/** The breakpoint panel. */
 	protected IBreakpointPanel	bpp;
 
+	/** The model container. */
+	protected ModelContainer modelcontainer;
+	
 	/** The change listener. */
 	protected ISubscriptionIntermediateFuture<IMonitoringEvent> sub;
 	
@@ -98,14 +103,66 @@ public class VisualProcessViewPanel extends JPanel
 			this.historyinfos	= new ArrayList<ProcessThreadInfo>();
 			this.ptmodel = new ProcessThreadModel();
 			this.hmodel	= new HistoryModel();
+			this.modelcontainer = new ModelContainer(null);
 			
 			String filename = access.getModel().getFilename();
-			final ModelContainer modelcontainer = new ModelContainer(null);
-			BpmnGraph graph = new BpmnGraph(modelcontainer, BpmnEditor.STYLE_SHEETS[0].getSecondEntity());
-			BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph);
+			BpmnStylesheetSelections sheet = new BpmnStylesheetSelections();
+			BpmnGraph graph = new BpmnGraph(modelcontainer, sheet);
+			BpmnVisualModelReader vreader = new BpmnVisualModelReader(graph)
+			{
+				public VActivity createActivity() 
+				{
+					return new VActivity(graph)
+					{
+						public String getStyle()
+						{
+							return getStyleHelper(super.getStyle(), getBpmnElement().getId());
+						}
+					};
+				}
+				
+				public VSubProcess createSuboprocess()
+				{
+					return new VSubProcess(graph)
+					{
+						public String getStyle()
+						{
+							return getStyleHelper(super.getStyle(), getBpmnElement().getId());
+						}
+					};
+				}
+				
+				public VExternalSubProcess createExternalSuboprocess()
+				{
+					return new VExternalSubProcess(graph)
+					{
+						public String getStyle()
+						{
+							return getStyleHelper(super.getStyle(), getBpmnElement().getId());
+						}
+					};
+				}
+				
+				protected String getStyleHelper(String ret, String myid)
+				{
+					if(threadinfos!=null)
+					{
+						for(ProcessThreadInfo pti: threadinfos)
+						{
+							if(pti.getActId().equals(myid))
+							{
+								ret += "_sel";
+								break;
+							}
+						}
+					}
+					return ret;
+				}
+			};
 			graph.deactivate();
 			graph.setEventsEnabled(false);
 			graph.getModel().beginUpdate();
+			// todo: test jar and use inputstream from classloader
 			MBpmnModel mmodel = SBpmnModelReader.readModel(new FileInputStream(filename), filename, vreader);
 			graph.getModel().endUpdate();
 			graph.setEventsEnabled(true);
@@ -189,18 +246,22 @@ public class VisualProcessViewPanel extends JPanel
 					}
 					else if(event.getType().endsWith(BpmnInterpreter.TYPE_THREAD))
 					{
+						ProcessThreadInfo pti = (ProcessThreadInfo)event.getProperty("details");
 						if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_CREATION))
 						{
-							threadinfos.add((ProcessThreadInfo)event.getProperty("details"));
+//							System.out.println("created thread: "+pti);
+							threadinfos.add(pti);
 						}
 						else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_DISPOSAL))
 						{
-							threadinfos.remove((ProcessThreadInfo)event.getProperty("details"));
+//							System.out.println("removed thread: "+pti);
+							threadinfos.remove(pti);
 						}
 						else if(event.getType().startsWith(IMonitoringEvent.EVENT_TYPE_MODIFICATION))
 						{
-							threadinfos.remove((ProcessThreadInfo)event.getProperty("details"));
-							threadinfos.add((ProcessThreadInfo)event.getProperty("details"));
+//							System.out.println("changed thread: "+pti);
+							threadinfos.remove(pti);
+							threadinfos.add(pti);
 						}
 					}
 					else if(event.getType().endsWith(BpmnInterpreter.TYPE_ACTIVITY))
@@ -267,14 +328,6 @@ public class VisualProcessViewPanel extends JPanel
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	protected void loadModel(String file)
-	{		
-		
-	}
-	
 	//-------- methods --------
 	
 	/**
@@ -312,6 +365,8 @@ public class VisualProcessViewPanel extends JPanel
 			}
 			bpp.setSelectedBreakpoints((String[])sel_bps.toArray(new String[sel_bps.size()]));
 		}
+		
+		modelcontainer.getGraphComponent().refresh();
 	}
 	
 	//-------- helper classes --------

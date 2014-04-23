@@ -1,6 +1,5 @@
 package jadex.bpmn.editor.model.visual;
 
-import jadex.bpmn.editor.gui.SHelper;
 import jadex.bpmn.model.MSubProcess;
 
 import com.mxgraph.view.mxGraph;
@@ -22,7 +21,7 @@ public class VSubProcess extends VActivity
 	public String getStyle()
 	{
 		String ret = super.getStyle();
-		if (MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)getBpmnElement()).getSubprocessType()))
+		if(MSubProcess.SUBPROCESSTYPE_EVENT.equals(((MSubProcess)getBpmnElement()).getSubprocessType()))
 		{
 			ret += "_Event";
 		}

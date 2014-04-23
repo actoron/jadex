@@ -18,6 +18,9 @@ public class ProcessThreadInfo
 	
 	/** The activity name. */
 	protected String activity;
+	
+	/** The activity id. */
+	protected String actid;
 
 	/** The pool name. */
 	protected String pool;
@@ -47,11 +50,12 @@ public class ProcessThreadInfo
 	/**
 	 *  Create a new history info.
 	 */
-	public ProcessThreadInfo(String id, String parentid, String activity, String pool, String lane)
+	public ProcessThreadInfo(String id, String parentid, String activity, String actid, String pool, String lane)
 	{
 		this.id = id;
 		this.parentid = parentid;
 		this.activity = activity;
+		this.actid = actid;
 		this.pool = pool;
 		this.lane = lane;
 	}
@@ -59,12 +63,13 @@ public class ProcessThreadInfo
 	/**
 	 *  Create a new process info.
 	 */
-	public ProcessThreadInfo(String id, String parentid, String activity, String pool, String lane, 
+	public ProcessThreadInfo(String id, String parentid, String activity, String actid, String pool, String lane, 
 		String exception, boolean waiting, String data)
 	{
 		this.id = id;
 		this.parentid = parentid;
 		this.activity = activity;
+		this.actid = actid;
 		this.pool = pool;
 		this.lane = lane;
 		this.exception = exception;
@@ -126,6 +131,24 @@ public class ProcessThreadInfo
 	public void	setActivity(String activity)
 	{
 		this.activity	= activity;
+	}
+
+	/**
+	 *  Get the actid.
+	 *  @return The actid.
+	 */
+	public String getActId()
+	{
+		return actid;
+	}
+
+	/**
+	 *  Set the actid.
+	 *  @param actid The actid to set.
+	 */
+	public void setActId(String actid)
+	{
+		this.actid = actid;
 	}
 
 	/**
@@ -215,7 +238,7 @@ public class ProcessThreadInfo
 	 */
 	public void getData(String data)
 	{
-		this.data	= data;
+		this.data = data;
 	}
 
 	/**

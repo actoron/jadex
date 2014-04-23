@@ -65,8 +65,6 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 	 */
 	public void readElement(QName tag, Map<String, String> attrs, Map<String, String> laneparents, Map<String, MIdElement> emap, Map<String, Object> buffer)
 	{
-		
-		
 		/*if (ve != null)
 		{
 			graph.getView().clear(ve, true, false);
@@ -100,29 +98,29 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			if (((MSubProcess) e).hasProperty("file") ||
 				((MSubProcess) e).hasProperty("filename"))
 			{
-				vnode = new VExternalSubProcess(graph);
+				vnode = createExternalSuboprocess();
 			}
 			else
 			{
-				vnode = new VSubProcess(graph);
+				vnode = createSuboprocess();
 			}
 		}
 		else if (e instanceof MActivity)
 		{
-			vnode = new VActivity(graph);
+			vnode = createActivity();
 		}
 		else if (e instanceof MPool)
 		{
-			vnode = new VPool(graph);
+			vnode = createPool();
 		}
 		else if (e instanceof MLane)
 		{
-			vnode = new VLane(graph);
+			vnode = createLane();
 		}
 		
 		if (internalparameters != null && vnode instanceof VActivity)
 		{
-			((VActivity) vnode).setInternalParameters(internalparameters);
+			((VActivity)vnode).setInternalParameters(internalparameters);
 		}
 		
 		if (vnode == null)
@@ -137,18 +135,18 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			}
 			
 			mxGeometry geo = null;
-			if (bounds != null)
+			if(bounds != null)
 			{
 				geo = new mxGeometry(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());;
 			}
 			
 			mxGeometry oldgeo = vnode.getGeometry();
-			if (geo != null)
+			if(geo != null)
 			{
 				vnode.setGeometry(geo);
 			}
 			
-			if (e instanceof MActivity)
+			if(e instanceof MActivity)
 			{
 				MActivity act = (MActivity) e;
 				VNode parent = null;
@@ -157,12 +155,12 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 				{
 					// Geometry is handled by layout manager.
 					vnode.setGeometry(oldgeo);
-					parent = (VNode) vmap.get(eventparentid);
+					parent = (VNode)vmap.get(eventparentid);
 				}
 				
 				if (parent == null)
 				{
-					parent = (VNode) vmap.get(subprocessparentid);
+					parent = (VNode)vmap.get(subprocessparentid);
 				}
 				
 				if (parent == null)
@@ -255,14 +253,14 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			if (medge instanceof MSequenceEdge)
 			{
 				MSequenceEdge mseqedge = (MSequenceEdge) medge;
-				vedge = new VSequenceEdge(graph);
+				vedge = createSequenceEdge();
 				vedge.setSource(vmap.get(mseqedge.getSource().getId()));
 				vedge.setTarget(vmap.get(mseqedge.getTarget().getId()));
 			}
 			else if (medge instanceof MMessagingEdge)
 			{
 				MMessagingEdge mmedge = (MMessagingEdge) medge;
-				vedge = new VMessagingEdge(graph);
+				vedge = createMessagingEdge();
 				vedge.setSource(vmap.get(mmedge.getSource().getId()));
 				vedge.setTarget(vmap.get(mmedge.getTarget().getId()));
 			}
@@ -314,13 +312,13 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 	 */
 	public void processGenericEdge(String type, List<Point2D> waypoints, Map<String, String> attrs, Map<String, MIdElement> emap)
 	{
-		if  ("data".equals(type))
+		if("data".equals(type))
 		{
 			String id = attrs.get("jadexElement");
 			MDataEdge dedge = (MDataEdge) emap.get(id);
-			if (dedge != null)
+			if(dedge != null)
 			{
-				VDataEdge vedge = new VDataEdge(graph);
+				VDataEdge vedge = createDataEdge();
 				VActivity sact = (VActivity) vmap.get(dedge.getSource().getId());
 				VActivity tact = (VActivity) vmap.get(dedge.getTarget().getId());
 				vedge.setSource(sact.getOutputParameterPort(dedge.getSourceParameter()));
@@ -357,5 +355,69 @@ public class BpmnVisualModelReader implements IBpmnVisualModelReader
 			}
 			
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public VExternalSubProcess createExternalSuboprocess()
+	{
+		return new VExternalSubProcess(graph);
+	}
+	
+	/**
+	 * 
+	 */
+	public VSubProcess createSuboprocess()
+	{
+		return new VSubProcess(graph);
+	}
+	
+	/**
+	 * 
+	 */
+	public VActivity createActivity()
+	{
+		return new VActivity(graph);
+	}
+	
+	/**
+	 * 
+	 */
+	public VPool createPool()
+	{
+		return new VPool(graph);
+	}
+	
+	/**
+	 * 
+	 */
+	public VLane createLane()
+	{
+		return new VLane(graph);
+	}
+	
+	/**
+	 * 
+	 */
+	public VSequenceEdge createSequenceEdge()
+	{
+		return new VSequenceEdge(graph);
+	}
+	
+	/**
+	 * 
+	 */
+	public VMessagingEdge createMessagingEdge()
+	{
+		return new VMessagingEdge(graph);
+	}
+	
+	/**
+	 * 
+	 */
+	public VDataEdge createDataEdge()
+	{
+		return new VDataEdge(graph);
 	}
 }

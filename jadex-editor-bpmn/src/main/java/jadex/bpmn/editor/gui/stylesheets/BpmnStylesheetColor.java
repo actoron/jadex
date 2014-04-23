@@ -46,7 +46,6 @@ import com.mxgraph.view.mxStylesheet;
 /**
  *  Style sheet defining the visual aspects of the BPMN model.
  *  This is the current default.
- *
  */
 public class BpmnStylesheetColor extends mxStylesheet
 {
@@ -210,8 +209,7 @@ public class BpmnStylesheetColor extends mxStylesheet
 
 				Rectangle tmp = state.getRectangle();
 
-				if (mxUtils
-						.isTrue(state.getStyle(), mxConstants.STYLE_HORIZONTAL, true))
+				if(mxUtils.isTrue(state.getStyle(), mxConstants.STYLE_HORIZONTAL, true))
 				{
 					if (configureGraphics(canvas, state, true))
 					{

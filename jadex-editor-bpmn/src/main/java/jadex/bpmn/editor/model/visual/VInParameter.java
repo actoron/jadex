@@ -21,7 +21,7 @@ public class VInParameter extends VNamedNode
 	public String getStyle()
 	{
 		String ret = super.getStyle();
-		if (getEdgeCount() > 0)
+		if(getEdgeCount() > 0)
 		{
 			ret += "_Connected";
 		}
