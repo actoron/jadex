@@ -114,7 +114,7 @@ public interface IComponentManagementService
 	 *  @param componentid The component identifier.
 	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
-	public IFuture<Void> stepComponent(IComponentIdentifier componentid);
+	public IFuture<Void> stepComponent(IComponentIdentifier componentid, String stepinfo);
 	
 	/**
 	 *  Set breakpoints for a component.

@@ -1127,10 +1127,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		Future<Void> ret = new Future<Void>();
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
+		{
 			ret.setException(new ComponentTerminatedException(desc.getName()));
+		}
 		else if(dostep)
+		{
 			ret.setException(new RuntimeException("Only one step allowed at a time."));
-			
+		}
+		
 		this.dostep	= true;		
 		this.stepfuture = ret;
 		

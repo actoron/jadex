@@ -51,6 +51,12 @@ public interface IDebuggerPanel
 	public String getTooltipText();
 	
 	/**
+	 *  Get the step info. Help to decide which component step to perform next.
+	 *  @return Step info for debugging.
+	 */
+	public String getStepInfo();
+	
+	/**
 	 *  Dispose the panel.
 	 */
 	public void dispose();

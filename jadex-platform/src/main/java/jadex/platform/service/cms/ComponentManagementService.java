@@ -80,7 +80,7 @@ import java.util.logging.Logger;
  *  Abstract default implementation of component management service.
  */
 @Service
-public class DecoupledComponentManagementService implements IComponentManagementService
+public class ComponentManagementService implements IComponentManagementService
 {
 	//-------- attributes --------
 	
@@ -168,7 +168,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
      *  Create a new component execution service.
      *  @param exta	The service provider.
      */
-    public DecoupledComponentManagementService(IComponentAdapter root, 
+    public ComponentManagementService(IComponentAdapter root, 
     	IBootstrapFactory componentfactory, boolean copy, boolean realtime, boolean persist, boolean uniqueids)
 	{
 		this.root = root;
@@ -1690,7 +1690,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture<Void> stepComponent(final IComponentIdentifier cid)
+	public IFuture<Void> stepComponent(final IComponentIdentifier cid, final String stepinfo)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -1700,7 +1700,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 			{
 				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					rcms.stepComponent(cid).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
+					rcms.stepComponent(cid, stepinfo).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 				}
 			}));
 		}
@@ -1718,6 +1718,14 @@ public class DecoupledComponentManagementService implements IComponentManagement
 				return ret;
 			}
 			
+			if(stepinfo!=null)
+			{
+				CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
+				if(desc!=null)
+				{
+					desc.setStepInfo(stepinfo);
+				}
+			}
 			doStep(adapter).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
@@ -2684,7 +2692,7 @@ public class DecoupledComponentManagementService implements IComponentManagement
 					for(Iterator<IComponentManagementService> it=result.iterator(); it.hasNext(); )
 					{
 						IComponentManagementService remotecms = it.next();
-						if(remotecms!=DecoupledComponentManagementService.this)
+						if(remotecms!=ComponentManagementService.this)
 						{
 							remotecms.searchComponents(adesc, con, false).addResultListener(lis);
 						}

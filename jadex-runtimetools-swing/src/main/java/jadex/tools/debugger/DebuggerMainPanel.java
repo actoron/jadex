@@ -211,7 +211,7 @@ public class DebuggerMainPanel extends JSplitPane
 						{
 							public void customResultAvailable(final IComponentManagementService cms)
 							{
-								IFuture<Void> ret = cms.stepComponent(DebuggerMainPanel.this.desc.getName());
+								IFuture<Void> ret = cms.stepComponent(DebuggerMainPanel.this.desc.getName(), getStepInfo());
 								ret.addResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void result)
@@ -258,7 +258,7 @@ public class DebuggerMainPanel extends JSplitPane
 						{
 							public void customResultAvailable(final IComponentManagementService ces)
 							{
-								IFuture<Void> ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName());
+								IFuture<Void> ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName(), getStepInfo());
 								ret.addResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void result)
@@ -424,5 +424,25 @@ public class DebuggerMainPanel extends JSplitPane
 				pause.setEnabled(false);
 			}
 		});
+	}
+	
+	/**
+	 *  Get the step info.
+	 */
+	public String getStepInfo()
+	{
+		String ret = null;
+		if(debuggerpanels!=null)
+		{
+			for(IDebuggerPanel pan: debuggerpanels)
+			{
+				ret = pan.getStepInfo();
+				if(ret!=null)
+				{
+					break;
+				}
+			}
+		}
+		return ret;
 	}
 }

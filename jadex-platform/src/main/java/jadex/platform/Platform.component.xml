@@ -271,7 +271,7 @@
 					jadex.platform.service.library.LibraryService.class.getClassLoader())!=null
 				? jadex.platform.service.persistence.PersistenceComponentManagementService.create($component.getComponentAdapter(), 
 					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
-			    : new jadex.platform.service.cms.DecoupledComponentManagementService($component.getComponentAdapter(), 
+			    : new jadex.platform.service.cms.ComponentManagementService($component.getComponentAdapter(), 
 					$args.componentfactory, $args.parametercopy, $args.realtimetimeout, $args.persist, $args.uniqueids)
 			</implementation>
 		</providedservice>

@@ -62,7 +62,7 @@ public class VisualProcessViewPanel extends JPanel
 	protected IExternalAccess access;
 	
 	/** The displayed process threads. */
-	protected Set<ProcessThreadInfo> threadinfos;
+	protected List<ProcessThreadInfo> threadinfos;
 	
 	/** The previous process thread steps. */
 	protected List<ProcessThreadInfo> historyinfos;
@@ -99,7 +99,7 @@ public class VisualProcessViewPanel extends JPanel
 		{
 			this.access = access;
 			this.bpp	= bpp;
-			this.threadinfos	= new LinkedHashSet<ProcessThreadInfo>();
+			this.threadinfos	= new ArrayList<ProcessThreadInfo>();
 			this.historyinfos	= new ArrayList<ProcessThreadInfo>();
 			this.ptmodel = new ProcessThreadModel();
 			this.hmodel	= new HistoryModel();
@@ -448,6 +448,10 @@ public class VisualProcessViewPanel extends JPanel
 			{
 				ret = info.isWaiting() ? "waiting" : "ready";
 			}
+			else
+			{
+				ret = info;
+			}
 			return ret;
 		}
 	}
@@ -494,11 +498,31 @@ public class VisualProcessViewPanel extends JPanel
 			{
 				ret = info.getLane(); 
 			}
+			else
+			{
+				ret = info;
+			}
 
 			return ret;
 		}
 	}
 	
+	/**
+	 *  Get the step info. Help to decide which component step to perform next.
+	 *  @return Step info for debugging.
+	 */
+	public String getStepInfo()
+	{
+		String ret = null;
+		int vrow = threads.getSelectedRow();
+		if(vrow!=-1)
+		{
+			int row = threads.convertRowIndexToModel(vrow);
+			ProcessThreadInfo pti = (ProcessThreadInfo)threads.getModel().getValueAt(row, -1);
+			ret = pti.getThreadId();
+		}
+		return ret;
+	}
 }
 
 

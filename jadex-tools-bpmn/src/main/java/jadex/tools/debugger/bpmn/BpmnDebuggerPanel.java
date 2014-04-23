@@ -13,8 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.UIDefaults;
 
 /**
- *  A generic debugger panel that can display
- *  arbitrary java objects.
+ *  A bpmndebugger panel that can display bpmn processes.
  */
 public class BpmnDebuggerPanel implements IDebuggerPanel
 {
@@ -84,6 +83,15 @@ public class BpmnDebuggerPanel implements IDebuggerPanel
 	public String getTooltipText()
 	{
 		return "Show the process state and history.";
+	}
+	
+	/**
+	 *  Get the step info. Help to decide which component step to perform next.
+	 *  @return Step info for debugging.
+	 */
+	public String getStepInfo()
+	{
+		return processpanel.getStepInfo();
 	}
 	
 	/**
